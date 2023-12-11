@@ -4,6 +4,12 @@ import './globals.css'
 import Header from './components/globalComponents/header'
 import Footer from './components/globalComponents/footer'
 
+import "../styles/index.scss";
+import "./index.css";
+import "../fonts/line-awesome-1.3.0/css/line-awesome.css";
+import "rc-slider/assets/index.css";
+// import reportWebVitals from "./reportWebVitals";
+
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
@@ -19,7 +25,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <Header/>
+        {/* <Header/> */}
         {children}
         <Footer/>
         </body>
