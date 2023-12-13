@@ -27,7 +27,7 @@ export default function Home() {
   return (
     <main>
 
-      <Header/>
+      {/* <Header/> */}
       {/* <MainNav1 isTop /> */}
       {/* <SiteHeader /> */}
       {/* <div className="nc-Header relative w-full z-40 ">

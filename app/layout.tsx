@@ -20,9 +20,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="bg-white text-base dark:bg-slate-900 text-slate-900 dark:text-slate-200">
-        {/* <Header/> */}
+        <Header/>
         {children}
-        {/* <Footer/> */}
+        <Footer/>
         </body>
     </html>
   )
