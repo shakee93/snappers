@@ -1,13 +1,18 @@
-// components/Header.js
-
-import Link from "next/link";
+import HeaderTopBar from "./HeaderTopBar";
+import HeaderNavigationBar from "./HeaderNavigationBar";
+import HeaderCategoryBar from "./HeaderCategoryBar";
 
 const Header = () => {
+  const iconSize = 13;
   return (
-    <header className="flex justify-between p-4">
-      <div>logo</div>
-      <div>Search bar</div>
-      <div>icons</div>
+    <header className="flex flex-col justify-between ">
+      <div className="hidden md:block">
+        <HeaderTopBar />
+      </div>
+      <div><HeaderNavigationBar/></div>
+      <div><HeaderCategoryBar/></div>
+
+
     </header>
   );
 };

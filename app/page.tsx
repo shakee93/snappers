@@ -12,12 +12,15 @@ import SectionGridFeatureItems from "@/app/containers/SectionGridFeatureItems";
 import SectionSliderCategories from "@/app/components/SectionSliderCategories/SectionSliderCategories";
 import SectionClientSay from "@/app/components/SectionClientSay/SectionClientSay";
 import Footer from '@/shared/Footer/Footer';
+import Header from "./components/globalComponents/Header";
 
 export default function Home() {
   return (
     <main>
-      <MainNav1 isTop />
-      {/* <MainNav2 /> */}
+
+      <Header/>
+      {/* <MainNav1 isTop /> */}
+      <MainNav2 />
       <div className="nc-PageHome relative overflow-hidden">
         {/* SECTION HERO */}
         <SectionHero2 />
