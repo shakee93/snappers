@@ -1,3 +1,4 @@
+"use client"
 import Logo from "./Logo";
 import { XIcon, Search, UserRound,ShoppingBag } from "lucide-react";
 import { useState } from "react";
