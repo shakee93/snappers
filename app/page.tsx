@@ -19,12 +19,16 @@ import SectionSliderLargeProduct from "@/app/components/SectionSliderLargeProduc
 import Heading from "@/app/components/Heading/Heading";
 import SectionMagazine5 from "@/app/containers/BlogPage/SectionMagazine5";
 import ButtonSecondary from "@/shared/Button/ButtonSecondary";
+import SiteHeader from "@/app/containers/SiteHeader";
 import Footer from '@/shared/Footer/Footer';
 
 export default function Home() {
   return (
     <main>
-      <MainNav1 isTop />
+      <SiteHeader />
+      {/* <div className="nc-Header relative w-full z-40 ">
+        <MainNav1 isTop />
+      </div> */}
       {/* <MainNav2 /> */}
       <div className="nc-PageHome relative overflow-hidden">
         {/* SECTION HERO */}
