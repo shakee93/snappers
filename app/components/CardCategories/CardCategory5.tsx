@@ -26,9 +26,9 @@ const COLORS = [
 
 const CardCategory5: FC<CardCategory5Props> = ({
   className = "",
-  featuredImage = images1,
+  featuredImage = images1 as unknown as string,
   name,
-  desc,
+  desc, 
   index,
 }) => {
   return (

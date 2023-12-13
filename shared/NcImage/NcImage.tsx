@@ -5,7 +5,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import checkInViewIntersectionObserver from "utils/isInViewPortIntersectionObserver";
+import checkInViewIntersectionObserver from "@/utils/isInViewPortIntersectionObserver";
 import PlaceIcon from "./PlaceIcon";
 
 export interface NcImageProps extends ImgHTMLAttributes<HTMLImageElement> {

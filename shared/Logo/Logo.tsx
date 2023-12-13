@@ -1,7 +1,7 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import logoImg from "images/logo.svg";
-import logoLightImg from "images/logo-light.svg";
+import logoImg from "@/public/images/logo.svg";
+import logoLightImg from "@/public/images/logo-light.svg";
+import Link from "next/link";
 
 export interface LogoProps {
   img?: string;
@@ -16,7 +16,7 @@ const Logo: React.FC<LogoProps> = ({
 }) => {
   return (
     <Link
-      to="/"
+      href="/"
       className={`ttnc-logo inline-block text-slate-600 ${className}`}
     >
       {/* THIS USE FOR MY CLIENT */}
@@ -26,7 +26,7 @@ const Logo: React.FC<LogoProps> = ({
           className={`block max-h-8 sm:max-h-10 ${
             imgLight ? "dark:hidden" : ""
           }`}
-          src={img}
+          src={img.src}
           alt="Logo"
         />
       ) : (

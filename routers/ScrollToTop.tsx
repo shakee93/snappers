@@ -1,10 +1,10 @@
 import { useEffect } from "react";
-import { useLocation } from "react-router-dom";
+import { useRouter } from "next/router";
 
 export interface ScrollToTopProps {}
 
 const ScrollToTop: React.FC<ScrollToTopProps> = () => {
-  const location = useLocation();
+  const location = useRouter();
 
   useEffect(() => {
     window.scrollTo(0, 0);

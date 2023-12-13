@@ -1,9 +1,9 @@
 import { Popover, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
-import CardCategory3 from "components/CardCategories/CardCategory3";
+import CardCategory3 from "@/app/components/CardCategories/CardCategory3";
 import React, { FC, Fragment, useState } from "react";
-import { NavLink } from "react-router-dom";
-import { LocationStates } from "routers/types";
+import  NavLink from "next/link";
+import { LocationStates } from "@routers/types";
 
 export interface NavItemType {
   id: string;
@@ -79,7 +79,7 @@ const NavigationItem: FC<NavigationItemProps> = ({ menuItem }) => {
           target={item.targetBlank ? "_blank" : undefined}
           rel="noopener noreferrer"
           className="font-normal text-slate-600 hover:text-black dark:text-slate-400 dark:hover:text-white "
-          to={{
+          href={{
             pathname: item.href || undefined,
           }}
         >
@@ -201,7 +201,7 @@ const NavigationItem: FC<NavigationItemProps> = ({ menuItem }) => {
               : "font-normal text-neutral-6000 dark:text-neutral-400 "
           }`
         }
-        to={{
+        href={{
           pathname: item.href || undefined,
         }}
       >
@@ -224,7 +224,7 @@ const NavigationItem: FC<NavigationItemProps> = ({ menuItem }) => {
           target={item.targetBlank ? "_blank" : undefined}
           rel="noopener noreferrer"
           className="inline-flex items-center text-sm lg:text-[15px] font-medium text-slate-700 dark:text-slate-300 py-2.5 px-4 xl:px-5 rounded-full hover:text-slate-900 hover:bg-slate-100 dark:hover:bg-slate-800 dark:hover:text-slate-200"
-          to={{
+          href={{
             pathname: item.href || undefined,
           }}
         >

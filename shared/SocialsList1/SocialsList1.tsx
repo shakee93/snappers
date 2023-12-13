@@ -1,9 +1,9 @@
-import { SocialType } from "shared/SocialsShare/SocialsShare";
+import { SocialType } from "@/shared/SocialsShare/SocialsShare";
 import React, { FC } from "react";
-import facebook from "images/socials/facebook.svg";
-import twitter from "images/socials/twitter.svg";
-import telegram from "images/socials/telegram.svg";
-import youtube from "images/socials/youtube.svg";
+import facebook from "@/public/images/socials/facebook.svg";
+import twitter from "@/public/images/socials/twitter.svg";
+import telegram from "@/public/images/socials/telegram.svg";
+import youtube from "@/public/images/socials/youtube.svg";
 
 export interface SocialsList1Props {
   className?: string;
@@ -25,7 +25,7 @@ const SocialsList1: FC<SocialsList1Props> = ({ className = "space-y-3" }) => {
         key={index}
       >
         <div className="flex-shrink-0 w-5 ">
-          <img src={item.icon} alt="" />
+          <img src={item.icon.src} alt="" />
         </div>
         <span className="hidden lg:block text-sm">{item.name}</span>
       </a>

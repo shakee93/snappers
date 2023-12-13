@@ -1,6 +1,6 @@
 import { Popover, Transition } from "@headlessui/react";
 import { Fragment } from "react";
-import Avatar from "shared/Avatar/Avatar";
+import Avatar from "@/shared/Avatar/Avatar";
 
 const solutions = [
   {

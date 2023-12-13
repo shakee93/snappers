@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import NcImage from "@/public/shared/NcImage/NcImage";
 import Link from "next/link";
-import explore1Svg from "images/collections/explore1.svg";
+import explore1Svg from "@/public/images/collections/explore1.svg";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
 
@@ -35,7 +35,7 @@ const CardCategory4: FC<CardCategory4Props> = ({
         <div className="absolute inset-5 sm:inset-8 flex flex-col justify-between">
           <div className="flex justify-between items-center">
             <NcImage
-              src={featuredImage}
+              src={featuredImage.src}
               containerClassName={`w-20 h-20 rounded-full overflow-hidden z-0 ${color}`}
             />
             <span className="text-xs text-slate-700 dark:text-neutral-300 font-medium">

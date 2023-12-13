@@ -1,6 +1,6 @@
 import React, { FC, Fragment } from "react";
 import { Menu, Transition } from "@headlessui/react";
-import { Link } from "react-router-dom";
+import Link from "next/link";
 
 export interface NcDropDownItem {
   id: string;
@@ -80,7 +80,7 @@ const NcDropDown: FC<NcDropDownProps> = ({
                     renderItem(item)
                   ) : !!item.href ? (
                     <Link
-                      to={item.href}
+                      href={item.href}
                       className={
                         "flex items-center rounded-md w-full px-3 py-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-100 truncate "
                       }

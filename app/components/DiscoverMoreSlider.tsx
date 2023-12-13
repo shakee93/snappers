@@ -4,37 +4,42 @@ import img1 from "@/public/images/collections/1.png";
 import img2 from "@/public/images/collections/5.png";
 import img3 from "@/public/images/collections/4.png";
 import img4 from "@/public/images/collections/3.png";
+import Image from 'next/image';
+import { StaticImageData } from "next/image";
 import CardCategory3, {
   CardCategory3Props,
 } from "./CardCategories/CardCategory3";
 import Glide from "@glidejs/glide";
 
+
 export const CATS_DISCOVER: CardCategory3Props[] = [
   {
     name: "Explore new arrivals",
     desc: "Shop the latest <br /> from top brands",
-    featuredImage: img1,
+    featuredImage: img1.src,
     color: "bg-yellow-50",
   },
   {
     name: "Digital gift cards",
     desc: "Give the gift <br /> of choice",
-    featuredImage: img2,
+    featuredImage: img2.src,
     color: "bg-red-50",
   },
   {
     name: "Sale collection",
     desc: "Up to <br /> 80% off retail",
-    featuredImage: img3,
+    featuredImage: img3.src,
     color: "bg-blue-50",
   },
   {
     name: "Sale collection",
     desc: "Up to <br /> 80% off retail",
-    featuredImage: img4,
+    featuredImage: img4.src,
     color: "bg-green-50",
   },
 ];
+
+// console.log(img1.src)
 
 const DiscoverMoreSlider = () => {
   const id = useId();

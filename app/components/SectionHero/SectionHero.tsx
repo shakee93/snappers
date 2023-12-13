@@ -1,7 +1,7 @@
 import React, { FC, ReactNode } from "react";
-import ButtonPrimary from "shared/Button/ButtonPrimary";
-import ButtonSecondary from "shared/Button/ButtonSecondary";
-import rightImg from "images/about-hero-right.png";
+import ButtonPrimary from "@/shared/Button/ButtonPrimary";
+import ButtonSecondary from "@/shared/Button/ButtonSecondary";
+import rightImg from "@/public/images/about-hero-right.png";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
 
 export interface SectionHeroProps {
@@ -65,7 +65,7 @@ const SectionHero: FC<SectionHeroProps> = ({
           </div>
         </div>
         <div className="flex-grow">
-          <img className="w-full" src={rightImg} alt="" />
+          <img className="w-full" src={rightImg.src} alt="" />
         </div>
       </div>
     </div>

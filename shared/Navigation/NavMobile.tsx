@@ -1,14 +1,14 @@
 import React from "react";
-import ButtonClose from "shared/ButtonClose/ButtonClose";
-import Logo from "shared/Logo/Logo";
+import ButtonClose from "@/shared/ButtonClose/ButtonClose";
+import Logo from "@/shared/Logo/Logo";
 import { Disclosure } from "@headlessui/react";
-import { NavLink } from "react-router-dom";
+import NavLink from "next/link";
 import { NavItemType } from "./NavigationItem";
-import { NAVIGATION_DEMO_2 } from "data/navigation";
-import ButtonPrimary from "shared/Button/ButtonPrimary";
-import SocialsList from "shared/SocialsList/SocialsList";
+import { NAVIGATION_DEMO_2 } from "@/data/navigation";
+import ButtonPrimary from "@/shared/Button/ButtonPrimary";
+import SocialsList from "@/shared/SocialsList/SocialsList";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
-import SwitchDarkMode from "shared/SwitchDarkMode/SwitchDarkMode";
+import SwitchDarkMode from "@/shared/SwitchDarkMode/SwitchDarkMode";
 
 export interface NavMobileProps {
   data?: NavItemType[];
@@ -28,7 +28,7 @@ const NavMobile: React.FC<NavMobileProps> = ({
         {item.children?.map((i, index) => (
           <Disclosure key={i.href + index} as="li">
             <NavLink
-              to={{
+              href={{
                 pathname: i.href || undefined,
               }}
               className={({ isActive }) =>
@@ -87,7 +87,7 @@ const NavMobile: React.FC<NavMobileProps> = ({
               isActive ? "text-secondary" : ""
             }`
           }
-          to={{
+          href={{
             pathname: item.href || undefined,
           }}
         >

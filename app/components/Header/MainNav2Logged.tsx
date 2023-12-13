@@ -1,18 +1,18 @@
 import React, { FC, useState } from "react";
-import Logo from "shared/Logo/Logo";
-import MenuBar from "shared/MenuBar/MenuBar";
+import Logo from "@/shared/Logo/Logo";
+import MenuBar from "@/shared/MenuBar/MenuBar";
 import AvatarDropdown from "./AvatarDropdown";
-import Navigation from "shared/Navigation/Navigation";
+import Navigation from "@/shared/Navigation/Navigation";
 import CartDropdown from "./CartDropdown";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-import { useNavigate } from "react-router-dom";
+import { useRouter } from "next/router";
 
 export interface MainNav2LoggedProps {}
 
 const MainNav2Logged: FC<MainNav2LoggedProps> = () => {
   const inputRef = React.createRef<HTMLInputElement>();
   const [showSearchForm, setShowSearchForm] = useState(false);
-  const navigate = useNavigate();
+  const router = useRouter();
 
   const renderMagnifyingGlassIcon = () => {
     return (
@@ -46,7 +46,7 @@ const MainNav2Logged: FC<MainNav2LoggedProps> = () => {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          navigate("/page-search");
+          router.push("/page-search");
         }}
         className="flex-1 py-2 text-slate-900 dark:text-slate-100"
       >

@@ -7,7 +7,6 @@ import TemplatesDropdown from "./TemplatesDropdown";
 import DropdownCategories from "./DropdownCategories";
 import CartDropdown from "./CartDropdown";
 import { XMarkIcon } from "@heroicons/react/24/outline";
-// import { useNavigate } from "react-router-dom";
 import { useRouter } from "next/navigation";
 
 export interface MainNav2Props {
