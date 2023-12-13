@@ -20,7 +20,7 @@ const Card12: FC<Card12Props> = ({ className = "h-full" }) => {
         className="block flex-shrink-0 flex-grow relative w-full h-0 aspect-w-4 aspect-h-3 rounded-3xl overflow-hidden"
       >
         <NcImage
-          src={imgHigtQualitys[0]}
+          src={imgHigtQualitys[0].src}
           containerClassName="absolute inset-0"
           alt={"title"}
         />

@@ -29,7 +29,7 @@ export default function Home() {
       {/* <div className="nc-Header relative w-full z-40 ">
         <MainNav1 isTop />
       </div> */}
-      {/* <MainNav2 /> */}
+      <MainNav2 />
       <div className="nc-PageHome relative overflow-hidden">
         {/* SECTION HERO */}
         <SectionHero2 />

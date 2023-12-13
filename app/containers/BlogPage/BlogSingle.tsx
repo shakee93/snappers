@@ -1,16 +1,16 @@
 import React from "react";
 import Link from "next/link";
-import Avatar from "shared/Avatar/Avatar";
-import Badge from "shared/Badge/Badge";
-import ButtonPrimary from "shared/Button/ButtonPrimary";
-import ButtonSecondary from "shared/Button/ButtonSecondary";
-import Comment from "shared/Comment/Comment";
-import NcImage from "shared/NcImage/NcImage";
-import SocialsList from "shared/SocialsList/SocialsList";
-import Textarea from "shared/Textarea/Textarea";
+import Avatar from "@/shared/Avatar/Avatar";
+import Badge from "@/shared/Badge/Badge";
+import ButtonPrimary from "@/shared/Button/ButtonPrimary";
+import ButtonSecondary from "@/shared/Button/ButtonSecondary";
+import Comment from "@/shared/Comment/Comment";
+import NcImage from "@/shared/NcImage/NcImage";
+import SocialsList from "@/shared/SocialsList/SocialsList";
+import Textarea from "@/shared/Textarea/Textarea";
 import { Helmet } from "react-helmet-async";
-import { _getImgRd, _getPersonNameRd, _getTitleRd } from "contains/fakeData";
-import Tag from "shared/Tag/Tag";
+import { _getImgRd, _getPersonNameRd, _getTitleRd } from "@/contains/fakeData";
+import Tag from "@/shared/Tag/Tag";
 
 const BlogSingle = () => {
   const renderHeader = () => {
@@ -87,27 +87,27 @@ const BlogSingle = () => {
         <ol>
           <li>We want everything to look good out of the box.</li>
           <li>
-            Really just the first reason, that's the whole point of the plugin.
+            Really just the first reason, that&apos;s the whole point of the plugin.
           </li>
           <li>
-            Here's a third pretend reason though a list with three items looks
+            Here&apos;s a third pretend reason though a list with three items looks
             more realistic than a list with two items.
           </li>
         </ol>
         <h3>Typography should be easy</h3>
         <p>
-          So that's a header for you — with any luck if we've done our job
+          So that&apos;s a header for you — with any luck if we&apos;ve done our job
           correctly that will look pretty reasonable.
         </p>
         <p>Something a wise person once told me about typography is:</p>
         <blockquote>
           <p>
-            Typography is pretty important if you don't want your stuff to look
-            like trash. Make it good then it won't be bad.
+            Typography is pretty important if you don&apos;t want your stuff to look
+            like trash. Make it good then it won&apos;t be bad.
           </p>
         </blockquote>
         <p>
-          It's probably important that images look okay here by default as well:
+          It&apos;s probably important that images look okay here by default as well:
         </p>
         <figure>
           <img
@@ -122,32 +122,32 @@ const BlogSingle = () => {
           </figcaption>
         </figure>
         <p>
-          Now I'm going to show you an example of an unordered list to make sure
+          Now I&apos;m going to show you an example of an unordered list to make sure
           that looks good, too:
         </p>
         <ul>
           <li>So here is the first item in this list.</li>
-          <li>In this example we're keeping the items short.</li>
-          <li>Later, we'll use longer, more complex list items.</li>
+          <li>In this example we&apos;re keeping the items short.</li>
+          <li>Later, we&apos;ll use longer, more complex list items.</li>
         </ul>
-        <p>And that's the end of this section.</p>
+        <p>And that&apos;s the end of this section.</p>
         <h2>Code should look okay by default.</h2>
         <p>
           I think most people are going to use{" "}
           <a href="https://highlightjs.org/">highlight.js</a> or{" "}
           <a href="https://prismjs.com/">Prism</a> or something if they want to
-          style their code blocks but it wouldn't hurt to make them look{" "}
+          style their code blocks but it wouldn&apos;t hurt to make them look{" "}
           <em>okay</em> out of the box, even with no syntax highlighting.
         </p>
         <p>
-          What I've written here is probably long enough, but adding this final
-          sentence can't hurt.
+          What I&apos;ve written here is probably long enough, but adding this final
+          sentence can&apos;t hurt.
         </p>
 
         <p>Hopefully that looks good enough to you.</p>
         <h3>We still need to think about stacked headings though.</h3>
         <h4>
-          Let's make sure we don't screw that up with <code>h4</code> elements,
+          Let&apos;s make sure we don&apos;t screw that up with <code>h4</code> elements,
           either.
         </h4>
         <p>
@@ -155,14 +155,14 @@ const BlogSingle = () => {
           they look pretty good.
         </p>
         <p>
-          Let's add a closing paragraph here so things end with a decently sized
-          block of text. I can't explain why I want things to end that way but I
-          have to assume it's because I think things will look weird or
+          Let&apos;s add a closing paragraph here so things end with a decently sized
+          block of text. I can&apos;t explain why I want things to end that way but I
+          have to assume it&apos;s because I think things will look weird or
           unbalanced if there is a heading too close to the end of the document.
         </p>
         <p>
-          What I've written here is probably long enough, but adding this final
-          sentence can't hurt.
+          What I&apos;ve written here is probably long enough, but adding this final
+          sentence can&apos;t hurt.
         </p>
       </div>
     );

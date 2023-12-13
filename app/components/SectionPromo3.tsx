@@ -1,5 +1,6 @@
 import React, { FC } from "react";
 import NcImage from "@/shared/NcImage/NcImage";
+import Image from "next/image";
 import rightImgDemo from "@/public/images/promo3.png";
 import backgroundLineSvg from "@/public/images/BackgroundLine.svg";
 import Badge from "@/shared/Badge/Badge";
@@ -16,7 +17,7 @@ const SectionPromo3: FC<SectionPromo3Props> = ({ className = "lg:pt-10" }) => {
     <div className={`nc-SectionPromo3 ${className}`}>
       <div className="relative flex flex-col lg:flex-row bg-slate-50 dark:bg-slate-800 rounded-2xl sm:rounded-[40px] p-4 pb-0 sm:p-5 sm:pb-0 lg:p-24">
         <div className="absolute inset-0">
-          <img
+          <Image
             className="absolute w-full h-full object-contain object-bottom dark:opacity-5"
             src={backgroundLineSvg}
             alt="backgroundLineSvg"
@@ -25,7 +26,7 @@ const SectionPromo3: FC<SectionPromo3Props> = ({ className = "lg:pt-10" }) => {
 
         <div className="lg:w-[50%] max-w-lg relative">
           <h2 className="font-semibold text-4xl md:text-5xl">
-            Don't miss out on special offers
+            Don&apos;t miss out on special offers
           </h2>
           <span className="block mt-5 text-neutral-500 dark:text-neutral-400">
             Register to receive news about the latest, savings combos, discount

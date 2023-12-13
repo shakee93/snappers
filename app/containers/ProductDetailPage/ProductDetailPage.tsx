@@ -1,29 +1,29 @@
 import React, { FC, useState } from "react";
-import ButtonPrimary from "shared/Button/ButtonPrimary";
-import LikeButton from "components/LikeButton";
+import ButtonPrimary from "@/shared/Button/ButtonPrimary";
+import LikeButton from "@/app/components/LikeButton";
 import AccordionInfo from "./AccordionInfo";
 import { StarIcon } from "@heroicons/react/24/solid";
-import BagIcon from "components/BagIcon";
-import NcInputNumber from "components/NcInputNumber";
+import BagIcon from "@/app/components/BagIcon";
+import NcInputNumber from "@/app/components/NcInputNumber";
 import { PRODUCTS } from "data/data";
 import {
   NoSymbolIcon,
   ClockIcon,
   SparklesIcon,
 } from "@heroicons/react/24/outline";
-import IconDiscount from "components/IconDiscount";
-import Prices from "components/Prices";
+import IconDiscount from "@/app/components/IconDiscount";
+import Prices from "@/app/components/Prices";
 import toast from "react-hot-toast";
-import SectionSliderProductCard from "components/SectionSliderProductCard";
+import SectionSliderProductCard from "@/app/components/SectionSliderProductCard";
 import detail1JPG from "images/products/detail1.jpg";
 import detail2JPG from "images/products/detail2.jpg";
 import detail3JPG from "images/products/detail3.jpg";
 import Policy from "./Policy";
-import ReviewItem from "components/ReviewItem";
-import ButtonSecondary from "shared/Button/ButtonSecondary";
-import SectionPromo2 from "components/SectionPromo2";
+import ReviewItem from "@/app/components/ReviewItem";
+import ButtonSecondary from "@/shared/Button/ButtonSecondary";
+import SectionPromo2 from "@/app/components/SectionPromo2";
 import ModalViewAllReviews from "./ModalViewAllReviews";
-import NotifyAddTocart from "components/NotifyAddTocart";
+import NotifyAddTocart from "@/app/components/NotifyAddTocart";
 
 export interface ProductDetailPageProps {
   className?: string;

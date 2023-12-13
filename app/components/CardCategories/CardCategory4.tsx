@@ -7,7 +7,7 @@ import Image from "next/image";
 
 export interface CardCategory4Props {
   className?: string;
-  featuredImage?: string;
+  featuredImage?: { src: string };
   bgSVG?: string;
   name: string;
   desc: string;
@@ -16,7 +16,7 @@ export interface CardCategory4Props {
 
 const CardCategory4: FC<CardCategory4Props> = ({
   className = "",
-  featuredImage = ".",
+  featuredImage = { src: "" },
   bgSVG = explore1Svg,
   name,
   desc,
@@ -29,14 +29,15 @@ const CardCategory4: FC<CardCategory4Props> = ({
     >
       <div>
         <div className="absolute bottom-0 right-0 max-w-[280px] opacity-80">
-          <Image src={bgSVG} alt="" />
+          <Image src={bgSVG} alt=""/>
         </div>
 
         <div className="absolute inset-5 sm:inset-8 flex flex-col justify-between">
           <div className="flex justify-between items-center">
-            <NcImage
+            <Image
               src={featuredImage.src}
-              containerClassName={`w-20 h-20 rounded-full overflow-hidden z-0 ${color}`}
+              alt=""
+              className={`w-20 h-20 rounded-full overflow-hidden z-0 ${color}`}
             />
             <span className="text-xs text-slate-700 dark:text-neutral-300 font-medium">
               {Math.floor(Math.random() * 200 + 125)} products

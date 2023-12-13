@@ -138,6 +138,7 @@ const ProductCard: FC<ProductCardProps> = ({
     }
 
     if (variantType === "color") {
+
       return (
         <div className="flex space-x-1">
           {variants.map((variant, index) => (

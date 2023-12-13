@@ -7,7 +7,8 @@ import Prices from "./Prices";
 
 export interface CollectionCard2Props {
   className?: string;
-  imgs?: string[];
+  // imgs?: string[];
+  imgs?: any;
   name?: string;
   price?: number;
   description?: string;
@@ -15,7 +16,7 @@ export interface CollectionCard2Props {
 
 const CollectionCard2: FC<CollectionCard2Props> = ({
   className,
-  imgs = [productImgs[9], productImgs[10], productImgs[11], productImgs[8]],
+  imgs = [productImgs[9].src, productImgs[10].src, productImgs[11].src, productImgs[8].src],
   name = "Product Name",
   description = "Product Description",
   price,

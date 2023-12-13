@@ -1,5 +1,5 @@
-import Logo from "shared/Logo/Logo";
-import SocialsList1 from "shared/SocialsList1/SocialsList1";
+import Logo from "@/shared/Logo/Logo";
+import SocialsList1 from "@/shared/SocialsList1/SocialsList1";
 import { CustomLink } from "data/types";
 import React from "react";
 
