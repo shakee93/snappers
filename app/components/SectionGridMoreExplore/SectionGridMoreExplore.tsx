@@ -29,7 +29,7 @@ interface ExploreType {
   id: number;
   name: string;
   desc: string;
-  image: string;
+  image: any;
   svgBg: string;
   color?: string;
 }
@@ -40,6 +40,7 @@ export interface SectionGridMoreExploreProps {
   boxCard?: "box1" | "box4" | "box6";
   data?: ExploreType[];
 }
+
 
 export const DEMO_MORE_EXPLORE_DATA = [
   {
@@ -142,7 +143,7 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
             name={item.name}
             desc={item.desc}
             bgSVG={item.svgBg}
-            featuredImage={item.image}
+            featuredImage={{ src: item.image }}
             key={item.id}
             color={item.color}
           />
@@ -165,7 +166,7 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
             name={item.name}
             desc={item.desc}
             bgSVG={item.svgBg}
-            featuredImage={item.image}
+            featuredImage={{ src: item.image }}
             key={item.id}
             color={item.color}
           />

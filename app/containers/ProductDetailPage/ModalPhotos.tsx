@@ -1,9 +1,9 @@
 import React, { FC, useEffect, useId, useMemo, useRef } from "react";
 import { Dialog } from "@headlessui/react";
-import NextPrev from "shared/NextPrev/NextPrev";
-import ButtonClose from "shared/ButtonClose/ButtonClose";
+import NextPrev from "@/shared/NextPrev/NextPrev";
+import ButtonClose from "@/shared/ButtonClose/ButtonClose";
 import Glide from "@glidejs/glide";
-import NcImage from "shared/NcImage/NcImage";
+import NcImage from "@/shared/NcImage/NcImage";
 
 export interface ModalPhotosProps {
   imgs: string[];

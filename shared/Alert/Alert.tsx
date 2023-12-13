@@ -1,5 +1,5 @@
 import React from "react";
-import ButtonClose from "shared/ButtonClose/ButtonClose";
+import ButtonClose from "@/shared/ButtonClose/ButtonClose";
 
 export interface AlertProps {
   containerClassName?: string;

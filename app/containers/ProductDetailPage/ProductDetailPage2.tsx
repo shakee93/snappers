@@ -4,27 +4,27 @@ import {
   ClockIcon,
   SparklesIcon,
 } from "@heroicons/react/24/outline";
-import ButtonPrimary from "shared/Button/ButtonPrimary";
-import ButtonSecondary from "shared/Button/ButtonSecondary";
-import NcImage from "shared/NcImage/NcImage";
+import ButtonPrimary from "@/shared/Button/ButtonPrimary";
+import ButtonSecondary from "@/shared/Button/ButtonSecondary";
+import NcImage from "@/shared/NcImage/NcImage";
 import LikeSaveBtns from "./LikeSaveBtns";
 import ModalPhotos from "./ModalPhotos";
-import ReviewItem from "components/ReviewItem";
-import detail21JPG from "images/products/detail3-1.webp";
-import detail22JPG from "images/products/detail3-2.webp";
-import detail23JPG from "images/products/detail3-3.webp";
-import detail24JPG from "images/products/detail3-4.webp";
-import { PRODUCTS } from "data/data";
-import IconDiscount from "components/IconDiscount";
-import NcInputNumber from "components/NcInputNumber";
-import BagIcon from "components/BagIcon";
+import ReviewItem from "@/app/components/ReviewItem";
+import detail21JPG from "@/public/images/products/detail3-1.webp";
+import detail22JPG from "@/public/images/products/detail3-2.webp";
+import detail23JPG from "@/public/images/products/detail3-3.webp";
+import detail24JPG from "@/public/images/products/detail3-4.webp";
+import { PRODUCTS } from "@/data/data";
+import IconDiscount from "@/app/components/IconDiscount";
+import NcInputNumber from "@/app/components/NcInputNumber";
+import BagIcon from "@/app/components/BagIcon";
 import AccordionInfo from "./AccordionInfo";
 import Policy from "./Policy";
 import toast from "react-hot-toast";
 import { StarIcon } from "@heroicons/react/24/solid";
-import SectionSliderProductCard from "components/SectionSliderProductCard";
+import SectionSliderProductCard from "@/app/components/SectionSliderProductCard";
 import ModalViewAllReviews from "./ModalViewAllReviews";
-import NotifyAddTocart from "components/NotifyAddTocart";
+import NotifyAddTocart from "@/app/components/NotifyAddTocart";
 
 export interface ProductDetailPage2Props {
   className?: string;
@@ -106,7 +106,7 @@ const ProductDetailPage2: FC<ProductDetailPage2Props> = ({
     toast.custom(
       (t) => (
         <NotifyAddTocart
-          productImage={LIST_IMAGES_DEMO[0]}
+          productImage={LIST_IMAGES_DEMO[0].src}
           qualitySelected={qualitySelected}
           show={t.visible}
           sizeSelected={sizeSelected}

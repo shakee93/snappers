@@ -1,8 +1,8 @@
 import React, { FC } from "react";
 import { Helmet } from "react-helmet-async";
-import SectionSliderCollections from "components/SectionSliderLargeProduct";
-import SectionPromo1 from "components/SectionPromo1";
-import ProductCard from "components/ProductCard";
+import SectionSliderCollections from "@/app/components/SectionSliderLargeProduct";
+import SectionPromo1 from "@/app/components/SectionPromo1";
+import ProductCard from "@/app/components/ProductCard";
 import { PRODUCTS } from "data/data";
 import SidebarFilters from "./SidebarFilters";
 
