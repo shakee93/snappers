@@ -36,7 +36,11 @@ module.exports = {
 
     extend: {
       colors: {
+        transparent: 'transparent',
+        primaryColor: '#0068af',
+
         primary: {
+        
           50: customColors("--c-primary-50"),
           100: customColors("--c-primary-100"),
           200: customColors("--c-primary-200"),

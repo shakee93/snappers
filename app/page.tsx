@@ -21,7 +21,7 @@ import SectionMagazine5 from "@/app/containers/BlogPage/SectionMagazine5";
 import ButtonSecondary from "@/shared/Button/ButtonSecondary";
 import SiteHeader from "@/app/containers/SiteHeader";
 import Footer from '@/shared/Footer/Footer';
-import Header from "./components/globalComponents/Header";
+import Header from "./components/GlobalComponents/Header";
 
 export default function Home() {
   return (

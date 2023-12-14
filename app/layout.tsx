@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import Header from './components/globalComponents/Header'
-import Footer from './components/globalComponents/Footer'
+import Header from './components/GlobalComponents/Header'
+import Footer from './components/GlobalComponents/Footer'
 
 import "../styles/index.scss";
 // import './globals.css'
@@ -22,7 +22,7 @@ export default function RootLayout({
       <body className="bg-gray-100 text-base dark:bg-slate-900 text-slate-900 dark:text-slate-200">
         <Header/>
         {children}
-        <Footer/>
+        {/* <Footer/> */}
         </body>
     </html>
   )
