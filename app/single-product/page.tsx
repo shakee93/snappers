@@ -1,13 +1,29 @@
 "use client";
 import { MousePointerClick } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
+import productImage from "@/public/iphone.webp";
+import Zoom from "react-img-zoom-gdn";
 import Features from "../components/SingleProductPage/FeatureCard";
 
 export default function singleProduct() {
+
+ 
+  
   return (
     <main className="container  m-auto">
       <div className="flex p-10 bg-white">
-        <div className="w-2/5">Product Image</div>
+        <div className="w-2/5">
+          {/* <Image
+            src={productImage}
+            alt=""
+            className=""
+          /> */}
+          <Zoom img={productImage.src} zoomScale={2} width={450} height={450} />;
+        </div>
+        <div id="product">
+
+        </div>
         <div className="w-2/5 flex flex-col gap-y-3">
           <div className="bg-orange-500 flex w-28 p-1 rounded-3xl text-white items-center justify-center gap-1 text-xs">
             Best Seller <MousePointerClick className="text-white" size={14} />
