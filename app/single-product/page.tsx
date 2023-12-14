@@ -5,6 +5,7 @@ import Image from "next/image";
 import productImage from "@/public/iphone.webp";
 import Zoom from "react-img-zoom-gdn";
 import ImageGallery from "./imageGallery";
+import { useState } from 'react';
 
 export default function singleProduct() {
 
