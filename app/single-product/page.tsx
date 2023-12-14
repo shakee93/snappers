@@ -6,6 +6,7 @@ import productImage from "@/public/iphone.webp";
 import Zoom from "react-img-zoom-gdn";
 import ImageGallery from "./imageGallery";
 import { useState } from 'react';
+import Features from "../components/SingleProductPage/FeatureCard";
 
 export default function singleProduct() {
 
@@ -179,7 +180,9 @@ export default function singleProduct() {
             </span>
           </div>
         </div>
-        <div className="w-1/5">Services</div>
+        <div className="w-1/5">
+          <Features/>
+        </div>
       </div>
       <div className="bg-white p-10 mt-10">
         <div className="pb-3 border-b-2 border-gray-200">
