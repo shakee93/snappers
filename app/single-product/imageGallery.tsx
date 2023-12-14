@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import Thumbnail from './Thumbnail';
+import Thumbnail from './thumbnail';
 
 interface ImageGalleryProps {
     images: {
