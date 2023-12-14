@@ -4,26 +4,58 @@ import Link from "next/link";
 import Image from "next/image";
 import productImage from "@/public/iphone.webp";
 import Zoom from "react-img-zoom-gdn";
+import { useState } from 'react';
+import ImageGallery from "./imageGallery";
+
 
 export default function singleProduct() {
 
- 
+  const images = [
+    {
+      original: "https://picsum.photos/id/1018/1000/600/",
+      thumbnail: "https://picsum.photos/id/1018/250/150/",
+    },
+    {
+      original: "https://picsum.photos/id/1015/1000/600/",
+      thumbnail: "https://picsum.photos/id/1015/250/150/",
+    },
+    {
+      original: "https://picsum.photos/id/1019/1000/600/",
+      thumbnail: "https://picsum.photos/id/1019/250/150/",
+    },
+    {
+      original: "https://picsum.photos/id/1018/1000/600/",
+      thumbnail: "https://picsum.photos/id/1018/250/150/",
+    },
+    {
+      original: "https://picsum.photos/id/1015/1000/600/",
+      thumbnail: "https://picsum.photos/id/1015/250/150/",
+    },
+  ];
+
+
+  const [selectedImage, setSelectedImage] = useState(images[0]);
   
+
+  const handleThumbnailClick = (newImageSrc: string) => {
+    setSelectedImage({ original: newImageSrc, thumbnail: newImageSrc });
+    console.log(selectedImage.original)
+  };
+
+
   return (
     <main className="container  m-auto">
       <div className="flex p-10 bg-white">
-        <div className="w-2/5">
-          {/* <Image
-            src={productImage}
-            alt=""
-            className=""
-          /> */}
-          <Zoom img={productImage.src} zoomScale={2} width={450} height={450} />;
+        <div className="w-1/6 overflow-y-auto max-h-full">
+          <ImageGallery images={images} onThumbnailClick={handleThumbnailClick} selectedImage={selectedImage}/>
         </div>
-        <div id="product">
 
+        <div className="w-2/6 flex items-center justify-center">
+          {selectedImage && (
+            <Zoom key={selectedImage.original}  img={selectedImage.original} zoomScale={2} width={300} height={300} />
+          )}
         </div>
-        <div className="w-2/5 flex flex-col gap-y-3">
+        <div className="w-2/6 flex flex-col gap-y-3">
           <div className="bg-orange-500 flex w-28 p-1 rounded-3xl text-white items-center justify-center gap-1 text-xs">
             Best Seller <MousePointerClick className="text-white" size={14} />
           </div>
@@ -80,7 +112,7 @@ export default function singleProduct() {
             </span>
           </div>
         </div>
-        <div className="w-1/5">Services</div>
+        <div className="w-1/6">Services</div>
       </div>
       <div className="bg-white p-10 mt-10">
         <div className="pb-3 border-b-2 border-gray-200">
