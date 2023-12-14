@@ -1,16 +1,26 @@
+"use client"
 import Link from "next/link";
 import { PhoneCall, MapPin, Facebook, Instagram } from "lucide-react";
 import { useState } from 'react';
+
+interface Product {
+  id: string;
+  brand: string;
+  category: string;
+  name: string;
+  slug: string;
+  description: string;
+}
 
 interface Brand {
   id: number;
   href: string;
   name: string;
-  products?: string[];
+  products?: Product[];
 }
 
 interface MegaMenuProps {
-  products?: string[];
+  products?: Product[];
   hover: boolean;
 }
 
@@ -20,19 +30,67 @@ const HeaderCategoryBar = () => {
       id: 1,
       href: "/apple",
       name: "Apple",
-      products: ["iPhone", "MacBook", "iPad"],
+      products: [
+        {
+          id: '1',
+          brand: 'Apple',
+          category: 'Phones',
+          name: 'iPhone 15',
+          slug: 'iphone-15',
+          description: 'The latest iPhone model.',
+        },
+        {
+          id: '2',
+          brand: 'Apple',
+          category: 'Laptops',
+          name: 'MacBook Pro',
+          slug: 'macbook-pro',
+          description: 'Powerful MacBook for professionals.',
+        },
+        {
+          id: '3',
+          brand: 'Apple',
+          category: 'Tablets',
+          name: 'iPad Pro',
+          slug: 'ipad-pro',
+          description: 'High-performance iPad for creative tasks.',
+        }
+      ],
     },
     {
       id: 2,
       href: "/samsung",
       name: "Samsung",
-      products: ["Galaxy S", "Galaxy Note", "Smart TV"],
+      products: [
+        {
+          id: '1',
+          brand: 'Samsung',
+          category: 'Phones',
+          name: 'Galaxy S',
+          slug: 'galaxys',
+          description: 'The latest Samsung model.',
+        },
+        {
+          id: '2',
+          brand: 'Samsung',
+          category: 'Phone',
+          name: 'Galaxy Note',
+          slug: 'galaxy-note',
+          description: 'Powerful MacBook for professionals.',
+        },
+        {
+          id: '3',
+          brand: 'Samsung',
+          category: 'TV',
+          name: 'Smart TV',
+          slug: 'smart-tv',
+          description: 'High-performance iPad for creative tasks.',
+        }],
     },
     {
       id: 3,
       href: "/page-collection-2",
       name: "Beats",
-      products: ["Buds", "Note"],
     },
 
     {
@@ -84,11 +142,18 @@ const HeaderCategoryBar = () => {
 
   const MegaMenu: React.FC<MegaMenuProps> = ({ products, hover }) => {
     return (
-      <div className={`mega-menu absolute ${hover ? 'block' : 'hidden'} bg-white p-4 mt-2 shadow-lg z-50`}>
+      <div
+        className={`mega-menu absolute ${hover ? "block" : "hidden"} bg-white p-4 mt-2 shadow-lg z-50`}
+      >
         <ul>
-          {products?.map((product, index) => (
-            <li key={index} className="text-primary-700">
-              {product}
+          {products?.map((product) => (
+            <li key={product.id} className="text-primary-700">
+              <Link
+                href="/[brand]/[item]"
+                as={`/${product.brand.toLowerCase()}/${product.slug}`}
+              >
+                {product.name}
+              </Link>
             </li>
           ))}
         </ul>
@@ -105,13 +170,16 @@ const HeaderCategoryBar = () => {
         <ul className="flex gap-2 text-[13px] items-center font-medium justify-between text-primary-700 mr-5 w-full">
           {brands.map((item) => (
             <Link key={item.id} href={item.href}>
-              <div className="relative group hover:bg-slate-200 rounded-3xl px-3 py-1 text-center"
+              <div
+                className="relative group hover:bg-slate-200 rounded-3xl px-3 py-1 text-center"
                 onMouseEnter={() => setBrandHover({ ...brandHover, [item.id]: true })}
                 onMouseLeave={() => setBrandHover({ ...brandHover, [item.id]: false })}
               >
                 {item.name}
-                {item.products && <MegaMenu products={item.products} hover={brandHover[item.id]} />}
-              </div >
+                {item.products && (
+                  <MegaMenu products={item.products} hover={brandHover[item.id]} />
+                )}
+              </div>
             </Link>
           ))}
         </ul>
