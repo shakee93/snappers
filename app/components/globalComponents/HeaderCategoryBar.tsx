@@ -1,3 +1,4 @@
+"use client"
 import Link from "next/link";
 import { PhoneCall, MapPin, Facebook, Instagram } from "lucide-react";
 import { useState } from 'react';
