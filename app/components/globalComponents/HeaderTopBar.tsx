@@ -1,14 +1,11 @@
-// components/Header.js
-
 import Link from "next/link";
-import Logo from "./Logo";
 import { PhoneCall, MapPin, Facebook, Instagram } from "lucide-react";
 
 const HeaderTopBar = () => {
   const iconSize = 13;
   return (
   
-      <div className="flex flex-row justify-between bg-primary-700 con p-2 text-xs text-white">
+      <div className="flex flex-row justify-between bg-primaryColor con p-2 text-xs text-white">
         <div className="flex gap-2 w-1/3">
           Contact Us : 
           <Link
