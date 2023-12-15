@@ -1,7 +1,8 @@
 "use client"
 import Link from "next/link";
 import { PhoneCall, MapPin, Facebook, Instagram } from "lucide-react";
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
+import MegaMenu from "./MegaMenu";
 
 interface Product {
   id: string;
@@ -140,52 +141,58 @@ const HeaderCategoryBar = () => {
     }
   ];
 
-  const MegaMenu: React.FC<MegaMenuProps> = ({ products, hover }) => {
-    return (
-      <div
-        className={`mega-menu absolute ${hover ? "block" : "hidden"} bg-white p-4 mt-2 shadow-lg z-50`}
-      >
-        <ul>
-          {products?.map((product) => (
-            <li key={product.id} className="text-primary-700">
-              <Link
-                href="/[brand]/[item]"
-                as={`/${product.brand.toLowerCase()}/${product.slug}`}
-              >
-                {product.name}
+
+  const [brandHover, setBrandHover] = useState<{ [key: number]: boolean }>({});
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const handleMouseEnter = (itemId) => {
+      setBrandHover({ ...brandHover, [itemId]: true });
+    };
+
+    const handleMouseLeave = (itemId) => {
+      setBrandHover({ ...brandHover, [itemId]: false });
+    };
+
+    const handleMenuMouseEnter = () => {
+      setBrandHover((prev) => ({ ...prev, [menuRef.current]: true }));
+    };
+
+    const handleMenuMouseLeave = () => {
+      setBrandHover((prev) => ({ ...prev, [menuRef.current]: false }));
+    };
+
+    return () => {
+      document.removeEventListener('mouseenter', handleMenuMouseEnter);
+      document.removeEventListener('mouseleave', handleMenuMouseLeave);
+    };
+  }, [brandHover]);
+
+  return (
+    <div className="flex flex-row bg-primary-200 text-xs text-white w-full">
+      <div className="bg-primary-700 w-2/12">All Categories</div>
+      <div className="w-10/12 p-2">
+        <ul className="flex gap-2 text-[13px] items-center font-medium justify-between text-primary-700 w-full">
+          {brands.map((item) => (
+            <li
+              key={item.id}
+              className="w-full relative group hover:bg-slate-200 rounded-3xl px-3 py-1 text-center"
+              onMouseEnter={() => setBrandHover({ ...brandHover, [item.id]: true })}
+              onMouseLeave={() => setBrandHover({ ...brandHover, [item.id]: false })}
+            >
+              <Link href={item.href}>
+                {item.name}
               </Link>
+              {item.products && (
+                <MegaMenu products={item.products} hover={brandHover[item.id]} />
+              )}
             </li>
           ))}
         </ul>
       </div>
-    );
-  };
-
-  const [brandHover, setBrandHover] = useState<{ [key: number]: boolean }>({});
-
-  return (
-    <div className="flex flex-row bg-primary-200 text-xs text-white">
-      <div className="bg-primary-700 w-2/12">All Categories</div>
-      <div className="w-10/12 p-2">
-        <ul className="flex gap-2 text-[13px] items-center font-medium justify-between text-primary-700 mr-5 w-full">
-          {brands.map((item) => (
-            <Link key={item.id} href={item.href}>
-              <div
-                className="relative group hover:bg-slate-200 rounded-3xl px-3 py-1 text-center"
-                onMouseEnter={() => setBrandHover({ ...brandHover, [item.id]: true })}
-                onMouseLeave={() => setBrandHover({ ...brandHover, [item.id]: false })}
-              >
-                {item.name}
-                {item.products && (
-                  <MegaMenu products={item.products} hover={brandHover[item.id]} />
-                )}
-              </div>
-            </Link>
-          ))}
-        </ul>
-      </div>
     </div>
+
   );
-};
+}
 
 export default HeaderCategoryBar;

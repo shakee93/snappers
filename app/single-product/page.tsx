@@ -1,13 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import Zoom from "react-img-zoom-gdn";
 import ImageGallery from "./imageGallery";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Features from "../components/SingleProductPage/FeatureCard";
 import ProductDetails from "../components/SingleProductPage/ProductDetails";
 import ProductOverview from "../components/SingleProductPage/ProductOverview";
-import { Fullscreen } from "lucide-react";
+import 'react-inner-image-zoom/lib/InnerImageZoom/styles.css';
+import InnerImageZoom from 'react-inner-image-zoom';
 import Link from "next/link";
 
 export default function singleProduct() {
@@ -42,6 +42,10 @@ export default function singleProduct() {
     setSelectedImage({ original: newImageSrc, thumbnail: newImageSrc });
   };
 
+  useEffect(() => {
+    
+  }, []);
+
   return (
     <main className="container  m-auto">
       <div className="mt-5 text-xs md:px-5 md:text-base">
@@ -57,14 +61,14 @@ export default function singleProduct() {
             />
           </div>
 
-          <div className="w-4/5 flex ">
+          <div className="w-4/5 flex h-fit">
             {selectedImage && (
-              <Zoom
-                key={selectedImage.original}
-                img={selectedImage.original}
-                zoomScale={2}
-                width={300}
-                height={300}
+              <InnerImageZoom
+                // key={selectedImage.original}
+                src={selectedImage.thumbnail}
+                zoomSrc={selectedImage.original}
+                zoomType="hover"
+                zoomPreload={false}
               />
             )}
           </div>
