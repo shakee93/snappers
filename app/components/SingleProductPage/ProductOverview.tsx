@@ -4,15 +4,15 @@ import ProductSpecifications from "./ProductSpecifications";
 const ProductOverview = () => {
   return (
     <>
-     <div className="bg-white p-10 mt-10">
+     <div className="bg-white p-5 rounded-3xl md:p-10 my-5">
         <div className="pb-3 border-b-2 border-gray-200">
-          <h3 className="text-xl">Overview</h3>
+          <h3 className="text-lg md:text-xl">Overview</h3>
         </div>
-        <div className="flex py-5">
-          <div className="w-3/5 p-4">
-            <div className="text-base py-2">Highlights</div>
+        <div className="flex flex-col md:flex-row py-2 md:py-5">
+          <div className="md:w-3/5 p-2 md:p-4">
+            <div className="text-sm md:text-base py-2">Highlights</div>
             <div>
-              <ul className="text-sm flex flex-col gap-1 list-disc pl-4 text-gray-600">
+              <ul className="text-xs md:text-sm flex flex-col gap-1 list-disc pl-4 text-gray-600">
                 <li>
                   A17 Pro game-changing chip for a groundbreaking performance.
                 </li>
@@ -30,15 +30,15 @@ const ProductOverview = () => {
                 </li>
               </ul>
             </div>
-            <div className="text-base py-2">Overview</div>
-            <div className="text-sm text-gray-600">
+            <div className="text-sm md:text-base py-2">Overview</div>
+            <div className="text-xs md:text-sm text-gray-600">
               The iPhone 15 Pro features an aerospace‑grade titanium design with
               an all‑new Action button to fast track to your favorite feature.
               The powerful camera system offers multiple focal lengths for
               super‑high‑resolution photos with a new level of detail and color.
             </div>
           </div>
-          <div className="w-2/5">
+          <div className="md:w-2/5">
             <ProductSpecifications/>
           </div>
         </div>

@@ -6,8 +6,8 @@ const ProductAddToCart = () => {
     <>
       <div className="flex space-x-3.5 py-4">
         <div className="flex items-center justify-center bg-slate-100/70 dark:bg-slate-800/70 px-2 py-1 sm:p-2 rounded-full">
-          <div className="nc-NcInputNumber flex items-center justify-between space-x-5 w-full">
-            <div className="nc-NcInputNumber__content flex items-center justify-between w-[104px] sm:w-28">
+          <div className=" flex items-center justify-between space-x-5 w-full">
+            <div className="flex items-center justify-between w-[104px] sm:w-28">
               <button
                 className="w-8 h-8 rounded-full flex items-center justify-center border border-neutral-400 dark:border-neutral-500 bg-white dark:bg-neutral-900 focus:outline-none hover:border-neutral-700 dark:hover:border-neutral-400 disabled:hover:border-neutral-400 dark:disabled:hover:border-neutral-500 disabled:opacity-50 disabled:cursor-default"
                 type="button"
@@ -51,7 +51,7 @@ const ProductAddToCart = () => {
             </div>
           </div>
         </div>
-        <button className="relative w-56 h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-1 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-primaryColor dark:bg-slate-100 hover:bg-orange-500 text-slate-50 dark:text-slate-800 shadow-xl  flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0">
+        <button className="relative  h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-1 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-primaryColor dark:bg-slate-100 hover:bg-orange-500 text-slate-50 dark:text-slate-800 shadow-xl  flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0">
           <svg
             className="hidden sm:inline-block w-5 h-5 mb-0.5"
             viewBox="0 0 9 9"
@@ -68,7 +68,7 @@ const ProductAddToCart = () => {
               fill="currentColor"
             ></path>
           </svg>
-          <span className="ml-3">Add to cart</span>
+          <span className="md:ml-3">Add to cart</span>
         </button>
       </div>
     </>
