@@ -8,6 +8,7 @@ import ProductDetails from "../components/SingleProductPage/ProductDetails";
 import ProductOverview from "../components/SingleProductPage/ProductOverview";
 import 'react-inner-image-zoom/lib/InnerImageZoom/styles.css';
 import InnerImageZoom from 'react-inner-image-zoom';
+import Link from "next/link";
 
 export default function singleProduct() {
   const images = [
@@ -45,9 +46,10 @@ export default function singleProduct() {
 
   return (
     <main className="container  m-auto">
-      <div className="flex p-10 bg-white">
-        <div className="w-2/5 flex">
-          <div className="w-1/5  max-h-full">
+      <div className="mt-5 text-xs md:px-5 md:text-base">Home &gt; Apple &gt; iPhone 15 Pro 128GB Black Titanium 5G With FaceTime</div>
+      <div className="flex flex-col md:flex-row p-3 rounded-3xl mt-5 md:mt-6 md:p-10 bg-white">
+        <div className="w-full md:w-2/5 p-2 flex  ">
+          <div className="w-full md:w-1/5 ">
             <ImageGallery
               images={images}
               onThumbnailClick={handleThumbnailClick}
@@ -68,14 +70,17 @@ export default function singleProduct() {
           </div>
         </div>
 
-        <div className="w-2/5 flex flex-col gap-y-3">
+        <div className="md:w-2/5 flex flex-col p-2 gap-y-1 md:gap-y-3">
           <ProductDetails />
         </div>
-        <div className="w-1/5">
+        <div className="hidden lg:block w-full md:w-1/5 ">
           <Features />
         </div>
       </div>
       <ProductOverview />
+      <div className=" lg:hidden w-full lg:w-1/5 p-3 bg-white rounded-3xl my-5">
+          <Features />
+        </div>
     </main>
   );
 }
