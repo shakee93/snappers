@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import MainNav2 from "./components/Header/MainNav2";
 import MainNav1 from "./components/Header/MainNav1";
@@ -20,13 +20,13 @@ import Heading from "@/app/components/Heading/Heading";
 import SectionMagazine5 from "@/app/containers/BlogPage/SectionMagazine5";
 import ButtonSecondary from "@/shared/Button/ButtonSecondary";
 import SiteHeader from "@/app/containers/SiteHeader";
-import Footer from '@/shared/Footer/Footer';
+import Footer from "@/shared/Footer/Footer";
 import Header from "./components/GlobalComponents/Header";
+import SingleProductBlock from "./components/SingleProductBlock/SingleProductBlock";
 
 export default function Home() {
   return (
     <main>
-
       {/* <Header/> */}
       {/* <MainNav1 isTop /> */}
       {/* <SiteHeader /> */}
@@ -37,6 +37,21 @@ export default function Home() {
       <div className="nc-PageHome relative overflow-hidden">
         {/* SECTION HERO */}
         <SectionHero2 />
+        <div className="grid grid-cols-4 gap-4 container m-auto">
+          <div>
+            <SingleProductBlock/>
+          </div>
+          <div>
+            <SingleProductBlock/>
+          </div>
+          <div>
+            <SingleProductBlock/>
+          </div>
+          <div>
+            <SingleProductBlock/>
+          </div>
+          
+        </div>
 
         <div className="mt-24 lg:mt-32">
           <DiscoverMoreSlider />
@@ -100,11 +115,10 @@ export default function Home() {
 
           {/* SECTION */}
           <SectionClientSay />
-
         </div>
       </div>
 
       <Footer />
     </main>
-  )
+  );
 }
