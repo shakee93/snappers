@@ -6,6 +6,7 @@ import { Helmet } from "react-helmet-async";
 import Input from "shared/Input/Input";
 
 import ButtonPrimary from "shared/Button/ButtonPrimary";
+import Link from "next/link";
 
 export interface PageLoginProps {
   className?: string;
@@ -92,7 +93,7 @@ const PageLogin: FC<PageLoginProps> = ({ className = "" }) => {
           {/* ==== */}
           <span className="block text-center text-neutral-700 dark:text-neutral-300">
             New user? {` `}
-            <Link className="text-green-600" to="/signup">
+            <Link className="text-green-600" href="/signup">
               Create an account
             </Link>
           </span>

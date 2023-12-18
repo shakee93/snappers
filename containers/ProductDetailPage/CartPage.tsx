@@ -5,6 +5,7 @@ import { Product, PRODUCTS } from "data/data";
 import { Helmet } from "react-helmet-async";
 
 import ButtonPrimary from "shared/Button/ButtonPrimary";
+import Link from "next/link";
 
 const CartPage = () => {
   const renderStatusSoldout = () => {

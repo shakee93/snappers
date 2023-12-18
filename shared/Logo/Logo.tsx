@@ -2,6 +2,7 @@ import React from "react";
 import logoImg from "@/public/images/logo.svg";
 import logoLightImg from "@/public/images/logo-light.svg";
 import Link from "next/link";
+import Image from "next/image";
 
 export interface LogoProps {
   img?: string;
@@ -22,7 +23,7 @@ const Logo: React.FC<LogoProps> = ({
       {/* THIS USE FOR MY CLIENT */}
       {/* PLEASE UN COMMENT BELLOW CODE AND USE IT */}
       {img ? (
-        <img
+        <Image
           className={`block max-h-8 sm:max-h-10 ${
             imgLight ? "dark:hidden" : ""
           }`}
@@ -33,7 +34,7 @@ const Logo: React.FC<LogoProps> = ({
         "Logo Here"
       )}
       {imgLight && (
-        <img
+        <Image
           className="hidden max-h-8 sm:max-h-10 dark:block"
           src={imgLight}
           alt="Logo-Light"

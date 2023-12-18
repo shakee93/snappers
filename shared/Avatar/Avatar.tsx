@@ -3,7 +3,7 @@ import React, { FC } from "react";
 
 import { avatarImgs } from "@/contains/fakeData";
 import VerifyIcon from "@/components/VerifyIcon";
-import {StaticImageData} from "next/image";
+import Image, {StaticImageData} from "next/image";
 
 export interface AvatarProps {
   containerClassName?: string;
@@ -39,9 +39,9 @@ const Avatar: FC<AvatarProps> = ({
       style={{ backgroundColor: url ? undefined : _setBgColor(name) }}
     >
       {url && (
-        <img
+        <Image
           className={`absolute inset-0 w-full h-full object-cover ${radius}`}
-          src={url?.src ? url.src : url}
+          src={url}
           alt={name}
         />
       )}

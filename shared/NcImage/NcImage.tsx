@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import checkInViewIntersectionObserver from "@/utils/isInViewPortIntersectionObserver";
 import PlaceIcon from "./PlaceIcon";
+import NextImage from "next/image";
 
 export interface NcImageProps extends ImgHTMLAttributes<HTMLImageElement> {
   containerClassName?: string;
@@ -82,7 +83,7 @@ const NcImage: FC<NcImageProps> = ({
       ref={_containerRef}
     >
       {__src && imageLoaded ? (
-        <img src={__src} className={className} alt={alt} {...args} />
+        <NextImage src={__src} className={className} alt={alt}  />
       ) : (
         renderLoadingPlaceholder()
       )}

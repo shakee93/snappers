@@ -1,14 +1,13 @@
 import { Popover, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
-import CardCategory3 from "@/app/components/CardCategories/CardCategory3";
+import CardCategory3 from "components/CardCategories/CardCategory3";
 import React, { FC, Fragment, useState } from "react";
 import  NavLink from "next/link";
-import { LocationStates } from "@routers/types";
 
 export interface NavItemType {
   id: string;
   name: string;
-  href: keyof LocationStates | string;
+  href: string;
   targetBlank?: boolean;
   children?: NavItemType[];
   type?: "dropdown" | "megaMenu" | "none";
@@ -194,16 +193,9 @@ const NavigationItem: FC<NavigationItemProps> = ({ menuItem }) => {
       <NavLink
         target={item.targetBlank ? "_blank" : undefined}
         rel="noopener noreferrer"
-        className={({ isActive }) =>
-          `flex items-center py-2 px-4 rounded-md hover:text-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 dark:hover:text-neutral-200 ${
-            isActive
-              ? "font-medium text-neutral-900 dark:text-neutral-100"
-              : "font-normal text-neutral-6000 dark:text-neutral-400 "
-          }`
+        className={`font-normal text-neutral-6000 dark:text-neutral-400 flex items-center py-2 px-4 rounded-md hover:text-neutral-700 hover:bg-neutral-100 dark:hover:bg-neutral-800 dark:hover:text-neutral-200`
         }
-        href={{
-          pathname: item.href || undefined,
-        }}
+        href={''}
       >
         {item.name}
         {item.type && (

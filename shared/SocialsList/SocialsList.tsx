@@ -4,6 +4,7 @@ import facebook from "@/public/images/socials/facebook.svg";
 import twitter from "@/public/images/socials/twitter.svg";
 import telegram from "@/public/images/socials/telegram.svg";
 import youtube from "@/public/images/socials/youtube.svg";
+import Image from "next/image";
 
 export interface SocialsListProps {
   className?: string;
@@ -37,7 +38,7 @@ const SocialsList: FC<SocialsListProps> = ({
           rel="noopener noreferrer"
           title={item.name}
         >
-          <img src={item.icon} alt="" />
+          <Image src={item.icon} alt="" />
         </a>
       ))}
     </nav>

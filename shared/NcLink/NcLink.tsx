@@ -2,7 +2,7 @@ import React, { FC, ReactNode } from "react";
 import Link from "next/link";
 import LinkProps from "next/link";
 
-export interface NcLinkProps extends LinkProps {
+export interface NcLinkProps {
   className?: string;
   colorClass?: string;
   children: ReactNode; 
@@ -15,13 +15,11 @@ const NcLink: FC<NcLinkProps> = ({
   ...args
 }) => {
   return (
-    <Link
+    <div
       className={`nc-NcLink ${colorClass} ${className}`}
-      data-nc-id="NcLink"
-      {...args}
     >
       {children}
-    </Link>
+    </div>
   );
 };
 

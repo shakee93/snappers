@@ -7,6 +7,7 @@ import Textarea from "shared/Textarea/Textarea";
 import CommonLayout from "./CommonLayout";
 import { Helmet } from "react-helmet-async";
 import { avatarImgs } from "contains/fakeData";
+import Image from "next/image";
 
 export interface AccountPageProps {
   className?: string;
@@ -28,7 +29,7 @@ const AccountPage: FC<AccountPageProps> = ({ className = "" }) => {
             <div className="flex-shrink-0 flex items-start">
               {/* AVATAR */}
               <div className="relative rounded-full overflow-hidden flex">
-                <img
+                <Image
                   src={avatarImgs[2]}
                   alt=""
                   className="w-32 h-32 rounded-full object-cover z-0"
