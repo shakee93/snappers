@@ -178,7 +178,7 @@ const ProductCard: FC<ProductCardProps> = ({
           onClick={() => notifyAddTocart({ size: "XL" })}
         >
           <BagIcon className="w-3.5 h-3.5 mb-0.5" />
-          <span className="ml-1">Add to bag</span>
+          <span className="ml-1">Add to Cart</span>
         </ButtonPrimary>
         <ButtonSecondary
           className="ml-1.5 bg-white hover:!bg-gray-100 hover:text-slate-900 transition-colors shadow-lg"
@@ -218,11 +218,7 @@ const ProductCard: FC<ProductCardProps> = ({
   return (
     <>
       <div
-<<<<<<< HEAD
-        className={`nc-ProductCard relative flex flex-col bg-white  ${className}`}
-=======
-        className={`nc-ProductCard relative flex flex-col  ${className}`}
->>>>>>> ca1a1541130c264518a673022a3ff3e1220a50b4
+        className={`nc-ProductCard relative flex flex-col bg-white p-2 rounded-3xl  ${className}`}
         data-nc-id="ProductCard"
       >
         <Link href={"/product-detail"} className=""></Link>
@@ -248,16 +244,13 @@ const ProductCard: FC<ProductCardProps> = ({
 
           <div>
             <h2
-              className={`nc-ProductCard__title text-base text-primaryColor font-semibold transition-colors`}
+              className={`nc-ProductCard__title text-base text-primaryColor line-clamp-2 min-h-[47px] font-semibold transition-colors`}
             >
               {name}
             </h2>
-            {/* <p className={`text-sm text-slate-500 dark:text-slate-400 mt-1 `}>
-              {description}
-            </p> */}
           </div>
 
-          <div className="flex justify-between items-end ">
+          <div className="flex justify-between ">
             <Prices price={price} />
             <div className="flex items-center mb-0.5">
             </div>
