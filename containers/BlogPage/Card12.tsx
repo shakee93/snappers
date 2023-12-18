@@ -38,7 +38,7 @@ const Card12: FC<Card12Props> = ({ className = "h-full" }) => {
             className="line-clamp-2 capitalize"
             title={"title"}
           >
-            {_getTitleRd()}
+           hello
           </Link>
         </h2>
         <span className="hidden sm:block mt-4 text-neutral-500 dark:text-neutral-400">
