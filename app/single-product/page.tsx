@@ -52,8 +52,8 @@ export default function singleProduct() {
         Home &gt; Apple &gt; iPhone 15 Pro 128GB Black Titanium 5G With FaceTime
       </div>
       <div className="flex flex-col md:flex-row p-3 rounded-3xl mt-5 md:mt-6 md:p-10 bg-white">
-        <div className="w-full md:w-2/5 p-2 flex  ">
-          <div className="w-full md:w-1/5 ">
+        <div className="w-full md:w-2/5 p-2 flex gap-2">
+          <div className="w-full md:w-1/5  ">
             <ImageGallery
               images={images}
               onThumbnailClick={handleThumbnailClick}
@@ -61,7 +61,7 @@ export default function singleProduct() {
             />
           </div>
 
-          <div className="w-4/5 flex h-fit">
+          <div className="w-4/5 flex  p-4">
             {selectedImage && (
               <InnerImageZoom
                 // key={selectedImage.original}
@@ -69,6 +69,7 @@ export default function singleProduct() {
                 zoomSrc={selectedImage.original}
                 zoomType="hover"
                 zoomPreload={false}
+                className="object-cover w-full h-auto "
               />
             )}
           </div>
@@ -86,7 +87,7 @@ export default function singleProduct() {
         <Features />
       </div>
       <div>
-        
+
       </div>
     </main>
   );

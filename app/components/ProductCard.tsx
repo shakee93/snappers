@@ -5,7 +5,6 @@ import LikeButton from "./LikeButton";
 import Prices from "./Prices";
 import { ArrowsPointingOutIcon } from "@heroicons/react/24/outline";
 import { Product, PRODUCTS } from "@/data/data";
-import { StarIcon } from "@heroicons/react/24/solid";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import ButtonSecondary from "@/shared/Button/ButtonSecondary";
 import BagIcon from "./BagIcon";
@@ -13,6 +12,7 @@ import toast from "react-hot-toast";
 import { Transition } from "@headlessui/react";
 import ModalQuickView from "./ModalQuickView";
 import ProductStatus from "./ProductStatus";
+import Image from "next/image";
 
 export interface ProductCardProps {
   className?: string;
@@ -67,7 +67,7 @@ const ProductCard: FC<ProductCardProps> = ({
     return (
       <div className="flex ">
         <div className="h-24 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
-          <img
+          <Image
             src={image}
             alt={name}
             className="h-full w-full object-cover object-center"
@@ -163,26 +163,7 @@ const ProductCard: FC<ProductCardProps> = ({
 
     return (
       <div className="flex ">
-        {variants.map((variant, index) => (
-          <div
-            key={index}
-            onClick={() => setVariantActive(index)}
-            className={`relative w-11 h-6 rounded-full overflow-hidden z-10 border cursor-pointer ${
-              variantActive === index
-                ? "border-black dark:border-slate-300"
-                : "border-transparent"
-            }`}
-            title={variant.name}
-          >
-            <div className="absolute inset-0.5 rounded-full overflow-hidden z-0">
-              <img
-                src={variant.thumbnail}
-                alt="variant"
-                className="absolute w-full h-full object-cover"
-              />
-            </div>
-          </div>
-        ))}
+        
       </div>
     );
   };
@@ -223,7 +204,7 @@ const ProductCard: FC<ProductCardProps> = ({
           return (
             <div
               key={index}
-              className="nc-shadow-lg w-10 h-10 rounded-xl bg-white hover:bg-slate-900 hover:text-white transition-colors cursor-pointer flex items-center justify-center uppercase font-semibold tracking-tight text-sm text-slate-900"
+              className="nc-shadow-lg w-10 h-10 rounded-xl bg-white hover:bg-primaryColor hover:text-white transition-colors cursor-pointer flex items-center justify-center uppercase font-semibold tracking-tight text-sm text-primaryColor"
               onClick={() => notifyAddTocart({ size })}
             >
               {size}
@@ -237,10 +218,10 @@ const ProductCard: FC<ProductCardProps> = ({
   return (
     <>
       <div
-        className={`nc-ProductCard relative flex flex-col bg-transparent ${className}`}
+        className={`nc-ProductCard relative flex flex-col  ${className}`}
         data-nc-id="ProductCard"
       >
-        <Link href={"/product-detail"} className="absolute inset-0"></Link>
+        <Link href={"/product-detail"} className=""></Link>
 
         <div className="relative flex-shrink-0 bg-slate-50 dark:bg-slate-300 rounded-3xl overflow-hidden z-1 group">
           <Link href={"/product-detail"} className="block">
@@ -259,27 +240,22 @@ const ProductCard: FC<ProductCardProps> = ({
         </div>
 
         <div className="space-y-4 px-2.5 pt-5 pb-2.5">
-          {renderVariants()}
+          {/* {renderVariants()} */}
 
           <div>
             <h2
-              className={`nc-ProductCard__title text-base font-semibold transition-colors`}
+              className={`nc-ProductCard__title text-base text-primaryColor font-semibold transition-colors`}
             >
               {name}
             </h2>
-            <p className={`text-sm text-slate-500 dark:text-slate-400 mt-1 `}>
+            {/* <p className={`text-sm text-slate-500 dark:text-slate-400 mt-1 `}>
               {description}
-            </p>
+            </p> */}
           </div>
 
           <div className="flex justify-between items-end ">
             <Prices price={price} />
             <div className="flex items-center mb-0.5">
-              <StarIcon className="w-5 h-5 pb-[1px] text-amber-400" />
-              <span className="text-sm ml-1 text-slate-500 dark:text-slate-400">
-                {(Math.random() * 1 + 4).toFixed(1)} (
-                {Math.floor(Math.random() * 70 + 20)} reviews)
-              </span>
             </div>
           </div>
         </div>

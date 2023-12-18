@@ -23,6 +23,7 @@ import SiteHeader from "@/app/containers/SiteHeader";
 import Footer from "@/shared/Footer/Footer";
 import Header from "./components/GlobalComponents/Header";
 import SingleProductBlock from "./components/SingleProductBlock/SingleProductBlock";
+import ProductCard from "./components/ProductCard";
 
 export default function Home() {
   return (
@@ -37,18 +38,21 @@ export default function Home() {
       <div className="nc-PageHome relative overflow-hidden">
         {/* SECTION HERO */}
         <SectionHero2 />
-        <div className="grid grid-cols-4 gap-4 container m-auto">
+        <div className=" gap-4 container m-auto">
           <div>
-            <SingleProductBlock/>
+          <SectionSliderProductCard
+          data={SPORT_PRODUCTS.filter((_, i) => i < 7)}
+          subHeading="New Sports equipment"
+        />
           </div>
           <div>
-            <SingleProductBlock/>
+            {/* <SingleProductBlock/> */}
           </div>
           <div>
-            <SingleProductBlock/>
+            {/* <SingleProductBlock/> */}
           </div>
           <div>
-            <SingleProductBlock/>
+            {/* <SingleProductBlock/> */}
           </div>
           
         </div>
