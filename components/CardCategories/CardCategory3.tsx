@@ -1,6 +1,6 @@
 import React, { FC } from "react";
 import NcImage from "shared/NcImage/NcImage";
-
+import Link from "next/link"
 import ButtonSecondary from "shared/Button/ButtonSecondary";
 import { CATS_DISCOVER } from "components/DiscoverMoreSlider";
 

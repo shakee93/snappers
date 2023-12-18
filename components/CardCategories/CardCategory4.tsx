@@ -1,6 +1,6 @@
 import React, { FC } from "react";
 import NcImage from "shared/NcImage/NcImage";
-
+import Link from "next/link"
 import explore1Svg from "@/public/images/collections/explore1.svg";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 

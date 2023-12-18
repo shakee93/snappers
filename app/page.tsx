@@ -2,26 +2,26 @@
 
 import MainNav2 from "./components/Header/MainNav2";
 import MainNav1 from "./components/Header/MainNav1";
-import SectionHero2 from "./components/SectionHero/SectionHero2";
-import DiscoverMoreSlider from "./components/DiscoverMoreSlider";
-import SectionSliderProductCard from "./components/SectionSliderProductCard";
+import SectionHero2 from "@/components/SectionHero/SectionHero2";
+import DiscoverMoreSlider from "components/DiscoverMoreSlider";
+import SectionSliderProductCard from "@/components/SectionSliderProductCard";
 import { PRODUCTS, SPORT_PRODUCTS } from "@/data/data";
-import BackgroundSection from "@/app/components/BackgroundSection/BackgroundSection";
-import SectionGridMoreExplore from "@/app/components/SectionGridMoreExplore/SectionGridMoreExplore";
-import SectionGridFeatureItems from "@/app/category/SectionGridFeatureItems";
-import SectionSliderCategories from "@/app/components/SectionSliderCategories/SectionSliderCategories";
-import SectionClientSay from "@/app/components/SectionClientSay/SectionClientSay";
-import SectionHowItWork from "@/app/components/SectionHowItWork/SectionHowItWork";
-import SectionPromo1 from "@/app/components/SectionPromo1";
-import SectionPromo2 from "@/app/components/SectionPromo2";
-import SectionPromo3 from "@/app/components/SectionPromo3";
-import SectionSliderLargeProduct from "@/app/components/SectionSliderLargeProduct";
-import Heading from "@/app/components/Heading/Heading";
+import BackgroundSection from "@/components/BackgroundSection/BackgroundSection";
+import SectionGridMoreExplore from "@/components/SectionGridMoreExplore/SectionGridMoreExplore";
+// import SectionGridFeatureItems from "@/containers/SectionGridFeatureItems";
+import SectionSliderCategories from "@/components/SectionSliderCategories/SectionSliderCategories";
+import SectionClientSay from "@/components/SectionClientSay/SectionClientSay";
+import SectionHowItWork from "@/components/SectionHowItWork/SectionHowItWork";
+import SectionPromo1 from "@/components/SectionPromo1";
+import SectionPromo2 from "@/components/SectionPromo2";
+import SectionPromo3 from "@/components/SectionPromo3";
+import SectionSliderLargeProduct from "@/components/SectionSliderLargeProduct";
+import Heading from "@/components/Heading/Heading";
 import SectionMagazine5 from "@/containers/BlogPage/SectionMagazine5";
 import ButtonSecondary from "@/shared/Button/ButtonSecondary";
-import SiteHeader from "@/containers/SiteHeader";
+import SiteHeader from "@/app/containers/SiteHeader";
 import Footer from "@/shared/Footer/Footer";
-import Header from "./components/GlobalComponents/Header";
+import Header from "@/app/components/Header/Header";
 import SingleProductBlock from "./components/SingleProductBlock/SingleProductBlock";
 import ProductCard from "./components/ProductCard";
 
@@ -87,7 +87,7 @@ export default function Home() {
           </div>
 
           {/* SECTION */}
-          <SectionGridFeatureItems />
+          {/* <SectionGridFeatureItems /> */}
 
           <SectionPromo2 />
 
