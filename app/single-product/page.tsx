@@ -43,7 +43,7 @@ export default function singleProduct() {
   };
 
   useEffect(() => {
-    
+
   }, []);
 
   return (
@@ -86,7 +86,7 @@ export default function singleProduct() {
         <Features />
       </div>
       <div>
-        
+
       </div>
     </main>
   );
