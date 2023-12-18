@@ -1,10 +1,10 @@
 import React, { FC } from "react";
 import { Helmet } from "react-helmet-async";
-import Pagination from "@/shared/Pagination/Pagination";
-import ButtonPrimary from "@/shared/Button/ButtonPrimary";
-import SectionSliderCollections from "@/app/components/SectionSliderLargeProduct";
-import SectionPromo1 from "@/app/components/SectionPromo1";
-import ProductCard from "@/app/components/ProductCard";
+import Pagination from "shared/Pagination/Pagination";
+import ButtonPrimary from "shared/Button/ButtonPrimary";
+import SectionSliderCollections from "components/SectionSliderLargeProduct";
+import SectionPromo1 from "components/SectionPromo1";
+import ProductCard from "components/ProductCard";
 import TabFilters from "./TabFilters";
 import { PRODUCTS } from "data/data";
 

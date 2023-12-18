@@ -1,10 +1,11 @@
+'use client'
 import React, { FC } from "react";
-import { Helmet } from "react-helmet-async";
-import SectionSliderCollections from "@/app/components/SectionSliderLargeProduct";
-import SectionPromo1 from "@/app/components/SectionPromo1";
-import ProductCard from "@/app/components/ProductCard";
-import { PRODUCTS } from "data/data";
-import SidebarFilters from "./SidebarFilters";
+import SectionSliderCollections from "components/SectionSliderLargeProduct";
+import SectionPromo1 from "components/SectionPromo1";
+import ProductCard from "components/ProductCard";
+import { PRODUCTS } from "@/data/data";
+import SidebarFilters from "containers/SidebarFilters";
+
 
 export interface PageCollection2Props {
   className?: string;
@@ -16,9 +17,6 @@ const PageCollection2: FC<PageCollection2Props> = ({ className = "" }) => {
       className={`nc-PageCollection2 ${className}`}
       data-nc-id="PageCollection2"
     >
-      <Helmet>
-        <title>Category || Ciseco Ecommerce Template</title>
-      </Helmet>
 
       <div className="container py-16 lg:pb-28 lg:pt-20 space-y-16 sm:space-y-20 lg:space-y-28">
         <div className="space-y-10 lg:space-y-14">
@@ -59,7 +57,7 @@ const PageCollection2: FC<PageCollection2Props> = ({ className = "" }) => {
         <hr className="border-slate-200 dark:border-slate-700" />
 
         {/* SUBCRIBES */}
-        <SectionPromo1 />
+        {/*<SectionPromo1 />*/}
       </div>
     </div>
   );
