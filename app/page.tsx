@@ -19,7 +19,7 @@ import SectionSliderLargeProduct from "@/components/SectionSliderLargeProduct";
 import Heading from "@/components/Heading/Heading";
 import SectionMagazine5 from "@/containers/BlogPage/SectionMagazine5";
 import ButtonSecondary from "@/shared/Button/ButtonSecondary";
-import SiteHeader from "@/app/containers/SiteHeader";
+import SiteHeader from "containers/SiteHeader";
 import Footer from "@/shared/Footer/Footer";
 import Header from "@/app/components/Header/Header";
 import SingleProductBlock from "./components/SingleProductBlock/SingleProductBlock";
