@@ -29,12 +29,51 @@ export const GET_PRODUCT = gql`
     }
 `;
 
+export const GET_ALL_PRODUCTS = gql`
+    query GetAllProducts {
+        products(first: 30) {
+            edges {
+                node {
+                    name
+                    slug
+                    image {
+                        mediaItemUrl
+                    }
+                    type
+                    ... on SimpleProduct {
+                        id
+                        name
+                        productCategories {
+                            nodes {
+                                name
+                            }
+                        }
+                        price
+                        productTags {
+                            nodes {
+                                name
+                            }
+                        }
+                    }
+                    
+                }
+            }
+        }
+        productCategories(first: 100) {
+            nodes {
+                name
+                slug
+            }
+        } 
+    }
+`
 
 
 export const GET_CATEGORY_SLUGS = gql`
     query productCategories {
-        productCategories {
+        productCategories(first: 100) {
             nodes {
+                name
                 slug
             }
         }

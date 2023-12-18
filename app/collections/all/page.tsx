@@ -1,11 +1,39 @@
-'use client'
 import SectionSliderCollections from "components/SectionSliderLargeProduct";
 import SectionPromo1 from "components/SectionPromo1";
 import ProductCard from "components/ProductCard";
 import { PRODUCTS } from "@/data/data";
 import SidebarFilters from "containers/SidebarFilters";
+import {getClient} from "@/lib/apollo-ssr";
+import {GET_ALL_PRODUCTS, GET_CATEGORY} from "@/lib/graphql/products";
+import {notFound} from "next/navigation";
+import {Product} from "@/lib/graphql/types/graphql";
+import Image from "next/image";
 
-const Page = () => {
+
+async function getData() {
+    const {data} = await getClient().query(
+        {
+            query: GET_ALL_PRODUCTS,
+        }
+    );
+
+
+    if (!data.products) {
+        return []
+    }
+
+    return {
+        products: data.products.edges,
+        productCategories: data.productCategories.nodes,
+    }
+}
+
+const Page = async () => {
+
+    const { products, productCategories } = await getData()
+
+    console.log(products, productCategories);
+
     return (
         <div
             className={`nc-PageCollection2 `}
@@ -17,7 +45,7 @@ const Page = () => {
                     {/* HEADING */}
                     <div className="max-w-screen-sm">
                         <h2 className="block text-2xl sm:text-3xl lg:text-4xl font-semibold">
-                            Man collection
+                            All Collections
                         </h2>
                         <span className="block mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
               We not only help you design exceptional products, but also make it
@@ -30,13 +58,23 @@ const Page = () => {
                         {/* LOOP ITEMS */}
                         <div className="flex flex-col lg:flex-row">
                             <div className="lg:w-1/3 xl:w-1/4 pr-4">
-                                <SidebarFilters />
+                                <SidebarFilters
+                                    categories={productCategories}
+                                />
                             </div>
                             <div className="flex-shrink-0 mb-10 lg:mb-0 lg:mx-4 border-t lg:border-t-0"></div>
                             <div className="flex-1 ">
                                 <div className="flex-1 grid sm:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-10 ">
-                                    {PRODUCTS.map((item, index) => (
-                                        <ProductCard data={item} key={index} />
+                                    {products.map((item: {
+                                        node: Product
+                                    }, index: number) => (
+                                        <div key={index}>
+                                            {item.node.name} <br/>
+                                            {/*{JSON.stringify(item.node.image?.mediaItemUrl)} */}
+                                            <br/>
+                                            <Image width={300} height={300} src={item.node.image?.mediaItemUrl || ''}
+                                                   alt={item.node.name || ''}/>
+                                        </div>
                                     ))}
                                 </div>
                             </div>
@@ -47,11 +85,11 @@ const Page = () => {
                 {/* === SECTION 5 === */}
                 <hr className="border-slate-200 dark:border-slate-700" />
 
-                <SectionSliderCollections />
+                {/*<SectionSliderCollections />*/}
                 <hr className="border-slate-200 dark:border-slate-700" />
 
                 {/* SUBCRIBES */}
-                <SectionPromo1 />
+                {/*<SectionPromo1 />*/}
             </div>
         </div>
     )
