@@ -1,0 +1,56 @@
+import {gql} from '@apollo/client';
+
+
+export const GET_PRODUCT_SLUGS = gql`
+    query productSlugs {
+        products {
+            nodes {
+                slug
+            }
+        }
+    }
+`;
+
+
+export const GET_PRODUCT = gql`
+    query GetProduct($productId: ID!, $categoryId: ID!) {
+        product(id: $productId, idType: SLUG) {
+            name
+            slug
+            databaseId
+            image {
+                link
+            }
+        }
+        productCategory(id: $categoryId, idType: SLUG) {
+            slug
+            databaseId
+        }
+    }
+`;
+
+
+
+export const GET_CATEGORY_SLUGS = gql`
+    query productCategories {
+        productCategories {
+            nodes {
+                slug
+            }
+        }
+    }
+`;
+
+export const GET_CATEGORY = gql`
+    query GetProductCategory($categoryId: ID!) {
+        productCategory(id: $categoryId, idType: SLUG) {
+            description
+            name
+            slug
+            databaseId
+            image {
+                link
+            }
+        }
+    }
+`;

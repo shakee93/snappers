@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "codegen": "graphql-codegen --config codegen.ts"
   },
   "dependencies": {
     "@glidejs/glide": "^3.6.0",
@@ -39,7 +40,10 @@
     "react-router-dom": "^6.9.0",
     "react-use": "^17.4.2",
     "sharp": "^0.33.0",
-    "web-vitals": "^3.1.0"
+    "web-vitals": "^3.1.0",
+    "@apollo/client": "^3.8.0-rc.2",
+    "@apollo/experimental-nextjs-app-support": "^0.5.2",
+    "html-react-parser": "^5.0.7"
   },
   "devDependencies": {
     "@types/node": "^20",
@@ -53,6 +57,9 @@
     "postcss": "^8",
     "sass": "^1.69.5",
     "tailwindcss": "^3.3.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "@graphql-codegen/cli": "5.0.0",
+    "@graphql-codegen/client-preset": "4.1.0",
+    "@graphql-codegen/introspection": "4.0.0"
   }
 }
