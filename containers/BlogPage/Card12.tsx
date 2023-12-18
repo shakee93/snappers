@@ -3,7 +3,7 @@ import NcImage from "shared/NcImage/NcImage";
 import { Link } from "react-router-dom";
 import SocialsShare from "shared/SocialsShare/SocialsShare";
 import { imgHigtQualitys, _getTitleRd } from "contains/fakeData";
-import PostCardMeta from "@/app/components/PostCardMeta/PostCardMeta";
+import PostCardMeta from "@/components/PostCardMeta/PostCardMeta";
 
 export interface Card12Props {
   className?: string;

@@ -2,7 +2,7 @@ import { avatarColors } from "@/contains/contants";
 import React, { FC } from "react";
 
 import { avatarImgs } from "@/contains/fakeData";
-import VerifyIcon from "@/app/components/VerifyIcon";
+import VerifyIcon from "@/components/VerifyIcon";
 
 export interface AvatarProps {
   containerClassName?: string;

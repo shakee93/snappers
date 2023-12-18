@@ -3,21 +3,21 @@ import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import LikeButton from "@/app/components/LikeButton";
 import { StarIcon } from "@heroicons/react/24/solid";
 import BagIcon from "@/app/components/BagIcon";
-import NcInputNumber from "@/app/components/NcInputNumber";
+import NcInputNumber from "@/components/NcInputNumber";
 import { PRODUCTS } from "@/data/data";
 import {
   NoSymbolIcon,
   ClockIcon,
   SparklesIcon,
 } from "@heroicons/react/24/outline";
-import IconDiscount from "@/app/components/IconDiscount";
+import IconDiscount from "@/components/IconDiscount";
 import Prices from "@/app/components/Prices";
 import toast from "react-hot-toast";
 import detail1JPG from "@/public/images/products/detail1.jpg";
 import detail2JPG from "@/public/images/products/detail2.jpg";
 import detail3JPG from "@/public/images/products/detail3.jpg";
 import NotifyAddTocart from "./NotifyAddTocart";
-import AccordionInfo from "@/app/containers/ProductDetailPage/AccordionInfo";
+import AccordionInfo from "@/containers/ProductDetailPage/AccordionInfo";
 import Link from 'next/link';
 
 export interface ProductQuickViewProps {
