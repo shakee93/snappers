@@ -3,7 +3,7 @@ import NcInputNumber from "components/NcInputNumber";
 import Prices from "components/Prices";
 import { Product, PRODUCTS } from "data/data";
 import { Helmet } from "react-helmet-async";
-import { Link } from "react-router-dom";
+
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 
 const CartPage = () => {
@@ -39,7 +39,7 @@ const CartPage = () => {
             alt={name}
             className="h-full w-full object-contain object-center"
           />
-          <Link to="/product-detail" className="absolute inset-0"></Link>
+          <Link href="/product-detail" className="absolute inset-0"></Link>
         </div>
 
         <div className="ml-3 sm:ml-6 flex flex-1 flex-col">
@@ -47,7 +47,7 @@ const CartPage = () => {
             <div className="flex justify-between ">
               <div className="flex-[1.5] ">
                 <h3 className="text-base font-semibold">
-                  <Link to="/product-detail">{name}</Link>
+                  <Link href="/product-detail">{name}</Link>
                 </h3>
                 <div className="mt-1.5 sm:mt-2.5 flex text-sm text-slate-600 dark:text-slate-300">
                   <div className="flex items-center space-x-1.5">
@@ -192,11 +192,11 @@ const CartPage = () => {
             Shopping Cart
           </h2>
           <div className="block mt-3 sm:mt-5 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-400">
-            <Link to={"/#"} className="">
+            <Link href={"/#"} className="">
               Homepage
             </Link>
             <span className="text-xs mx-1 sm:mx-1.5">/</span>
-            <Link to={"/#"} className="">
+            <Link href={"/#"} className="">
               Clothing Categories
             </Link>
             <span className="text-xs mx-1 sm:mx-1.5">/</span>

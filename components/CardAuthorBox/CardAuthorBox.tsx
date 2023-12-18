@@ -5,6 +5,7 @@ import React, { FC } from "react";
 
 import Avatar from "shared/Avatar/Avatar";
 import Badge from "shared/Badge/Badge";
+import Link from "next/link";
 
 export interface CardAuthorBoxProps {
   className?: string;

@@ -10,7 +10,7 @@ import 'react-inner-image-zoom/lib/InnerImageZoom/styles.css';
 import InnerImageZoom from 'react-inner-image-zoom';
 import Link from "next/link";
 
-export default function singleProduct() {
+export default function SingleProduct() {
   const images = [
     {
       original:
@@ -41,10 +41,6 @@ export default function singleProduct() {
   const handleThumbnailClick = (newImageSrc: string) => {
     setSelectedImage({ original: newImageSrc, thumbnail: newImageSrc });
   };
-
-  useEffect(() => {
-
-  }, []);
 
   return (
     <main className="container  m-auto">

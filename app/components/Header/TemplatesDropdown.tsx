@@ -2,9 +2,9 @@ import { Popover, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import { Fragment } from "react";
 import { MEGAMENU_TEMPLATES } from "@/data/navigation";
-import CardCategory3 from "../CardCategories/CardCategory3";
 import  NavLink  from "next/link";
 import { NavItemType } from "@/public/shared/Navigation/NavigationItem";
+import CardCategory3 from "@/components/CardCategories/CardCategory3";
 
 export default function TemplatesDropdown() {
   const renderMegaMenuNavlink = (item: NavItemType) => {

@@ -3,6 +3,7 @@ import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
 import rightImg from "@/public/images/about-hero-right.png";
 import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import Image from "next/image";
 
 export interface SectionHeroProps {
   className?: string;
@@ -65,7 +66,7 @@ const SectionHero: FC<SectionHeroProps> = ({
           </div>
         </div>
         <div className="flex-grow">
-          <img className="w-full" src={rightImg} alt="" />
+          <Image className="w-full" src={rightImg} alt="" />
         </div>
       </div>
     </div>

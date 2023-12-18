@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { usePathname, useSearchParams } from 'next/navigation'
 import ButtonClose from "@/shared/ButtonClose/ButtonClose";
 import ProductQuickView from "./ProductQuickView";
-import ProductQuickView2 from "./ProductQuickView2";
+import ProductQuickView2 from "@/components/ProductQuickView2";
 
 export interface ModalQuickViewProps {
   show: boolean;

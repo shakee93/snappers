@@ -5,7 +5,7 @@ import googleSvg from "@/app/public/images/Google.svg";
 import { Helmet } from "react-helmet-async";
 import Input from "shared/Input/Input";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
-import { Link } from "react-router-dom";
+
 
 export interface PageSignUpProps {
   className?: string;

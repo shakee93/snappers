@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+
 import Avatar from "shared/Avatar/Avatar";
 import Badge from "shared/Badge/Badge";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
@@ -11,6 +11,7 @@ import Textarea from "shared/Textarea/Textarea";
 import { Helmet } from "react-helmet-async";
 import { _getImgRd, _getPersonNameRd, _getTitleRd } from "contains/fakeData";
 import Tag from "shared/Tag/Tag";
+import Link from "next/link";
 
 const BlogSingle = () => {
   const renderHeader = () => {
@@ -252,7 +253,7 @@ const BlogSingle = () => {
         key={index}
         className="relative aspect-w-3 aspect-h-4 rounded-3xl overflow-hidden group"
       >
-        <Link to={"/blog-single"} />
+        <Link href={"/blog-single"} />
         <NcImage
           className="object-cover w-full h-full transform group-hover:scale-105 transition-transform duration-300"
           src={_getImgRd()}
@@ -274,7 +275,7 @@ const BlogSingle = () => {
             <span className="font-normal truncate">May 20, 2021</span>
           </div>
         </div>
-        <Link to={"/blog-single"} />
+        <Link href={"/blog-single"} />
       </div>
     );
   };

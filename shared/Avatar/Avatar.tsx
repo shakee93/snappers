@@ -3,12 +3,13 @@ import React, { FC } from "react";
 
 import { avatarImgs } from "@/contains/fakeData";
 import VerifyIcon from "@/components/VerifyIcon";
+import {StaticImageData} from "next/image";
 
 export interface AvatarProps {
   containerClassName?: string;
   sizeClass?: string;
   radius?: string;
-  imgUrl?: string;
+  imgUrl?: StaticImageData | string;
   userName?: string;
   hasChecked?: boolean;
   hasCheckedClass?: string;
@@ -40,7 +41,7 @@ const Avatar: FC<AvatarProps> = ({
       {url && (
         <img
           className={`absolute inset-0 w-full h-full object-cover ${radius}`}
-          src={url.src}
+          src={url?.src ? url.src : url}
           alt={name}
         />
       )}

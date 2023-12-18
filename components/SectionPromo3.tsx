@@ -25,7 +25,7 @@ const SectionPromo3: FC<SectionPromo3Props> = ({ className = "lg:pt-10" }) => {
 
         <div className="lg:w-[50%] max-w-lg relative">
           <h2 className="font-semibold text-4xl md:text-5xl">
-            Don't miss out on special offers
+            Don&apos;t miss out on special offers
           </h2>
           <span className="block mt-5 text-neutral-500 dark:text-neutral-400">
             Register to receive news about the latest, savings combos, discount

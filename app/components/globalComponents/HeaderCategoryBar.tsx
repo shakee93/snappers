@@ -143,14 +143,14 @@ const HeaderCategoryBar = () => {
 
 
   const [brandHover, setBrandHover] = useState<{ [key: number]: boolean }>({});
-  const menuRef = useRef(null);
+  const menuRef = useRef<any>(null);
 
   useEffect(() => {
-    const handleMouseEnter = (itemId) => {
+    const handleMouseEnter = (itemId: number) => {
       setBrandHover({ ...brandHover, [itemId]: true });
     };
 
-    const handleMouseLeave = (itemId) => {
+    const handleMouseLeave = (itemId: number) => {
       setBrandHover({ ...brandHover, [itemId]: false });
     };
 

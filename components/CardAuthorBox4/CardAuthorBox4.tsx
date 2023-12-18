@@ -6,6 +6,7 @@ import { nftsAbstracts, personNames } from "contains/fakeData";
 import VerifyIcon from "components/VerifyIcon";
 import FollowButton from "components/FollowButton";
 import Badge from "shared/Badge/Badge";
+import Link from "next/link";
 
 export interface CardAuthorBox4Props {
   className?: string;

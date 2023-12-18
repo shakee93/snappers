@@ -19,7 +19,7 @@ const HeaderFilterSection: FC<HeaderFilterSectionProps> = ({
 
   return (
     <div className={`flex flex-col relative ${className}`}>
-      <Heading>What's trending now</Heading>
+      <Heading>What&apos;s trending now</Heading>
       <div className="flex flex-col lg:flex-row lg:items-center justify-between space-y-6 lg:space-y-0 lg:space-x-2 ">
         <Nav
           className="sm:space-x-2"

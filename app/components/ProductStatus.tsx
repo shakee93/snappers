@@ -5,7 +5,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { Product } from "@/data/data";
 import React, { FC } from "react";
-import IconDiscount from "./IconDiscount";
+import IconDiscount from "@/components/IconDiscount";
 
 interface Props {
   status: Product["status"];

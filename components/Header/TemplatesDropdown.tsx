@@ -3,23 +3,21 @@ import { ChevronDownIcon } from "@heroicons/react/24/solid";
 import { Fragment } from "react";
 import { MEGAMENU_TEMPLATES } from "data/navigation";
 import CardCategory3 from "components/CardCategories/CardCategory3";
-import { NavLink } from "react-router-dom";
 import { NavItemType } from "shared/Navigation/NavigationItem";
+import Link from "next/link";
 
 export default function TemplatesDropdown() {
   const renderMegaMenuNavlink = (item: NavItemType) => {
     return (
       <li key={item.id} className={`${item.isNew ? "menuIsNew" : ""}`}>
-        <NavLink
+        <Link
           target={item.targetBlank ? "_blank" : undefined}
           rel="noopener noreferrer"
           className="font-normal text-slate-600 hover:text-black dark:text-slate-400 dark:hover:text-white"
-          href={{
-            pathname: item.href || undefined,
-          }}
+          href={''}
         >
           {item.name}
-        </NavLink>
+        </Link>
       </li>
     );
   };

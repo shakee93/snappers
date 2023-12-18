@@ -4,6 +4,7 @@ import { Fragment } from "react";
 
 import Avatar from "shared/Avatar/Avatar";
 import SwitchDarkMode2 from "shared/SwitchDarkMode/SwitchDarkMode2";
+import Link from "next/link";
 
 export default function AvatarDropdown() {
   return (

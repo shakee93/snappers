@@ -5,6 +5,7 @@ import NcImage from "shared/NcImage/NcImage";
 import { nftsAbstracts, personNames } from "contains/fakeData";
 import VerifyIcon from "components/VerifyIcon";
 import FollowButton from "components/FollowButton";
+import Link from "next/link";
 
 export interface CardAuthorBox3Props {
   className?: string;

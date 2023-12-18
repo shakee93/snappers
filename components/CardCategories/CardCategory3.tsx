@@ -3,10 +3,11 @@ import NcImage from "shared/NcImage/NcImage";
 import Link from "next/link"
 import ButtonSecondary from "shared/Button/ButtonSecondary";
 import { CATS_DISCOVER } from "components/DiscoverMoreSlider";
+import {StaticImageData} from "next/image";
 
 export interface CardCategory3Props {
   className?: string;
-  featuredImage?: string;
+  featuredImage?: string | StaticImageData;
   name?: string;
   desc?: string;
   color?: string;

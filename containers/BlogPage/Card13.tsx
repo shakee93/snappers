@@ -1,8 +1,9 @@
 import React, { FC } from "react";
 import NcImage from "shared/NcImage/NcImage";
-import { Link } from "react-router-dom";
+
 import { _getImgRd, _getTitleRd } from "contains/fakeData";
 import PostCardMeta from "@/components/PostCardMeta/PostCardMeta";
+import Link from "next/link";
 
 export interface Card13Props {
   className?: string;
@@ -14,7 +15,7 @@ const Card13: FC<Card13Props> = ({ className = "" }) => {
       <div className="flex flex-col h-full py-2">
         <h2 className={`nc-card-title block font-semibold text-base`}>
           <Link
-            to={"/blog-single"}
+            href={"/blog-single"}
             className="line-clamp-2 capitalize"
             title={"title"}
           >
@@ -36,7 +37,7 @@ const Card13: FC<Card13Props> = ({ className = "" }) => {
       </div>
 
       <Link
-        to={"/blog-single"}
+        href={"/blog-single"}
         className={`block relative h-full flex-shrink-0 w-2/5 sm:w-1/3 ml-3 sm:ml-5`}
       >
         <NcImage

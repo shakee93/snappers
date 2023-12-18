@@ -1,9 +1,10 @@
 import React, { FC } from "react";
 import NcImage from "shared/NcImage/NcImage";
-import { Link } from "react-router-dom";
+
 import SocialsShare from "shared/SocialsShare/SocialsShare";
 import { imgHigtQualitys, _getTitleRd } from "contains/fakeData";
 import PostCardMeta from "@/components/PostCardMeta/PostCardMeta";
+import Link from "next/link";
 
 export interface Card12Props {
   className?: string;
@@ -16,7 +17,7 @@ const Card12: FC<Card12Props> = ({ className = "h-full" }) => {
       data-nc-id="Card12"
     >
       <Link
-        to={"/blog-single"}
+        href={"/blog-single"}
         className="block flex-shrink-0 flex-grow relative w-full h-0 aspect-w-4 aspect-h-3 rounded-3xl overflow-hidden"
       >
         <NcImage
@@ -33,7 +34,7 @@ const Card12: FC<Card12Props> = ({ className = "h-full" }) => {
           className={`nc-card-title block font-semibold text-neutral-900 dark:text-neutral-100 transition-colors text-lg sm:text-2xl`}
         >
           <Link
-            to={"/blog-single"}
+            href={"/blog-single"}
             className="line-clamp-2 capitalize"
             title={"title"}
           >

@@ -1,8 +1,9 @@
 import PostCardMeta from "components/PostCardMeta/PostCardMeta";
 import { _getImgRd, _getTitleRd } from "contains/fakeData";
 import React, { FC } from "react";
-import { Link } from "react-router-dom";
+
 import NcImage from "shared/NcImage/NcImage";
+import Link from "next/link";
 
 export interface Card3SmallProps {
   className?: string;
@@ -15,7 +16,7 @@ const Card3Small: FC<Card3SmallProps> = ({ className = "h-full" }) => {
       data-nc-id="Card3Small"
     >
       <Link
-        to={"/blog-single"}
+        href={"/blog-single"}
         className=" absolute inset-0"
         title={"title"}
       ></Link>
@@ -23,7 +24,7 @@ const Card3Small: FC<Card3SmallProps> = ({ className = "h-full" }) => {
         <PostCardMeta />
         <h2 className="nc-card-title block text-base font-semibold text-neutral-900 dark:text-neutral-100">
           <Link
-            to={"/blog-single"}
+            href={"/blog-single"}
             className=" line-clamp-2 capitalize"
             title={"title"}
           >

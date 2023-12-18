@@ -1,6 +1,6 @@
-import HeaderTopBar from "./HeaderTopBar";
-import HeaderNavigationBar from "./HeaderNavigationBar";
-import HeaderCategoryBar from "./HeaderCategoryBar";
+import HeaderTopBar from "@/app/components/globalComponents/HeaderTopBar";
+import HeaderNavigationBar from "@/app/components/globalComponents/HeaderNavigationBar";
+import HeaderCategoryBar from "@/app/components/globalComponents/HeaderCategoryBar";
 
 const Header = () => {
   const iconSize = 13;

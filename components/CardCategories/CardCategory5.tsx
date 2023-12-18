@@ -2,6 +2,7 @@ import React, { FC } from "react";
 import NcImage from "shared/NcImage/NcImage";
 
 import images1 from "@/public/images/nfts/cat1.webp";
+import Link from "next/link";
 
 export interface CardCategory5Props {
   className?: string;

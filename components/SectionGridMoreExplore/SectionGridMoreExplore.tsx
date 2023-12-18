@@ -24,12 +24,13 @@ import explore7Png from "@/public/images/collections/explore7.png";
 import explore8Png from "@/public/images/collections/explore8.png";
 import explore9Png from "@/public/images/collections/explore9.png";
 import CardCategory6 from "components/CardCategories/CardCategory6";
+import {StaticImageData} from "next/image";
 
 interface ExploreType {
   id: number;
   name: string;
   desc: string;
-  image: string;
+  image: string | StaticImageData;
   svgBg: string;
   color?: string;
 }

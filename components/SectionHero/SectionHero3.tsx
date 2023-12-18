@@ -2,6 +2,7 @@ import React, { FC } from "react";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import backgroundLineSvg from "@/public/images/Moon.svg";
 import imageRightPng2 from "@/public/images/hero-2-right-1.png";
+import Image from "next/image";
 
 export interface SectionHero3Props {
   className?: string;
@@ -35,7 +36,7 @@ const SectionHero3: FC<SectionHero3Props> = ({ className = "" }) => {
       <div className="relative z-[1] lg:aspect-w-16 lg:aspect-h-8 2xl:aspect-h-7">
         <div className=" ">
           <div className="mt-5 lg:mt-0 lg:absolute right-0 bottom-0 top-0 w-full max-w-xl lg:max-w-2xl xl:max-w-3xl 2xl:max-w-4xl ml-auto">
-            <img
+            <Image
               className="w-full sm:h-full object-contain object-right-bottom "
               src={imageRightPng2}
               alt=""

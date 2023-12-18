@@ -3,10 +3,11 @@ import NcImage from "shared/NcImage/NcImage";
 import Link from "next/link"
 import explore1Svg from "@/public/images/collections/explore1.svg";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
+import {StaticImageData} from "next/image";
 
 export interface CardCategory4Props {
   className?: string;
-  featuredImage?: string;
+  featuredImage?: string | StaticImageData;
   bgSVG?: string;
   name: string;
   desc: string;

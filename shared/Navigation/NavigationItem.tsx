@@ -8,7 +8,7 @@ import { LocationStates } from "@routers/types";
 export interface NavItemType {
   id: string;
   name: string;
-  href: keyof LocationStates;
+  href: keyof LocationStates | string;
   targetBlank?: boolean;
   children?: NavItemType[];
   type?: "dropdown" | "megaMenu" | "none";

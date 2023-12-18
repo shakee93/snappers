@@ -4,7 +4,7 @@ import twitterSvg from "@/app/public/images/Twitter.svg";
 import googleSvg from "@/app/public/images/Google.svg";
 import { Helmet } from "react-helmet-async";
 import Input from "shared/Input/Input";
-import { Link } from "react-router-dom";
+
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 
 export interface PageLoginProps {
@@ -80,7 +80,7 @@ const PageLogin: FC<PageLoginProps> = ({ className = "" }) => {
             <label className="block">
               <span className="flex justify-between items-center text-neutral-800 dark:text-neutral-200">
                 Password
-                <Link to="/forgot-pass" className="text-sm text-green-600">
+                <Link href="/forgot-pass" className="text-sm text-green-600">
                   Forgot password?
                 </Link>
               </span>
