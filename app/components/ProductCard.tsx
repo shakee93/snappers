@@ -13,6 +13,7 @@ import { Transition } from "@headlessui/react";
 import ModalQuickView from "./ModalQuickView";
 import ProductStatus from "./ProductStatus";
 import Image from "next/image";
+import { useState, useRef, useEffect } from "react";
 
 export interface ProductCardProps {
   className?: string;
@@ -217,13 +218,7 @@ const ProductCard: FC<ProductCardProps> = ({
 
   return (
     <>
-      <div
-<<<<<<< HEAD
-        className={`nc-ProductCard relative flex flex-col bg-white  ${className}`}
-=======
-        className={`nc-ProductCard relative flex flex-col  ${className}`}
->>>>>>> ca1a1541130c264518a673022a3ff3e1220a50b4
-        data-nc-id="ProductCard"
+      <div className={`nc-ProductCard relative flex flex-col bg-white  ${className}`} data-nc-id="ProductCard"
       >
         <Link href={"/product-detail"} className=""></Link>
 
