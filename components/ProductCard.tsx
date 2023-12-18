@@ -69,7 +69,7 @@ const ProductCard: FC<ProductCardProps> = ({
     return (
       <div className="flex ">
         <div className="h-24 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
-          <Image
+          <Image fill style={{ objectFit: 'cover' }}
               fill
             src={image}
             alt={name}
@@ -177,7 +177,7 @@ const ProductCard: FC<ProductCardProps> = ({
             title={variant.name}
           >
             <div className="absolute inset-0.5 rounded-full overflow-hidden z-0">
-              <Image
+              <Image fill style={{ objectFit: 'cover' }}
                   fill
                 src={variant.thumbnail || ''}
                 alt="variant"

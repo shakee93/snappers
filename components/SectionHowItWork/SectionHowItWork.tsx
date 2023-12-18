@@ -54,7 +54,7 @@ const SectionHowItWork: FC<SectionHowItWorkProps> = ({
       data-nc-id="SectionHowItWork"
     >
       <div className="relative grid sm:grid-cols-2 lg:grid-cols-4 gap-10 sm:gap-16 xl:gap-20">
-        <Image
+        <Image fill style={{ objectFit: 'cover' }}
           className="hidden md:block absolute inset-x-0 top-5"
           src={VectorImg}
           alt="vector"

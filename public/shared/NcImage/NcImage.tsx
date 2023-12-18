@@ -40,7 +40,7 @@
 //       return true;
 //     }
   
-//     const img =<Image src={src} alt={alt} className={className} {...props} />;
+//     const img =<Image fill style={{ objectFit: 'cover' }} src={src} alt={alt} className={className} {...props} />;
   
 //     // If you need to handle the load event, you can do so here
 //     const imgElement = React.createElement(img.type, img.props);
@@ -81,7 +81,7 @@
 //       ref={_containerRef}
 //     >
 //       {__src && imageLoaded ? (
-//        <Image src={__src} className={className} alt={alt} {...props} />
+//        <Image fill style={{ objectFit: 'cover' }} src={__src} className={className} alt={alt} {...props} />
 //       ) : (
 //         renderLoadingPlaceholder()
 //       )}
@@ -174,7 +174,7 @@ const NcImage: FC<NcImageProps> = ({
       ref={_containerRef}
     >
       {__src && imageLoaded ? (
-        <Image src={__src} className={className} alt={alt} {...args} />
+        <Image fill style={{ objectFit: 'cover' }} src={__src} className={className} alt={alt} {...args} />
       ) : (
         renderLoadingPlaceholder()
       )}

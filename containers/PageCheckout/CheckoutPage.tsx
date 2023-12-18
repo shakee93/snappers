@@ -31,7 +31,7 @@ const CheckoutPage = () => {
     return (
       <div key={index} className="relative flex py-7 first:pt-0 last:pb-0">
         <div className="relative h-36 w-24 sm:w-28 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
-          <Image
+          <Image fill style={{ objectFit: 'cover' }}
             src={image}
             alt={name}
             className="h-full w-full object-contain object-center"

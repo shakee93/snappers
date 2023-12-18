@@ -15,7 +15,7 @@ const SectionPromo2: FC<SectionPromo2Props> = ({ className = "lg:pt-10" }) => {
     <div className={`nc-SectionPromo2 ${className}`}>
       <div className="relative flex flex-col lg:flex-row lg:justify-end bg-yellow-50 dark:bg-slate-800 rounded-2xl sm:rounded-[40px] p-4 pb-0 sm:p-5 sm:pb-0 lg:p-24">
         <div className="absolute inset-0">
-          <Image
+          <Image fill style={{ objectFit: 'cover' }}
             className="absolute w-full h-full object-contain dark:opacity-5"
             src={backgroundLineSvg}
             alt="backgroundLineSvg"

@@ -10,7 +10,7 @@ const AccountOrder = () => {
     return (
       <div key={index} className="flex py-4 sm:py-7 last:pb-0 first:pt-0">
         <div className="h-24 w-16 sm:w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
-          <Image
+          <Image fill style={{ objectFit: 'cover' }}
             src={image}
             alt={name}
             className="h-full w-full object-cover object-center"

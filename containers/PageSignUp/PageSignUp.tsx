@@ -49,7 +49,7 @@ const PageSignUp: FC<PageSignUpProps> = ({ className = "" }) => {
                 href={item.href}
                 className=" flex w-full rounded-lg bg-primary-50 dark:bg-neutral-800 px-4 py-3 transform transition-transform sm:px-6 hover:translate-y-[-2px]"
               >
-                <Image
+                <Image fill style={{ objectFit: 'cover' }}
                   className="flex-shrink-0"
                   src={item.icon}
                   alt={item.name}

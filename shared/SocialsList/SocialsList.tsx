@@ -38,7 +38,7 @@ const SocialsList: FC<SocialsListProps> = ({
           rel="noopener noreferrer"
           title={item.name}
         >
-         <Image src={item.icon} alt="" />
+         <Image fill style={{ objectFit: 'cover' }} src={item.icon} alt="" />
         </a>
       ))}
     </nav>

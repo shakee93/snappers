@@ -82,7 +82,7 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({ className = "" }) => {
               }`}
             >
               <div className="absolute inset-0.5 rounded-full overflow-hidden z-0">
-                <Image
+                <Image fill style={{ objectFit: 'cover' }}
                   src={variant.thumbnail || ''}
                   alt=""
                   className="absolute w-full h-full object-cover"
@@ -361,7 +361,7 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({ className = "" }) => {
             {/* HEADING */}
             <div className="relative">
               <div className="aspect-w-16 aspect-h-16">
-               <Image
+               <Image fill style={{ objectFit: 'cover' }}
                   src={LIST_IMAGES_DEMO[0]}
                   className="w-full rounded-2xl object-cover"
                   alt="product detail 1"
@@ -378,7 +378,7 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({ className = "" }) => {
                     key={index}
                     className="aspect-w-11 xl:aspect-w-10 2xl:aspect-w-11 aspect-h-16"
                   >
-                   <Image
+                   <Image fill style={{ objectFit: 'cover' }}
                       src={item}
                       className="w-full rounded-2xl object-cover"
                       alt="product detail 1"

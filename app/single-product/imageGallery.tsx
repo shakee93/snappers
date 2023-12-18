@@ -13,7 +13,7 @@ interface ImageGalleryProps {
     };
 }
 
-const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onThumbnailClick, selectedImage }) => {
+const ImageGallery: React.FC<Image fill style={{ objectFit: 'cover' }}GalleryProps> = ({ images, onThumbnailClick, selectedImage }) => {
     const [startIndex, setStartIndex] = useState(0);
 
     const handleNextClick = () => {

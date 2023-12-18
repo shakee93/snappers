@@ -52,7 +52,7 @@ const Page = async ({ params }: any) => {
         <ul>
             <li>{product.name}</li>
             <li>
-                <Image src={product.image?.link || ''} alt={product.name || ''}/>
+                <Image fill style={{ objectFit: 'cover' }} src={product.image?.link || ''} alt={product.name || ''}/>
             </li>
         </ul>
     </div>

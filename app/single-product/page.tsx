@@ -50,7 +50,7 @@ export default function SingleProduct() {
       <div className="flex flex-col md:flex-row p-3 rounded-3xl mt-5 md:mt-6 md:p-10 bg-white">
         <div className="w-full md:w-2/5 p-2 flex gap-2">
           <div className="w-full md:w-1/5  ">
-           <ImageGallery
+           <Image fill style={{ objectFit: 'cover' }}Gallery
               images={images}
               onThumbnailClick={handleThumbnailClick}
               selectedImage={selectedImage}

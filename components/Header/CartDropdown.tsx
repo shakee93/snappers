@@ -14,7 +14,7 @@ export default function CartDropdown() {
     return (
       <div key={index} className="flex py-5 last:pb-0">
         <div className="relative h-24 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
-          <Image
+          <Image fill style={{ objectFit: 'cover' }}
             src={image}
             alt={name}
             className="h-full w-full object-contain object-center"

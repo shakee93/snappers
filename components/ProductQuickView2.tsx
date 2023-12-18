@@ -75,7 +75,7 @@ const ProductQuickView2: FC<ProductQuickView2Props> = ({ className = "" }) => {
               }`}
             >
               <div className="absolute inset-0.5 rounded-full overflow-hidden z-0">
-               <Image
+               <Image fill style={{ objectFit: 'cover' }}
                   src={variant.thumbnail || ''}
                   alt=""
                   className="absolute w-full h-full object-cover"
@@ -271,7 +271,7 @@ const ProductQuickView2: FC<ProductQuickView2Props> = ({ className = "" }) => {
           {/* HEADING */}
           <div className="relative">
             <div className="aspect-w-1 aspect-h-1">
-             <Image
+             <Image fill style={{ objectFit: 'cover' }}
                 src={LIST_IMAGES_DEMO[0]}
                 className="w-full rounded-xl object-cover"
                 alt="product detail 1"

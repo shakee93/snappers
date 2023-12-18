@@ -33,7 +33,7 @@ const SectionHero: FC<SectionHeroProps> = ({
           {!!btnText && <ButtonPrimary href="/login">{btnText}</ButtonPrimary>}
         </div>
         <div className="flex-grow">
-         <Image className="w-full" src={rightImg} alt="" />
+         <Image fill style={{ objectFit: 'cover' }} className="w-full" src={rightImg} alt="" />
         </div>
       </div>
     </div>

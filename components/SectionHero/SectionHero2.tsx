@@ -155,7 +155,7 @@ const SectionHero2: FC<SectionHero2Props> = ({ className = "" }) => {
         {/* BG */}
         <div className="absolute inset-0 bg-[#E3FFE6]">
           {/* <div className="absolute inset-0 bg-[#F7F0EA]"> */}
-          <Image
+          <Image fill style={{ objectFit: 'cover' }}
             className="absolute w-full h-full object-contain"
             src={backgroundLineSvg}
             alt="hero"
@@ -202,7 +202,7 @@ const SectionHero2: FC<SectionHero2Props> = ({ className = "" }) => {
             </ButtonPrimary>
           </div>
           <div className="mt-10 lg:mt-0 lg:absolute right-0 bottom-0 top-0 w-full max-w-2xl xl:max-w-3xl 2xl:max-w-4xl">
-           <Image
+           <Image fill style={{ objectFit: 'cover' }}
               className="w-full h-full object-contain object-right-bottom nc-SectionHero2Item__image"
               src={item.image}
               alt={item.heading}

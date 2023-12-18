@@ -91,7 +91,7 @@ const ProductDetailPage2: FC<ProductDetailPage2Props> = ({
               }`}
             >
               <div className="absolute inset-0.5 rounded-full overflow-hidden z-0">
-                <Image
+                <Image fill style={{ objectFit: 'cover' }}
                   src={variant.thumbnail || ''}
                   alt=""
                   className="absolute w-full h-full object-cover"

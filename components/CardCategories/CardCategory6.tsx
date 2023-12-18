@@ -31,7 +31,7 @@ const CardCategory6: FC<CardCategory6Props> = ({
     >
       <div>
         <div className="absolute bottom-0 right-0 top-0 opacity-10">
-          <Image src={bgSVG} alt="" />
+          <Image fill style={{ objectFit: 'cover' }} src={bgSVG} alt="" />
         </div>
 
         <div className="absolute inset-5 flex flex-col justify-between items-center">
