@@ -219,7 +219,7 @@ export const PRODUCTS: Product[] = [
 export const SPORT_PRODUCTS: Product[] = [
   {
     id: 1,
-    name: "Mastermind Toys",
+    name: "iPhone 14 Pro 512GB Silver 5G With FaceTime - Middle East Version",
     description: "Brown cockroach wings",
     price: 74,
     image: productSport1.src,
@@ -234,7 +234,7 @@ export const SPORT_PRODUCTS: Product[] = [
   },
   {
     id: 2,
-    name: "Jump Rope Kids",
+    name: "iPhone 14 Pro 512GB Silver/gray/black 5G With FaceTime - Middle East Version",
     description: "Classic green",
     price: 68,
     image: productSport2.src,
