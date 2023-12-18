@@ -65,7 +65,7 @@ const SingleProductBlock = () => {
                 key={index}
                 className="w-full flex-shrink-0"
               >
-                <Image
+               <Image
                   src={image}
                   alt="Product"
                   className="object-contain w-full h-72"

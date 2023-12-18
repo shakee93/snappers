@@ -59,28 +59,28 @@ const SectionClientSay: FC<SectionClientSayProps> = ({ className = "" }) => {
   const renderBg = () => {
     return (
       <div className="hidden md:block">
-        <Image className="absolute top-9 -left-20" src={clientSay1} alt="" />
-        <Image
+       <Image className="absolute top-9 -left-20" src={clientSay1} alt="" />
+       <Image
           className="absolute bottom-[100px] right-full mr-40"
           src={clientSay2}
           alt=""
         />
-        <Image
+       <Image
           className="absolute top-full left-[140px]"
           src={clientSay3}
           alt=""
         />
-        <Image
+       <Image
           className="absolute -bottom-10 right-[140px]"
           src={clientSay4}
           alt=""
         />
-        <Image
+       <Image
           className="absolute left-full ml-32 bottom-[80px]"
           src={clientSay5}
           alt=""
         />
-        <Image className="absolute -right-10 top-10 " src={clientSay6} alt="" />
+       <Image className="absolute -right-10 top-10 " src={clientSay6} alt="" />
       </div>
     );
   };
@@ -96,14 +96,14 @@ const SectionClientSay: FC<SectionClientSayProps> = ({ className = "" }) => {
       <div className="relative md:mb-16 max-w-2xl mx-auto">
         {renderBg()}
 
-        <Image className="mx-auto" src={clientSayMain} alt="" />
+       <Image className="mx-auto" src={clientSayMain} alt="" />
         <div className={`mt-12 lg:mt-16 relative ${UNIQUE_CLASS}`}>
-          <Image
+         <Image
             className="opacity-50 md:opacity-100 absolute -mr-16 lg:mr-3 right-full top-1"
             src={quotationImg}
             alt=""
           />
-          <Image
+         <Image
             className="opacity-50 md:opacity-100 absolute -ml-16 lg:ml-3 left-full top-1"
             src={quotationImg2}
             alt=""

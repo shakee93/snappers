@@ -26,6 +26,7 @@ import SectionSliderProductCard from "components/SectionSliderProductCard";
 import ModalViewAllReviews from "./ModalViewAllReviews";
 import NotifyAddTocart from "components/NotifyAddTocart";
 import {StaticImageData} from "next/image";
+import Image from "next/image";
 
 export interface ProductDetailPage2Props {
   className?: string;
@@ -90,8 +91,8 @@ const ProductDetailPage2: FC<ProductDetailPage2Props> = ({
               }`}
             >
               <div className="absolute inset-0.5 rounded-full overflow-hidden z-0">
-                <img
-                  src={variant.thumbnail}
+                <Image
+                  src={variant.thumbnail || ''}
                   alt=""
                   className="absolute w-full h-full object-cover"
                 />

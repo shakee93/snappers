@@ -6,6 +6,7 @@ import { Helmet } from "react-helmet-async";
 import Input from "shared/Input/Input";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import Link from "next/link";
+import Image from "next/image";
 
 
 export interface PageSignUpProps {
@@ -48,7 +49,7 @@ const PageSignUp: FC<PageSignUpProps> = ({ className = "" }) => {
                 href={item.href}
                 className=" flex w-full rounded-lg bg-primary-50 dark:bg-neutral-800 px-4 py-3 transform transition-transform sm:px-6 hover:translate-y-[-2px]"
               >
-                <img
+                <Image
                   className="flex-shrink-0"
                   src={item.icon}
                   alt={item.name}

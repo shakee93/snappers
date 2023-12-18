@@ -39,7 +39,7 @@ const Avatar: FC<AvatarProps> = ({
       style={{ backgroundColor: url ? undefined : _setBgColor(name) }}
     >
       {url && (
-        <Image
+       <Image
           className={`absolute inset-0 w-full h-full object-cover ${radius}`}
           src={url}
           alt={name}

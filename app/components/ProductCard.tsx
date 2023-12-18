@@ -68,7 +68,7 @@ const ProductCard: FC<ProductCardProps> = ({
     return (
       <div className="flex ">
         <div className="h-24 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
-          <Image
+         <Image
             src={image}
             alt={name}
             className="h-full w-full object-cover object-center"

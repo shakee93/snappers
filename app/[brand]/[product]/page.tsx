@@ -52,7 +52,7 @@ const Page = async ({ params }: any) => {
         <ul>
             <li>{product.name}</li>
             <li>
-                <img width={100} height={100} src={product.image?.link || ''} alt={product.name || ''}/>
+                <Image src={product.image?.link || ''} alt={product.name || ''}/>
             </li>
         </ul>
     </div>

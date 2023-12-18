@@ -14,6 +14,7 @@ import { Transition } from "@headlessui/react";
 import ModalQuickView from "./ModalQuickView";
 import ProductStatus from "./ProductStatus";
 import Link from "next/link";
+import Image from "next/image";
 
 export interface ProductCardProps {
   className?: string;
@@ -68,7 +69,8 @@ const ProductCard: FC<ProductCardProps> = ({
     return (
       <div className="flex ">
         <div className="h-24 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
-          <img
+          <Image
+              fill
             src={image}
             alt={name}
             className="h-full w-full object-cover object-center"
@@ -175,8 +177,9 @@ const ProductCard: FC<ProductCardProps> = ({
             title={variant.name}
           >
             <div className="absolute inset-0.5 rounded-full overflow-hidden z-0">
-              <img
-                src={variant.thumbnail}
+              <Image
+                  fill
+                src={variant.thumbnail || ''}
                 alt="variant"
                 className="absolute w-full h-full object-cover"
               />

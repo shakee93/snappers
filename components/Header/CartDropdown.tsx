@@ -2,6 +2,7 @@ import { Popover, Transition } from "@headlessui/react";
 import Prices from "components/Prices";
 import { Product, PRODUCTS } from "data/data";
 import { Fragment } from "react";
+import Image from "next/image";
 
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
@@ -13,7 +14,7 @@ export default function CartDropdown() {
     return (
       <div key={index} className="flex py-5 last:pb-0">
         <div className="relative h-24 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
-          <img
+          <Image
             src={image}
             alt={name}
             className="h-full w-full object-contain object-center"

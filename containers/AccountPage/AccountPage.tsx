@@ -29,7 +29,7 @@ const AccountPage: FC<AccountPageProps> = ({ className = "" }) => {
             <div className="flex-shrink-0 flex items-start">
               {/* AVATAR */}
               <div className="relative rounded-full overflow-hidden flex">
-                <Image
+               <Image
                   src={avatarImgs[2]}
                   alt=""
                   className="w-32 h-32 rounded-full object-cover z-0"
