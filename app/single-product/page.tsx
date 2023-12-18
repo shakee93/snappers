@@ -43,7 +43,7 @@ export default function singleProduct() {
   };
 
   useEffect(() => {
-    
+
   }, []);
 
   return (
