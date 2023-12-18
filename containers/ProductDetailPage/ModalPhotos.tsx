@@ -4,9 +4,10 @@ import NextPrev from "shared/NextPrev/NextPrev";
 import ButtonClose from "shared/ButtonClose/ButtonClose";
 import Glide from "@glidejs/glide";
 import NcImage from "shared/NcImage/NcImage";
+import {StaticImageData} from "next/image";
 
 export interface ModalPhotosProps {
-  imgs: string[];
+  imgs: StaticImageData[];
   onClose: () => void;
   isOpen: boolean;
   initFocus?: number;

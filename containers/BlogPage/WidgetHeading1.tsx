@@ -1,5 +1,6 @@
 import { CustomLink } from "data/types";
 import React, { FC } from "react";
+import Link from "next/link";
 
 
 export interface WidgetHeading1Props {
@@ -26,7 +27,7 @@ const WidgetHeading1: FC<WidgetHeading1Props> = ({
           className="flex-shrink-0 block text-primary-700 dark:text-primary-500 font-semibold text-sm"
           target={viewAll.targetBlank ? "_blank" : undefined}
           rel="noopener noreferrer"
-          to={viewAll.href}
+          href={viewAll.href}
         >
           {viewAll.label}
         </Link>

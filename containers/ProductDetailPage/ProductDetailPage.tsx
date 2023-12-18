@@ -24,6 +24,7 @@ import ButtonSecondary from "shared/Button/ButtonSecondary";
 import SectionPromo2 from "components/SectionPromo2";
 import ModalViewAllReviews from "./ModalViewAllReviews";
 import NotifyAddTocart from "components/NotifyAddTocart";
+import Image from "next/image";
 
 export interface ProductDetailPageProps {
   className?: string;
@@ -360,7 +361,7 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({ className = "" }) => {
             {/* HEADING */}
             <div className="relative">
               <div className="aspect-w-16 aspect-h-16">
-                <img
+                <Image
                   src={LIST_IMAGES_DEMO[0]}
                   className="w-full rounded-2xl object-cover"
                   alt="product detail 1"
@@ -377,7 +378,7 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({ className = "" }) => {
                     key={index}
                     className="aspect-w-11 xl:aspect-w-10 2xl:aspect-w-11 aspect-h-16"
                   >
-                    <img
+                    <Image
                       src={item}
                       className="w-full rounded-2xl object-cover"
                       alt="product detail 1"

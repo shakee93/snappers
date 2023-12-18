@@ -10,6 +10,7 @@ import Input from "shared/Input/Input";
 import ContactInfo from "./ContactInfo";
 import PaymentMethod from "./PaymentMethod";
 import ShippingAddress from "./ShippingAddress";
+import Link from "next/link";
 
 const CheckoutPage = () => {
   const [tabActive, setTabActive] = useState<

@@ -5,6 +5,7 @@ import googleSvg from "@/app/public/images/Google.svg";
 import { Helmet } from "react-helmet-async";
 import Input from "shared/Input/Input";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
+import Link from "next/link";
 
 
 export interface PageSignUpProps {
@@ -89,7 +90,7 @@ const PageSignUp: FC<PageSignUpProps> = ({ className = "" }) => {
           {/* ==== */}
           <span className="block text-center text-neutral-700 dark:text-neutral-300">
             Already have an account? {` `}
-            <Link className="text-green-600" to="/login">
+            <Link className="text-green-600" href="/login">
               Sign in
             </Link>
           </span>

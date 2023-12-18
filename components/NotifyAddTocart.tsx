@@ -8,7 +8,7 @@ import Link from "next/link";
 
 interface Props {
   show: boolean;
-  productImage: StaticImageData;
+  productImage: StaticImageData | string;
   variantActive: number;
   sizeSelected: string;
   qualitySelected: number;

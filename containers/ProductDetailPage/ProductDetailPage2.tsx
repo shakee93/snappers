@@ -25,6 +25,7 @@ import { StarIcon } from "@heroicons/react/24/solid";
 import SectionSliderProductCard from "components/SectionSliderProductCard";
 import ModalViewAllReviews from "./ModalViewAllReviews";
 import NotifyAddTocart from "components/NotifyAddTocart";
+import {StaticImageData} from "next/image";
 
 export interface ProductDetailPage2Props {
   className?: string;
@@ -34,7 +35,7 @@ const ProductDetailPage2: FC<ProductDetailPage2Props> = ({
   className = "",
 }) => {
   const { sizes, variants, status, allOfSizes } = PRODUCTS[0];
-  const LIST_IMAGES_DEMO: string[] = [
+  const LIST_IMAGES_DEMO: StaticImageData[] = [
     detail21JPG,
     detail22JPG,
     detail23JPG,

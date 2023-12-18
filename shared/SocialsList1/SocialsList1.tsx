@@ -4,6 +4,7 @@ import facebook from "@/public/images/socials/facebook.svg";
 import twitter from "@/public/images/socials/twitter.svg";
 import telegram from "@/public/images/socials/telegram.svg";
 import youtube from "@/public/images/socials/youtube.svg";
+import Image from "next/image";
 
 export interface SocialsList1Props {
   className?: string;
@@ -25,7 +26,7 @@ const SocialsList1: FC<SocialsList1Props> = ({ className = "space-y-3" }) => {
         key={index}
       >
         <div className="flex-shrink-0 w-5 ">
-          <img src={item.icon.src} alt="" />
+          <Image src={item.icon} alt="" />
         </div>
         <span className="hidden lg:block text-sm">{item.name}</span>
       </a>
