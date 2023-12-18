@@ -1,32 +1,36 @@
 import {getClient} from "@/lib/apollo-ssr";
 import {notFound} from 'next/navigation'
 import {GET_POST, GET_POST_SLUGS} from "@/lib/graphql/posts";
+import {Post, ProductCategory} from "@/lib/graphql/types/graphql";
+import parseHTML from "html-react-parser";
+import {GET_CATEGORY, GET_CATEGORY_SLUGS} from "@/lib/graphql/products";
+import Image from "next/image";
 
 export async function generateStaticParams() {
 
-    const {data: {posts}} = await getClient().query({
-        query: GET_POST_SLUGS
+    const {data: {productCategories}} = await getClient().query({
+        query: GET_CATEGORY_SLUGS
     });
 
-    return posts.nodes.map(p => p.slug);
+    return productCategories.nodes.map((p: ProductCategory) => p.slug);
 }
 
-async function getData(slug) {
+async function getData(slug: string) {
     const {data} = await getClient().query(
         {
-            query: GET_POST,
+            query: GET_CATEGORY,
             variables: {
-                postId: slug
+                categoryId: slug
             }
         }
     );
 
 
-    if (!data.post) {
+    if (!data.productCategory) {
         return undefined
     }
 
-    return data.post
+    return data.productCategory
 }
 
 const Brand = async ({params}: { params: { brand: string} }) => {
@@ -37,7 +41,9 @@ const Brand = async ({params}: { params: { brand: string} }) => {
     }
 
     return <div>
-        {post.content}
+        <div>
+            {parseHTML(post.name)}
+        </div>
     </div>
 }
 
