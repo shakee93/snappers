@@ -240,18 +240,18 @@ const ProductCard: FC<ProductCardProps> = ({
           {sizes ? renderSizeList() : renderGroupButtons()}
         </div>
 
-        <div className="space-y-4 px-2.5 pt-5 pb-2.5">
+        <div className="space-y-2 px-2.5 pt-5 pb-2.5">
           {/* {renderVariants()} */}
 
           <div>
             <h2
-              className={`nc-ProductCard__title text-base text-primaryColor line-clamp-2 min-h-[47px] font-semibold transition-colors`}
+              className={`nc-ProductCard__title  text-sm lg:text-base text-black line-clamp-2 min-h-[40px] lg:min-h-[47px] font-semibold transition-colors`}
             >
               {name}
             </h2>
           </div>
 
-          <div className="flex justify-between ">
+          <div className="flex m-0 mb-2">
             <Prices price={price} />
             <div className="flex items-center mb-0.5">
             </div>

@@ -1,7 +1,7 @@
 import React, { FC, useEffect, useId, useRef } from "react";
 import Heading from "components/Heading/Heading";
 import Glide from "@glidejs/glide";
-import ProductCard from "./ProductCard2";
+import ProductCard from "@/app/components/ProductCard";
 import { Product, PRODUCTS } from "@/data/data";
 
 export interface SectionSliderProductCardProps {
