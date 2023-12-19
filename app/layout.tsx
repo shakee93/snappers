@@ -1,7 +1,6 @@
 "use client";
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import Header from '@/app/components/GlobalComponents/header'
 import MainNav1 from "components/Header/MainNav1";
 import MainNav2 from "components/Header/MainNav2";
 
@@ -12,6 +11,8 @@ import "../styles/index.scss";
 import "./index.css";
 import "../fonts/line-awesome-1.3.0/css/line-awesome.css";
 import "rc-slider/assets/index.css";
+import ApolloWrapper from "@/lib/apollo-client";
+import Header from "@/app/components/globalComponents/header";
 // import reportWebVitals from "./reportWebVitals";
 
 // const inter = Inter({ subsets: ['latin'] })
@@ -27,7 +28,9 @@ export default function RootLayout({
         <Header/>
         {/* <MainNav1 isTop/> */}
         {/* <MainNav2 isTop/> */}
-        {children}
+        <ApolloWrapper>
+          {children}
+        </ApolloWrapper>
         {/* <Footer/> */}
         </body>
     </html>

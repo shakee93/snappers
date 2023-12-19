@@ -10,6 +10,8 @@
     "codegen": "graphql-codegen --config codegen.ts"
   },
   "dependencies": {
+    "@apollo/client": "^3.8.0-rc.2",
+    "@apollo/experimental-nextjs-app-support": "^0.5.2",
     "@glidejs/glide": "^3.6.0",
     "@headlessui/react": "^1.7.17",
     "@heroicons/react": "^2.0.18",
@@ -25,6 +27,7 @@
     "@types/node": "^18.11.10",
     "@types/react": "^18.0.26",
     "@types/react-router-dom": "^5.3.3",
+    "html-react-parser": "^5.0.7",
     "lucide-react": "^0.294.0",
     "next": "14.0.3",
     "next-images": "^1.8.5",
@@ -40,11 +43,12 @@
     "react-use": "^17.4.2",
     "sharp": "^0.33.0",
     "web-vitals": "^3.1.0",
-    "@apollo/client": "^3.8.0-rc.2",
-    "@apollo/experimental-nextjs-app-support": "^0.5.2",
-    "html-react-parser": "^5.0.7"
+    "zustand": "^4.4.7"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "5.0.0",
+    "@graphql-codegen/client-preset": "4.1.0",
+    "@graphql-codegen/introspection": "4.0.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
@@ -56,9 +60,6 @@
     "postcss": "^8",
     "sass": "^1.69.5",
     "tailwindcss": "^3.3.0",
-    "typescript": "^5",
-    "@graphql-codegen/cli": "5.0.0",
-    "@graphql-codegen/client-preset": "4.1.0",
-    "@graphql-codegen/introspection": "4.0.0"
+    "typescript": "^5"
   }
 }

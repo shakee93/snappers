@@ -30,7 +30,7 @@ interface MegaMenuProps {
 const MegaMenu: React.FC<MegaMenuProps> = ({ categories, isVisible }) => {
     const router = useRouter();
     const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
-    const menuClasses = `absolute top-full mt-0.5 left-0 z-10 bg-white shadow-lg ${isVisible ? 'block' : 'hidden'
+    const menuClasses = `absolute top-full mt-0.5 left-0 z-10 bg-white rounded-b-2xl shadow-lg ${isVisible ? 'block' : 'hidden'
         } w-full `;
 
     return (
