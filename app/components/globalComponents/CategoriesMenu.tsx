@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import NavLink from 'next/link';
-import { ChevronDownIcon } from '@heroicons/react/outline';
+
 
 interface Subcategory {
     id: string;
@@ -25,8 +25,8 @@ interface MegaMenuProps {
 const MegaMenu: React.FC<MegaMenuProps> = ({ categories, isVisible }) => {
     const router = useRouter();
     const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
-    const menuClasses = `absolute top-full left-0 z-40 bg-white border border-gray-300 shadow-lg ${isVisible ? 'block' : 'hidden'
-        } w-full sm:w-screen`;
+    const menuClasses = `absolute top-full mt-0.5 left-0 z-10 bg-white shadow-lg ${isVisible ? 'block' : 'hidden'
+        } w-full `;
 
     return (
         <div className={menuClasses}>
