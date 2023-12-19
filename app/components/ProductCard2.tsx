@@ -82,7 +82,7 @@ const ProductCard: FC<ProductCardProps> = ({
         transition: 'transform 0.3s ease-in-out',
         transform: `translateX(-${currentVariation * 100}%)`,
     };
-    
+
     /* End of Slider Code */
 
     const notifyAddTocart = ({ size }: { size?: string }) => {
@@ -114,7 +114,7 @@ const ProductCard: FC<ProductCardProps> = ({
         return (
             <div className="flex ">
                 <div className="h-24 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
-                   <Image fill style={{ objectFit: 'cover' }}
+                    <Image fill style={{ objectFit: 'cover' }}
                         src={image}
                         alt={name}
                         className="h-full w-full object-cover object-center"
