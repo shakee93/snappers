@@ -153,7 +153,7 @@ const SectionHero: FC<SectionHero2Props> = ({ className = "" }) => {
         />
 
         {/* BG */}
-        <div className="absolute inset-0 bg-[#E3FFE6]">
+        <div className="absolute inset-0 bg-[#CCE0EF]">
           {/* <div className="absolute inset-0 bg-[#F7F0EA]"> */}
           <Image fill style={{ objectFit: 'cover' }}
             className="absolute w-full h-full object-contain"

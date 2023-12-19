@@ -279,9 +279,11 @@ const ProductCard: FC<ProductCardProps> = ({
             <div style={sliderStyle}>
               {data.variants?.map((variant, index) => (
                 <div key={index} className="w-full flex-shrink-0">
-                  <NcImage
-                    containerClassName="flex aspect-w-11 aspect-h-12 w-full h-0"
+                  <Image
                     src={image}
+                    width={1000}
+                    alt=" "
+                    height={1000}
                     className="object-cover w-full h-full drop-shadow-xl"
                   />
                 </div>

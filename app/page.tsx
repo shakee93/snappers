@@ -1,7 +1,7 @@
 "use client";
 
 import SectionHero2 from "@/app/components/HomePage/SectionHero";
-import DiscoverMoreSlider from "components/DiscoverMoreSlider";
+import DiscoverMoreSlider from "@/app/components/HomePage/DiscoverMoreSlider";
 import SectionSliderProductCard from "@/app/components/SectionSliderProductCard";
 import { PRODUCTS, SPORT_PRODUCTS } from "@/data/data";
 import BackgroundSection from "@/components/BackgroundSection/BackgroundSection";
