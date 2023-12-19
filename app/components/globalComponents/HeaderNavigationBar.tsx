@@ -50,14 +50,15 @@ const HeaderNavigationBar = () => {
         <Logo />
         <button
           onClick={handleAllCategoriesClick}
-          className="ml-[50px] bg-primaryColor flex text-white px-4 justify-center py-2 text-sm items-center rounded-lg relative"
+          className="ml-[15px] xl:ml-[50px] bg-primaryColor flex text-white px-4 justify-center py-2 text-xs xl:text-sm items-center rounded-lg"
         >
           All Categories <ChevronDown className="h-5 ml-1" />
         </button>
-        {showMegaMenu && (
+        
+      </div>
+      {showMegaMenu && (
           <Menu categories={categories} isVisible={showMegaMenu} />
         )}
-      </div>
       <div className="w-1/3 flex justify-center">
         <form
           className="flex-1 py-2 text-primary-700"
@@ -75,7 +76,7 @@ const HeaderNavigationBar = () => {
               autoFocus
             />
             <button type="button" onClick={() => setShowSearchForm(false)}>
-              <XIcon size={15} />
+              {/* <XIcon size={15} /> */}
             </button>
           </div>
           <input type="submit" hidden value="" />
@@ -85,10 +86,10 @@ const HeaderNavigationBar = () => {
       <div className="w-1/3 flex items-center justify-end">
         <NavLinks />
         <div className="flex">
-          <button className=" lg:flex w-10 h-10 sm:w-12 sm:h-12 rounded-full text-slate-700  hover:bg-slate-100  focus:outline-none items-center justify-center">
+          <button className=" flex  w-10 h-10 sm:w-12 sm:h-12 rounded-full text-slate-700  hover:bg-slate-100  focus:outline-none items-center justify-center">
             <UserRound className="text-primary-700" />
           </button>
-          <button className=" lg:flex w-10 h-10 sm:w-12 sm:h-12 rounded-full text-slate-700  hover:bg-slate-100  focus:outline-none items-center justify-center">
+          <button className=" flex w-10 h-10 sm:w-12 sm:h-12 rounded-full text-slate-700  hover:bg-slate-100  focus:outline-none items-center justify-center">
             <ShoppingBag className="text-primary-700" />
             <span className="w-4 h-4 flex items-center justify-center bg-red-500 relative mt-[-20px] ml-[-9px]  rounded-full text-[10px] leading-none text-white font-medium">
               99
