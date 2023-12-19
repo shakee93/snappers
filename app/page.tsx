@@ -1,14 +1,11 @@
 "use client";
 
-import MainNav2 from "./components/Header/MainNav2";
-import MainNav1 from "./components/Header/MainNav1";
-import SectionHero2 from "@/components/SectionHero/SectionHero2";
-import DiscoverMoreSlider from "components/DiscoverMoreSlider";
+import SectionHero2 from "@/app/components/HomePage/SectionHero";
+import DiscoverMoreSlider from "@/app/components/HomePage/DiscoverMoreSlider";
 import SectionSliderProductCard from "@/app/components/SectionSliderProductCard";
 import { PRODUCTS, SPORT_PRODUCTS } from "@/data/data";
 import BackgroundSection from "@/components/BackgroundSection/BackgroundSection";
 import SectionGridMoreExplore from "@/components/SectionGridMoreExplore/SectionGridMoreExplore";
-// import SectionGridFeatureItems from "@/containers/SectionGridFeatureItems";
 import SectionSliderCategories from "@/components/SectionSliderCategories/SectionSliderCategories";
 import SectionClientSay from "@/components/SectionClientSay/SectionClientSay";
 import SectionHowItWork from "@/components/SectionHowItWork/SectionHowItWork";
@@ -19,22 +16,14 @@ import SectionSliderLargeProduct from "@/components/SectionSliderLargeProduct";
 import Heading from "@/components/Heading/Heading";
 import SectionMagazine5 from "@/containers/BlogPage/SectionMagazine5";
 import ButtonSecondary from "@/shared/Button/ButtonSecondary";
-import SiteHeader from "containers/SiteHeader";
 import Footer from "@/shared/Footer/Footer";
-import Header from "@/app/components/Header/Header";
+
 import SingleProductBlock from "./components/SingleProductBlock/SingleProductBlock";
-import ProductCard from "./components/ProductCard2";
 
 export default function Home() {
   return (
     <main>
-      {/* <Header/> */}
-      {/* <MainNav1 isTop /> */}
-      {/* <SiteHeader /> */}
-      {/* <div className="nc-Header relative w-full z-40 ">
-        <MainNav1 isTop />
-      </div> */}
-      {/* <MainNav2 /> */}
+
       <div className="nc-PageHome relative overflow-hidden">
         {/* SECTION HERO */}
         <SectionHero2 />
