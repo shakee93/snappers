@@ -71,6 +71,8 @@ const ProductCard: FC<ProductCardProps> = ({
          <Image fill style={{ objectFit: 'cover' }}
             src={image}
             alt={name}
+            width={280}
+            height={305}
             className="h-full w-full object-cover object-center"
           />
         </div>

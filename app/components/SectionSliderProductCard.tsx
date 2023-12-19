@@ -1,5 +1,5 @@
 import React, { FC, useEffect, useId, useRef } from "react";
-import Heading from "components/Heading/Heading";
+import Heading from "@/app/components/Heading/Heading";
 import Glide from "@glidejs/glide";
 import ProductCard from "@/app/components/ProductCard";
 import { Product, PRODUCTS } from "@/data/data";
@@ -20,7 +20,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
   headingFontClassName,
   headingClassName,
   heading,
-  subHeading = "REY backpacks & bags",
+  subHeading = " ",
   data = PRODUCTS.filter((_, i) => i < 8 && i > 2),
 }) => {
   const sliderRef = useRef(null);
@@ -76,10 +76,10 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
           rightDescText={subHeading}
           hasNextPrev
         >
-          {heading || `New Arrivals`}
+          {heading || `More From Apple`}
         </Heading>
         <div className="glide__track" data-glide-el="track">
-          <ul className="glide__slides">
+          <ul className="glide__slides py-3">
             {data.map((item, index) => (
               <li key={index} className={`glide__slide ${itemClassName}`}>
                 <ProductCard data={item} />

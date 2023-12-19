@@ -23,12 +23,14 @@ const Logo: React.FC<LogoProps> = ({
       {/* THIS USE FOR MY CLIENT */}
       {/* PLEASE UN COMMENT BELLOW CODE AND USE IT */}
       {img ? (
-       <Image fill style={{ objectFit: 'cover' }}
+       <Image style={{ objectFit: 'cover' }}
           className={`block max-h-8 sm:max-h-10 ${
             
             imgLight ? "dark:hidden" : ""
           }`}
           src={img.src}
+          width={200}
+          height={50}
           alt="Logo"
         />
       ) : (

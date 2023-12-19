@@ -3,12 +3,15 @@
 import Image from "next/image";
 import ImageGallery from "./imageGallery";
 import { useState, useEffect } from "react";
-import Features from "../components/SingleProductPage/FeatureCard";
+import Features from "@/app/components/SingleProductPage/FeatureCard";
 import ProductDetails from "../components/SingleProductPage/ProductDetails";
 import ProductOverview from "../components/SingleProductPage/ProductOverview";
 import 'react-inner-image-zoom/lib/InnerImageZoom/styles.css';
 import InnerImageZoom from 'react-inner-image-zoom';
+import { PRODUCTS, SPORT_PRODUCTS } from "@/data/data";
 import Link from "next/link";
+import SectionSliderProductCard from "@/app/components/SectionSliderProductCard";
+
 
 export default function SingleProduct() {
   const images = [
@@ -50,11 +53,11 @@ export default function SingleProduct() {
       <div className="flex flex-col md:flex-row p-3 rounded-3xl mt-5 md:mt-6 md:p-10 bg-white">
         <div className="w-full md:w-2/5 p-2 flex gap-2">
           <div className="w-full md:w-1/5  ">
-           <Image fill style={{ objectFit: 'cover' }}Gallery
+           {/* <ImageGallery fill style={{ objectFit: 'cover' }}
               images={images}
               onThumbnailClick={handleThumbnailClick}
               selectedImage={selectedImage}
-            />
+            /> */}
           </div>
 
           <div className="w-4/5 flex  p-4">
@@ -82,7 +85,16 @@ export default function SingleProduct() {
       <div className=" lg:hidden w-full lg:w-1/5 p-3 bg-white rounded-3xl my-5">
         <Features />
       </div>
-      <div>
+      <div className="py-5 rounded-3xl my-5">
+      <SectionSliderProductCard
+            data={[
+              PRODUCTS[4],
+              SPORT_PRODUCTS[5],
+              PRODUCTS[7],
+              SPORT_PRODUCTS[1],
+              PRODUCTS[6],
+            ]}
+          />
 
       </div>
     </main>

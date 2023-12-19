@@ -5,7 +5,7 @@ import SiteLogo from "@/public/global/logo.webp"
 const Logo = () => {
   return (
     <Link href={"/"}>
-     <Image fill style={{ objectFit: 'cover' }} src={SiteLogo} alt="logo" className="h-16 w-auto"></Image>
+     <Image   width={200} src={SiteLogo} alt="logo" className="h-32 p-4 relative top-[-8px] mb-[-560px] bg-white w-auto"></Image>
     </Link>
   );
 };
