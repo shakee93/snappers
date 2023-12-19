@@ -46,24 +46,22 @@ export default function SingleProduct() {
   };
 
   return (
-    <main className="container  m-auto">
+    <main className="container m-auto">
+
       <div className="mt-5 text-xs md:px-5 md:text-base">
         Home &gt; Apple &gt; iPhone 15 Pro 128GB Black Titanium 5G With FaceTime
       </div>
-      <div className="flex flex-col md:flex-row p-3 rounded-3xl mt-5 md:mt-6 md:p-10 bg-white">
-        <div className="w-full md:w-2/5 p-2 flex gap-2">
-          <div className="w-full md:w-1/5  ">
-           {/* <ImageGallery fill style={{ objectFit: 'cover' }}
-              images={images}
-              onThumbnailClick={handleThumbnailClick}
-              selectedImage={selectedImage}
-            /> */}
-          </div>
 
-          <div className="w-4/5 flex  p-4">
+      <div>
+
+      </div>
+      <div className="flex flex-col md:flex-row p-3 rounded-3xl mt-5 md:mt-6 md:p-10 bg-white">
+
+        <div className="w-full md:w-2/5 flex-col gap-2">
+
+          <div className="w-full flex p-4 h-">
             {selectedImage && (
               <InnerImageZoom
-                // key={selectedImage.original}
                 src={selectedImage.thumbnail}
                 zoomSrc={selectedImage.original}
                 zoomType="hover"
@@ -72,29 +70,46 @@ export default function SingleProduct() {
               />
             )}
           </div>
+
+          <div className="flex w-full md:w-full p-2">
+            <ImageGallery
+              // style={{ objectFit: 'cover' }}
+              images={images}
+              onThumbnailClick={handleThumbnailClick}
+              selectedImage={selectedImage}
+            />
+          </div>
+
         </div>
+
 
         <div className="md:w-2/5 flex flex-col p-2 gap-y-1 md:gap-y-3">
           <ProductDetails />
         </div>
+
         <div className="hidden lg:block w-full md:w-1/5 ">
           <Features />
         </div>
+
       </div>
+
+      {/* Image Gallery */}
+
+
       <ProductOverview />
       <div className=" lg:hidden w-full lg:w-1/5 p-3 bg-white rounded-3xl my-5">
         <Features />
       </div>
       <div className="py-5 rounded-3xl my-5">
-      <SectionSliderProductCard
-            data={[
-              PRODUCTS[4],
-              SPORT_PRODUCTS[5],
-              PRODUCTS[7],
-              SPORT_PRODUCTS[1],
-              PRODUCTS[6],
-            ]}
-          />
+        <SectionSliderProductCard
+          data={[
+            PRODUCTS[4],
+            SPORT_PRODUCTS[5],
+            PRODUCTS[7],
+            SPORT_PRODUCTS[1],
+            PRODUCTS[6],
+          ]}
+        />
 
       </div>
     </main>
