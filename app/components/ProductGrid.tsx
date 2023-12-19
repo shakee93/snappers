@@ -5,6 +5,7 @@ import {useStore} from "@/store/store";
 import {useEffect, useState} from "react";
 import {GET_ALL_PRODUCTS} from "@/lib/graphql/products";
 import {useQuery} from "@apollo/client";
+import Link from "next/link";
 
 
 const ProductGrid = ({ products }: {
@@ -36,13 +37,13 @@ const ProductGrid = ({ products }: {
     return loading ? <div>loading...</div> : <div className="flex-1 grid sm:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-10 " >
 
         {(_products ? _products : products).map((item, index: number) => (
-            <div key={item.node.slug}>
+            <Link href={`/product/${item.node.slug}`} key={item.node.slug}>
                 {item.node.name} <br/>
                 {/*{JSON.stringify(item.node.image?.mediaItemUrl)} */}
                 <br/>
                 <Image width={300} height={300} src={item.node.image?.mediaItemUrl || ''}
                        alt={item.node.name || ''}/>
-            </div>
+            </Link>
         ))}
     </div>;
 }
