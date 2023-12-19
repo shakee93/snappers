@@ -27,7 +27,7 @@ export default function RootLayout({
       <body className="bg-gray-50 text-base dark:bg-slate-900 text-slate-900 dark:text-slate-200">
         <Header/>
         {/* <MainNav1 isTop/> */}
-        {/* <MainNav2 isTop/> */}
+        <MainNav2/>
         <ApolloWrapper>
           {children}
         </ApolloWrapper>
