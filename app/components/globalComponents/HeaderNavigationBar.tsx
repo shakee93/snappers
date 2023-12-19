@@ -1,20 +1,62 @@
 "use client";
 import Logo from "./Logo";
-import { XIcon, Search, UserRound, ShoppingBag, ChevronDown  } from "lucide-react";
+import { XIcon, Search, UserRound, ShoppingBag, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import NavLinks from "./NavLinks";
+import Menu from "./CategoriesMenu";
 
 const HeaderNavigationBar = () => {
   const [showSearchForm, setShowSearchForm] = useState(false);
+  const [showMegaMenu, setShowMegaMenu] = useState(false);
 
   const router = useRouter();
 
+  const categories = [
+    {
+      id: '1',
+      name: 'Category 1',
+      brands: [
+        { id: '1.1', name: 'Brand 1.1', logoSrc: '/brand1.1-logo.png' },
+        { id: '1.2', name: 'Brand 1.2', logoSrc: '/brand1.2-logo.png' },
+      ],
+    },
+    {
+      id: '2',
+      name: 'Category 2',
+      brands: [
+        { id: '2.1', name: 'Brand 2.1', logoSrc: '/brand2.1-logo.png' },
+        { id: '2.2', name: 'Brand 2.2', logoSrc: '/brand2.2-logo.png' },
+      ],
+    },
+    {
+      id: '3',
+      name: 'Category 3',
+      brands: [
+        { id: '3.1', name: 'Brand 3.1', logoSrc: '/brand3.1-logo.png' },
+        { id: '3.2', name: 'Brand 3.2', logoSrc: '/brand3.2-logo.png' },
+      ],
+    },
+  ];
+  
+
+  const handleAllCategoriesClick = () => {
+    setShowMegaMenu(!showMegaMenu);
+  };
+
   return (
-    <div className="flex justify-between  shadow-sm bg-white z-40 m-auto p-4">
-      <div className="w-1/3 flex items-center">
+    <div className="flex justify-between shadow-sm bg-white z-40 m-auto p-4 relative">
+      <div className="w-1/3 flex items-center relative">
         <Logo />
-        <button className="ml-[50px] bg-primaryColor flex text-white px-4 justify-center py-2 text-sm items-center rounded-lg">All Categories <ChevronDown className="h-5"/></button>
+        <button
+          onClick={handleAllCategoriesClick}
+          className="ml-[50px] bg-primaryColor flex text-white px-4 justify-center py-2 text-sm items-center rounded-lg relative"
+        >
+          All Categories <ChevronDown className="h-5 ml-1" />
+        </button>
+        {showMegaMenu && (
+          <Menu categories={categories} isVisible={showMegaMenu} />
+        )}
       </div>
       <div className="w-1/3 flex justify-center">
         <form
