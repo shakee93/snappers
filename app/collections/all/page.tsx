@@ -3,21 +3,21 @@ import SectionPromo1 from "components/SectionPromo1";
 import ProductCard from "components/ProductCard";
 import { PRODUCTS } from "@/data/data";
 import SidebarFilters from "containers/SidebarFilters";
-import {getClient} from "@/lib/apollo-ssr";
-import {GET_ALL_PRODUCTS, GET_CATEGORY} from "@/lib/graphql/products";
-import {notFound} from "next/navigation";
-import {Product} from "@/lib/graphql/types/graphql";
+import { getClient } from "@/lib/apollo-ssr";
+import { GET_ALL_PRODUCTS, GET_CATEGORY } from "@/lib/graphql/products";
+import { notFound } from "next/navigation";
+import { Product } from "@/lib/graphql/types/graphql";
 import Image from "next/image";
 
 
 async function getData() {
-    const {data} = await getClient().query(
+    const { data } = await getClient().query(
         {
             query: GET_ALL_PRODUCTS,
         }
     );
 
-   
+
     if (!data || !data.products) {
         return {
             products: [],
@@ -51,9 +51,9 @@ const Page = async () => {
                             All Collections
                         </h2>
                         <span className="block mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
-              We not only help you design exceptional products, but also make it
-              easy for you to share your designs with more like-minded people.
-            </span>
+                            We not only help you design exceptional products, but also make it
+                            easy for you to share your designs with more like-minded people.
+                        </span>
                     </div>
 
                     <hr className="border-slate-200 dark:border-slate-700" />
@@ -72,11 +72,11 @@ const Page = async () => {
                                         node: Product
                                     }, index: number) => (
                                         <div key={index}>
-                                            {item.node.name} <br/>
+                                            {item.node.name} <br />
                                             {/*{JSON.stringify(item.node.image?.mediaItemUrl)} */}
-                                            <br/>
+                                            <br />
                                             <Image width={300} height={300} src={item.node.image?.mediaItemUrl || ''}
-                                                   alt={item.node.name || ''}/>
+                                                alt={item.node.name || ''} />
                                         </div>
                                     ))}
                                 </div>
