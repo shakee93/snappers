@@ -1,28 +1,10 @@
+"use client"
 import React, { useState } from "react";
 
 import Checkbox from "shared/Checkbox/Checkbox";
 import Slider from "rc-slider";
 import Radio from "shared/Radio/Radio";
 import MySwitch from "components/MySwitch";
-
-// DEMO DATA
-const DATA_categories = [
-  {
-    name: "Backpacks",
-  },
-  {
-    name: "Travel Bags",
-  },
-  {
-    name: "Laptop Sleeves",
-  },
-  {
-    name: "Organization",
-  },
-  {
-    name: "Accessories",
-  },
-];
 
 const DATA_colors = [
   { name: "White" },
@@ -53,7 +35,9 @@ const DATA_sortOrderRadios = [
 
 const PRICE_RANGE = [1, 500];
 //
-const SidebarFilters = () => {
+const SidebarFilters = ({
+    categories = []
+                        }: any) => {
   //
   const [isOnSale, setIsIsOnSale] = useState(true);
   const [rangePrices, setRangePrices] = useState([100, 500]);
@@ -88,7 +72,7 @@ const SidebarFilters = () => {
     return (
       <div className="relative flex flex-col pb-8 space-y-4">
         <h3 className="font-semibold mb-2.5">Categories</h3>
-        {DATA_categories.map((item) => (
+        {categories.map((item: any) => (
           <div key={item.name} className="">
             <Checkbox
               name={item.name}
