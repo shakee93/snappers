@@ -30,8 +30,8 @@ export const GET_PRODUCT = gql`
 `;
 
 export const GET_ALL_PRODUCTS = gql`
-    query GetAllProducts {
-        products(first: 30) {
+    query GetAllProducts($categoryIdIn: [Int]) {
+        products(first: 12,  where: {categoryIdIn: $categoryIdIn}) {
             edges {
                 node {
                     name
@@ -55,7 +55,48 @@ export const GET_ALL_PRODUCTS = gql`
                             }
                         }
                     }
-                    
+
+                }
+            }
+        }
+        productCategories(first: 100) {
+            nodes {
+                name
+                slug
+                id
+                databaseId
+            }
+        }
+    }
+`
+
+export const GET_ALL_PRODUCTS_FILTER_CATEGORIES = gql`
+    query GetAllProducts($categoryIdIn: [Int]) {
+        products(first: 30,  where: {categoryIdIn: $categoryIdIn}) {
+            edges {
+                node {
+                    name
+                    slug
+                    image {
+                        mediaItemUrl
+                    }
+                    type
+                    ... on SimpleProduct {
+                        id
+                        name
+                        productCategories {
+                            nodes {
+                                name
+                            }
+                        }
+                        price
+                        productTags {
+                            nodes {
+                                name
+                            }
+                        }
+                    }
+
                 }
             }
         }
@@ -64,7 +105,7 @@ export const GET_ALL_PRODUCTS = gql`
                 name
                 slug
             }
-        } 
+        }
     }
 `
 
