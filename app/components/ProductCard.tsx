@@ -39,6 +39,53 @@ const ProductCard: FC<ProductCardProps> = ({
   const [variantActive, setVariantActive] = React.useState(0);
   const [showModalQuickView, setShowModalQuickView] = React.useState(false);
 
+  /* Slider Code */
+
+  const [isHovered, setIsHovered] = useState(false);
+  const [currentVariation, setCurrentVariation] = useState(0);
+  const hoverIntervalRef = useRef<number | null>(null);
+  const delayBeforeNextImage = 1500;
+
+  useEffect(() => {
+    return () => {
+      if (hoverIntervalRef.current !== null) {
+        clearInterval(hoverIntervalRef.current);
+      }
+    };
+  }, []);
+
+  const startSlider = () => {
+    hoverIntervalRef.current = window.setInterval(() => {
+      setCurrentVariation((prev) => (prev + 1) % (data.variants?.length || 1));
+    }, delayBeforeNextImage);
+  };
+
+  const handleHover = () => {
+    setIsHovered(true);
+    startSlider();
+  };
+
+  const handleHoverOut = () => {
+    setIsHovered(false);
+    setCurrentVariation(0);
+    clearInterval(hoverIntervalRef.current!);
+  };
+
+  const handleDotClick = (index: number) => {
+    setCurrentVariation(index);
+    clearInterval(hoverIntervalRef.current!);
+  };
+
+  const sliderStyle = {
+    display: 'flex',
+    cursor: 'pointer',
+    transition: 'transform 0.3s ease-in-out',
+    transform: `translateX(-${currentVariation * 100}%)`,
+  };
+
+  /* End of Slider Code */
+
+
   const notifyAddTocart = ({ size }: { size?: string }) => {
     toast.custom(
       (t) => (
@@ -68,7 +115,7 @@ const ProductCard: FC<ProductCardProps> = ({
     return (
       <div className="flex ">
         <div className="h-24 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
-         <Image fill style={{ objectFit: 'cover' }}
+          <Image fill style={{ objectFit: 'cover' }}
             src={image}
             alt={name}
             width={280}
@@ -148,11 +195,10 @@ const ProductCard: FC<ProductCardProps> = ({
             <div
               key={index}
               onClick={() => setVariantActive(index)}
-              className={`relative w-6 h-6 rounded-full overflow-hidden z-10 border cursor-pointer ${
-                variantActive === index
-                  ? getBorderClass(variant.color)
-                  : "border-transparent"
-              }`}
+              className={`relative w-6 h-6 rounded-full overflow-hidden z-10 border cursor-pointer ${variantActive === index
+                ? getBorderClass(variant.color)
+                : "border-transparent"
+                }`}
               title={variant.name}
             >
               <div
@@ -166,7 +212,7 @@ const ProductCard: FC<ProductCardProps> = ({
 
     return (
       <div className="flex ">
-        
+
       </div>
     );
   };
@@ -223,16 +269,24 @@ const ProductCard: FC<ProductCardProps> = ({
       <div
         className={`nc-ProductCard relative flex flex-col bg-white p-2 rounded-3xl  ${className}`}
         data-nc-id="ProductCard"
+        onMouseEnter={handleHover}
+        onMouseLeave={handleHoverOut}
       >
         <Link href={"/product-detail"} className=""></Link>
 
         <div className="relative flex-shrink-0 bg-slate-50 dark:bg-slate-300 rounded-3xl overflow-hidden z-1 group">
           <Link href={"/product-detail"} className="block">
-            <NcImage
-              containerClassName="flex aspect-w-11 aspect-h-12 w-full h-0"
-              src={image}
-              className="object-cover w-full h-full drop-shadow-xl"
-            />
+            <div style={sliderStyle}>
+              {data.variants?.map((variant, index) => (
+                <div key={index} className="w-full flex-shrink-0">
+                  <NcImage
+                    containerClassName="flex aspect-w-11 aspect-h-12 w-full h-0"
+                    src={image}
+                    className="object-cover w-full h-full drop-shadow-xl"
+                  />
+                </div>
+              ))}
+            </div>
           </Link>
 
           <ProductStatus status={status} />
