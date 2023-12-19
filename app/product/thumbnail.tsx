@@ -11,7 +11,7 @@ interface ThumbnailProps {
 
 const Thumbnail: React.FC<ThumbnailProps> = ({ image, onClick, isSelected }) => {
     return (
-        <div className={`thumbnail cursor-pointer mb-4 ${isSelected ? 'border-4 border-red-300' : 'hover:border-4'}`} onClick={() => onClick(image.original)}>
+        <div className={`thumbnail cursor-pointer mb-4 ${isSelected ? 'border-2 border-slate-900' : 'hover:border-2'}`} onClick={() => onClick(image.original)}>
             <img src={image.thumbnail} alt="Thumbnail" />
         </div>
     );

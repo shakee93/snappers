@@ -35,7 +35,7 @@ export default function Home() {
           heading="New Arrivals"
         />
           </div>
-          
+
         </div>
 
         <div className="mt-24 lg:mt-32">
@@ -102,8 +102,6 @@ export default function Home() {
           <SectionClientSay />
         </div>
       </div>
-
-      <Footer />
     </main>
   );
 }

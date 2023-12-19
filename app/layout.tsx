@@ -13,6 +13,7 @@ import "../fonts/line-awesome-1.3.0/css/line-awesome.css";
 import "rc-slider/assets/index.css";
 import ApolloWrapper from "@/lib/apollo-client";
 import Header from "@/app/components/globalComponents/header";
+// import Footer from "@/app/components/globalComponents/footer";
 // import reportWebVitals from "./reportWebVitals";
 
 // const inter = Inter({ subsets: ['latin'] })
