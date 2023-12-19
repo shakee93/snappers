@@ -59,7 +59,7 @@ export default function SingleProduct() {
 
         <div className="w-full md:w-2/5 flex-col gap-2">
 
-          <div className="w-full flex p-4 h-">
+          <div className="w-full flex p-4 min-h-[400px]">
             {selectedImage && (
               <InnerImageZoom
                 src={selectedImage.thumbnail}

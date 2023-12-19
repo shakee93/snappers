@@ -29,10 +29,10 @@ export default function Home() {
         <SectionHero2 />
         <div className=" gap-4 container m-auto">
           <div>
-          <SectionSliderProductCard
-          data={SPORT_PRODUCTS.filter((_, i) => i < 7)}
-          subHeading="New Sports equipment"
-        />
+            <SectionSliderProductCard
+              data={SPORT_PRODUCTS.filter((_, i) => i < 7)}
+              subHeading="New Sports equipment"
+            />
           </div>
           <div>
             {/* <SingleProductBlock/> */}
@@ -43,7 +43,7 @@ export default function Home() {
           <div>
             {/* <SingleProductBlock/> */}
           </div>
-          
+
         </div>
 
         <div className="mt-24 lg:mt-32">
@@ -110,8 +110,6 @@ export default function Home() {
           <SectionClientSay />
         </div>
       </div>
-
-      <Footer />
     </main>
   );
 }
