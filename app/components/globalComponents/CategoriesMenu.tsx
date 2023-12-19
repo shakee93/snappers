@@ -9,16 +9,9 @@ interface Brand {
     logoSrc: string;
 }
 
-interface Subcategory {
-    id: string;
-    name: string;
-    href: string;
-}
-
 interface Category {
     id: string;
     name: string;
-    children: Subcategory[];
     brands: Brand[];
 }
 
