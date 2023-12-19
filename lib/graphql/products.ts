@@ -13,18 +13,14 @@ export const GET_PRODUCT_SLUGS = gql`
 
 
 export const GET_PRODUCT = gql`
-    query GetProduct($productId: ID!, $categoryId: ID!) {
+    query GetProduct($productId: ID!) {
         product(id: $productId, idType: SLUG) {
             name
             slug
             databaseId
             image {
-                link
+                mediaItemUrl
             }
-        }
-        productCategory(id: $categoryId, idType: SLUG) {
-            slug
-            databaseId
         }
     }
 `;

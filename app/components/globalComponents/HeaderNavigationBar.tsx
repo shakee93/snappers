@@ -5,6 +5,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import NavLinks from "./NavLinks";
 import Menu from "./CategoriesMenu";
+import AvatarDropdown from "../Header/AvatarDropdown";
+import CartDropdown from "../Header/CartDropdown";
 
 const HeaderNavigationBar = () => {
   const [showSearchForm, setShowSearchForm] = useState(false);
@@ -84,15 +86,17 @@ const HeaderNavigationBar = () => {
       <div className="w-1/3 flex items-center justify-end">
         <NavLinks />
         <div className="flex">
-          <button className="flex w-10 h-10 sm:w-12 sm:h-12 rounded-full text-slate-700 hover:bg-slate-100 focus:outline-none items-center justify-center">
+          {/* <button className="flex w-10 h-10 sm:w-12 sm:h-12 rounded-full text-slate-700 hover:bg-slate-100 focus:outline-none items-center justify-center">
             <UserRound className="text-primary-700" />
-          </button>
-          <button className="flex w-10 h-10 sm:w-12 sm:h-12 rounded-full text-slate-700 hover:bg-slate-100 focus:outline-none items-center justify-center">
+          </button> */}
+          <AvatarDropdown />
+          <CartDropdown />
+          {/* <button className="flex w-10 h-10 sm:w-12 sm:h-12 rounded-full text-slate-700 hover:bg-slate-100 focus:outline-none items-center justify-center">
             <ShoppingBag className="text-primary-700" />
             <span className="w-4 h-4 flex items-center justify-center bg-red-500 relative mt-[-20px] ml-[-9px]  rounded-full text-[10px] leading-none text-white font-medium">
               99
             </span>
-          </button>
+          </button> */}
         </div>
       </div>
     </div>
