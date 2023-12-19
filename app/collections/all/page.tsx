@@ -17,9 +17,12 @@ async function getData() {
         }
     );
 
-
-    if (!data.products) {
-        return []
+   
+    if (!data || !data.products) {
+        return {
+            products: [],
+            productCategories: [],
+        };
     }
 
     return {

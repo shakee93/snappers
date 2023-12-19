@@ -3,6 +3,7 @@ import Prices from "@/app/components/Prices";
 import { PRODUCTS } from "@/data/data";
 import React, { FC } from "react";
 import Link from "next/link";
+import Image from "next/image";
 
 interface Props {
   show: boolean;

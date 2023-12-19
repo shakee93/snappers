@@ -19,6 +19,7 @@ import detail3JPG from "@/public/images/products/detail3.jpg";
 import NotifyAddTocart from "./NotifyAddTocart";
 import AccordionInfo from "@/containers/ProductDetailPage/AccordionInfo";
 import Link from 'next/link';
+import Image from "next/image";
 
 export interface ProductQuickViewProps {
   className?: string;

@@ -1,9 +1,13 @@
-// MegaMenu.tsx
-
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import NavLink from 'next/link';
-import { ChevronDownIcon } from '@heroicons/react/outline';
+// import { ChevronDownIcon } from '@heroicons/react/outline';
+
+interface Brand {
+    id: string;
+    name: string;
+    logoSrc: string;
+}
 
 interface Subcategory {
     id: string;
@@ -15,6 +19,7 @@ interface Category {
     id: string;
     name: string;
     children: Subcategory[];
+    brands: Brand[];
 }
 
 interface MegaMenuProps {
