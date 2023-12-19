@@ -17,17 +17,18 @@ interface Category {
 
 interface MegaMenuProps {
     categories: Category[];
-    isVisible: boolean; // Add a prop to control visibility
+    isVisible: boolean;
+    onMouseLeave: () => void;
 }
 
-const MegaMenu: React.FC<MegaMenuProps> = ({ categories, isVisible }) => {
+const MegaMenu: React.FC<MegaMenuProps> = ({ categories, isVisible, onMouseLeave }) => {
     const router = useRouter();
     const [hoveredCategory, setHoveredCategory] = useState<string | null>(null);
     const menuClasses = `absolute top-full mt-0.5 left-0 z-10 bg-white rounded-b-2xl shadow-lg ${isVisible ? 'block' : 'hidden'
         } w-full `;
 
     return (
-        <div className={menuClasses}>
+        <div className={menuClasses} onMouseLeave={onMouseLeave}>
             <div className="container mx-auto px-4 py-6 flex space-x-8">
                 {/* Left side - Categories */}
                 <div className="flex flex-col space-y-4">

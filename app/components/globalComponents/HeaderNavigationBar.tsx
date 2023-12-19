@@ -45,6 +45,11 @@ const HeaderNavigationBar = () => {
     setShowMegaMenu((prevShowMegaMenu) => !prevShowMegaMenu);
   };
 
+  const handleMegaMenuLeave = () => {
+    setShowMegaMenu(false);
+  };
+
+
   return (
     <div className="flex justify-between shadow-sm bg-white z-40 m-auto p-4 relative">
       <div className="w-1/3 flex items-center relative">
@@ -57,7 +62,7 @@ const HeaderNavigationBar = () => {
         </button>
       </div>
       {showMegaMenu && (
-        <Menu categories={categories} isVisible={showMegaMenu} />
+        <Menu categories={categories} isVisible={showMegaMenu} onMouseLeave={handleMegaMenuLeave} />
       )}
       <div className="w-1/3 flex justify-center">
         <form
