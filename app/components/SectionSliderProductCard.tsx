@@ -76,7 +76,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
           rightDescText={subHeading}
           hasNextPrev
         >
-          {heading || `More From Apple`}
+          {heading}
         </Heading>
         <div className="glide__track" data-glide-el="track">
           <ul className="glide__slides py-3">

@@ -109,6 +109,7 @@ export default function SingleProduct() {
             SPORT_PRODUCTS[1],
             PRODUCTS[6],
           ]}
+          heading="Related Products"
         />
 
       </div>

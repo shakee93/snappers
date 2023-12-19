@@ -8,7 +8,7 @@ import BackgroundSection from "@/components/BackgroundSection/BackgroundSection"
 import SectionGridMoreExplore from "@/components/SectionGridMoreExplore/SectionGridMoreExplore";
 import SectionSliderCategories from "@/components/SectionSliderCategories/SectionSliderCategories";
 import SectionClientSay from "@/components/SectionClientSay/SectionClientSay";
-import SectionHowItWork from "@/components/SectionHowItWork/SectionHowItWork";
+import SectionHowItWork from "@/app/components/HomePage/SectionHowItWork";
 import SectionPromo1 from "@/components/SectionPromo1";
 import SectionPromo2 from "@/components/SectionPromo2";
 import SectionPromo3 from "@/components/SectionPromo3";
@@ -28,20 +28,12 @@ export default function Home() {
         {/* SECTION HERO */}
         <SectionHero2 />
         <div className=" gap-4 container m-auto">
-          <div>
+          <div className="my-10">
           <SectionSliderProductCard
           data={SPORT_PRODUCTS.filter((_, i) => i < 7)}
           subHeading="New Sports equipment"
+          heading="New Arrivals"
         />
-          </div>
-          <div>
-            {/* <SingleProductBlock/> */}
-          </div>
-          <div>
-            {/* <SingleProductBlock/> */}
-          </div>
-          <div>
-            {/* <SingleProductBlock/> */}
           </div>
           
         </div>
