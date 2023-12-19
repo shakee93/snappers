@@ -6,7 +6,10 @@ const HeaderTopBar = () => {
   return (
   
       <div className="flex flex-row justify-between bg-primaryColor con p-2 text-xs text-white">
-        <div className="flex gap-2 w-1/3">
+        <div className="flex gap-2 w-1/12">
+        
+        </div>
+        <div className="flex gap-2 w-4/12">
           Contact Us : 
           <Link
             href={"tel:0777555665"}
@@ -23,12 +26,12 @@ const HeaderTopBar = () => {
           </Link>
         </div>
         
-        <div className="flex gap-2 w-1/3 items-center justify-center">
+        <div className="flex gap-2 w-3/12 items-center justify-center">
           Social Media : 
           <Link href={"https://www.facebook.com/gqmobilestore"}><Facebook size={iconSize}/></Link>
           <Link href={"https://www.instagram.com/gqthemobilestoreunlimited"}><Instagram size={iconSize}/></Link>
         </div>
-        <div className="flex gap-2 w-1/3 items-center justify-end">
+        <div className="flex gap-2 w-4/12 items-center justify-end">
           Address : 
           <MapPin size={iconSize} />
           250/54, Ground Floor, Liberty Plaza, Colombo 03.

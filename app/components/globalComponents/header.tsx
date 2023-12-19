@@ -9,7 +9,7 @@ const Header = () => {
         <HeaderTopBar />
       </div>
       <div><HeaderNavigationBar/></div>
-      <div><HeaderCategoryBar/></div>
+      {/* <div><HeaderCategoryBar/></div> */}
 
 
     </header>

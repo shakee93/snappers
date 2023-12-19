@@ -23,9 +23,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-gray-100 text-base dark:bg-slate-900 text-slate-900 dark:text-slate-200">
+      <body className="bg-gray-50 text-base dark:bg-slate-900 text-slate-900 dark:text-slate-200">
         <Header/>
-        <MainNav1 isTop/>
+        {/* <MainNav1 isTop/> */}
         {/* <MainNav2 isTop/> */}
         {children}
         {/* <Footer/> */}
