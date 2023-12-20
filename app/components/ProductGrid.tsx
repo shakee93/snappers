@@ -6,10 +6,7 @@ import {useEffect, useState} from "react";
 import {GET_ALL_PRODUCTS} from "@/graphql/defs/products";
 import {useQuery} from "@apollo/client";
 import Link from "next/link";
-import { useStore } from "@/store/store";
-import { useQuery } from "@apollo/client";
-import { GET_ALL_PRODUCTS } from "@/lib/graphql/products";
-import { Product } from "@/lib/graphql/types/graphql";
+
 import ProductCard, { ProductCardProps } from "./ProductCard3";
 
 const ProductGrid = ({ products }: { products: { node: Product }[] }) => {
