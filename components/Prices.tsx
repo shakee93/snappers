@@ -17,7 +17,7 @@ const Prices: FC<PricesProps> = ({
         className={`flex items-center border-2 border-green-500 rounded-lg ${contentClass}`}
       >
         <span className="text-green-500 !leading-none">
-          ${price.toFixed(2)}
+          ${price}
         </span>
       </div>
     </div>

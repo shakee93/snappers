@@ -10,10 +10,6 @@ const AddToCart = ({ product }: {product: Product}) => {
 
     const { sessionToken } = useSession()
 
-    const { data, loading: fetching } = useQuery(GET_CART, {
-        fetchPolicy: 'no-cache'
-    });
-
     const [addToCart, { loading: adding }] = useMutation(ADD_TO_CART, {
         variables: {
             productId: product.databaseId
@@ -39,15 +35,6 @@ const AddToCart = ({ product }: {product: Product}) => {
             </div>
         }
 
-        <div>
-            CART:
-
-            <ul>
-                <li>
-                    {JSON.stringify(data)}
-                </li>
-            </ul>
-        </div>
     </div>
 
 }

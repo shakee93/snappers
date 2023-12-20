@@ -1,14 +1,20 @@
 'use client'
 import { CheckIcon } from "@heroicons/react/24/outline";
 import NcInputNumber from "components/NcInputNumber";
-import Prices from "components/Prices";
-import { Product, PRODUCTS } from "data/data";
 import Image from "next/image";
 
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import Link from "next/link";
+import {useCart} from "@/context/CartProvider";
+import {CartItem, Product, SimpleProduct, VariableProduct} from "@/graphql/defs/types/graphql";
+import Prices from "@/app/components/Prices";
 
 const CartPage = () => {
+
+  const { cart } = useCart()
+  
+  console.log(cart);
+  
   const renderStatusSoldout = () => {
     return (
       <div className="rounded-full flex items-center justify-center px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
@@ -26,8 +32,15 @@ const CartPage = () => {
     );
   };
 
-  const renderProduct = (item: Product, index: number) => {
-    const { image, price, name } = item;
+  const renderProduct = (item: CartItem, index: number) => {
+    const { product, quantity  } = item;
+
+    if (!product?.node) {
+      return null
+    }
+
+    const { name, image, price, slug, salePrice, type, stockQuantity } : SimpleProduct | VariableProduct = product.node;
+
 
     return (
       <div
@@ -36,11 +49,11 @@ const CartPage = () => {
       >
         <div className="relative h-36 w-24 sm:w-32 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
           <Image fill style={{ objectFit: 'cover' }}
-            src={image}
-            alt={name}
+            src={image?.sourceUrl || ''}
+            alt={name || ''}
             className="h-full w-full object-contain object-center"
           />
-          <Link href="/product-detail" className="absolute inset-0"></Link>
+          <Link href={`/product/${slug}`} className="absolute inset-0"></Link>
         </div>
 
         <div className="ml-3 sm:ml-6 flex flex-1 flex-col">
@@ -48,91 +61,94 @@ const CartPage = () => {
             <div className="flex justify-between ">
               <div className="flex-[1.5] ">
                 <h3 className="text-base font-semibold">
-                  <Link href="/product-detail">{name}</Link>
+                  <Link href={`/product/${slug}`}>{name}</Link>
                 </h3>
-                <div className="mt-1.5 sm:mt-2.5 flex text-sm text-slate-600 dark:text-slate-300">
-                  <div className="flex items-center space-x-1.5">
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M7.01 18.0001L3 13.9901C1.66 12.6501 1.66 11.32 3 9.98004L9.68 3.30005L17.03 10.6501C17.4 11.0201 17.4 11.6201 17.03 11.9901L11.01 18.0101C9.69 19.3301 8.35 19.3301 7.01 18.0001Z"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeMiterlimit="10"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M8.35 1.94995L9.69 3.28992"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeMiterlimit="10"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M2.07 11.92L17.19 11.26"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeMiterlimit="10"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M3 22H16"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeMiterlimit="10"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M18.85 15C18.85 15 17 17.01 17 18.24C17 19.26 17.83 20.09 18.85 20.09C19.87 20.09 20.7 19.26 20.7 18.24C20.7 17.01 18.85 15 18.85 15Z"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
 
-                    <span>{`Black`}</span>
-                  </div>
-                  <span className="mx-4 border-l border-slate-200 dark:border-slate-700 "></span>
-                  <div className="flex items-center space-x-1.5">
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-                      <path
-                        d="M21 9V3H15"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M3 15V21H9"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M21 3L13.5 10.5"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                      <path
-                        d="M10.5 13.5L3 21"
-                        stroke="currentColor"
-                        strokeWidth="1.5"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
+                {type === 'VARIABLE' &&
+                    <div className="mt-1.5 sm:mt-2.5 flex text-sm text-slate-600 dark:text-slate-300">
+                      <div className="flex items-center space-x-1.5">
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
+                          <path
+                              d="M7.01 18.0001L3 13.9901C1.66 12.6501 1.66 11.32 3 9.98004L9.68 3.30005L17.03 10.6501C17.4 11.0201 17.4 11.6201 17.03 11.9901L11.01 18.0101C9.69 19.3301 8.35 19.3301 7.01 18.0001Z"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeMiterlimit="10"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                          />
+                          <path
+                              d="M8.35 1.94995L9.69 3.28992"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeMiterlimit="10"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                          />
+                          <path
+                              d="M2.07 11.92L17.19 11.26"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeMiterlimit="10"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                          />
+                          <path
+                              d="M3 22H16"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeMiterlimit="10"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                          />
+                          <path
+                              d="M18.85 15C18.85 15 17 17.01 17 18.24C17 19.26 17.83 20.09 18.85 20.09C19.87 20.09 20.7 19.26 20.7 18.24C20.7 17.01 18.85 15 18.85 15Z"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                          />
+                        </svg>
 
-                    <span>{`2XL`}</span>
-                  </div>
-                </div>
+                        <span>{`Black`}</span>
+                      </div>
+                      <span className="mx-4 border-l border-slate-200 dark:border-slate-700 "></span>
+                      <div className="flex items-center space-x-1.5">
+                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
+                          <path
+                              d="M21 9V3H15"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                          />
+                          <path
+                              d="M3 15V21H9"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                          />
+                          <path
+                              d="M21 3L13.5 10.5"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                          />
+                          <path
+                              d="M10.5 13.5L3 21"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                          />
+                        </svg>
 
+                        <span>{`2XL`}</span>
+                      </div>
+                    </div>
+
+                }
                 <div className="mt-3 flex justify-between w-full sm:hidden relative">
                   <select
                     name="qty"
@@ -150,24 +166,28 @@ const CartPage = () => {
                   <Prices
                     contentClass="py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium h-full"
                     price={price}
+                    salePrice={salePrice}
                   />
                 </div>
               </div>
 
               <div className="hidden sm:block text-center relative">
-                <NcInputNumber className="relative z-10" />
+                <NcInputNumber defaultValue={quantity || 1} className="relative z-10" />
               </div>
 
               <div className="hidden flex-1 sm:flex justify-end">
-                <Prices price={price} className="mt-0.5" />
+                <Prices salePrice={salePrice} price={price} className="mt-0.5" />
               </div>
             </div>
           </div>
 
           <div className="flex mt-auto pt-4 items-end justify-between text-sm">
-            {Math.random() > 0.6
-              ? renderStatusSoldout()
-              : renderStatusInstock()}
+            {/*{stockQuantity && stockQuantity > 0*/}
+            {/*  ? renderStatusInstock()*/}
+            {/*  : renderStatusSoldout()*/}
+            {/*}*/}
+
+            <div></div>
 
             <a
               href="#"
@@ -193,10 +213,6 @@ const CartPage = () => {
               Homepage
             </Link>
             <span className="text-xs mx-1 sm:mx-1.5">/</span>
-            <Link href={"/#"} className="">
-              Clothing Categories
-            </Link>
-            <span className="text-xs mx-1 sm:mx-1.5">/</span>
             <span className="underline">Shopping Cart</span>
           </div>
         </div>
@@ -205,13 +221,7 @@ const CartPage = () => {
 
         <div className="flex flex-col lg:flex-row">
           <div className="w-full lg:w-[60%] xl:w-[55%] divide-y divide-slate-200 dark:divide-slate-700 ">
-            {[
-              PRODUCTS[0],
-              PRODUCTS[1],
-              PRODUCTS[2],
-              PRODUCTS[3],
-              PRODUCTS[4],
-            ].map(renderProduct)}
+            {cart?.contents?.nodes.map(renderProduct)}
           </div>
           <div className="border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-700 my-10 lg:my-0 lg:mx-10 xl:mx-16 2xl:mx-20 flex-shrink-0"></div>
           <div className="flex-1">
@@ -221,24 +231,18 @@ const CartPage = () => {
                 <div className="flex justify-between pb-4">
                   <span>Subtotal</span>
                   <span className="font-semibold text-slate-900 dark:text-slate-200">
-                    $249.00
+                    {cart?.subtotal}
                   </span>
                 </div>
                 <div className="flex justify-between py-4">
                   <span>Shpping estimate</span>
                   <span className="font-semibold text-slate-900 dark:text-slate-200">
-                    $5.00
-                  </span>
-                </div>
-                <div className="flex justify-between py-4">
-                  <span>Tax estimate</span>
-                  <span className="font-semibold text-slate-900 dark:text-slate-200">
-                    $24.90
+                    {cart?.shippingTotal}
                   </span>
                 </div>
                 <div className="flex justify-between font-semibold text-slate-900 dark:text-slate-200 text-base pt-4">
                   <span>Order total</span>
-                  <span>$276.00</span>
+                  <span>{cart?.total}</span>
                 </div>
               </div>
               <ButtonPrimary href="/checkout" className="mt-8 w-full">

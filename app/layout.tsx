@@ -14,6 +14,7 @@ import "rc-slider/assets/index.css";
 import ApolloWrapper from "@/graphql/apollo-client";
 import Header from "@/app/components/globalComponents/header";
 import {SessionProvider} from "@/context/SessionProvider";
+import {CartProvider} from "@/context/CartProvider";
 // import Footer from "@/app/components/globalComponents/footer";
 // import reportWebVitals from "./reportWebVitals";
 
@@ -32,7 +33,9 @@ export default function RootLayout({
         {/* <MainNav2/> */}
         <ApolloWrapper>
           <SessionProvider>
-            {children}
+            <CartProvider>
+              {children}
+            </CartProvider>
           </SessionProvider>
         </ApolloWrapper>
         {/* <Footer/> */}
