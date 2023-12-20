@@ -36,7 +36,8 @@ export interface Product {
   variantType?: "color" | "image";
   sizes?: string[];
   allOfSizes?: string[];
-  status?: "New in" | "limited edition" | "Sold Out" | "50% Discount";
+  status?: "New in" | "limited edition" | "Sold Out" | "50% Discount" | "IN_STOCK" | undefined;
+  // status?: "";
 }
 
 const DEMO_VARIANTS: ProductVariant[] = [

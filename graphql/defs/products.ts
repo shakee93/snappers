@@ -1,4 +1,4 @@
-import {gql} from '@apollo/client';
+import { gql } from '@apollo/client';
 
 
 export const GET_PRODUCT_SLUGS = gql`
@@ -135,7 +135,6 @@ export const GET_ALL_PRODUCTS = gql`
                             }
                         }
                     }
-
                 }
             }
         }
@@ -214,3 +213,48 @@ export const GET_CATEGORY = gql`
         }
     }
 `;
+
+export const GET_VARIATIONS_PRODUCT = gql`
+query GetAllProducts($categoryIdIn: [Int]) {
+    products(first: 25, where: {categoryIdIn: $categoryIdIn}) {
+      edges {
+        node {
+          name
+          slug
+          image {
+            mediaItemUrl
+          }
+          ... on VariableProduct {
+            name
+            productCategories {
+              nodes {
+                name
+              }
+            }
+            price
+            productTags {
+              nodes {
+                name
+              }
+            }
+            id
+            variations {
+              edges {
+                node {
+                  id
+                  image {
+                    mediaItemUrl
+                    sizes
+                  }
+                  name
+                  price
+                  salePrice
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  `;

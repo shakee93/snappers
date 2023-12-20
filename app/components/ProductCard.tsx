@@ -44,7 +44,7 @@ const ProductCard: FC<ProductCardProps> = ({
   const [isHovered, setIsHovered] = useState(false);
   const [currentVariation, setCurrentVariation] = useState(0);
   const hoverIntervalRef = useRef<number | null>(null);
-  const delayBeforeNextImage = 1500;
+  const delayBeforeNextImage = 500;
 
   useEffect(() => {
     return () => {
@@ -275,6 +275,7 @@ const ProductCard: FC<ProductCardProps> = ({
         <Link href={"/product-detail"} className=""></Link>
 
         <div className="relative flex-shrink-0 bg-slate-50 dark:bg-slate-300 rounded-3xl overflow-hidden z-1 group">
+
           <Link href={"/product-detail"} className="block">
             <div style={sliderStyle}>
               {data.variants?.map((variant, index) => (
@@ -315,6 +316,7 @@ const ProductCard: FC<ProductCardProps> = ({
             </div>
           </div>
         </div>
+        
       </div>
 
       {/* QUICKVIEW */}
