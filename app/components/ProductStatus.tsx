@@ -8,7 +8,7 @@ import React, { FC } from "react";
 import IconDiscount from "@/components/IconDiscount";
 
 interface Props {
-  status: Product["status"];
+  status?: string;
   className?: string;
 }
 
@@ -38,6 +38,14 @@ const ProductStatus: FC<Props> = ({
       );
     }
     if (status === "Sold Out") {
+      return (
+        <div className={CLASSES}>
+          <NoSymbolIcon className="w-3.5 h-3.5" />
+          <span className="ml-1 leading-none">{status}</span>
+        </div>
+      );
+    }
+    if (status === "IN_STOCK") {
       return (
         <div className={CLASSES}>
           <NoSymbolIcon className="w-3.5 h-3.5" />

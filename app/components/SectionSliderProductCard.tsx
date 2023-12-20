@@ -4,6 +4,9 @@ import Glide from "@glidejs/glide";
 import ProductCard from "@/app/components/ProductCard";
 import { Product, PRODUCTS } from "@/data/data";
 
+import { getClient } from "@/lib/apollo-ssr";
+import { GET_ALL_PRODUCTS, GET_CATEGORY } from "@/lib/graphql/products";
+
 export interface SectionSliderProductCardProps {
   className?: string;
   itemClassName?: string;
@@ -13,6 +16,7 @@ export interface SectionSliderProductCardProps {
   subHeading?: string;
   data?: Product[];
 }
+
 
 const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
   className = "",
@@ -29,7 +33,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
 
   useEffect(() => {
     if (!sliderRef.current) {
-      return () => {};
+      return () => { };
     }
 
     // @ts-ignore
