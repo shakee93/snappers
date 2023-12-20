@@ -7,6 +7,11 @@ const NavLinks = () => {
 
   const navLinks= [
     {
+      id: 1,
+      href: "/collections/all",
+      name: "/",
+    },
+    {
       id: 2,
       href: "/collections/all",
       name: "Shop",
