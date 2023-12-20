@@ -1,7 +1,8 @@
+'use client'
 import { MousePointerClick } from "lucide-react";
 import Link from "next/link";
 import ProductAddToCart from "./ProductAddToCart";
-import {Product} from "@/graphql/defs/types/graphql";
+import {Product} from "@/graphql/types/graphql";
 
 const ProductDetails = ({
     product

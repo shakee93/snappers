@@ -8,7 +8,7 @@ import ButtonPrimary from "@/public/shared/Button/ButtonPrimary";
 import ButtonSecondary from "@/public/shared/Button/ButtonSecondary";
 import Image from "next/image";
 import {useCart} from "@/context/CartProvider";
-import {CartItem, SimpleProduct, VariableProduct} from "@/graphql/defs/types/graphql";
+import {CartItem, SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
 
 export default function CartDropdown() {
 

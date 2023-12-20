@@ -1,31 +1,30 @@
 import {getClient} from "@/graphql/apollo-ssr";
-import {GET_POST} from "@/graphql/defs/posts";
-import {GET_CATEGORY_SLUGS, GET_PRODUCT, GET_PRODUCT_SLUGS} from "@/graphql/defs/products";
-import {Product, ProductCategory} from "@/graphql/defs/types/graphql";
+import {GET_BRANDS, GET_CATEGORY_SLUGS, GET_PRODUCT, GET_PRODUCT_SLUGS} from "@/graphql/defs/products";
+import {Brand, Product, ProductCategory} from "@/graphql/types/graphql";
 import {notFound} from "next/navigation";
 import Image from "next/image";
 import {useQuery} from "@apollo/client";
 import AddToCart from "@/app/components/AddToCart";
 import InnerImageZoom from "react-inner-image-zoom";
-import ImageGallery from "@/app/product/imageGallery";
 import ProductDetails from "@/app/components/SingleProductPage/ProductDetails";
 import Features from "@/app/components/SingleProductPage/FeatureCard";
 import ProductOverview from "@/app/components/SingleProductPage/ProductOverview";
 import SectionSliderProductCard from "@/app/components/SectionSliderProductCard";
 import {PRODUCTS, SPORT_PRODUCTS} from "@/data/data";
+import Link from "next/link";
 
 
 export async function generateStaticParams() {
 
-    const {data: {products}} = await getClient().query({
-        query: GET_PRODUCT_SLUGS
+    const {data: {brands}} = await getClient().query({
+        query: GET_BRANDS
     });
 
-    return products.nodes.map((p: ProductCategory) => p.slug);
+    return brands.nodes.map((p: Brand) => p.slug);
 }
 
 
-async function getData(slug: string) {
+async function getData(slug: string, brand: string) {
 
     try {
 
@@ -43,7 +42,20 @@ async function getData(slug: string) {
             return notFound();
         }
 
-        return data.product
+        const productBrand = data.product.terms?.nodes.find((term: Brand) => term.__typename === 'Brand') || {
+            name: 'Product',
+            slug: 'product'
+        };
+
+
+        if(productBrand.slug !== brand) {
+            return notFound()
+        }
+
+        return {
+            product: data.product,
+            brand: productBrand
+        }
 
     } catch (e ) {
         console.log(e);
@@ -53,13 +65,14 @@ async function getData(slug: string) {
 
 const Page = async ({ params }: any) => {
 
-    const product: Product = await getData(params.slug)
+    const { product, brand} = await getData(params.slug, params.brand)
+
 
     return <div className='mt-24'>
         <main className="container m-auto">
 
             <div className="mt-5 text-xs md:px-5 md:text-base">
-                Home &gt; Apple &gt; {product.name}
+                <Link href='/'>Home</Link> &gt; <Link href={`/${brand.slug}`}>{brand.name}</Link> &gt; <Link href={`/${brand.slug}/${product.slug}`}>{product.name}</Link>
             </div>
 
             <div>

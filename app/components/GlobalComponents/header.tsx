@@ -20,7 +20,7 @@ import Logo from "@/app/components/GlobalComponents/Logo";
 import { useQuery } from "@apollo/client";
 import { GET_ALL_PRODUCTS, GET_CATEGORY, GET_VARIATIONS_PRODUCT } from "@/graphql/defs/products";
 import { useStore } from "@/store/store";
-import { Product } from "@/graphql/defs/types/graphql";
+import { Product } from "@/graphql/types/graphql";
 
 const Header = () => {
 

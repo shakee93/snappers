@@ -1,5 +1,5 @@
 import React, { FC } from "react";
-import { Maybe } from "@/graphql/defs/types/graphql";
+import { Maybe } from "@/graphql/types/graphql";
 
 export interface PricesProps {
     className?: string;

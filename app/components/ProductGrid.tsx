@@ -1,5 +1,5 @@
 "use client"
-import {Product} from "@/graphql/defs/types/graphql";
+import {Product} from "@/graphql/types/graphql";
 import Image from "next/image";
 import {useStore} from "@/store/store";
 import {useEffect, useState} from "react";
@@ -16,6 +16,7 @@ const ProductGrid = ({ products }: { products: { node: Product }[] }) => {
             categoryIdIn: categories,
         },
     });
+
 
     useEffect(() => {
         refetch();
@@ -34,11 +35,8 @@ const ProductGrid = ({ products }: { products: { node: Product }[] }) => {
     ) : (
         <div className="flex-1 grid sm:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-10">
             {(_products ? _products : products).map((item, index: number) => {
-                console.log("item", item.node);
                 return (
-                    <Link href={`/product/${item.node.slug}`} key={item.node.slug}>
-                        <ProductCard data={item.node} />
-                    </Link>
+                    <ProductCard  key={item.node.slug} data={item.node} />
                 );
             })}
         </div>

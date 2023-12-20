@@ -1,7 +1,7 @@
 'use client'
 
 
-import {Product} from "@/graphql/defs/types/graphql";
+import {Product} from "@/graphql/types/graphql";
 import {useMutation, useQuery} from "@apollo/client";
 import {ADD_TO_CART, GET_CART} from "@/graphql/defs/cart";
 import {useSession} from "@/context/SessionProvider";

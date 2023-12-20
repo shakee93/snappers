@@ -6,7 +6,7 @@ import Image from "next/image";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import Link from "next/link";
 import {useCart} from "@/context/CartProvider";
-import {CartItem, Product, SimpleProduct, VariableProduct} from "@/graphql/defs/types/graphql";
+import {CartItem, Product, SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
 import Prices from "@/app/components/Prices";
 import CartItemProduct from "@/app/containers/ProductDetailPage/CartItem";
 

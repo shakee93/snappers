@@ -1,10 +1,11 @@
-import {SimpleProduct, VariableProduct} from "@/graphql/defs/types/graphql";
+import {Product, SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
 import Image from "next/image";
 import Link from "next/link";
 import Prices from "@/app/components/Prices";
 import NcInputNumber from "@/components/NcInputNumber";
 import {CartItem} from "@/lib/graphql/types/graphql";
 import {useCart} from "@/context/CartProvider";
+import useProductLink from "@/hooks/useProductLink";
 
 
 const CartItemProduct = ({
@@ -17,12 +18,14 @@ const CartItemProduct = ({
 
     const { product, quantity, key  } = cartItem;
     const { removeFromCart, updateCart } = useCart()
+    const link = useProductLink(product?.node)
 
     if (!product?.node) {
         return null
     }
 
-    const { name, image, price, slug, salePrice, type, stockQuantity } : SimpleProduct | VariableProduct = product.node;
+
+    const { name, image, price, slug, salePrice, type, stockQuantity } : SimpleProduct | VariableProduct = product.node as Product;
 
 
     return (
@@ -35,7 +38,7 @@ const CartItemProduct = ({
                        alt={name || ''}
                        className="h-full w-full object-contain object-center"
                 />
-                <Link href={`/product/${slug}`} className="absolute inset-0"></Link>
+                <Link href={`${link}`} className="absolute inset-0"></Link>
             </div>
 
             <div className="ml-3 sm:ml-6 flex flex-1 flex-col">
@@ -43,7 +46,7 @@ const CartItemProduct = ({
                     <div className="flex justify-between ">
                         <div className="flex-[1.5] ">
                             <h3 className="text-base font-semibold">
-                                <Link href={`/product/${slug}`}>{name}</Link>
+                                <Link href={`${link}`}>{name}</Link>
                             </h3>
 
                             {type === 'VARIABLE' &&

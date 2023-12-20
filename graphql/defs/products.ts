@@ -2,6 +2,16 @@ import { gql } from '@apollo/client';
 import {ProductContentFull} from "@/graphql/defs/products.fragments";
 
 
+export const GET_BRANDS = gql`
+    query getBrands {
+        brands {
+            nodes {
+                name
+                slug
+            }
+        }
+    }
+`
 export const GET_PRODUCT_SLUGS = gql`
     query productSlugs {
         products {
@@ -36,6 +46,15 @@ export const GET_ALL_PRODUCTS = gql`
                         id
                         name
                         stockStatus
+                        terms {
+                            nodes {
+                                ... on Brand {
+                                    id
+                                    name
+                                    slug
+                                }
+                            }
+                        }
                         productCategories {
                             nodes {
                                 name

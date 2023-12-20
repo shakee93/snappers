@@ -16,7 +16,7 @@ import {
     REMOVE_ITEMS_FROM_CART,
     UPDATE_CART_ITEM_QUANTITY
 } from "@/graphql/defs/cart";
-import {Cart, Customer} from "@/graphql/defs/types/graphql";
+import {Cart, Customer} from "@/graphql/types/graphql";
 
 
 type CartSession = {

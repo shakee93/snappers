@@ -7,6 +7,15 @@ export const ProductContentSlice = gql`
         name
         slug
         type
+        terms {
+            nodes {
+                ... on Brand {
+                    id
+                    name
+                    slug
+                }
+            }
+        }
         image {
             id
             sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
@@ -86,6 +95,15 @@ export const ProductContentFull = gql`
                 }
             }
         }
+        terms {
+            nodes {
+                ... on Brand {
+                    id
+                    name
+                    slug
+                }
+            }
+        } 
         ... on SimpleProduct {
             onSale
             stockStatus
