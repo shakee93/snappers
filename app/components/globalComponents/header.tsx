@@ -15,10 +15,36 @@ import AvatarDropdown from "../Header/AvatarDropdown";
 import CartDropdown from "../Header/CartDropdown";
 import Link from "next/link";
 import Image from "next/image";
-import MegaMenu from "@/app/components/globalComponents/CategoriesMenu";
-import Logo from "@/app/components/globalComponents/Logo";
+import MegaMenu from "@/app/components/GlobalComponents/CategoriesMenu";
+import Logo from "@/app/components/GlobalComponents/Logo";
+import { useQuery } from "@apollo/client";
+import { GET_ALL_PRODUCTS, GET_CATEGORY, GET_VARIATIONS_PRODUCT } from "@/graphql/defs/products";
+import { useStore } from "@/store/store";
+import { Product } from "@/graphql/defs/types/graphql";
 
 const Header = () => {
+
+  const { sidebar: { categories } } = useStore();
+  const [_products, setProducts] = useState(null);
+  let { loading, error, data, refetch } = useQuery(GET_ALL_PRODUCTS, {
+    variables: {
+      categoryIdIn: categories,
+    },
+  });
+
+  useEffect(() => {
+    refetch();
+  }, [categories]);
+
+  useEffect(() => {
+    if (data?.products.edges.length > 0) {
+      setProducts(data.products.edges);
+    }
+  }, [data]);
+
+
+  console.log('categories', data?.productCategories.nodes.map((variant, index) => console.log(variant.name)));
+
   const iconSize = 18;
 
   const navLinks = [
@@ -44,7 +70,7 @@ const Header = () => {
       name: "Contact Us",
     },
   ];
-  const categories = [
+  const categoriesdump = [
     {
       id: "1",
       name: "Category 1",
@@ -120,7 +146,7 @@ const Header = () => {
       )}
 
       <div className="">
-        
+
         {/* header top bar */}
 
         <div className="hidden lg:flex flex-row justify-between bg-primaryColor con p-2 text-xs text-white">
@@ -162,7 +188,7 @@ const Header = () => {
 
         <div className="flex justify-between shadow-sm bg-white z-40 m-auto p-2 md:p-4 relative">
           <div className="w-1/3 flex items-center relative">
-            <Logo/>
+            <Logo />
             <button
               onClick={handleAllCategoriesClick}
               className="hidden ml-[15px] xl:ml-[50px] bg-primaryColor lg:flex text-white px-4 justify-center py-2 text-xs xl:text-sm items-center rounded-lg"
@@ -217,16 +243,16 @@ const Header = () => {
             <div className="hidden md:flex">
               <AvatarDropdown />
               <CartDropdown />
-              
+
             </div>
             <div className="block lg:hidden">
-                <button
-                  onClick={menuHandler}
-                  className=" flex w-10 h-10 sm:w-12 sm:h-12 rounded-full text-slate-700  hover:bg-slate-100  focus:outline-none items-center justify-center"
-                >
-                  <Menu className="text-primary-700" />
-                </button>
-              </div>
+              <button
+                onClick={menuHandler}
+                className=" flex w-10 h-10 sm:w-12 sm:h-12 rounded-full text-slate-700  hover:bg-slate-100  focus:outline-none items-center justify-center"
+              >
+                <Menu className="text-primary-700" />
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -239,7 +265,7 @@ const Header = () => {
         }
       >
         <div className="flex w-full items-center justify-between">
-          <Logo/>
+          <Logo />
           <div onClick={menuHandler} className="cursor-pointer">
             <XIcon />
           </div>
