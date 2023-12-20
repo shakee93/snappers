@@ -29,11 +29,11 @@ export default function Home() {
         <SectionHero2 />
         <div className=" gap-4 container m-auto">
           <div className="my-10">
-          <SectionSliderProductCard
-          data={SPORT_PRODUCTS.filter((_, i) => i < 7)}
-          subHeading="New Sports equipment"
-          heading="New Arrivals"
-        />
+            <SectionSliderProductCard
+              data={SPORT_PRODUCTS.filter((_, i) => i < 7)}
+              subHeading="New Sports equipment"
+              heading="New Arrivals"
+            />
           </div>
 
         </div>

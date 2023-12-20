@@ -3,7 +3,7 @@ import SectionPromo1 from "components/SectionPromo1";
 import ProductCard from "components/ProductCard";
 import { PRODUCTS } from "@/data/data";
 import {getClient} from "@/lib/apollo-ssr";
-import {GET_ALL_PRODUCTS, GET_CATEGORY} from "@/lib/graphql/products";
+import {GET_ALL_PRODUCTS, GET_CATEGORY, GET_VARIATIONS_PRODUCT} from "@/lib/graphql/products";
 import {notFound} from "next/navigation";
 import {Product} from "@/lib/graphql/types/graphql";
 import Image from "next/image";
@@ -25,7 +25,7 @@ export async function getData(categories : number[] | null = null)  {
     if (!data.products) {
         return {
             products: [],
-            productCategories: []
+            productCategories: [],
         }
     }
 
@@ -35,11 +35,37 @@ export async function getData(categories : number[] | null = null)  {
     }
 }
 
+export async function getVariationData(categories : number[] | null = null)  {
+
+    const {data} = await getClient().query(
+        {
+            query: GET_VARIATIONS_PRODUCT,
+            variables:   {
+                categoryIdIn: categories
+            }
+        }
+    )
+
+
+    if (!data.products) {
+        return {
+            variationproducts:[],
+        }
+    }
+
+    return {
+        varaitions: data.products.edges
+    }
+}
+
+
 const Page = async () => {
 
     const { products, productCategories } = await getData()
+    // const { variationproducts } = await getVariationData() 
 
-    console.log(products, productCategories);
+    // console.log(products, productCategories);
+    // console.log({variationproducts})
 
     return (
         <div
