@@ -12,10 +12,10 @@ import {CartItem, SimpleProduct, VariableProduct} from "@/graphql/defs/types/gra
 
 export default function CartDropdown() {
 
-  const {cart} = useCart();
+  const {cart, removeFromCart} = useCart();
 
   const renderProduct = (item: CartItem, index: number, close: () => void) => {
-    const { product, quantity  } = item;
+    const { product, quantity, key  } = item;
 
     if (!product?.node) {
       return null
@@ -58,10 +58,13 @@ export default function CartDropdown() {
             </div>
           </div>
           <div className="flex flex-1 items-end justify-between text-sm">
-            <p className="text-gray-500 dark:text-slate-400">{`Qty 1`}</p>
+            <p className="text-gray-500 dark:text-slate-400">Qty {quantity}</p>
 
             <div className="flex">
               <button
+                  onClick={e => removeFromCart([
+                      key
+                  ])}
                 type="button"
                 className="font-medium text-primary-6000 dark:text-primary-500 "
               >
