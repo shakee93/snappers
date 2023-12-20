@@ -27,8 +27,7 @@ const ProductGrid = ({ products }: { products: { node: Product }[] }) => {
         }
     }, [data]);
 
-    console.log({ data });
-    console.log({ error });
+    // console.log({ data });
 
     return loading ? (
         <div>loading...</div>

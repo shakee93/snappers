@@ -2,13 +2,14 @@ import SectionSliderCollections from "components/SectionSliderLargeProduct";
 import SectionPromo1 from "components/SectionPromo1";
 import ProductCard from "components/ProductCard";
 import { PRODUCTS } from "@/data/data";
+import {getClient} from "@/graphql/apollo-ssr";
+import {GET_ALL_PRODUCTS, GET_CATEGORY, GET_VARIATIONS_PRODUCT} from "@/graphql/defs/products";
 import {notFound} from "next/navigation";
 import {Product} from "@/graphql/defs/types/graphql";
 import Image from "next/image";
 import SidebarFilters from "@/app/components/SidebarFilters";
 import ProductGrid from "@/app/components/ProductGrid";
 import { useQuery } from "@apollo/client";
-import {GET_ALL_PRODUCTS, GET_CATEGORY, GET_VARIATIONS_PRODUCT} from "@/graphql/defs/products";
 
 
 export async function getData(categories : number[] | null = null)  {
