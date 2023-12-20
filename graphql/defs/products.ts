@@ -110,7 +110,7 @@ export const GET_PRODUCT = gql`
 
 export const GET_ALL_PRODUCTS = gql`
     query GetAllProducts($categoryIdIn: [Int]) {
-        products(first: 12,  where: {categoryIdIn: $categoryIdIn}) {
+        products(first: 45,  where: {categoryIdIn: $categoryIdIn}) {
             edges {
                 node {
                     name
@@ -134,6 +134,36 @@ export const GET_ALL_PRODUCTS = gql`
                                 name
                             }
                         }
+                    }
+                    ... on VariableProduct {
+                        name
+                        productCategories {
+                          nodes {
+                            name
+                          }
+                        }
+                        price
+                        productTags {
+                          nodes {
+                            name
+                          }
+                        }
+                        id
+                        variations {
+                          edges {
+                            node {
+                              id
+                              image {
+                                mediaItemUrl
+                                sizes
+                              }
+                              name
+                              price
+                              salePrice
+                            }
+                          }
+                        }
+                      
                     }
                 }
             }
@@ -175,6 +205,7 @@ export const GET_ALL_PRODUCTS_FILTER_CATEGORIES = gql`
                             }
                         }
                     }
+                    
 
                 }
             }

@@ -31,6 +31,22 @@ interface Product {
         nodes: ProductCategory[];
     };
     type: string;
+    variations?: {
+        edges: Variation[];
+    };
+}
+
+interface Variation {
+    node: {
+        id: string;
+        name: string;
+        image: {
+            mediaItemUrl: string;
+            sizes?: string[];
+        };
+        price: string;
+        salePrice?: string;
+    };
 }
 
 export interface ProductCardProps {
@@ -55,17 +71,20 @@ const ProductCard: FC<ProductCardProps> = ({
             nodes: [],
         },
         type: "",
+        variations: {
+            edges: [],
+        },
     },
     isLiked,
 }) => {
-    const { name, price, image, productCategories, slug, stockStatus } = data;
+    const { name, price, image, productCategories, slug, stockStatus, variations } = data;
     const [showModalQuickView, setShowModalQuickView] = useState(false);
 
 
     const [isHovered, setIsHovered] = useState(false);
     const [currentVariation, setCurrentVariation] = useState(0);
     const hoverIntervalRef = useRef<number | null>(null);
-    const delayBeforeNextImage = 500;
+    const delayBeforeNextImage = 1000;
 
     useEffect(() => {
         return () => {
@@ -75,27 +94,31 @@ const ProductCard: FC<ProductCardProps> = ({
         };
     }, []);
 
-    // const startSlider = () => {
-    //     hoverIntervalRef.current = window.setInterval(() => {
-    //         setCurrentVariation((prev) => (prev + 1) % (data.variants?.length || 1));
-    //     }, delayBeforeNextImage);
-    // };
+    /* Slider Start */
 
-    // const handleHover = () => {
-    //     setIsHovered(true);
-    //     startSlider();
-    // };
+    const startSlider = () => {
+        hoverIntervalRef.current = window.setInterval(() => {
+            setCurrentVariation((prev) => (prev + 1) % (variations?.edges.length || 1));
+        }, delayBeforeNextImage);
+    };
 
-    // const handleHoverOut = () => {
-    //     setIsHovered(false);
-    //     setCurrentVariation(0);
-    //     clearInterval(hoverIntervalRef.current!);
-    // };
+    const handleHover = () => {
+        setIsHovered(true);
+        startSlider();
+    };
 
-    // const handleDotClick = (index: number) => {
-    //     setCurrentVariation(index);
-    //     clearInterval(hoverIntervalRef.current!);
-    // };
+    const handleHoverOut = () => {
+        setIsHovered(false);
+        setCurrentVariation(0);
+        clearInterval(hoverIntervalRef.current!);
+    };
+
+    const handleDotClick = (index: number) => {
+        setCurrentVariation(index);
+        clearInterval(hoverIntervalRef.current!);
+    };
+
+    const variationImages = variations?.edges.map((variation) => variation.node.image.mediaItemUrl) || [];
 
     const sliderStyle = {
         display: 'flex',
@@ -203,40 +226,32 @@ const ProductCard: FC<ProductCardProps> = ({
         return "border-transparent";
     };
 
-    // const renderVariants = () => {
-    //     if (!variants || !variants.length || !variantType) {
-    //         return null;
-    //     }
-
-    //     if (variantType === "color") {
-
-    //         return (
-    //             <div className="flex space-x-1">
-    //                 {variants.map((variant, index) => (
-    //                     <div
-    //                         key={index}
-    //                         onClick={() => setVariantActive(index)}
-    //                         className={`relative w-6 h-6 rounded-full overflow-hidden z-10 border cursor-pointer ${variantActive === index
-    //                             ? getBorderClass(variant.color)
-    //                             : "border-transparent"
-    //                             }`}
-    //                         title={variant.name}
-    //                     >
-    //                         <div
-    //                             className={`absolute inset-0.5 rounded-full z-0 ${variant.color}`}
-    //                         ></div>
-    //                     </div>
-    //                 ))}
-    //             </div>
-    //         );
-    //     }
-
-    //     return (
-    //         <div className="flex ">
-
-    //         </div>
-    //     );
-    // };
+    const renderVariants = () => {
+        if (data.type !== "VARIABLE" || !variations || !variations.edges.length) {
+            return null;
+        } else {
+            return (
+                <div className="flex space-x-1">
+                    {variations.edges.map((variation, index) => (
+                        <div
+                            key={index}
+                            onClick={() => setCurrentVariation(index)}
+                            className={`relative w-6 h-6 rounded-full overflow-hidden z-10 border cursor-pointer ${currentVariation === index
+                                ? 'border-primaryColor'
+                                : 'border-transparent'
+                                }`}
+                            title={variation.node.name}
+                        >
+                            <div
+                                className="absolute inset-0.5 rounded-full z-0"
+                                style={{ backgroundColor: 'var(--your-variant-color-property)' }}
+                            ></div>
+                        </div>
+                    ))}
+                </div>
+            )
+        };
+    };
 
     const renderGroupButtons = () => {
         return (
@@ -290,21 +305,39 @@ const ProductCard: FC<ProductCardProps> = ({
             <div
                 className={`nc-ProductCard relative flex flex-col bg-white p-2 rounded-3xl ${className}`}
                 data-nc-id="ProductCard"
+                onMouseEnter={handleHover}
+                onMouseLeave={handleHoverOut}
             >
                 <div className="relative flex-shrink-0 bg-slate-50 dark:bg-slate-300 rounded-3xl overflow-hidden group">
 
                     <Link href={`/product/${slug}`}>
-
-                        <Image
-                            width={300}
-                            height={300}
-                            src={image?.mediaItemUrl || ''}
-                            alt={name || ''}
-                            className="object-cover w-full h-full drop-shadow-xl"
-                        />
+                        <div style={sliderStyle}>
+                            {variations?.edges && variations.edges.some(variation => variation.node?.image?.mediaItemUrl) ? (
+                                variations.edges.map((variation, index) => (
+                                    <div key={index} className="w-full flex-shrink-0">
+                                        <Image
+                                            src={variation?.node?.image?.mediaItemUrl || ''}
+                                            width={300}
+                                            height={300}
+                                            alt={name || ''}
+                                            className="object-cover w-full h-full drop-shadow-xl"
+                                        />
+                                    </div>
+                                ))
+                            ) : (
+                                <Image
+                                    width={300}
+                                    height={300}
+                                    src={image?.mediaItemUrl || ''}
+                                    alt={name || ''}
+                                    className="object-cover w-full h-full drop-shadow-xl"
+                                />
+                            )}
+                        </div>
                     </Link>
 
-                    <ProductStatus status={stockStatus} />
+
+                    {/* <ProductStatus status={stockStatus} /> */}
 
                     <LikeButton liked={isLiked} className="absolute top-3 right-3 z-10" />
 
@@ -313,7 +346,11 @@ const ProductCard: FC<ProductCardProps> = ({
 
                 </div>
 
-                <div className="space-y-2 px-2.5 pt-5 pb-2.5">
+                <div className="space-y-2 px-2.5 pt-5 pb-2.5"
+                    onMouseEnter={handleHover}
+                    onMouseLeave={handleHoverOut}
+                >
+
                     {/* {renderVariants()} */}
 
                     <div>
