@@ -4,14 +4,14 @@ import SectionHero2 from "@/app/components/HomePage/SectionHero";
 import DiscoverMoreSlider from "@/app/components/HomePage/DiscoverMoreSlider";
 import SectionSliderProductCard from "@/app/components/SectionSliderProductCard";
 import { PRODUCTS, SPORT_PRODUCTS } from "@/data/data";
-import BackgroundSection from "@/components/BackgroundSection/BackgroundSection";
-import SectionGridMoreExplore from "@/components/SectionGridMoreExplore/SectionGridMoreExplore";
+import BackgroundSection from "@/app/components/HomePage/BackgroundSection";
+import SectionGridMoreExplore from "@/app/components/HomePage/SectionGridMoreExplore";
 import SectionSliderCategories from "@/components/SectionSliderCategories/SectionSliderCategories";
 import SectionClientSay from "@/components/SectionClientSay/SectionClientSay";
 import SectionHowItWork from "@/app/components/HomePage/SectionHowItWork";
-import SectionPromo1 from "@/components/SectionPromo1";
-import SectionPromo2 from "@/components/SectionPromo2";
-import SectionPromo3 from "@/components/SectionPromo3";
+import SectionPromo1 from "@/app/components/HomePage/SectionPromo1";
+import SectionPromo2 from "@/app/components/HomePage/SectionPromo2";
+import SectionPromo3 from "@/app/components/HomePage/SectionPromo3";
 import SectionSliderLargeProduct from "@/components/SectionSliderLargeProduct";
 import Heading from "@/components/Heading/Heading";
 import SectionMagazine5 from "@/containers/BlogPage/SectionMagazine5";
@@ -98,7 +98,7 @@ export default function Home() {
           </div>
 
           {/* SECTION */}
-          <SectionClientSay />
+          {/* <SectionClientSay /> */}
         </div>
       </div>
     </main>
