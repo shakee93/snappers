@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter,  Route } from "react-router-dom";
 import { Page } from "./types";
 import ScrollToTop from "./ScrollToTop";
 import Footer from "@/shared/Footer/Footer";
@@ -67,12 +67,6 @@ const MyRoutes = () => {
       <Toaster />
       <ScrollToTop />
       <SiteHeader />
-      <Routes>
-        {pages.map(({ component: Component, path }, index) => {
-          return <Route key={index} element={<Component />} path={path} />;
-        })}
-        <Route element={<Page404 />} />
-      </Routes>
       <Footer />
     </BrowserRouter>
   );

@@ -1,7 +1,7 @@
-import {getClient} from "@/lib/apollo-ssr";
-import {GET_POST} from "@/lib/graphql/posts";
-import {GET_CATEGORY_SLUGS, GET_PRODUCT, GET_PRODUCT_SLUGS} from "@/lib/graphql/products";
-import {Product, ProductCategory} from "@/lib/graphql/types/graphql";
+import {getClient} from "@/graphql/apollo-ssr";
+import {GET_POST} from "@/graphql/defs/posts";
+import {GET_CATEGORY_SLUGS, GET_PRODUCT, GET_PRODUCT_SLUGS} from "@/graphql/defs/products";
+import {Product, ProductCategory} from "@/graphql/defs/types/graphql";
 import {notFound} from "next/navigation";
 import Image from "next/image";
 
