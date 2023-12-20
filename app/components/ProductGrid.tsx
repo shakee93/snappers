@@ -1,6 +1,10 @@
 "use client"
-
-import React, { FC, useEffect, useState } from "react";
+import {Product} from "@/graphql/defs/types/graphql";
+import Image from "next/image";
+import {useStore} from "@/store/store";
+import {useEffect, useState} from "react";
+import {GET_ALL_PRODUCTS} from "@/graphql/defs/products";
+import {useQuery} from "@apollo/client";
 import Link from "next/link";
 import { useStore } from "@/store/store";
 import { useQuery } from "@apollo/client";

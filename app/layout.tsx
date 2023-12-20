@@ -11,8 +11,9 @@ import "../styles/index.scss";
 import "./index.css";
 import "../fonts/line-awesome-1.3.0/css/line-awesome.css";
 import "rc-slider/assets/index.css";
-import ApolloWrapper from "@/lib/apollo-client";
+import ApolloWrapper from "@/graphql/apollo-client";
 import Header from "@/app/components/globalComponents/header";
+import {SessionProvider} from "@/context/SessionProvider";
 // import Footer from "@/app/components/globalComponents/footer";
 // import reportWebVitals from "./reportWebVitals";
 
@@ -30,7 +31,9 @@ export default function RootLayout({
         {/* <MainNav1 isTop/> */}
         {/* <MainNav2/> */}
         <ApolloWrapper>
-          {children}
+          <SessionProvider>
+            {children}
+          </SessionProvider>
         </ApolloWrapper>
         {/* <Footer/> */}
         </body>

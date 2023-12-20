@@ -23,10 +23,10 @@ import SingleProductBlock from "./components/SingleProductBlock/SingleProductBlo
 export default function Home() {
   return (
     <main>
-
       <div className="nc-PageHome relative overflow-hidden">
-        {/* SECTION HERO */}
-        <SectionHero2 />
+        <div className="z-30">
+          <SectionHero2 />
+        </div>
         <div className=" gap-4 container m-auto">
           <div className="my-10">
             <SectionSliderProductCard
@@ -35,7 +35,6 @@ export default function Home() {
               heading="New Arrivals"
             />
           </div>
-
         </div>
 
         <div className="mt-24 lg:mt-32">
