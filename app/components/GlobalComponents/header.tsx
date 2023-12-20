@@ -43,7 +43,7 @@ const Header = () => {
   }, [data]);
 
 
-  console.log('categories', data?.productCategories.nodes.map((variant, index) => console.log(variant.name)));
+  // console.log('categories', data?.productCategories.nodes.map((variant, index) => console.log(variant.name)));
 
   const iconSize = 18;
 

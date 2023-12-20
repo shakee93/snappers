@@ -11,9 +11,9 @@ import "../fonts/line-awesome-1.3.0/css/line-awesome.css";
 import "rc-slider/assets/index.css";
 import ApolloWrapper from "@/graphql/apollo-client";
 import {SessionProvider} from "@/context/SessionProvider";
-import MobileBottomNav from "./components/globalComponents/MobileBottomNav";
+import MobileBottomNav from "@/app/components/GlobalComponents/MobileBottomNav";
 import {CartProvider} from "@/context/CartProvider";
-import Header from "@/app/components/globalComponents/header";
+import Header from "@/app/components/GlobalComponents/header";
 // import Footer from "@/app/components/globalComponents/footer";
 // import reportWebVitals from "./reportWebVitals";
 
