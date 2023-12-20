@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import SiteLogo from "@/public/global/logo.webp";
 import {
   Menu,
   XIcon,
@@ -16,7 +15,8 @@ import AvatarDropdown from "../Header/AvatarDropdown";
 import CartDropdown from "../Header/CartDropdown";
 import Link from "next/link";
 import Image from "next/image";
-import MegaMenu from "./CategoriesMenu";
+import MegaMenu from "@/app/components/GlobalComponents/CategoriesMenu";
+import Logo from "@/app/components/GlobalComponents/Logo";
 
 const Header = () => {
   const iconSize = 18;
@@ -119,8 +119,11 @@ const Header = () => {
         ></div>
       )}
 
-      <div className="hidden md:block">
-        <div className="flex flex-row justify-between bg-primaryColor con p-2 text-xs text-white">
+      <div className="">
+        
+        {/* header top bar */}
+
+        <div className="hidden lg:flex flex-row justify-between bg-primaryColor con p-2 text-xs text-white">
           <div className="flex gap-2 xl:w-48"></div>
           <div className="flex gap-2 items-center w-4/12">
             Contact Us :
@@ -154,19 +157,15 @@ const Header = () => {
             250/54, Ground Floor, Liberty Plaza, Colombo 03.
           </div>
         </div>
-        <div className="flex justify-between shadow-sm bg-white z-40 m-auto p-4 relative">
+
+        {/* header navigation bar */}
+
+        <div className="flex justify-between shadow-sm bg-white z-40 m-auto p-2 md:p-4 relative">
           <div className="w-1/3 flex items-center relative">
-            <Link href={"/"}>
-              <Image
-                width={200}
-                src={SiteLogo}
-                alt="logo"
-                className="h-20  lg:h-32 p-4 relative top-[-25px] lg:top-[-50px] mb-[-60px] lg:mb-[-80px] shadow-xl z-50 bg-white w-auto rounded-b-2xl"
-              ></Image>
-            </Link>
+            <Logo/>
             <button
               onClick={handleAllCategoriesClick}
-              className="ml-[15px] xl:ml-[50px] bg-primaryColor flex text-white px-4 justify-center py-2 text-xs xl:text-sm items-center rounded-lg"
+              className="hidden ml-[15px] xl:ml-[50px] bg-primaryColor lg:flex text-white px-4 justify-center py-2 text-xs xl:text-sm items-center rounded-lg"
             >
               All Categories{" "}
               {showMegaMenu ? (
@@ -183,7 +182,7 @@ const Header = () => {
               onMouseLeave={handleMegaMenuLeave}
             />
           )}
-          <div className="w-1/3 flex justify-center">
+          <div className="hidden w-1/3 md:flex justify-center">
             <form
               className="flex-1 py-2 text-primary-700"
               onSubmit={(e) => {
@@ -205,7 +204,7 @@ const Header = () => {
           </div>
           <div className=""></div>
           <div className="w-1/3 flex items-center justify-end">
-            <ul className="flex gap-1 xl:gap-2 text-[12px] xl:text-[13px] items-center font-medium justify-end text-primary-700 xl:mr-5 w-full">
+            <ul className="hidden lg:flex gap-1 xl:gap-2 text-[12px] xl:text-[13px] items-center font-medium justify-end text-primary-700 xl:mr-5 w-full">
               {navLinks.map((item) => (
                 <li
                   key={item.id}
@@ -215,31 +214,23 @@ const Header = () => {
                 </li>
               ))}
             </ul>
-            <div className="flex">
-              {/* <button className="flex w-10 h-10 sm:w-12 sm:h-12 rounded-full text-slate-700 hover:bg-slate-100 focus:outline-none items-center justify-center">
-            <UserRound className="text-primary-700" />
-          </button> */}
+            <div className="hidden md:flex">
               <AvatarDropdown />
               <CartDropdown />
-              {/* <button className="flex w-10 h-10 sm:w-12 sm:h-12 rounded-full text-slate-700 hover:bg-slate-100 focus:outline-none items-center justify-center">
-            <ShoppingBag className="text-primary-700" />
-            <span className="w-4 h-4 flex items-center justify-center bg-red-500 relative mt-[-20px] ml-[-9px]  rounded-full text-[10px] leading-none text-white font-medium">
-              99
-            </span>
-          </button> */}
+              
             </div>
+            <div className="block lg:hidden">
+                <button
+                  onClick={menuHandler}
+                  className=" flex w-10 h-10 sm:w-12 sm:h-12 rounded-full text-slate-700  hover:bg-slate-100  focus:outline-none items-center justify-center"
+                >
+                  <Menu className="text-primary-700" />
+                </button>
+              </div>
           </div>
         </div>
       </div>
-      <div className="block md:hidden">
-        {/* <TabHeader /> */}
-        <button
-          onClick={menuHandler}
-          className=" flex w-10 h-10 sm:w-12 sm:h-12 rounded-full text-slate-700  hover:bg-slate-100  focus:outline-none items-center justify-center"
-        >
-          <Menu className="text-primary-700" />
-        </button>
-      </div>
+
       <div
         className={
           menuOpen
@@ -248,9 +239,11 @@ const Header = () => {
         }
       >
         <div className="flex w-full items-center justify-between">
+          <Logo/>
           <div onClick={menuHandler} className="cursor-pointer">
             <XIcon />
           </div>
+
         </div>
         <div className="flex flex-col gap-5">
           <ul className="gap-1 text-base mt-12 text-center items-center font-medium  text-primary-700 ">

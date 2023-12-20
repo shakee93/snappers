@@ -12,8 +12,9 @@ import "./index.css";
 import "../fonts/line-awesome-1.3.0/css/line-awesome.css";
 import "rc-slider/assets/index.css";
 import ApolloWrapper from "@/graphql/apollo-client";
-import Header from "@/app/components/globalComponents/header";
+import Header from "@/app/components/GlobalComponents/Header";
 import {SessionProvider} from "@/context/SessionProvider";
+import MobileBottomNav from "./components/GlobalComponents/MobileBottomNav";
 // import Footer from "@/app/components/globalComponents/footer";
 // import reportWebVitals from "./reportWebVitals";
 
@@ -35,6 +36,10 @@ export default function RootLayout({
             {children}
           </SessionProvider>
         </ApolloWrapper>
+        
+        <div className="md:hidden">
+          <MobileBottomNav />
+        </div>
         {/* <Footer/> */}
         </body>
     </html>
