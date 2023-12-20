@@ -16,7 +16,7 @@ const CartItemProduct = ({
 }) => {
 
     const { product, quantity, key  } = cartItem;
-    const { removeFromCart } = useCart()
+    const { removeFromCart, updateCart } = useCart()
 
     if (!product?.node) {
         return null
@@ -154,7 +154,10 @@ const CartItemProduct = ({
                         </div>
 
                         <div className="hidden sm:block text-center relative">
-                            <NcInputNumber defaultValue={quantity || 1} className="relative z-10" />
+                            <NcInputNumber onChange={async q => {
+                                await updateCart(key, q)
+
+                            }} defaultValue={quantity || 1} className="relative z-10" />
                         </div>
 
                         <div className="hidden flex-1 sm:flex justify-end">

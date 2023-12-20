@@ -9,7 +9,13 @@ import {
     OperationVariables,
     useMutation, FetchResult
 } from '@apollo/client';
-import {ADD_TO_CART, GET_CART, GET_SESSION, REMOVE_ITEMS_FROM_CART} from "@/graphql/defs/cart";
+import {
+    ADD_TO_CART,
+    GET_CART,
+    GET_SESSION,
+    REMOVE_ITEMS_FROM_CART,
+    UPDATE_CART_ITEM_QUANTITY
+} from "@/graphql/defs/cart";
 import {Cart, Customer} from "@/graphql/defs/types/graphql";
 
 
@@ -18,7 +24,7 @@ type CartSession = {
     customer: Customer | null
     loading: boolean | null
     error?: ApolloError
-    updateCart?: () => void
+    updateCart: (key: string, quantity: number) => void
     removeFromCart: (keys : string[]) => void
     addToCart: (id : number) => void
 }
@@ -28,7 +34,8 @@ const CartContext = createContext<CartSession>({
     customer: null,
     loading: null,
     removeFromCart : (keys) => {},
-    addToCart : (id) => {}
+    addToCart : (id) => {},
+    updateCart : (key, q) => {}
 });
 
 export function useCart() {
@@ -48,11 +55,11 @@ export function CartProvider({ children }: {
         }
     }) => {
         const key = Object.keys(data)[0]
-        setCart(data?.[key]?.cart)
-        setCustomer(data?.[key]?.customer)
+        setCart(data?.[key]?.cart || data.cart)
+        setCustomer(data?.[key]?.customer || data.customer)
     }
 
-    const { loading, error } = useQuery(GET_CART, {
+    const { data, loading, error } = useQuery(GET_CART, {
         fetchPolicy: 'no-cache',
         onCompleted: refreshData
     })
@@ -62,13 +69,13 @@ export function CartProvider({ children }: {
         onCompleted: refreshData
     })
 
-    const [_addToCart, { loading: adding }] = useMutation(ADD_TO_CART, {
+    const [_addToCart] = useMutation(ADD_TO_CART, {
         onCompleted: refreshData
     });
 
-    const updateCart = () => {
-
-    }
+    const [_updateCart] = useMutation(UPDATE_CART_ITEM_QUANTITY, {
+        onCompleted: refreshData
+    });
 
     const removeFromCart = async (keys: string[] = []) => {
 
@@ -90,6 +97,16 @@ export function CartProvider({ children }: {
 
     }
 
+    const updateCart = async (key: string, quantity: number) => {
+        return await _updateCart({
+            variables: {
+                items: [{
+                    key,
+                    quantity
+                }]
+            }
+        })
+    }
 
     return (
         <CartContext.Provider value={{
