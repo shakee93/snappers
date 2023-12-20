@@ -1,9 +1,9 @@
-import {getClient} from "@/lib/apollo-ssr";
+import {getClient} from "@/graphql/apollo-ssr";
 import {notFound} from 'next/navigation'
-import {GET_POST, GET_POST_SLUGS} from "@/lib/graphql/posts";
-import {Post, ProductCategory} from "@/lib/graphql/types/graphql";
+import {GET_POST, GET_POST_SLUGS} from "@/graphql/defs/posts";
+import {Post, ProductCategory} from "@/graphql/defs/types/graphql";
 import parseHTML from "html-react-parser";
-import {GET_CATEGORY, GET_CATEGORY_SLUGS} from "@/lib/graphql/products";
+import {GET_CATEGORY, GET_CATEGORY_SLUGS} from "@/graphql/defs/products";
 import Image from "next/image";
 
 export async function generateStaticParams() {
@@ -27,7 +27,7 @@ async function getData(slug: string) {
 
 
     if (!data.productCategory) {
-        return undefined
+        return notFound()
     }
 
     return data.productCategory
@@ -35,10 +35,6 @@ async function getData(slug: string) {
 
 const Brand = async ({params}: { params: { brand: string} }) => {
     const post = await getData(params.brand)
-
-    if (!post) {
-        notFound()
-    }
 
     return <div>
         <div>

@@ -1,7 +1,7 @@
-import {getClient} from "@/lib/apollo-ssr";
-import {GET_POST} from "@/lib/graphql/posts";
-import {GET_CATEGORY_SLUGS, GET_PRODUCT, GET_PRODUCT_SLUGS} from "@/lib/graphql/products";
-import {Product, ProductCategory} from "@/lib/graphql/types/graphql";
+import {getClient} from "@/graphql/apollo-ssr";
+import {GET_POST} from "@/graphql/defs/posts";
+import {GET_CATEGORY_SLUGS, GET_PRODUCT, GET_PRODUCT_SLUGS} from "@/graphql/defs/products";
+import {Product, ProductCategory} from "@/graphql/defs/types/graphql";
 import {notFound} from "next/navigation";
 import Image from "next/image";
 
@@ -11,7 +11,7 @@ export async function generateStaticParams() {
     const {data: {products}} = await getClient().query({
         query: GET_PRODUCT_SLUGS
     });
-    
+
     return products.nodes.map((p: ProductCategory) => p.slug);
 }
 
@@ -52,7 +52,7 @@ const Page = async ({ params }: any) => {
         <ul>
             <li>{product.name}</li>
             <li>
-                <img width={100} height={100} src={product.image?.link || ''} alt={product.name || ''}/>
+                <Image fill style={{ objectFit: 'cover' }} src={product.image?.link || ''} alt={product.name || ''}/>
             </li>
         </ul>
     </div>
