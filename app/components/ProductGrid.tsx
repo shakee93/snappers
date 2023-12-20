@@ -1,9 +1,9 @@
 "use client"
-import {Product} from "@/lib/graphql/types/graphql";
+import {Product} from "@/graphql/defs/types/graphql";
 import Image from "next/image";
 import {useStore} from "@/store/store";
 import {useEffect, useState} from "react";
-import {GET_ALL_PRODUCTS} from "@/lib/graphql/products";
+import {GET_ALL_PRODUCTS} from "@/graphql/defs/products";
 import {useQuery} from "@apollo/client";
 import Link from "next/link";
 

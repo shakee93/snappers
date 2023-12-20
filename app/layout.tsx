@@ -1,6 +1,6 @@
 "use client";
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
 import MainNav1 from "components/Header/MainNav1";
 import MainNav2 from "components/Header/MainNav2";
 
@@ -11,8 +11,9 @@ import "../styles/index.scss";
 import "./index.css";
 import "../fonts/line-awesome-1.3.0/css/line-awesome.css";
 import "rc-slider/assets/index.css";
-import ApolloWrapper from "@/lib/apollo-client";
+import ApolloWrapper from "@/graphql/apollo-client";
 import Header from "@/app/components/globalComponents/header";
+import {SessionProvider} from "@/context/SessionProvider";
 // import Footer from "@/app/components/globalComponents/footer";
 // import reportWebVitals from "./reportWebVitals";
 
@@ -21,18 +22,21 @@ import Header from "@/app/components/globalComponents/header";
 export default function RootLayout({
   children,
 }: {
-  children: React.ReactNode;
+  children: React.ReactNode
 }) {
   return (
     <html lang="en">
       <body className="bg-gray-50 text-base dark:bg-slate-900 text-slate-900 dark:text-slate-200">
-        <div className="">
-          <Header />
-        </div>
-
-        <ApolloWrapper>{children}</ApolloWrapper>
+        <Header/>
+        {/* <MainNav1 isTop/> */}
+        {/* <MainNav2/> */}
+        <ApolloWrapper>
+          <SessionProvider>
+            {children}
+          </SessionProvider>
+        </ApolloWrapper>
         {/* <Footer/> */}
-      </body>
+        </body>
     </html>
-  );
+  )
 }
