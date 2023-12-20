@@ -122,6 +122,7 @@ export const GET_ALL_PRODUCTS = gql`
                     ... on SimpleProduct {
                         id
                         name
+                        stockStatus
                         productCategories {
                             nodes {
                                 name
