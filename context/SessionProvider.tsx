@@ -2,7 +2,7 @@
 
 import React, {createContext, ReactNode, useContext, useEffect, useState} from 'react';
 import { useQuery, useApolloClient } from '@apollo/client';
-import {GET_CART, GET_SESSION} from "@/graphql/defs/cart";
+import {GET_CART} from "@/graphql/defs/cart";
 
 type Session = {
     sessionToken: string | null

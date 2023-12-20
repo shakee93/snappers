@@ -1,4 +1,5 @@
 import { gql } from '@apollo/client';
+import {ProductContentFull} from "@/graphql/defs/products.fragments";
 
 
 export const GET_PRODUCT_SLUGS = gql`
@@ -6,94 +7,6 @@ export const GET_PRODUCT_SLUGS = gql`
         products {
             nodes {
                 slug
-            }
-        }
-    }
-`;
-
-
-export const ProductContentFull = gql`
-    fragment ProductContentFull on Product {
-        id
-        databaseId
-        slug
-        name
-        type
-        description
-        shortDescription(format: RAW)
-        image {
-            id
-            sourceUrl
-            altText
-        }
-        galleryImages {
-            nodes {
-                id
-                sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
-                altText
-            }
-        }
-        productTags(first: 20) {
-            nodes {
-                id
-                slug
-                name
-            }
-        }
-        attributes {
-            nodes {
-                id
-                attributeId
-                ... on LocalProductAttribute {
-                    name
-                    options
-                    variation
-                }
-                ... on GlobalProductAttribute {
-                    name
-                    options
-                    variation
-                }
-            }
-        }
-        ... on SimpleProduct {
-            onSale
-            stockStatus
-            price
-            rawPrice: price(format: RAW)
-            regularPrice
-            salePrice
-            stockStatus
-            stockQuantity
-            soldIndividually
-        }
-        ... on VariableProduct {
-            onSale
-            price
-            rawPrice: price(format: RAW)
-            regularPrice
-            salePrice
-            stockStatus
-            stockQuantity
-            soldIndividually
-            variations(first: 50) {
-                nodes {
-                    id
-                    databaseId
-                    name
-                    price
-                    rawPrice: price(format: RAW)
-                    regularPrice
-                    salePrice
-                    onSale
-                    attributes {
-                        nodes {
-                            name
-                            label
-                            value
-                        }
-                    }
-                }
             }
         }
     }
@@ -179,45 +92,6 @@ export const GET_ALL_PRODUCTS = gql`
     }
 `
 
-export const GET_ALL_PRODUCTS_FILTER_CATEGORIES = gql`
-    query GetAllProducts($categoryIdIn: [Int]) {
-        products(first: 30,  where: {categoryIdIn: $categoryIdIn}) {
-            edges {
-                node {
-                    name
-                    slug
-                    image {
-                        mediaItemUrl
-                    }
-                    type
-                    ... on SimpleProduct {
-                        id
-                        name
-                        productCategories {
-                            nodes {
-                                name
-                            }
-                        }
-                        price
-                        productTags {
-                            nodes {
-                                name
-                            }
-                        }
-                    }
-                    
-
-                }
-            }
-        }
-        productCategories(first: 100) {
-            nodes {
-                name
-                slug
-            }
-        }
-    }
-`
 
 
 export const GET_CATEGORY_SLUGS = gql`
@@ -246,7 +120,7 @@ export const GET_CATEGORY = gql`
 `;
 
 export const GET_VARIATIONS_PRODUCT = gql`
-query GetAllProducts($categoryIdIn: [Int]) {
+query GetAllProductVariations($categoryIdIn: [Int]) {
     products(first: 25, where: {categoryIdIn: $categoryIdIn}) {
       edges {
         node {
