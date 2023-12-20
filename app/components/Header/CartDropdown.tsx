@@ -7,23 +7,35 @@ import Link from "next/link";
 import ButtonPrimary from "@/public/shared/Button/ButtonPrimary";
 import ButtonSecondary from "@/public/shared/Button/ButtonSecondary";
 import Image from "next/image";
+import {useCart} from "@/context/CartProvider";
+import {CartItem, SimpleProduct, VariableProduct} from "@/graphql/defs/types/graphql";
 
 export default function CartDropdown() {
-  const renderProduct = (item: Product, index: number, close: () => void) => {
-    const { name, price, image } = item;
+
+  const {cart} = useCart();
+
+  const renderProduct = (item: CartItem, index: number, close: () => void) => {
+    const { product, quantity  } = item;
+
+    if (!product?.node) {
+      return null
+    }
+
+    const { name, image, price, slug, salePrice, type, stockQuantity } : SimpleProduct | VariableProduct = product.node;
+
     return (
       <div key={index} className="flex py-5 last:pb-0">
         <div className="relative h-24 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
          <Image fill style={{ objectFit: 'cover' }}
             layout="fill"
-            src={image}
-            alt={name}
+            src={image?.sourceUrl || ''}
+            alt={name || ''}
             className="h-full w-full object-contain object-center"
           />
           <Link
             onClick={close}
             className="absolute inset-0"
-            href={"/product-detail"}
+            href={`/product/${slug}`}
           />
         </div>
 
@@ -32,7 +44,7 @@ export default function CartDropdown() {
             <div className="flex justify-between ">
               <div>
                 <h3 className="text-base font-medium ">
-                  <Link onClick={close} href={"/product-detail"}>
+                  <Link onClick={close} href={`/product/${slug}`}>
                     {name}
                   </Link>
                 </h3>
@@ -75,9 +87,13 @@ export default function CartDropdown() {
               <span className="mt-[1px]">3</span>
             </div>
             <div className="text-primaryColor">
-            <ShoppingBag/>
-
+              <ShoppingBag/>
             </div>
+            {cart?.contents?.itemCount &&
+                <div className="w-3.5 h-3.5 flex items-center justify-center bg-primary-500 absolute top-1.5 right-1.5 rounded-full text-[10px] leading-none text-white font-medium">
+                  <span className="mt-[1px]">{cart?.contents?.itemCount}</span>
+                </div>
+            }
 
             <Link className="block md:hidden absolute inset-0" href={"/cart"} />
           </Popover.Button>
@@ -96,7 +112,7 @@ export default function CartDropdown() {
                   <div className="max-h-[60vh] p-5 overflow-y-auto hiddenScrollbar">
                     <h3 className="text-xl font-semibold">Shopping cart</h3>
                     <div className="divide-y divide-slate-100 dark:divide-slate-700">
-                      {[PRODUCTS[0], PRODUCTS[1], PRODUCTS[2]].map(
+                      {cart?.contents?.nodes?.map(
                         (item, index) => renderProduct(item, index, close)
                       )}
                     </div>
@@ -109,7 +125,7 @@ export default function CartDropdown() {
                           Shipping and taxes calculated at checkout.
                         </span>
                       </span>
-                      <span className="">$299.00</span>
+                      <span className="">{cart?.subtotal}</span>
                     </p>
                     <div className="flex space-x-2 mt-5">
                       <ButtonSecondary
@@ -124,7 +140,7 @@ export default function CartDropdown() {
                         onClick={close}
                         className="flex-1"
                       >
-                        Check out
+                        Checkout
                       </ButtonPrimary>
                     </div>
                   </div>

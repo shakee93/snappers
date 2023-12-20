@@ -1,6 +1,6 @@
 "use client";
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import type {Metadata} from 'next'
+import {Inter} from 'next/font/google'
 import MainNav1 from "components/Header/MainNav1";
 import MainNav2 from "components/Header/MainNav2";
 
@@ -12,39 +12,37 @@ import "./index.css";
 import "../fonts/line-awesome-1.3.0/css/line-awesome.css";
 import "rc-slider/assets/index.css";
 import ApolloWrapper from "@/graphql/apollo-client";
-import Header from "@/app/components/GlobalComponents/Header";
 import {SessionProvider} from "@/context/SessionProvider";
-import MobileBottomNav from "./components/GlobalComponents/MobileBottomNav";
+import MobileBottomNav from "./components/globalComponents/MobileBottomNav";
 import {CartProvider} from "@/context/CartProvider";
+import Header from "@/app/components/globalComponents/header";
 // import Footer from "@/app/components/globalComponents/footer";
 // import reportWebVitals from "./reportWebVitals";
 
 // const inter = Inter({ subsets: ['latin'] })
 
 export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
+                                       children,
+                                   }: {
+    children: React.ReactNode
 }) {
-  return (
-    <html lang="en">
-      <body className="bg-gray-50 text-base dark:bg-slate-900 text-slate-900 dark:text-slate-200">
-        <Header/>
-        {/* <MainNav1 isTop/> */}
-        {/* <MainNav2/> */}
+    return (
+        <html lang="en">
         <ApolloWrapper>
-          <SessionProvider>
-            <CartProvider>
-              {children}
-            </CartProvider>
-          </SessionProvider>
-        </ApolloWrapper>
+            <SessionProvider>
+                <CartProvider>
+                    <body className="bg-gray-50 text-base dark:bg-slate-900 text-slate-900 dark:text-slate-200">
+                    <Header/>
 
-        <div className="md:hidden">
-          <MobileBottomNav />
-        </div>
-        {/* <Footer/> */}
-        </body>
-    </html>
-  )
+                    {children}
+
+                    <div className="md:hidden">
+                        <MobileBottomNav/>
+                    </div>
+                    </body>
+                </CartProvider>
+            </SessionProvider>
+        </ApolloWrapper>
+        </html>
+    )
 }
