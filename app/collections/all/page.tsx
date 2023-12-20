@@ -9,6 +9,7 @@ import SidebarFilters from "@/app/components/SidebarFilters";
 import ProductGrid from "@/app/components/ProductGrid";
 import { useQuery } from "@apollo/client";
 import {GET_ALL_PRODUCTS, GET_CATEGORY, GET_VARIATIONS_PRODUCT} from "@/graphql/defs/products";
+import {getClient} from "@/graphql/apollo-ssr";
 
 
 export async function getData(categories : number[] | null = null)  {

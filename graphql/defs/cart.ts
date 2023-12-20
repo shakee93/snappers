@@ -158,3 +158,34 @@ export const GET_CART = gql`
     ${CartContent}
     ${CustomerContent}
 `;
+
+
+export const UPDATE_CART_ITEM_QUANTITY = gql`
+    mutation UpdateCartItemQuantities($items: [CartItemQuantityInput]) {
+        updateItemQuantities(input: {items: $items}) {
+            cart {
+                ...CartContent
+            }
+            items {
+                ...CartItemContent
+            }
+        }
+    }
+    ${CartContent}
+    ${CartItemContent}
+`;
+
+export const REMOVE_ITEMS_FROM_CART = gql`
+    mutation RemoveItemsFromCart($keys: [ID], $all: Boolean) {
+        removeItemsFromCart(input: {keys: $keys, all: $all}) {
+            cart {
+                ...CartContent
+            }
+            cartItems {
+                ...CartItemContent
+            }
+        }
+    }
+    ${CartContent}
+    ${CartItemContent}
+`;

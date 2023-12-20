@@ -15,8 +15,8 @@ import AvatarDropdown from "../Header/AvatarDropdown";
 import CartDropdown from "../Header/CartDropdown";
 import Link from "next/link";
 import Image from "next/image";
-import MegaMenu from "@/app/components/GlobalComponents/CategoriesMenu";
-import Logo from "@/app/components/GlobalComponents/Logo";
+import MegaMenu from "@/app/components/globalComponents/CategoriesMenu";
+import Logo from "@/app/components/globalComponents/Logo";
 
 const Header = () => {
   const iconSize = 18;
