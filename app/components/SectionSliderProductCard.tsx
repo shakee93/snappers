@@ -1,11 +1,12 @@
-import React, { FC, useEffect, useId, useRef } from "react";
+import React, { FC, useEffect, useId, useRef, useState } from "react";
+import { useQuery } from "@apollo/client";
 import Heading from "@/app/components/Heading/Heading";
 import Glide from "@glidejs/glide";
-import ProductCard from "@/app/components/ProductCard";
+import ProductCard from "@/app/components/ProductCard3";
 import { Product, PRODUCTS } from "@/data/data";
 
 import { getClient } from "@/lib/apollo-ssr";
-import { GET_ALL_PRODUCTS, GET_CATEGORY } from "@/lib/graphql/products";
+import { GET_PRODUCTS, GET_CATEGORY } from "@/graphql/defs/products";
 
 export interface SectionSliderProductCardProps {
   className?: string;
@@ -25,8 +26,18 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
   headingClassName,
   heading,
   subHeading = " ",
-  data = PRODUCTS.filter((_, i) => i < 8 && i > 2),
+  // data = PRODUCTS.filter((_, i) => i < 8 && i > 2),
 }) => {
+
+  const [_products, setProducts] = useState(null);
+  let { loading, error, data, refetch } = useQuery(GET_PRODUCTS);
+
+  useEffect(() => {
+    if (data?.products.edges.length > 0) {
+      setProducts(data.products.edges);
+    }
+  }, [data]);
+
   const sliderRef = useRef(null);
   const id = useId();
   const UNIQUE_CLASS = "glidejs" + id.replace(/:/g, "_");
@@ -69,7 +80,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
     return () => {
       slider.destroy();
     };
-  }, [sliderRef, UNIQUE_CLASS]);
+  }, [sliderRef, UNIQUE_CLASS, _products]);
 
   return (
     <div className={`nc-SectionSliderProductCard ${className}`}>
@@ -82,15 +93,17 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
         >
           {heading}
         </Heading>
+
         <div className="glide__track" data-glide-el="track">
           <ul className="glide__slides py-3">
-            {data.map((item, index) => (
+            {_products?.map((item, index) => (
               <li key={index} className={`glide__slide ${itemClassName}`}>
-                <ProductCard data={item} />
+                <ProductCard key={item.node.slug} data={item.node} />
               </li>
             ))}
           </ul>
         </div>
+
       </div>
     </div>
   );

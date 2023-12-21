@@ -5,6 +5,7 @@ import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import ButtonSecondary from "@/shared/Button/ButtonSecondary";
 import { ArrowsPointingOutIcon } from "@heroicons/react/24/outline";
 import BagIcon from "./BagIcon";
+import { StarIcon } from "@heroicons/react/24/solid";
 import toast, { Toaster } from 'react-hot-toast';
 import { Transition } from "@headlessui/react";
 import ModalQuickView from "./ModalQuickView";
@@ -26,7 +27,7 @@ const ProductCard: FC<ProductCardProps> = ({
     data,
     isLiked,
 }) => {
-    const { name, price, image, productCategories, slug, stockStatus, variations } = data;
+    const { name, price, image, productCategories, slug, stockStatus, variations, terms, reviewCount, averageRating, featured, salePrice } = data;
     const [showModalQuickView, setShowModalQuickView] = useState(false);
 
 
@@ -43,6 +44,8 @@ const ProductCard: FC<ProductCardProps> = ({
             }
         };
     }, []);
+
+    console.log({ data })
 
     /* Slider Start */
 
@@ -75,6 +78,8 @@ const ProductCard: FC<ProductCardProps> = ({
         cursor: 'pointer',
         transition: 'transform 0.3s ease-in-out',
         transform: `translateX(-${currentVariation * 100}%)`,
+        height: `250px`,
+        backgroundColor: `#fefefe`
     };
 
     /* End of Slider Code */
@@ -82,7 +87,7 @@ const ProductCard: FC<ProductCardProps> = ({
     const notifyAddTocart = () => {
         console.log('add to cart clicked')
         toast.custom(
-            (t : any) => (
+            (t: any) => (
                 <Transition
                     appear
                     show={t.visible}
@@ -204,7 +209,7 @@ const ProductCard: FC<ProductCardProps> = ({
 
     const renderGroupButtons = () => {
         return (
-            <div className="absolute bottom-0 group-hover:bottom-4 inset-x-1 flex justify-center opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+            <div className="absolute bottom-4 inset-x-1 flex justify-center opacity-100 visible transition-all">
                 <ButtonPrimary
                     className="shadow-lg"
                     fontSize="text-xs"
@@ -224,6 +229,7 @@ const ProductCard: FC<ProductCardProps> = ({
                     <span className="ml-1">Quick view</span>
                 </ButtonSecondary>
             </div>
+
         );
     };
 
@@ -263,13 +269,13 @@ const ProductCard: FC<ProductCardProps> = ({
                         <div style={sliderStyle}>
                             {variations?.edges && variations.edges.some(variation => variation.node?.image?.mediaItemUrl) ? (
                                 variations.edges.map((variation, index) => (
-                                    <div key={index} className="w-full flex-shrink-0">
+                                    <div key={index} className="w-full flex-shrink-0 bg-[#fefefe]">
                                         <Image
                                             src={variation?.node?.image?.mediaItemUrl || ''}
                                             width={300}
                                             height={300}
                                             alt={name || ''}
-                                            className="object-cover w-full h-full drop-shadow-xl"
+                                            className="object-contain w-auto h-full mx-auto my-auto"
                                         />
                                     </div>
                                 ))
@@ -279,7 +285,7 @@ const ProductCard: FC<ProductCardProps> = ({
                                     height={300}
                                     src={image?.mediaItemUrl || ''}
                                     alt={name || ''}
-                                    className="object-cover w-full h-full drop-shadow-xl"
+                                    className="object-contain w-auto h-full mx-auto my-auto"
                                 />
                             )}
                         </div>
@@ -307,15 +313,40 @@ const ProductCard: FC<ProductCardProps> = ({
                         >
                             {name}
                         </h2>
-                    </div>
-
-                    <div className="flex m-0 mb-2">
-                        <Prices price={price} />
-                        <div className="flex items-center mb-0.5">
+                        <div
+                            className={`nc-ProductCard__title text-xs lg:text-sm text-black line-clamp-2 min-h-[20px] lg:min-h-[20px] text-slate-800`}
+                        >
+                            {terms?.nodes.map((brand, index) => (
+                                <span key={index}>{brand.name}</span>
+                            ))}
                         </div>
                     </div>
-                </div>
 
+                    {(salePrice === price || salePrice === null || salePrice === '') && (
+                        <div className="flex m-0 mb-2 justify-between items-center">
+                            <Prices price={price} />
+                            <div className="flex items-center mb-0.5">
+                                <StarIcon className="w-4 h-4 pb-[1px] text-amber-400" />
+                                <span className="text-xs text-slate-500 dark:text-slate-400">
+                                    {averageRating ? (
+                                        <>{averageRating.toFixed(1)}</>
+                                    ) : (
+                                        <span className="mr-1">5</span>
+                                    )}
+                                    (
+                                    {reviewCount ? (
+                                        <>{reviewCount} review{reviewCount > 1 ? 's' : ''}</>
+                                    ) : (
+                                        '0 reviews'
+                                    )}
+                                    )
+                                </span>
+                            </div>
+                        </div>
+                    )}
+
+
+                </div>
             </div>
 
 

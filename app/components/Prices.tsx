@@ -15,11 +15,11 @@ const Prices: FC<PricesProps> = ({
     contentClass = " text-base font-medium",
 }) => {
     return (
-        <div className={`flex gap-2 ${className}`}>
+        <div className={`flex gap-2 items-center ${className}`}>
             <div
-                className={`flex ${contentClass}`}
+                className={`flex items-center border-2 border-gray-300 rounded-lg p-2 ${contentClass}`}
             >
-                <span className="text-[#335fac] text-base lg:text-lg font-bold !leading-none">
+                <span className="text-slate-950 text-base lg:text-sm font-bold !leading-none">
                     {price}
                 </span>
             </div>
@@ -33,6 +33,8 @@ const Prices: FC<PricesProps> = ({
                 </div>
             }
         </div>
+
+        
 
     );
 };

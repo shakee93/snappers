@@ -1,5 +1,5 @@
 import { gql } from '@apollo/client';
-import {ProductContentFull} from "@/graphql/defs/products.fragments";
+import { ProductContentFull } from "@/graphql/defs/products.fragments";
 
 
 export const GET_BRANDS = gql`
@@ -38,6 +38,9 @@ export const GET_ALL_PRODUCTS = gql`
                 node {
                     name
                     slug
+                    averageRating
+                    reviewCount
+                    onSale
                     image {
                         mediaItemUrl
                     }
@@ -61,6 +64,7 @@ export const GET_ALL_PRODUCTS = gql`
                             }
                         }
                         price
+                        salePrice
                         productTags {
                             nodes {
                                 name
@@ -182,3 +186,82 @@ query GetAllProductVariations($categoryIdIn: [Int]) {
     }
   }
   `;
+
+export const GET_PRODUCTS = gql`
+query GetAllProducts($categoryIdIn: [Int]) {
+  products(first: 10, where: {categoryIdIn: $categoryIdIn}) {
+    edges {
+      node {
+        name
+        slug
+        averageRating
+        reviewCount
+        featured
+        onSale
+        image {
+          mediaItemUrl
+        }
+        type
+        ... on SimpleProduct {
+          id
+          name
+          stockStatus
+          terms {
+            nodes {
+              ... on Brand {
+                id
+                name
+                slug
+              }
+            }
+          }
+          productCategories {
+            nodes {
+              name
+            }
+          }
+          price
+          salePrice
+          productTags {
+            nodes {
+              name
+            }
+          }
+          
+        }
+        ... on VariableProduct {
+          name
+          productCategories {
+            nodes {
+              name
+            }
+          }
+          price
+          productTags {
+            nodes {
+              name
+            }
+          }
+          id
+          variations {
+            edges {
+              node {
+                id
+                image {
+                  mediaItemUrl
+                  sizes
+                }
+                name
+                price
+                salePrice
+              }
+            }
+          }
+          averageRating
+          reviewCount
+        }
+      }
+    }
+  }
+}
+`

@@ -71,9 +71,7 @@ let TIME_OUT: NodeJS.Timeout | null = null;
 const SectionHero: FC<SectionHero2Props> = ({ className = "" }) => {
 
   const [slide, setSlide] = useState<SlideType[]>([]);
-  let { loading, error, data, refetch } = useQuery(GET_SLIDES, {
-
-  });
+  let { loading, error, data, refetch } = useQuery(GET_SLIDES);
 
   useEffect(() => {
     if (!loading && data?.slides?.nodes?.length > 0) {
