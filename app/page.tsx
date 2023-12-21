@@ -53,9 +53,9 @@ export default function Home() {
             ]}
           />
 
-          <div className="py-24 lg:py-32 border-t border-b border-slate-200 dark:border-slate-700">
+          {/* <div className="py-24 lg:py-32 border-t border-b border-slate-200 dark:border-slate-700">
             <SectionHowItWork />
-          </div>
+          </div> */}
 
           {/* SECTION */}
           <SectionPromo1 />
@@ -84,9 +84,9 @@ export default function Home() {
             subHeading="Best selling of the month"
           />
 
-          <div className="relative py-24 lg:py-32">
-            <BackgroundSection />
-            <div>
+          {/* <div className="relative py-24 lg:py-32"> */}
+            {/* <BackgroundSection /> */}
+            {/* <div>
               <Heading rightDescText="From the Ciseco blog">
                 The latest news
               </Heading>
@@ -94,8 +94,8 @@ export default function Home() {
               <div className="flex mt-16 justify-center">
                 <ButtonSecondary>Show all blog articles</ButtonSecondary>
               </div>
-            </div>
-          </div>
+            </div> */}
+          {/* </div> */}
 
           {/* SECTION */}
           {/* <SectionClientSay /> */}

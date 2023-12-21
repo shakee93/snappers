@@ -31,6 +31,7 @@ export const GET_PRODUCT = gql`
     }
 `;
 
+
 export const GET_ALL_PRODUCTS = gql`
     query GetAllProducts($categoryIdIn: [Int]) {
         products(first: 45,  where: {categoryIdIn: $categoryIdIn}) {
@@ -186,6 +187,40 @@ query GetAllProductVariations($categoryIdIn: [Int]) {
     }
   }
   `;
+
+
+export const GET_BRAND_ARCHIVE = gql`
+    query GetBrandArchive($brandId: ID!) {
+        brand(id: $brandId, idType: SLUG) {
+            id
+            name
+            description
+        }
+        productCategories(first: 100) {
+            nodes {
+                name
+                slug
+                id
+                databaseId
+            }
+        }
+        brands(first: 100) {
+            nodes {
+                id
+                name
+                slug
+            }
+        } 
+        products(first: 25) {
+            edges {
+                node {
+                    ...ProductContentFull
+                }
+            }
+        }
+    }
+    ${ProductContentFull} 
+`
 
 export const GET_PRODUCTS = gql`
 query GetAllProducts($categoryIdIn: [Int]) {

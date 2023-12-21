@@ -15,44 +15,13 @@ import AvatarDropdown from "../Header/AvatarDropdown";
 import CartDropdown from "../Header/CartDropdown";
 import Link from "next/link";
 import Image from "next/image";
-import MegaMenu from "@/app/components/GlobalComponents/CategoriesMenu";
-import Logo from "@/app/components/GlobalComponents/Logo";
-import { useQuery } from "@apollo/client";
-import { GET_ALL_PRODUCTS, GET_CATEGORY, GET_VARIATIONS_PRODUCT } from "@/graphql/defs/products";
-import { useStore } from "@/store/store";
-import { Product } from "@/graphql/types/graphql";
+import Logo from "./Logo";
+import NavLinks from "./NavLinks";
+import BrandBar from "./BrandBar";
 
 const Header = () => {
-
-  const { sidebar: { categories } } = useStore();
-  const [_products, setProducts] = useState(null);
-  let { loading, error, data, refetch } = useQuery(GET_ALL_PRODUCTS, {
-    variables: {
-      categoryIdIn: categories,
-    },
-  });
-
-  useEffect(() => {
-    refetch();
-  }, [categories]);
-
-  useEffect(() => {
-    if (data?.products.edges.length > 0) {
-      setProducts(data.products.edges);
-    }
-  }, [data]);
-
-
-  // console.log('categories', data?.productCategories.nodes.map((variant, index) => console.log(variant.name)));
-
   const iconSize = 18;
-
   const navLinks = [
-    {
-      id: 1,
-      href: "/",
-      name: "Home",
-    },
     {
       id: 2,
       href: "/collections/all",
@@ -70,35 +39,9 @@ const Header = () => {
       name: "Contact Us",
     },
   ];
-  const categoriesdump = [
-    {
-      id: "1",
-      name: "Category 1",
-      brands: [
-        { id: "1.1", name: "Brand 1.1", logoSrc: "/brand1.1-logo.png" },
-        { id: "1.2", name: "Brand 1.2", logoSrc: "/brand1.2-logo.png" },
-      ],
-    },
-    {
-      id: "2",
-      name: "Category 2",
-      brands: [
-        { id: "2.1", name: "Brand 2.1", logoSrc: "/brand2.1-logo.png" },
-        { id: "2.2", name: "Brand 2.2", logoSrc: "/brand2.2-logo.png" },
-      ],
-    },
-    {
-      id: "3",
-      name: "Category 3",
-      brands: [
-        { id: "3.1", name: "Brand 3.1", logoSrc: "/brand3.1-logo.png" },
-        { id: "3.2", name: "Brand 3.2", logoSrc: "/brand3.2-logo.png" },
-      ],
-    },
-  ];
+  
   const router = useRouter();
 
-  const [showMegaMenu, setShowMegaMenu] = useState(false);
 
   const [header, setHeader] = useState(false);
 
@@ -115,13 +58,8 @@ const Header = () => {
       setHeader(false);
     }
   };
-  const handleAllCategoriesClick = () => {
-    setShowMegaMenu((prevShowMegaMenu) => !prevShowMegaMenu);
-  };
+  
 
-  const handleMegaMenuLeave = () => {
-    setShowMegaMenu(false);
-  };
   useEffect(() => {
     window.addEventListener("scroll", scrollHeader);
 
@@ -134,7 +72,7 @@ const Header = () => {
     <header
       className={
         header
-          ? "fixed w-full flex flex-col justify-between top-0 bg-red-500 z-50 transition-all duration-1400"
+          ? "fixed w-full flex flex-col justify-between top-0 bg-white z-50 transition-all duration-1400"
           : "flex flex-col justify-between top-0 bg-white z-50 transition-all duration-1300"
       }
     >
@@ -146,10 +84,9 @@ const Header = () => {
       )}
 
       <div className="">
-
         {/* header top bar */}
 
-        <div className="hidden lg:flex flex-row justify-between bg-primaryColor con p-2 text-xs text-white">
+        {/* <div className="hidden lg:flex flex-row justify-between bg-primaryColor con p-2 text-xs text-white">
           <div className="flex gap-2 xl:w-48"></div>
           <div className="flex gap-2 items-center w-4/12">
             Contact Us :
@@ -182,33 +119,19 @@ const Header = () => {
             <MapPin size={iconSize} />
             250/54, Ground Floor, Liberty Plaza, Colombo 03.
           </div>
-        </div>
+        </div> */}
 
         {/* header navigation bar */}
 
         <div className="flex justify-between shadow-sm bg-white z-40 m-auto p-2 md:p-4 relative">
-          <div className="w-1/3 flex items-center relative">
-            <Logo />
-            <button
-              onClick={handleAllCategoriesClick}
-              className="hidden ml-[15px] xl:ml-[50px] bg-primaryColor lg:flex text-white px-4 justify-center py-2 text-xs xl:text-sm items-center rounded-lg"
-            >
-              All Categories{" "}
-              {showMegaMenu ? (
-                <ChevronUp className="h-5 ml-1" />
-              ) : (
-                <ChevronDown className="h-5 ml-1" />
-              )}
-            </button>
+          <div className="w-[300px] flex items-center relative">
+          <Logo />
+            
+          
           </div>
-          {showMegaMenu && (
-            <MegaMenu
-              categories={categories}
-              isVisible={showMegaMenu}
-              onMouseLeave={handleMegaMenuLeave}
-            />
-          )}
-          <div className="hidden w-1/3 md:flex justify-center">
+          
+          
+          <div className="hidden w-full md:flex justify-center">
             <form
               className="flex-1 py-2 text-primary-700"
               onSubmit={(e) => {
@@ -229,21 +152,13 @@ const Header = () => {
             </form>
           </div>
           <div className=""></div>
-          <div className="w-1/3 flex items-center justify-end">
-            <ul className="hidden lg:flex gap-1 xl:gap-2 text-[12px] xl:text-[13px] items-center font-medium justify-end text-primary-700 xl:mr-5 w-full">
-              {navLinks.map((item) => (
-                <li
-                  key={item.id}
-                  className="hover:bg-slate-200 rounded-3xl px-1 xl:px-3  py-1 text-center"
-                >
-                  <Link href={item.href}>{item.name}</Link>
-                </li>
-              ))}
-            </ul>
+          <div className="lg:w-[620px] flex items-center justify-end">
+            <div className="hidden lg:block">
+            <NavLinks />
+            </div>
             <div className="hidden md:flex">
               <AvatarDropdown />
               <CartDropdown />
-
             </div>
             <div className="block lg:hidden">
               <button
@@ -254,7 +169,11 @@ const Header = () => {
               </button>
             </div>
           </div>
+          
         </div>
+        <div>
+            <BrandBar/>
+          </div>
       </div>
 
       <div
@@ -269,7 +188,6 @@ const Header = () => {
           <div onClick={menuHandler} className="cursor-pointer">
             <XIcon />
           </div>
-
         </div>
         <div className="flex flex-col gap-5">
           <ul className="gap-1 text-base mt-12 text-center items-center font-medium  text-primary-700 ">

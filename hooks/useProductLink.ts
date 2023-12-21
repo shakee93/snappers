@@ -17,9 +17,7 @@ const useProductLink = (product?: Product | null) => {
             slug: 'product'
         };
 
-        console.log(product);
         setLink(`/${productBrand.slug}/${product.slug}`)
-        console.log('changed!', link);
     }, [product])
 
     return link

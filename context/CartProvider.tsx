@@ -12,7 +12,6 @@ import {
 import {
     ADD_TO_CART,
     GET_CART,
-    GET_SESSION,
     REMOVE_ITEMS_FROM_CART,
     UPDATE_CART_ITEM_QUANTITY
 } from "@/graphql/defs/cart";
@@ -26,7 +25,7 @@ type CartSession = {
     error?: ApolloError
     updateCart: (key: string, quantity: number) => void
     removeFromCart: (keys : string[]) => void
-    addToCart: (id : number) => void
+    addToCart: (id : number, quantity?: number) => void | Promise<Cart & Customer>
 }
 
 const CartContext = createContext<CartSession>({
@@ -87,11 +86,12 @@ export function CartProvider({ children }: {
 
     }
 
-    const addToCart = async (id: number) => {
+    const addToCart = async (id: number, quantity?: number) => {
 
        return await _addToCart({
            variables: {
-               productId: id
+               productId: id,
+               quantity: quantity
            },
        })
 

@@ -3,7 +3,7 @@ import SectionPromo1 from "components/SectionPromo1";
 import ProductCard from "components/ProductCard";
 import { PRODUCTS } from "@/data/data";
 import {getClient} from "@/graphql/apollo-ssr";
-import {GET_ALL_PRODUCTS, GET_CATEGORY, GET_VARIATIONS_PRODUCT} from "@/graphql/defs/products";
+import {GET_ALL_PRODUCTS, GET_BRAND_ARCHIVE, GET_CATEGORY, GET_VARIATIONS_PRODUCT} from "@/graphql/defs/products";
 import {notFound} from "next/navigation";
 import {Product} from "@/graphql/types/graphql";
 import Image from "next/image";
@@ -12,36 +12,56 @@ import ProductGrid from "@/app/components/ProductGrid";
 import { useQuery } from "@apollo/client";
 
 
-export async function getData(categories : number[] | null = null)  {
-    const {data} = await getClient().query(
+export async function getData(slug : string | null = null)  {
+
+
+    const {data, error} = await getClient().query(
         {
-            query: GET_ALL_PRODUCTS,
+            query: GET_BRAND_ARCHIVE,
             variables:   {
-                categoryIdIn: categories
-            }
+                brandId: slug
+            },
+            fetchPolicy: 'no-cache'
         }
     );
+
+
+    console.log(data.brand);
+
+    if (!data.brand) {
+        return notFound()
+    }
 
     if (!data.products) {
         return {
             products: [],
             productCategories: [],
-        }
+            brand: null
+        };
     }
 
     return {
         products: data.products.edges,
-        productCategories: data.products.categories
+        productCategories: data.productCategories.nodes,
+        brand: data.brand
     }
+    //
+    // return {
+    //     products: [],
+    //     brand: null
+    // }
+   
 }
 
 
 
-const Page = async () => {
+const Page = async ({ params } : {
+    params: {
+        brand: string
+    }
+}) => {
 
-    const { products } = await getData()
-
-    // console.log(products, productCategories);
+    const { products, productCategories, brand } = await getData(params.brand)
 
     return (
         <div
@@ -54,7 +74,7 @@ const Page = async () => {
                     {/* HEADING */}
                     <div className="max-w-screen-sm">
                         <h2 className="block text-2xl sm:text-3xl lg:text-4xl font-semibold">
-                            All Collections
+                            {brand.name}
                         </h2>
                         <span className="block mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
                             We not only help you design exceptional products, but also make it

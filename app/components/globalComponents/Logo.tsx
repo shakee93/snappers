@@ -6,10 +6,10 @@ const Logo = () => {
   return (
     <Link href={"/"}>
       <Image
-        width={200}
+        width={2000}
         src={SiteLogo}
         alt="logo"
-        className="h-20 md:h-28  lg:h-32 p-4 relative top-[-25px] lg:top-[-52px] mb-[-60px] lg:mb-[-80px] shadow-xl z-50 bg-white w-auto rounded-b-2xl"
+        className="h-20  lg:h-32 p-4 relative top-[-25px] md:top-[-40px] lg:top-[-20px] mb-[-60px] lg:mb-[-80px] shadow-xl z-50 bg-white w-auto rounded-b-2xl"
       ></Image>
     </Link>
   );
