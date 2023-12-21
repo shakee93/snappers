@@ -31,6 +31,7 @@ export async function getData(categories : number[] | null = null)  {
 
     return {
         products: data.products.edges,
+        productCategories: data.products.categories
     }
 }
 

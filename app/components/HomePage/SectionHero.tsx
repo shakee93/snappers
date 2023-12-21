@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { FC, useState, useEffect } from "react";
 import imageRightPng from "@/public/images/hero-right.png";
 import imageRightPng2 from "@/public/images/hero-right-2.png";
 import imageRightPng3 from "@/public/images/hero-right-3.png";
@@ -9,7 +9,11 @@ import Next from "shared/NextPrev/Next";
 import Prev from "shared/NextPrev/Prev";
 import useInterval from "react-use/lib/useInterval";
 import useBoolean from "react-use/lib/useBoolean";
-import Image, {StaticImageData} from "next/image";
+import Image, { StaticImageData } from "next/image";
+
+import { useStore } from "@/store/store";
+import { GET_SLIDES } from "@/graphql/defs/slides";
+import { useQuery } from "@apollo/client";
 
 interface Hero2DataType {
   image: StaticImageData;
@@ -18,6 +22,21 @@ interface Hero2DataType {
   btnText: string;
   btnLink: string;
 }
+
+interface SlideType {
+  id: string;
+  slideFields: {
+    mainHeading: string;
+    subHeading: string;
+    buttonText: string;
+    buttonLink: string;
+    featureImage: {
+      id: string;
+      sourceUrl: string;
+    };
+  };
+}
+
 export interface SectionHero2Props {
   className?: string;
 }
@@ -47,7 +66,25 @@ const DATA: Hero2DataType[] = [
 ];
 let TIME_OUT: NodeJS.Timeout | null = null;
 
+
+
 const SectionHero: FC<SectionHero2Props> = ({ className = "" }) => {
+
+  const [slide, setSlide] = useState<SlideType[]>([]);
+  let { loading, error, data, refetch } = useQuery(GET_SLIDES, {
+
+  });
+
+  useEffect(() => {
+    if (!loading && data?.slides?.nodes?.length > 0) {
+      setSlide(data.slides.nodes);
+    }
+  }, [loading]);
+
+  // console.log( data?.slides );
+  // console.log(slide?.map((i) => i.slideFields.mainHeading));
+
+
   // =================
   const [indexActive, setIndexActive] = useState(0);
   const [isRunning, toggleIsRunning] = useBoolean(true);
@@ -102,7 +139,7 @@ const SectionHero: FC<SectionHero2Props> = ({ className = "" }) => {
 
   const renderItem = (index: number) => {
     const isActive = indexActive === index;
-    const item = DATA[index];
+    const item = slide[index];
     if (!isActive) {
       return null;
     }
@@ -128,9 +165,8 @@ const SectionHero: FC<SectionHero2Props> = ({ className = "" }) => {
                 >
                   {isActive && (
                     <div
-                      className={`nc-SectionHero2Item__dot absolute inset-0 bg-slate-900 rounded-md ${
-                        isActive ? " " : " "
-                      }`}
+                      className={`nc-SectionHero2Item__dot absolute inset-0 bg-slate-900 rounded-md ${isActive ? " " : " "
+                        }`}
                     ></div>
                   )}
                 </div>
@@ -168,19 +204,19 @@ const SectionHero: FC<SectionHero2Props> = ({ className = "" }) => {
           >
             <div className="space-y-5 sm:space-y-6">
               <span className="nc-SectionHero2Item__subheading block text-base md:text-xl text-slate-700 font-medium">
-                {item.subHeading}
+                {item.slideFields.subHeading}
               </span>
               <h2 className="nc-SectionHero2Item__heading font-semibold text-3xl sm:text-4xl md:text-5xl xl:text-6xl 2xl:text-7xl !leading-[114%] text-slate-900">
-                {item.heading}
+                {item.slideFields.mainHeading}
               </h2>
             </div>
 
             <ButtonPrimary
               className="nc-SectionHero2Item__button dark:bg-slate-900"
               sizeClass="py-3 px-6 sm:py-5 sm:px-9"
-              href={item.btnLink as any}
+              href={item.slideFields.buttonLink as any}
             >
-              <span>{item.btnText}</span>
+              <span>{item.slideFields.buttonText}</span>
               <span>
                 <svg className="w-5 h-5 ml-2.5" viewBox="0 0 24 24" fill="none">
                   <path
@@ -202,10 +238,12 @@ const SectionHero: FC<SectionHero2Props> = ({ className = "" }) => {
             </ButtonPrimary>
           </div>
           <div className="mt-10 lg:mt-0 lg:absolute right-0 bottom-0 top-0 w-full max-w-2xl xl:max-w-3xl 2xl:max-w-4xl">
-           <Image
+            <Image
               className="w-full h-full object-contain object-right-bottom nc-SectionHero2Item__image"
-              src={item.image}
-              alt={item.heading}
+              width={300}
+              height={300}
+              src={item.slideFields.featureImage.sourceUrl}
+              alt={item.slideFields.mainHeading}
             />
           </div>
         </div>
@@ -213,7 +251,7 @@ const SectionHero: FC<SectionHero2Props> = ({ className = "" }) => {
     );
   };
 
-  return <>{DATA.map((_, index) => renderItem(index))}</>;
+  return <>{slide.map((_, index) => renderItem(index))}</>;
 };
 
 export default SectionHero;

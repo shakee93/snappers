@@ -5,15 +5,14 @@ import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import ButtonSecondary from "@/shared/Button/ButtonSecondary";
 import { ArrowsPointingOutIcon } from "@heroicons/react/24/outline";
 import BagIcon from "./BagIcon";
-import toast from "react-hot-toast";
+import toast, { Toaster } from 'react-hot-toast';
 import { Transition } from "@headlessui/react";
 import ModalQuickView from "./ModalQuickView";
 import ProductStatus from "./ProductStatus";
 import Prices from "./Prices";
 import LikeButton from "./LikeButton";
 import useProductLink from "@/hooks/useProductLink";
-import {Product, SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
-
+import { Product, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 
 
 export interface ProductCardProps {
@@ -69,7 +68,7 @@ const ProductCard: FC<ProductCardProps> = ({
         clearInterval(hoverIntervalRef.current!);
     };
 
-    const variationImages = variations?.edges.map((variation) => variation.node.image.mediaItemUrl) || [];
+    const variationImages = variations?.edges.map((variation: any) => variation.node.image.mediaItemUrl) || [];
 
     const sliderStyle = {
         display: 'flex',
@@ -80,10 +79,10 @@ const ProductCard: FC<ProductCardProps> = ({
 
     /* End of Slider Code */
 
-
-    const notifyAddTocart = ({ size }: { size?: string }) => {
+    const notifyAddTocart = () => {
+        console.log('add to cart clicked')
         toast.custom(
-            (t) => (
+            (t : any) => (
                 <Transition
                     appear
                     show={t.visible}
@@ -99,58 +98,57 @@ const ProductCard: FC<ProductCardProps> = ({
                         Added to cart!
                     </p>
                     <div className="border-t border-slate-200 dark:border-slate-700 my-4" />
-                    {/* {renderProductCartOnNotify({ size })} */}
+                    {renderProductCartOnNotify()}
                 </Transition>
             ),
             { position: "top-right", id: "nc-product-notify", duration: 3000 }
         );
     };
 
-    // const renderProductCartOnNotify = ({ size }: { size?: string }) => {
-    //     return (
-    //         <div className="flex ">
-    //             <div className="h-24 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
-    //                 <Image fill style={{ objectFit: 'cover' }}
-    //                     src={image}
-    //                     alt={name}
-    //                     width={280}
-    //                     height={305}
-    //                     className="h-full w-full object-cover object-center"
-    //                 />
-    //             </div>
+    const renderProductCartOnNotify = () => {
+        return (
+            <div className="flex">
+                <div className="h-24 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
+                    <Image
+                        style={{ objectFit: 'cover' }}
+                        src={variations?.edges[currentVariation]?.node?.image?.mediaItemUrl || image?.mediaItemUrl || ''}
+                        alt={name || ''}
+                        width={280}
+                        height={305}
+                        className="h-full w-full object-cover object-center"
+                    />
+                </div>
 
-    //             <div className="ml-4 flex flex-1 flex-col">
-    //                 <div>
-    //                     <div className="flex justify-between ">
-    //                         <div>
-    //                             <h3 className="text-base font-medium ">{name}</h3>
-    //                             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-    //                                 <span>
-    //                                     {variants ? variants[variantActive].name : `Natural`}
-    //                                 </span>
-    //                                 <span className="mx-2 border-l border-slate-200 dark:border-slate-700 h-4"></span>
-    //                                 <span>{size || "XL"}</span>
-    //                             </p>
-    //                         </div>
-    //                         <Prices price={price} className="mt-0.5" />
-    //                     </div>
-    //                 </div>
-    //                 <div className="flex flex-1 items-end justify-between text-sm">
-    //                     <p className="text-gray-500 dark:text-slate-400">Qty 1</p>
+                <div className="ml-4 flex flex-1 flex-col">
+                    <div>
+                        <div className="flex justify-between">
+                            <div>
+                                <h3 className="text-base font-medium ">{name}</h3>
+                                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                                    <span>
+                                        {data.name}
+                                    </span>
+                                    <span className="mx-2 border-l border-slate-200 dark:border-slate-700 h-4"></span>
+                                    {/* Omitted the size span */}
+                                </p>
+                            </div>
+                            <Prices price={price} className="mt-0.5" />
+                        </div>
+                    </div>
+                    <div className="flex flex-1 items-end justify-between text-sm">
+                        <p className="text-gray-500 dark:text-slate-400">Qty 1</p>
+                        <div className="flex">
+                            <Link href={"/cart"} className="font-medium text-primary-6000 dark:text-primary-500 ">
+                                View cart
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    };
 
-    //                     <div className="flex">
-    //                         <Link
-    //                             href={"/cart"}
-    //                             className="font-medium text-primary-6000 dark:text-primary-500 "
-    //                         >
-    //                             View cart
-    //                         </Link>
-    //                     </div>
-    //                 </div>
-    //             </div>
-    //         </div>
-    //     );
-    // };
+
 
     const getBorderClass = (Bgclass = "") => {
         if (Bgclass.includes("red")) {
@@ -211,7 +209,7 @@ const ProductCard: FC<ProductCardProps> = ({
                     className="shadow-lg"
                     fontSize="text-xs"
                     sizeClass="py-2 px-4"
-                    onClick={() => notifyAddTocart({ size: "XL" })}
+                    onClick={() => notifyAddTocart()}
                 >
                     <BagIcon className="w-3.5 h-3.5 mb-0.5" />
                     <span className="ml-1">Add to Cart</span>
@@ -254,11 +252,12 @@ const ProductCard: FC<ProductCardProps> = ({
     return (
         <>
             <div
-                className={`nc-ProductCard relative flex flex-col bg-white p-2 rounded-3xl group${className}`}
+                className={`nc-ProductCard relative flex flex-col bg-white p-2 rounded-3xl group group${className}`}
                 data-nc-id="ProductCard"
                 onMouseEnter={handleHover}
                 onMouseLeave={handleHoverOut}
             >
+                <div className="relative flex-shrink-0 bg-slate-50 dark:bg-slate-300 rounded-3xl overflow-hidden ">
                 <div className="relative flex-shrink-0 bg-slate-50 dark:bg-slate-300 rounded-3xl overflow-hidden ">
 
                     <Link href={link}>
@@ -298,8 +297,7 @@ const ProductCard: FC<ProductCardProps> = ({
                 </div>
 
                 <div className="space-y-2 px-2.5 pt-5 pb-2.5"
-                    onMouseEnter={handleHover}
-                    onMouseLeave={handleHoverOut}
+
                 >
 
                     {/* {renderVariants()} */}
