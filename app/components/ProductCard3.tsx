@@ -258,105 +258,102 @@ const ProductCard: FC<ProductCardProps> = ({
     // };
 
     return (
-            <div
-                className={`nc-ProductCard relative flex flex-col bg-white p-2 rounded-3xl group ${className}`}
-                data-nc-id="ProductCard"
-                onMouseEnter={handleHover}
-                onMouseLeave={handleHoverOut}
-            >
-                <div className="relative flex-shrink-0 bg-slate-50 dark:bg-slate-300 rounded-3xl overflow-hidden ">
+        <div
+            className={`nc-ProductCard relative flex flex-col bg-white p-2 rounded-3xl group ${className}`}
+            data-nc-id="ProductCard"
+            onMouseEnter={handleHover}
+            onMouseLeave={handleHoverOut}
+        >
+            <div className="relative flex-shrink-0 bg-slate-50 dark:bg-slate-300 rounded-3xl overflow-hidden ">
 
-                    <Link href={link}>
-                        <div style={sliderStyle}>
-                            {variations?.edges && variations.edges.some(variation => variation.node?.image?.mediaItemUrl) ? (
-                                variations.edges.map((variation, index) => (
-                                    <div key={index} className="w-full flex-shrink-0 bg-[#fefefe]">
-                                        <Image
-                                            src={variation?.node?.image?.mediaItemUrl || ''}
-                                            width={300}
-                                            height={300}
-                                            alt={name || ''}
-                                            className="object-contain w-auto h-full mx-auto my-auto"
-                                        />
-                                    </div>
-                                ))
-                            ) : (
-                                <Image
-                                    width={300}
-                                    height={300}
-                                    src={image?.mediaItemUrl || ''}
-                                    alt={name || ''}
-                                    className="object-contain w-auto h-full mx-auto my-auto"
-                                />
-                            )}
-                        </div>
-                    </Link>
-
-
-                    {/* <ProductStatus status={stockStatus} /> */}
-
-                    <LikeButton liked={isLiked} className="absolute top-3 right-3 z-10" />
-
-                    {/* {sizes ? renderSizeList() : renderGroupButtons()} */}
-                    {renderGroupButtons()}
-
-                </div>
-
-                <div className="space-y-2 px-2.5 pt-5 pb-2.5"
-
-                >
-
-                    {/* {renderVariants()} */}
-
-                    <div>
-                        <h2
-                            className={`nc-ProductCard__title  text-sm lg:text-base text-black line-clamp-2 min-h-[40px] lg:min-h-[47px] font-semibold transition-colors`}
-                        >
-                            {name}
-                        </h2>
-                        <div
-                            className={`nc-ProductCard__title text-xs lg:text-sm text-black line-clamp-2 min-h-[20px] lg:min-h-[20px] text-slate-800`}
-                        >
-                            {terms?.nodes.map((brand, index) => (
-                                <span key={index}>{brand.name}</span>
-                            ))}
-                        </div>
+                <Link href={link}>
+                    <div style={sliderStyle}>
+                        {variations?.edges && variations.edges.some(variation => variation.node?.image?.mediaItemUrl) ? (
+                            variations.edges.map((variation, index) => (
+                                <div key={index} className="w-full flex-shrink-0 bg-[#fefefe]">
+                                    <Image
+                                        src={variation?.node?.image?.mediaItemUrl || ''}
+                                        width={300}
+                                        height={300}
+                                        alt={name || ''}
+                                        className="object-contain w-auto h-full mx-auto my-auto"
+                                    />
+                                </div>
+                            ))
+                        ) : (
+                            <Image
+                                width={300}
+                                height={300}
+                                src={image?.mediaItemUrl || ''}
+                                alt={name || ''}
+                                className="object-contain w-auto h-full mx-auto my-auto"
+                            />
+                        )}
                     </div>
-
-                    {(salePrice === price || salePrice === null || salePrice === '') && (
-                        <div className="flex m-0 mb-2 justify-between items-center">
-                            <Prices price={price} />
-                            <div className="flex items-center mb-0.5">
-                                <StarIcon className="w-4 h-4 pb-[1px] text-amber-400" />
-                                <span className="text-xs text-slate-500 dark:text-slate-400">
-                                    {averageRating ? (
-                                        <>{averageRating.toFixed(1)}</>
-                                    ) : (
-                                        <span className="mr-1">5</span>
-                                    )}
-                                    (
-                                    {reviewCount ? (
-                                        <>{reviewCount} review{reviewCount > 1 ? 's' : ''}</>
-                                    ) : (
-                                        '0 reviews'
-                                    )}
-                                    )
-                                </span>
-                            </div>
-                        </div>
-                    )}
+                </Link>
 
 
-                </div>
+                {/* <ProductStatus status={stockStatus} /> */}
+
+                <LikeButton liked={isLiked} className="absolute top-3 right-3 z-10" />
+
+                {/* {sizes ? renderSizeList() : renderGroupButtons()} */}
+                {renderGroupButtons()}
+
             </div>
 
+            <div className="space-y-2 px-2.5 pt-5 pb-2.5"
 
-            {/* QUICKVIEW */}
+            >
+
+                {/* {renderVariants()} */}
+
+                <div>
+                    <h2
+                        className={`nc-ProductCard__title  text-sm lg:text-base text-black line-clamp-2 min-h-[40px] lg:min-h-[47px] font-semibold transition-colors`}
+                    >
+                        {name}
+                    </h2>
+                    <div
+                        className={`nc-ProductCard__title text-xs lg:text-sm text-black line-clamp-2 min-h-[20px] lg:min-h-[20px] text-slate-800`}
+                    >
+                        {terms?.nodes.map((brand, index) => (
+                            <span key={index}>{brand.name}</span>
+                        ))}
+                    </div>
+                </div>
+
+                {(salePrice === price || salePrice === null || salePrice === '') && (
+                    <div className="flex m-0 mb-2 justify-between items-center">
+                        <Prices price={price} />
+                        <div className="flex items-center mb-0.5">
+                            <StarIcon className="w-4 h-4 pb-[1px] text-amber-400" />
+                            <span className="text-xs text-slate-500 dark:text-slate-400">
+                                {averageRating ? (
+                                    <>{averageRating.toFixed(1)}</>
+                                ) : (
+                                    <span className="mr-1">5</span>
+                                )}
+                                (
+                                {reviewCount ? (
+                                    <>{reviewCount} review{reviewCount > 1 ? 's' : ''}</>
+                                ) : (
+                                    '0 reviews'
+                                )}
+                                )
+                            </span>
+                        </div>
+                    </div>
+                )}
+
+
+            </div>
             < ModalQuickView
                 show={showModalQuickView}
                 onCloseModalQuickView={() => setShowModalQuickView(false)}
             />
-            </div>
+        </div>
+
     );
 };
 
