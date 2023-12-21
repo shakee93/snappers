@@ -1,7 +1,7 @@
 "use client"
 import React, {useEffect, useState} from "react";
 
-import Checkbox from "shared/Checkbox/Checkbox";
+import Checkbox from "@/app/components/globalComponents/Checkbox/Checkbox";
 import Slider from "rc-slider";
 import Radio from "shared/Radio/Radio";
 import MySwitch from "components/MySwitch";
