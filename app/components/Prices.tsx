@@ -23,18 +23,18 @@ const Prices: FC<PricesProps> = ({
                     {price}
                 </span>
             </div>
-            {salePrice &&
-                <div
-                    className={`flex ${contentClass}`}
-                >
+
+            {salePrice && salePrice !== price && (
+                <div className={`flex ${contentClass}`}>
                     <s className="text-gray-400 text-xs lg:text-sm">
-                        {price}
+                        {salePrice}
                     </s>
                 </div>
-            }
+            )}
+
         </div>
 
-        
+
 
     );
 };

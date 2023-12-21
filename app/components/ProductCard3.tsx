@@ -71,8 +71,6 @@ const ProductCard: FC<ProductCardProps> = ({
         clearInterval(hoverIntervalRef.current!);
     };
 
-    console.log(variations);
-
     const variationImages = variations?.edges.map((variation: any) => variation.node.image.mediaItemUrl) || [];
 
     const sliderStyle = {
@@ -155,33 +153,6 @@ const ProductCard: FC<ProductCardProps> = ({
         );
     };
 
-
-
-    const getBorderClass = (Bgclass = "") => {
-        if (Bgclass.includes("red")) {
-            return "border-red-500";
-        }
-        if (Bgclass.includes("violet")) {
-            return "border-violet-500";
-        }
-        if (Bgclass.includes("orange")) {
-            return "border-orange-500";
-        }
-        if (Bgclass.includes("green")) {
-            return "border-green-500";
-        }
-        if (Bgclass.includes("blue")) {
-            return "border-blue-500";
-        }
-        if (Bgclass.includes("sky")) {
-            return "border-sky-500";
-        }
-        if (Bgclass.includes("yellow")) {
-            return "border-yellow-500";
-        }
-        return "border-transparent";
-    };
-
     const renderVariants = () => {
         if (data.type !== "VARIABLE" || !variations || !variations.edges.length) {
             return null;
@@ -234,28 +205,6 @@ const ProductCard: FC<ProductCardProps> = ({
 
         );
     };
-
-    // const renderSizeList = () => {
-    //     if (!sizes || !sizes.length) {
-    //         return null;
-    //     }
-
-    //     return (
-    //         <div className="absolute bottom-0 inset-x-1 space-x-1.5 flex justify-center opacity-0 invisible group-hover:bottom-4 group-hover:opacity-100 group-hover:visible transition-all">
-    //             {sizes.map((size, index) => {
-    //                 return (
-    //                     <div
-    //                         key={index}
-    //                         className="nc-shadow-lg w-10 h-10 rounded-xl bg-white hover:bg-primaryColor hover:text-white transition-colors cursor-pointer flex items-center justify-center uppercase font-semibold tracking-tight text-sm text-primaryColor"
-    //                         onClick={() => notifyAddTocart({ size })}
-    //                     >
-    //                         {size}
-    //                     </div>
-    //                 );
-    //             })}
-    //         </div>
-    //     );
-    // };
 
     return (
         <div
@@ -318,14 +267,15 @@ const ProductCard: FC<ProductCardProps> = ({
                         className={`nc-ProductCard__title text-xs lg:text-sm text-black line-clamp-2 min-h-[20px] lg:min-h-[20px] text-slate-800`}
                     >
                         {terms?.nodes.map((brand, index) => (
-                            <span key={index}>{brand.name}</span>
+                            <span key={index}>{brand?.name}</span>
                         ))}
                     </div>
                 </div>
 
-                {(salePrice === price || salePrice === null || salePrice === '') && (
-                    <div className="flex m-0 mb-2 justify-between items-center">
-                        <Prices price={price} />
+
+                <div className="flex m-0 mb-2 justify-between items-center">
+                    <Prices price={price} salePrice={salePrice}/>
+                    {(salePrice === price || salePrice === null || salePrice === '') && (
                         <div className="flex items-center mb-0.5">
                             <StarIcon className="w-4 h-4 pb-[1px] text-amber-400" />
                             <span className="text-xs text-slate-500 dark:text-slate-400">
@@ -343,8 +293,9 @@ const ProductCard: FC<ProductCardProps> = ({
                                 )
                             </span>
                         </div>
-                    </div>
-                )}
+                    )}
+                </div>
+
 
 
             </div>
