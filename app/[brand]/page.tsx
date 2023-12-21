@@ -3,7 +3,13 @@ import SectionPromo1 from "components/SectionPromo1";
 import ProductCard from "components/ProductCard";
 import { PRODUCTS } from "@/data/data";
 import {getClient} from "@/graphql/apollo-ssr";
-import {GET_ALL_PRODUCTS, GET_BRAND_ARCHIVE, GET_CATEGORY, GET_VARIATIONS_PRODUCT} from "@/graphql/defs/products";
+import {
+    GET_ALL_PRODUCTS,
+    GET_BRAND,
+    GET_BRAND_ARCHIVE,
+    GET_CATEGORY,
+    GET_VARIATIONS_PRODUCT
+} from "@/graphql/defs/products";
 import {notFound} from "next/navigation";
 import {Product} from "@/graphql/types/graphql";
 import Image from "next/image";
@@ -15,9 +21,9 @@ import { useQuery } from "@apollo/client";
 export async function getData(slug : string | null = null)  {
 
 
-    const {data, error} = await getClient().query(
+    const {data: brandql} = await getClient().query(
         {
-            query: GET_BRAND_ARCHIVE,
+            query: GET_BRAND,
             variables:   {
                 brandId: slug
             },
@@ -25,17 +31,24 @@ export async function getData(slug : string | null = null)  {
         }
     );
 
-
-    console.log(data.brand);
-
-    if (!data.brand) {
+    if (!brandql.brand) {
         return notFound()
     }
 
+    const {data, error} = await getClient().query(
+        {
+            query: GET_BRAND_ARCHIVE,
+            variables:   {
+                brandId: brandql.brand.databaseId
+            },
+            fetchPolicy: 'no-cache'
+        }
+    );
+    
     return {
-        products: data.brand.products.edges,
+        products: data.products.edges,
         productCategories: data.productCategories.nodes,
-        brand: data.brand,
+        brand: brandql.brand,
         brands: data.brands.nodes
     }
 }

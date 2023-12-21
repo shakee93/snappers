@@ -191,20 +191,18 @@ query GetAllProductVariations($categoryIdIn: [Int]) {
   `;
 
 
-export const GET_BRAND_ARCHIVE = gql`
-    query GetBrandArchive($brandId: ID!) {
+export const GET_BRAND = gql`
+    query GetBrand($brandId: ID!) {
         brand(id: $brandId, idType: SLUG) {
-            id
+            databaseId
             name
-            description
-            products(first: 25) {
-               edges {
-                   node {
-                       ...ProductContentFull
-                   }
-               }
-            } 
+            slug
         }
+    }
+`
+
+export const GET_BRAND_ARCHIVE = gql`
+    query GetBrandArchive($brandId: Int) {
         productCategories(first: 100) {
             nodes {
                 name
@@ -215,11 +213,29 @@ export const GET_BRAND_ARCHIVE = gql`
         }
         brands(first: 100) {
             nodes {
-                id
+                databaseId
                 name
                 slug
             }
-        } 
+        }
+        products(where: {taxonomyFilter: {filters: [
+            {
+                taxonomy: PWB_BRAND, ids: [ $brandId ]
+            }
+            {
+                taxonomy: PWB_BRAND, ids: [ $brandId ]
+            }
+
+        ]
+            relation: AND
+            
+        }}) {
+            edges {
+                node {
+                    ...ProductContentFull
+                }
+            }
+        }
     }
     ${ProductContentFull} 
 `
