@@ -1,6 +1,6 @@
 import {getClient} from "@/graphql/apollo-ssr";
 import {GET_BRANDS, GET_CATEGORY_SLUGS, GET_PRODUCT, GET_PRODUCT_SLUGS} from "@/graphql/defs/products";
-import {Brand, Product, ProductCategory} from "@/graphql/types/graphql";
+import {Brand, Product, ProductCategory, SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
 import {notFound} from "next/navigation";
 import Image from "next/image";
 import {useQuery} from "@apollo/client";
@@ -12,6 +12,8 @@ import ProductOverview from "@/app/components/SingleProductPage/ProductOverview"
 import SectionSliderProductCard from "@/app/components/SectionSliderProductCard";
 import {PRODUCTS, SPORT_PRODUCTS} from "@/data/data";
 import Link from "next/link";
+import ImageGallery from "@/app/[brand]/imageGallery";
+import ProductImage from "@/app/components/SingleProductPage/ProductImage";
 
 
 export async function generateStaticParams() {
@@ -65,7 +67,10 @@ async function getData(slug: string, brand: string) {
 
 const Page = async ({ params }: any) => {
 
-    const { product, brand} = await getData(params.slug, params.brand)
+    const { product, brand} : {
+        product: SimpleProduct | VariableProduct
+        brand: Brand
+    } = await getData(params.slug, params.brand)
 
 
     return <div className='mt-24'>
@@ -82,26 +87,8 @@ const Page = async ({ params }: any) => {
 
                 <div className="w-full md:w-2/5 flex-col gap-2">
 
-                    {/*<div className="w-full flex p-4 min-h-[400px]">*/}
-                    {/*    {selectedImage && (*/}
-                    {/*        <InnerImageZoom*/}
-                    {/*            src={selectedImage.thumbnail}*/}
-                    {/*            zoomSrc={selectedImage.original}*/}
-                    {/*            zoomType="hover"*/}
-                    {/*            zoomPreload={false}*/}
-                    {/*            className="object-cover w-full h-auto "*/}
-                    {/*        />*/}
-                    {/*    )}*/}
-                    {/*</div>*/}
 
-                    {/*<div className="flex w-full md:w-full p-2">*/}
-                    {/*    <ImageGallery*/}
-                    {/*        // style={{ objectFit: 'cover' }}*/}
-                    {/*        images={images}*/}
-                    {/*        onThumbnailClick={handleThumbnailClick}*/}
-                    {/*        selectedImage={selectedImage}*/}
-                    {/*    />*/}
-                    {/*</div>*/}
+                   <ProductImage product={product}/>
 
                 </div>
 

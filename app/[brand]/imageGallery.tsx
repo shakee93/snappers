@@ -1,8 +1,9 @@
+'use client'
 import React, { useState } from 'react';
 import Thumbnail from './thumbnail';
 
 interface ImageGalleryProps {
-    images: {
+    images?: {
         original: string;
         thumbnail: string;
     }[];
@@ -15,6 +16,11 @@ interface ImageGalleryProps {
 
 const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onThumbnailClick, selectedImage }) => {
     const [startIndex, setStartIndex] = useState(0);
+
+
+    if (!images) {
+        return <div></div>
+    }
 
     const handleSlideLeft = () => {
         setStartIndex((prevIndex) => Math.max(prevIndex - 1, 0));
