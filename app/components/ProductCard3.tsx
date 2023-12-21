@@ -45,8 +45,6 @@ const ProductCard: FC<ProductCardProps> = ({
         };
     }, []);
 
-    console.log({ data })
-
     /* Slider Start */
 
     const startSlider = () => {

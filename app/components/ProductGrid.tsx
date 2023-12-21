@@ -1,52 +1,60 @@
 "use client"
-import {Product} from "@/graphql/types/graphql";
-import Image from "next/image";
+import {Brand, Category, Product} from "@/graphql/types/graphql";
 import {useStore} from "@/store/store";
 import {useEffect, useState} from "react";
-import {GET_ALL_PRODUCTS} from "@/graphql/defs/products";
-import {useQuery} from "@apollo/client";
-import Link from "next/link";
-import ProductCard, { ProductCardProps } from "./ProductCard3";
+import {GET_BRAND_ARCHIVE} from "@/graphql/defs/products";
+import {useLazyQuery} from "@apollo/client";
+import ProductCard from "./ProductCard3";
 
-const ProductGrid = ({ products }: { products: { node: Product }[] }) => {
-    const { sidebar: { categories } } = useStore();
-    const [_products, setProducts] = useState(products);
-    let { loading, error, data, refetch } = useQuery(GET_ALL_PRODUCTS, {
-        skip: true,
-        variables: {
-            categoryIdIn: categories,
-        },
+interface ProductGridProps {
+    products: { node: Product }[]
+    brand?: Brand
+    category?: Category
+}
+const ProductGrid = ({ products, brand, category }: ProductGridProps) => {
+    const { sidebar: { categories, brands , mounted} } = useStore();
+    const [_products, setProducts] = useState<{ node: Product }[]>(products);
+    const [mounts, setMounts] = useState(0)
+
+    let [getArchiveData, { loading, error }] = useLazyQuery(GET_BRAND_ARCHIVE, {
+        fetchPolicy: 'no-cache'
     });
 
 
-    useEffect(() => {
-        refetch();
-    }, [categories]);
 
     useEffect(() => {
-        if (data?.products.edges.length > 0) {
-            setProducts(data.products.edges);
+
+
+        if (categories.length === 0 && brands.length === 0 && mounted) {
+            setMounts(p => p + 1)
         }
-    }, [data]);
+
+        if (mounts >= 1) {
+            (async () => {
+                let { data } = await  getArchiveData({
+                    variables: {
+                        categoryIdIn: categories.length === 0 ? null : categories,
+                        brandId: brand && categories.length === 0 && brands.length === 0 ? [brand.databaseId] : brands
+                    },
+                    fetchPolicy: 'no-cache'
+                });
+
+                setProducts(data.products.edges)
+            })();
+        }
 
 
-    // console.log({ data });
-
-
-    useEffect(() => {
-        console.log(_products);
-    }, [])
+        
+    }, [categories, brands]);
 
 
     return loading ? (
         <div>loading...</div>
     ) : (
         <div className="flex-1 grid sm:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-10">
-            {_products.map((item, index: number) => {
-                return (
-                    <ProductCard  key={item.node.slug} data={item.node} />
-                );
-            })}
+            {_products.map((item, index: number) =>
+                <ProductCard  key={item.node.slug} data={item.node} />
+            )}
         </div>
     );
 };

@@ -198,32 +198,34 @@ export const GET_BRAND = gql`
             name
             slug
         }
-    }
-`
-
-export const GET_BRAND_ARCHIVE = gql`
-    query GetBrandArchive($brandId: Int) {
-        productCategories(first: 100) {
+        productCategories(first: 100, where: {orderby: COUNT}) {
             nodes {
                 name
                 slug
                 id
                 databaseId
+                count
             }
         }
-        brands(first: 100) {
+        brands(first: 100, where: {orderby: COUNT}) {
             nodes {
                 databaseId
                 name
                 slug
+                count
             }
         }
-        products(where: {taxonomyFilter: {filters: [
+    }
+`
+
+export const GET_BRAND_ARCHIVE = gql`
+    query GetBrandArchive($brandId: [Int] = null, $categoryIdIn: [Int] = null) {
+        products(first: 45, where: {taxonomyFilter: {filters: [
             {
-                taxonomy: PWB_BRAND, ids: [ $brandId ]
+                taxonomy: PWB_BRAND, ids:$brandId
             }
             {
-                taxonomy: PWB_BRAND, ids: [ $brandId ]
+                taxonomy: PRODUCT_CAT, ids: $categoryIdIn
             }
 
         ]

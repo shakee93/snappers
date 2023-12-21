@@ -21,7 +21,7 @@ import { useQuery } from "@apollo/client";
 export async function getData(slug : string | null = null)  {
 
 
-    const {data: brandql} = await getClient().query(
+    const {data} = await getClient().query(
         {
             query: GET_BRAND,
             variables:   {
@@ -31,24 +31,24 @@ export async function getData(slug : string | null = null)  {
         }
     );
 
-    if (!brandql.brand) {
+    if (!data.brand) {
         return notFound()
     }
 
-    const {data, error} = await getClient().query(
+    const {data: productql, error} = await getClient().query(
         {
             query: GET_BRAND_ARCHIVE,
             variables:   {
-                brandId: brandql.brand.databaseId
+                brandId: [data.brand.databaseId]
             },
             fetchPolicy: 'no-cache'
         }
     );
     
     return {
-        products: data.products.edges,
+        products: productql.products.edges,
         productCategories: data.productCategories.nodes,
-        brand: brandql.brand,
+        brand: data.brand,
         brands: data.brands.nodes
     }
 }
@@ -89,12 +89,11 @@ const Page = async ({ params } : {
                             <div className="lg:w-1/3 xl:w-1/4 pr-4">
                                 <SidebarFilters
                                     categories={productCategories}
-                                    brands={brands}
                                 />
                             </div>
                             <div className="flex-shrink-0 mb-10 lg:mb-0 lg:mx-4 border-t lg:border-t-0"></div>
                             <div className="flex-1 ">
-                                <ProductGrid products={products}/>
+                                <ProductGrid brand={brand} products={products}/>
                             </div>
                         </div>
                     </main>
