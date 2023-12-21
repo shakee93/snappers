@@ -119,7 +119,7 @@ const Page = async ({ params }: any) => {
             {/* Image Gallery */}
 
 
-            <ProductOverview />
+            <ProductOverview product={product} />
             <div className=" lg:hidden w-full lg:w-1/5 p-3 bg-white rounded-3xl my-5">
                 <Features />
             </div>

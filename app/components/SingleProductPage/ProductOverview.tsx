@@ -1,7 +1,13 @@
 import ProductSpecifications from "./ProductSpecifications";
+import {SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
+import parseHtml from 'html-react-parser'
 
+const ProductOverview = ({
+    product
+                         }:{
+  product: SimpleProduct | VariableProduct
+}) => {
 
-const ProductOverview = () => {
   return (
     <>
      <div className="bg-white p-5 rounded-3xl md:p-10 my-5">
@@ -10,6 +16,8 @@ const ProductOverview = () => {
         </div>
         <div className="flex flex-col md:flex-row py-2 md:py-5">
           <div className="md:w-3/5 p-2 md:p-4">
+
+
             <div className="text-sm md:text-base py-2">Highlights</div>
             <div>
               <ul className="text-xs md:text-sm flex flex-col gap-1 list-disc pl-4 text-gray-600">
@@ -32,10 +40,7 @@ const ProductOverview = () => {
             </div>
             <div className="text-sm md:text-base py-2">Overview</div>
             <div className="text-xs md:text-sm text-gray-600">
-              The iPhone 15 Pro features an aerospace‑grade titanium design with
-              an all‑new Action button to fast track to your favorite feature.
-              The powerful camera system offers multiple focal lengths for
-              super‑high‑resolution photos with a new level of detail and color.
+              {parseHtml(product.description || '')}
             </div>
           </div>
           <div className="md:w-2/5">
