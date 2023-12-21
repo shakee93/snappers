@@ -4,6 +4,7 @@ import InnerImageZoom from "react-inner-image-zoom";
 import ImageGallery from "@/app/[brand]/imageGallery";
 import {useEffect, useState} from "react";
 import {SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
+import 'react-inner-image-zoom/lib/InnerImageZoom/styles.min.css';
 
 interface ProductImageProps {
     product: SimpleProduct | VariableProduct
@@ -13,11 +14,11 @@ const ProductImage = ({
     product,
 }: ProductImageProps) => {
 
-    const [selectedImage, setSelectedImage] = useState({
+    const [selectedImage, setSelectedImage] = useState<GalleryImage>({
         original: product?.image?.sourceUrl || '',
         thumbnail: product?.image?.sourceUrl || ''
     })
-    const [images, setImages] = useState([
+    const [images, setImages] = useState<GalleryImage[]>([
         selectedImage,
         ...product.galleryImages?.nodes.map((image: any, index) => {
 
@@ -29,12 +30,10 @@ const ProductImage = ({
         }) || []
     ])
 
-    const onThumbClick = (image: string) => {
+    const onThumbClick = (image: GalleryImage) => {
 
-        const _im = images.find(i => i.original === image)
-
-        if (_im) {
-            setSelectedImage(_im);
+        if (image) {
+            setSelectedImage(image);
         }
     }
 

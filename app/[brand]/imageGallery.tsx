@@ -3,15 +3,9 @@ import React, { useState } from 'react';
 import Thumbnail from './thumbnail';
 
 interface ImageGalleryProps {
-    images?: {
-        original: string;
-        thumbnail: string;
-    }[];
-    onThumbnailClick: (newImageSrc: string) => void;
-    selectedImage: {
-        original: string;
-        thumbnail: string;
-    };
+    images?: GalleryImage[];
+    onThumbnailClick: (newImageSrc: GalleryImage) => void;
+    selectedImage: GalleryImage
 }
 
 const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onThumbnailClick, selectedImage }) => {
