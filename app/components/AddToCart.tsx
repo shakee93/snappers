@@ -11,7 +11,6 @@ const AddToCart = ({ product }: {product: Product}) => {
 
     const { addToCart } = useCart()
 
-
     return <div>
         {product.type === 'SIMPLE' &&
             <button onClick={e => addToCart(product.databaseId)} className='border px-2 py-2 bg-blue-500 rounded'>

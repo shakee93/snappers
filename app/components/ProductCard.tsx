@@ -267,7 +267,7 @@ const ProductCard: FC<ProductCardProps> = ({
   return (
     <>
       <div
-        className={`nc-ProductCard relative flex flex-col bg-white p-2 rounded-3xl  ${className}`}
+        className={`nc-ProductCard relative flex flex-col bg-white p-2 rounded-3xl group ${className}`}
         data-nc-id="ProductCard"
         onMouseEnter={handleHover}
         onMouseLeave={handleHoverOut}

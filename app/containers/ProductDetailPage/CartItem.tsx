@@ -1,22 +1,22 @@
-import {Product, SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
+import { Product, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import Image from "next/image";
 import Link from "next/link";
 import Prices from "@/app/components/Prices";
 import NcInputNumber from "@/components/NcInputNumber";
-import {CartItem} from "@/lib/graphql/types/graphql";
-import {useCart} from "@/context/CartProvider";
+import { CartItem } from "@/lib/graphql/types/graphql";
+import { useCart } from "@/context/CartProvider";
 import useProductLink from "@/hooks/useProductLink";
 
 
 const CartItemProduct = ({
     cartItem,
     index
-                  }: {
-    cartItem : CartItem,
+}: {
+    cartItem: CartItem,
     index: number
 }) => {
 
-    const { product, quantity, key  } = cartItem;
+    const { product, quantity, key } = cartItem;
     const { removeFromCart, updateCart } = useCart()
     const link = useProductLink(product?.node)
 
@@ -25,7 +25,7 @@ const CartItemProduct = ({
     }
 
 
-    const { name, image, price, slug, salePrice, type, stockQuantity } : SimpleProduct | VariableProduct = product.node as Product;
+    const { name, image, price, slug, salePrice, type, stockQuantity }: SimpleProduct | VariableProduct = product.node as Product;
 
 
     return (
@@ -34,9 +34,9 @@ const CartItemProduct = ({
         >
             <div className="relative h-36 w-24 sm:w-32 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
                 <Image fill style={{ objectFit: 'cover' }}
-                       src={image?.sourceUrl || ''}
-                       alt={name || ''}
-                       className="h-full w-full object-contain object-center"
+                    src={image?.sourceUrl || ''}
+                    alt={name || ''}
+                    className="h-full w-full object-contain object-center"
                 />
                 <Link href={`${link}`} className="absolute inset-0"></Link>
             </div>
