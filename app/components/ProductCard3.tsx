@@ -217,11 +217,11 @@ const ProductCard: FC<ProductCardProps> = ({
 
                 <Link href={link}>
                     <div style={sliderStyle}>
-                        {variations?.edges && variations.edges.some(variation => variation.node?.image?.mediaItemUrl) ? (
+                        {variations?.edges && variations.edges.some(variation => variation.node?.image?.sourceUrl) ? (
                             variations.edges.map((variation, index) => (
                                 <div key={index} className="w-full flex-shrink-0 bg-[#fefefe]">
                                     <Image
-                                        src={variation?.node?.image?.mediaItemUrl || ''}
+                                        src={variation?.node?.image?.sourceUrl || ''}
                                         width={300}
                                         height={300}
                                         alt={name || ''}
@@ -233,7 +233,7 @@ const ProductCard: FC<ProductCardProps> = ({
                             <Image
                                 width={300}
                                 height={300}
-                                src={image?.mediaItemUrl || ''}
+                                src={image?.sourceUrl || ''}
                                 alt={name || ''}
                                 className="object-contain w-auto h-full mx-auto my-auto"
                             />

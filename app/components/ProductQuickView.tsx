@@ -77,7 +77,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "" }) => {
                 <Image fill style={{ objectFit: 'cover' }}
                   width={300}
                   height={300}
-                  src={variant.thumbnail}
+                  src={variant.thumbnail || ''}
                   alt=""
                   className="absolute w-full h-full object-cover"
                 />
@@ -225,7 +225,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "" }) => {
         </div>
 
         {/* ---------- 3 VARIANTS AND SIZE LIST ----------  */}
-        <div className="">{renderVariants()}</div>
+        {/*<div className="">{renderVariants()}</div>*/}
         <div className="">{renderSizeList()}</div>
 
         {/*  ---------- 4  QTY AND ADD TO CART BUTTON */}
@@ -287,7 +287,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "" }) => {
           {/* HEADING */}
           <div className="relative">
             <div className="aspect-w-16 aspect-h-16">
-              <Image fill style={{ objectFit: 'cover' }}
+              <Image style={{ objectFit: 'cover' }}
                 width={300}
                 height={300}
                 src={LIST_IMAGES_DEMO[0]}
@@ -305,7 +305,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "" }) => {
             {[LIST_IMAGES_DEMO[1], LIST_IMAGES_DEMO[2]].map((item, index) => {
               return (
                 <div key={index} className="aspect-w-3 aspect-h-4">
-                  <Image fill style={{ objectFit: 'cover' }}
+                  <Image style={{ objectFit: 'cover' }}
                     width={300}
                     height={300}
                     src={item}

@@ -44,6 +44,7 @@ export const GET_ALL_PRODUCTS = gql`
                     onSale
                     image {
                         mediaItemUrl
+                        sourceUrl
                     }
                     type
                     ... on SimpleProduct {
@@ -151,7 +152,8 @@ query GetAllProductVariations($categoryIdIn: [Int]) {
           name
           slug
           image {
-            mediaItemUrl
+              mediaItemUrl
+              sourceUrl
           }
           ... on VariableProduct {
             name
@@ -235,6 +237,7 @@ query GetAllProducts($categoryIdIn: [Int]) {
         onSale
         image {
           mediaItemUrl
+            sourceUrl
         }
         type
         ... on SimpleProduct {
