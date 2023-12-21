@@ -107,7 +107,7 @@ const Page = async ({ params }: any) => {
 
 
                 <div className="md:w-2/5 flex flex-col p-2 gap-y-1 md:gap-y-3">
-                    <ProductDetails product={product} />
+                    <ProductDetails brand={brand} product={product} />
                 </div>
 
                 <div className="hidden lg:block w-full md:w-1/5 ">

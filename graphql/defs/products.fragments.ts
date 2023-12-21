@@ -95,6 +95,7 @@ export const ProductContentFull = gql`
                 }
             }
         }
+        
         terms {
             nodes {
                 ... on Brand {
@@ -114,6 +115,15 @@ export const ProductContentFull = gql`
             stockStatus
             stockQuantity
             soldIndividually
+            productCategories {
+                edges {
+                    node {
+                        id
+                        name
+                        slug
+                    }
+                }
+            }
         }
         ... on VariableProduct {
             onSale
@@ -124,6 +134,13 @@ export const ProductContentFull = gql`
             stockStatus
             stockQuantity
             soldIndividually
+            productCategories {
+                nodes {
+                    id
+                    name
+                    slug
+                }
+            }
             variations(first: 50) {
                 nodes {
                     id

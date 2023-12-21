@@ -1,57 +1,63 @@
 import { MousePointerClick } from "lucide-react";
 import Link from "next/link";
+import {useCart} from "@/context/CartProvider";
+import {SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
+import NcInputNumber from "@/components/NcInputNumber";
+import React, {useState} from "react";
+import toast from "react-hot-toast";
+import {Transition} from "@headlessui/react";
+import Image from "next/image";
+import Prices from "@/app/components/Prices";
+import AddedToCart from "@/app/components/Notifications/added-to-cart";
 
-const ProductAddToCart = () => {
+const ProductAddToCart = ({product} : {
+  product: SimpleProduct | VariableProduct
+}) => {
+
+  const [quantity, setQuantity] = useState(1)
+  const { addToCart } = useCart()
+
+  const notifyAddTocart = (quantity:number) => {
+    toast.custom(
+        (t : any) => (
+            <Transition
+                appear
+                show={t.visible}
+                className="p-4 max-w-md w-full bg-white dark:bg-slate-800 shadow-lg rounded-2xl pointer-events-auto ring-1 ring-black/5 dark:ring-white/10 text-slate-900 dark:text-slate-200"
+                enter="transition-all duration-150"
+                enterFrom="opacity-0 translate-x-20"
+                enterTo="opacity-100 translate-x-0"
+                leave="transition-all duration-150"
+                leaveFrom="opacity-100 translate-x-0"
+                leaveTo="opacity-0 translate-x-20"
+            >
+              <p className="block text-base font-semibold leading-none">
+                Added to cart!
+              </p>
+              <div className="border-t border-slate-200 dark:border-slate-700 my-4" />
+              <AddedToCart product={product} quantity={quantity}/>
+            </Transition>
+        ),
+        { position: "top-right", id: "nc-product-notify", duration: 3000 }
+    );
+  };
+
+  const cartCompleted = () => {
+    notifyAddTocart(quantity)
+    setQuantity(1)
+  }
+
   return (
     <>
       <div className="flex space-x-3.5 py-4">
         <div className="flex items-center justify-center bg-slate-100/70 dark:bg-slate-800/70 px-2 py-1 sm:p-2 rounded-full">
           <div className=" flex items-center justify-between space-x-5 w-full">
-            <div className="flex items-center justify-between w-[104px] sm:w-28">
-              <button
-                className="w-8 h-8 rounded-full flex items-center justify-center border border-neutral-400 dark:border-neutral-500 bg-white dark:bg-neutral-900 focus:outline-none hover:border-neutral-700 dark:hover:border-neutral-400 disabled:hover:border-neutral-400 dark:disabled:hover:border-neutral-500 disabled:opacity-50 disabled:cursor-default"
-                type="button"
-                disabled
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  aria-hidden="true"
-                  className="w-4 h-4"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M3.75 12a.75.75 0 01.75-.75h15a.75.75 0 010 1.5h-15a.75.75 0 01-.75-.75z"
-                    clipRule="evenodd"
-                  ></path>
-                </svg>
-              </button>
-              <span className="select-none block flex-1 text-center leading-none">
-                1
-              </span>
-              <button
-                className="w-8 h-8 rounded-full flex items-center justify-center border border-neutral-400 dark:border-neutral-500 bg-white dark:bg-neutral-900 focus:outline-none hover:border-neutral-700 dark:hover:border-neutral-400 disabled:hover:border-neutral-400 dark:disabled:hover:border-neutral-500 disabled:opacity-50 disabled:cursor-default"
-                type="button"
-              >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  aria-hidden="true"
-                  className="w-4 h-4"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M12 3.75a.75.75 0 01.75.75v6.75h6.75a.75.75 0 010 1.5h-6.75v6.75a.75.75 0 01-1.5 0v-6.75H4.5a.75.75 0 010-1.5h6.75V4.5a.75.75 0 01.75-.75z"
-                    clipRule="evenodd"
-                  ></path>
-                </svg>
-              </button>
-            </div>
+            <NcInputNumber onChange={v => setQuantity(v)} defaultValue={quantity} />
           </div>
         </div>
-        <button className="relative  h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-1 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-primaryColor dark:bg-slate-100 hover:bg-orange-500 text-slate-50 dark:text-slate-800 shadow-xl  flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0">
+        <button
+            onClick={e => addToCart(product.databaseId, quantity)?.then(e => cartCompleted())}
+            className="relative  h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-1 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-primaryColor dark:bg-slate-100 hover:bg-orange-500 text-slate-50 dark:text-slate-800 shadow-xl  flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0">
           <svg
             className="hidden sm:inline-block w-5 h-5 mb-0.5"
             viewBox="0 0 9 9"

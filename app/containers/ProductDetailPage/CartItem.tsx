@@ -1,9 +1,8 @@
-import { Product, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
+import {CartItem, Product, SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
 import Image from "next/image";
 import Link from "next/link";
 import Prices from "@/app/components/Prices";
 import NcInputNumber from "@/components/NcInputNumber";
-import { CartItem } from "@/lib/graphql/types/graphql";
 import { useCart } from "@/context/CartProvider";
 import useProductLink from "@/hooks/useProductLink";
 
