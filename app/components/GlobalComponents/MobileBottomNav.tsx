@@ -16,7 +16,16 @@ const MobileBottomNav = () => {
   const router = useRouter();
 
   return (
-    <div className="fixed grid grid-cols-5 shadow-3xl justify-between bottom-0 z-40 bg-white border-slate-100 border-t-2 pt-2 w-full py-1 px-1">
+    <div className="fixed grid grid-cols-4 shadow-3xl justify-between bottom-0 z-40 bg-white border-slate-100 border-t-2 pt-2 w-full py-1 px-1">
+      <div>
+        <Link
+          href="#"
+          className="flex flex-col justify-center items-center text-primaryColor gap-1"
+        >
+          <Home />
+          <div className="text-[11px]">Home</div>
+        </Link>
+      </div>
       <div>
         <Link
           href="#"
@@ -36,16 +45,8 @@ const MobileBottomNav = () => {
           <div className="text-[11px]">Search</div>
         </Link>
       </div>
-      <div>
-        <Link
-          href="#"
-          className="flex flex-col justify-center items-center text-primaryColor gap-1"
-        >
-          <Home />
-          <div className="text-[11px]">Home</div>
-        </Link>
-      </div>
-      <div>
+      
+      {/* <div>
         <Link
           href="#"
           className="flex flex-col justify-center items-center text-primaryColor gap-1"
@@ -53,7 +54,7 @@ const MobileBottomNav = () => {
           <UserCircle />
           <div className="text-[11px]">Profile</div>
         </Link>
-      </div>
+      </div> */}
       <div>
         <Link
           href="#"
@@ -67,7 +68,7 @@ const MobileBottomNav = () => {
       <div
         className={`${
           openCat ? "translate-y-0" : "translate-y-full"
-        } fixed left-0 bottom-0 w-[80%] h-screen bg-red-50 p-5 ease-in-out duration-300 transform origin-bottom z-[35]`}
+        } fixed left-0 bottom-0 w-[100%] h-screen bg-gray-50 p-5 ease-in-out duration-300 transform origin-bottom z-[40]`}
       >
         <div className="flex w-full items-center justify-between">
           <Logo />

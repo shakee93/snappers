@@ -252,12 +252,11 @@ const ProductCard: FC<ProductCardProps> = ({
     return (
         <>
             <div
-                className={`nc-ProductCard relative flex flex-col bg-white p-2 rounded-3xl group group${className}`}
+                className={`nc-ProductCard relative flex flex-col bg-white p-2 rounded-3xl group ${className}`}
                 data-nc-id="ProductCard"
                 onMouseEnter={handleHover}
                 onMouseLeave={handleHoverOut}
             >
-                <div className="relative flex-shrink-0 bg-slate-50 dark:bg-slate-300 rounded-3xl overflow-hidden ">
                 <div className="relative flex-shrink-0 bg-slate-50 dark:bg-slate-300 rounded-3xl overflow-hidden ">
 
                     <Link href={link}>
