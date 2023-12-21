@@ -1,8 +1,6 @@
 "use client";
-import MainNav1 from "components/Header/MainNav1";
-import MainNav2 from "components/Header/MainNav2";
 
-// import Footer from './components/GlobalComponents/Footer'
+// import Footer from '@/app/components/GlobalComponents/Footer'
 
 import "../styles/index.scss";
 // import './globals.css'
@@ -14,7 +12,7 @@ import {SessionProvider} from "@/context/SessionProvider";
 import MobileBottomNav from "./components/globalComponents/MobileBottomNav";
 import {CartProvider} from "@/context/CartProvider";
 import Header from "@/app/components/globalComponents/header";
-// import Footer from "@/app/components/globalComponents/footer";
+import Footer from "@/app/components/globalComponents/footer";
 // import reportWebVitals from "./reportWebVitals";
 
 // const inter = Inter({ subsets: ['latin'] })
@@ -37,6 +35,7 @@ export default function RootLayout({
                     <div className="md:hidden">
                         <MobileBottomNav/>
                     </div>
+                    <Footer/>
                     </body>
                 </CartProvider>
             </SessionProvider>
