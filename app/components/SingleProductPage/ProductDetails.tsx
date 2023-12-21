@@ -1,19 +1,27 @@
+'use client'
 import { MousePointerClick } from "lucide-react";
 import Link from "next/link";
 import ProductAddToCart from "./ProductAddToCart";
+import {Product} from "@/graphql/types/graphql";
 
-const ProductDetails = () => {
+const ProductDetails = ({
+    product
+                        }: {
+    product: Product
+}) => {
+
   return (
     <>
       <div className="bg-orange-500 flex w-28 p-1 rounded-3xl text-white items-center justify-center gap-1 text-xs">
         Best Seller <MousePointerClick className="text-white" size={14} />
       </div>
       <div className="flex gap-1  text-sm text-gray-500">
-        Brand : <span className="">Apple</span>
+        Brand : <span className="">
+      </span>
       </div>
 
       <div className="text-base md:text-lg font-medium ">
-        iPhone 15 Pro 128GB Black Titanium 5G With FaceTime
+          {product.name}
       </div>
 
       <div className="py-2 text-gray-500">

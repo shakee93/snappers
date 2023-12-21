@@ -1,12 +1,14 @@
 
 import type { CodegenConfig } from '@graphql-codegen/cli';
+import * as dotenv from 'dotenv';
+dotenv.config();
 
 const config: CodegenConfig = {
   overwrite: true,
   schema: process.env.NEXT_PUBLIC_WP_GRAPHQL,
-  documents: "lib/**/*.ts",
+  documents: "graphql/**/*.ts",
   generates: {
-    "lib/graphql/types/": {
+    "./graphql/types/": {
       preset: "client",
       plugins: []
     },

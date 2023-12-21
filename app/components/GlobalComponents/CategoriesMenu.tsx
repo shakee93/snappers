@@ -16,7 +16,7 @@ interface Category {
 }
 
 interface MegaMenuProps {
-    categories: Category[];
+    categories: string[];
     isVisible: boolean;
     onMouseLeave: () => void;
 }

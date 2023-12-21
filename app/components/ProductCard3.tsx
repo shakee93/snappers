@@ -11,70 +11,20 @@ import ModalQuickView from "./ModalQuickView";
 import ProductStatus from "./ProductStatus";
 import Prices from "./Prices";
 import LikeButton from "./LikeButton";
+import useProductLink from "@/hooks/useProductLink";
+import {Product, SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
 
-interface ProductCategory {
-    __typename: string;
-    name: string;
-}
 
-interface Product {
-    __typename: string;
-    id: string;
-    name: string;
-    slug: string;
-    image: {
-        mediaItemUrl: string;
-    };
-    price: string;
-    stockStatus: string;
-    productCategories: {
-        nodes: ProductCategory[];
-    };
-    type: string;
-    variations?: {
-        edges: Variation[];
-    };
-}
-
-interface Variation {
-    node: {
-        id: string;
-        name: string;
-        image: {
-            mediaItemUrl: string;
-            sizes?: string[];
-        };
-        price: string;
-        salePrice?: string;
-    };
-}
 
 export interface ProductCardProps {
     className?: string;
-    data?: Product;
+    data: SimpleProduct | VariableProduct;
     isLiked?: boolean;
 }
 
 const ProductCard: FC<ProductCardProps> = ({
     className = "",
-    data = {
-        __typename: "Product",
-        id: "",
-        name: "",
-        slug: "",
-        image: {
-            mediaItemUrl: "",
-        },
-        price: "0",
-        stockStatus: "",
-        productCategories: {
-            nodes: [],
-        },
-        type: "",
-        variations: {
-            edges: [],
-        },
-    },
+    data,
     isLiked,
 }) => {
     const { name, price, image, productCategories, slug, stockStatus, variations } = data;
@@ -85,6 +35,7 @@ const ProductCard: FC<ProductCardProps> = ({
     const [currentVariation, setCurrentVariation] = useState(0);
     const hoverIntervalRef = useRef<number | null>(null);
     const delayBeforeNextImage = 1000;
+    const link = useProductLink(data)
 
     useEffect(() => {
         return () => {
@@ -310,7 +261,7 @@ const ProductCard: FC<ProductCardProps> = ({
             >
                 <div className="relative flex-shrink-0 bg-slate-50 dark:bg-slate-300 rounded-3xl overflow-hidden group">
 
-                    <Link href={`/product/${slug}`}>
+                    <Link href={link}>
                         <div style={sliderStyle}>
                             {variations?.edges && variations.edges.some(variation => variation.node?.image?.mediaItemUrl) ? (
                                 variations.edges.map((variation, index) => (

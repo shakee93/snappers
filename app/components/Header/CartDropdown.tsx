@@ -8,14 +8,14 @@ import ButtonPrimary from "@/public/shared/Button/ButtonPrimary";
 import ButtonSecondary from "@/public/shared/Button/ButtonSecondary";
 import Image from "next/image";
 import {useCart} from "@/context/CartProvider";
-import {CartItem, SimpleProduct, VariableProduct} from "@/graphql/defs/types/graphql";
+import {CartItem, SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
 
 export default function CartDropdown() {
 
-  const {cart} = useCart();
+  const {cart, removeFromCart} = useCart();
 
   const renderProduct = (item: CartItem, index: number, close: () => void) => {
-    const { product, quantity  } = item;
+    const { product, quantity, key  } = item;
 
     if (!product?.node) {
       return null
@@ -58,10 +58,13 @@ export default function CartDropdown() {
             </div>
           </div>
           <div className="flex flex-1 items-end justify-between text-sm">
-            <p className="text-gray-500 dark:text-slate-400">{`Qty 1`}</p>
+            <p className="text-gray-500 dark:text-slate-400">Qty {quantity}</p>
 
             <div className="flex">
               <button
+                  onClick={e => removeFromCart([
+                      key
+                  ])}
                 type="button"
                 className="font-medium text-primary-6000 dark:text-primary-500 "
               >
@@ -83,17 +86,16 @@ export default function CartDropdown() {
                 ${open ? "" : "text-opacity-90"}
                  group w-10 h-10 sm:w-12 sm:h-12 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full inline-flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 relative`}
           >
-            <div className="w-3.5 h-3.5 flex items-center justify-center bg-primary-500 absolute top-1.5 right-1.5 rounded-full text-[10px] leading-none text-white font-medium">
-              <span className="mt-[1px]">3</span>
-            </div>
-            <div className="text-primaryColor">
-              <ShoppingBag/>
-            </div>
-            {cart?.contents?.itemCount &&
+            {!!cart?.contents?.itemCount &&
                 <div className="w-3.5 h-3.5 flex items-center justify-center bg-primary-500 absolute top-1.5 right-1.5 rounded-full text-[10px] leading-none text-white font-medium">
                   <span className="mt-[1px]">{cart?.contents?.itemCount}</span>
                 </div>
             }
+
+            <div className="text-primaryColor">
+              <ShoppingBag/>
+            </div>
+
 
             <Link className="block md:hidden absolute inset-0" href={"/cart"} />
           </Popover.Button>
