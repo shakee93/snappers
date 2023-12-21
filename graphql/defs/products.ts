@@ -195,6 +195,13 @@ export const GET_BRAND_ARCHIVE = gql`
             id
             name
             description
+            products(first: 25) {
+               edges {
+                   node {
+                       ...ProductContentFull
+                   }
+               }
+            } 
         }
         productCategories(first: 100) {
             nodes {
@@ -211,13 +218,6 @@ export const GET_BRAND_ARCHIVE = gql`
                 slug
             }
         } 
-        products(first: 25) {
-            edges {
-                node {
-                    ...ProductContentFull
-                }
-            }
-        }
     }
     ${ProductContentFull} 
 `

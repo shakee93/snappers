@@ -32,25 +32,12 @@ export async function getData(slug : string | null = null)  {
         return notFound()
     }
 
-    if (!data.products) {
-        return {
-            products: [],
-            productCategories: [],
-            brand: null
-        };
-    }
-
     return {
-        products: data.products.edges,
+        products: data.brand.products.edges,
         productCategories: data.productCategories.nodes,
-        brand: data.brand
+        brand: data.brand,
+        brands: data.brands.nodes
     }
-    //
-    // return {
-    //     products: [],
-    //     brand: null
-    // }
-   
 }
 
 
@@ -61,7 +48,7 @@ const Page = async ({ params } : {
     }
 }) => {
 
-    const { products, productCategories, brand } = await getData(params.brand)
+    const { products, productCategories, brand, brands } = await getData(params.brand)
 
     return (
         <div
@@ -89,6 +76,7 @@ const Page = async ({ params } : {
                             <div className="lg:w-1/3 xl:w-1/4 pr-4">
                                 <SidebarFilters
                                     categories={productCategories}
+                                    brands={brands}
                                 />
                             </div>
                             <div className="flex-shrink-0 mb-10 lg:mb-0 lg:mx-4 border-t lg:border-t-0"></div>

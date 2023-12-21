@@ -10,8 +10,9 @@ import ProductCard, { ProductCardProps } from "./ProductCard3";
 
 const ProductGrid = ({ products }: { products: { node: Product }[] }) => {
     const { sidebar: { categories } } = useStore();
-    const [_products, setProducts] = useState(null);
+    const [_products, setProducts] = useState(products);
     let { loading, error, data, refetch } = useQuery(GET_ALL_PRODUCTS, {
+        skip: true,
         variables: {
             categoryIdIn: categories,
         },
@@ -31,11 +32,17 @@ const ProductGrid = ({ products }: { products: { node: Product }[] }) => {
 
     // console.log({ data });
 
+
+    useEffect(() => {
+        console.log(_products);
+    }, [])
+
+
     return loading ? (
         <div>loading...</div>
     ) : (
         <div className="flex-1 grid sm:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-10">
-            {(_products ? _products : products).map((item, index: number) => {
+            {_products.map((item, index: number) => {
                 return (
                     <ProductCard  key={item.node.slug} data={item.node} />
                 );

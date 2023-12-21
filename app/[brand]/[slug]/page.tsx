@@ -121,7 +121,6 @@ const Page = async ({ params }: any) => {
                 {/*    ]}*/}
                 {/*    heading="Related Products"*/}
                 {/*/>*/}
-
             </div>
         </main>
     </div>;

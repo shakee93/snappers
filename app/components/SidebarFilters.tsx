@@ -37,25 +37,31 @@ const DATA_sortOrderRadios = [
 const PRICE_RANGE = [1, 500];
 //
 const SidebarFilters = ({
-    categories = []
+    categories = [],
+    brands = []
                         }: any) => {
   //
   const [isOnSale, setIsIsOnSale] = useState(true);
   const [rangePrices, setRangePrices] = useState([100, 500]);
   const [categoriesState, setCategoriesState] = useState<string[]>([]);
+  const [brandsState, setBrandsState] = useState<string[]>([]);
   const [colorsState, setColorsState] = useState<string[]>([]);
   const [sizesState, setSizesState] = useState<string[]>([]);
   const [sortOrderStates, setSortOrderStates] = useState<string>("");
 
-  const { sidebar, syncCategories } = useStore()
+  const { sidebar, syncCategories, syncBrands } = useStore()
   
   //
   const handleChangeCategories = (checked: boolean, name: string) => {
     checked
       ? setCategoriesState([...categoriesState, name])
       : setCategoriesState(categoriesState.filter((i) => i !== name));
-    
-    
+  };
+
+  const handleChangeBrands = (checked: boolean, name: string) => {
+    checked
+        ? setCategoriesState([...brandsState, name])
+        : setCategoriesState(brandsState.filter((i) => i !== name));
   };
 
   const handleChangeColors = (checked: boolean, name: string) => {
@@ -75,6 +81,9 @@ const SidebarFilters = ({
     syncCategories(categoriesState)
   }, [categoriesState])
 
+  useEffect(() => {
+    syncBrands(brandsState)
+  }, [brandsState])
 
   // OK
   const renderTabsCategories = () => {
@@ -96,6 +105,29 @@ const SidebarFilters = ({
       </div>
     );
   };
+
+
+  const renderTabsBrands = () => {
+    return (
+        <div className="relative flex flex-col pb-8 space-y-4">
+          <h3 className="font-semibold mb-2.5">Brands</h3>
+          {brands.map((item: any) => (
+              <div key={item.databaseId} className="">
+                <Checkbox
+                    name={item.databaseId}
+                    label={item.name}
+                    defaultChecked={brandsState.includes(item.databaseId)}
+                    sizeClassName="w-5 h-5"
+                    labelClassName="text-sm font-normal"
+                    onChange={(checked) => handleChangeBrands(checked, item.databaseId)}
+                />
+              </div>
+          ))}
+        </div>
+    );
+  };
+
+
 
   // OK
   const renderTabsColor = () => {
@@ -230,6 +262,7 @@ const SidebarFilters = ({
   return (
     <div className="divide-y divide-slate-200 dark:divide-slate-700">
       {renderTabsCategories()}
+      {renderTabsBrands()}
       {renderTabsColor()}
       {renderTabsSize()}
       {renderTabsPriceRage()}

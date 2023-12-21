@@ -71,7 +71,7 @@ const ProductCard: FC<ProductCardProps> = ({
         clearInterval(hoverIntervalRef.current!);
     };
 
-    const variationImages = variations?.edges.map((variation: any) => variation.node.image.mediaItemUrl) || [];
+    // const variationImages = variations?.edges.map((variation: any) => variation.node.image.mediaItemUrl) || [];
 
     const sliderStyle = {
         display: 'flex',
