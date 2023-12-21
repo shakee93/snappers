@@ -1,3 +1,5 @@
+
+
 import SectionSliderCollections from "components/SectionSliderLargeProduct";
 import SectionPromo1 from "components/SectionPromo1";
 import ProductCard from "components/ProductCard";
@@ -10,6 +12,7 @@ import Image from "next/image";
 import SidebarFilters from "@/app/components/SidebarFilters";
 import ProductGrid from "@/app/components/ProductGrid";
 import { useQuery } from "@apollo/client";
+// import {TabFilters} from "@/app/components/TabFilters"
 
 
 export async function getData(categories : number[] | null = null)  {
@@ -67,6 +70,7 @@ const Page = async () => {
                     <main>
                         {/* LOOP ITEMS */}
                         <div className="flex flex-col lg:flex-row">
+                            {/* <TabFilters/> */}
                             <div className="lg:w-1/3 xl:w-1/4 pr-4">
                                 <SidebarFilters
                                     categories={productCategories}
