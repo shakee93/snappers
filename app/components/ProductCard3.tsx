@@ -68,6 +68,8 @@ const ProductCard: FC<ProductCardProps> = ({
         clearInterval(hoverIntervalRef.current!);
     };
 
+    console.log(variations);
+
     const variationImages = variations?.edges.map((variation: any) => variation.node.image.mediaItemUrl) || [];
 
     const sliderStyle = {
@@ -250,7 +252,6 @@ const ProductCard: FC<ProductCardProps> = ({
     // };
 
     return (
-        <>
             <div
                 className={`nc-ProductCard relative flex flex-col bg-white p-2 rounded-3xl group ${className}`}
                 data-nc-id="ProductCard"
@@ -324,7 +325,7 @@ const ProductCard: FC<ProductCardProps> = ({
                 show={showModalQuickView}
                 onCloseModalQuickView={() => setShowModalQuickView(false)}
             />
-        </>
+            </div>
     );
 };
 
