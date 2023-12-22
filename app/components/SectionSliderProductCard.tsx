@@ -1,3 +1,4 @@
+'use client'
 import React, { FC, useEffect, useId, useRef, useState } from "react";
 import { useQuery } from "@apollo/client";
 import Heading from "@/app/components/Heading/Heading";
@@ -5,7 +6,6 @@ import Glide from "@glidejs/glide";
 import ProductCard from "@/app/components/ProductCard3";
 import { Product, PRODUCTS } from "@/data/data";
 
-import { getClient } from "@/lib/apollo-ssr";
 import { GET_PRODUCTS, GET_CATEGORY } from "@/graphql/defs/products";
 
 export interface SectionSliderProductCardProps {

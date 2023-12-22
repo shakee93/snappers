@@ -7,14 +7,12 @@ export const { getClient } = registerApolloClient(() => {
         link: new HttpLink({
             // https://studio.apollographql.com/public/spacex-l4uc6p/
             uri: process.env.NEXT_PUBLIC_WP_GRAPHQL,
-            // fetchOptions: {
-            //     next: {
-            //         revalidate: 10
-            //     }
-            // },
+            fetchOptions: {
+                cache: 'no-store'
+            }
             // you can disable result caching here if you want to
             // (this does not work if you are rendering your page with `export const dynamic = "force-static"`)
-            fetchOptions: { cache: "no-store" },
+            // fetchOptions: { cache: "no-store" },
         }),
     });
 });

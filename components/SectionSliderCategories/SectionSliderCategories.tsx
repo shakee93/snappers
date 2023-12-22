@@ -1,3 +1,5 @@
+'use client'
+
 import React, { FC, useEffect, useId } from "react";
 import Heading from "components/Heading/Heading";
 import Glide from "@glidejs/glide";

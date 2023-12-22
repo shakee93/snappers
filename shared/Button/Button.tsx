@@ -1,3 +1,4 @@
+'use client'
 import React, { ButtonHTMLAttributes, FC } from "react";
 import Link from "next/link";
 import { LocationStates } from "routers/types";

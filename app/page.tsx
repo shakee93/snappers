@@ -1,5 +1,3 @@
-"use client";
-
 import SectionHero2 from "@/app/components/HomePage/SectionHero";
 import SectionHero3 from "@/app/components/HomePage/SectionHero2";
 import DiscoverMoreSlider from "@/app/components/HomePage/DiscoverMoreSlider";
@@ -16,18 +14,27 @@ import SectionPromo3 from "@/app/components/HomePage/SectionPromo3";
 import SectionSliderLargeProduct from "@/components/SectionSliderLargeProduct";
 import Heading from "@/components/Heading/Heading";
 import SectionMagazine5 from "@/containers/BlogPage/SectionMagazine5";
-import ButtonSecondary from "@/shared/Button/ButtonSecondary";
-import Footer from "@/shared/Footer/Footer";
+import {getClient} from "@/graphql/apollo-ssr";
+import {GET_SLIDES} from "@/graphql/defs/slides";
 
-import SingleProductBlock from "./components/SingleProductBlock/SingleProductBlock";
+const getSlides = async () => {
+  const { data } = await getClient().query({
+    query: GET_SLIDES,
+  })
 
-export default function Home() {
+  return data.slides.nodes
+}
+
+export default async function Home() {
+
+  const slides = await getSlides()
+
   return (
     <main>
       <div className="nc-PageHome relative overflow-hidden">
         <div className="z-30">
           {/* <SectionHero2 /> */}
-          <SectionHero3 />
+          <SectionHero3 slides={slides} />
         </div>
         <div className=" gap-4 container m-auto">
           <div className="my-10">

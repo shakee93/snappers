@@ -84,18 +84,15 @@ const SidebarFilters = ({
 
   useEffect(() => {
     syncCategories(categoriesState)
-    console.log('changed cat', categoriesState);
   }, [categoriesState])
 
   useEffect(() => {
     syncBrands(brandsState)
-    console.log('changed brand', brandsState);
   }, [brandsState])
 
   useEffect(() => {
     setMounted()
-    console.log('m');
-  }, []) 
+  }, [])
   
   const renderTabsPriceRage = () => {
     return (

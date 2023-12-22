@@ -1,3 +1,5 @@
+'use client'
+
 import CardCategory1 from "@/app/components/CardCategories/CardCategory1";
 import CardCategory4 from "@/app/components/CardCategories/CardCategory4";
 import Heading from "@/app/components/Heading/Heading";

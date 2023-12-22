@@ -1,3 +1,4 @@
+'use client'
 import React, { FC } from "react";
 import Slider from "react-slick";
 import NcImage from "shared/NcImage/NcImage";

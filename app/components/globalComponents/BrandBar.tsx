@@ -10,7 +10,6 @@ import {Brand} from "@/graphql/types/graphql";
 const getData = async () => {
   const { data } = await getClient().query({
     query: GET_BRANDS,
-    fetchPolicy: 'no-cache'
   })
 
   return data.brands.nodes

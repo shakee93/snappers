@@ -10,7 +10,7 @@
     "codegen": "graphql-codegen --config codegen.ts"
   },
   "dependencies": {
-    "@apollo/client": "^3.8.0-rc.2",
+    "@apollo/client": "^3.8.8",
     "@apollo/experimental-nextjs-app-support": "^0.5.2",
     "@glidejs/glide": "^3.6.0",
     "@headlessui/react": "^1.7.17",

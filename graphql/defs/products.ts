@@ -271,6 +271,7 @@ query GetAllProducts($categoryIdIn: [Int]) {
   products(first: 10, where: {categoryIdIn: $categoryIdIn}) {
     edges {
       node {
+          id
         name
         slug
         averageRating

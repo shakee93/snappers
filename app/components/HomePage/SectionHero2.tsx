@@ -1,4 +1,4 @@
-// Import React and other required modules
+'use client'
 import React, { FC, useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useQuery } from "@apollo/client";
@@ -39,21 +39,14 @@ interface SlideType {
 
 export interface SectionHero2Props {
   className?: string;
+  slides?: any
 }
 
 // Define constants
 let TIME_OUT: NodeJS.Timeout | null = null;
 
 // Define the SectionHero2 component
-const SectionHero2: FC<SectionHero2Props> = ({ className = "" }) => {
-  const [slide, setSlide] = useState<SlideType[]>([]);
-  const { loading, error, data, refetch } = useQuery(GET_SLIDES);
-
-  useEffect(() => {
-    if (!loading && data?.slides?.nodes?.length > 0) {
-      setSlide(data.slides.nodes);
-    }
-  }, [loading]);
+const SectionHero2 = ({ className = "", slides }: SectionHero2Props) => {
 
   const [indexActive, setIndexActive] = useState(0);
   const [isRunning, toggleIsRunning] = useBoolean(true);
@@ -69,7 +62,7 @@ const SectionHero2: FC<SectionHero2Props> = ({ className = "" }) => {
   // Define handleAutoNext function
   const handleAutoNext = () => {
     setIndexActive((state) => {
-      if (state >= slide.length - 1) {
+      if (state >= slides.length - 1) {
         return 0;
       }
       return state + 1;
@@ -79,7 +72,7 @@ const SectionHero2: FC<SectionHero2Props> = ({ className = "" }) => {
   // Define handleClickNext function
   const handleClickNext = () => {
     setIndexActive((state) => {
-      if (state >= slide.length - 1) {
+      if (state >= slides.length - 1) {
         return 0;
       }
       return state + 1;
@@ -91,7 +84,7 @@ const SectionHero2: FC<SectionHero2Props> = ({ className = "" }) => {
   const handleClickPrev = () => {
     setIndexActive((state) => {
       if (state === 0) {
-        return slide.length - 1;
+        return slides.length - 1;
       }
       return state - 1;
     });
@@ -112,7 +105,7 @@ const SectionHero2: FC<SectionHero2Props> = ({ className = "" }) => {
   // Define renderItem function
   const renderItem = (index: number) => {
     const isActive = indexActive === index;
-    const item = slide[index];
+    const item = slides[index];
     if (!isActive) {
       return null;
     }
@@ -126,7 +119,7 @@ const SectionHero2: FC<SectionHero2Props> = ({ className = "" }) => {
         }`}
       >
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 flex justify-center">
-        {slide.map((_, dotIndex) => (
+        {slides.map((_, dotIndex) => (
             <div
               key={dotIndex}
               onClick={() => {
@@ -218,7 +211,7 @@ const SectionHero2: FC<SectionHero2Props> = ({ className = "" }) => {
     );
   };
 
-  return <>{slide.map((_, index) => renderItem(index))}</>;
+  return <>{slides.map((_, index) => renderItem(index))}</>;
 };
 
 export default SectionHero2;

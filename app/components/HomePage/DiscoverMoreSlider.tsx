@@ -1,3 +1,4 @@
+'use client'
 import React, { useEffect, useId } from "react";
 import Heading from "components/Heading/Heading";
 import img1 from "@/public/images/collections/1.png";
