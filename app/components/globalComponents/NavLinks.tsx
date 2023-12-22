@@ -1,18 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import {
-  Menu,
-  XIcon,
-  Facebook,
-  Instagram,
-  PhoneCall,
-  MapPin,
-  ChevronDown,
-  ChevronUp,
-  Search,
-} from "lucide-react";
-import AvatarDropdown from "../Header/AvatarDropdown";
-import CartDropdown from "../Header/CartDropdown";
 import Link from "next/link";
 
 const NavLinks = () => {

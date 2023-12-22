@@ -1,4 +1,3 @@
-import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
   Menu,
@@ -6,15 +5,11 @@ import {
   Facebook,
   Instagram,
   PhoneCall,
-  MapPin,
-  ChevronDown,
-  ChevronUp,
   Search,
 } from "lucide-react";
 import AvatarDropdown from "../Header/AvatarDropdown";
 import CartDropdown from "../Header/CartDropdown";
 import Link from "next/link";
-import Image from "next/image";
 import Logo from "./Logo";
 import NavLinks from "./NavLinks";
 import BrandBar from "./BrandBar";
@@ -39,49 +34,20 @@ const Header = () => {
       name: "Contact Us",
     },
   ];
-  
-  const router = useRouter();
 
-
-  const [header, setHeader] = useState(false);
-
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  const menuHandler = () => {
-    setMenuOpen(!menuOpen);
-  };
-
-  const scrollHeader = () => {
-    if (window.scrollY >= 150) {
-      setHeader(true);
-    } else {
-      setHeader(false);
-    }
-  };
-  
-
-  useEffect(() => {
-    window.addEventListener("scroll", scrollHeader);
-
-    return () => {
-      window.removeEventListener("scroll", scrollHeader);
-    };
-  }, []);
 
   return (
     <header
       className={
-        header
-          ? "fixed w-full flex flex-col justify-between top-0 bg-white z-50 transition-all duration-1400"
-          : "flex flex-col justify-between top-0 bg-white z-50 transition-all duration-1300"
+
+           "flex flex-col justify-between top-0 bg-white z-50 transition-all duration-1300 border-b"
       }
     >
-      {menuOpen && (
-        <div
-          className="fixed top-0 left-0 w-full h-screen bg-black opacity-70 z-50"
-          onClick={menuHandler}
-        ></div>
-      )}
+      {/*{menuOpen && (*/}
+      {/*  <div*/}
+      {/*    className="fixed top-0 left-0 w-full h-screen bg-black opacity-70 z-50"*/}
+      {/*  ></div>*/}
+      {/*)}*/}
 
       <div className="">
         {/* header top bar */}
@@ -123,7 +89,7 @@ const Header = () => {
 
         {/* header navigation bar */}
 
-        <div className="flex justify-between shadow-sm bg-white z-40 m-auto p-2 md:p-4 relative">
+        <div className="flex justify-between border-b bg-white z-40 m-auto p-2 md:p-4 relative">
           <div className="w-[300px] flex items-center relative">
           <Logo />
             
@@ -134,10 +100,6 @@ const Header = () => {
           <div className="hidden w-full md:flex justify-center">
             <form
               className="flex-1 py-2 text-primary-700"
-              onSubmit={(e) => {
-                e.preventDefault();
-                router.push("/page-search");
-              }}
             >
               <div className="bg-slate-100 border-slate-900  flex items-center space-x-1.5 px-3 rounded-2xl h-full ">
                 <Search />
@@ -162,7 +124,6 @@ const Header = () => {
             </div>
             <div className="block lg:hidden">
               <button
-                onClick={menuHandler}
                 className=" flex w-10 h-10 sm:w-12 sm:h-12 rounded-full text-slate-700  hover:bg-slate-100  focus:outline-none items-center justify-center"
               >
                 <Menu className="text-primary-700" />
@@ -178,14 +139,12 @@ const Header = () => {
 
       <div
         className={
-          menuOpen
-            ? "fixed left-0 top-0 w-[70%] sm:hidden h-screen bg-gray-100 py-5 px-3 ease-in duration-300 z-50"
-            : "fixed left-[-100%] top-0 p-10 h-screen  z-50 ease-in duration-200"
+          "fixed left-[-100%] top-0 p-10 h-screen  z-50 ease-in duration-200"
         }
       >
         <div className="flex w-full items-center justify-between">
           <Logo />
-          <div onClick={menuHandler} className="cursor-pointer">
+          <div className="cursor-pointer">
             <XIcon />
           </div>
         </div>

@@ -4,10 +4,11 @@ import { ProductContentFull } from "@/graphql/defs/products.fragments";
 
 export const GET_BRANDS = gql`
     query getBrands {
-        brands {
+        brands(first: 12, where: {orderby: COUNT}) {
             nodes {
                 name
                 slug
+                databaseId
             }
         }
     }
@@ -217,6 +218,7 @@ export const GET_BRAND = gql`
         }
     }
 `
+
 
 export const GET_BRAND_ARCHIVE = gql`
     query GetBrandArchive($brandId: [Int] = null, $categoryIdIn: [Int] = null) {

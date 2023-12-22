@@ -1,3 +1,5 @@
+'use client'
+
 import { Popover, Transition } from "@headlessui/react";
 import { avatarImgs } from "@/contains/fakeData";
 import { CircleUserRound } from "lucide-react"; 

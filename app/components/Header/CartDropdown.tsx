@@ -1,3 +1,4 @@
+'use client'
 import { Popover, Transition } from "@headlessui/react";
 import Prices from "@/app/components/Prices";
 import { Product, PRODUCTS } from "@/data/data";
