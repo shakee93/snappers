@@ -40,7 +40,7 @@ const Header = () => {
     <header
       className={
 
-           "flex flex-col justify-between top-0 bg-white z-50 transition-all duration-1300 border-b"
+           "backdrop-blur-md sticky top-0 flex flex-col justify-between bg-white/90 z-50 transition-all duration-1300 border-b"
       }
     >
       <div className="flex justify-between items-center lg:items-stretch">
@@ -53,11 +53,11 @@ const Header = () => {
               <form
                   className="flex-1 text-primary-700"
               >
-                <div className="bg-slate-100 border-slate-900 py-2 flex items-center space-x-1.5 px-5 rounded-2xl h-full ">
-                  <Search />
+                <div className="bg-primaryColor/5 border border-primaryColor/20 py-2 flex items-center space-x-1.5 px-5 rounded-2xl h-full ">
+                  <Search className='text-primaryColor' />
                   <input
                       type="text"
-                      placeholder="Type and press enter"
+                      placeholder="Type to Quick Search"
                       className="border-none bg-transparent focus:outline-none focus:ring-0 w-full text-sm"
                       autoFocus
                   />

@@ -1,12 +1,29 @@
 import Link from "next/link";
 import Image from "next/image";
 import SiteLogo from "@/public/global/logo.webp";
+import {getClient} from "@/graphql/apollo-ssr";
+import {GET_BRANDS} from "@/graphql/defs/products";
+import {Brand} from "@/graphql/types/graphql";
 
-const Footer = () => {
+const getData = async () => {
+  const { data } = await getClient().query({
+    query: GET_BRANDS,
+    fetchPolicy: 'no-cache'
+  })
+
+  return data.brands.nodes
+}
+
+
+
+const Footer = async () => {
+
+  const brands = await getData()
+
   return (
-    <footer className=" bg-blue-50 border-t-1 border-gray-400 mb-16 md:mb-0 text-black">
-      <div className="container p-4 grid grid-cols-1 gap-3 md:grid-cols-4 justify-between">
-        <div className=" flex gap-1 md:gap-2 p-2 flex-col items-center md:items-start">
+    <footer className="border-t text-black">
+      <div className="container py-16 px-8 grid grid-cols-1 gap-3 md:grid-cols-4 justify-between">
+        <div className="flex gap-1 md:gap-2 p-2 flex-col items-center md:items-center justify-center">
           <Link href={"/"}>
             <Image
               width={200}
@@ -15,16 +32,10 @@ const Footer = () => {
               className="h-20 md:h-28  lg:h-32  w-auto rounded-b-2xl"
             />
           </Link>
-          <div className="text-base md:text-lg font-medium text-primaryColor">About us</div>
-          <div className="text-xs md:text-sm text-gray-500 text-center md:text-left">
-            GQ the Mobile Store Unlimited carries a wide selection of mobile
-            phones and tablets fresh from release, with prices that will suit
-            every budget.
-          </div>
         </div>
         <div className="flex gap-1 md:gap-2 p-2 flex-col items-center md:items-start">
           <div className="text-base md:text-lg font-medium text-primaryColor">Quick Links</div>
-          <ul className="text-xs md:text-sm text-gray-500 flex flex-col gap-3 pl-4  list-disc">
+          <ul className="text-xs md:text-sm text-gray-500 flex flex-col gap-3 ">
             <li className="hover:text-primaryColor">
               <Link href={"/"}>Home</Link>
             </li>
@@ -47,66 +58,18 @@ const Footer = () => {
         </div>
         <div className="flex gap-1 md:gap-2 p-2 flex-col items-center md:items-start">
           <div className="text-base md:text-lg font-medium text-primaryColor">Top Brands</div>
-          <ul className="text-xs md:text-sm text-gray-500 grid grid-cols-3  gap-x-8 gap-y-3   list-disc">
-            <li className="hover:text-primaryColor">
-              <Link href={"/"}>Apple</Link>
-            </li>
-            <li className="hover:text-primaryColor">
-              <Link href={"/"}>Bose</Link>
-            </li>
-            <li className="hover:text-primaryColor">
-              <Link href={"/"}>Samsung</Link>
-            </li>
-            <li className="hover:text-primaryColor">
-              <Link href={"/"}>OnePlus</Link>
-            </li>
-            <li className="hover:text-primaryColor">
-              <Link href={"/"}>Google</Link>
-            </li>
-            <li className="hover:text-primaryColor">
-              <Link href={"/"}>Amazfit</Link>
-            </li>
-            <li className="hover:text-primaryColor">
-              <Link href={"/"}>Honor</Link>
-            </li>
-            <li className="hover:text-primaryColor">
-              <Link href={"/"}>Huawei</Link>
-            </li>
-            <li className="hover:text-primaryColor">
-              <Link href={"/"}>Beats</Link>
-            </li>
-            <li className="hover:text-primaryColor">
-              <Link href={"/"}>ZTE</Link>
-            </li>
-            <li className="hover:text-primaryColor">
-              <Link href={"/"}>JBL</Link>
-            </li>
-            <li className="hover:text-primaryColor">
-              <Link href={"/"}>Xiaomi</Link>
-            </li>
-            <li className="hover:text-primaryColor">
-              <Link href={"/"}>Asus</Link>
-            </li>
-            <li className="hover:text-primaryColor">
-              <Link href={"/"}>Fitbit</Link>
-            </li>
-            <li className="hover:text-primaryColor">
-              <Link href={"/"}>Microsoft</Link>
-            </li>
-            <li className="hover:text-primaryColor">
-              <Link href={"/"}>Oppo</Link>
-            </li>
-            <li className="hover:text-primaryColor">
-              <Link href={"/"}>Tecno</Link>
-            </li>
-            <li className="hover:text-primaryColor">
-              <Link href={"/"}>Sony</Link>
-            </li>
+          <ul className="text-xs md:text-sm text-gray-500 grid grid-cols-2 gap-x-4 gap-y-3">
+
+            {brands.map((brand: Brand, index: number) =>
+                <li key={index} className="hover:text-primaryColor">
+                  <Link href={`/${brand.slug}`}>{brand.name}</Link>
+                </li>
+            )}
           </ul>
         </div>
         <div className=" flex gap-3 md:gap-2 p-2 flex-col items-center md:items-start">
           <div className="text-base md:text-lg font-medium text-primaryColor">
-            Sign up to Newsletter
+            Follow us
           </div>
 
           <div className="text-xs md:text-sm text-gray-500 text-center md:text-left">
