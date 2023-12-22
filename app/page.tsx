@@ -1,6 +1,7 @@
 "use client";
 
 import SectionHero2 from "@/app/components/HomePage/SectionHero";
+import SectionHero3 from "@/app/components/HomePage/SectionHero2";
 import DiscoverMoreSlider from "@/app/components/HomePage/DiscoverMoreSlider";
 import SectionSliderProductCard from "@/app/components/SectionSliderProductCard";
 import { PRODUCTS, SPORT_PRODUCTS } from "@/data/data";
@@ -25,7 +26,10 @@ export default function Home() {
     <main>
       <div className="nc-PageHome relative overflow-hidden">
         <div className="z-30">
-          <SectionHero2 />
+          {/* <SectionHero2 /> */}
+          <SectionHero3 />
+
+
         </div>
         <div className=" gap-4 container m-auto">
           <div className="my-10">

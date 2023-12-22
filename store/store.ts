@@ -2,17 +2,23 @@ import {create} from 'zustand'
 
 type State = {
     sidebar: {
-        categories: string[]
+        mounted: number
+        categories: string[],
+        brands: string[]
     }
 }
 
 type Actions = {
     syncCategories: (categories: string[]) => void
+    syncBrands: (brands: string[]) => void
+    setMounted: () => void
 }
 
 export const useStore = create<State & Actions>((set) => ({
     sidebar: {
-        categories: []
+        categories: [],
+        brands: [],
+        mounted: 0,
     },
     syncCategories: (categories: string[]) => set((state) => ({
         sidebar: {
@@ -20,4 +26,16 @@ export const useStore = create<State & Actions>((set) => ({
             categories
         }
     })),
+    syncBrands: (brands: string[]) => set((state) => ({
+        sidebar: {
+            ...state.sidebar,
+            brands
+        }
+    })),
+    setMounted: () => set((state) => ({
+        sidebar: {
+            ...state.sidebar,
+            mounted: state.sidebar.mounted + 1,
+        }
+    }))
 }))

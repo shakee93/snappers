@@ -1,18 +1,3 @@
-import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import {
-  Menu,
-  XIcon,
-  Facebook,
-  Instagram,
-  PhoneCall,
-  MapPin,
-  ChevronDown,
-  ChevronUp,
-  Search,
-} from "lucide-react";
-import AvatarDropdown from "../Header/AvatarDropdown";
-import CartDropdown from "../Header/CartDropdown";
 import Link from "next/link";
 
 const NavLinks = () => {
@@ -38,10 +23,10 @@ const NavLinks = () => {
   ];
 
   return (
-    <ul className="gap-1 text-sm  flex text-center items-center font-medium  text-black ">
+    <ul className="gap-1 text-sm  flex text-center items-center font-medium  text-black px-3 ">
       {navLinks.map((item) => (
         <Link href={item.href} key={item.id}>
-          <li className="hover:[#f1f5f9] rounded-3xl px-1 xl:px-3  py-1 ">
+          <li className="hover:[#f1f5f9] rounded-3xl px-1 xl:px-3  py-1 whitespace-nowrap ">
             {item.name}
           </li>
         </Link>

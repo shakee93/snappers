@@ -3,7 +3,13 @@ import SectionPromo1 from "components/SectionPromo1";
 import ProductCard from "components/ProductCard";
 import { PRODUCTS } from "@/data/data";
 import {getClient} from "@/graphql/apollo-ssr";
-import {GET_ALL_PRODUCTS, GET_BRAND_ARCHIVE, GET_CATEGORY, GET_VARIATIONS_PRODUCT} from "@/graphql/defs/products";
+import {
+    GET_ALL_PRODUCTS,
+    GET_BRAND,
+    GET_BRAND_ARCHIVE,
+    GET_CATEGORY,
+    GET_VARIATIONS_PRODUCT
+} from "@/graphql/defs/products";
 import {notFound} from "next/navigation";
 import {Product} from "@/graphql/types/graphql";
 import Image from "next/image";
@@ -15,9 +21,9 @@ import { useQuery } from "@apollo/client";
 export async function getData(slug : string | null = null)  {
 
 
-    const {data, error} = await getClient().query(
+    const {data} = await getClient().query(
         {
-            query: GET_BRAND_ARCHIVE,
+            query: GET_BRAND,
             variables:   {
                 brandId: slug
             },
@@ -25,32 +31,26 @@ export async function getData(slug : string | null = null)  {
         }
     );
 
-
-    console.log(data.brand);
-
     if (!data.brand) {
         return notFound()
     }
 
-    if (!data.products) {
-        return {
-            products: [],
-            productCategories: [],
-            brand: null
-        };
-    }
-
+    const {data: productql, error} = await getClient().query(
+        {
+            query: GET_BRAND_ARCHIVE,
+            variables:   {
+                brandId: [data.brand.databaseId]
+            },
+            fetchPolicy: 'no-cache'
+        }
+    );
+    
     return {
-        products: data.products.edges,
+        products: productql.products.edges,
         productCategories: data.productCategories.nodes,
-        brand: data.brand
+        brand: data.brand,
+        brands: data.brands.nodes
     }
-    //
-    // return {
-    //     products: [],
-    //     brand: null
-    // }
-   
 }
 
 
@@ -61,7 +61,7 @@ const Page = async ({ params } : {
     }
 }) => {
 
-    const { products, productCategories, brand } = await getData(params.brand)
+    const { products, productCategories, brand, brands } = await getData(params.brand)
 
     return (
         <div
@@ -93,7 +93,7 @@ const Page = async ({ params } : {
                             </div>
                             <div className="flex-shrink-0 mb-10 lg:mb-0 lg:mx-4 border-t lg:border-t-0"></div>
                             <div className="flex-1 ">
-                                <ProductGrid products={products}/>
+                                <ProductGrid brand={brand} products={products}/>
                             </div>
                         </div>
                     </main>

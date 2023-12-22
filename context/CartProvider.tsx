@@ -25,7 +25,7 @@ type CartSession = {
     error?: ApolloError
     updateCart: (key: string, quantity: number) => void
     removeFromCart: (keys : string[]) => void
-    addToCart: (id : number, quantity?: number) => void | Promise<Cart & Customer>
+    addToCart: (id : number, quantity?: number) => void | Promise<any>
 }
 
 const CartContext = createContext<CartSession>({

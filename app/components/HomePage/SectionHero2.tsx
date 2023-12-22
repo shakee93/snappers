@@ -1,20 +1,20 @@
+// Import React and other required modules
 import React, { FC, useState, useEffect } from "react";
-import imageRightPng from "@/public/images/hero-right.png";
-import imageRightPng2 from "@/public/images/hero-right-2.png";
-import imageRightPng3 from "@/public/images/hero-right-3.png";
-
+import { motion } from "framer-motion";
+import { useQuery } from "@apollo/client";
+import useBoolean from "react-use/lib/useBoolean";
+import useInterval from "react-use/lib/useInterval";
+import Image, { StaticImageData } from "next/image";
+import { GET_SLIDES } from "@/graphql/defs/slides";
+import { useStore } from "@/store/store";
 import backgroundLineSvg from "@/public/images/Moon.svg";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import Next from "shared/NextPrev/Next";
 import Prev from "shared/NextPrev/Prev";
-import useInterval from "react-use/lib/useInterval";
-import useBoolean from "react-use/lib/useBoolean";
-import Image, { StaticImageData } from "next/image";
+import NcImage from "@/shared/NcImage/NcImage";
+import { log } from "console";
 
-import { useStore } from "@/store/store";
-import { GET_SLIDES } from "@/graphql/defs/slides";
-import { useQuery } from "@apollo/client";
-
+// Define interfaces
 interface Hero2DataType {
   image: StaticImageData;
   heading: string;
@@ -41,37 +41,13 @@ export interface SectionHero2Props {
   className?: string;
 }
 
-const DATA: Hero2DataType[] = [
-  {
-    image: imageRightPng2,
-    heading: "Exclusive collection for everyone",
-    subHeading: "In this season, find the best 🔥",
-    btnText: "Explore now",
-    btnLink: "/",
-  },
-  {
-    image: imageRightPng3,
-    heading: "Exclusive collection for everyone",
-    subHeading: "In this season, find the best 🔥",
-    btnText: "Explore now",
-    btnLink: "/",
-  },
-  {
-    image: imageRightPng,
-    heading: "Exclusive collection for everyone",
-    subHeading: "In this season, find the best 🔥",
-    btnText: "Explore now",
-    btnLink: "/",
-  },
-];
+// Define constants
 let TIME_OUT: NodeJS.Timeout | null = null;
 
-
-
-const SectionHero: FC<SectionHero2Props> = ({ className = "" }) => {
-
+// Define the SectionHero2 component
+const SectionHero2: FC<SectionHero2Props> = ({ className = "" }) => {
   const [slide, setSlide] = useState<SlideType[]>([]);
-  let { loading, error, data, refetch } = useQuery(GET_SLIDES);
+  const { loading, error, data, refetch } = useQuery(GET_SLIDES);
 
   useEffect(() => {
     if (!loading && data?.slides?.nodes?.length > 0) {
@@ -79,34 +55,31 @@ const SectionHero: FC<SectionHero2Props> = ({ className = "" }) => {
     }
   }, [loading]);
 
-  // console.log( data?.slides );
-  // console.log(slide?.map((i) => i.slideFields.mainHeading));
-
-
-  // =================
   const [indexActive, setIndexActive] = useState(0);
   const [isRunning, toggleIsRunning] = useBoolean(true);
 
+  // Define the useInterval function
   useInterval(
     () => {
       handleAutoNext();
     },
     isRunning ? 5500 : null
   );
-  //
 
+  // Define handleAutoNext function
   const handleAutoNext = () => {
     setIndexActive((state) => {
-      if (state >= DATA.length - 1) {
+      if (state >= slide.length - 1) {
         return 0;
       }
       return state + 1;
     });
   };
 
+  // Define handleClickNext function
   const handleClickNext = () => {
     setIndexActive((state) => {
-      if (state >= DATA.length - 1) {
+      if (state >= slide.length - 1) {
         return 0;
       }
       return state + 1;
@@ -114,16 +87,18 @@ const SectionHero: FC<SectionHero2Props> = ({ className = "" }) => {
     handleAfterClick();
   };
 
+  // Define handleClickPrev function
   const handleClickPrev = () => {
     setIndexActive((state) => {
       if (state === 0) {
-        return DATA.length - 1;
+        return slide.length - 1;
       }
       return state - 1;
     });
     handleAfterClick();
   };
 
+  // Define handleAfterClick function
   const handleAfterClick = () => {
     toggleIsRunning(false);
     if (TIME_OUT) {
@@ -133,48 +108,44 @@ const SectionHero: FC<SectionHero2Props> = ({ className = "" }) => {
       toggleIsRunning(true);
     }, 1000);
   };
-  // =================
 
+  // Define renderItem function
   const renderItem = (index: number) => {
     const isActive = indexActive === index;
     const item = slide[index];
     if (!isActive) {
       return null;
     }
+
+    // console.log(item)
     return (
       <div
-        className={`nc-SectionHero2Item nc-SectionHero2Item--animation flex flex-col-reverse lg:flex-col relative overflow-hidden  ${className}`}
         key={index}
+        className={`relative w-full h-[650px] md:h-[400px] xl:h-[500px] justify-center  nc-SectionHero2Item--animation flex items-center bg-red-300 transition-transform ease-in-out transform ${
+          isActive ? "translate-y-0" : "translate-y-10"
+        }`}
       >
-      
-
-      {/* navigation dots */}
-
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex justify-center">
-          {DATA.map((_, index) => {
-            const isActive = indexActive === index;
-            return (
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 flex justify-center">
+        {slide.map((_, dotIndex) => (
+            <div
+              key={dotIndex}
+              onClick={() => {
+                setIndexActive(dotIndex);
+                handleAfterClick();
+              }}
+              className={`relative px-1 py-1.5 cursor-pointer`}
+            >
               <div
-                key={index}
-                onClick={() => {
-                  setIndexActive(index);
-                  handleAfterClick();
-                }}
-                className={`relative px-1 py-1.5 cursor-pointer`}
+                className={`relative w-20 h-1 shadow-sm rounded-md bg-white`}
               >
                 <div
-                  className={`relative w-20 h-1 shadow-sm rounded-md bg-white`}
-                >
-                  {isActive && (
-                    <div
-                      className={`nc-SectionHero2Item__dot absolute inset-0 bg-slate-900 rounded-md ${isActive ? " " : " "
-                        }`}
-                    ></div>
-                  )}
-                </div>
+                  className={` absolute inset-0 bg-black rounded-md ${
+                    dotIndex === indexActive ? "opacity-100 nc-SectionHero2Item__dot" : "opacity-0"
+                  }`}
+                ></div>
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
 
         <Prev
@@ -189,30 +160,21 @@ const SectionHero: FC<SectionHero2Props> = ({ className = "" }) => {
           svgSize="w-6 h-6"
           onClickNext={handleClickNext}
         />
-
-        {/* BG */}
         <div className="absolute inset-0 bg-[#CCE0EF]">
-      
-          <Image fill style={{ objectFit: 'cover' }}
+          <NcImage
             className="absolute w-full h-full object-contain"
             src={backgroundLineSvg}
             alt="hero"
           />
         </div>
-
-        <div className=" container pb-0 pt-14 sm:pt-20 lg:py-44">
-          <div
-            className={`relative z-[1] w-full max-w-3xl space-y-8 sm:space-y-14 nc-SectionHero2Item__left`}
-          >
-            <div className="space-y-5 sm:space-y-6">
-              <span className="nc-SectionHero2Item__subheading block text-base md:text-xl text-slate-700 font-medium">
-                {item.slideFields.subHeading}
-              </span>
-              <h2 className="nc-SectionHero2Item__heading font-semibold text-3xl sm:text-4xl md:text-5xl xl:text-6xl 2xl:text-7xl !leading-[114%] text-slate-900">
-                {item.slideFields.mainHeading}
-              </h2>
-            </div>
-
+        <div className="flex-col md:flex-row container flex justify-between items-center z-[1] w-full ">
+          <div className="space-y-3 sm:space-y-4">
+            <span className="nc-SectionHero2Item__subheading block text-base md:text-xl text-slate-700 font-medium">
+              {item.slideFields.subHeading}
+            </span>
+            <h2 className="nc-SectionHero2Item__heading font-semibold text-3xl sm:text-4xl md:text-4xl xl:text-5xl 2xl:text-5xl !leading-[114%] text-slate-900">
+              {item.slideFields.mainHeading}
+            </h2>
             <ButtonPrimary
               className="nc-SectionHero2Item__button dark:bg-slate-900"
               sizeClass="py-3 px-6 sm:py-5 sm:px-9"
@@ -239,15 +201,18 @@ const SectionHero: FC<SectionHero2Props> = ({ className = "" }) => {
               </span>
             </ButtonPrimary>
           </div>
-          <div className="mt-10 lg:mt-0 lg:absolute right-0 bottom-0 top-0 w-full max-w-2xl xl:max-w-3xl 2xl:max-w-4xl ">
-            <Image
-              className="w-auto h-[500px] object-contain object-right-bottom "
-              width={300}
-              height={300}
+
+          <motion.div
+            initial={{ opacity: 0, translateY: 100 }}
+            animate={{ opacity: 1, translateY: 0 }}
+            transition={{ duration: 0.8 }}
+            className="feature-image"
+          >
+            <NcImage
               src={item.slideFields.featureImage.sourceUrl}
-              alt={item.slideFields.mainHeading}
+              className="min-h-[400px] max-h-[500px] w-auto py-6 px-4"
             />
-          </div>
+          </motion.div>
         </div>
       </div>
     );
@@ -256,4 +221,4 @@ const SectionHero: FC<SectionHero2Props> = ({ className = "" }) => {
   return <>{slide.map((_, index) => renderItem(index))}</>;
 };
 
-export default SectionHero;
+export default SectionHero2;

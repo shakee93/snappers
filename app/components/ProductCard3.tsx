@@ -13,7 +13,7 @@ import ProductStatus from "./ProductStatus";
 import Prices from "./Prices";
 import LikeButton from "./LikeButton";
 import useProductLink from "@/hooks/useProductLink";
-import { Product, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
+import {Brand, Product, SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
 import AddedToCart from "@/app/components/Notifications/added-to-cart";
 import { useCart } from "@/context/CartProvider";
 
@@ -48,8 +48,6 @@ const ProductCard: FC<ProductCardProps> = ({
         };
     }, []);
 
-    // console.log({ data })
-
     /* Slider Start */
 
     const startSlider = () => {
@@ -74,7 +72,7 @@ const ProductCard: FC<ProductCardProps> = ({
         clearInterval(hoverIntervalRef.current!);
     };
 
-    const variationImages = variations?.edges.map((variation: any) => variation.node.image.mediaItemUrl) || [];
+    // const variationImages = variations?.edges.map((variation: any) => variation.node.image.mediaItemUrl) || [];
 
     const sliderStyle = {
         display: 'flex',
@@ -237,11 +235,11 @@ const ProductCard: FC<ProductCardProps> = ({
 
                 <Link href={link}>
                     <div style={sliderStyle}>
-                        {variations?.edges && variations.edges.some(variation => variation.node?.image?.mediaItemUrl) ? (
+                        {variations?.edges && variations.edges.some(variation => variation.node?.image?.sourceUrl) ? (
                             variations.edges.map((variation, index) => (
                                 <div key={index} className="w-full flex-shrink-0 bg-[#fefefe]">
                                     <Image
-                                        src={variation?.node?.image?.mediaItemUrl || ''}
+                                        src={variation?.node?.image?.sourceUrl || ''}
                                         width={300}
                                         height={300}
                                         alt={name || ''}
@@ -253,7 +251,7 @@ const ProductCard: FC<ProductCardProps> = ({
                             <Image
                                 width={300}
                                 height={300}
-                                src={image?.mediaItemUrl || ''}
+                                src={image?.sourceUrl || ''}
                                 alt={name || ''}
                                 className="object-contain w-auto h-full mx-auto my-auto"
                             />
@@ -286,8 +284,8 @@ const ProductCard: FC<ProductCardProps> = ({
                     <div
                         className={`nc-ProductCard__title text-xs lg:text-sm text-black line-clamp-2 min-h-[20px] lg:min-h-[20px] text-slate-800`}
                     >
-                        {terms?.nodes.map((brand, index) => (
-                            <span key={index}>{brand?.name}</span>
+                        {terms?.nodes.map((brand : Brand, index) => (
+                            <Link href={`/${brand?.slug}`} key={index}>{brand?.name}</Link>
                         ))}
                     </div>
                 </div>

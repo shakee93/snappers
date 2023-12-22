@@ -69,6 +69,7 @@ const ModalQuickView: FC<ModalQuickViewProps> = ({
                   ) : ( */}
                     <ProductQuickView product={productData}/>
                   {/* )} */}
+                  {/* <ProductQuickView2/> */}
                 </div>
               </div>
             </div>

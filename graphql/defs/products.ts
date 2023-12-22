@@ -4,10 +4,11 @@ import { ProductContentFull } from "@/graphql/defs/products.fragments";
 
 export const GET_BRANDS = gql`
     query getBrands {
-        brands {
+        brands(first: 12, where: {orderby: COUNT}) {
             nodes {
                 name
                 slug
+                databaseId
             }
         }
     }
@@ -169,7 +170,8 @@ query GetAllProductVariations($categoryIdIn: [Int]) {
           name
           slug
           image {
-            mediaItemUrl
+              mediaItemUrl
+              sourceUrl
           }
           ... on VariableProduct {
             name
@@ -207,29 +209,48 @@ query GetAllProductVariations($categoryIdIn: [Int]) {
   `;
 
 
-export const GET_BRAND_ARCHIVE = gql`
-    query GetBrandArchive($brandId: ID!) {
+export const GET_BRAND = gql`
+    query GetBrand($brandId: ID!) {
         brand(id: $brandId, idType: SLUG) {
-            id
+            databaseId
             name
-            description
+            slug
         }
-        productCategories(first: 100) {
+        productCategories(first: 100, where: {orderby: COUNT}) {
             nodes {
                 name
                 slug
                 id
                 databaseId
+                count
             }
         }
-        brands(first: 100) {
+        brands(first: 100, where: {orderby: COUNT}) {
             nodes {
-                id
+                databaseId
                 name
                 slug
+                count
             }
-        } 
-        products(first: 25) {
+        }
+    }
+`
+
+
+export const GET_BRAND_ARCHIVE = gql`
+    query GetBrandArchive($brandId: [Int] = null, $categoryIdIn: [Int] = null) {
+        products(first: 45, where: {taxonomyFilter: {filters: [
+            {
+                taxonomy: PWB_BRAND, ids:$brandId
+            }
+            {
+                taxonomy: PRODUCT_CAT, ids: $categoryIdIn
+            }
+
+        ]
+            relation: AND
+            
+        }}) {
             edges {
                 node {
                     ...ProductContentFull
@@ -253,6 +274,7 @@ query GetAllProducts($categoryIdIn: [Int]) {
         onSale
         image {
           mediaItemUrl
+            sourceUrl
         }
         type
         ... on SimpleProduct {
