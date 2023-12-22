@@ -12,7 +12,11 @@ import Image from "next/image";
 import SidebarFilters from "@/app/components/SidebarFilters";
 import ProductGrid from "@/app/components/ProductGrid";
 import { useQuery } from "@apollo/client";
-// import {TabFilters} from "@/app/components/TabFilters"
+import TabFilters from "@/app/components/TabFilters";
+// import TabFilters from "@/containers/TabFilters";
+
+// import TabFilters from "";
+
 
 
 export async function getData(categories : number[] | null = null)  {
@@ -65,17 +69,17 @@ const Page = async () => {
                             easy for you to share your designs with more like-minded people.
                         </span>
                     </div>
+                    <TabFilters />
 
                     <hr className="border-slate-200 dark:border-slate-700"/>
                     <main>
                         {/* LOOP ITEMS */}
                         <div className="flex flex-col lg:flex-row">
-                            {/* <TabFilters/> */}
-                            <div className="lg:w-1/3 xl:w-1/4 pr-4">
+                            {/* <div className="lg:w-1/3 xl:w-1/4 pr-4">
                                 <SidebarFilters
                                     categories={productCategories}
                                 />
-                            </div>
+                            </div> */}
                             <div className="flex-shrink-0 mb-10 lg:mb-0 lg:mx-4 border-t lg:border-t-0"></div>
                             <div className="flex-1 ">
                                 <ProductGrid products={products}/>

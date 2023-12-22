@@ -51,7 +51,7 @@ const ProductGrid = ({ products, brand, category }: ProductGridProps) => {
     return loading ? (
         <div>loading...</div>
     ) : (
-        <div className="flex-1 grid sm:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-10">
+        <div className="flex-1 grid  sm:grid-cols-2 xl:grid-cols-4 gap-x-8 gap-y-10">
             {_products.map((item, index: number) =>
                 <ProductCard  key={item.node.slug} data={item.node} />
             )}
