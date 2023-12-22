@@ -4,6 +4,7 @@ import img1 from "@/public/images/collections/1.png";
 import img2 from "@/public/images/collections/5.png";
 import img3 from "@/public/images/collections/4.png";
 import img4 from "@/public/images/collections/3.png";
+import img5 from "@/public/images/collections/3.png";
 import CardCategory3, {
   CardCategory3Props,
 } from "@/app/components/CardCategories/CardCategory3";
@@ -11,30 +12,38 @@ import Glide from "@glidejs/glide";
 
 export const CATS_DISCOVER: CardCategory3Props[] = [
   {
-    name: "Explore new arrivals",
-    desc: "Shop the latest <br /> from top brands",
+    name: "Innovative Smartphones",
+    desc: "Infinite Possibilities",
     featuredImage: img1,
     color: "bg-yellow-50",
   },
   {
-    name: "Digital gift cards",
-    desc: "Give the gift <br /> of choice",
+    name: "Audio Excellence Collection",
+    desc: "Immerse Yourself in Sound",
     featuredImage: img2,
     color: "bg-red-50",
   },
   {
-    name: "Sale collection",
-    desc: "Up to <br /> 80% off retail",
+    name: "Immersive Speaker Collection",
+    desc: "Surround Yourself with Sound",
     featuredImage: img3,
     color: "bg-blue-50",
   },
   {
-    name: "Sale collection",
-    desc: "Up to <br /> 80% off retail",
+    name: "Futuristic Smartwatches",
+    desc: "Stay Connected, Stay Active",
     featuredImage: img4,
     color: "bg-green-50",
   },
+  {
+    name: "Cutting-Edge Laptops",
+    desc: "Elevate Your Productivity",
+    featuredImage: img5,
+    color: "bg-orange-50",
+  }
 ];
+
+
 
 const DiscoverMoreSlider = () => {
   const id = useId();

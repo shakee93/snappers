@@ -28,8 +28,6 @@ export default function Home() {
         <div className="z-30">
           {/* <SectionHero2 /> */}
           <SectionHero3 />
-
-
         </div>
         <div className=" gap-4 container m-auto">
           <div className="my-10">
@@ -62,11 +60,15 @@ export default function Home() {
           </div> */}
 
           {/* SECTION */}
-          <SectionPromo1 />
+          <div className="relative py-10 lg:py-20">
+            <BackgroundSection className="bg-blue-100"/>
+
+            <SectionPromo1 />
+          </div>
 
           {/* SECTION */}
           <div className="relative py-24 lg:py-32">
-            <BackgroundSection />
+            <BackgroundSection  />
             <SectionGridMoreExplore />
           </div>
 
@@ -89,8 +91,8 @@ export default function Home() {
           />
 
           {/* <div className="relative py-24 lg:py-32"> */}
-            {/* <BackgroundSection /> */}
-            {/* <div>
+          {/* <BackgroundSection /> */}
+          {/* <div>
               <Heading rightDescText="From the Ciseco blog">
                 The latest news
               </Heading>
