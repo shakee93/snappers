@@ -50,10 +50,7 @@ const SidebarFilters = ({
   const [sortOrderStates, setSortOrderStates] = useState<string>("");
 
   const { sidebar, syncCategories, syncBrands, setMounted } = useStore()
-  
-  
-  
-  
+
   //
   const handleChangeCategories = (checked: boolean, name: string) => {
     checked

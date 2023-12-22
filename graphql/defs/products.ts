@@ -151,20 +151,7 @@ export const GET_CATEGORY_SLUGS = gql`
     }
 `;
 
-export const GET_CATEGORY = gql`
-    query GetProductCategory($categoryId: ID!) {
-        productCategory(id: $categoryId, idType: SLUG) {
-            description
-            name
-            slug
-            databaseId
-            image {
-                link
-                sourceUrl
-            }
-        }
-    }
-`;
+
 
 export const GET_VARIATIONS_PRODUCT = gql`
 query GetAllProductVariations($categoryIdIn: [Int]) {
@@ -241,6 +228,35 @@ export const GET_BRAND = gql`
     }
 `
 
+export const GET_CATEGORY = gql`
+    query GetCategory($categoryId: ID!) {
+        productCategory(id: $categoryId, idType: SLUG) {
+            description
+            name
+            slug
+            databaseId
+        }
+        productCategories(first: 100, where: {orderby: COUNT}) {
+            nodes {
+                name
+                slug
+                id
+                databaseId
+                count
+            }
+        }
+        brands(first: 100, where: {orderby: COUNT}) {
+            nodes {
+                databaseId
+                name
+                slug
+                count
+            }
+        }
+    }
+`
+
+
 
 export const GET_BRAND_ARCHIVE = gql`
     query GetBrandArchive($brandId: [Int] = null, $categoryIdIn: [Int] = null) {
@@ -264,6 +280,19 @@ export const GET_BRAND_ARCHIVE = gql`
         }
     }
     ${ProductContentFull} 
+`
+
+export const GET_CATEGORY_ARCHIVE = gql`
+    query GetCategoryArchive( $categoryIdIn: [Int] = null) {
+        products(where: {categoryIdIn: $categoryIdIn}) {
+            edges {
+                node {
+                    ...ProductContentFull
+                }
+            }
+        }
+    }
+    ${ProductContentFull}
 `
 
 export const GET_PRODUCTS = gql`

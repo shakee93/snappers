@@ -25,19 +25,26 @@ const ProductGrid = ({ products, brand, category }: ProductGridProps) => {
     useEffect(() => {
 
 
+        console.log(categories);
+
         if (categories.length === 0 && brands.length === 0 && mounted) {
             setMounts(p => p + 1)
         }
 
-        if (mounts >= 1) {
+        console.log(mounts);
+
+        if (mounts >= 0) {
             (async () => {
                 let { data } = await  getArchiveData({
                     variables: {
-                        categoryIdIn: categories.length === 0 ? null : categories,
+                        categoryIdIn: category && categories.length === 0 && brands.length === 0 ? [category.databaseId] : categories,
                         brandId: brand && categories.length === 0 && brands.length === 0 ? [brand.databaseId] : brands
                     },
                     fetchPolicy: 'no-cache'
                 });
+
+                console.log(data.products.edges);
+
 
                 setProducts(data.products.edges)
             })();
@@ -51,7 +58,7 @@ const ProductGrid = ({ products, brand, category }: ProductGridProps) => {
     return loading ? (
         <div>loading...</div>
     ) : (
-        <div className="flex-1 grid  sm:grid-cols-2 xl:grid-cols-4 gap-x-8 gap-y-10">
+        <div className="flex-1 grid  sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10">
             {_products.map((item, index: number) =>
                 <ProductCard  key={item.node.slug} data={item.node} />
             )}

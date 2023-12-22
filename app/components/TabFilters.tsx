@@ -1,5 +1,5 @@
 "use client";
-import React, { Fragment, useState } from "react";
+import React, {Fragment, useEffect, useState} from "react";
 import { Dialog, Popover, Transition } from "@headlessui/react";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonThird from "shared/Button/ButtonThird";
@@ -9,31 +9,10 @@ import Slider from "rc-slider";
 import Radio from "shared/Radio/Radio";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import MySwitch from "components/MySwitch";
+import {useStore} from "@/store/store";
+import {Brand} from "@/graphql/types/graphql";
 
 // DEMO DATA
-const DATA_categories = [
-  {
-    name: "New Arrivals",
-  },
-  {
-    name: "Sale",
-  },
-  {
-    name: "Backpacks",
-  },
-  {
-    name: "Travel Bags",
-  },
-  {
-    name: "Laptop Sleeves",
-  },
-  {
-    name: "Organization",
-  },
-  {
-    name: "Accessories",
-  },
-];
 
 const DATA_colors = [
   { name: "White" },
@@ -65,7 +44,10 @@ const DATA_sortOrderRadios = [
 
 const PRICE_RANGE = [1, 500];
 //
-const TabFilters = () => {
+const TabFilters = ({
+                      categories = [],
+                      brands = []
+                    }: any) => {
   const [isOpenMoreFilter, setisOpenMoreFilter] = useState(false);
   //
   const [isOnSale, setIsIsOnSale] = useState(true);
@@ -74,6 +56,12 @@ const TabFilters = () => {
   const [colorsState, setColorsState] = useState<string[]>([]);
   const [sizesState, setSizesState] = useState<string[]>([]);
   const [sortOrderStates, setSortOrderStates] = useState<string>("");
+  const [brandsState, setBrandsState] = useState<string[]>([]);
+
+  const { sidebar, syncCategories, syncBrands, setMounted } = useStore()
+
+
+
 
   //
   const closeModalMoreFilter = () => setisOpenMoreFilter(false);
@@ -84,6 +72,14 @@ const TabFilters = () => {
     checked
       ? setCategoriesState([...categoriesState, name])
       : setCategoriesState(categoriesState.filter((i) => i !== name));
+  };
+
+  const handleChangeBrands = (checked: boolean, name: string) => {
+    console.log(checked, name);
+
+    checked
+        ? setBrandsState([...brandsState, name])
+        : setBrandsState(brandsState.filter((i) => i !== name));
   };
 
   const handleChangeColors = (checked: boolean, name: string) => {
@@ -122,6 +118,7 @@ const TabFilters = () => {
 
   // OK
   const renderTabsCategories = () => {
+
     return (
       <Popover className="relative">
         {({ open, close }) => (
@@ -206,7 +203,7 @@ const TabFilters = () => {
               leaveFrom="opacity-100 translate-y-0"
               leaveTo="opacity-0 translate-y-1"
             >
-              <Popover.Panel className="absolute z-40 w-screen max-w-sm px-4 mt-3 left-0 sm:px-0 lg:max-w-md">
+              <Popover.Panel className="absolute z-40 w-screen max-w-sm px-4 mt-3 left-0 sm:px-0 lg:max-w-xl">
                 <div className="overflow-hidden rounded-2xl shadow-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
                   <div className="relative flex flex-col px-5 py-6 space-y-5">
                     <Checkbox
@@ -219,19 +216,21 @@ const TabFilters = () => {
                         handleChangeCategories(checked, "All Categories")
                       }
                     />
-                    <div className="w-full border-b border-neutral-200 dark:border-neutral-700" />
-                    {DATA_categories.map((item) => (
-                      <div key={item.name} className="">
-                        <Checkbox
-                          name={item.name}
-                          label={item.name}
-                          defaultChecked={categoriesState.includes(item.name)}
-                          onChange={(checked) =>
-                            handleChangeCategories(checked, item.name)
-                          }
-                        />
-                      </div>
-                    ))}
+                    <div className="w-full border-b  border-neutral-200 dark:border-neutral-700" />
+                    <div className='grid grid-cols-2 gap-2'>
+                      {categories.map((item) => (
+                          <div key={item.databaseId} className="">
+                            <Checkbox
+                                name={item.databaseId}
+                                label={item.name}
+                                defaultChecked={categoriesState.includes(item.databaseId)}
+                                onChange={(checked) =>
+                                    handleChangeCategories(checked, item.databaseId)
+                                }
+                            />
+                          </div>
+                      ))}
+                    </div>
                   </div>
                   <div className="p-5 bg-neutral-50 dark:bg-neutral-900 dark:border-t dark:border-neutral-800 flex items-center justify-between">
                     <ButtonThird
@@ -244,7 +243,10 @@ const TabFilters = () => {
                       Clear
                     </ButtonThird>
                     <ButtonPrimary
-                      onClick={close}
+                      onClick={() => {
+                        syncCategories(categoriesState)
+                        close()
+                      }}
                       sizeClass="px-4 py-2 sm:px-5"
                     >
                       Apply
@@ -259,6 +261,149 @@ const TabFilters = () => {
     );
   };
 
+  const renderTabsBrands = () => {
+
+    return (
+        <Popover className="relative">
+          {({ open, close }) => (
+              <>
+                <Popover.Button
+                    className={`flex items-center justify-center px-4 py-2 text-sm rounded-full border focus:outline-none select-none
+               ${
+                        open
+                            ? "!border-primary-500 "
+                            : "border-neutral-300 dark:border-neutral-700"
+                    }
+                ${
+                        !!brandsState.length
+                            ? "!border-primary-500 bg-primary-50 text-primary-900"
+                            : "border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
+                    }
+                `}
+                >
+                  <svg
+                      className="w-4 h-4"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                        d="M8 2V5"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeMiterlimit="10"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    />
+                    <path
+                        d="M16 2V5"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeMiterlimit="10"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    />
+                    <path
+                        d="M7 13H15"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeMiterlimit="10"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    />
+                    <path
+                        d="M7 17H12"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeMiterlimit="10"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    />
+                    <path
+                        d="M16 3.5C19.33 3.68 21 4.95 21 9.65V15.83C21 19.95 20 22.01 15 22.01H9C4 22.01 3 19.95 3 15.83V9.65C3 4.95 4.67 3.69 8 3.5H16Z"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeMiterlimit="10"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                    />
+                  </svg>
+
+                  <span className="ml-2">Brands</span>
+                  {!brandsState.length ? (
+                      <ChevronDownIcon className="w-4 h-4 ml-3" />
+                  ) : (
+                      <span onClick={() => setBrandsState([])}>
+                  {renderXClear()}
+                </span>
+                  )}
+                </Popover.Button>
+                <Transition
+                    as={Fragment}
+                    enter="transition ease-out duration-200"
+                    enterFrom="opacity-0 translate-y-1"
+                    enterTo="opacity-100 translate-y-0"
+                    leave="transition ease-in duration-150"
+                    leaveFrom="opacity-100 translate-y-0"
+                    leaveTo="opacity-0 translate-y-1"
+                >
+                  <Popover.Panel className="absolute z-40 w-screen max-w-sm px-4 mt-3 left-0 sm:px-0 lg:max-w-xl">
+                    <div className="overflow-hidden rounded-2xl shadow-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
+                      <div className="relative flex flex-col px-5 py-6 space-y-5">
+                        <Checkbox
+                            name="All Brands"
+                            label="All Brands"
+                            defaultChecked={brandsState.includes(
+                                "All Brands"
+                            )}
+                            onChange={(checked) =>
+                                handleChangeBrands(checked, "All Brands")
+                            }
+                        />
+                        <div className="w-full border-b  border-neutral-200 dark:border-neutral-700" />
+                        <div className='grid grid-cols-2 gap-2'>
+                          {brands.map((item: Brand) => (
+                              <div key={item.databaseId} className="">
+                                <Checkbox
+                                    name={item.databaseId as unknown as string}
+                                    label={item.name as string}
+                                    defaultChecked={brandsState.includes(item.databaseId as unknown as string)}
+                                    onChange={(checked) =>
+                                        handleChangeBrands(checked, item.databaseId as unknown as string)
+                                    }
+                                />
+                              </div>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="p-5 bg-neutral-50 dark:bg-neutral-900 dark:border-t dark:border-neutral-800 flex items-center justify-between">
+                        <ButtonThird
+                            onClick={() => {
+                              close();
+                              setBrandsState([]);
+                            }}
+                            sizeClass="px-4 py-2 sm:px-5"
+                        >
+                          Clear
+                        </ButtonThird>
+                        <ButtonPrimary
+                            onClick={() => {
+                              syncBrands(brandsState)
+                              close()
+                            }}
+                            sizeClass="px-4 py-2 sm:px-5"
+                        >
+                          Apply
+                        </ButtonPrimary>
+                      </div>
+                    </div>
+                  </Popover.Panel>
+                </Transition>
+              </>
+          )}
+        </Popover>
+    );
+  };
   // OK
   const renderTabsSortOrder = () => {
     return (
@@ -972,7 +1117,7 @@ const TabFilters = () => {
                       <div className="py-7">
                         <h3 className="text-xl font-medium">Categories</h3>
                         <div className="mt-6 relative ">
-                          {renderMoreFilterItem(DATA_categories)}
+                          {renderMoreFilterItem(categories)}
                         </div>
                       </div>
                       {/* --------- */}
@@ -1129,12 +1274,19 @@ const TabFilters = () => {
     );
   };
 
+
+  useEffect(() => {
+    setMounted()
+  }, [])
+
+
   return (
     <div className="flex lg:space-x-4">
       {/* FOR DESKTOP */}
       <div className="hidden lg:flex flex-1 space-x-4">
-        {renderTabsPriceRage()}
         {renderTabsCategories()}
+        {renderTabsBrands()}
+        {renderTabsPriceRage()}
         {/* {renderTabsColor()} */}
         {/* {renderTabsSize()} */}
         {renderTabIsOnsale()}
