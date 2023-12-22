@@ -40,6 +40,14 @@ const ProductCard: FC<ProductCardProps> = ({
     const delayBeforeNextImage = 1000;
     const link = useProductLink(data)
 
+    useEffect(() => {
+        return () => {
+            if (hoverIntervalRef.current !== null) {
+                clearInterval(hoverIntervalRef.current);
+            }
+        };
+    }, []);
+
     // console.log('product card', data)
 
     /* Slider Start */
@@ -53,7 +61,6 @@ const ProductCard: FC<ProductCardProps> = ({
     const handleHover = () => {
         setIsHovered(true);
         startSlider();
-
     };
 
     const handleHoverOut = () => {
@@ -61,6 +68,7 @@ const ProductCard: FC<ProductCardProps> = ({
         setCurrentVariation(0);
         clearInterval(hoverIntervalRef.current!);
     };
+
 
     const handleCloseModalQuickView = () => {
         setShowModalQuickView(true);
@@ -119,6 +127,7 @@ const ProductCard: FC<ProductCardProps> = ({
     }
 
     const handleAddToCart = () => {
+        console.log(data.databaseId);
         if (data.databaseId) {
             addToCart(data.databaseId, quantity)?.then(cartCompleted);
         } else {
@@ -204,7 +213,7 @@ const ProductCard: FC<ProductCardProps> = ({
                     className="shadow-lg"
                     fontSize="text-xs"
                     sizeClass="py-2 px-4"
-                    onClick={handleCloseModalQuickView}
+                    onClick={handleAddToCart}
                 >
                     <BagIcon className="w-3.5 h-3.5 mb-0.5" />
                     <span className="ml-1">Add to Cart</span>
@@ -213,7 +222,7 @@ const ProductCard: FC<ProductCardProps> = ({
                     className="ml-1.5 bg-white hover:!bg-gray-100 hover:text-slate-900 transition-colors shadow-lg"
                     fontSize="text-xs"
                     sizeClass="py-2 px-4"
-                    onClick={() => setShowModalQuickView(true)}
+                    onClick={() => handleCloseModalQuickView(true)}
                 >
                     <ArrowsPointingOutIcon className="w-3.5 h-3.5" />
                     <span className="ml-1">Quick view</span>
