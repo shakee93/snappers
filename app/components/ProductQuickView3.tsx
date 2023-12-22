@@ -22,26 +22,18 @@ import ProductAddToCart from "./SingleProductPage/ProductAddToCart";
 export interface ProductQuickViewProps {
   className?: string;
   product: SimpleProduct | VariableProduct;
-  // product: {
-  //   name: string;
-  //   image: {
-  //     mediaItemUrl: string;
-  //   };
-  //   price: string;
-  //   averageRating: number;
-  //   reviewCount: number;
-  //   description: string;
-  //   stockStatus: string;
-  //   variations: {
-  //     edges: Variation[];
-  //   };
-  //   status: string;
-  // };
 }
 
 const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }) => {
-  // const { name, image, price, averageRating, reviewCount, variations, status } = product;
-  const LIST_IMAGES_DEMO = [product.image.mediaItemUrl, product.galleryImages.nodes[0].sourceUrl, product.galleryImages.nodes[1].sourceUrl];
+  let LIST_IMAGES_DEMO: string[] = [];
+
+  if (product.galleryImages.nodes) {
+    LIST_IMAGES_DEMO = [product.image.sourceUrl, ...product.galleryImages.nodes.map(node => node.sourceUrl)];
+  } else if (product.galleryImages.edges && product.galleryImages.edges.length > 0) {
+    LIST_IMAGES_DEMO = [product.image.sourceUrl, product.galleryImages.edges[0].node.sourceUrl, product.galleryImages.edges[1].node.sourceUrl];
+  } else {
+    LIST_IMAGES_DEMO = [product.image.sourceUrl];
+  }
   const link = useProductLink(product)
 
   console.log('recieved from quick view', product)
@@ -74,88 +66,35 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
       <div>
         <label htmlFor="">
           <span className="text-sm font-medium">
-            Color:
+            Variations:
             <span className="ml-1 font-semibold">
               {/* {variants[variantActive].name} */}
             </span>
           </span>
         </label>
         <div className="flex mt-2.5">
-          {/* {variants.map((variant, index) => (
+          {product.variations.edges.map((variant, index) => (
             <div
               key={index}
               onClick={() => setVariantActive(index)}
-              className={`relative flex-1 max-w-[75px] h-10 rounded-full border-2 cursor-pointer ${variantActive === index
+              className={`w-auto relative flex-1 max-w-[75px] h-16 rounded-full border-2 cursor-pointer ${variantActive === index
                 ? "border-primary-6000 dark:border-primary-500"
                 : "border-transparent"
                 }`}
             >
               <div className="absolute inset-0.5 rounded-full overflow-hidden z-0">
                 <Image fill style={{ objectFit: 'cover' }}
-                  src={variant.thumbnail}
+                  src={variant.node.image.sourceUrl}
                   alt=""
                   className="absolute w-full h-full object-cover"
                 />
               </div>
             </div>
-          ))} */}
+          ))}
         </div>
       </div>
     );
   };
-
-  // const renderSizeList = () => {
-  //   if (!allOfSizes || !sizes || !sizes.length) {
-  //     return null;
-  //   }
-  //   return (
-  //     <div>
-  //       <div className="flex justify-between font-medium text-sm">
-  //         <label htmlFor="">
-  //           <span className="">
-  //             Size:
-  //             <span className="ml-1 font-semibold">{sizeSelected}</span>
-  //           </span>
-  //         </label>
-  //         <a
-  //           target="_blank"
-  //           rel="noopener noreferrer"
-  //           href="##"
-  //           className="text-primary-6000 hover:text-primary-500"
-  //         >
-  //           See sizing chart
-  //         </a>
-  //       </div>
-  //       <div className="grid grid-cols-5 sm:grid-cols-7 gap-2 mt-2.5">
-  //         {allOfSizes.map((size, index) => {
-  //           const isActive = size === sizeSelected;
-  //           const sizeOutStock = !sizes.includes(size);
-  //           return (
-  //             <div
-  //               key={index}
-  //               className={`relative h-10 sm:h-11 rounded-2xl border flex items-center justify-center 
-  //               text-sm sm:text-base uppercase font-semibold select-none overflow-hidden z-0 ${sizeOutStock
-  //                   ? "text-opacity-20 dark:text-opacity-20 cursor-not-allowed"
-  //                   : "cursor-pointer"
-  //                 } ${isActive
-  //                   ? "bg-primary-6000 border-primary-6000 text-white hover:bg-primary-6000"
-  //                   : "border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-200 hover:bg-neutral-50 dark:hover:bg-neutral-700"
-  //                 }`}
-  //               onClick={() => {
-  //                 if (sizeOutStock) {
-  //                   return;
-  //                 }
-  //                 setSizeSelected(size);
-  //               }}
-  //             >
-  //               {size}
-  //             </div>
-  //           );
-  //         })}
-  //       </div>
-  //     </div>
-  //   );
-  // };
 
   const renderStatus = () => {
     if (!status) {
@@ -217,7 +156,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
 
             <div className="flex items-center">
               <Link
-                href="/product-detail"
+                href={link}
                 className="flex items-center text-sm font-medium"
               >
                 <StarIcon className="w-5 h-5 pb-[1px] text-yellow-400" />
@@ -258,7 +197,6 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
               name: "Description",
               content: product.description,
             },
-            // You can add more sections as needed
           ]}
         />
       </div>
@@ -274,7 +212,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
           {/* HEADING */}
           <div className="relative">
             <div className="aspect-w-16 aspect-h-16">
-              <Image fill style={{ objectFit: 'cover' }}
+              <Image fill style={{ objectFit: 'contain' }}
                 src={LIST_IMAGES_DEMO[0]}
                 className="w-full rounded-xl object-cover"
                 alt="product detail 1"
@@ -286,19 +224,21 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
             {/* META FAVORITES */}
             <LikeButton className="absolute right-3 top-3 " />
           </div>
-          <div className="hidden lg:grid grid-cols-2 gap-3 mt-3 sm:gap-6 sm:mt-6 xl:gap-5 xl:mt-5">
-            {[LIST_IMAGES_DEMO[1], LIST_IMAGES_DEMO[2]].map((item, index) => {
-              return (
-                <div key={index} className="aspect-w-3 aspect-h-4">
-                  <Image fill style={{ objectFit: 'cover' }}
-                    src={item}
-                    className="w-full rounded-xl object-cover"
-                    alt={`product detail ${index + 2}`}
-                  />
-                </div>
-              );
-            })}
-          </div>
+          {(product.galleryImages.nodes || (product.galleryImages.edges && product.galleryImages.edges.length > 0)) && (
+            <div className="hidden lg:grid grid-cols-2 gap-3 mt-3 sm:gap-6 sm:mt-6 xl:gap-5 xl:mt-5">
+              {[LIST_IMAGES_DEMO[1], LIST_IMAGES_DEMO[2]].map((item, index) => {
+                return (
+                  <div key={index} className="aspect-w-3 aspect-h-4">
+                    <Image fill style={{ objectFit: 'contain' }}
+                      src={item}
+                      className="w-full rounded-xl object-contain"
+                      alt={`product detail ${index + 2}`}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </div>
 
         {/* SIDEBAR */}
