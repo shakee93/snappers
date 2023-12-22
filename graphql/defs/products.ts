@@ -44,6 +44,7 @@ query GetAllProducts($categoryIdIn: [Int]) {
         reviewCount
         onSale
         databaseId
+        description
         image {
           mediaItemUrl
           sourceUrl
@@ -54,6 +55,7 @@ query GetAllProducts($categoryIdIn: [Int]) {
           name
           stockStatus
           databaseId
+          
           terms {
             nodes {
               ... on Brand {
@@ -105,6 +107,7 @@ query GetAllProducts($categoryIdIn: [Int]) {
                 id
                 image {
                   mediaItemUrl
+                  sourceUrl
                   sizes
                 }
                 name
@@ -157,6 +160,7 @@ export const GET_CATEGORY = gql`
             databaseId
             image {
                 link
+                sourceUrl
             }
         }
     }
@@ -193,6 +197,7 @@ query GetAllProductVariations($categoryIdIn: [Int]) {
                   id
                   image {
                     mediaItemUrl
+                    sourceUrl
                     sizes
                   }
                   name
@@ -272,6 +277,7 @@ query GetAllProducts($categoryIdIn: [Int]) {
         reviewCount
         featured
         onSale
+        description
         image {
           mediaItemUrl
             sourceUrl
@@ -281,6 +287,7 @@ query GetAllProducts($categoryIdIn: [Int]) {
           id
           name
           stockStatus
+          description
           terms {
             nodes {
               ... on Brand {
@@ -306,6 +313,7 @@ query GetAllProducts($categoryIdIn: [Int]) {
         }
         ... on VariableProduct {
           name
+          description
           productCategories {
             nodes {
               name
@@ -324,6 +332,7 @@ query GetAllProducts($categoryIdIn: [Int]) {
                 id
                 image {
                   mediaItemUrl
+                  sourceUrl
                   sizes
                 }
                 name
