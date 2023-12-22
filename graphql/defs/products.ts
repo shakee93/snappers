@@ -191,35 +191,53 @@ query GetAllProductVariations($categoryIdIn: [Int]) {
   `;
 
 
-export const GET_BRAND_ARCHIVE = gql`
-    query GetBrandArchive($brandId: ID!) {
+export const GET_BRAND = gql`
+    query GetBrand($brandId: ID!) {
         brand(id: $brandId, idType: SLUG) {
-            id
+            databaseId
             name
-            description
-            products(first: 25) {
-               edges {
-                   node {
-                       ...ProductContentFull
-                   }
-               }
-            } 
+            slug
         }
-        productCategories(first: 100) {
+        productCategories(first: 100, where: {orderby: COUNT}) {
             nodes {
                 name
                 slug
                 id
                 databaseId
+                count
             }
         }
-        brands(first: 100) {
+        brands(first: 100, where: {orderby: COUNT}) {
             nodes {
-                id
+                databaseId
                 name
                 slug
+                count
             }
-        } 
+        }
+    }
+`
+
+export const GET_BRAND_ARCHIVE = gql`
+    query GetBrandArchive($brandId: [Int] = null, $categoryIdIn: [Int] = null) {
+        products(first: 45, where: {taxonomyFilter: {filters: [
+            {
+                taxonomy: PWB_BRAND, ids:$brandId
+            }
+            {
+                taxonomy: PRODUCT_CAT, ids: $categoryIdIn
+            }
+
+        ]
+            relation: AND
+            
+        }}) {
+            edges {
+                node {
+                    ...ProductContentFull
+                }
+            }
+        }
     }
     ${ProductContentFull} 
 `

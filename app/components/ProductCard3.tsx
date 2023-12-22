@@ -13,7 +13,7 @@ import ProductStatus from "./ProductStatus";
 import Prices from "./Prices";
 import LikeButton from "./LikeButton";
 import useProductLink from "@/hooks/useProductLink";
-import { Product, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
+import {Brand, Product, SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
 
 
 export interface ProductCardProps {
@@ -44,8 +44,6 @@ const ProductCard: FC<ProductCardProps> = ({
             }
         };
     }, []);
-
-    console.log({ data })
 
     /* Slider Start */
 
@@ -266,8 +264,8 @@ const ProductCard: FC<ProductCardProps> = ({
                     <div
                         className={`nc-ProductCard__title text-xs lg:text-sm text-black line-clamp-2 min-h-[20px] lg:min-h-[20px] text-slate-800`}
                     >
-                        {terms?.nodes.map((brand, index) => (
-                            <span key={index}>{brand?.name}</span>
+                        {terms?.nodes.map((brand : Brand, index) => (
+                            <Link href={`/${brand?.slug}`} key={index}>{brand?.name}</Link>
                         ))}
                     </div>
                 </div>
