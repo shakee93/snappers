@@ -43,7 +43,7 @@ const Header = () => {
            "flex flex-col justify-between top-0 bg-white z-50 transition-all duration-1300 border-b"
       }
     >
-      <div className="flex justify-between items-center">
+      <div className="flex justify-between items-center lg:items-stretch">
         <div className="flex items-center relative">
           <Logo />
         </div>
