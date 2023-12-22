@@ -48,10 +48,9 @@ const BrandBar = async () => {
   ];
 
   return (
-    <div className="hidden md:flex">
-      <div className="w-44 hidden lg:block"></div>
-      <div className="w-full flex justify-between overflow-hidden px-2 py-1 items-center">
-        <div>
+    <div className="flex border-t">
+      <div className="w-full flex justify-between overflow-hidden items-center">
+        <div >
           <button
             className="hidden ml-[15px] mr-2 bg-primaryColor md:flex text-white w-40 pl-3 justify-center py-2 text-xs xl:text-sm items-center rounded-lg"
           >
@@ -65,7 +64,7 @@ const BrandBar = async () => {
             <Link
               key={index}
               href={`/${brand.slug}`}
-              className="px-4 py-2 font-medium text-gray-500 text-sm border-r last:border-none"
+              className="flex-1 py-4 text-center font-medium text-gray-500 text-sm border-l"
             >
               {brand.name}
             </Link>
