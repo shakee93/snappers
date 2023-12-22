@@ -4,7 +4,6 @@ import LikeButton from "@/app/components/LikeButton";
 import { StarIcon } from "@heroicons/react/24/solid";
 import BagIcon from "@/app/components/BagIcon";
 import NcInputNumber from "@/components/NcInputNumber";
-import { PRODUCTS } from "@/data/data";
 import {
   NoSymbolIcon,
   ClockIcon,
@@ -13,24 +12,42 @@ import {
 import IconDiscount from "@/components/IconDiscount";
 import Prices from "@/app/components/Prices";
 import toast from "react-hot-toast";
-import detail1JPG from "@/public/images/products/detail1.jpg";
-import detail2JPG from "@/public/images/products/detail2.jpg";
-import detail3JPG from "@/public/images/products/detail3.jpg";
 import NotifyAddTocart from "./NotifyAddTocart";
 import AccordionInfo from "@/containers/ProductDetailPage/AccordionInfo";
 import Link from 'next/link';
 import Image from "next/image";
+import useProductLink from "@/hooks/useProductLink";
+import ProductAddToCart from "./SingleProductPage/ProductAddToCart";
 
 export interface ProductQuickViewProps {
   className?: string;
+  product: SimpleProduct | VariableProduct;
+  // product: {
+  //   name: string;
+  //   image: {
+  //     mediaItemUrl: string;
+  //   };
+  //   price: string;
+  //   averageRating: number;
+  //   reviewCount: number;
+  //   description: string;
+  //   stockStatus: string;
+  //   variations: {
+  //     edges: Variation[];
+  //   };
+  //   status: string;
+  // };
 }
 
-const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "" }) => {
-  const { sizes, variants, status, allOfSizes } = PRODUCTS[0];
-  const LIST_IMAGES_DEMO = [detail1JPG.src, detail2JPG.src, detail3JPG.src];
+const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }) => {
+  // const { name, image, price, averageRating, reviewCount, variations, status } = product;
+  const LIST_IMAGES_DEMO = [product.image.mediaItemUrl, product.galleryImages.nodes[0].sourceUrl, product.galleryImages.nodes[1].sourceUrl];
+  const link = useProductLink(product)
+
+  console.log('recieved from quick view', product)
 
   const [variantActive, setVariantActive] = React.useState(0);
-  const [sizeSelected, setSizeSelected] = React.useState(sizes ? sizes[0] : "");
+  const [sizeSelected, setSizeSelected] = React.useState("");
   const [qualitySelected, setQualitySelected] = React.useState(1);
 
   const notifyAddTocart = () => {
@@ -49,7 +66,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "" }) => {
   };
 
   const renderVariants = () => {
-    if (!variants || !variants.length) {
+    if (!product.variations || !product.variations.edges.length) {
       return null;
     }
 
@@ -59,12 +76,12 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "" }) => {
           <span className="text-sm font-medium">
             Color:
             <span className="ml-1 font-semibold">
-              {variants[variantActive].name}
+              {/* {variants[variantActive].name} */}
             </span>
           </span>
         </label>
         <div className="flex mt-2.5">
-          {variants.map((variant, index) => (
+          {/* {variants.map((variant, index) => (
             <div
               key={index}
               onClick={() => setVariantActive(index)}
@@ -75,72 +92,70 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "" }) => {
             >
               <div className="absolute inset-0.5 rounded-full overflow-hidden z-0">
                 <Image fill style={{ objectFit: 'cover' }}
-                  // width={300}
-                  // height={300}
                   src={variant.thumbnail}
                   alt=""
                   className="absolute w-full h-full object-cover"
                 />
               </div>
             </div>
-          ))}
+          ))} */}
         </div>
       </div>
     );
   };
 
-  const renderSizeList = () => {
-    if (!allOfSizes || !sizes || !sizes.length) {
-      return null;
-    }
-    return (
-      <div>
-        <div className="flex justify-between font-medium text-sm">
-          <label htmlFor="">
-            <span className="">
-              Size:
-              <span className="ml-1 font-semibold">{sizeSelected}</span>
-            </span>
-          </label>
-          <a
-            target="_blank"
-            rel="noopener noreferrer"
-            href="##"
-            className="text-primary-6000 hover:text-primary-500"
-          >
-            See sizing chart
-          </a>
-        </div>
-        <div className="grid grid-cols-5 sm:grid-cols-7 gap-2 mt-2.5">
-          {allOfSizes.map((size, index) => {
-            const isActive = size === sizeSelected;
-            const sizeOutStock = !sizes.includes(size);
-            return (
-              <div
-                key={index}
-                className={`relative h-10 sm:h-11 rounded-2xl border flex items-center justify-center 
-                text-sm sm:text-base uppercase font-semibold select-none overflow-hidden z-0 ${sizeOutStock
-                    ? "text-opacity-20 dark:text-opacity-20 cursor-not-allowed"
-                    : "cursor-pointer"
-                  } ${isActive
-                    ? "bg-primary-6000 border-primary-6000 text-white hover:bg-primary-6000"
-                    : "border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-200 hover:bg-neutral-50 dark:hover:bg-neutral-700"
-                  }`}
-                onClick={() => {
-                  if (sizeOutStock) {
-                    return;
-                  }
-                  setSizeSelected(size);
-                }}
-              >
-                {size}
-              </div>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
+  // const renderSizeList = () => {
+  //   if (!allOfSizes || !sizes || !sizes.length) {
+  //     return null;
+  //   }
+  //   return (
+  //     <div>
+  //       <div className="flex justify-between font-medium text-sm">
+  //         <label htmlFor="">
+  //           <span className="">
+  //             Size:
+  //             <span className="ml-1 font-semibold">{sizeSelected}</span>
+  //           </span>
+  //         </label>
+  //         <a
+  //           target="_blank"
+  //           rel="noopener noreferrer"
+  //           href="##"
+  //           className="text-primary-6000 hover:text-primary-500"
+  //         >
+  //           See sizing chart
+  //         </a>
+  //       </div>
+  //       <div className="grid grid-cols-5 sm:grid-cols-7 gap-2 mt-2.5">
+  //         {allOfSizes.map((size, index) => {
+  //           const isActive = size === sizeSelected;
+  //           const sizeOutStock = !sizes.includes(size);
+  //           return (
+  //             <div
+  //               key={index}
+  //               className={`relative h-10 sm:h-11 rounded-2xl border flex items-center justify-center 
+  //               text-sm sm:text-base uppercase font-semibold select-none overflow-hidden z-0 ${sizeOutStock
+  //                   ? "text-opacity-20 dark:text-opacity-20 cursor-not-allowed"
+  //                   : "cursor-pointer"
+  //                 } ${isActive
+  //                   ? "bg-primary-6000 border-primary-6000 text-white hover:bg-primary-6000"
+  //                   : "border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-200 hover:bg-neutral-50 dark:hover:bg-neutral-700"
+  //                 }`}
+  //               onClick={() => {
+  //                 if (sizeOutStock) {
+  //                   return;
+  //                 }
+  //                 setSizeSelected(size);
+  //               }}
+  //             >
+  //               {size}
+  //             </div>
+  //           );
+  //         })}
+  //       </div>
+  //     </div>
+  //   );
+  // };
 
   const renderStatus = () => {
     if (!status) {
@@ -189,14 +204,13 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "" }) => {
         {/* ---------- 1 HEADING ----------  */}
         <div>
           <h2 className="text-2xl font-semibold hover:text-primary-6000 transition-colors">
-            <Link href="/product-detail">Heavy Weight Shoes</Link>
+            <Link href={link}>{product.name}</Link>
           </h2>
 
           <div className="flex items-center mt-5 space-x-4 sm:space-x-5">
-            {/* <div className="flex text-xl font-semibold">$112.00</div> */}
             <Prices
               contentClass="py-1 px-2 md:py-1.5 md:px-3 text-lg font-semibold"
-              price={112}
+              price={product.price}
             />
 
             <div className="h-6 border-l border-slate-300 dark:border-slate-700"></div>
@@ -208,10 +222,10 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "" }) => {
               >
                 <StarIcon className="w-5 h-5 pb-[1px] text-yellow-400" />
                 <div className="ml-1.5 flex">
-                  <span>4.9</span>
+                  <span>{product.averageRating}</span>
                   <span className="block mx-2">·</span>
                   <span className="text-slate-600 dark:text-slate-400 underline">
-                    142 reviews
+                    {product.reviewCount} reviews
                   </span>
                 </div>
               </Link>
@@ -226,23 +240,11 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "" }) => {
 
         {/* ---------- 3 VARIANTS AND SIZE LIST ----------  */}
         <div className="">{renderVariants()}</div>
-        <div className="">{renderSizeList()}</div>
+        {/* <div className="">{renderSizeList()}</div> */}
 
         {/*  ---------- 4  QTY AND ADD TO CART BUTTON */}
         <div className="flex space-x-3.5">
-          <div className="flex items-center justify-center bg-slate-100/70 dark:bg-slate-800/70 px-2 py-3 sm:p-3.5 rounded-full">
-            <NcInputNumber
-              defaultValue={qualitySelected}
-              onChange={setQualitySelected}
-            />
-          </div>
-          <ButtonPrimary
-            className="flex-1 flex-shrink-0"
-            onClick={notifyAddTocart}
-          >
-            <BagIcon className="hidden sm:inline-block w-5 h-5 mb-0.5" />
-            <span className="ml-3">Add to cart</span>
-          </ButtonPrimary>
+          <ProductAddToCart product={product} />
         </div>
 
         {/*  */}
@@ -254,24 +256,9 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "" }) => {
           data={[
             {
               name: "Description",
-              content:
-                "Fashion is a form of self-expression and autonomy at a particular period and place and in a specific context, of clothing, footwear, lifestyle, accessories, makeup, hairstyle, and body posture.",
+              content: product.description,
             },
-            {
-              name: "Features",
-              content: `<ul class="list-disc list-inside leading-7">
-            <li>Material: 43% Sorona Yarn + 57% Stretch Polyester</li>
-            <li>
-             Casual pants waist with elastic elastic inside
-            </li>
-            <li>
-              The pants are a bit tight so you always feel comfortable
-            </li>
-            <li>
-              Excool technology application 4-way stretch
-            </li>
-          </ul>`,
-            },
+            // You can add more sections as needed
           ]}
         />
       </div>
@@ -306,7 +293,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "" }) => {
                   <Image fill style={{ objectFit: 'cover' }}
                     src={item}
                     className="w-full rounded-xl object-cover"
-                    alt="product detail 1"
+                    alt={`product detail ${index + 2}`}
                   />
                 </div>
               );

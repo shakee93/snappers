@@ -47,6 +47,7 @@ const ProductAddToCart = ({product} : {
     setQuantity(1)
   }
 
+
   return (
     <>
       <div className="flex space-x-3.5 py-4">

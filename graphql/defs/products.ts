@@ -33,89 +33,107 @@ export const GET_PRODUCT = gql`
 
 
 export const GET_ALL_PRODUCTS = gql`
-    query GetAllProducts($categoryIdIn: [Int]) {
-        products(first: 45,  where: {categoryIdIn: $categoryIdIn}) {
-            edges {
-                node {
-                    name
-                    slug
-                    averageRating
-                    reviewCount
-                    onSale
-                    image {
-                        mediaItemUrl
-                    }
-                    type
-                    ... on SimpleProduct {
-                        id
-                        name
-                        stockStatus
-                        terms {
-                            nodes {
-                                ... on Brand {
-                                    id
-                                    name
-                                    slug
-                                }
-                            }
-                        }
-                        productCategories {
-                            nodes {
-                                name
-                            }
-                        }
-                        price
-                        salePrice
-                        productTags {
-                            nodes {
-                                name
-                            }
-                        }
-                    }
-                    ... on VariableProduct {
-                        name
-                        productCategories {
-                          nodes {
-                            name
-                          }
-                        }
-                        price
-                        productTags {
-                          nodes {
-                            name
-                          }
-                        }
-                        id
-                        variations {
-                          edges {
-                            node {
-                              id
-                              image {
-                                mediaItemUrl
-                                sizes
-                              }
-                              name
-                              price
-                              salePrice
-                            }
-                          }
-                        }
-                      
-                    }
-                }
-            }
+query GetAllProducts($categoryIdIn: [Int]) {
+  products(first: 45, where: {categoryIdIn: $categoryIdIn}) {
+    edges {
+      node {
+        name
+        slug
+        averageRating
+        reviewCount
+        onSale
+        databaseId
+        image {
+          mediaItemUrl
+          sourceUrl
         }
-        productCategories(first: 100) {
+        type
+        ... on SimpleProduct {
+          id
+          name
+          stockStatus
+          databaseId
+          terms {
             nodes {
+              ... on Brand {
+                id
                 name
                 slug
-                id
-                databaseId
+              }
             }
+          }
+          productCategories {
+            nodes {
+              name
+              slug
+            }
+          }
+          price
+          salePrice
+          productTags {
+            nodes {
+              name
+            }
+          }
+          galleryImages {
+            nodes {
+              id
+              sourceUrl
+            }
+          }
         }
+        ... on VariableProduct {
+          name
+          databaseId
+          productCategories {
+            nodes {
+              name
+              slug
+            }
+          }
+          price
+          productTags {
+            nodes {
+              name
+            }
+          }
+          id
+          variations {
+            edges {
+              node {
+                id
+                image {
+                  mediaItemUrl
+                  sizes
+                }
+                name
+                price
+                salePrice
+              }
+            }
+          }
+          galleryImages {
+            edges {
+              node {
+                mediaItemUrl
+                sourceUrl
+              }
+            }
+          }
+        }
+      }
     }
+  }
+  productCategories(first: 100) {
+    nodes {
+        name
+        slug
+        id
+        databaseId
+    }
+  }
+}
 `
-
 
 
 export const GET_CATEGORY_SLUGS = gql`
@@ -262,7 +280,7 @@ query GetAllProducts($categoryIdIn: [Int]) {
               name
             }
           }
-          
+          databaseId
         }
         ... on VariableProduct {
           name
@@ -294,6 +312,7 @@ query GetAllProducts($categoryIdIn: [Int]) {
           }
           averageRating
           reviewCount
+          databaseId
         }
       }
     }

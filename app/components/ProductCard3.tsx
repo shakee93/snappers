@@ -14,6 +14,8 @@ import Prices from "./Prices";
 import LikeButton from "./LikeButton";
 import useProductLink from "@/hooks/useProductLink";
 import { Product, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
+import AddedToCart from "@/app/components/Notifications/added-to-cart";
+import { useCart } from "@/context/CartProvider";
 
 
 export interface ProductCardProps {
@@ -27,7 +29,8 @@ const ProductCard: FC<ProductCardProps> = ({
     data,
     isLiked,
 }) => {
-    const { name, price, image, productCategories, slug, stockStatus, variations, terms, reviewCount, averageRating, featured, salePrice } = data;
+
+    const { name, price, image, productCategories, slug, stockStatus, variations, terms, reviewCount, averageRating, featured, salePrice, databaseId } = data;
     const [showModalQuickView, setShowModalQuickView] = useState(false);
 
 
@@ -45,7 +48,7 @@ const ProductCard: FC<ProductCardProps> = ({
         };
     }, []);
 
-    console.log({ data })
+    // console.log({ data })
 
     /* Slider Start */
 
@@ -84,8 +87,10 @@ const ProductCard: FC<ProductCardProps> = ({
 
     /* End of Slider Code */
 
-    const notifyAddTocart = () => {
-        console.log('add to cart clicked')
+    const [quantity, setQuantity] = useState(1)
+    const { addToCart } = useCart()
+
+    const notifyAddTocart = (quantity: number) => {
         toast.custom(
             (t: any) => (
                 <Transition
@@ -103,11 +108,24 @@ const ProductCard: FC<ProductCardProps> = ({
                         Added to cart!
                     </p>
                     <div className="border-t border-slate-200 dark:border-slate-700 my-4" />
-                    {renderProductCartOnNotify()}
+                    <AddedToCart product={data} quantity={quantity} />
                 </Transition>
             ),
             { position: "top-right", id: "nc-product-notify", duration: 3000 }
         );
+    };
+
+    const cartCompleted = () => {
+        notifyAddTocart(quantity)
+        setQuantity(1)
+    }
+
+    const handleAddToCart = () => {
+        if (data.databaseId) {
+            addToCart(data.databaseId, quantity)?.then(cartCompleted());
+        } else {
+            notifyAddTocart(1);
+        }
     };
 
     const renderProductCartOnNotify = () => {
@@ -187,7 +205,7 @@ const ProductCard: FC<ProductCardProps> = ({
                     className="shadow-lg"
                     fontSize="text-xs"
                     sizeClass="py-2 px-4"
-                    onClick={() => notifyAddTocart()}
+                    onClick={handleAddToCart}
                 >
                     <BagIcon className="w-3.5 h-3.5 mb-0.5" />
                     <span className="ml-1">Add to Cart</span>
@@ -205,6 +223,8 @@ const ProductCard: FC<ProductCardProps> = ({
 
         );
     };
+
+
 
     return (
         <div
@@ -274,7 +294,7 @@ const ProductCard: FC<ProductCardProps> = ({
 
 
                 <div className="flex m-0 mb-2 justify-between items-center">
-                    <Prices price={price} salePrice={salePrice}/>
+                    <Prices price={price} salePrice={salePrice} />
                     {(salePrice === price || salePrice === null || salePrice === '') && (
                         <div className="flex items-center mb-0.5">
                             <StarIcon className="w-4 h-4 pb-[1px] text-amber-400" />
@@ -302,6 +322,7 @@ const ProductCard: FC<ProductCardProps> = ({
             < ModalQuickView
                 show={showModalQuickView}
                 onCloseModalQuickView={() => setShowModalQuickView(false)}
+                productData={data} 
             />
         </div>
 

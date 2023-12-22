@@ -72,6 +72,7 @@ const Page = async ({ params }: any) => {
         brand: Brand
     } = await getData(params.slug, params.brand)
 
+    // console.log({product})
 
     return <div className='mt-24'>
         <main className="container m-auto">
@@ -86,7 +87,6 @@ const Page = async ({ params }: any) => {
             <div className="flex flex-col md:flex-row p-3 rounded-3xl mt-5 md:mt-6 md:p-10 bg-white">
 
                 <div className="w-full md:w-2/5 flex-col gap-2">
-
 
                    <ProductImage product={product}/>
 
