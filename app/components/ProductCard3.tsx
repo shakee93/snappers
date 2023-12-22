@@ -13,7 +13,7 @@ import ProductStatus from "./ProductStatus";
 import Prices from "./Prices";
 import LikeButton from "./LikeButton";
 import useProductLink from "@/hooks/useProductLink";
-import {Brand, Product, SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
+import { Brand, Product, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import AddedToCart from "@/app/components/Notifications/added-to-cart";
 import { useCart } from "@/context/CartProvider";
 
@@ -40,13 +40,7 @@ const ProductCard: FC<ProductCardProps> = ({
     const delayBeforeNextImage = 1000;
     const link = useProductLink(data)
 
-    useEffect(() => {
-        return () => {
-            if (hoverIntervalRef.current !== null) {
-                clearInterval(hoverIntervalRef.current);
-            }
-        };
-    }, []);
+    // console.log('product card', data)
 
     /* Slider Start */
 
@@ -59,6 +53,7 @@ const ProductCard: FC<ProductCardProps> = ({
     const handleHover = () => {
         setIsHovered(true);
         startSlider();
+
     };
 
     const handleHoverOut = () => {
@@ -67,10 +62,15 @@ const ProductCard: FC<ProductCardProps> = ({
         clearInterval(hoverIntervalRef.current!);
     };
 
-    const handleDotClick = (index: number) => {
-        setCurrentVariation(index);
-        clearInterval(hoverIntervalRef.current!);
+    const handleCloseModalQuickView = () => {
+        setShowModalQuickView(true);
     };
+
+    useEffect(() => {
+        if (showModalQuickView) {
+            handleHoverOut();
+        }
+    }, [showModalQuickView]);
 
     // const variationImages = variations?.edges.map((variation: any) => variation.node.image.mediaItemUrl) || [];
 
@@ -120,11 +120,12 @@ const ProductCard: FC<ProductCardProps> = ({
 
     const handleAddToCart = () => {
         if (data.databaseId) {
-            addToCart(data.databaseId, quantity)?.then(cartCompleted());
+            addToCart(data.databaseId, quantity)?.then(cartCompleted);
         } else {
             notifyAddTocart(1);
         }
     };
+
 
     const renderProductCartOnNotify = () => {
         return (
@@ -203,7 +204,7 @@ const ProductCard: FC<ProductCardProps> = ({
                     className="shadow-lg"
                     fontSize="text-xs"
                     sizeClass="py-2 px-4"
-                    onClick={handleAddToCart}
+                    onClick={handleCloseModalQuickView}
                 >
                     <BagIcon className="w-3.5 h-3.5 mb-0.5" />
                     <span className="ml-1">Add to Cart</span>
@@ -284,7 +285,7 @@ const ProductCard: FC<ProductCardProps> = ({
                     <div
                         className={`nc-ProductCard__title text-xs lg:text-sm text-black line-clamp-2 min-h-[20px] lg:min-h-[20px] text-slate-800`}
                     >
-                        {terms?.nodes.map((brand : Brand, index) => (
+                        {terms?.nodes.map((brand: Brand, index) => (
                             <Link href={`/${brand?.slug}`} key={index}>{brand?.name}</Link>
                         ))}
                     </div>
@@ -320,7 +321,7 @@ const ProductCard: FC<ProductCardProps> = ({
             < ModalQuickView
                 show={showModalQuickView}
                 onCloseModalQuickView={() => setShowModalQuickView(false)}
-                productData={data} 
+                productData={data}
             />
         </div>
 
