@@ -47,7 +47,7 @@ const BrandBar = async () => {
   ];
 
   return (
-    <div className="flex border-t">
+    <div className="flex border-t max-w-[calc(100vw-160px)] overflow-hidden">
       <div className="w-full flex justify-between overflow-hidden items-center">
         <div  className='text-primaryColor font-semibold flex h-full'>
           <button
