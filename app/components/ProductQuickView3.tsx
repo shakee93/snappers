@@ -25,14 +25,14 @@ export interface ProductQuickViewProps {
 }
 
 const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }) => {
-  let LIST_IMAGES_DEMO: string[] = [];
+  let product_images: string[] = [];
 
   if (product.galleryImages.nodes) {
-    LIST_IMAGES_DEMO = [product.image.sourceUrl, ...product.galleryImages.nodes.map(node => node.sourceUrl)];
+    product_images = [product.image.sourceUrl, ...product.galleryImages.nodes.map(node => node.sourceUrl)];
   } else if (product.galleryImages.edges && product.galleryImages.edges.length > 0) {
-    LIST_IMAGES_DEMO = [product.image.sourceUrl, product.galleryImages.edges[0].node.sourceUrl, product.galleryImages.edges[1].node.sourceUrl];
+    product_images = [product.image.sourceUrl, product.galleryImages.edges[0].node.sourceUrl, product.galleryImages.edges[1].node.sourceUrl];
   } else {
-    LIST_IMAGES_DEMO = [product.image.sourceUrl];
+    product_images = [product.image.sourceUrl];
   }
   const link = useProductLink(product)
 
@@ -46,7 +46,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
     toast.custom(
       (t) => (
         <NotifyAddTocart
-          productImage={LIST_IMAGES_DEMO[0]}
+          productImage={product_images[0]}
           qualitySelected={qualitySelected}
           show={t.visible}
           sizeSelected={sizeSelected}
@@ -213,7 +213,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
           <div className="relative">
             <div className="aspect-w-16 aspect-h-16">
               <Image fill style={{ objectFit: 'contain' }}
-                src={LIST_IMAGES_DEMO[0]}
+                src={product_images[0]}
                 className="w-full rounded-xl object-cover"
                 alt="product detail 1"
               />
@@ -224,9 +224,9 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
             {/* META FAVORITES */}
             <LikeButton className="absolute right-3 top-3 " />
           </div>
-          {(product.galleryImages.nodes || (product.galleryImages.edges && product.galleryImages.edges.length > 0)) && (
+          {/* {(product.galleryImages.nodes || (product.galleryImages.edges && product.galleryImages.edges.length > 0)) && (
             <div className="hidden lg:grid grid-cols-2 gap-3 mt-3 sm:gap-6 sm:mt-6 xl:gap-5 xl:mt-5">
-              {[LIST_IMAGES_DEMO[1], LIST_IMAGES_DEMO[2]].map((item, index) => {
+              {[product_images[1], product_images[2]].map((item, index) => {
                 return (
                   <div key={index} className="aspect-w-3 aspect-h-4">
                     <Image fill style={{ objectFit: 'contain' }}
@@ -238,7 +238,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
                 );
               })}
             </div>
-          )}
+          )} */}
         </div>
 
         {/* SIDEBAR */}

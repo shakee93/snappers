@@ -307,6 +307,7 @@ query GetAllProducts($categoryIdIn: [Int]) {
         featured
         onSale
         description
+        
         image {
           mediaItemUrl
             sourceUrl
@@ -317,6 +318,14 @@ query GetAllProducts($categoryIdIn: [Int]) {
           name
           stockStatus
           description
+          galleryImages {
+            edges {
+              node {
+                mediaItemUrl
+                sourceUrl
+              }
+            }
+          }
           terms {
             nodes {
               ... on Brand {
@@ -346,6 +355,14 @@ query GetAllProducts($categoryIdIn: [Int]) {
           productCategories {
             nodes {
               name
+            }
+          }
+          galleryImages {
+            edges {
+              node {
+                mediaItemUrl
+                sourceUrl
+              }
             }
           }
           price
