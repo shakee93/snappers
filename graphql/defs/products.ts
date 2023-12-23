@@ -32,7 +32,6 @@ export const GET_PRODUCT = gql`
     }
 `;
 
-
 export const GET_ALL_PRODUCTS = gql`
 query GetAllProducts($categoryIdIn: [Int]) {
   products(first: 45, where: {categoryIdIn: $categoryIdIn}) {
