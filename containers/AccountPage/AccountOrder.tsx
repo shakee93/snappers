@@ -37,7 +37,6 @@ const AccountOrder = () => {
               <span className="inline-block sm:hidden">x</span>
               <span className="ml-2">1</span>
             </p>
-
             <div className="flex">
               <button
                 type="button"

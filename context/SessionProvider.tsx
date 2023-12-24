@@ -40,6 +40,15 @@ export function SessionProvider({ children }: {
                     input: {
                         email,
                         password,
+                        displayName: "a",
+                        firstName: "",
+                        metaData: [
+                     { key: "dob", id: "234", value: $dobValue },
+                          { key: "address", id: "235", value: $addressValue },
+                          { key: "gender", id: "236", value: $genderValue },
+                          { key: "phone_number", id: "237", value: $phoneNumberValue },
+                          { key: "about", id: "238", value: $aboutValue }
+                        ]
                     },
                 },
             });
