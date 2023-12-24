@@ -1,27 +1,50 @@
 "use client"
 import {Search} from "lucide-react";
 import {
-    Hits,
-    InstantSearch,
-    InstantSearchSSRProvider,
-    RefinementList,
+    Configure,
+    Index,
     useHits,
     useSearchBox
 } from 'react-instantsearch';
 import TypesenseInstantSearchAdapter from "typesense-instantsearch-adapter";
-import {useCallback} from "react";
 import {Hit} from "instantsearch.js";
 import {InstantSearchNext} from "react-instantsearch-nextjs";
+import ProductCard from "@/app/components/ProductCard3";
+import {Product} from "@/graphql/types/graphql";
+import {useEffect} from "react";
 
 
 
+
+function SearchResultsCategory( ) {
+
+    const { hits } = useHits();
+    
+    console.log(hits);
+
+    return <>
+        <div className="flex-1 grid pt-8 sm:grid-cols-4 lg:grid-cols-4 gap-x-8 gap-y-10">
+            {hits.map((item: Hit, index: number) =>
+                <div key={item.objectID}>{item.posts_count} - {item.post_title}</div>
+            )}
+        </div>
+    </>;
+}
 
 function SearchResults( ) {
 
     const { hits } = useHits();
 
+    useEffect(() => {
+        console.log(hits);
+    }, [hits])
+
     return <>
-        {hits.map((hit: Hit) => <pre key={hit.objectID}>{JSON.stringify(hit.post_thumbnail)}</pre>)}
+        <div className="flex-1 grid pt-8 sm:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-10">
+            {hits.map((item: Hit, index: number) =>
+                <ProductCard  key={item.slug} data={item as unknown as Product} />
+            )}
+        </div>
     </>;
 }
 
@@ -56,7 +79,8 @@ const typesenseInstantSearchAdapter = new TypesenseInstantSearchAdapter({
         apiKey: "xyz", // Be sure to use an API key that only allows search operations
         nodes: [
             {
-                host: "192.168.1.77",
+                // host: "0.0.0.0",
+                host: "52.45.14.64",
                 port: 8108,
                 path: "", // Optional. Example: If you have your typesense mounted in localhost:8108/typesense, path should be equal to '/typesense'
                 protocol: "http",
@@ -64,11 +88,8 @@ const typesenseInstantSearchAdapter = new TypesenseInstantSearchAdapter({
         ],
         cacheSearchResultsForSeconds: 2 * 60, // Cache search results from server. Defaults to 2 minutes. Set to 0 to disable caching.
     },
-    // The following parameters are directly passed to Typesense's search API endpoint.
-    //  So you can pass any parameters supported by the search endpoint below.
-    //  query_by is required.
     additionalSearchParameters: {
-        query_by: "post_title,post_content",
+        query_by: "name, description",
     },
 });
 
@@ -81,8 +102,13 @@ function Page() {
     return <div className='container py-16'>
         <InstantSearchNext  future={{
             preserveSharedStateOnUnmount: true
-        }} routing searchClient={searchClient} indexName={"product"}>
+        }} routing={{
+            router: {
+                cleanUrlOnDispose: false
+            }
+        }} searchClient={searchClient} indexName='product' >
             <SearchBox/>
+            <Configure filters={'rawPrice:=[3900..500000] && productCategories.edges.node.slug:smart-phones'} hitsPerPage={12}/>
             <SearchResults/>
         </InstantSearchNext>
     </div>
