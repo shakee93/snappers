@@ -1,12 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import {useState} from "react";
 import Input from "@/shared/Input/Input";
 import Link from "next/link";
 import ButtonPrimary from "@/public/shared/Button/ButtonPrimary";
-import { REGISTER_CUSTOMER_MUTATION } from "@/graphql/defs/auth";
-import { useSession } from "@/context/SessionProvider";
-import { SignUpResponse} from "@/utils/type";
+import {useSession} from "@/context/SessionProvider";
+import {SignUpResponse} from "@/utils/type";
 
 
 const SignupForm = () => {
@@ -16,19 +15,19 @@ const SignupForm = () => {
     const [password, setPassword] = useState(""); // State for password input
 
 
-    const { login } = useSession()
+    const { signUp } = useSession()
     const handleFormSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
         try {
-            let response : SignUpResponse = await login(email, password);
+            let response : SignUpResponse = await signUp(email, password);
             if(response.error !== null ){
                 alert(`Signup Issue: ${response.error}`)
                 return
             }
-
-
-
+            if( response.data == "registered"){
+                alert("Registered Successfully")
+            }
         } catch (error) {
             console.error("Error:", error);
         }

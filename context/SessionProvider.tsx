@@ -4,13 +4,12 @@ import React, {createContext, ReactNode, useContext, useEffect, useState} from '
 import {ApolloError, FetchResult, useApolloClient, useMutation, useQuery} from '@apollo/client';
 import {GET_CART} from "@/graphql/defs/cart";
 import {REGISTER_CUSTOMER_MUTATION} from '@/graphql/defs/auth';
-import {Session, SignUpResponse} from "@/utils/type";
-import {UnregisterCallback} from "history";
-import {RegisterCustomerInput, RegisterCustomerMutation} from "@/graphql/types/graphql";
+import {Session} from "@/utils/type";
+import {RegisterCustomerMutation} from "@/graphql/types/graphql";
 
 const SessionContext = createContext<Session>({
     sessionToken: null,
-    login: async (email: string, password: string) => {
+    signUp: async (email: string, password: string) => {
         return { data: null, error: null };
     }
 });
@@ -30,7 +29,7 @@ export function SessionProvider({ children }: {
 
     const [registerCustomer] = useMutation(REGISTER_CUSTOMER_MUTATION);
 
-    const login = async (email: string, password: string) => {
+    const signUp = async (email: string, password: string) => {
         try {
             const response: FetchResult<RegisterCustomerMutation> = await registerCustomer({
                 variables: {
@@ -89,7 +88,7 @@ export function SessionProvider({ children }: {
     }, []);
 
     return (
-        <SessionContext.Provider value={{ sessionToken, login }}>
+        <SessionContext.Provider value={{ sessionToken, signUp }}>
             {children}
         </SessionContext.Provider>
     );
