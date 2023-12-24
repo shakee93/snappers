@@ -6,6 +6,7 @@ import Link from "next/link";
 import ButtonPrimary from "@/public/shared/Button/ButtonPrimary";
 import {useSession} from "@/context/SessionProvider";
 import {SignUpResponse} from "@/utils/type";
+import {useRouter} from "next/router";
 
 
 const SignupForm = () => {
@@ -14,8 +15,8 @@ const SignupForm = () => {
     const [email, setEmail] = useState(""); // State for email input
     const [password, setPassword] = useState(""); // State for password input
 
-
     const { signUp } = useSession()
+    let router = useRouter();
     const handleFormSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
@@ -28,6 +29,8 @@ const SignupForm = () => {
             if( response.data == "registered"){
                 alert("Registered Successfully")
             }
+            router.push("/");
+
         } catch (error) {
             console.error("Error:", error);
         }

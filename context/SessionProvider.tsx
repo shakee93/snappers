@@ -1,32 +1,60 @@
 'use client';
 
 import React, {createContext, ReactNode, useContext, useEffect, useState} from 'react';
-import {ApolloError, FetchResult, useApolloClient, useMutation, useQuery} from '@apollo/client';
+import {ApolloError, FetchResult, useMutation, useQuery} from '@apollo/client';
 import {GET_CART} from "@/graphql/defs/cart";
 import {LOGIN_CUSTOMER_MUTATION, REGISTER_CUSTOMER_MUTATION} from '@/graphql/defs/auth';
 import {LoginResponse, Session} from "@/utils/type";
-import {LoginCustomerMutation, LoginInput, RegisterCustomerMutation} from "@/graphql/types/graphql";
+import {LoginCustomerMutation, RegisterCustomerMutation} from "@/graphql/types/graphql";
 
 const SessionContext = createContext<Session>({
     sessionToken: null,
     signUp: async (email: string, password: string) => {
-        return { data: null, error: null };
+        return {data: null, error: null};
     },
     login: async (email: string, password: string) => {
-        return { data: null, error: null };
+        return {data: null, error: null};
     },
+    logout: ()=>{}
 });
 
 export function useSession() {
     return useContext(SessionContext);
 }
 
-export function SessionProvider({ children }: {
+function saveResponseToLocalStorage(response: any) {
+    const authToken = response?.data?.registerCustomer?.authToken;
+    const refreshToken = response?.data?.registerCustomer?.refreshToken;
+    const email = response?.data?.registerCustomer?.customer?.email;
+    const displayName = response?.data?.registerCustomer?.customer?.displayName;
+    const firstName = response?.data?.registerCustomer?.customer?.firstName;
+    const address = response?.data?.registerCustomer?.customer?.metaData?.[0]?.value;
+    const dob = response?.data?.registerCustomer?.customer?.metaData?.[1]?.value;
+    const gender = response?.data?.registerCustomer?.customer?.metaData?.[2]?.value;
+    const phone_number = response?.data?.registerCustomer?.customer?.metaData?.[3]?.value;
+    const about = response?.data?.registerCustomer?.customer?.metaData?.[4]?.value;
+    const id = response?.data?.registerCustomer?.customer?.id;
+
+    console.log("response: ", response);
+
+    localStorage.setItem("authToken", authToken || "");
+    localStorage.setItem("refreshToken", refreshToken || "");
+    localStorage.setItem("email", email || "");
+    localStorage.setItem("displayName", displayName || "");
+    localStorage.setItem("firstName", firstName || "");
+    localStorage.setItem("address", address || "");
+    localStorage.setItem("dob", dob || "");
+    localStorage.setItem("gender", gender || "");
+    localStorage.setItem("phone_number", phone_number || "");
+    localStorage.setItem("about", about || "");
+    localStorage.setItem("id", id || "");
+}
+
+export function SessionProvider({children}: {
     children: ReactNode
 }) {
     const [sessionToken, setSessionToken] = useState<string | null>(typeof window !== "undefined" ? localStorage.getItem('sessionToken') : null);
-    const client = useApolloClient();
-    const { data, refetch } = useQuery(GET_CART, {
+    const {data, refetch} = useQuery(GET_CART, {
         skip: true
     })
 
@@ -43,23 +71,19 @@ export function SessionProvider({ children }: {
                         displayName: "a",
                         firstName: "",
                         metaData: [
-                     { key: "dob", id: "234", value: $dobValue },
-                          { key: "address", id: "235", value: $addressValue },
-                          { key: "gender", id: "236", value: $genderValue },
-                          { key: "phone_number", id: "237", value: $phoneNumberValue },
-                          { key: "about", id: "238", value: $aboutValue }
+                            {key: "address", value: ""},
+                            {key: "dob", value: ""},
+                            {key: "gender", value: ""},
+                            {key: "phone_number", value: ""},
+                            {key: "about", value: ""}
                         ]
                     },
                 },
             });
 
-            const authToken = response?.data?.registerCustomer?.authToken;
-            const refreshToken = response?.data?.registerCustomer?.refreshToken;
+            saveResponseToLocalStorage(response);
 
-            localStorage.setItem("authToken", authToken ?? "");
-            localStorage.setItem("refreshToken", refreshToken ?? "");
-
-            return { data: "registered", error: null };
+            return {data: "registered", error: null};
         } catch (error) {
             let errorMessage = "An error occurred.";
             if (error instanceof ApolloError) {
@@ -71,29 +95,31 @@ export function SessionProvider({ children }: {
             } else {
                 console.error("An error occurred:", error);
             }
-            return { data: null, error: errorMessage };
+            return {data: null, error: errorMessage};
         }
     };
 
-
     const login = async (email: string, password: string): Promise<LoginResponse> => {
         try {
+            const username = email;
             const response: FetchResult<LoginCustomerMutation> = await loginCustomer({
                 variables: {
                     input: {
-                        email,
+                        username,
                         password,
                     },
                 },
             });
-    
+
             const authToken = response?.data?.login?.authToken;
             const refreshToken = response?.data?.login?.refreshToken;
-    
+
+            saveResponseToLocalStorage(response);
+
             localStorage.setItem("authToken", authToken ?? "");
             localStorage.setItem("refreshToken", refreshToken ?? "");
-    
-            return { data: "logged_in", error: null };
+
+            return {data: "logged_in", error: null};
         } catch (error) {
             let errorMessage = "An error occurred during login.";
             if (error instanceof ApolloError) {
@@ -107,17 +133,21 @@ export function SessionProvider({ children }: {
             } else {
                 console.error("An error occurred:", error);
             }
-            return { data: null, error: errorMessage };
+            return {data: null, error: errorMessage};
         }
     };
 
-
+    const logout = () => {
+        localStorage.removeItem("authToken"); // Remove the authToken from localStorage
+        localStorage.removeItem("sessionToken"); // Remove the sessionToken from localStorage
+        setSessionToken(null); // Set sessionToken to null in state
+    };
 
     useEffect(() => {
         // Fetch and store the session token when the component mounts
         async function fetchAndStoreSessionToken() {
             try {
-                const { data } = await refetch()
+                const {data} = await refetch()
 
                 console.log(data);
 
@@ -138,7 +168,7 @@ export function SessionProvider({ children }: {
     }, []);
 
     return (
-        <SessionContext.Provider value={{ sessionToken, signUp, login }}>
+        <SessionContext.Provider value={{sessionToken, signUp, login, logout}}>
             {children}
         </SessionContext.Provider>
     );

@@ -1,4 +1,3 @@
-
 // import Footer from '@/app/components/GlobalComponents/Footer'
 
 import "../styles/index.scss";
@@ -17,9 +16,8 @@ import Footer from "@/app/components/globalComponents/footer";
 
 // const inter = Inter({ subsets: ['latin'] })
 
-export default function RootLayout({
-                                       children,
-                                   }: {
+
+export default function RootLayout({children}: {
     children: React.ReactNode
 }) {
     return (
@@ -43,4 +41,4 @@ export default function RootLayout({
         </body>
         </html>
     )
-}
+};

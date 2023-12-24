@@ -1,13 +1,13 @@
 "use client";
 
-import { useState } from "react";
-import { useMutation } from "@apollo/client";
+import {useState} from "react";
 import gql from "graphql-tag";
 import Input from "@/shared/Input/Input";
 import Link from "next/link";
 import ButtonPrimary from "@/public/shared/Button/ButtonPrimary";
-import { LoginResponse } from "@/utils/type";
-import { useSession } from "@/context/SessionProvider";
+import {LoginResponse} from "@/utils/type";
+import {useSession} from "@/context/SessionProvider";
+import {useRouter} from "next/navigation";
 
 const REGISTER_CUSTOMER_MUTATION = gql`
     mutation RegisterCustomer($input: RegisterCustomerInput!) {
@@ -19,12 +19,15 @@ const REGISTER_CUSTOMER_MUTATION = gql`
 `;
 
 const LoginForm = () => {
+
     const [authToken, setAuthToken] = useState<string | null>(null);
     const [refreshToken, setRefreshToken] = useState<string | null>(null);
     const [email, setEmail] = useState(""); // State for email input
     const [password, setPassword] = useState(""); // State for password input
 
     const {login} = useSession();
+    const router = useRouter();
+
     const handleFormSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
@@ -37,6 +40,7 @@ const LoginForm = () => {
             if( response.data == "logged_in"){
                 alert("Registered Successfully")
             }
+            router.push("/");
         } catch (error) {
             console.error("Error:", error);
         }
