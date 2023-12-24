@@ -1,15 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import {FetchResult, useMutation} from "@apollo/client";
-import gql from "graphql-tag";
 import Input from "@/shared/Input/Input";
 import Link from "next/link";
 import ButtonPrimary from "@/public/shared/Button/ButtonPrimary";
 import { REGISTER_CUSTOMER_MUTATION } from "@/graphql/defs/auth";
 import { useSession } from "@/context/SessionProvider";
-import {SignUpResponse} from "@/utils/type";
-import {RegisterCustomerMutation} from "@/graphql/types/graphql";
+import { SignUpResponse} from "@/utils/type";
 
 
 const SignupForm = () => {
@@ -24,15 +21,13 @@ const SignupForm = () => {
         event.preventDefault();
 
         try {
-            let response: FetchResult<RegisterCustomerMutation> | null = await login(email, password);
+            let response : SignUpResponse = await login(email, password);
+            if(response.error !== null ){
+                alert(`Signup Issue: ${response.error}`)
+                return
+            }
 
-            const authToken = response?.data?.registerCustomer?.authToken;
-            const refreshToken = response?.data?.registerCustomer?.refreshToken;
 
-            console.log("auth token: ", authToken);
-
-            localStorage.setItem("authToken", authToken ?? "");
-            localStorage.setItem("refreshToken", refreshToken ?? "");
 
         } catch (error) {
             console.error("Error:", error);
