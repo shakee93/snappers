@@ -6,6 +6,8 @@ import gql from "graphql-tag";
 import Input from "@/shared/Input/Input";
 import Link from "next/link";
 import ButtonPrimary from "@/public/shared/Button/ButtonPrimary";
+import { LoginResponse } from "@/utils/type";
+import { useSession } from "@/context/SessionProvider";
 
 const REGISTER_CUSTOMER_MUTATION = gql`
     mutation RegisterCustomer($input: RegisterCustomerInput!) {
@@ -22,35 +24,23 @@ const LoginForm = () => {
     const [email, setEmail] = useState(""); // State for email input
     const [password, setPassword] = useState(""); // State for password input
 
-    const [registerCustomer] = useMutation(REGISTER_CUSTOMER_MUTATION);
-
+    const {login} = useSession();
     const handleFormSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
+
         try {
-            const response = await registerCustomer({
-                variables: {
-                    input: {
-                        email, // Pass email state to the mutation
-                        password, // Pass password state to the mutation
-                        username: "example", // Replace with the user's username
-                    },
-                },
-            });
-
-            const { authToken, refreshToken } = response.data.registerCustomer;
-
-            localStorage.setItem("authToken", authToken);
-            localStorage.setItem("refreshToken", refreshToken);
-
-            setAuthToken(authToken);
-            setRefreshToken(refreshToken);
-
-            // Optionally, perform navigation or UI updates here
+            let response : LoginResponse = await login(email, password);
+            if(response.error !== null ){
+                alert(`Login Issue: ${response.error}`)
+                return
+            }
+            if( response.data == "logged_in"){
+                alert("Registered Successfully")
+            }
         } catch (error) {
             console.error("Error:", error);
         }
     };
-
     return (
         <form className="grid grid-cols-1 gap-6" onSubmit={handleFormSubmit}>
             <label className="block">

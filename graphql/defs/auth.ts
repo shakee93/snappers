@@ -8,3 +8,15 @@ mutation RegisterCustomer($input: RegisterCustomerInput!) {
     }
 }
 `;
+
+export const LOGIN_CUSTOMER_MUTATION = gql`
+mutation LoginCustomer($input: LoginInput!) {
+    login(input: $input) {
+        authToken
+        clientMutationId
+        refreshToken
+        sessionToken
+    }
+}
+`;
+
