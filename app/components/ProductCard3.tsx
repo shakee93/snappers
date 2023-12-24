@@ -1,3 +1,4 @@
+'use client'
 import React, { FC, useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -212,21 +213,21 @@ const ProductCard: FC<ProductCardProps> = ({
                 <ButtonPrimary
                     className="shadow-lg"
                     fontSize="text-xs"
-                    sizeClass="py-2 px-4"
+                    sizeClass="py-3.5 px-5"
                     onClick={handleAddToCart}
                 >
                     <BagIcon className="w-3.5 h-3.5 mb-0.5" />
                     <span className="ml-1">Add to Cart</span>
                 </ButtonPrimary>
-                <ButtonSecondary
-                    className="ml-1.5 bg-white hover:!bg-gray-100 hover:text-slate-900 transition-colors shadow-lg"
-                    fontSize="text-xs"
-                    sizeClass="py-2 px-4"
-                    onClick={() => handleCloseModalQuickView(true)}
-                >
-                    <ArrowsPointingOutIcon className="w-3.5 h-3.5" />
-                    <span className="ml-1">Quick view</span>
-                </ButtonSecondary>
+                {/*<ButtonSecondary*/}
+                {/*    className="ml-1.5 bg-white hover:!bg-gray-100 hover:text-slate-900 transition-colors shadow-lg"*/}
+                {/*    fontSize="text-xs"*/}
+                {/*    sizeClass="py-2 px-4"*/}
+                {/*    onClick={() => handleCloseModalQuickView(true)}*/}
+                {/*>*/}
+                {/*    <ArrowsPointingOutIcon className="w-3.5 h-3.5" />*/}
+                {/*    <span className="ml-1">Quick view</span>*/}
+                {/*</ButtonSecondary>*/}
             </div>
 
         );
@@ -272,7 +273,10 @@ const ProductCard: FC<ProductCardProps> = ({
 
                 {/* <ProductStatus status={stockStatus} /> */}
 
-                <LikeButton liked={isLiked} className="absolute top-3 right-3 z-10" />
+                <div className={"absolute top-3 right-3 z-10"} onClick={e => handleCloseModalQuickView(true)}>
+                    <ArrowsPointingOutIcon className='w-5'/>
+                    {/*<LikeButton liked={isLiked} className="" />*/}
+                </div>
 
                 {/* {sizes ? renderSizeList() : renderGroupButtons()} */}
                 {renderGroupButtons()}

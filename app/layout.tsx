@@ -12,6 +12,7 @@ import {CartProvider} from "@/context/CartProvider";
 import Header from "@/app/components/globalComponents/header";
 import {Toaster} from "react-hot-toast";
 import Footer from "@/app/components/globalComponents/footer";
+import {SearchProvider} from "@/context/SearchProvider";
 // import reportWebVitals from "./reportWebVitals";
 
 // const inter = Inter({ subsets: ['latin'] })
@@ -25,17 +26,17 @@ export default function RootLayout({children}: {
         <body className="bg-gray-50 text-base dark:bg-slate-900 text-slate-900 dark:text-slate-200">
         <ApolloWrapper>
             <SessionProvider>
-                <CartProvider>
-                    <Toaster/>
-                    <Header/>
-
-                    {children}
-
-                    <div className="md:hidden">
-                        <MobileBottomNav/>
-                    </div>
-                    <Footer/>
-                </CartProvider>
+                <>
+                    <CartProvider>
+                        <Toaster/>
+                        <Header/>
+                        {children}
+                        <div className="md:hidden">
+                            <MobileBottomNav/>
+                        </div>
+                        <Footer/>
+                    </CartProvider>
+                </>
             </SessionProvider>
         </ApolloWrapper>
         </body>

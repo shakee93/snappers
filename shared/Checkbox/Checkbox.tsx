@@ -34,7 +34,7 @@ const Checkbox: FC<CheckboxProps> = ({
       {label && (
         <label
           htmlFor={name}
-          className="pl-2.5 sm:pl-3.5 flex flex-col flex-1 justify-center select-none"
+          className="pl-2.5 sm:pl-3.5 text-sm flex flex-col flex-1 justify-center select-none"
         >
           <span
             className={`text-slate-900 dark:text-slate-100 ${labelClassName} ${
@@ -44,7 +44,7 @@ const Checkbox: FC<CheckboxProps> = ({
             {label}
           </span>
           {subLabel && (
-            <p className="mt-0.5 text-slate-500 dark:text-slate-400 text-sm font-light">
+            <p className="mt-0.5 text-slate-500 dark:text-slate-400 text-xs font-light">
               {subLabel}
             </p>
           )}

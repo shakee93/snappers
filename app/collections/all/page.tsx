@@ -1,48 +1,27 @@
-import SectionSliderCollections from "components/SectionSliderLargeProduct";
-import SectionPromo1 from "components/SectionPromo1";
-import ProductCard from "components/ProductCard";
-import { PRODUCTS } from "@/data/data";
 import { getClient } from "@/graphql/apollo-ssr";
 import {
   GET_ALL_PRODUCTS,
-  GET_CATEGORY,
-  GET_VARIATIONS_PRODUCT,
 } from "@/graphql/defs/products";
-import { notFound } from "next/navigation";
-import { Product } from "@/graphql/types/graphql";
-import Image from "next/image";
-import SidebarFilters from "@/app/components/SidebarFilters";
-import ProductGrid from "@/app/components/ProductGrid";
-import { useQuery } from "@apollo/client";
 import TabFilters from "@/app/components/TabFilters";
 import Pagination from "@/shared/Pagination/Pagination";
-import ButtonPrimary from "@/shared/Button/ButtonPrimary";
+import InstantSearchWrapper from "@/app/components/InstantSearchWrapper";
 
 export async function getData(categories: number[] | null = null) {
-  const { data } = await getClient().query({
+  const { data, error } = await getClient().query({
     query: GET_ALL_PRODUCTS,
-    variables: {
-      categoryIdIn: categories,
-    },
+    fetchPolicy: 'no-cache'
   });
 
-  if (!data.products) {
-    return {
-      products: [],
-      productCategories: [],
-    };
-  }
-
   return {
-    products: data.products.edges,
     productCategories: data.productCategories.nodes,
+    brands: data.brands.nodes,
   };
 }
 
-const Page = async () => {
-  const { products, productCategories } = await getData();
 
-  // console.log(products, productCategories);
+
+const Page = async () => {
+  const { productCategories, brands } = await getData();
 
   return (
     <div className={`nc-PageCollection2 `} data-nc-id="PageCollection2">
@@ -58,7 +37,7 @@ const Page = async () => {
               easy for you to share your designs with more like-minded people.
             </span>
           </div>
-          <TabFilters />
+          <TabFilters brands={brands} categories={productCategories} />
 
           <hr className="border-slate-200 dark:border-slate-700" />
           <main>
@@ -71,7 +50,8 @@ const Page = async () => {
                             </div> */}
               <div className="flex-shrink-0 mb-10 lg:mb-0 lg:mx-4 border-t lg:border-t-0"></div>
               <div className="flex-1 ">
-                <ProductGrid products={products} />
+                {/*<ProductGrid products={products} />*/}
+                <InstantSearchWrapper/>
               </div>
             </div>
             <div className="flex flex-col mt-12 items-center lg:mt-16 space-y-5 sm:space-y-0 sm:space-x-3 sm:flex-row sm:justify-between sm:items-center">
