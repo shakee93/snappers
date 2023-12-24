@@ -5,7 +5,6 @@ import {
   Facebook,
   Instagram,
   PhoneCall,
-  Search,
 } from "lucide-react";
 import AvatarDropdown from "../Header/AvatarDropdown";
 import CartDropdown from "../Header/CartDropdown";
@@ -13,6 +12,7 @@ import Link from "next/link";
 import Logo from "./Logo";
 import NavLinks from "./NavLinks";
 import BrandBar from "./BrandBar";
+import SearchBar from "@/app/components/globalComponents/SearchBar";
 
 const Header = () => {
   const iconSize = 18;
@@ -50,20 +50,7 @@ const Header = () => {
         <div className='hidden lg:flex flex-1 flex-col justify-between'>
           <div className='w-full flex flex-1'>
             <div className="flex pl-5 flex-1 justify-center items-center">
-              <form
-                  className="flex-1 text-primary-700"
-              >
-                <div className="bg-primaryColor/5 border border-primaryColor/20 py-2 flex items-center space-x-1.5 px-5 rounded-2xl h-full ">
-                  <Search className='text-primaryColor' />
-                  <input
-                      type="text"
-                      placeholder="Type to Quick Search"
-                      className="border-none bg-transparent focus:outline-none focus:ring-0 w-full text-sm"
-                      autoFocus
-                  />
-                </div>
-                <input type="submit" hidden value="" />
-              </form>
+              <SearchBar/>
             </div>
             <div className="w-fit flex items-center justify-end">
               <div className="hidden lg:block">
