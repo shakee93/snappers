@@ -1,4 +1,4 @@
-"use client"
+'use client'
 import {Search} from "lucide-react";
 import {
     Configure,
@@ -11,17 +11,12 @@ import {Hit} from "instantsearch.js";
 import {InstantSearchNext} from "react-instantsearch-nextjs";
 import ProductCard from "@/app/components/ProductCard3";
 import {Product} from "@/graphql/types/graphql";
-import {useEffect} from "react";
-
-
 
 
 function SearchResultsCategory( ) {
 
     const { hits } = useHits();
     
-    console.log(hits);
-
     return <>
         <div className="flex-1 grid pt-8 sm:grid-cols-4 lg:grid-cols-4 gap-x-8 gap-y-10">
             {hits.map((item: Hit, index: number) =>
@@ -34,10 +29,6 @@ function SearchResultsCategory( ) {
 function SearchResults( ) {
 
     const { hits } = useHits();
-
-    useEffect(() => {
-        console.log(hits);
-    }, [hits])
 
     return <>
         <div className="flex-1 grid pt-8 sm:grid-cols-3 lg:grid-cols-4 gap-x-8 gap-y-10">

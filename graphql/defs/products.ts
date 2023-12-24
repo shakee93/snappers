@@ -33,108 +33,24 @@ export const GET_PRODUCT = gql`
 `;
 
 export const GET_ALL_PRODUCTS = gql`
-query GetAllProducts($categoryIdIn: [Int]) {
-  products(first: 45, where: {categoryIdIn: $categoryIdIn}) {
-    edges {
-      node {
-        name
-        slug
-        averageRating
-        reviewCount
-        onSale
-        databaseId
-        description
-        image {
-          mediaItemUrl
-          sourceUrl
+query GetAllProducts {
+    productCategories(first: 100, where: {orderby: COUNT}) {
+        nodes {
+            name
+            slug
+            id
+            databaseId
+            count
         }
-        type
-        ... on SimpleProduct {
-          id
-          name
-          stockStatus
-          databaseId
-          
-          terms {
-            nodes {
-              ... on Brand {
-                id
-                name
-                slug
-              }
-            }
-          }
-          productCategories {
-            nodes {
-              name
-              slug
-            }
-          }
-          price
-          salePrice
-          productTags {
-            nodes {
-              name
-            }
-          }
-          galleryImages {
-            nodes {
-              id
-              sourceUrl
-            }
-          }
-        }
-        ... on VariableProduct {
-          name
-          databaseId
-          productCategories {
-            nodes {
-              name
-              slug
-            }
-          }
-          price
-          productTags {
-            nodes {
-              name
-            }
-          }
-          id
-          variations {
-            edges {
-              node {
-                id
-                image {
-                  mediaItemUrl
-                  sourceUrl
-                  sizes
-                }
-                name
-                price
-                salePrice
-              }
-            }
-          }
-          galleryImages {
-            edges {
-              node {
-                mediaItemUrl
-                sourceUrl
-              }
-            }
-          }
-        }
-      }
     }
-  }
-  productCategories(first: 100) {
-    nodes {
-        name
-        slug
-        id
-        databaseId
-    }
-  }
+    brands(first: 100, where: {orderby: COUNT}) {
+        nodes {
+            databaseId
+            name
+            slug
+            count
+        }
+    } 
 }
 `
 

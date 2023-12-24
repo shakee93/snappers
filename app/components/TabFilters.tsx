@@ -10,7 +10,7 @@ import Radio from "shared/Radio/Radio";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import MySwitch from "components/MySwitch";
 import {useStore} from "@/store/store";
-import {Brand} from "@/graphql/types/graphql";
+import {Brand, ProductCategory} from "@/graphql/types/graphql";
 
 // DEMO DATA
 
@@ -43,15 +43,21 @@ const DATA_sortOrderRadios = [
 ];
 
 const PRICE_RANGE = [1, 500];
+
+interface TabFilterProps {
+  categories: ProductCategory[]
+  brands: Brand[]
+}
+
 //
 const TabFilters = ({
                       categories = [],
                       brands = []
-                    }: any) => {
+                    }: TabFilterProps) => {
   const [isOpenMoreFilter, setisOpenMoreFilter] = useState(false);
   //
   const [isOnSale, setIsIsOnSale] = useState(true);
-  const [rangePrices, setRangePrices] = useState([100, 500]);
+  const [rangePrices, setRangePrices] = useState([500, 500000]);
   const [categoriesState, setCategoriesState] = useState<string[]>([]);
   const [colorsState, setColorsState] = useState<string[]>([]);
   const [sizesState, setSizesState] = useState<string[]>([]);
@@ -203,7 +209,7 @@ const TabFilters = ({
               leaveFrom="opacity-100 translate-y-0"
               leaveTo="opacity-0 translate-y-1"
             >
-              <Popover.Panel className="absolute z-40 w-screen max-w-sm px-4 mt-3 left-0 sm:px-0 lg:max-w-xl">
+              <Popover.Panel className="absolute z-40 w-screen max-w-sm px-4 mt-3 left-0 sm:px-0 lg:max-w-2xl">
                 <div className="overflow-hidden rounded-2xl shadow-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
                   <div className="relative flex flex-col px-5 py-6 space-y-5">
                     <Checkbox
@@ -222,7 +228,7 @@ const TabFilters = ({
                           <div key={item.databaseId} className="">
                             <Checkbox
                                 name={item.databaseId}
-                                label={item.name}
+                                label={`${item.name} (${item.count})`}
                                 defaultChecked={categoriesState.includes(item.databaseId)}
                                 onChange={(checked) =>
                                     handleChangeCategories(checked, item.databaseId)
@@ -347,7 +353,7 @@ const TabFilters = ({
                     leaveFrom="opacity-100 translate-y-0"
                     leaveTo="opacity-0 translate-y-1"
                 >
-                  <Popover.Panel className="absolute z-40 w-screen max-w-sm px-4 mt-3 left-0 sm:px-0 lg:max-w-xl">
+                  <Popover.Panel className="absolute z-40 w-screen max-w-sm px-4 mt-3 left-0 sm:px-0 lg:max-w-2xl">
                     <div className="overflow-hidden rounded-2xl shadow-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
                       <div className="relative flex flex-col px-5 py-6 space-y-5">
                         <Checkbox
@@ -361,12 +367,12 @@ const TabFilters = ({
                             }
                         />
                         <div className="w-full border-b  border-neutral-200 dark:border-neutral-700" />
-                        <div className='grid grid-cols-2 gap-2'>
+                        <div className='grid grid-cols-3 gap-2'>
                           {brands.map((item: Brand) => (
                               <div key={item.databaseId} className="">
                                 <Checkbox
                                     name={item.databaseId as unknown as string}
-                                    label={item.name as string}
+                                    label={`${item.name} (${item.count})`}
                                     defaultChecked={brandsState.includes(item.databaseId as unknown as string)}
                                     onChange={(checked) =>
                                         handleChangeBrands(checked, item.databaseId as unknown as string)
@@ -1120,6 +1126,12 @@ const TabFilters = ({
                           {renderMoreFilterItem(categories)}
                         </div>
                       </div>
+                      <div className="py-7">
+                        <h3 className="text-xl font-medium">Brands</h3>
+                        <div className="mt-6 relative ">
+                          {renderMoreFilterItem(categories)}
+                        </div>
+                      </div>
                       {/* --------- */}
                       {/* ---- */}
                       <div className="py-7">
@@ -1287,10 +1299,12 @@ const TabFilters = ({
         {renderTabsCategories()}
         {renderTabsBrands()}
         {renderTabsPriceRage()}
-        {/* {renderTabsColor()} */}
-        {/* {renderTabsSize()} */}
         {renderTabIsOnsale()}
         <div className="!ml-auto">{renderTabsSortOrder()}</div>
+      </div>
+
+      <div>
+        {JSON.stringify(sidebar)}
       </div>
 
       {/* FOR RESPONSIVE MOBILE */}
