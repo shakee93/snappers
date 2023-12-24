@@ -1,20 +1,10 @@
 import { gql } from '@apollo/client';
 
-export const RegisterCustomer = gql`
-
-    mutation registerCustomer {
-        registerCustomer(
-            input: {
-                email: "hello@gmail.com",
-                username: "hello"
-            }
-        ) {
-            authToken
-            clientMutationId
-            refreshToken
-        }
-
+export const REGISTER_CUSTOMER_MUTATION = gql`
+mutation RegisterCustomer($input: RegisterCustomerInput!) {
+    registerCustomer(input: $input) {
+        authToken
+        refreshToken
     }
-
+}
 `;
-

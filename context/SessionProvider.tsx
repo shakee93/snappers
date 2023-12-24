@@ -1,14 +1,16 @@
 'use client';
 
 import React, {createContext, ReactNode, useContext, useEffect, useState} from 'react';
-import { useQuery, useApolloClient } from '@apollo/client';
+import {FetchResult, useApolloClient, useMutation, useQuery} from '@apollo/client';
 import {GET_CART} from "@/graphql/defs/cart";
+import {REGISTER_CUSTOMER_MUTATION} from '@/graphql/defs/auth';
+import {Session, SignUpResponse} from "@/utils/type";
+import {UnregisterCallback} from "history";
+import {RegisterCustomerInput, RegisterCustomerMutation} from "@/graphql/types/graphql";
 
-type Session = {
-    sessionToken: string | null
-}
 const SessionContext = createContext<Session>({
-    sessionToken: null
+    sessionToken: null,
+    login: ()=> null
 });
 
 export function useSession() {
@@ -23,6 +25,21 @@ export function SessionProvider({ children }: {
     const { data, refetch } = useQuery(GET_CART, {
         skip: true
     })
+
+    const [registerCustomer] = useMutation(REGISTER_CUSTOMER_MUTATION);
+
+    const login = async (email: string, password: string)  => {
+        let res: FetchResult<RegisterCustomerMutation>;
+        return res = await registerCustomer({
+            variables: {
+                input: {
+                    email,
+                    password,
+                },
+            },
+        });
+    };
+
 
     useEffect(() => {
         // Fetch and store the session token when the component mounts
@@ -49,7 +66,7 @@ export function SessionProvider({ children }: {
     }, []);
 
     return (
-        <SessionContext.Provider value={{ sessionToken }}>
+        <SessionContext.Provider value={{ sessionToken, login }}>
             {children}
         </SessionContext.Provider>
     );

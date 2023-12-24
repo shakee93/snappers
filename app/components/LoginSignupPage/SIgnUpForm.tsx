@@ -1,20 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { useMutation } from "@apollo/client";
+import {FetchResult, useMutation} from "@apollo/client";
 import gql from "graphql-tag";
 import Input from "@/shared/Input/Input";
 import Link from "next/link";
 import ButtonPrimary from "@/public/shared/Button/ButtonPrimary";
+import { REGISTER_CUSTOMER_MUTATION } from "@/graphql/defs/auth";
+import { useSession } from "@/context/SessionProvider";
+import {SignUpResponse} from "@/utils/type";
+import {RegisterCustomerMutation} from "@/graphql/types/graphql";
 
-const REGISTER_CUSTOMER_MUTATION = gql`
-    mutation RegisterCustomer($input: RegisterCustomerInput!) {
-        registerCustomer(input: $input) {
-            authToken
-            refreshToken
-        }
-    }
-`;
 
 const SignupForm = () => {
     const [authToken, setAuthToken] = useState<string | null>(null);
@@ -22,32 +18,22 @@ const SignupForm = () => {
     const [email, setEmail] = useState(""); // State for email input
     const [password, setPassword] = useState(""); // State for password input
 
-    const [registerCustomer] = useMutation(REGISTER_CUSTOMER_MUTATION);
 
+    const { login } = useSession()
     const handleFormSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
         try {
-            const response = await registerCustomer({
-                variables: {
-                    input: {
-                        email, // Pass email state to the mutation
-                        password, // Pass password state to the mutation
-                        username: "example", // Replace with the user's username
-                    },
-                },
-            });
-            console.log({response});
+            let response: FetchResult<RegisterCustomerMutation> | null = await login(email, password);
 
-            const { authToken, refreshToken } = response.data.registerCustomer;
+            const authToken = response?.data?.registerCustomer?.authToken;
+            const refreshToken = response?.data?.registerCustomer?.refreshToken;
 
-            localStorage.setItem("authToken", authToken);
-            localStorage.setItem("refreshToken", refreshToken);
+            console.log("auth token: ", authToken);
 
-            setAuthToken(authToken);
-            setRefreshToken(refreshToken);
+            localStorage.setItem("authToken", authToken ?? "");
+            localStorage.setItem("refreshToken", refreshToken ?? "");
 
-            // Optionally, perform navigation or UI updates here
         } catch (error) {
             console.error("Error:", error);
         }
@@ -56,9 +42,9 @@ const SignupForm = () => {
     return (
         <form className="grid grid-cols-1 gap-6" onSubmit={handleFormSubmit}>
             <label className="block">
-        <span className="text-neutral-800 dark:text-neutral-200">
-          Email address
-        </span>
+                <span className="text-neutral-800 dark:text-neutral-200">
+                    Email address
+                </span>
                 <Input
                     type="email"
                     placeholder="example@example.com"
@@ -68,12 +54,12 @@ const SignupForm = () => {
                 />
             </label>
             <label className="block">
-        <span className="flex justify-between items-center text-neutral-800 dark:text-neutral-200">
-          Password
-          <Link href="/forgot-pass" className="text-sm text-green-600">
-            Forgot password?
-          </Link>
-        </span>
+                <span className="flex justify-between items-center text-neutral-800 dark:text-neutral-200">
+                    Password
+                    <Link href="/forgot-pass" className="text-sm text-green-600">
+                        Forgot password?
+                    </Link>
+                </span>
                 <Input
                     type="password"
                     className="mt-1"

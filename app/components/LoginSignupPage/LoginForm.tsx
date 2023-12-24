@@ -26,7 +26,6 @@ const LoginForm = () => {
 
     const handleFormSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
-
         try {
             const response = await registerCustomer({
                 variables: {
