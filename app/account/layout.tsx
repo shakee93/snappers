@@ -10,41 +10,41 @@ export interface CommonLayoutProps {
   children?: React.ReactNode;
 }
 
-export const GET_ACCOUNT_DETAILS = gql`
-  query getAccountDetails($id: ID = "Y3VzdG9tZXI6NQ==") {
-    customer(id: $id) {
-      email
-      displayName
-      billing {
-        address1
-        phone
-        email
-      }
-      metaData(multiple: true) {
-        key
-        value
-        id
-      }
-      username
-      id
-    }
-  }
-`;
+// export const GET_ACCOUNT_DETAILS = gql`
+//   query getAccountDetails($id: ID = "Y3VzdG9tZXI6NQ==") {
+//     customer(id: $id) {
+//       email
+//       displayName
+//       billing {
+//         address1
+//         phone
+//         email
+//       }
+//       metaData(multiple: true) {
+//         key
+//         value
+//         id
+//       }
+//       username
+//       id
+//     }
+//   }
+// `;
 
 
 const CommonLayout: FC<CommonLayoutProps> =  ({ children }) => {
 
-  const getAccountDetails = async () => {
-    const { data, error } = await getClient().query({
-      query: GET_ACCOUNT_DETAILS,
-    });
-    console.log("data: ", data);
-    console.log("error: ", error);
+  // const getAccountDetails = async () => {
+  //   const { data, error } = await getClient().query({
+  //     query: GET_ACCOUNT_DETAILS,
+  //   });
+  //   console.log("data: ", data);
+  //   console.log("error: ", error);
 
-    return
-  }
+  //   return
+  // }
 
-  getAccountDetails();
+  // getAccountDetails();
 
   return (
     <div className="nc-CommonLayoutProps container">

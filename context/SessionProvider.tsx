@@ -1,21 +1,21 @@
 'use client';
 
-import React, {createContext, ReactNode, useContext, useEffect, useState} from 'react';
-import {ApolloError, FetchResult, useMutation, useQuery} from '@apollo/client';
-import {GET_CART} from "@/graphql/defs/cart";
-import {LOGIN_CUSTOMER_MUTATION, REGISTER_CUSTOMER_MUTATION} from '@/graphql/defs/auth';
-import {LoginResponse, Session} from "@/utils/type";
-import {LoginCustomerMutation, RegisterCustomerMutation} from "@/graphql/types/graphql";
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { ApolloError, FetchResult, useMutation, useQuery } from '@apollo/client';
+import { GET_CART } from "@/graphql/defs/cart";
+import { LOGIN_CUSTOMER_MUTATION, REGISTER_CUSTOMER_MUTATION } from '@/graphql/defs/auth';
+import { LoginResponse, Session } from "@/utils/type";
+import { LoginCustomerMutation, RegisterCustomerMutation } from "@/graphql/types/graphql";
 
 const SessionContext = createContext<Session>({
     sessionToken: null,
     signUp: async (email: string, password: string) => {
-        return {data: null, error: null};
+        return { data: null, error: null };
     },
     login: async (email: string, password: string) => {
-        return {data: null, error: null};
+        return { data: null, error: null };
     },
-    logout: ()=>{}
+    logout: () => { }
 });
 
 export function useSession() {
@@ -36,8 +36,11 @@ function saveResponseToLocalStorage(response: any, type = "registerCustomer") {
     const phone_number = response?.data?.[type]?.customer?.metaData?.[3]?.value;
     const about = response?.data?.[type]?.customer?.metaData?.[4]?.value;
     const id = response?.data?.[type]?.customer?.id;
-
-    localStorage.setItem("authToken", authToken || "");
+    let session = response?.data?.[type]?.sessionToken || response?.data?.[type]?.customer?.jwtAuthToken
+   
+    localStorage.setItem("sesToken", session || "");
+    localStorage.setItem("authToken", session || "");
+    
     localStorage.setItem("refreshToken", refreshToken || "");
     localStorage.setItem("email", email || "");
     localStorage.setItem("displayName", displayName || "");
@@ -53,11 +56,11 @@ function saveResponseToLocalStorage(response: any, type = "registerCustomer") {
 }
 
 
-export function SessionProvider({children}: {
+export function SessionProvider({ children }: {
     children: ReactNode
 }) {
     const [sessionToken, setSessionToken] = useState<string | null>(typeof window !== "undefined" ? localStorage.getItem('sessionToken') : null);
-    const {data, refetch} = useQuery(GET_CART, {
+    const { data, refetch } = useQuery(GET_CART, {
         skip: true
     })
 
@@ -74,11 +77,11 @@ export function SessionProvider({children}: {
                         displayName: "a",
                         firstName: "",
                         metaData: [
-                            {key: "address", value: ""},
-                            {key: "dob", value: ""},
-                            {key: "gender", value: ""},
-                            {key: "phone_number", value: ""},
-                            {key: "about", value: ""}
+                            { key: "address", value: "" },
+                            { key: "dob", value: "" },
+                            { key: "gender", value: "" },
+                            { key: "phone_number", value: "" },
+                            { key: "about", value: "" }
                         ]
                     },
                 },
@@ -86,7 +89,7 @@ export function SessionProvider({children}: {
 
             saveResponseToLocalStorage(response);
 
-            return {data: "registered", error: null};
+            return { data: "registered", error: null };
         } catch (error) {
             let errorMessage = "An error occurred.";
             if (error instanceof ApolloError) {
@@ -98,7 +101,7 @@ export function SessionProvider({children}: {
             } else {
                 console.error("An error occurred:", error);
             }
-            return {data: null, error: errorMessage};
+            return { data: null, error: errorMessage };
         }
     };
 
@@ -122,7 +125,7 @@ export function SessionProvider({children}: {
             localStorage.setItem("authToken", authToken ?? "");
             localStorage.setItem("refreshToken", refreshToken ?? "");
 
-            return {data: "logged_in", error: null};
+            return { data: "logged_in", error: null };
         } catch (error) {
             let errorMessage = "An error occurred during login.";
             if (error instanceof ApolloError) {
@@ -136,7 +139,7 @@ export function SessionProvider({children}: {
             } else {
                 console.error("An error occurred:", error);
             }
-            return {data: null, error: errorMessage};
+            return { data: null, error: errorMessage };
         }
     };
 
@@ -149,7 +152,7 @@ export function SessionProvider({children}: {
     useEffect(() => {
         async function fetchAndStoreSessionToken() {
             try {
-                const {data} = await refetch()
+                const { data } = await refetch()
 
                 console.log(data);
 
@@ -170,7 +173,7 @@ export function SessionProvider({children}: {
     }, []);
 
     return (
-        <SessionContext.Provider value={{sessionToken, signUp, login, logout}}>
+        <SessionContext.Provider value={{ sessionToken, signUp, login, logout }}>
             {children}
         </SessionContext.Provider>
     );

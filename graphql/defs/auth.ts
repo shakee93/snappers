@@ -8,6 +8,7 @@ export const REGISTER_CUSTOMER_MUTATION = gql`
             refreshToken
             customer {
                 email
+                jwtAuthToken
                 firstName
                 metaData {
                     key
@@ -77,8 +78,10 @@ mutation LoginCustomer($input: LoginInput!) {
     login(input: $input) {
         authToken
         refreshToken
+        sessionToken
         customer {
             email
+            jwtAuthToken
             firstName
             metaData {
                 key

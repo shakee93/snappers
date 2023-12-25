@@ -1,16 +1,91 @@
 "use client";
 
-import {ApolloLink, defaultDataIdFromObject, HttpLink} from "@apollo/client";
+import { ApolloLink, defaultDataIdFromObject, FetchResult, HttpLink, useMutation } from "@apollo/client";
 import {
     ApolloNextAppProvider,
     NextSSRInMemoryCache,
     NextSSRApolloClient,
     SSRMultipartLink,
 } from "@apollo/experimental-nextjs-app-support/ssr";
-import {useSession} from "@/context/SessionProvider";
-import {setContext} from "@apollo/client/link/context";
 
-export default function ApolloWrapper ({ children }: React.PropsWithChildren)  {
+import { gql } from '@apollo/client';
+import { getClient } from "./apollo-ssr";
+import { RefreshJwtAuthTokenInput, RefreshJwtAuthTokenPayload } from "./types/graphql";
+
+const RefreshAuthTokenDocument = gql`
+  mutation RefreshAuthToken($refreshToken: String!) {
+    refreshJwtAuthToken(input: { jwtRefreshToken: $refreshToken }) {
+      authToken
+    }
+  }
+`;
+
+export function hasCredentials() {
+    const authToken = localStorage.getItem("authToken");
+    const refreshToken = localStorage.getItem("refreshToken");
+
+    if (!!authToken && !!refreshToken) {
+        return true;
+    }
+
+    return false;
+}
+
+async function fetchAuthToken() {
+    const refreshToken = localStorage.getItem("refreshToken");
+    let authToken;
+    if (!refreshToken) {
+        // No refresh token means the user is not authenticated.
+        return;
+    }
+
+    try {
+        let [refresh] = useMutation(RefreshAuthTokenDocument)
+
+        const results: any  = await refresh({
+            variables: {
+                refreshToken,
+            },
+        });
+        console.log("results", results);
+        authToken = results?.authToken;
+        if (!authToken) {
+            throw new Error('Failed to retrieve a new auth token');
+        }
+    } catch (err) {
+        console.error(err);
+    }
+
+    // Save token.
+    sessionStorage.setItem("authToken", authToken);
+    if (tokenSetter) {
+        clearInterval(tokenSetter);
+    }
+    tokenSetter = setInterval(
+        async () => {
+            if (!hasCredentials()) {
+                clearInterval(tokenSetter);
+                return;
+            }
+            fetchAuthToken();
+        },
+        Number(process.env.AUTH_KEY_TIMEOUT || 30000),
+    );
+
+    return authToken;
+}
+let tokenSetter: any;
+
+export async function getAuthToken() {
+    let authToken = localStorage.getItem("authToken");
+
+    if (!authToken || !tokenSetter) {
+        authToken = await fetchAuthToken();
+    }
+    return authToken;
+}
+
+export default function ApolloWrapper({ children }: React.PropsWithChildren) {
 
     function makeClient() {
 
@@ -21,20 +96,37 @@ export default function ApolloWrapper ({ children }: React.PropsWithChildren)  {
             });
         })
 
-        const authLink = new ApolloLink((operation, forward) => {
 
+        const authLink = new ApolloLink( (operation, forward) => {
             const sessionToken = localStorage.getItem('sessionToken');
-            const authToken = localStorage.getItem('authToken');
+            const refreshToken = localStorage.getItem('refreshToken'); // Assuming refreshToken is available
+            
+            // const authToken = await getAuthToken();
+            //   const sessionToken = await getSessionToken();
+            console.log("session token: ", sessionToken);
+            console.log("refresh token: ", refreshToken);
 
-                operation.setContext({
+            // Set the "woocommerce-session" header in all cases
+            operation.setContext({
+                headers: {
+                    'woocommerce-session': `Session ${sessionToken}`,
+                },
+            });
+            
+
+            // If refreshToken is available, add the "Authorization" header
+            if (refreshToken) {
+                operation.setContext((context: any) => ({
                     headers: {
-                        'woocommerce-session' : `Session ${sessionToken}`, // Set the sessionToken as an Authorization header
-                        'authorization' : `Bearer ${authToken}`, // Set the sessionToken as an Authorization header
+                        ...context.headers,
+                        'Authorization': `Bearer ${refreshToken}`,
                     },
-                });
+                }));
+            }
 
             return forward(operation);
         });
+
 
         const httpLink = new HttpLink({
             // this needs to be an absolute url, as relative urls cannot be used in SSR
@@ -55,7 +147,7 @@ export default function ApolloWrapper ({ children }: React.PropsWithChildren)  {
             // use the `NextSSRInMemoryCache`, not the normal `InMemoryCache`
             connectToDevTools: true,
             cache: new NextSSRInMemoryCache(),
-            link: middleware.concat(authLink.concat( typeof window === "undefined"
+            link: middleware.concat(authLink.concat(typeof window === "undefined"
                 ? ApolloLink.from([
                     // in a SSR environment, if you use multipart features like
                     // @defer, you need to decide how to handle these.

@@ -9,8 +9,23 @@ import Textarea from "@/shared/Textarea/Textarea";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import { redirect } from "next/navigation";
 
+// export const GET_ACCOUNT_DETAILS = gql`
+
+// query MyQuery2 {
+//   brands {
+//     edges {
+//       node {
+//         id
+//       }
+//     }
+//   }
+// }
+  
+// `;
+
 export const GET_ACCOUNT_DETAILS = gql`
-  query getAccountDetails($id: ID = "Y3VzdG9tZXI6NQ==") {
+
+query getAccountDetails($id: ID = "Y3VzdG9tZXI6NQ==") {
     customer(id: $id) {
       email
       displayName
@@ -28,7 +43,7 @@ export const GET_ACCOUNT_DETAILS = gql`
       id
     }
   }
-`;
+  `;
 
 const AccountPage = () => {
     const [customerId, setCustomerId] = useState("");
@@ -60,7 +75,9 @@ const AccountPage = () => {
 
         const id = localStorage.getItem("id");
         const authToken = localStorage.getItem("authToken");
-
+        console.log("authToken is: ", authToken);
+        console.log("id is: ", id);
+        
         if (!id || !authToken) {
             redirect('/login');
             return;
@@ -69,7 +86,6 @@ const AccountPage = () => {
         setCustomerId(id);
         setAuthKey(authToken);
 
-        console.log("customer id: ", id);
 
         const storedData = {
             id: id,
