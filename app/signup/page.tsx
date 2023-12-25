@@ -7,7 +7,7 @@ import Input from "shared/Input/Input";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import Link from "next/link";
 import Image from "next/image";
-import SignupForm from "@/app/components/LoginSignupPage/SIgnUpForm";
+import SignUpForm from "@/app/components/LoginSignupPage/SignUpForm";
 
 
 export interface PageSignUpProps {
@@ -89,7 +89,7 @@ const PageSignUp: FC<PageSignUpProps> = ({ className = "" }) => {
               {/*          <ButtonPrimary type="submit">Continue</ButtonPrimary>*/}
               {/*      </form>*/}
 
-                    <SignupForm/>
+                    <SignUpForm/>
 
                     {/* ==== */}
                     <span className="block text-center text-neutral-700 dark:text-neutral-300">

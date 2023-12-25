@@ -6,62 +6,61 @@ import Link from "next/link";
 import ButtonPrimary from "@/public/shared/Button/ButtonPrimary";
 import {useSession} from "@/context/SessionProvider";
 import {SignUpResponse} from "@/utils/type";
-import {useRouter} from "next/router";
+import {useRouter} from "next/navigation";
 
 
-const SignupForm = () => {
-    const [authToken, setAuthToken] = useState<string | null>(null);
-    const [refreshToken, setRefreshToken] = useState<string | null>(null);
-    const [email, setEmail] = useState(""); // State for email input
-    const [password, setPassword] = useState(""); // State for password input
+const SignUpForm = () => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
 
-    const { signUp } = useSession()
-    let router = useRouter();
+    const { signUp } = useSession();
+    const router = useRouter();
+
     const handleFormSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
         try {
-            let response : SignUpResponse = await signUp(email, password);
-            if(response.error !== null ){
-                alert(`Signup Issue: ${response.error}`)
-                return
-            }
-            if( response.data == "registered"){
-                alert("Registered Successfully")
-            }
-            router.push("/");
+            const response: SignUpResponse = await signUp(email, password);
 
+            if (response.error !== null) {
+                alert(`Signup Issue: ${response.error}`);
+                return;
+            }
+
+            if (response.data === 'registered') {
+                alert('Registered Successfully');
+            }
+
+            router.push('/');
         } catch (error) {
-            console.error("Error:", error);
+            console.error('Error:', error);
         }
     };
 
     return (
         <form className="grid grid-cols-1 gap-6" onSubmit={handleFormSubmit}>
             <label className="block">
-                <span className="text-neutral-800 dark:text-neutral-200">
-                    Email address
-                </span>
+                <span className="text-neutral-800 dark:text-neutral-200">Email address</span>
                 <Input
                     type="email"
                     placeholder="example@example.com"
                     className="mt-1"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)} // Update email state on change
+                    onChange={(e) => setEmail(e.target.value)}
                 />
             </label>
             <label className="block">
-                <span className="flex justify-between items-center text-neutral-800 dark:text-neutral-200">
-                    Password
-                    <Link href="/forgot-pass" className="text-sm text-green-600">
-                        Forgot password?
-                    </Link>
-                </span>
+        <span className="flex justify-between items-center text-neutral-800 dark:text-neutral-200">
+          Password
+          <Link href="/forgot-pass" className="text-sm text-green-600">
+            Forgot password?
+          </Link>
+        </span>
                 <Input
                     type="password"
                     className="mt-1"
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)} // Update password state on change
+                    onChange={(e) => setPassword(e.target.value)}
                 />
             </label>
             <ButtonPrimary type="submit">Continue</ButtonPrimary>
@@ -69,4 +68,4 @@ const SignupForm = () => {
     );
 };
 
-export default SignupForm;
+export default SignUpForm;

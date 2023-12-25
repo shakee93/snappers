@@ -1,16 +1,52 @@
 "use client";
-import React, {FC, useEffect, useState} from "react";
-import {useMutation} from "@apollo/client";
-import {UPDATE_CUSTOMER_MUTATION} from "@/graphql/defs/auth";
+import React, { FC, useEffect, useState } from "react";
+import { gql, useMutation, useQuery } from "@apollo/client";
+import {  UPDATE_ACCOUNT_INFORMATION } from "@/graphql/defs/auth";
 import Input from "@/shared/Input/Input";
 import Label from "@/components/Label/Label";
 import Select from "@/shared/Select/Select";
 import Textarea from "@/shared/Textarea/Textarea";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
-import {redirect} from "next/navigation";
+import { redirect } from "next/navigation";
 
-const AccountPage: FC = () => {
+export const GET_ACCOUNT_DETAILS = gql`
+  query getAccountDetails($id: ID = "Y3VzdG9tZXI6NQ==") {
+    customer(id: $id) {
+      email
+      displayName
+      billing {
+        address1
+        phone
+        email
+      }
+      metaData(multiple: true) {
+        key
+        value
+        id
+      }
+      username
+      id
+    }
+  }
+`;
+
+const AccountPage = () => {
+    const [customerId, setCustomerId] = useState("");
+    const [authKey, setAuthKey] = useState("");
+
+    const [UpdateCustomer] = useMutation(UPDATE_ACCOUNT_INFORMATION);
+
+    const { data: accountDetailsData, error: accountDetailsError } = useQuery(GET_ACCOUNT_DETAILS);
+
+    if (accountDetailsError) {
+        console.error("Error fetching account details:", accountDetailsError);
+    }
+
+    // Log the fetched data
+    console.log("Account Details Data:", accountDetailsData);
+
     const [formData, setFormData] = useState({
+        id: customerId,
         fullName: "",
         email: "",
         dateOfBirth: "",
@@ -21,26 +57,36 @@ const AccountPage: FC = () => {
     });
 
     useEffect(() => {
-        let authKey = localStorage.getItem("authToken");
-        if (!authKey) {
+
+        const id = localStorage.getItem("id");
+        const authToken = localStorage.getItem("authToken");
+
+        if (!id || !authToken) {
             redirect('/login');
             return;
         }
 
+        setCustomerId(id);
+        setAuthKey(authToken);
+
+        console.log("customer id: ", id);
+
         const storedData = {
+            id: id,
             fullName: localStorage.getItem("displayName") || "",
             email: localStorage.getItem("email") || "",
             dateOfBirth: localStorage.getItem("dob") || "",
             address: localStorage.getItem("address") || "",
-            gender: localStorage.getItem("gender") || "",
+            gender: localStorage.getItem("gender") || "Male",
             phoneNumber: localStorage.getItem("phone_number") || "",
             about: localStorage.getItem("about") || "",
         };
-        console.log(storedData);
+        console.log("storedData: ", storedData);
         setFormData(storedData);
     }, []);
 
-    const [UpdateCustomer] = useMutation(UPDATE_CUSTOMER_MUTATION);
+
+
 
     const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
@@ -50,27 +96,38 @@ const AccountPage: FC = () => {
             ...prevData,
             [name]: value,
         }));
+        console.log(formData);
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        let id = localStorage.getItem("id");
+        const { fullName, email, dateOfBirth, address, gender, phoneNumber, about } = formData;
+
         const response = await UpdateCustomer({
             variables: {
                 input: {
-                    id: id,
-                    displayName: formData.fullName,
-                    firstName: formData.fullName,
+                    id: customerId,
+                    billing: { address1: address, phone: phoneNumber },
+                    email: email,
+                    displayName: fullName,
+                    firstName: fullName,
                     metaData: [
-                        { key: "dob", value: formData.dateOfBirth },
-                        { key: "address", value: formData.address },
-                        { key: "gender", value: formData.gender },
-                        { key: "phoneNumber", value: formData.phoneNumber },
-                        { key: "about", value: formData.about },
+                        { key: "dob", value: dateOfBirth },
+                        { key: "gender", value: gender },
+                        { key: "about", value: about },
                     ],
                 },
             },
         });
+
+        localStorage.setItem("displayName", fullName || "");
+        localStorage.setItem("firstName", fullName || "");
+        localStorage.setItem("address", address || "");
+        localStorage.setItem("dob", dateOfBirth || "");
+        localStorage.setItem("gender", gender || "");
+        localStorage.setItem("phone_number", phoneNumber || "");
+        localStorage.setItem("about", about || "");
+
         console.log("Updated Response: ", response);
         console.log("Form Data:", formData);
     };
@@ -94,9 +151,9 @@ const AccountPage: FC = () => {
                             <div>
                                 <Label>Email</Label>
                                 <div className="mt-1.5 flex">
-                  <span className="inline-flex items-center px-2.5 rounded-l-2xl border border-r-0 border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 text-sm">
-                    <i className="text-2xl las la-envelope"></i>
-                  </span>
+                                    <span className="inline-flex items-center px-2.5 rounded-l-2xl border border-r-0 border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 text-sm">
+                                        <i className="text-2xl las la-envelope"></i>
+                                    </span>
                                     <Input
                                         className="!rounded-l-none"
                                         name="email"
@@ -110,9 +167,9 @@ const AccountPage: FC = () => {
                             <div className="max-w-lg">
                                 <Label>Date of birth</Label>
                                 <div className="mt-1.5 flex">
-                  <span className="inline-flex items-center px-2.5 rounded-l-2xl border border-r-0 border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 text-sm">
-                    <i className="text-2xl las la-calendar"></i>
-                  </span>
+                                    <span className="inline-flex items-center px-2.5 rounded-l-2xl border border-r-0 border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 text-sm">
+                                        <i className="text-2xl las la-calendar"></i>
+                                    </span>
                                     <Input
                                         className="!rounded-l-none"
                                         name="dateOfBirth"
@@ -125,9 +182,9 @@ const AccountPage: FC = () => {
                             <div>
                                 <Label>Address</Label>
                                 <div className="mt-1.5 flex">
-                  <span className="inline-flex items-center px-2.5 rounded-l-2xl border border-r-0 border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 text-sm">
-                    <i className="text-2xl las la-map-signs"></i>
-                  </span>
+                                    <span className="inline-flex items-center px-2.5 rounded-l-2xl border border-r-0 border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 text-sm">
+                                        <i className="text-2xl las la-map-signs"></i>
+                                    </span>
                                     <Input
                                         className="!rounded-l-none"
                                         name="address"
@@ -152,9 +209,9 @@ const AccountPage: FC = () => {
                             <div>
                                 <Label>Phone number</Label>
                                 <div className="mt-1.5 flex">
-                  <span className="inline-flex items-center px-2.5 rounded-l-2xl border border-r-0 border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 text-sm">
-                    <i className="text-2xl las la-phone-volume"></i>
-                  </span>
+                                    <span className="inline-flex items-center px-2.5 rounded-l-2xl border border-r-0 border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 text-sm">
+                                        <i className="text-2xl las la-phone-volume"></i>
+                                    </span>
                                     <Input
                                         className="!rounded-l-none"
                                         name="phoneNumber"

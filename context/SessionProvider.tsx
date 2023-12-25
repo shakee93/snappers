@@ -22,20 +22,20 @@ export function useSession() {
     return useContext(SessionContext);
 }
 
-function saveResponseToLocalStorage(response: any) {
-    const authToken = response?.data?.registerCustomer?.authToken;
-    const refreshToken = response?.data?.registerCustomer?.refreshToken;
-    const email = response?.data?.registerCustomer?.customer?.email;
-    const displayName = response?.data?.registerCustomer?.customer?.displayName;
-    const firstName = response?.data?.registerCustomer?.customer?.firstName;
-    const address = response?.data?.registerCustomer?.customer?.metaData?.[0]?.value;
-    const dob = response?.data?.registerCustomer?.customer?.metaData?.[1]?.value;
-    const gender = response?.data?.registerCustomer?.customer?.metaData?.[2]?.value;
-    const phone_number = response?.data?.registerCustomer?.customer?.metaData?.[3]?.value;
-    const about = response?.data?.registerCustomer?.customer?.metaData?.[4]?.value;
-    const id = response?.data?.registerCustomer?.customer?.id;
+type AuthType = "registerCustomer" | "login";
 
-    console.log("response: ", response);
+function saveResponseToLocalStorage(response: any, type = "registerCustomer") {
+    const authToken = response?.data?.[type]?.authToken;
+    const refreshToken = response?.data?.[type]?.refreshToken;
+    const email = response?.data?.[type]?.customer?.email;
+    const displayName = response?.data?.[type]?.customer?.displayName;
+    const firstName = response?.data?.[type]?.customer?.firstName;
+    const address = response?.data?.[type]?.customer?.metaData?.[0]?.value;
+    const dob = response?.data?.[type]?.customer?.metaData?.[1]?.value;
+    const gender = response?.data?.[type]?.customer?.metaData?.[2]?.value;
+    const phone_number = response?.data?.[type]?.customer?.metaData?.[3]?.value;
+    const about = response?.data?.[type]?.customer?.metaData?.[4]?.value;
+    const id = response?.data?.[type]?.customer?.id;
 
     localStorage.setItem("authToken", authToken || "");
     localStorage.setItem("refreshToken", refreshToken || "");
@@ -48,7 +48,10 @@ function saveResponseToLocalStorage(response: any) {
     localStorage.setItem("phone_number", phone_number || "");
     localStorage.setItem("about", about || "");
     localStorage.setItem("id", id || "");
+
+    console.log("Updated Response: ", response);
 }
+
 
 export function SessionProvider({children}: {
     children: ReactNode
@@ -114,7 +117,7 @@ export function SessionProvider({children}: {
             const authToken = response?.data?.login?.authToken;
             const refreshToken = response?.data?.login?.refreshToken;
 
-            saveResponseToLocalStorage(response);
+            saveResponseToLocalStorage(response, "login");
 
             localStorage.setItem("authToken", authToken ?? "");
             localStorage.setItem("refreshToken", refreshToken ?? "");
@@ -138,13 +141,12 @@ export function SessionProvider({children}: {
     };
 
     const logout = () => {
-        localStorage.removeItem("authToken"); // Remove the authToken from localStorage
-        localStorage.removeItem("sessionToken"); // Remove the sessionToken from localStorage
-        setSessionToken(null); // Set sessionToken to null in state
+        localStorage.removeItem("authToken");
+        localStorage.removeItem("sessionToken");
+        setSessionToken(null);
     };
 
     useEffect(() => {
-        // Fetch and store the session token when the component mounts
         async function fetchAndStoreSessionToken() {
             try {
                 const {data} = await refetch()
