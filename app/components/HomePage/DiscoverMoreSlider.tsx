@@ -1,11 +1,11 @@
 'use client'
 import React, { useEffect, useId } from "react";
 import Heading from "components/Heading/Heading";
-import img1 from "@/public/images/collections/1.png";
-import img2 from "@/public/images/collections/5.png";
-import img3 from "@/public/images/collections/4.png";
-import img4 from "@/public/images/collections/3.png";
-import img5 from "@/public/images/collections/3.png";
+import img1 from "@/public/homepage/Layer 2.png";
+import img2 from "@/public/homepage/Layer 3.png";
+import img3 from "@/public/homepage/Layer 5.png";
+import img4 from "@/public/homepage/Layer 4.png";
+import img5 from "@/public/homepage/mbp14-silver2.png";
 import CardCategory3, {
   CardCategory3Props,
 } from "@/app/components/CardCategories/CardCategory3";
@@ -81,11 +81,16 @@ const DiscoverMoreSlider = () => {
     };
 
     let slider = new Glide(`.${UNIQUE_CLASS}`, OPTIONS);
-    slider.mount();
-    return () => {
-      slider.destroy();
-    };
-  }, [UNIQUE_CLASS]);
+  slider.mount();
+  
+  // Start autoplay
+  slider.play();
+
+  // Cleanup on component unmount
+  return () => {
+    slider.destroy();
+  };
+}, [UNIQUE_CLASS]);
 
   return (
     <div className={`nc-DiscoverMoreSlider nc-p-l-container ${UNIQUE_CLASS} `}>

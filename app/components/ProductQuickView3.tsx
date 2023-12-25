@@ -37,6 +37,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
   const link = useProductLink(product)
 
   console.log('recieved from quick view', product)
+  // console.log({product_images})
 
   const [variantActive, setVariantActive] = React.useState(0);
   const [sizeSelected, setSizeSelected] = React.useState("");
@@ -224,7 +225,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
             {/* META FAVORITES */}
             <LikeButton className="absolute right-3 top-3 " />
           </div>
-          {/* {(product.galleryImages.nodes || (product.galleryImages.edges && product.galleryImages.edges.length > 0)) && (
+          {(product.galleryImages.nodes || (product.galleryImages.edges && product.galleryImages.edges.length > 0)) && (
             <div className="hidden lg:grid grid-cols-2 gap-3 mt-3 sm:gap-6 sm:mt-6 xl:gap-5 xl:mt-5">
               {[product_images[1], product_images[2]].map((item, index) => {
                 return (
@@ -238,7 +239,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
                 );
               })}
             </div>
-          )} */}
+          )}
         </div>
 
         {/* SIDEBAR */}
