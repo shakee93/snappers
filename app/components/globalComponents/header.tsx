@@ -60,6 +60,8 @@ const Header = () => {
               <div className="hidden md:flex">
                 <AvatarDropdown />
                 <CartDropdown />
+          
+      
               </div>
 
             </div>

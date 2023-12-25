@@ -29,7 +29,7 @@ export default function ApolloWrapper ({ children }: React.PropsWithChildren)  {
                 operation.setContext({
                     headers: {
                         'woocommerce-session' : `Session ${sessionToken}`, // Set the sessionToken as an Authorization header
-                        'authorization' : `Bearer ${authToken}`, // Set the sessionToken as an Authorization header
+                        // 'authorization' : `Bearer ${authToken}`, // Set the sessionToken as an Authorization header
                     },
                 });
 
