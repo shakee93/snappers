@@ -70,7 +70,7 @@ const SectionPromo1: FC<SectionPromo1Props> = ({ className = "" }) => {
           </ButtonSecondary>
         </div>
       </div>
-      <div className="relative flex-1 w-1/2 h-full">
+      <div className="relative flex-1 w-full md:w-1/2 h-full">
         <Slider {...settings}>
           {sliderImages.map((image, index) => (
             <NcImage

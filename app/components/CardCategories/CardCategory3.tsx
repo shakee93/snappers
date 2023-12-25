@@ -33,7 +33,7 @@ const CardCategory3: FC<CardCategory3Props> = ({
           <NcImage
             src={featuredImage}
             containerClassName="absolute inset-5 sm:inset-8"
-            className="absolute right-0 w-1/2 max-w-[260px] h-full object-contain drop-shadow-xl"
+            className="absolute right-0 w-1/2 max-w-[200px] h-full object-contain drop-shadow-xl"
           />
         </div>
         <span className="opacity-0 group-hover:opacity-40 absolute inset-0 bg-black/10 transition-opacity"></span>

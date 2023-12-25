@@ -27,7 +27,7 @@ const NcImage: FC<NcImageProps> = ({
       data-nc-id="NcImage"
     >
 
-      <Image src={src} className={className} alt={alt} width={1000} height={1000}  />
+      <Image src={src} className={className} alt={alt} width={10000} height={10000}  />
     </div>
   );
 };
