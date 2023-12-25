@@ -4,23 +4,26 @@ import Link from "next/link"
 import explore1Svg from "@/public/images/collections/explore1.svg";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import {StaticImageData} from "next/image";
+import Image from 'next/image';
 
 export interface CardCategory4Props {
   className?: string;
-  featuredImage?: string | StaticImageData;
+  featuredImage?: string ;
   bgSVG?: string;
   name: string;
   desc: string;
   color?: string;
+  slug?: string;
 }
 
 const CardCategory4: FC<CardCategory4Props> = ({
   className = "",
-  featuredImage = ".",
+  featuredImage,
   bgSVG = explore1Svg,
   name,
   desc,
   color = "bg-rose-50",
+  slug = ""
 }) => {
   return (
     <div
@@ -29,14 +32,17 @@ const CardCategory4: FC<CardCategory4Props> = ({
     >
       <div>
         <div className="absolute bottom-0 right-0 max-w-[280px] opacity-80">
-          <img src={bgSVG} alt="" />
+          <Image src={bgSVG} alt="" />
         </div>
 
         <div className="absolute inset-5 sm:inset-8 flex flex-col justify-between">
           <div className="flex justify-between items-center">
-            <NcImage
-              src={featuredImage}
-              containerClassName={`w-20 h-20 rounded-full overflow-hidden z-0 ${color}`}
+            <Image
+              src={featuredImage?.src}
+              className={`w-20 h-20 rounded-full overflow-hidden z-0 ${color}`}
+              alt=""
+              width={1000}
+              height={1000}
             />
             <span className="text-xs text-slate-700 dark:text-neutral-300 font-medium">
              products
@@ -53,7 +59,7 @@ const CardCategory4: FC<CardCategory4Props> = ({
           </div>
 
           <Link
-            href={"/page-collection"}
+            href={`/${slug}`}
             className="flex items-center text-sm font-medium group-hover:text-primary-500 transition-colors"
           >
             <span>See Collection</span>
@@ -62,7 +68,7 @@ const CardCategory4: FC<CardCategory4Props> = ({
         </div>
       </div>
 
-      <Link href={"/page-collection"}></Link>
+      <Link href={`/${slug}`}></Link>
     </div>
   );
 };
