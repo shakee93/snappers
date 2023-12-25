@@ -312,3 +312,16 @@ query GetProducts($categoryIdIn: [Int]) {
   }
 }
 `
+export const GET_BRAND_DETAILS = gql`
+query GetBrandDetails($slug: [String]) {
+  brands(first: 100, where: { slug: $slug }) {
+    nodes {
+      databaseId
+      name
+      slug
+      count
+      id
+    }
+  }
+}
+`

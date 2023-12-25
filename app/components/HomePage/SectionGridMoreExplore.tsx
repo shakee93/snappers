@@ -47,6 +47,7 @@ import tecno from "@/public/images/brandLogo/tecno.jpg";
 import { StaticImageData } from "next/image";
 import { useQuery } from "@apollo/client";
 import { GET_PRODUCTS, GET_BRANDS } from "@/graphql/defs/products";
+import { GET_BRAND_DETAILS } from "@/graphql/defs/products";
 
 
 interface ExploreType {
@@ -142,38 +143,75 @@ export const DEMO_MORE_EXPLORE_DATA = [
   },
 ];
 
+// const hardcodedBrands = {
+//   Mobiles: [
+//     { name: "Samsung", id: 'dGVybToyMTk=', slug: "samsung", img: samsung },
+//     { name: "Apple", id: 'dGVybToyMjY=', slug: "apple", img: apple },
+//     { name: "Google", id: 'dGVybToyMjk=', slug: "google", img: google },
+//     { name: "OnePlus", id: 'dGVybToyMjA=', slug: "oneplus", img: oneplus },
+//     { name: "Huawei", id: 'dGVybToyMjU=', slug: "huawei", img: huawei },
+//     { name: "Nokia", id: 'dGVybToyMzk=', slug: "nokia", img: nokia },
+//   ],
+//   Watches: [
+//     { name: "Fitbit", id: 'dGVybToyMzI=', slug: "fitbit", img: fitbit },
+//     { name: "Amazfit", id: 'dGVybToyMjQ=', slug: "amazfit", img: amazfit },
+//     { name: "Huawei", id: 'dGVybToyMjU=', slug: "huawei", img: huawei },
+//   ],
+//   Laptops: [
+//     { name: "Apple", id: 'dGVybToyMjY=', slug: "apple", img: apple },
+//     { name: "Samsung", id: 'dGVybToyMTk=', slug: "samsung", img: samsung },
+//   ],
+//   Speakers: [
+//     { name: "Bose", id: 'dGVybToyNDE=', slug: "bose", img: bose },
+//     { name: "Beats", id: 'dGVybToyMzM=', slug: "beats", img: beats },
+//     { name: "Meimi", id: 'dGVybToyNzA=', slug: "meimi", img: '' },
+//   ],
+//   PowerBanks: [
+//     { name: "Porodo", id: 'dGVybToyNDA=', slug: "porodo", img: porodo },
+//     { name: "Belkin", id: 'dGVybToyMzg=', slug: "belkin", img: belkin },
+//   ],
+//   Gaming: [
+//     { name: "Logitech", id: 'dGVybToyMzQ=', slug: "logitech", img: logitech },
+//     { name: "Tec", id: 'dGVybToyNTg=', slug: "tecno", img: tecno },
+//     { name: "Skull", id: 'dGVybToyMjE=', slug: "skullcandy", img: skullcandy },
+//     { name: "Green Lion", id: 'dGVybToyMzc=', slug: "green-lion", img: greenlion },
+//   ],
+
+// };
+
+
 const hardcodedBrands = {
   Mobiles: [
-    { name: "Samsung", id: 1, slug: "samsung", img: samsung },
-    { name: "Apple", id: 2, slug: "apple", img: apple },
-    { name: "Google", id: 3, slug: "google", img: google },
-    { name: "OnePlus", id: 4, slug: "oneplus", img: oneplus },
-    { name: "Huawei", id: 5, slug: "huawei", img: huawei },
-    { name: "Nokia", id: 6, slug: "nokia", img: nokia },
+    { name: "Sam", id: 'dGVybToyMTk=', slug: "samsung", img: samsung },
+    { name: "Ape", id: 'dGVybToyMjY=', slug: "apple", img: apple },
+    { name: "Ggle", id: 'dGVybToyMjk=', slug: "google", img: google },
+    { name: "OePlus", id: 'dGVybToyMjA=', slug: "oneplus", img: oneplus },
+    { name: "Hawei", id: 'dGVybToyMjU=', slug: "huawei", img: huawei },
+    { name: "Nia", id: 'dGVybToyMzk=', slug: "nokia", img: nokia },
   ],
   Watches: [
-    { name: "Fitbit", id: 7, slug: "fitbit", img: fitbit },
-    { name: "Amazfit", id: 8, slug: "amazfit", img: amazfit },
-    { name: "Huawei", id: 9, slug: "huawei", img: huawei },
+    { name: "Fbit", id: 'dGVybToyMzI=', slug: "fitbit", img: fitbit },
+    { name: "azfit", id: 'dGVybToyMjQ=', slug: "amazfit", img: amazfit },
+    { name: "Hei", id: 'dGVybToyMjU=', slug: "huawei", img: huawei },
   ],
   Laptops: [
-    { name: "Apple", id: 10, slug: "apple", img: apple },
-    { name: "Samsung", id: 8, slug: "samsung", img: samsung },
+    { name: "pple", id: 'dGVybToyMjY=', slug: "apple", img: apple },
+    { name: "Smsung", id: 'dGVybToyMTk=', slug: "samsung", img: samsung },
   ],
   Speakers: [
-    { name: "Bose", id: 7, slug: "bose", img: bose },
-    { name: "Beats", id: 8, slug: "beats", img: beats },
-    { name: "Meimi", id: 9, slug: "meimi", img: '' },
+    { name: "ose", id: 'dGVybToyNDE=', slug: "bose", img: bose },
+    { name: "ats", id: 'dGVybToyMzM=', slug: "beats", img: beats },
+    { name: "Mimi", id: 'dGVybToyNzA=', slug: "meimi", img: '' },
   ],
   PowerBanks: [
-    { name: "Porodo", id: 10, slug: "porodo", img: porodo },
-    { name: "Belkin", id: 8, slug: "belkin", img: belkin },
+    { name: "orodo", id: 'dGVybToyNDA=', slug: "porodo", img: porodo },
+    { name: "Blkin", id: 'dGVybToyMzg=', slug: "belkin", img: belkin },
   ],
   Gaming: [
-    { name: "Logitech", id: 10, slug: "logitech", img: logitech },
-    { name: "Tecno", id: 8, slug: "tecno", img: tecno },
-    { name: "Skullcandy", id: 8, slug: "skullcandy", img: skullcandy },
-    { name: "Green Lion", id: 8, slug: "green-lion", img: greenlion },
+    { name: "Loitech", id: 'dGVybToyMzQ=', slug: "logitech", img: logitech },
+    { name: "Tec", id: 'dGVybToyNTg=', slug: "tecno", img: tecno },
+    { name: "Skull", id: 'dGVybToyMjE=', slug: "skullcandy", img: skullcandy },
+    { name: "Green Lion", id: 'dGVybToyMzc=', slug: "green-lion", img: greenlion },
   ],
 
 };
@@ -185,25 +223,47 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
   // data = DEMO_MORE_EXPLORE_DATA.filter((_, i) => i < 6),
 }) => {
 
+  const { loading, error, data, refetch } = useQuery(GET_BRAND_DETAILS, {
+    variables: {
+      slug: [],
+    },
+  });
 
-  const [brands, setBrands] = useState(hardcodedBrands["Mobiles"]);
-  let { loading, error, data, refetch } = useQuery(GET_BRANDS);
+  const [brands, setBrands] = useState();
   const [tabActive, setTabActive] = useState("Mobiles");
 
-  // useEffect(() => {
-  //   if (data?.brands.nodes.length > 0) {
-  //     setBrands(data?.brands.nodes);
-  //   }
-  // }, [data]);
-
-  const updateBrands = (tabName: string) => {
-    setTabActive(tabName);
-    const hardcodedBrandList = hardcodedBrands[tabName] || [];
-    setBrands(hardcodedBrandList);
+  const fetchBrandsForCategory = async (category: string) => {
+    try {
+      const hardcodedBrandList = hardcodedBrands[category] || [];
+      const slugs = hardcodedBrandList.map((brand) => brand.slug);
+      console.log('Brand Slugs:', slugs);
+  
+      const { data: fetchedData } = await refetch({
+        slug: slugs,
+      });
+  
+      // console.log({ fetchedData });
+  
+      const fetchedBrandsFromServer = fetchedData?.brands.nodes || [];
+  
+      // Extract the name and slug from the fetched brands
+      const fetchedBrands = fetchedBrandsFromServer.map((fetchedBrand) => ({
+        name: fetchedBrand.name,
+        slug: fetchedBrand.slug,
+        count: fetchedBrand.count,
+        databaseId: fetchedBrand.databaseId
+      }));
+  
+      // console.log('Fetched Brands:', fetchedBrands);
+      setBrands(fetchedBrands);
+    } catch (error) {
+      console.error(`Error fetching brands for ${category}`, error);
+    }
   };
-
-  // console.log({ brands });
-  // console.log({ data });
+  
+  useEffect(() => {
+    fetchBrandsForCategory(tabActive);
+  }, [tabActive]);
 
   const renderCard = (item: ExploreType) => {
     switch (boxCard) {
@@ -332,7 +392,6 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
               key={index}
               isActive={tabActive === item.name}
               onClick={() => {
-                updateBrands(item.name);
                 setTabActive(item.name);
               }}
             >
@@ -357,7 +416,7 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
     >
       {renderHeading()}
       <div className={`grid gap-4 md:gap-7 ${gridClassName}`}>
-        {brands.map((brand) => (
+        {brands?.map((brand) => (
           <div key={brand.id}>
             {renderCard(brand)}
           </div>
