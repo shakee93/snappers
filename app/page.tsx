@@ -60,6 +60,8 @@ export default async function Home() {
               SPORT_PRODUCTS[1],
               PRODUCTS[6],
             ]}
+            subHeading= "Explore the Latest in Smartphone Innovation"
+              heading="Mobiles"
           />
 
           {/* <div className="py-24 lg:py-32 border-t border-b border-slate-200 dark:border-slate-700">
@@ -82,15 +84,15 @@ export default async function Home() {
           {/* SECTION */}
           {/* <SectionGridFeatureItems /> */}
 
-          <SectionPromo2 />
+          {/* <SectionPromo2 /> */}
 
           {/* SECTION 3 */}
-          <SectionSliderLargeProduct cardStyle="style2" />
+          {/* <SectionSliderLargeProduct cardStyle="style2" /> */}
 
           {/* SECTION */}
-          <SectionSliderCategories />
+          {/* <SectionSliderCategories /> */}
 
-          <SectionPromo3 />
+          {/* <SectionPromo3 /> */}
 
           <SectionSliderProductCard
             heading="Best Sellers"

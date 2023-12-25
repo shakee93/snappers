@@ -5,7 +5,7 @@ export interface HeaderProps { }
 
 const Header: FC<HeaderProps> = () => {
   return (
-    <div className="nc-Header relative w-full z-40 ">
+    <div className="nc-Header relative w-full z-30 ">
       <MainNav2 />
     </div>
   );

@@ -40,7 +40,7 @@ const Header = () => {
     <header
       className={
 
-           "backdrop-blur-md sticky top-0 flex flex-col justify-between bg-white/90 z-50 transition-all duration-1300 border-b"
+           "backdrop-blur-md sticky top-0 flex flex-col justify-between bg-white/90 z-40 transition-all duration-1300 border-b"
       }
     >
       <div className="flex justify-between items-center lg:items-stretch">
