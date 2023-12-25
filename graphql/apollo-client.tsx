@@ -99,10 +99,8 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
 
         const authLink = new ApolloLink( (operation, forward) => {
             const sessionToken = localStorage.getItem('sessionToken');
-            const refreshToken = localStorage.getItem('refreshToken'); // Assuming refreshToken is available
+            const refreshToken = localStorage.getItem('refreshToken');
             
-            // const authToken = await getAuthToken();
-            //   const sessionToken = await getSessionToken();
             console.log("session token: ", sessionToken);
             console.log("refresh token: ", refreshToken);
 
@@ -116,13 +114,16 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
 
             // If refreshToken is available, add the "Authorization" header
             if (refreshToken) {
-                operation.setContext((context: any) => ({
+                (async () => {
+                  const token = await getAuthToken();
+                  operation.setContext((context: any) => ({
                     headers: {
-                        ...context.headers,
-                        'Authorization': `Bearer ${refreshToken}`,
+                      ...context.headers,
+                      'Authorization': `Bearer ${token}`,
                     },
-                }));
-            }
+                  }));
+                })();
+              }
 
             return forward(operation);
         });
