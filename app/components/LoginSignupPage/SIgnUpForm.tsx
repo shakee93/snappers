@@ -6,7 +6,7 @@ import Link from "next/link";
 import ButtonPrimary from "@/public/shared/Button/ButtonPrimary";
 import {useSession} from "@/context/SessionProvider";
 import {SignUpResponse} from "@/utils/type";
-import {useRouter} from "next/router";
+import {useRouter} from "next/navigation";
 
 
 const SignupForm = () => {

@@ -140,9 +140,6 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
     }
   }, [data]);
 
-  console.log({_brands});
-  console.log({data});
-  
   const [tabActive, setTabActive] = React.useState("Man");
 
   const renderCard = (item: ExploreType) => {

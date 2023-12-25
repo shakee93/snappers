@@ -65,6 +65,14 @@ export const ProductContentFull = gql`
             sourceUrl
             altText
         }
+        brands {
+            nodes {
+                databaseId
+                name
+                slug
+                count
+            }
+        }
         galleryImages {
             nodes {
                 id
@@ -83,28 +91,11 @@ export const ProductContentFull = gql`
             nodes {
                 id
                 attributeId
-                ... on LocalProductAttribute {
-                    name
-                    options
-                    variation
-                }
-                ... on GlobalProductAttribute {
-                    name
-                    options
-                    variation
-                }
+                name
+                label
+                options
             }
         }
-        
-        terms {
-            nodes {
-                ... on Brand {
-                    id
-                    name
-                    slug
-                }
-            }
-        } 
         ... on SimpleProduct {
             onSale
             stockStatus
@@ -126,6 +117,48 @@ export const ProductContentFull = gql`
             }
         }
         ... on VariableProduct {
+            allPaCapacity {
+                nodes {
+                    name
+                    slug
+                }
+            }
+            allPaColor {
+                nodes {
+                    name
+                    slug
+                }
+            }
+            allPaColour {
+                nodes {
+                    name
+                    slug
+                }
+            }
+            allPaSpecification {
+                nodes {
+                    name
+                    slug
+                }
+            }
+            allPaVariant {
+                nodes {
+                    name
+                    slug
+                }
+            }
+            allPaWarranty {
+                nodes {
+                    name
+                    slug
+                }
+            }
+            allPaWatchSize {
+                nodes {
+                    name
+                    slug
+                }
+            } 
             onSale
             price
             rawPrice: price(format: RAW)
@@ -135,10 +168,12 @@ export const ProductContentFull = gql`
             stockQuantity
             soldIndividually
             productCategories {
-                nodes {
-                    id
-                    name
-                    slug
+                edges {
+                    node {
+                        id
+                        name
+                        slug
+                    }
                 }
             }
             variations(first: 50) {
@@ -147,6 +182,7 @@ export const ProductContentFull = gql`
                     databaseId
                     name
                     price
+                    stockStatus 
                     rawPrice: price(format: RAW)
                     regularPrice
                     salePrice
