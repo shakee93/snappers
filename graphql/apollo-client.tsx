@@ -24,10 +24,12 @@ export default function ApolloWrapper ({ children }: React.PropsWithChildren)  {
         const authLink = new ApolloLink((operation, forward) => {
 
             const sessionToken = localStorage.getItem('sessionToken');
+            const authToken = localStorage.getItem('authToken');
 
                 operation.setContext({
                     headers: {
                         'woocommerce-session' : `Session ${sessionToken}`, // Set the sessionToken as an Authorization header
+                        'authorization' : `Bearer ${authToken}`, // Set the sessionToken as an Authorization header
                     },
                 });
 
