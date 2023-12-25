@@ -55,7 +55,7 @@ const ProductCard: FC<ProductCardProps> = ({
 
     const startSlider = () => {
         hoverIntervalRef.current = window.setInterval(() => {
-            setCurrentVariation((prev) => (prev + 1) % (variations?.edges.length || 1));
+            setCurrentVariation((prev) => (prev + 1) % (variations?.edges?.length || 1));
         }, delayBeforeNextImage);
     };
 
@@ -219,15 +219,15 @@ const ProductCard: FC<ProductCardProps> = ({
                     <BagIcon className="w-3.5 h-3.5 mb-0.5" />
                     <span className="ml-1">Add to Cart</span>
                 </ButtonPrimary>
-                {/*<ButtonSecondary*/}
-                {/*    className="ml-1.5 bg-white hover:!bg-gray-100 hover:text-slate-900 transition-colors shadow-lg"*/}
-                {/*    fontSize="text-xs"*/}
-                {/*    sizeClass="py-2 px-4"*/}
-                {/*    onClick={() => handleCloseModalQuickView(true)}*/}
-                {/*>*/}
-                {/*    <ArrowsPointingOutIcon className="w-3.5 h-3.5" />*/}
-                {/*    <span className="ml-1">Quick view</span>*/}
-                {/*</ButtonSecondary>*/}
+                {/* <ButtonSecondary
+                   className="ml-1.5 bg-white hover:!bg-gray-100 hover:text-slate-900 transition-colors shadow-lg"
+                   fontSize="text-xs"
+                   sizeClass="py-2 px-4"
+                   onClick={() => handleCloseModalQuickView(true)}
+                >
+                   <ArrowsPointingOutIcon className="w-3.5 h-3.5" />
+                   <span className="ml-1">Quick view</span>
+                </ButtonSecondary> */}
             </div>
 
         );

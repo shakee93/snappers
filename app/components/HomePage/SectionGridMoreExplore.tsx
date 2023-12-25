@@ -4,7 +4,7 @@ import CardCategory1 from "@/app/components/CardCategories/CardCategory1";
 import CardCategory4 from "@/app/components/CardCategories/CardCategory4";
 import Heading from "@/app/components/Heading/Heading";
 import NavItem2 from "@/app/components/HomePage/NavItem2";
-import React, { FC } from "react";
+import React, { FC, useState, useEffect } from "react";
 import Nav from "@/app/components/HomePage/Nav";
 import explore1Svg from "@/public/images/collections/explore1.svg";
 import explore2Svg from "@/public/images/collections/explore2.svg";
@@ -27,6 +27,9 @@ import explore8Png from "@/public/images/collections/explore8.png";
 import explore9Png from "@/public/images/collections/explore9.png";
 import CardCategory6 from "components/CardCategories/CardCategory6";
 import {StaticImageData} from "next/image";
+import { useQuery } from "@apollo/client";
+import { GET_PRODUCTS, GET_BRANDS } from "@/graphql/defs/products";
+
 
 interface ExploreType {
   id: number;
@@ -119,12 +122,27 @@ export const DEMO_MORE_EXPLORE_DATA = [
   },
 ];
 
+
 const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
   className = "",
   boxCard = "box4",
   gridClassName = "grid-cols-1 md:grid-cols-2 xl:grid-cols-3",
-  data = DEMO_MORE_EXPLORE_DATA.filter((_, i) => i < 6),
+  // data = DEMO_MORE_EXPLORE_DATA.filter((_, i) => i < 6),
 }) => {
+  
+
+  const [_brands, setBrands] = useState(null);
+  let { loading, error, data, refetch } = useQuery(GET_BRANDS);
+
+  useEffect(() => {
+    if (data?.brands.nodes.length > 0) {
+      setBrands(data?.brands.nodes);
+    }
+  }, [data]);
+
+  console.log({_brands});
+  console.log({data});
+  
   const [tabActive, setTabActive] = React.useState("Man");
 
   const renderCard = (item: ExploreType) => {
@@ -275,7 +293,7 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
     >
       {renderHeading()}
       <div className={`grid gap-4 md:gap-7 ${gridClassName}`}>
-        {data.map((item) => renderCard(item))}
+        {/* {data.map((item) => renderCard(item))} */}
       </div>
     </div>
   );
