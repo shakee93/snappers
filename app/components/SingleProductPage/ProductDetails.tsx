@@ -57,6 +57,8 @@ const ProductDetails = ({
 
         if (vProduct) {
             setActiveVariation(vProduct);
+        } else {
+            setActiveVariation(null)
         }
 
     }, [attribute])

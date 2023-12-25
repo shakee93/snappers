@@ -55,6 +55,11 @@ const ProductAddToCart = ({product, variation} : {
   }
 
 
+  if (product.type === 'VARIABLE' && !variation) {
+    return <></>
+  }
+
+
   return (
     <>
       <div className="flex space-x-3.5 py-4">
