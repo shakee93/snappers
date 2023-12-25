@@ -35,13 +35,13 @@ import bose from "@/public/images/brandLogo/bose.png";
 import fitbit from "@/public/images/brandLogo/fitbit.png";
 import google from "@/public/images/brandLogo/google.png";
 import greenlion from "@/public/images/brandLogo/greenlion.png";
-import huawei from "@/public/images/brandLogo/huawei.jpg";
-import logitech from "@/public/images/brandLogo/logitech.webp";
+import huawei from "@/public/images/brandLogo/huawei.jpeg";
+import logitech from "@/public/images/brandLogo/logitech.png";
 import nokia from "@/public/images/brandLogo/nokia.webp";
 import oneplus from "@/public/images/brandLogo/oneplus.png";
 import porodo from "@/public/images/brandLogo/porodo.png";
 import samsung from "@/public/images/brandLogo/samsung.png";
-import skullcandy from "@/public/images/brandLogo/skullcandy.png";
+import skullcandy from "@/public/images/brandLogo/skullcandy.jpg";
 import tecno from "@/public/images/brandLogo/tecno.jpg";
 
 import { StaticImageData } from "next/image";
