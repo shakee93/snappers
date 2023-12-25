@@ -15,8 +15,6 @@ import {Product} from "@/graphql/types/graphql";
 import Image from "next/image";
 import SidebarFilters from "@/app/components/SidebarFilters";
 import ProductGrid from "@/app/components/ProductGrid";
-import { useQuery } from "@apollo/client";
-
 
 export async function getData(slug : string | null = null)  {
 
@@ -53,8 +51,6 @@ export async function getData(slug : string | null = null)  {
     }
 }
 
-
-
 const Page = async ({ params } : {
     params: {
         brand: string
@@ -68,7 +64,6 @@ const Page = async ({ params } : {
             className={`nc-PageCollection2 `}
             data-nc-id="PageCollection2"
         >
-
             <div className="container py-16 lg:pb-24 lg:pt-12 space-y-16 sm:space-y-20 lg:space-y-28">
                 <div className="space-y-10 lg:space-y-14">
                     {/* HEADING */}

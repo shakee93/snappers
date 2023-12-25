@@ -26,7 +26,25 @@ import explore7Png from "@/public/images/collections/explore7.png";
 import explore8Png from "@/public/images/collections/explore8.png";
 import explore9Png from "@/public/images/collections/explore9.png";
 import CardCategory6 from "components/CardCategories/CardCategory6";
-import {StaticImageData} from "next/image";
+
+import amazfit from "@/public/images/brandLogo/amazfit.png";
+import apple from "@/public/images/brandLogo/apple.png";
+import beats from "@/public/images/brandLogo/beats.jpg";
+import belkin from "@/public/images/brandLogo/belkin.jpg";
+import bose from "@/public/images/brandLogo/bose.png";
+import fitbit from "@/public/images/brandLogo/fitbit.png";
+import google from "@/public/images/brandLogo/google.png";
+import greenlion from "@/public/images/brandLogo/greenlion.png";
+import huawei from "@/public/images/brandLogo/huawei.jpg";
+import logitech from "@/public/images/brandLogo/logitech.webp";
+import nokia from "@/public/images/brandLogo/nokia.webp";
+import oneplus from "@/public/images/brandLogo/oneplus.png";
+import porodo from "@/public/images/brandLogo/porodo.png";
+import samsung from "@/public/images/brandLogo/samsung.png";
+import skullcandy from "@/public/images/brandLogo/skullcandy.png";
+import tecno from "@/public/images/brandLogo/tecno.jpg";
+
+import { StaticImageData } from "next/image";
 import { useQuery } from "@apollo/client";
 import { GET_PRODUCTS, GET_BRANDS } from "@/graphql/defs/products";
 
@@ -34,10 +52,12 @@ import { GET_PRODUCTS, GET_BRANDS } from "@/graphql/defs/products";
 interface ExploreType {
   id: number;
   name: string;
-  desc: string;
-  image: string | StaticImageData;
-  svgBg: string;
+  desc?: string;
+  image?: string | StaticImageData;
+  svgBg?: string;
   color?: string;
+  slug?: string;
+  img: string;
 }
 
 export interface SectionGridMoreExploreProps {
@@ -122,6 +142,41 @@ export const DEMO_MORE_EXPLORE_DATA = [
   },
 ];
 
+const hardcodedBrands = {
+  Mobiles: [
+    { name: "Samsung", id: 1, slug: "samsung", img: samsung },
+    { name: "Apple", id: 2, slug: "apple", img: apple },
+    { name: "Google", id: 3, slug: "google", img: google },
+    { name: "OnePlus", id: 4, slug: "oneplus", img: oneplus },
+    { name: "Huawei", id: 5, slug: "huawei", img: huawei },
+    { name: "Nokia", id: 6, slug: "nokia", img: nokia },
+  ],
+  Watches: [
+    { name: "Fitbit", id: 7, slug: "fitbit", img: fitbit },
+    { name: "Amazfit", id: 8, slug: "amazfit", img: amazfit },
+    { name: "Huawei", id: 9, slug: "huawei", img: huawei },
+  ],
+  Laptops: [
+    { name: "Apple", id: 10, slug: "apple", img: apple },
+    { name: "Samsung", id: 8, slug: "samsung", img: samsung },
+  ],
+  Speakers: [
+    { name: "Bose", id: 7, slug: "bose", img: bose },
+    { name: "Beats", id: 8, slug: "beats", img: beats },
+    { name: "Meimi", id: 9, slug: "meimi", img: '' },
+  ],
+  PowerBanks: [
+    { name: "Porodo", id: 10, slug: "porodo", img: porodo },
+    { name: "Belkin", id: 8, slug: "belkin", img: belkin },
+  ],
+  Gaming: [
+    { name: "Logitech", id: 10, slug: "logitech", img: logitech },
+    { name: "Tecno", id: 8, slug: "tecno", img: tecno },
+    { name: "Skullcandy", id: 8, slug: "skullcandy", img: skullcandy },
+    { name: "Green Lion", id: 8, slug: "green-lion", img: greenlion },
+  ],
+
+};
 
 const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
   className = "",
@@ -129,18 +184,26 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
   gridClassName = "grid-cols-1 md:grid-cols-2 xl:grid-cols-3",
   // data = DEMO_MORE_EXPLORE_DATA.filter((_, i) => i < 6),
 }) => {
-  
 
-  const [_brands, setBrands] = useState(null);
+
+  const [brands, setBrands] = useState(hardcodedBrands["Mobiles"]);
   let { loading, error, data, refetch } = useQuery(GET_BRANDS);
+  const [tabActive, setTabActive] = useState("Mobiles");
 
-  useEffect(() => {
-    if (data?.brands.nodes.length > 0) {
-      setBrands(data?.brands.nodes);
-    }
-  }, [data]);
+  // useEffect(() => {
+  //   if (data?.brands.nodes.length > 0) {
+  //     setBrands(data?.brands.nodes);
+  //   }
+  // }, [data]);
 
-  const [tabActive, setTabActive] = React.useState("Man");
+  const updateBrands = (tabName: string) => {
+    setTabActive(tabName);
+    const hardcodedBrandList = hardcodedBrands[tabName] || [];
+    setBrands(hardcodedBrandList);
+  };
+
+  // console.log({ brands });
+  // console.log({ data });
 
   const renderCard = (item: ExploreType) => {
     switch (boxCard) {
@@ -150,7 +213,7 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
             key={item.id}
             name={item.name}
             desc={item.desc}
-            featuredImage={item.image}
+            featuredImage={item.img}
           />
         );
 
@@ -160,9 +223,10 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
             name={item.name}
             desc={item.desc}
             bgSVG={item.svgBg}
-            featuredImage={item.image}
+            featuredImage={item.img}
             key={item.id}
             color={item.color}
+            slug={item.slug}
           />
         );
       case "box6":
@@ -171,7 +235,7 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
             name={item.name}
             desc={item.desc}
             bgSVG={item.svgBg}
-            featuredImage={item.image}
+            featuredImage={item.img}
             key={item.id}
             color={item.color}
           />
@@ -183,7 +247,7 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
             name={item.name}
             desc={item.desc}
             bgSVG={item.svgBg}
-            featuredImage={item.image}
+            featuredImage={item.img}
             key={item.id}
             color={item.color}
           />
@@ -243,11 +307,11 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
               // <path d="M22.5 14.5V9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               // <path d="M1.5 14.5V9.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               // </svg>
-              
+
               //  `,
             },
             {
-              name: "Powerbanks",
+              name: "PowerBanks",
               // icon: `<svg class="w-4 h-4 sm:w-5 sm:h-5" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
               // <path d="M16.7 18.98H7.30002C6.88002 18.98 6.41002 18.65 6.27002 18.25L2.13002 6.66999C1.54002 5.00999 2.23002 4.49999 3.65002 5.51999L7.55002 8.30999C8.20002 8.75999 8.94002 8.52999 9.22002 7.79999L10.98 3.10999C11.54 1.60999 12.47 1.60999 13.03 3.10999L14.79 7.79999C15.07 8.52999 15.81 8.75999 16.45 8.30999L20.11 5.69999C21.67 4.57999 22.42 5.14999 21.78 6.95999L17.74 18.27C17.59 18.65 17.12 18.98 16.7 18.98Z" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
               // <path d="M6.5 22H17.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
@@ -267,13 +331,16 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
             <NavItem2
               key={index}
               isActive={tabActive === item.name}
-              onClick={() => setTabActive(item.name)}
+              onClick={() => {
+                updateBrands(item.name);
+                setTabActive(item.name);
+              }}
             >
               <div className="flex items-center justify-center space-x-1.5 sm:space-x-2.5 text-xs sm:text-sm ">
-                <span
+                {/* <span
                   className="inline-block"
                   dangerouslySetInnerHTML={{ __html: item.icon }}
-                ></span>
+                ></span> */}
                 <span>{item.name}</span>
               </div>
             </NavItem2>
@@ -290,7 +357,11 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
     >
       {renderHeading()}
       <div className={`grid gap-4 md:gap-7 ${gridClassName}`}>
-        {/* {data.map((item) => renderCard(item))} */}
+        {brands.map((brand) => (
+          <div key={brand.id}>
+            {renderCard(brand)}
+          </div>
+        ))}
       </div>
     </div>
   );
