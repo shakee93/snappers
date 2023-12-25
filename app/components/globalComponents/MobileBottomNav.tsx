@@ -16,7 +16,7 @@ const MobileBottomNav = () => {
   const router = useRouter();
 
   return (
-    <div className="fixed grid grid-cols-4 shadow-3xl justify-between bottom-0 z-40 bg-white border-slate-100 border-t-2 pt-2 w-full py-1 px-1">
+    <div className="fixed grid grid-cols-4 shadow-3xl justify-between bottom-0 z-30 bg-white border-slate-100 border-t-2 pt-2 w-full py-1 px-1">
       <div>
         <Link
           href="#"
@@ -68,7 +68,7 @@ const MobileBottomNav = () => {
       <div
         className={`${
           openCat ? "translate-y-0" : "translate-y-full"
-        } fixed left-0 bottom-0 w-[100%] h-screen bg-gray-50 p-5 ease-in-out duration-300 transform origin-bottom z-[40]`}
+        } fixed left-0 bottom-0 w-[100%] h-screen bg-gray-50 p-5 ease-in-out duration-300 transform origin-bottom z-20`}
       >
         <div className="flex w-full items-center justify-between">
           <Logo />
