@@ -31,7 +31,18 @@ const ProductCard: FC<ProductCardProps> = ({
     isLiked,
 }) => {
 
-    const { name, price, image, productCategories, slug, stockStatus, variations, terms, reviewCount, averageRating, featured, salePrice, databaseId } = data;
+    const { name, price,
+        type,
+        image,
+        attributes,
+        productCategories,
+        slug, stockStatus,
+        variations,
+        brands,
+        reviewCount,
+        averageRating, featured,
+        salePrice, databaseId } = data;
+
     const [showModalQuickView, setShowModalQuickView] = useState(false);
 
 
@@ -210,24 +221,50 @@ const ProductCard: FC<ProductCardProps> = ({
     const renderGroupButtons = () => {
         return (
             <div className="absolute bottom-4 inset-x-1 flex justify-center opacity-100 visible transition-all">
-                <ButtonPrimary
-                    className="shadow-lg"
-                    fontSize="text-xs"
-                    sizeClass="py-3.5 px-5"
-                    onClick={handleAddToCart}
-                >
-                    <BagIcon className="w-3.5 h-3.5 mb-0.5" />
-                    <span className="ml-1">Add to Cart</span>
-                </ButtonPrimary>
-                {/* <ButtonSecondary
-                   className="ml-1.5 bg-white hover:!bg-gray-100 hover:text-slate-900 transition-colors shadow-lg"
-                   fontSize="text-xs"
-                   sizeClass="py-2 px-4"
-                   onClick={() => handleCloseModalQuickView(true)}
-                >
-                   <ArrowsPointingOutIcon className="w-3.5 h-3.5" />
-                   <span className="ml-1">Quick view</span>
-                </ButtonSecondary> */}
+
+
+                {stockStatus === 'IN_STOCK' ?
+                    <>
+                        {type === 'SIMPLE' &&
+                            <ButtonPrimary
+                                className="shadow-lg"
+                                fontSize="text-xs"
+                                sizeClass="py-3.5 px-5"
+                                onClick={handleAddToCart}
+                            >
+                                <BagIcon className="w-3.5 h-3.5 mb-0.5" />
+                                <span className="ml-1">Add to Cart</span>
+                            </ButtonPrimary>
+                        }
+
+                        {type === 'VARIABLE' &&
+                            <Link href={link}>
+                                <ButtonPrimary
+                                    className="shadow-lg"
+                                    fontSize="text-xs"
+                                    sizeClass="py-3.5 px-5"
+                                >
+                                    <BagIcon className="w-3.5 h-3.5 mb-0.5" />
+                                    <span className="ml-1">Choose {attributes?.nodes[0].label || "Options" }</span>
+                                </ButtonPrimary>
+                            </Link>
+                        }
+                    </> :
+
+                    <Link href={link}>
+                        <ButtonPrimary
+                            className="shadow-lg"
+                            fontSize="text-xs"
+                            sizeClass="py-3.5 px-5"
+                        >
+                            <BagIcon className="w-3.5 h-3.5 mb-0.5" />
+                            <span className="ml-1">Out of Stock</span>
+                        </ButtonPrimary>
+                    </Link>
+                }
+
+
+
             </div>
 
         );
@@ -298,19 +335,22 @@ const ProductCard: FC<ProductCardProps> = ({
                     <div
                         className={`nc-ProductCard__title text-xs lg:text-sm text-black line-clamp-2 min-h-[20px] lg:min-h-[20px] text-slate-800`}
                     >
-                        {terms?.nodes.map((brand: Brand, index) => (
+                        {brands?.nodes.map((brand: Brand, index) => (
                             <Link href={`/${brand?.slug}`} key={index}>{brand?.name}</Link>
                         ))}
+
+                        - {type} - {databaseId}
                     </div>
                 </div>
 
 
                 <div className="flex m-0 mb-2 justify-between items-center">
                     <Prices price={price} salePrice={salePrice} />
-                    {(salePrice === price || salePrice === null || salePrice === '') && (
+                    {((salePrice === price || !salePrice) && reviewCount) && (
                         <div className="flex items-center mb-0.5">
                             <StarIcon className="w-4 h-4 pb-[1px] text-amber-400" />
                             <span className="text-xs text-slate-500 dark:text-slate-400">
+
                                 {averageRating ? (
                                     <>{averageRating.toFixed(1)}</>
                                 ) : (

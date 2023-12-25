@@ -44,7 +44,7 @@ async function getData(slug: string, brand: string) {
             return notFound();
         }
 
-        const productBrand = data.product.terms?.nodes.find((term: Brand) => term.__typename === 'Brand') || {
+        const productBrand = data.product.brands?.nodes[0] || {
             name: 'Product',
             slug: 'product'
         };
@@ -71,8 +71,6 @@ const Page = async ({ params }: any) => {
         product: SimpleProduct | VariableProduct
         brand: Brand
     } = await getData(params.slug, params.brand)
-
-    // console.log({product})
 
     return <div className='mt-24'>
         <main className="container m-auto">

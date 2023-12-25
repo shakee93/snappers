@@ -19,7 +19,7 @@ const ProductGridInstant = ({ products, brand, category }: ProductGridProps) => 
 
     useEffect(() => {
         console.log(hits);
-    }, [])
+    }, [hits])
 
     return (
         <div className="flex-1 grid  sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10">

@@ -1,22 +1,29 @@
+'use client'
 import { MousePointerClick } from "lucide-react";
 import Link from "next/link";
 import {useCart} from "@/context/CartProvider";
-import {SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
+import {ProductVariation, SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
 import NcInputNumber from "@/components/NcInputNumber";
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import toast from "react-hot-toast";
 import {Transition} from "@headlessui/react";
 import Image from "next/image";
 import Prices from "@/app/components/Prices";
 import AddedToCart from "@/app/components/Notifications/added-to-cart";
+import {twMerge} from "tailwind-merge";
 
-const ProductAddToCart = ({product} : {
+
+const ProductAddToCart = ({product, variation} : {
   product: SimpleProduct | VariableProduct
+  variation: ProductVariation
 }) => {
 
   const [quantity, setQuantity] = useState(1)
   const { addToCart } = useCart()
 
+  useEffect(() => {
+    console.log(product);
+  }, [product])
   const notifyAddTocart = (quantity:number) => {
     toast.custom(
         (t : any) => (
@@ -48,6 +55,11 @@ const ProductAddToCart = ({product} : {
   }
 
 
+  if (product.type === 'VARIABLE' && !variation) {
+    return <></>
+  }
+
+
   return (
     <>
       <div className="flex space-x-3.5 py-4">
@@ -57,8 +69,11 @@ const ProductAddToCart = ({product} : {
           </div>
         </div>
         <button
-            onClick={e => addToCart(product.databaseId, quantity)?.then(e => cartCompleted())}
-            className="relative  h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-1 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-primaryColor dark:bg-slate-100 hover:bg-orange-500 text-slate-50 dark:text-slate-800 shadow-xl  flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0">
+            onClick={e => addToCart(product.databaseId, quantity, variation?.databaseId )?.then(e => cartCompleted())}
+            className={twMerge(
+                "relative  h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-1 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-primaryColor dark:bg-slate-100 text-slate-50 dark:text-slate-800 shadow-xl  flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0",
+                (product.stockStatus !== 'IN_STOCK' || variation?.stockStatus !== 'IN_STOCK')  && 'opacity-50 cursor-not-allowed'
+            )}>
           <svg
             className="hidden sm:inline-block w-5 h-5 mb-0.5"
             viewBox="0 0 9 9"
