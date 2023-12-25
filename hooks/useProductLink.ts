@@ -12,7 +12,7 @@ const useProductLink = (product?: Product | null) => {
             return;
         }
 
-        const productBrand = product?.terms?.nodes.find((term: Brand) => term.__typename === 'Brand') || {
+        const productBrand = product?.brands?.nodes[0] ||  {
             name: 'Product',
             slug: 'product'
         };

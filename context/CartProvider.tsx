@@ -25,7 +25,7 @@ type CartSession = {
     error?: ApolloError
     updateCart: (key: string, quantity: number) => void
     removeFromCart: (keys : string[]) => void
-    addToCart: (id : number, quantity?: number) => void | Promise<any>
+    addToCart: (id : number, quantity?: number, variation?: number) => void | Promise<any>
 }
 
 const CartContext = createContext<CartSession>({
@@ -86,12 +86,13 @@ export function CartProvider({ children }: {
 
     }
 
-    const addToCart = async (id: number, quantity?: number) => {
+    const addToCart = async (id: number, quantity?: number, variation?: number) => {
 
        return await _addToCart({
            variables: {
                productId: id,
-               quantity: quantity
+               quantity: quantity,
+               variationId: variation
            },
        })
 
