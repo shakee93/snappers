@@ -145,7 +145,8 @@ export function SessionProvider({ children }: {
 
     const logout = () => {
         localStorage.removeItem("authToken");
-        localStorage.removeItem("sessionToken");
+        // localStorage.removeItem("sessionToken");
+        localStorage.removeItem("refreshToken");
         setSessionToken(null);
     };
 

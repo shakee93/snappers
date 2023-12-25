@@ -116,6 +116,7 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
             if (refreshToken) {
                 (async () => {
                   const token = await getAuthToken();
+                  console.log("TOKEN IS : ", token);
                   operation.setContext((context: any) => ({
                     headers: {
                       ...context.headers,

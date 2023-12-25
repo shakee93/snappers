@@ -10,7 +10,6 @@ import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import { redirect } from "next/navigation";
 
 // export const GET_ACCOUNT_DETAILS = gql`
-
 // query MyQuery2 {
 //   brands {
 //     edges {
@@ -23,10 +22,10 @@ import { redirect } from "next/navigation";
   
 // `;
 
-export const GET_ACCOUNT_DETAILS = gql`
 
-query getAccountDetails($id: ID = "Y3VzdG9tZXI6NQ==") {
-    customer(id: $id) {
+export const GET_ACCOUNT_DETAILS = gql`
+  query getAccountDetails {
+    customer {
       email
       displayName
       billing {
@@ -43,7 +42,7 @@ query getAccountDetails($id: ID = "Y3VzdG9tZXI6NQ==") {
       id
     }
   }
-  `;
+`;
 
 const AccountPage = () => {
     const [customerId, setCustomerId] = useState("");
@@ -85,7 +84,6 @@ const AccountPage = () => {
 
         setCustomerId(id);
         setAuthKey(authToken);
-
 
         const storedData = {
             id: id,
