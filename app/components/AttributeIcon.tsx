@@ -2,7 +2,7 @@ import {MemoryStick, PaintBucket} from "lucide-react";
 import {Maybe} from "@/graphql/types/graphql";
 
 
-const AttributeIcon = ({ name, className} : { name: string | Maybe<string>, className?: string}) => {
+const AttributeIcon = ({ name, className} : { name?: string | Maybe<string>, className?: string}) => {
 
 
     return  <>

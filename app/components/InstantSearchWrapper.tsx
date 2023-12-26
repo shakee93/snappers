@@ -1,15 +1,79 @@
 'use client'
-import {Configure} from "react-instantsearch";
+import {Configure, RefinementList, SortBy, useSortBy} from "react-instantsearch";
 import {InstantSearchNext} from "react-instantsearch-nextjs";
 import TypesenseInstantSearchAdapter from "typesense-instantsearch-adapter";
 import ProductGridInstant from "@/app/components/ProductGridInstant";
 import SearchInput from "@/app/components/SearchInput";
+import TabFilters from "@/app/components/TabFilters";
+import {Brand, ProductCategory} from "@/graphql/types/graphql";
+import {useDeferredValue, useEffect, useState} from "react";
+import {useStore} from "@/store/store";
 
 
+interface InstantSearchWrapperProps {
+    search?: boolean
+    filters?: boolean
+    categories?: ProductCategory[]
+    brands?: Brand[]
+}
 
+function CustomSortBy() {
+    const { sidebar: { sort } } = useStore()
+    
+    const {
+        initialIndex,
+        currentRefinement,
+        options,
+        refine,
+        canRefine,
+    } = useSortBy({
+        items: [
+            { label: 'Featured', value: 'instant_search' },
+            { label: 'Price (asc)', value: 'instant_search_price_asc' },
+            { label: 'Price (desc)', value: 'instant_search_price_desc' },
+        ],
+    });
+    
+    
+    useEffect(() => {
+        console.log(currentRefinement);
+        // refine('name:asc')
+    }, [sort])
+    
 
-const InstantSearchWrapper = () => {
+    return <>{/* Your JSX */}</>;
+}
 
+const InstantSearchWrapper = ({
+                                  search = false,
+                                  filters = false,
+                                  categories,
+                                  brands
+                              }: InstantSearchWrapperProps) => {
+    
+    const { sidebar } = useStore()
+    const [filterQuery, setFilterQuery] = useState("")
+    const [sortQuery, setSortQuery] = useState("")
+    const differedSidebar = useDeferredValue(sidebar)
+
+    
+    useEffect(() => {
+        const f =[
+            `rawPrice:[${sidebar.priceRange[0]}..${sidebar.priceRange[1]}]`,
+            sidebar.categories.length > 0 ? `productCategories.edges.node.databaseId:[${sidebar.categories.join(',')}]` : null,
+            sidebar.brands.length > 0 ? `brands.nodes.databaseId:[${sidebar.brands.join(',')}]` : null,
+            sidebar.on_sale ? 'onSale:true': null
+        ]
+
+        setFilterQuery(f.filter(n => n).join(" && "))
+
+        if (differedSidebar.sort) {
+            setSortQuery(differedSidebar.sort);
+        } else {
+            setSortQuery(null)
+        }
+
+    }, [differedSidebar])
 
     const makeClient: any = () => {
         try {
@@ -29,12 +93,11 @@ const InstantSearchWrapper = () => {
                 },
                 additionalSearchParameters: {
                     query_by: "name, description",
+                    sort_by: sortQuery
                 },
             });
 
-            const searchClient = typesenseInstantSearchAdapter.searchClient
-
-            return searchClient
+            return typesenseInstantSearchAdapter.searchClient
         }
 
         catch (e) {
@@ -50,9 +113,13 @@ const InstantSearchWrapper = () => {
             cleanUrlOnDispose: false
         }
     }} searchClient={makeClient()} indexName='product' >
-        {/*<SearchInput/>*/}
-        <Configure filters={'rawPrice:=[3900..500000] && type:VARIABLE'} hitsPerPage={12}/>
-        <ProductGridInstant/>
+        <div className='flex gap-6 flex-col'>
+            {search && <SearchInput/>}
+            {filters && <TabFilters categories={categories} brands={brands}/>}
+            <Configure  filters={filterQuery} hitsPerPage={12}/>
+            {/*<RefinementList attribute="brands.nodes"/>*/}
+            <ProductGridInstant/>
+        </div>
     </InstantSearchNext>
 }
 
