@@ -1,11 +1,13 @@
 import Image from "next/image";
 import Prices from "@/app/components/Prices";
 import Link from "next/link";
-import React from "react";
-import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
+import React, {Fragment} from "react";
+import {ProductVariation, SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
+import AttributeIcon from "@/app/components/AttributeIcon";
 
-const AddedToCart = ({ quantity, product }: {
+const AddedToCart = ({ quantity, product, variation }: {
     product: SimpleProduct | VariableProduct
+    variation: ProductVariation
     quantity: number
 }) => {
     return <div className="flex">
@@ -27,6 +29,21 @@ const AddedToCart = ({ quantity, product }: {
                         <h3 className="text-base font-medium ">{product.name}</h3>
                         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                             {/* Check if product.productCategories exists */}
+
+                            {product.type === 'VARIABLE' &&
+                                <p className="my-1 text-sm text-slate-500 dark:text-slate-400">
+
+                                    {variation?.attributes?.nodes.map((attr, index) =>
+                                        <Fragment key={index}>
+                                            <div className='flex items-center gap-1'>
+                                                <AttributeIcon name={attr?.name || ''} className='w-4'/> <span key={attr.value}> {product[`allPa${attr.label}`]?.nodes.find(node => node.slug === attr.value)?.name}</span>
+                                            </div>
+                                        </Fragment>
+                                    )}
+
+                                </p>
+                            }
+
                             {product.productCategories && (
                                 product.productCategories.edges ? (
                                     product.productCategories.edges.map((category: any, index: number) => (
@@ -54,7 +71,9 @@ const AddedToCart = ({ quantity, product }: {
 
                         </p>
                     </div>
-                    <Prices salePrice={product.salePrice} price={product.price} className="mt-0.5" />
+                    <Prices salePrice={product.type === 'VARIABLE' ? variation?.regularPrice : product.regularPrice}
+                            price={product.type === 'VARIABLE' ? variation?.price : product.price}
+                            className="mt-0.5 flex-col" />
                 </div>
             </div>
             <div className="flex flex-1 items-end justify-between text-sm">

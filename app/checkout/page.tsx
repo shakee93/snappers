@@ -15,6 +15,8 @@ import PaymentMethod from "./PaymentMethod";
 import ShippingAddress from "./ShippingAddress";
 import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
+import { useQuery } from "@apollo/client";
+import { GET_PAYMENT_GATEWAYS } from "@/graphql/defs/cart";
 
 export interface CartInfo {
     appliedCoupons: null;
@@ -66,8 +68,13 @@ const CheckoutPage = () => {
 
     const { cart, removeFromCart, updateCart } = useCart();
 
-    console.log({ cart })
+    // console.log({ cart })
 
+    const { loading, error, data, refetch } = useQuery(GET_PAYMENT_GATEWAYS);
+
+    // console.log({data})
+
+    const paymentGateways = data?.paymentGateways.nodes;
 
     const [tabActive, setTabActive] = useState<
         "ContactInfo" | "ShippingAddress" | "PaymentMethod"
@@ -234,15 +241,14 @@ const CheckoutPage = () => {
                             />
                         </div>
 
-                        <a
-                            href=""
-                            className="relative z-10 flex items-center mt-3 font-medium text-primary-6000 hover:text-primary-500 text-sm"
+                        <span
+                            className="cursor-pointer relative z-10 flex items-center mt-3 font-medium text-primary-6000 hover:text-primary-500 text-sm"
                             onClick={async () => {
                                 await removeFromCart([key]);
                             }}
                         >
-                            <span>Remove</span>
-                        </a>
+                            Remove
+                        </span> 
                     </div>
                 </div>
             </div>
@@ -288,6 +294,7 @@ const CheckoutPage = () => {
                             handleScrollToEl("PaymentMethod");
                         }}
                         onCloseActive={() => setTabActive("PaymentMethod")}
+                        paymentGateways={paymentGateways}
                     />
                 </div>
             </div>
@@ -397,25 +404,25 @@ const CheckoutPage = () => {
                                     />
                                 </svg>
                                 Learn more{` `}
-                                <a
+                                <Link
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    href="##"
+                                    href="/terms"
                                     className="text-slate-900 dark:text-slate-200 underline font-medium"
                                 >
                                     Taxes
-                                </a>
+                                </Link>
                                 <span>
                                     {` `}and{` `}
                                 </span>
-                                <a
+                                <Link
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    href="##"
+                                    href="/terms"
                                     className="text-slate-900 dark:text-slate-200 underline font-medium"
                                 >
                                     Shipping
-                                </a>
+                                </Link>
                                 {` `} infomation
                             </p>
                         </div>

@@ -17,6 +17,11 @@ export const CartItemContent = gql`
             }
         }
         variation {
+            attributes {
+                label
+                name
+                value
+            }
             node {
                 ...ProductVariationContentSlice
             }

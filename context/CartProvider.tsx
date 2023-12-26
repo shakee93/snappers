@@ -46,6 +46,7 @@ export function CartProvider({ children }: {
 }) {
     const [cart, setCart] = useState<Cart | null>(null)
     const [customer, setCustomer] = useState<Customer | null>(null)
+    const [loading, setLoading] = useState(false)
 
     const refreshData = (data: {
         [key: string] : {
@@ -58,7 +59,7 @@ export function CartProvider({ children }: {
         setCustomer(data?.[key]?.customer || data.customer)
     }
 
-    const { data, loading, error } = useQuery(GET_CART, {
+    const { data,  error } = useQuery(GET_CART, {
         fetchPolicy: 'no-cache',
         onCompleted: refreshData
     })
@@ -77,12 +78,13 @@ export function CartProvider({ children }: {
     });
 
     const removeFromCart = async (keys: string[] = []) => {
+        setLoading(true)
 
         return await _removeFromCart({
             variables: {
                 keys: keys
             }
-        })
+        }).finally(() => setLoading(false))
 
     }
 
@@ -99,6 +101,8 @@ export function CartProvider({ children }: {
     }
 
     const updateCart = async (key: string, quantity: number) => {
+        setLoading(true)
+
         return await _updateCart({
             variables: {
                 items: [{
@@ -106,7 +110,7 @@ export function CartProvider({ children }: {
                     quantity
                 }]
             }
-        })
+        }).finally(() => setLoading(false))
     }
 
     return (

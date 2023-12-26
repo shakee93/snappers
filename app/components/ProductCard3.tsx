@@ -17,6 +17,7 @@ import useProductLink from "@/hooks/useProductLink";
 import { Brand, Product, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import AddedToCart from "@/app/components/Notifications/added-to-cart";
 import { useCart } from "@/context/CartProvider";
+import {ExternalLink, List, MenuSquare, MoreHorizontal, MoreVertical} from "lucide-react";
 
 
 export interface ProductCardProps {
@@ -244,7 +245,6 @@ const ProductCard: FC<ProductCardProps> = ({
                                     fontSize="text-xs"
                                     sizeClass="py-3.5 px-5"
                                 >
-                                    <BagIcon className="w-3.5 h-3.5 mb-0.5" />
                                     <span className="ml-1">Choose {attributes?.nodes[0].label || "Options" }</span>
                                 </ButtonPrimary>
                             </Link>
@@ -253,11 +253,11 @@ const ProductCard: FC<ProductCardProps> = ({
 
                     <Link href={link}>
                         <ButtonPrimary
-                            className="shadow-lg"
+                            className="shadow-lg bg-zinc-500"
                             fontSize="text-xs"
                             sizeClass="py-3.5 px-5"
                         >
-                            <BagIcon className="w-3.5 h-3.5 mb-0.5" />
+                            <ExternalLink className="w-3.5 h-3.5 mb-0.5"  />
                             <span className="ml-1">Out of Stock</span>
                         </ButtonPrimary>
                     </Link>

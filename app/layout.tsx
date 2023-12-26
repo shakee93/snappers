@@ -15,6 +15,7 @@ import Footer from "@/app/components/globalComponents/footer";
 import {SearchProvider} from "@/context/SearchProvider";
 import { getClient } from "@/graphql/apollo-ssr";
 import { gql } from "@apollo/client";
+import {Loader} from "lucide-react";
 // import reportWebVitals from "./reportWebVitals";
 
 // const inter = Inter({ subsets: ['latin'] })
@@ -62,6 +63,7 @@ export default async  function RootLayout({children}: {
                 <>
                     <CartProvider>
                         <Toaster/>
+
                         <Header/>
                         {children}
                         <div className="md:hidden">
