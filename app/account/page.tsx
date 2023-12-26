@@ -8,43 +8,51 @@ import Select from "@/shared/Select/Select";
 import Textarea from "@/shared/Textarea/Textarea";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import { redirect } from "next/navigation";
+import { getClient } from "@/graphql/apollo-ssr";
+
+// export const GET_ACCOUNT_DETAILS = gql`
+// query MyQuery2 {
+//   brands {
+//     edges {
+//       node {
+//         id
+//       }
+//     }
+//   }
+// }
+  
+// `;
+
 
 export const GET_ACCOUNT_DETAILS = gql`
-  query getAccountDetails($id: ID = "Y3VzdG9tZXI6NQ==") {
-    customer(id: $id) {
+  query getAccountDetails{
+  customer {
+    email
+    displayName
+    billing {
+      address1
+      phone
       email
-      displayName
-      billing {
-        address1
-        phone
-        email
-      }
-      metaData(multiple: true) {
-        key
-        value
-        id
-      }
-      username
+    }
+    metaData(multiple: true) {
+      key
+      value
       id
     }
+    username
+    id
   }
+}
 `;
 
-const AccountPage = () => {
+
+const AccountPage =  () => {
     const [customerId, setCustomerId] = useState("");
     const [authKey, setAuthKey] = useState("");
 
     const [UpdateCustomer] = useMutation(UPDATE_ACCOUNT_INFORMATION);
 
-    const { data: accountDetailsData, error: accountDetailsError } = useQuery(GET_ACCOUNT_DETAILS);
-
-    if (accountDetailsError) {
-        console.error("Error fetching account details:", accountDetailsError);
-    }
-
-    // Log the fetched data
-    console.log("Account Details Data:", accountDetailsData);
-
+  
     const [formData, setFormData] = useState({
         id: customerId,
         fullName: "",
@@ -60,7 +68,9 @@ const AccountPage = () => {
 
         const id = localStorage.getItem("id");
         const authToken = localStorage.getItem("authToken");
-
+        console.log("authToken is: ", authToken);
+        console.log("id is: ", id);
+        
         if (!id || !authToken) {
             redirect('/login');
             return;
@@ -68,8 +78,6 @@ const AccountPage = () => {
 
         setCustomerId(id);
         setAuthKey(authToken);
-
-        console.log("customer id: ", id);
 
         const storedData = {
             id: id,

@@ -8,6 +8,7 @@ export const REGISTER_CUSTOMER_MUTATION = gql`
             refreshToken
             customer {
                 email
+                jwtAuthToken
                 firstName
                 metaData {
                     key
@@ -17,6 +18,16 @@ export const REGISTER_CUSTOMER_MUTATION = gql`
             }
         }
     }
+`;
+
+
+
+export const GET_AUTH_TOKEN = gql`
+  mutation RefreshAuthToken($refreshToken: String!) {
+    refreshJwtAuthToken(input: { jwtRefreshToken: $refreshToken }) {
+      authToken
+    }
+  }
 `;
 
 // export const UPDATE_CUSTOMER_MUTATION = gql`
@@ -77,8 +88,10 @@ mutation LoginCustomer($input: LoginInput!) {
     login(input: $input) {
         authToken
         refreshToken
+        sessionToken
         customer {
             email
+            jwtAuthToken
             firstName
             metaData {
                 key

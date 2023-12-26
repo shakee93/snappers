@@ -38,7 +38,7 @@ const CardCategory4: FC<CardCategory4Props> = ({
         <div className="absolute inset-5 sm:inset-8 flex flex-col justify-between">
           <div className="flex justify-between items-center">
             <Image
-              src={featuredImage?.src}
+              src={featuredImage}
               className={`w-20 h-20 rounded-full overflow-hidden z-0 ${color}`}
               alt=""
               width={1000}

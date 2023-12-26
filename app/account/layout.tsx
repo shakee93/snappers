@@ -11,8 +11,8 @@ export interface CommonLayoutProps {
 }
 
 export const GET_ACCOUNT_DETAILS = gql`
-  query getAccountDetails($id: ID = "Y3VzdG9tZXI6NQ==") {
-    customer(id: $id) {
+  query getAccountDetails {
+    customer {
       email
       displayName
       billing {
@@ -34,17 +34,17 @@ export const GET_ACCOUNT_DETAILS = gql`
 
 const CommonLayout: FC<CommonLayoutProps> =  ({ children }) => {
 
-  const getAccountDetails = async () => {
-    const { data, error } = await getClient().query({
-      query: GET_ACCOUNT_DETAILS,
-    });
-    console.log("data: ", data);
-    console.log("error: ", error);
+  // const getAccountDetails = async () => {
+  //   const { data, error } = await getClient().query({
+  //     query: GET_ACCOUNT_DETAILS,
+  //   });
+  //   console.log("data: ", data);
+  //   console.log("error: ", error);
 
-    return
-  }
+  //   return
+  // }
 
-  getAccountDetails();
+  // getAccountDetails();
 
   return (
     <div className="nc-CommonLayoutProps container">
