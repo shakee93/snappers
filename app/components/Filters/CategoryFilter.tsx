@@ -13,7 +13,7 @@ interface CategoryFilterProps {
 }
 
 const CategoryFilter = ({categories}: CategoryFilterProps) => {
-    const { syncCategories } = useStore()
+    const { syncCategories, sidebar: {categories : catState } } = useStore()
     const [categoriesState, setCategoriesState] = useState<number[]>([]);
 
     const handleChangeCategories = (checked: boolean, name: number) => {
@@ -27,6 +27,9 @@ const CategoryFilter = ({categories}: CategoryFilterProps) => {
         checked
             ? setCategoriesState([...categoriesState, name])
             : setCategoriesState(categoriesState.filter((i) => i !== name));
+
+
+        // syncCategories(categoriesState);
     };
 
     const icon =  <svg
@@ -81,7 +84,7 @@ const CategoryFilter = ({categories}: CategoryFilterProps) => {
         <FilterPopover
             title='Categories'
             icon={icon}
-            active={!!categoriesState.length}
+            active={!!catState.length}
             onClear={() =>{
                 setCategoriesState([])
                 syncCategories([])

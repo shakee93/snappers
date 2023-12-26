@@ -13,7 +13,7 @@ interface BrandFilterProps {
 }
 
 const BrandFilter = ({brands}: BrandFilterProps) => {
-    const { syncBrands } = useStore()
+    const { syncBrands, sidebar: { brands: brandStore } } = useStore()
     const [brandsState, setBrandsState] = useState<number[]>([]);
 
     const handleChange = (checked: boolean, name: number) => {
@@ -81,7 +81,7 @@ const BrandFilter = ({brands}: BrandFilterProps) => {
         <FilterPopover
             title='Brands'
             icon={icon}
-            active={!!brandsState.length}
+            active={!!brandStore.length}
             onClear={() =>{
                 setBrandsState([])
                 syncBrands([])

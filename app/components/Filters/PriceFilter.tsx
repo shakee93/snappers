@@ -22,7 +22,7 @@ const BrandFilter = ({}: BrandFilterProps) => {
 
 
     useEffect(() => {
-        // synPriceRange(rangePrices)
+        synPriceRange(rangePrices)
     }, [rangePrices])
 
     const icon =  <svg
@@ -58,7 +58,7 @@ const BrandFilter = ({}: BrandFilterProps) => {
         <FilterPopover
             title={`LKR ${priceRange[0].toLocaleString()} - LKR ${priceRange[1].toLocaleString()}`}
             icon={icon}
-            active={(PRICE_RANGE[0] !== priceRange[0]) || (PRICE_RANGE[1] !== priceRange[1])}
+            active={(PRICE_RANGE[0] !== rangePrices[0]) || (PRICE_RANGE[1] !== rangePrices[1])}
             className='lg:max-w-sm'
             onClear={() =>{
                 setRangePrices(PRICE_RANGE)
@@ -134,27 +134,6 @@ const BrandFilter = ({}: BrandFilterProps) => {
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div className="p-5 bg-neutral-50 dark:bg-neutral-900 dark:border-t dark:border-neutral-800 flex items-center justify-between">
-                        <ButtonThird
-                            onClick={() => {
-                                setRangePrices(PRICE_RANGE);
-                                synPriceRange(PRICE_RANGE)
-                                close();
-                            }}
-                            sizeClass="px-4 py-2 sm:px-5"
-                        >
-                            Clear
-                        </ButtonThird>
-                        <ButtonPrimary
-                            onClick={() => {
-                                synPriceRange(rangePrices)
-                                close()
-                            }}
-                            sizeClass="px-4 py-2 sm:px-5"
-                        >
-                            Apply
-                        </ButtonPrimary>
                     </div>
                 </div>
             )}
