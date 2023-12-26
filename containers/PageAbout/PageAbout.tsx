@@ -1,4 +1,5 @@
-import rightImg from "@/app/public/images/hero-right1.png";
+"use client"
+import rightImg from "public/images/hero-right1.png";
 import React, { FC } from "react";
 import SectionFounder from "./SectionFounder";
 import SectionStatistic from "./SectionStatistic";
@@ -6,7 +7,7 @@ import { Helmet } from "react-helmet-async";
 import BgGlassmorphism from "components/BgGlassmorphism/BgGlassmorphism";
 import BackgroundSection from "components/BackgroundSection/BackgroundSection";
 import SectionHero from "./SectionHero";
-import SectionClientSay from "components/SectionClientSay/SectionClientSay";
+import SectionClientSay from "@/app/components/SectionClientSay/SectionClientSay";
 import SectionPromo3 from "components/SectionPromo3";
 
 export interface PageAboutProps {
@@ -20,7 +21,7 @@ const PageAbout: FC<PageAboutProps> = ({ className = "" }) => {
       data-nc-id="PageAbout"
     >
       <Helmet>
-        <title>About || Ciseco React Template</title>
+        <title>About</title>
       </Helmet>
 
       {/* ======== BG GLASS ======== */}
