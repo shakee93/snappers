@@ -72,10 +72,11 @@ function saveResponseToLocalStorage(response: any, type: AuthType = "registerCus
         refreshToken = response?.data?.registerCustomer?.user?.jwtRefreshToken;
     }
 
-    console.log("authToken before assigning:", authToken);
-    console.log("refreshToken before assigning:", refreshToken);
+console.log("authToken before assigning:", authToken);
+console.log("refreshToken before assigning:", refreshToken);
 
     if (authToken) {
+        localStorage.setItem(process.env.AUTH_TOKEN_SS_KEY || "", authToken);
         localStorage.setItem(process.env.AUTH_TOKEN_SS_KEY || "", authToken);
     }
     if (refreshToken) {
