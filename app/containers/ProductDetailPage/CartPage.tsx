@@ -9,10 +9,12 @@ import {useCart} from "@/context/CartProvider";
 import {CartItem, Product, SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
 import Prices from "@/app/components/Prices";
 import CartItemProduct from "@/app/containers/ProductDetailPage/CartItem";
+import {Loader} from "lucide-react";
+import BackdropSpinner from "@/app/components/BackdropSpinner";
 
 const CartPage = () => {
 
-  const { cart } = useCart()
+  const { cart, loading } = useCart()
   
   const renderStatusSoldout = () => {
     return (
@@ -35,6 +37,7 @@ const CartPage = () => {
   return (
     <div className="nc-CartPage">
       <main className="container py-16 lg:pb-28 lg:pt-20 ">
+
         <div className="mb-12 sm:mb-16">
           <h2 className="block text-2xl sm:text-3xl lg:text-4xl font-semibold ">
             Shopping Cart
@@ -51,13 +54,17 @@ const CartPage = () => {
         <hr className="border-slate-200 dark:border-slate-700 my-10 xl:my-12" />
 
         <div className="flex flex-col lg:flex-row">
-          <div className="w-full lg:w-[60%] xl:w-[55%] divide-y divide-slate-200 dark:divide-slate-700 ">
+          <div className="relative w-full lg:w-[60%] xl:w-[55%] divide-y divide-slate-200 dark:divide-slate-700 lg:pr-10 xl:px-16 2xl:px-20 py-4">
+
+            {loading && <BackdropSpinner/> }
+
             {cart?.contents?.nodes.map( (item, index) =>
                 <CartItemProduct key={index} cartItem={item} index={index}/>
             )}
           </div>
-          <div className="border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-700 my-10 lg:my-0 lg:mx-10 xl:mx-16 2xl:mx-20 flex-shrink-0"></div>
-          <div className="flex-1">
+          <div className="border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-700 my-10 lg:my-0 lg:mr-10 xl:mr-16 2xl:mr-20 flex-shrink-0"></div>
+          <div className="flex-1 relative px-4 py-4" >
+            {loading && <BackdropSpinner/> }
             <div className="sticky top-28">
               <h3 className="text-lg font-semibold ">Order Summary</h3>
               <div className="mt-7 text-sm text-slate-500 dark:text-slate-400 divide-y divide-slate-200/70 dark:divide-slate-700/80">

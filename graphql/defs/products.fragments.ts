@@ -27,6 +27,48 @@ export const ProductContentSlice = gql`
             soldIndividually
         }
         ... on VariableProduct {
+            allPaCapacity {
+                nodes {
+                    name
+                    slug
+                }
+            }
+            allPaColor {
+                nodes {
+                    name
+                    slug
+                }
+            }
+            allPaColour {
+                nodes {
+                    name
+                    slug
+                }
+            }
+            allPaSpecification {
+                nodes {
+                    name
+                    slug
+                }
+            }
+            allPaVariant {
+                nodes {
+                    name
+                    slug
+                }
+            }
+            allPaWarranty {
+                nodes {
+                    name
+                    slug
+                }
+            }
+            allPaWatchSize {
+                nodes {
+                    name
+                    slug
+                }
+            }
             price
             regularPrice
             soldIndividually

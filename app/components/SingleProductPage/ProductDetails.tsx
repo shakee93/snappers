@@ -95,7 +95,7 @@ const ProductDetails = ({
                 <>
                     {product.attributes?.nodes.map((attr : ProductAttribute, index: number) =>
                         <div key={index} className="py-2 text-gray-500">
-                            <div className="text-sm py-2">{attr.label}:</div>
+                            <div className="text-sm py-2">{attr.label}: <span className='font-medium text-gray-700'>{product[`allPa${attr.label}`]?.nodes.find(node => node.slug === activeAttr(attr)?.val)?.name}</span> </div>
 
                             <ul className="flex gap-2 flex-wrap text-sm items-center">
 
@@ -120,20 +120,9 @@ const ProductDetails = ({
             }
 
 
-            {(product.stockStatus !== 'IN_STOCK') &&
-                <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1">
-                    Out of Stock
-                </div>
-            }
 
-            {activeVariation?.stockStatus !== 'IN_STOCK' &&
 
-                <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1">
-                    Out of Stock
-                </div>
-            }
-
-            {activeVariation ? <div>
+            {product.type === 'VARIABLE' && activeVariation ? <div>
                     <div className="flex gap-4 text-base py-2 flex-wrap md:text-lg font-medium text-gray-600">
                 <span>
                 {activeVariation.price}
@@ -147,19 +136,32 @@ const ProductDetails = ({
 
                     </div>
                 </div> :
-                <div className="flex flex-col text-base py-2 flex-wrap md:text-lg font-medium text-gray-600">
+                <div className="flex gap-2 text-base py-2 flex-wrap md:text-lg font-medium text-gray-600">
                 <span>
-                {product.regularPrice}
+                {product.price}
                 </span>
 
                     {(!!product.salePrice && product.salePrice !== product.regularPrice) &&
                         <span className="text-red-400">
-                        <s>{product.salePrice}</s>
+                        <s>{product.regularPrice}</s>
                     </span>
                     }
 
                 </div>
             }
+
+            {(product.stockStatus !== 'IN_STOCK') &&
+                <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1">
+                    Sold Out
+                </div>
+            }
+
+            {product.type === 'VARIABLE' && activeVariation?.stockStatus !== 'IN_STOCK' &&
+                <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1">
+                    Sold Out
+                </div>
+            }
+
             <ProductAddToCart product={product} variation={activeVariation} />
             <div className="flex gap-1 items-center text-sm md:text-base text-gray-500">
                 <div className="text-sm py-2">Category:</div>

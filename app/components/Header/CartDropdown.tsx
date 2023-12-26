@@ -3,26 +3,30 @@ import { Popover, Transition } from "@headlessui/react";
 import Prices from "@/app/components/Prices";
 import { Product, PRODUCTS } from "@/data/data";
 import { ShoppingBag } from "lucide-react";
-import { Fragment } from "react";
+import {Fragment, useEffect} from "react";
 import Link from "next/link";
 import ButtonPrimary from "@/public/shared/Button/ButtonPrimary";
 import ButtonSecondary from "@/public/shared/Button/ButtonSecondary";
 import Image from "next/image";
 import {useCart} from "@/context/CartProvider";
 import {CartItem, SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
+import AttributeIcon from "@/app/components/AttributeIcon";
 
 export default function CartDropdown() {
 
   const {cart, removeFromCart} = useCart();
 
   const renderProduct = (item: CartItem, index: number, close: () => void) => {
-    const { product, quantity, key  } = item;
+    const { product, variation, quantity, key  } = item;
 
-    if (!product?.node) {
+
+      const { name, image, price, slug, salePrice, type, stockQuantity, variations, regularPrice } : SimpleProduct & VariableProduct = product.node;
+
+      // console.log(product, variation);
+
+      if (!product?.node) {
       return null
     }
-
-    const { name, image, price, slug, salePrice, type, stockQuantity } : SimpleProduct | VariableProduct = product.node;
 
     return (
       <div key={index} className="flex py-5 last:pb-0">
@@ -49,16 +53,27 @@ export default function CartDropdown() {
                     {name}
                   </Link>
                 </h3>
-                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                  <span>{`Natural`}</span>
-                  <span className="mx-2 border-l border-slate-200 dark:border-slate-700 h-4"></span>
-                  <span>{"XL"}</span>
-                </p>
+                  {type === 'VARIABLE' &&
+                      <p className="my-1 text-sm text-slate-500 dark:text-slate-400">
+
+                          {variation?.attributes?.map((attr, index) =>
+                              <Fragment key={index}>
+                                  <div className='flex items-center gap-1'>
+                                      <AttributeIcon name={attr?.name || ''} className='w-4'/> <span key={attr.value}> {product.node[`allPa${attr.label}`]?.nodes.find(node => node.slug === attr.value)?.name}</span>
+                                  </div>
+                              </Fragment>
+                          )}
+
+                      </p>
+                  }
+
               </div>
-              <Prices price={price} className="mt-0.5" />
+              <Prices salePrice={type === 'VARIABLE' ? variation?.node.regularPrice : regularPrice}
+                      price={type === 'VARIABLE' ? variation?.node.price : price}
+                      className="mt-0.5 flex-col" />
             </div>
           </div>
-          <div className="flex flex-1 items-end justify-between text-sm">
+          <div className="flex flex-1 items-center justify-between text-sm">
             <p className="text-gray-500 dark:text-slate-400">Qty {quantity}</p>
 
             <div className="flex">
