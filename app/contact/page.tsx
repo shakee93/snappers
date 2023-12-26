@@ -1,7 +1,7 @@
 import React from "react";
 import Link from "next/link";
 import { PinIcon } from "lucide-react";
-import ContactBg from "./contactBg";
+import ContactBg from "./ContactBg";
 
 interface ContactTextAreaProps {
   row: any;

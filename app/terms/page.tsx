@@ -34,7 +34,7 @@ const PageAbout: FC<PageAboutProps> = ({ className = "" }) => {
         /> */}
 
                 <div className="py-8">
-                    <h2 className="text-3xl font-semibold mb-4">Terms and Conditions</h2>
+                    <h2 className="text-3xl !leading-tight font-semibold text-neutral-900 md:text-4xl xl:text-5xl dark:text-neutral-100 pb-10">Terms and Conditions.</h2>
 
                     {/* Welcome section */}
                     <div className="mb-6">
