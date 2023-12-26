@@ -22,13 +22,13 @@ const MobileNavLinks = () => {
     },
     {
       id: 3,
-      href: "/page-collection-2",
+      href: "/about",
       name: "About Us",
     },
 
     {
       id: 4,
-      href: "/page-collection-2",
+      href: "/contact",
       name: "Contact Us",
     },
   ];

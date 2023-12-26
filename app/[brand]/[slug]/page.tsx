@@ -68,11 +68,11 @@ async function getData(slug: string, brand: string) {
 const Page = async ({ params }: any) => {
 
     const { product, brand} : {
-        product: SimpleProduct | VariableProduct
+        product: SimpleProduct & VariableProduct
         brand: Brand
     } = await getData(params.slug, params.brand)
 
-    return <div className='mt-24'>
+    return <div className='mt-16'>
         <main className="container m-auto">
 
             <div className="mt-5 text-xs md:px-5 md:text-base">

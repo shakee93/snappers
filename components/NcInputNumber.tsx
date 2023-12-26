@@ -74,7 +74,7 @@ const NcInputNumber: FC<NcInputNumberProps> = ({
         >
           <MinusIcon className="w-4 h-4" />
         </button>
-        <span className="select-none block flex-1 text-center leading-none">
+        <span className="select-none block flex-1 text-center leading-none px-2">
           {value}
         </span>
         <button
