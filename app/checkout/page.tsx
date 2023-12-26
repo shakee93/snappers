@@ -397,25 +397,25 @@ const CheckoutPage = () => {
                                     />
                                 </svg>
                                 Learn more{` `}
-                                <a
+                                <Link
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    href="##"
+                                    href="/terms"
                                     className="text-slate-900 dark:text-slate-200 underline font-medium"
                                 >
                                     Taxes
-                                </a>
+                                </Link>
                                 <span>
                                     {` `}and{` `}
                                 </span>
-                                <a
+                                <Link
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    href="##"
+                                    href="/terms"
                                     className="text-slate-900 dark:text-slate-200 underline font-medium"
                                 >
                                     Shipping
-                                </a>
+                                </Link>
                                 {` `} infomation
                             </p>
                         </div>
