@@ -20,6 +20,16 @@ export const REGISTER_CUSTOMER_MUTATION = gql`
     }
 `;
 
+
+
+export const GET_AUTH_TOKEN = gql`
+  mutation RefreshAuthToken($refreshToken: String!) {
+    refreshJwtAuthToken(input: { jwtRefreshToken: $refreshToken }) {
+      authToken
+    }
+  }
+`;
+
 // export const UPDATE_CUSTOMER_MUTATION = gql`
 //     mutation UpdateCustomer($input: UpdateCustomerInput!) {
 //         updateCustomer(input: $input) {

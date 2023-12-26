@@ -25,8 +25,8 @@ export function useSession() {
 type AuthType = "registerCustomer" | "login";
 
 function saveResponseToLocalStorage(response: any, type = "registerCustomer") {
-    const authToken = response?.data?.[type]?.authToken;
-    const refreshToken = response?.data?.[type]?.refreshToken;
+    // const authToken = response?.data?.[type]?.authToken;
+    // const refreshToken = response?.data?.[type]?.refreshToken;
     const email = response?.data?.[type]?.customer?.email;
     const displayName = response?.data?.[type]?.customer?.displayName;
     const firstName = response?.data?.[type]?.customer?.firstName;
@@ -36,12 +36,12 @@ function saveResponseToLocalStorage(response: any, type = "registerCustomer") {
     const phone_number = response?.data?.[type]?.customer?.metaData?.[3]?.value;
     const about = response?.data?.[type]?.customer?.metaData?.[4]?.value;
     const id = response?.data?.[type]?.customer?.id;
-    let session = response?.data?.[type]?.sessionToken || response?.data?.[type]?.customer?.jwtAuthToken
+    // let session = response?.data?.[type]?.sessionToken || response?.data?.[type]?.customer?.jwtAuthToken
    
-    localStorage.setItem("sesToken", session || "");
-    localStorage.setItem("authToken", session || "");
+    // localStorage.setItem("sesToken", session || "");
+    // localStorage.setItem("authToken", session || "");
     
-    localStorage.setItem("refreshToken", refreshToken || "");
+    // localStorage.setItem("refreshToken", refreshToken || "");
     localStorage.setItem("email", email || "");
     localStorage.setItem("displayName", displayName || "");
     localStorage.setItem("firstName", firstName || "");
@@ -51,6 +51,27 @@ function saveResponseToLocalStorage(response: any, type = "registerCustomer") {
     localStorage.setItem("phone_number", phone_number || "");
     localStorage.setItem("about", about || "");
     localStorage.setItem("id", id || "");
+
+    let authToken, refreshToken;
+
+    if (type === "login") {
+        authToken = response?.data?.login?.authToken;
+        refreshToken = response?.data?.login?.refreshToken;
+    } else if (type === "register") {
+        // Assuming the structure of response is similar for registration
+        authToken = response?.data?.registerUser?.user?.jwtAuthToken;
+        refreshToken = response?.data?.registerUser?.user?.jwtRefreshToken;
+    }
+
+    if (authToken) {
+        localStorage.setItem(process.env.AUTH_TOKEN_LS_KEY || "", authToken);
+    }
+    if (refreshToken) {
+        localStorage.setItem(process.env.REFRESH_TOKEN_LS_KEY || "", refreshToken);
+    }
+    const checkTotken = localStorage.getItem(process.env.AUTH_TOKEN_LS_KEY|| "");
+    console.log(checkTotken);
+
 
     console.log("Updated Response: ", response);
 }
@@ -115,15 +136,9 @@ export function SessionProvider({ children }: {
                         password,
                     },
                 },
-            });
-
-            const authToken = response?.data?.login?.authToken;
-            const refreshToken = response?.data?.login?.refreshToken;
+            })
 
             saveResponseToLocalStorage(response, "login");
-
-            localStorage.setItem("authToken", authToken ?? "");
-            localStorage.setItem("refreshToken", refreshToken ?? "");
 
             return { data: "logged_in", error: null };
         } catch (error) {
@@ -145,7 +160,7 @@ export function SessionProvider({ children }: {
 
     const logout = () => {
         localStorage.removeItem("authToken");
-        // localStorage.removeItem("sessionToken");
+        localStorage.removeItem("sessionToken");
         localStorage.removeItem("refreshToken");
         setSessionToken(null);
     };
