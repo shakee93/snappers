@@ -24,26 +24,26 @@ import { getClient } from "@/graphql/apollo-ssr";
 // `;
 
 
-export const GET_ACCOUNT_DETAILS = gql`
-  query getAccountDetails{
-  customer {
-    email
-    displayName
-    billing {
-      address1
-      phone
-      email
-    }
-    metaData(multiple: true) {
-      key
-      value
-      id
-    }
-    username
-    id
-  }
-}
-`;
+// export const GET_ACCOUNT_DETAILS = gql`
+//   query getAccountDetails{
+//   customer {
+//     email
+//     displayName
+//     billing {
+//       address1
+//       phone
+//       email
+//     }
+//     metaData(multiple: true) {
+//       key
+//       value
+//       id
+//     }
+//     username
+//     id
+//   }
+// }
+// `;
 
 
 const AccountPage =  () => {
@@ -67,7 +67,7 @@ const AccountPage =  () => {
     useEffect(() => {
 
         const id = localStorage.getItem("id");
-        const authToken = localStorage.getItem("authToken");
+        const authToken = localStorage.getItem(process.env.AUTH_TOKEN_SS_KEY?? "");
         console.log("authToken is: ", authToken);
         console.log("id is: ", id);
         
@@ -114,7 +114,7 @@ const AccountPage =  () => {
         const response = await UpdateCustomer({
             variables: {
                 input: {
-                    id: customerId,
+                    // id: customerId,
                     billing: { address1: address, phone: phoneNumber },
                     email: email,
                     displayName: fullName,

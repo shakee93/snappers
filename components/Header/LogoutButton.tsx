@@ -7,10 +7,9 @@ const LogoutButton = () => {
     let { logout } = useSession();
     const router = useRouter();
     const handleLogout = async () => {
-        console.log("Handle logout");
+        console.log("Logging out");
         logout();
         router.push('/login');
-        console.log("key: ", localStorage.getItem("authToken"));
     };
 
 
