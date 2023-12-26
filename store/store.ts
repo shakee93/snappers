@@ -1,5 +1,5 @@
 import {create} from 'zustand'
-import {ProductAttribute} from "@/graphql/types/graphql";
+import {ProductAttribute, VariationAttribute} from "@/graphql/types/graphql";
 
 type State = {
     sidebar: {
@@ -16,7 +16,7 @@ type Actions = {
     syncCategories: (categories: string[]) => void
     syncBrands: (brands: string[]) => void
     setMounted: () => void
-    setAttribute: (attr: ProductAttribute, option: string) => void
+    setAttribute: (attr: ProductAttribute | VariationAttribute, option: string) => void
 }
 
 export const useStore = create<State & Actions>((set) => ({
@@ -54,17 +54,21 @@ export const useStore = create<State & Actions>((set) => ({
             attribute: state.product.attribute
         }
 
-        const paAttr = product.attribute.find(a => a.attr.name === value.name);
+        const paAttr = product.attribute.find(a => a.name === value.name);
 
         if (paAttr) {
             product.attribute = product.attribute.map(attr => {
-                attr.option = option
+
+                if (attr.name === value.name) {
+                    attr.val = option;
+                }
+
                 return attr
             })
         } else {
             product.attribute.push({
-                attr: value,
-                option: option
+                ...value,
+                val: option
             });
         }
 

@@ -5,11 +5,11 @@ import ProductAddToCart from "./ProductAddToCart";
 import {
     Attribute,
     Brand,
-    Category,
+    Category, GlobalProductAttribute,
     Product,
     ProductAttribute, ProductUnion, ProductVariation,
     SimpleProduct,
-    VariableProduct
+    VariableProduct, VariationAttribute
 } from "@/graphql/types/graphql";
 import {useCallback, useEffect, useMemo, useState} from "react";
 import {useStore} from "@/store/store";
@@ -23,52 +23,65 @@ const ProductDetails = ({
 }) => {
 
     const { product : { attribute }, setAttribute } = useStore()
-    const [activeVariation, setActiveVariation] = useState<any>(product?.variations?.nodes.length > 0 ? product?.variations?.nodes[0] : null)
+    const [activeVariation, setActiveVariation] = useState<any>(!!product?.variations?.nodes?.length ? product?.variations?.nodes[0] : null)
+    const [activeOption, setActiveOption] = useState(
+        !!product?.variations?.nodes?.length ? product?.variations?.nodes[0].attributes?.nodes[0].value : null
+    )
 
 
     useEffect(() => {
 
-        product.attributes?.nodes.map((attr: ProductAttribute) => {
-            setAttribute(attr, attr?.options[0] || '')
-        })
+        if (product.type === 'VARIABLE') {
 
-    }, [])
+            const defAttributes = product?.defaultAttributes?.nodes;
+
+            product?.attributes?.nodes.map((attr: ProductAttribute) => {
+                setAttribute(attr, attr?.options && attr?.options[0] || '')
+            })
+
+            defAttributes?.forEach((defAttr: VariationAttribute) => {
+                setAttribute(defAttr, defAttr.value || '')
+            })
+        }
+
+    }, []);
 
 
     const activeAttr = useCallback((attr: ProductAttribute) => {
-        return attribute.find(a => a.attr.name === attr.name)
+        return attribute.find(a => a.name === attr.name)
     }, [attribute])
 
     useEffect(() => {
 
-        if (product.type !== 'VARIABLE') {
-            return
+
+        if (product.type === 'VARIABLE') {
+
+            let variation = (product as VariableProduct).variations?.nodes as unknown as ProductVariation[];
+
+            let vProduct = variation.find(v => {
+
+                let nodes = v.attributes?.nodes as unknown as VariationAttribute[];
+
+                let attrKey = attribute.map(a => `${a.name}:${a.val}`).join('+');
+                let variationKey = nodes?.map(a => `${a.name}:${a.value}`).join('+')
+
+                return attrKey === variationKey
+            });
+
+
+            if (vProduct) {
+                setActiveVariation(vProduct);
+            } else {
+                setActiveVariation(null)
+            } 
         }
 
-        let variation = product?.variations?.nodes as unknown as ProductVariation[];
-
-        let vProduct = variation.find(v => {
-
-            let node = v.attributes?.nodes;
-            
-            return node?.find(n => attribute.find(attr => attr.option === n.value))
-        });
-
-
-        if (vProduct) {
-            setActiveVariation(vProduct);
-        } else {
-            setActiveVariation(null)
-        }
+        
 
     }, [attribute])
 
     return (
         <>
-            {/*<div className="bg-orange-500 flex w-28 p-1 rounded-3xl text-white items-center justify-center gap-1 text-xs">*/}
-            {/*    Best Seller <MousePointerClick className="text-white" size={14} />*/}
-            {/*</div>*/}
-
             <div className="flex gap-1  text-sm text-gray-500">
                 Brand : <span className="">{brand?.name}</span>
             </div>
@@ -92,7 +105,7 @@ const ProductDetails = ({
                                         className={
                                         twMerge(
                                             "border bg-gray-200/80 cursor-pointer text-black inline-block py-2 px-3.5  text-xs md:text-sm rounded",
-                                            activeAttr(attr)?.option === option && ' border-blue-700 bg-white'
+                                            activeAttr(attr)?.val === option && ' border-blue-700 bg-white'
                                         )
                                     }>
                                         {product[`allPa${attr.label}`]?.nodes.find(node => node.slug === option)?.name || 'Option'}
@@ -102,16 +115,20 @@ const ProductDetails = ({
                             </ul>
                         </div>
                     )}
+
                 </>
             }
 
 
-            {(product.stockStatus === 'IN_STOCK' || activeVariation?.stockStatus === 'IN_STOCK') ?
-                // <div className="w-max px-4 bg-green-300  text-center rounded-full  text-gray-700 text-xs md:text-sm py-1">
-                //   In Stock
-                // </div> :
-                <div></div> :
-                <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-500 text-xs md:text-sm py-1">
+            {(product.stockStatus !== 'IN_STOCK') &&
+                <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1">
+                    Out of Stock
+                </div>
+            }
+
+            {activeVariation?.stockStatus !== 'IN_STOCK' &&
+
+                <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1">
                     Out of Stock
                 </div>
             }

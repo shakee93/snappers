@@ -99,7 +99,12 @@ function Page() {
             }
         }} searchClient={searchClient} indexName='product' >
             <SearchBox/>
-            <Configure filters={'rawPrice:=[3900..500000] && productCategories.edges.node.slug:smart-phones'} hitsPerPage={12}/>
+            <Configure
+            //     filters={
+            //     'rawPrice:=[3900..500000] && productCategories.edges.node.slug:smart-phones'
+            // }
+
+                hitsPerPage={12}/>
             <SearchResults/>
         </InstantSearchNext>
     </div>

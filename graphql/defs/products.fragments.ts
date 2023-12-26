@@ -167,6 +167,20 @@ export const ProductContentFull = gql`
             stockStatus
             stockQuantity
             soldIndividually
+            defaultAttributes {
+                nodes {
+                    name
+                    label
+                    value
+                }
+            }
+            globalAttributes {
+                nodes {
+                    slug
+                    name
+                    label
+                }
+            } 
             productCategories {
                 edges {
                     node {

@@ -54,6 +54,18 @@ const ProductAddToCart = ({product, variation} : {
     setQuantity(1)
   }
 
+  const addItemToCart = () => {
+
+    if (product.type === 'VARIABLE' && variation && variation.stockStatus !== 'IN_STOCK') {
+      return;
+    }
+
+    if (product.type === 'SIMPLE' && product.stockStatus !== 'IN_STOCK') {
+      return;
+    }
+
+    addToCart(product.databaseId, quantity, variation?.databaseId )?.then(e => cartCompleted());
+  }
 
   if (product.type === 'VARIABLE' && !variation) {
     return <></>
@@ -69,7 +81,7 @@ const ProductAddToCart = ({product, variation} : {
           </div>
         </div>
         <button
-            onClick={e => addToCart(product.databaseId, quantity, variation?.databaseId )?.then(e => cartCompleted())}
+            onClick={e => addItemToCart() }
             className={twMerge(
                 "relative  h-auto inline-flex items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-1 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-primaryColor dark:bg-slate-100 text-slate-50 dark:text-slate-800 shadow-xl  flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0",
                 (product.stockStatus !== 'IN_STOCK' || variation?.stockStatus !== 'IN_STOCK')  && 'opacity-50 cursor-not-allowed'
