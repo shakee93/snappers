@@ -63,7 +63,7 @@ const FilterPopover = ({children, icon, title, active, onClear, className}: Filt
                         leaveTo="opacity-0 translate-y-1"
                     >
                         <Popover.Panel className={twMerge(
-                            "absolute z-40 w-screen max-w-sm px-4 mt-3 left-0 sm:px-0 lg:max-w-2xl",
+                            "absolute z-40 w-screen max-w-sm px-4 mt-3 sm:px-0 lg:max-w-2xl",
                             className
                         )}>
                             {children({open, close})}

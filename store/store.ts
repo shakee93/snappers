@@ -6,7 +6,9 @@ type State = {
         mounted: number
         categories: number[],
         brands: number[]
-        priceRange: number[]
+        priceRange: number[],
+        on_sale: boolean,
+        sort: string
     }
     product: {
         attribute: any[]
@@ -15,6 +17,8 @@ type State = {
 
 type Actions = {
     syncCategories: (categories: number[]) => void
+    syncOnSale: (onSale:boolean) => void
+    setSort: (sort:string) => void
     syncBrands: (brands: number[]) => void
     synPriceRange: (brands: number[]) => void
     setMounted: () => void
@@ -26,11 +30,27 @@ export const useStore = create<State & Actions>((set) => ({
         categories: [],
         brands: [],
         mounted: 0,
-        priceRange: [500, 500000]
+        priceRange: [500, 500000],
+        on_sale: false,
+        sort: ""
     },
     product: {
         attribute: []
     },
+    setSort: (sort: string) => set((state) => ({
+        ...state,
+        sidebar: {
+            ...state.sidebar,
+            sort
+        },
+    })),
+    syncOnSale: (on_sale: boolean) => set((state) => ({
+        ...state,
+        sidebar: {
+            ...state.sidebar,
+            on_sale: on_sale
+        },
+    })),
     syncCategories: (categories: number[]) => set((state) => ({
         ...state,
         sidebar: {
