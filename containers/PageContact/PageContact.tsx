@@ -1,3 +1,4 @@
+"use client"
 import React, { FC } from "react";
 import { Helmet } from "react-helmet-async";
 import SocialsList from "shared/SocialsList/SocialsList";

@@ -6,7 +6,6 @@ import {useQuery} from "@apollo/client";
 import {GET_BRANDS} from "@/graphql/defs/products";
 import {getClient} from "@/graphql/apollo-ssr";
 import {Brand} from "@/graphql/types/graphql";
-import CategryDropdown from "./CategoryDropdown"
 
 const getData = async () => {
   const { data } = await getClient().query({

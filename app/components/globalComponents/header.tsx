@@ -53,7 +53,7 @@ const Header = () => {
             <div className="flex pl-5 flex-1 justify-center items-center">
               <SearchBar/>
             </div>
-            <div className="w-fit flex items-center justify-end">
+            <div className="w-fit flex items-center justify-end pr-3">
               <div className="hidden lg:block">
                 <NavLinks />
               </div>

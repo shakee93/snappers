@@ -5,6 +5,8 @@ import Prices from "@/app/components/Prices";
 import NcInputNumber from "@/components/NcInputNumber";
 import { useCart } from "@/context/CartProvider";
 import useProductLink from "@/hooks/useProductLink";
+import {Fragment} from "react";
+import AttributeIcon from "@/app/components/AttributeIcon";
 
 
 const CartItemProduct = ({
@@ -15,17 +17,17 @@ const CartItemProduct = ({
     index: number
 }) => {
 
-    const { product, quantity, key } = cartItem;
+    const { product, quantity, variation, key } = cartItem;
+
     const { removeFromCart, updateCart } = useCart()
     const link = useProductLink(product?.node)
 
     if (!product?.node) {
-        return null
+        return <></>;
     }
 
 
-    const { name, image, price, slug, salePrice, type, stockQuantity }: SimpleProduct | VariableProduct = product.node as Product;
-
+    const { name, image, price, slug, salePrice, type, stockQuantity, regularPrice }: SimpleProduct | VariableProduct = product.node as Product;
 
     return (
         <div
@@ -50,86 +52,20 @@ const CartItemProduct = ({
 
                             {type === 'VARIABLE' &&
                                 <div className="mt-1.5 sm:mt-2.5 flex text-sm text-slate-600 dark:text-slate-300">
-                                    <div className="flex items-center space-x-1.5">
-                                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-                                            <path
-                                                d="M7.01 18.0001L3 13.9901C1.66 12.6501 1.66 11.32 3 9.98004L9.68 3.30005L17.03 10.6501C17.4 11.0201 17.4 11.6201 17.03 11.9901L11.01 18.0101C9.69 19.3301 8.35 19.3301 7.01 18.0001Z"
-                                                stroke="currentColor"
-                                                strokeWidth="1.5"
-                                                strokeMiterlimit="10"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                            />
-                                            <path
-                                                d="M8.35 1.94995L9.69 3.28992"
-                                                stroke="currentColor"
-                                                strokeWidth="1.5"
-                                                strokeMiterlimit="10"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                            />
-                                            <path
-                                                d="M2.07 11.92L17.19 11.26"
-                                                stroke="currentColor"
-                                                strokeWidth="1.5"
-                                                strokeMiterlimit="10"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                            />
-                                            <path
-                                                d="M3 22H16"
-                                                stroke="currentColor"
-                                                strokeWidth="1.5"
-                                                strokeMiterlimit="10"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                            />
-                                            <path
-                                                d="M18.85 15C18.85 15 17 17.01 17 18.24C17 19.26 17.83 20.09 18.85 20.09C19.87 20.09 20.7 19.26 20.7 18.24C20.7 17.01 18.85 15 18.85 15Z"
-                                                stroke="currentColor"
-                                                strokeWidth="1.5"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                            />
-                                        </svg>
+                                    {type === 'VARIABLE' &&
+                                        <p className="my-1 text-sm text-slate-500 dark:text-slate-400">
 
-                                        <span>{`Black`}</span>
-                                    </div>
-                                    <span className="mx-4 border-l border-slate-200 dark:border-slate-700 "></span>
-                                    <div className="flex items-center space-x-1.5">
-                                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none">
-                                            <path
-                                                d="M21 9V3H15"
-                                                stroke="currentColor"
-                                                strokeWidth="1.5"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                            />
-                                            <path
-                                                d="M3 15V21H9"
-                                                stroke="currentColor"
-                                                strokeWidth="1.5"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                            />
-                                            <path
-                                                d="M21 3L13.5 10.5"
-                                                stroke="currentColor"
-                                                strokeWidth="1.5"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                            />
-                                            <path
-                                                d="M10.5 13.5L3 21"
-                                                stroke="currentColor"
-                                                strokeWidth="1.5"
-                                                strokeLinecap="round"
-                                                strokeLinejoin="round"
-                                            />
-                                        </svg>
+                                            {variation?.attributes?.map((attr, index) =>
+                                                <Fragment key={index}>
+                                                    <div className='flex items-center gap-1'>
+                                                        <AttributeIcon name={attr?.name || ''} className='w-4'/> <span key={attr.value}> {product.node[`allPa${attr.label}`]?.nodes.find(node => node.slug === attr.value)?.name}</span>
+                                                    </div>
+                                                </Fragment>
+                                            )}
 
-                                        <span>{`2XL`}</span>
-                                    </div>
+                                        </p>
+                                    }
+
                                 </div>
 
                             }
@@ -163,7 +99,9 @@ const CartItemProduct = ({
                         </div>
 
                         <div className="hidden flex-1 sm:flex justify-end">
-                            <Prices salePrice={salePrice} price={price} className="mt-0.5" />
+                            <Prices salePrice={type === 'VARIABLE' ? variation?.node.regularPrice : regularPrice}
+                                    price={type === 'VARIABLE' ? variation?.node.price : price}
+                                    className="mt-0.5 flex-col" />
                         </div>
                     </div>
                 </div>
@@ -179,7 +117,8 @@ const CartItemProduct = ({
                     <button
                         onClick={e => removeFromCart([
                             key
-                        ])}
+                        ])
+                    }
                         className="relative z-10 flex items-center mt-3 font-medium text-primary-6000 hover:text-primary-500 text-sm "
                     >
                         <span>Remove</span>
