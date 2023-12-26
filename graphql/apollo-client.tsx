@@ -141,7 +141,7 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
 
 
     const authLink = new ApolloLink((operation, forward) => {
-      const sessionToken = localStorage.getItem("sessionToken");
+      const sessionToken = localStorage.getItem(process.env.SESSION_TOKEN_LS_KEY || "");
       const refreshToken = localStorage.getItem(process.env.REFRESH_TOKEN_LS_KEY || "");
       const authToken = localStorage.getItem(process.env.AUTH_TOKEN_SS_KEY || "");
 
