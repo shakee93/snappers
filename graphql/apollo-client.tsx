@@ -14,35 +14,13 @@ import {
   SSRMultipartLink,
 } from "@apollo/experimental-nextjs-app-support/ssr";
 import { GraphQLClient } from 'graphql-request';
-import { GraphQLClient } from 'graphql-request';
 
 import { gql } from "@apollo/client";
 import { GET_AUTH_TOKEN } from "./defs/auth";
 import { getClient } from "./apollo-ssr";
 
-import { getClient } from "./apollo-ssr";
 
 
-
-export default function ApolloWrapper({ children }: React.PropsWithChildren) {
-  function makeClient() {
-    const middleware = new ApolloLink((operation, forward) => {
-      return forward(operation).map((response) => {
-        return response;
-      });
-    });
-
-    // // getting token
-    // const [refresh] = await getClient().request({
-    //   mutation: GET_AUTH_TOKEN,
-    // });
-
-    function hasCredentials() {
-      const authToken = localStorage.getItem(process.env.AUTH_TOKEN_SS_KEY ?? "");
-      const refreshToken = localStorage.getItem(process.env.REFRESH_TOKEN_LS_KEY ?? "");
-
-      console.log("has Creds authToken:", authToken);
-      console.log("has Creds refreshToken:", refreshToken);
 export default function ApolloWrapper({ children }: React.PropsWithChildren) {
   function makeClient() {
     const middleware = new ApolloLink((operation, forward) => {
@@ -66,18 +44,11 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
       if (!!authToken && !!refreshToken) {
         return true;
       }
-      if (!!authToken && !!refreshToken) {
-        return true;
-      }
 
-          return false;
-        }
-    
+      return false;
+    }
     
 
-    async function refreshAuthToken(refreshToken: string) {
-      console.log("Refreshing auth token...");
-      try {
     async function refreshAuthToken(refreshToken: string) {
       console.log("Refreshing auth token...");
       try {
@@ -92,34 +63,20 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
         //   },
         // });
         console.log("Refreshed auth token results:", results);
-        console.log("Refreshing auth token...");
-        const graphQLClient = new GraphQLClient(process.env.NEXT_PUBLIC_WP_GRAPHQL|| "");
 
-        const results = await graphQLClient.request(GET_AUTH_TOKEN, { refreshToken }) as Results;
-        // const results: any = await refresh({
-        //   variables: {
-        //     refreshToken,
-        //   },
-        // });
-        console.log("Refreshed auth token results:", results);
+        const authToken = results?.refreshJwtAuthToken?.authToken;
 
-            const authToken = results?.refreshJwtAuthToken?.refreshJwtAuthToken?.authToken;
-
-        console.log("refreshed authTOken");
-        
-    
         console.log("refreshed authTOken");
         
         if (!authToken) {
-              throw new Error("Failed to retrieve a new auth token");
-            }
-            return authToken;
-          } catch (err) {
-            console.error("Error refreshing auth token:", err);
-            throw err;
-          }
+          throw new Error("Failed to retrieve a new auth token");
         }
-    let tokenSetter: any;
+        return authToken;
+      } catch (err) {
+        console.error("Error refreshing auth token:", err);
+        throw err;
+      }
+    }
     let tokenSetter: any;
 
     async function fetchAuthToken() {
