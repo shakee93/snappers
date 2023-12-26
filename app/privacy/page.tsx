@@ -1,4 +1,5 @@
 import React, { FC } from "react";
+import Link from "next/link";
 
 export interface PagePrivacyProps {
   className?: string;
@@ -12,17 +13,22 @@ const PagePrivacy: FC<PagePrivacyProps> = ({ className = "" }) => {
     >
       <title>Privacy Policy </title>
 
-      <div className="container py-16 lg:py-28 space-y-16 lg:space-y-28">
+      <div className="container py-10 lg:py-10 space-y-16 lg:space-y-28">
         <div className="py-8">
-          <h2 className="text-3xl !leading-tight font-semibold text-neutral-900 md:text-4xl xl:text-5xl dark:text-neutral-100 pb-10">Privacy Policy</h2>
+          <h2 className="text-3xl !leading-tight font-semibold text-neutral-900 md:text-4xl xl:text-5xl dark:text-neutral-100 pb-10">
+            Privacy Policy
+          </h2>
 
           {/* Welcome section */}
           <div className="mb-6">
             <p className="mb-4 leading-8">
-              At GQ Mobiles, accessible from https://gqmobiles.lk, one of our
-              main priorities is the privacy of our visitors. This Privacy
-              Policy document contains types of information that is collected
-              and recorded by GQ Mobiles and how we use it.
+              At GQ Mobiles, accessible from{" "}
+              <Link href={" https://gqmobiles.lk"}>
+                https://gqmobiles.lk,
+              </Link>{" "}
+              one of our main priorities is the privacy of our visitors. This
+              Privacy Policy document contains types of information that is
+              collected and recorded by GQ Mobiles and how we use it.
             </p>
             <p className="mb-4 leading-8">
               If you have additional questions or require more information about
@@ -144,7 +150,7 @@ const PagePrivacy: FC<PagePrivacyProps> = ({ className = "" }) => {
                 sites on the internet. However, visitors may choose to decline
                 the use of DART cookies by visiting the Google ad and content
                 network Privacy Policy at the following URL –
-                https://policies.google.com/technologies/ads
+                <Link href={"https://policies.google.com/technologies/ads"}> https://policies.google.com/technologies/ads</Link>
               </p>
             </div>
 
@@ -162,7 +168,7 @@ const PagePrivacy: FC<PagePrivacyProps> = ({ className = "" }) => {
                 their Privacy Policies below.
               </p>
               <ul className="list-disc pl-5 mb-4 leading-8">
-                <li>Google https://policies.google.com/technologies/ads</li>
+                <li>Google  <Link href={"https://policies.google.com/technologies/ads"}> https://policies.google.com/technologies/ads</Link></li>
               </ul>
             </div>
 
@@ -312,8 +318,6 @@ const PagePrivacy: FC<PagePrivacyProps> = ({ className = "" }) => {
                 records.
               </p>
             </div>
-
-
           </div>
         </div>
       </div>
