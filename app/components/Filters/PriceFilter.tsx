@@ -12,7 +12,7 @@ import Slider from "rc-slider";
 interface BrandFilterProps {
 }
 
-const PRICE_RANGE = [500, 500000];
+export const PRICE_RANGE = [500, 500000];
 
 
 const BrandFilter = ({}: BrandFilterProps) => {

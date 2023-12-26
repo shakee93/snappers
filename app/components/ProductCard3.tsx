@@ -40,6 +40,7 @@ const ProductCard: FC<ProductCardProps> = ({
         productCategories,
         slug, stockStatus,
         variations,
+        regularPrice,
         brands,
         reviewCount,
         averageRating, featured,
@@ -347,8 +348,8 @@ const ProductCard: FC<ProductCardProps> = ({
 
 
                 <div className="flex m-0 mb-2 justify-between items-center">
-                    <Prices price={price} salePrice={salePrice} />
-                    {((salePrice === price || !salePrice) && reviewCount) && (
+                    <Prices price={price} salePrice={regularPrice} />
+                    {((salePrice === price || !salePrice) && !!reviewCount) && (
                         <div className="flex items-center mb-0.5">
                             <StarIcon className="w-4 h-4 pb-[1px] text-amber-400" />
                             <span className="text-xs text-slate-500 dark:text-slate-400">

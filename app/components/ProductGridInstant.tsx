@@ -13,8 +13,6 @@ interface ProductGridProps {
     category?: Category
 }
 const ProductGridInstant = ({ products, brand, category }: ProductGridProps) => {
-    const { sidebar: { categories, brands , mounted} } = useStore();
-
     const { hits } = useHits()
 
     useEffect(() => {

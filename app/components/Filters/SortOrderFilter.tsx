@@ -10,15 +10,16 @@ import FilterPopover from "@/app/components/Filters/FilterPopover";
 import Radio from "@/shared/Radio/Radio";
 
 const DATA_sortOrderRadios = [
-    { name: "Most Popular", id: "most-popular" },
-    { name: "Best Rating", id: "best-rating" },
-    { name: "Newest", id: "newest" },
-    { name: "Price Low - High", id: "price-low-high" },
-    { name: "Price High - Low", id: "price-high-low" },
+    { name: "Name", id: "name:asc" },
+    { name: "Most Popular", id: "totalSales(missing_values: last):desc" },
+    { name: "Best Rating", id: "reviewCount(missing_values: last):desc" },
+    { name: "Newest", id: "databaseId:desc" },
+    { name: "Price Low - High", id: "rawPriceNumber(missing_values: last):asc" },
+    { name: "Price High - Low", id: "rawPriceNumber(missing_values: last):desc" },
 ];
 
 const CategoryFilter = () => {
-    const { setSort, sidebar: {categories : catState } } = useStore()
+    const { setSort, sidebar: {sort } } = useStore()
     const [sortOrderStates, setSortOrderStates] = useState<string>("");
 
 
@@ -77,7 +78,7 @@ const CategoryFilter = () => {
                 )[0].name
                 : "Sort order"}
             icon={icon}
-            active={!!catState.length}
+            active={!!sort}
             onClear={() =>{
                 setSortOrderStates("")
                 setSort("")

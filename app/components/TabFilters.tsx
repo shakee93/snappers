@@ -597,7 +597,7 @@ const TabFilters = ({
       </div>
 
       <div>
-        {JSON.stringify(sidebar)}
+        {/*{JSON.stringify(sidebar)}*/}
       </div>
 
       {/* FOR RESPONSIVE MOBILE */}

@@ -46,7 +46,7 @@ const FilterPopover = ({children, icon, title, active, onClear, className}: Filt
                         {!active ? (
                             <ChevronDownIcon className="w-4 h-4 ml-3" />
                         ) : (
-                            <span onClick={(e) => {e.preventDefault(); onClear()}}>
+                            <span onClick={(e) => {e.preventDefault(); close(); onClear()}}>
                   <div className="flex-shrink-0 w-4 h-4 rounded-full bg-primary-500 text-white flex items-center justify-center ml-3 cursor-pointer">
                       <XIcon className='p-0.5'/>
                   </div>
