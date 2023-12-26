@@ -18,6 +18,7 @@ import { Brand, Product, SimpleProduct, VariableProduct } from "@/graphql/types/
 import AddedToCart from "@/app/components/Notifications/added-to-cart";
 import { useCart } from "@/context/CartProvider";
 import {ExternalLink, List, MenuSquare, MoreHorizontal, MoreVertical} from "lucide-react";
+import AttributeIcon from "@/app/components/AttributeIcon";
 
 
 export interface ProductCardProps {
@@ -245,6 +246,7 @@ const ProductCard: FC<ProductCardProps> = ({
                                     fontSize="text-xs"
                                     sizeClass="py-3.5 px-5"
                                 >
+                                    <AttributeIcon className='w-4 mr-1' name={attributes?.nodes[0].name}/>
                                     <span className="ml-1">Choose {attributes?.nodes[0].label || "Options" }</span>
                                 </ButtonPrimary>
                             </Link>

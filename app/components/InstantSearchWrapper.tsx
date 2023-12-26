@@ -4,11 +4,23 @@ import {InstantSearchNext} from "react-instantsearch-nextjs";
 import TypesenseInstantSearchAdapter from "typesense-instantsearch-adapter";
 import ProductGridInstant from "@/app/components/ProductGridInstant";
 import SearchInput from "@/app/components/SearchInput";
+import TabFilters from "@/app/components/TabFilters";
+import {Brand, ProductCategory} from "@/graphql/types/graphql";
 
 
+interface InstantSearchWrapperProps {
+    search?: boolean
+    filters?: boolean
+    categories?: ProductCategory[]
+    brands?: Brand[]
+}
 
-
-const InstantSearchWrapper = () => {
+const InstantSearchWrapper = ({
+    search = false,
+                                  filters = false,
+    categories,
+    brands
+                              }: InstantSearchWrapperProps) => {
 
 
     const makeClient: any = () => {
@@ -50,9 +62,12 @@ const InstantSearchWrapper = () => {
             cleanUrlOnDispose: false
         }
     }} searchClient={makeClient()} indexName='product' >
-        {/*<SearchInput/>*/}
-        <Configure filters={'rawPrice:=[3900..500000] && type:VARIABLE'} hitsPerPage={12}/>
-        <ProductGridInstant/>
+        <div className='flex gap-6 flex-col'>
+            {search && <SearchInput/>}
+            {filters && <TabFilters categories={categories} brands={brands}/>}
+            <Configure filters={'rawPrice:=[3900..500000] && type:VARIABLE'} hitsPerPage={12}/>
+            <ProductGridInstant/>
+        </div>
     </InstantSearchNext>
 }
 

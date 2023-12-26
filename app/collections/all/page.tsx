@@ -19,7 +19,6 @@ export async function getData(categories: number[] | null = null) {
 }
 
 
-
 const Page = async () => {
   const { productCategories, brands } = await getData();
 
