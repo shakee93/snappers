@@ -57,21 +57,22 @@ function saveResponseToLocalStorage(response: any, type = "registerCustomer") {
     if (type === "login") {
         authToken = response?.data?.login?.authToken;
         refreshToken = response?.data?.login?.refreshToken;
+
     } else if (type === "register") {
         // Assuming the structure of response is similar for registration
         authToken = response?.data?.registerUser?.user?.jwtAuthToken;
         refreshToken = response?.data?.registerUser?.user?.jwtRefreshToken;
     }
 
+console.log("authToken before assigning:", authToken);
+console.log("refreshToken before assigning:", refreshToken);
+
     if (authToken) {
-        localStorage.setItem(process.env.AUTH_TOKEN_LS_KEY || "", authToken);
+        localStorage.setItem(process.env.AUTH_TOKEN_SS_KEY || "", authToken);
     }
     if (refreshToken) {
         localStorage.setItem(process.env.REFRESH_TOKEN_LS_KEY || "", refreshToken);
     }
-    const checkTotken = localStorage.getItem(process.env.AUTH_TOKEN_LS_KEY|| "");
-    console.log(checkTotken);
-
 
     console.log("Updated Response: ", response);
 }
@@ -161,7 +162,10 @@ export function SessionProvider({ children }: {
     const logout = () => {
         localStorage.removeItem("authToken");
         localStorage.removeItem("sessionToken");
-        localStorage.removeItem("refreshToken");
+        // localStorage.removeItem("refreshToken");
+        localStorage.removeItem(process.env.AUTH_TOKEN_SS_KEY || "");
+        localStorage.removeItem(process.env.REFRESH_TOKEN_LS_KEY || "");
+
         setSessionToken(null);
     };
 
