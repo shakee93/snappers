@@ -6,6 +6,7 @@ export const REGISTER_CUSTOMER_MUTATION = gql`
         registerCustomer(input: $input) {
             authToken
             refreshToken
+            sessionToken
             customer {
                 email
                 jwtAuthToken
