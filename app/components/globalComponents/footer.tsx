@@ -40,19 +40,19 @@ const Footer = async () => {
                 <Link href={"/"}>Home</Link>
               </li>
               <li className="hover:text-primaryColor">
-                <Link href={"/"}>About us</Link>
+                <Link href={"/about"}>About us</Link>
               </li>
               <li className="hover:text-primaryColor">
-                <Link href={"/"}>Stores</Link>
+                <Link href={"/collections/all"}>Shop</Link>
               </li>
               <li className="hover:text-primaryColor">
-                <Link href={"/"}>Contact Us</Link>
+                <Link href={"/contact"}>Contact Us</Link>
               </li>
               <li className="hover:text-primaryColor">
-                <Link href={"/"}>Privacy Policy</Link>
+                <Link href={"/privacy"}>Privacy Policy</Link>
               </li>
               <li className="hover:text-primaryColor">
-                <Link href={"/"}>Terms & Conditions</Link>
+                <Link href={"/terms"}>Terms & Conditions</Link>
               </li>
             </ul>
           </div>

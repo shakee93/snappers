@@ -102,6 +102,7 @@ export const ProductContentFull = gql`
         type
         description
         shortDescription(format: RAW)
+        reviewCount
         image {
             id
             sourceUrl
@@ -227,6 +228,7 @@ export const ProductContentFull = gql`
                 edges {
                     node {
                         id
+                        databaseId
                         name
                         slug
                     }

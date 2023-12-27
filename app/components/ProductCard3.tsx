@@ -18,6 +18,7 @@ import { Brand, Product, SimpleProduct, VariableProduct } from "@/graphql/types/
 import AddedToCart from "@/app/components/Notifications/added-to-cart";
 import { useCart } from "@/context/CartProvider";
 import {ExternalLink, List, MenuSquare, MoreHorizontal, MoreVertical} from "lucide-react";
+import AttributeIcon from "@/app/components/AttributeIcon";
 
 
 export interface ProductCardProps {
@@ -39,6 +40,7 @@ const ProductCard: FC<ProductCardProps> = ({
         productCategories,
         slug, stockStatus,
         variations,
+        regularPrice,
         brands,
         reviewCount,
         averageRating, featured,
@@ -245,6 +247,7 @@ const ProductCard: FC<ProductCardProps> = ({
                                     fontSize="text-xs"
                                     sizeClass="py-3.5 px-5"
                                 >
+                                    <AttributeIcon className='w-4 mr-1' name={attributes?.nodes[0].name}/>
                                     <span className="ml-1">Choose {attributes?.nodes[0].label || "Options" }</span>
                                 </ButtonPrimary>
                             </Link>
@@ -345,8 +348,8 @@ const ProductCard: FC<ProductCardProps> = ({
 
 
                 <div className="flex m-0 mb-2 justify-between items-center">
-                    <Prices price={price} salePrice={salePrice} />
-                    {((salePrice === price || !salePrice) && reviewCount) && (
+                    <Prices price={price} salePrice={regularPrice} />
+                    {((salePrice === price || !salePrice) && !!reviewCount) && (
                         <div className="flex items-center mb-0.5">
                             <StarIcon className="w-4 h-4 pb-[1px] text-amber-400" />
                             <span className="text-xs text-slate-500 dark:text-slate-400">

@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, {FC, useEffect, useState} from "react";
 
 export interface CheckboxProps {
   label?: string;
@@ -9,6 +9,7 @@ export interface CheckboxProps {
   name: string;
   defaultChecked?: boolean;
   onChange?: (checked: boolean) => void;
+  setDefault?: () => void
 }
 
 const Checkbox: FC<CheckboxProps> = ({
@@ -21,6 +22,12 @@ const Checkbox: FC<CheckboxProps> = ({
   defaultChecked,
   onChange,
 }) => {
+  const [defaultStatus, setDefault] = useState(defaultChecked)
+
+  useEffect(() => {
+    setDefault(defaultChecked)
+  }, [defaultChecked])
+
   return (
     <div className={`flex text-sm sm:text-base ${className}`}>
       <input
@@ -28,7 +35,7 @@ const Checkbox: FC<CheckboxProps> = ({
         name={name}
         type="checkbox"
         className={`focus:ring-action-primary text-primary-500 rounded border-slate-400 hover:border-slate-700 bg-transparent dark:border-slate-700 dark:hover:border-slate-500 dark:checked:bg-primary-500 focus:ring-primary-500 ${sizeClassName}`}
-        defaultChecked={defaultChecked}
+        checked={defaultChecked}
         onChange={(e) => onChange && onChange(e.target.checked)}
       />
       {label && (

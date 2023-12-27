@@ -15,7 +15,7 @@ const Prices: FC<PricesProps> = ({
     contentClass = " text-base font-medium",
 }) => {
     return (
-        <div className={`flex gap-2 items-center ${className}`}>
+        <div className={`flex gap-3 items-center ${className}`}>
             <div
                 className={`flex items-center border-2 border-gray-300 rounded-lg p-2 ${contentClass}`}
             >
@@ -26,7 +26,7 @@ const Prices: FC<PricesProps> = ({
 
             {salePrice && salePrice !== price && (
                 <div className={`flex ${contentClass}`}>
-                    <s className="text-gray-400 text-xs lg:text-sm">
+                    <s className="text-red-400 font-bold text-xs lg:text-sm">
                         {salePrice}
                     </s>
                 </div>

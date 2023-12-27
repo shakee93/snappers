@@ -4,3 +4,8 @@ interface GalleryImage {
     thumbnail: string
 }
 
+type Results = {
+    refreshJwtAuthToken: {
+      authToken: string;
+    };
+  };

@@ -4,8 +4,11 @@ import {ProductAttribute, VariationAttribute} from "@/graphql/types/graphql";
 type State = {
     sidebar: {
         mounted: number
-        categories: string[],
-        brands: string[]
+        categories: number[],
+        brands: number[]
+        priceRange: number[],
+        on_sale: boolean,
+        sort: string
     }
     product: {
         attribute: any[]
@@ -13,8 +16,11 @@ type State = {
 }
 
 type Actions = {
-    syncCategories: (categories: string[]) => void
-    syncBrands: (brands: string[]) => void
+    syncCategories: (categories: number[]) => void
+    syncOnSale: (onSale:boolean) => void
+    setSort: (sort:string) => void
+    syncBrands: (brands: number[]) => void
+    synPriceRange: (brands: number[]) => void
     setMounted: () => void
     setAttribute: (attr: ProductAttribute | VariationAttribute, option: string) => void
 }
@@ -24,22 +30,46 @@ export const useStore = create<State & Actions>((set) => ({
         categories: [],
         brands: [],
         mounted: 0,
+        priceRange: [500, 500000],
+        on_sale: false,
+        sort: ""
     },
     product: {
         attribute: []
     },
-    syncCategories: (categories: string[]) => set((state) => ({
+    setSort: (sort: string) => set((state) => ({
+        ...state,
+        sidebar: {
+            ...state.sidebar,
+            sort
+        },
+    })),
+    syncOnSale: (on_sale: boolean) => set((state) => ({
+        ...state,
+        sidebar: {
+            ...state.sidebar,
+            on_sale: on_sale
+        },
+    })),
+    syncCategories: (categories: number[]) => set((state) => ({
         ...state,
         sidebar: {
             ...state.sidebar,
             categories
         },
     })),
-    syncBrands: (brands: string[]) => set((state) => ({
+    syncBrands: (brands: number[]) => set((state) => ({
         ...state,
         sidebar: {
             ...state.sidebar,
             brands
+        },
+    })),
+    synPriceRange: (priceRange: number[]) => set((state) => ({
+        ...state,
+        sidebar: {
+            ...state.sidebar,
+            priceRange
         },
     })),
     setMounted: () => set((state) => ({
@@ -49,7 +79,7 @@ export const useStore = create<State & Actions>((set) => ({
             mounted: state.sidebar.mounted + 1,
         },
     })),
-    setAttribute: (value: ProductAttribute, option) => set((state) => {
+    setAttribute: (value: VariationAttribute, option) => set((state) => {
         const product = {
             attribute: state.product.attribute
         }
