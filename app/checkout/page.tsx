@@ -68,17 +68,66 @@ const CheckoutPage = () => {
 
     const { cart, removeFromCart, updateCart } = useCart();
 
-    // console.log({ cart })
-
     const { loading, error, data, refetch } = useQuery(GET_PAYMENT_GATEWAYS);
-
-    // console.log({data})
 
     const paymentGateways = data?.paymentGateways.nodes;
 
     const [tabActive, setTabActive] = useState<
         "ContactInfo" | "ShippingAddress" | "PaymentMethod"
     >("ShippingAddress");
+
+    const [formData, setFormData] = useState({
+        contactInfo: {
+
+        },
+        shippingAddress: {
+
+        },
+        paymentMethod: {
+
+        },
+    });
+
+    const updateFormData = (section: string, data: any) => {
+        console.log('Incoming data:', data);
+
+        setFormData((prevData) => {
+            let updatedData;
+
+            if (section.toLowerCase() === 'shippingaddress') {
+                updatedData = {
+                    ...prevData,
+                    shippingAddress: {
+                        ...prevData.shippingAddress,
+                        ...data,
+                    },
+                };
+            } else if (section.toLowerCase() === 'contactinfo') {
+                updatedData = {
+                    ...prevData,
+                    contactInfo: {
+                        ...prevData.contactInfo,
+                        ...data,
+                    },
+                };
+            } else {
+                updatedData = {
+                    ...prevData,
+                    [section]: {
+                        ...prevData[section],
+                        ...data,
+                    },
+                };
+            }
+
+            return updatedData;
+        });
+    };
+
+
+    console.log({ formData })
+
+
 
     const handleScrollToEl = (id: string) => {
         const element = document.getElementById(id);
@@ -87,17 +136,11 @@ const CheckoutPage = () => {
         }, 80);
     };
 
-
-
     const renderProduct = (item: CartItem, index: number) => {
 
         const { product, quantity, key, subtotal, total } = item;
         const { node } = product || {};
         const { name, price, image, terms } = node || {};
-
-        // console.log({product})
-        // console.log({ terms })
-        // console.log({ product })
 
         const brandSlug = terms.nodes[0]?.slug || terms.nodes[1]?.slug || terms.nodes[2]?.slug || terms.nodes[3]?.slug;
 
@@ -248,7 +291,7 @@ const CheckoutPage = () => {
                             }}
                         >
                             Remove
-                        </span> 
+                        </span>
                     </div>
                 </div>
             </div>
@@ -269,6 +312,9 @@ const CheckoutPage = () => {
                             setTabActive("ShippingAddress");
                             handleScrollToEl("ShippingAddress");
                         }}
+                        updateFormData={(section, data) => {
+                            updateFormData(section, data);
+                        }}
                     />
                 </div>
 
@@ -283,6 +329,9 @@ const CheckoutPage = () => {
                             setTabActive("PaymentMethod");
                             handleScrollToEl("PaymentMethod");
                         }}
+                        updateFormData={(section, data) => {
+                            updateFormData(section, data);
+                        }}
                     />
                 </div>
 
@@ -295,6 +344,9 @@ const CheckoutPage = () => {
                         }}
                         onCloseActive={() => setTabActive("PaymentMethod")}
                         paymentGateways={paymentGateways}
+                        updateFormData={(section, data) => {
+                            updateFormData(section, data);
+                        }}
                     />
                 </div>
             </div>
