@@ -142,7 +142,7 @@ const ProductCard: FC<ProductCardProps> = ({
     }
 
     const handleAddToCart = () => {
-        console.log(data.databaseId);
+        // console.log(data.databaseId);
         if (data.databaseId) {
             addToCart(data.databaseId, quantity)?.then(cartCompleted);
         } else {

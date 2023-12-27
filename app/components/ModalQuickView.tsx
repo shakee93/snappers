@@ -6,6 +6,7 @@ import ButtonClose from "@/shared/ButtonClose/ButtonClose";
 import ProductQuickView from "./ProductQuickView3";
 import ProductQuickView2 from "@/components/ProductQuickView";
 
+
 export interface ModalQuickViewProps {
   show: boolean;
   onCloseModalQuickView: () => void;

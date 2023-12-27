@@ -215,7 +215,7 @@ query GetProducts($categoryIdIn: [Int]) {
   products(first: 10, where: {categoryIdIn: $categoryIdIn}) {
     edges {
       node {
-          id
+        id
         name
         slug
         averageRating
@@ -226,7 +226,7 @@ query GetProducts($categoryIdIn: [Int]) {
         
         image {
           mediaItemUrl
-            sourceUrl
+          sourceUrl
         }
         type
         ... on SimpleProduct {
@@ -251,9 +251,14 @@ query GetProducts($categoryIdIn: [Int]) {
               }
             }
           }
-          productCategories {
+         productCategories {
             nodes {
               name
+            }
+            edges {
+              node {
+                name
+              }
             }
           }
           price
@@ -271,6 +276,11 @@ query GetProducts($categoryIdIn: [Int]) {
           productCategories {
             nodes {
               name
+            }
+            edges {
+              node {
+                name
+              }
             }
           }
           galleryImages {

@@ -1,6 +1,9 @@
 import { Disclosure } from "@headlessui/react";
 import { MinusIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { FC } from "react";
+import ReactDOMServer from "react-dom/server";
+
+import ProductSpecifications from "@/app/components/SingleProductPage/ProductSpecifications";
 
 const DEMO_DATA = [
   {
@@ -76,8 +79,14 @@ const AccordionInfo: FC<Props> = ({
                 <Disclosure.Panel
                   className={panelClassName}
                   as="div"
-                  dangerouslySetInnerHTML={{ __html: item.content }}
-                ></Disclosure.Panel>
+                  // Conditionally render ProductSpecifications component
+                  // based on the name property in your data
+                >
+                  {item.name === "Specifications" && <ProductSpecifications />}
+                  {item.name !== "Specifications" && (
+                    <div dangerouslySetInnerHTML={{ __html: item.content }} />
+                  )}
+                </Disclosure.Panel>
               </>
             )}
           </Disclosure>
