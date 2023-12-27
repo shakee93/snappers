@@ -15,6 +15,7 @@ import {Product} from "@/graphql/types/graphql";
 import Image from "next/image";
 import SidebarFilters from "@/app/components/SidebarFilters";
 import ProductGrid from "@/app/components/ProductGrid";
+import InstantSearchWrapper from "@/app/components/InstantSearchWrapper";
 
 export async function getData(slug : string | null = null)  {
 
@@ -81,14 +82,16 @@ const Page = async ({ params } : {
                     <main>
                         {/* LOOP ITEMS */}
                         <div className="flex flex-col lg:flex-row">
-                            <div className="lg:w-1/3 xl:w-1/4 pr-4">
-                                <SidebarFilters
-                                    categories={productCategories}
-                                />
-                            </div>
                             <div className="flex-shrink-0 mb-10 lg:mb-0 lg:mx-4 border-t lg:border-t-0"></div>
                             <div className="flex-1 ">
-                                <ProductGrid brand={brand} products={products}/>
+                                <InstantSearchWrapper
+                                    filters
+                                    brand={brand}
+                                    categories={productCategories}
+                                    brands={brands}
+                                >
+
+                                </InstantSearchWrapper>
                             </div>
                         </div>
                     </main>

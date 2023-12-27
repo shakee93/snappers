@@ -21,8 +21,8 @@ const getSlides = async () => {
   const { data } = await getClient().query({
     query: GET_SLIDES,
   })
-
-  return data.slides.nodes
+  
+  return data?.slides?.nodes
 }
 
 export default async function Home() {

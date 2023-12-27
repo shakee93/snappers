@@ -10,19 +10,21 @@ export interface PricesProps {
 
 const Prices: FC<PricesProps> = ({
     className = "",
-    price = 33,
+    price = null,
     salePrice = null,
     contentClass = " text-base font-medium",
 }) => {
     return (
         <div className={`flex gap-3 items-center ${className}`}>
-            <div
-                className={`flex items-center border-2 border-gray-300 rounded-lg p-2 ${contentClass}`}
-            >
+            {price &&
+                <div
+                    className={`flex items-center border-2 border-gray-300 rounded-lg p-2 ${contentClass}`}
+                >
                 <span className="text-slate-950 text-base lg:text-sm font-bold !leading-none">
                     {price}
                 </span>
-            </div>
+                </div>
+            }
 
             {salePrice && salePrice !== price && (
                 <div className={`flex ${contentClass}`}>

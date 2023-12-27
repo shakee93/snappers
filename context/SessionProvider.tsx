@@ -12,9 +12,7 @@ const SessionContext = createContext<Session>({
     signUp: async (email: string, password: string) => {
         return { data: null, error: null };
     },
-    login: async (email: string, password: string) => {
-        return { data: null, error: null };
-    },
+    login: ()=>{},
     logout: () => { }
 });
 
@@ -60,7 +58,7 @@ function saveResponseToLocalStorage(response: any, type: AuthType = "registerCus
     localStorage.setItem("about", about || "");
     localStorage.setItem("id", id || "");
 
-    let authToken, refreshToken;
+    let authToken, refreshToken, sess;
 
     if (type === "login") {
         authToken = response?.data?.login?.authToken;
@@ -188,7 +186,7 @@ export function SessionProvider({ children }: {
                 if (data && data?.customer?.sessionToken) {
                     const newSessionToken = data.customer.sessionToken;
                     setSessionToken(newSessionToken);
-                    localStorage.setItem('sessionToken', newSessionToken);
+                    localStorage.setItem('wpSessionToken', newSessionToken);
                 }
             } catch (error) {
                 console.error('Error fetching session token:', error);

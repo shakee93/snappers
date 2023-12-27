@@ -13,47 +13,15 @@ import Header from "@/app/components/globalComponents/header";
 import {Toaster} from "react-hot-toast";
 import Footer from "@/app/components/globalComponents/footer";
 import {SearchProvider} from "@/context/SearchProvider";
-import { getClient } from "@/graphql/apollo-ssr";
-import { gql } from "@apollo/client";
 import {Loader} from "lucide-react";
 // import reportWebVitals from "./reportWebVitals";
 
 // const inter = Inter({ subsets: ['latin'] })
 
-export const GET_ACCOUNT_DETAILS = gql`
-  query getAccountDetails{
-  customer {
-    email
-    displayName
-    billing {
-      address1
-      phone
-      email
-    }
-    metaData(multiple: true) {
-      key
-      value
-      id
-    }
-    username
-    id
-  }
-}
-`;
+
 export default async  function RootLayout({children}: {
     children: React.ReactNode
 }) {
-
-    const { data: accountDetailsData, error: accountDetailsError } = await getClient().query({
-        query: GET_ACCOUNT_DETAILS
-    });
-
-    if (accountDetailsError) {
-        console.error("Error fetching account details:", accountDetailsError);
-    }
-
-    // Log the fetched data
-    console.log("Account Details Data:", accountDetailsData);
 
     return (
         <html lang="en">

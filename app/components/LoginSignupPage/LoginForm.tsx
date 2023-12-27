@@ -1,13 +1,13 @@
 "use client";
 
-import {useState} from "react";
+import { useState } from "react";
 import gql from "graphql-tag";
 import Input from "@/shared/Input/Input";
 import Link from "next/link";
 import ButtonPrimary from "@/public/shared/Button/ButtonPrimary";
-import {LoginResponse} from "@/utils/type";
-import {useSession} from "@/context/SessionProvider";
-import {useRouter} from "next/navigation";
+import { LoginResponse } from "@/utils/type";
+import { useSession } from "@/context/SessionProvider";
+import { useRouter } from "next/navigation";
 
 const REGISTER_CUSTOMER_MUTATION = gql`
     mutation RegisterCustomer($input: RegisterCustomerInput!) {
@@ -19,28 +19,24 @@ const REGISTER_CUSTOMER_MUTATION = gql`
 `;
 
 const LoginForm = () => {
+    const [email, setEmail] = useState(""); 
+    const [password, setPassword] = useState(""); 
 
-    const [authToken, setAuthToken] = useState<string | null>(null);
-    const [refreshToken, setRefreshToken] = useState<string | null>(null);
-    const [email, setEmail] = useState(""); // State for email input
-    const [password, setPassword] = useState(""); // State for password input
-
-    const {login} = useSession();
+    const { login } = useSession();
     const router = useRouter();
 
     const handleFormSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
 
         try {
-            let response : LoginResponse = await login(email, password);
-            if(response.error !== null ){
+            let response: LoginResponse = await login(email, password);
+            console.log("response of login: ", response)
+            if (response.error) {
                 alert(`Login Issue: ${response.error}`)
                 return
             }
-            if( response.data == "logged_in"){
-                alert("Registered Successfully")
-            }
-            router.push("/");
+            alert("Logged in  Successfully")
+            router.push("/account");
         } catch (error) {
             console.error("Error:", error);
         }
@@ -48,9 +44,9 @@ const LoginForm = () => {
     return (
         <form className="grid grid-cols-1 gap-6" onSubmit={handleFormSubmit}>
             <label className="block">
-        <span className="text-neutral-800 dark:text-neutral-200">
-          Email address
-        </span>
+                <span className="text-neutral-800 dark:text-neutral-200">
+                    Email address
+                </span>
                 <Input
                     type="email"
                     placeholder="example@example.com"
@@ -60,12 +56,12 @@ const LoginForm = () => {
                 />
             </label>
             <label className="block">
-        <span className="flex justify-between items-center text-neutral-800 dark:text-neutral-200">
-          Password
-          <Link href="/forgot-pass" className="text-sm text-green-600">
-            Forgot password?
-          </Link>
-        </span>
+                <span className="flex justify-between items-center text-neutral-800 dark:text-neutral-200">
+                    Password
+                    <Link href="/forgot-pass" className="text-sm text-green-600">
+                        Forgot password?
+                    </Link>
+                </span>
                 <Input
                     type="password"
                     className="mt-1"
