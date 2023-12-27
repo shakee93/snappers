@@ -6,7 +6,7 @@ import ProductGridInstant from "@/app/components/ProductGridInstant";
 import SearchInput from "@/app/components/SearchInput";
 import TabFilters from "@/app/components/TabFilters";
 import {Brand, ProductCategory} from "@/graphql/types/graphql";
-import {useDeferredValue, useEffect, useState} from "react";
+import {useCallback, useDeferredValue, useEffect, useMemo, useState} from "react";
 import {useStore} from "@/store/store";
 import {PRICE_RANGE} from "@/app/components/Filters/PriceFilter";
 import Pagination from "@/shared/Pagination/Pagination";
@@ -17,32 +17,46 @@ interface InstantSearchWrapperProps {
     filters?: boolean
     categories?: ProductCategory[]
     brands?: Brand[]
+    brand?: Brand
+    category?: ProductCategory
 }
 
 const InstantSearchWrapper = ({
                                   search = false,
                                   filters = false,
                                   categories,
-                                  brands
+                                  brands,
+    brand,category
                               }: InstantSearchWrapperProps) => {
-    
+
     const { sidebar } = useStore()
-    const [filterQuery, setFilterQuery] = useState("")
-    const [page, setPage] = useState(1)
-    const [sortQuery, setSortQuery] = useState<undefined | string>("")
     const differedSidebar = useDeferredValue(sidebar)
 
-    
-    useEffect(() => {
+    const getFilterQuery: () => string = () => {
         const f =[
-            sidebar.priceRange !== PRICE_RANGE ?`rawPrice:[${sidebar.priceRange[0]}..${sidebar.priceRange[1]}]` : null,
-            sidebar.categories.length > 0 ? `productCategories.edges.node.databaseId:[${sidebar.categories.join(',')}]` : null,
-            sidebar.brands.length > 0 ? `brands.nodes.databaseId:[${sidebar.brands.join(',')}]` : null,
+            sidebar.priceRange !== PRICE_RANGE ?
+                `rawPrice:[${sidebar.priceRange[0]}..${sidebar.priceRange[1]}]` : null,
+            category ?   `productCategories.edges.node.databaseId:${category.databaseId}`
+                :sidebar.categories.length > 0 ?
+                `productCategories.edges.node.databaseId:[${sidebar.categories.join(',')}]` : null,
+            brand ? `brands.nodes.databaseId:${brand.databaseId}` :
+                sidebar.brands.length > 0 ?
+                    `brands.nodes.databaseId:[${sidebar.brands.join(',')}]` : null,
             sidebar.on_sale ? 'onSale:true': null,
             sidebar.in_stock ? 'stockStatus:IN_STOCK': null,
         ]
 
-        setFilterQuery(f.filter(n => n).join(" && "))
+        return f.filter(n => n).join(" && ")
+    }
+
+    const [filterQuery, setFilterQuery] = useState<string>(getFilterQuery)
+    const [page, setPage] = useState(1)
+    const [sortQuery, setSortQuery] = useState<undefined | string>("")
+
+
+    useEffect(() => {
+
+        setFilterQuery(getFilterQuery)
 
         if (differedSidebar.sort) {
             setSortQuery(differedSidebar.sort);
@@ -50,12 +64,13 @@ const InstantSearchWrapper = ({
             setSortQuery(undefined)
         }
         
-        console.log('changed!', f.filter(n => n).join(" && "));
-
     }, [differedSidebar])
 
-    const makeClient: any = () => {
+
+    const makeClient: any = useMemo(() => {
         try {
+
+            console.log('called!');
             const typesenseInstantSearchAdapter = new TypesenseInstantSearchAdapter({
                 server: {
                     apiKey: "xyz", // Be sure to use an API key that only allows search operations
@@ -82,7 +97,7 @@ const InstantSearchWrapper = ({
         catch (e) {
             console.log(e);
         }
-    }
+    }, [sortQuery])
 
 
     return <InstantSearchNext  future={{
@@ -91,10 +106,10 @@ const InstantSearchWrapper = ({
         router: {
             cleanUrlOnDispose: false
         }
-    }} searchClient={makeClient()} indexName='product' >
+    }} searchClient={makeClient} indexName='product' >
         <div className='flex gap-6 flex-col'>
             {search && <SearchInput/>}
-            {filters && <TabFilters categories={categories} brands={brands}/>}
+            {filters && <TabFilters category={category} brand={brand} categories={categories} brands={brands}/>}
             <Configure  filters={filterQuery} hitsPerPage={12}/>
             {/*<RefinementList attribute="brands.nodes"/>*/}
             <ProductGridInstant/>

@@ -179,7 +179,7 @@ export function SessionProvider({ children }: {
                 if (data && data?.customer?.sessionToken) {
                     const newSessionToken = data.customer.sessionToken;
                     setSessionToken(newSessionToken);
-                    localStorage.setItem('sessionToken', newSessionToken);
+                    localStorage.setItem('wpSessionToken', newSessionToken);
                 }
             } catch (error) {
                 console.error('Error fetching session token:', error);

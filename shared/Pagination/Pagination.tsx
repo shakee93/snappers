@@ -42,6 +42,10 @@ const Paginationx: FC<PaginationProps> = ({ className = "" }) => {
   const nextPageIndex = currentRefinement + 1;
   const lastPageIndex = nbPages - 1;
 
+    if (nbPages === 1) {
+        return <></>
+    }
+
   return (
       <nav
           className={`nc-Pagination inline-flex space-x-1 text-base font-medium ${className}`}

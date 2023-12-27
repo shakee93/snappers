@@ -1,4 +1,5 @@
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
+import { useStore } from "@/store/store";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import LikeButton from "@/app/components/LikeButton";
 import { StarIcon } from "@heroicons/react/24/solid";
@@ -18,6 +19,11 @@ import Link from 'next/link';
 import Image from "next/image";
 import useProductLink from "@/hooks/useProductLink";
 import ProductAddToCart from "./SingleProductPage/ProductAddToCart";
+import { twMerge } from "tailwind-merge";
+
+import ProductDetails from "./SingleProductPage/ProductDetails";
+import ProductSpecifications from "./SingleProductPage/ProductSpecifications";
+import BrandBar from "./globalComponents/BrandBar";
 import {SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
 
 export interface ProductQuickViewProps {
@@ -26,6 +32,10 @@ export interface ProductQuickViewProps {
 }
 
 const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }) => {
+
+  let brand = product.terms.nodes.find(node => node?.name)?.name || "DefaultBrand";
+  let slug = product.terms.nodes.find(node => node?.slug)?.slug || "product";
+
   let product_images: string[] = [];
 
   if (product.galleryImages.nodes) {
@@ -35,14 +45,18 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
   } else {
     product_images = [product.image.sourceUrl];
   }
-  const link = useProductLink(product)
 
-  console.log('recieved from quick view', product)
-  // console.log({product_images})
+  // console.log({ product });
+
+  // const link = useProductLink(product)
+
+  // console.log('recieved from quick view', product)
 
   const [variantActive, setVariantActive] = React.useState(0);
   const [sizeSelected, setSizeSelected] = React.useState("");
   const [qualitySelected, setQualitySelected] = React.useState(1);
+  const { product: { attribute }, setAttribute } = useStore()
+  const [activeVariation, setActiveVariation] = useState<any>(!!product?.variations?.nodes?.length ? product?.variations?.nodes[0] : null)
 
   const notifyAddTocart = () => {
     toast.custom(
@@ -142,13 +156,106 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
   const renderSectionContent = () => {
     return (
       <div className="space-y-8">
-        {/* ---------- 1 HEADING ----------  */}
-        <div>
-          <h2 className="text-2xl font-semibold hover:text-primary-6000 transition-colors">
-            <Link href={link}>{product.name}</Link>
-          </h2>
 
-          <div className="flex items-center mt-5 space-x-4 sm:space-x-5">
+        {/* <ProductDetails brand={brand} product={product} /> */}
+        {/* ---------- 1 HEADING ----------  */}
+
+
+        <div>
+
+          <div className="flex gap-1  text-sm text-gray-500 pb-4">
+            Brand : <span className="">{brand}</span>
+          </div>
+
+          <div className="text-base md:text-lg font-medium ">
+            <Link href={`${slug}/${product.slug}`}> {product.name} - {product.databaseId} </Link>
+          </div>
+
+
+          {product.type === 'VARIABLE' &&
+            <>
+              {product.attributes?.nodes.map((attr: ProductAttribute, index: number) =>
+                <div key={index} className="py-2 text-gray-500">
+                  <div className="text-sm py-2">{attr.label}: <span className='font-medium text-gray-700'>{product[`allPa${attr.label}`]?.nodes.find(node => node.slug === activeAttr(attr)?.val)?.name}</span> </div>
+
+                  <ul className="flex gap-2 flex-wrap text-sm items-center">
+
+                    {attr.options?.map((option, index) =>
+                      <li key={index}
+                        onClick={e => setAttribute(attr, option)}
+                        className={
+                          twMerge(
+                            "border bg-gray-200/80 cursor-pointer text-black inline-block py-2 px-3.5  text-xs md:text-sm rounded",
+                            activeAttr(attr)?.val === option && ' border-blue-700 bg-white'
+                          )
+                        }>
+                        {product[`allPa${attr.label}`]?.nodes.find(node => node.slug === option)?.name || 'Option'}
+                      </li>
+                    )}
+
+                  </ul>
+                </div>
+              )}
+
+            </>
+          }
+
+          {product.type === 'VARIABLE' && activeVariation ? <div>
+            <div className="flex gap-4 text-base py-2 flex-wrap md:text-lg font-medium text-gray-600">
+              <span>
+                {activeVariation.price}
+              </span>
+
+              {(!!activeVariation.salePrice && activeVariation.salePrice !== activeVariation.regularPrice) &&
+                <span className="text-red-400">
+                  <s>{activeVariation.regularPrice}</s>
+                </span>
+              }
+
+            </div>
+          </div> :
+            <div className="flex gap-2 text-base py-2 flex-wrap md:text-lg font-medium text-gray-600">
+              <span>
+                {product.price}
+              </span>
+
+              {(!!product.salePrice && product.salePrice !== product.regularPrice) &&
+                <span className="text-red-400">
+                  <s>{product.regularPrice}</s>
+                </span>
+              }
+
+            </div>
+          }
+
+          {(product.stockStatus !== 'IN_STOCK') &&
+            <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1">
+              Sold Out
+            </div>
+          }
+
+          {product.type === 'VARIABLE' && activeVariation?.stockStatus !== 'IN_STOCK' &&
+            <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1">
+              Sold Out
+            </div>
+          }
+
+          <ProductAddToCart product={product} variation={activeVariation} />
+          <div className="flex gap-1 items-center py-2 text-sm md:text-base text-gray-500">
+            <div className="text-sm py-2">Category:</div>
+            {product.productCategories?.edges.map((category: any, index: number) =>
+              <Link href={`/collections/${category.node.slug}`} key={index} className="bg-primary-100 inline-block py-1 px-2  text-xs md:text-sm rounded-3xl">
+                {category.node.name}
+              </Link>
+            )}
+
+          </div>
+
+          {/* <h2 className="text-2xl font-semibold hover:text-primary-6000 transition-colors">
+            <Link href={link}>{product.name}</Link>
+          </h2> */}
+
+          {/* <div className="flex items-center mt-5 space-x-4 sm:space-x-5">
             <Prices
               contentClass="py-1 px-2 md:py-1.5 md:px-3 text-lg font-semibold"
               price={product.price}
@@ -176,17 +283,18 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
                 <span className="ml-1 leading-none">{status}</span>
               </div>
             </div>
-          </div>
+          </div> */}
+
         </div>
 
         {/* ---------- 3 VARIANTS AND SIZE LIST ----------  */}
-        <div className="">{renderVariants()}</div>
+        {/* <div className="">{renderVariants()}</div> */}
         {/* <div className="">{renderSizeList()}</div> */}
 
         {/*  ---------- 4  QTY AND ADD TO CART BUTTON */}
-        <div className="flex space-x-3.5">
+        {/* <div className="flex space-x-3.5">
           <ProductAddToCart product={product} />
-        </div>
+        </div> */}
 
         {/*  */}
         <hr className=" border-slate-200 dark:border-slate-700"></hr>
@@ -199,6 +307,10 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
               name: "Description",
               content: product.description,
             },
+            {
+              name: "Specifications",
+              content: product.description,
+            }
           ]}
         />
       </div>

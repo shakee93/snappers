@@ -7,6 +7,7 @@ import { Product, PRODUCTS } from "data/data";
 import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import Image from "next/image";
+import { useMutation } from '@apollo/client';
 
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import Input from "shared/Input/Input";
@@ -17,6 +18,7 @@ import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
 import { useQuery } from "@apollo/client";
 import { GET_PAYMENT_GATEWAYS } from "@/graphql/defs/cart";
+import { GET_CUSTOMER_INFO, CHECKOUT_MUTATION } from "@/graphql/defs/order";
 
 export interface CartInfo {
     appliedCoupons: null;
@@ -77,15 +79,9 @@ const CheckoutPage = () => {
     >("ShippingAddress");
 
     const [formData, setFormData] = useState({
-        contactInfo: {
-
-        },
-        shippingAddress: {
-
-        },
-        paymentMethod: {
-
-        },
+        contactInfo: {},
+        shippingAddress: {},
+        paymentMethod: {},
     });
 
     const updateFormData = (section: string, data: any) => {
@@ -127,6 +123,24 @@ const CheckoutPage = () => {
 
     console.log({ formData })
 
+    const [checkoutMutation, { loading: checkoutLoading, error: checkoutError, data: checkoutData }] = useMutation(CHECKOUT_MUTATION);
+    const handleCheckout = async () => {
+        try {
+            const paymentMethodId = formData?.paymentMethod?.selectedGateway.id;
+
+            const { data } = await checkoutMutation({
+                variables: { paymentMethod: paymentMethodId },
+            });
+
+            console.log('data inside mutation', checkoutData)
+
+            const orderDetails = data.checkout.order;
+            console.log("Order Details:", orderDetails);
+
+        } catch (error) {
+            console.error("Checkout failed:", error);
+        }
+    };
 
 
     const handleScrollToEl = (id: string) => {
@@ -423,7 +437,7 @@ const CheckoutPage = () => {
                                 <span>{cart?.total || "$0.00"}</span>
                             </div>
                         </div>
-                        <ButtonPrimary href="/account-my-order" className="mt-8 w-full">
+                        <ButtonPrimary href="" onClick={handleCheckout} className="mt-8 w-full">
                             Confirm order
                         </ButtonPrimary>
                         <div className="mt-5 text-sm text-slate-500 dark:text-slate-400 flex items-center justify-center">

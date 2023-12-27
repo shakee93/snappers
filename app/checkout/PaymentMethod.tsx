@@ -36,13 +36,13 @@ const PaymentMethod: FC<Props> = ({
 
   useEffect(() => {
   }, [paymentGateways]);
-  
+
   const [selectedGateway, setSelectedGateway] = useState({
     id: null,
     title: null,
   });
 
-  const PaymentMethods = (gateway, updateFormData) => {
+  const PaymentMethods = (gateway) => {
 
     const active = methodActive === gateway.id;
 
@@ -208,7 +208,9 @@ const PaymentMethod: FC<Props> = ({
           {/* <div>{renderDebitCredit()}</div> */}
 
           {/* ==================== */}
-          <div className="flex flex-col gap-6">{paymentGateways?.map((gateway) => PaymentMethods(gateway))}</div>
+          <div className="flex flex-col gap-6">
+            {paymentGateways?.map((gateway) => PaymentMethods(gateway))}
+          </div>
 
           <div className="flex pt-6">
             <ButtonPrimary

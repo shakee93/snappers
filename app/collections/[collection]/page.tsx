@@ -17,6 +17,7 @@ import { useQuery } from "@apollo/client";
 import TabFilters from "@/app/components/TabFilters";
 import Pagination from "@/shared/Pagination/Pagination";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
+import InstantSearchWrapper from "@/app/components/InstantSearchWrapper";
 
 export async function getData(slug : string | null = null)  {
 
@@ -53,7 +54,7 @@ export async function getData(slug : string | null = null)  {
     }
 }
 
-const Page = async ({ params }) => {
+const Page = async ({ params }: { params: { collection: string}}) => {
     const { products, productCategories, productCategory, brands } = await getData(params.collection);
 
     return (
@@ -70,25 +71,21 @@ const Page = async ({ params }) => {
               easy for you to share your designs with more like-minded people.
             </span>
                     </div>
-                    <TabFilters categories={productCategories} brands={brands} />
-
                     <hr className="border-slate-200 dark:border-slate-700" />
                     <main>
                         {/* LOOP ITEMS */}
                         <div className="flex flex-col lg:flex-row">
-                            {/* <div className="lg:w-1/3 xl:w-1/4 pr-4">
-                                <SidebarFilters
-                                    categories={productCategories}
-                                />
-                            </div> */}
                             <div className="flex-shrink-0 mb-10 lg:mb-0 lg:mx-4 border-t lg:border-t-0"></div>
                             <div className="flex-1 ">
-                                <ProductGrid products={products} category={productCategory} />
+                                <InstantSearchWrapper
+                                    filters
+                                    categories={productCategories}
+                                    brands={brands}
+                                    category={productCategory}
+                                >
+
+                                </InstantSearchWrapper>
                             </div>
-                        </div>
-                        <div className="flex flex-col mt-12 items-center lg:mt-16 space-y-5 sm:space-y-0 sm:space-x-3 sm:flex-row sm:justify-between sm:items-center">
-                            <Pagination />
-                            <button className="ttnc-ButtonPrimary disabled:bg-opacity-90 bg-primaryColor hover:bg-slate-800 text-slate-50 dark:text-slate-800 shadow-xl px-4 py-2 rounded-2xl w-max ">Load More</button> {/* <ButtonPrimary>Show me more</ButtonPrimary> */}
                         </div>
                     </main>
                 </div>
