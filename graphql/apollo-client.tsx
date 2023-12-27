@@ -2,6 +2,7 @@
 
 import {
   ApolloLink,
+  DefaultContext,
   defaultDataIdFromObject,
   FetchResult, from,
   HttpLink,
@@ -20,6 +21,14 @@ import { GET_AUTH_TOKEN } from "./defs/auth";
 import { getClient } from "./apollo-ssr";
 
 
+// export async function getSessionToken(forceFetch = false) {
+//   let sessionToken = localStorage.getItem(process.env.SESSION_TOKEN_LS_KEY as string);
+//   if (!sessionToken || forceFetch) {
+//     sessionToken = await fetchSessionToken();
+//   }
+//   return sessionToken;
+// }
+
 
 export default function ApolloWrapper({ children }: React.PropsWithChildren) {
   function makeClient() {
@@ -29,10 +38,7 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
       });
     });
 
-    // // getting token
-    // const [refresh] = await getClient().request({
-    //   mutation: GET_AUTH_TOKEN,
-    // });
+
 
     function hasCredentials() {
       const authToken = localStorage.getItem(process.env.AUTH_TOKEN_SS_KEY ?? "");
@@ -47,14 +53,13 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
 
       return false;
     }
-    
 
     async function refreshAuthToken(refreshToken: string) {
       console.log("Refreshing auth token...");
       try {
 
         console.log("Refreshing auth token...");
-        const graphQLClient = new GraphQLClient(process.env.NEXT_PUBLIC_WP_GRAPHQL|| "");
+        const graphQLClient = new GraphQLClient(process.env.NEXT_PUBLIC_WP_GRAPHQL || "");
 
         const results = await graphQLClient.request(GET_AUTH_TOKEN, { refreshToken }) as Results;
         // const results: any = await refresh({
@@ -67,7 +72,7 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
         const authToken = results?.refreshJwtAuthToken?.authToken;
 
         console.log("refreshed authTOken");
-        
+
         if (!authToken) {
           throw new Error("Failed to retrieve a new auth token");
         }
@@ -119,9 +124,7 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
       return authToken;
     }
 
-
-
-     async function getAuthToken() {
+    async function getAuthToken() {
       console.log("getAuthToken");
       let authToken = localStorage.getItem(process.env.AUTH_TOKEN_SS_KEY ?? "");
       console.log("getAuthToken authToken:", authToken);
@@ -138,8 +141,6 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
       return authToken;
     }
 
-
-
     const authLink = new ApolloLink((operation, forward) => {
       const sessionToken = localStorage.getItem('wpSessionToken');
       const refreshToken = localStorage.getItem('wpRefreshToken');
@@ -149,28 +150,58 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
       console.log("Refresh token inside apollo Link::", refreshToken);
       console.log("Auth token inside apollo Link::", authToken);
 
-      // Set the "woocommerce-session" header in all cases
-      operation.setContext({
-        headers: {
-          "woocommerce-session": `Session ${sessionToken}`,
-          "Authorization" : `Bearer ${authToken}`
-        },
-      });
 
-      // Call the async function to handle refreshToken and Authorization header
-      async function handleRefreshToken() {
+
+
+      // // async function handleRefreshToken() {
+      //   if (refreshToken) {
+      //     try {
+      //       const token = await getAuthToken();
+      //       // const token = process.env.WORDPRESS_AUTH_REFRESH_TOKEN;
+      //       console.log("got auth token as :", token);
+      //       operation.setContext((context: any) => ({
+      //         headers: {
+      //           ...context.headers,
+      //           Authorization: `Bearer ${token}`,
+      //         },
+      //       }));
+      //       console.log("Bearer token added to header");
+      //     } catch (err) {
+      //       console.error("Error setting Authorization header:", err);
+      //     }
+      //   }
+      // }
+
+      // // Call the async function to handle refreshToken
+      // handleRefreshToken();
+
+
+      operation.setContext(async ({ context }: DefaultContext) => {
+        const { headers: currentHeaders = {} } = context || {}; // Destructure context and set default headers object
+        const headers = { ...currentHeaders };
+        const authToken = await getAuthToken();
+
+        if (authToken) {
+          headers.Authorization = `Bearer ${authToken}`;
+        }
+
         if (refreshToken) {
-          try {
-            const token = await getAuthToken();
-            console.log(token);
-          } catch (err) {
-            console.error("Error setting Authorization header:", err);
+          if (sessionToken) {
+            headers['woocommerce-session'] = `Session ${sessionToken}`;
           }
         }
-      }
 
-      // Call the async function to handle refreshToken
-      handleRefreshToken();
+        if (authToken || sessionToken) {
+          return { headers };
+        }
+
+        return {};
+      });
+
+
+
+
+
 
       return forward(operation);
     });

@@ -9,6 +9,7 @@ import Textarea from "@/shared/Textarea/Textarea";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import { redirect } from "next/navigation";
 import { getClient } from "@/graphql/apollo-ssr";
+import { useSession } from "@/context/SessionProvider";
 
 // export const GET_ACCOUNT_DETAILS = gql`
 // query MyQuery2 {
@@ -24,35 +25,32 @@ import { getClient } from "@/graphql/apollo-ssr";
 // `;
 
 
-// export const GET_ACCOUNT_DETAILS = gql`
-//   query getAccountDetails{
-//   customer {
-//     email
-//     displayName
-//     billing {
-//       address1
-//       phone
-//       email
-//     }
-//     metaData(multiple: true) {
-//       key
-//       value
-//       id
-//     }
-//     username
-//     id
-//   }
-// }
-// `;
+export const GET_ACCOUNT_DETAILS = gql`
+  query getAccountDetails{
+  customer {
+    email
+    displayName
+    billing {
+      address1
+      phone
+      email
+    }
+    metaData(multiple: true) {
+      key
+      value
+      id
+    }
+    username
+    id
+  }
+}
+`;
 
 
 const AccountPage =  () => {
     const [customerId, setCustomerId] = useState("");
     const [authKey, setAuthKey] = useState("");
-
     const [UpdateCustomer] = useMutation(UPDATE_ACCOUNT_INFORMATION);
-
-  
     const [formData, setFormData] = useState({
         id: customerId,
         fullName: "",
@@ -63,8 +61,26 @@ const AccountPage =  () => {
         phoneNumber: "",
         about: "",
     });
+    const {updateCustomer} = useSession()
+    let response = useQuery(GET_ACCOUNT_DETAILS);
+    console.log(response);
 
     useEffect(() => {
+        // const fetchData = async () => {
+        //     try {
+        //         let response = await getAccountDetails();
+        //         console.log("response: ", response);
+        //     } catch (error) {
+        //         console.error("Error fetching account details:", error);
+        //     }
+        // };
+    
+        // fetchData();
+    }, []);
+    
+    
+    useEffect(() => {
+
 
         const id = localStorage.getItem("id");
         const authToken = localStorage.getItem(process.env.AUTH_TOKEN_SS_KEY?? "");
@@ -79,21 +95,18 @@ const AccountPage =  () => {
         setCustomerId(id);
         setAuthKey(authToken);
 
-        const storedData = {
-            id: id,
-            fullName: localStorage.getItem("displayName") || "",
-            email: localStorage.getItem("email") || "",
-            dateOfBirth: localStorage.getItem("dob") || "",
-            address: localStorage.getItem("address") || "",
-            gender: localStorage.getItem("gender") || "Male",
-            phoneNumber: localStorage.getItem("phone_number") || "",
-            about: localStorage.getItem("about") || "",
-        };
-        console.log("storedData: ", storedData);
-        setFormData(storedData);
+        // const storedData = {
+        //     id: id,
+        //     fullName: localStorage.getItem("displayName") || "",
+        //     email: localStorage.getItem("email") || "",
+        //     dateOfBirth: localStorage.getItem("dob") || "",
+        //     address: localStorage.getItem("address") || "",
+        //     gender: localStorage.getItem("gender") || "Male",
+        //     phoneNumber: localStorage.getItem("phone_number") || "",
+        //     about: localStorage.getItem("about") || "",
+        // };
+        // setFormData(storedData);
     }, []);
-
-
 
 
     const handleChange = (
@@ -104,7 +117,6 @@ const AccountPage =  () => {
             ...prevData,
             [name]: value,
         }));
-        console.log(formData);
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -114,7 +126,7 @@ const AccountPage =  () => {
         const response = await UpdateCustomer({
             variables: {
                 input: {
-                    // id: customerId,
+                    id: customerId,
                     billing: { address1: address, phone: phoneNumber },
                     email: email,
                     displayName: fullName,
@@ -127,6 +139,7 @@ const AccountPage =  () => {
                 },
             },
         });
+        console.log("Updated Response: ", response);
 
         localStorage.setItem("displayName", fullName || "");
         localStorage.setItem("firstName", fullName || "");
@@ -136,7 +149,7 @@ const AccountPage =  () => {
         localStorage.setItem("phone_number", phoneNumber || "");
         localStorage.setItem("about", about || "");
 
-        console.log("Updated Response: ", response);
+     
         console.log("Form Data:", formData);
     };
 

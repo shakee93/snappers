@@ -60,7 +60,7 @@ function saveResponseToLocalStorage(response: any, type: AuthType = "registerCus
     localStorage.setItem("about", about || "");
     localStorage.setItem("id", id || "");
 
-    let authToken, refreshToken;
+    let authToken, refreshToken, sess;
 
     if (type === "login") {
         authToken = response?.data?.login?.authToken;

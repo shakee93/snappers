@@ -1,8 +1,11 @@
 export type Session = {
     sessionToken: string | null,
     signUp: (email: string, password: string) => Promise<SignUpResponse>,
-    login: (email: string, password: string) => Promise<LoginResponse>,
-    logout: ()=> void
+    // login: (email: string, password: string) => Promise<LoginResponse>,
+    login:any, 
+    logout: ()=> void,
+    updateCustomer:any
+
 }
 
 export type SignUpResponse = {
