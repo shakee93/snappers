@@ -164,7 +164,6 @@ export function SessionProvider({ children }: {
     const logout = () => {
         localStorage.removeItem("authToken");
         localStorage.removeItem("sessionToken");
-        // localStorage.removeItem("refreshToken");
         localStorage.removeItem(process.env.AUTH_TOKEN_SS_KEY || "");
         localStorage.removeItem(process.env.REFRESH_TOKEN_LS_KEY || "");
         localStorage.removeItem(process.env.SESSION_TOKEN_LS_KEY || "");
