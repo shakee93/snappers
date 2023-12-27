@@ -33,24 +33,10 @@ export interface ProductQuickViewProps {
 
 const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }) => {
 
-  let brand = product.terms.nodes.find(node => node?.name)?.name || "DefaultBrand";
-  let slug = product.terms.nodes.find(node => node?.slug)?.slug || "product";
 
-  let product_images: string[] = [];
 
-  if (product.galleryImages.nodes) {
-    product_images = [product.image.sourceUrl, ...product.galleryImages.nodes.map(node => node.sourceUrl)];
-  } else if (product.galleryImages.edges && product.galleryImages.edges.length > 0) {
-    product_images = [product.image.sourceUrl, product.galleryImages.edges[0].node.sourceUrl, product.galleryImages.edges[1].node.sourceUrl];
-  } else {
-    product_images = [product.image.sourceUrl];
-  }
+  const link = useProductLink(product)
 
-  // console.log({ product });
-
-  // const link = useProductLink(product)
-
-  // console.log('recieved from quick view', product)
 
   const [variantActive, setVariantActive] = React.useState(0);
   const [sizeSelected, setSizeSelected] = React.useState("");

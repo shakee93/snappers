@@ -2,12 +2,18 @@ import Image from "next/image";
 import Prices from "@/app/components/Prices";
 import Link from "next/link";
 import React, {Fragment} from "react";
-import {ProductVariation, SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
+import {
+    PaCapacity,
+    ProductVariation,
+    SimpleProduct,
+    VariableProduct,
+    VariationAttribute
+} from "@/graphql/types/graphql";
 import AttributeIcon from "@/app/components/AttributeIcon";
 
 const AddedToCart = ({ quantity, product, variation }: {
-    product: SimpleProduct | VariableProduct
-    variation: ProductVariation
+    product: SimpleProduct & VariableProduct
+    variation?: ProductVariation
     quantity: number
 }) => {
     return <div className="flex">
@@ -33,10 +39,10 @@ const AddedToCart = ({ quantity, product, variation }: {
                             {product.type === 'VARIABLE' &&
                                 <p className="my-1 text-sm text-slate-500 dark:text-slate-400">
 
-                                    {variation?.attributes?.nodes.map((attr, index) =>
+                                    {variation?.attributes?.nodes.map((attr: VariationAttribute, index) =>
                                         <Fragment key={index}>
                                             <div className='flex items-center gap-1'>
-                                                <AttributeIcon name={attr?.name || ''} className='w-4'/> <span key={attr.value}> {product[`allPa${attr.label}`]?.nodes.find(node => node.slug === attr.value)?.name}</span>
+                                                <AttributeIcon name={attr?.name || ''} className='w-4'/> <span key={attr?.value}> {product[`allPa${attr?.label as unknown as 'Capacity'}`]?.nodes.find((node: PaCapacity) => node.slug === attr?.value)?.name}</span>
                                             </div>
                                         </Fragment>
                                     )}

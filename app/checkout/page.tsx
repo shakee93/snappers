@@ -19,6 +19,7 @@ import { useCart } from "@/context/CartProvider";
 import { useQuery } from "@apollo/client";
 import { GET_PAYMENT_GATEWAYS } from "@/graphql/defs/cart";
 import { GET_CUSTOMER_INFO, CHECKOUT_MUTATION } from "@/graphql/defs/order";
+import {PaymentGateway, SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
 
 export interface CartInfo {
     appliedCoupons: null;
@@ -72,7 +73,7 @@ const CheckoutPage = () => {
 
     const { loading, error, data, refetch } = useQuery(GET_PAYMENT_GATEWAYS);
 
-    const paymentGateways = data?.paymentGateways.nodes;
+    const paymentGateways: PaymentGateway[] = data?.paymentGateways.nodes;
 
     const [tabActive, setTabActive] = useState<
         "ContactInfo" | "ShippingAddress" | "PaymentMethod"
@@ -81,43 +82,47 @@ const CheckoutPage = () => {
     const [formData, setFormData] = useState({
         contactInfo: {},
         shippingAddress: {},
-        paymentMethod: {},
+        paymentMethod: {
+            selectedGateway: {
+                id: null
+            }
+        },
     });
 
     const updateFormData = (section: string, data: any) => {
         console.log('Incoming data:', data);
 
-        setFormData((prevData) => {
-            let updatedData;
-
-            if (section.toLowerCase() === 'shippingaddress') {
-                updatedData = {
-                    ...prevData,
-                    shippingAddress: {
-                        ...prevData.shippingAddress,
-                        ...data,
-                    },
-                };
-            } else if (section.toLowerCase() === 'contactinfo') {
-                updatedData = {
-                    ...prevData,
-                    contactInfo: {
-                        ...prevData.contactInfo,
-                        ...data,
-                    },
-                };
-            } else {
-                updatedData = {
-                    ...prevData,
-                    [section]: {
-                        ...prevData[section],
-                        ...data,
-                    },
-                };
-            }
-
-            return updatedData;
-        });
+        // setFormData((prevData) => {
+        //     let updatedData;
+        //
+        //     if (section.toLowerCase() === 'shippingaddress') {
+        //         updatedData = {
+        //             ...prevData,
+        //             shippingAddress: {
+        //                 ...prevData.shippingAddress,
+        //                 ...data,
+        //             },
+        //         };
+        //     } else if (section.toLowerCase() === 'contactinfo') {
+        //         updatedData = {
+        //             ...prevData,
+        //             contactInfo: {
+        //                 ...prevData.contactInfo,
+        //                 ...data,
+        //             },
+        //         };
+        //     } else {
+        //         updatedData = {
+        //             ...prevData,
+        //             [section]: {
+        //                 ...prevData[section],
+        //                 ...data,
+        //             },
+        //         };
+        //     }
+        //
+        //     return updatedData;
+        // });
     };
 
 
@@ -153,20 +158,18 @@ const CheckoutPage = () => {
     const renderProduct = (item: CartItem, index: number) => {
 
         const { product, quantity, key, subtotal, total } = item;
-        const { node } = product || {};
-        const { name, price, image, terms } = node || {};
-
-        const brandSlug = terms.nodes[0]?.slug || terms.nodes[1]?.slug || terms.nodes[2]?.slug || terms.nodes[3]?.slug;
+        const { name, slug, brands, price, image, terms } =
+            product.node as unknown as SimpleProduct & VariableProduct ;
 
         return (
             <div key={index} className="relative flex py-7 first:pt-0 last:pb-0">
                 <div className="relative h-36 w-24 sm:w-28 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
                     <Image fill style={{ objectFit: 'cover' }}
-                        src={image.sourceUrl}
-                        alt={name}
+                        src={image?.sourceUrl || ''}
+                        alt={name || ''}
                         className="h-full w-full object-contain object-center"
                     />
-                    <Link href={`/${brandSlug}/${product.node.slug}`} className="absolute inset-0"></Link>
+                    <Link href={`/${brands?.nodes[0].slug}/${slug}`} className="absolute inset-0"></Link>
                 </div>
 
                 <div className="ml-3 sm:ml-6 flex flex-1 flex-col">
@@ -174,7 +177,7 @@ const CheckoutPage = () => {
                         <div className="flex justify-between ">
                             <div className="flex-[1.5] ">
                                 <h3 className="text-base font-semibold">
-                                    <Link href={`/${brandSlug}/${product.node.slug}`}>{name}</Link>
+                                    <Link href={`/${brands?.nodes[0].slug}/${slug}`}>{name}</Link>
                                 </h3>
                                 <div className="mt-1.5 sm:mt-2.5 flex text-sm text-slate-600 dark:text-slate-300">
                                     <div className="flex items-center space-x-1.5">
@@ -400,7 +403,7 @@ const CheckoutPage = () => {
                         <h3 className="text-lg font-semibold">Order summary</h3>
                         <div className="mt-8 divide-y divide-slate-200/70 dark:divide-slate-700 ">
                             {/* {[PRODUCTS[0], PRODUCTS[2], PRODUCTS[3]].map(renderProduct)} */}
-                            {cart?.contents?.nodes.map(renderProduct)}
+                            {/*{cart?.contents?.nodes.map(renderProduct)}*/}
                         </div>
 
                         <div className="mt-10 pt-6 text-sm text-slate-500 dark:text-slate-400 border-t border-slate-200/70 dark:border-slate-700 ">
@@ -437,7 +440,7 @@ const CheckoutPage = () => {
                                 <span>{cart?.total || "$0.00"}</span>
                             </div>
                         </div>
-                        <ButtonPrimary href="" onClick={handleCheckout} className="mt-8 w-full">
+                        <ButtonPrimary onClick={handleCheckout} className="mt-8 w-full">
                             Confirm order
                         </ButtonPrimary>
                         <div className="mt-5 text-sm text-slate-500 dark:text-slate-400 flex items-center justify-center">

@@ -18,11 +18,13 @@ const ContactInfo: FC<Props> = ({
   onOpenActive,
   updateFormData,
 }) => {
-  const renderAccount = () => {
 
-    const [phone, setPhone] = useState("+94");
-    const [email, setEmail] = useState("");
-    const [subscribeToNews, setSubscribeToNews] = useState(true);
+  const [phone, setPhone] = useState("+94");
+  const [email, setEmail] = useState("");
+  const [subscribeToNews, setSubscribeToNews] = useState(true);
+
+
+  const renderAccount = () => {
 
     return (
       <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden z-0">

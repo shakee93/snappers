@@ -1,4 +1,11 @@
-import {CartItem, Product, SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
+import {
+    CartItem,
+    PaCapacity,
+    Product,
+    SimpleProduct,
+    VariableProduct,
+    VariationAttribute
+} from "@/graphql/types/graphql";
 import Image from "next/image";
 import Link from "next/link";
 import Prices from "@/app/components/Prices";
@@ -27,7 +34,7 @@ const CartItemProduct = ({
     }
 
 
-    const { name, image, price, slug, salePrice, type, stockQuantity, regularPrice }: SimpleProduct | VariableProduct = product.node as Product;
+    const { name, image, price, slug, salePrice, type, stockQuantity, regularPrice }: SimpleProduct & VariableProduct = product.node;
 
     return (
         <div
@@ -53,17 +60,17 @@ const CartItemProduct = ({
                             {type === 'VARIABLE' &&
                                 <div className="mt-1.5 sm:mt-2.5 flex text-sm text-slate-600 dark:text-slate-300">
                                     {type === 'VARIABLE' &&
-                                        <p className="my-1 text-sm text-slate-500 dark:text-slate-400">
+                                        <div className="my-1 text-sm text-slate-500 dark:text-slate-400">
 
                                             {variation?.attributes?.map((attr, index) =>
                                                 <Fragment key={index}>
                                                     <div className='flex items-center gap-1'>
-                                                        <AttributeIcon name={attr?.name || ''} className='w-4'/> <span key={attr.value}> {product.node[`allPa${attr.label}`]?.nodes.find(node => node.slug === attr.value)?.name}</span>
+                                                        <AttributeIcon name={attr?.name || ''} className='w-4'/> <span key={attr?.value}> {(product.node as unknown as VariableProduct)[`allPa${attr?.label as unknown as 'Capacity'}`]?.nodes.find((node: PaCapacity) => node.slug === attr?.value)?.name}</span>
                                                     </div>
                                                 </Fragment>
                                             )}
 
-                                        </p>
+                                        </div>
                                     }
 
                                 </div>

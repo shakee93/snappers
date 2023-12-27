@@ -5,12 +5,13 @@ import { usePathname, useSearchParams } from 'next/navigation'
 import ButtonClose from "@/shared/ButtonClose/ButtonClose";
 import ProductQuickView from "./ProductQuickView3";
 import ProductQuickView2 from "@/components/ProductQuickView";
+import {SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
 
 
 export interface ModalQuickViewProps {
   show: boolean;
   onCloseModalQuickView: () => void;
-  productData: SimpleProduct | VariableProduct;
+  productData: SimpleProduct & VariableProduct;
 }
 
 const ModalQuickView: FC<ModalQuickViewProps> = ({

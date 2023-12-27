@@ -88,7 +88,7 @@ console.log("refreshToken before assigning:", refreshToken);
 export function SessionProvider({ children }: {
     children: ReactNode
 }) {
-    const [sessionToken, setSessionToken] = useState<string | null>(typeof window !== "undefined" ? localStorage.getItem('sessionToken') : null);
+    const [sessionToken, setSessionToken] = useState<string | null>(typeof window !== "undefined" ? localStorage.getItem('wpSessionToken') : null);
     const { data, refetch } = useQuery(GET_CART, {
         skip: true
     })
@@ -180,8 +180,6 @@ export function SessionProvider({ children }: {
         async function fetchAndStoreSessionToken() {
             try {
                 const { data } = await refetch()
-
-                console.log(data);
 
                 if (data && data?.customer?.sessionToken) {
                     const newSessionToken = data.customer.sessionToken;

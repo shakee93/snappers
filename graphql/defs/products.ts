@@ -4,7 +4,7 @@ import { ProductContentFull } from "@/graphql/defs/products.fragments";
 
 export const GET_BRANDS = gql`
     query getBrands {
-        brands(first: 12, where: {orderby: COUNT}) {
+        brands(first: 50, where: {orderby: COUNT}) {
             nodes {
                 name
                 slug

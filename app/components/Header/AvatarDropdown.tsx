@@ -5,11 +5,11 @@ import {avatarImgs} from "@/contains/fakeData";
 import {CircleUserRound} from "lucide-react";
 import {Fragment, useEffect} from "react";
 import Link from "next/link";
-import Avatar from "@/public/shared/Avatar/Avatar";
-import SwitchDarkMode2 from "@/public/shared/SwitchDarkMode/SwitchDarkMode2";
 import LogoutButton from "@/components/Header/LogoutButton";
 import {useLazyQuery, useQuery} from "@apollo/client";
 import { GET_ACCOUNT_DETAILS } from "@/graphql/defs/auth";
+import SwitchDarkMode2 from "@/shared/SwitchDarkMode/SwitchDarkMode2";
+import Avatar from "@/shared/Avatar/Avatar";
 
 export default function AvatarDropdown() {
 

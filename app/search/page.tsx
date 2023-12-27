@@ -2,7 +2,7 @@ import {getClient} from "@/graphql/apollo-ssr";
 import {GET_ALL_PRODUCTS} from "@/graphql/defs/products";
 import InstantSearchWrapper from "@/app/components/InstantSearchWrapper";
 
-export async function getData(categories: number[] | null = null) {
+async function getData(categories: number[] | null = null) {
     const { data, error } = await getClient().query({
         query: GET_ALL_PRODUCTS,
         fetchPolicy: 'no-cache'

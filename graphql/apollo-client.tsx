@@ -120,23 +120,23 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
         );
       }
 
-      console.log("Auth token:", authToken);
+      // console.log("Auth token:", authToken);
       return authToken;
     }
 
     async function getAuthToken() {
       console.log("getAuthToken");
       let authToken = localStorage.getItem(process.env.AUTH_TOKEN_SS_KEY ?? "");
-      console.log("getAuthToken authToken:", authToken);
+      // console.log("getAuthToken authToken:", authToken);
 
 
       if (!authToken || !tokenSetter) {
         console.log("token not set");
 
         authToken = await fetchAuthToken() ?? "no auth token";
-        console.log("after fetchAuthToken ", authToken);
+        // console.log("after fetchAuthToken ", authToken);
       }
-      console.log("not fetched AuthToken");
+      // console.log("not fetched AuthToken");
 
       return authToken;
     }
@@ -146,9 +146,9 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
       const refreshToken = localStorage.getItem('wpRefreshToken');
       const authToken = localStorage.getItem(process.env.AUTH_TOKEN_SS_KEY || "");
 
-      console.log("Session token inside apollo Link:", sessionToken);
-      console.log("Refresh token inside apollo Link::", refreshToken);
-      console.log("Auth token inside apollo Link::", authToken);
+      // console.log("Session token inside apollo Link:", sessionToken);
+      // console.log("Refresh token inside apollo Link::", refreshToken);
+      // console.log("Auth token inside apollo Link::", authToken);
 
 
 
@@ -176,30 +176,33 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
       // handleRefreshToken();
 
 
-      operation.setContext(async ({ context }: DefaultContext) => {
-        const { headers: currentHeaders = {} } = context || {}; // Destructure context and set default headers object
-        const headers = { ...currentHeaders };
-        const authToken = await getAuthToken();
+      // operation.setContext(async ({ context }: DefaultContext) => {
+      //   const { headers } = context ; // Destructure context and set default headers object
+      //   // const authToken = await getAuthToken();
+      //
+      //   // if (authToken) {
+      //   //   // headers.Authorization = `Bearer ${authToken}`;
+      //   // }
+      //
+      //   if (sessionToken) {
+      //     headers['woocommerce-session'] = `Session ${sessionToken}`;
+      //   }
+      //
+      //   if (sessionToken) {
+      //
+      //     console.log(headers);
+      //     return { headers };
+      //   }
+      //
+      //   return {};
+      // });
 
-        if (authToken) {
-          headers.Authorization = `Bearer ${authToken}`;
-        }
 
-        if (refreshToken) {
-          if (sessionToken) {
-            headers['woocommerce-session'] = `Session ${sessionToken}`;
-          }
-        }
-
-        if (authToken || sessionToken) {
-          return { headers };
-        }
-
-        return {};
+      operation.setContext({
+        headers: {
+          'woocommerce-session' : `Session ${sessionToken}`, // Set the sessionToken as an Authorization header
+        },
       });
-
-
-
 
 
 
@@ -226,21 +229,18 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
       // Use the `NextSSRInMemoryCache`, not the normal `InMemoryCache`
       connectToDevTools: true,
       cache: new NextSSRInMemoryCache(),
-      link : from([
-        authLink,
-        typeof window === "undefined"
-            ? ApolloLink.from([
-              // In an SSR environment, if you use multipart features like
-              // @defer, you need to decide how to handle these.
-              // This strips all interfaces with a `@defer` directive from your queries.
-              new SSRMultipartLink({
-                stripDefer: true,
-              }),
-              httpLink,
-            ])
-            : httpLink
-      ]),
-
+      link : authLink.concat(typeof window === "undefined"
+          ? ApolloLink.from([
+            // In an SSR environment, if you use multipart features like
+            // @defer, you need to decide how to handle these.
+            // This strips all interfaces with a `@defer` directive from your queries.
+            new SSRMultipartLink({
+              stripDefer: true,
+            }),
+            httpLink,
+          ])
+          : httpLink
+      ),
       defaultOptions: {
         watchQuery: {
           fetchPolicy: "no-cache",

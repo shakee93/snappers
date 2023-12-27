@@ -6,18 +6,19 @@ import {getClient} from "@/graphql/apollo-ssr";
 import {
     GET_ALL_PRODUCTS,
     GET_BRAND,
-    GET_BRAND_ARCHIVE,
+    GET_BRAND_ARCHIVE, GET_BRANDS,
     GET_CATEGORY,
     GET_VARIATIONS_PRODUCT
 } from "@/graphql/defs/products";
 import {notFound} from "next/navigation";
-import {Product} from "@/graphql/types/graphql";
+import {Brand, Product} from "@/graphql/types/graphql";
 import Image from "next/image";
 import SidebarFilters from "@/app/components/SidebarFilters";
 import ProductGrid from "@/app/components/ProductGrid";
 import InstantSearchWrapper from "@/app/components/InstantSearchWrapper";
 
-export async function getData(slug : string | null = null)  {
+
+async function getData(slug : string | null = null)  {
 
 
     const {data} = await getClient().query(

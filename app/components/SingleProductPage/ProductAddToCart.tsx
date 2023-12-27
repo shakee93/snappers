@@ -14,7 +14,7 @@ import {twMerge} from "tailwind-merge";
 
 
 const ProductAddToCart = ({product, variation} : {
-  product: SimpleProduct | VariableProduct
+  product: SimpleProduct & VariableProduct
   variation: ProductVariation
 }) => {
 

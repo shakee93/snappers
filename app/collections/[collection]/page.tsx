@@ -19,7 +19,7 @@ import Pagination from "@/shared/Pagination/Pagination";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import InstantSearchWrapper from "@/app/components/InstantSearchWrapper";
 
-export async function getData(slug : string | null = null)  {
+async function getData(slug : string | null = null)  {
 
     const {data} = await getClient().query(
         {

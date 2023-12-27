@@ -417,13 +417,13 @@ const TabFilters = ({
                       <div className="py-7">
                         <h3 className="text-xl font-medium">Categories</h3>
                         <div className="mt-6 relative ">
-                          {renderMoreFilterItem(categories)}
+                          {/*{renderMoreFilterItem(categories)}*/}
                         </div>
                       </div>
                       <div className="py-7">
                         <h3 className="text-xl font-medium">Brands</h3>
                         <div className="mt-6 relative ">
-                          {renderMoreFilterItem(categories)}
+                          {/*{renderMoreFilterItem(categories)}*/}
                         </div>
                       </div>
                       {/* --------- */}

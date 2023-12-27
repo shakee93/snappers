@@ -1,14 +1,12 @@
 import React, { FC } from "react";
 import Link from "next/link";
 
-export interface PagePrivacyProps {
-  className?: string;
-}
 
-const PagePrivacy: FC<PagePrivacyProps> = ({ className = "" }) => {
+
+export default function PagePrivacy() {
   return (
     <div
-      className={`overflow-hidden relative ${className}`}
+      className={`overflow-hidden relative`}
       data-nc-id="PageAbout"
     >
       <title>Privacy Policy </title>
@@ -325,4 +323,3 @@ const PagePrivacy: FC<PagePrivacyProps> = ({ className = "" }) => {
   );
 };
 
-export default PagePrivacy;
