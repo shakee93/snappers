@@ -9,15 +9,6 @@ import { LoginResponse } from "@/utils/type";
 import { useSession } from "@/context/SessionProvider";
 import { useRouter } from "next/navigation";
 
-const REGISTER_CUSTOMER_MUTATION = gql`
-    mutation RegisterCustomer($input: RegisterCustomerInput!) {
-        registerCustomer(input: $input) {
-            authToken
-            refreshToken
-        }
-    }
-`;
-
 const LoginForm = () => {
     const [email, setEmail] = useState(""); 
     const [password, setPassword] = useState(""); 

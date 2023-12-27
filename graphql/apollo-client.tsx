@@ -19,6 +19,7 @@ import { GraphQLClient } from 'graphql-request';
 import { gql } from "@apollo/client";
 import { GET_AUTH_TOKEN } from "./defs/auth";
 import { getClient } from "./apollo-ssr";
+import { getSessionToken } from "./session-handler";
 
 
 // export async function getSessionToken(forceFetch = false) {
@@ -142,45 +143,19 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
     }
 
     const authLink = new ApolloLink((operation, forward) => {
-      const sessionToken = localStorage.getItem('wpSessionToken');
-      const refreshToken = localStorage.getItem('wpRefreshToken');
-      const authToken = localStorage.getItem(process.env.AUTH_TOKEN_SS_KEY || "");
-
-      console.log("Session token inside apollo Link:", sessionToken);
-      console.log("Refresh token inside apollo Link::", refreshToken);
-      console.log("Auth token inside apollo Link::", authToken);
-
-
-
-
-      // // async function handleRefreshToken() {
-      //   if (refreshToken) {
-      //     try {
-      //       const token = await getAuthToken();
-      //       // const token = process.env.WORDPRESS_AUTH_REFRESH_TOKEN;
-      //       console.log("got auth token as :", token);
-      //       operation.setContext((context: any) => ({
-      //         headers: {
-      //           ...context.headers,
-      //           Authorization: `Bearer ${token}`,
-      //         },
-      //       }));
-      //       console.log("Bearer token added to header");
-      //     } catch (err) {
-      //       console.error("Error setting Authorization header:", err);
-      //     }
-      //   }
-      // }
-
-      // // Call the async function to handle refreshToken
-      // handleRefreshToken();
-
-
       operation.setContext(async ({ context }: DefaultContext) => {
         const { headers: currentHeaders = {} } = context || {}; // Destructure context and set default headers object
         const headers = { ...currentHeaders };
+        const sessionToken = await getSessionToken();
         const authToken = await getAuthToken();
 
+        const refreshToken = localStorage.getItem(process.env.REFRESH_TOKEN_LS_KEY || "");
+        const localAuthToken = localStorage.getItem(process.env.AUTH_TOKEN_SS_KEY || "");
+
+        console.log('localAuthToken inside apollo link: ', localAuthToken);
+        console.log("Refresh token inside apollo Link::", refreshToken);
+        console.log("Auth token inside apollo Link::", authToken);
+        
         if (authToken) {
           headers.Authorization = `Bearer ${authToken}`;
         }
@@ -197,11 +172,6 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
 
         return {};
       });
-
-
-
-
-
 
       return forward(operation);
     });
@@ -226,19 +196,19 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
       // Use the `NextSSRInMemoryCache`, not the normal `InMemoryCache`
       connectToDevTools: true,
       cache: new NextSSRInMemoryCache(),
-      link : from([
+      link: from([
         authLink,
         typeof window === "undefined"
-            ? ApolloLink.from([
-              // In an SSR environment, if you use multipart features like
-              // @defer, you need to decide how to handle these.
-              // This strips all interfaces with a `@defer` directive from your queries.
-              new SSRMultipartLink({
-                stripDefer: true,
-              }),
-              httpLink,
-            ])
-            : httpLink
+          ? ApolloLink.from([
+            // In an SSR environment, if you use multipart features like
+            // @defer, you need to decide how to handle these.
+            // This strips all interfaces with a `@defer` directive from your queries.
+            new SSRMultipartLink({
+              stripDefer: true,
+            }),
+            httpLink,
+          ])
+          : httpLink
       ]),
 
       defaultOptions: {

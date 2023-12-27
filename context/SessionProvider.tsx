@@ -12,7 +12,9 @@ const SessionContext = createContext<Session>({
     signUp: async (email: string, password: string) => {
         return { data: null, error: null };
     },
-    login: ()=>{},
+    login: async (email: string, password: string) => {
+        return { data: null, error: null };
+    },
     logout: () => { }
 });
 
@@ -23,8 +25,6 @@ export function useSession() {
 type AuthType = "registerCustomer" | "login";
 
 function saveResponseToLocalStorage(response: any, type: AuthType = "registerCustomer") {
-    // const authToken = response?.data?.[type]?.authToken;
-    // const refreshToken = response?.data?.[type]?.refreshToken;
     const email = response?.data?.[type]?.customer?.email;
     const displayName = response?.data?.[type]?.customer?.displayName;
     const firstName = response?.data?.[type]?.customer?.firstName;
@@ -34,20 +34,8 @@ function saveResponseToLocalStorage(response: any, type: AuthType = "registerCus
     const phone_number = response?.data?.[type]?.customer?.metaData?.[3]?.value;
     const about = response?.data?.[type]?.customer?.metaData?.[4]?.value;
     const id = response?.data?.[type]?.customer?.id;
-    let session = response?.data?.[type]?.sessionToken || response?.data?.[type]?.customer?.jwtAuthToken; // Check session token
-
-
-    // Set session token in localStorage
-    if (process.env.SESSION_TOKEN_LS_KEY) { 
-        console.log("key Name is available");
-        
-        localStorage.setItem(process.env.SESSION_TOKEN_LS_KEY, session ?? "");
-    }
     
-    // localStorage.setItem("sesToken", session || "");
-    // localStorage.setItem("authToken", session || "");
-
-    // localStorage.setItem("refreshToken", refreshToken || "");
+    // save User details
     localStorage.setItem("email", email || "");
     localStorage.setItem("displayName", displayName || "");
     localStorage.setItem("firstName", firstName || "");
@@ -58,23 +46,27 @@ function saveResponseToLocalStorage(response: any, type: AuthType = "registerCus
     localStorage.setItem("about", about || "");
     localStorage.setItem("id", id || "");
 
-    let authToken, refreshToken, sess;
+    let authToken, refreshToken, sessionToken;
 
     if (type === "login") {
+        sessionToken = response.data?.login?.sessionToken;
         authToken = response?.data?.login?.authToken;
         refreshToken = response?.data?.login?.refreshToken;
 
     } else if (type === "registerCustomer") {
-        // Assuming the structure of response is similar for registration
+        sessionToken = response.data?.login?.customer.sessionToken;
         authToken = response?.data?.registerCustomer?.user?.jwtAuthToken;
         refreshToken = response?.data?.registerCustomer?.user?.jwtRefreshToken;
     }
 
-console.log("authToken before assigning:", authToken);
-console.log("refreshToken before assigning:", refreshToken);
+    console.log("sessionToken on the login:", sessionToken);
+    console.log("refreshToken on the login:", refreshToken);
+    console.log("authToken on the login:", authToken);
 
+    if(sessionToken) {
+        localStorage.setItem(process.env.SESSION_TOKEN_LS_KEY || "", sessionToken);
+    }
     if (authToken) {
-        localStorage.setItem(process.env.AUTH_TOKEN_SS_KEY || "", authToken);
         localStorage.setItem(process.env.AUTH_TOKEN_SS_KEY || "", authToken);
     }
     if (refreshToken) {
@@ -172,6 +164,7 @@ export function SessionProvider({ children }: {
         // localStorage.removeItem("refreshToken");
         localStorage.removeItem(process.env.AUTH_TOKEN_SS_KEY || "");
         localStorage.removeItem(process.env.REFRESH_TOKEN_LS_KEY || "");
+        localStorage.removeItem(process.env.SESSION_TOKEN_LS_KEY || "");
 
         setSessionToken(null);
     };

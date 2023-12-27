@@ -25,6 +25,7 @@ const getSlides = async () => {
   return data?.slides?.nodes
 }
 
+
 export default async function Home() {
 
   const slides = await getSlides()

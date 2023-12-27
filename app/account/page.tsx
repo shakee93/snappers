@@ -1,7 +1,7 @@
 "use client";
 import React, { FC, useEffect, useState } from "react";
-import { gql, useMutation, useQuery } from "@apollo/client";
-import {  UPDATE_ACCOUNT_INFORMATION } from "@/graphql/defs/auth";
+import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { GET_ACCOUNT_DETAILS, UPDATE_ACCOUNT_INFORMATION } from "@/graphql/defs/auth";
 import Input from "@/shared/Input/Input";
 import Label from "@/components/Label/Label";
 import Select from "@/shared/Select/Select";
@@ -12,10 +12,10 @@ import { getClient } from "@/graphql/apollo-ssr";
 import { useSession } from "@/context/SessionProvider";
 
 
-const AccountPage =  () => {
+const AccountPage = () => {
     const [customerId, setCustomerId] = useState("");
-    const [authKey, setAuthKey] = useState("");
     const [UpdateCustomer] = useMutation(UPDATE_ACCOUNT_INFORMATION);
+
     const [formData, setFormData] = useState({
         id: customerId,
         fullName: "",
@@ -26,37 +26,29 @@ const AccountPage =  () => {
         phoneNumber: "",
         about: "",
     });
-   
-    useEffect(() => {
-        // const fetchData = async () => {
-        //     try {
-        //         let response = await getAccountDetails();
-        //         console.log("response: ", response);
-        //     } catch (error) {
-        //         console.error("Error fetching account details:", error);
-        //     }
-        // };
-    
-        // fetchData();
-    }, []);
-    
-    
-    useEffect(() => {
+
+    const data= useQuery(GET_ACCOUNT_DETAILS, {
+        fetchPolicy: 'no-cache'
+    })
 
 
+    useEffect(() => {
+        console.log(data);
+    }, [data])
+
+
+    useEffect(() => {
         const id = localStorage.getItem("id");
-        const authToken = localStorage.getItem(process.env.AUTH_TOKEN_SS_KEY?? "");
+        const authToken = localStorage.getItem(process.env.AUTH_TOKEN_SS_KEY ?? "");
         console.log("authToken is: ", authToken);
         console.log("id is: ", id);
-        
-    if (!id || !authToken) {
+
+        if (!id || !authToken) {
             redirect('/login');
             return;
         }
 
         setCustomerId(id);
-        setAuthKey(authToken);
-
         // const storedData = {
         //     id: id,
         //     fullName: localStorage.getItem("displayName") || "",
@@ -111,7 +103,7 @@ const AccountPage =  () => {
         localStorage.setItem("phone_number", phoneNumber || "");
         localStorage.setItem("about", about || "");
 
-     
+
         console.log("Form Data:", formData);
     };
 
