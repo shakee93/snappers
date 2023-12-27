@@ -6,6 +6,7 @@ import { GET_CART } from "@/graphql/defs/cart";
 import { LOGIN_CUSTOMER_MUTATION, REGISTER_CUSTOMER_MUTATION } from '@/graphql/defs/auth';
 import { LoginResponse, Session } from "@/utils/type";
 import { LoginCustomerMutation, RegisterCustomerMutation } from "@/graphql/types/graphql";
+import { saveCredentials } from '@/graphql/session-handler';
 
 const SessionContext = createContext<Session>({
     sessionToken: null,
@@ -72,6 +73,8 @@ function saveResponseToLocalStorage(response: any, type: AuthType = "registerCus
     if (refreshToken) {
         localStorage.setItem(process.env.REFRESH_TOKEN_LS_KEY || "", refreshToken);
     }
+
+    saveCredentials(authToken, sessionToken, refreshToken);
 
     console.log("Updated Response: ", response);
 }
@@ -179,7 +182,7 @@ export function SessionProvider({ children }: {
                 if (data && data?.customer?.sessionToken) {
                     const newSessionToken = data.customer.sessionToken;
                     setSessionToken(newSessionToken);
-                    localStorage.setItem('wpSessionToken', newSessionToken);
+                    localStorage.setItem(process.env.SESSION_TOKEN_LS_KEY || "", newSessionToken);
                 }
             } catch (error) {
                 console.error('Error fetching session token:', error);

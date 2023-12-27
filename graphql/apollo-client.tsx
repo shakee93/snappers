@@ -137,7 +137,6 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
         authToken = await fetchAuthToken() ?? "no auth token";
         console.log("after fetchAuthToken ", authToken);
       }
-      console.log("not fetched AuthToken");
 
       return authToken;
     }
@@ -156,15 +155,17 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
         console.log("Refresh token inside apollo Link::", refreshToken);
         console.log("Auth token inside apollo Link::", authToken);
         
-        if (authToken) {
-          headers.Authorization = `Bearer ${authToken}`;
-        }
-
         if (refreshToken) {
-          if (sessionToken) {
-            headers['woocommerce-session'] = `Session ${sessionToken}`;
+          if (authToken) {
+            headers.Authorization = `Bearer ${authToken}`;
           }
         }
+
+
+        if (sessionToken) {
+          headers['woocommerce-session'] = `Session ${sessionToken}`;
+        }
+
 
         if (authToken || sessionToken) {
           return { headers };

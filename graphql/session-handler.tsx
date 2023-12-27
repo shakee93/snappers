@@ -24,11 +24,17 @@ async function fetchSessionToken() {
 }
 
 export function saveCredentials(authToken: string, sessionToken: string, refreshToken = null) {
-    if(authToken || sessionToken) {
-        throw new Error('Invalid credentials');
-    }
-    sessionStorage.setItem(process.env.AUTH_TOKEN_SS_KEY || "", authToken);
-    sessionStorage.setItem(process.env.SESSION_TOKEN_LS_KEY || "", sessionToken);
+    const authTokenExists = !!authToken;
+    const sessionTokenExists = !!sessionToken;
+    const refreshTokenExists = !!refreshToken;
+
+    console.log("saving credentials");
+    console.log("Auth Token Exists:", authTokenExists);
+    console.log("Session Token Exists:", sessionTokenExists);
+    console.log("Refresh Token Exists:", refreshTokenExists);
+
+    localStorage.setItem(process.env.AUTH_TOKEN_SS_KEY || "", authToken);
+    localStorage.setItem(process.env.SESSION_TOKEN_LS_KEY || "", sessionToken);
     if (refreshToken) {
       localStorage.setItem(process.env.REFRESH_TOKEN_LS_KEY || "", refreshToken);
     }
