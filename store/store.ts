@@ -1,5 +1,6 @@
 import {create} from 'zustand'
 import {ProductAttribute, VariationAttribute} from "@/graphql/types/graphql";
+import {PRICE_RANGE} from "@/app/components/Filters/PriceFilter";
 
 type State = {
     sidebar: {
@@ -9,6 +10,7 @@ type State = {
         priceRange: number[],
         on_sale: boolean,
         sort: string
+        in_stock: boolean
     }
     product: {
         attribute: any[]
@@ -18,6 +20,7 @@ type State = {
 type Actions = {
     syncCategories: (categories: number[]) => void
     syncOnSale: (onSale:boolean) => void
+    setInStock: (onSale:boolean) => void
     setSort: (sort:string) => void
     syncBrands: (brands: number[]) => void
     synPriceRange: (brands: number[]) => void
@@ -30,9 +33,10 @@ export const useStore = create<State & Actions>((set) => ({
         categories: [],
         brands: [],
         mounted: 0,
-        priceRange: [500, 500000],
+        priceRange: PRICE_RANGE,
         on_sale: false,
-        sort: ""
+        sort: "",
+        in_stock: false
     },
     product: {
         attribute: []
@@ -42,6 +46,13 @@ export const useStore = create<State & Actions>((set) => ({
         sidebar: {
             ...state.sidebar,
             sort
+        },
+    })),
+    setInStock: (in_stock: boolean) => set((state) => ({
+        ...state,
+        sidebar: {
+            ...state.sidebar,
+            in_stock
         },
     })),
     syncOnSale: (on_sale: boolean) => set((state) => ({

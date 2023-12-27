@@ -178,7 +178,7 @@ const ProductCard: FC<ProductCardProps> = ({
                                     {/* Omitted the size span */}
                                 </p>
                             </div>
-                            <Prices price={price} className="mt-0.5" />
+                            <Prices price={price} salePrice={regularPrice} className="mt-0.5" />
                         </div>
                     </div>
                     <div className="flex flex-1 items-end justify-between text-sm">
