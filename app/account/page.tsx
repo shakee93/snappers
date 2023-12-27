@@ -11,41 +11,6 @@ import { redirect } from "next/navigation";
 import { getClient } from "@/graphql/apollo-ssr";
 import { useSession } from "@/context/SessionProvider";
 
-// export const GET_ACCOUNT_DETAILS = gql`
-// query MyQuery2 {
-//   brands {
-//     edges {
-//       node {
-//         id
-//       }
-//     }
-//   }
-// }
-  
-// `;
-
-
-export const GET_ACCOUNT_DETAILS = gql`
-  query getAccountDetails{
-  customer {
-    email
-    displayName
-    billing {
-      address1
-      phone
-      email
-    }
-    metaData(multiple: true) {
-      key
-      value
-      id
-    }
-    username
-    id
-  }
-}
-`;
-
 
 const AccountPage =  () => {
     const [customerId, setCustomerId] = useState("");
@@ -61,10 +26,7 @@ const AccountPage =  () => {
         phoneNumber: "",
         about: "",
     });
-    const {updateCustomer} = useSession()
-    let response = useQuery(GET_ACCOUNT_DETAILS);
-    console.log(response);
-
+   
     useEffect(() => {
         // const fetchData = async () => {
         //     try {
@@ -87,7 +49,7 @@ const AccountPage =  () => {
         console.log("authToken is: ", authToken);
         console.log("id is: ", id);
         
-        if (!id || !authToken) {
+    if (!id || !authToken) {
             redirect('/login');
             return;
         }

@@ -10,26 +10,26 @@ export interface CommonLayoutProps {
   children?: React.ReactNode; 
 }
 
-export const GET_ACCOUNT_DETAILS = gql`
-  query getAccountDetails{
-  customer {
-    email
-    displayName
-    billing {
-      address1
-      phone
-      email
-    }
-    metaData(multiple: true) {
-      key
-      value
-      id
-    }
-    username
-    id
-  }
-}
-`;
+// export const GET_ACCOUNT_DETAILS = gql`
+//   query getAccountDetails{
+//   customer {
+//     email
+//     displayName
+//     billing {
+//       address1
+//       phone
+//       email
+//     }
+//     metaData(multiple: true) {
+//       key
+//       value
+//       id
+//     }
+//     username
+//     id
+//   }
+// }
+// `;
 
 const CommonLayout: FC<CommonLayoutProps> = async ({ children }) => {
 

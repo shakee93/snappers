@@ -9,23 +9,23 @@ import Avatar from "@/public/shared/Avatar/Avatar";
 import SwitchDarkMode2 from "@/public/shared/SwitchDarkMode/SwitchDarkMode2";
 import LogoutButton from "@/components/Header/LogoutButton";
 import {useLazyQuery, useQuery} from "@apollo/client";
-import {GET_ACCOUNT_DETAILS} from "@/app/account/layout";
+import { GET_ACCOUNT_DETAILS } from "@/graphql/defs/auth";
 
 export default function AvatarDropdown() {
 
-    const [getUser, { data }] = useLazyQuery(GET_ACCOUNT_DETAILS, {
-        fetchPolicy: 'no-cache'
-    })
+    // const [getUser, { data }] = useLazyQuery(GET_ACCOUNT_DETAILS, {
+    //     fetchPolicy: 'no-cache'
+    // })
 
 
-    useEffect(() => {
-        console.log(data?.data);
-    }, [data])
+    // useEffect(() => {
+    //     console.log(data?.data);
+    // }, [data])
 
   return (
     <div className="AvatarDropdown ">
 
-        <button onClick={e => getUser() }>Fetch User</button>
+        {/* <button onClick={e => getUser() }>Fetch User</button> */}
       <Popover className="relative">
         {({ open, close }) => (
           <>

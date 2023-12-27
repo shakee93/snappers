@@ -92,26 +92,26 @@ export const UPDATE_ACCOUNT_INFORMATION = gql`
 `;
 
 
-// export const GET_ACCOUNT_DETAILS = gql`
-//     query getAccountDetails($input: UpdateCustomerInput!) {
-//         customer(id: $input) {
-//             email
-//             displayName
-//             billing {
-//                 address1
-//                 phone
-//                 email
-//             }
-//             metaData(multiple: true) {
-//                 key
-//                 value
-//                 id
-//             }
-//             username
-//             id
-//         }
-//     }
-// `;
+export const GET_ACCOUNT_DETAILS = gql`
+    query getAccountDetails {
+        customer {
+            email
+            displayName
+            billing {
+                address1
+                phone
+                email
+            }
+            metaData(multiple: true) {
+                key
+                value
+                id
+            }
+            username
+            id
+        }
+    }
+`;
 
 
 export const LOGIN_CUSTOMER_MUTATION = gql`

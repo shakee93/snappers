@@ -12,9 +12,7 @@ const SessionContext = createContext<Session>({
     signUp: async (email: string, password: string) => {
         return { data: null, error: null };
     },
-    login: async (email: string, password: string) => {
-        return { data: null, error: null };
-    },
+    login: ()=>{},
     logout: () => { }
 });
 
