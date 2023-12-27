@@ -1,5 +1,5 @@
 import Label from "components/Label/Label";
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Input from "shared/Input/Input";
@@ -10,14 +10,27 @@ interface Props {
   isActive: boolean;
   onCloseActive: () => void;
   onOpenActive: () => void;
+  updateFormData: (section: string, data: any) => void;
 }
 
 const ShippingAddress: FC<Props> = ({
   isActive,
   onCloseActive,
   onOpenActive,
+  updateFormData,
 }) => {
   const renderShippingAddress = () => {
+
+    const [firstName, setFirstName] = useState("Cole");
+    const [lastName, setLastName] = useState("Enrico");
+    const [address, setAddress] = useState("123, Dream Avenue, USA");
+    const [apartment, setApartment] = useState("55U - DD5");
+    const [city, setCity] = useState("Norris");
+    const [state, setState] = useState("Texas");
+    const [postal, setPostal] = useState("2500");
+    const [country, setCountry] = useState("United States");
+    const [addressType, setAddressType] = useState("home");
+
     return (
       <div className="border border-slate-200 dark:border-slate-700 rounded-xl ">
         <div className="p-6 flex flex-col sm:flex-row items-start">
@@ -99,19 +112,26 @@ const ShippingAddress: FC<Props> = ({
           </ButtonSecondary>
         </div>
         <div
-          className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${
-            isActive ? "block" : "hidden"
-          }`}
+          className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${isActive ? "block" : "hidden"
+            }`}
         >
           {/* ============ */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
             <div>
               <Label className="text-sm">First name</Label>
-              <Input className="mt-1.5" defaultValue="Cole" />
+              <Input
+                className="mt-1.5"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+              />
             </div>
             <div>
               <Label className="text-sm">Last name</Label>
-              <Input className="mt-1.5" defaultValue="Enrico " />
+              <Input
+                className="mt-1.5"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+              />
             </div>
           </div>
 
@@ -124,11 +144,16 @@ const ShippingAddress: FC<Props> = ({
                 placeholder=""
                 defaultValue={"123, Dream Avenue, USA"}
                 type={"text"}
+                onChange={(e) => setAddress(e.target.value)}
               />
             </div>
             <div className="sm:w-1/3">
               <Label className="text-sm">Apt, Suite *</Label>
-              <Input className="mt-1.5" defaultValue="55U - DD5 " />
+              <Input
+                className="mt-1.5"
+                defaultValue="55U - DD5"
+                onChange={(e) => setApartment(e.target.value)}
+              />
             </div>
           </div>
 
@@ -136,11 +161,19 @@ const ShippingAddress: FC<Props> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
             <div>
               <Label className="text-sm">City</Label>
-              <Input className="mt-1.5" defaultValue="Norris" />
+              <Input
+                className="mt-1.5"
+                defaultValue="Norris"
+                onChange={(e) => setCity(e.target.value)}
+              />
             </div>
             <div>
               <Label className="text-sm">Country</Label>
-              <Select className="mt-1.5" defaultValue="United States ">
+              <Select
+                className="mt-1.5"
+                defaultValue="United States "
+                onChange={(e) => setCountry(e.target.value)}
+              >
                 <option value="United States">United States</option>
                 <option value="United States">Canada</option>
                 <option value="United States">Mexico</option>
@@ -157,11 +190,19 @@ const ShippingAddress: FC<Props> = ({
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
             <div>
               <Label className="text-sm">State/Province</Label>
-              <Input className="mt-1.5" defaultValue="Texas" />
+              <Input
+                className="mt-1.5"
+                defaultValue="Texas"
+                onChange={(e) => setState(e.target.value)}
+              />
             </div>
             <div>
               <Label className="text-sm">Postal code</Label>
-              <Input className="mt-1.5" defaultValue="2500 " />
+              <Input
+                className="mt-1.5"
+                defaultValue="2500 "
+                onChange={(e) => setPostal(e.target.value)}
+              />
             </div>
           </div>
 
@@ -173,12 +214,14 @@ const ShippingAddress: FC<Props> = ({
                 label={`<span class="text-sm font-medium">Home <span class="font-light">(All Day Delivery)</span></span>`}
                 id="Address-type-home"
                 name="Address-type"
-                defaultChecked
+                defaultChecked={addressType === 'home'}
+                onChange={() => setAddressType('home')}
               />
               <Radio
                 label={`<span class="text-sm font-medium">Office <span class="font-light">(Delivery <span class="font-medium">9 AM - 5 PM</span>)</span> </span>`}
                 id="Address-type-office"
                 name="Address-type"
+                onChange={() => setAddressType('office')}
               />
             </div>
           </div>
@@ -187,7 +230,21 @@ const ShippingAddress: FC<Props> = ({
           <div className="flex flex-col sm:flex-row pt-6">
             <ButtonPrimary
               className="sm:!px-7 shadow-none"
-              onClick={onCloseActive}
+              onClick={() => {
+                const shippingAddressData = {
+                  firstName,
+                  lastName,
+                  address,
+                  apartment,
+                  city,
+                  state,
+                  postal,
+                  country,
+                  addressType
+                };
+                updateFormData("shippingAddress", shippingAddressData);
+                onCloseActive();
+              }}
             >
               Save and next to Payment
             </ButtonPrimary>

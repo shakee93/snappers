@@ -1,5 +1,5 @@
 import Label from "components/Label/Label";
-import React, { FC } from "react";
+import React, { FC, useState } from "react";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Checkbox from "shared/Checkbox/Checkbox";
@@ -9,10 +9,21 @@ interface Props {
   isActive: boolean;
   onOpenActive: () => void;
   onCloseActive: () => void;
+  updateFormData: (section: string, data: any) => void;
 }
 
-const ContactInfo: FC<Props> = ({ isActive, onCloseActive, onOpenActive }) => {
+const ContactInfo: FC<Props> = ({
+  isActive,
+  onCloseActive,
+  onOpenActive,
+  updateFormData,
+}) => {
   const renderAccount = () => {
+
+    const [phone, setPhone] = useState("+94");
+    const [email, setEmail] = useState("");
+    const [subscribeToNews, setSubscribeToNews] = useState(true);
+
     return (
       <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden z-0">
         <div className="flex flex-col sm:flex-row items-start p-6 ">
@@ -78,9 +89,8 @@ const ContactInfo: FC<Props> = ({ isActive, onCloseActive, onOpenActive }) => {
           </ButtonSecondary>
         </div>
         <div
-          className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${
-            isActive ? "block" : "hidden"
-          }`}
+          className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${isActive ? "block" : "hidden"
+            }`}
         >
           <div className="flex justify-between flex-wrap items-baseline">
             <h3 className="text-lg font-semibold">Contact infomation</h3>
@@ -93,18 +103,28 @@ const ContactInfo: FC<Props> = ({ isActive, onCloseActive, onOpenActive }) => {
           </div>
           <div className="max-w-lg">
             <Label className="text-sm">Your phone number</Label>
-            <Input className="mt-1.5" defaultValue={"+808 xxx"} type={"tel"} />
+            <Input
+              className="mt-1.5"
+              defaultValue={"+94 "}
+              type={"tel"}
+              onChange={(e) => setPhone(e.target.value)}
+            />
           </div>
           <div className="max-w-lg">
             <Label className="text-sm">Email address</Label>
-            <Input className="mt-1.5" type={"email"} />
+            <Input
+              className="mt-1.5"
+              type={"email"}
+              onChange={(e) => setEmail(e.target.value)}
+            />
           </div>
           <div>
             <Checkbox
               className="!text-sm"
               name="uudai"
               label="Email me news and offers"
-              defaultChecked
+              defaultChecked={subscribeToNews}
+              onChange={() => setSubscribeToNews(!subscribeToNews)}
             />
           </div>
 
@@ -112,7 +132,15 @@ const ContactInfo: FC<Props> = ({ isActive, onCloseActive, onOpenActive }) => {
           <div className="flex flex-col sm:flex-row pt-6">
             <ButtonPrimary
               className="sm:!px-7 shadow-none"
-              onClick={() => onCloseActive()}
+              onClick={() => {
+                const contactInfo = {
+                  phone,
+                  email,
+                  subscribeToNews
+                };
+                updateFormData("contactInfo", contactInfo);
+                onCloseActive();
+              }}
             >
               Save and next to Shipping
             </ButtonPrimary>
