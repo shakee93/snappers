@@ -17,6 +17,7 @@ import BrandFilter from "@/app/components/Filters/BrandFilter";
 import PriceFilter from "@/app/components/Filters/PriceFilter";
 import OnSaleFilter from "@/app/components/Filters/OnSaleFilter";
 import SortOrderFilter from "@/app/components/Filters/SortOrderFilter";
+import InStockFilter from "@/app/components/Filters/InStockFilter";
 
 // DEMO DATA
 
@@ -591,6 +592,7 @@ const TabFilters = ({
         <BrandFilter brands={brands}/>
         <PriceFilter/>
         <OnSaleFilter/>
+        <InStockFilter/>
         <div className="!ml-auto">
           <SortOrderFilter/>
         </div>

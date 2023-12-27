@@ -42,32 +42,14 @@ const Page = async () => {
           <main>
             {/* LOOP ITEMS */}
             <div className="flex flex-col lg:flex-row">
-              {/* <div className="lg:w-1/3 xl:w-1/4 pr-4">
-                                <SidebarFilters
-                                    categories={productCategories}
-                                />
-                            </div> */}
               <div className="flex-shrink-0 mb-10 lg:mb-0 lg:mx-4 border-t lg:border-t-0"></div>
               <div className="flex-1 ">
                 {/*<ProductGrid products={products} />*/}
                 <InstantSearchWrapper/>
               </div>
             </div>
-            <div className="flex flex-col mt-12 items-center lg:mt-16 space-y-5 sm:space-y-0 sm:space-x-3 sm:flex-row sm:justify-between sm:items-center">
-              <Pagination />
-             <button className="ttnc-ButtonPrimary disabled:bg-opacity-90 bg-primaryColor hover:bg-slate-800 text-slate-50 dark:text-slate-800 shadow-xl px-4 py-2 rounded-2xl w-max ">Load More</button> {/* <ButtonPrimary>Show me more</ButtonPrimary> */}
-            </div>
           </main>
         </div>
-
-        {/* === SECTION 5 === */}
-        <hr className="border-slate-200 dark:border-slate-700" />
-
-        {/*<SectionSliderCollections />*/}
-        <hr className="border-slate-200 dark:border-slate-700" />
-
-        {/* SUBCRIBES */}
-        {/*<SectionPromo1 />*/}
       </div>
     </div>
   );
