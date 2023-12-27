@@ -13,13 +13,19 @@ const MobileBottomNav = () => {
     setOpenCat(!openCat);
   };
 
+  const categories = [
+    { name: 'Mobile', link: '/mobile' },
+    { name: 'Speakers', link: '/speakers' },
+    { name: 'Laptops', link: '/laptops' },
+    { name: 'Smart Watches', link: '/smart-watches' },
+  ];
   const router = useRouter();
 
   return (
     <div className="fixed grid grid-cols-4 shadow-3xl justify-between bottom-0 z-30 bg-white border-slate-100 border-t-2 pt-2 w-full py-1 px-1">
       <div>
         <Link
-          href="#"
+          href="/"
           className="flex flex-col justify-center items-center text-primaryColor gap-1"
         >
           <Home />
@@ -57,7 +63,7 @@ const MobileBottomNav = () => {
       </div> */}
       <div>
         <Link
-          href="#"
+          href="/cart"
           className="flex flex-col justify-center items-center text-primaryColor gap-1"
         >
           <ShoppingBag />
@@ -76,7 +82,18 @@ const MobileBottomNav = () => {
             <XIcon />
           </div>
         </div>
-        {/* Add your category panel content here */}
+        <ul className="py-2 text-left text-sm text-gray-700 dark:text-gray-200">
+            {categories.map((category, index) => (
+              <li key={index}>
+                <Link
+                  href={category.link}
+                  className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
+                >
+                  {category.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
       </div>
     </div>
   );

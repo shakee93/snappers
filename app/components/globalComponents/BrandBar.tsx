@@ -6,6 +6,7 @@ import {useQuery} from "@apollo/client";
 import {GET_BRANDS} from "@/graphql/defs/products";
 import {getClient} from "@/graphql/apollo-ssr";
 import {Brand} from "@/graphql/types/graphql";
+import CategoryDropdown from "./CategryDropdown";
 
 const getData = async () => {
   const { data } = await getClient().query({
@@ -20,14 +21,10 @@ const BrandBar = async () => {
   const brands = await getData()
 
   return (
-    <div className="flex border-t z-50 max-w-[calc(100vw-160px)] overflow-x-hidden">
-      <div className="w-full flex justify-between overflow-hidden items-center">
+    <div className="flex border-t z-50 max-w-[calc(100vw-160px)] ">
+      <div className="w-full flex justify-between items-center">
         <div  className='text-primaryColor font-semibold flex h-full'>
-          <button
-            className="hidden uppercase ml-[15px] mr-2  md:flex  w-40 pl-3 justify-center py-2 text-xs xl:text-sm items-center rounded-lg"
-          >
-            All Categories <ChevronDown className="h-5 ml-1" />
-          </button>
+          <CategoryDropdown/>
         </div>
 
         <div className="w-full flex justify-between">
