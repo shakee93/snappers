@@ -174,7 +174,7 @@ export function SessionProvider({ children }: {
             try {
                 const { data } = await refetch()
 
-                console.log(data);
+                console.log("Cartdata", data);
 
                 if (data && data?.customer?.sessionToken) {
                     const newSessionToken = data.customer.sessionToken;

@@ -8,10 +8,11 @@ async function fetchSessionToken() {
         const graphQLClient = new GraphQLClient(process.env.NEXT_PUBLIC_WP_GRAPHQL || "");
 
         const cartData: any = await graphQLClient.request(GET_CART);
+        console.log("cartData", cartData);
 
 
-        sessionToken = cartData?.cart?.sessionToken ?? "";
-
+        sessionToken = cartData?.customer?.sessionToken ?? "";
+        console.log('retrieved sessionToken', sessionToken);
         if (!sessionToken) {
             throw new Error('Failed to retrieve a new session token');
         }
