@@ -1,3 +1,4 @@
+'use client'
 import React, { FC } from "react";
 import NcImage from "shared/NcImage/NcImage";
 import Link from "next/link"
@@ -6,12 +7,13 @@ import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import {StaticImageData} from "next/image";
 import Image from 'next/image';
 
+
 export interface CardCategory4Props {
   className?: string;
   featuredImage?: string ;
   bgSVG?: string;
   name: string;
-  desc: string;
+  desc?: string;
   color?: string;
   slug?: string;
 }
@@ -25,6 +27,7 @@ const CardCategory4: FC<CardCategory4Props> = ({
   color = "bg-rose-50",
   slug = ""
 }) => {
+
   return (
     <div
       className={`nc-CardCategory4 relative w-full aspect-w-12 aspect-h-11 h-0 rounded-3xl overflow-hidden bg-white dark:bg-neutral-900 group hover:nc-shadow-lg transition-shadow ${className}`}
@@ -32,7 +35,7 @@ const CardCategory4: FC<CardCategory4Props> = ({
     >
       <div>
         <div className="absolute bottom-0 right-0 max-w-[280px] opacity-80">
-          <Image src={bgSVG} alt="" />
+          <Image src={bgSVG || ''} alt="" />
         </div>
 
         <div className="absolute inset-5 sm:inset-8 flex flex-col justify-between">
