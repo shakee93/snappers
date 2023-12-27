@@ -54,12 +54,14 @@ const PRICE_RANGE = [1, 500];
 interface TabFilterProps {
   categories?: ProductCategory[]
   brands?: Brand[]
+  brand?: Brand
 }
 
 //
 const TabFilters = ({
                       categories = [],
-                      brands = []
+                      brands = [],
+    brand
                     }: TabFilterProps) => {
   const [isOpenMoreFilter, setisOpenMoreFilter] = useState(false);
   //
@@ -71,8 +73,6 @@ const TabFilters = ({
   const [brandsState, setBrandsState] = useState<string[]>([]);
 
   const { sidebar, syncCategories, syncBrands, setMounted } = useStore()
-
-
 
 
   //
@@ -589,7 +589,7 @@ const TabFilters = ({
       {/* FOR DESKTOP */}
       <div className="hidden lg:flex flex-1 space-x-4">
         <CategoryFilter categories={categories}/>
-        <BrandFilter brands={brands}/>
+        {!brand && <BrandFilter brands={brands}/>}
         <PriceFilter/>
         <OnSaleFilter/>
         <InStockFilter/>
