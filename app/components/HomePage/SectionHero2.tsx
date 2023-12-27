@@ -1,20 +1,18 @@
-'use client'
-import React, { FC, useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { useQuery } from "@apollo/client";
-import useBoolean from "react-use/lib/useBoolean";
-import useInterval from "react-use/lib/useInterval";
-import Image, { StaticImageData } from "next/image";
-import { GET_SLIDES } from "@/graphql/defs/slides";
-import { useStore } from "@/store/store";
-import backgroundLineSvg from "@/public/images/Moon.svg";
-import ButtonPrimary from "shared/Button/ButtonPrimary";
-import Next from "shared/NextPrev/Next";
-import Prev from "shared/NextPrev/Prev";
-import NcImage from "@/shared/NcImage/NcImage";
-import { log } from "console";
+"use client"
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { useQuery } from '@apollo/client';
+import useBoolean from 'react-use/lib/useBoolean';
+import useInterval from 'react-use/lib/useInterval';
+import Image, { StaticImageData } from 'next/image';
+import { GET_SLIDES } from '@/graphql/defs/slides';
+import { useStore } from '@/store/store';
+import backgroundLineSvg from '@/public/images/Moon.svg';
+import ButtonPrimary from 'shared/Button/ButtonPrimary';
+import Next from 'shared/NextPrev/Next';
+import Prev from 'shared/NextPrev/Prev';
+import NcImage from '@/shared/NcImage/NcImage';
 
-// Define interfaces
 interface Hero2DataType {
   image: StaticImageData;
   heading: string;
@@ -39,19 +37,15 @@ interface SlideType {
 
 export interface SectionHero2Props {
   className?: string;
-  slides?: any
+  slides?: SlideType[];
 }
 
-// Define constants
 let TIME_OUT: NodeJS.Timeout | null = null;
 
-// Define the SectionHero2 component
-const SectionHero2 = ({ className = "", slides }: SectionHero2Props) => {
-
+const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
   const [indexActive, setIndexActive] = useState(0);
   const [isRunning, toggleIsRunning] = useBoolean(true);
 
-  // Define the useInterval function
   useInterval(
     () => {
       handleAutoNext();
@@ -59,7 +53,6 @@ const SectionHero2 = ({ className = "", slides }: SectionHero2Props) => {
     isRunning ? 5500 : null
   );
 
-  // Define handleAutoNext function
   const handleAutoNext = () => {
     setIndexActive((state) => {
       if (state >= slides.length - 1) {
@@ -69,7 +62,6 @@ const SectionHero2 = ({ className = "", slides }: SectionHero2Props) => {
     });
   };
 
-  // Define handleClickNext function
   const handleClickNext = () => {
     setIndexActive((state) => {
       if (state >= slides.length - 1) {
@@ -80,7 +72,6 @@ const SectionHero2 = ({ className = "", slides }: SectionHero2Props) => {
     handleAfterClick();
   };
 
-  // Define handleClickPrev function
   const handleClickPrev = () => {
     setIndexActive((state) => {
       if (state === 0) {
@@ -91,7 +82,6 @@ const SectionHero2 = ({ className = "", slides }: SectionHero2Props) => {
     handleAfterClick();
   };
 
-  // Define handleAfterClick function
   const handleAfterClick = () => {
     toggleIsRunning(false);
     if (TIME_OUT) {
@@ -102,24 +92,26 @@ const SectionHero2 = ({ className = "", slides }: SectionHero2Props) => {
     }, 1000);
   };
 
-  // Define renderItem function
   const renderItem = (index: number) => {
     const isActive = indexActive === index;
     const item = slides[index];
+
+    const backgroundColors = ['#CCE0EF', '#F4E7E7', '#E2F1F0']; // Add more colors as needed
+
     if (!isActive) {
       return null;
     }
 
-    // console.log(item)
     return (
       <div
         key={index}
-        className={`relative w-full h-[650px] md:h-[400px] xl:h-[500px] justify-center  nc-SectionHero2Item--animation flex items-center bg-red-300 transition-transform ease-in-out transform ${
-          isActive ? "translate-y-0" : "translate-y-10"
+        className={`relative w-full h-[650px] md:h-[400px] xl:h-[500px] justify-center  nc-SectionHero2Item--animation flex items-center transition-transform ease-in-out transform ${
+          isActive ? 'translate-y-0' : 'translate-y-10'
         }`}
+        style={{ backgroundColor: backgroundColors[index] }}
       >
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 flex justify-center">
-        {slides.map((_, dotIndex) => (
+          {slides.map((_, dotIndex) => (
             <div
               key={dotIndex}
               onClick={() => {
@@ -133,7 +125,7 @@ const SectionHero2 = ({ className = "", slides }: SectionHero2Props) => {
               >
                 <div
                   className={` absolute inset-0 bg-black rounded-md ${
-                    dotIndex === indexActive ? "opacity-100 nc-SectionHero2Item__dot" : "opacity-0"
+                    dotIndex === indexActive ? 'opacity-100 nc-SectionHero2Item__dot' : 'opacity-0'
                   }`}
                 ></div>
               </div>
@@ -153,7 +145,7 @@ const SectionHero2 = ({ className = "", slides }: SectionHero2Props) => {
           svgSize="w-6 h-6"
           onClickNext={handleClickNext}
         />
-        <div className="absolute inset-0 bg-[#CCE0EF]">
+        <div className={`absolute inset-0 bg-${backgroundColors[index]}`}>
           <NcImage
             className="absolute w-full h-full object-contain"
             src={backgroundLineSvg}
