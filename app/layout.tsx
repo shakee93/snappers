@@ -20,40 +20,10 @@ import {Loader} from "lucide-react";
 
 // const inter = Inter({ subsets: ['latin'] })
 
-export const GET_ACCOUNT_DETAILS = gql`
-  query getAccountDetails{
-  customer {
-    email
-    displayName
-    billing {
-      address1
-      phone
-      email
-    }
-    metaData(multiple: true) {
-      key
-      value
-      id
-    }
-    username
-    id
-  }
-}
-`;
+
 export default async  function RootLayout({children}: {
     children: React.ReactNode
 }) {
-
-    const { data: accountDetailsData, error: accountDetailsError } = await getClient().query({
-        query: GET_ACCOUNT_DETAILS
-    });
-
-    if (accountDetailsError) {
-        console.error("Error fetching account details:", accountDetailsError);
-    }
-
-    // Log the fetched data
-    console.log("Account Details Data:", accountDetailsData);
 
     return (
         <html lang="en">

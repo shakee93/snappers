@@ -3,15 +3,29 @@
 import {Popover, Transition} from "@headlessui/react";
 import {avatarImgs} from "@/contains/fakeData";
 import {CircleUserRound} from "lucide-react";
-import {Fragment} from "react";
+import {Fragment, useEffect} from "react";
 import Link from "next/link";
 import Avatar from "@/public/shared/Avatar/Avatar";
 import SwitchDarkMode2 from "@/public/shared/SwitchDarkMode/SwitchDarkMode2";
 import LogoutButton from "@/components/Header/LogoutButton";
+import {useLazyQuery, useQuery} from "@apollo/client";
+import {GET_ACCOUNT_DETAILS} from "@/app/account/layout";
 
 export default function AvatarDropdown() {
+
+    const [getUser, { data }] = useLazyQuery(GET_ACCOUNT_DETAILS, {
+        fetchPolicy: 'no-cache'
+    })
+
+
+    useEffect(() => {
+        console.log(data?.data);
+    }, [data])
+
   return (
     <div className="AvatarDropdown ">
+
+        <button onClick={e => getUser() }>Fetch User</button>
       <Popover className="relative">
         {({ open, close }) => (
           <>

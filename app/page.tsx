@@ -18,11 +18,11 @@ import {getClient} from "@/graphql/apollo-ssr";
 import {GET_SLIDES} from "@/graphql/defs/slides";
 
 const getSlides = async () => {
-  const { data } = await getClient().query({
-    query: GET_SLIDES,
-  })
-
-  return data.slides.nodes
+  // const { data } = await getClient().query({
+  //   query: GET_SLIDES,
+  // })
+  //
+  // return data?.slides?.nodes
 }
 
 export default async function Home() {
@@ -34,7 +34,7 @@ export default async function Home() {
       <div className="nc-PageHome relative overflow-hidden">
         <div className="z-30">
           {/* <SectionHero2 /> */}
-          <SectionHero3 slides={slides} />
+          {/*<SectionHero3 slides={slides} />*/}
         </div>
         <div className=" gap-4 container m-auto">
           <div className="my-10">

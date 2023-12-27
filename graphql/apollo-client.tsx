@@ -3,7 +3,7 @@
 import {
   ApolloLink,
   defaultDataIdFromObject,
-  FetchResult,
+  FetchResult, from,
   HttpLink,
   useMutation,
 } from "@apollo/client";
@@ -141,8 +141,8 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
 
 
     const authLink = new ApolloLink((operation, forward) => {
-      const sessionToken = localStorage.getItem(process.env.SESSION_TOKEN_LS_KEY || "");
-      const refreshToken = localStorage.getItem(process.env.REFRESH_TOKEN_LS_KEY || "");
+      const sessionToken = localStorage.getItem('wpSessionToken');
+      const refreshToken = localStorage.getItem('wpRefreshToken');
       const authToken = localStorage.getItem(process.env.AUTH_TOKEN_SS_KEY || "");
 
       console.log("Session token inside apollo Link:", sessionToken);
@@ -153,6 +153,7 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
       operation.setContext({
         headers: {
           "woocommerce-session": `Session ${sessionToken}`,
+          "Authorization" : `Bearer ${authToken}`
         },
       });
 
@@ -161,14 +162,7 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
         if (refreshToken) {
           try {
             const token = await getAuthToken();
-            console.log("got auth token as :", token);
-            operation.setContext((context: any) => ({
-              headers: {
-                ...context.headers,
-                Authorization: `Bearer ${token}`,
-              },
-            }));
-            console.log("Bearer token added to header");
+            console.log(token);
           } catch (err) {
             console.error("Error setting Authorization header:", err);
           }
@@ -201,9 +195,9 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
       // Use the `NextSSRInMemoryCache`, not the normal `InMemoryCache`
       connectToDevTools: true,
       cache: new NextSSRInMemoryCache(),
-      link: middleware.concat(
-        authLink.concat(
-          typeof window === "undefined"
+      link : from([
+        authLink,
+        typeof window === "undefined"
             ? ApolloLink.from([
               // In an SSR environment, if you use multipart features like
               // @defer, you need to decide how to handle these.
@@ -214,8 +208,8 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
               httpLink,
             ])
             : httpLink
-        )
-      ),
+      ]),
+
       defaultOptions: {
         watchQuery: {
           fetchPolicy: "no-cache",
