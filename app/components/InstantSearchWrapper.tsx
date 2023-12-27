@@ -18,6 +18,7 @@ interface InstantSearchWrapperProps {
     categories?: ProductCategory[]
     brands?: Brand[]
     brand?: Brand
+    category?: ProductCategory
 }
 
 const InstantSearchWrapper = ({
@@ -25,7 +26,7 @@ const InstantSearchWrapper = ({
                                   filters = false,
                                   categories,
                                   brands,
-    brand
+    brand,category
                               }: InstantSearchWrapperProps) => {
 
     const { sidebar } = useStore()
@@ -33,15 +34,16 @@ const InstantSearchWrapper = ({
 
     const getFilterQuery: () => string = () => {
         const f =[
-            differedSidebar.priceRange !== PRICE_RANGE ?
-                `rawPrice:[${differedSidebar.priceRange[0]}..${differedSidebar.priceRange[1]}]` : null,
-            differedSidebar.categories.length > 0 ?
-                `productCategories.edges.node.databaseId:[${differedSidebar.categories.join(',')}]` : null,
+            sidebar.priceRange !== PRICE_RANGE ?
+                `rawPrice:[${sidebar.priceRange[0]}..${sidebar.priceRange[1]}]` : null,
+            category ?   `productCategories.edges.node.databaseId:${category.databaseId}`
+                :sidebar.categories.length > 0 ?
+                `productCategories.edges.node.databaseId:[${sidebar.categories.join(',')}]` : null,
             brand ? `brands.nodes.databaseId:${brand.databaseId}` :
-                differedSidebar.brands.length > 0 ?
-                    `brands.nodes.databaseId:[${differedSidebar.brands.join(',')}]` : null,
-            differedSidebar.on_sale ? 'onSale:true': null,
-            differedSidebar.in_stock ? 'stockStatus:IN_STOCK': null,
+                sidebar.brands.length > 0 ?
+                    `brands.nodes.databaseId:[${sidebar.brands.join(',')}]` : null,
+            sidebar.on_sale ? 'onSale:true': null,
+            sidebar.in_stock ? 'stockStatus:IN_STOCK': null,
         ]
 
         return f.filter(n => n).join(" && ")
@@ -54,7 +56,7 @@ const InstantSearchWrapper = ({
 
     useEffect(() => {
 
-        setFilterQuery(getFilterQuery())
+        setFilterQuery(getFilterQuery)
 
         if (differedSidebar.sort) {
             setSortQuery(differedSidebar.sort);
@@ -107,7 +109,7 @@ const InstantSearchWrapper = ({
     }} searchClient={makeClient} indexName='product' >
         <div className='flex gap-6 flex-col'>
             {search && <SearchInput/>}
-            {filters && <TabFilters brand={brand} categories={categories} brands={brands}/>}
+            {filters && <TabFilters category={category} brand={brand} categories={categories} brands={brands}/>}
             <Configure  filters={filterQuery} hitsPerPage={12}/>
             {/*<RefinementList attribute="brands.nodes"/>*/}
             <ProductGridInstant/>

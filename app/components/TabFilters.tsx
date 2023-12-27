@@ -53,6 +53,7 @@ const PRICE_RANGE = [1, 500];
 
 interface TabFilterProps {
   categories?: ProductCategory[]
+  category?: ProductCategory
   brands?: Brand[]
   brand?: Brand
 }
@@ -61,7 +62,7 @@ interface TabFilterProps {
 const TabFilters = ({
                       categories = [],
                       brands = [],
-    brand
+    brand, category
                     }: TabFilterProps) => {
   const [isOpenMoreFilter, setisOpenMoreFilter] = useState(false);
   //
@@ -588,7 +589,7 @@ const TabFilters = ({
     <div className="flex flex-col gap-3 lg:space-x-4">
       {/* FOR DESKTOP */}
       <div className="hidden lg:flex flex-1 space-x-4">
-        <CategoryFilter categories={categories}/>
+        {!category && <CategoryFilter categories={categories}/>}
         {!brand && <BrandFilter brands={brands}/>}
         <PriceFilter/>
         <OnSaleFilter/>
