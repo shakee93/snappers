@@ -18,7 +18,7 @@ import {twMerge} from "tailwind-merge";
 const ProductDetails = ({
     product, brand
 }: {
-    product: VariableProduct | SimpleProduct
+    product: VariableProduct & SimpleProduct
     brand: Brand
 }) => {
 
@@ -118,8 +118,6 @@ const ProductDetails = ({
 
                 </>
             }
-
-
 
 
             {product.type === 'VARIABLE' && activeVariation ? <div>

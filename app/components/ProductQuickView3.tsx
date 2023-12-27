@@ -18,10 +18,11 @@ import Link from 'next/link';
 import Image from "next/image";
 import useProductLink from "@/hooks/useProductLink";
 import ProductAddToCart from "./SingleProductPage/ProductAddToCart";
+import {SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
 
 export interface ProductQuickViewProps {
   className?: string;
-  product: SimpleProduct | VariableProduct;
+  product: SimpleProduct  & VariableProduct;
 }
 
 const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }) => {
@@ -59,7 +60,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
   };
 
   const renderVariants = () => {
-    if (!product.variations || !product.variations.edges.length) {
+    if (!product.variations || !product.variations?.nodes?.length) {
       return null;
     }
 
@@ -74,7 +75,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
           </span>
         </label>
         <div className="flex mt-2.5">
-          {product.variations.edges.map((variant, index) => (
+          {product.variations.nodes?.map((variant, index) => (
             <div
               key={index}
               onClick={() => setVariantActive(index)}
@@ -85,7 +86,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
             >
               <div className="absolute inset-0.5 rounded-full overflow-hidden z-0">
                 <Image fill style={{ objectFit: 'cover' }}
-                  src={variant.node.image.sourceUrl}
+                  src={variant.image?.sourceUrl}
                   alt=""
                   className="absolute w-full h-full object-cover"
                 />
