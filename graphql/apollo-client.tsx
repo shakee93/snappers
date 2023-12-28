@@ -18,6 +18,8 @@ import { GET_AUTH_TOKEN } from "./defs/auth";
 import {AUTH_TOKEN_KEY, REFRESH_TOKEN_KEY, SESSION_TOKEN_KEY} from "@/context/SessionProvider";
 import {onError} from "@apollo/client/link/error";
 import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
+import {GraphQLError} from "graphql/error";
+import {GraphQLErrors} from "@apollo/client/errors";
 
 loadDevMessages();
 loadErrorMessages();
@@ -83,9 +85,7 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
       let observable;
       
       
-      console.log(graphQLErrors, graphQLErrors?.some(err => targetErrors.includes(err?.debugMessage)));
-      
-      if (graphQLErrors && graphQLErrors.some(err => targetErrors.includes(err?.debugMessage))) {
+      if (graphQLErrors && graphQLErrors.some((err: any) => targetErrors.includes(err?.debugMessage))) {
         
         return new Observable(observer => {
           fetchAuthToken()
