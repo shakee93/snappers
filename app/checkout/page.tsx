@@ -68,6 +68,20 @@ export interface CartItemProductNode {
     terms: string[];
 }
 
+interface SelectedGateway {
+    id: string;
+    title: string;
+}
+
+interface FormData {
+    contactInfo: Record<string, any>;
+    shippingAddress: Record<string, any>;
+    paymentMethod: {
+        selectedGateway?: {
+            id: string;
+        };
+    };
+}
 
 const CheckoutPage = () => {
 
@@ -82,7 +96,7 @@ const CheckoutPage = () => {
         "ContactInfo" | "ShippingAddress" | "PaymentMethod"
     >("ShippingAddress");
 
-    const [formData, setFormData] = useState({
+    const [formData, setFormData] = useState<FormData>({
         contactInfo: {},
         shippingAddress: {},
         paymentMethod: {},
@@ -114,7 +128,7 @@ const CheckoutPage = () => {
                 updatedData = {
                     ...prevData,
                     [section]: {
-                        ...prevData[section],
+                        ...(prevData as Record<string, any>)[section] || {},
                         ...data,
                     },
                 };
@@ -128,13 +142,18 @@ const CheckoutPage = () => {
     console.log({ formData })
 
     const [checkoutMutation, { loading: checkoutLoading, error: checkoutError, data: checkoutData }] = useMutation(CHECKOUT_MUTATION);
+
     const handleCheckout = async () => {
         try {
             const paymentMethodId = formData?.paymentMethod?.selectedGateway.id;
 
-            const { data } = await checkoutMutation({
-                variables: { paymentMethod: paymentMethodId },
-            });
+            if (paymentMethodId !== undefined) {
+                const { data } = await checkoutMutation({
+                    variables: { paymentMethod: paymentMethodId },
+                });
+            } else {
+                console.error("Payment method ID is undefined");
+            }
 
             console.log('data inside mutation', checkoutData)
 
@@ -145,7 +164,6 @@ const CheckoutPage = () => {
             console.error("Checkout failed:", error);
         }
     };
-
 
     const handleScrollToEl = (id: string) => {
         const element = document.getElementById(id);
@@ -235,7 +253,7 @@ const CheckoutPage = () => {
                                 <span>{cart?.total || "$0.00"}</span>
                             </div>
                         </div>
-                        <ButtonPrimary href="" onClick={handleCheckout} className="mt-8 w-full">
+                        <ButtonPrimary onClick={handleCheckout} className="mt-8 w-full">
                             Confirm order
                         </ButtonPrimary>
                         <div className="mt-5 text-sm text-slate-500 dark:text-slate-400 flex items-center justify-center">

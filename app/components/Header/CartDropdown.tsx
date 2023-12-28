@@ -20,7 +20,7 @@ export default function CartDropdown() {
     const { product, variation, quantity, key  } = item;
 
 
-      const { name, image, price, slug, salePrice, type, stockQuantity, variations, regularPrice } : SimpleProduct & VariableProduct = product.node;
+      const { name, image, price, slug, salePrice, type, stockQuantity, variations, regularPrice, brands } : SimpleProduct & VariableProduct = product.node;
 
       // console.log(product, variation);
 
@@ -40,7 +40,7 @@ export default function CartDropdown() {
           <Link
             onClick={close}
             className="absolute inset-0"
-            href={`/product/${slug}`}
+            href={`${brands.nodes[0].slug}/${slug}`}
           />
         </div>
 
@@ -49,7 +49,7 @@ export default function CartDropdown() {
             <div className="flex justify-between ">
               <div>
                 <h3 className="text-base font-medium ">
-                  <Link onClick={close} href={`/product/${slug}`}>
+                  <Link onClick={close} href={`${brands.nodes[0].slug}/${slug}`}>
                     {name}
                   </Link>
                 </h3>

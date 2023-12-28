@@ -25,6 +25,13 @@ export const ProductContentSlice = gql`
             price
             regularPrice
             soldIndividually
+            brands {
+                nodes {
+                  id
+                  name
+                  slug
+                }
+              }
         }
         ... on VariableProduct {
             allPaCapacity {
@@ -72,6 +79,13 @@ export const ProductContentSlice = gql`
             price
             regularPrice
             soldIndividually
+            brands {
+                nodes {
+                  id
+                  name
+                  slug
+                }
+              }
         }
     }
 `;

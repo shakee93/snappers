@@ -6,7 +6,7 @@ import Prices from "components/Prices";
 
 
 export interface CartItem {
-    extraData: any[];
+    extraData?: Maybe<Maybe<MetaData>[]> | undefined;
     key: string;
     product: CartItemProduct;
     quantity: number;
@@ -24,8 +24,10 @@ export interface CartItemProductNode {
     id: number;
     name: string;
     price: number;
+    slug: string;
     image: string;
     terms: string[];
+    brands: string[];
 }
 
 interface CartItemsProps {
@@ -39,9 +41,9 @@ interface CartItemsProps {
 
     const { product, quantity, key, subtotal, total } = item;
     const { node } = product || {};
-    const { name, price, image, terms } = node || {};
+    const { name, price, image, terms, brands } = node || {};
 
-    const brandSlug = terms.nodes[0]?.slug || terms.nodes[1]?.slug || terms.nodes[2]?.slug || terms.nodes[3]?.slug;
+    const brandSlug = brands.nodes[0]?.slug ;
 
     return (
         <div key={index} className="relative flex py-7 first:pt-0 last:pb-0">
