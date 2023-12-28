@@ -35,7 +35,7 @@ import {
 
 export interface ProductQuickViewProps {
   className?: string;
-  product: SimpleProduct & VariableProduct;
+  product: SimpleProduct | VariableProduct;
 }
 
 const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }) => {
@@ -44,7 +44,12 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
   const [sizeSelected, setSizeSelected] = React.useState("");
   const [qualitySelected, setQualitySelected] = React.useState(1);
   const { product: { attribute }, setAttribute } = useStore()
-  const [activeVariation, setActiveVariation] = useState<any>(!!product?.variations?.nodes?.length ? product?.variations?.nodes[0] : null)
+  const [activeVariation, setActiveVariation] = useState<any>(
+    !!product && 'variations' in product && product.variations?.nodes?.length
+      ? product.variations.nodes[0]
+      : null
+  );
+  
 
   const link = useProductLink(product)
 
