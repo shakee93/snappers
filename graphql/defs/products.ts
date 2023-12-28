@@ -242,6 +242,13 @@ query GetProducts($categoryIdIn: [Int]) {
               }
             }
           }
+          brands {
+            nodes {
+              id
+              name
+              slug
+            }
+          }
           terms {
             nodes {
               ... on Brand {
@@ -254,6 +261,7 @@ query GetProducts($categoryIdIn: [Int]) {
          productCategories {
             nodes {
               name
+              slug
             }
             edges {
               node {
@@ -273,9 +281,17 @@ query GetProducts($categoryIdIn: [Int]) {
         ... on VariableProduct {
           name
           description
+          brands {
+            nodes {
+              id
+              name
+              slug
+            }
+          }
           productCategories {
             nodes {
               name
+              slug
             }
             edges {
               node {

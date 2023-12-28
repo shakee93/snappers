@@ -24,39 +24,39 @@ import { twMerge } from "tailwind-merge";
 import ProductDetails from "./SingleProductPage/ProductDetails";
 import ProductSpecifications from "./SingleProductPage/ProductSpecifications";
 import BrandBar from "./globalComponents/BrandBar";
-import {SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
+import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 
 export interface ProductQuickViewProps {
   className?: string;
-  product: SimpleProduct  & VariableProduct;
+  product: SimpleProduct & VariableProduct;
 }
 
 const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }) => {
-
-  let brand = product.terms.nodes.find(node => node?.name)?.name || "DefaultBrand";
-  let slug = product.terms.nodes.find(node => node?.slug)?.slug || "product";
-
-  let product_images: string[] = [];
-
-  if (product.galleryImages.nodes) {
-    product_images = [product.image.sourceUrl, ...product.galleryImages.nodes.map(node => node.sourceUrl)];
-  } else if (product.galleryImages.edges && product.galleryImages.edges.length > 0) {
-    product_images = [product.image.sourceUrl, product.galleryImages.edges[0].node.sourceUrl, product.galleryImages.edges[1].node.sourceUrl];
-  } else {
-    product_images = [product.image.sourceUrl];
-  }
-
-  // console.log({ product });
-
-  // const link = useProductLink(product)
-
-  // console.log('recieved from quick view', product)
 
   const [variantActive, setVariantActive] = React.useState(0);
   const [sizeSelected, setSizeSelected] = React.useState("");
   const [qualitySelected, setQualitySelected] = React.useState(1);
   const { product: { attribute }, setAttribute } = useStore()
   const [activeVariation, setActiveVariation] = useState<any>(!!product?.variations?.nodes?.length ? product?.variations?.nodes[0] : null)
+
+  const link = useProductLink(product)
+
+  let brand = product?.brands?.nodes[0]?.name;
+
+  let product_images: string[] = [];
+  if (product?.galleryImages?.nodes) {
+    product_images = [product?.image?.sourceUrl, ...product.galleryImages.nodes.map(node => node?.sourceUrl ?? "")];
+  } else if (product?.galleryImages?.edges && product.galleryImages.edges.length > 0) {
+    product_images = [
+      product?.image?.sourceUrl ?? "",
+      product?.galleryImages?.edges[0]?.node?.sourceUrl ?? "",
+      product?.galleryImages?.edges[1]?.node?.sourceUrl ?? ""
+    ];
+  } else {
+    product_images = [product?.image?.sourceUrl ?? ""];
+  }
+
+  console.log({ product });
 
   const notifyAddTocart = () => {
     toast.custom(
@@ -168,7 +168,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
           </div>
 
           <div className="text-base md:text-lg font-medium ">
-            <Link href={`${slug}/${product.slug}`}> {product.name} - {product.databaseId} </Link>
+            <Link href={link}> {product.name} - {product.databaseId} </Link>
           </div>
 
 
@@ -305,11 +305,11 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
           data={[
             {
               name: "Description",
-              content: product.description,
+              content: product.description ?? "",
             },
             {
               name: "Specifications",
-              content: product.description,
+              content: product.description ?? "",
             }
           ]}
         />
@@ -338,7 +338,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
             {/* META FAVORITES */}
             <LikeButton className="absolute right-3 top-3 " />
           </div>
-          {(product.galleryImages.nodes || (product.galleryImages.edges && product.galleryImages.edges.length > 0)) && (
+          {(product?.galleryImages?.nodes || (product?.galleryImages?.edges && product?.galleryImages?.edges?.length > 0)) && (
             <div className="hidden lg:grid grid-cols-2 gap-3 mt-3 sm:gap-6 sm:mt-6 xl:gap-5 xl:mt-5">
               {[product_images[1], product_images[2]].map((item, index) => {
                 return (

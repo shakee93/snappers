@@ -11,7 +11,7 @@ const useProductLink = (product?: Product | null) => {
         if (!product) {
             return;
         }
-        
+
         const productBrand = product?.brands?.nodes[0] ||  {
             name: 'Product',
             slug: 'product'
