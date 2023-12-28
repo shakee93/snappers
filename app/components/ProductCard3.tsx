@@ -352,11 +352,10 @@ const ProductCard: FC<ProductCardProps> = ({
                     <div
                         className={`nc-ProductCard__title text-xs lg:text-sm text-black line-clamp-2 min-h-[20px] lg:min-h-[20px] text-slate-800`}
                     >
-                        {brands?.edges?.nodes?.map((brand: Brand, index) => (
+                        {brands?.nodes?.map((brand: Brand, index) => (
                             <Link href={`/${brand?.slug}`} key={index}>{brand?.name}</Link>
                         ))}
-
-                        - {type} - {databaseId}
+                        {/*- {type} - {databaseId}*/}
                     </div>
                 </div>
 

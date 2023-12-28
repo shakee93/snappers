@@ -96,37 +96,37 @@ const CheckoutPage = () => {
     const updateFormData = (section: string, data: any) => {
         console.log('Incoming data:', data);
 
-        setFormData((prevData) => {
-            let updatedData;
-
-            if (section.toLowerCase() === 'shippingaddress') {
-                updatedData = {
-                    ...prevData,
-                    shippingAddress: {
-                        ...prevData.shippingAddress,
-                        ...data,
-                    },
-                };
-            } else if (section.toLowerCase() === 'contactinfo') {
-                updatedData = {
-                    ...prevData,
-                    contactInfo: {
-                        ...prevData.contactInfo,
-                        ...data,
-                    },
-                };
-            } else {
-                updatedData = {
-                    ...prevData,
-                    [section]: {
-                        ...prevData[section],
-                        ...data,
-                    },
-                };
-            }
-
-            return updatedData;
-        });
+        // setFormData((prevData) => {
+        //     let updatedData;
+        //
+        //     if (section.toLowerCase() === 'shippingaddress') {
+        //         updatedData = {
+        //             ...prevData,
+        //             shippingAddress: {
+        //                 ...prevData.shippingAddress,
+        //                 ...data,
+        //             },
+        //         };
+        //     } else if (section.toLowerCase() === 'contactinfo') {
+        //         updatedData = {
+        //             ...prevData,
+        //             contactInfo: {
+        //                 ...prevData.contactInfo,
+        //                 ...data,
+        //             },
+        //         };
+        //     } else {
+        //         updatedData = {
+        //             ...prevData,
+        //             [section]: {
+        //                 ...prevData[section],
+        //                 ...data,
+        //             },
+        //         };
+        //     }
+        //
+        //     return updatedData;
+        // });
     };
 
 
@@ -202,7 +202,7 @@ const CheckoutPage = () => {
                         <h3 className="text-lg font-semibold">Order summary</h3>
                         <div className="mt-8 divide-y divide-slate-200/70 dark:divide-slate-700 ">
                             {cart?.contents?.nodes.map((item, index) => (
-                                <CartItems key={index} item={item} onQuantityChange={updateCart} onRemove={removeFromCart} />
+                                <CartItems index={index} key={index} item={item as unknown as CartItem} onQuantityChange={updateCart} onRemove={removeFromCart} />
                             ))}
                         </div>
 
