@@ -19,7 +19,7 @@ import { useCart } from "@/context/CartProvider";
 import { useQuery } from "@apollo/client";
 import { GET_PAYMENT_GATEWAYS } from "@/graphql/defs/cart";
 import { GET_CUSTOMER_INFO, CHECKOUT_MUTATION } from "@/graphql/defs/order";
-import {PaymentGateway, SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
+import { PaymentGateway, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 
 import CheckoutDetails from "./CheckoutDetails";
 import CartItems from "./CartItems";
@@ -79,7 +79,7 @@ interface FormData {
     shippingAddress: Record<string, any>;
     paymentMethod: {
         selectedGateway?: {
-            id: string;
+            id?: string;
         };
     };
 }
@@ -101,9 +101,7 @@ const CheckoutPage = () => {
         contactInfo: {},
         shippingAddress: {},
         paymentMethod: {
-            selectedGateway: {
-                id: null
-            }
+            selectedGateway: {}
         },
     });
 
@@ -150,7 +148,7 @@ const CheckoutPage = () => {
 
     const handleCheckout = async () => {
         try {
-            const paymentMethodId = formData?.paymentMethod?.selectedGateway.id;
+            const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
 
             if (paymentMethodId !== undefined) {
                 const { data } = await checkoutMutation({
@@ -220,7 +218,7 @@ const CheckoutPage = () => {
                         <h3 className="text-lg font-semibold">Order summary</h3>
                         <div className="mt-8 divide-y divide-slate-200/70 dark:divide-slate-700 ">
                             {cart?.contents?.nodes.map((item, index) => (
-                                <CartItems index={index} key={index} item={item as unknown as CartItem} onQuantityChange={updateCart} onRemove={removeFromCart} />
+                                <CartItems index={index} key={index} item={item as any} onQuantityChange={updateCart} onRemove={removeFromCart} />
                             ))}
                         </div>
 

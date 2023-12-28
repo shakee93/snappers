@@ -6,7 +6,7 @@ import Prices from "components/Prices";
 
 
 export interface CartItem {
-    extraData?: Maybe<Maybe<MetaData>[]> | undefined;
+    extraData?: null | any;
     key: string;
     product: CartItemProduct;
     quantity: number;
@@ -25,9 +25,13 @@ export interface CartItemProductNode {
     name: string;
     price: number;
     slug: string;
-    image: string;
+    image: {
+        sourceUrl: string;
+    };
     terms: string[];
-    brands: string[];
+    brands: {
+        nodes: any
+    };
 }
 
 interface CartItemsProps {
@@ -43,13 +47,15 @@ interface CartItemsProps {
     const { node } = product || {};
     const { name, price, image, terms, brands } = node || {};
 
-    const brandSlug = brands.nodes[0]?.slug ;
+    console.log({brands})
+
+    const brandSlug = brands?.nodes[0]?.slug ;
 
     return (
         <div key={index} className="relative flex py-7 first:pt-0 last:pb-0">
             <div className="relative h-36 w-24 sm:w-28 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
                 <Image fill style={{ objectFit: 'cover' }}
-                    src={image.sourceUrl}
+                    src={image?.sourceUrl}
                     alt={name}
                     className="h-full w-full object-contain object-center"
                 />

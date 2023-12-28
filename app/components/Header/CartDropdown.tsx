@@ -41,7 +41,7 @@ export default function CartDropdown() {
           <Link
             onClick={close}
             className="absolute inset-0"
-            href={`${brands.nodes[0].slug}/${slug}`}
+            href={`${brands?.nodes[0].slug}/${slug}`}
           />
         </div>
 
@@ -50,7 +50,7 @@ export default function CartDropdown() {
             <div className="flex justify-between ">
               <div>
                 <h3 className="text-base font-medium ">
-                  <Link onClick={close} href={`${brands.nodes[0].slug}/${slug}`}>
+                  <Link onClick={close} href={`${brands?.nodes[0].slug}/${slug}`}>
                     {name}
                   </Link>
                 </h3>
@@ -60,7 +60,7 @@ export default function CartDropdown() {
                           {variation?.attributes?.map((attr, index) =>
                               <Fragment key={index}>
                                   <div className='flex items-center gap-1'>
-                                      <AttributeIcon name={attr?.name || ''} className='w-4'/> <span key={attr?.value}> {(product.node as unknown as VariableProduct)[`allPa${attr?.label as unknown as 'Capacity'}`]?.nodes.find((node: PaCapacity) => node.slug === attr?.value)?.name}</span>
+                                  <AttributeIcon name={attr?.name || ''} className='w-4'/> <span key={attr?.value}> {(product.node as unknown as VariableProduct)[`allPa${attr?.label as unknown as 'Capacity'}`]?.nodes.find((node: PaCapacity) => node.slug === attr?.value)?.name}</span>
                                   </div>
                               </Fragment>
                           )}
