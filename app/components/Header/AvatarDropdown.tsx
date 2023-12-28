@@ -18,14 +18,13 @@ export default function AvatarDropdown() {
 
 
     useEffect(() => {
-        // console.log(customer);
     }, [customer])
 
 
   return (
     <div className="AvatarDropdown ">
 
-        {!customer ?  <Link href={'/login'} className={`text-primaryColor w-10 h-10 sm:w-12 sm:h-12 rounded-full dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none flex items-center justify-center`}>
+        {(!customer || customer.id === 'guest') ?  <Link href={'/login'} className={`text-primaryColor w-10 h-10 sm:w-12 sm:h-12 rounded-full dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none flex items-center justify-center`}>
                 <CircleUserRound/>
             </Link> :
 

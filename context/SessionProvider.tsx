@@ -149,7 +149,7 @@ export function SessionProvider({ children }: {
         localStorage.removeItem(USER_DATA_KEY);
 
         setCustomer(undefined)
-        setSessionToken(null);
+        // setSessionToken(null);
     };
 
 
