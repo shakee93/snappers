@@ -18,7 +18,6 @@ export interface SectionSliderProductCardProps {
   data?: Product[];
 }
 
-
 const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
   className = "",
   itemClassName = "",
@@ -44,7 +43,8 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
 
   useEffect(() => {
     if (!sliderRef.current) {
-      return () => { };
+      console.error('Slider reference is not assigned properly.');
+      return;
     }
 
     // @ts-ignore
@@ -52,6 +52,8 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
       perView: 4,
       gap: 32,
       bound: true,
+      // autoplay: 5000,
+      // hoverpause: false,
       breakpoints: {
         1280: {
           perView: 4 - 1,
@@ -77,6 +79,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
 
     let slider = new Glide(`.${UNIQUE_CLASS}`, OPTIONS);
     slider.mount();
+
     return () => {
       slider.destroy();
     };

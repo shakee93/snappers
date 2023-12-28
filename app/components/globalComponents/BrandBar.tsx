@@ -21,7 +21,7 @@ const BrandBar = async () => {
   const brands = await getData()
 
   return (
-    <div className="flex border-t z-50 max-w-[calc(100vw-160px)] ">
+    <div className="flex border-t z-50 max-w-[calc(100vw-160px)] overflow-hidden">
       <div className="w-full flex justify-between items-center">
         <div  className='text-primaryColor font-semibold flex h-full'>
           <CategoryDropdown/>

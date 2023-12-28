@@ -4,6 +4,7 @@ import SiteLogo from "@/public/global/logo.webp";
 import {getClient} from "@/graphql/apollo-ssr";
 import {GET_BRANDS} from "@/graphql/defs/products";
 import {Brand} from "@/graphql/types/graphql";
+import { Menu, XIcon, Facebook, Instagram, PhoneCall } from "lucide-react";
 
 const getData = async () => {
   const { data } = await getClient().query({
@@ -18,11 +19,12 @@ const getData = async () => {
 const Footer = async () => {
 
   const brands = await getData()
+  const iconSize = 18;
 
   return (
     <footer className="border-t text-black">
       <div className='container'>
-        <div className=" py-16  grid grid-cols-1 gap-3 md:grid-cols-4 justify-between">
+        <div className=" py-16  grid grid-cols-2 gap-3 md:grid-cols-4 justify-between">
           <div className="flex gap-1 md:gap-2 p-2 flex-col items-center md:items-center justify-center">
             <Link href={"/"}>
               <Image
@@ -33,7 +35,7 @@ const Footer = async () => {
               />
             </Link>
           </div>
-          <div className="flex gap-1 md:gap-4 p-2 flex-col items-center md:items-start">
+          <div className="flex gap-1 md:gap-4 p-2 flex-col items-center md:items-center">
             <div className="text-base md:text-lg font-medium text-primaryColor">Quick Links</div>
             <ul className="text-xs md:text-sm text-gray-500 flex flex-col gap-3 ">
               <li className="hover:text-primaryColor">
@@ -56,7 +58,7 @@ const Footer = async () => {
               </li>
             </ul>
           </div>
-          <div className="flex gap-1 md:gap-4 p-2 flex-col items-center md:items-start">
+          <div className="flex gap-1 md:gap-4 p-2 flex-col items-center md:items-center">
             <div className="text-base md:text-lg font-medium text-primaryColor">Top Brands</div>
             <ul className="text-xs md:text-sm text-gray-500 grid grid-cols-2 gap-x-4 gap-y-3">
 
@@ -67,16 +69,20 @@ const Footer = async () => {
               )}
             </ul>
           </div>
-          <div className=" flex gap-3 md:gap-4 p-2 flex-col items-center md:items-start">
+          <div className=" flex gap-3 md:gap-4 p-2 flex-col items-center md:items-center">
             <div className="text-base md:text-lg font-medium text-primaryColor">
               Follow us
             </div>
 
-            <div className="text-xs md:text-sm text-gray-500 text-center md:text-left">
-              Stay up to date with the roadmap progress, announcements and
-              exclusive discounts feel free to sign up with your email.
-            </div >
-            <div className="relative w-full flex">
+            <div className="flex flex-col gap-3 justify-center text-sm text-gray-500">
+            <Link className="flex gap-2" href={"https://www.facebook.com/gqmobilestore"}>
+              <Facebook size={iconSize} className="text-primaryColor"/><span>Facebook</span> 
+            </Link>
+            <Link className="flex gap-2"  href={"https://www.instagram.com/gqthemobilestoreunlimited"}>
+              <Instagram size={iconSize} className="text-primaryColor" /><span>Instagram</span> 
+            </Link>
+          </div>
+            {/* <div className="relative w-full flex">
               <input
                   className="block p-2 pl-10 w-full text-sm text-gray-900 bg-gray-50 rounded-lg border border-gray-300 sm:rounded-none sm:rounded-l-lg focus:ring-primary-500 focus:border-primary-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-primary-500 dark:focus:border-primary-500"
                   placeholder="Enter your email"
@@ -92,7 +98,7 @@ const Footer = async () => {
                   Subscribe
                 </button>
               </div>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

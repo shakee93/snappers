@@ -40,7 +40,7 @@ export default async function Home() {
           <div className="my-10">
             <SectionSliderProductCard
               data={SPORT_PRODUCTS.filter((_, i) => i < 7)}
-              subHeading="New Sports equipment"
+              // subHeading="New Sports equipment"
               heading="New Arrivals"
             />
           </div>
@@ -69,10 +69,22 @@ export default async function Home() {
           </div> */}
 
           {/* SECTION */}
-          <div className="relative py-10 lg:py-20">
-            <BackgroundSection className="bg-blue-100"/>
-
+          <div className="  ">
             <SectionPromo1 />
+          </div>
+
+          <div>
+          <SectionSliderProductCard
+            data={[
+              PRODUCTS[4],
+              SPORT_PRODUCTS[5],
+              PRODUCTS[7],
+              SPORT_PRODUCTS[1],
+              PRODUCTS[6],
+            ]}
+            subHeading= "Surround Yourself with Sound"
+              heading="Speakers"
+          />
           </div>
 
           {/* SECTION */}
@@ -95,7 +107,7 @@ export default async function Home() {
           {/* <SectionPromo3 /> */}
 
           <SectionSliderProductCard
-            heading="Best Sellers"
+            heading="Top Selling"
             subHeading="Best selling of the month"
           />
 
