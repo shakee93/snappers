@@ -1,12 +1,17 @@
 'use client';
 
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { ApolloError, FetchResult, useMutation, useQuery } from '@apollo/client';
+import {ApolloError, FetchResult, useLazyQuery, useMutation, useQuery} from '@apollo/client';
 import { GET_CART } from "@/graphql/defs/cart";
-import { LOGIN_CUSTOMER_MUTATION, REGISTER_CUSTOMER_MUTATION } from '@/graphql/defs/auth';
+import {GET_ACCOUNT_DETAILS, LOGIN_CUSTOMER_MUTATION, REGISTER_CUSTOMER_MUTATION} from '@/graphql/defs/auth';
 import { LoginResponse, Session } from "@/utils/type";
-import { LoginCustomerMutation, RegisterCustomerMutation } from "@/graphql/types/graphql";
-import { saveCredentials } from '@/graphql/session-handler';
+import {
+    Customer,
+    LoginCustomerMutation,
+    LoginPayload, Maybe,
+    RegisterCustomerMutation,
+    RegisterCustomerPayload
+} from "@/graphql/types/graphql";
 
 const SessionContext = createContext<Session>({
     sessionToken: null,
@@ -16,7 +21,9 @@ const SessionContext = createContext<Session>({
     login: async (email: string, password: string) => {
         return { data: null, error: null };
     },
-    logout: () => { }
+    logout: () => { },
+    fetchCustomer: () => {},
+    customer: undefined
 });
 
 export function useSession() {
@@ -25,71 +32,46 @@ export function useSession() {
 
 type AuthType = "registerCustomer" | "login";
 
-function saveResponseToLocalStorage(response: any, type: AuthType = "registerCustomer") {
-    const email = response?.data?.[type]?.customer?.email;
-    const displayName = response?.data?.[type]?.customer?.displayName;
-    const firstName = response?.data?.[type]?.customer?.firstName;
-    const address = response?.data?.[type]?.customer?.metaData?.[0]?.value;
-    const dob = response?.data?.[type]?.customer?.metaData?.[1]?.value;
-    const gender = response?.data?.[type]?.customer?.metaData?.[2]?.value;
-    const phone_number = response?.data?.[type]?.customer?.metaData?.[3]?.value;
-    const about = response?.data?.[type]?.customer?.metaData?.[4]?.value;
-    const id = response?.data?.[type]?.customer?.id;
-    
-    // save User details
-    localStorage.setItem("email", email || "");
-    localStorage.setItem("displayName", displayName || "");
-    localStorage.setItem("firstName", firstName || "");
-    localStorage.setItem("address", address || "");
-    localStorage.setItem("dob", dob || "");
-    localStorage.setItem("gender", gender || "");
-    localStorage.setItem("phone_number", phone_number || "");
-    localStorage.setItem("about", about || "");
-    localStorage.setItem("id", id || "");
+export const REFRESH_TOKEN_KEY = 'wp_refresh_token';
+export const SESSION_TOKEN_KEY = 'wp_session_token';
+export const AUTH_TOKEN_KEY = 'wp_auth_token';
 
-    let authToken, refreshToken, sessionToken;
+export const USER_DATA_KEY = 'wp_user'
 
-    if (type === "login") {
-        sessionToken = response.data?.login?.sessionToken;
-        authToken = response?.data?.login?.authToken;
-        refreshToken = response?.data?.login?.refreshToken;
 
-    } else if (type === "registerCustomer") {
-        sessionToken = response.data?.login?.customer.sessionToken;
-        authToken = response?.data?.registerCustomer?.user?.jwtAuthToken;
-        refreshToken = response?.data?.registerCustomer?.user?.jwtRefreshToken;
-    }
-
-    console.log("sessionToken on the login:", sessionToken);
-    console.log("refreshToken on the login:", refreshToken);
-    console.log("authToken on the login:", authToken);
-
-    if(sessionToken) {
-        localStorage.setItem(process.env.SESSION_TOKEN_LS_KEY || "", sessionToken);
-    }
-    if (authToken) {
-        localStorage.setItem(process.env.AUTH_TOKEN_SS_KEY || "", authToken);
-    }
-    if (refreshToken) {
-        localStorage.setItem(process.env.REFRESH_TOKEN_LS_KEY || "", refreshToken);
-    }
-
-    saveCredentials(authToken, sessionToken, refreshToken);
-
-    console.log("Updated Response: ", response);
-}
 
 
 export function SessionProvider({ children }: {
     children: ReactNode
 }) {
-    const [sessionToken, setSessionToken] = useState<string | null>(typeof window !== "undefined" ? localStorage.getItem('sessionToken') : null);
+    const [sessionToken, setSessionToken] = useState<string | null>(
+        typeof window !== "undefined" ? localStorage.getItem('sessionToken') : null);
+    const [customer, setCustomer] = useState<Customer>()
+
     const { data, refetch } = useQuery(GET_CART, {
         skip: true
+    })
+    const [getUser] = useLazyQuery(GET_ACCOUNT_DETAILS, {
+        fetchPolicy: 'no-cache'
     })
 
     const [registerCustomer] = useMutation(REGISTER_CUSTOMER_MUTATION);
     const [loginCustomer] = useMutation(LOGIN_CUSTOMER_MUTATION);
+
+    function saveResponseToLocalStorage(response: any, type: AuthType = "registerCustomer") {
+
+        const data : LoginPayload & RegisterCustomerPayload = response?.data?.[type]
+
+        if (type === "login") {
+            localStorage.setItem(USER_DATA_KEY, JSON.stringify(data.customer));
+            setCustomer(data.customer as Customer)
+
+            localStorage.setItem(AUTH_TOKEN_KEY, data.authToken || '');
+            localStorage.setItem(SESSION_TOKEN_KEY, data.sessionToken || '');
+            localStorage.setItem(REFRESH_TOKEN_KEY, data.refreshToken || '');
+        }
+
+    }
 
     const signUp = async (email: string, password: string) => {
         try {
@@ -131,11 +113,10 @@ export function SessionProvider({ children }: {
 
     const login = async (email: string, password: string): Promise<LoginResponse> => {
         try {
-            const username = email;
             const response: FetchResult<LoginCustomerMutation> = await loginCustomer({
                 variables: {
                     input: {
-                        username,
+                        username: email,
                         password,
                     },
                 },
@@ -162,26 +143,39 @@ export function SessionProvider({ children }: {
     };
 
     const logout = () => {
-        localStorage.removeItem("authToken");
-        localStorage.removeItem("sessionToken");
-        localStorage.removeItem(process.env.AUTH_TOKEN_SS_KEY || "");
-        localStorage.removeItem(process.env.REFRESH_TOKEN_LS_KEY || "");
-        localStorage.removeItem(process.env.SESSION_TOKEN_LS_KEY || "");
+        localStorage.removeItem(AUTH_TOKEN_KEY);
+        localStorage.removeItem(REFRESH_TOKEN_KEY);
+        // localStorage.removeItem(SESSION_TOKEN_KEY);
+        localStorage.removeItem(USER_DATA_KEY);
 
+        setCustomer(undefined)
         setSessionToken(null);
     };
+
+
+    const fetchCustomer = async () => {
+
+        const userData = localStorage.getItem(USER_DATA_KEY);
+
+        if (userData) {
+            setCustomer(JSON.parse(userData) as unknown as Customer)
+            return userData
+        }
+
+        const { data } = await getUser();
+        setCustomer(data.customer as Customer)
+        return data
+    }
 
     useEffect(() => {
         async function fetchAndStoreSessionToken() {
             try {
                 const { data } = await refetch()
 
-                console.log("Cartdata", data);
-
                 if (data && data?.customer?.sessionToken) {
                     const newSessionToken = data.customer.sessionToken;
                     setSessionToken(newSessionToken);
-                    localStorage.setItem(process.env.SESSION_TOKEN_LS_KEY || "", newSessionToken);
+                    localStorage.setItem(SESSION_TOKEN_KEY, newSessionToken);
                 }
             } catch (error) {
                 console.error('Error fetching session token:', error);
@@ -192,10 +186,12 @@ export function SessionProvider({ children }: {
             fetchAndStoreSessionToken();
         }
 
+        fetchCustomer()
+
     }, []);
 
     return (
-        <SessionContext.Provider value={{ sessionToken, signUp, login, logout }}>
+        <SessionContext.Provider value={{ sessionToken, signUp, login, logout, fetchCustomer, customer }}>
             {children}
         </SessionContext.Provider>
     );
