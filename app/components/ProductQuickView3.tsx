@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { FC, useState, useCallback } from "react";
 import { useStore } from "@/store/store";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import LikeButton from "@/app/components/LikeButton";
@@ -24,39 +24,46 @@ import { twMerge } from "tailwind-merge";
 import ProductDetails from "./SingleProductPage/ProductDetails";
 import ProductSpecifications from "./SingleProductPage/ProductSpecifications";
 import BrandBar from "./globalComponents/BrandBar";
-import {SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
+import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
+import {
+  Attribute,
+  Brand,
+  Category, GlobalProductAttribute,
+  Product,
+  ProductAttribute, ProductUnion, ProductVariation,
+} from "@/graphql/types/graphql";
 
 export interface ProductQuickViewProps {
   className?: string;
-  product: SimpleProduct  & VariableProduct;
+  product: SimpleProduct | VariableProduct;
 }
 
 const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }) => {
-
-  let brand = product.terms.nodes.find(node => node?.name)?.name || "DefaultBrand";
-  let slug = product.terms.nodes.find(node => node?.slug)?.slug || "product";
-
-  let product_images: string[] = [];
-
-  if (product.galleryImages.nodes) {
-    product_images = [product.image.sourceUrl, ...product.galleryImages.nodes.map(node => node.sourceUrl)];
-  } else if (product.galleryImages.edges && product.galleryImages.edges.length > 0) {
-    product_images = [product.image.sourceUrl, product.galleryImages.edges[0].node.sourceUrl, product.galleryImages.edges[1].node.sourceUrl];
-  } else {
-    product_images = [product.image.sourceUrl];
-  }
-
-  // console.log({ product });
-
-  // const link = useProductLink(product)
-
-  // console.log('recieved from quick view', product)
 
   const [variantActive, setVariantActive] = React.useState(0);
   const [sizeSelected, setSizeSelected] = React.useState("");
   const [qualitySelected, setQualitySelected] = React.useState(1);
   const { product: { attribute }, setAttribute } = useStore()
   const [activeVariation, setActiveVariation] = useState<any>(!!product?.variations?.nodes?.length ? product?.variations?.nodes[0] : null)
+
+  const link = useProductLink(product)
+
+  let brand = product?.brands?.nodes[0]?.name;
+
+  console.log({ product })
+
+  let product_images: string[] = [];
+  product_images = [
+    product?.image?.sourceUrl ?? "",
+    product?.galleryImages?.edges[0]?.node?.sourceUrl ?? "",
+    product?.galleryImages?.edges[1]?.node?.sourceUrl ?? ""
+  ];
+
+  console.log({ product });
+
+  const activeAttr = useCallback((attr: ProductAttribute) => {
+    return attribute.find(a => a.name === attr.name)
+  }, [attribute])
 
   const notifyAddTocart = () => {
     toast.custom(
@@ -168,7 +175,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
           </div>
 
           <div className="text-base md:text-lg font-medium ">
-            <Link href={`${slug}/${product.slug}`}> {product.name} - {product.databaseId} </Link>
+            <Link href={link}> {product.name} - {product.databaseId} </Link>
           </div>
 
 
@@ -176,20 +183,32 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
             <>
               {product.attributes?.nodes.map((attr: ProductAttribute, index: number) =>
                 <div key={index} className="py-2 text-gray-500">
-                  <div className="text-sm py-2">{attr.label}: <span className='font-medium text-gray-700'>{product[`allPa${attr.label}`]?.nodes.find(node => node.slug === activeAttr(attr)?.val)?.name}</span> </div>
+                  <div className="text-sm py-2"> {attr.label}:{" "}
+                    <span className="font-medium text-gray-700">
+                      {(product as any)[`allPa${attr.label}`]?.nodes.find(
+                        (node: any) => node.slug === activeAttr(attr)?.val
+                      )?.name}
+                    </span>{" "}</div>
 
                   <ul className="flex gap-2 flex-wrap text-sm items-center">
 
                     {attr.options?.map((option, index) =>
                       <li key={index}
-                        onClick={e => setAttribute(attr, option)}
+                        onClick={e => setAttribute(attr, option ?? "")}
                         className={
                           twMerge(
                             "border bg-gray-200/80 cursor-pointer text-black inline-block py-2 px-3.5  text-xs md:text-sm rounded",
                             activeAttr(attr)?.val === option && ' border-blue-700 bg-white'
                           )
                         }>
-                        {product[`allPa${attr.label}`]?.nodes.find(node => node.slug === option)?.name || 'Option'}
+                        {
+                          (typeof product[`allPa${attr.label}` as keyof typeof product] === 'object' &&
+                            Array.isArray((product[`allPa${attr.label}` as keyof typeof product] as any)?.nodes) &&
+                            (product[`allPa${attr.label}` as keyof typeof product] as any)?.nodes.find(
+                              (node: any) => node.slug === option
+                            )?.name || 'Option')
+                        }
+
                       </li>
                     )}
 
@@ -305,11 +324,11 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
           data={[
             {
               name: "Description",
-              content: product.description,
+              content: product.description ?? "",
             },
             {
               name: "Specifications",
-              content: product.description,
+              content: product.description ?? "",
             }
           ]}
         />
@@ -338,7 +357,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
             {/* META FAVORITES */}
             <LikeButton className="absolute right-3 top-3 " />
           </div>
-          {(product.galleryImages.nodes || (product.galleryImages.edges && product.galleryImages.edges.length > 0)) && (
+          {(product?.galleryImages?.nodes || (product?.galleryImages?.edges && product?.galleryImages?.edges?.length > 0)) && (
             <div className="hidden lg:grid grid-cols-2 gap-3 mt-3 sm:gap-6 sm:mt-6 xl:gap-5 xl:mt-5">
               {[product_images[1], product_images[2]].map((item, index) => {
                 return (

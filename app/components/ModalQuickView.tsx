@@ -5,7 +5,7 @@ import { usePathname, useSearchParams } from 'next/navigation'
 import ButtonClose from "@/shared/ButtonClose/ButtonClose";
 import ProductQuickView from "./ProductQuickView3";
 import ProductQuickView2 from "@/components/ProductQuickView";
-
+import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 
 export interface ModalQuickViewProps {
   show: boolean;
@@ -65,12 +65,7 @@ const ModalQuickView: FC<ModalQuickViewProps> = ({
                 </span>
 
                 <div className="flex-1 overflow-y-auto rounded-xl hiddenScrollbar">
-                  {/* {pathname.includes("home2") ? (
-                    <ProductQuickView2 data={productData}/>
-                  ) : ( */}
                     <ProductQuickView product={productData}/>
-                  {/* )} */}
-                  {/* <ProductQuickView2/> */}
                 </div>
               </div>
             </div>
