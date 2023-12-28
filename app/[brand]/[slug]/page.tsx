@@ -72,10 +72,10 @@ const Page = async ({ params }: any) => {
         brand: Brand
     } = await getData(params.slug, params.brand)
 
-    return <div className='mt-16'>
+    return <div className='mt-5 md:mt-16'>
         <main className="container m-auto">
 
-            <div className="mt-5 text-xs md:px-5 md:text-base">
+            <div className="md:mt-5 text-xs md:px-5 md:text-base">
                 <Link href='/'>Home</Link> &gt; <Link href={`/${brand.slug}`}>{brand.name}</Link> &gt; <Link href={`/${brand.slug}/${product.slug}`}>{product.name}</Link>
             </div>
 
