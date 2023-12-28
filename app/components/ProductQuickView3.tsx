@@ -35,7 +35,7 @@ import {
 
 export interface ProductQuickViewProps {
   className?: string;
-  product: SimpleProduct & VariableProduct;
+  product: SimpleProduct | VariableProduct;
 }
 
 const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }) => {
