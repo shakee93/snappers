@@ -10,24 +10,22 @@ import SwitchDarkMode2 from "@/public/shared/SwitchDarkMode/SwitchDarkMode2";
 import LogoutButton from "@/components/Header/LogoutButton";
 import {useLazyQuery, useQuery} from "@apollo/client";
 import { GET_ACCOUNT_DETAILS } from "@/graphql/defs/auth";
+import {useSession} from "@/context/SessionProvider";
 
 export default function AvatarDropdown() {
 
-    // const [getUser, { data }] = useLazyQuery(GET_ACCOUNT_DETAILS, {
-    //     fetchPolicy: 'no-cache'
-    // })
+    const { customer, fetchCustomer } = useSession()
 
 
-    // useEffect(() => {
-    //     console.log(data?.data);
-    // }, [data])
+    useEffect(() => {
+        // console.log(customer);
+    }, [customer])
 
-    const loggedIn = false;
+
   return (
     <div className="AvatarDropdown ">
 
-
-        {!loggedIn ?  <Link href={'/login'} className={`text-primaryColor w-10 h-10 sm:w-12 sm:h-12 rounded-full dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none flex items-center justify-center`}>
+        {!customer ?  <Link href={'/login'} className={`text-primaryColor w-10 h-10 sm:w-12 sm:h-12 rounded-full dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none flex items-center justify-center`}>
                 <CircleUserRound/>
             </Link> :
 
@@ -52,14 +50,14 @@ export default function AvatarDropdown() {
               leaveFrom="opacity-100 translate-y-0"
               leaveTo="opacity-0 translate-y-1"
             >
-              <Popover.Panel className="absolute z-10 w-screen max-w-[260px] px-4 mt-3.5 -right-10 sm:right-0 sm:px-0">
+              <Popover.Panel className="absolute z-[100] w-screen max-w-[260px] px-4 mt-3.5 -right-10 sm:right-0 sm:px-0">
                 <div className="overflow-hidden rounded-3xl shadow-lg ring-1 ring-black ring-opacity-5">
                   <div className="relative grid grid-cols-1 gap-6 bg-white dark:bg-neutral-800 py-7 px-6">
                     <div className="flex items-center space-x-3">
                       <Avatar imgUrl={avatarImgs[7].src} sizeClass="w-12 h-12" />
 
                       <div className="flex-grow">
-                        <h4 className="font-semibold">Eden Smith</h4>
+                        <h4 className="font-semibold">{customer?.displayName}</h4>
                         <p className="text-xs mt-0.5">Los Angeles, CA</p>
                       </div>
                     </div>

@@ -2,10 +2,8 @@
 
 import {
   ApolloLink,
-  DefaultContext,
-  defaultDataIdFromObject,
-  FetchResult, from,
-  HttpLink,
+  from,
+  HttpLink, Observable,
   useMutation,
 } from "@apollo/client";
 import {
@@ -16,148 +14,111 @@ import {
 } from "@apollo/experimental-nextjs-app-support/ssr";
 import { GraphQLClient } from 'graphql-request';
 
-import { gql } from "@apollo/client";
 import { GET_AUTH_TOKEN } from "./defs/auth";
-import { getClient } from "./apollo-ssr";
-import { getSessionToken } from "./session-handler";
+import {AUTH_TOKEN_KEY, REFRESH_TOKEN_KEY, SESSION_TOKEN_KEY} from "@/context/SessionProvider";
+import {onError} from "@apollo/client/link/error";
+import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
 
-
-// export async function getSessionToken(forceFetch = false) {
-//   let sessionToken = localStorage.getItem(process.env.SESSION_TOKEN_LS_KEY as string);
-//   if (!sessionToken || forceFetch) {
-//     sessionToken = await fetchSessionToken();
-//   }
-//   return sessionToken;
-// }
-
+loadDevMessages();
+loadErrorMessages();
 
 export default function ApolloWrapper({ children }: React.PropsWithChildren) {
   function makeClient() {
-    const middleware = new ApolloLink((operation, forward) => {
-      return forward(operation).map((response) => {
-        return response;
-      });
-    });
 
+    async function refreshAuthToken(refreshToken?: string) {
+      const graphQLClient = new GraphQLClient(process.env.NEXT_PUBLIC_WP_GRAPHQL || "");
 
+      const results = await graphQLClient.request(GET_AUTH_TOKEN, { refreshToken }) as Results;
 
-    function hasCredentials() {
-      const authToken = localStorage.getItem(process.env.AUTH_TOKEN_SS_KEY ?? "");
-      const refreshToken = localStorage.getItem(process.env.REFRESH_TOKEN_LS_KEY ?? "");
+      const authToken = results?.refreshJwtAuthToken?.authToken;
 
-
-      if (!!authToken && !!refreshToken) {
-        return true;
+      if (!authToken) {
+        throw new Error("Failed to retrieve a new auth token");
       }
 
-      return false;
-    }
+      localStorage.setItem(AUTH_TOKEN_KEY, authToken)
 
-    async function refreshAuthToken(refreshToken: string) {
-      try {
-        const graphQLClient = new GraphQLClient(process.env.NEXT_PUBLIC_WP_GRAPHQL || "");
-
-        const results = await graphQLClient.request(GET_AUTH_TOKEN, { refreshToken }) as Results;
-        // const results: any = await refresh({
-        //   variables: {
-        //     refreshToken,
-        //   },
-        // });
-
-        const authToken = results?.refreshJwtAuthToken?.authToken;
-
-
-        if (!authToken) {
-          throw new Error("Failed to retrieve a new auth token");
-        }
-        return authToken;
-      } catch (err) {
-        console.error("Error refreshing auth token:", err);
-        throw err;
-      }
+      return authToken;
     }
     let tokenSetter: any;
 
     async function fetchAuthToken() {
-      const refreshToken = localStorage.getItem(process.env.REFRESH_TOKEN_LS_KEY || "");
-      let authToken;
+      const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
 
       if (!refreshToken) {
-        // No refresh token means the user is not authenticated.
-        return;
+        new Error('refresh token missing');
       }
 
-      try {
-        authToken = await refreshAuthToken(refreshToken);
-      } catch (err) {
-        console.error("Error fetching auth token:", err);
-      }
-
-      if (authToken) {
-        // Save token.
-        localStorage.setItem(process.env.AUTH_TOKEN_SS_KEY || "", authToken);
-        if (tokenSetter) {
-          clearInterval(tokenSetter);
-        }
-        tokenSetter = setInterval(
-          async () => {
-            if (!hasCredentials()) {
-              clearInterval(tokenSetter);
-              return;
-            }
-            fetchAuthToken();
-          },
-          Number(process.env.AUTH_KEY_TIMEOUT || 30000)
-        );
-      }
-
-      return authToken;
-    }
-
-    async function getAuthToken() {
-      let authToken = localStorage.getItem(process.env.AUTH_TOKEN_SS_KEY ?? "");
-
-
-      if (!authToken || !tokenSetter) {
-
-        authToken = await fetchAuthToken() ?? "no auth token";
-      }
-
-      return authToken;
+      return await refreshAuthToken(refreshToken || undefined);
     }
 
     const authLink = new ApolloLink((operation, forward) => {
-      operation.setContext(async ({ context }: DefaultContext) => {
-        const { headers: currentHeaders = {} } = context || {}; // Destructure context and set default headers object
-        const headers = { ...currentHeaders };
-        const sessionToken = await getSessionToken();
-        const authToken = await getAuthToken();
 
-        const refreshToken = localStorage.getItem(process.env.REFRESH_TOKEN_LS_KEY || "");
-        const localAuthToken = localStorage.getItem(process.env.AUTH_TOKEN_SS_KEY || "");
+      const sessionToken = localStorage.getItem(SESSION_TOKEN_KEY);
+      const authToken = localStorage.getItem(AUTH_TOKEN_KEY);
 
-        if (refreshToken) {
-          if (authToken) {
-            headers.Authorization = `Bearer ${authToken}`;
-          }
-        }
-
-
-        if (sessionToken) {
-          headers['woocommerce-session'] = `Session ${sessionToken}`;
-        }
-
-
-        if (authToken || sessionToken) {
-          return { headers };
-        }
-
-        return {};
+      operation.setContext({
+        headers: {
+          ...(sessionToken && {
+            'woocommerce-session' : `Session ${sessionToken}`,
+          }),
+          ...(authToken && {
+            Authorization : `Bearer ${authToken}`
+          })
+        },
       });
 
       return forward(operation);
     });
 
+
+    const errorLink = onError(({graphQLErrors, operation, forward, networkError}) => {
+      const targetErrors = [
+        'The iss do not match with this server',
+        'invalid-secret-key | Expired token',
+        'invalid-secret-key | Signature verification failed',
+        'Expired token',
+        'Wrong number of segments',
+      ];
+      let observable;
+      
+      
+      console.log(graphQLErrors, graphQLErrors?.some(err => targetErrors.includes(err?.debugMessage)));
+      
+      if (graphQLErrors && graphQLErrors.some(err => targetErrors.includes(err?.debugMessage))) {
+        
+        return new Observable(observer => {
+          fetchAuthToken()
+              .then(newToken => {
+
+                console.log('newToken', newToken);
+                // Update the context with the new token
+                operation.setContext(({headers = {}}) => ({
+                  headers: {
+                    ...headers,
+                    authorization: `Bearer ${newToken}`, // Update the authorization header
+                  },
+                }));
+              })
+              .then(() => {
+                const subscriber = {
+                  next: observer.next.bind(observer),
+                  error: observer.error.bind(observer),
+                  complete: observer.complete.bind(observer),
+                };
+
+                // Retry the request
+                forward(operation).subscribe(subscriber);
+              })
+              .catch(error => {
+                // Handle token refresh errors
+                observer.error(error);
+              });
+        });
+      }
+
+      if (networkError) console.log(`[Network error]: ${networkError}`);
+    });
 
     const httpLink = new HttpLink({
       // This needs to be an absolute URL, as relative URLs cannot be used in SSR
@@ -174,25 +135,19 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
       // const { data } = useSuspenseQuery(MY_QUERY, { context: { fetchOptions: { cache: "force-cache" }}});
     });
 
+
     return new NextSSRApolloClient({
       // Use the `NextSSRInMemoryCache`, not the normal `InMemoryCache`
       connectToDevTools: true,
       cache: new NextSSRInMemoryCache(),
       link: from([
+        ...(typeof window === "undefined" ? [new SSRMultipartLink({
+          stripDefer: true,
+        })] : []),
         authLink,
-        typeof window === "undefined"
-          ? ApolloLink.from([
-            // In an SSR environment, if you use multipart features like
-            // @defer, you need to decide how to handle these.
-            // This strips all interfaces with a `@defer` directive from your queries.
-            new SSRMultipartLink({
-              stripDefer: true,
-            }),
-            httpLink,
-          ])
-          : httpLink
+        errorLink,
+        httpLink
       ]),
-
       defaultOptions: {
         watchQuery: {
           fetchPolicy: "no-cache",

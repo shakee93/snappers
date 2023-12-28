@@ -1,6 +1,7 @@
 "use client";
 import { GraphQLClient } from 'graphql-request';
 import { GET_CART } from './defs/cart';
+import {SESSION_TOKEN_KEY} from "@/context/SessionProvider";
 
 async function fetchSessionToken() {
     let sessionToken;
@@ -20,20 +21,8 @@ async function fetchSessionToken() {
     return sessionToken;
 }
 
-export function saveCredentials(authToken: string, sessionToken: string, refreshToken = null) {
-    const authTokenExists = !!authToken;
-    const sessionTokenExists = !!sessionToken;
-    const refreshTokenExists = !!refreshToken;
-
-    localStorage.setItem(process.env.AUTH_TOKEN_SS_KEY || "", authToken);
-    localStorage.setItem(process.env.SESSION_TOKEN_LS_KEY || "", sessionToken);
-    if (refreshToken) {
-      localStorage.setItem(process.env.REFRESH_TOKEN_LS_KEY || "", refreshToken);
-    }
-  }
-
 export async function getSessionToken(forceFetch = false) {
-    let sessionToken = localStorage.getItem(process.env.SESSION_TOKEN_LS_KEY as string);
+    let sessionToken = localStorage.getItem(SESSION_TOKEN_KEY);
     if (!sessionToken || forceFetch) {
         sessionToken = await fetchSessionToken();
     }
