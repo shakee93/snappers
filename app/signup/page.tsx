@@ -32,9 +32,9 @@ const loginSocials = [
     },
 ];
 
-const PageSignUp: FC<PageSignUpProps> = ({ className = "" }) => {
+const PageSignUp = () => {
     return (
-        <div className={`nc-PageSignUp  ${className}`} data-nc-id="PageSignUp">
+        <div className={`nc-PageSignUp`} data-nc-id="PageSignUp">
             {/*<Helmet>*/}
             {/*    <title>Sign up || Ciseco React Template</title>*/}
             {/*</Helmet>*/}

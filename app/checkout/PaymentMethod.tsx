@@ -4,21 +4,16 @@ import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Input from "shared/Input/Input";
 import Radio from "shared/Radio/Radio";
+import {PaymentGateway} from "@/graphql/types/graphql";
 
 interface Props {
   isActive: boolean;
   onCloseActive: () => void;
   onOpenActive: () => void;
   updateFormData: (section: string, data: any) => void;
+  paymentGateways: PaymentGateway[]
 }
 
-interface PaymentGateway {
-  description: string;
-  icon: string | null;
-  id: string;
-  title: string;
-  paymentGateways: PaymentGateway[];
-}
 
 const PaymentMethod: FC<Props> = ({
   isActive,
@@ -37,12 +32,12 @@ const PaymentMethod: FC<Props> = ({
   useEffect(() => {
   }, [paymentGateways]);
 
-  const [selectedGateway, setSelectedGateway] = useState({
-    id: null,
+  const [selectedGateway, setSelectedGateway] = useState<PaymentGateway>({
+    id: "",
     title: null,
   });
 
-  const PaymentMethods = (gateway) => {
+  const PaymentMethods = (gateway: PaymentGateway) => {
 
     const active = methodActive === gateway.id;
 
@@ -94,7 +89,7 @@ const PaymentMethod: FC<Props> = ({
           </label>
           <div className={`mt-6 mb-4 ${active ? "block" : "hidden"}`}>
             <p className="text-sm dark:text-slate-300">
-              Your order will be delivered to you after you {gateway.methodText || 'transfer funds'} to:
+              Your order will be delivered to you after you {gateway.title || 'transfer funds'} to:
             </p>
             <ul className="mt-3.5 text-sm text-slate-500 dark:text-slate-400 space-y-2">
               <li>

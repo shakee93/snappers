@@ -19,6 +19,7 @@ import { useCart } from "@/context/CartProvider";
 import { useQuery } from "@apollo/client";
 import { GET_PAYMENT_GATEWAYS } from "@/graphql/defs/cart";
 import { GET_CUSTOMER_INFO, CHECKOUT_MUTATION } from "@/graphql/defs/order";
+import {PaymentGateway, SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
 
 import CheckoutDetails from "./CheckoutDetails";
 import CartItems from "./CartItems";
@@ -83,14 +84,14 @@ interface FormData {
     };
 }
 
+
 const CheckoutPage = () => {
 
     const { cart, removeFromCart, updateCart } = useCart();
-    console.log({ cart })
 
     const { loading, error, data, refetch } = useQuery(GET_PAYMENT_GATEWAYS);
 
-    const paymentGateways = data?.paymentGateways.nodes;
+    const paymentGateways: PaymentGateway[] = data?.paymentGateways.nodes;
 
     const [tabActive, setTabActive] = useState<
         "ContactInfo" | "ShippingAddress" | "PaymentMethod"
@@ -99,43 +100,47 @@ const CheckoutPage = () => {
     const [formData, setFormData] = useState<FormData>({
         contactInfo: {},
         shippingAddress: {},
-        paymentMethod: {},
+        paymentMethod: {
+            selectedGateway: {
+                id: null
+            }
+        },
     });
 
     const updateFormData = (section: string, data: any) => {
         console.log('Incoming data:', data);
 
-        setFormData((prevData) => {
-            let updatedData;
-
-            if (section.toLowerCase() === 'shippingaddress') {
-                updatedData = {
-                    ...prevData,
-                    shippingAddress: {
-                        ...prevData.shippingAddress,
-                        ...data,
-                    },
-                };
-            } else if (section.toLowerCase() === 'contactinfo') {
-                updatedData = {
-                    ...prevData,
-                    contactInfo: {
-                        ...prevData.contactInfo,
-                        ...data,
-                    },
-                };
-            } else {
-                updatedData = {
-                    ...prevData,
-                    [section]: {
-                        ...(prevData as Record<string, any>)[section] || {},
-                        ...data,
-                    },
-                };
-            }
-
-            return updatedData;
-        });
+        // setFormData((prevData) => {
+        //     let updatedData;
+        //
+        //     if (section.toLowerCase() === 'shippingaddress') {
+        //         updatedData = {
+        //             ...prevData,
+        //             shippingAddress: {
+        //                 ...prevData.shippingAddress,
+        //                 ...data,
+        //             },
+        //         };
+        //     } else if (section.toLowerCase() === 'contactinfo') {
+        //         updatedData = {
+        //             ...prevData,
+        //             contactInfo: {
+        //                 ...prevData.contactInfo,
+        //                 ...data,
+        //             },
+        //         };
+        //     } else {
+        //         updatedData = {
+        //             ...prevData,
+        //             [section]: {
+        //                 ...prevData[section],
+        //                 ...data,
+        //             },
+        //         };
+        //     }
+        //
+        //     return updatedData;
+        // });
     };
 
 
@@ -215,7 +220,7 @@ const CheckoutPage = () => {
                         <h3 className="text-lg font-semibold">Order summary</h3>
                         <div className="mt-8 divide-y divide-slate-200/70 dark:divide-slate-700 ">
                             {cart?.contents?.nodes.map((item, index) => (
-                                <CartItems key={index} item={item} onQuantityChange={updateCart} onRemove={removeFromCart} />
+                                <CartItems index={index} key={index} item={item as unknown as CartItem} onQuantityChange={updateCart} onRemove={removeFromCart} />
                             ))}
                         </div>
 

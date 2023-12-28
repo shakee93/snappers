@@ -1,14 +1,10 @@
 import React, { FC } from "react";
 import Link from "next/link";
 
-export interface PageTermProps {
-  className?: string;
-}
-
-const PageTerm: FC<PageTermProps> = ({ className = "" }) => {
+const PageTerm = () => {
   return (
     <div
-      className={` overflow-hidden relative ${className}`}
+      className={` overflow-hidden relative`}
       data-nc-id="Pageterms"
     >
       <title>Terms and Conditions</title>

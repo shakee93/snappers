@@ -6,7 +6,7 @@ import TabFilters from "@/app/components/TabFilters";
 import Pagination from "@/shared/Pagination/Pagination";
 import InstantSearchWrapper from "@/app/components/InstantSearchWrapper";
 
-export async function getData(categories: number[] | null = null) {
+async function getData(categories: number[] | null = null) {
   const { data, error } = await getClient().query({
     query: GET_ALL_PRODUCTS,
     fetchPolicy: 'no-cache'

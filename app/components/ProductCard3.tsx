@@ -14,7 +14,15 @@ import ProductStatus from "./ProductStatus";
 import Prices from "./Prices";
 import LikeButton from "./LikeButton";
 import useProductLink from "@/hooks/useProductLink";
-import { Brand, Product, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
+import {
+    Brand,
+    Edge,
+    Product,
+    ProductVariation,
+    SimpleProduct,
+    VariableProduct,
+    VariationAttribute
+} from "@/graphql/types/graphql";
 import AddedToCart from "@/app/components/Notifications/added-to-cart";
 import { useCart } from "@/context/CartProvider";
 import {ExternalLink, List, MenuSquare, MoreHorizontal, MoreVertical} from "lucide-react";
@@ -23,7 +31,7 @@ import AttributeIcon from "@/app/components/AttributeIcon";
 
 export interface ProductCardProps {
     className?: string;
-    data: SimpleProduct | VariableProduct;
+    data: SimpleProduct & VariableProduct;
     isLiked?: boolean;
 }
 
@@ -200,7 +208,9 @@ const ProductCard: FC<ProductCardProps> = ({
         } else {
             return (
                 <div className="flex space-x-1">
-                    {variations.edges.map((variation, index) => (
+                    {variations.edges.map((variation : {
+                        node : ProductVariation
+                    }, index) => (
                         <div
                             key={index}
                             onClick={() => setCurrentVariation(index)}
@@ -208,7 +218,7 @@ const ProductCard: FC<ProductCardProps> = ({
                                 ? 'border-primaryColor'
                                 : 'border-transparent'
                                 }`}
-                            title={variation.node.name}
+                            title={variation.node.name || ''}
                         >
                             <div
                                 className="absolute inset-0.5 rounded-full z-0"
@@ -286,8 +296,12 @@ const ProductCard: FC<ProductCardProps> = ({
 
                 <Link href={link}>
                     <div style={sliderStyle}>
-                        {variations?.edges && variations.edges.some(variation => variation.node?.image?.sourceUrl) ? (
-                            variations.edges.map((variation, index) => (
+                        {variations?.edges && variations.edges.some((variation: {
+                            node: ProductVariation
+                        }) => variation.node?.image?.sourceUrl) ? (
+                            variations.edges.map((variation: {
+                                node: ProductVariation
+                            }, index) => (
                                 <div key={index} className="w-full flex-shrink-0 bg-[#fefefe]">
                                     <Image
                                         src={variation?.node?.image?.sourceUrl || ''}
@@ -313,7 +327,7 @@ const ProductCard: FC<ProductCardProps> = ({
 
                 {/* <ProductStatus status={stockStatus} /> */}
 
-                <div className={"absolute top-3 right-3 z-10"} onClick={e => handleCloseModalQuickView(true)}>
+                <div className={"absolute top-3 right-3 z-10"} onClick={e => handleCloseModalQuickView()}>
                     <ArrowsPointingOutIcon className='w-5'/>
                     {/*<LikeButton liked={isLiked} className="" />*/}
                 </div>
@@ -338,11 +352,10 @@ const ProductCard: FC<ProductCardProps> = ({
                     <div
                         className={`nc-ProductCard__title text-xs lg:text-sm text-black line-clamp-2 min-h-[20px] lg:min-h-[20px] text-slate-800`}
                     >
-                        {brands?.edges?.nodes?.map((brand: Brand, index) => (
+                        {brands?.nodes?.map((brand: Brand, index) => (
                             <Link href={`/${brand?.slug}`} key={index}>{brand?.name}</Link>
                         ))}
-
-                        - {type} - {databaseId}
+                        {/*- {type} - {databaseId}*/}
                     </div>
                 </div>
 

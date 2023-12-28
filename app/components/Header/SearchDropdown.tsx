@@ -1,5 +1,5 @@
 import { Popover, Transition } from "@headlessui/react";
-import Input from "@/public/shared/Input/Input";
+import Input from "@/shared/Input/Input";
 import React, { FC, Fragment } from "react";
 
 interface Props {

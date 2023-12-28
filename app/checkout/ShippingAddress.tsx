@@ -19,17 +19,19 @@ const ShippingAddress: FC<Props> = ({
   onOpenActive,
   updateFormData,
 }) => {
+  const [firstName, setFirstName] = useState("Cole");
+  const [lastName, setLastName] = useState("Enrico");
+  const [address, setAddress] = useState("123, Dream Avenue, USA");
+  const [apartment, setApartment] = useState("55U - DD5");
+  const [city, setCity] = useState("Norris");
+  const [state, setState] = useState("Texas");
+  const [postal, setPostal] = useState("2500");
+  const [country, setCountry] = useState("United States");
+  const [addressType, setAddressType] = useState("home");
+
   const renderShippingAddress = () => {
 
-    const [firstName, setFirstName] = useState("Cole");
-    const [lastName, setLastName] = useState("Enrico");
-    const [address, setAddress] = useState("123, Dream Avenue, USA");
-    const [apartment, setApartment] = useState("55U - DD5");
-    const [city, setCity] = useState("Norris");
-    const [state, setState] = useState("Texas");
-    const [postal, setPostal] = useState("2500");
-    const [country, setCountry] = useState("United States");
-    const [addressType, setAddressType] = useState("home");
+
 
     return (
       <div className="border border-slate-200 dark:border-slate-700 rounded-xl ">
@@ -98,7 +100,7 @@ const ShippingAddress: FC<Props> = ({
             </h3>
             <div className="font-semibold mt-1 text-sm">
               <span className="">
-                St. Paul's Road, Norris, SD 57560, Dakota, USA
+                St. Paul&apos;s Road, Norris, SD 57560, Dakota, USA
               </span>
             </div>
           </div>

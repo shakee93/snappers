@@ -77,7 +77,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "" }) => {
                 <Image fill style={{ objectFit: 'cover' }}
                   // width={300}
                   // height={300}
-                  src={variant.thumbnail}
+                  src={variant.thumbnail || ''}
                   alt=""
                   className="absolute w-full h-full object-cover"
                 />

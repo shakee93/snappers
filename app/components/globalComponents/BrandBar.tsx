@@ -1,5 +1,3 @@
-import MegaMenu from "./CategoriesMenu";
-
 import Link from "next/link";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import {useQuery} from "@apollo/client";
