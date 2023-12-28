@@ -65,7 +65,7 @@ const CommonLayout: FC<CommonLayoutProps> = async ({ children }) => {
               },
               {
                 name: "Change Billing",
-                link: "/account-billing",
+                link: "/account/change-billing",
               },
             ].map((item, index) => (
               <Link
