@@ -7,6 +7,7 @@ import ProductCard from "@/app/components/ProductCard3";
 import { Product, PRODUCTS } from "@/data/data";
 
 import { GET_PRODUCTS, GET_CATEGORY } from "@/graphql/defs/products";
+import {SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
 
 export interface SectionSliderProductCardProps {
   className?: string;
@@ -28,7 +29,9 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
   // data = PRODUCTS.filter((_, i) => i < 8 && i > 2),
 }) => {
 
-  const [_products, setProducts] = useState(null);
+  const [_products, setProducts] = useState<{
+    node: SimpleProduct & VariableProduct
+  }[]>([]);
   let { loading, error, data, refetch } = useQuery(GET_PRODUCTS);
 
   useEffect(() => {

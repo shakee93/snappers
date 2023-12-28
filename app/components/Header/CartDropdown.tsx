@@ -5,12 +5,12 @@ import { Product, PRODUCTS } from "@/data/data";
 import { ShoppingBag } from "lucide-react";
 import {Fragment, useEffect} from "react";
 import Link from "next/link";
-import ButtonPrimary from "@/public/shared/Button/ButtonPrimary";
-import ButtonSecondary from "@/public/shared/Button/ButtonSecondary";
 import Image from "next/image";
 import {useCart} from "@/context/CartProvider";
-import {CartItem, SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
+import {CartItem, PaCapacity, ProductAllPaCapacityArgs, SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
 import AttributeIcon from "@/app/components/AttributeIcon";
+import ButtonPrimary from "@/shared/Button/ButtonPrimary";
+import ButtonSecondary from "@/shared/Button/ButtonSecondary";
 
 export default function CartDropdown() {
 
@@ -19,14 +19,11 @@ export default function CartDropdown() {
   const renderProduct = (item: CartItem, index: number, close: () => void) => {
     const { product, variation, quantity, key  } = item;
 
-
-      const { name, image, price, slug, salePrice, type, stockQuantity, variations, regularPrice } : SimpleProduct & VariableProduct = product.node;
-
-      // console.log(product, variation);
-
       if (!product?.node) {
       return null
     }
+
+      const { name, image, price, slug, salePrice, type, stockQuantity, variations, regularPrice } : SimpleProduct & VariableProduct = product.node;
 
     return (
       <div key={index} className="flex py-5 last:pb-0">
@@ -59,7 +56,7 @@ export default function CartDropdown() {
                           {variation?.attributes?.map((attr, index) =>
                               <Fragment key={index}>
                                   <div className='flex items-center gap-1'>
-                                      <AttributeIcon name={attr?.name || ''} className='w-4'/> <span key={attr.value}> {product.node[`allPa${attr.label}`]?.nodes.find(node => node.slug === attr.value)?.name}</span>
+                                      <AttributeIcon name={attr?.name || ''} className='w-4'/> <span key={attr?.value}> {(product.node as unknown as VariableProduct)[`allPa${attr?.label as unknown as 'Capacity'}`]?.nodes.find((node: PaCapacity) => node.slug === attr?.value)?.name}</span>
                                   </div>
                               </Fragment>
                           )}

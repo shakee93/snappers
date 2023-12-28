@@ -37,7 +37,7 @@ interface SlideType {
 
 export interface SectionHero2Props {
   className?: string;
-  slides?: SlideType[];
+  slides: SlideType[];
 }
 
 let TIME_OUT: NodeJS.Timeout | null = null;
@@ -55,6 +55,7 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
 
   const handleAutoNext = () => {
     setIndexActive((state) => {
+
       if (state >= slides.length - 1) {
         return 0;
       }
@@ -64,6 +65,10 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
 
   const handleClickNext = () => {
     setIndexActive((state) => {
+      if (!slides) {
+        return state
+      }
+
       if (state >= slides.length - 1) {
         return 0;
       }
@@ -74,6 +79,10 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
 
   const handleClickPrev = () => {
     setIndexActive((state) => {
+      if (!slides) {
+        return state
+      }
+
       if (state === 0) {
         return slides.length - 1;
       }

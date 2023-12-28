@@ -4,7 +4,7 @@ import { useState } from "react";
 import gql from "graphql-tag";
 import Input from "@/shared/Input/Input";
 import Link from "next/link";
-import ButtonPrimary from "@/public/shared/Button/ButtonPrimary";
+import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import { LoginResponse } from "@/utils/type";
 import { useSession } from "@/context/SessionProvider";
 import { useRouter } from "next/navigation";

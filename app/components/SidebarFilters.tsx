@@ -43,8 +43,8 @@ const SidebarFilters = ({
   //
   const [isOnSale, setIsIsOnSale] = useState(true);
   const [rangePrices, setRangePrices] = useState([100, 500]);
-  const [categoriesState, setCategoriesState] = useState<string[]>([]);
-  const [brandsState, setBrandsState] = useState<string[]>([]);
+  const [categoriesState, setCategoriesState] = useState<number[]>([]);
+  const [brandsState, setBrandsState] = useState<number[]>([]);
   const [colorsState, setColorsState] = useState<string[]>([]);
   const [sizesState, setSizesState] = useState<string[]>([]);
   const [sortOrderStates, setSortOrderStates] = useState<string>("");
@@ -52,13 +52,13 @@ const SidebarFilters = ({
   const { sidebar, syncCategories, syncBrands, setMounted } = useStore()
 
   //
-  const handleChangeCategories = (checked: boolean, name: string) => {
+  const handleChangeCategories = (checked: boolean, name: number) => {
     checked
       ? setCategoriesState([...categoriesState, name])
       : setCategoriesState(categoriesState.filter((i) => i !== name));
   };
 
-  const handleChangeBrands = (checked: boolean, name: string) => {
+  const handleChangeBrands = (checked: boolean, name: number) => {
     console.log(checked, name);
 
     checked

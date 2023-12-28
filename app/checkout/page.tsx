@@ -19,6 +19,7 @@ import { useCart } from "@/context/CartProvider";
 import { useQuery } from "@apollo/client";
 import { GET_PAYMENT_GATEWAYS } from "@/graphql/defs/cart";
 import { GET_CUSTOMER_INFO, CHECKOUT_MUTATION } from "@/graphql/defs/order";
+import {PaymentGateway, SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
 
 import CheckoutDetails from "./CheckoutDetails";
 import CartItems from "./CartItems";
@@ -69,14 +70,14 @@ export interface CartItemProductNode {
 }
 
 
+
 const CheckoutPage = () => {
 
     const { cart, removeFromCart, updateCart } = useCart();
-    console.log({ cart })
 
     const { loading, error, data, refetch } = useQuery(GET_PAYMENT_GATEWAYS);
 
-    const paymentGateways = data?.paymentGateways.nodes;
+    const paymentGateways: PaymentGateway[] = data?.paymentGateways.nodes;
 
     const [tabActive, setTabActive] = useState<
         "ContactInfo" | "ShippingAddress" | "PaymentMethod"
@@ -85,7 +86,11 @@ const CheckoutPage = () => {
     const [formData, setFormData] = useState({
         contactInfo: {},
         shippingAddress: {},
-        paymentMethod: {},
+        paymentMethod: {
+            selectedGateway: {
+                id: null
+            }
+        },
     });
 
     const updateFormData = (section: string, data: any) => {
@@ -235,7 +240,7 @@ const CheckoutPage = () => {
                                 <span>{cart?.total || "$0.00"}</span>
                             </div>
                         </div>
-                        <ButtonPrimary href="" onClick={handleCheckout} className="mt-8 w-full">
+                        <ButtonPrimary onClick={handleCheckout} className="mt-8 w-full">
                             Confirm order
                         </ButtonPrimary>
                         <div className="mt-5 text-sm text-slate-500 dark:text-slate-400 flex items-center justify-center">

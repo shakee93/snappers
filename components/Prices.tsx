@@ -1,8 +1,9 @@
 import React, { FC } from "react";
+import {Maybe} from "@/graphql/types/graphql";
 
 export interface PricesProps {
   className?: string;
-  price?: number;
+  price?: number | string | Maybe<string>;
   contentClass?: string;
 }
 
