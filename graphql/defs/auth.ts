@@ -14,6 +14,7 @@ export const REGISTER_CUSTOMER_MUTATION = gql`
                     key
                     value
                 }
+                sessionToken
                 displayName
             }
         }

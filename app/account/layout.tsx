@@ -53,15 +53,15 @@ const CommonLayout: FC<CommonLayoutProps> = async ({ children }) => {
               },
               {
                 name: "Save lists",
-                link: "/account-savelists",
+                link: "/account/save-lists",
               },
               {
                 name: " My order",
-                link: "/account-my-order",
+                link: "/account/my-order",
               },
               {
                 name: "Change password",
-                link: "/account-change-password",
+                link: "/account/change-password",
               },
               {
                 name: "Change Billing",
