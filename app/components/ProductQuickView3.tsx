@@ -1,4 +1,4 @@
-import React, { FC, useState } from "react";
+import React, { FC, useState, useCallback } from "react";
 import { useStore } from "@/store/store";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import LikeButton from "@/app/components/LikeButton";
@@ -25,6 +25,13 @@ import ProductDetails from "./SingleProductPage/ProductDetails";
 import ProductSpecifications from "./SingleProductPage/ProductSpecifications";
 import BrandBar from "./globalComponents/BrandBar";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
+import {
+  Attribute,
+  Brand,
+  Category, GlobalProductAttribute,
+  Product,
+  ProductAttribute, ProductUnion, ProductVariation,
+} from "@/graphql/types/graphql";
 
 export interface ProductQuickViewProps {
   className?: string;
@@ -43,20 +50,20 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
 
   let brand = product?.brands?.nodes[0]?.name;
 
+  console.log({ product })
+
   let product_images: string[] = [];
-  if (product?.galleryImages?.nodes) {
-    product_images = [product?.image?.sourceUrl, ...product.galleryImages.nodes.map(node => node?.sourceUrl ?? "")];
-  } else if (product?.galleryImages?.edges && product.galleryImages.edges.length > 0) {
-    product_images = [
-      product?.image?.sourceUrl ?? "",
-      product?.galleryImages?.edges[0]?.node?.sourceUrl ?? "",
-      product?.galleryImages?.edges[1]?.node?.sourceUrl ?? ""
-    ];
-  } else {
-    product_images = [product?.image?.sourceUrl ?? ""];
-  }
+  product_images = [
+    product?.image?.sourceUrl ?? "",
+    product?.galleryImages?.edges[0]?.node?.sourceUrl ?? "",
+    product?.galleryImages?.edges[1]?.node?.sourceUrl ?? ""
+  ];
 
   console.log({ product });
+
+  const activeAttr = useCallback((attr: ProductAttribute) => {
+    return attribute.find(a => a.name === attr.name)
+  }, [attribute])
 
   const notifyAddTocart = () => {
     toast.custom(
@@ -176,20 +183,32 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
             <>
               {product.attributes?.nodes.map((attr: ProductAttribute, index: number) =>
                 <div key={index} className="py-2 text-gray-500">
-                  <div className="text-sm py-2">{attr.label}: <span className='font-medium text-gray-700'>{product[`allPa${attr.label}`]?.nodes.find(node => node.slug === activeAttr(attr)?.val)?.name}</span> </div>
+                  <div className="text-sm py-2"> {attr.label}:{" "}
+                    <span className="font-medium text-gray-700">
+                      {(product as any)[`allPa${attr.label}`]?.nodes.find(
+                        (node: any) => node.slug === activeAttr(attr)?.val
+                      )?.name}
+                    </span>{" "}</div>
 
                   <ul className="flex gap-2 flex-wrap text-sm items-center">
 
                     {attr.options?.map((option, index) =>
                       <li key={index}
-                        onClick={e => setAttribute(attr, option)}
+                        onClick={e => setAttribute(attr, option ?? "")}
                         className={
                           twMerge(
                             "border bg-gray-200/80 cursor-pointer text-black inline-block py-2 px-3.5  text-xs md:text-sm rounded",
                             activeAttr(attr)?.val === option && ' border-blue-700 bg-white'
                           )
                         }>
-                        {product[`allPa${attr.label}`]?.nodes.find(node => node.slug === option)?.name || 'Option'}
+                        {
+                          (typeof product[`allPa${attr.label}` as keyof typeof product] === 'object' &&
+                            Array.isArray((product[`allPa${attr.label}` as keyof typeof product] as any)?.nodes) &&
+                            (product[`allPa${attr.label}` as keyof typeof product] as any)?.nodes.find(
+                              (node: any) => node.slug === option
+                            )?.name || 'Option')
+                        }
+
                       </li>
                     )}
 

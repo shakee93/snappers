@@ -4,12 +4,12 @@ import ShippingAddress from './ShippingAddress';
 import PaymentMethod from './PaymentMethod';
 
 interface CheckoutLeftProps {
-    tabActive: string;
-    setTabActive: (value: string) => void;
+    tabActive: "ContactInfo" | "ShippingAddress" | "PaymentMethod";
+    setTabActive: (value: "ContactInfo" | "ShippingAddress" | "PaymentMethod") => void;
     handleScrollToEl: (id: string) => void;
     updateFormData: (section: string, data: any) => void;
     paymentGateways: any[];
-  }
+}
 
 
 const CheckoutDetails: React.FC<CheckoutLeftProps> = ({ tabActive, setTabActive, handleScrollToEl, updateFormData, paymentGateways }) => {

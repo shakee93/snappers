@@ -69,7 +69,6 @@ export interface CartItemProductNode {
 }
 
 
-
 const CheckoutPage = () => {
 
     const { cart, removeFromCart, updateCart } = useCart();
@@ -157,8 +156,6 @@ const CheckoutPage = () => {
 
 
 
-
-
     return (
         <div className="nc-CheckoutPage">
             {/* <Helmet> */}
@@ -185,7 +182,13 @@ const CheckoutPage = () => {
 
                 <div className="flex flex-col lg:flex-row">
                     <div className="flex-1">
-                        <CheckoutDetails {...{ tabActive, setTabActive, handleScrollToEl, updateFormData, paymentGateways }} />
+                        <CheckoutDetails
+                            tabActive={tabActive}
+                            setTabActive={(value: "ContactInfo" | "ShippingAddress" | "PaymentMethod") => setTabActive(value)}
+                            handleScrollToEl={handleScrollToEl}
+                            updateFormData={updateFormData}
+                            paymentGateways={paymentGateways}
+                        />
                     </div>
 
                     <div className="flex-shrink-0 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-700 my-10 lg:my-0 lg:mx-10 xl:lg:mx-14 2xl:mx-16 "></div>
