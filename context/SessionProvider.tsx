@@ -25,28 +25,21 @@ export function useSession() {
 
 type AuthType = "registerCustomer" | "login";
 
-function saveResponseToLocalStorage(response: any, type: AuthType = "registerCustomer") {
-    const email = response?.data?.[type]?.customer?.email;
-    const displayName = response?.data?.[type]?.customer?.displayName;
-    const firstName = response?.data?.[type]?.customer?.firstName;
-    const address = response?.data?.[type]?.customer?.metaData?.[0]?.value;
-    const dob = response?.data?.[type]?.customer?.metaData?.[1]?.value;
-    const gender = response?.data?.[type]?.customer?.metaData?.[2]?.value;
-    const phone_number = response?.data?.[type]?.customer?.metaData?.[3]?.value;
-    const about = response?.data?.[type]?.customer?.metaData?.[4]?.value;
-    const id = response?.data?.[type]?.customer?.id;
-    
-    // save User details
-    localStorage.setItem("email", email || "");
-    localStorage.setItem("displayName", displayName || "");
-    localStorage.setItem("firstName", firstName || "");
-    localStorage.setItem("address", address || "");
-    localStorage.setItem("dob", dob || "");
-    localStorage.setItem("gender", gender || "");
-    localStorage.setItem("phone_number", phone_number || "");
-    localStorage.setItem("about", about || "");
-    localStorage.setItem("id", id || "");
+export const REFRESH_TOKEN_KEY = 'wp_refresh_token';
+export const SESSION_TOKEN_KEY = 'wp_session_token';
+export const AUTH_TOKEN_KEY = 'wp_auth_token';
 
+export const USER_DATA_KEY = 'wp_user'
+
+function saveResponseToLocalStorage(response: any, type: AuthType = "registerCustomer") {
+
+    const data = response?.data?.[type]
+
+
+    console.log(data);
+
+    return
+    // save User details
     let authToken, refreshToken, sessionToken;
 
     if (type === "login") {
@@ -76,7 +69,6 @@ function saveResponseToLocalStorage(response: any, type: AuthType = "registerCus
 
     saveCredentials(authToken, sessionToken, refreshToken);
 
-    console.log("Updated Response: ", response);
 }
 
 
@@ -131,11 +123,10 @@ export function SessionProvider({ children }: {
 
     const login = async (email: string, password: string): Promise<LoginResponse> => {
         try {
-            const username = email;
             const response: FetchResult<LoginCustomerMutation> = await loginCustomer({
                 variables: {
                     input: {
-                        username,
+                        username: email,
                         password,
                     },
                 },
@@ -175,8 +166,6 @@ export function SessionProvider({ children }: {
         async function fetchAndStoreSessionToken() {
             try {
                 const { data } = await refetch()
-
-                console.log("Cartdata", data);
 
                 if (data && data?.customer?.sessionToken) {
                     const newSessionToken = data.customer.sessionToken;

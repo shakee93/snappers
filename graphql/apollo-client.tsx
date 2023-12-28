@@ -45,8 +45,6 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
       const authToken = localStorage.getItem(process.env.AUTH_TOKEN_SS_KEY ?? "");
       const refreshToken = localStorage.getItem(process.env.REFRESH_TOKEN_LS_KEY ?? "");
 
-      console.log("has Creds authToken:", authToken);
-      console.log("has Creds refreshToken:", refreshToken);
 
       if (!!authToken && !!refreshToken) {
         return true;
@@ -56,10 +54,7 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
     }
 
     async function refreshAuthToken(refreshToken: string) {
-      console.log("Refreshing auth token...");
       try {
-
-        console.log("Refreshing auth token...");
         const graphQLClient = new GraphQLClient(process.env.NEXT_PUBLIC_WP_GRAPHQL || "");
 
         const results = await graphQLClient.request(GET_AUTH_TOKEN, { refreshToken }) as Results;
@@ -68,11 +63,9 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
         //     refreshToken,
         //   },
         // });
-        console.log("Refreshed auth token results:", results);
 
         const authToken = results?.refreshJwtAuthToken?.authToken;
 
-        console.log("refreshed authTOken");
 
         if (!authToken) {
           throw new Error("Failed to retrieve a new auth token");
@@ -86,13 +79,11 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
     let tokenSetter: any;
 
     async function fetchAuthToken() {
-      console.log("Started the fetching token");
       const refreshToken = localStorage.getItem(process.env.REFRESH_TOKEN_LS_KEY || "");
       let authToken;
 
       if (!refreshToken) {
         // No refresh token means the user is not authenticated.
-        console.log("User is not authenticated");
         return;
       }
 
@@ -112,7 +103,6 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
           async () => {
             if (!hasCredentials()) {
               clearInterval(tokenSetter);
-              console.log("Token setter cleared");
               return;
             }
             fetchAuthToken();
@@ -121,21 +111,16 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
         );
       }
 
-      console.log("Auth token:", authToken);
       return authToken;
     }
 
     async function getAuthToken() {
-      console.log("getAuthToken");
       let authToken = localStorage.getItem(process.env.AUTH_TOKEN_SS_KEY ?? "");
-      console.log("getAuthToken authToken:", authToken);
 
 
       if (!authToken || !tokenSetter) {
-        console.log("token not set");
 
         authToken = await fetchAuthToken() ?? "no auth token";
-        console.log("after fetchAuthToken ", authToken);
       }
 
       return authToken;
@@ -151,10 +136,6 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
         const refreshToken = localStorage.getItem(process.env.REFRESH_TOKEN_LS_KEY || "");
         const localAuthToken = localStorage.getItem(process.env.AUTH_TOKEN_SS_KEY || "");
 
-        console.log('localAuthToken inside apollo link: ', localAuthToken);
-        console.log("Refresh token inside apollo Link::", refreshToken);
-        console.log("Auth token inside apollo Link::", authToken);
-        
         if (refreshToken) {
           if (authToken) {
             headers.Authorization = `Bearer ${authToken}`;
