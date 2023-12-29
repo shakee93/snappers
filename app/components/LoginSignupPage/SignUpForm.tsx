@@ -7,6 +7,7 @@ import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import {useSession} from "@/context/SessionProvider";
 import {SignUpResponse} from "@/utils/type";
 import {useRouter} from "next/navigation";
+import toast from "react-hot-toast";
 
 
 const SignUpForm = () => {
@@ -23,14 +24,14 @@ const SignUpForm = () => {
             const response: SignUpResponse = await signUp(email, password);
 
             if (response.error !== null) {
-                alert(`Signup Issue: ${response.error}`);
+                toast(`Signup Issue: ${response.error}`);
                 return;
             }
-
             if (response.data === 'registered') {
-                alert('Registered Successfully');
+                toast("Registered Successfully")
+                router.push('/');
+                return
             }
-
             router.push('/');
         } catch (error) {
             console.error('Error:', error);

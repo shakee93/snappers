@@ -8,6 +8,7 @@ import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import { LoginResponse } from "@/utils/type";
 import { useSession } from "@/context/SessionProvider";
 import { useRouter } from "next/navigation";
+import toast, { Toaster } from 'react-hot-toast';
 
 const LoginForm = () => {
     const [email, setEmail] = useState(""); 
@@ -23,10 +24,11 @@ const LoginForm = () => {
             let response: LoginResponse = await login(email, password);
             console.log("response of login: ", response)
             if (response.error) {
-                alert(`Login Issue: ${response.error}`)
+                let errorMessage = `Login Issue: ${response.error}`
+                toast(errorMessage);
                 return
             }
-            alert("Logged in  Successfully")
+            toast("Logged in  Successfully")
             router.push("/account");
         } catch (error) {
             console.error("Error:", error);
