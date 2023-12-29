@@ -64,20 +64,22 @@ const AccountPage = () => {
         e.preventDefault();
         const { displayName, email, dateOfBirth, address, gender, phoneNumber, about } = formData;
 
-        const response = await UpdateCustomer({
-            variables: {
-                input: {
-                    shipping: { address1: address, phone: phoneNumber },
-                    email: email,
-                    displayName: displayName,
-                    metaData: [
-                        { key: "dob", value: dateOfBirth },
-                        { key: "gender", value: gender },
-                        { key: "about", value: about },
-                    ],
-                },
-            },
-        });
+        const response = await UpdateCustomer(
+            // {
+            // variables: {
+            //     input: {
+            //         shipping: { address1: address, phone: phoneNumber },
+            //         email: email,
+            //         displayName: displayName,
+            //         metaData: [
+            //             { key: "dob", value: dateOfBirth },
+            //             { key: "gender", value: gender },
+            //             { key: "about", value: about },
+            //         ],
+            //     },
+            // },
+        // }
+        );
         console.log("Updated Response: ", response);
 
         localStorage.setItem("displayName", displayName || "");

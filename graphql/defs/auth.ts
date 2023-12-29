@@ -72,13 +72,14 @@ export const Login = gql`
 // about
 // date
 export const UPDATE_ACCOUNT_INFORMATION = gql`
-    mutation updateCustomer($input: UpdateCustomerInput!) {
-      updateCustomer(input: $input) {
-        customer {
-          displayName
-        }
-      }
-    }
+    mutation updateCustomer {
+  updateCustomer(input: {firstName: "asdfasfdsdaf", id: "Y3VzdG9tZXI6Mjk="}) {
+    authToken
+    clientMutationId
+    refreshToken
+  }
+}
+
 `;
 
 // metalist__
