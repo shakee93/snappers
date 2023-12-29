@@ -45,7 +45,8 @@ export function SessionProvider({ children }: {
     children: ReactNode
 }) {
     const [sessionToken, setSessionToken] = useState<string | null>(
-        typeof window !== "undefined" ? localStorage.getItem('sessionToken') : null);
+        typeof window !== "undefined" ? localStorage.getItem(SESSION_TOKEN_KEY) : null);
+
     const [customer, setCustomer] = useState<Customer>()
 
     const { data, refetch } = useQuery(GET_CART, {
@@ -145,7 +146,7 @@ export function SessionProvider({ children }: {
     const logout = () => {
         localStorage.removeItem(AUTH_TOKEN_KEY);
         localStorage.removeItem(REFRESH_TOKEN_KEY);
-        // localStorage.removeItem(SESSION_TOKEN_KEY);
+        localStorage.removeItem(SESSION_TOKEN_KEY);
         localStorage.removeItem(USER_DATA_KEY);
 
         setCustomer(undefined)
@@ -174,7 +175,7 @@ export function SessionProvider({ children }: {
 
                 if (data && data?.customer?.sessionToken) {
                     const newSessionToken = data.customer.sessionToken;
-                    setSessionToken(newSessionToken);
+                    setSessionToken(newSessionToken)
                     localStorage.setItem(SESSION_TOKEN_KEY, newSessionToken);
                 }
             } catch (error) {
@@ -182,11 +183,9 @@ export function SessionProvider({ children }: {
             }
         }
 
-        if (!sessionToken) {
+        if (!sessionToken && !localStorage.getItem(REFRESH_TOKEN_KEY)) {
             fetchAndStoreSessionToken();
         }
-
-        fetchCustomer()
 
     }, []);
 
