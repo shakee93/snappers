@@ -15,8 +15,24 @@ import NavLinks from "./NavLinks";
 import BrandBar from "./BrandBar";
 import SearchBar from "@/app/components/globalComponents/SearchBar";
 import MobileNavLinks from "./MobileNavLinks";
+import {getClient} from "@/graphql/apollo-ssr";
+import {GET_ALL_PRODUCTS} from "@/graphql/defs/products";
+import HeaderSearchResults from "@/app/components/globalComponents/HeaderSearchResults";
 
-const Header = () => {
+async function getData(categories: number[] | null = null) {
+  const { data, error } = await getClient().query({
+    query: GET_ALL_PRODUCTS,
+  });
+
+  return {
+    productCategories: data.productCategories.nodes,
+    brands: data.brands.nodes,
+  };
+}
+
+const Header = async () => {
+  const { productCategories, brands } = await getData();
+
   const iconSize = 18;
   const navLinks = [
     {
@@ -39,42 +55,43 @@ const Header = () => {
 
 
   return (
-    <header
-      className={
+    <div>
+      <header
+          className={
 
-           "backdrop-blur-md sticky top-0 flex flex-col justify-between bg-white/90 z-30 transition-all duration-1300 border-b"
-      }
-    >
-      <div className="flex justify-between items-center lg:items-stretch">
-        <div className="flex items-center relative">
-          <Logo />
-        </div>
-        <div className='hidden lg:flex flex-1 flex-col justify-between'>
-          <div className='w-full flex flex-1'>
-            <div className="flex pl-5 flex-1 justify-center items-center">
-              <SearchBar/>
-            </div>
-            <div className="w-fit flex items-center justify-end pr-3">
-              <div className="hidden lg:block">
-                <NavLinks />
-              </div>
-              <div className="hidden md:flex">
-                <AvatarDropdown />
-                <CartDropdown />
-          
-      
-              </div>
-
-            </div>
+            "backdrop-blur-md sticky top-0 flex flex-col justify-between bg-white/90 z-30 transition-all duration-1300 border-b"
+          }
+      >
+        <div className="flex justify-between items-center lg:items-stretch">
+          <div className="flex items-center relative">
+            <Logo />
           </div>
-          <BrandBar/>
-        </div>
-        <MobileNavLinks/>
-      </div>
+          <div className='hidden lg:flex flex-1 flex-col justify-between'>
+            <div className='w-full flex flex-1'>
+              <div className="flex pl-5 flex-1 justify-center items-center">
+                <SearchBar />
+              </div>
+              <div className="w-fit flex items-center justify-end pr-3">
+                <div className="hidden lg:block">
+                  <NavLinks />
+                </div>
+                <div className="hidden md:flex">
+                  <AvatarDropdown />
+                  <CartDropdown />
 
-      
-      <div className="block sm:hidden">{/* <MobileBottomNav /> */}</div>
-    </header>
+
+                </div>
+
+              </div>
+            </div>
+            <BrandBar/>
+          </div>
+          <MobileNavLinks/>
+        </div>
+        <div className="block sm:hidden">{/* <MobileBottomNav /> */}</div>
+      </header>
+      <HeaderSearchResults productCategories={productCategories} brands={brands} />
+    </div>
   );
 };
 
