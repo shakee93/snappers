@@ -2,8 +2,9 @@
 import React, { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
 import Link from 'next/link';
+import { Category } from '@/graphql/types/graphql';
 
-const DropdownButton = () => {
+const DropdownButton = ({categories}) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleDropdown = () => {
@@ -11,12 +12,12 @@ const DropdownButton = () => {
   };
 
   
-  const categories = [
-    { name: 'Mobile', link: '/mobile' },
-    { name: 'Speakers', link: '/speakers' },
-    { name: 'Laptops', link: '/laptops' },
-    { name: 'Smart Watches', link: '/smart-watches' },
-  ];
+  // const categories = [
+  //   { name: 'Mobile', link: '/mobile' },
+  //   { name: 'Speakers', link: '/speakers' },
+  //   { name: 'Laptops', link: '/laptops' },
+  //   { name: 'Smart Watches', link: '/smart-watches' },
+  // ];
 
   return (
     <div className="relative top-3 inline-block text-center">
@@ -31,15 +32,15 @@ const DropdownButton = () => {
 
       {/* Dropdown menu */}
       {isOpen && (
-        <div className="z-50 absolute mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
-          <ul className="py-2 text-left text-sm text-gray-700 dark:text-gray-200">
-            {categories.map((category, index) => (
-              <li key={index}>
+        <div className="z-50 absolute mt-2 bg-white divide-y divide-gray-100 rounded-lg shadow dark:bg-gray-700">
+          <ul className="py-2 text-left text-sm text-gray-700 grid grid-cols-4 min-w-max  dark:text-gray-200">
+            {categories?.map((category: Category, index: number) => (
+              <li key={index} className='w-full'>
                 <Link
-                  href={category.link}
+                  href={`/${category.slug}`}
                   className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                 >
-                  {category.name}
+                   {category.name}
                 </Link>
               </li>
             ))}

@@ -14,8 +14,6 @@ const getData = async () => {
   return data.brands.nodes
 }
 
-
-
 const Footer = async () => {
 
   const brands = await getData()

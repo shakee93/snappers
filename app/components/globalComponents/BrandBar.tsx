@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { ChevronUp, ChevronDown } from "lucide-react";
 import {useQuery} from "@apollo/client";
-import {GET_BRANDS} from "@/graphql/defs/products";
+import {GET_BRANDS, GET_CATEGORY_SLUGS} from "@/graphql/defs/products";
 import {getClient} from "@/graphql/apollo-ssr";
 import {Brand} from "@/graphql/types/graphql";
 import CategoryDropdown from "./CategryDropdown";
@@ -13,16 +13,25 @@ const getData = async () => {
 
   return data.brands.nodes
 }
+const getCatData = async () => {
+  const { data } = await getClient().query({
+    query: GET_CATEGORY_SLUGS,
+  })
+
+  return data.productCategories.nodes
+}
+
 
 const BrandBar = async () => {
 
   const brands = await getData()
+  const categories = await getCatData()
 
   return (
-    <div className="flex border-t z-50 max-w-[calc(100vw-160px)] overflow-hidden">
+    <div className="flex border-t z-50 max-w-[calc(100vw-160px)]">
       <div className="w-full flex justify-between items-center">
         <div  className='text-primaryColor font-semibold flex h-full'>
-          <CategoryDropdown/>
+          <CategoryDropdown categories={categories}/>
         </div>
 
         <div className="w-full flex justify-between">
