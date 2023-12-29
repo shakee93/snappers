@@ -200,12 +200,23 @@ export const GET_BRAND_ARCHIVE = gql`
 `
 
 export const GET_CATEGORY_ARCHIVE = gql`
-    query GetCategoryArchive( $categoryIdIn: [Int] = null) {
-        products(where: {categoryIdIn: $categoryIdIn}) {
+    query GetCategoryArchive( $categoryIdIn: [Int] = null,  $first: Int = 10) {
+        products(first: $first,where: {categoryIdIn: $categoryIdIn}) {
             edges {
                 node {
                     ...ProductContentFull
                 }
+            }
+        }
+    }
+    ${ProductContentFull}
+`
+
+export const GET_PRODUCTS_NODES = gql`
+    query getProductsNode( $categoryIdIn: [Int] = null,  $first: Int = 10) {
+        products(first: $first,where: {categoryIdIn: $categoryIdIn, , stockStatus: IN_STOCK, orderby: {field: DATE, order:DESC}}) {
+            nodes {
+                ...ProductContentFull
             }
         }
     }
@@ -352,4 +363,15 @@ query GetBrandDetails($slug: [String]) {
     }
   }
 }
+`
+
+export const GET_NEW_ARRIVALS = gql`
+    query GET_NEW_ARRIVALS {
+        products(where: {orderby: {field: DATE, order:DESC}}) {
+            nodes {
+                ...ProductContentFull 
+            }
+        }
+    }
+    ${ProductContentFull} 
 `

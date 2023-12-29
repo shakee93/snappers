@@ -23,8 +23,6 @@ const PaymentMethod: FC<Props> = ({
   updateFormData,
 }) => {
 
-  // console.log({ paymentGateways })
-
   const [methodActive, setMethodActive] = useState<
     "Credit-Card" | "Internet-banking" | "Wallet"
   >("Credit-Card");
@@ -102,8 +100,6 @@ const PaymentMethod: FC<Props> = ({
                   {gateway.description}
                 </span>
               </li>
-              {/* Additional fields from the gateway data */}
-              {/* ... */}
             </ul>
           </div>
         </div>

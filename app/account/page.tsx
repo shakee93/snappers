@@ -1,24 +1,21 @@
 "use client";
+
 import React, { FC, useEffect, useState } from "react";
-import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import {  useMutation, useQuery } from "@apollo/client";
 import { GET_ACCOUNT_DETAILS, UPDATE_ACCOUNT_INFORMATION } from "@/graphql/defs/auth";
 import Input from "@/shared/Input/Input";
 import Label from "@/components/Label/Label";
 import Select from "@/shared/Select/Select";
 import Textarea from "@/shared/Textarea/Textarea";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
-import { redirect } from "next/navigation";
-import { getClient } from "@/graphql/apollo-ssr";
 import { useSession } from "@/context/SessionProvider";
 
-
 const AccountPage = () => {
-    const [customerId, setCustomerId] = useState("");
     const [UpdateCustomer] = useMutation(UPDATE_ACCOUNT_INFORMATION);
+    const { customer, fetchCustomer } = useSession();
 
     const [formData, setFormData] = useState({
-        id: customerId,
-        fullName: "",
+        displayName: "",
         email: "",
         dateOfBirth: "",
         address: "",
@@ -27,40 +24,30 @@ const AccountPage = () => {
         about: "",
     });
 
-    const data= useQuery(GET_ACCOUNT_DETAILS, {
-        fetchPolicy: 'no-cache'
-    })
-
-
     useEffect(() => {
-        console.log(data);
-    }, [data])
+        if (customer) {
+            console.log("Customer details:", customer);
+            const newFormData: any = {
+                id: customer.id || "",
+                displayName: customer.displayName || "",
+                email: customer.email || "",
+                dateOfBirth: customer.metaData?.find(md => md?.key === "dob")?.value,
+                address: customer.shipping?.address1, 
+                gender: (customer.metaData?.find(md => md?.key === "gender")?.value) || "",
+                phoneNumber: customer.shipping?.phone, 
+                about: (customer.metaData?.find(md => md?.key === "about")?.value) || "",
+            };
 
-
-    useEffect(() => {
-        const id = localStorage.getItem("id");
-        const authToken = localStorage.getItem(process.env.AUTH_TOKEN_SS_KEY ?? "");
-        console.log("authToken is: ", authToken);
-        console.log("id is: ", id);
-
-        if (!id || !authToken) {
-            redirect('/login');
-            return;
+            Object.keys(newFormData).forEach(key => {
+                if (!newFormData[key]) {
+                    console.log(`No details found for ${key}`);
+                    newFormData[key] = "";
+                }
+            });
+            setFormData(newFormData);
         }
+    }, [customer]);
 
-        setCustomerId(id);
-        // const storedData = {
-        //     id: id,
-        //     fullName: localStorage.getItem("displayName") || "",
-        //     email: localStorage.getItem("email") || "",
-        //     dateOfBirth: localStorage.getItem("dob") || "",
-        //     address: localStorage.getItem("address") || "",
-        //     gender: localStorage.getItem("gender") || "Male",
-        //     phoneNumber: localStorage.getItem("phone_number") || "",
-        //     about: localStorage.getItem("about") || "",
-        // };
-        // setFormData(storedData);
-    }, []);
 
 
     const handleChange = (
@@ -75,16 +62,14 @@ const AccountPage = () => {
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const { fullName, email, dateOfBirth, address, gender, phoneNumber, about } = formData;
+        const { displayName, email, dateOfBirth, address, gender, phoneNumber, about } = formData;
 
         const response = await UpdateCustomer({
             variables: {
                 input: {
-                    id: customerId,
-                    billing: { address1: address, phone: phoneNumber },
+                    shipping: { address1: address, phone: phoneNumber },
                     email: email,
-                    displayName: fullName,
-                    firstName: fullName,
+                    displayName: displayName,
                     metaData: [
                         { key: "dob", value: dateOfBirth },
                         { key: "gender", value: gender },
@@ -95,16 +80,12 @@ const AccountPage = () => {
         });
         console.log("Updated Response: ", response);
 
-        localStorage.setItem("displayName", fullName || "");
-        localStorage.setItem("firstName", fullName || "");
+        localStorage.setItem("displayName", displayName || "");
         localStorage.setItem("address", address || "");
         localStorage.setItem("dob", dateOfBirth || "");
         localStorage.setItem("gender", gender || "");
         localStorage.setItem("phone_number", phoneNumber || "");
         localStorage.setItem("about", about || "");
-
-
-        console.log("Form Data:", formData);
     };
 
     return (
@@ -119,7 +100,7 @@ const AccountPage = () => {
                                 <Input
                                     className="mt-1.5"
                                     name="fullName"
-                                    value={formData.fullName}
+                                    value={formData.displayName}
                                     onChange={handleChange}
                                 />
                             </div>

@@ -10,7 +10,7 @@ import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 export interface ModalQuickViewProps {
   show: boolean;
   onCloseModalQuickView: () => void;
-  productData: SimpleProduct | VariableProduct;
+  productData: SimpleProduct & VariableProduct;
 }
 
 const ModalQuickView: FC<ModalQuickViewProps> = ({

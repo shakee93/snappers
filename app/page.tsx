@@ -16,19 +16,71 @@ import Heading from "@/components/Heading/Heading";
 import SectionMagazine5 from "@/containers/BlogPage/SectionMagazine5";
 import {getClient} from "@/graphql/apollo-ssr";
 import {GET_SLIDES} from "@/graphql/defs/slides";
+import {GET_CATEGORY_ARCHIVE, GET_NEW_ARRIVALS, GET_PRODUCTS_NODES} from "@/graphql/defs/products";
+import {
+    ProductConnectionEdge,
+    RootQuery,
+    RootQueryToProductUnionConnection,
+    SimpleProduct, VariableProduct
+} from "@/graphql/types/graphql";
 
-const getSlides = async () => {
-  const { data } = await getClient().query({
-    query: GET_SLIDES,
-  })
-  
-  return data?.slides?.nodes
+const getData = async () => {
+    const {data: slides} = await getClient().query({
+        query: GET_SLIDES,
+    })
+
+    const {data: newArrivals}: {
+        data: RootQuery
+    } = await getClient().query({
+        query: GET_PRODUCTS_NODES,
+
+    })
+
+    const {data: mobiles}: {
+        data: RootQuery
+    } = await getClient().query({
+        query: GET_PRODUCTS_NODES,
+        variables: {
+            first: 10,
+            categoryIdIn: [165]
+        }
+    })
+
+    const {data: speakers}: {
+        data: RootQuery
+    } = await getClient().query({
+        query: GET_PRODUCTS_NODES,
+        variables: {
+            first: 10,
+            categoryIdIn: [71]
+        }
+    })
+
+
+    const {data: topSelling}: {
+        data: RootQuery
+    } = await getClient().query({
+        query: GET_PRODUCTS_NODES,
+        variables: {
+            first: 10,
+            categoryIdIn: [86]
+        }
+    })
+
+
+    return {
+        slides: slides?.slides?.nodes,
+        newArrivals: newArrivals.products?.nodes as (SimpleProduct & VariableProduct)[],
+        mobiles: mobiles.products?.nodes  as (SimpleProduct & VariableProduct)[],
+        speakers: speakers.products?.nodes  as (SimpleProduct & VariableProduct)[],
+        topSelling: topSelling.products?.nodes  as (SimpleProduct & VariableProduct)[],
+    }
 }
 
 
 export default async function Home() {
 
-  const slides = await getSlides()
+  const { slides, newArrivals, mobiles, speakers, topSelling } = await getData()
 
   return (
     <main>
@@ -40,7 +92,7 @@ export default async function Home() {
         <div className=" gap-4 container m-auto">
           <div className="my-10">
             <SectionSliderProductCard
-              data={SPORT_PRODUCTS.filter((_, i) => i < 7)}
+                products={newArrivals}
               // subHeading="New Sports equipment"
               heading="New Arrivals"
             />
@@ -54,13 +106,7 @@ export default async function Home() {
         <div className="container relative space-y-24 my-24 lg:space-y-32 lg:my-32">
           {/* SECTION */}
           <SectionSliderProductCard
-            data={[
-              PRODUCTS[4],
-              SPORT_PRODUCTS[5],
-              PRODUCTS[7],
-              SPORT_PRODUCTS[1],
-              PRODUCTS[6],
-            ]}
+            products={mobiles}
             subHeading= "Explore the Latest in Smartphone Innovation"
               heading="Mobiles"
           />
@@ -76,13 +122,7 @@ export default async function Home() {
 
           <div>
           <SectionSliderProductCard
-            data={[
-              PRODUCTS[4],
-              SPORT_PRODUCTS[5],
-              PRODUCTS[7],
-              SPORT_PRODUCTS[1],
-              PRODUCTS[6],
-            ]}
+            products={speakers}
             subHeading= "Surround Yourself with Sound"
               heading="Speakers"
           />
@@ -108,7 +148,8 @@ export default async function Home() {
           {/* <SectionPromo3 /> */}
 
           <SectionSliderProductCard
-            heading="Top Selling"
+              products={topSelling}
+            heading="Smart Watches"
             subHeading="Best selling of the month"
           />
 
