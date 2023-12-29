@@ -12,7 +12,7 @@ const AccountBilling = () => {
           <div className="max-w-2xl prose prose-slate dark:prose-invert">
             <span className="">
               When you receive a payment for a order, we call that payment to
-              you a "payout." Our secure payment system supports several payout
+              you a &ldquo;payout.&ldquo; Our secure payment system supports several payout
               methods, which can be set up below. Go to FAQ.
               <br />
               <br />

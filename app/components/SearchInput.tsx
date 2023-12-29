@@ -1,14 +1,26 @@
 import {useSearchBox} from "react-instantsearch";
 import {Search} from "lucide-react";
+import {useStore} from "@/store/store";
+import {useEffect} from "react";
 
 
-const SearchInput = () => {
+const SearchInput = ({ show = true } : { show?: boolean}) => {
     const {
         query,
         refine,
         clear,
-        // Deprecated
     } = useSearchBox();
+
+    const { search } = useStore()
+
+    useEffect(() => {
+        refine(search)
+    }, [search])
+
+    if (!show) {
+        return <></>
+    }
+
 
     return  <form
         className="flex-1 text-primary-700"
@@ -25,7 +37,7 @@ const SearchInput = () => {
             />
         </div>
         <input type="submit" hidden value="" />
-    </form>
+    </form>;
 }
 
 export default SearchInput

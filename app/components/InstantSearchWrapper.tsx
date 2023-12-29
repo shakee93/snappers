@@ -108,7 +108,7 @@ const InstantSearchWrapper = ({
         }
     }} searchClient={makeClient} indexName='product' >
         <div className='flex gap-6 flex-col'>
-            {search && <SearchInput/>}
+            <SearchInput show={search}/>
             {filters && <TabFilters category={category} brand={brand} categories={categories} brands={brands}/>}
             <Configure  filters={filterQuery} hitsPerPage={12}/>
             {/*<RefinementList attribute="brands.nodes"/>*/}

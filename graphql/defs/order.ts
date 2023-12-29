@@ -1,5 +1,12 @@
 import { gql } from '@apollo/client';
 
+// export const GET_CUSTOMER_INFO = gql`
+//   query GetCusDetails{
+//     customer {
+//       addPaymentMethodUrl
+//     }
+//   }
+// `;
 
 
 export const CHECKOUT_MUTATION = gql`
@@ -14,6 +21,20 @@ export const CHECKOUT_MUTATION = gql`
     }
   }
 `;
+
+export const GUEST_CHECKOUT_MUTATION = gql`
+mutation guestCheckout ($paymentMethod: String!, , $lineItems: [LineItemInput!]!) {
+  createOrder(input: {
+    paymentMethod: $paymentMethod,
+    lineItems: $lineItems
+  }) {
+    clientMutationId
+    order {
+      orderKey
+      total
+    }
+  }
+}`
 
 export const PAYMENT_DETAILS = gql`
 query paymentDetails {

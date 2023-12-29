@@ -7,6 +7,8 @@ import { ArrowRightIcon } from "@heroicons/react/24/outline";
 import {StaticImageData} from "next/image";
 import Image from 'next/image';
 
+import FallbackImage from "@/public/images/brandLogo/apple.png"
+
 
 export interface CardCategory4Props {
   className?: string;
@@ -39,17 +41,24 @@ const CardCategory4: FC<CardCategory4Props> = ({
         </div>
 
         <div className="absolute inset-5 sm:inset-8 flex flex-col justify-between">
-          <div className="flex justify-between items-center">
-            <Image
-              src={featuredImage || ''}
+          <div className="flex justify-center items-center">
+            {/* <Image
+              src={featuredImage || FallbackImage}
               className={`w-20 h-20 rounded-full overflow-hidden z-0 ${color}`}
               alt=""
               width={1000}
               height={1000}
+            /> */}
+             <Image
+              src={featuredImage || FallbackImage}
+              className={`w-full max-w-[200px] max-h-[200px] overflow-hidden z-0 ${color}`}
+              alt=""
+              width={1000}
+              height={1000}
             />
-            <span className="text-xs text-slate-700 dark:text-neutral-300 font-medium">
+            {/* <span className="text-xs text-slate-700 dark:text-neutral-300 font-medium">
              products
-            </span>
+            </span> */}
           </div>
 
           <div className="">

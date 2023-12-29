@@ -17,7 +17,7 @@ const ProductGridInstant = ({ products, brand, category }: ProductGridProps) => 
     const { hits, results } = useHits()
 
     useEffect(() => {
-        console.log(results);
+        // console.log(results);
     }, [hits])
 
     return (
@@ -32,7 +32,9 @@ const ProductGridInstant = ({ products, brand, category }: ProductGridProps) => 
 
             <hr className="border-slate-200 my-8 dark:border-slate-700" />
 
-            <Pagination />
+            {(results && results?.nbHits > results?.hitsPerPage) &&
+                <Pagination />
+            }
         </div>
 
     );

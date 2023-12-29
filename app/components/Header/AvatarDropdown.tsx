@@ -19,7 +19,6 @@ export default function AvatarDropdown() {
     useEffect(() => {
     }, [customer])
 
-
   return (
     <div className="AvatarDropdown ">
 

@@ -243,12 +243,21 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
   
       const fetchedBrandsFromServer: Brand[] = fetchedData?.brands.nodes || [];
 
-      // console.log('Fetched Brands:', fetchedBrands);
-      setBrands(fetchedBrandsFromServer);
+      const updatedBrands = fetchedBrandsFromServer.map((serverBrand) => {
+        const matchingHardcodedBrand = hardcodedBrandList.find((h) => h.slug === serverBrand.slug);
+        return {
+          ...serverBrand,
+          img: matchingHardcodedBrand?.img || '', // Use the hardcoded img or provide a default value
+        };
+      });
+
+      setBrands(updatedBrands);
     } catch (error) {
       console.error(`Error fetching brands for ${category}`, error);
     }
   };
+
+  console.log({brands});
   
   useEffect(() => {
     fetchBrandsForCategory(tabActive);
@@ -305,6 +314,7 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
                 desc={brand.description || ''}
                 key={brand.id}
                 slug={brand.slug || ''}
+                featuredImage={brand.img}
             />
           </div>
         ))}

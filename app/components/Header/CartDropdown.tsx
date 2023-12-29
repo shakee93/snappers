@@ -20,6 +20,7 @@ export default function CartDropdown() {
     const { product, variation, quantity, key  } = item;
 
 
+      // @ts-ignore
       const { name, image, price, slug, salePrice, type, stockQuantity, variations, regularPrice, brands } : SimpleProduct & VariableProduct = product.node;
 
       // console.log(product, variation);

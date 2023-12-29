@@ -16,7 +16,7 @@ export interface SectionSliderProductCardProps {
   headingFontClassName?: string;
   headingClassName?: string;
   subHeading?: string;
-  data?: Product[];
+  products?: (SimpleProduct & VariableProduct)[];
 }
 
 const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
@@ -26,19 +26,10 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
   headingClassName,
   heading,
   subHeading = " ",
-  // data = PRODUCTS.filter((_, i) => i < 8 && i > 2),
+    products = []
 }) => {
 
-  const [_products, setProducts] = useState<{
-    node: SimpleProduct & VariableProduct
-  }[]>([]);
-  let { loading, error, data, refetch } = useQuery(GET_PRODUCTS);
-
-  useEffect(() => {
-    if (data?.products.edges.length > 0) {
-      setProducts(data.products.edges);
-    }
-  }, [data]);
+  const [_products, setProducts] = useState<(SimpleProduct & VariableProduct)[]>(products);
 
   const sliderRef = useRef(null);
   const id = useId();
@@ -103,8 +94,8 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
         <div className="glide__track" data-glide-el="track">
           <ul className="glide__slides py-3">
             {_products?.map((item, index) => (
-              <li key={index} className={`glide__slide ${itemClassName}`}>
-                <ProductCard key={item.node.slug} data={item.node} />
+              <li key={index} className={`w-fit ${itemClassName}`}>
+                <ProductCard key={item.slug} data={item} />
               </li>
             ))}
           </ul>
