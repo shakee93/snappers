@@ -4,7 +4,7 @@ import { ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { Category } from '@/graphql/types/graphql';
 
-const DropdownButton = ({categories}) => {
+const DropdownButton = ({categories} : { categories: any }) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const toggleDropdown = () => {

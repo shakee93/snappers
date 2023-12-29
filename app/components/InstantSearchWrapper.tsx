@@ -21,6 +21,13 @@ interface InstantSearchWrapperProps {
     category?: ProductCategory
 }
 
+const typesenseConfig = {
+    host: process.env.NEXT_PUBLIC_TYPESENSE_HOST || "gq.freshpixl.com",
+    port: process.env.NEXT_PUBLIC_TYPESENSE_PORT as unknown as number || 80,
+    path: process.env.NEXT_PUBLIC_TYPESENSE_PATH || "/q-search",
+    protocol: process.env.NEXT_PUBLIC_TYPESENSE_PROTOCOL || "http",
+};
+
 const InstantSearchWrapper = ({
                                   search = false,
                                   filters = false,
@@ -75,13 +82,7 @@ const InstantSearchWrapper = ({
                 server: {
                     apiKey: "xyz", // Be sure to use an API key that only allows search operations
                     nodes: [
-                        {
-                            // host: "0.0.0.0",
-                            host: "52.45.14.64",
-                            port: 8108,
-                            path: "", // Optional. Example: If you have your typesense mounted in localhost:8108/typesense, path should be equal to '/typesense'
-                            protocol: "https",
-                        },
+                        typesenseConfig
                     ],
                     cacheSearchResultsForSeconds: 2 * 60, // Cache search results from server. Defaults to 2 minutes. Set to 0 to disable caching.
                 },

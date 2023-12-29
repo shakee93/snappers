@@ -226,7 +226,7 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
 
   const [getBrands, { loading, error, data, refetch }] = useLazyQuery(GET_BRANDS);
 
-  const [brands, setBrands] = useState<Brand[]>([]);
+  const [brands, setBrands] = useState<any[]>([]);
   const [tabActive, setTabActive] = useState<keyof typeof hardcodedBrands>("Mobiles");
 
   const fetchBrandsForCategory = async (category: keyof typeof hardcodedBrands) => {
@@ -314,7 +314,7 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
                 desc={brand.description || ''}
                 key={brand.id}
                 slug={brand.slug || ''}
-                featuredImage={brand.img}
+                featuredImage={brand?.brandImage}
             />
           </div>
         ))}
