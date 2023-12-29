@@ -35,7 +35,7 @@ import {
 
 export interface ProductQuickViewProps {
   className?: string;
-  product: SimpleProduct | VariableProduct;
+  product: SimpleProduct & VariableProduct;
 }
 
 const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }) => {
@@ -100,7 +100,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
           </span>
         </label>
         <div className="flex mt-2.5">
-          {product.variations.nodes?.map((variant, index) => (
+          {product.variations.nodes?.map((variant: ProductVariation, index) => (
             <div
               key={index}
               onClick={() => setVariantActive(index)}
@@ -111,7 +111,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
             >
               <div className="absolute inset-0.5 rounded-full overflow-hidden z-0">
                 <Image fill style={{ objectFit: 'cover' }}
-                  src={variant.image?.sourceUrl}
+                  src={variant.image?.sourceUrl || ''}
                   alt=""
                   className="absolute w-full h-full object-cover"
                 />

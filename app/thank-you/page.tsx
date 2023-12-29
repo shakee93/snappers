@@ -1,8 +1,6 @@
-// src/ThankYouPage.tsx
-import React from "react";
 import { BadgeCheck } from "lucide-react";
 
-const ThankYouPage: React.FC = () => {
+const ThankYouPage = () => {
   const dummyProducts = [
     { name: "Product A", quantity: 2, price: 20 },
     { name: "Product B", quantity: 1, price: 15 },
