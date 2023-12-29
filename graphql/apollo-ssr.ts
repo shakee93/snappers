@@ -8,7 +8,7 @@ export const { getClient } = registerApolloClient(() => {
             // https://studio.apollographql.com/public/spacex-l4uc6p/
             uri: process.env.NEXT_PUBLIC_WP_GRAPHQL,
             fetchOptions: {
-                cache: 'no-store'
+                // cache: 'no-store'
             }
             // you can disable result caching here if you want to
             // (this does not work if you are rendering your page with `export const dynamic = "force-static"`)
