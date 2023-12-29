@@ -15,11 +15,10 @@ import {
 import { GraphQLClient } from 'graphql-request';
 
 import { GET_AUTH_TOKEN } from "./defs/auth";
-import {AUTH_TOKEN_KEY, REFRESH_TOKEN_KEY, SESSION_TOKEN_KEY} from "@/context/SessionProvider";
-import {onError} from "@apollo/client/link/error";
+import { AUTH_TOKEN_KEY, REFRESH_TOKEN_KEY, SESSION_TOKEN_KEY } from "@/context/SessionProvider";
+import { onError } from "@apollo/client/link/error";
 import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
-import {GraphQLError} from "graphql/error";
-import {GraphQLErrors} from "@apollo/client/errors";
+
 
 loadDevMessages();
 loadErrorMessages();
@@ -62,10 +61,10 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
       operation.setContext({
         headers: {
           ...(sessionToken && {
-            'woocommerce-session' : `Session ${sessionToken}`,
+            'woocommerce-session': `Session ${sessionToken}`,
           }),
           ...(authToken && {
-            Authorization : `Bearer ${authToken}`
+            Authorization: `Bearer ${authToken}`
           })
         },
       });
@@ -74,46 +73,44 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
     });
 
 
-    const errorLink = onError(({graphQLErrors, operation, forward, networkError}) => {
+    const errorLink = onError(({ graphQLErrors, operation, forward, networkError }) => {
       const targetErrors = [
         'The iss do not match with this server',
-        'invalid-secret-key | Expired token',
+        'invalid-secret-key | Expipred token',
         'invalid-secret-key | Signature verification failed',
         'Expired token',
         'Wrong number of segments',
       ];
-      let observable;
-      
-      
+
+
       if (graphQLErrors && graphQLErrors.some((err: any) => targetErrors.includes(err?.debugMessage))) {
-        
         return new Observable(observer => {
           fetchAuthToken()
-              .then(newToken => {
+            .then(newToken => {
 
-                console.log('newToken', newToken);
-                // Update the context with the new token
-                operation.setContext(({headers = {}}) => ({
-                  headers: {
-                    ...headers,
-                    authorization: `Bearer ${newToken}`, // Update the authorization header
-                  },
-                }));
-              })
-              .then(() => {
-                const subscriber = {
-                  next: observer.next.bind(observer),
-                  error: observer.error.bind(observer),
-                  complete: observer.complete.bind(observer),
-                };
+              console.log('newToken', newToken);
+              // Update the context with the new token
+              operation.setContext(({ headers = {} }) => ({
+                headers: {
+                  ...headers,
+                  authorization: `Bearer ${newToken}`, // Update the authorization header
+                },
+              }));
+            })
+            .then(() => {
+              const subscriber = {
+                next: observer.next.bind(observer),
+                error: observer.error.bind(observer),
+                complete: observer.complete.bind(observer),
+              };
 
-                // Retry the request
-                forward(operation).subscribe(subscriber);
-              })
-              .catch(error => {
-                // Handle token refresh errors
-                observer.error(error);
-              });
+              // Retry the request
+              forward(operation).subscribe(subscriber);
+            })
+            .catch(error => {
+              // Handle token refresh errors
+              observer.error(error);
+            });
         });
       }
 

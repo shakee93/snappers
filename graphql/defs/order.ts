@@ -1,12 +1,5 @@
 import { gql } from '@apollo/client';
 
-export const GET_CUSTOMER_INFO = gql`
-  query GetCusDetails{
-    customer {
-      addPaymentMethodUrl
-    }
-  }
-`;
 
 
 export const CHECKOUT_MUTATION = gql`
@@ -25,7 +18,6 @@ export const CHECKOUT_MUTATION = gql`
 export const PAYMENT_DETAILS = gql`
 query paymentDetails {
   customer(id: "") {
-    type
     availablePaymentMethods {
       gateway {
         id

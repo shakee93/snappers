@@ -18,7 +18,7 @@ import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
 import { useQuery } from "@apollo/client";
 import { GET_PAYMENT_GATEWAYS } from "@/graphql/defs/cart";
-import { GET_CUSTOMER_INFO, CHECKOUT_MUTATION } from "@/graphql/defs/order";
+import {  CHECKOUT_MUTATION } from "@/graphql/defs/order";
 import { PaymentGateway, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 
 import CheckoutDetails from "./CheckoutDetails";

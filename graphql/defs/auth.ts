@@ -78,40 +78,35 @@ export const UpdateCustomer = gql`
 
 
 export const UPDATE_ACCOUNT_INFORMATION = gql`
-    mutation updateAccountDetails($input: UpdateCustomerInput!) {
-        updateCustomer(input: $input) {
-            customer {
-            email
-            metaData {
-                key
-                value
-                }
-            id
-            }
+    mutation updateCustomer($input: UpdateCustomerInput!) {
+      updateCustomer(input: $input) {
+        customer {
+          displayName
         }
+      }
     }
 `;
 
-
+// metalist__
+// gender
+// about
+// date
 export const GET_ACCOUNT_DETAILS = gql`
-    query getAccountDetails {
-        customer {
-            email
-            displayName
-            billing {
-                address1
-                phone
-                email
-            }
-            metaData(multiple: true) {
-                key
-                value
-                id
-            }
-            username
-            id
+   query getAccountDetails {
+      customer {
+        displayName
+        email
+        metaData{
+          key
+          value
         }
-    }
+        shipping {
+          address1
+          phone
+        }
+
+  }
+}
 `;
 
 
