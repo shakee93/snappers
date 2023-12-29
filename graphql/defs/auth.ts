@@ -65,18 +65,12 @@ export const Login = gql`
   ${CustomerFields}
 `;
 
-export const UpdateCustomer = gql`
-  mutation UpdateCustomer($input: UpdateCustomerInput!) {
-    updateCustomer(input: $input) {
-      customer {
-        ...CustomerFields
-      }
-    }
-  }
-  ${CustomerFields}
-`;
 
 
+// metalist__
+// gender
+// about
+// date
 export const UPDATE_ACCOUNT_INFORMATION = gql`
     mutation updateCustomer($input: UpdateCustomerInput!) {
       updateCustomer(input: $input) {
@@ -104,7 +98,6 @@ export const GET_ACCOUNT_DETAILS = gql`
           address1
           phone
         }
-
   }
 }
 `;

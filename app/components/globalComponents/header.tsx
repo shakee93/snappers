@@ -14,8 +14,9 @@ import NavLinks from "./NavLinks";
 import BrandBar from "./BrandBar";
 import SearchBar from "@/app/components/globalComponents/SearchBar";
 import MobileNavLinks from "./MobileNavLinks";
+import { GET_CATEGORY_SLUGS } from "@/graphql/defs/products";
 
-const Header = () => {
+const Header = async () => {  
   const iconSize = 18;
   const navLinks = [
     {
