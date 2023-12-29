@@ -124,7 +124,7 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
       // This needs to be an absolute URL, as relative URLs cannot be used in SSR
       uri: process.env.NEXT_PUBLIC_WP_GRAPHQL,
       fetchOptions: {
-        // cache: "no-store",
+        cache: "no-store",
       },
       // You can disable result caching here if you want to
       // (this does not work if you are rendering your page with `export const dynamic = "force-static"`)
@@ -150,7 +150,10 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
       ]),
       defaultOptions: {
         watchQuery: {
-          fetchPolicy: "no-cache",
+          fetchPolicy: 'no-cache',
+        },
+        query: {
+          fetchPolicy: 'no-cache',
         },
       },
     });
