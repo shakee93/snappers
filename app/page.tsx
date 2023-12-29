@@ -17,18 +17,38 @@ import SectionMagazine5 from "@/containers/BlogPage/SectionMagazine5";
 import {getClient} from "@/graphql/apollo-ssr";
 import {GET_SLIDES} from "@/graphql/defs/slides";
 
-const getSlides = async () => {
-  const { data } = await getClient().query({
-    query: GET_SLIDES,
-  })
-  
-  return data?.slides?.nodes
+const getData = async () => {
+    const {data: slides} = await getClient().query({
+        query: GET_SLIDES,
+    })
+
+    const {data: newArrivals} = await getClient().query({
+        query: GET_SLIDES,
+    })
+
+    const {data: mobiles} = await getClient().query({
+        query: GET_SLIDES,
+    })
+
+    const {data: speakers} = await getClient().query({
+        query: GET_SLIDES,
+    })
+
+    const {data: topSelling} = await getClient().query({
+        query: GET_SLIDES,
+    })
+
+
+    return {
+        slides: slides?.slides?.nodes,
+        newArrivals: newArrivals
+    }
 }
 
 
 export default async function Home() {
 
-  const slides = await getSlides()
+  const { slides } = await getData()
 
   return (
     <main>
