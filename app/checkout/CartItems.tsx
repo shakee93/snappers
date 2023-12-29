@@ -47,7 +47,7 @@ interface CartItemsProps {
     const { node } = product || {};
     const { name, price, image, terms, brands } = node || {};
 
-    console.log({brands})
+    // console.log({brands})
 
     const brandSlug = brands?.nodes[0]?.slug ;
 

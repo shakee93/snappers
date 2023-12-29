@@ -50,17 +50,17 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
       : null
   );
   
-
   const link = useProductLink(product)
 
   let brand = product?.brands?.nodes[0]?.name;
 
+  console.log({product})
 
   let product_images: string[] = [];
   product_images = [
     product?.image?.sourceUrl ?? "",
-    product?.galleryImages?.edges[0]?.node?.sourceUrl ?? "",
-    product?.galleryImages?.edges[1]?.node?.sourceUrl ?? ""
+    product?.galleryImages?.nodes[0]?.sourceUrl ?? "",
+    product?.galleryImages?.nodes[1]?.sourceUrl ?? ""
   ];
 
   console.log({ product });

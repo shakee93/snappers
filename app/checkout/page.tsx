@@ -4,7 +4,7 @@ import Label from "components/Label/Label";
 import NcInputNumber from "components/NcInputNumber";
 import Prices from "components/Prices";
 import { Product, PRODUCTS } from "data/data";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Helmet } from "react-helmet-async";
 import Image from "next/image";
 import { useMutation } from '@apollo/client';
@@ -18,7 +18,7 @@ import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
 import { useQuery } from "@apollo/client";
 import { GET_PAYMENT_GATEWAYS } from "@/graphql/defs/cart";
-import { GET_CUSTOMER_INFO, CHECKOUT_MUTATION } from "@/graphql/defs/order";
+import { GET_CUSTOMER_INFO, CHECKOUT_MUTATION, GUEST_CHECKOUT_MUTATION } from "@/graphql/defs/order";
 import { PaymentGateway, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 
 import CheckoutDetails from "./CheckoutDetails";
@@ -91,6 +91,19 @@ const CheckoutPage = () => {
 
     const { loading, error, data, refetch } = useQuery(GET_PAYMENT_GATEWAYS);
 
+    // useEffect(() => {
+    //     const fetchPaymentGateways = async () => {
+    //       try {
+    //         await refetch();
+    //       } catch (error) {
+    //         console.error("Error fetching payment gateways:", error);
+    //       }
+    //     };
+
+    //     fetchPaymentGateways();
+    //   }, []); 
+
+
     const paymentGateways: PaymentGateway[] = data?.paymentGateways.nodes;
 
     const [tabActive, setTabActive] = useState<
@@ -108,65 +121,78 @@ const CheckoutPage = () => {
     const updateFormData = (section: string, data: any) => {
         console.log('Incoming data:', data);
 
-        // setFormData((prevData) => {
-        //     let updatedData;
-        //
-        //     if (section.toLowerCase() === 'shippingaddress') {
-        //         updatedData = {
-        //             ...prevData,
-        //             shippingAddress: {
-        //                 ...prevData.shippingAddress,
-        //                 ...data,
-        //             },
-        //         };
-        //     } else if (section.toLowerCase() === 'contactinfo') {
-        //         updatedData = {
-        //             ...prevData,
-        //             contactInfo: {
-        //                 ...prevData.contactInfo,
-        //                 ...data,
-        //             },
-        //         };
-        //     } else {
-        //         updatedData = {
-        //             ...prevData,
-        //             [section]: {
-        //                 ...prevData[section],
-        //                 ...data,
-        //             },
-        //         };
-        //     }
-        //
-        //     return updatedData;
-        // });
+        setFormData((prevData) => ({
+            ...prevData,
+            [section as keyof FormData]: {
+                ...prevData[section as keyof FormData],
+                ...data,
+            },
+        }))
     };
 
 
     console.log({ formData })
+    console.log({ cart })
 
-    const [checkoutMutation, { loading: checkoutLoading, error: checkoutError, data: checkoutData }] = useMutation(CHECKOUT_MUTATION);
+    // const [checkoutMutation, { loading: checkoutLoading, error: checkoutError, data: checkoutData }] = useMutation(CHECKOUT_MUTATION);
+    const [guestCheckoutMutation, { loading: checkoutLoading, error: checkoutError, data: checkoutData }] = useMutation(GUEST_CHECKOUT_MUTATION);
 
     const handleCheckout = async () => {
         try {
             const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
+            console.log('payment', paymentMethodId)
+
+            const lineItems = cart?.contents?.nodes.map(item => ({
+                productId: item?.product?.node?.databaseId,
+                quantity: item?.quantity,
+            })) || [];
 
             if (paymentMethodId !== undefined) {
-                const { data } = await checkoutMutation({
-                    variables: { paymentMethod: paymentMethodId },
+                const { data } = await guestCheckoutMutation({
+                    variables: {
+                        paymentMethod: paymentMethodId,
+                        lineItems: lineItems,
+                    },
                 });
+
+                console.log('data inside mutation', data);
+
+                if (data && data.createOrder) {
+                    const orderDetails = data.createOrder.order;
+                    console.log("Order Details:", orderDetails);
+                } else {
+                    console.error("Failed to retrieve order details");
+                }
             } else {
                 console.error("Payment method ID is undefined");
             }
-
-            console.log('data inside mutation', checkoutData)
-
-            const orderDetails = data.checkout.order;
-            console.log("Order Details:", orderDetails);
 
         } catch (error) {
             console.error("Checkout failed:", error);
         }
     };
+
+
+    // try {
+    //     const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
+
+    //     if (paymentMethodId !== undefined) {
+    //         const { data } = await checkoutMutation({
+    //             variables: { paymentMethod: paymentMethodId },
+    //         });
+    //     } else {
+    //         console.error("Payment method ID is undefined");
+    //     }
+
+    //     console.log('data inside mutation', checkoutData)
+
+    //     const orderDetails = data.checkout.order;
+    //     console.log("Order Details:", orderDetails);
+
+    // } catch (error) {
+    //     console.error("Checkout failed:", error);
+    // }
+    // };
 
     const handleScrollToEl = (id: string) => {
         const element = document.getElementById(id);
@@ -174,7 +200,6 @@ const CheckoutPage = () => {
             element?.scrollIntoView({ behavior: "smooth" });
         }, 80);
     };
-
 
 
     return (
