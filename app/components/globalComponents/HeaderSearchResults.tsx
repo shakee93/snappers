@@ -25,7 +25,7 @@ const HeaderSearchResults = ({ brands, productCategories}: SearchBarProps) => {
 
     }, [search])
 
-    return search.length > 0 ? <div className='fixed inset-0 p-5 md:p-10 mt-[129px] bg-gray-100 z-[150] overflow-y-scroll'>
+    return search.length > 0 ? <div className='fixed inset-0 p-5 md:p-10 mt-[129px] bg-gray-100 z-[100] overflow-y-scroll'>
         <InstantSearchWrapper
             filters
             categories={productCategories}

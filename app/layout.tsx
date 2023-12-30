@@ -25,6 +25,9 @@ export default async  function RootLayout({children}: {
 
     return (
         <html lang="en">
+        <head>
+            <meta name="robots" content="noindex, nofollow"/>
+        </head>
         <body className="bg-gray-50 text-base dark:bg-slate-900 text-slate-900 dark:text-slate-200">
         <ApolloWrapper>
             <SessionProvider>

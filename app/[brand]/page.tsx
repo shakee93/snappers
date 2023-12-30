@@ -27,7 +27,6 @@ async function getData(slug : string | null = null)  {
             variables:   {
                 brandId: slug
             },
-            fetchPolicy: 'no-cache'
         }
     );
 
@@ -35,18 +34,7 @@ async function getData(slug : string | null = null)  {
         return notFound()
     }
 
-    const {data: productql, error} = await getClient().query(
-        {
-            query: GET_BRAND_ARCHIVE,
-            variables:   {
-                brandId: [data.brand.databaseId]
-            },
-            fetchPolicy: 'no-cache'
-        }
-    );
-    
     return {
-        products: productql.products.edges,
         productCategories: data.productCategories.nodes,
         brand: data.brand,
         brands: data.brands.nodes
@@ -59,7 +47,9 @@ const Page = async ({ params } : {
     }
 }) => {
 
-    const { products, productCategories, brand, brands } = await getData(params.brand)
+    const { productCategories, brand, brands } = await getData(params.brand)
+
+
 
     return (
         <div

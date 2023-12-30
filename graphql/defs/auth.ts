@@ -74,9 +74,17 @@ export const Login = gql`
 export const UPDATE_ACCOUNT_INFORMATION = gql`
     mutation updateCustomer {
   updateCustomer(input: {firstName: "asdfasfdsdaf", id: "Y3VzdG9tZXI6Mjk="}) {
-    authToken
-    clientMutationId
-    refreshToken
+      authToken
+      clientMutationId
+      refreshToken
+      customer {
+          metaData {
+              key
+              value
+          }
+          displayName
+      }
+      
   }
 }
 
