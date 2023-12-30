@@ -18,6 +18,7 @@ import {getClient} from "@/graphql/apollo-ssr";
 import {GET_ALL_PRODUCTS} from "@/graphql/defs/products";
 import HeaderSearchResults from "@/app/components/globalComponents/HeaderSearchResults";
 import {Brand} from "@/graphql/types/graphql";
+import BackdropSpinner from "@/app/components/BackdropSpinner";
 
 async function getData(categories: number[] | null = null) {
   const { data, error } = await getClient().query({
@@ -63,7 +64,6 @@ const Header = async () => {
           </div>
           <MobileNavLinks/>
         </div>
-        <div className="block sm:hidden">{/* <MobileBottomNav /> */}</div>
       </header>
       <HeaderSearchResults productCategories={productCategories} brands={brands} />
     </>
