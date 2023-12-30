@@ -125,23 +125,6 @@ export const GET_BRAND = gql`
             name
             slug
         }
-        productCategories(first: 100, where: {orderby: COUNT}) {
-            nodes {
-                name
-                slug
-                id
-                databaseId
-                count
-            }
-        }
-        brands(first: 100, where: {orderby: COUNT}) {
-            nodes {
-                databaseId
-                name
-                slug
-                count
-            }
-        }
     }
 `
 

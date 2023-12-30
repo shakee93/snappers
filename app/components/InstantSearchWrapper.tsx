@@ -77,7 +77,6 @@ const InstantSearchWrapper = ({
     const makeClient: any = useMemo(() => {
         try {
 
-            console.log('called!');
             const typesenseInstantSearchAdapter = new TypesenseInstantSearchAdapter({
                 server: {
                     apiKey: "xyz", // Be sure to use an API key that only allows search operations

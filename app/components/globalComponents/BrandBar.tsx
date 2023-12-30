@@ -54,12 +54,12 @@ const BrandBar = ({ brands, categories}: BrandBarProps) => {
   return (
     <div className="flex border-t z-50 max-w-[calc(100vw-157px)]">
       <div className="relative w-full flex justify-between items-center">
-        <div  className='text-primaryColor font-semibold flex h-full'>
+        <div  className='items-center text-primaryColor font-semibold flex h-full'>
           <CategoryDropdown categories={categories}/>
         </div>
         {(scrolled > 0) &&
             <button onClick={e => smoothScroll(true)}
-                    className='absolute z-10 left-[183px] py-3.5 px-3.5 pr-8 bg-gradient-to-r from-white via-white to-transparent'>
+                    className='absolute z-10 left-[181px] py-3.5 border-l px-3.5 pr-8 bg-gradient-to-r from-white via-white to-transparent'>
               <ChevronLeft/>
             </button>
         }
@@ -68,7 +68,7 @@ const BrandBar = ({ brands, categories}: BrandBarProps) => {
             <Link
               key={index}
               href={`/${brand.slug}`}
-              className="flex-1 px-4 whitespace-nowrap py-4 uppercase text-center font-medium text-gray-700 tracking-wide text-sm border-l"
+              className="flex-1 hover:text-white hover:bg-primaryColor px-4 whitespace-nowrap py-4 uppercase text-center font-medium text-gray-700 tracking-wide text-sm border-l"
             >
               {brand.name}
             </Link>
