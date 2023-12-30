@@ -3,11 +3,21 @@ import {Search, XIcon} from "lucide-react";
 import HeaderSearchResults from "@/app/components/globalComponents/HeaderSearchResults";
 import {Brand, ProductCategory} from "@/graphql/types/graphql";
 import {useStore} from "@/store/store";
+import {useRouter} from "next/router";
+import {useEffect} from "react";
+import {usePathname} from "next/navigation";
 
 
 const SearchBar = () => {
 
+    const router = usePathname()
+
     const { search, setSearch } = useStore()
+
+
+    useEffect(() => {
+        setSearch('')
+    }, [router])
 
     return <div className='flex-1'>
         <form
