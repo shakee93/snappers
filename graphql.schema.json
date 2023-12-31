@@ -1066,6 +1066,18 @@
             "deprecationReason": "Deprecated in favor of databaseId"
           },
           {
+            "name": "brandImage",
+            "description": "Brand Image for Brand",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
             "name": "children",
             "description": "Connection between the Brand type and its children Brands.",
             "args": [
@@ -23953,8 +23965,8 @@
             "name": "currency",
             "description": "Currency the order was created with, in ISO format.",
             "type": {
-              "kind": "SCALAR",
-              "name": "String",
+              "kind": "ENUM",
+              "name": "CurrencyEnum",
               "ofType": null
             },
             "defaultValue": null,
@@ -26932,10 +26944,1047 @@
         "possibleTypes": null
       },
       {
+        "kind": "ENUM",
+        "name": "CurrencyEnum",
+        "description": "Currencies enumeration",
+        "fields": null,
+        "inputFields": null,
+        "interfaces": null,
+        "enumValues": [
+          {
+            "name": "AED",
+            "description": "United Arab Emirates dirham",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "AFN",
+            "description": "Afghan afghani",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ALL",
+            "description": "Albanian lek",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "AMD",
+            "description": "Armenian dram",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ANG",
+            "description": "Netherlands Antillean guilder",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "AOA",
+            "description": "Angolan kwanza",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ARS",
+            "description": "Argentine peso",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "AUD",
+            "description": "Australian dollar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "AWG",
+            "description": "Aruban florin",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "AZN",
+            "description": "Azerbaijani manat",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "BAM",
+            "description": "Bosnia and Herzegovina convertible mark",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "BBD",
+            "description": "Barbadian dollar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "BDT",
+            "description": "Bangladeshi taka",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "BGN",
+            "description": "Bulgarian lev",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "BHD",
+            "description": "Bahraini dinar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "BIF",
+            "description": "Burundian franc",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "BMD",
+            "description": "Bermudian dollar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "BND",
+            "description": "Brunei dollar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "BOB",
+            "description": "Bolivian boliviano",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "BRL",
+            "description": "Brazilian real",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "BSD",
+            "description": "Bahamian dollar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "BTC",
+            "description": "Bitcoin",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "BTN",
+            "description": "Bhutanese ngultrum",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "BWP",
+            "description": "Botswana pula",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "BYN",
+            "description": "Belarusian ruble",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "BYR",
+            "description": "Belarusian ruble (old)",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "BZD",
+            "description": "Belize dollar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "CAD",
+            "description": "Canadian dollar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "CDF",
+            "description": "Congolese franc",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "CHF",
+            "description": "Swiss franc",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "CLP",
+            "description": "Chilean peso",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "CNY",
+            "description": "Chinese yuan",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "COP",
+            "description": "Colombian peso",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "CRC",
+            "description": "Costa Rican col&oacute;n",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "CUC",
+            "description": "Cuban convertible peso",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "CUP",
+            "description": "Cuban peso",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "CVE",
+            "description": "Cape Verdean escudo",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "CZK",
+            "description": "Czech koruna",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "DJF",
+            "description": "Djiboutian franc",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "DKK",
+            "description": "Danish krone",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "DOP",
+            "description": "Dominican peso",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "DZD",
+            "description": "Algerian dinar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "EGP",
+            "description": "Egyptian pound",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ERN",
+            "description": "Eritrean nakfa",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ETB",
+            "description": "Ethiopian birr",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "EUR",
+            "description": "Euro",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "FJD",
+            "description": "Fijian dollar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "FKP",
+            "description": "Falkland Islands pound",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "GBP",
+            "description": "Pound sterling",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "GEL",
+            "description": "Georgian lari",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "GGP",
+            "description": "Guernsey pound",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "GHS",
+            "description": "Ghana cedi",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "GIP",
+            "description": "Gibraltar pound",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "GMD",
+            "description": "Gambian dalasi",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "GNF",
+            "description": "Guinean franc",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "GTQ",
+            "description": "Guatemalan quetzal",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "GYD",
+            "description": "Guyanese dollar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "HKD",
+            "description": "Hong Kong dollar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "HNL",
+            "description": "Honduran lempira",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "HRK",
+            "description": "Croatian kuna",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "HTG",
+            "description": "Haitian gourde",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "HUF",
+            "description": "Hungarian forint",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "IDR",
+            "description": "Indonesian rupiah",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ILS",
+            "description": "Israeli new shekel",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "IMP",
+            "description": "Manx pound",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "INR",
+            "description": "Indian rupee",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "IQD",
+            "description": "Iraqi dinar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "IRR",
+            "description": "Iranian rial",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "IRT",
+            "description": "Iranian toman",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ISK",
+            "description": "Icelandic kr&oacute;na",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "JEP",
+            "description": "Jersey pound",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "JMD",
+            "description": "Jamaican dollar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "JOD",
+            "description": "Jordanian dinar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "JPY",
+            "description": "Japanese yen",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "KES",
+            "description": "Kenyan shilling",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "KGS",
+            "description": "Kyrgyzstani som",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "KHR",
+            "description": "Cambodian riel",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "KMF",
+            "description": "Comorian franc",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "KPW",
+            "description": "North Korean won",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "KRW",
+            "description": "South Korean won",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "KWD",
+            "description": "Kuwaiti dinar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "KYD",
+            "description": "Cayman Islands dollar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "KZT",
+            "description": "Kazakhstani tenge",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "LAK",
+            "description": "Lao kip",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "LBP",
+            "description": "Lebanese pound",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "LKR",
+            "description": "Sri Lankan rupee",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "LRD",
+            "description": "Liberian dollar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "LSL",
+            "description": "Lesotho loti",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "LYD",
+            "description": "Libyan dinar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "MAD",
+            "description": "Moroccan dirham",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "MDL",
+            "description": "Moldovan leu",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "MGA",
+            "description": "Malagasy ariary",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "MKD",
+            "description": "Macedonian denar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "MMK",
+            "description": "Burmese kyat",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "MNT",
+            "description": "Mongolian t&ouml;gr&ouml;g",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "MOP",
+            "description": "Macanese pataca",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "MRU",
+            "description": "Mauritanian ouguiya",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "MUR",
+            "description": "Mauritian rupee",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "MVR",
+            "description": "Maldivian rufiyaa",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "MWK",
+            "description": "Malawian kwacha",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "MXN",
+            "description": "Mexican peso",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "MYR",
+            "description": "Malaysian ringgit",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "MZN",
+            "description": "Mozambican metical",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "NAD",
+            "description": "Namibian dollar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "NGN",
+            "description": "Nigerian naira",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "NIO",
+            "description": "Nicaraguan c&oacute;rdoba",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "NOK",
+            "description": "Norwegian krone",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "NPR",
+            "description": "Nepalese rupee",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "NZD",
+            "description": "New Zealand dollar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "OMR",
+            "description": "Omani rial",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "PAB",
+            "description": "Panamanian balboa",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "PEN",
+            "description": "Sol",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "PGK",
+            "description": "Papua New Guinean kina",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "PHP",
+            "description": "Philippine peso",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "PKR",
+            "description": "Pakistani rupee",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "PLN",
+            "description": "Polish z&#x142;oty",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "PRB",
+            "description": "Transnistrian ruble",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "PYG",
+            "description": "Paraguayan guaran&iacute;",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "QAR",
+            "description": "Qatari riyal",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "RON",
+            "description": "Romanian leu",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "RSD",
+            "description": "Serbian dinar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "RUB",
+            "description": "Russian ruble",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "RWF",
+            "description": "Rwandan franc",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "SAR",
+            "description": "Saudi riyal",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "SBD",
+            "description": "Solomon Islands dollar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "SCR",
+            "description": "Seychellois rupee",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "SDG",
+            "description": "Sudanese pound",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "SEK",
+            "description": "Swedish krona",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "SGD",
+            "description": "Singapore dollar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "SHP",
+            "description": "Saint Helena pound",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "SLL",
+            "description": "Sierra Leonean leone",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "SOS",
+            "description": "Somali shilling",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "SRD",
+            "description": "Surinamese dollar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "SSP",
+            "description": "South Sudanese pound",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "STN",
+            "description": "S&atilde;o Tom&eacute; and Pr&iacute;ncipe dobra",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "SYP",
+            "description": "Syrian pound",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "SZL",
+            "description": "Swazi lilangeni",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "THB",
+            "description": "Thai baht",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "TJS",
+            "description": "Tajikistani somoni",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "TMT",
+            "description": "Turkmenistan manat",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "TND",
+            "description": "Tunisian dinar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "TOP",
+            "description": "Tongan pa&#x2bb;anga",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "TRY",
+            "description": "Turkish lira",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "TTD",
+            "description": "Trinidad and Tobago dollar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "TWD",
+            "description": "New Taiwan dollar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "TZS",
+            "description": "Tanzanian shilling",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "UAH",
+            "description": "Ukrainian hryvnia",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "UGX",
+            "description": "Ugandan shilling",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "USD",
+            "description": "United States (US) dollar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "UYU",
+            "description": "Uruguayan peso",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "UZS",
+            "description": "Uzbekistani som",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "VEF",
+            "description": "Venezuelan bol&iacute;var (2008–2018)",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "VES",
+            "description": "Venezuelan bol&iacute;var",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "VND",
+            "description": "Vietnamese &#x111;&#x1ed3;ng",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "VUV",
+            "description": "Vanuatu vatu",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "WST",
+            "description": "Samoan t&#x101;l&#x101;",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "XAF",
+            "description": "Central African CFA franc",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "XCD",
+            "description": "East Caribbean dollar",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "XOF",
+            "description": "West African CFA franc",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "XPF",
+            "description": "CFP franc",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "YER",
+            "description": "Yemeni rial",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ZAR",
+            "description": "South African rand",
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "ZMW",
+            "description": "Zambian kwacha",
+            "isDeprecated": false,
+            "deprecationReason": null
+          }
+        ],
+        "possibleTypes": null
+      },
+      {
         "kind": "OBJECT",
         "name": "Customer",
         "description": "A customer object",
         "fields": [
+          {
+            "name": "accountNonce",
+            "description": "A nonce for the account page. By default, it expires in 1 hour.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "accountUrl",
+            "description": "A nonce link to the account page for session user. Expires in 24 hours.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "addPaymentMethodNonce",
+            "description": "A nonce for the add payment method page. By default, it expires in 1 hour.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "addPaymentMethodUrl",
+            "description": "A nonce link to the add payment method page for the authenticated user. Expires in 24 hours.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
           {
             "name": "availablePaymentMethods",
             "description": "Customer&#039;s stored payment tokens.",
@@ -27003,6 +28052,54 @@
             "type": {
               "kind": "SCALAR",
               "name": "Boolean",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "cartNonce",
+            "description": "A nonce for the cart page. By default, it expires in 1 hour.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "cartUrl",
+            "description": "A nonced link to the cart page. By default, it expires in 1 hour.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "checkoutNonce",
+            "description": "A nonce for the checkout page. By default, it expires in 1 hour.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
+              "ofType": null
+            },
+            "isDeprecated": false,
+            "deprecationReason": null
+          },
+          {
+            "name": "checkoutUrl",
+            "description": "A nonce link to the checkout page for session user. Expires in 24 hours.",
+            "args": [],
+            "type": {
+              "kind": "SCALAR",
+              "name": "String",
               "ofType": null
             },
             "isDeprecated": false,
@@ -32391,7 +33488,7 @@
             "args": [],
             "type": {
               "kind": "INTERFACE",
-              "name": "Product",
+              "name": "ProductUnion",
               "ofType": null
             },
             "isDeprecated": false,
@@ -55579,8 +56676,8 @@
             "deprecationReason": null
           },
           {
-            "name": "ORDER_NUMBER",
-            "description": "Order number.",
+            "name": "ORDER_KEY",
+            "description": "Order key.",
             "isDeprecated": false,
             "deprecationReason": null
           }
@@ -166439,8 +167536,8 @@
             "name": "currency",
             "description": "Currency the order was created with, in ISO format.",
             "type": {
-              "kind": "SCALAR",
-              "name": "String",
+              "kind": "ENUM",
+              "name": "CurrencyEnum",
               "ofType": null
             },
             "defaultValue": null,

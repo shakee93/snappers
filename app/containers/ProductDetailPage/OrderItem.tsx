@@ -16,25 +16,24 @@ import {Fragment} from "react";
 import AttributeIcon from "@/app/components/AttributeIcon";
 
 
-const CartItemProduct = ({
-    cartItem,
+const OrderItemProduct = ({
+    orderItem,
     index
-}: {
-    cartItem: CartItem,
+}:{
+    orderItem: any,
     index: number
 }) => {
 
-    const { product, quantity, variation, key } = cartItem;
+    const { product, quantity, variation, key } = orderItem.node;
 
     const { removeFromCart, updateCart } = useCart()
-    const link = useProductLink(product?.node)
+    const link = useProductLink(orderItem?.node)
 
-    if (!product?.node) {
-        return <p>No productnode found. {JSON.stringify(cartItem)} </p>;
+    if (!orderItem?.node) {
+        return <p></p>;
     }
     
-
-    const { name, image, price, slug, salePrice, type, stockQuantity, regularPrice }: SimpleProduct & VariableProduct = product.node;
+    const { name, image, price, slug, salePrice, type, stockQuantity, regularPrice }: SimpleProduct & VariableProduct = orderItem.node;
 
     return (
         <div
@@ -62,10 +61,13 @@ const CartItemProduct = ({
                                     {type === 'VARIABLE' &&
                                         <div className="my-1 text-sm text-slate-500 dark:text-slate-400">
 
-                                            {variation?.attributes?.map((attr, index) =>
+                                            {variation?.attributes?.map((attr: any, index: any) =>
                                                 <Fragment key={index}>
                                                     <div className='flex items-center gap-1'>
-                                                        <AttributeIcon name={attr?.name || ''} className='w-4'/> <span key={attr?.value}> {(product.node as unknown as VariableProduct)[`allPa${attr?.label as unknown as 'Capacity'}`]?.nodes.find((node: PaCapacity) => node.slug === attr?.value)?.name}</span>
+                                                        <AttributeIcon name={attr?.name || ''} 
+                                                        
+                                                        className='w-4'/> <span key={attr?.value}> {(product.node as unknown as VariableProduct)[`allPa${attr?.label as unknown as 'Capacity'}`
+                                                        ]?.nodes.find((node: PaCapacity) => node.slug === attr?.value)?.name}</span>
                                                     </div>
                                                 </Fragment>
                                             )}
@@ -77,7 +79,7 @@ const CartItemProduct = ({
 
                             }
                             <div className="mt-3 flex justify-between w-full sm:hidden relative">
-                                <select
+                                {/* <select
                                     name="qty"
                                     id="qty"
                                     className="form-select text-sm rounded-md py-1 border-slate-200 dark:border-slate-700 relative z-10 dark:bg-slate-800 "
@@ -89,7 +91,7 @@ const CartItemProduct = ({
                                     <option value="5">5</option>
                                     <option value="6">6</option>
                                     <option value="7">7</option>
-                                </select>
+                                </select> */}
                                 <Prices
                                     contentClass="py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium h-full"
                                     price={price}
@@ -98,12 +100,12 @@ const CartItemProduct = ({
                             </div>
                         </div>
 
-                        <div className="hidden sm:block text-center relative">
+                        {/* <div className="hidden sm:block text-center relative">
                             <NcInputNumber onChange={async q => {
                                 await updateCart(key, q)
 
                             }} defaultValue={quantity || 1} className="relative z-10" />
-                        </div>
+                        </div> */}
 
                         <div className="hidden flex-1 sm:flex justify-end">
                             <Prices salePrice={type === 'VARIABLE' ? variation?.node.regularPrice : regularPrice}
@@ -121,7 +123,7 @@ const CartItemProduct = ({
 
                     <div></div>
 
-                    <button
+                    {/* <button
                         onClick={e => removeFromCart([
                             key
                         ])
@@ -129,11 +131,11 @@ const CartItemProduct = ({
                         className="relative z-10 flex items-center mt-3 font-medium text-primary-6000 hover:text-primary-500 text-sm "
                     >
                         <span>Remove</span>
-                    </button>
+                    </button> */}
                 </div>
             </div>
         </div>
     )
 }
 
-export default CartItemProduct
+export default OrderItemProduct

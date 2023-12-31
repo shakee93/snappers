@@ -8,6 +8,7 @@ export type Session = {
     logout:  any,
     fetchCustomer: () => any
     customer: Maybe<Customer | undefined>
+    updateCustomer: any
 
 }
 

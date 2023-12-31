@@ -3,7 +3,7 @@
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
 import {ApolloError, FetchResult, useLazyQuery, useMutation, useQuery} from '@apollo/client';
 import { GET_CART } from "@/graphql/defs/cart";
-import {GET_ACCOUNT_DETAILS, LOGIN_CUSTOMER_MUTATION, REGISTER_CUSTOMER_MUTATION} from '@/graphql/defs/auth';
+import {GET_ACCOUNT_DETAILS, LOGIN_CUSTOMER_MUTATION, REGISTER_CUSTOMER_MUTATION, UPDATE_ACCOUNT_INFORMATION} from '@/graphql/defs/auth';
 import { LoginResponse, Session } from "@/utils/type";
 import {
     Customer,
@@ -23,7 +23,8 @@ const SessionContext = createContext<Session>({
     },
     logout: () => { },
     fetchCustomer: () => {},
-    customer: undefined
+    customer: undefined,
+    updateCustomer: undefined
 });
 
 export function useSession() {
@@ -62,7 +63,8 @@ export function SessionProvider({ children }: {
     function saveResponseToLocalStorage(response: any, type: AuthType = "registerCustomer") {
 
         const data : LoginPayload & RegisterCustomerPayload = response?.data?.[type]
-
+        console.log('Saved response to the local storage', data);
+        
         if (type === "login") {
             localStorage.setItem(USER_DATA_KEY, JSON.stringify(data.customer));
             setCustomer(data.customer as Customer)
@@ -81,7 +83,7 @@ export function SessionProvider({ children }: {
                     input: {
                         email,
                         password,
-                        displayName: "a",
+                        displayName: "",
                         firstName: "",
                         metaData: [
                             { key: "address", value: "" },
@@ -127,7 +129,9 @@ export function SessionProvider({ children }: {
 
             return { data: "logged_in", error: null };
         } catch (error) {
-            let errorMessage = "An error occurred during login.";
+            console.log('error', error);
+            let errorMessage = "An error occurred while login.";
+                
             if (error instanceof ApolloError) {
                 if (error.message.includes("No user found with this email address")) {
                     errorMessage = "No user found with this email address. Please check your credentials.";
@@ -153,7 +157,6 @@ export function SessionProvider({ children }: {
         // setSessionToken(null);
     };
 
-
     const fetchCustomer = async () => {
 
         const userData = localStorage.getItem(USER_DATA_KEY);
@@ -165,8 +168,31 @@ export function SessionProvider({ children }: {
 
         const { data } = await getUser();
         setCustomer(data.customer as Customer)
+        saveResponseToLocalStorage(data.customer, "login");
         return data
     }
+
+    const [updateCustomerMutation] = useMutation(UPDATE_ACCOUNT_INFORMATION);
+
+    const updateCustomer = async (input: any) => {
+        try {
+            const response = await updateCustomerMutation({
+                variables: { input },
+            });
+            const data: any = response?.data?.updateCustomer;
+
+            // Update the customer data in the session and local storage
+            if (data?.customer) {
+                setCustomer(data.customer as Customer);
+                localStorage.setItem(USER_DATA_KEY, JSON.stringify(data.customer));
+            }
+
+            return { data: "updated", error: null };
+        } catch (error) {
+            console.error("An error occurred while updating customer:", error);
+            return { data: null, error: "An error occurred while updating customer." };
+        }
+    };
 
     useEffect(() => {
         async function fetchAndStoreSessionToken() {
@@ -190,7 +216,7 @@ export function SessionProvider({ children }: {
     }, []);
 
     return (
-        <SessionContext.Provider value={{ sessionToken, signUp, login, logout, fetchCustomer, customer }}>
+        <SessionContext.Provider value={{ sessionToken, signUp, login, logout, fetchCustomer, customer, updateCustomer }}>
             {children}
         </SessionContext.Provider>
     );

@@ -1,29 +1,17 @@
 "use client";
+import { useSession } from "@/context/SessionProvider";
 import React, { useEffect, useState } from "react";
 
 const UserDetails = () => {
-  const [displayName, setDisplayName] = useState("");
-  const [email, setEmail] = useState("");
-  const [address, setAddress] = useState("");
+  const { customer, fetchCustomer, updateCustomer } = useSession();
 
   useEffect(() => {
-    // Check if the code is running on the client side (in a browser)
-    if (typeof window !== "undefined") {
-      const storedDisplayName = localStorage.getItem("displayName");
-      const storedEmail = localStorage.getItem("email");
-      const storedAddress = localStorage.getItem("address");
+    fetchCustomer();
+  }, []);
 
-      if (storedDisplayName) {
-        setDisplayName(storedDisplayName);
-      }
-      if (storedEmail) {
-        setEmail(storedEmail);
-      }
-      if (storedAddress) {
-        setAddress(storedAddress);
-      }
-    }
-  }, []); // Empty dependency array ensures that this effect runs only once
+  const displayName = customer?.displayName || "";
+  const email = customer?.email || "";
+  const address = customer?.shipping?.address1 || "";
 
   return (
     <div className="max-w-2xl">

@@ -1,12 +1,6 @@
 import { gql } from '@apollo/client';
+import { ProductContentSlice } from './products.fragments';
 
-// export const GET_CUSTOMER_INFO = gql`
-//   query GetCusDetails{
-//     customer {
-//       addPaymentMethodUrl
-//     }
-//   }
-// `;
 
 
 export const CHECKOUT_MUTATION = gql`
@@ -54,3 +48,38 @@ query paymentDetails {
   }
 }
 `
+
+export const GET_ALL_ORDER_DETAILS = gql`
+query MyQuery2 {
+    orders {
+      edges {
+        node {
+          orderNumber
+          shipping {
+            address1
+          }
+          date
+          total
+          subtotal
+          lineItems {
+            nodes {
+              product {
+                node {
+                  ...ProductContentSlice
+                }
+              }
+              total
+            }
+          }
+          currency
+          datePaid
+          id
+          pricesIncludeTax
+        }
+      }
+    }
+  }
+  ${ProductContentSlice}
+
+
+`;
