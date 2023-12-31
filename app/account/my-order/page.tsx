@@ -27,17 +27,34 @@ const AccountOrder = () => {
     );
 };
 
+const formatDate = (date: any) => {
+    date = new Date(date);
+
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+
+  const hours = String(date.getHours() % 12).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
+
+  const formattedDate = `${year}-${month}-${day} ${hours}:${minutes} ${ampm}`;
+  return formattedDate
+
+}
+
 const OrderHeader = ({ order }: any) => (
     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 sm:p-8 bg-slate-50 dark:bg-slate-500/5">
         <div>
             <p className="text-lg font-semibold">#{order.orderNumber}</p>
             <p className="text-slate-500 dark:text-slate-400 text-sm mt-1.5 sm:mt-2">
-                <span>{order.date}</span>
+                <span>{ formatDate(order.date)}</span>
                 <span className="mx-2">·</span>
-                <span className="text-primary-500">Delivered</span>
+                <span className="text-primary-500">{order.status}</span>
             </p>
+            <p className=" text-sm mt-1.5 sm:mt-2"><strong>Total:</strong> {order.total}</p>
         </div>
-        <ButtonSecondary sizeClass="py-2.5 px-4 sm:px-6" fontSize="text-sm font-medium">View Order</ButtonSecondary>
+        {/* <ButtonSecondary sizeClass="py-2.5 px-4 sm:px-6" fontSize="text-sm font-medium">View Order</ButtonSecondary> */}
     </div>
 );
 

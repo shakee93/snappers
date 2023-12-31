@@ -76,7 +76,7 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
     const errorLink = onError(({ graphQLErrors, operation, forward, networkError }) => {
       const targetErrors = [
         'The iss do not match with this server',
-        'invalid-secret-key | Expired token',
+        'invalid-secret-key | Expired token',  
         'invalid-secret-key | Signature verification failed',
         'Expired token',
         'Wrong number of segments',

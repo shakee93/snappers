@@ -9,7 +9,7 @@ export interface CommonLayoutProps {
 const menuItems = [
   { name: "Account info", link: "/account" },
   { name: "My order", link: "/account/my-order" },
-  { name: "Change password", link: "/account/change-password" },
+  // { name: "Change password", link: "/account/change-password" },
 ];
 
 const CommonLayout: FC<CommonLayoutProps> = async ({ children }) => {

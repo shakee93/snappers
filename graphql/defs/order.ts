@@ -75,6 +75,10 @@ query MyQuery2 {
           datePaid
           id
           pricesIncludeTax
+          needsProcessing
+          needsShippingAddress
+          needsPayment
+          status
         }
       }
     }
