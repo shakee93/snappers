@@ -17,6 +17,8 @@ import MobileNavLinks from "./MobileNavLinks";
 import {getClient} from "@/graphql/apollo-ssr";
 import {GET_ALL_PRODUCTS} from "@/graphql/defs/products";
 import HeaderSearchResults from "@/app/components/globalComponents/HeaderSearchResults";
+import {Brand} from "@/graphql/types/graphql";
+import BackdropSpinner from "@/app/components/BackdropSpinner";
 
 async function getData(categories: number[] | null = null) {
   const { data, error } = await getClient().query({
@@ -25,39 +27,17 @@ async function getData(categories: number[] | null = null) {
 
   return {
     productCategories: data.productCategories.nodes,
-    brands: data.brands.nodes,
+    brands: data.brands.nodes as Brand[],
   };
 }
 
 const Header = async () => {
   const { productCategories, brands } = await getData();
 
-  const iconSize = 18;
-  const navLinks = [
-    {
-      id: 2,
-      href: "/collections/all",
-      name: "Shop",
-    },
-    {
-      id: 3,
-      href: "/page-collection-2",
-      name: "About Us",
-    },
-
-    {
-      id: 4,
-      href: "/page-collection-2",
-      name: "Contact Us",
-    },
-  ];
-
-
   return (
-    <div>
+    <>
       <header
           className={
-
             "backdrop-blur-md sticky top-0 flex flex-col justify-between bg-white/90 z-30 transition-all duration-1300 border-b"
           }
       >
@@ -77,20 +57,16 @@ const Header = async () => {
                 <div className="hidden md:flex">
                   <AvatarDropdown />
                   <CartDropdown />
-
-
                 </div>
-
               </div>
             </div>
-            <BrandBar/>
+            <BrandBar categories={productCategories} brands={brands}/>
           </div>
           <MobileNavLinks/>
         </div>
-        <div className="block sm:hidden">{/* <MobileBottomNav /> */}</div>
       </header>
       <HeaderSearchResults productCategories={productCategories} brands={brands} />
-    </div>
+    </>
   );
 };
 

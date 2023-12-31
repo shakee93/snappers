@@ -25,56 +25,36 @@ import {
 } from "@/graphql/types/graphql";
 
 const getData = async () => {
-    const {data: slides} = await getClient().query({
-        query: GET_SLIDES,
-    })
 
-    const {data: newArrivals}: {
-        data: RootQuery
-    } = await getClient().query({
-        query: GET_PRODUCTS_NODES,
-
-    })
-
-    const {data: mobiles}: {
-        data: RootQuery
-    } = await getClient().query({
-        query: GET_PRODUCTS_NODES,
-        variables: {
-            first: 10,
-            categoryIdIn: [165]
-        }
-    })
-
-    const {data: speakers}: {
-        data: RootQuery
-    } = await getClient().query({
-        query: GET_PRODUCTS_NODES,
-        variables: {
-            first: 10,
-            categoryIdIn: [71]
-        }
-    })
-
-
-    const {data: topSelling}: {
-        data: RootQuery
-    } = await getClient().query({
-        query: GET_PRODUCTS_NODES,
-        variables: {
-            first: 10,
-            categoryIdIn: [86]
-        }
-    })
-
+    const [slides,
+        newArrivals,
+        mobiles,
+        speakers,
+        topSelling] = await Promise.all([
+        getClient().query({ query: GET_SLIDES }),
+        getClient().query({ query: GET_PRODUCTS_NODES }),
+        getClient().query({
+            query: GET_PRODUCTS_NODES,
+            variables: { first: 10, categoryIdIn: [165] },
+        }),
+        getClient().query({
+            query: GET_PRODUCTS_NODES,
+            variables: { first: 10, categoryIdIn: [71] },
+        }),
+        getClient().query({
+            query: GET_PRODUCTS_NODES,
+            variables: { first: 10, categoryIdIn: [86] },
+        }),
+    ]);
 
     return {
-        slides: slides?.slides?.nodes,
-        newArrivals: newArrivals.products?.nodes as (SimpleProduct & VariableProduct)[],
-        mobiles: mobiles.products?.nodes  as (SimpleProduct & VariableProduct)[],
-        speakers: speakers.products?.nodes  as (SimpleProduct & VariableProduct)[],
-        topSelling: topSelling.products?.nodes  as (SimpleProduct & VariableProduct)[],
+        slides: slides.data?.slides?.nodes,
+        newArrivals: newArrivals.data.products?.nodes as (SimpleProduct & VariableProduct)[],
+        mobiles: mobiles.data.products?.nodes  as (SimpleProduct & VariableProduct)[],
+        speakers: speakers.data.products?.nodes  as (SimpleProduct & VariableProduct)[],
+        topSelling: topSelling.data.products?.nodes  as (SimpleProduct & VariableProduct)[],
     }
+
 }
 
 

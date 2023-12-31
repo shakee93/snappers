@@ -59,7 +59,7 @@ const Page = async ({ params }: { params: { collection: string}}) => {
 
     return (
         <div className={`nc-PageCollection2 `} data-nc-id="PageCollection2">
-            <div className="container py-16 lg:pb-28 lg:pt-20 space-y-16 sm:space-y-20 lg:space-y-28">
+            <div className="container py-16 lg:pb-28 lg:pt-12 space-y-16 sm:space-y-20 lg:space-y-28">
                 <div className="space-y-10 lg:space-y-14">
                     {/* HEADING */}
                     <div className="max-w-screen-sm">
