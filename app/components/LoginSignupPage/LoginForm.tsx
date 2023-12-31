@@ -22,7 +22,6 @@ const LoginForm = () => {
 
         try {
             let response: LoginResponse = await login(email, password);
-            console.log("response of login: ", response)
             if (response.error) {
                 let errorMessage = `Login Issue: ${response.error}`
                 toast(errorMessage);

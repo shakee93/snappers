@@ -63,8 +63,8 @@ export function SessionProvider({ children }: {
     function saveResponseToLocalStorage(response: any, type: AuthType = "registerCustomer") {
 
         const data : LoginPayload & RegisterCustomerPayload = response?.data?.[type]
-        console.log('Saved response to the local storage', data);
-        
+
+    
         if (type === "login") {
             localStorage.setItem(USER_DATA_KEY, JSON.stringify(data.customer));
             setCustomer(data.customer as Customer)
