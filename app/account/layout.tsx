@@ -9,6 +9,7 @@ export interface CommonLayoutProps {
 const menuItems = [
   { name: "Account info", link: "/account" },
   { name: "My order", link: "/account/my-order" },
+  { name: "Address", link: "/account/address" },
   // { name: "Change password", link: "/account/change-password" },
 ];
 

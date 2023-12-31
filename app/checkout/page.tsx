@@ -270,12 +270,12 @@ const CheckoutPage = () => {
                                     {cart?.shippingTotal || "$0.00"}
                                 </span>
                             </div>
-                            <div className="flex justify-between py-2.5">
+                            {/* <div className="flex justify-between py-2.5">
                                 <span>Tax estimate</span>
                                 <span className="font-semibold text-slate-900 dark:text-slate-200">
                                     {cart?.totalTax || "$0.00"}
                                 </span>
-                            </div>
+                            </div> */}
                             <div className="flex justify-between font-semibold text-slate-900 dark:text-slate-200 text-base pt-4">
                                 <span>Order total</span>
                                 <span>{cart?.total || "$0.00"}</span>

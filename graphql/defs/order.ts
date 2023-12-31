@@ -1,5 +1,6 @@
 import { gql } from '@apollo/client';
 import { ProductContentSlice } from './products.fragments';
+import { CustomerAddressFragment } from './order.fragments';
 
 
 
@@ -87,3 +88,18 @@ query MyQuery2 {
 
 
 `;
+
+export const GET_ADDRESSES = gql`
+query getShippingDetails {
+    customer {
+      billing {
+        ...CustomerAddressFragment
+        }
+      shipping {
+        ...CustomerAddressFragment
+        }
+    }
+}
+${CustomerAddressFragment}
+
+`; 
