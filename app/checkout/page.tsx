@@ -18,7 +18,7 @@ import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
 import { useQuery } from "@apollo/client";
 import { GET_PAYMENT_GATEWAYS } from "@/graphql/defs/cart";
-import {  CHECKOUT_MUTATION, GUEST_CHECKOUT_MUTATION } from "@/graphql/defs/order";
+import { CHECKOUT_MUTATION, GUEST_CHECKOUT_MUTATION } from "@/graphql/defs/order";
 import { PaymentGateway, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 
 import CheckoutDetails from "./CheckoutDetails";
@@ -130,17 +130,11 @@ const CheckoutPage = () => {
         }))
     };
 
-
-    console.log({ formData })
-    console.log({ cart })
-
-    // const [checkoutMutation, { loading: checkoutLoading, error: checkoutError, data: checkoutData }] = useMutation(CHECKOUT_MUTATION);
     const [guestCheckoutMutation, { loading: checkoutLoading, error: checkoutError, data: checkoutData }] = useMutation(GUEST_CHECKOUT_MUTATION);
 
     const handleCheckout = async () => {
         try {
             const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
-            console.log('payment', paymentMethodId)
 
             const lineItems = cart?.contents?.nodes.map(item => ({
                 productId: item?.product?.node?.databaseId,
@@ -155,7 +149,6 @@ const CheckoutPage = () => {
                     },
                 });
 
-                console.log('data inside mutation', data);
 
                 if (data && data.createOrder) {
                     const orderDetails = data.createOrder.order;
@@ -204,9 +197,7 @@ const CheckoutPage = () => {
 
     return (
         <div className="nc-CheckoutPage">
-            {/* <Helmet> */}
             <title>Checkout</title>
-            {/* </Helmet> */}
 
             <main className="container py-16 lg:pb-28 lg:pt-20 ">
                 <div className="mb-16">
@@ -227,6 +218,7 @@ const CheckoutPage = () => {
                 </div>
 
                 <div className="flex flex-col lg:flex-row">
+                    {/* Informations about user */}
                     <div className="flex-1">
                         <CheckoutDetails
                             tabActive={tabActive}

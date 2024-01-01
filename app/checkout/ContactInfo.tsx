@@ -23,7 +23,6 @@ const ContactInfo: FC<Props> = ({
   const [email, setEmail] = useState("");
   const [subscribeToNews, setSubscribeToNews] = useState(true);
 
-
   const renderAccount = () => {
 
     return (

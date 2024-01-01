@@ -1,7 +1,11 @@
-import React from 'react';
+"use client";
+
+import React, { useEffect } from 'react';
 import ContactInfo from './ContactInfo';
 import ShippingAddress from './ShippingAddress';
 import PaymentMethod from './PaymentMethod';
+import { useLazyQuery } from '@apollo/client';
+import { useSession } from '@/context/SessionProvider';
 
 interface CheckoutLeftProps {
     tabActive: "ContactInfo" | "ShippingAddress" | "PaymentMethod";
@@ -13,6 +17,13 @@ interface CheckoutLeftProps {
 
 
 const CheckoutDetails: React.FC<CheckoutLeftProps> = ({ tabActive, setTabActive, handleScrollToEl, updateFormData, paymentGateways }) => {
+
+    const {customer} = useSession();
+
+    useEffect(() => {
+        console.log("Customer:", customer);
+    },[customer])
+
     return (
         <div className="space-y-8">
             <div id="ContactInfo" className="scroll-mt-24">

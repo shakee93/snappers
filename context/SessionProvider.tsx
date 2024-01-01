@@ -64,10 +64,11 @@ export function SessionProvider({ children }: {
 
         const data : LoginPayload & RegisterCustomerPayload = response?.data?.[type]
 
-    
         if (type === "login") {
+
             localStorage.setItem(USER_DATA_KEY, JSON.stringify(data.customer));
             setCustomer(data.customer as Customer)
+            
 
             localStorage.setItem(AUTH_TOKEN_KEY, data.authToken || '');
             localStorage.setItem(SESSION_TOKEN_KEY, data.sessionToken || '');
