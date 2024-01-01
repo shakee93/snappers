@@ -37,7 +37,7 @@ const ShippingForm: FC = () => {
     const [formData, setFormData] = useState({
         firstName: "", lastName: "", country: "",
         address1: "", address2: "", city: "",
-        state: "", postcode: "", phone: ""
+        state: "western", postcode: "", phone: ""
     });
 
     useEffect(() => {

@@ -1,5 +1,6 @@
+import { CustomerAddress } from "@/graphql/types/graphql";
 import Label from "components/Label/Label";
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Input from "shared/Input/Input";
@@ -11,6 +12,7 @@ interface Props {
   onCloseActive: () => void;
   onOpenActive: () => void;
   updateFormData: (section: string, data: any) => void;
+  initialData: CustomerAddress | null
 }
 
 const ShippingAddress: FC<Props> = ({
@@ -18,21 +20,34 @@ const ShippingAddress: FC<Props> = ({
   onCloseActive,
   onOpenActive,
   updateFormData,
+  initialData
 }) => {
-  const [firstName, setFirstName] = useState("Cole");
-  const [lastName, setLastName] = useState("Enrico");
-  const [address, setAddress] = useState("123, Dream Avenue, USA");
-  const [apartment, setApartment] = useState("55U - DD5");
-  const [city, setCity] = useState("Norris");
-  const [state, setState] = useState("Texas");
-  const [postal, setPostal] = useState("2500");
-  const [country, setCountry] = useState("United States");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [address, setAddress] = useState("");
+  const [apartment, setApartment] = useState("");
+  const [city, setCity] = useState("");
+  const [state, setState] = useState("");
+  const [postal, setPostal] = useState("");
+  const [country, setCountry] = useState("");
   const [addressType, setAddressType] = useState("home");
 
+  useEffect(() => {
+    if (initialData) {
+      setFirstName(initialData.firstName || "");
+      setLastName(initialData.lastName || "");
+      setAddress(initialData.address2 || "");
+      setApartment(initialData.address1 || "");
+      setCity(initialData.city || "");
+      setState(initialData.state || "");
+      setPostal(initialData.postcode || "");
+      setCountry(initialData.country || "");
+      setAddressType("home");
+    }
+  }, [initialData]);
+
+
   const renderShippingAddress = () => {
-
-
-
     return (
       <div className="border border-slate-200 dark:border-slate-700 rounded-xl ">
         <div className="p-6 flex flex-col sm:flex-row items-start">
@@ -100,7 +115,8 @@ const ShippingAddress: FC<Props> = ({
             </h3>
             <div className="font-semibold mt-1 text-sm">
               <span className="">
-                St. Paul&apos;s Road, Norris, SD 57560, Dakota, USA
+                {initialData?.address1 || "Your Address"}
+
               </span>
             </div>
           </div>
@@ -120,9 +136,9 @@ const ShippingAddress: FC<Props> = ({
           {/* ============ */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
             <div>
-              <Label className="text-sm">First name</Label>
+              <Label className="text-sm capitalize ">first name</Label>
               <Input
-                className="mt-1.5"
+                className="mt-1.5 capitalize"
                 value={firstName}
                 onChange={(e) => setFirstName(e.target.value)}
               />
@@ -130,7 +146,7 @@ const ShippingAddress: FC<Props> = ({
             <div>
               <Label className="text-sm">Last name</Label>
               <Input
-                className="mt-1.5"
+                className="mt-1.5 capitalize"
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
               />
@@ -142,18 +158,19 @@ const ShippingAddress: FC<Props> = ({
             <div className="flex-1">
               <Label className="text-sm">Address</Label>
               <Input
-                className="mt-1.5"
+                className="mt-1.5 capitalize"
                 placeholder=""
-                defaultValue={"123, Dream Avenue, USA"}
+                name="address1"
+                value={address}
                 type={"text"}
                 onChange={(e) => setAddress(e.target.value)}
               />
             </div>
             <div className="sm:w-1/3">
-              <Label className="text-sm">Apt, Suite *</Label>
+              <Label className="text-sm ">Apt, Suite *</Label>
               <Input
-                className="mt-1.5"
-                defaultValue="55U - DD5"
+                className="mt-1.5 capitalize"
+                value={apartment}
                 onChange={(e) => setApartment(e.target.value)}
               />
             </div>
@@ -162,28 +179,25 @@ const ShippingAddress: FC<Props> = ({
           {/* ============ */}
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
             <div>
-              <Label className="text-sm">City</Label>
+              <Label className="text-sm  normal-case ">city</Label>
               <Input
-                className="mt-1.5"
-                defaultValue="Norris"
+                className="mt-1.5  normal-case  "
+                value={city}
                 onChange={(e) => setCity(e.target.value)}
               />
             </div>
             <div>
               <Label className="text-sm">Country</Label>
               <Select
-                className="mt-1.5"
-                defaultValue="United States "
+                value="LK"
+                className="mt-1.5 capitalize"
+                 
+                
+                placeholder="SRI LANKAJ"
                 onChange={(e) => setCountry(e.target.value)}
+                disabled={true}
               >
-                <option value="United States">United States</option>
-                <option value="United States">Canada</option>
-                <option value="United States">Mexico</option>
-                <option value="United States">Israel</option>
-                <option value="United States">France</option>
-                <option value="United States">England</option>
-                <option value="United States">Laos</option>
-                <option value="United States">China</option>
+                <option value="Sri Lanka">Sri Lanka</option>
               </Select>
             </div>
           </div>
@@ -193,16 +207,18 @@ const ShippingAddress: FC<Props> = ({
             <div>
               <Label className="text-sm">State/Province</Label>
               <Input
-                className="mt-1.5"
-                defaultValue="Texas"
+                className="mt-1.5 capitalize"
+                 
+                value={state}
                 onChange={(e) => setState(e.target.value)}
               />
             </div>
             <div>
               <Label className="text-sm">Postal code</Label>
               <Input
-                className="mt-1.5"
-                defaultValue="2500 "
+                className="mt-1.5 capitalize"
+                 
+                value={postal}
                 onChange={(e) => setPostal(e.target.value)}
               />
             </div>

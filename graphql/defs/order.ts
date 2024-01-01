@@ -101,7 +101,19 @@ query getShippingDetails {
     }
 }
 ${CustomerAddressFragment}
+`;
 
+export const GET_CHECKOUT_USER_DETAILS = gql`
+query GET_CHECKOUT_USER_DETAILS {
+  customer {
+    displayName
+    shipping {
+      ...CustomerAddressFragment
+    }
+    email
+  }
+}
+${CustomerAddressFragment}
 `;
 
 export const UPDATE_ADDRESS = gql`

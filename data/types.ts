@@ -16,3 +16,9 @@ export type TwMainColor =
   | "gray";
 
 //
+
+export type contactInformation = {
+  phone: string;
+  email: string;
+  displayName: string;
+}

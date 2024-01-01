@@ -1,3 +1,4 @@
+import { contactInformation } from "@/data/types";
 import Label from "components/Label/Label";
 import React, { FC, useState } from "react";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
@@ -10,6 +11,7 @@ interface Props {
   onOpenActive: () => void;
   onCloseActive: () => void;
   updateFormData: (section: string, data: any) => void;
+  initialData: contactInformation
 }
 
 const ContactInfo: FC<Props> = ({
@@ -17,11 +19,13 @@ const ContactInfo: FC<Props> = ({
   onCloseActive,
   onOpenActive,
   updateFormData,
+  initialData
 }) => {
 
   const [phone, setPhone] = useState("+94");
   const [email, setEmail] = useState("");
   const [subscribeToNews, setSubscribeToNews] = useState(true);
+
 
   const renderAccount = () => {
 
@@ -76,8 +80,8 @@ const ContactInfo: FC<Props> = ({
               </svg>
             </h3>
             <div className="font-semibold mt-1 text-sm">
-              <span className="">Enrico Smith</span>
-              <span className="ml-3 tracking-tighter">+855 - 666 - 7744</span>
+              <span className="">{initialData?.displayName ?? "Your name"}</span>
+              <span className="ml-3 tracking-tighter">{initialData?.phone || "Your phone number"}</span>
             </div>
           </div>
           <ButtonSecondary
@@ -95,6 +99,7 @@ const ContactInfo: FC<Props> = ({
         >
           <div className="flex justify-between flex-wrap items-baseline">
             <h3 className="text-lg font-semibold">Contact infomation</h3>
+            
             <span className="block text-sm my-1 md:my-0">
               Do not have an account?{` `}
               <a href="##" className="text-primary-500 font-medium">
@@ -106,7 +111,7 @@ const ContactInfo: FC<Props> = ({
             <Label className="text-sm">Your phone number</Label>
             <Input
               className="mt-1.5"
-              defaultValue={"+94 "}
+              defaultValue={initialData?.phone || "+94 "}
               type={"tel"}
               onChange={(e) => setPhone(e.target.value)}
             />
@@ -115,6 +120,7 @@ const ContactInfo: FC<Props> = ({
             <Label className="text-sm">Email address</Label>
             <Input
               className="mt-1.5"
+              defaultValue={initialData?.email || ""}
               type={"email"}
               onChange={(e) => setEmail(e.target.value)}
             />
