@@ -108,7 +108,7 @@ const Page = async ({ params }: any) => {
             <div className=" lg:hidden w-full lg:w-1/5 p-3 bg-white rounded-3xl my-5">
                 <Features />
             </div>
-            <div className="py-5 rounded-3xl my-5">
+            <div className="hidden py-5 rounded-3xl my-5">
                 {/*<SectionSliderProductCard*/}
                 {/*    data={[*/}
                 {/*        PRODUCTS[4],*/}
