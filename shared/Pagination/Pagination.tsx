@@ -36,7 +36,6 @@ const Paginationx: FC<PaginationProps> = ({ className = "" }) => {
     pages, refine, currentRefinement, isFirstPage,
     isLastPage, nbPages
   } = usePagination();
-  const { status } = useInstantSearch()
 
   const firstPageIndex = 0;
   const previousPageIndex = currentRefinement - 1;
@@ -52,7 +51,7 @@ const Paginationx: FC<PaginationProps> = ({ className = "" }) => {
           className={`nc-Pagination inline-flex space-x-1 text-base font-medium ${className}`}
       >
 
-          {['loading', 'stalled'].includes(status) ?
+          {['loading', 'stalled'].includes('') ?
               <div>
                   <div className='flex gap-1'>
                       <div className="h-11 bg-gray-300 rounded-full w-11 animate-pulse"></div>
