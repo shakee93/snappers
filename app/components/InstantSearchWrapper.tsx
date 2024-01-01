@@ -19,6 +19,7 @@ interface InstantSearchWrapperProps {
     brands?: Brand[]
     brand?: Brand
     category?: ProductCategory
+    routing?: boolean
 }
 
 const typesenseConfig = {
@@ -31,6 +32,7 @@ const typesenseConfig = {
 const InstantSearchWrapper = ({
                                   search = false,
                                   filters = false,
+    routing = false,
                                   categories,
                                   brands,
     brand,category
@@ -100,13 +102,13 @@ const InstantSearchWrapper = ({
     }, [sortQuery])
 
 
-    return <InstantSearchNext  future={{
+    return <InstantSearchNext stalledSearchDelay={0} future={{
         preserveSharedStateOnUnmount: true
-    }} routing={{
+    }} routing={ routing ? {
         router: {
             cleanUrlOnDispose: false
         }
-    }} searchClient={makeClient} indexName='product' >
+    }: undefined} searchClient={makeClient} indexName='product' >
         <div className='flex gap-6 flex-col'>
             <SearchInput show={search}/>
             {filters && <TabFilters category={category} brand={brand} categories={categories} brands={brands}/>}

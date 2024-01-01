@@ -1,83 +1,92 @@
+// Use Client Directive
 "use client";
 
-import React, { FC, useEffect, useState } from "react";
+// React and Next.js Imports
+import React, { FC, useEffect, useState, ChangeEvent, FormEvent } from "react";
+
+// GraphQL and Apollo Imports
 import { useLazyQuery, useMutation } from "@apollo/client";
-import { UPDATE_ACCOUNT_INFORMATION } from "@/graphql/defs/auth";
+import { GET_ADDRESSES, UPDATE_ADDRESS } from "@/graphql/defs/order";
+
+// Component Imports
 import Input from "@/shared/Input/Input";
 import Label from "@/components/Label/Label";
 import Select from "@/shared/Select/Select";
-import Textarea from "@/shared/Textarea/Textarea";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
+
+// Context and Utility Imports
 import { useSession } from "@/context/SessionProvider";
 import toast from "react-hot-toast";
-import { GET_ADDRESSES } from "@/graphql/defs/order";
 
+// Types and Interfaces
+import { Customer } from "@/graphql/types/graphql";
+import { InputField, SelectField } from "./HelperComps";
 
+// Constants
+const SRI_LANKAN_STATES = [
+    "Western", "Central", "Southern", "Northern", "Eastern",
+    "North Western", "North Central", "Uva", "Sabaragamuwa",
+];
 
 const ShippingForm: FC = () => {
-
     const { customer, fetchCustomer, updateCustomer } = useSession();
-    let [getAddresses, { loading, data, error }] = useLazyQuery(GET_ADDRESSES, {
+    const [getAddresses, { loading, data, error }] = useLazyQuery(GET_ADDRESSES, {
         fetchPolicy: 'no-cache'
     });
-
-
+    const [updateShipping] = useMutation(UPDATE_ADDRESS);
     const [formData, setFormData] = useState({
-        country: "",
-        streetAddress: "",
-        townCity: "",
-        postcodeZip: "",
-        billingPhone: "",
-        billingEmail: "",
+        firstName: "", lastName: "", country: "",
+        address1: "", address2: "", city: "",
+        state: "", postcode: "", phone: ""
     });
 
-  
     useEffect(() => {
-        console.log("address Details: ", data);
-        let a = data?.customer
-        console.log('a', a);
-
-        
-    },[data])
+        getAddresses();
+    }, []);
 
     useEffect(() => {
-        getAddresses()
-    },[])
+        if (data?.customer?.shipping) {
+            const { shipping } = data.customer;
+            setFormData(prevData => ({ ...prevData, ...shipping }));
+        }
+    }, [data]);
 
-
-    const handleChange = (
-        e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>
-    ) => {
+    const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
+        setFormData(prevData => ({ ...prevData, [name]: value }));
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // const { displayName, email, dateOfBirth, address, gender, phoneNumber, about } = formData;
+        try {
+            await updateShipping({
+                variables: {
+                    input: {
+                        shipping: {
+                            firstName: formData.firstName,
+                            lastName: formData.lastName,
+                            address1: formData.address1,
+                            address2: formData.address2,
+                            city: formData.city,
+                            country: "LK",
+                            state: formData.state,
+                            postcode: formData.postcode,
+                            phone: formData.phone,
+                        }
+                    },
+                },
+            });
 
-        // const input = {
-        //     shipping: { address1: address, phone: phoneNumber },
-        //     email: email,
-        //     displayName: displayName,
-        //     metaData: [
-        //         { key: "dob", value: dateOfBirth },
-        //         { key: "gender", value: gender },
-        //         { key: "about", value: about },
-        //     ],
-        // };
-
-        // const response = await updateCustomer(input);
-        toast.success("Account details updated successfully");
+            toast.success("Shipping address updated successfully");
+        } catch (error: any) {
+            toast.error("Error updating shipping address:", error);
+        }
     };
 
-    if(error){
-        return <p>{error.message}</p>
+    if (error) {
+        return <p>Error: {error.message}</p>;
     }
-    
+
     return (
         <div className="nc-AddressPage" data-nc-id="AccountPage">
             <div className="space-y-10 sm:space-y-12">
@@ -85,76 +94,33 @@ const ShippingForm: FC = () => {
                 <form onSubmit={handleSubmit} className="gap-2">
                     <div className="flex flex-col gap-2 md:flex-row">
                         <div className="flex-grow mt-10 md:mt-0 max-w-3xl space-y-6">
-                            <div>
-                                <Label>Country</Label>
-                                <Input
-                                    className=""
-                                    name="country"
-                                    placeholder="Country"
-                                    value={formData.country}
-                                    onChange={handleChange}
-                                />
+                            <div className="flex gap-2">
+                                <InputField label="First Name" name="firstName" placeholder="First Name" value={formData.firstName} onChange={handleChange} />
+                                <InputField label="Last Name" name="lastName" placeholder="Last Name" value={formData.lastName} onChange={handleChange} />
+                            </div>
+                            <div className="flex gap-2">
+                                <InputField label="Street Address" name="address2" placeholder="Street Address" value={formData.address2} onChange={handleChange} />
+                                <InputField  label="Apt, Suite, etc." name="address1" placeholder="Apt, Suite, etc." value={formData.address1} onChange={handleChange} />
+                            </div>
+                            <div className="flex gap-2">
+                                <InputField label="Town/City" name="city" placeholder="Town/City" value={formData.city} onChange={handleChange} />
+                                <SelectField label="Country" name="country" value={formData.country} options={[{value: "LK", label: "Sri Lanka"}]} onChange={handleChange} disabled={true} />
+                            </div>
+                            <div className="flex gap-2">
+                                <InputField label="Postcode/ZIP" name="postcode" placeholder="Postcode/ZIP" value={formData.postcode} onChange={handleChange} />
+                                <SelectField label="State" name="state" value={formData.state} options={SRI_LANKAN_STATES.map(state => ({ value: state, label: state }))} onChange={handleChange} />
                             </div>
                             <div>
-                                <Label>Street Address</Label>
-                                <Input
-                                    className=""
-                                    name="streetAddress"
-                                    placeholder="Street Address"
-                                    value={formData.streetAddress}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <div>
-                                <Label>Town/City</Label>
-                                <Input
-                                    className=""
-                                    name="townCity"
-                                    placeholder="Town/City"
-                                    value={formData.townCity}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <div>
-                                <Label>Postcode/ZIP</Label>
-                                <Input
-                                    className=""
-                                    name="postcodeZip"
-                                    placeholder="Postcode/ZIP"
-                                    value={formData.postcodeZip}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <div>
-                                <Label className="pt-2">Phone</Label>
-                                <Input
-                                    className="mt-0"
-                                    name="billingPhone"
-                                    placeholder="Phone"
-                                    value={formData.billingPhone}
-                                    onChange={handleChange}
-                                />
-                            </div>
-                            <div>
-                                <Label>Email</Label>
-                                <Input
-                                    className=""
-                                    name="billingEmail"
-                                    placeholder="Email"
-                                    value={formData.billingEmail}
-                                    onChange={handleChange}
-                                />
+                                <InputField label="Phone" name="phone" placeholder="Phone" value={formData.phone} onChange={handleChange} />
                             </div>
                         </div>
-
                     </div>
-                    <ButtonPrimary type="submit"  className="mt-4">
-                        Save Shipping Address
-                    </ButtonPrimary>
+                    <ButtonPrimary type="submit" className="mt-4">Save Shipping Address</ButtonPrimary>
                 </form>
             </div>
         </div>
     );
+    
 };
 
 export default ShippingForm;

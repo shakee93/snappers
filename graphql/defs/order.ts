@@ -102,4 +102,22 @@ query getShippingDetails {
 }
 ${CustomerAddressFragment}
 
-`; 
+`;
+
+export const UPDATE_ADDRESS = gql`
+mutation updateCustomer($input: UpdateCustomerInput!) {
+  updateCustomer(input: $input) {
+    customer{
+      billing {
+        ...CustomerAddressFragment
+      }
+      shipping {
+        ...CustomerAddressFragment
+      }
+    }
+  }
+}
+
+${CustomerAddressFragment}
+`;
+

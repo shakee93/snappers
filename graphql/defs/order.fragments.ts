@@ -11,5 +11,7 @@ fragment CustomerAddressFragment on CustomerAddress {
   country
   state
   postcode
+  phone
+  email
 }
 `;

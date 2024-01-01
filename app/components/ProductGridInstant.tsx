@@ -5,7 +5,7 @@ import {useEffect, useState} from "react";
 import {GET_BRAND_ARCHIVE} from "@/graphql/defs/products";
 import {useLazyQuery} from "@apollo/client";
 import ProductCard from "./ProductCard3";
-import {useHits} from "react-instantsearch";
+import {useHits, useInstantSearch} from "react-instantsearch";
 import Pagination from "@/shared/Pagination/Pagination";
 
 interface ProductGridProps {
@@ -15,28 +15,47 @@ interface ProductGridProps {
 }
 const ProductGridInstant = ({ products, brand, category }: ProductGridProps) => {
     const { hits, results } = useHits()
+    const { status: statusState } = useInstantSearch();
+    // useEffect(() => {
+    //     // console.log(status, hits);
+    // }, [status])
 
-    useEffect(() => {
-        // console.log(results);
-    }, [hits])
+    // const status = 'x'
+
+    const grid = 8;
 
     return (
-
         <div>
             <div className="flex-1 grid  sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10">
-                {hits.map((item, index: number) =>
-                    <ProductCard  key={item.slug as unknown as string} data={item as unknown as Product} />
-                )}
+
+                {['loading', 'stalled'].includes(statusState)  ?
+                     <>
+                         {Array(grid).fill(null).map((x, index) =>
+                             <div key={index} className="space-y-3">
+                                 <div className="h-52 bg-gray-200 rounded-md animate-pulse"></div>
+                                 <div className="h-4 bg-gray-300 rounded-md"></div>
+                                 <div className="h-4 bg-gray-300 rounded-md w-2/3"></div>
+                                 <div className="h-8 bg-gray-300 rounded-md w-1/4"></div>
+                             </div>
+                         )}
+                     </>: <>
+                        {hits.map((item, index: number) =>
+                            <ProductCard  key={item.slug as unknown as string} data={item as unknown as Product} />
+                        )}
+                    </>
+                }
+
 
             </div>
 
 
-            {(results && results?.nbHits > results?.hitsPerPage) &&
+            {(results && results?.nbHits > results?.hitsPerPage ) &&
                 <>
                     <hr className="border-slate-200 my-8 dark:border-slate-700" />
                     <Pagination />
                 </>
             }
+
         </div>
 
     );

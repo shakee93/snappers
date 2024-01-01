@@ -30,10 +30,7 @@ const AddressPage: FC = () => {
                     <AddressSection title="Shipping Address" onClick={() => toggleForm("shipping")} />
                     <AddressSection title="Billing Address" onClick={() => toggleForm("billing")} />
                 </div>
-                {/* {showShippingForm && <ShippingForm />} */}
-            <ShippingForm/>
-
-
+                {showShippingForm && <ShippingForm />}
                 {showBillingForm && <BillingForm />}
             </div>
         </div>
