@@ -25,7 +25,7 @@ const CardCategory4: FC<CardCategory4Props> = ({
   bgSVG = explore1Svg,
   name,
   desc,
-  color = "bg-rose-50",
+  color = "",
   slug = ""
 }) => {
 
@@ -35,12 +35,12 @@ const CardCategory4: FC<CardCategory4Props> = ({
       data-nc-id="CardCategory4"
     >
       <div>
-        <div className="absolute bottom-0 right-0 max-w-[280px] opacity-80">
+        {/* <div className="absolute bottom-0 right-0 max-w-[280px] opacity-80">
           <Image src={bgSVG || ''} alt="" />
-        </div>
+        </div> */}
 
         <div className="absolute inset-5 sm:inset-8 flex flex-col justify-between">
-          <div className="flex justify-center items-center">
+          <div className="flex justify-center items-center min-h-[200px]">
             {/* <Image
               src={featuredImage || FallbackImage}
               className={`w-20 h-20 rounded-full overflow-hidden z-0 ${color}`}

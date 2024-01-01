@@ -4,7 +4,10 @@ import Link from "next/link";
 const ProductSpecifications = () => {
   return (
     <>
-      <div className="text-sm md:text-base py-2 mb-2">Specifications</div>
+      <div className="hidden md:block text-sm md:text-base py-2 mb-2">Specifications</div>
+      <div className="md:hidden py-3 border-b-2 border-gray-200 mb-4">
+        <h3 className="text-lg md:text-xl">Specifications</h3>
+      </div>
       <div className="shadow-md sm:rounded-lg">
         <table className="w-full text-xs md:text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
           <tbody>
