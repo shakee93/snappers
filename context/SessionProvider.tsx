@@ -1,9 +1,9 @@
 'use client';
 
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import {ApolloError, FetchResult, useLazyQuery, useMutation, useQuery} from '@apollo/client';
+import { ApolloError, FetchResult, useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { GET_CART } from "@/graphql/defs/cart";
-import {GET_ACCOUNT_DETAILS, LOGIN_CUSTOMER_MUTATION, REGISTER_CUSTOMER_MUTATION, UPDATE_ACCOUNT_INFORMATION} from '@/graphql/defs/auth';
+import { GET_ACCOUNT_DETAILS, LOGIN_CUSTOMER_MUTATION, REGISTER_CUSTOMER_MUTATION, UPDATE_ACCOUNT_INFORMATION } from '@/graphql/defs/auth';
 import { LoginResponse, Session } from "@/utils/type";
 import {
     Customer,
@@ -22,7 +22,7 @@ const SessionContext = createContext<Session>({
         return { data: null, error: null };
     },
     logout: () => { },
-    fetchCustomer: () => {},
+    fetchCustomer: () => { },
     customer: undefined,
     updateCustomer: undefined
 });
@@ -62,16 +62,25 @@ export function SessionProvider({ children }: {
 
     function saveResponseToLocalStorage(response: any, type: AuthType = "registerCustomer") {
 
-        const data : LoginPayload & RegisterCustomerPayload = response?.data?.[type]
+        const data: LoginPayload & RegisterCustomerPayload = response?.data?.[type]
 
         if (type === "login") {
 
-            localStorage.setItem(USER_DATA_KEY, JSON.stringify(data.customer));
-            setCustomer(data.customer as Customer)
-            
+            localStorage.setItem(USER_DATA_KEY, JSON.stringify(data?.customer));
+            setCustomer(data?.customer as Customer)
 
             localStorage.setItem(AUTH_TOKEN_KEY, data.authToken || '');
             localStorage.setItem(SESSION_TOKEN_KEY, data.sessionToken || '');
+            localStorage.setItem(REFRESH_TOKEN_KEY, data.refreshToken || '');
+        }
+
+        if (type == "registerCustomer"){
+            console.log("data register",data);
+            localStorage.setItem(USER_DATA_KEY, JSON.stringify(data?.customer));
+            setCustomer(data?.customer as Customer)
+
+            localStorage.setItem(AUTH_TOKEN_KEY, data.authToken || '');
+            localStorage.setItem(SESSION_TOKEN_KEY, data?.customer?.sessionToken || '');
             localStorage.setItem(REFRESH_TOKEN_KEY, data.refreshToken || '');
         }
 
@@ -84,18 +93,11 @@ export function SessionProvider({ children }: {
                     input: {
                         email,
                         password,
-                        displayName: "",
-                        firstName: "",
-                        metaData: [
-                            { key: "address", value: "" },
-                            { key: "dob", value: "" },
-                            { key: "gender", value: "" },
-                            { key: "phone_number", value: "" },
-                            { key: "about", value: "" }
-                        ]
                     },
                 },
             });
+
+            console.log("Sign up",response);
 
             saveResponseToLocalStorage(response);
 
@@ -106,10 +108,11 @@ export function SessionProvider({ children }: {
                 if (error.message.includes("An account is already registered with your email address")) {
                     errorMessage = "An account with this email address already exists. Please log in.";
                 } else {
-                    console.error("An ApolloError occurred:", error);
+                    throw "An error occurred while Signup";
+                    // console.log("An ApolloError occurred:", error);
                 }
             } else {
-                console.error("An error occurred:", error);
+                console.log("An error occurred:", error);
             }
             return { data: null, error: errorMessage };
         }
@@ -130,18 +133,17 @@ export function SessionProvider({ children }: {
 
             return { data: "logged_in", error: null };
         } catch (error) {
-            console.log('error', error);
             let errorMessage = "An error occurred while login.";
-                
             if (error instanceof ApolloError) {
-                if (error.message.includes("No user found with this email address")) {
-                    errorMessage = "No user found with this email address. Please check your credentials.";
-                } else if (error.message.includes("Incorrect password")) {
-                    errorMessage = "Incorrect password. Please try again.";
+                if (error.message.includes("invalid_email")) {
+                    errorMessage = "No user found with this email address.";
+                } else if (error.message.includes("incorrect_password")) {
+                    errorMessage = "Incorrect password.";
                 } else {
                     console.error("An ApolloError occurred:", error);
                 }
             } else {
+                errorMessage = typeof error === "string" ? error : "";
                 console.error("An error occurred:", error);
             }
             return { data: null, error: errorMessage };

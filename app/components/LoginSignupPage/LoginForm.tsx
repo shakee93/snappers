@@ -9,10 +9,11 @@ import { LoginResponse } from "@/utils/type";
 import { useSession } from "@/context/SessionProvider";
 import { useRouter } from "next/navigation";
 import toast, { Toaster } from 'react-hot-toast';
+import { errorCodes } from "@apollo/client/invariantErrorCodes";
 
 const LoginForm = () => {
-    const [email, setEmail] = useState(""); 
-    const [password, setPassword] = useState(""); 
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
 
     const { login } = useSession();
     const router = useRouter();
@@ -23,8 +24,8 @@ const LoginForm = () => {
         try {
             let response: LoginResponse = await login(email, password);
             if (response.error) {
-                let errorMessage = `Login Issue: ${response.error}`
-                toast(errorMessage);
+                let errorMessage = `${response.error}`
+                toast.error(errorMessage);
                 return
             }
             toast("Logged in  Successfully")
@@ -33,6 +34,7 @@ const LoginForm = () => {
             console.error("Error:", error);
         }
     };
+
     return (
         <form className="grid grid-cols-1 gap-6" onSubmit={handleFormSubmit}>
             <label className="block">
@@ -42,6 +44,7 @@ const LoginForm = () => {
                 <Input
                     type="email"
                     placeholder="example@example.com"
+                    required={true}
                     className="mt-1"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)} // Update email state on change
@@ -50,13 +53,14 @@ const LoginForm = () => {
             <label className="block">
                 <span className="flex justify-between items-center text-neutral-800 dark:text-neutral-200">
                     Password
-                    <Link href="/forgot-pass" className="text-sm text-green-600">
+                    {/* <Link href="/forgot-pass" className="text-sm text-green-600">
                         Forgot password?
-                    </Link>
+                    </Link> */}
                 </span>
                 <Input
                     type="password"
                     className="mt-1"
+                    required={true}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)} // Update password state on change
                 />

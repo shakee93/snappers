@@ -4,19 +4,19 @@ import { AccountDetailsFragment } from './auth.fragments';
 export const REGISTER_CUSTOMER_MUTATION = gql`
     mutation RegisterCustomer($input: RegisterCustomerInput!) {
         registerCustomer(input: $input) {
-            authToken
-            refreshToken
-            customer {
-                email
-                jwtAuthToken
-                firstName
-                metaData {
-                    key
-                    value
-                }
-                sessionToken
-                displayName
+          authToken
+          refreshToken
+          customer {
+            email
+            jwtAuthToken
+            firstName
+            metaData {
+              key
+              value
             }
+            sessionToken
+            displayName
+          }
         }
     }
 `;

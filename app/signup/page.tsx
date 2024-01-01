@@ -63,41 +63,41 @@ const PageSignUp = () => {
                     </div> */}
                     {/* OR */}
                     <div className="relative text-center">
-            <span className="relative z-10 inline-block px-4 font-medium text-sm bg-white dark:text-neutral-400 dark:bg-neutral-900">
+                        {/* <span className="relative z-10 inline-block px-4 font-medium text-sm bg-white dark:text-neutral-400 dark:bg-neutral-900">
               OR
-            </span>
+            </span> */}
                         <div className="absolute left-0 w-full top-1/2 transform -translate-y-1/2 border border-neutral-100 dark:border-neutral-800"></div>
                     </div>
                     {/* FORM */}
-              {/*      <form className="grid grid-cols-1 gap-6" action="#" method="post">*/}
-              {/*          <label className="block">*/}
-              {/*<span className="text-neutral-800 dark:text-neutral-200">*/}
-              {/*  Email address*/}
-              {/*</span>*/}
-              {/*              <Input*/}
-              {/*                  type="email"*/}
-              {/*                  placeholder="example@example.com"*/}
-              {/*                  className="mt-1"*/}
-              {/*              />*/}
-              {/*          </label>*/}
-              {/*          <label className="block">*/}
-              {/*<span className="flex justify-between items-center text-neutral-800 dark:text-neutral-200">*/}
-              {/*  Password*/}
-              {/*</span>*/}
-              {/*              <Input type="password" className="mt-1" />*/}
-              {/*          </label>*/}
-              {/*          <ButtonPrimary type="submit">Continue</ButtonPrimary>*/}
-              {/*      </form>*/}
+                    {/*      <form className="grid grid-cols-1 gap-6" action="#" method="post">*/}
+                    {/*          <label className="block">*/}
+                    {/*<span className="text-neutral-800 dark:text-neutral-200">*/}
+                    {/*  Email address*/}
+                    {/*</span>*/}
+                    {/*              <Input*/}
+                    {/*                  type="email"*/}
+                    {/*                  placeholder="example@example.com"*/}
+                    {/*                  className="mt-1"*/}
+                    {/*              />*/}
+                    {/*          </label>*/}
+                    {/*          <label className="block">*/}
+                    {/*<span className="flex justify-between items-center text-neutral-800 dark:text-neutral-200">*/}
+                    {/*  Password*/}
+                    {/*</span>*/}
+                    {/*              <Input type="password" className="mt-1" />*/}
+                    {/*          </label>*/}
+                    {/*          <ButtonPrimary type="submit">Continue</ButtonPrimary>*/}
+                    {/*      </form>*/}
 
-                    <SignUpForm/>
+                    <SignUpForm />
 
                     {/* ==== */}
                     <span className="block text-center text-neutral-700 dark:text-neutral-300">
-            Already have an account? {` `}
+                        Already have an account? {` `}
                         <Link className="text-green-600" href="/login">
-              Sign in
-            </Link>
-          </span>
+                            Sign in
+                        </Link>
+                    </span>
                 </div>
             </div>
         </div>

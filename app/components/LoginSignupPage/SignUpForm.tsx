@@ -1,12 +1,12 @@
 "use client";
 
-import {useState} from "react";
+import { useState } from "react";
 import Input from "@/shared/Input/Input";
 import Link from "next/link";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
-import {useSession} from "@/context/SessionProvider";
-import {SignUpResponse} from "@/utils/type";
-import {useRouter} from "next/navigation";
+import { useSession } from "@/context/SessionProvider";
+import { SignUpResponse } from "@/utils/type";
+import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 
 
@@ -43,6 +43,7 @@ const SignUpForm = () => {
             <label className="block">
                 <span className="text-neutral-800 dark:text-neutral-200">Email address</span>
                 <Input
+                    required={true}
                     type="email"
                     placeholder="example@example.com"
                     className="mt-1"
@@ -51,16 +52,18 @@ const SignUpForm = () => {
                 />
             </label>
             <label className="block">
-        <span className="flex justify-between items-center text-neutral-800 dark:text-neutral-200">
-          Password
-          <Link href="/forgot-pass" className="text-sm text-green-600">
-            Forgot password?
-          </Link>
-        </span>
+                <span className="flex justify-between items-center text-neutral-800 dark:text-neutral-200">
+                    Password
+                    {/* <Link href="/forgot-pass" className="text-sm text-green-600">
+                        Forgot password?
+                    </Link> */}
+                </span>
                 <Input
+                    required={true}
                     type="password"
                     className="mt-1"
                     value={password}
+
                     onChange={(e) => setPassword(e.target.value)}
                 />
             </label>
