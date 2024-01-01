@@ -60,7 +60,7 @@ const OrderHeader = ({ order }: any) => (
 
 const OrderItems = ({ lineItems }: any) => (
     <div className="border-t border-slate-200 dark:border-slate-700 p-2 sm:p-8 divide-y divide-y-slate-200 dark:divide-slate-700">
-        {lineItems.map((item: any, index: any) => <OrderItemProduct index={index} orderItem={item.product} />)}
+        {lineItems.map((item: any, index: any) => <OrderItemProduct key={index} index={index} orderItem={item.product} />)}
     </div>
 );
 

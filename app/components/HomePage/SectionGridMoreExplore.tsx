@@ -45,10 +45,10 @@ import skullcandy from "@/public/images/brandLogo/skullcandy.jpg";
 import tecno from "@/public/images/brandLogo/tecno.jpg";
 
 import { StaticImageData } from "next/image";
-import {useLazyQuery, useQuery} from "@apollo/client";
+import { useLazyQuery, useQuery } from "@apollo/client";
 import { GET_PRODUCTS, GET_BRANDS } from "@/graphql/defs/products";
 import { GET_BRAND_DETAILS } from "@/graphql/defs/products";
-import {Brand} from "@/graphql/types/graphql";
+import { Brand } from "@/graphql/types/graphql";
 
 
 interface ExploreType {
@@ -221,7 +221,6 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
   className = "",
   boxCard = "box4",
   gridClassName = "grid-cols-1 md:grid-cols-2 xl:grid-cols-3",
-  // data = DEMO_MORE_EXPLORE_DATA.filter((_, i) => i < 6),
 }) => {
 
   const [getBrands, { loading, error, data, refetch }] = useLazyQuery(GET_BRANDS);
@@ -233,35 +232,42 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
     try {
       const hardcodedBrandList = hardcodedBrands[category] || [];
       const slugs = hardcodedBrandList.map((brand) => brand.slug);
-      console.log('Brand Slugs:', slugs);
-  
+      // console.log('Brand Slugs:', slugs);
+
       const { data: fetchedData } = await getBrands({
         variables: {
-          slug: hardcodedBrandList.map(h => h.slug)
+          slug: slugs
         }
       });
-  
+
       const fetchedBrandsFromServer: Brand[] = fetchedData?.brands.nodes || [];
 
+      console.log({ fetchedBrandsFromServer });
+
       const updatedBrands = fetchedBrandsFromServer.map((serverBrand) => {
-        const matchingHardcodedBrand = hardcodedBrandList.find((h) => h.slug === serverBrand.slug);
         return {
           ...serverBrand,
-          img: matchingHardcodedBrand?.img || '', // Use the hardcoded img or provide a default value
+          img: serverBrand.brandImage || '',
         };
       });
+
+      console.log({ updatedBrands })
 
       setBrands(updatedBrands);
     } catch (error) {
       console.error(`Error fetching brands for ${category}`, error);
     }
+
+    console.log({ brands })
   };
 
-  console.log({brands});
-  
   useEffect(() => {
     fetchBrandsForCategory(tabActive);
   }, [tabActive]);
+
+  useEffect(() => {
+    console.log({ brands });
+  }, [brands]);
 
   const renderHeading = () => {
     return (
@@ -310,11 +316,11 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
         {brands?.map((brand) => (
           <div key={brand.id}>
             <CardCategory4
-                name={brand.name || ''}
-                desc={brand.description || ''}
-                key={brand.id}
-                slug={brand.slug || ''}
-                featuredImage={brand?.brandImage}
+              name={brand.name || ''}
+              desc={brand.description || ''}
+              key={brand.id}
+              slug={brand.slug || ''}
+              featuredImage={brand?.brandImage}
             />
           </div>
         ))}

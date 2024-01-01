@@ -37,7 +37,6 @@ const ArchiveLayout = async ({ title, description, filters = false, search = fal
                 <hr className="border-slate-200 dark:border-slate-700" />
                 <main>
                     <div className="flex flex-col lg:flex-row">
-                        <div className="flex-shrink-0 mb-10 lg:mb-0 lg:mx-4 border-t lg:border-t-0"></div>
                         <div className="flex-1 ">
                             <InstantSearchWrapper categories={productCategories}
                                                   brands={brands}

@@ -54,8 +54,6 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
 
   let brand = product?.brands?.nodes[0]?.name;
 
-  console.log({product})
-
   let product_images: string[] = [];
   product_images = [
     product?.image?.sourceUrl ?? "",
