@@ -3,17 +3,18 @@ import { ProductContentFull } from "@/graphql/defs/products.fragments";
 
 
 export const GET_BRANDS = gql`
-    query getBrands($slug: [String] = []) {
-        brands(first: 50, where: {orderby: COUNT, slug: $slug}) {
-            nodes {
-                id
-                name
-                slug
-                databaseId
-                description
-            }
-        }
+query getBrands($slug: [String] = []) {
+  brands(first: 50, where: {orderby: COUNT, slug: $slug}) {
+    nodes {
+      id
+      name
+      slug
+      databaseId
+      description
+      brandImage
     }
+  }
+}
 `
 export const GET_PRODUCT_SLUGS = gql`
     query productSlugs {

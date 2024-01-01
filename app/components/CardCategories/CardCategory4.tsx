@@ -9,7 +9,6 @@ import Image from 'next/image';
 
 import FallbackImage from "@/public/images/brandLogo/apple.png"
 
-
 export interface CardCategory4Props {
   className?: string;
   featuredImage?: string ;
