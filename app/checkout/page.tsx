@@ -45,7 +45,7 @@ const CheckoutPage = () => {
 
     const paymentGateways: PaymentGateway[] = data?.paymentGateways.nodes;
 
-    const [tabActive, setTabActive] = useState<"ContactInfo" | "ShippingAddress" | "BillingAddress" | "PaymentMethod"> ("ShippingAddress");
+    const [tabActive, setTabActive] = useState<"ContactInfo" | "ShippingAddress" | "BillingAddress" | "PaymentMethod">("ContactInfo");
 
     const [formData, setFormData] = useState<FormData>({
         contactInfo: {},
@@ -60,10 +60,16 @@ const CheckoutPage = () => {
         console.log('Incoming data:', data);
       
         setFormData((prevData) => {
-          const updatedSection = {
-            ...prevData[section as keyof FormData],
-            ...data,
-          };
+          let updatedSection;
+      
+          if (Object.keys(data).length === 0) {
+            updatedSection = {};
+          } else {
+            updatedSection = {
+              ...prevData[section as keyof FormData],
+              ...data,
+            };
+          }
       
           const updatedFormData = {
             ...prevData,
@@ -74,8 +80,9 @@ const CheckoutPage = () => {
       
           return updatedFormData;
         });
-      }
+      };
       
+
 
     const [guestCheckoutMutation, { loading: checkoutLoading, error: checkoutError, data: checkoutData }] = useMutation(GUEST_CHECKOUT_MUTATION);
 
@@ -83,7 +90,7 @@ const CheckoutPage = () => {
         try {
             const paymentMethodId = formData?.paymentMethod?.selectedGateway;
             console.log('paymentMethodId', paymentMethodId);
-            
+
 
             const lineItems = cart?.contents?.nodes.map(item => ({
                 productId: item?.product?.node?.databaseId,
@@ -91,25 +98,25 @@ const CheckoutPage = () => {
             })) || [];
 
             if (paymentMethodId !== undefined) {
-              try {
-                const { data } = await guestCheckoutMutation({
-                    variables: {
-                        paymentMethod: paymentMethodId,
-                        lineItems: lineItems,
-                    },
-                });
+                try {
+                    const { data } = await guestCheckoutMutation({
+                        variables: {
+                            paymentMethod: paymentMethodId,
+                            lineItems: lineItems,
+                        },
+                    });
 
 
-                if (data && data.createOrder) {
-                    const orderDetails = data.createOrder.order;
-                    console.log("Order Details:", orderDetails);
-                } else {
-                    console.error("Failed to retrieve order details");
+                    if (data && data.createOrder) {
+                        const orderDetails = data.createOrder.order;
+                        console.log("Order Details:", orderDetails);
+                    } else {
+                        console.error("Failed to retrieve order details");
+                    }
+                } catch (error: any) {
+                    console.log("Error:", error);
+
                 }
-              } catch (error: any) {
-                console.log("Error:", error);
-                
-              }
             } else {
                 console.error("Payment method ID is undefined");
             }
@@ -176,7 +183,7 @@ const CheckoutPage = () => {
                     <div className="flex-1">
                         <CheckoutDetails
                             tabActive={tabActive}
-                            setTabActive={(value: "ContactInfo" | "ShippingAddress" | "BillingAddress" |  "PaymentMethod") => setTabActive(value)}
+                            setTabActive={(value: "ContactInfo" | "ShippingAddress" | "BillingAddress" | "PaymentMethod") => setTabActive(value)}
                             handleScrollToEl={handleScrollToEl}
                             updateFormData={updateFormData}
                             paymentGateways={paymentGateways}
@@ -259,7 +266,7 @@ const CheckoutPage = () => {
                                         strokeLinejoin="round"
                                     />
                                 </svg>
-                                By proceeding with your purchase you agree to our 
+                                By proceeding with your purchase you agree to our
                                 {' '}
                                 <Link
                                     target="_blank"

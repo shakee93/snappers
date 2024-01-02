@@ -13,10 +13,10 @@ import BillingAddress from "./BillingAddress";
 
 interface CheckoutLeftProps {
   tabActive:
-    | "ContactInfo"
-    | "ShippingAddress"
-    | "PaymentMethod"
-    | "BillingAddress";
+  | "ContactInfo"
+  | "ShippingAddress"
+  | "PaymentMethod"
+  | "BillingAddress";
   setTabActive: (
     value:
       | "ContactInfo"
@@ -48,8 +48,18 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
   const [isBillingSameAsShipping, setIsBillingSameAsShipping] = useState(false);
 
   const handleCheckboxChange = () => {
-    setIsBillingSameAsShipping((prevValue) => !prevValue);
+    setIsBillingSameAsShipping((prevValue) => {
+      if (!prevValue) {
+        // Update with shipping details when checking the checkbox
+        updateFormData("billingAddress", shippingDetails);
+      } else {
+        // Update with an empty object when unchecking the checkbox
+        updateFormData("billingAddress", {});
+      }
+      return !prevValue; // Toggle the checkbox state
+    });
   };
+  
 
   useEffect(() => {
     if (data) {
@@ -72,7 +82,6 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
       } else {
         console.log("billing is null");
       }
-      // shipping;
     }
   }, [data]);
 
