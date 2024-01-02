@@ -116,6 +116,9 @@ query GET_CHECKOUT_USER_DETAILS {
 ${CustomerAddressFragment}
 `;
 
+
+
+
 export const UPDATE_ADDRESS = gql`
 mutation updateCustomer($input: UpdateCustomerInput!) {
   updateCustomer(input: $input) {
