@@ -38,7 +38,7 @@ const ProductSpecifications = ({ techspecs }) => {
                 SIM Type
               </td>
               <td className="px-3 py-2">
-                {/* {techspecs?.items[0]?.inside?.cellular?.sim_slot || ""} */}
+                {techspecs?.items[0]?.inside?.cellular?.sim_slot || ""}
               </td>
             </tr>}
 
@@ -47,7 +47,7 @@ const ProductSpecifications = ({ techspecs }) => {
                 SIM Count
               </td>
               <td className="px-3 py-2">
-                {/* {techspecs?.items[0]?.inside?.cellular?.sim_type || ""} */}
+                {techspecs?.items[0]?.inside?.cellular?.sim_type || ""}
               </td>
             </tr>}
 
@@ -56,7 +56,7 @@ const ProductSpecifications = ({ techspecs }) => {
                 Operating System
               </td>
               <td className="px-3 py-2">
-                {/* {techspecs?.items[0]?.inside?.software?.os || ""} */}
+                {techspecs?.items[0]?.inside?.software?.os || ""}
               </td>
             </tr>}
 
@@ -65,7 +65,7 @@ const ProductSpecifications = ({ techspecs }) => {
                 RAM Size
               </td>
               <td className="px-3 py-2">
-                {/* {techspecs?.items[0]?.inside?.ram?.capacity || ""} */}
+                {techspecs?.items[0]?.inside?.ram?.capacity || ""}
               </td>
             </tr>}
 
@@ -74,7 +74,7 @@ const ProductSpecifications = ({ techspecs }) => {
                 Battery Size
               </td>
               <td className="px-3 py-2">
-                {/* {techspecs?.items[0]?.inside?.battery?.capacity || ""} */}
+                {techspecs?.items[0]?.inside?.battery?.capacity || ""}
               </td>
             </tr>}
 
@@ -83,7 +83,7 @@ const ProductSpecifications = ({ techspecs }) => {
                 Internal Memory
               </td>
               <td className="px-3 py-2">
-                {/* {techspecs?.items[0]?.inside?.storage?.capacity || ""} */}
+                {techspecs?.items[0]?.inside?.storage?.capacity || ""}
               </td>
             </tr>}
 
@@ -92,7 +92,7 @@ const ProductSpecifications = ({ techspecs }) => {
                 Refresh Rate
               </td>
               <td className="px-3 py-2">
-                {/* {techspecs?.items[0]?.display.refresh_rate || ""} */}
+                {techspecs?.items[0]?.display.refresh_rate || ""}
               </td>
             </tr>}
 
@@ -101,7 +101,7 @@ const ProductSpecifications = ({ techspecs }) => {
                 Region
               </td>
               <td className="px-3 py-2">
-                {/* {techspecs?.items[0]?.product.region || ""} */}
+                {techspecs?.items[0]?.product.region || ""}
               </td>
             </tr>}
 
@@ -110,7 +110,7 @@ const ProductSpecifications = ({ techspecs }) => {
                 Screen Size
               </td>
               <td className="px-3 py-2">
-                {/* {techspecs?.items[0]?.display.diagonal || ""} */}
+                {techspecs?.items[0]?.display.diagonal || ""}
               </td>
             </tr>}
 
