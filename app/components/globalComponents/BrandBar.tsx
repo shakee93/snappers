@@ -55,7 +55,7 @@ const BrandBar = ({ brands, categories}: BrandBarProps) => {
   }
 
   return (
-    <div className="flex border-t z-50 max-w-[calc(100vw-157px)]">
+    <div className="flex border-t z-50 max-w-[calc(100vw-158px)]">
       <div className="relative w-full flex justify-between items-center">
         <div  className='items-center text-primaryColor font-semibold flex h-full'>
           <CategoryDropdown categories={categories}/>

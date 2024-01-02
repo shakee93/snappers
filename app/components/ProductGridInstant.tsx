@@ -16,12 +16,11 @@ interface ProductGridProps {
 const ProductGridInstant = ({ products, brand, category }: ProductGridProps) => {
     const { hits, results } = useHits()
     const [_status, setStatus] = useState('')
+
     // const { status: statusState } = useInstantSearch();
     // useEffect(() => {
     //     setStatus(statusState)
     // }, [statusState])
-
-    const status = 'x'
 
     const grid = 8;
 
@@ -41,6 +40,7 @@ const ProductGridInstant = ({ products, brand, category }: ProductGridProps) => 
                          )}
                      </>: <>
                         {hits.map((item, index: number) =>
+                            // <div key={index}></div>
                             <ProductCard  key={item.slug as unknown as string} data={item as unknown as Product} />
                         )}
                     </>

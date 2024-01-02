@@ -23,7 +23,6 @@ const ContactInfo: FC<Props> = ({
 }) => {
   const [phone, setPhone] = useState("+94");
   const [email, setEmail] = useState("");
-  const [subscribeToNews, setSubscribeToNews] = useState(true);
 
   useEffect(() => {
     if (initialData) {
@@ -128,6 +127,7 @@ const ContactInfo: FC<Props> = ({
               type={"tel"}
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
+              required
             />
           </div>
           <div className="max-w-lg">
@@ -138,6 +138,7 @@ const ContactInfo: FC<Props> = ({
               value={email}
               type={"email"}
               onChange={(e) => setEmail(e.target.value)}
+              required
             />
           </div>
 
@@ -149,7 +150,6 @@ const ContactInfo: FC<Props> = ({
                 const contactInfo = {
                   phone,
                   email,
-                  subscribeToNews,
                 };
                 updateFormData("contactInfo", contactInfo);
                 setPhone(initialData?.phone);

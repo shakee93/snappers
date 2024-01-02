@@ -28,6 +28,8 @@ import AddedToCart from "@/app/components/Notifications/added-to-cart";
 import { useCart } from "@/context/CartProvider";
 import {ExternalLink, List, MenuSquare, MoreHorizontal, MoreVertical, XIcon} from "lucide-react";
 import AttributeIcon from "@/app/components/AttributeIcon";
+import {getBlurData} from "@/utils/blurPlaceholder";
+import {twMerge} from "tailwind-merge";
 
 export interface ProductCardProps {
   className?: string;
@@ -58,38 +60,16 @@ const ProductCard: FC<ProductCardProps> = ({
   } = data;
 
     const [showModalQuickView, setShowModalQuickView] = useState(false);
-
+    const [imageLoaded, setImageLoaded] = useState(false)
 
     const [isHovered, setIsHovered] = useState(false);
     const [currentVariation, setCurrentVariation] = useState(0);
     const hoverIntervalRef = useRef<number | null>(null);
     const [loading, setLoading] = useState(false)
 
-    const delayBeforeNextImage = 1000;
     const link = useProductLink(data)
 
-    useEffect(() => {
-        return () => {
-            if (hoverIntervalRef.current !== null) {
-                clearInterval(hoverIntervalRef.current);
-            }
-        };
-    }, []);
 
-    // console.log('product card', data)
-
-    /* Slider Start */
-
-    const startSlider = () => {
-        hoverIntervalRef.current = window.setInterval(() => {
-            setCurrentVariation((prev) => (prev + 1) % (variations?.edges?.length || 1));
-        }, delayBeforeNextImage);
-    };
-
-    const handleHover = () => {
-        setIsHovered(true);
-        startSlider();
-    };
 
     const handleHoverOut = () => {
         setIsHovered(false);
@@ -108,18 +88,6 @@ const ProductCard: FC<ProductCardProps> = ({
         }
     }, [showModalQuickView]);
 
-    // const variationImages = variations?.edges.map((variation: any) => variation.node.image.mediaItemUrl) || [];
-
-    const sliderStyle = {
-        display: 'flex',
-        cursor: 'pointer',
-        transition: 'transform 0.3s ease-in-out',
-        transform: `translateX(-${currentVariation * 100}%)`,
-        height: `250px`,
-        backgroundColor: `#fefefe`
-    };
-
-    /* End of Slider Code */
 
     const [quantity, setQuantity] = useState(1)
     const { addToCart } = useCart()
@@ -166,8 +134,6 @@ const ProductCard: FC<ProductCardProps> = ({
         cartCompleted();
         setLoading(false);
     };
-
-
 
     const renderGroupButtons = () => {
         return (
@@ -232,10 +198,8 @@ const ProductCard: FC<ProductCardProps> = ({
         <div
             className={`nc-ProductCard relative flex flex-col bg-white rounded-3xl p-2 group ${className}`}
             data-nc-id="ProductCard"
-            onMouseEnter={handleHover}
-            onMouseLeave={handleHoverOut}
         >
-            <div className="relative flex-shrink-0 bg-slate-50 rounded-3xl dark:bg-slate-300 overflow-hidden ">
+            <div className="relative flex-shrink-0 bg-slate-50 rounded-2xl dark:bg-slate-300 overflow-hidden ">
 
                 <Link href={link}>
                     <div className='flex items-center justify-center h-[150px] sm:h-[250px]' >
@@ -256,13 +220,22 @@ const ProductCard: FC<ProductCardProps> = ({
                                 </div>
                             ))
                         ) : (
-                            <Image
-                                width={300}
-                                height={300}
-                                src={image?.sourceUrl || ''}
-                                alt={name || ''}
-                                className="object-cover object-center h-[150px] sm:h-[250px] mx-auto my-auto rounded-3xl"
-                            />
+                            <>
+                                {/*{!imageLoaded &&*/}
+                                {/*    <div className="h-full w-full bg-gray-200 rounded-3xl animate-pulse"></div>*/}
+                                {/*}*/}
+
+                                <Image
+                                    width={300}
+                                    height={300}
+                                    src={image?.sourceUrl || ''}
+                                    alt={name || ''}
+                                    className={twMerge(
+                                        `object-cover object-center mx-auto my-auto rounded-3xl`,
+                                    )}
+                                />
+                            </>
+
                         )}
                     </div>
                 </Link>
@@ -270,7 +243,7 @@ const ProductCard: FC<ProductCardProps> = ({
 
                 {/* <ProductStatus status={stockStatus} /> */}
 
-                <div className={"absolute top-3 cursor-pointer right-3 z-10"} onClick={e => handleCloseModalQuickView()}>
+                <div className={"absolute top-3 cursor-pointer right-3"} onClick={e => handleCloseModalQuickView()}>
                     <ArrowsPointingOutIcon className='w-5'/>
                     {/*<LikeButton liked={isLiked} className="" />*/}
                 </div>
@@ -285,7 +258,7 @@ const ProductCard: FC<ProductCardProps> = ({
                 </div>
             </div>
 
-            <div className="space-y-2 px-2.5 pt-2 pb-2.5"
+            <div className="space-y-2 px-2.5 pt-1 pb-1 lg:pt-2 lg:pb-2.5"
 
             >
 
@@ -306,7 +279,7 @@ const ProductCard: FC<ProductCardProps> = ({
                 </div>
 
                 <div className="flex m-0 mb-2 justify-between items-center">
-                    <Prices price={price} salePrice={regularPrice} />
+                    <Prices price={price} salePrice={regularPrice} className='lg:flex-row' />
                     {((salePrice === price || !salePrice) && !!reviewCount) && (
                         <div className="flex items-center mb-0.5">
                             <StarIcon className="w-4 h-4 pb-[1px] text-amber-400" />

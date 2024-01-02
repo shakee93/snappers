@@ -1,7 +1,7 @@
 import { MousePointerClick } from "lucide-react";
 import Link from "next/link";
 
-const ProductSpecifications = ({ techspecs }) => {
+const ProductSpecifications = ({ techspecs }: { techspecs: any }) => {
 
   console.log("tech", techspecs)
 

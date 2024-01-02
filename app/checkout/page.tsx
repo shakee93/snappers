@@ -28,6 +28,7 @@ import CartItems from "./CartItems";
 interface FormData {
     contactInfo: Record<string, any>;
     shippingAddress: Record<string, any>;
+    billingAddress: Record<string, any>;
     paymentMethod: {
         selectedGateway?: {
             id?: string;
@@ -44,13 +45,12 @@ const CheckoutPage = () => {
 
     const paymentGateways: PaymentGateway[] = data?.paymentGateways.nodes;
 
-    const [tabActive, setTabActive] = useState<
-        "ContactInfo" | "ShippingAddress" | "PaymentMethod"
-    >("ShippingAddress");
+    const [tabActive, setTabActive] = useState<"ContactInfo" | "ShippingAddress" | "BillingAddress" | "PaymentMethod"> ("ShippingAddress");
 
     const [formData, setFormData] = useState<FormData>({
         contactInfo: {},
         shippingAddress: {},
+        billingAddress: {},
         paymentMethod: {
             selectedGateway: {}
         },
@@ -58,15 +58,24 @@ const CheckoutPage = () => {
 
     const updateFormData = (section: string, data: any) => {
         console.log('Incoming data:', data);
-
-        setFormData((prevData) => ({
+      
+        setFormData((prevData) => {
+          const updatedSection = {
+            ...prevData[section as keyof FormData],
+            ...data,
+          };
+      
+          const updatedFormData = {
             ...prevData,
-            [section as keyof FormData]: {
-                ...prevData[section as keyof FormData],
-                ...data,
-            },
-        }))
-    };
+            [section as keyof FormData]: updatedSection,
+          };
+      
+          console.log('Updated FormData:', updatedFormData);
+      
+          return updatedFormData;
+        });
+      }
+      
 
     const [guestCheckoutMutation, { loading: checkoutLoading, error: checkoutError, data: checkoutData }] = useMutation(GUEST_CHECKOUT_MUTATION);
 
@@ -153,10 +162,10 @@ const CheckoutPage = () => {
                         <Link href={"/#"} className="">
                             Homepage
                         </Link>
-                        <span className="text-xs mx-1 sm:mx-1.5">/</span>
-                        <Link href={"/#"} className="">
+                        {/* <span className="text-xs mx-1 sm:mx-1.5">/</span> */}
+                        {/* <Link href={"/#"} className="">
                             Clothing Categories
-                        </Link>
+                        </Link> */}
                         <span className="text-xs mx-1 sm:mx-1.5">/</span>
                         <span className="underline">Checkout</span>
                     </div>
@@ -167,7 +176,7 @@ const CheckoutPage = () => {
                     <div className="flex-1">
                         <CheckoutDetails
                             tabActive={tabActive}
-                            setTabActive={(value: "ContactInfo" | "ShippingAddress" | "PaymentMethod") => setTabActive(value)}
+                            setTabActive={(value: "ContactInfo" | "ShippingAddress" | "BillingAddress" |  "PaymentMethod") => setTabActive(value)}
                             handleScrollToEl={handleScrollToEl}
                             updateFormData={updateFormData}
                             paymentGateways={paymentGateways}
@@ -250,14 +259,15 @@ const CheckoutPage = () => {
                                         strokeLinejoin="round"
                                     />
                                 </svg>
-                                Learn more{` `}
+                                By proceeding with your purchase you agree to our 
+                                {' '}
                                 <Link
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     href="/terms"
                                     className="text-slate-900 dark:text-slate-200 underline font-medium"
                                 >
-                                    Taxes
+                                    Terms and Conditions
                                 </Link>
                                 <span>
                                     {` `}and{` `}
@@ -268,9 +278,9 @@ const CheckoutPage = () => {
                                     href="/terms"
                                     className="text-slate-900 dark:text-slate-200 underline font-medium"
                                 >
-                                    Shipping
+                                    Privacy Policy
                                 </Link>
-                                {` `} infomation
+                                {` `}.
                             </p>
                         </div>
                     </div>
