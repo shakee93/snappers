@@ -91,19 +91,6 @@ const CheckoutPage = () => {
 
     const { loading, error, data, refetch } = useQuery(GET_PAYMENT_GATEWAYS);
 
-    // useEffect(() => {
-    //     const fetchPaymentGateways = async () => {
-    //       try {
-    //         await refetch();
-    //       } catch (error) {
-    //         console.error("Error fetching payment gateways:", error);
-    //       }
-    //     };
-
-    //     fetchPaymentGateways();
-    //   }, []); 
-
-
     const paymentGateways: PaymentGateway[] = data?.paymentGateways.nodes;
 
     const [tabActive, setTabActive] = useState<
@@ -134,7 +121,9 @@ const CheckoutPage = () => {
 
     const handleCheckout = async () => {
         try {
-            const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
+            const paymentMethodId = formData?.paymentMethod?.selectedGateway;
+            console.log('paymentMethodId', paymentMethodId);
+            
 
             const lineItems = cart?.contents?.nodes.map(item => ({
                 productId: item?.product?.node?.databaseId,
@@ -142,6 +131,7 @@ const CheckoutPage = () => {
             })) || [];
 
             if (paymentMethodId !== undefined) {
+              try {
                 const { data } = await guestCheckoutMutation({
                     variables: {
                         paymentMethod: paymentMethodId,
@@ -156,6 +146,10 @@ const CheckoutPage = () => {
                 } else {
                     console.error("Failed to retrieve order details");
                 }
+              } catch (error: any) {
+                console.log("Error:", error);
+                
+              }
             } else {
                 console.error("Payment method ID is undefined");
             }

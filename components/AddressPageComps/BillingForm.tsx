@@ -126,7 +126,7 @@ const BillingForm: FC = () => {
                             </div>
                             <div className="flex gap-2">
                                 <InputField label="Postcode/ZIP" name="postcode" placeholder="Postcode/ZIP" value={formData.postcode} onChange={handleChange} />
-                                <SelectField label="State" name="state" value={formData.state} options={SRI_LANKAN_STATES.map(state => ({ value: state, label: state }))} onChange={handleChange} />
+                                <SelectField label="State" name="state" defaultValue={SRI_LANKAN_STATES[0]} value={formData.state} options={SRI_LANKAN_STATES.map(state => ({ value: state, label: state }))} onChange={handleChange} />
                             </div>
                             <div>
                                 <InputField label="Phone" name="phone" placeholder="Phone" value={formData.phone} onChange={handleChange} />

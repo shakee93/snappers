@@ -1,47 +1,49 @@
-'use client'
+"use client";
 
 import { Popover, Transition } from "@headlessui/react";
-import { avatarImgs } from "@/contains/fakeData";
 import { CircleUserRound } from "lucide-react";
-import { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
-import Avatar from "@/shared/Avatar/Avatar";
-import SwitchDarkMode2 from "@/shared/SwitchDarkMode/SwitchDarkMode2";
 import LogoutButton from "@/components/Header/LogoutButton";
 import { useLazyQuery, useQuery } from "@apollo/client";
-import { GET_ACCOUNT_DETAILS } from "@/graphql/defs/auth";
+import {
+  GET_ACCOUNT_DETAILS,
+  GET_DEFAULT_ACC_FOR_AVATAR,
+} from "@/graphql/defs/auth";
 import { useSession } from "@/context/SessionProvider";
+import { Customer } from "@/graphql/types/graphql";
 
 export default function AvatarDropdown() {
+  // const { customer, fetchCustomer } = useSession();
+  const {data} = useQuery(GET_DEFAULT_ACC_FOR_AVATAR);
 
-  const { customer, fetchCustomer } = useSession()
-
+  const [customer , setCustomer] = useState<Customer | null>(null)
   useEffect(() => {
-  }, [customer])
+    let customer: Customer= data?.customer
+    setCustomer(customer)
+  }, [data]);
 
   return (
     <div className="AvatarDropdown ">
-
-      {(!customer || customer.id === 'guest') ?
-      // {(false) ? 
-        <Link href={'/login'}
+      {!customer || customer?.id === "guest" ? (
+      // {false ? (
+        <Link
+          href={"/login"}
           className={`text-primaryColor w-10 h-10 sm:w-12 sm:h-12 rounded-full dark:text-slate-300
-         hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none flex items-center justify-center`}>
+        hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none flex items-center justify-center`}
+        >
           <CircleUserRound />
         </Link>
-         :
-
+      ) : (
         <Popover className="relative">
           {({ open, close }) => (
             <>
-              <Popover.Button
-                className={``}
-              >
-
-                <div className={`text-primaryColor w-10 h-10 sm:w-12 sm:h-12 rounded-full dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none flex items-center justify-center`}>
+              <Popover.Button className={``}>
+                <div
+                  className={`text-primaryColor w-10 h-10 sm:w-12 sm:h-12 rounded-full dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none flex items-center justify-center`}
+                >
                   <CircleUserRound />
                 </div>
-
               </Popover.Button>
               <Transition
                 as={Fragment}
@@ -59,7 +61,9 @@ export default function AvatarDropdown() {
                         {/* <Avatar imgUrl={avatarImgs[7].src} sizeClass="w-12 h-12" /> */}
 
                         <div className="flex-grow">
-                          <h4 className="font-semibold">{customer?.displayName ?? "Username"}</h4>
+                          <h4 className="font-semibold">
+                            {customer?.displayName ?? "Username"}
+                          </h4>
                         </div>
                       </div>
 
@@ -291,7 +295,8 @@ export default function AvatarDropdown() {
               </Transition>
             </>
           )}
-        </Popover>}
+        </Popover>
+      )}
     </div>
   );
 }

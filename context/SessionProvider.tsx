@@ -87,6 +87,7 @@ export function SessionProvider({ children }: {
     }
 
     const signUp = async (email: string, password: string) => {
+        logout()
         try {
             const response: FetchResult<RegisterCustomerMutation> = await registerCustomer({
                 variables: {
@@ -119,6 +120,7 @@ export function SessionProvider({ children }: {
     };
 
     const login = async (email: string, password: string): Promise<LoginResponse> => {
+        logout()
         try {
             const response: FetchResult<LoginCustomerMutation> = await loginCustomer({
                 variables: {
