@@ -31,11 +31,12 @@ const AccountPage: FC = () => {
         id: customer.id || "",
         displayName: customer.displayName || "",
         email: customer.email || "",
-        dateOfBirth: customer.metaData?.find((md) => md?.key === "dob")?.value,
-        address: customer.shipping?.address1,
+        dateOfBirth:
+          customer.metaData?.find((md) => md?.key === "dob")?.value || "",
+        address: customer.shipping?.address1 || "",
         gender:
           customer.metaData?.find((md) => md?.key === "gender")?.value || "",
-        phoneNumber: customer.shipping?.phone,
+        phoneNumber: customer.shipping?.phone || "",
         about:
           customer.metaData?.find((md) => md?.key === "about")?.value || "",
       };
@@ -98,6 +99,7 @@ const AccountPage: FC = () => {
               <div>
                 <Label>Display Name</Label>
                 <Input
+                  required={true}
                   className="mt-1.5"
                   name="displayName"
                   placeholder="Your name"
@@ -117,7 +119,6 @@ const AccountPage: FC = () => {
                     disabled={true}
                     placeholder="example@email.com"
                     value={formData.email}
-                    onChange={handleChange}
                   />
                 </div>
               </div>

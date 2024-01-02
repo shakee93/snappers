@@ -134,7 +134,7 @@ const BillingForm: FC = () => {
                             <Checkbox
                                 defaultChecked={saveBothAddresses}
                                 name="save for both addresses"
-                                label="Include this in the billing as well"
+                                label="Include this in the Shipping as well"
                                 onChange={() => setSaveBothAddresses(!saveBothAddresses)}
                             />
                         </div>
