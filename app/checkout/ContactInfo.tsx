@@ -34,7 +34,7 @@ const ContactInfo: FC<Props> = ({
 
   const renderAccount = () => {
     return (
-      <form onSubmit={ }>
+      <form onSubmit={}>
         <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden z-0">
           <div className="flex flex-col sm:flex-row items-start p-6 ">
             <span className="hidden sm:block">
