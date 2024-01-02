@@ -1,4 +1,5 @@
-'use client'
+"use client";
+import { Loader, ShoppingCart } from "lucide-react";
 import React, { FC, useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -7,7 +8,7 @@ import ButtonSecondary from "@/shared/Button/ButtonSecondary";
 import { ArrowsPointingOutIcon } from "@heroicons/react/24/outline";
 import BagIcon from "./BagIcon";
 import { StarIcon } from "@heroicons/react/24/solid";
-import toast, { Toaster } from 'react-hot-toast';
+import toast, { Toaster } from "react-hot-toast";
 import { Transition } from "@headlessui/react";
 import ModalQuickView from "./ModalQuickView";
 import ProductStatus from "./ProductStatus";
@@ -15,34 +16,35 @@ import Prices from "./Prices";
 import LikeButton from "./LikeButton";
 import useProductLink from "@/hooks/useProductLink";
 import {
-    Brand,
-    Edge,
-    Product,
-    ProductVariation,
-    SimpleProduct,
-    VariableProduct,
-    VariationAttribute
+  Brand,
+  Edge,
+  Product,
+  ProductVariation,
+  SimpleProduct,
+  VariableProduct,
+  VariationAttribute,
 } from "@/graphql/types/graphql";
 import AddedToCart from "@/app/components/Notifications/added-to-cart";
 import { useCart } from "@/context/CartProvider";
-import {ExternalLink, List, MenuSquare, MoreHorizontal, MoreVertical} from "lucide-react";
+import {ExternalLink, List, MenuSquare, MoreHorizontal, MoreVertical, XIcon} from "lucide-react";
 import AttributeIcon from "@/app/components/AttributeIcon";
 
-
 export interface ProductCardProps {
-    className?: string;
-    data: SimpleProduct & VariableProduct;
-    isLiked?: boolean;
+  className?: string;
+  data: SimpleProduct & VariableProduct;
+  isLiked?: boolean;
 }
 
 const ProductCard: FC<ProductCardProps> = ({
-    className = "",
-    data,
-    isLiked,
+  className = "",
+  data,
+  isLiked,
 }) => {
-
-    const { name, price,
-        type,
+  const {
+    name,
+    price,
+    type,
+    purchasable,
         image,
         attributes,
         productCategories,
@@ -52,7 +54,8 @@ const ProductCard: FC<ProductCardProps> = ({
         brands,
         reviewCount,
         averageRating, featured,
-        salePrice, databaseId } = data;
+        salePrice, databaseId,
+  } = data;
 
     const [showModalQuickView, setShowModalQuickView] = useState(false);
 
@@ -60,6 +63,8 @@ const ProductCard: FC<ProductCardProps> = ({
     const [isHovered, setIsHovered] = useState(false);
     const [currentVariation, setCurrentVariation] = useState(0);
     const hoverIntervalRef = useRef<number | null>(null);
+    const [loading, setLoading] = useState(false)
+
     const delayBeforeNextImage = 1000;
     const link = useProductLink(data)
 
@@ -133,9 +138,9 @@ const ProductCard: FC<ProductCardProps> = ({
                     leaveFrom="opacity-100 translate-x-0"
                     leaveTo="opacity-0 translate-x-20"
                 >
-                    <p className="block text-base font-semibold leading-none">
-                        Added to cart!
-                    </p>
+                    <div className="flex items-center w-full justify-between text-base font-semibold leading-none">
+                        Added to cart! <button onClick={e => toast.dismiss('nc-product-notify')}><XIcon/></button>
+                    </div>
                     <div className="border-t border-slate-200 dark:border-slate-700 my-4" />
                     <AddedToCart product={data} quantity={quantity} />
                 </Transition>
@@ -149,91 +154,24 @@ const ProductCard: FC<ProductCardProps> = ({
         setQuantity(1)
     }
 
-    const handleAddToCart = () => {
+    const handleAddToCart = async () => {
         // console.log(data.databaseId);
         if (data.databaseId) {
             addToCart(data.databaseId, quantity)?.then(cartCompleted);
         } else {
             notifyAddTocart(1);
         }
+        setLoading(true);
+        await addToCart(data.databaseId, quantity);
+        cartCompleted();
+        setLoading(false);
     };
 
 
-    const renderProductCartOnNotify = () => {
-        return (
-            <div className="flex">
-                <div className="h-24 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
-                    <Image
-                        style={{ objectFit: 'cover' }}
-                        src={variations?.edges[currentVariation]?.node?.image?.mediaItemUrl || image?.mediaItemUrl || ''}
-                        alt={name || ''}
-                        width={280}
-                        height={305}
-                        className="h-full w-full object-cover object-center"
-                    />
-                </div>
-
-                <div className="ml-4 flex flex-1 flex-col">
-                    <div>
-                        <div className="flex justify-between">
-                            <div>
-                                <h3 className="text-base font-medium ">{name}</h3>
-                                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                                    <span>
-                                        {data.name}
-                                    </span>
-                                    <span className="mx-2 border-l border-slate-200 dark:border-slate-700 h-4"></span>
-                                    {/* Omitted the size span */}
-                                </p>
-                            </div>
-                            <Prices price={price} salePrice={regularPrice} className="mt-0.5" />
-                        </div>
-                    </div>
-                    <div className="flex flex-1 items-end justify-between text-sm">
-                        <p className="text-gray-500 dark:text-slate-400">Qty 1</p>
-                        <div className="flex">
-                            <Link href={"/cart"} className="font-medium text-primary-6000 dark:text-primary-500 ">
-                                View cart
-                            </Link>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        );
-    };
-
-    const renderVariants = () => {
-        if (data.type !== "VARIABLE" || !variations || !variations.edges.length) {
-            return null;
-        } else {
-            return (
-                <div className="flex space-x-1">
-                    {variations.edges.map((variation : {
-                        node : ProductVariation
-                    }, index) => (
-                        <div
-                            key={index}
-                            onClick={() => setCurrentVariation(index)}
-                            className={`relative w-6 h-6 rounded-full overflow-hidden z-10 border cursor-pointer ${currentVariation === index
-                                ? 'border-primaryColor'
-                                : 'border-transparent'
-                                }`}
-                            title={variation.node.name || ''}
-                        >
-                            <div
-                                className="absolute inset-0.5 rounded-full z-0"
-                                style={{ backgroundColor: 'var(--your-variant-color-property)' }}
-                            ></div>
-                        </div>
-                    ))}
-                </div>
-            )
-        };
-    };
 
     const renderGroupButtons = () => {
         return (
-            <div className="absolute bottom-4 inset-x-1 flex justify-center opacity-100 visible transition-all">
+            <div className="flex justify-center opacity-100 visible transition-all">
 
 
                 {stockStatus === 'IN_STOCK' ?
@@ -242,10 +180,15 @@ const ProductCard: FC<ProductCardProps> = ({
                             <ButtonPrimary
                                 className="shadow-lg"
                                 fontSize="text-xs"
-                                sizeClass="py-3.5 px-5"
+                                sizeClass="py-2.5 px-5"
                                 onClick={handleAddToCart}
+                                disabled={loading}
                             >
-                                <BagIcon className="w-3.5 h-3.5 mb-0.5" />
+                                {loading ? (
+                                    <Loader className="animate-spin w-4" />
+                                ) : (
+                                    <ShoppingCart className='w-4' />
+                                )}
                                 <span className="ml-1">Add to Cart</span>
                             </ButtonPrimary>
                         }
@@ -255,7 +198,7 @@ const ProductCard: FC<ProductCardProps> = ({
                                 <ButtonPrimary
                                     className="shadow-lg"
                                     fontSize="text-xs"
-                                    sizeClass="py-3.5 px-5"
+                                    sizeClass="py-2.5 px-5"
                                 >
                                     <AttributeIcon className='w-4 mr-1' name={attributes?.nodes[0].name}/>
                                     <span className="ml-1">Choose {attributes?.nodes[0].label || "Options" }</span>
@@ -327,38 +270,40 @@ const ProductCard: FC<ProductCardProps> = ({
 
                 {/* <ProductStatus status={stockStatus} /> */}
 
-                <div className={"absolute top-3 right-3 z-10"} onClick={e => handleCloseModalQuickView()}>
+                <div className={"absolute top-3 cursor-pointer right-3 z-10"} onClick={e => handleCloseModalQuickView()}>
                     <ArrowsPointingOutIcon className='w-5'/>
                     {/*<LikeButton liked={isLiked} className="" />*/}
                 </div>
 
-                {/* {sizes ? renderSizeList() : renderGroupButtons()} */}
-                {renderGroupButtons()}
-
+                <div
+                    className={`absolute left-1.5 top-2 text-center text-xs lg:text-sm line-clamp-2 text-slate-800`}
+                >
+                    {brands?.nodes?.map((brand: Brand, index) => (
+                        <Link className='bg-zinc-100/70 px-2 py-1 rounded-lg' href={`/${brand?.slug}`} key={index}>{brand?.name}</Link>
+                    ))}
+                    {/*- {type} - {databaseId}*/}
+                </div>
             </div>
 
-            <div className="space-y-2 px-2.5 pt-5 pb-2.5"
+            <div className="space-y-2 px-2.5 pt-2 pb-2.5"
 
             >
 
                 {/* {renderVariants()} */}
 
+
+                <div>
+                    {renderGroupButtons()}
+                </div>
+
                 <div>
                     <h2
-                        className={`nc-ProductCard__title  text-sm lg:text-base text-black line-clamp-2 min-h-[40px] lg:min-h-[47px] font-semibold transition-colors whitespace-normal`}
+                        className={`nc-ProductCard__title  text-xs lg:text-sm text-black line-clamp-2 font-semibold transition-colors whitespace-normal`}
                     >
                         {name}
                     </h2>
-                    <div
-                        className={`nc-ProductCard__title text-xs lg:text-sm text-black line-clamp-2 min-h-[20px] lg:min-h-[20px] text-slate-800`}
-                    >
-                        {brands?.nodes?.map((brand: Brand, index) => (
-                            <Link href={`/${brand?.slug}`} key={index}>{brand?.name}</Link>
-                        ))}
-                        {/*- {type} - {databaseId}*/}
-                    </div>
-                </div>
 
+                </div>
 
                 <div className="flex m-0 mb-2 justify-between items-center">
                     <Prices price={price} salePrice={regularPrice} />
@@ -383,6 +328,9 @@ const ProductCard: FC<ProductCardProps> = ({
                         </div>
                     )}
                 </div>
+
+
+
 
 
 
