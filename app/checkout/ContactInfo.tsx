@@ -142,7 +142,7 @@ const ContactInfo: FC<Props> = ({
                 type={"tel"}
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                required
+                required={true}
               />
             </div>
             <div className="max-w-lg">
@@ -153,7 +153,7 @@ const ContactInfo: FC<Props> = ({
                 value={email}
                 type={"email"}
                 onChange={(e) => setEmail(e.target.value)}
-                required
+                required={true}
               />
             </div>
 
