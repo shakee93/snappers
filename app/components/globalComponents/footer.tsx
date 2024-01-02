@@ -22,7 +22,7 @@ const Footer = async () => {
   return (
     <footer className="border-t text-black">
       <div className='container'>
-        <div className=" py-16  grid grid-cols-2 gap-3 lg:grid-cols-4 justify-between">
+        <div className=" py-16  grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-4 justify-between">
           <div className="flex gap-1 md:gap-2 p-2 flex-col items-center md:items-center justify-center">
             <Link href={"/"}>
               <Image
@@ -35,7 +35,7 @@ const Footer = async () => {
           </div>
           <div className="flex gap-1 md:gap-4 p-2 flex-col items-center md:items-center">
             <div className="text-base md:text-lg font-medium text-primaryColor">Quick Links</div>
-            <ul className="text-xs md:text-sm text-gray-500 flex flex-col gap-3 ">
+            <ul className="text-xs text-center md:text-sm text-gray-500 flex flex-col gap-3 ">
               <li className="hover:text-primaryColor">
                 <Link href={"/"}>Home</Link>
               </li>
@@ -57,8 +57,8 @@ const Footer = async () => {
             </ul>
           </div>
           <div className="flex gap-1 md:gap-4 p-2 flex-col items-center md:items-center">
-            <div className="text-base md:text-lg font-medium text-primaryColor">Top Brands</div>
-            <ul className="text-xs md:text-sm text-gray-500 grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-3">
+            <div className="text-base pb-2 md:text-lg font-medium text-primaryColor">Top Brands</div>
+            <ul className="text-xs text-center md:text-sm text-gray-500 grid grid-cols-2 md:grid-cols-3 gap-x-4 gap-y-3">
 
               {brands.slice(0, 15).map((brand: Brand, index: number) =>
                 <li key={index} className="hover:text-primaryColor">

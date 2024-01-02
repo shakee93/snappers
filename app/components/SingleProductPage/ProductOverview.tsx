@@ -1,16 +1,17 @@
 import ProductSpecifications from "./ProductSpecifications";
-import {SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
+import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import parseHtml from 'html-react-parser'
 
 const ProductOverview = ({
-    product
-                         }:{
+  product,
+  techspecs
+}: {
   product: SimpleProduct | VariableProduct
 }) => {
 
   return (
     <>
-     <div className="bg-white p-5 rounded-3xl md:p-10 my-5">
+      <div className="bg-white p-5 rounded-3xl md:p-10 my-5">
         <div className="pb-3 border-b-2 border-gray-200">
           <h3 className="text-lg md:text-xl">Overview</h3>
         </div>
@@ -43,7 +44,7 @@ const ProductOverview = ({
             </div>
           </div>
           <div className="md:w-2/5">
-            <ProductSpecifications/>
+            <ProductSpecifications techspecs={techspecs}/>
           </div>
         </div>
       </div>
