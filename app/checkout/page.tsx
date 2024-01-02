@@ -25,55 +25,6 @@ import CheckoutDetails from "./CheckoutDetails";
 import CartItems from "./CartItems";
 
 
-export interface CartInfo {
-    appliedCoupons: null;
-    availableShippingMethods: {}[];
-    contents: {
-        itemCount: number;
-        nodes: CartItem[];
-        __typename: string;
-    };
-    discountTax: string;
-    discountTotal: string;
-    feeTax: string;
-    feeTotal: string;
-    needsShippingAddress: boolean;
-    shippingTax: string;
-    shippingTotal: string;
-    subtotal: string;
-    subtotalTax: string;
-    total: string;
-    totalTax: string;
-}
-
-export interface CartItem {
-    extraData: any[];
-    key: string;
-    product: CartItemProduct;
-    quantity: number;
-    subtotal: string;
-    subtotalTax: string;
-    total: string;
-    variation: null | any;
-}
-
-export interface CartItemProduct {
-    node: CartItemProductNode;
-}
-
-export interface CartItemProductNode {
-    id: number;
-    name: string;
-    price: number;
-    image: string;
-    terms: string[];
-}
-
-interface SelectedGateway {
-    id: string;
-    title: string;
-}
-
 interface FormData {
     contactInfo: Record<string, any>;
     shippingAddress: Record<string, any>;
@@ -234,7 +185,7 @@ const CheckoutPage = () => {
                         </div>
 
                         <div className="mt-10 pt-6 text-sm text-slate-500 dark:text-slate-400 border-t border-slate-200/70 dark:border-slate-700 ">
-                            <div>
+                            {/* <div>
                                 <Label className="text-sm">Discount code</Label>
                                 <div className="flex mt-1.5">
                                     <Input sizeClass="h-10 px-4 py-3" className="flex-1" />
@@ -242,7 +193,7 @@ const CheckoutPage = () => {
                                         Apply
                                     </button>
                                 </div>
-                            </div>
+                            </div> */}
 
                             <div className="mt-4 flex justify-between py-2.5">
                                 <span>Subtotal</span>

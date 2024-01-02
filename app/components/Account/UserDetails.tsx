@@ -1,13 +1,18 @@
 "use client";
 import { useSession } from "@/context/SessionProvider";
-import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import React, { useEffect } from "react";
 
 const UserDetails = () => {
   const { customer, fetchCustomer, updateCustomer } = useSession();
-
+  const router = useRouter();
   useEffect(() => {
     fetchCustomer();
-  }, []);
+    if (!customer) {
+      // Redirect to the login page if customer is not found
+      router.push('/login');
+    }
+  }, [customer]);
 
   const displayName = customer?.displayName || "";
   const email = customer?.email || "";
