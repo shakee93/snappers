@@ -18,6 +18,7 @@ import { GET_AUTH_TOKEN } from "./defs/auth";
 import { AUTH_TOKEN_KEY, REFRESH_TOKEN_KEY, SESSION_TOKEN_KEY } from "@/context/SessionProvider";
 import { onError } from "@apollo/client/link/error";
 import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
+import { Results } from "@/types";
 
 
 loadDevMessages();

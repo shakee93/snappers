@@ -1,4 +1,4 @@
-import {useSearchBox} from "react-instantsearch";
+import {useInstantSearch, useSearchBox} from "react-instantsearch";
 import {Search} from "lucide-react";
 import {useStore} from "@/store/store";
 import {useEffect} from "react";

@@ -6,26 +6,6 @@ import Heading from "@/app/components/Heading/Heading";
 import NavItem2 from "@/app/components/HomePage/NavItem2";
 import React, { FC, useState, useEffect } from "react";
 import Nav from "@/app/components/HomePage/Nav";
-import explore1Svg from "@/public/images/collections/explore1.svg";
-import explore2Svg from "@/public/images/collections/explore2.svg";
-import explore3Svg from "@/public/images/collections/explore3.svg";
-import explore4Svg from "@/public/images/collections/explore4.svg";
-import explore5Svg from "@/public/images/collections/explore5.svg";
-import explore6Svg from "@/public/images/collections/explore6.svg";
-import explore7Svg from "@/public/images/collections/explore7.svg";
-import explore8Svg from "@/public/images/collections/explore8.svg";
-import explore9Svg from "@/public/images/collections/explore9.svg";
-//
-import explore1Png from "@/public/images/collections/explore1.png";
-import explore2Png from "@/public/images/collections/explore2.png";
-import explore3Png from "@/public/images/collections/explore3.png";
-import explore4Png from "@/public/images/collections/explore4.png";
-import explore5Png from "@/public/images/collections/explore5.png";
-import explore6Png from "@/public/images/collections/explore6.png";
-import explore7Png from "@/public/images/collections/explore7.png";
-import explore8Png from "@/public/images/collections/explore8.png";
-import explore9Png from "@/public/images/collections/explore9.png";
-import CardCategory6 from "components/CardCategories/CardCategory6";
 
 import amazfit from "@/public/images/brandLogo/amazfit.png";
 import apple from "@/public/images/brandLogo/apple.png";
@@ -69,117 +49,6 @@ export interface SectionGridMoreExploreProps {
   data?: ExploreType[];
 }
 
-export const DEMO_MORE_EXPLORE_DATA = [
-  {
-    id: 1,
-    name: "Backpack",
-    desc: "Manufacturar",
-    image: explore1Png,
-    svgBg: explore1Svg,
-    color: "bg-indigo-50",
-  },
-  {
-    id: 2,
-    name: "Shoes",
-    desc: "Manufacturar",
-    image: explore2Png,
-    svgBg: explore2Svg,
-    color: "bg-slate-100/80",
-  },
-  {
-    id: 3,
-    name: "Recycled Blanket",
-    desc: "Manufacturar",
-    image: explore3Png,
-    svgBg: explore3Svg,
-    color: "bg-violet-50",
-  },
-  {
-    id: 4,
-    name: "Cycling Shorts",
-    desc: "Manufacturar",
-    image: explore9Png,
-    svgBg: explore9Svg,
-    color: "bg-orange-50",
-  },
-  {
-    id: 5,
-    name: "Cycling Jersey",
-    desc: "Manufacturar",
-    image: explore5Png,
-    svgBg: explore5Svg,
-    color: "bg-blue-50",
-  },
-  {
-    id: 6,
-    name: "Car Coat",
-    desc: "Manufacturar",
-    image: explore6Png,
-    svgBg: explore6Svg,
-    color: "bg-orange-50",
-  },
-  {
-    id: 7,
-    name: "Sunglasses",
-    desc: "Manufacturar",
-    image: explore7Png,
-    svgBg: explore7Svg,
-    color: "bg-stone-100",
-  },
-  {
-    id: 8,
-    name: "kid hats",
-    desc: "Manufacturar",
-    image: explore8Png,
-    svgBg: explore8Svg,
-    color: "bg-blue-50",
-  },
-  {
-    id: 9,
-    name: "Wool Jacket",
-    desc: "Manufacturar",
-    image: explore4Png,
-    svgBg: explore4Svg,
-    color: "bg-slate-100/80",
-  },
-];
-
-// const hardcodedBrands = {
-//   Mobiles: [
-//     { name: "Samsung", id: 'dGVybToyMTk=', slug: "samsung", img: samsung },
-//     { name: "Apple", id: 'dGVybToyMjY=', slug: "apple", img: apple },
-//     { name: "Google", id: 'dGVybToyMjk=', slug: "google", img: google },
-//     { name: "OnePlus", id: 'dGVybToyMjA=', slug: "oneplus", img: oneplus },
-//     { name: "Huawei", id: 'dGVybToyMjU=', slug: "huawei", img: huawei },
-//     { name: "Nokia", id: 'dGVybToyMzk=', slug: "nokia", img: nokia },
-//   ],
-//   Watches: [
-//     { name: "Fitbit", id: 'dGVybToyMzI=', slug: "fitbit", img: fitbit },
-//     { name: "Amazfit", id: 'dGVybToyMjQ=', slug: "amazfit", img: amazfit },
-//     { name: "Huawei", id: 'dGVybToyMjU=', slug: "huawei", img: huawei },
-//   ],
-//   Laptops: [
-//     { name: "Apple", id: 'dGVybToyMjY=', slug: "apple", img: apple },
-//     { name: "Samsung", id: 'dGVybToyMTk=', slug: "samsung", img: samsung },
-//   ],
-//   Speakers: [
-//     { name: "Bose", id: 'dGVybToyNDE=', slug: "bose", img: bose },
-//     { name: "Beats", id: 'dGVybToyMzM=', slug: "beats", img: beats },
-//     { name: "Meimi", id: 'dGVybToyNzA=', slug: "meimi", img: '' },
-//   ],
-//   PowerBanks: [
-//     { name: "Porodo", id: 'dGVybToyNDA=', slug: "porodo", img: porodo },
-//     { name: "Belkin", id: 'dGVybToyMzg=', slug: "belkin", img: belkin },
-//   ],
-//   Gaming: [
-//     { name: "Logitech", id: 'dGVybToyMzQ=', slug: "logitech", img: logitech },
-//     { name: "Tec", id: 'dGVybToyNTg=', slug: "tecno", img: tecno },
-//     { name: "Skull", id: 'dGVybToyMjE=', slug: "skullcandy", img: skullcandy },
-//     { name: "Green Lion", id: 'dGVybToyMzc=', slug: "green-lion", img: greenlion },
-//   ],
-
-// };
-
 
 const hardcodedBrands = {
   Mobiles: [
@@ -202,17 +71,19 @@ const hardcodedBrands = {
   Speakers: [
     { name: "ose", id: 'dGVybToyNDE=', slug: "bose", img: bose },
     { name: "ats", id: 'dGVybToyMzM=', slug: "beats", img: beats },
-    { name: "Mimi", id: 'dGVybToyNzA=', slug: "meimi", img: '' },
+    { name: "Mimi", id: 'dGVybToyNzA=', slug: "marshals", img: '' },
   ],
   PowerBanks: [
     { name: "orodo", id: 'dGVybToyNDA=', slug: "porodo", img: porodo },
     { name: "Blkin", id: 'dGVybToyMzg=', slug: "belkin", img: belkin },
+    { name: "Blkin", id: 'dGVybToyMzg=', slug: "anker", img: '' },
   ],
   Gaming: [
     { name: "Loitech", id: 'dGVybToyMzQ=', slug: "logitech", img: logitech },
     { name: "Tec", id: 'dGVybToyNTg=', slug: "tecno", img: tecno },
     { name: "Skull", id: 'dGVybToyMjE=', slug: "skullcandy", img: skullcandy },
     { name: "Green Lion", id: 'dGVybToyMzc=', slug: "green-lion", img: greenlion },
+    { name: "Green Lion", id: 'dGVybToyMzc=', slug: "nintendo", img: '' },
   ],
 
 };
@@ -223,21 +94,20 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
   gridClassName = "grid-cols-1 md:grid-cols-2 xl:grid-cols-3",
 }) => {
 
-  const [getBrands, { loading, error, data, refetch }] = useLazyQuery(GET_BRANDS);
-
   const [brands, setBrands] = useState<any[]>([]);
   const [tabActive, setTabActive] = useState<keyof typeof hardcodedBrands>("Mobiles");
+
+  const { loading, error, data, refetch } = useQuery(GET_BRANDS);
 
   const fetchBrandsForCategory = async (category: keyof typeof hardcodedBrands) => {
     try {
       const hardcodedBrandList = hardcodedBrands[category] || [];
       const slugs = hardcodedBrandList.map((brand) => brand.slug);
-      // console.log('Brand Slugs:', slugs);
 
-      const { data: fetchedData } = await getBrands({
-        variables: {
+      const { data: fetchedData } = await refetch({
+        
           slug: slugs
-        }
+        
       });
 
       const fetchedBrandsFromServer: Brand[] = fetchedData?.brands.nodes || [];
@@ -250,8 +120,6 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
           img: serverBrand.brandImage || '',
         };
       });
-
-      console.log({ updatedBrands })
 
       setBrands(updatedBrands);
     } catch (error) {

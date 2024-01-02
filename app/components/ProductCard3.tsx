@@ -385,7 +385,7 @@ const ProductCard: FC<ProductCardProps> = ({
 
         <div>
           <h2
-            className={`nc-ProductCard__title  text-sm lg:text-base text-black line-clamp-2 min-h-[40px] lg:min-h-[47px] font-semibold transition-colors`}
+            className={`nc-ProductCard__title  text-sm lg:text-base text-black line-clamp-2 min-h-[40px] lg:min-h-[47px] font-semibold transition-colors whitespace-normal`}
           >
             {name}
           </h2>

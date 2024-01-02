@@ -56,7 +56,7 @@ const MobileNavLinks = () => {
         } fixed left-0 top-0 w-[100%] h-screen bg-gray-50  ease-in-out duration-300 transform origin-left z-50`}
       >
         <div className="flex w-full items-center justify-between">
-          <Logo />
+          <Logo  className='' />
           <div  onClick={handleMunu}  className="cursor-pointer pr-4">
             <XIcon />
           </div>

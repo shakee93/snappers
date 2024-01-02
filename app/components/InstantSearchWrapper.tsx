@@ -1,5 +1,5 @@
 'use client'
-import {Configure, RefinementList, SortBy, useSortBy} from "react-instantsearch";
+import {Configure, RefinementList, SortBy, useInstantSearch, useSortBy} from "react-instantsearch";
 import {InstantSearchNext} from "react-instantsearch-nextjs";
 import TypesenseInstantSearchAdapter from "typesense-instantsearch-adapter";
 import ProductGridInstant from "@/app/components/ProductGridInstant";
@@ -102,7 +102,7 @@ const InstantSearchWrapper = ({
     }, [sortQuery])
 
 
-    return <InstantSearchNext stalledSearchDelay={0} future={{
+    return <InstantSearchNext stalledSearchDelay={500} future={{
         preserveSharedStateOnUnmount: true
     }} routing={ routing ? {
         router: {

@@ -15,12 +15,12 @@ interface ProductGridProps {
 }
 const ProductGridInstant = ({ products, brand, category }: ProductGridProps) => {
     const { hits, results } = useHits()
-    const { status: statusState } = useInstantSearch();
+    // const { status: statusState } = useInstantSearch();
     // useEffect(() => {
     //     // console.log(status, hits);
     // }, [status])
 
-    // const status = 'x'
+    const status = 'x'
 
     const grid = 8;
 
@@ -28,7 +28,7 @@ const ProductGridInstant = ({ products, brand, category }: ProductGridProps) => 
         <div>
             <div className="flex-1 grid  sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10">
 
-                {['loading', 'stalled'].includes(statusState)  ?
+                {['loading', 'stalled'].includes(status)  ?
                      <>
                          {Array(grid).fill(null).map((x, index) =>
                              <div key={index} className="space-y-3">

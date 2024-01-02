@@ -19,8 +19,8 @@ import { useSession } from "@/context/SessionProvider";
 import toast from "react-hot-toast";
 
 // Types and Interfaces
-import { Customer } from "@/graphql/types/graphql";
 import { InputField, SelectField } from "./HelperComps";
+import Checkbox from "@/shared/Checkbox/Checkbox";
 
 // Constants
 const SRI_LANKAN_STATES = [
@@ -33,11 +33,13 @@ const ShippingForm: FC = () => {
     const [getAddresses, { loading, data, error }] = useLazyQuery(GET_ADDRESSES, {
         fetchPolicy: 'no-cache'
     });
-    const [updateBillingAddress] = useMutation(UPDATE_ADDRESS);
+    const [saveBothAddresses, setSaveBothAddresses] = useState(false);
+
+    const [updateShipping] = useMutation(UPDATE_ADDRESS);
     const [formData, setFormData] = useState({
         firstName: "", lastName: "", country: "",
-        address1: "", address2: "", townCity: "",
-        state: "", postcodeZip: "", phone: ""
+        address1: "", address2: "", city: "",
+        state: "Western", postcode: "", phone: ""
     });
 
     useEffect(() => {
@@ -59,7 +61,7 @@ const ShippingForm: FC = () => {
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            const { data } = await updateBillingAddress({
+            await updateShipping({
                 variables: {
                     input: {
                         shipping: {
@@ -67,21 +69,32 @@ const ShippingForm: FC = () => {
                             lastName: formData.lastName,
                             address1: formData.address1,
                             address2: formData.address2,
-                            city: formData.townCity,
+                            city: formData.city,
                             country: "LK",
                             state: formData.state,
-                            postcode: formData.postcodeZip,
+                            postcode: formData.postcode,
                             phone: formData.phone,
-                        }
+                        },
+                        ...(saveBothAddresses && {
+                            billing: {
+                                firstName: formData.firstName,
+                                lastName: formData.lastName,
+                                address1: formData.address1,
+                                address2: formData.address2,
+                                city: formData.city,
+                                country: "LK",
+                                state: formData.state,
+                                postcode: formData.postcode,
+                                phone: formData.phone,
+                            }
+                        })
                     },
                 },
             });
 
-            // Handle success or show a success message
             toast.success("Shipping address updated successfully");
         } catch (error: any) {
-            // Handle error or show an error message
-            toast.error("Error updating billing address:", error);
+            toast.error("Error updating shipping address:", error);
         }
     };
 
@@ -102,14 +115,14 @@ const ShippingForm: FC = () => {
                             </div>
                             <div className="flex gap-2">
                                 <InputField label="Street Address" name="address2" placeholder="Street Address" value={formData.address2} onChange={handleChange} />
-                                <InputField  label="Apt, Suite, etc." name="address1" placeholder="Apt, Suite, etc." value={formData.address1} onChange={handleChange} />
+                                <InputField label="Apt, Suite, etc." name="address1" placeholder="Apt, Suite, etc." value={formData.address1} onChange={handleChange} />
                             </div>
                             <div className="flex gap-2">
-                                <InputField label="Town/City" name="townCity" placeholder="Town/City" value={formData.townCity} onChange={handleChange} />
-                                <SelectField label="Country" name="country" value={formData.country} options={[{value: "LK", label: "Sri Lanka"}]} onChange={handleChange} disabled={true} />
+                                <InputField label="Town/City" name="city" placeholder="Town/City" value={formData.city} onChange={handleChange} />
+                                <SelectField label="Country" name="country" value={formData.country} options={[{ value: "LK", label: "Sri Lanka" }]} onChange={handleChange} disabled={true} />
                             </div>
                             <div className="flex gap-2">
-                                <InputField label="Postcode/ZIP" name="postcodeZip" placeholder="Postcode/ZIP" value={formData.postcodeZip} onChange={handleChange} />
+                                <InputField label="Postcode/ZIP" name="postcode" placeholder="Postcode/ZIP" value={formData.postcode} onChange={handleChange} />
                                 <SelectField label="State" name="state" value={formData.state} options={SRI_LANKAN_STATES.map(state => ({ value: state, label: state }))} onChange={handleChange} />
                             </div>
                             <div>
@@ -117,12 +130,18 @@ const ShippingForm: FC = () => {
                             </div>
                         </div>
                     </div>
+                    <Checkbox
+                        defaultChecked={saveBothAddresses}
+                        name="save for both addresses"
+                        label="Include this in the billing as well"
+                        onChange={() => setSaveBothAddresses(!saveBothAddresses)}
+                    />
                     <ButtonPrimary type="submit" className="mt-4">Save Shipping Address</ButtonPrimary>
                 </form>
             </div>
         </div>
     );
-    
+
 };
 
 export default ShippingForm;
