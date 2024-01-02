@@ -131,130 +131,140 @@ const ShippingAddress: FC<Props> = ({
             Change
           </ButtonSecondary>
         </div>
-        <div
-          className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${isActive ? "block" : "hidden"
-            }`}
-        >
-          {/* ============ */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
-            <div>
-              <Label className="text-sm capitalize ">first name</Label>
-              <Input
-                className="mt-1.5 capitalize"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-              />
+        <form onSubmit={() => {
+          const shippingAddressData = {
+            firstName,
+            lastName,
+            address,
+            apartment,
+            city,
+            state,
+            postal,
+            country,
+            addressType
+          };
+          updateFormData("shippingAddress", shippingAddressData);
+          setIsConfirmed(true);
+          onCloseActive();
+        }}>
+          <div
+            className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${isActive ? "block" : "hidden"
+              }`}
+          >
+            {/* ============ */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
+              <div>
+                <Label className="text-sm capitalize ">first name</Label>
+                <Input
+                  className="mt-1.5 capitalize"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <Label className="text-sm">Last name</Label>
+                <Input
+                  className="mt-1.5 capitalize"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                  
+                />
+              </div>
             </div>
-            <div>
-              <Label className="text-sm">Last name</Label>
-              <Input
-                className="mt-1.5 capitalize"
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-              />
-            </div>
-          </div>
 
-          {/* ============ */}
-          <div className="sm:flex space-y-4 sm:space-y-0 sm:space-x-3">
-            <div className="flex-1">
-              <Label className="text-sm">Address</Label>
-              <Input
-                className="mt-1.5 capitalize"
-                placeholder=""
-                name="address1"
-                value={address}
-                type={"text"}
-                onChange={(e) => setAddress(e.target.value)}
-              />
+            {/* ============ */}
+            <div className="sm:flex space-y-4 sm:space-y-0 sm:space-x-3">
+              <div className="flex-1">
+                <Label className="text-sm">Address</Label>
+                <Input
+                  className="mt-1.5 capitalize"
+                  placeholder=""
+                  name="address1"
+                  value={address}
+                  type={"text"}
+                  onChange={(e) => setAddress(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="sm:w-1/3">
+                <Label className="text-sm ">Apt, Suite *</Label>
+                <Input
+                  className="mt-1.5 capitalize"
+                  value={apartment}
+                  onChange={(e) => setApartment(e.target.value)}
+                  required
+                />
+              </div>
             </div>
-            <div className="sm:w-1/3">
-              <Label className="text-sm ">Apt, Suite *</Label>
-              <Input
-                className="mt-1.5 capitalize"
-                value={apartment}
-                onChange={(e) => setApartment(e.target.value)}
-              />
-            </div>
-          </div>
 
-          {/* ============ */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
-            <div>
-              <Label className="text-sm   ">City</Label>
-              <Input
-                className="mt-1.5  normal-case  "
-                value={city}
-                onChange={(e) => setCity(e.target.value)}
-              />
+            {/* ============ */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
+              <div>
+                <Label className="text-sm   ">City</Label>
+                <Input
+                  className="mt-1.5  normal-case  "
+                  value={city}
+                  onChange={(e) => setCity(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <Label className="text-sm">Country</Label>
+                <Select
+                  value="LK"
+                  className="mt-1.5 capitalize"
+
+
+                  placeholder="SRI LANKA"
+                  onChange={(e) => setCountry(e.target.value)}
+                  disabled={true}
+                >
+                  <option value="Sri Lanka">Sri Lanka</option>
+                </Select>
+              </div>
             </div>
-            <div>
-              <Label className="text-sm">Country</Label>
-              <Select
-                value="LK"
-                className="mt-1.5 capitalize"
-                 
-                
-                placeholder="SRI LANKAJ"
-                onChange={(e) => setCountry(e.target.value)}
-                disabled={true}
+
+            {/* ============ */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
+              <div>
+                <Label className="text-sm">State/Province</Label>
+                <Input
+                  className="mt-1.5 capitalize"
+                  required
+                  value={state}
+                  onChange={(e) => setState(e.target.value)}
+                />
+              </div>
+              <div>
+                <Label className="text-sm">Postal code</Label>
+                <Input
+                  className="mt-1.5 capitalize"
+                  required
+                  value={postal}
+                  onChange={(e) => setPostal(e.target.value)}
+                />
+              </div>
+            </div>
+
+            {/* ============ */}
+
+
+            {/* ============ */}
+            <div className="flex flex-col sm:flex-row pt-6">
+              <ButtonPrimary
+                className="sm:!px-7 shadow-none"
+                onClick={() => {
+
+                }}
               >
-                <option value="Sri Lanka">Sri Lanka</option>
-              </Select>
+                Save and next to Payment
+              </ButtonPrimary>
+
             </div>
           </div>
-
-          {/* ============ */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
-            <div>
-              <Label className="text-sm">State/Province</Label>
-              <Input
-                className="mt-1.5 capitalize"
-                 
-                value={state}
-                onChange={(e) => setState(e.target.value)}
-              />
-            </div>
-            <div>
-              <Label className="text-sm">Postal code</Label>
-              <Input
-                className="mt-1.5 capitalize"
-                 
-                value={postal}
-                onChange={(e) => setPostal(e.target.value)}
-              />
-            </div>
-          </div>
-
-          {/* ============ */}
-     
-
-          {/* ============ */}
-          <div className="flex flex-col sm:flex-row pt-6">
-            <ButtonPrimary
-              className="sm:!px-7 shadow-none"
-              onClick={() => {
-                const shippingAddressData = {
-                  firstName,
-                  lastName,
-                  address,
-                  apartment,
-                  city,
-                  state,
-                  postal,
-                  country,
-                  addressType
-                };
-                updateFormData("shippingAddress", shippingAddressData);
-                setIsConfirmed(true);
-                onCloseActive();
-              }}
-            >
-              Save and next to Payment
-            </ButtonPrimary>
-           
-          </div>
-        </div>
+        </form>
       </div>
     );
   };
