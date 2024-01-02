@@ -176,7 +176,7 @@ const ProductCard: FC<ProductCardProps> = ({
 
                 {stockStatus === 'IN_STOCK' ?
                     <>
-                        {type === 'SIMPLE' &&
+                        {(type === 'SIMPLE' && price && price?.length > 0) &&
                             <ButtonPrimary
                                 className="shadow-lg"
                                 fontSize="text-xs"
@@ -189,7 +189,7 @@ const ProductCard: FC<ProductCardProps> = ({
                                 ) : (
                                     <ShoppingCart className='w-4' />
                                 )}
-                                <span className="ml-1">Add to Cart</span>
+                                <span className="ml-2">Add</span>
                             </ButtonPrimary>
                         }
 
@@ -230,15 +230,15 @@ const ProductCard: FC<ProductCardProps> = ({
 
     return (
         <div
-            className={`nc-ProductCard relative flex flex-col bg-white p-2 rounded-3xl group ${className}`}
+            className={`nc-ProductCard relative flex flex-col bg-white rounded-3xl p-2 group ${className}`}
             data-nc-id="ProductCard"
             onMouseEnter={handleHover}
             onMouseLeave={handleHoverOut}
         >
-            <div className="relative flex-shrink-0 bg-slate-50 dark:bg-slate-300 rounded-3xl overflow-hidden ">
+            <div className="relative flex-shrink-0 bg-slate-50 rounded-3xl dark:bg-slate-300 overflow-hidden ">
 
                 <Link href={link}>
-                    <div style={sliderStyle}>
+                    <div className='flex items-center justify-center h-[150px] sm:h-[250px]' >
                         {variations?.edges && variations.edges.some((variation: {
                             node: ProductVariation
                         }) => variation.node?.image?.sourceUrl) ? (
@@ -261,7 +261,7 @@ const ProductCard: FC<ProductCardProps> = ({
                                 height={300}
                                 src={image?.sourceUrl || ''}
                                 alt={name || ''}
-                                className="object-contain w-auto h-full mx-auto my-auto"
+                                className="object-cover object-center h-[150px] sm:h-[250px] mx-auto my-auto rounded-3xl"
                             />
                         )}
                     </div>

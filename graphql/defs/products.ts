@@ -348,6 +348,17 @@ query GetBrandDetails($slug: [String]) {
   }
 }
 `
+export const GET_TECH_SPEC = gql`
+query techspec ($productId: ID!) {
+  product(id: $productId, idType: DATABASE_ID) {
+    id
+    name
+    metaData(key: "tech_spec") {
+      id
+      value
+    }
+  }
+}`
 
 export const GET_NEW_ARRIVALS = gql`
     query GET_NEW_ARRIVALS {
