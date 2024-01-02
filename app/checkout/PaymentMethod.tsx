@@ -91,13 +91,13 @@ const PaymentMethod: FC<Props> = ({
             </p>
             <ul className="mt-3.5 text-sm text-slate-500 dark:text-slate-400 space-y-2">
               <li>
-                <h3 className="text-base text-slate-800 dark:text-slate-200 font-semibold mb-1">
+                {/* <h3 className="text-base text-slate-800 dark:text-slate-200 font-semibold mb-1">
                   {gateway.title}
-                </h3>
+                </h3> */}
               </li>
               <li>
                 <span className="text-slate-900 dark:text-slate-200 font-medium">
-                  {gateway.description}
+                   <span dangerouslySetInnerHTML={{ __html: gateway.description }} />
                 </span>
               </li>
             </ul>

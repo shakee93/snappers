@@ -9,13 +9,14 @@ import { useSession } from '@/context/SessionProvider';
 import { GET_CHECKOUT_USER_DETAILS } from '@/graphql/defs/order';
 import { Customer, CustomerAddress } from '@/graphql/types/graphql';
 import { contactInformation } from '@/data/types';
+import BillingAddress from './BillingAddress';
 
 
 
 
 interface CheckoutLeftProps {
-    tabActive: "ContactInfo" | "ShippingAddress" | "PaymentMethod";
-    setTabActive: (value: "ContactInfo" | "ShippingAddress" | "PaymentMethod") => void;
+    tabActive: "ContactInfo" | "ShippingAddress" | "PaymentMethod" | "BillingAddress";
+    setTabActive: (value: "ContactInfo" | "ShippingAddress" | "BillingAddress" |  "PaymentMethod") => void;
     handleScrollToEl: (id: string) => void;
     updateFormData: (section: string, data: any) => void;
     paymentGateways: any[];
@@ -29,6 +30,12 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({ tabActive, setTabActive,
     const [shippingDetails, setShippingDetails] = useState<CustomerAddress | null>(null);
     const [initContactInformation, setInitContactInformation ] = useState<contactInformation | null>(null);
 
+    const [isBillingSameAsShipping, setIsBillingSameAsShipping] = useState(false);
+
+    const handleCheckboxChange = () => {
+      setIsBillingSameAsShipping((prevValue) => !prevValue);
+    };
+    
     useEffect(() => {
         if (data) {
             const { displayName, email, shipping } = data.customer as Customer;
@@ -77,14 +84,41 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({ tabActive, setTabActive,
                         handleScrollToEl("ShippingAddress");
                     }}
                     onCloseActive={() => {
-                        setTabActive("PaymentMethod");
-                        handleScrollToEl("PaymentMethod");
+                        setTabActive("BillingAddress");
+                        handleScrollToEl("BillingAddress");
                     }}
                     updateFormData={(section, data) => {
                         updateFormData(section, data);
                     }}
                     initialData={shippingDetails!}
                 />
+            </div>
+
+            <label>
+        <input
+          type="checkbox"
+          checked={isBillingSameAsShipping}
+          onChange={handleCheckboxChange}
+        />
+        Billing address is the same as shipping address
+      </label>
+
+            <div id="BillingAddress" className="scroll-mt-24">
+            {!isBillingSameAsShipping && ( <BillingAddress
+          isActive={tabActive === "BillingAddress"}
+          onOpenActive={() => {
+            setTabActive("BillingAddress");
+            handleScrollToEl("BillingAddress");
+          }}
+          onCloseActive={() => {
+            setTabActive("PaymentMethod");
+            handleScrollToEl("PaymentMethod");
+          }}
+          updateFormData={(section, data) => {
+            updateFormData(section, data);
+          }}
+          initialData={shippingDetails}
+        /> )}
             </div>
 
             <div id="PaymentMethod" className="scroll-mt-24">
