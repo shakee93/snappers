@@ -12,7 +12,7 @@ const UserDetails = () => {
       // Redirect to the login page if customer is not found
       router.push('/login');
     }
-  }, [customer]);
+  }, []);
 
   const displayName = customer?.displayName || "";
   const email = customer?.email || "";
