@@ -9,7 +9,6 @@ import 'react-inner-image-zoom/lib/InnerImageZoom/styles.min.css';
 interface ProductImageProps {
     product: SimpleProduct | VariableProduct
 }
-
 const ProductImage = ({
     product,
 }: ProductImageProps) => {
