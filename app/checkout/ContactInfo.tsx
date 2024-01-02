@@ -23,6 +23,7 @@ const ContactInfo: FC<Props> = ({
 }) => {
   const [phone, setPhone] = useState("+94");
   const [email, setEmail] = useState("");
+  const [isConfirmed, setIsConfirmed] = useState(false);
 
   useEffect(() => {
     if (initialData) {
@@ -147,24 +148,23 @@ const ContactInfo: FC<Props> = ({
             <ButtonPrimary
               className="sm:!px-7 shadow-none"
               onClick={() => {
-                const contactInfo = {
-                  phone,
-                  email,
-                };
-                updateFormData("contactInfo", contactInfo);
-                setPhone(initialData?.phone);
-                setEmail(initialData?.email);
-                onCloseActive();
+                if (phone && email) {
+                  const contactInfo = {
+                    phone,
+                    email,
+                  };
+                  updateFormData("contactInfo", contactInfo);
+                  setPhone(initialData?.phone);
+                  setEmail(initialData?.email);
+                  setIsConfirmed(true);
+                  onCloseActive();
+                } else {
+                  setIsConfirmed(false);
+                }
               }}
             >
               Save and next to Shipping
             </ButtonPrimary>
-            <ButtonSecondary
-              className="mt-3 sm:mt-0 sm:ml-3"
-              onClick={() => onCloseActive()}
-            >
-              Cancel
-            </ButtonSecondary>
           </div>
         </div>
       </div>

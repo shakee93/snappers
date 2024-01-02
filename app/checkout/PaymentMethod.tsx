@@ -35,6 +35,8 @@ const PaymentMethod: FC<Props> = ({
     title: null,
   });
 
+  const [isConfirmed, setIsConfirmed] = useState(false);
+
   const PaymentMethods = (gateway: PaymentGateway) => {
 
     const active = methodActive === gateway.id;
@@ -214,6 +216,7 @@ const PaymentMethod: FC<Props> = ({
                   selectedGateway
                 };
                 updateFormData("paymentMethod", paymethod);
+                setIsConfirmed(true);
                 onCloseActive();
               }}
             >

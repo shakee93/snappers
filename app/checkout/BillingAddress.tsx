@@ -32,6 +32,8 @@ const BillingAddress: FC<Props> = ({
   const [country, setCountry] = useState("");
   const [addressType, setAddressType] = useState("home");
 
+  const [isConfirmed, setIsConfirmed] = useState(false);
+
   useEffect(() => {
     if (initialData) {
       setFirstName(initialData.firstName || "");
@@ -244,17 +246,12 @@ const BillingAddress: FC<Props> = ({
                   addressType
                 };
                 updateFormData("billingAddress", billingAddressData);
+                setIsConfirmed(true);
                 onCloseActive();
               }}
             >
               Save and next to Payment
             </ButtonPrimary>
-            <ButtonSecondary
-              className="mt-3 sm:mt-0 sm:ml-3"
-              onClick={onCloseActive}
-            >
-              Cancel
-            </ButtonSecondary>
           </div>
         </div>
       </div>
