@@ -4,6 +4,8 @@ import {Brand, ProductCategory} from "@/graphql/types/graphql";
 import CategoryDropdown from "./CategryDropdown";
 import {useEffect, useRef, useState} from "react";
 import {ChevronLeft, ChevronRight} from "lucide-react";
+import {usePathname} from "next/navigation";
+import {twMerge} from "tailwind-merge";
 
 
 interface BrandBarProps {
@@ -15,6 +17,7 @@ const BrandBar = ({ brands, categories}: BrandBarProps) => {
 
   const ref = useRef<HTMLDivElement>(null)
   const [scrolled, setScrollPosition] = useState(0)
+  const path = usePathname()
 
   // Function to handle the scroll event
   const handleScroll = () => {
@@ -68,7 +71,10 @@ const BrandBar = ({ brands, categories}: BrandBarProps) => {
             <Link
               key={index}
               href={`/${brand.slug}`}
-              className="flex-1 hover:text-white hover:bg-primaryColor px-4 whitespace-nowrap py-4 uppercase text-center font-medium text-gray-700 tracking-wide text-sm border-l"
+              className={twMerge(
+                  "flex-1 hover:text-white hover:bg-primaryColor px-4 whitespace-nowrap py-4 uppercase text-center font-medium text-gray-700 tracking-wide text-sm border-l",
+                  path === `/${brand.slug}` && 'bg-primaryColor text-white'
+              )}
             >
               {brand.name}
             </Link>
