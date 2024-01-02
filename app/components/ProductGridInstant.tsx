@@ -15,20 +15,21 @@ interface ProductGridProps {
 }
 const ProductGridInstant = ({ products, brand, category }: ProductGridProps) => {
     const { hits, results } = useHits()
+    const [_status, setStatus] = useState('')
     // const { status: statusState } = useInstantSearch();
     // useEffect(() => {
-    //     // console.log(status, hits);
-    // }, [status])
+    //     setStatus(statusState)
+    // }, [statusState])
 
     const status = 'x'
 
     const grid = 8;
 
     return (
-        <div>
-            <div className="flex-1 grid  sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10">
+        <>
+            <div className="flex-1 grid  grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-5 lg:gap-x-8 lg:gap-y-10">
 
-                {['loading', 'stalled'].includes(status)  ?
+                {['loading'].includes(_status)  ?
                      <>
                          {Array(grid).fill(null).map((x, index) =>
                              <div key={index} className="space-y-3">
@@ -56,7 +57,7 @@ const ProductGridInstant = ({ products, brand, category }: ProductGridProps) => 
                 </>
             }
 
-        </div>
+        </>
 
     );
 };

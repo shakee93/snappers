@@ -30,7 +30,6 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({ tabActive, setTabActive,
     const [initContactInformation, setInitContactInformation ] = useState<contactInformation | null>(null);
 
     useEffect(() => {
-        console.log('data', data);
         if (data) {
             const { displayName, email, shipping } = data.customer as Customer;
             setInitContactInformation({

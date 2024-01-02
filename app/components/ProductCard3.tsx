@@ -26,13 +26,7 @@ import {
 } from "@/graphql/types/graphql";
 import AddedToCart from "@/app/components/Notifications/added-to-cart";
 import { useCart } from "@/context/CartProvider";
-import {
-  ExternalLink,
-  List,
-  MenuSquare,
-  MoreHorizontal,
-  MoreVertical,
-} from "lucide-react";
+import {ExternalLink, List, MenuSquare, MoreHorizontal, MoreVertical, XIcon} from "lucide-react";
 import AttributeIcon from "@/app/components/AttributeIcon";
 
 export interface ProductCardProps {
@@ -50,389 +44,305 @@ const ProductCard: FC<ProductCardProps> = ({
     name,
     price,
     type,
-    image,
-    attributes,
-    productCategories,
-    slug,
-    stockStatus,
-    variations,
-    regularPrice,
-    brands,
-    reviewCount,
-    averageRating,
-    featured,
-    salePrice,
-    databaseId,
+    purchasable,
+        image,
+        attributes,
+        productCategories,
+        slug, stockStatus,
+        variations,
+        regularPrice,
+        brands,
+        reviewCount,
+        averageRating, featured,
+        salePrice, databaseId,
   } = data;
 
-  const [showModalQuickView, setShowModalQuickView] = useState(false);
+    const [showModalQuickView, setShowModalQuickView] = useState(false);
 
-  const [loading, setLoading] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const [currentVariation, setCurrentVariation] = useState(0);
-  const hoverIntervalRef = useRef<number | null>(null);
-  const delayBeforeNextImage = 1000;
-  const link = useProductLink(data);
 
-  useEffect(() => {
-    return () => {
-      if (hoverIntervalRef.current !== null) {
-        clearInterval(hoverIntervalRef.current);
-      }
-    };
-  }, []);
+    const [isHovered, setIsHovered] = useState(false);
+    const [currentVariation, setCurrentVariation] = useState(0);
+    const hoverIntervalRef = useRef<number | null>(null);
+    const [loading, setLoading] = useState(false)
 
-  // console.log('product card', data)
+    const delayBeforeNextImage = 1000;
+    const link = useProductLink(data)
 
-  /* Slider Start */
-
-  const startSlider = () => {
-    hoverIntervalRef.current = window.setInterval(() => {
-      setCurrentVariation(
-        (prev) => (prev + 1) % (variations?.edges?.length || 1)
-      );
-    }, delayBeforeNextImage);
-  };
-
-  const handleHover = () => {
-    setIsHovered(true);
-    startSlider();
-  };
-
-  const handleHoverOut = () => {
-    setIsHovered(false);
-    setCurrentVariation(0);
-    clearInterval(hoverIntervalRef.current!);
-  };
-
-  const handleCloseModalQuickView = () => {
-    setShowModalQuickView(true);
-  };
-
-  useEffect(() => {
-    if (showModalQuickView) {
-      handleHoverOut();
-    }
-  }, [showModalQuickView]);
-
-  // const variationImages = variations?.edges.map((variation: any) => variation.node.image.mediaItemUrl) || [];
-
-  const sliderStyle = {
-    display: "flex",
-    cursor: "pointer",
-    transition: "transform 0.3s ease-in-out",
-    transform: `translateX(-${currentVariation * 100}%)`,
-    height: `250px`,
-    backgroundColor: `#fefefe`,
-  };
-
-  /* End of Slider Code */
-
-  const [quantity, setQuantity] = useState(1);
-  const { addToCart } = useCart();
-
-  const notifyAddTocart = (quantity: number) => {
-    toast.custom(
-      (t: any) => (
-        <Transition
-          appear
-          show={t.visible}
-          className="p-4 max-w-md w-full bg-white dark:bg-slate-800 shadow-lg rounded-2xl pointer-events-auto ring-1 ring-black/5 dark:ring-white/10 text-slate-900 dark:text-slate-200"
-          enter="transition-all duration-150"
-          enterFrom="opacity-0 translate-x-20"
-          enterTo="opacity-100 translate-x-0"
-          leave="transition-all duration-150"
-          leaveFrom="opacity-100 translate-x-0"
-          leaveTo="opacity-0 translate-x-20"
-        >
-          <p className="block text-base font-semibold leading-none">
-            Added to cart!
-          </p>
-          <div className="border-t border-slate-200 dark:border-slate-700 my-4" />
-          <AddedToCart product={data} quantity={quantity} />
-        </Transition>
-      ),
-      { position: "top-right", id: "nc-product-notify", duration: 3000 }
-    );
-  };
-
-  const cartCompleted = () => {
-    notifyAddTocart(quantity);
-    setQuantity(1);
-  };
-
-  const handleAddToCart = async () => {
-    if (data.type === "SIMPLE" && data.stockStatus !== "IN_STOCK") {
-      return;
-    }
-
-    setLoading(true);
-    await addToCart(data.databaseId, quantity);
-    cartCompleted();
-    setLoading(false);
-  };
-
-  const renderProductCartOnNotify = () => {
-    return (
-      <div className="flex">
-        <div className="h-24 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
-          <Image
-            style={{ objectFit: "cover" }}
-            src={
-              variations?.edges[currentVariation]?.node?.image?.mediaItemUrl ||
-              image?.mediaItemUrl ||
-              ""
+    useEffect(() => {
+        return () => {
+            if (hoverIntervalRef.current !== null) {
+                clearInterval(hoverIntervalRef.current);
             }
-            alt={name || ""}
-            width={280}
-            height={305}
-            className="h-full w-full object-cover object-center"
-          />
-        </div>
+        };
+    }, []);
 
-        <div className="ml-4 flex flex-1 flex-col">
-          <div>
-            <div className="flex justify-between">
-              <div>
-                <h3 className="text-base font-medium ">{name}</h3>
-                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-                  <span>{data.name}</span>
-                  <span className="mx-2 border-l border-slate-200 dark:border-slate-700 h-4"></span>
-                  {/* Omitted the size span */}
-                </p>
-              </div>
-              <Prices
-                price={price}
-                salePrice={regularPrice}
-                className="mt-0.5"
-              />
-            </div>
-          </div>
-          <div className="flex flex-1 items-end justify-between text-sm">
-            <p className="text-gray-500 dark:text-slate-400">Qty 1</p>
-            <div className="flex">
-              <Link
-                href={"/cart"}
-                className="font-medium text-primary-6000 dark:text-primary-500 "
-              >
-                View cart
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  };
+    // console.log('product card', data)
 
-  const renderVariants = () => {
-    if (data.type !== "VARIABLE" || !variations || !variations.edges.length) {
-      return null;
-    } else {
-      return (
-        <div className="flex space-x-1">
-          {variations.edges.map(
-            (
-              variation: {
-                node: ProductVariation;
-              },
-              index
-            ) => (
-              <div
-                key={index}
-                onClick={() => setCurrentVariation(index)}
-                className={`relative w-6 h-6 rounded-full overflow-hidden z-10 border cursor-pointer ${
-                  currentVariation === index
-                    ? "border-primaryColor"
-                    : "border-transparent"
-                }`}
-                title={variation.node.name || ""}
-              >
-                <div
-                  className="absolute inset-0.5 rounded-full z-0"
-                  style={{
-                    backgroundColor: "var(--your-variant-color-property)",
-                  }}
-                ></div>
-              </div>
-            )
-          )}
-        </div>
-      );
-    }
-  };
+    /* Slider Start */
 
-  const renderGroupButtons = () => {
-    return (
-      <div className="absolute bottom-4 inset-x-1 flex justify-center opacity-100 visible transition-all">
-        {stockStatus === "IN_STOCK" ? (
-          <>
-            {type === "SIMPLE" && (
-              <ButtonPrimary
-                disabled={loading}
-                className="shadow-lg"
-                fontSize="text-xs"
-                sizeClass="py-3.5 px-5"
-                onClick={handleAddToCart}
-              >
-                {/* <BagIcon className="w-3.5 h-3.5 mb-0.5" /> */}
-                {loading ? (
-                  <Loader className="animate-spin" />
-                ) : (
-                  <ShoppingCart />
-                )}
-                <span className="ml-1">Add to Cart</span>
-              </ButtonPrimary>
-            )}
+    const startSlider = () => {
+        hoverIntervalRef.current = window.setInterval(() => {
+            setCurrentVariation((prev) => (prev + 1) % (variations?.edges?.length || 1));
+        }, delayBeforeNextImage);
+    };
 
-            {type === "VARIABLE" && (
-              <Link href={link}>
-                <ButtonPrimary
-                  className="shadow-lg"
-                  fontSize="text-xs"
-                  sizeClass="py-3.5 px-5"
+    const handleHover = () => {
+        setIsHovered(true);
+        startSlider();
+    };
+
+    const handleHoverOut = () => {
+        setIsHovered(false);
+        setCurrentVariation(0);
+        clearInterval(hoverIntervalRef.current!);
+    };
+
+
+    const handleCloseModalQuickView = () => {
+        setShowModalQuickView(true);
+    };
+
+    useEffect(() => {
+        if (showModalQuickView) {
+            handleHoverOut();
+        }
+    }, [showModalQuickView]);
+
+    // const variationImages = variations?.edges.map((variation: any) => variation.node.image.mediaItemUrl) || [];
+
+    const sliderStyle = {
+        display: 'flex',
+        cursor: 'pointer',
+        transition: 'transform 0.3s ease-in-out',
+        transform: `translateX(-${currentVariation * 100}%)`,
+        height: `250px`,
+        backgroundColor: `#fefefe`
+    };
+
+    /* End of Slider Code */
+
+    const [quantity, setQuantity] = useState(1)
+    const { addToCart } = useCart()
+
+    const notifyAddTocart = (quantity: number) => {
+        toast.custom(
+            (t: any) => (
+                <Transition
+                    appear
+                    show={t.visible}
+                    className="p-4 max-w-md w-full bg-white dark:bg-slate-800 shadow-lg rounded-2xl pointer-events-auto ring-1 ring-black/5 dark:ring-white/10 text-slate-900 dark:text-slate-200"
+                    enter="transition-all duration-150"
+                    enterFrom="opacity-0 translate-x-20"
+                    enterTo="opacity-100 translate-x-0"
+                    leave="transition-all duration-150"
+                    leaveFrom="opacity-100 translate-x-0"
+                    leaveTo="opacity-0 translate-x-20"
                 >
-                  <AttributeIcon
-                    className="w-4 mr-1"
-                    name={attributes?.nodes[0].name}
-                  />
-                  <span className="ml-1">
-                    Choose {attributes?.nodes[0].label || "Options"}
-                  </span>
-                </ButtonPrimary>
-              </Link>
-            )}
-          </>
-        ) : (
-          <Link href={link}>
-            <ButtonPrimary
-              className="shadow-lg bg-zinc-500"
-              fontSize="text-xs"
-              sizeClass="py-3.5 px-5"
-            >
-              <ExternalLink className="w-3.5 h-3.5 mb-0.5" />
-              <span className="ml-1">Out of Stock</span>
-            </ButtonPrimary>
-          </Link>
-        )}
-      </div>
-    );
-  };
+                    <div className="flex items-center w-full justify-between text-base font-semibold leading-none">
+                        Added to cart! <button onClick={e => toast.dismiss('nc-product-notify')}><XIcon/></button>
+                    </div>
+                    <div className="border-t border-slate-200 dark:border-slate-700 my-4" />
+                    <AddedToCart product={data} quantity={quantity} />
+                </Transition>
+            ),
+            { position: "top-right", id: "nc-product-notify", duration: 3000 }
+        );
+    };
 
-  return (
-    <div
-      className={`nc-ProductCard relative flex flex-col bg-white p-2 rounded-3xl group ${className}`}
-      data-nc-id="ProductCard"
-      onMouseEnter={handleHover}
-      onMouseLeave={handleHoverOut}
-    >
-      <div className="relative flex-shrink-0 bg-slate-50 dark:bg-slate-300 rounded-3xl overflow-hidden ">
-        <Link href={link}>
-          <div style={sliderStyle}>
-            {variations?.edges &&
-            variations.edges.some(
-              (variation: { node: ProductVariation }) =>
-                variation.node?.image?.sourceUrl
-            ) ? (
-              variations.edges.map(
-                (
-                  variation: {
-                    node: ProductVariation;
-                  },
-                  index
-                ) => (
-                  <div
-                    key={index}
-                    className="w-full flex-shrink-0 bg-[#fefefe]"
-                  >
-                    <Image
-                      src={variation?.node?.image?.sourceUrl || ""}
-                      width={300}
-                      height={300}
-                      alt={name || ""}
-                      className="object-contain w-auto h-full mx-auto my-auto"
-                    />
-                  </div>
-                )
-              )
-            ) : (
-              <Image
-                width={300}
-                height={300}
-                src={image?.sourceUrl || ""}
-                alt={name || ""}
-                className="object-contain w-auto h-full mx-auto my-auto"
-              />
-            )}
-          </div>
-        </Link>
+    const cartCompleted = () => {
+        notifyAddTocart(quantity)
+        setQuantity(1)
+    }
 
-        {/* <ProductStatus status={stockStatus} /> */}
+    const handleAddToCart = async () => {
+        // console.log(data.databaseId);
+        if (data.databaseId) {
+            addToCart(data.databaseId, quantity)?.then(cartCompleted);
+        } else {
+            notifyAddTocart(1);
+        }
+        setLoading(true);
+        await addToCart(data.databaseId, quantity);
+        cartCompleted();
+        setLoading(false);
+    };
 
-        <div
-          className={"absolute top-3 right-3 z-10"}
-          onClick={(e) => handleCloseModalQuickView()}
-        >
-          <ArrowsPointingOutIcon className="w-5" />
-          {/*<LikeButton liked={isLiked} className="" />*/}
-        </div>
 
-        {/* {sizes ? renderSizeList() : renderGroupButtons()} */}
-        {renderGroupButtons()}
-      </div>
 
-      <div className="space-y-2 px-2.5 pt-5 pb-2.5">
-        {/* {renderVariants()} */}
+    const renderGroupButtons = () => {
+        return (
+            <div className="flex justify-center opacity-100 visible transition-all">
 
-        <div>
-          <h2
-            className={`nc-ProductCard__title  text-sm lg:text-base text-black line-clamp-2 min-h-[40px] lg:min-h-[47px] font-semibold transition-colors whitespace-normal`}
-          >
-            {name}
-          </h2>
-          <div
-            className={`nc-ProductCard__title text-xs lg:text-sm text-black line-clamp-2 min-h-[20px] lg:min-h-[20px] text-slate-800`}
-          >
-            {brands?.nodes?.map((brand: Brand, index) => (
-              <Link href={`/${brand?.slug}`} key={index}>
-                {brand?.name}
-              </Link>
-            ))}
-            {/*- {type} - {databaseId}*/}
-          </div>
-        </div>
 
-        <div className="flex m-0 mb-2 justify-between items-center">
-          <Prices price={price} salePrice={regularPrice} />
-          {(salePrice === price || !salePrice) && !!reviewCount && (
-            <div className="flex items-center mb-0.5">
-              <StarIcon className="w-4 h-4 pb-[1px] text-amber-400" />
-              <span className="text-xs text-slate-500 dark:text-slate-400">
-                {averageRating ? (
-                  <>{averageRating.toFixed(1)}</>
-                ) : (
-                  <span className="mr-1">5</span>
-                )}
-                (
-                {reviewCount ? (
-                  <>
-                    {reviewCount} review{reviewCount > 1 ? "s" : ""}
-                  </>
-                ) : (
-                  "0 reviews"
-                )}
-                )
-              </span>
+                {stockStatus === 'IN_STOCK' ?
+                    <>
+                        {(type === 'SIMPLE' && price && price?.length > 0) &&
+                            <ButtonPrimary
+                                className="shadow-lg"
+                                fontSize="text-xs"
+                                sizeClass="py-2.5 px-5"
+                                onClick={handleAddToCart}
+                                disabled={loading}
+                            >
+                                {loading ? (
+                                    <Loader className="animate-spin w-4" />
+                                ) : (
+                                    <ShoppingCart className='w-4' />
+                                )}
+                                <span className="ml-2">Add</span>
+                            </ButtonPrimary>
+                        }
+
+                        {type === 'VARIABLE' &&
+                            <Link href={link}>
+                                <ButtonPrimary
+                                    className="shadow-lg"
+                                    fontSize="text-xs"
+                                    sizeClass="py-2.5 px-5"
+                                >
+                                    <AttributeIcon className='w-4 mr-1' name={attributes?.nodes[0].name}/>
+                                    <span className="ml-1">Choose {attributes?.nodes[0].label || "Options" }</span>
+                                </ButtonPrimary>
+                            </Link>
+                        }
+                    </> :
+
+                    <Link href={link}>
+                        <ButtonPrimary
+                            className="shadow-lg bg-zinc-500"
+                            fontSize="text-xs"
+                            sizeClass="py-3.5 px-5"
+                        >
+                            <ExternalLink className="w-3.5 h-3.5 mb-0.5"  />
+                            <span className="ml-1">Out of Stock</span>
+                        </ButtonPrimary>
+                    </Link>
+                }
+
+
+
             </div>
-          )}
+
+        );
+    };
+
+
+
+    return (
+        <div
+            className={`nc-ProductCard relative flex flex-col bg-white rounded-3xl p-2 group ${className}`}
+            data-nc-id="ProductCard"
+            onMouseEnter={handleHover}
+            onMouseLeave={handleHoverOut}
+        >
+            <div className="relative flex-shrink-0 bg-slate-50 rounded-3xl dark:bg-slate-300 overflow-hidden ">
+
+                <Link href={link}>
+                    <div className='flex items-center justify-center h-[150px] sm:h-[250px]' >
+                        {variations?.edges && variations.edges.some((variation: {
+                            node: ProductVariation
+                        }) => variation.node?.image?.sourceUrl) ? (
+                            variations.edges.map((variation: {
+                                node: ProductVariation
+                            }, index) => (
+                                <div key={index} className="w-full flex-shrink-0 bg-[#fefefe]">
+                                    <Image
+                                        src={variation?.node?.image?.sourceUrl || ''}
+                                        width={300}
+                                        height={300}
+                                        alt={name || ''}
+                                        className="object-contain w-auto h-full mx-auto my-auto"
+                                    />
+                                </div>
+                            ))
+                        ) : (
+                            <Image
+                                width={300}
+                                height={300}
+                                src={image?.sourceUrl || ''}
+                                alt={name || ''}
+                                className="object-cover object-center h-[150px] sm:h-[250px] mx-auto my-auto rounded-3xl"
+                            />
+                        )}
+                    </div>
+                </Link>
+
+
+                {/* <ProductStatus status={stockStatus} /> */}
+
+                <div className={"absolute top-3 cursor-pointer right-3 z-10"} onClick={e => handleCloseModalQuickView()}>
+                    <ArrowsPointingOutIcon className='w-5'/>
+                    {/*<LikeButton liked={isLiked} className="" />*/}
+                </div>
+
+                <div
+                    className={`absolute left-1.5 top-2 text-center text-xs lg:text-sm line-clamp-2 text-slate-800`}
+                >
+                    {brands?.nodes?.map((brand: Brand, index) => (
+                        <Link className='bg-zinc-100/70 px-2 py-1 rounded-lg' href={`/${brand?.slug}`} key={index}>{brand?.name}</Link>
+                    ))}
+                    {/*- {type} - {databaseId}*/}
+                </div>
+            </div>
+
+            <div className="space-y-2 px-2.5 pt-2 pb-2.5"
+
+            >
+
+                {/* {renderVariants()} */}
+
+
+                <div>
+                    {renderGroupButtons()}
+                </div>
+
+                <div>
+                    <h2
+                        className={`nc-ProductCard__title  text-xs lg:text-sm text-black line-clamp-2 font-semibold transition-colors whitespace-normal`}
+                    >
+                        {name}
+                    </h2>
+
+                </div>
+
+                <div className="flex m-0 mb-2 justify-between items-center">
+                    <Prices price={price} salePrice={regularPrice} />
+                    {((salePrice === price || !salePrice) && !!reviewCount) && (
+                        <div className="flex items-center mb-0.5">
+                            <StarIcon className="w-4 h-4 pb-[1px] text-amber-400" />
+                            <span className="text-xs text-slate-500 dark:text-slate-400">
+
+                                {averageRating ? (
+                                    <>{averageRating.toFixed(1)}</>
+                                ) : (
+                                    <span className="mr-1">5</span>
+                                )}
+                                (
+                                {reviewCount ? (
+                                    <>{reviewCount} review{reviewCount > 1 ? 's' : ''}</>
+                                ) : (
+                                    '0 reviews'
+                                )}
+                                )
+                            </span>
+                        </div>
+                    )}
+                </div>
+
+
+
+
+
+
+            </div>
+            < ModalQuickView
+                show={showModalQuickView}
+                onCloseModalQuickView={() => setShowModalQuickView(false)}
+                productData={data}
+            />
         </div>
-      </div>
-      <ModalQuickView
-        show={showModalQuickView}
-        onCloseModalQuickView={() => setShowModalQuickView(false)}
-        productData={data}
-      />
-    </div>
-  );
+
+    );
 };
 
 export default ProductCard;

@@ -91,7 +91,6 @@ const ShippingForm: FC = () => {
                     },
                 },
             });
-
             toast.success("Shipping address updated successfully");
         } catch (error: any) {
             toast.error("Error updating shipping address:", error);
@@ -132,8 +131,9 @@ const ShippingForm: FC = () => {
                     </div>
                     <Checkbox
                         defaultChecked={saveBothAddresses}
+                        className="mt-1.5"
                         name="save for both addresses"
-                        label="Include this in the billing as well"
+                        label="Include this in the shipping as well"
                         onChange={() => setSaveBothAddresses(!saveBothAddresses)}
                     />
                     <ButtonPrimary type="submit" className="mt-4">Save Shipping Address</ButtonPrimary>
