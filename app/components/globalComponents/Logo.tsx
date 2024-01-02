@@ -2,9 +2,9 @@ import Link from "next/link";
 import Image from "next/image";
 import SiteLogo from "@/public/global/logo.webp";
 
-const Logo = () => {
+const Logo = ({ className = 'border-r'}:{ className?: string}) => {
   return (
-    <Link href={"/"} className='border-r'>
+    <Link href={"/"} className={className}>
       <Image
         width={320}
         height={266}
