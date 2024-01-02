@@ -7,6 +7,7 @@ export const ProductContentSlice = gql`
         name
         slug
         type
+        purchasable 
         terms {
             nodes {
                 ... on Brand {

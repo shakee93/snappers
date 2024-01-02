@@ -1,6 +1,6 @@
 import { contactInformation } from "@/data/types";
 import Label from "components/Label/Label";
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Checkbox from "shared/Checkbox/Checkbox";
@@ -11,7 +11,7 @@ interface Props {
   onOpenActive: () => void;
   onCloseActive: () => void;
   updateFormData: (section: string, data: any) => void;
-  initialData: contactInformation
+  initialData: contactInformation;
 }
 
 const ContactInfo: FC<Props> = ({
@@ -19,16 +19,20 @@ const ContactInfo: FC<Props> = ({
   onCloseActive,
   onOpenActive,
   updateFormData,
-  initialData
+  initialData,
 }) => {
-
   const [phone, setPhone] = useState("+94");
   const [email, setEmail] = useState("");
   const [subscribeToNews, setSubscribeToNews] = useState(true);
 
+  useEffect(() => {
+    if (initialData) {
+      setPhone(initialData?.phone);
+      setEmail(initialData?.email);
+    }
+  }, [initialData]);
 
   const renderAccount = () => {
-
     return (
       <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden z-0">
         <div className="flex flex-col sm:flex-row items-start p-6 ">
@@ -80,8 +84,12 @@ const ContactInfo: FC<Props> = ({
               </svg>
             </h3>
             <div className="font-semibold mt-1 text-sm">
-              <span className="">{initialData?.displayName ?? "Your name"}</span>
-              <span className="ml-3 tracking-tighter">{initialData?.phone || "Your phone number"}</span>
+              <span className="">
+                {initialData?.displayName ?? "Your name"}
+              </span>
+              <span className="ml-3 tracking-tighter">
+                {initialData?.phone || "Your phone number"}
+              </span>
             </div>
           </div>
           <ButtonSecondary
@@ -94,25 +102,31 @@ const ContactInfo: FC<Props> = ({
           </ButtonSecondary>
         </div>
         <div
-          className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${isActive ? "block" : "hidden"
-            }`}
+          className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${
+            isActive ? "block" : "hidden"
+          }`}
         >
           <div className="flex justify-between flex-wrap items-baseline">
             <h3 className="text-lg font-semibold">Contact infomation</h3>
-            
-            <span className="block text-sm my-1 md:my-0">
-              Do not have an account?{` `}
-              <a href="##" className="text-primary-500 font-medium">
-                Log in
-              </a>
-            </span>
+
+            {!initialData?.displayName && (
+              <span className="block text-sm my-1 md:my-0">
+                Do not have an account?{` `}
+                <a href="##" className="text-primary-500 font-medium">
+                  Log in
+                </a>
+              </span>
+            )}
           </div>
           <div className="max-w-lg">
-            <Label className="text-sm">Your phone number</Label>
+            <Label className="text-sm">
+              Your phone number 
+            </Label>
             <Input
               className="mt-1.5"
-              defaultValue={initialData?.phone || "+94 "}
+              defaultValue={initialData?.phone}
               type={"tel"}
+              value={phone}
               onChange={(e) => setPhone(e.target.value)}
             />
           </div>
@@ -121,17 +135,9 @@ const ContactInfo: FC<Props> = ({
             <Input
               className="mt-1.5"
               defaultValue={initialData?.email || ""}
+              value={email}
               type={"email"}
               onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div>
-            <Checkbox
-              className="!text-sm"
-              name="uudai"
-              label="Email me news and offers"
-              defaultChecked={subscribeToNews}
-              onChange={() => setSubscribeToNews(!subscribeToNews)}
             />
           </div>
 
@@ -143,9 +149,11 @@ const ContactInfo: FC<Props> = ({
                 const contactInfo = {
                   phone,
                   email,
-                  subscribeToNews
+                  subscribeToNews,
                 };
                 updateFormData("contactInfo", contactInfo);
+                setPhone(initialData?.phone);
+                setEmail(initialData?.email);
                 onCloseActive();
               }}
             >

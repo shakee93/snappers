@@ -19,8 +19,8 @@ import { useSession } from "@/context/SessionProvider";
 import toast from "react-hot-toast";
 
 // Types and Interfaces
-import { Customer } from "@/graphql/types/graphql";
 import { InputField, SelectField } from "./HelperComps";
+import Checkbox from "@/shared/Checkbox/Checkbox";
 
 // Constants
 const SRI_LANKAN_STATES = [
@@ -33,11 +33,13 @@ const ShippingForm: FC = () => {
     const [getAddresses, { loading, data, error }] = useLazyQuery(GET_ADDRESSES, {
         fetchPolicy: 'no-cache'
     });
+    const [saveBothAddresses, setSaveBothAddresses] = useState(false);
+
     const [updateShipping] = useMutation(UPDATE_ADDRESS);
     const [formData, setFormData] = useState({
         firstName: "", lastName: "", country: "",
         address1: "", address2: "", city: "",
-        state: "western", postcode: "", phone: ""
+        state: "Western", postcode: "", phone: ""
     });
 
     useEffect(() => {
@@ -72,11 +74,23 @@ const ShippingForm: FC = () => {
                             state: formData.state,
                             postcode: formData.postcode,
                             phone: formData.phone,
-                        }
+                        },
+                        ...(saveBothAddresses && {
+                            billing: {
+                                firstName: formData.firstName,
+                                lastName: formData.lastName,
+                                address1: formData.address1,
+                                address2: formData.address2,
+                                city: formData.city,
+                                country: "LK",
+                                state: formData.state,
+                                postcode: formData.postcode,
+                                phone: formData.phone,
+                            }
+                        })
                     },
                 },
             });
-
             toast.success("Shipping address updated successfully");
         } catch (error: any) {
             toast.error("Error updating shipping address:", error);
@@ -100,11 +114,11 @@ const ShippingForm: FC = () => {
                             </div>
                             <div className="flex gap-2">
                                 <InputField label="Street Address" name="address2" placeholder="Street Address" value={formData.address2} onChange={handleChange} />
-                                <InputField  label="Apt, Suite, etc." name="address1" placeholder="Apt, Suite, etc." value={formData.address1} onChange={handleChange} />
+                                <InputField label="Apt, Suite, etc." name="address1" placeholder="Apt, Suite, etc." value={formData.address1} onChange={handleChange} />
                             </div>
                             <div className="flex gap-2">
                                 <InputField label="Town/City" name="city" placeholder="Town/City" value={formData.city} onChange={handleChange} />
-                                <SelectField label="Country" name="country" value={formData.country} options={[{value: "LK", label: "Sri Lanka"}]} onChange={handleChange} disabled={true} />
+                                <SelectField label="Country" name="country" value={formData.country} options={[{ value: "LK", label: "Sri Lanka" }]} onChange={handleChange} disabled={true} />
                             </div>
                             <div className="flex gap-2">
                                 <InputField label="Postcode/ZIP" name="postcode" placeholder="Postcode/ZIP" value={formData.postcode} onChange={handleChange} />
@@ -115,12 +129,19 @@ const ShippingForm: FC = () => {
                             </div>
                         </div>
                     </div>
+                    <Checkbox
+                        defaultChecked={saveBothAddresses}
+                        className="mt-1.5"
+                        name="save for both addresses"
+                        label="Include this in the shipping as well"
+                        onChange={() => setSaveBothAddresses(!saveBothAddresses)}
+                    />
                     <ButtonPrimary type="submit" className="mt-4">Save Shipping Address</ButtonPrimary>
                 </form>
             </div>
         </div>
     );
-    
+
 };
 
 export default ShippingForm;

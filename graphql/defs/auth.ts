@@ -113,6 +113,15 @@ export const GET_ACCOUNT_DETAILS = gql`
 }
 `;
 
+export const GET_DEFAULT_ACC_FOR_AVATAR = gql`
+   query getAccountDetails {
+      customer {
+        id
+        displayName
+  }
+}
+`;
+
 
 export const LOGIN_CUSTOMER_MUTATION = gql`
 mutation LoginCustomer($input: LoginInput!) {

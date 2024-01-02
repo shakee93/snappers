@@ -148,7 +148,7 @@ const ProductDetails = ({
                 </div>
             }
 
-            {(product.stockStatus !== 'IN_STOCK') &&
+            {(product.type === 'SIMPLE' && product.stockStatus !== 'IN_STOCK') &&
                 <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1">
                     Sold Out
                 </div>
