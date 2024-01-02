@@ -34,7 +34,21 @@ const ContactInfo: FC<Props> = ({
 
   const renderAccount = () => {
     return (
-      <form onSubmit={}>
+      <form  onSubmit={ ()=>{
+        if (phone && email) {
+          const contactInfo = {
+            phone,
+            email,
+          };
+          updateFormData("contactInfo", contactInfo);
+          setPhone(initialData?.phone);
+          setEmail(initialData?.email);
+          setIsConfirmed(true);
+          onCloseActive();
+        } else {
+          setIsConfirmed(false);
+        }
+      }}>
         <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden z-0">
           <div className="flex flex-col sm:flex-row items-start p-6 ">
             <span className="hidden sm:block">
@@ -148,21 +162,7 @@ const ContactInfo: FC<Props> = ({
               <ButtonPrimary
                 type="submit"
                 className="sm:!px-7 shadow-none"
-                onClick={() => {
-                  if (phone && email) {
-                    const contactInfo = {
-                      phone,
-                      email,
-                    };
-                    updateFormData("contactInfo", contactInfo);
-                    setPhone(initialData?.phone);
-                    setEmail(initialData?.email);
-                    setIsConfirmed(true);
-                    onCloseActive();
-                  } else {
-                    setIsConfirmed(false);
-                  }
-                }}
+           
               >
                 Save and next to Shipping
               </ButtonPrimary>
