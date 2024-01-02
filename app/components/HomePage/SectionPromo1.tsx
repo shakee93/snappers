@@ -13,24 +13,33 @@ import StoreImg1 from "public/store/GqMobiles-Buy-geniune-branded-eletronics-fro
 import StoreImg2 from "public/store/GqMobiles-Buy-geniune-branded-eletronics-from-GQMobiles-for-best-price-2-1.webp";
 import StoreImg3 from "public/store/GqMobiles-Buy-geniune-branded-eletronics-from-GQMobiles-for-best-price-3.webp";
 import StoreImg4 from "public/store/GqMobiles-Buy-geniune-branded-eletronics-from-GQMobiles-for-best-price-4-1.webp";
+import useEmblaCarousel from 'embla-carousel-react'
+import Autoplay from 'embla-carousel-autoplay'
+import StoreImageSlider from "./StoreImageSlide"
+import { EmblaOptionsType } from 'embla-carousel-react'
+
 
 export interface SectionPromo1Props {
   className?: string;
 }
-
+const OPTIONS: EmblaOptionsType = {}
+const SLIDE_COUNT = 4
+const SLIDES = Array.from(Array(SLIDE_COUNT).keys())
 const SectionPromo1: FC<SectionPromo1Props> = ({ className = "" }) => {
   const sliderImages = [StoreImg1, StoreImg2, StoreImg3, StoreImg4];
 
-  const settings = {
-    dots: false,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-    autoplay: true, // Enable autoplay
-    autoplaySpeed: 3000, // Set autoplay speed in milliseconds (e.g., 3000ms = 3 seconds)
-  };
+  // const settings = {
+  //   dots: false,
+  //   infinite: true,
+  //   speed: 500,
+  //   slidesToShow: 1,
+  //   slidesToScroll: 1,
+  //   autoplay: true, // Enable autoplay
+  //   autoplaySpeed: 3000, // Set autoplay speed in milliseconds (e.g., 3000ms = 3 seconds)
+  // };
+    const [emblaRef] = useEmblaCarousel({ loop: false }, [Autoplay()])
 
+    
   return (
     <div className="  bg-blue-100 flex flex-col justify-between p-12 lg:flex-row gap-5 lg:gap-3 rounded-3xl">
       <div className="lg:w-1/2 w-full gap-4 justify-center flex flex-col">
@@ -66,16 +75,7 @@ const SectionPromo1: FC<SectionPromo1Props> = ({ className = "" }) => {
         </div>
       </div>
       <div className="w-full lg:w-1/2 m-auto">
-        <Slider {...settings}>
-          {sliderImages.map((image, index) => (
-            <NcImage
-              key={index}
-              containerClassName=""
-              src={image}
-              className="rounded-3xl"
-            />
-          ))}
-        </Slider>
+        <StoreImageSlider slides={SLIDES} options={OPTIONS}/>
       </div>
       {/* <div
       className={`nc-SectionPromo1 lg:max-h-[400px]  flex flex-col  lg:flex-row items-center w-full ${className}`}
