@@ -149,7 +149,19 @@ const ContactInfo: FC<Props> = ({
                 type="submit"
                 className="sm:!px-7 shadow-none"
                 onClick={() => {
-                  
+                  if (phone && email) {
+                    const contactInfo = {
+                      phone,
+                      email,
+                    };
+                    updateFormData("contactInfo", contactInfo);
+                    setPhone(initialData?.phone);
+                    setEmail(initialData?.email);
+                    setIsConfirmed(true);
+                    onCloseActive();
+                  } else {
+                    setIsConfirmed(false);
+                  }
                 }}
               >
                 Save and next to Shipping
