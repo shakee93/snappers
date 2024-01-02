@@ -70,6 +70,8 @@ const Page = async ({ params }: any) => {
     } = await getData(params.slug, params.brand)
     const techValue = tech?.product.metaData[0]?.value;
     const techspecs = JSON.parse(techValue)
+    console.log('techspecs: jaka jaka', tech);
+
     console.log("techasdasd", tech.product)
     // console.log({product})
     return <div className='mt-5 md:mt-16'>
