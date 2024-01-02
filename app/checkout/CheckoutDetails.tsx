@@ -10,13 +10,14 @@ import { GET_CHECKOUT_USER_DETAILS } from "@/graphql/defs/order";
 import { Customer, CustomerAddress } from "@/graphql/types/graphql";
 import { contactInformation } from "@/data/types";
 import BillingAddress from "./BillingAddress";
+import Checkbox from "@/shared/Checkbox/Checkbox";
 
 interface CheckoutLeftProps {
   tabActive:
-  | "ContactInfo"
-  | "ShippingAddress"
-  | "PaymentMethod"
-  | "BillingAddress";
+    | "ContactInfo"
+    | "ShippingAddress"
+    | "PaymentMethod"
+    | "BillingAddress";
   setTabActive: (
     value:
       | "ContactInfo"
@@ -59,7 +60,6 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
       return !prevValue; // Toggle the checkbox state
     });
   };
-  
 
   useEffect(() => {
     if (data) {
@@ -123,14 +123,14 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
         />
       </div>
 
-      <label>
-        <input
-          type="checkbox"
-          checked={isBillingSameAsShipping}
+      <div className="mt-2">
+        <Checkbox
+          label=" Billing address is the same as shipping address"
+          name="checkbox"
+          defaultChecked={isBillingSameAsShipping}
           onChange={handleCheckboxChange}
         />
-        Billing address is the same as shipping address
-      </label>
+      </div>
 
       <div id="BillingAddress" className="scroll-mt-24">
         {!isBillingSameAsShipping && (

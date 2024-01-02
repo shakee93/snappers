@@ -8,10 +8,8 @@ const UserDetails = () => {
   const router = useRouter();
   useEffect(() => {
     fetchCustomer();
-    if (!customer) {
-      // Redirect to the login page if customer is not found
-      router.push('/login');
-    }
+
+    console.log("customer on userDetails", customer);
   }, []);
 
   const displayName = customer?.displayName || "";

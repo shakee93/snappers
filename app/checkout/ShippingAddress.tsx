@@ -31,7 +31,6 @@ const ShippingAddress: FC<Props> = ({
   const [postal, setPostal] = useState("");
   const [country, setCountry] = useState("");
   const [addressType, setAddressType] = useState("home");
-
   const [isConfirmed, setIsConfirmed] = useState(false);
 
   useEffect(() => {
@@ -47,7 +46,6 @@ const ShippingAddress: FC<Props> = ({
       setAddressType("home");
     }
   }, [initialData]);
-
 
   const renderShippingAddress = () => {
     return (
