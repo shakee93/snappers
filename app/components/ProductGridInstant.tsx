@@ -16,10 +16,10 @@ interface ProductGridProps {
 const ProductGridInstant = ({ products, brand, category }: ProductGridProps) => {
     const { hits, results } = useHits()
     const [_status, setStatus] = useState('')
-    const { status: statusState } = useInstantSearch();
-    useEffect(() => {
-        setStatus(statusState)
-    }, [statusState])
+    // const { status: statusState } = useInstantSearch();
+    // useEffect(() => {
+    //     setStatus(statusState)
+    // }, [statusState])
 
     const status = 'x'
 
