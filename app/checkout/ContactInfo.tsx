@@ -117,10 +117,9 @@ const ContactInfo: FC<Props> = ({
               </span>
             )}
           </div>
+          
           <div className="max-w-lg">
-            <Label className="text-sm">
-              Your phone number 
-            </Label>
+            <Label className="text-sm">Your phone number</Label>
             <Input
               className="mt-1.5"
               defaultValue={initialData?.phone}
@@ -129,6 +128,7 @@ const ContactInfo: FC<Props> = ({
               onChange={(e) => setPhone(e.target.value)}
             />
           </div>
+
           <div className="max-w-lg">
             <Label className="text-sm">Email address</Label>
             <Input
@@ -142,10 +142,7 @@ const ContactInfo: FC<Props> = ({
 
           {/* ============ */}
           <div className="flex flex-col sm:flex-row pt-6">
-            <ButtonPrimary
-              className="sm:!px-7 shadow-none"
-            
-            >
+            <ButtonPrimary className="sm:!px-7 shadow-none">
               Save and next to Shipping
             </ButtonPrimary>
             <ButtonSecondary
