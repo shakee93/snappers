@@ -88,10 +88,11 @@ const Page = async ({params}: any) => {
         tech: any;
     } = await getData(params.slug, params.brand);
     const techValue = tech?.product.metaData[0]?.value;
-    const techspecs = JSON.parse(techValue);
-    // console.log('techspecs: jaka jaka', tech);
+    const techspecs = JSON.parse(techValue)
 
-    // console.log("techasdasd", tech.product)
+    console.log('techspecs: jaka jaka', tech);
+    console.log("techasdasd", tech.product)
+    
     // console.log({product})
 
     const OPTIONS: EmblaOptionsType = {};

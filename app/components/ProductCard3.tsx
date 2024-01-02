@@ -30,7 +30,6 @@ import {ExternalLink, List, MenuSquare, MoreHorizontal, MoreVertical, XIcon} fro
 import AttributeIcon from "@/app/components/AttributeIcon";
 import {getBlurData} from "@/utils/blurPlaceholder";
 import {twMerge} from "tailwind-merge";
-import useNextBlurhash from "use-next-blurhash";
 
 export interface ProductCardProps {
   className?: string;
@@ -62,39 +61,15 @@ const ProductCard: FC<ProductCardProps> = ({
 
     const [showModalQuickView, setShowModalQuickView] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false)
-    const [blurDataUrl] = useNextBlurhash("LbQl,,D*_N-o%gtRn~RP.7xuRPRk");
-
 
     const [isHovered, setIsHovered] = useState(false);
     const [currentVariation, setCurrentVariation] = useState(0);
     const hoverIntervalRef = useRef<number | null>(null);
     const [loading, setLoading] = useState(false)
 
-    const delayBeforeNextImage = 1000;
     const link = useProductLink(data)
 
-    useEffect(() => {
-        return () => {
-            if (hoverIntervalRef.current !== null) {
-                clearInterval(hoverIntervalRef.current);
-            }
-        };
-    }, []);
 
-    // console.log('product card', data)
-
-    /* Slider Start */
-
-    const startSlider = () => {
-        hoverIntervalRef.current = window.setInterval(() => {
-            setCurrentVariation((prev) => (prev + 1) % (variations?.edges?.length || 1));
-        }, delayBeforeNextImage);
-    };
-
-    const handleHover = () => {
-        setIsHovered(true);
-        startSlider();
-    };
 
     const handleHoverOut = () => {
         setIsHovered(false);
@@ -113,18 +88,6 @@ const ProductCard: FC<ProductCardProps> = ({
         }
     }, [showModalQuickView]);
 
-    // const variationImages = variations?.edges.map((variation: any) => variation.node.image.mediaItemUrl) || [];
-
-    const sliderStyle = {
-        display: 'flex',
-        cursor: 'pointer',
-        transition: 'transform 0.3s ease-in-out',
-        transform: `translateX(-${currentVariation * 100}%)`,
-        height: `250px`,
-        backgroundColor: `#fefefe`
-    };
-
-    /* End of Slider Code */
 
     const [quantity, setQuantity] = useState(1)
     const { addToCart } = useCart()
@@ -235,8 +198,6 @@ const ProductCard: FC<ProductCardProps> = ({
         <div
             className={`nc-ProductCard relative flex flex-col bg-white rounded-3xl p-2 group ${className}`}
             data-nc-id="ProductCard"
-            onMouseEnter={handleHover}
-            onMouseLeave={handleHoverOut}
         >
             <div className="relative flex-shrink-0 bg-slate-50 rounded-2xl dark:bg-slate-300 overflow-hidden ">
 
@@ -269,9 +230,8 @@ const ProductCard: FC<ProductCardProps> = ({
                                     height={300}
                                     src={image?.sourceUrl || ''}
                                     alt={name || ''}
-                                    blurDataURL={blurDataUrl}
                                     className={twMerge(
-                                        `object-cover object-center h-[150px] sm:h-[250px] w-[150px] sm:w-[250px] mx-auto my-auto rounded-3xl`,
+                                        `object-cover object-center mx-auto my-auto rounded-3xl`,
                                     )}
                                 />
                             </>
