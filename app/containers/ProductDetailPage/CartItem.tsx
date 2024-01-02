@@ -108,7 +108,7 @@ const CartItemProduct = ({
                         <div className="hidden flex-1 sm:flex justify-end">
                             <Prices salePrice={type === 'VARIABLE' ? variation?.node.regularPrice : regularPrice}
                                     price={type === 'VARIABLE' ? variation?.node.price : price}
-                                    className="mt-0.5 flex-col" />
+                                    className="mt-0.5 lg:flex-col" />
                         </div>
                     </div>
                 </div>

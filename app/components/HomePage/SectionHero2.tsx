@@ -203,6 +203,7 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
             className="feature-image"
           >
             <NcImage
+                priority={true}
               src={item.slideFields.featureImage.sourceUrl}
               className="min-h-[400px] max-h-[500px] w-auto py-6 px-4"
             />

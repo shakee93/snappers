@@ -28,6 +28,9 @@ import AddedToCart from "@/app/components/Notifications/added-to-cart";
 import { useCart } from "@/context/CartProvider";
 import {ExternalLink, List, MenuSquare, MoreHorizontal, MoreVertical, XIcon} from "lucide-react";
 import AttributeIcon from "@/app/components/AttributeIcon";
+import {getBlurData} from "@/utils/blurPlaceholder";
+import {twMerge} from "tailwind-merge";
+import useNextBlurhash from "use-next-blurhash";
 
 export interface ProductCardProps {
   className?: string;
@@ -58,6 +61,8 @@ const ProductCard: FC<ProductCardProps> = ({
   } = data;
 
     const [showModalQuickView, setShowModalQuickView] = useState(false);
+    const [imageLoaded, setImageLoaded] = useState(false)
+    const [blurDataUrl] = useNextBlurhash("LbQl,,D*_N-o%gtRn~RP.7xuRPRk");
 
 
     const [isHovered, setIsHovered] = useState(false);
@@ -167,8 +172,6 @@ const ProductCard: FC<ProductCardProps> = ({
         setLoading(false);
     };
 
-
-
     const renderGroupButtons = () => {
         return (
             <div className="flex justify-center opacity-100 visible transition-all">
@@ -235,7 +238,7 @@ const ProductCard: FC<ProductCardProps> = ({
             onMouseEnter={handleHover}
             onMouseLeave={handleHoverOut}
         >
-            <div className="relative flex-shrink-0 bg-slate-50 rounded-3xl dark:bg-slate-300 overflow-hidden ">
+            <div className="relative flex-shrink-0 bg-slate-50 rounded-2xl dark:bg-slate-300 overflow-hidden ">
 
                 <Link href={link}>
                     <div className='flex items-center justify-center h-[150px] sm:h-[250px]' >
@@ -256,13 +259,23 @@ const ProductCard: FC<ProductCardProps> = ({
                                 </div>
                             ))
                         ) : (
-                            <Image
-                                width={300}
-                                height={300}
-                                src={image?.sourceUrl || ''}
-                                alt={name || ''}
-                                className="object-cover object-center h-[150px] sm:h-[250px] mx-auto my-auto rounded-3xl"
-                            />
+                            <>
+                                {/*{!imageLoaded &&*/}
+                                {/*    <div className="h-full w-full bg-gray-200 rounded-3xl animate-pulse"></div>*/}
+                                {/*}*/}
+
+                                <Image
+                                    width={300}
+                                    height={300}
+                                    src={image?.sourceUrl || ''}
+                                    alt={name || ''}
+                                    blurDataURL={blurDataUrl}
+                                    className={twMerge(
+                                        `object-cover object-center h-[150px] sm:h-[250px] w-[150px] sm:w-[250px] mx-auto my-auto rounded-3xl`,
+                                    )}
+                                />
+                            </>
+
                         )}
                     </div>
                 </Link>
@@ -270,7 +283,7 @@ const ProductCard: FC<ProductCardProps> = ({
 
                 {/* <ProductStatus status={stockStatus} /> */}
 
-                <div className={"absolute top-3 cursor-pointer right-3 z-10"} onClick={e => handleCloseModalQuickView()}>
+                <div className={"absolute top-3 cursor-pointer right-3"} onClick={e => handleCloseModalQuickView()}>
                     <ArrowsPointingOutIcon className='w-5'/>
                     {/*<LikeButton liked={isLiked} className="" />*/}
                 </div>
@@ -285,7 +298,7 @@ const ProductCard: FC<ProductCardProps> = ({
                 </div>
             </div>
 
-            <div className="space-y-2 px-2.5 pt-2 pb-2.5"
+            <div className="space-y-2 px-2.5 pt-1 pb-1 lg:pt-2 lg:pb-2.5"
 
             >
 
@@ -306,7 +319,7 @@ const ProductCard: FC<ProductCardProps> = ({
                 </div>
 
                 <div className="flex m-0 mb-2 justify-between items-center">
-                    <Prices price={price} salePrice={regularPrice} />
+                    <Prices price={price} salePrice={regularPrice} className='lg:flex-row' />
                     {((salePrice === price || !salePrice) && !!reviewCount) && (
                         <div className="flex items-center mb-0.5">
                             <StarIcon className="w-4 h-4 pb-[1px] text-amber-400" />
