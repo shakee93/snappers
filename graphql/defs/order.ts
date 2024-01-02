@@ -110,6 +110,9 @@ query GET_CHECKOUT_USER_DETAILS {
     shipping {
       ...CustomerAddressFragment
     }
+    billing{
+      ...CustomerAddressFragment
+    }
     email
   }
 }
