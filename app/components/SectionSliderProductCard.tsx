@@ -44,21 +44,21 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
     // @ts-ignore
     const OPTIONS: Glide.Options = {
       perView: 4,
-      gap: 32,
+      gap: 20,
       bound: true,
       // autoplay: 5000,
       // hoverpause: false,
       breakpoints: {
         1280: {
-          perView: 4 - 1,
+          perView: 4,
         },
         1024: {
           gap: 20,
-          perView: 4 - 1,
+          perView: 4,
         },
         768: {
           gap: 20,
-          perView: 4 - 2,
+          perView: 3,
         },
         640: {
           gap: 20,
@@ -66,7 +66,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
         },
         500: {
           gap: 20,
-          perView: 1.3,
+          perView: 2,
         },
       },
     };
@@ -81,7 +81,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
 
   return (
     <div className={`nc-SectionSliderProductCard ${className}`}>
-      <div className={`${UNIQUE_CLASS} flow-root`} ref={sliderRef}>
+      <div className={`glide ${UNIQUE_CLASS} flow-root`} ref={sliderRef}>
         <Heading
           className={headingClassName}
           fontClass={headingFontClassName}
@@ -94,7 +94,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
         <div className="glide__track" data-glide-el="track">
           <ul className="glide__slides py-3">
             {_products?.map((item, index) => (
-              <li key={index} className={`w-fit ${itemClassName}`}>
+              <li key={index} className={`w-2/4 ${itemClassName}`}>
                 <ProductCard key={item.slug} data={item} />
               </li>
             ))}

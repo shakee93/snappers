@@ -1,31 +1,35 @@
 "use client"
 import React, { useState, useEffect, useCallback } from "react";
+import InnerImageZoom from "react-inner-image-zoom";
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react";
+import { Thumb } from "app/components/HomePage/EmblaCarouselThumbsButton";
+import "styles/product_embla.css";
+import {
+  MediaItem,
+  ProductGalleryImagesArgs,
+  ProductToMediaItemConnection,
+  SimpleProduct,
+  VariableProduct
+} from "@/graphql/types/graphql";
+import {GalleryImage} from "@/types";
 import Image from "next/image";
-import StoreImg1 from "public/store/GqMobiles-Buy-geniune-branded-eletronics-from-GQMobiles-for-best-price-1-1.webp";
-import StoreImg2 from "public/store/GqMobiles-Buy-geniune-branded-eletronics-from-GQMobiles-for-best-price-2-1.webp";
-import StoreImg3 from "public/store/GqMobiles-Buy-geniune-branded-eletronics-from-GQMobiles-for-best-price-3.webp";
-import StoreImg4 from "public/store/GqMobiles-Buy-geniune-branded-eletronics-from-GQMobiles-for-best-price-4-1.webp";
-import { Thumb } from "./EmblaCarouselThumbsButton";
-import "styles/embla.css";
+
 
 type PropType = {
   slides: number[];
   options?: EmblaOptionsType;
+  product: SimpleProduct & VariableProduct
 };
-export const images: any[] = [StoreImg1, StoreImg2, StoreImg3, StoreImg4];
 
-const imageByIndex = (index: number): string => images[index % images.length];
 
 const EmblaCarousel: React.FC<PropType> = (props) => {
-  const { slides, options } = props;
+  const { slides, options, product } = props;
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [emblaMainRef, emblaMainApi] = useEmblaCarousel(options);
   const [emblaThumbsRef, emblaThumbsApi] = useEmblaCarousel({
     containScroll: "keepSnaps",
     dragFree: true,
   });
-
   const onThumbClick = useCallback(
     (index: number) => {
       if (!emblaMainApi || !emblaThumbsApi) return;
@@ -49,16 +53,26 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
 
   return (
     <div className="embla">
-      <div className="embla__viewport rounded-lg" ref={emblaMainRef}>
+      <div className="embla__viewport" ref={emblaMainRef}>
         <div className="embla__container">
-          {slides.map((index) => (
+          {product.galleryImages?.nodes.map((image: MediaItem, index) => (
             <div className="embla__slide" key={index}>
               <div className="embla__slide__number">
                 <span>{index + 1}</span>
               </div>
-              <Image
+              {/*<InnerImageZoom*/}
+              {/*      src={image.sourceUrl || ''}*/}
+              {/*      zoomSrc={image.sourceUrl || ''}*/}
+              {/*      zoomType="hover"*/}
+              {/*      zoomPreload={false}*/}
+              {/*      className="embla__slide__img"*/}
+              {/*  />*/}
+
+               <Image
+                   width={600}
+                   height={600}
                 className="embla__slide__img"
-                src={imageByIndex(index)}
+                src={image?.sourceUrl || ''}
                 alt="Your alt text"
               />
             </div>
@@ -69,12 +83,12 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
       <div className="embla-thumbs">
         <div className="embla-thumbs__viewport" ref={emblaThumbsRef}>
           <div className="embla-thumbs__container">
-            {slides.map((index) => (
+            {product.galleryImages?.nodes.map((image: MediaItem, index) => (
               <Thumb
                 onClick={() => onThumbClick(index)}
                 selected={index === selectedIndex}
                 index={index}
-                imgSrc={imageByIndex(index)}
+                imgSrc={image?.sourceUrl || ''}
                 key={index}
               />
             ))}

@@ -7,11 +7,14 @@ import React, {
 } from "react";
 import checkInViewIntersectionObserver from "@/utils/isInViewPortIntersectionObserver";
 import PlaceIcon from "./PlaceIcon";
-import Image from "next/image";
+import Image, {ImageProps} from "next/image";
 
-export interface NcImageProps extends ImgHTMLAttributes<HTMLImageElement> {
+export interface NcImageProps  {
   containerClassName?: string;
   src?: any;
+  priority?:boolean
+  className?: string
+  alt?: string
 }
 
 const NcImage: FC<NcImageProps> = ({
@@ -19,6 +22,7 @@ const NcImage: FC<NcImageProps> = ({
   alt = "nc-imgs",
   src = "",
   className = "object-cover w-full h-full",
+                                     priority =  false
 }) => {
 
   return (
@@ -27,7 +31,7 @@ const NcImage: FC<NcImageProps> = ({
       data-nc-id="NcImage"
     >
 
-      <Image src={src} className={className} alt={alt} width={10000} height={10000}  />
+      <Image src={src} className={className} alt={alt} width={1000} height={1000} priority={priority}  />
     </div>
   );
 };
