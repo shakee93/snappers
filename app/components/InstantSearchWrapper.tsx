@@ -101,7 +101,7 @@ const InstantSearchWrapper = ({
         }
     }, [sortQuery])
 
-    return <InstantSearchNext stalledSearchDelay={0} future={{
+    return <InstantSearchNext stalledSearchDelay={300} future={{
         preserveSharedStateOnUnmount: true
     }} routing={ routing ? {
         router: {
