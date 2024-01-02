@@ -7,6 +7,7 @@ const ProductOverview = ({
   techspecs
 }: {
   product: SimpleProduct | VariableProduct
+  techspecs: any
 }) => {
 
   return (

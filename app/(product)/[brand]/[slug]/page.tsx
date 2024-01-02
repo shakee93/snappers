@@ -91,6 +91,7 @@ const Page = async ({ params }: any) => {
 
     const techValue = tech?.product.metaData[0]?.value;
     const techspecs = JSON.parse(techValue)
+    console.log('techspecs: jaka jaka', tech);
 
     console.log("techasdasd", tech.product)
     // console.log({product})
