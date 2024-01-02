@@ -26,6 +26,8 @@
     "@types/jest": "^29.2.3",
     "@types/react": "^18.0.26",
     "@types/react-router-dom": "^5.3.3",
+    "embla-carousel-autoplay": "^8.0.0-rc17",
+    "embla-carousel-react": "^8.0.0-rc17",
     "framer-motion": "^10.16.16",
     "html-react-parser": "^5.0.7",
     "lucide-react": "^0.294.0",

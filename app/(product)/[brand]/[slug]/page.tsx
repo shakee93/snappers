@@ -14,22 +14,14 @@ import { PRODUCTS, SPORT_PRODUCTS } from "@/data/data";
 import Link from "next/link";
 import ImageGallery from "@/app/[brand]/imageGallery";
 import ProductImage from "@/app/components/SingleProductPage/ProductImage";
-
-
 export async function generateStaticParams() {
-
     const { data: { brands } } = await getClient().query({
         query: GET_BRANDS
     });
-
     return brands.nodes.map((p: Brand) => p.slug);
 }
-
-
 async function getData(slug: string, brand: string) {
-
     try {
-
         const { data } = await getClient().query(
             {
                 query: GET_PRODUCT,
@@ -39,24 +31,18 @@ async function getData(slug: string, brand: string) {
                 fetchPolicy: 'no-cache'
             }
         );
-
         if (!data.product) {
             return notFound();
         }
-
         const productBrand = data.product.brands?.nodes[0] || {
             name: 'Product',
             slug: 'product'
         };
-
-
         if (productBrand.slug !== brand) {
             return notFound()
         }
-
         const productId = data.product.databaseId
         console.log({ productId })
-
         const results = await getClient().query(
             {
                 query: GET_TECH_SPEC,
@@ -66,68 +52,47 @@ async function getData(slug: string, brand: string) {
                 fetchPolicy: 'no-cache'
             }
         );
-
-
         return {
             product: data.product,
             brand: productBrand,
             tech: results.data
         }
-
     } catch (e) {
         console.log(e);
         return notFound();
     }
 }
-
-
 const Page = async ({ params }: any) => {
-
     const { product, brand, tech }: {
         product: SimpleProduct & VariableProduct
         brand: Brand
         tech: any
     } = await getData(params.slug, params.brand)
-
     const techValue = tech?.product.metaData[0]?.value;
     const techspecs = JSON.parse(techValue)
     console.log('techspecs: jaka jaka', tech);
 
     console.log("techasdasd", tech.product)
     // console.log({product})
-
     return <div className='mt-5 md:mt-16'>
         <main className="container m-auto">
-
             <div className="md:mt-5 text-xs md:px-5 md:text-base">
                 <Link href='/'>Home</Link> &gt; <Link href={`/${brand.slug}`}>{brand.name}</Link> &gt; <Link href={`/${brand.slug}/${product.slug}`}>{product.name}</Link>
             </div>
-
             <div>
-
             </div>
             <div className="flex flex-col md:flex-row p-3 rounded-3xl mt-5 md:mt-6 md:p-10 bg-white">
-
                 <div className="w-full md:w-2/5 flex-col gap-2">
-
                     <ProductImage product={product} />
-
                 </div>
-
-
                 <div className="md:w-2/5 flex flex-col p-2 gap-y-1 md:gap-y-3">
                     <ProductDetails brand={brand} product={product} />
                 </div>
-
                 <div className="hidden lg:block w-full md:w-1/5 ">
                     <Features />
                 </div>
-
             </div>
-
             {/* Image Gallery */}
-
-
             <ProductOverview product={product} techspecs={techspecs} />
             <div className=" lg:hidden w-full lg:w-1/5 p-3 bg-white rounded-3xl my-5">
                 <Features />
@@ -147,5 +112,11 @@ const Page = async ({ params }: any) => {
         </main>
     </div>;
 }
-
 export default Page
+
+
+
+
+
+
+
