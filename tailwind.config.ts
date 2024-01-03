@@ -1,3 +1,4 @@
+import {nextui} from "@nextui-org/react";
 const defaultTheme = require("tailwindcss/defaultTheme");
 
 interface CustomColorsParams {
@@ -18,7 +19,7 @@ function customColors(cssVar: string) {
 }
 
 module.exports = {
-  content: ["./app/**/*.{js,jsx,ts,tsx}", "./public/index.html"],
+  content: ["./app/**/*.{js,jsx,ts,tsx}", "./public/index.html" , "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}"],
   darkMode: "class", // or 'media' or 'class',
   theme: {
     container: {
@@ -33,7 +34,7 @@ module.exports = {
       display: ["var(--font-display)", ...defaultTheme.fontFamily.sans],
       body: ["var(--font-body)", ...defaultTheme.fontFamily.sans],
     },
-
+    darkMode: "class",
     extend: {
       colors: {
         transparent: 'transparent',
@@ -87,5 +88,6 @@ module.exports = {
     require("@tailwindcss/forms"),
     // require("@tailwindcss/line-clamp"),
     require("@tailwindcss/aspect-ratio"),
+    nextui()
   ],
 };
