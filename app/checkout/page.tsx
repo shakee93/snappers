@@ -49,6 +49,7 @@ const CheckoutPage = () => {
   const { loading, error, data, refetch } = useQuery(GET_PAYMENT_GATEWAYS);
 
   const paymentGateways: PaymentGateway[] = data?.paymentGateways.nodes;
+  const [isConfirmed, setIsConfirmed] = useState(false);
 
   const [tabActive, setTabActive] = useState<
     "ContactInfo" | "ShippingAddress" | "BillingAddress" | "PaymentMethod"

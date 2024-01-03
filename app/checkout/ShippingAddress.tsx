@@ -7,6 +7,7 @@ import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Input from "shared/Input/Input";
 import Radio from "shared/Radio/Radio";
 import Select from "shared/Select/Select";
+import { RequiredTag } from "./CheckoutHelperComps";
 
 interface Props {
   isActive: boolean;
@@ -87,9 +88,9 @@ const ShippingAddress: FC<Props> = ({
         <div className="p-6 flex flex-col sm:flex-row items-start">
           <Receipt strokeWidth={1} />
           <div className="sm:ml-8">
-            <h3 className=" text-slate-700 dark:text-slate-300 flex ">
+            <h3 className=" text-slate-700 items-center gap-2 dark:text-slate-300 flex ">
               <span className="uppercase">SHIPPING ADDRESS</span>
-              {!isConfirmed ? <BadgeMinus color="red" /> : <Check />}
+              {!isConfirmed ? <RequiredTag/> : <Check />}
             </h3>
             <div className="font-semibold mt-1 text-sm">
               <span className="">
