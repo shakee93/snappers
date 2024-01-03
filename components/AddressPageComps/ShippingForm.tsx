@@ -47,7 +47,9 @@ const ShippingForm: FC = () => {
     }, [getAddresses]);
 
     useEffect(() => {
+
         if (data?.customer?.shipping) {
+            console.log("Address: ", data);
             const { shipping } = data.customer;
             setFormData(prevData => ({ ...prevData, ...shipping }));
         }

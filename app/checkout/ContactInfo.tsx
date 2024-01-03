@@ -34,6 +34,23 @@ const ContactInfo: FC<Props> = ({
     }
   }, [initialData]);
 
+  const handleContactSubmit = (e: any)=>{
+    e.preventDefault();
+    if (phone && email) {
+      const contactInfo = {
+        phone,
+        email,
+      };
+      updateFormData("contactInfo", contactInfo);
+      setPhone(initialData?.phone);
+      setEmail(initialData?.email);
+      setIsConfirmed(true);
+      onCloseActive();
+    } else {
+      setIsConfirmed(false);
+    }
+  }
+
   const renderAccount = () => {
     return (
       <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden z-0">
@@ -100,21 +117,7 @@ const ContactInfo: FC<Props> = ({
           </ButtonSecondary>
         </div>
         <form
-          onSubmit={() => {
-            if (phone && email) {
-              const contactInfo = {
-                phone,
-                email,
-              };
-              updateFormData("contactInfo", contactInfo);
-              setPhone(initialData?.phone);
-              setEmail(initialData?.email);
-              setIsConfirmed(true);
-              onCloseActive();
-            } else {
-              setIsConfirmed(false);
-            }
-          }}
+          onSubmit={handleContactSubmit}
         >
           <div
             className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${
@@ -137,7 +140,7 @@ const ContactInfo: FC<Props> = ({
               <Label className="text-sm">Your phone number</Label>
               <Input
                 className="mt-1.5"
-                defaultValue={phone}
+                value={phone}
                 type="tel"
                 onChange={(e) => setPhone(e.target.value)}
                 required={true}
@@ -147,7 +150,7 @@ const ContactInfo: FC<Props> = ({
               <Label className="text-sm">Email address</Label>
               <Input
                 className="mt-1.5"
-                defaultValue={initialData?.email || ""}
+                value={email}
                 type="email"
                 onChange={(e) => setEmail(e.target.value)}
                 required={true}

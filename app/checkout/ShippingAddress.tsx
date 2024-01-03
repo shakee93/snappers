@@ -12,7 +12,7 @@ interface Props {
   onCloseActive: () => void;
   onOpenActive: () => void;
   updateFormData: (section: string, data: any) => void;
-  initialData: CustomerAddress | null
+  initialData: CustomerAddress | null;
 }
 
 const ShippingAddress: FC<Props> = ({
@@ -20,7 +20,7 @@ const ShippingAddress: FC<Props> = ({
   onCloseActive,
   onOpenActive,
   updateFormData,
-  initialData
+  initialData,
 }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -35,6 +35,7 @@ const ShippingAddress: FC<Props> = ({
 
   useEffect(() => {
     if (initialData) {
+      console.log("initalData: ", initialData);
       setFirstName(initialData.firstName || "");
       setLastName(initialData.lastName || "");
       setAddress(initialData.address1 || "");
@@ -46,6 +47,25 @@ const ShippingAddress: FC<Props> = ({
       setAddressType("home");
     }
   }, [initialData]);
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const shippingAddressData = {
+      firstName,
+      lastName,
+      address,
+      apartment,
+      city,
+      state,
+      postal,
+      country,
+      addressType,
+    };
+
+    updateFormData("shippingAddress", shippingAddressData);
+    setIsConfirmed(true);
+    onCloseActive();
+  };
 
   const renderShippingAddress = () => {
     return (
@@ -116,7 +136,6 @@ const ShippingAddress: FC<Props> = ({
             <div className="font-semibold mt-1 text-sm">
               <span className="">
                 {initialData?.address1 || "Your Address"}
-
               </span>
             </div>
           </div>
@@ -129,25 +148,11 @@ const ShippingAddress: FC<Props> = ({
             Change
           </ButtonSecondary>
         </div>
-        <form onSubmit={() => {
-          const shippingAddressData = {
-            firstName,
-            lastName,
-            address,
-            apartment,
-            city,
-            state,
-            postal,
-            country,
-            addressType
-          };
-          updateFormData("shippingAddress", shippingAddressData);
-          setIsConfirmed(true);
-          onCloseActive();
-        }}>
+        <form onSubmit={handleSubmit}>
           <div
-            className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${isActive ? "block" : "hidden"
-              }`}
+            className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${
+              isActive ? "block" : "hidden"
+            }`}
           >
             {/* ============ */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
@@ -157,7 +162,7 @@ const ShippingAddress: FC<Props> = ({
                   className="mt-1.5 capitalize"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  required
+                  required={true}
                 />
               </div>
               <div>
@@ -166,8 +171,7 @@ const ShippingAddress: FC<Props> = ({
                   className="mt-1.5 capitalize"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  required
-                  
+                  required={true}
                 />
               </div>
             </div>
@@ -183,16 +187,17 @@ const ShippingAddress: FC<Props> = ({
                   value={address}
                   type={"text"}
                   onChange={(e) => setAddress(e.target.value)}
-                  required
+                  required={true}
                 />
               </div>
               <div className="sm:w-1/3">
                 <Label className="text-sm ">Apt, Suite *</Label>
                 <Input
                   className="mt-1.5 capitalize"
+                  name="address2"
                   value={apartment}
                   onChange={(e) => setApartment(e.target.value)}
-                  required
+                  required={true}
                 />
               </div>
             </div>
@@ -205,7 +210,7 @@ const ShippingAddress: FC<Props> = ({
                   className="mt-1.5  normal-case  "
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  required
+                  required={true}
                 />
               </div>
               <div>
@@ -213,8 +218,6 @@ const ShippingAddress: FC<Props> = ({
                 <Select
                   value="LK"
                   className="mt-1.5 capitalize"
-
-
                   placeholder="SRI LANKA"
                   onChange={(e) => setCountry(e.target.value)}
                   disabled={true}
@@ -230,36 +233,27 @@ const ShippingAddress: FC<Props> = ({
                 <Label className="text-sm">State/Province</Label>
                 <Input
                   className="mt-1.5 capitalize"
-                  required
                   value={state}
                   onChange={(e) => setState(e.target.value)}
+                  required={true}
                 />
               </div>
               <div>
                 <Label className="text-sm">Postal code</Label>
                 <Input
                   className="mt-1.5 capitalize"
-                  required
                   value={postal}
                   onChange={(e) => setPostal(e.target.value)}
+                  required={true}
                 />
               </div>
             </div>
 
             {/* ============ */}
-
-
-            {/* ============ */}
             <div className="flex flex-col sm:flex-row pt-6">
-              <ButtonPrimary
-                className="sm:!px-7 shadow-none"
-                onClick={() => {
-
-                }}
-              >
+              <ButtonPrimary className="sm:!px-7 shadow-none" type="submit">
                 Save and next to Payment
               </ButtonPrimary>
-
             </div>
           </div>
         </form>
