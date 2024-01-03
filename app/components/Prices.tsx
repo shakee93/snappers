@@ -1,5 +1,6 @@
 import React, { FC } from "react";
 import { Maybe } from "@/graphql/types/graphql";
+import {twMerge} from "tailwind-merge";
 
 export interface PricesProps {
     className?: string;
@@ -15,12 +16,15 @@ const Prices: FC<PricesProps> = ({
     contentClass = " text-base font-medium",
 }) => {
     return (
-        <div className={`flex gap-3 items-center ${className}`}>
+        <div className={twMerge(
+            `flex flex-col lg:gap-3 gap-1 items-center`,
+            className
+        )}>
             {price &&
                 <div
                     className={`flex items-center border-2 border-gray-300 rounded-lg p-2 ${contentClass}`}
                 >
-                <span className="text-slate-950 text-base lg:text-sm font-bold !leading-none">
+                <span className="text-slate-950 text-xs lg:text-sm font-bold !leading-none">
                     {price}
                 </span>
                 </div>

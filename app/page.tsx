@@ -1,4 +1,5 @@
 import SectionHero2 from "@/app/components/HomePage/SectionHero";
+import CategoryBlockSection from "@/app/components/HomePage/CategoryBlocksSection"
 import SectionHero3 from "@/app/components/HomePage/SectionHero2";
 import DiscoverMoreSlider from "@/app/components/HomePage/DiscoverMoreSlider";
 import SectionSliderProductCard from "@/app/components/SectionSliderProductCard";
@@ -77,10 +78,14 @@ export default async function Home() {
               heading="New Arrivals"
             />
           </div>
-        </div>
+        </div>1
+        <div className="mt-24 container lg:my-10">
+          {/* <DiscoverMoreSlider /> */}
+          <Heading>
+                Featured Categories
+              </Heading>
+          <CategoryBlockSection/>
 
-        <div className="mt-24 lg:mt-32">
-          <DiscoverMoreSlider />
         </div>
 
         <div className="container relative space-y-24 my-24 lg:space-y-32 lg:my-32">

@@ -101,8 +101,7 @@ const InstantSearchWrapper = ({
         }
     }, [sortQuery])
 
-
-    return <InstantSearchNext stalledSearchDelay={500} future={{
+    return <InstantSearchNext stalledSearchDelay={300} future={{
         preserveSharedStateOnUnmount: true
     }} routing={ routing ? {
         router: {
@@ -113,7 +112,6 @@ const InstantSearchWrapper = ({
             <SearchInput show={search}/>
             {filters && <TabFilters category={category} brand={brand} categories={categories} brands={brands}/>}
             <Configure  filters={filterQuery} hitsPerPage={12}/>
-            {/*<RefinementList attribute="brands.nodes"/>*/}
             <ProductGridInstant/>
         </div>
     </InstantSearchNext>

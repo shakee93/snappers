@@ -6,9 +6,11 @@ import { Category } from '@/graphql/types/graphql';
 import {Popover, Transition} from "@headlessui/react";
 import {ChevronDownIcon} from "@heroicons/react/24/outline";
 import {twMerge} from "tailwind-merge";
+import {usePathname} from "next/navigation";
 
 const DropdownButton = ({categories} : { categories: any }) => {
 
+    const path = usePathname()
 
   return (
     <div className="relative text-center">
@@ -33,15 +35,19 @@ const DropdownButton = ({categories} : { categories: any }) => {
                         leaveTo="opacity-0 translate-y-1"
                     >
                         <Popover.Panel className={twMerge(
-                            "absolute z-40 w-screen max-w-sm mt-3 lg:max-w-5xl  shadow-2xl bg-white rounded-lg",
+                            "absolute z-[350] w-screen max-w-sm mt-3 lg:max-w-5xl  shadow-2xl bg-white rounded-lg",
                         )}>
                             <ul className="py-4 px-4 text-left text-sm font-normal text-gray-700 grid grid-cols-4 dark:text-gray-200">
                                 {categories?.map((category: Category, index: number) => (
                                     <li key={index} className='w-full'>
                                         <Link
+
                                             onClick={e => close()}
                                             href={`/collections/${category.slug}`}
-                                            className="transition-all block px-4 py-3 hover:pl-6 rounded hover:text-white hover:bg-primaryColor dark:hover:bg-gray-600 dark:hover:text-white"
+                                            className={twMerge(
+                                                "transition-all block px-4 py-3 hover:pl-6 rounded hover:text-white hover:bg-primaryColor dark:hover:bg-gray-600 dark:hover:text-white",
+                                                path === `/collections/${category.slug}` && 'text-white bg-primaryColor pl-6'
+                                            )}
                                         >
                                             {category.name}
                                         </Link>

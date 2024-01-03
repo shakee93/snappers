@@ -18,7 +18,6 @@ const ModalQuickView: FC<ModalQuickViewProps> = ({
   onCloseModalQuickView,
   productData,
 }) => {
-  // console.log('Received productData:', productData);
 
   const pathname = usePathname()
 

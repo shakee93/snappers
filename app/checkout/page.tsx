@@ -25,58 +25,10 @@ import CheckoutDetails from "./CheckoutDetails";
 import CartItems from "./CartItems";
 
 
-export interface CartInfo {
-    appliedCoupons: null;
-    availableShippingMethods: {}[];
-    contents: {
-        itemCount: number;
-        nodes: CartItem[];
-        __typename: string;
-    };
-    discountTax: string;
-    discountTotal: string;
-    feeTax: string;
-    feeTotal: string;
-    needsShippingAddress: boolean;
-    shippingTax: string;
-    shippingTotal: string;
-    subtotal: string;
-    subtotalTax: string;
-    total: string;
-    totalTax: string;
-}
-
-export interface CartItem {
-    extraData: any[];
-    key: string;
-    product: CartItemProduct;
-    quantity: number;
-    subtotal: string;
-    subtotalTax: string;
-    total: string;
-    variation: null | any;
-}
-
-export interface CartItemProduct {
-    node: CartItemProductNode;
-}
-
-export interface CartItemProductNode {
-    id: number;
-    name: string;
-    price: number;
-    image: string;
-    terms: string[];
-}
-
-interface SelectedGateway {
-    id: string;
-    title: string;
-}
-
 interface FormData {
     contactInfo: Record<string, any>;
     shippingAddress: Record<string, any>;
+    billingAddress: Record<string, any>;
     paymentMethod: {
         selectedGateway?: {
             id?: string;
@@ -91,50 +43,50 @@ const CheckoutPage = () => {
 
     const { loading, error, data, refetch } = useQuery(GET_PAYMENT_GATEWAYS);
 
-    // useEffect(() => {
-    //     const fetchPaymentGateways = async () => {
-    //       try {
-    //         await refetch();
-    //       } catch (error) {
-    //         console.error("Error fetching payment gateways:", error);
-    //       }
-    //     };
-
-    //     fetchPaymentGateways();
-    //   }, []); 
-
-
     const paymentGateways: PaymentGateway[] = data?.paymentGateways.nodes;
 
-    const [tabActive, setTabActive] = useState<
-        "ContactInfo" | "ShippingAddress" | "PaymentMethod"
-    >("ShippingAddress");
+    const [tabActive, setTabActive] = useState<"ContactInfo" | "ShippingAddress" | "BillingAddress" | "PaymentMethod">("ContactInfo");
 
     const [formData, setFormData] = useState<FormData>({
         contactInfo: {},
         shippingAddress: {},
+        billingAddress: {},
         paymentMethod: {
             selectedGateway: {}
         },
     });
 
     const updateFormData = (section: string, data: any) => {
-        console.log('Incoming data:', data);
-
-        setFormData((prevData) => ({
+      
+        setFormData((prevData) => {
+          let updatedSection;
+      
+          if (Object.keys(data).length === 0) {
+            updatedSection = {};
+          } else {
+            updatedSection = {
+              ...prevData[section as keyof FormData],
+              ...data,
+            };
+          }
+      
+          const updatedFormData = {
             ...prevData,
-            [section as keyof FormData]: {
-                ...prevData[section as keyof FormData],
-                ...data,
-            },
-        }))
-    };
+            [section as keyof FormData]: updatedSection,
+          };
+      
+          return updatedFormData;
+        });
+      };
+      
+
 
     const [guestCheckoutMutation, { loading: checkoutLoading, error: checkoutError, data: checkoutData }] = useMutation(GUEST_CHECKOUT_MUTATION);
 
     const handleCheckout = async () => {
         try {
-            const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
+            const paymentMethodId = formData?.paymentMethod?.selectedGateway;
+
 
             const lineItems = cart?.contents?.nodes.map(item => ({
                 productId: item?.product?.node?.databaseId,
@@ -142,19 +94,23 @@ const CheckoutPage = () => {
             })) || [];
 
             if (paymentMethodId !== undefined) {
-                const { data } = await guestCheckoutMutation({
-                    variables: {
-                        paymentMethod: paymentMethodId,
-                        lineItems: lineItems,
-                    },
-                });
+                try {
+                    const { data } = await guestCheckoutMutation({
+                        variables: {
+                            paymentMethod: paymentMethodId,
+                            lineItems: lineItems,
+                        },
+                    });
 
 
-                if (data && data.createOrder) {
-                    const orderDetails = data.createOrder.order;
-                    console.log("Order Details:", orderDetails);
-                } else {
-                    console.error("Failed to retrieve order details");
+                    if (data && data.createOrder) {
+                        const orderDetails = data.createOrder.order;
+                    } else {
+                        console.error("Failed to retrieve order details");
+                    }
+                } catch (error: any) {
+                    console.log("Error:", error);
+
                 }
             } else {
                 console.error("Payment method ID is undefined");
@@ -208,10 +164,10 @@ const CheckoutPage = () => {
                         <Link href={"/#"} className="">
                             Homepage
                         </Link>
-                        <span className="text-xs mx-1 sm:mx-1.5">/</span>
-                        <Link href={"/#"} className="">
+                        {/* <span className="text-xs mx-1 sm:mx-1.5">/</span> */}
+                        {/* <Link href={"/#"} className="">
                             Clothing Categories
-                        </Link>
+                        </Link> */}
                         <span className="text-xs mx-1 sm:mx-1.5">/</span>
                         <span className="underline">Checkout</span>
                     </div>
@@ -222,7 +178,7 @@ const CheckoutPage = () => {
                     <div className="flex-1">
                         <CheckoutDetails
                             tabActive={tabActive}
-                            setTabActive={(value: "ContactInfo" | "ShippingAddress" | "PaymentMethod") => setTabActive(value)}
+                            setTabActive={(value: "ContactInfo" | "ShippingAddress" | "BillingAddress" | "PaymentMethod") => setTabActive(value)}
                             handleScrollToEl={handleScrollToEl}
                             updateFormData={updateFormData}
                             paymentGateways={paymentGateways}
@@ -240,7 +196,7 @@ const CheckoutPage = () => {
                         </div>
 
                         <div className="mt-10 pt-6 text-sm text-slate-500 dark:text-slate-400 border-t border-slate-200/70 dark:border-slate-700 ">
-                            <div>
+                            {/* <div>
                                 <Label className="text-sm">Discount code</Label>
                                 <div className="flex mt-1.5">
                                     <Input sizeClass="h-10 px-4 py-3" className="flex-1" />
@@ -248,7 +204,7 @@ const CheckoutPage = () => {
                                         Apply
                                     </button>
                                 </div>
-                            </div>
+                            </div> */}
 
                             <div className="mt-4 flex justify-between py-2.5">
                                 <span>Subtotal</span>
@@ -305,14 +261,15 @@ const CheckoutPage = () => {
                                         strokeLinejoin="round"
                                     />
                                 </svg>
-                                Learn more{` `}
+                                By proceeding with your purchase you agree to our
+                                {' '}
                                 <Link
                                     target="_blank"
                                     rel="noopener noreferrer"
                                     href="/terms"
                                     className="text-slate-900 dark:text-slate-200 underline font-medium"
                                 >
-                                    Taxes
+                                    Terms and Conditions
                                 </Link>
                                 <span>
                                     {` `}and{` `}
@@ -323,9 +280,9 @@ const CheckoutPage = () => {
                                     href="/terms"
                                     className="text-slate-900 dark:text-slate-200 underline font-medium"
                                 >
-                                    Shipping
+                                    Privacy Policy
                                 </Link>
-                                {` `} infomation
+                                {` `}.
                             </p>
                         </div>
                     </div>

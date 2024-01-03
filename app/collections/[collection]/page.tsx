@@ -34,7 +34,6 @@ async function getData(slug : string | null = null)  {
         return notFound()
     }
 
-    console.log(data.productCategory.databaseId);
 
     const {data: productql, error} = await getClient().query(
         {

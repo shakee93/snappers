@@ -61,7 +61,7 @@ const SectionVideos: FC<SectionVideosProps> = ({
               containerClassName="absolute inset-0 rounded-3xl overflow-hidden z-0"
               className="object-cover w-full h-full transition-transform group-hover:scale-105 duration-300  "
               src={video.thumbnail}
-              title={video.title}
+              // title={video.title}
               alt={video.title}
             />
           </>

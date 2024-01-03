@@ -3,6 +3,7 @@ import InstantSearchWrapper from "@/app/components/InstantSearchWrapper";
 import {Brand, ProductCategory} from "@/graphql/types/graphql";
 import {useStore} from "@/store/store";
 import {useEffect} from "react";
+import {twMerge} from "tailwind-merge";
 
 interface SearchBarProps {
     productCategories : ProductCategory[]
@@ -25,7 +26,10 @@ const HeaderSearchResults = ({ brands, productCategories}: SearchBarProps) => {
 
     }, [search])
 
-    return search.length > 0 ? <div className='fixed inset-0 p-5 md:p-10 mt-[129px] bg-gray-100 z-[100] overflow-y-scroll'>
+    return <div className={twMerge(
+        `inset-0 p-5 md:pt-0 md:p-10 mt-[129px] bg-gray-100 z-[15] overflow-y-scroll`,
+        search.length > 0 ? 'fixed' : 'hidden'
+    )}>
         <div className='container mx-auto'>
             <InstantSearchWrapper
                 filters
@@ -34,7 +38,7 @@ const HeaderSearchResults = ({ brands, productCategories}: SearchBarProps) => {
             >
             </InstantSearchWrapper>
         </div>
-    </div> : <></>
+    </div>
 }
 
 export default HeaderSearchResults

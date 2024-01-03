@@ -110,11 +110,17 @@ query GET_CHECKOUT_USER_DETAILS {
     shipping {
       ...CustomerAddressFragment
     }
+    billing{
+      ...CustomerAddressFragment
+    }
     email
   }
 }
 ${CustomerAddressFragment}
 `;
+
+
+
 
 export const UPDATE_ADDRESS = gql`
 mutation updateCustomer($input: UpdateCustomerInput!) {

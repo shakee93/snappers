@@ -15,7 +15,7 @@ interface Props {
   initialData: CustomerAddress | null
 }
 
-const ShippingAddress: FC<Props> = ({
+const BillingAddress: FC<Props> = ({
   isActive,
   onCloseActive,
   onOpenActive,
@@ -31,6 +31,7 @@ const ShippingAddress: FC<Props> = ({
   const [postal, setPostal] = useState("");
   const [country, setCountry] = useState("");
   const [addressType, setAddressType] = useState("home");
+
   const [isConfirmed, setIsConfirmed] = useState(false);
 
   useEffect(() => {
@@ -47,7 +48,8 @@ const ShippingAddress: FC<Props> = ({
     }
   }, [initialData]);
 
-  const renderShippingAddress = () => {
+
+  const renderBillingAddress = () => {
     return (
       <div className="border border-slate-200 dark:border-slate-700 rounded-xl ">
         <div className="p-6 flex flex-col sm:flex-row items-start">
@@ -98,7 +100,7 @@ const ShippingAddress: FC<Props> = ({
 
           <div className="sm:ml-8">
             <h3 className=" text-slate-700 dark:text-slate-300 flex ">
-              <span className="uppercase">SHIPPING ADDRESS</span>
+              <span className="uppercase">Billing ADDRESS</span>
               <svg
                 fill="none"
                 viewBox="0 0 24 24"
@@ -130,7 +132,7 @@ const ShippingAddress: FC<Props> = ({
           </ButtonSecondary>
         </div>
         <form onSubmit={() => {
-          const shippingAddressData = {
+          const billingAddressData = {
             firstName,
             lastName,
             address,
@@ -141,7 +143,7 @@ const ShippingAddress: FC<Props> = ({
             country,
             addressType
           };
-          updateFormData("shippingAddress", shippingAddressData);
+          updateFormData("billingAddress", billingAddressData);
           setIsConfirmed(true);
           onCloseActive();
         }}>
@@ -167,7 +169,6 @@ const ShippingAddress: FC<Props> = ({
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   required
-                  
                 />
               </div>
             </div>
@@ -215,7 +216,7 @@ const ShippingAddress: FC<Props> = ({
                   className="mt-1.5 capitalize"
 
 
-                  placeholder="SRI LANKA"
+                  placeholder="SRI LANKAJ"
                   onChange={(e) => setCountry(e.target.value)}
                   disabled={true}
                 >
@@ -259,14 +260,13 @@ const ShippingAddress: FC<Props> = ({
               >
                 Save and next to Payment
               </ButtonPrimary>
-
             </div>
           </div>
         </form>
       </div>
     );
   };
-  return renderShippingAddress();
+  return renderBillingAddress();
 };
 
-export default ShippingAddress;
+export default BillingAddress;

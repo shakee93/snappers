@@ -1,7 +1,7 @@
 // import Footer from '@/app/components/GlobalComponents/Footer'
 
 import "../styles/index.scss";
-// import './globals.css'
+import { Providers } from "./providers";
 import "./index.css";
 import "../fonts/line-awesome-1.3.0/css/line-awesome.css";
 import "rc-slider/assets/index.css";

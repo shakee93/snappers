@@ -1,6 +1,6 @@
 import { contactInformation } from "@/data/types";
 import Label from "components/Label/Label";
-import React, { FC, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Checkbox from "shared/Checkbox/Checkbox";
@@ -11,7 +11,7 @@ interface Props {
   onOpenActive: () => void;
   onCloseActive: () => void;
   updateFormData: (section: string, data: any) => void;
-  initialData: contactInformation
+  initialData: contactInformation;
 }
 
 const ContactInfo: FC<Props> = ({
@@ -19,16 +19,22 @@ const ContactInfo: FC<Props> = ({
   onCloseActive,
   onOpenActive,
   updateFormData,
-  initialData
+  initialData,
 }) => {
-
   const [phone, setPhone] = useState("+94");
   const [email, setEmail] = useState("");
-  const [subscribeToNews, setSubscribeToNews] = useState(true);
+  const [displayName, setDisplayName] = useState("");
+  const [isConfirmed, setIsConfirmed] = useState(false);
 
+  useEffect(() => {
+    if (initialData) {
+      setPhone(initialData?.phone);
+      setEmail(initialData?.email);
+      setDisplayName(initialData?.displayName);
+    }
+  }, [initialData]);
 
   const renderAccount = () => {
-
     return (
       <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden z-0">
         <div className="flex flex-col sm:flex-row items-start p-6 ">
@@ -80,8 +86,8 @@ const ContactInfo: FC<Props> = ({
               </svg>
             </h3>
             <div className="font-semibold mt-1 text-sm">
-              <span className="">{initialData?.displayName ?? "Your name"}</span>
-              <span className="ml-3 tracking-tighter">{initialData?.phone || "Your phone number"}</span>
+              <span className="">{displayName ?? ""}</span>
+              <span className="ml-3 tracking-tighter">{phone || ""}</span>
             </div>
           </div>
           <ButtonSecondary
@@ -93,72 +99,69 @@ const ContactInfo: FC<Props> = ({
             Change
           </ButtonSecondary>
         </div>
-        <div
-          className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${isActive ? "block" : "hidden"
-            }`}
+        <form
+          onSubmit={() => {
+            if (phone && email) {
+              const contactInfo = {
+                phone,
+                email,
+              };
+              updateFormData("contactInfo", contactInfo);
+              setPhone(initialData?.phone);
+              setEmail(initialData?.email);
+              setIsConfirmed(true);
+              onCloseActive();
+            } else {
+              setIsConfirmed(false);
+            }
+          }}
         >
-          <div className="flex justify-between flex-wrap items-baseline">
-            <h3 className="text-lg font-semibold">Contact infomation</h3>
-            
-            <span className="block text-sm my-1 md:my-0">
-              Do not have an account?{` `}
-              <a href="##" className="text-primary-500 font-medium">
-                Log in
-              </a>
-            </span>
-          </div>
-          <div className="max-w-lg">
-            <Label className="text-sm">Your phone number</Label>
-            <Input
-              className="mt-1.5"
-              defaultValue={initialData?.phone || "+94 "}
-              type={"tel"}
-              onChange={(e) => setPhone(e.target.value)}
-            />
-          </div>
-          <div className="max-w-lg">
-            <Label className="text-sm">Email address</Label>
-            <Input
-              className="mt-1.5"
-              defaultValue={initialData?.email || ""}
-              type={"email"}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
-          <div>
-            <Checkbox
-              className="!text-sm"
-              name="uudai"
-              label="Email me news and offers"
-              defaultChecked={subscribeToNews}
-              onChange={() => setSubscribeToNews(!subscribeToNews)}
-            />
-          </div>
+          <div
+            className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${
+              isActive ? "block" : "hidden"
+            }`}
+          >
+            <div className="flex justify-between flex-wrap items-baseline">
+              <h3 className="text-lg font-semibold">Contact infomation</h3>
 
-          {/* ============ */}
-          <div className="flex flex-col sm:flex-row pt-6">
-            <ButtonPrimary
-              className="sm:!px-7 shadow-none"
-              onClick={() => {
-                const contactInfo = {
-                  phone,
-                  email,
-                  subscribeToNews
-                };
-                updateFormData("contactInfo", contactInfo);
-                onCloseActive();
-              }}
-            >
-              Save and next to Shipping
-            </ButtonPrimary>
-            <ButtonSecondary
-              className="mt-3 sm:mt-0 sm:ml-3"
-              onClick={() => onCloseActive()}
-            >
-              Cancel
-            </ButtonSecondary>
+              {!initialData?.displayName && (
+                <span className="block text-sm my-1 md:my-0">
+                  Do not have an account?{` `}
+                  <a href="##" className="text-primary-500 font-medium">
+                    Log in
+                  </a>
+                </span>
+              )}
+            </div>
+            <div className="max-w-lg">
+              <Label className="text-sm">Your phone number</Label>
+              <Input
+                className="mt-1.5"
+                defaultValue={phone}
+                type="tel"
+                onChange={(e) => setPhone(e.target.value)}
+                required={true}
+              />
+            </div>
+            <div className="max-w-lg">
+              <Label className="text-sm">Email address</Label>
+              <Input
+                className="mt-1.5"
+                defaultValue={initialData?.email || ""}
+                type="email"
+                onChange={(e) => setEmail(e.target.value)}
+                required={true}
+              />
+            </div>
+
+            {/* ============ */}
+            <div className="flex flex-col sm:flex-row pt-6">
+              <ButtonPrimary type="submit" className="sm:!px-7 shadow-none">
+                Save and next to Shipping
+              </ButtonPrimary>
+            </div>
           </div>
-        </div>
+        </form>
       </div>
     );
   };

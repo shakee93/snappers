@@ -126,7 +126,7 @@ const BillingForm: FC = () => {
                             </div>
                             <div className="flex gap-2">
                                 <InputField label="Postcode/ZIP" name="postcode" placeholder="Postcode/ZIP" value={formData.postcode} onChange={handleChange} />
-                                <SelectField label="State" name="state" value={formData.state} options={SRI_LANKAN_STATES.map(state => ({ value: state, label: state }))} onChange={handleChange} />
+                                <SelectField label="State" name="state" defaultValue={SRI_LANKAN_STATES[0]} value={formData.state} options={SRI_LANKAN_STATES.map(state => ({ value: state, label: state }))} onChange={handleChange} />
                             </div>
                             <div>
                                 <InputField label="Phone" name="phone" placeholder="Phone" value={formData.phone} onChange={handleChange} />
@@ -134,7 +134,7 @@ const BillingForm: FC = () => {
                             <Checkbox
                                 defaultChecked={saveBothAddresses}
                                 name="save for both addresses"
-                                label="Include this in the billing as well"
+                                label="Include this in the Shipping as well"
                                 onChange={() => setSaveBothAddresses(!saveBothAddresses)}
                             />
                         </div>

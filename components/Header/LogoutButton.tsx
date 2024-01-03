@@ -3,12 +3,14 @@ import {useRouter} from "next/navigation";
 import {useSession} from "@/context/SessionProvider";
 
 
-const LogoutButton = () => {
+const LogoutButton = ({set }: any) => {
     let { logout } = useSession();
     const router = useRouter();
     const handleLogout = async () => {
+        set(null)
         logout();
         router.push('/login');
+
     };
 
 

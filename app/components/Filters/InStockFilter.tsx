@@ -1,13 +1,6 @@
-import {Popover, Transition} from "@headlessui/react";
-import {ChevronDownIcon} from "@heroicons/react/24/outline";
-import React, {Fragment, useEffect, useState} from "react";
-import Checkbox from "@/shared/Checkbox/Checkbox";
-import ButtonThird from "@/shared/Button/ButtonThird";
-import ButtonPrimary from "@/shared/Button/ButtonPrimary";
-import {Brand, ProductCategory} from "@/graphql/types/graphql";
+
+import React, { useEffect, useState} from "react";
 import {useStore} from "@/store/store";
-import FilterPopover from "@/app/components/Filters/FilterPopover";
-import Slider from "rc-slider";
 import {Package, XIcon} from "lucide-react";
 
 
