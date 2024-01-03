@@ -8,9 +8,8 @@ const ProductOverview = ({
   product: SimpleProduct | VariableProduct
 }) => {
 
-  // console.log("tech", product.databaseId , techspecs);
-  // const techValue = tech?.product.metaData[0]?.value;
-  // const techspecs = JSON.parse(techValue)
+  const techValue = product.metaData?.find(meta => meta?.key === 'tech_spec')?.value;
+  const techSpecs = JSON.parse(techValue || 'false')
 
   return (
     <>
@@ -48,9 +47,9 @@ const ProductOverview = ({
             </div>
           </div>
           <div className="md:w-2/5">
-            {/*{techspecs && techspecs.items && techspecs.items.length > 0 && (*/}
-            {/*  <ProductSpecifications techspecs={techspecs} />*/}
-            {/*)}*/}
+            {techSpecs && techSpecs.items && techSpecs.items.length > 0 && (
+              <ProductSpecifications techspecs={techSpecs} />
+            )}
           </div>
         </div>
       </div>

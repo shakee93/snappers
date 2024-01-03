@@ -1,7 +1,6 @@
 import { Dialog, Transition } from "@headlessui/react";
 import React, { FC, Fragment } from "react";
 import { useRouter } from "next/navigation";
-import { usePathname, useSearchParams } from 'next/navigation'
 import ButtonClose from "@/shared/ButtonClose/ButtonClose";
 import ProductQuickView from "./ProductQuickView3";
 import ProductQuickView2 from "@/components/ProductQuickView";
@@ -18,8 +17,6 @@ const ModalQuickView: FC<ModalQuickViewProps> = ({
   onCloseModalQuickView,
   productData,
 }) => {
-
-  const pathname = usePathname()
 
   return (
     <Transition appear show={show} as={Fragment}>

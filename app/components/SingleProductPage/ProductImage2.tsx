@@ -16,16 +16,15 @@ import Image from "next/image";
 
 
 type PropType = {
-  slides: number[];
   options?: EmblaOptionsType;
   product: SimpleProduct & VariableProduct
 };
 
 
-const EmblaCarousel: React.FC<PropType> = (props) => {
-  const { slides, options, product } = props;
+const EmblaCarousel: React.FC<PropType> = ({product}) => {
+
   const [selectedIndex, setSelectedIndex] = useState(0);
-  const [emblaMainRef, emblaMainApi] = useEmblaCarousel(options);
+  const [emblaMainRef, emblaMainApi] = useEmblaCarousel({});
   const [emblaThumbsRef, emblaThumbsApi] = useEmblaCarousel({
     containScroll: "keepSnaps",
     dragFree: true,
