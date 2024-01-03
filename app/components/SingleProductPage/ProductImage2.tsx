@@ -56,8 +56,8 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
       <div className="embla__viewport" ref={emblaMainRef}>
         <div className="embla__container">
           {[
+            ...[product.image as MediaItem] || [],
               ...product.galleryImages?.nodes || [],
-              ...[product.image as MediaItem] || []
           ].map((image: MediaItem, index) => (
             <div className="embla__slide" key={index}>
               <div className="embla__slide__number">
@@ -87,8 +87,8 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
         <div className="embla-thumbs__viewport" ref={emblaThumbsRef}>
           <div className="embla-thumbs__container">
             {[
+              ...[product.image as MediaItem] || [],
               ...product.galleryImages?.nodes || [],
-              ...[product.image as MediaItem] || []
             ].map((image: MediaItem, index) => (
               <Thumb
                 onClick={() => onThumbClick(index)}
