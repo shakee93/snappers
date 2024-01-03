@@ -32,6 +32,12 @@ const nextConfig = {
       },
       {
         protocol: 'http',
+        hostname: 'gq.freshpixl.com',
+        port: '',
+        pathname: '/*/**',
+      },
+      {
+        protocol: 'http',
         hostname: 'localhost',
         port: '10013',
         pathname: '/*/**',

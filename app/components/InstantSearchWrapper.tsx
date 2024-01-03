@@ -10,6 +10,7 @@ import {useCallback, useDeferredValue, useEffect, useMemo, useState} from "react
 import {useStore} from "@/store/store";
 import {PRICE_RANGE} from "@/app/components/Filters/PriceFilter";
 import Pagination from "@/shared/Pagination/Pagination";
+import SortInput from "@/app/components/SortInput";
 
 
 interface InstantSearchWrapperProps {
@@ -28,6 +29,19 @@ const typesenseConfig = {
     path: process.env.NEXT_PUBLIC_TYPESENSE_PATH || "/q-search",
     protocol: process.env.NEXT_PUBLIC_TYPESENSE_PROTOCOL || "http",
 };
+
+const typesenseInstantSearchAdapter = new TypesenseInstantSearchAdapter({
+    server: {
+        apiKey: "xyz", // Be sure to use an API key that only allows search operations
+        nodes: [
+            typesenseConfig
+        ],
+        cacheSearchResultsForSeconds: 2 * 60, // Cache search results from server. Defaults to 2 minutes. Set to 0 to disable caching.
+    },
+    additionalSearchParameters: {
+        query_by: "name, description",
+    },
+});
 
 const InstantSearchWrapper = ({
                                   search = false,
@@ -62,55 +76,50 @@ const InstantSearchWrapper = ({
     const [page, setPage] = useState(1)
     const [sortQuery, setSortQuery] = useState<undefined | string>("")
 
+    const searchClient = useMemo(() => {
+
+        const typesenseInstantSearchAdapter = new TypesenseInstantSearchAdapter({
+            server: {
+                apiKey: "xyz", // Be sure to use an API key that only allows search operations
+                nodes: [
+                    typesenseConfig
+                ],
+                cacheSearchResultsForSeconds: 2 * 60, // Cache search results from server. Defaults to 2 minutes. Set to 0 to disable caching.
+            },
+            additionalSearchParameters: {
+                query_by: "name, description",
+                // sort_by: sortQuery
+            },
+        });
+
+        return typesenseInstantSearchAdapter.searchClient
+
+    }, [sortQuery])
+
 
     useEffect(() => {
 
         setFilterQuery(getFilterQuery)
-
-        if (differedSidebar.sort) {
-            setSortQuery(differedSidebar.sort);
-        } else {
-            setSortQuery(undefined)
-        }
+        // setSortQuery(differedSidebar.sort);
 
     }, [differedSidebar])
 
 
-    const makeClient: any = useMemo(() => {
-        try {
-
-            const typesenseInstantSearchAdapter = new TypesenseInstantSearchAdapter({
-                server: {
-                    apiKey: "xyz", // Be sure to use an API key that only allows search operations
-                    nodes: [
-                        typesenseConfig
-                    ],
-                    cacheSearchResultsForSeconds: 2 * 60, // Cache search results from server. Defaults to 2 minutes. Set to 0 to disable caching.
-                },
-                additionalSearchParameters: {
-                    query_by: "name, description",
-                    sort_by: sortQuery,
-                },
-            });
-
-            return typesenseInstantSearchAdapter.searchClient
-        }
-
-        catch (e) {
-            console.log(e);
-        }
-    }, [sortQuery])
+    useEffect(() => {
+        console.log(filterQuery);
+    }, [filterQuery])
 
     return <div>
-        <InstantSearchNext stalledSearchDelay={300} future={{
+        <InstantSearchNext stalledSearchDelay={10} future={{
             preserveSharedStateOnUnmount: true
         }} routing={ routing ? {
             router: {
-                cleanUrlOnDispose: false
+                cleanUrlOnDispose: true
             }
-        }: undefined} searchClient={makeClient} indexName='product' >
+        }: undefined} searchClient={searchClient} indexName='product' >
             <div className='flex gap-6 flex-col'>
                 <SearchInput show={search}/>
+                <SortInput/>
                 {filters && <TabFilters category={category} brand={brand} categories={categories} brands={brands}/>}
                 <Configure  filters={filterQuery} hitsPerPage={12}/>
                 <ProductGridInstant/>

@@ -78,7 +78,7 @@ export default async function Home() {
               heading="New Arrivals"
             />
           </div>
-        </div>1
+        </div>
         <div className="mt-24 container lg:my-10">
           {/* <DiscoverMoreSlider /> */}
           <Heading>
