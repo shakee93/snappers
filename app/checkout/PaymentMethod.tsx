@@ -4,6 +4,8 @@ import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Input from "shared/Input/Input";
 import Radio from "shared/Radio/Radio";
+import Image from 'next/image';
+
 import { PaymentGateway } from "@/graphql/types/graphql";
 
 interface Props {
@@ -66,9 +68,16 @@ const PaymentMethod: FC<Props> = ({
             >
               {/* Use gateway-specific icon or default */}
               {gateway.icon ? (
-                <img
+                // <img
+                //   src={gateway.icon}
+                //   alt={`${gateway.title} Icon`}
+                //   className="w-6 h-6 sm:w-7 sm:h-7"
+                // />
+                <Image
                   src={gateway.icon}
                   alt={`${gateway.title} Icon`}
+                  width={28} // Width for sm:w-7
+                  height={28} // Height for sm:h-7
                   className="w-6 h-6 sm:w-7 sm:h-7"
                 />
               ) : (
