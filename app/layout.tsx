@@ -16,6 +16,8 @@ import {SearchProvider} from "@/context/SearchProvider";
 import {Loader} from "lucide-react";
 import {getClient} from "@/graphql/apollo-ssr";
 import {GET_ALL_PRODUCTS} from "@/graphql/defs/products";
+import {Suspense} from "react";
+import {NavigationEvents} from "@/app/components/NavigationEvents";
 
 // import reportWebVitals from "./reportWebVitals";
 
@@ -36,7 +38,7 @@ export default async function RootLayout({
                                          }: {
     children: React.ReactNode;
 }) {
-    // const {productCategories} = await getData();
+    const {productCategories} = await getData();
     return (
         <html lang="en">
         <head>
@@ -47,12 +49,15 @@ export default async function RootLayout({
             <SessionProvider>
                 <>
                     <CartProvider>
+                        <Suspense fallback={null}>
+                            <NavigationEvents></NavigationEvents>
+                        </Suspense>
                         <Toaster/>
 
                         <Header/>
                         {children}
                         <div className="md:hidden">
-                            {/*<MobileBottomNav categories={productCategories}/>*/}
+                            <MobileBottomNav categories={productCategories}/>
                         </div>
                         <Footer/>
                     </CartProvider>

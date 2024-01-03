@@ -5,6 +5,7 @@ import {PRICE_RANGE} from "@/app/components/Filters/PriceFilter";
 type State = {
     search: string,
     search_status: string,
+    navigation: string[]
     sidebar: {
         mounted: number
         categories: number[],
@@ -25,6 +26,7 @@ type Actions = {
     setInStock: (onSale:boolean) => void
     setSort: (sort:string) => void
     setSearch: (search:string) => void
+    pushNavigation: (event:string) => void
     setSearchStatus: (status:string) => void
     syncBrands: (brands: number[]) => void
     synPriceRange: (brands: number[]) => void
@@ -35,6 +37,7 @@ type Actions = {
 export const useStore = create<State & Actions>((set) => ({
     search: "",
     search_status: '',
+    navigation: [],
     sidebar: {
         categories: [],
         brands: [],
@@ -62,6 +65,20 @@ export const useStore = create<State & Actions>((set) => ({
         ...state,
         search
     })),
+    pushNavigation: (event: string) => set((state) => {
+
+        if (state.navigation.length > 0 && state.navigation[state.navigation.length - 1] === event) {
+            return state;
+        }
+
+        return {
+            ...state,
+            navigation: [
+                ...state.navigation,
+                event
+            ]
+        }
+    }),
     setInStock: (in_stock: boolean) => set((state) => ({
         ...state,
         sidebar: {
