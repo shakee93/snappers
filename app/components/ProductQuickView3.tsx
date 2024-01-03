@@ -1,4 +1,4 @@
-import React, { FC, useState, useCallback } from "react";
+import React, { FC, useState, useCallback, useEffect } from "react";
 import { useStore } from "@/store/store";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import LikeButton from "@/app/components/LikeButton";
@@ -33,6 +33,9 @@ import {
   ProductAttribute, ProductUnion, ProductVariation,
 } from "@/graphql/types/graphql";
 
+import { GET_TECH_SPEC } from "@/graphql/defs/products";
+import { useQuery } from "@apollo/client";
+
 export interface ProductQuickViewProps {
   className?: string;
   product: SimpleProduct & VariableProduct;
@@ -44,12 +47,13 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
   const [sizeSelected, setSizeSelected] = React.useState("");
   const [qualitySelected, setQualitySelected] = React.useState(1);
   const { product: { attribute }, setAttribute } = useStore()
+  const [techspecs, setTechSpecs] = React.useState(null);
   const [activeVariation, setActiveVariation] = useState<any>(
     !!product && 'variations' in product && product.variations?.nodes?.length
       ? product.variations.nodes[0]
       : null
   );
-  
+
   const link = useProductLink(product)
 
   let brand = product?.brands?.nodes[0]?.name;
@@ -61,7 +65,19 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
     product?.galleryImages?.nodes[1]?.sourceUrl ?? ""
   ];
 
-  console.log({ product });
+  // console.log({ product });
+
+  const { loading, error, data } = useQuery(GET_TECH_SPEC, {
+    variables: {
+      productId: product.databaseId,
+    }
+  });
+
+  useEffect(() => {
+    if (data) {
+      setTechSpecs(data);
+    }
+  }, [data]);
 
   const activeAttr = useCallback((attr: ProductAttribute) => {
     return attribute.find(a => a.name === attr.name)
@@ -264,8 +280,10 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
           <ProductAddToCart product={product} variation={activeVariation} />
           <div className="flex gap-1 items-center py-2 text-sm md:text-base text-gray-500">
             <div className="text-sm py-2">Category:</div>
-            {product.productCategories?.edges.map((category: any, index: number) =>
-              <Link href={`/collections/${category.node.slug}`} key={index} className="bg-primary-100 inline-block py-1 px-2  text-xs md:text-sm rounded-3xl">
+
+            {product.productCategories?.edges && product.productCategories?.edges.map((category: any, index: number) =>
+              <Link href={`/collections/${category.node.slug}`} key={index} 
+              className="bg-primary-100 inline-block py-1 px-2  text-xs md:text-sm rounded-3xl">
                 {category.node.name}
               </Link>
             )}
@@ -333,6 +351,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
               content: product.description ?? "",
             }
           ]}
+          techspecs={techspecs}
         />
       </div>
     );

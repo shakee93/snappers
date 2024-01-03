@@ -30,7 +30,7 @@ const CartItemProduct = ({
     const link = useProductLink(product?.node)
 
     if (!product?.node) {
-        return <p>No productnode found. {JSON.stringify(cartItem)} </p>;
+        return <p>No product found. {JSON.stringify(cartItem)} </p>;
     }
     
 
@@ -41,7 +41,7 @@ const CartItemProduct = ({
             className="relative flex py-8 sm:py-10 xl:py-12 first:pt-0 last:pb-0"
         >
             <div className="relative h-36 w-24 sm:w-32 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
-                <Image fill style={{ objectFit: 'cover' }}
+                <Image width={100} height={100} style={{ objectFit: 'contain' }}
                     src={image?.sourceUrl || ''}
                     alt={name || ''}
                     className="h-full w-full object-contain object-center"

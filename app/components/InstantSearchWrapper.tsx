@@ -72,7 +72,7 @@ const InstantSearchWrapper = ({
         } else {
             setSortQuery(undefined)
         }
-        
+
     }, [differedSidebar])
 
 
@@ -101,20 +101,22 @@ const InstantSearchWrapper = ({
         }
     }, [sortQuery])
 
-    return <InstantSearchNext stalledSearchDelay={300} future={{
-        preserveSharedStateOnUnmount: true
-    }} routing={ routing ? {
-        router: {
-            cleanUrlOnDispose: false
-        }
-    }: undefined} searchClient={makeClient} indexName='product' >
-        <div className='flex gap-6 flex-col'>
-            <SearchInput show={search}/>
-            {filters && <TabFilters category={category} brand={brand} categories={categories} brands={brands}/>}
-            <Configure  filters={filterQuery} hitsPerPage={12}/>
-            <ProductGridInstant/>
-        </div>
-    </InstantSearchNext>
+    return <div>
+        <InstantSearchNext stalledSearchDelay={300} future={{
+            preserveSharedStateOnUnmount: true
+        }} routing={ routing ? {
+            router: {
+                cleanUrlOnDispose: false
+            }
+        }: undefined} searchClient={makeClient} indexName='product' >
+            <div className='flex gap-6 flex-col'>
+                <SearchInput show={search}/>
+                {filters && <TabFilters category={category} brand={brand} categories={categories} brands={brands}/>}
+                <Configure  filters={filterQuery} hitsPerPage={12}/>
+                <ProductGridInstant/>
+            </div>
+        </InstantSearchNext>
+    </div>
 }
 
 export default InstantSearchWrapper

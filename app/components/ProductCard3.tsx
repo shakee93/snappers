@@ -167,7 +167,7 @@ const ProductCard: FC<ProductCardProps> = ({
                                     sizeClass="py-2.5 px-5"
                                 >
                                     <AttributeIcon className='w-4 mr-1' name={attributes?.nodes[0].name}/>
-                                    <span className="ml-1">Choose {attributes?.nodes[0].label || "Options" }</span>
+                                    <span className="ml-1">{attributes?.nodes[0].label || "Options" }</span>
                                 </ButtonPrimary>
                             </Link>
                         }
