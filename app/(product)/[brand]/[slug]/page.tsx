@@ -87,6 +87,7 @@ const Page = async ({params}: any) => {
         brand: Brand;
         tech: any;
     } = await getData(params.slug, params.brand);
+    
     const techValue = tech?.product.metaData[0]?.value;
     const techspecs = JSON.parse(techValue)
 

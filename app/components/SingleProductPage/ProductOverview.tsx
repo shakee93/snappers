@@ -10,6 +10,8 @@ const ProductOverview = ({
   techspecs: any
 }) => {
 
+  console.log("tech", product.databaseId , techspecs);
+
   return (
     <>
       <div className="bg-white p-5 rounded-3xl md:p-10 my-5">
@@ -45,7 +47,9 @@ const ProductOverview = ({
             </div>
           </div>
           <div className="md:w-2/5">
-            <ProductSpecifications techspecs={techspecs}/>
+            {techspecs && techspecs.items && techspecs.items.length > 0 && (
+              <ProductSpecifications techspecs={techspecs} />
+            )}
           </div>
         </div>
       </div>
