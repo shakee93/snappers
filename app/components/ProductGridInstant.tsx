@@ -7,6 +7,9 @@ import {useLazyQuery} from "@apollo/client";
 import ProductCard from "./ProductCard3";
 import {useHits, useInstantSearch} from "react-instantsearch";
 import Pagination from "@/shared/Pagination/Pagination";
+import Image from "next/image";
+
+import NotFound from '@/public/not_found.svg'
 
 interface ProductGridProps {
     products?: { node: Product }[]
@@ -15,15 +18,15 @@ interface ProductGridProps {
 }
 const ProductGridInstant = ({ products, brand, category }: ProductGridProps) => {
     const { hits, results } = useHits()
-    const [_status, setStatus] = useState('')
 
     const { status: statusState } = useInstantSearch();
-    // useEffect(() => {
-    //     setStatus(statusState)
-    // }, [statusState])
+    const { setSearchStatus } = useStore()
 
     const grid = 8;
 
+    useEffect(() => {
+        setSearchStatus(statusState)
+    }, [statusState])
 
     if (statusState === 'stalled' ) {
         return <div className='flex-1 grid  grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-5 lg:gap-x-8 lg:gap-y-10'>
@@ -43,27 +46,20 @@ const ProductGridInstant = ({ products, brand, category }: ProductGridProps) => 
         <>
             {/*{statusState}*/}
             <div className="flex-1 grid  grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-5 lg:gap-x-8 lg:gap-y-10">
-
-                {['loading'].includes(_status)  ?
-                     <>
-                         {Array(grid).fill(null).map((x, index) =>
-                             <div key={index} className="space-y-3">
-                                 <div className="h-52 bg-gray-200 rounded-md animate-pulse"></div>
-                                 <div className="h-4 bg-gray-300 rounded-md"></div>
-                                 <div className="h-4 bg-gray-300 rounded-md w-2/3"></div>
-                                 <div className="h-8 bg-gray-300 rounded-md w-1/4"></div>
-                             </div>
-                         )}
-                     </>: <>
-                        {hits.map((item, index: number) =>
-                            // <div key={index}></div>
-                            <ProductCard  key={item.slug as unknown as string} data={item as unknown as Product} />
-                        )}
-                    </>
-                }
-
-
+                {hits.map((item, index: number) =>
+                    // <div key={index}></div>
+                    <ProductCard  key={item.slug as unknown as string} data={item as unknown as Product} />
+                )}
             </div>
+
+            {results?.nbHits === 0 && <div className='text-center text-slate-500 flex flex-col items-center gap-20 py-12'>
+                <div>
+                    <Image className='w-64' src={NotFound} alt='No Search Results'/>
+                </div>
+                <div>
+                    We couldn&lsquo;t find any matches for your search. :(
+                </div>
+            </div>}
 
 
             {(results && results?.nbHits > results?.hitsPerPage ) &&
