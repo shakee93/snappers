@@ -25,7 +25,7 @@ const nextConfig = {
         pathname: '/*/**',
       },
       {
-        protocol: 'http',
+        protocol: 'https',
         hostname: 'gq.freshpixl.com',
         port: '',
         pathname: '/*/**',

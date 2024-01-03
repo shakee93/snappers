@@ -110,18 +110,23 @@ const InstantSearchWrapper = ({
     }, [filterQuery])
 
     return <div>
-        <InstantSearchNext stalledSearchDelay={200} future={{
-            preserveSharedStateOnUnmount: true
-        }} routing={ routing ? {
-            router: {
-                cleanUrlOnDispose: true
-            }
-        }: undefined} searchClient={searchClient} indexName='product' >
+        <InstantSearchNext 
+            stalledSearchDelay={200}
+                           future={{
+                               preserveSharedStateOnUnmount: true
+                           }}
+                           routing={routing ? {
+                               router: {
+                                   cleanUrlOnDispose: true
+                               }
+                           } : undefined}
+                           searchClient={searchClient}
+                           indexName='product'>
             <div className='flex gap-6 flex-col'>
                 <SearchInput show={search}/>
                 <SortInput/>
                 {filters && <TabFilters category={category} brand={brand} categories={categories} brands={brands}/>}
-                <Configure  filters={filterQuery} hitsPerPage={12}/>
+                <Configure filters={filterQuery} hitsPerPage={12}/>
                 <ProductGridInstant/>
             </div>
         </InstantSearchNext>
