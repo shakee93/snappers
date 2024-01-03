@@ -12,6 +12,7 @@ import ContactInfo from "./ContactInfo";
 import PaymentMethod from "./PaymentMethod";
 import ShippingAddress from "./ShippingAddress";
 import Link from "next/link";
+import MySwitch from "components/MySwitch";
 
 const CheckoutPage = () => {
   const [tabActive, setTabActive] = useState<
@@ -290,6 +291,7 @@ const CheckoutPage = () => {
             <ButtonPrimary href="/account-my-order" className="mt-8 w-full">
               Confirm order
             </ButtonPrimary>
+            
             <div className="mt-5 text-sm text-slate-500 dark:text-slate-400 flex items-center justify-center">
               <p className="block relative pl-5">
                 <svg

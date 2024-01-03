@@ -30,6 +30,7 @@ import {
 
 import CheckoutDetails from "./CheckoutDetails";
 import CartItems from "./CartItems";
+import MySwitch from "@/components/MySwitch"
 
 interface FormData {
   contactInfo: Record<string, any>;
@@ -167,12 +168,13 @@ const CheckoutPage = () => {
               setTabActive={(
                 value:
                   | "ContactInfo"
-                  | "ShippingAddress"
                   | "BillingAddress"
+                  | "ShippingAddress"
                   | "PaymentMethod"
               ) => setTabActive(value)}
               handleScrollToEl={handleScrollToEl}
               updateFormData={updateFormData}
+              formData={formData}
               paymentGateways={paymentGateways}
             />
           </div>
@@ -229,11 +231,14 @@ const CheckoutPage = () => {
             </div>
             <ButtonPrimary
               onClick={handleCheckout}
-              disabled={!canConfirmOrder}
+              // disabled={!canConfirmOrder}
+              // disabled={}
               className="mt-8 w-full"
             >
+
               Confirm order
             </ButtonPrimary>
+
             <div className="mt-5 text-sm text-slate-500 dark:text-slate-400 flex items-center justify-center">
               <p className="block relative pl-5">
                 <svg

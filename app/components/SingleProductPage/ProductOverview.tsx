@@ -42,6 +42,7 @@ const ProductOverview = ({
             {/*    </li>*/}
             {/*  </ul>*/}
             {/*</div>*/}
+            
             <div className="text-xs md:text-sm text-gray-600">
               {parseHtml(product.description || '')}
             </div>

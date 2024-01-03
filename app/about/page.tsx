@@ -96,7 +96,7 @@ const AccountPage = () => {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 p-5  lg:py-20">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 p-5  lg:py-20"
           {about.map((item) => (
             <div key={item.id} className="gap-2 md:gap-5 flex flex-col">
               <div className="">
