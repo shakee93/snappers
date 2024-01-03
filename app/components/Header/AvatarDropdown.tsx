@@ -23,8 +23,6 @@ export default function AvatarDropdown() {
     setCustomer(customer);
   }, [data]);
 
-
-
   return (
     <div className="AvatarDropdown ">
       {!customer || customer?.id === "guest" ? (

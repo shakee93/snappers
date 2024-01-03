@@ -74,7 +74,7 @@ const PaymentMethod: FC<Props> = ({
                 //   className="w-6 h-6 sm:w-7 sm:h-7"
                 // />
                 <Image
-                  src={gateway.icon}
+                  src={gateway?.icon}
                   alt={`${gateway.title} Icon`}
                   width={28} // Width for sm:w-7
                   height={28} // Height for sm:h-7

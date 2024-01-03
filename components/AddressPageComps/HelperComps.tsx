@@ -25,7 +25,7 @@ const SelectField = React.memo(function SelectField({ label, name, value, option
     return (
         <div className="flex-1">
             <Label>{label}</Label>
-            <Select className="mt-1.5" value={value || ''} name={name} onChange={onChange} disabled={disabled}>
+            <Select required={true} className="mt-1.5" value={value || ''} name={name} onChange={onChange} disabled={disabled}>
                 {options.map((option: any) => (
                     <option key={option.value} value={option.value}>
                         {option.label}

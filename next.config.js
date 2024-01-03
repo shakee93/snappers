@@ -42,7 +42,14 @@ const nextConfig = {
         port: '',
         pathname: '/id/*/**',
       },
+      {
+        protocol: 'https', // Add this configuration for your domain
+        hostname: 'payherestorage.blob.core.windows.net',
+        port: '',
+        pathname: '/*/**',
+      },
     ],
+
   }
 }
 
