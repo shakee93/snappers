@@ -135,6 +135,7 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
             updateFormData(section, data);
           }}
           initialData={billingDetails!}
+          formData={formData}
         />
       </div>
 

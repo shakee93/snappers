@@ -81,15 +81,12 @@ const Page = async ({params}: any) => {
     const {
         product,
         brand,
-        tech,
     }: {
         product: SimpleProduct & VariableProduct;
         brand: Brand;
         tech: any;
     } = await getData(params.slug, params.brand);
     
-    const techValue = tech?.product.metaData[0]?.value;
-    const techspecs = JSON.parse(techValue)
 
 
     // console.log({product})
@@ -118,7 +115,7 @@ const Page = async ({params}: any) => {
                     </div>
                 </div>
                 {/* Image Gallery */}
-                <ProductOverview product={product} techspecs={techspecs}/>
+                {/*<ProductOverview product={product} techspecs={techspecs}/>*/}
                 <div className=" lg:hidden w-full lg:w-1/5 p-3 bg-white rounded-3xl my-5">
                     <Features/>
                 </div>
