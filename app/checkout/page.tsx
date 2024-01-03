@@ -176,7 +176,6 @@ const CheckoutPage = () => {
               updateFormData={updateFormData}
               formData={formData}
               paymentGateways={paymentGateways}
-              formData={formData}
             />
           </div>
 
