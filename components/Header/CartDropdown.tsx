@@ -35,17 +35,17 @@ export default function CartDropdown() {
                     {name}
                   </Link>
                 </h3>
-                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                <div className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                   <span>{`Natural`}</span>
                   <span className="mx-2 border-l border-slate-200 dark:border-slate-700 h-4"></span>
                   <span>{"XL"}</span>
-                </p>
+                </div>
               </div>
               <Prices price={price} className="mt-0.5" />
             </div>
           </div>
           <div className="flex flex-1 items-end justify-between text-sm">
-            <p className="text-gray-500 dark:text-slate-400">{`Qty 1`}</p>
+            <div className="text-gray-500 dark:text-slate-400">{`Qty 1`}</div>
 
             <div className="flex">
               <button
@@ -136,7 +136,7 @@ export default function CartDropdown() {
                     </div>
                   </div>
                   <div className="bg-neutral-50 dark:bg-slate-900 p-5">
-                    <p className="flex justify-between font-semibold text-slate-900 dark:text-slate-100">
+                    <div className="flex justify-between font-semibold text-slate-900 dark:text-slate-100">
                       <span>
                         <span>Subtotal</span>
                         <span className="block text-sm text-slate-500 dark:text-slate-400 font-normal">
@@ -144,7 +144,7 @@ export default function CartDropdown() {
                         </span>
                       </span>
                       <span className="">$299.00</span>
-                    </p>
+                    </div>
                     <div className="flex space-x-2 mt-5">
                       <ButtonSecondary
                         href="/cart"
