@@ -55,7 +55,9 @@ const ShippingAddress: FC<Props> = ({
     // console.log("main Form Data: ", formData);
     // get the length of the formData
     const isShippingAddressEmpty =
-      Object.keys(formData.shippingAddress).length === 0;
+      formData?.shippingAddress &&
+      Object.keys(formData?.shippingAddress).length === 0;
+
     if (isShippingAddressEmpty) {
       setIsConfirmed(false);
     }
