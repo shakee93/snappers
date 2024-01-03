@@ -25,13 +25,11 @@ const ProductGrid = ({ products, brand, category }: ProductGridProps) => {
     useEffect(() => {
 
 
-        console.log(categories);
 
         if (categories.length === 0 && brands.length === 0 && mounted) {
             setMounts(p => p + 1)
         }
 
-        console.log(mounts);
 
         if (mounts >= 0) {
             (async () => {
@@ -42,9 +40,6 @@ const ProductGrid = ({ products, brand, category }: ProductGridProps) => {
                     },
                     fetchPolicy: 'no-cache'
                 });
-
-                console.log(data.products.edges);
-
 
                 setProducts(data.products.edges)
             })();

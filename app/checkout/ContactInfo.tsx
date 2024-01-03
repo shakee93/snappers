@@ -23,12 +23,14 @@ const ContactInfo: FC<Props> = ({
 }) => {
   const [phone, setPhone] = useState("+94");
   const [email, setEmail] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [isConfirmed, setIsConfirmed] = useState(false);
 
   useEffect(() => {
     if (initialData) {
       setPhone(initialData?.phone);
       setEmail(initialData?.email);
+      setDisplayName(initialData?.displayName);
     }
   }, [initialData]);
 
@@ -84,12 +86,8 @@ const ContactInfo: FC<Props> = ({
               </svg>
             </h3>
             <div className="font-semibold mt-1 text-sm">
-              <span className="">
-                {initialData?.displayName ?? "Your name"}
-              </span>
-              <span className="ml-3 tracking-tighter">
-                {initialData?.phone || "Your phone number"}
-              </span>
+              <span className="">{displayName ?? ""}</span>
+              <span className="ml-3 tracking-tighter">{phone || ""}</span>
             </div>
           </div>
           <ButtonSecondary
@@ -101,24 +99,27 @@ const ContactInfo: FC<Props> = ({
             Change
           </ButtonSecondary>
         </div>
-        <form onSubmit={() => {
-          if (phone && email) {
-            const contactInfo = {
-              phone,
-              email,
-            };
-            updateFormData("contactInfo", contactInfo);
-            setPhone(initialData?.phone);
-            setEmail(initialData?.email);
-            setIsConfirmed(true);
-            onCloseActive();
-          } else {
-            setIsConfirmed(false);
-          }
-        }}>
+        <form
+          onSubmit={() => {
+            if (phone && email) {
+              const contactInfo = {
+                phone,
+                email,
+              };
+              updateFormData("contactInfo", contactInfo);
+              setPhone(initialData?.phone);
+              setEmail(initialData?.email);
+              setIsConfirmed(true);
+              onCloseActive();
+            } else {
+              setIsConfirmed(false);
+            }
+          }}
+        >
           <div
-            className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${isActive ? "block" : "hidden"
-              }`}
+            className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${
+              isActive ? "block" : "hidden"
+            }`}
           >
             <div className="flex justify-between flex-wrap items-baseline">
               <h3 className="text-lg font-semibold">Contact infomation</h3>
@@ -133,14 +134,11 @@ const ContactInfo: FC<Props> = ({
               )}
             </div>
             <div className="max-w-lg">
-              <Label className="text-sm">
-                Your phone number
-              </Label>
+              <Label className="text-sm">Your phone number</Label>
               <Input
                 className="mt-1.5"
-                defaultValue={initialData?.phone}
-                type={"tel"}
-                value={phone}
+                defaultValue={phone}
+                type="tel"
                 onChange={(e) => setPhone(e.target.value)}
                 required={true}
               />
@@ -150,8 +148,7 @@ const ContactInfo: FC<Props> = ({
               <Input
                 className="mt-1.5"
                 defaultValue={initialData?.email || ""}
-                value={email}
-                type={"email"}
+                type="email"
                 onChange={(e) => setEmail(e.target.value)}
                 required={true}
               />
@@ -159,18 +156,13 @@ const ContactInfo: FC<Props> = ({
 
             {/* ============ */}
             <div className="flex flex-col sm:flex-row pt-6">
-              <ButtonPrimary
-                type="submit"
-                className="sm:!px-7 shadow-none"
-
-              >
+              <ButtonPrimary type="submit" className="sm:!px-7 shadow-none">
                 Save and next to Shipping
               </ButtonPrimary>
             </div>
           </div>
         </form>
       </div>
-
     );
   };
 

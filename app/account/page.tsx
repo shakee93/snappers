@@ -13,6 +13,7 @@ import toast from "react-hot-toast";
 
 const AccountPage: FC = () => {
   const { customer, fetchCustomer, updateCustomer } = useSession();
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
     displayName: "",
@@ -82,9 +83,17 @@ const AccountPage: FC = () => {
         { key: "about", value: about },
       ],
     };
-
-    const response = await updateCustomer(input);
-    toast.success("Account details updated successfully");
+    try {
+      await updateCustomer(input);
+      toast.remove();
+      toast.success("Account details updated successfully");
+    } catch (error: any) {
+      toast.error("Something Went Wrong!");
+    } finally {
+      setTimeout(() => {
+        setIsSubmitting(false);
+      }, 3000);
+    }
   };
 
   return (
@@ -114,6 +123,7 @@ const AccountPage: FC = () => {
                     <i className="text-2xl las la-envelope"></i>
                   </span>
                   <Input
+                    required={true}
                     className="!rounded-l-none"
                     name="email"
                     disabled={true}
@@ -129,6 +139,7 @@ const AccountPage: FC = () => {
                     <i className="text-2xl las la-calendar"></i>
                   </span>
                   <Input
+                    required={true}
                     className="!rounded-l-none"
                     name="dateOfBirth"
                     type="date"
@@ -138,24 +149,10 @@ const AccountPage: FC = () => {
                 </div>
               </div>
 
-              {/* <Label>Address</Label> */}
-              {/* <div className="mt-1.5 flex">
-                                <span className="inline-flex items-center px-2.5 rounded-l-2xl border border-r-0 border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400 text-sm">
-                                    <i className="text-2xl las la-map-signs"></i>
-                                </span>
-                                <ButtonPrimary>
-                                    Add Billing Address
-                                </ButtonPrimary>
-                                {/* <Input
-                                    className="!rounded-l-none"
-                                    name="address"
-                                    value={formData.address}
-                                    onChange={handleChange}
-                                /> */}
-              {/* </div> */}
               <div>
                 <Label>Gender</Label>
                 <Select
+                  required={true}
                   className="mt-1.5"
                   name="gender"
                   value={formData.gender}
@@ -174,24 +171,19 @@ const AccountPage: FC = () => {
                     <i className="text-2xl las la-phone-volume"></i>
                   </span>
                   <Input
+                    required={true}
                     className="!rounded-l-none"
                     name="phoneNumber"
+                    type="tel"
                     value={formData.phoneNumber}
                     onChange={handleChange}
                   />
                 </div>
               </div>
-              {/* <div>
-                <Label>About you</Label>
-                <Textarea
-                  className="mt-1.5"
-                  name="about"
-                  value={formData.about}
-                  onChange={handleChange}
-                />
-              </div> */}
               <div className="pt-2">
-                <ButtonPrimary type="submit">Update account</ButtonPrimary>
+                <ButtonPrimary type="submit" disabled={isSubmitting}>
+                  {isSubmitting ? "Updating..." : "Update account"}
+                </ButtonPrimary>
               </div>
             </div>
           </div>

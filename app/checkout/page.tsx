@@ -57,7 +57,6 @@ const CheckoutPage = () => {
     });
 
     const updateFormData = (section: string, data: any) => {
-        console.log('Incoming data:', data);
       
         setFormData((prevData) => {
           let updatedSection;
@@ -76,8 +75,6 @@ const CheckoutPage = () => {
             [section as keyof FormData]: updatedSection,
           };
       
-          console.log('Updated FormData:', updatedFormData);
-      
           return updatedFormData;
         });
       };
@@ -89,7 +86,6 @@ const CheckoutPage = () => {
     const handleCheckout = async () => {
         try {
             const paymentMethodId = formData?.paymentMethod?.selectedGateway;
-            console.log('paymentMethodId', paymentMethodId);
 
 
             const lineItems = cart?.contents?.nodes.map(item => ({
@@ -109,7 +105,6 @@ const CheckoutPage = () => {
 
                     if (data && data.createOrder) {
                         const orderDetails = data.createOrder.order;
-                        console.log("Order Details:", orderDetails);
                     } else {
                         console.error("Failed to retrieve order details");
                     }
