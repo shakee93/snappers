@@ -31,55 +31,48 @@ const CardCategory4: FC<CardCategory4Props> = ({
 
   return (
     <div
-      className={`nc-CardCategory4 relative w-full aspect-w-12 aspect-h-11 h-0 rounded-3xl overflow-hidden bg-white dark:bg-neutral-900 group hover:nc-shadow-lg transition-shadow ${className}`}
+      className={`nc-CardCategory4 relative w-full rounded-3xl overflow-hidden bg-white dark:bg-neutral-900 group hover:nc-shadow-lg transition-shadow ${className}`}
       data-nc-id="CardCategory4"
     >
-      <div>
-        {/* <div className="absolute bottom-0 right-0 max-w-[280px] opacity-80">
-          <Image src={bgSVG || ''} alt="" />
-        </div> */}
-
-        <div className="absolute inset-5 sm:inset-8 flex flex-col justify-between">
-          <div className="flex justify-center items-center min-h-[200px]">
-            {/* <Image
+      <div className="flex p-8 flex-col justify-between">
+        <div className="flex items-center ">
+          {/* <Image
               src={featuredImage || FallbackImage}
               className={`w-20 h-20 rounded-full overflow-hidden z-0 ${color}`}
               alt=""
               width={1000}
               height={1000}
             /> */}
-             <Image
+          <Image
               src={featuredImage || FallbackImage}
-              className={`w-full max-w-[200px] max-h-[200px] overflow-hidden z-0 ${color}`}
+              className={`h-[50px] object-contain w-auto ${color}`}
               alt=""
-              width={1000}
-              height={1000}
-            />
-            {/* <span className="text-xs text-slate-700 dark:text-neutral-300 font-medium">
+              width={100}
+              height={100}
+          />
+          {/* <span className="text-xs text-slate-700 dark:text-neutral-300 font-medium">
              products
             </span> */}
-          </div>
+        </div>
 
-          <div className="">
+        <div className="">
             <span
-              className={`block mb-2 text-sm text-slate-500 dark:text-slate-400`}
+                className={`block mb-2 text-sm text-slate-500 dark:text-slate-400`}
             >
               {desc}
             </span>
-            <h2 className={`text-2xl sm:text-3xl font-semibold`}>{name}</h2>
-          </div>
+          <h2 className={`text-2xl sm:text-3xl font-semibold`}>{name}</h2>
+        </div>
 
-          <Link
+        <Link
             href={`/${slug}`}
             className="flex items-center text-sm font-medium group-hover:text-primary-500 transition-colors"
-          >
-            <span>See Collection</span>
-            <ArrowRightIcon className="w-4 h-4 ml-2.5" />
-          </Link>
-        </div>
+        >
+          <span>See Collection</span>
+          <ArrowRightIcon className="w-4 h-4 ml-2.5" />
+        </Link>
       </div>
 
-      <Link href={`/${slug}`}></Link>
     </div>
   );
 };
