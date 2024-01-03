@@ -50,43 +50,46 @@ export interface SectionGridMoreExploreProps {
 }
 
 
-const hardcodedBrands = {
+const hardcodedBrands: {
+  [key: string]: {
+    id: string;
+    slug: string;
+  }[];
+} = {
   Mobiles: [
-    { name: "Sam", id: 'dGVybToyMTk=', slug: "samsung", img: samsung },
-    { name: "Ape", id: 'dGVybToyMjY=', slug: "apple", img: apple },
-    { name: "Ggle", id: 'dGVybToyMjk=', slug: "google", img: google },
-    { name: "OePlus", id: 'dGVybToyMjA=', slug: "oneplus", img: oneplus },
-    { name: "Hawei", id: 'dGVybToyMjU=', slug: "huawei", img: huawei },
-    { name: "Nia", id: 'dGVybToyMzk=', slug: "nokia", img: nokia },
+    { id: 'dGVybToyMTk=', slug: "samsung" },
+    { id: 'dGVybToyMjY=', slug: "apple" },
+    { id: 'dGVybToyMjk=', slug: "google" },
+    { id: 'dGVybToyMjA=', slug: "oneplus" },
+    { id: 'dGVybToyMjU=', slug: "huawei" },
+    { id: 'dGVybToyMzk=', slug: "nokia" },
   ],
   Watches: [
-    { name: "Fbit", id: 'dGVybToyMzI=', slug: "fitbit", img: fitbit },
-    { name: "azfit", id: 'dGVybToyMjQ=', slug: "amazfit", img: amazfit },
-    { name: "Hei", id: 'dGVybToyMjU=', slug: "huawei", img: huawei },
+    { id: 'dGVybToyMzI=', slug: "fitbit" },
+    { id: 'dGVybToyMjQ=', slug: "amazfit" },
+    { id: 'dGVybToyMjU=', slug: "huawei" },
   ],
   Laptops: [
-    { name: "pple", id: 'dGVybToyMjY=', slug: "apple", img: apple },
-    { name: "Smsung", id: 'dGVybToyMTk=', slug: "samsung", img: samsung },
+    { id: 'dGVybToyMjY=', slug: "apple" },
+    { id: 'dGVybToyMTk=', slug: "samsung" },
   ],
   Speakers: [
-    { name: "ose", id: 'dGVybToyNDE=', slug: "bose", img: bose },
-    { name: "ats", id: 'dGVybToyMzM=', slug: "beats", img: beats },
-    { name: "Mimi", id: 'dGVybToyNzA=', slug: "marshals", img: '' },
+    { id: 'dGVybToyNDE=', slug: "bose" },
+    { id: 'dGVybToyMzM=', slug: "beats" },
+    { id: 'dGVybToyNzA=', slug: "marshals" },
   ],
   PowerBanks: [
-    { name: "orodo", id: 'dGVybToyNDA=', slug: "porodo", img: porodo },
-    { name: "Blkin", id: 'dGVybToyMzg=', slug: "belkin", img: belkin },
-    { name: "Blkin", id: 'dGVybToyMzg=', slug: "anker", img: '' },
+    { id: 'dGVybToyNDA=', slug: "porodo" },
+    { id: 'dGVybToyMzg=', slug: "belkin" },
   ],
   Gaming: [
-    { name: "Loitech", id: 'dGVybToyMzQ=', slug: "logitech", img: logitech },
-    { name: "Tec", id: 'dGVybToyNTg=', slug: "tecno", img: tecno },
-    { name: "Skull", id: 'dGVybToyMjE=', slug: "skullcandy", img: skullcandy },
-    { name: "Green Lion", id: 'dGVybToyMzc=', slug: "green-lion", img: greenlion },
-    { name: "Green Lion", id: 'dGVybToyMzc=', slug: "nintendo", img: '' },
+    { id: 'dGVybToyMzQ=', slug: "logitech" },
+    { id: 'dGVybToyNTg=', slug: "tecno" },
+    { id: 'dGVybToyMjE=', slug: "skullcandy" },
+    { id: 'dGVybToyMzc=', slug: "green-lion" },
   ],
-
 };
+;
 
 const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
   className = "",
@@ -94,48 +97,36 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
   gridClassName = "grid-cols-1 md:grid-cols-2 xl:grid-cols-3",
 }) => {
 
-  const [brands, setBrands] = useState<any[]>([]);
+  const [brands, setBrands] = useState<Brand[]>([]);
   const [tabActive, setTabActive] = useState<keyof typeof hardcodedBrands>("Mobiles");
 
   const { loading, error, data, refetch } = useQuery(GET_BRANDS);
 
   const fetchBrandsForCategory = async (category: keyof typeof hardcodedBrands) => {
     try {
-      const hardcodedBrandList = hardcodedBrands[category] || [];
-      const slugs = hardcodedBrandList.map((brand) => brand.slug);
+      const allSlugs = [];
+
+      for (const category in hardcodedBrands) {
+        const brandsInCategory = hardcodedBrands[category] ;
+        for (const brand of brandsInCategory) {
+          allSlugs.push(brand.slug);
+        }
+      }
 
       const { data: fetchedData } = await refetch({
-        
-          slug: slugs
-        
+          slug: allSlugs
       });
 
-      const fetchedBrandsFromServer: Brand[] = fetchedData?.brands.nodes || [];
-
-      console.log({ fetchedBrandsFromServer });
-
-      const updatedBrands = fetchedBrandsFromServer.map((serverBrand) => {
-        return {
-          ...serverBrand,
-          img: serverBrand.brandImage || '',
-        };
-      });
-
-      setBrands(updatedBrands);
+      setBrands(fetchedData.brands.nodes as Brand[]);
     } catch (error) {
       console.error(`Error fetching brands for ${category}`, error);
     }
 
-    console.log({ brands })
   };
 
   useEffect(() => {
     fetchBrandsForCategory(tabActive);
-  }, [tabActive]);
-
-  useEffect(() => {
-    console.log({ brands });
-  }, [brands]);
+  }, []);
 
   const renderHeading = () => {
     return (
@@ -181,14 +172,16 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
     >
       {renderHeading()}
       <div className={`grid gap-4 md:gap-7 ${gridClassName}`}>
-        {brands?.map((brand) => (
-          <div key={brand.id}>
+        {hardcodedBrands[tabActive]
+            ?.map(brand => brands.find(b => b.id === brand.id) as Brand)
+            ?.filter(n => n !== undefined).map((brand, index) => (
+          <div key={brand.id + index}>
             <CardCategory4
               name={brand.name || ''}
               desc={brand.description || ''}
               key={brand.id}
               slug={brand.slug || ''}
-              featuredImage={brand?.brandImage}
+              featuredImage={brand?.brandImage || ''}
             />
           </div>
         ))}

@@ -27,7 +27,7 @@ const PaymentMethod: FC<Props> = ({
     "Credit-Card" | "Internet-banking" | "Wallet"
   >("Credit-Card");
 
-  useEffect(() => {}, [paymentGateways]);
+  useEffect(() => { }, [paymentGateways]);
 
   const [selectedGateway, setSelectedGateway] = useState<PaymentGateway>({
     id: "",
@@ -60,11 +60,10 @@ const PaymentMethod: FC<Props> = ({
             className="flex items-center space-x-4 sm:space-x-6"
           >
             <div
-              className={`p-2.5 rounded-xl border-2 ${
-                active
-                  ? "border-slate-600 dark:border-slate-300"
-                  : "border-gray-200 dark:border-slate-600"
-              }`}
+              className={`p-2.5 rounded-xl border-2 ${active
+                ? "border-slate-600 dark:border-slate-300"
+                : "border-gray-200 dark:border-slate-600"
+                }`}
             >
               {/* Use gateway-specific icon or default */}
               {gateway.icon ? (
@@ -87,14 +86,22 @@ const PaymentMethod: FC<Props> = ({
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
                 >
-                  {/* Default SVG paths here */}
                 </svg>
               )}
             </div>
             <p className="font-medium">{gateway.title}</p>
           </label>
           <div className={`mt-6 mb-4 ${active ? "block" : "hidden"}`}>
-            <p className="text-sm dark:text-slate-300">
+            {gateway.icon ? (<Image
+              src={gateway?.icon}
+              alt="payment gateway"
+              width={1000}
+              height={1000}
+              className="pb-2"
+            />) : (
+              <></>
+            )}
+            < p className="text-sm dark:text-slate-300">
               Your order will be delivered to you after you{" "}
               {gateway.title || "transfer funds"} to:
             </p>
@@ -116,7 +123,7 @@ const PaymentMethod: FC<Props> = ({
             </ul>
           </div>
         </div>
-      </div>
+      </div >
     );
   };
 
@@ -204,9 +211,8 @@ const PaymentMethod: FC<Props> = ({
         </div>
 
         <div
-          className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-6 ${
-            isActive ? "block" : "hidden"
-          }`}
+          className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-6 ${isActive ? "block" : "hidden"
+            }`}
         >
           {/* ==================== */}
           {/* <div>{renderDebitCredit()}</div> */}
