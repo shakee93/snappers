@@ -22,8 +22,6 @@ const MobileBottomNav = ({ categories }: { categories: any }) => {
 
   const router = useRouter();
 
-  console.log(categories);
-
   return (
     <div className="fixed grid grid-cols-4 shadow-3xl  justify-between bottom-0 z-30 bg-white border-slate-100 border-t-2 pt-2 w-full py-1 px-1">
       <div>
