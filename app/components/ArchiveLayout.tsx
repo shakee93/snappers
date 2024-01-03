@@ -25,7 +25,6 @@ interface ArchiveLayoutProps {
 
 const ArchiveLayout = async ({ title, description, filters = false, search = false, brand, category}: ArchiveLayoutProps) => {
     const { productCategories, brands } = await getData();
-
     return (
         <div className="container py-16 lg:pb-28 lg:pt-12 space-y-16 sm:space-y-20 lg:space-y-28">
             <div className="space-y-10 lg:space-y-14">
