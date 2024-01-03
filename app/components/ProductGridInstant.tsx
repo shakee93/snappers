@@ -41,7 +41,6 @@ const ProductGridInstant = ({ products, brand, category }: ProductGridProps) => 
         </div>
     }
 
-
     return (
         <>
             {/*{statusState}*/}
@@ -57,7 +56,7 @@ const ProductGridInstant = ({ products, brand, category }: ProductGridProps) => 
                     <Image className='w-64' src={NotFound} alt='No Search Results'/>
                 </div>
                 <div>
-                    We couldn&lsquo;t find any matches for your search. :(
+                    We couldn&lsquo;t find any products :(
                 </div>
             </div>}
 

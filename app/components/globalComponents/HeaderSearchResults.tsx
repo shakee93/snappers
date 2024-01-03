@@ -2,7 +2,7 @@
 import InstantSearchWrapper from "@/app/components/InstantSearchWrapper";
 import {Brand, ProductCategory} from "@/graphql/types/graphql";
 import {useStore} from "@/store/store";
-import {Suspense, useEffect} from "react";
+import {Suspense, useEffect, useState} from "react";
 import {twMerge} from "tailwind-merge";
 
 interface SearchBarProps {
@@ -14,6 +14,7 @@ interface SearchBarProps {
 const HeaderSearchResults = ({ brands, productCategories}: SearchBarProps) => {
 
     const { search } = useStore()
+    const [mounted, setMounted] = useState(false)
 
     useEffect(() => {
         const body = document.getElementsByTagName('body')[0] as HTMLBodyElement
@@ -26,7 +27,15 @@ const HeaderSearchResults = ({ brands, productCategories}: SearchBarProps) => {
 
     }, [search])
 
-    return <div className={twMerge(
+    useEffect(() => {
+        setMounted(true)
+    }, [])
+
+    if (!mounted) {
+        return <></>
+    }
+
+    return search.length > 0 ? <div className={twMerge(
         `inset-0 p-5 md:pt-0 md:p-10 mt-[129px] bg-gray-100 z-[15] overflow-y-scroll`,
         search.length > 0 ? 'fixed' : 'hidden'
     )}>
@@ -40,7 +49,7 @@ const HeaderSearchResults = ({ brands, productCategories}: SearchBarProps) => {
                 </InstantSearchWrapper>
             </Suspense>
         </div>
-    </div>
+    </div> : <></>;
 }
 
 export default HeaderSearchResults
