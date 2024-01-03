@@ -81,8 +81,10 @@ const AccordionInfo: FC<Props> = ({
                   as="div"
                   // Conditionally render ProductSpecifications component
                   // based on the name property in your data
-                >
-                  {item.name === "Specifications" && <ProductSpecifications />}
+                > 
+                
+                {/* TODO: pass the techspecs prop to ProductSpecifications */}
+                  {item.name === "Specifications" && <ProductSpecifications techspecs={undefined} />}
                   {item.name !== "Specifications" && (
                     <div dangerouslySetInnerHTML={{ __html: item.content }} />
                   )}

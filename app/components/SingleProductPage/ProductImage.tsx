@@ -5,6 +5,7 @@ import ImageGallery from "@/app/[brand]/imageGallery";
 import {useEffect, useState} from "react";
 import {SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
 import 'react-inner-image-zoom/lib/InnerImageZoom/styles.min.css';
+import { GalleryImage } from "@/types";
 
 interface ProductImageProps {
     product: SimpleProduct | VariableProduct
