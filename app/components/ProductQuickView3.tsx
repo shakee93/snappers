@@ -65,7 +65,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
     product?.galleryImages?.nodes[1]?.sourceUrl ?? ""
   ];
 
-  console.log({ product });
+  // console.log({ product });
 
   const { loading, error, data } = useQuery(GET_TECH_SPEC, {
     variables: {
@@ -78,20 +78,6 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
       setTechSpecs(data);
     }
   }, [data]);
-
-  // if (data) {
-  //   const techValue = data?.product.metaData[0]?.value;
-
-  //   if (techValue) {
-  //     const specifications = JSON.parse(techValue)
-  //     setTechSpecs(specifications)
-  //     console.log({ specifications });
-  //   } else {
-  //     console.error('techvalue is not defined')
-  //   }
-  // } else {
-  //   console.error('data is not defined')
-  // }
 
   const activeAttr = useCallback((attr: ProductAttribute) => {
     return attribute.find(a => a.name === attr.name)
@@ -294,8 +280,10 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
           <ProductAddToCart product={product} variation={activeVariation} />
           <div className="flex gap-1 items-center py-2 text-sm md:text-base text-gray-500">
             <div className="text-sm py-2">Category:</div>
-            {product.productCategories?.edges.map((category: any, index: number) =>
-              <Link href={`/collections/${category.node.slug}`} key={index} className="bg-primary-100 inline-block py-1 px-2  text-xs md:text-sm rounded-3xl">
+
+            {product.productCategories?.edges && product.productCategories?.edges.map((category: any, index: number) =>
+              <Link href={`/collections/${category.node.slug}`} key={index} 
+              className="bg-primary-100 inline-block py-1 px-2  text-xs md:text-sm rounded-3xl">
                 {category.node.name}
               </Link>
             )}

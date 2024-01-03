@@ -57,7 +57,7 @@ const DEMO_DATA = [
 interface Props {
   panelClassName?: string;
   data?: typeof DEMO_DATA;
-  techspecs: {
+  techspecs?: {
     product: {
       metaData: [
         {
@@ -65,7 +65,7 @@ interface Props {
         }
       ];
     };
-  };  
+  };
 }
 
 
