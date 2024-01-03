@@ -10,7 +10,7 @@ const ProductOverview = ({
   techspecs: any
 }) => {
 
-  console.log("tech", product.databaseId , techspecs);
+  // console.log("tech", product.databaseId , techspecs);
 
   return (
     <>
