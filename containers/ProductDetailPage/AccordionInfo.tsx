@@ -54,18 +54,20 @@ const DEMO_DATA = [
   },
 ];
 
+type techSpech = {
+  product: {
+    metaData: [
+      {
+        value: string;
+      }
+    ];
+  };
+};
+
 interface Props {
   panelClassName?: string;
   data?: typeof DEMO_DATA;
-  techspecs?: {
-    product: {
-      metaData: [
-        {
-          value: string;
-        }
-      ];
-    };
-  };
+  techspecs?: techSpech | null;
 }
 
 
