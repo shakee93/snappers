@@ -1,6 +1,6 @@
 import { CustomerAddress } from "@/graphql/types/graphql";
 import Label from "components/Label/Label";
-import { BadgeMinus, Check } from "lucide-react";
+import { BadgeMinus, Check, Receipt } from "lucide-react";
 import React, { FC, useEffect, useState } from "react";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
@@ -49,29 +49,34 @@ const BillingAddress: FC<Props> = ({
     }
   }, [initialData]);
 
+  const handleSubmit = (e: any) => {
+    e.preventDefault();
+    const billingAddressData = {
+      firstName,
+      lastName,
+      address,
+      apartment,
+      city,
+      state,
+      postal,
+      country,
+      addressType,
+    };
+    updateFormData("billingAddress", billingAddressData);
+    setIsConfirmed(true);
+    onCloseActive();
+  };
+
   const renderBillingAddress = () => {
     return (
       <div className="border border-slate-200 dark:border-slate-700 rounded-xl ">
         <div className="p-6 flex flex-col sm:flex-row items-start">
-          <Check />
-          <BadgeMinus />
+          <Receipt strokeWidth={1} />
 
           <div className="sm:ml-8">
             <h3 className=" text-slate-700 dark:text-slate-300 flex ">
               <span className="uppercase">Billing ADDRESS</span>
-              <svg
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="2.5"
-                stroke="currentColor"
-                className="w-5 h-5 ml-3 text-slate-900 dark:text-slate-100"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4.5 12.75l6 6 9-13.5"
-                />
-              </svg>
+              {isConfirmed ? <BadgeMinus color="red" /> : <Check />}
             </h3>
             <div className="font-semibold mt-1 text-sm">
               <span className="">
@@ -88,25 +93,7 @@ const BillingAddress: FC<Props> = ({
             Change
           </ButtonSecondary>
         </div>
-        <form
-          onSubmit={(e: React.FormEvent<HTMLFormElement>) => {
-            e.preventDefault();
-            const billingAddressData = {
-              firstName,
-              lastName,
-              address,
-              apartment,
-              city,
-              state,
-              postal,
-              country,
-              addressType,
-            };
-            updateFormData("billingAddress", billingAddressData);
-            setIsConfirmed(true);
-            onCloseActive();
-          }}
-        >
+        <form onSubmit={handleSubmit}>
           <div
             className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${
               isActive ? "block" : "hidden"
