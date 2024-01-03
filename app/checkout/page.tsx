@@ -174,6 +174,7 @@ const CheckoutPage = () => {
               handleScrollToEl={handleScrollToEl}
               updateFormData={updateFormData}
               paymentGateways={paymentGateways}
+              formData={formData}
             />
           </div>
 

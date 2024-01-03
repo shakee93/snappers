@@ -28,6 +28,7 @@ interface CheckoutLeftProps {
   handleScrollToEl: (id: string) => void;
   updateFormData: (section: string, data: any) => void;
   paymentGateways: any[];
+  formData: any;
 }
 
 const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
@@ -36,6 +37,7 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
   handleScrollToEl,
   updateFormData,
   paymentGateways,
+  formData
 }) => {
   const { data }: QueryResult = useQuery(GET_CHECKOUT_USER_DETAILS);
   const [shippingDetails, setShippingDetails] =
@@ -120,6 +122,7 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
             updateFormData(section, data);
           }}
           initialData={shippingDetails!}
+          formData={formData}
         />
       </div>
 
