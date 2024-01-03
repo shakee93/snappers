@@ -2,7 +2,7 @@
 import InstantSearchWrapper from "@/app/components/InstantSearchWrapper";
 import {Brand, ProductCategory} from "@/graphql/types/graphql";
 import {useStore} from "@/store/store";
-import {useEffect} from "react";
+import {Suspense, useEffect} from "react";
 import {twMerge} from "tailwind-merge";
 
 interface SearchBarProps {
@@ -31,12 +31,14 @@ const HeaderSearchResults = ({ brands, productCategories}: SearchBarProps) => {
         search.length > 0 ? 'fixed' : 'hidden'
     )}>
         <div className='container mx-auto'>
-            <InstantSearchWrapper
-                filters
-                categories={productCategories}
-                brands={brands}
-            >
-            </InstantSearchWrapper>
+            <Suspense fallback={'loading...'}>
+                <InstantSearchWrapper
+                    filters
+                    categories={productCategories}
+                    brands={brands}
+                >
+                </InstantSearchWrapper>
+            </Suspense>
         </div>
     </div>
 }
