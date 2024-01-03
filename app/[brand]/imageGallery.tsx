@@ -1,6 +1,7 @@
 'use client'
 import React, { useState } from 'react';
 import Thumbnail from './thumbnail';
+import { GalleryImage } from '@/types';
 
 interface ImageGalleryProps {
     images?: GalleryImage[];

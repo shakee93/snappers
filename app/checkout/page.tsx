@@ -102,6 +102,7 @@ const CheckoutPage = () => {
                         },
                     });
 
+                    
 
                     if (data && data.createOrder) {
                         const orderDetails = data.createOrder.order;
@@ -120,28 +121,6 @@ const CheckoutPage = () => {
             console.error("Checkout failed:", error);
         }
     };
-
-
-    // try {
-    //     const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
-
-    //     if (paymentMethodId !== undefined) {
-    //         const { data } = await checkoutMutation({
-    //             variables: { paymentMethod: paymentMethodId },
-    //         });
-    //     } else {
-    //         console.error("Payment method ID is undefined");
-    //     }
-
-    //     console.log('data inside mutation', checkoutData)
-
-    //     const orderDetails = data.checkout.order;
-    //     console.log("Order Details:", orderDetails);
-
-    // } catch (error) {
-    //     console.error("Checkout failed:", error);
-    // }
-    // };
 
     const handleScrollToEl = (id: string) => {
         const element = document.getElementById(id);
