@@ -40,11 +40,8 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
   paymentGateways,
 }) => {
   const { data }: QueryResult = useQuery(GET_CHECKOUT_USER_DETAILS);
-  const [shippingDetails, setShippingDetails] =
-    useState<CustomerAddress | null>(null);
-  const [billingDetails, setBillingDetails] = useState<CustomerAddress | null>(
-    null
-  );
+  const [shippingDetails, setShippingDetails] = useState<CustomerAddress | null>(null);
+  const [billingDetails, setBillingDetails] = useState<CustomerAddress | null>(null);
   const [initContactInformation, setInitContactInformation] =
     useState<contactInformation | null>(null);
 
@@ -52,27 +49,33 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
   const [isStorePickup, setIsStorePickup] = useState(false);
 
   const handleCheckboxChange = () => {
-    console.log("form data" , formData)
     setIsBillingSameAsShipping((prevValue) => {
-      if (!prevValue) {
-        updateFormData("shippingAddress", billingDetails);
+      const newValue = !prevValue;
+
+      if (newValue) {
+        updateFormData("shippingAddress", formData.billingAddress);
       } else {
-        updateFormData("billingAddress", {});
+        updateFormData("shippingAddress", {});
       }
-      return !prevValue;
+
+      
+    console.log("New checkbox value:", newValue);
+    console.log("Updated shippingAddress:", formData.shippingAddress);
+
+      return newValue;
     });
   };
 
   const handleStorePickupChange = () => {
-    setIsStorePickup((prevValue) => {
-      if (!prevValue) {
-        updateFormData("shippingAddress", billingDetails);
-        updateFormData("shippingDetails",
-          { "databaseId": "local_pickup", "id": "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==", "title": "StorePickup" }
-        )
-      }
-      return !prevValue;
-    });
+    // setIsStorePickup((prevValue) => {
+    //   if (!prevValue) {
+    //     updateFormData("shippingAddress", billingDetails);
+    //     updateFormData("shippingDetails",
+    //       { "databaseId": "local_pickup", "id": "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==", "title": "StorePickup" }
+    //     )
+    //   }
+    //   return !prevValue;
+    // });
   }
 
   useEffect(() => {
@@ -135,7 +138,6 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
             updateFormData(section, data);
           }}
           initialData={billingDetails!}
-          formData={formData}
         />
       </div>
 
@@ -177,6 +179,7 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
               updateFormData(section, data);
             }}
             initialData={shippingDetails!}
+            formData={formData}
           />)}
       </div>
 

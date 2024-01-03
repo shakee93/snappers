@@ -73,7 +73,7 @@ const CheckoutPage = () => {
     setFormData((prevData) => {
       let updatedSection;
 
-      if (Object.keys(data).length === 0) {
+      if (data === null || data === undefined) {
         updatedSection = {};
       } else {
         updatedSection = {

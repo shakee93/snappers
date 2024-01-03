@@ -52,7 +52,7 @@ const ShippingAddress: FC<Props> = ({
   }, [initialData]);
 
   useEffect(() => {
-    console.log("main Form Data: ", formData);
+    // console.log("main Form Data: ", formData);
     // get the length of the formData
     const isShippingAddressEmpty =
       formData?.shippingAddress &&
@@ -76,7 +76,6 @@ const ShippingAddress: FC<Props> = ({
       country,
       addressType,
     };
-
     updateFormData("shippingAddress", shippingAddressData);
     setIsConfirmed(true);
     onCloseActive();
