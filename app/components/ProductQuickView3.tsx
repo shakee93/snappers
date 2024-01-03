@@ -1,4 +1,4 @@
-import React, { FC, useState, useCallback } from "react";
+import React, { FC, useState, useCallback, useEffect } from "react";
 import { useStore } from "@/store/store";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import LikeButton from "@/app/components/LikeButton";
@@ -33,6 +33,9 @@ import {
   ProductAttribute, ProductUnion, ProductVariation,
 } from "@/graphql/types/graphql";
 
+import { GET_TECH_SPEC } from "@/graphql/defs/products";
+import { useQuery } from "@apollo/client";
+
 export interface ProductQuickViewProps {
   className?: string;
   product: SimpleProduct & VariableProduct;
@@ -44,12 +47,13 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
   const [sizeSelected, setSizeSelected] = React.useState("");
   const [qualitySelected, setQualitySelected] = React.useState(1);
   const { product: { attribute }, setAttribute } = useStore()
+  const [techspecs, setTechSpecs] = React.useState(null);
   const [activeVariation, setActiveVariation] = useState<any>(
     !!product && 'variations' in product && product.variations?.nodes?.length
       ? product.variations.nodes[0]
       : null
   );
-  
+
   const link = useProductLink(product)
 
   let brand = product?.brands?.nodes[0]?.name;
@@ -62,6 +66,32 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
   ];
 
   console.log({ product });
+
+  const { loading, error, data } = useQuery(GET_TECH_SPEC, {
+    variables: {
+      productId: product.databaseId,
+    }
+  });
+
+  useEffect(() => {
+    if (data) {
+      setTechSpecs(data);
+    }
+  }, [data]);
+
+  // if (data) {
+  //   const techValue = data?.product.metaData[0]?.value;
+
+  //   if (techValue) {
+  //     const specifications = JSON.parse(techValue)
+  //     setTechSpecs(specifications)
+  //     console.log({ specifications });
+  //   } else {
+  //     console.error('techvalue is not defined')
+  //   }
+  // } else {
+  //   console.error('data is not defined')
+  // }
 
   const activeAttr = useCallback((attr: ProductAttribute) => {
     return attribute.find(a => a.name === attr.name)
@@ -333,6 +363,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
               content: product.description ?? "",
             }
           ]}
+          techspecs={techspecs}
         />
       </div>
     );
