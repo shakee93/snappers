@@ -44,7 +44,7 @@ const ShippingForm: FC = () => {
 
     useEffect(() => {
         getAddresses();
-    }, []);
+    }, [getAddresses]);
 
     useEffect(() => {
         if (data?.customer?.shipping) {
@@ -113,8 +113,8 @@ const ShippingForm: FC = () => {
                                 <InputField label="Last Name" name="lastName" placeholder="Last Name" value={formData.lastName} onChange={handleChange} />
                             </div>
                             <div className="flex gap-2">
-                                <InputField label="Street Address" name="address2" placeholder="Street Address" value={formData.address2} onChange={handleChange} />
-                                <InputField label="Apt, Suite, etc." name="address1" placeholder="Apt, Suite, etc." value={formData.address1} onChange={handleChange} />
+                                <InputField label="Street Address" name="address1" placeholder="Street Address" value={formData.address1} onChange={handleChange} />
+                                <InputField label="Apt, Suite, etc." name="address2" placeholder="Apt, Suite, etc." value={formData.address2} onChange={handleChange} />
                             </div>
                             <div className="flex gap-2">
                                 <InputField label="Town/City" name="city" placeholder="Town/City" value={formData.city} onChange={handleChange} />

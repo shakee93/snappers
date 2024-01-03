@@ -147,14 +147,14 @@ const BillingForm: FC = () => {
                   label="Street Address"
                   name="address2"
                   placeholder="Street Address"
-                  value={formData.address2}
+                  value={formData.address1}
                   onChange={handleChange}
                 />
                 <InputField
                   label="Apt, Suite, etc."
                   name="address1"
                   placeholder="Apt, Suite, etc."
-                  value={formData.address1}
+                  value={formData.address2}
                   onChange={handleChange}
                 />
               </div>
