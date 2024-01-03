@@ -111,10 +111,6 @@ const InstantSearchWrapper = ({
 
     return <div>
         <InstantSearchNext 
-            onStateChange={({ setUiState, uiState }) => {
-                // console.log(uiState, brand);
-                setUiState(uiState)
-            }}
             stalledSearchDelay={200}
                            future={{
                                preserveSharedStateOnUnmount: true
