@@ -29,7 +29,7 @@ const ProductGridInstant = ({ products, brand, category }: ProductGridProps) => 
         setSearchStatus(statusState)
     }, [statusState])
 
-    if ((search.length > 0 || navigation.length > 1) && (statusState === 'stalled' || statusState === 'loading') ) {
+    if ((search.length > 0 || navigation.length > 1) && (statusState === 'stalled' ) ) {
         return <div className='flex-1 grid  grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-5 lg:gap-x-8 lg:gap-y-10'>
             {Array(grid).fill(null).map((x, index) =>
                 <div key={index} className="space-y-3">

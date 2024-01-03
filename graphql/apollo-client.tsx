@@ -115,6 +115,8 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
         });
       }
 
+      console.log(graphQLErrors);
+
       if (networkError) console.log(`[Network error]: ${networkError}`);
     });
 
