@@ -58,24 +58,27 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
         updateFormData("shippingAddress", {});
       }
 
-      
-    console.log("New checkbox value:", newValue);
-    console.log("Updated shippingAddress:", formData.shippingAddress);
-
       return newValue;
     });
   };
 
   const handleStorePickupChange = () => {
-    // setIsStorePickup((prevValue) => {
-    //   if (!prevValue) {
-    //     updateFormData("shippingAddress", billingDetails);
-    //     updateFormData("shippingDetails",
-    //       { "databaseId": "local_pickup", "id": "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==", "title": "StorePickup" }
-    //     )
-    //   }
-    //   return !prevValue;
-    // });
+    setIsStorePickup((prevValue) => {
+      const newValue = !prevValue;
+
+      if (newValue) {
+        updateFormData("shippingAddress", formData.billingAddress);
+        updateFormData("shippingDetails",
+          { "databaseId": "local_pickup", "id": "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==", "title": "StorePickup" }
+        )
+      } else {
+        updateFormData("shippingAddress", {});
+        updateFormData("shippingDetails",
+        { "databaseId": null, "id": null, "title": null });
+      }
+
+      return newValue;
+    });
   }
 
   useEffect(() => {
