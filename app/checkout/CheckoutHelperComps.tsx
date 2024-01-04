@@ -10,9 +10,9 @@ export const RequiredTag = () => {
 };
 export const CompletedTag = () => {
   return (
-    <div className={`py-2 px-4  flex  gap-2  rounded-xl bg-red-100 `}>
+    <div className={`py-2 px-4  flex  gap-2  rounded-xl bg-green-100 `}>
       <Check color="green" />
-      <div className={`text-red-500 font-semibold`}>Completed</div>
+      <div className={`text-green-500 font-semibold`}>Completed</div>
     </div>
   );
 };
