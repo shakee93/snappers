@@ -83,7 +83,7 @@ const AccordionInfo: FC<Props> = ({
   const techSpecIndex = techspecs?.product?.metaData.findIndex(item => item?.key === 'tech_spec');
 
   if (techSpecIndex !== -1) {
-    const techValue = techspecs?.product?.metaData[techSpecIndex]?.value;
+    const techValue = techspecs?.product?.metaData[techSpecIndex!]?.value;
     if (techValue) {
       specifications = JSON.parse(techValue);
     } else {
