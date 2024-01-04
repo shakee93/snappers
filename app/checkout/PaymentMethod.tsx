@@ -184,14 +184,8 @@ const PaymentMethod: FC<Props> = ({
           </span>
           <div className="sm:ml-8">
             <h3 className=" text-slate-700 items-center dark:text-slate-300 flex ">
-              <span className="uppercase tracking-tight">PAYMENT METHOD</span>
-              <div className={`mx-4`}>
-                {isConfirmed ? (
-                  <Check color="#31b434" strokeWidth={3} />
-                ) : (
-                  <RequiredTag />
-                )}
-              </div>
+              <span className="uppercase tracking-tight">PAYMENT METHOD*</span>
+            
             </h3>
             <div className="font-semibold mt-1 text-sm">
               <span className="">Select Payment Method</span>

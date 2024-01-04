@@ -7,7 +7,6 @@ import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Input from "shared/Input/Input";
 import Radio from "shared/Radio/Radio";
 import Select from "shared/Select/Select";
-import { CompletedTag, RequiredTag } from "./CheckoutHelperComps";
 
 interface Props {
   isActive: boolean;
@@ -79,14 +78,8 @@ const BillingAddress: FC<Props> = ({
 
           <div className="sm:ml-8">
             <h3 className=" text-slate-700 items-center dark:text-slate-300 flex ">
-              <span className="uppercase">Billing ADDRESS</span>
-              <div className={`mx-4`}>
-                {!isConfirmed ? (
-                  <RequiredTag />
-                ) : (
-                  <CompletedTag/>
-                )}
-              </div>
+              <span className="uppercase">Billing ADDRESS*</span>
+             
             </h3>
             <div className="font-semibold mt-1 text-sm">
               <span className="">
