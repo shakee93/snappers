@@ -16,6 +16,7 @@ interface Props {
   updateFormData: (section: string, data: any) => void;
   paymentGateways: PaymentGateway[];
   handleConfirmationChange: any;
+  isBillingAddressEnabled: any
 }
 
 const PaymentMethod: FC<Props> = ({
@@ -24,7 +25,8 @@ const PaymentMethod: FC<Props> = ({
   onOpenActive,
   paymentGateways,
   updateFormData,
-  handleConfirmationChange
+  handleConfirmationChange,
+  isBillingAddressEnabled
 }) => {
   const [methodActive, setMethodActive] = useState<
     "Credit-Card" | "Internet-banking" | "Wallet"
@@ -134,7 +136,9 @@ const PaymentMethod: FC<Props> = ({
     return (
       <div className="border border-slate-200 dark:border-slate-700 rounded-xl ">
         <div className="p-6 flex flex-col sm:flex-row items-start">
-          <h1 className="text-2xl self-center  font-semibold">4</h1>
+          <h1 className="text-2xl self-center  font-semibold">
+            {isBillingAddressEnabled ? "3": "4"}
+          </h1>
           <div className="sm:ml-8">
             <h3 className=" text-slate-700 items-center dark:text-slate-300 flex ">
               <span className="uppercase tracking-tight">PAYMENT METHOD*</span>

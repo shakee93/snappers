@@ -163,6 +163,7 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
           updateFormData={(section, data) => {
             updateFormData(section, data);
           }}
+          isBillingAddressEnabled={isBillingAddressHidden}
           handleConfirmationChange={(value: any) => handleConfirmationChange("paymentMethod", value)}
         />
       </div>
