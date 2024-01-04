@@ -1,5 +1,14 @@
 import { gql } from '@apollo/client';
 
+export const ProductSpecs = gql`
+    fragment ProductSpecs on Product {
+        metaData(key: "tech_spec") {
+            id
+            key
+            value
+        }
+    }
+`
 export const ProductContentSlice = gql`
     fragment ProductContentSlice on Product {
         id

@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { ProductContentFull } from "@/graphql/defs/products.fragments";
+import {ProductContentFull, ProductSpecs} from "@/graphql/defs/products.fragments";
 
 export const GET_BRANDS = gql`
   query getBrands($slug: [String] = []) {
@@ -27,9 +27,11 @@ export const GET_PRODUCT_SLUGS = gql`
 
 export const GET_PRODUCT = gql`
   ${ProductContentFull}
+  ${ProductSpecs}
   query GetProduct($productId: ID!) {
     product(id: $productId, idType: SLUG) {
       ...ProductContentFull
+      ...ProductSpecs
     }
   }
 `;

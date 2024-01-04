@@ -83,6 +83,7 @@ const AccountPage: FC = () => {
         { key: "about", value: about },
       ],
     };
+
     try {
       await updateCustomer(input);
       toast.remove();

@@ -4,13 +4,12 @@ import parseHtml from 'html-react-parser'
 
 const ProductOverview = ({
   product,
-  techspecs
 }: {
   product: SimpleProduct | VariableProduct
-  techspecs: any
 }) => {
 
-  // console.log("tech", product.databaseId , techspecs);
+  const techValue = product.metaData?.find(meta => meta?.key === 'tech_spec')?.value;
+  const techSpecs = JSON.parse(techValue || 'false')
 
   return (
     <>
@@ -42,13 +41,14 @@ const ProductOverview = ({
             {/*    </li>*/}
             {/*  </ul>*/}
             {/*</div>*/}
+            
             <div className="text-xs md:text-sm text-gray-600">
               {parseHtml(product.description || '')}
             </div>
           </div>
           <div className="md:w-2/5">
-            {techspecs && techspecs.items && techspecs.items.length > 0 && (
-              <ProductSpecifications techspecs={techspecs} />
+            {techSpecs && techSpecs.items && techSpecs.items.length > 0 && (
+              <ProductSpecifications techspecs={techSpecs} />
             )}
           </div>
         </div>

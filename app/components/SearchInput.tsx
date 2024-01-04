@@ -1,7 +1,7 @@
 import {useInstantSearch, useSearchBox} from "react-instantsearch";
 import {Search} from "lucide-react";
 import {useStore} from "@/store/store";
-import {useEffect} from "react";
+import {useDeferredValue, useEffect} from "react";
 
 
 const SearchInput = ({ show = true } : { show?: boolean}) => {
@@ -12,10 +12,11 @@ const SearchInput = ({ show = true } : { show?: boolean}) => {
     } = useSearchBox();
 
     const { search } = useStore()
+    const deferredSearch = useDeferredValue(search)
 
     useEffect(() => {
-        refine(search)
-    }, [search])
+        refine(deferredSearch)
+    }, [deferredSearch])
 
     if (!show) {
         return <></>

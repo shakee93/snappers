@@ -85,7 +85,6 @@ const AccordionInfo: FC<Props> = ({
     specifications = JSON.parse(techValue);
   }
 
-
   return (
     <div className="w-full rounded-2xl space-y-2.5">
       {/* ============ */}

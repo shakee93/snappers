@@ -14,10 +14,10 @@ import Checkbox from "@/shared/Checkbox/Checkbox";
 
 interface CheckoutLeftProps {
   tabActive:
-    | "ContactInfo"
-    | "ShippingAddress"
-    | "PaymentMethod"
-    | "BillingAddress";
+  | "ContactInfo"
+  | "ShippingAddress"
+  | "PaymentMethod"
+  | "BillingAddress";
   setTabActive: (
     value:
       | "ContactInfo"
@@ -27,8 +27,10 @@ interface CheckoutLeftProps {
   ) => void;
   handleScrollToEl: (id: string) => void;
   updateFormData: (section: string, data: any) => void;
-  paymentGateways: any[];
   formData: any;
+  paymentGateways: any[];
+  onStorePickupChange : any;
+  handleConfirmationChange: any;
 }
 
 const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
@@ -36,32 +38,55 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
   setTabActive,
   handleScrollToEl,
   updateFormData,
+  formData,
   paymentGateways,
-  formData
+  onStorePickupChange,
+  handleConfirmationChange
 }) => {
   const { data }: QueryResult = useQuery(GET_CHECKOUT_USER_DETAILS);
-  const [shippingDetails, setShippingDetails] =
-    useState<CustomerAddress | null>(null);
-  const [billingDetails, setBillingDetails] = useState<CustomerAddress | null>(
-    null
-  );
+  const [shippingDetails, setShippingDetails] = useState<CustomerAddress | null>(null);
+  const [billingDetails, setBillingDetails] = useState<CustomerAddress | null>(null);
   const [initContactInformation, setInitContactInformation] =
     useState<contactInformation | null>(null);
 
   const [isBillingSameAsShipping, setIsBillingSameAsShipping] = useState(false);
+  const [isStorePickup, setIsStorePickup] = useState(false);
 
   const handleCheckboxChange = () => {
     setIsBillingSameAsShipping((prevValue) => {
-      if (!prevValue) {
-        // Update with shipping details when checking the checkbox
-        updateFormData("billingAddress", shippingDetails);
+      const newValue = !prevValue;
+
+      if (newValue) {
+        updateFormData("shippingAddress", formData.billingAddress);
+        handleConfirmationChange("shippingAddress", true);
       } else {
-        // Update with an empty object when unchecking the checkbox
-        updateFormData("billingAddress", {});
+        updateFormData("shippingAddress", {});
+        handleConfirmationChange("shippingAddress", false);
       }
-      return !prevValue; // Toggle the checkbox state
+
+      return newValue;
     });
   };
+
+  const handleStorePickupChange = () => {
+    setIsStorePickup((prevValue) => {
+      const storepickupValue = !prevValue;
+
+      if (storepickupValue) {
+        updateFormData("shippingAddress", formData.billingAddress);
+        updateFormData("shippingDetails",
+          { "databaseId": "local_pickup", "id": "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==", "title": "StorePickup" }
+        )
+      } else {
+        updateFormData("shippingAddress", {});
+        updateFormData("shippingDetails",
+        { "databaseId": null, "id": null, "title": null });
+      }
+
+      onStorePickupChange(storepickupValue);
+      return storepickupValue;
+    });
+  }
 
   useEffect(() => {
     if (data) {
@@ -89,6 +114,7 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
 
   return (
     <div className="space-y-8">
+
       <div id="ContactInfo" className="scroll-mt-24">
         <ContactInfo
           isActive={tabActive === "ContactInfo"}
@@ -97,51 +123,65 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
             handleScrollToEl("ContactInfo");
           }}
           onCloseActive={() => {
-            setTabActive("ShippingAddress");
-            handleScrollToEl("ShippingAddress");
-          }}
-          updateFormData={(section, data) => {
-            updateFormData(section, data);
-          }}
-          initialData={initContactInformation!}
-        />
-      </div>
-
-      <div id="ShippingAddress" className="scroll-mt-24">
-        <ShippingAddress
-          isActive={tabActive === "ShippingAddress"}
-          onOpenActive={() => {
-            setTabActive("ShippingAddress");
-            handleScrollToEl("ShippingAddress");
-          }}
-          onCloseActive={() => {
             setTabActive("BillingAddress");
             handleScrollToEl("BillingAddress");
           }}
           updateFormData={(section, data) => {
             updateFormData(section, data);
           }}
-          initialData={shippingDetails!}
-          formData={formData}
-        />
-      </div>
-
-      <div className="mt-2">
-        <Checkbox
-          label=" Billing address is the same as shipping address"
-          name="checkbox"
-          defaultChecked={isBillingSameAsShipping}
-          onChange={handleCheckboxChange}
+          initialData={initContactInformation!}
+          handleConfirmationChange={(value : any) => handleConfirmationChange("contactInfo", value)}
         />
       </div>
 
       <div id="BillingAddress" className="scroll-mt-24">
-        {!isBillingSameAsShipping && (
-          <BillingAddress
-            isActive={tabActive === "BillingAddress"}
+        <BillingAddress
+          isActive={tabActive === "BillingAddress"}
+          onOpenActive={() => {
+            setTabActive("BillingAddress");
+            handleScrollToEl("BillingAddress");
+          }}
+          onCloseActive={() => {
+            setTabActive("ShippingAddress");
+            handleScrollToEl("");
+          }}
+          updateFormData={(section, data) => {
+            updateFormData(section, data);
+          }}
+          initialData={billingDetails!}
+          handleConfirmationChange={(value : any) => handleConfirmationChange("billingAddress", value)}
+        />
+      </div>
+
+      <div className="flex justify-between">
+        <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4">
+          <Checkbox
+            label=" Shipping address is the same as billing address"
+            name="checkbox"
+            defaultChecked={isBillingSameAsShipping}
+            onChange={handleCheckboxChange}
+            className=""
+          />
+        </div>
+
+        <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4">
+          <Checkbox
+            label="Store Pickup"
+            name="checkbox"
+            defaultChecked={isStorePickup}
+            onChange={handleStorePickupChange}
+          />
+        </div>
+      </div>
+
+      <div id="ShippingAddress" className="scroll-mt-24">
+
+        {(!isBillingSameAsShipping && !isStorePickup) && (
+          <ShippingAddress
+            isActive={tabActive === "ShippingAddress"}
             onOpenActive={() => {
-              setTabActive("BillingAddress");
-              handleScrollToEl("BillingAddress");
+              setTabActive("ShippingAddress");
+              handleScrollToEl("ShippingAddress");
             }}
             onCloseActive={() => {
               setTabActive("PaymentMethod");
@@ -150,9 +190,10 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
             updateFormData={(section, data) => {
               updateFormData(section, data);
             }}
-            initialData={billingDetails!}
-          />
-        )}
+            initialData={shippingDetails!}
+            formData={formData}
+            handleConfirmationChange={(value : any) => handleConfirmationChange("shippingAddress", value)}
+          />)}
       </div>
 
       <div id="PaymentMethod" className="scroll-mt-24">
@@ -167,6 +208,7 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
           updateFormData={(section, data) => {
             updateFormData(section, data);
           }}
+          handleConfirmationChange={(value : any) => handleConfirmationChange("paymentMethod", value)}
         />
       </div>
     </div>

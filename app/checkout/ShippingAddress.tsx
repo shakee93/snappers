@@ -7,6 +7,7 @@ import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Input from "shared/Input/Input";
 import Radio from "shared/Radio/Radio";
 import Select from "shared/Select/Select";
+import { CompletedTag, RequiredTag } from "./CheckoutHelperComps";
 
 interface Props {
   isActive: boolean;
@@ -15,6 +16,7 @@ interface Props {
   updateFormData: (section: string, data: any) => void;
   initialData: CustomerAddress | null;
   formData: any;
+  handleConfirmationChange : any;
 }
 
 const ShippingAddress: FC<Props> = ({
@@ -24,6 +26,7 @@ const ShippingAddress: FC<Props> = ({
   updateFormData,
   initialData,
   formData,
+  handleConfirmationChange
 }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -52,10 +55,12 @@ const ShippingAddress: FC<Props> = ({
   }, [initialData]);
 
   useEffect(() => {
-    console.log("main Form Data: ", formData);
+    // console.log("main Form Data: ", formData);
     // get the length of the formData
     const isShippingAddressEmpty =
-      Object.keys(formData.shippingAddress).length === 0;
+      formData?.shippingAddress &&
+      Object.keys(formData?.shippingAddress).length === 0;
+
     if (isShippingAddressEmpty) {
       setIsConfirmed(false);
     }
@@ -74,10 +79,10 @@ const ShippingAddress: FC<Props> = ({
       country,
       addressType,
     };
-
     updateFormData("shippingAddress", shippingAddressData);
     setIsConfirmed(true);
     onCloseActive();
+    handleConfirmationChange(true);
   };
 
   const renderShippingAddress = () => {
@@ -86,9 +91,9 @@ const ShippingAddress: FC<Props> = ({
         <div className="p-6 flex flex-col sm:flex-row items-start">
           <Receipt strokeWidth={1} />
           <div className="sm:ml-8">
-            <h3 className=" text-slate-700 dark:text-slate-300 flex ">
+            <h3 className=" text-slate-700 items-center gap-2 dark:text-slate-300 flex ">
               <span className="uppercase">SHIPPING ADDRESS</span>
-              {!isConfirmed ? <BadgeMinus color="red" /> : <Check />}
+              {!isConfirmed ? <RequiredTag/> : <CompletedTag/>}
             </h3>
             <div className="font-semibold mt-1 text-sm">
               <span className="">

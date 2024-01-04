@@ -19,6 +19,7 @@ import {GET_ALL_PRODUCTS} from "@/graphql/defs/products";
 import HeaderSearchResults from "@/app/components/globalComponents/HeaderSearchResults";
 import {Brand} from "@/graphql/types/graphql";
 import BackdropSpinner from "@/app/components/BackdropSpinner";
+import MobileBottomNav from "@/app/components/globalComponents/MobileBottomNav";
 
 async function getData(categories: number[] | null = null) {
   const { data, error } = await getClient().query({
@@ -63,9 +64,13 @@ const Header = async () => {
             <BrandBar categories={productCategories} brands={brands}/>
           </div>
           <MobileNavLinks/>
+
         </div>
       </header>
       <HeaderSearchResults productCategories={productCategories} brands={brands} />
+      <div className="md:hidden">
+        <MobileBottomNav categories={productCategories}/>
+      </div>
     </>
   );
 };
