@@ -8,7 +8,6 @@ import Image from 'next/image';
 
 import { PaymentGateway } from "@/graphql/types/graphql";
 import { Check } from "lucide-react";
-import { RequiredTag } from "./CheckoutHelperComps";
 
 interface Props {
   isActive: boolean;

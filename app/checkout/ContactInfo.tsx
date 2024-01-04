@@ -6,7 +6,7 @@ import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Checkbox from "shared/Checkbox/Checkbox";
 import Input from "shared/Input/Input";
 import { BadgeMinus, Check } from "lucide-react";
-import { CompletedTag, RequiredTag } from "./CheckoutHelperComps";
+
 
 interface Props {
   isActive: boolean;
