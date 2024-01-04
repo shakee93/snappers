@@ -156,7 +156,7 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
       <div className="flex justify-between">
         <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4">
           <Checkbox
-            label=" Devliery address is the same as billing address"
+            label=" Delivery address is the same as billing address"
             name="checkbox"
             defaultChecked={isBillingSameAsShipping}
             onChange={handleCheckboxChange}
