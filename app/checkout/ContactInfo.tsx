@@ -5,6 +5,8 @@ import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Checkbox from "shared/Checkbox/Checkbox";
 import Input from "shared/Input/Input";
+import { BadgeMinus, Check } from "lucide-react";
+import { CompletedTag, RequiredTag } from "./CheckoutHelperComps";
 
 interface Props {
   isActive: boolean;
@@ -12,6 +14,7 @@ interface Props {
   onCloseActive: () => void;
   updateFormData: (section: string, data: any) => void;
   initialData: contactInformation;
+  handleConfirmationChange : any;
 }
 
 const ContactInfo: FC<Props> = ({
@@ -20,6 +23,7 @@ const ContactInfo: FC<Props> = ({
   onOpenActive,
   updateFormData,
   initialData,
+  handleConfirmationChange
 }) => {
   const [phone, setPhone] = useState("+94");
   const [email, setEmail] = useState("");
@@ -34,7 +38,7 @@ const ContactInfo: FC<Props> = ({
     }
   }, [initialData]);
 
-  const handleContactSubmit = (e: any)=>{
+  const handleContactSubmit = (e: any) => {
     e.preventDefault();
     if (phone && email) {
       const contactInfo = {
@@ -46,10 +50,12 @@ const ContactInfo: FC<Props> = ({
       setEmail(initialData?.email);
       setIsConfirmed(true);
       onCloseActive();
+      handleConfirmationChange(true);
     } else {
       setIsConfirmed(false);
     }
-  }
+  };
+
 
   const renderAccount = () => {
     return (
@@ -86,21 +92,15 @@ const ContactInfo: FC<Props> = ({
             </svg>
           </span>
           <div className="sm:ml-8">
-            <h3 className=" text-slate-700 dark:text-slate-300 flex ">
+            <h3 className=" text-slate-700 items-center dark:text-slate-300 flex ">
               <span className="uppercase tracking-tight">CONTACT INFO</span>
-              <svg
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="2.5"
-                stroke="currentColor"
-                className="w-5 h-5 ml-3 text-slate-900 dark:text-slate-100 "
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4.5 12.75l6 6 9-13.5"
-                />
-              </svg>
+              <div className={`mx-4`}>
+                {isConfirmed ? (
+                  <CompletedTag/>
+                ) : (
+                  <RequiredTag />
+                )}
+              </div>
             </h3>
             <div className="font-semibold mt-1 text-sm">
               <span className="">{displayName ?? ""}</span>
@@ -116,9 +116,7 @@ const ContactInfo: FC<Props> = ({
             Change
           </ButtonSecondary>
         </div>
-        <form
-          onSubmit={handleContactSubmit}
-        >
+        <form onSubmit={handleContactSubmit}>
           <div
             className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${
               isActive ? "block" : "hidden"

@@ -7,6 +7,7 @@ import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Input from "shared/Input/Input";
 import Radio from "shared/Radio/Radio";
 import Select from "shared/Select/Select";
+import { CompletedTag, RequiredTag } from "./CheckoutHelperComps";
 
 interface Props {
   isActive: boolean;
@@ -14,6 +15,7 @@ interface Props {
   onOpenActive: () => void;
   updateFormData: (section: string, data: any) => void;
   initialData: CustomerAddress | null;
+  handleConfirmationChange: any;
 }
 
 const BillingAddress: FC<Props> = ({
@@ -22,6 +24,7 @@ const BillingAddress: FC<Props> = ({
   onOpenActive,
   updateFormData,
   initialData,
+  handleConfirmationChange,
 }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -65,6 +68,7 @@ const BillingAddress: FC<Props> = ({
     updateFormData("billingAddress", billingAddressData);
     setIsConfirmed(true);
     onCloseActive();
+    handleConfirmationChange(true);
   };
 
   const renderBillingAddress = () => {
@@ -74,9 +78,15 @@ const BillingAddress: FC<Props> = ({
           <Receipt strokeWidth={1} />
 
           <div className="sm:ml-8">
-            <h3 className=" text-slate-700 dark:text-slate-300 flex ">
+            <h3 className=" text-slate-700 items-center dark:text-slate-300 flex ">
               <span className="uppercase">Billing ADDRESS</span>
-              {isConfirmed ? <BadgeMinus color="red" /> : <Check />}
+              <div className={`mx-4`}>
+                {!isConfirmed ? (
+                  <RequiredTag />
+                ) : (
+                  <CompletedTag/>
+                )}
+              </div>
             </h3>
             <div className="font-semibold mt-1 text-sm">
               <span className="">
