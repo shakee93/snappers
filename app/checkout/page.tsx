@@ -120,7 +120,7 @@ const CheckoutPage = () => {
 
   const handleCheckout = async () => {
     try {
-      const paymentMethodId = formData?.paymentMethod?.selectedGateway;
+      const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
 
       const lineItems =
         cart?.contents?.nodes.map((item) => ({
