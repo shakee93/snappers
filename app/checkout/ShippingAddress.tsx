@@ -17,6 +17,8 @@ interface Props {
   formData: any;
   handleConfirmationChange: any;
   updateBillingVisibility: (isVisible: boolean) => void;
+  isStorePickup: boolean;
+  updateStorePickupVisibility: (isVisible: boolean) => void;
 }
 
 const ShippingAddress: FC<Props> = ({
@@ -27,7 +29,8 @@ const ShippingAddress: FC<Props> = ({
   initialData,
   formData,
   handleConfirmationChange,
-  updateBillingVisibility
+  updateBillingVisibility,
+  updateStorePickupVisibility
 }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -66,20 +69,25 @@ const ShippingAddress: FC<Props> = ({
       const storepickupValue = !prevValue;
 
       if (storepickupValue) {
-        updateFormData("shippingAddress", formData.billingAddress);
-        updateFormData("shippingDetails",
-          { "databaseId": "local_pickup", "id": "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==", "title": "StorePickup" }
-        )
+        updateFormData("billingAddress", formData.shippingAddress);
+        updateFormData("shippingDetails", {
+          "databaseId": "local_pickup",
+          "id": "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==",
+          "title": "StorePickup"
+        });
       } else {
-        updateFormData("shippingAddress", {});
-        updateFormData("shippingDetails",
-          { "databaseId": null, "id": null, "title": null });
+        updateFormData("shippingDetails", {
+          "databaseId": null,
+          "id": null,
+          "title": null
+        });
       }
 
-      // onStorePickupChange(storepickupValue);
+      updateStorePickupVisibility(storepickupValue);
+
       return storepickupValue;
     });
-  }
+  };
 
   useEffect(() => {
     if (initialData) {
@@ -97,8 +105,6 @@ const ShippingAddress: FC<Props> = ({
   }, [initialData]);
 
   useEffect(() => {
-    // console.log("main Form Data: ", formData);
-    // get the length of the formData
     const isShippingAddressEmpty =
       formData?.shippingAddress &&
       Object.keys(formData?.shippingAddress).length === 0;
@@ -125,6 +131,12 @@ const ShippingAddress: FC<Props> = ({
     setIsConfirmed(true);
     onCloseActive();
     handleConfirmationChange(true);
+    if (isBillingSameAsShipping) {
+      console.log('same same');
+      updateFormData("billingAddress", shippingAddressData);
+      handleConfirmationChange("billingAddress", true);
+      handleConfirmationChange("shippingAddress", true);
+    }
   };
 
   const renderShippingAddress = () => {

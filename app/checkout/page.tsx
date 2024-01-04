@@ -209,6 +209,8 @@ const CheckoutPage = () => {
               paymentGateways={paymentGateways}
               onStorePickupChange={handleStorePickupChange}
               handleConfirmationChange={handleConfirmationChange}
+              isStorePickup={isStorePickup}
+              setIsStorePickupHidden={(isVisible : boolean) => setIsStorePickup(isVisible)}
             />
           </div>
 

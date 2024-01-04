@@ -31,6 +31,8 @@ interface CheckoutLeftProps {
   paymentGateways: any[];
   onStorePickupChange: any;
   handleConfirmationChange: any;
+  setIsStorePickupHidden: any;
+  isStorePickup : boolean;
 }
 
 const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
@@ -49,13 +51,13 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
   const [initContactInformation, setInitContactInformation] =
     useState<contactInformation | null>(null);
 
-  const [isBillingSameAsShipping, setIsBillingSameAsShipping] = useState(false);
-  const [isStorePickup, setIsStorePickup] = useState(false);
+  const [isBillingSameAsShipping, setIsBillingSameAsShipping] = useState(true);
+  const [isStorePickup, setIsStorePickup] = useState(true);
 
   const [isBillingAddressHidden, setIsBillingAddressHidden] = useState(false);
 
   useEffect(() => {
-    setIsBillingAddressHidden(isBillingSameAsShipping || isStorePickup);
+    setIsBillingAddressHidden(isBillingSameAsShipping || isStorePickup );
   }, [isBillingSameAsShipping, isStorePickup]);
 
   useEffect(() => {
@@ -120,8 +122,12 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
           }}
           initialData={shippingDetails!}
           formData={formData}
-          handleConfirmationChange={(value: any) => handleConfirmationChange("shippingAddress", value)}
-          updateBillingVisibility={(isVisible : boolean) => setIsBillingAddressHidden(isVisible)}
+          handleConfirmationChange={(value: any) => handleConfirmationChange("shippingAddress", true)}
+          updateBillingVisibility={(isVisible: boolean) => setIsBillingAddressHidden(isVisible)}
+          isStorePickup={isStorePickup}
+          updateStorePickupVisibility={(isVisible) =>
+            setIsStorePickup(isVisible)
+          }
         />
       </div>
 
