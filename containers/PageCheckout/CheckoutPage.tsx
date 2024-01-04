@@ -12,7 +12,6 @@ import ContactInfo from "./ContactInfo";
 import PaymentMethod from "./PaymentMethod";
 import ShippingAddress from "./ShippingAddress";
 import Link from "next/link";
-import MySwitch from "components/MySwitch";
 
 const CheckoutPage = () => {
   const [tabActive, setTabActive] = useState<
