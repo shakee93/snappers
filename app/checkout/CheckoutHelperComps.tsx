@@ -1,4 +1,4 @@
-import { BadgeMinus } from "lucide-react";
+import { BadgeMinus, Check } from "lucide-react";
 
 export const RequiredTag = () => {
   return (
@@ -8,3 +8,13 @@ export const RequiredTag = () => {
     </div>
   );
 };
+export const CompletedTag = () => {
+  return (
+    <div className={`py-2 px-4  flex  gap-2  rounded-xl bg-red-100 `}>
+      <Check color="green" />
+      <div className={`text-red-500 font-semibold`}>Completed</div>
+    </div>
+  );
+};
+
+
