@@ -52,7 +52,7 @@ const Footer = async () => {
                 <Link href={"/privacy"}>Privacy Policy</Link>
               </li>
               <li className="hover:text-primaryColor">
-                <Link href={"/terms"}>Terms & Conditions</Link>
+                <Link href={"/terms-and-conditions"}>Terms & Conditions</Link>
               </li>
             </ul>
           </div>

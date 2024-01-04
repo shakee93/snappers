@@ -8,6 +8,7 @@ import Input from "shared/Input/Input";
 import Radio from "shared/Radio/Radio";
 import Select from "shared/Select/Select";
 import { CompletedTag, RequiredTag } from "./CheckoutHelperComps";
+import Checkbox from "@/shared/Checkbox/Checkbox";
 
 interface Props {
   isActive: boolean;
@@ -16,7 +17,8 @@ interface Props {
   updateFormData: (section: string, data: any) => void;
   initialData: CustomerAddress | null;
   formData: any;
-  handleConfirmationChange : any;
+  handleConfirmationChange: any;
+  updateBillingVisibility: (isVisible: boolean) => void;
 }
 
 const ShippingAddress: FC<Props> = ({
@@ -26,7 +28,8 @@ const ShippingAddress: FC<Props> = ({
   updateFormData,
   initialData,
   formData,
-  handleConfirmationChange
+  handleConfirmationChange,
+  updateBillingVisibility
 }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -38,6 +41,47 @@ const ShippingAddress: FC<Props> = ({
   const [country, setCountry] = useState("");
   const [addressType, setAddressType] = useState("home");
   const [isConfirmed, setIsConfirmed] = useState(false);
+
+  const [isBillingSameAsShipping, setIsBillingSameAsShipping] = useState(true);
+  const [isStorePickup, setIsStorePickup] = useState(true);
+
+  const handleCheckboxChange = () => {
+    setIsBillingSameAsShipping((prevValue) => {
+      const newValue = !prevValue;
+
+      if (newValue) {
+        updateFormData("billingAddress", formData.shippingAddress);
+        handleConfirmationChange("billingAddress", true);
+        updateBillingVisibility(true);
+      } else {
+        updateFormData("billingAddress", {});
+        handleConfirmationChange("billingAddress", false);
+        updateBillingVisibility(false);
+      }
+
+      return newValue;
+    });
+  };
+
+  const handleStorePickupChange = () => {
+    setIsStorePickup((prevValue) => {
+      const storepickupValue = !prevValue;
+
+      if (storepickupValue) {
+        updateFormData("shippingAddress", formData.billingAddress);
+        updateFormData("shippingDetails",
+          { "databaseId": "local_pickup", "id": "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==", "title": "StorePickup" }
+        )
+      } else {
+        updateFormData("shippingAddress", {});
+        updateFormData("shippingDetails",
+          { "databaseId": null, "id": null, "title": null });
+      }
+
+      // onStorePickupChange(storepickupValue);
+      return storepickupValue;
+    });
+  }
 
   useEffect(() => {
     if (initialData) {
@@ -93,7 +137,7 @@ const ShippingAddress: FC<Props> = ({
           <div className="sm:ml-8">
             <h3 className=" text-slate-700 items-center gap-2 dark:text-slate-300 flex ">
               <span className="uppercase">SHIPPING ADDRESS</span>
-              {!isConfirmed ? <RequiredTag/> : <CompletedTag/>}
+              {!isConfirmed ? <RequiredTag /> : <CompletedTag />}
             </h3>
             <div className="font-semibold mt-1 text-sm">
               <span className="">
@@ -112,9 +156,8 @@ const ShippingAddress: FC<Props> = ({
         </div>
         <form onSubmit={handleSubmit}>
           <div
-            className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${
-              isActive ? "block" : "hidden"
-            }`}
+            className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${isActive ? "block" : "hidden"
+              }`}
           >
             {/* ============ */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
@@ -216,6 +259,27 @@ const ShippingAddress: FC<Props> = ({
               <ButtonPrimary className="sm:!px-7 shadow-none" type="submit">
                 Save and next to Payment
               </ButtonPrimary>
+            </div>
+
+            <div className="flex justify-between">
+              <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4">
+                <Checkbox
+                  label=" Shipping address is the same as billing address"
+                  name="checkbox"
+                  defaultChecked={isBillingSameAsShipping}
+                  onChange={handleCheckboxChange}
+                  className=""
+                />
+              </div>
+
+              <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4">
+                <Checkbox
+                  label="Store Pickup"
+                  name="checkbox"
+                  defaultChecked={isStorePickup}
+                  onChange={handleStorePickupChange}
+                />
+              </div>
             </div>
           </div>
         </form>

@@ -5,17 +5,17 @@ import Image from "next/image";
 
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import Link from "next/link";
-import {useCart} from "@/context/CartProvider";
-import {CartItem, Product, SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
+import { useCart } from "@/context/CartProvider";
+import { CartItem, Product, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import Prices from "@/app/components/Prices";
 import CartItemProduct from "@/app/containers/ProductDetailPage/CartItem";
-import {Loader} from "lucide-react";
+import { Loader } from "lucide-react";
 import BackdropSpinner from "@/app/components/BackdropSpinner";
 
 const CartPage = () => {
 
   const { cart, loading } = useCart()
-  
+
   const renderStatusSoldout = () => {
     return (
       <div className="rounded-full flex items-center justify-center px-2.5 py-1.5 text-xs text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
@@ -56,15 +56,15 @@ const CartPage = () => {
         <div className="flex flex-col lg:flex-row">
           <div className="relative w-full lg:w-[60%] xl:w-[55%] divide-y divide-slate-200 dark:divide-slate-700 lg:pr-10 xl:px-16 2xl:px-20 py-4">
 
-            {loading && <BackdropSpinner/> }
+            {loading && <BackdropSpinner />}
 
-            {cart?.contents?.nodes.map( (item, index) =>
-                <CartItemProduct key={index} cartItem={item} index={index}/>
+            {cart?.contents?.nodes.map((item, index) =>
+              <CartItemProduct key={index} cartItem={item} index={index} />
             )}
           </div>
           <div className="border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-700 my-10 lg:my-0 lg:mr-10 xl:mr-16 2xl:mr-20 flex-shrink-0"></div>
           <div className="flex-1 relative px-4 py-4" >
-            {loading && <BackdropSpinner/> }
+            {loading && <BackdropSpinner />}
             <div className="sticky top-28">
               <h3 className="text-lg font-semibold ">Order Summary</h3>
               <div className="mt-7 text-sm text-slate-500 dark:text-slate-400 divide-y divide-slate-200/70 dark:divide-slate-700/80">
@@ -117,27 +117,27 @@ const CartPage = () => {
                       strokeLinejoin="round"
                     />
                   </svg>
-                  Learn more{` `}
-                  <a
+                  By proceeding with your purchase you agree to our{" "}
+                  <Link
                     target="_blank"
                     rel="noopener noreferrer"
-                    href="##"
+                    href="/terms-and-conditions"
                     className="text-slate-900 dark:text-slate-200 underline font-medium"
                   >
-                    Taxes
-                  </a>
+                    Terms and Conditions
+                  </Link>
                   <span>
                     {` `}and{` `}
                   </span>
-                  <a
+                  <Link
                     target="_blank"
                     rel="noopener noreferrer"
-                    href="##"
+                    href="/privacy"
                     className="text-slate-900 dark:text-slate-200 underline font-medium"
                   >
-                    Shipping
-                  </a>
-                  {` `} infomation
+                    Privacy Policy
+                  </Link>
+                  {` `}.
                 </p>
               </div>
             </div>

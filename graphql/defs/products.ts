@@ -357,6 +357,7 @@ export const GET_TECH_SPEC = gql`
       name
       metaData(key: "tech_spec") {
         id
+        key
         value
       }
     }

@@ -29,7 +29,7 @@ interface CheckoutLeftProps {
   updateFormData: (section: string, data: any) => void;
   formData: any;
   paymentGateways: any[];
-  onStorePickupChange : any;
+  onStorePickupChange: any;
   handleConfirmationChange: any;
 }
 
@@ -52,41 +52,11 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
   const [isBillingSameAsShipping, setIsBillingSameAsShipping] = useState(false);
   const [isStorePickup, setIsStorePickup] = useState(false);
 
-  const handleCheckboxChange = () => {
-    setIsBillingSameAsShipping((prevValue) => {
-      const newValue = !prevValue;
+  const [isBillingAddressHidden, setIsBillingAddressHidden] = useState(false);
 
-      if (newValue) {
-        updateFormData("shippingAddress", formData.billingAddress);
-        handleConfirmationChange("shippingAddress", true);
-      } else {
-        updateFormData("shippingAddress", {});
-        handleConfirmationChange("shippingAddress", false);
-      }
-
-      return newValue;
-    });
-  };
-
-  const handleStorePickupChange = () => {
-    setIsStorePickup((prevValue) => {
-      const storepickupValue = !prevValue;
-
-      if (storepickupValue) {
-        updateFormData("shippingAddress", formData.billingAddress);
-        updateFormData("shippingDetails",
-          { "databaseId": "local_pickup", "id": "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==", "title": "StorePickup" }
-        )
-      } else {
-        updateFormData("shippingAddress", {});
-        updateFormData("shippingDetails",
-        { "databaseId": null, "id": null, "title": null });
-      }
-
-      onStorePickupChange(storepickupValue);
-      return storepickupValue;
-    });
-  }
+  useEffect(() => {
+    setIsBillingAddressHidden(isBillingSameAsShipping || isStorePickup);
+  }, [isBillingSameAsShipping, isStorePickup]);
 
   useEffect(() => {
     if (data) {
@@ -130,71 +100,50 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
             updateFormData(section, data);
           }}
           initialData={initContactInformation!}
-          handleConfirmationChange={(value : any) => handleConfirmationChange("contactInfo", value)}
+          handleConfirmationChange={(value: any) => handleConfirmationChange("contactInfo", value)}
         />
       </div>
 
-      <div id="BillingAddress" className="scroll-mt-24">
-        <BillingAddress
-          isActive={tabActive === "BillingAddress"}
+      <div id="ShippingAddress" className="scroll-mt-24">
+        <ShippingAddress
+          isActive={tabActive === "ShippingAddress"}
           onOpenActive={() => {
-            setTabActive("BillingAddress");
-            handleScrollToEl("BillingAddress");
+            setTabActive("ShippingAddress");
+            handleScrollToEl("ShippingAddress");
           }}
           onCloseActive={() => {
-            setTabActive("ShippingAddress");
-            handleScrollToEl("");
+            setTabActive("PaymentMethod");
+            handleScrollToEl("PaymentMethod");
           }}
           updateFormData={(section, data) => {
             updateFormData(section, data);
           }}
-          initialData={billingDetails!}
-          handleConfirmationChange={(value : any) => handleConfirmationChange("billingAddress", value)}
+          initialData={shippingDetails!}
+          formData={formData}
+          handleConfirmationChange={(value: any) => handleConfirmationChange("shippingAddress", value)}
+          updateBillingVisibility={(isVisible) => setIsBillingAddressHidden(isVisible)}
         />
       </div>
 
-      <div className="flex justify-between">
-        <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-          <Checkbox
-            label=" Shipping address is the same as billing address"
-            name="checkbox"
-            defaultChecked={isBillingSameAsShipping}
-            onChange={handleCheckboxChange}
-            className=""
-          />
-        </div>
-
-        <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-          <Checkbox
-            label="Store Pickup"
-            name="checkbox"
-            defaultChecked={isStorePickup}
-            onChange={handleStorePickupChange}
-          />
-        </div>
-      </div>
-
-      <div id="ShippingAddress" className="scroll-mt-24">
-
-        {(!isBillingSameAsShipping && !isStorePickup) && (
-          <ShippingAddress
-            isActive={tabActive === "ShippingAddress"}
+      {!isBillingAddressHidden && (
+        <div id="BillingAddress" className="scroll-mt-24">
+          <BillingAddress
+            isActive={tabActive === "BillingAddress"}
             onOpenActive={() => {
-              setTabActive("ShippingAddress");
-              handleScrollToEl("ShippingAddress");
+              setTabActive("BillingAddress");
+              handleScrollToEl("BillingAddress");
             }}
             onCloseActive={() => {
-              setTabActive("PaymentMethod");
-              handleScrollToEl("PaymentMethod");
+              setTabActive("ShippingAddress");
+              handleScrollToEl("");
             }}
             updateFormData={(section, data) => {
               updateFormData(section, data);
             }}
-            initialData={shippingDetails!}
-            formData={formData}
-            handleConfirmationChange={(value : any) => handleConfirmationChange("shippingAddress", value)}
-          />)}
-      </div>
+            initialData={billingDetails!}
+            handleConfirmationChange={(value: any) => handleConfirmationChange("billingAddress", value)}
+          />
+        </div>)}
 
       <div id="PaymentMethod" className="scroll-mt-24">
         <PaymentMethod
@@ -208,7 +157,7 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
           updateFormData={(section, data) => {
             updateFormData(section, data);
           }}
-          handleConfirmationChange={(value : any) => handleConfirmationChange("paymentMethod", value)}
+          handleConfirmationChange={(value: any) => handleConfirmationChange("paymentMethod", value)}
         />
       </div>
     </div>

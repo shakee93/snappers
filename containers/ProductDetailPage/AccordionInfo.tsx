@@ -56,11 +56,10 @@ const DEMO_DATA = [
 
 type techSpech = {
   product: {
-    metaData: [
-      {
-        value: string;
-      }
-    ];
+    metaData: Array<{
+      value: string;
+      key?: string; 
+    }>;
   };
 };
 
@@ -79,10 +78,17 @@ const AccordionInfo: FC<Props> = ({
   techspecs
 }) => {
 
+  console.log({ techspecs });
 
-  if (techspecs) {
-    const techValue = techspecs?.product?.metaData[0]?.value;
-    specifications = JSON.parse(techValue);
+  const techSpecIndex = techspecs?.product?.metaData.findIndex(item => item?.key === 'tech_spec');
+
+  if (techSpecIndex !== -1) {
+    const techValue = techspecs?.product?.metaData[techSpecIndex]?.value;
+    if (techValue) {
+      specifications = JSON.parse(techValue);
+    } else {
+      specifications = {};
+    }
   }
 
   return (

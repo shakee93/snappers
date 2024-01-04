@@ -113,15 +113,15 @@ const CheckoutPage = () => {
     });
   };
 
-  // const [
-  //   guestCheckoutMutation,
-  //   { loading: checkoutLoading, error: checkoutError, data: checkoutData },
-  // ] = useMutation(GUEST_CHECKOUT_MUTATION);
-
   const [
-    exisitingUserMutation,
+    guestCheckoutMutation,
     { loading: checkoutLoading, error: checkoutError, data: checkoutData },
-  ] = useMutation(CHECKOUT_MUTATION);
+  ] = useMutation(GUEST_CHECKOUT_MUTATION);
+
+  // const [
+  //   exisitingUserMutation,
+  //   { loading: checkoutLoading, error: checkoutError, data: checkoutData },
+  // ] = useMutation(CHECKOUT_MUTATION);
 
   const handleCheckout = async () => {
     try {
@@ -134,12 +134,11 @@ const CheckoutPage = () => {
         })) || [];
 
       console.log('form data final', formData)
-
       console.log(paymentMethodId, lineItems);
 
       if (paymentMethodId !== undefined) {
         try {
-          const { data } = await exisitingUserMutation({
+          const { data } = await guestCheckoutMutation({
             variables: {
               paymentMethod: paymentMethodId,
               lineItems: lineItems,
@@ -316,7 +315,7 @@ const CheckoutPage = () => {
                 <Link
                   target="_blank"
                   rel="noopener noreferrer"
-                  href="/terms"
+                  href="/terms-and-conditions"
                   className="text-slate-900 dark:text-slate-200 underline font-medium"
                 >
                   Terms and Conditions
@@ -327,7 +326,7 @@ const CheckoutPage = () => {
                 <Link
                   target="_blank"
                   rel="noopener noreferrer"
-                  href="/terms"
+                  href="/privacy"
                   className="text-slate-900 dark:text-slate-200 underline font-medium"
                 >
                   Privacy Policy
