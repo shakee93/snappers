@@ -235,7 +235,7 @@ const PaymentMethod: FC<Props> = ({
                 handleConfirmationChange(true);
               }}
             >
-              Confirm order
+              Save Payment Method
             </ButtonPrimary>
             <ButtonSecondary className="ml-3" onClick={onCloseActive}>
               Cancel

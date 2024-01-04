@@ -100,27 +100,32 @@ const CheckoutPage = () => {
     setIsStorePickup(value);
   }
 
-  const [
-    guestCheckoutMutation,
-    { loading: checkoutLoading, error: checkoutError, data: checkoutData },
-  ] = useMutation(GUEST_CHECKOUT_MUTATION);
-
-  const handleConfirmationChange = (component : string, value : boolean)  => {
+  const handleConfirmationChange = (component: string, value: boolean) => {
     setIsConfirmed((prevConfirmed) => {
       const updatedConfirmed = {
         ...prevConfirmed,
         [component]: value,
       };
-  
+
       console.log("Updated Confirmation Values:", updatedConfirmed);
-  
+
       return updatedConfirmed;
     });
   };
 
+  // const [
+  //   guestCheckoutMutation,
+  //   { loading: checkoutLoading, error: checkoutError, data: checkoutData },
+  // ] = useMutation(GUEST_CHECKOUT_MUTATION);
+
+  const [
+    exisitingUserMutation,
+    { loading: checkoutLoading, error: checkoutError, data: checkoutData },
+  ] = useMutation(CHECKOUT_MUTATION);
+
   const handleCheckout = async () => {
     try {
-      const paymentMethodId = formData?.paymentMethod?.selectedGateway;
+      const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
 
       const lineItems =
         cart?.contents?.nodes.map((item) => ({
@@ -128,9 +133,13 @@ const CheckoutPage = () => {
           quantity: item?.quantity,
         })) || [];
 
+      console.log('form data final', formData)
+
+      console.log(paymentMethodId, lineItems);
+
       if (paymentMethodId !== undefined) {
         try {
-          const { data } = await guestCheckoutMutation({
+          const { data } = await exisitingUserMutation({
             variables: {
               paymentMethod: paymentMethodId,
               lineItems: lineItems,
@@ -139,6 +148,7 @@ const CheckoutPage = () => {
 
           if (data && data.createOrder) {
             const orderDetails = data.createOrder.order;
+            console.log('order Details', orderDetails);
           } else {
             console.error("Failed to retrieve order details");
           }
@@ -253,7 +263,8 @@ const CheckoutPage = () => {
                             </div> */}
               <div className="flex justify-between font-semibold text-slate-900 dark:text-slate-200 text-base pt-4">
                 <span>Order total</span>
-                <span>{cart?.total || "$0.00"}</span>
+                {!isStorePickup && (<span>{cart?.total || "$0.00"}</span>)}
+                {isStorePickup && (<span>{cart?.total || "$0.00"}</span>)}
               </div>
             </div>
             <ButtonPrimary
