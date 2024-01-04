@@ -75,7 +75,7 @@ const BillingAddress: FC<Props> = ({
     return (
       <div className="border border-slate-200 dark:border-slate-700 rounded-xl ">
         <div className="p-6 flex flex-col sm:flex-row items-start">
-          <h1 className="text-2xl self-center  font-semibold">2</h1>
+          <h1 className="text-2xl self-center  font-semibold">3</h1>
           <div className="sm:ml-8">
             <h3 className=" text-slate-700 items-center dark:text-slate-300 flex ">
               <span className="uppercase">Billing ADDRESS*</span>

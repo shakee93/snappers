@@ -13,7 +13,7 @@ import ButtonPrimary from "shared/Button/ButtonPrimary";
 import Input from "shared/Input/Input";
 import ContactInfo from "./ContactInfo";
 import PaymentMethod from "./PaymentMethod";
-import ShippingAddress from "./ShippingAddress";
+import ShippingAddress from "./DeliveryAddress";
 import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
 import { useQuery } from "@apollo/client";

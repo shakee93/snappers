@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import ContactInfo from "./ContactInfo";
-import ShippingAddress from "./ShippingAddress";
+import ShippingAddress from "./DeliveryAddress";
 import PaymentMethod from "./PaymentMethod";
 import { QueryResult, useLazyQuery, useQuery } from "@apollo/client";
 import { useSession } from "@/context/SessionProvider";

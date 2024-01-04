@@ -21,7 +21,7 @@ interface Props {
   updateStorePickupVisibility: (isVisible: boolean) => void;
 }
 
-const ShippingAddress: FC<Props> = ({
+const DeliveryAddress: FC<Props> = ({
   isActive,
   onCloseActive,
   onOpenActive,
@@ -143,7 +143,7 @@ const ShippingAddress: FC<Props> = ({
     return (
       <div className="border border-slate-200 dark:border-slate-700 rounded-xl ">
         <div className="p-6 flex flex-col sm:flex-row items-start">
-          <h1 className="text-2xl self-center  font-semibold">3</h1>
+          <h1 className="text-2xl self-center  font-semibold">2</h1>
           <div className="sm:ml-8">
             <h3 className=" text-slate-700 items-center gap-2 dark:text-slate-300 flex ">
               <span className="uppercase">DELIVERY ADDRESS*</span>
@@ -272,7 +272,7 @@ const ShippingAddress: FC<Props> = ({
             <div className="flex justify-between">
               <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4">
                 <Checkbox
-                  label=" Shipping address is the same as billing address"
+                  label=" Delivery address is the same as billing address"
                   name="checkbox"
                   defaultChecked={isBillingSameAsShipping}
                   onChange={handleCheckboxChange}
@@ -297,4 +297,4 @@ const ShippingAddress: FC<Props> = ({
   return renderShippingAddress();
 };
 
-export default ShippingAddress;
+export default DeliveryAddress;
