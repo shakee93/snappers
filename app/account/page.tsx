@@ -1,12 +1,9 @@
 "use client";
 
 import React, { FC, useEffect, useState } from "react";
-import { useMutation } from "@apollo/client";
-import { UPDATE_ACCOUNT_INFORMATION } from "@/graphql/defs/auth";
 import Input from "@/shared/Input/Input";
 import Label from "@/components/Label/Label";
 import Select from "@/shared/Select/Select";
-import Textarea from "@/shared/Textarea/Textarea";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import { useSession } from "@/context/SessionProvider";
 import toast from "react-hot-toast";

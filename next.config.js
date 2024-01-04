@@ -23,12 +23,7 @@ const nextConfig = {
         port: "",
         pathname: "/*/**",
       },
-      {
-        protocol: "http",
-        hostname: "gq.freshpixl.com",
-        port: "",
-        pathname: "/*/**",
-      },
+
       {
         protocol: "http",
         hostname: "gq.freshpixl.com",
@@ -50,6 +45,12 @@ const nextConfig = {
       {
         protocol: "https", // Add this configuration for your domain
         hostname: "payherestorage.blob.core.windows.net",
+        port: "",
+        pathname: "/*/**",
+      },
+      {
+        protocol: "https",
+        hostname: "gq.freshpixl.com",
         port: "",
         pathname: "/*/**",
       },

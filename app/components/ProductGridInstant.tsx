@@ -29,22 +29,22 @@ const ProductGridInstant = ({ products, brand, category }: ProductGridProps) => 
         setSearchStatus(statusState)
     }, [statusState])
 
-    if ((search.length > 0 || navigation.length > 1) && (statusState === 'stalled' ) ) {
-        return <div className='flex-1 grid  grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-5 lg:gap-x-8 lg:gap-y-10'>
-            {Array(grid).fill(null).map((x, index) =>
-                <div key={index} className="space-y-3">
-                    <div className="h-52 bg-gray-200 rounded-md animate-pulse"></div>
-                    <div className="h-4 bg-gray-300 rounded-md"></div>
-                    <div className="h-4 bg-gray-300 rounded-md w-2/3"></div>
-                    <div className="h-8 bg-gray-300 rounded-md w-1/4"></div>
-                </div>
-            )}
-        </div>
-    }
+    // if ((search.length > 0 || navigation.length > 1) && (statusState === 'stalled' ) ) {
+    //     return <div className='flex-1 grid  grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-5 lg:gap-x-8 lg:gap-y-10'>
+    //         {Array(grid).fill(null).map((x, index) =>
+    //             <div key={index} className="space-y-3">
+    //                 <div className="h-52 bg-gray-200 rounded-md animate-pulse"></div>
+    //                 <div className="h-4 bg-gray-300 rounded-md"></div>
+    //                 <div className="h-4 bg-gray-300 rounded-md w-2/3"></div>
+    //                 <div className="h-8 bg-gray-300 rounded-md w-1/4"></div>
+    //             </div>
+    //         )}
+    //     </div>
+    // }
 
     return (
         <>
-            {results?.nbHits === 0 && <div className='text-center text-slate-500 flex flex-col items-center gap-20 py-12'>
+            {(results?.nbHits === 0 && statusState === 'idle') && <div className='text-center text-slate-500 flex flex-col items-center gap-20 py-12'>
                 <div>
                     <Image className='w-64' src={NotFound} alt='No Search Results'/>
                 </div>

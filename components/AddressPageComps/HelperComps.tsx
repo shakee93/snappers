@@ -4,6 +4,18 @@ import Select from "@/shared/Select/Select";
 import Label from "../Label/Label";
 import React from "react";
 
+
+const SRI_LANKAN_STATES = [
+    "Western",
+    "Central",
+    "Southern",
+    "Northern",
+    "Eastern",
+    "North Western",
+    "North Central",
+    "Uva",
+    "Sabaragamuwa",
+  ];
 // Smaller Components
 const InputField = React.memo(function InputField({ label, name, placeholder, value, onChange }: any) {
     return (
@@ -36,4 +48,4 @@ const SelectField = React.memo(function SelectField({ label, name, value, option
     );
 });
 
-export { InputField, SelectField };
+export { InputField, SelectField, SRI_LANKAN_STATES };

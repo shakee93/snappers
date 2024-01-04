@@ -20,21 +20,11 @@ import toast from "react-hot-toast";
 
 // Types and Interfaces
 import { Customer } from "@/graphql/types/graphql";
-import { InputField, SelectField } from "./HelperComps";
+import { InputField, SRI_LANKAN_STATES, SelectField } from "./HelperComps";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 
 // Constants
-const SRI_LANKAN_STATES = [
-  "Western",
-  "Central",
-  "Southern",
-  "Northern",
-  "Eastern",
-  "North Western",
-  "North Central",
-  "Uva",
-  "Sabaragamuwa",
-];
+
 
 const BillingForm: FC = () => {
   const { customer, fetchCustomer, updateCustomer } = useSession();

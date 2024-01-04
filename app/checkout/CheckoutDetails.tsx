@@ -121,7 +121,7 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
           initialData={shippingDetails!}
           formData={formData}
           handleConfirmationChange={(value: any) => handleConfirmationChange("shippingAddress", value)}
-          updateBillingVisibility={(isVisible) => setIsBillingAddressHidden(isVisible)}
+          updateBillingVisibility={(isVisible : boolean) => setIsBillingAddressHidden(isVisible)}
         />
       </div>
 
