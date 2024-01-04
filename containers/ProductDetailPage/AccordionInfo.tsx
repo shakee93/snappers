@@ -80,15 +80,13 @@ const AccordionInfo: FC<Props> = ({
 
   console.log({ techspecs });
 
-  const techSpecIndex = techspecs?.product?.metaData.findIndex(item => item?.key === 'tech_spec');
+  const techSpec = techspecs?.product?.metaData.find(item => item?.key === 'tech_spec')?.value;
+  let specifications = {
+    items: []
+  };
 
-  if (techSpecIndex !== -1) {
-    const techValue = techspecs?.product?.metaData[techSpecIndex!]?.value;
-    if (techValue) {
-      specifications = JSON.parse(techValue);
-    } else {
-      specifications = {};
-    }
+  if (techSpec) {
+    specifications = JSON.parse(techSpec);
   }
 
   return (
@@ -113,7 +111,7 @@ const AccordionInfo: FC<Props> = ({
                 >
 
                   {/* TODO: pass the techspecs prop to ProductSpecifications */}
-                  {specifications && specifications.items && specifications.items.length > 0 && item.name === "Specifications" &&
+                  {specifications && specifications?.items && specifications?.items.length > 0 && item.name === "Specifications" &&
                     <ProductSpecifications techspecs={specifications} />
                   }
                   {item.name !== "Specifications" && (
