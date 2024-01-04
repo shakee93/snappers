@@ -11,6 +11,7 @@ import {useStore} from "@/store/store";
 import {PRICE_RANGE} from "@/app/components/Filters/PriceFilter";
 import Pagination from "@/shared/Pagination/Pagination";
 import SortInput from "@/app/components/SortInput";
+import { useDebounce } from 'use-debounce';
 
 
 interface InstantSearchWrapperProps {
@@ -21,6 +22,7 @@ interface InstantSearchWrapperProps {
     brand?: Brand
     category?: ProductCategory
     routing?: boolean
+    bindToStore?: boolean
 }
 
 const typesenseConfig = {
@@ -44,6 +46,7 @@ const typesenseInstantSearchAdapter = new TypesenseInstantSearchAdapter({
 });
 
 const InstantSearchWrapper = ({
+                                  bindToStore = false,
                                   search = false,
                                   filters = false,
     routing = false,
@@ -53,7 +56,7 @@ const InstantSearchWrapper = ({
                               }: InstantSearchWrapperProps) => {
 
     const { sidebar } = useStore()
-    const differedSidebar = useDeferredValue(sidebar)
+    const [differedSidebar] = useDebounce(sidebar, 1000)
 
     const getFilterQuery: () => string = () => {
         const f =[
@@ -123,7 +126,7 @@ const InstantSearchWrapper = ({
                            searchClient={searchClient}
                            indexName='product'>
             <div className='flex gap-6 flex-col'>
-                <SearchInput show={search}/>
+                <SearchInput bindToStore={bindToStore} show={search}/>
                 <SortInput/>
                 {filters && <TabFilters category={category} brand={brand} categories={categories} brands={brands}/>}
                 <Configure filters={filterQuery} hitsPerPage={12}/>

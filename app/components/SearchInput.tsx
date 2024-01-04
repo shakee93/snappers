@@ -2,9 +2,10 @@ import {useInstantSearch, useSearchBox} from "react-instantsearch";
 import {Search} from "lucide-react";
 import {useStore} from "@/store/store";
 import {useDeferredValue, useEffect} from "react";
+import { useDebounce } from 'use-debounce';
 
 
-const SearchInput = ({ show = true } : { show?: boolean}) => {
+const SearchInput = ({ show = true, bindToStore = false } : { show?: boolean, bindToStore?: boolean}) => {
     const {
         query,
         refine,
@@ -12,11 +13,16 @@ const SearchInput = ({ show = true } : { show?: boolean}) => {
     } = useSearchBox();
 
     const { search } = useStore()
-    const deferredSearch = useDeferredValue(search)
+    const [value] = useDebounce(search, 1000);
 
     useEffect(() => {
-        refine(deferredSearch)
-    }, [deferredSearch])
+
+        if (!bindToStore) {
+            return;
+        }
+
+        refine(value);
+    }, [value])
 
     if (!show) {
         return <></>

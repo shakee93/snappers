@@ -45,6 +45,7 @@ const HeaderSearchResults = ({ brands, productCategories}: SearchBarProps) => {
                     filters
                     categories={productCategories}
                     brands={brands}
+                    bindToStore={true}
                 >
                 </InstantSearchWrapper>
             </Suspense>
