@@ -1,13 +1,11 @@
+import { SRI_LANKAN_STATES, SelectField } from "@/components/AddressPageComps/HelperComps";
 import { CustomerAddress } from "@/graphql/types/graphql";
 import Label from "components/Label/Label";
-import { BadgeMinus, Check, Receipt } from "lucide-react";
 import React, { FC, useEffect, useState } from "react";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Input from "shared/Input/Input";
-import Radio from "shared/Radio/Radio";
 import Select from "shared/Select/Select";
-import { CompletedTag, RequiredTag } from "./CheckoutHelperComps";
 
 interface Props {
   isActive: boolean;
@@ -16,7 +14,7 @@ interface Props {
   updateFormData: (section: string, data: any) => void;
   initialData: CustomerAddress | null;
   formData: any;
-  handleConfirmationChange : any;
+  handleConfirmationChange: any;
 }
 
 const ShippingAddress: FC<Props> = ({
@@ -26,7 +24,7 @@ const ShippingAddress: FC<Props> = ({
   updateFormData,
   initialData,
   formData,
-  handleConfirmationChange
+  handleConfirmationChange,
 }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -89,15 +87,13 @@ const ShippingAddress: FC<Props> = ({
     return (
       <div className="border border-slate-200 dark:border-slate-700 rounded-xl ">
         <div className="p-6 flex flex-col sm:flex-row items-start">
-          <Receipt strokeWidth={1} />
+          <h1 className="text-2xl self-center  font-semibold">3</h1>
           <div className="sm:ml-8">
             <h3 className=" text-slate-700 items-center gap-2 dark:text-slate-300 flex ">
-              <span className="uppercase">SHIPPING ADDRESS*</span>
+              <span className="uppercase">DELIVERY ADDRESS*</span>
             </h3>
             <div className="font-semibold mt-1 text-sm">
-              <span className="">
-                {initialData?.address1 || "Your Address"}
-              </span>
+              <span className="">{address || "Your Delivery Address"}</span>
             </div>
           </div>
           <ButtonSecondary
@@ -190,15 +186,16 @@ const ShippingAddress: FC<Props> = ({
 
             {/* ============ */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
-              <div>
-                <Label className="text-sm">State/Province</Label>
-                <Input
-                  className="mt-1.5 capitalize"
-                  value={state}
-                  onChange={(e) => setState(e.target.value)}
-                  required={true}
-                />
-              </div>
+              <SelectField
+                label="State"
+                name="state"
+                value={state}
+                options={SRI_LANKAN_STATES.map((state) => ({
+                  value: state,
+                  label: state,
+                }))}
+                onChange={(e: any) => setState(e.target.value)}
+              />
               <div>
                 <Label className="text-sm">Postal code</Label>
                 <Input
