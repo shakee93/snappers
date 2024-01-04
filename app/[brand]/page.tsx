@@ -7,7 +7,7 @@ import {notFound} from "next/navigation";
 import ArchiveLayout from "@/app/components/ArchiveLayout";
 import {Brand} from "@/graphql/types/graphql";
 
-export const dynamic = 'force-dynamic';
+// export const dynamic = 'force-dynamic';
 
 // export async function generateStaticParams() {
 //     const {data} = await getClient().query(
