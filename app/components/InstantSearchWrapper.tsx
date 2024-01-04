@@ -56,7 +56,7 @@ const InstantSearchWrapper = ({
                               }: InstantSearchWrapperProps) => {
 
     const { sidebar } = useStore()
-    const [differedSidebar] = useDebounce(sidebar, 1000)
+    const [differedSidebar] = useDebounce(sidebar, 500)
 
     const getFilterQuery: () => string = () => {
         const f =[
