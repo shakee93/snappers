@@ -44,18 +44,14 @@ interface FormData {
 }
 
 const CheckoutPage = () => {
+
   const { cart, removeFromCart, updateCart } = useCart();
-
   const { loading, error, data, refetch } = useQuery(GET_PAYMENT_GATEWAYS);
-
   const paymentGateways: PaymentGateway[] = data?.paymentGateways.nodes;
-  const [isConfirmed, setIsConfirmed] = useState(false);
-
   const [tabActive, setTabActive] = useState<
     "ContactInfo" | "ShippingAddress" | "BillingAddress" | "PaymentMethod"
   >("ContactInfo");
   const [canConfirmOrder, setcanConfirmOrder] = useState(false);
-
   const [formData, setFormData] = useState<FormData>({
     contactInfo: {},
     shippingAddress: {},
@@ -63,6 +59,13 @@ const CheckoutPage = () => {
     paymentMethod: {
       selectedGateway: {},
     },
+  });
+  const [isStorePickup, setIsStorePickup] = useState(false);
+  const [isConfirmed, setIsConfirmed] = useState({
+    contactInfo: false,
+    shippingAddress: false,
+    paymentMethod: false,
+    billingAddress: false,
   });
 
   useEffect(() => {
@@ -92,10 +95,28 @@ const CheckoutPage = () => {
     });
   };
 
+  const handleStorePickupChange = (value: boolean) => {
+    // console.log('store pickup changed', value);
+    setIsStorePickup(value);
+  }
+
   const [
     guestCheckoutMutation,
     { loading: checkoutLoading, error: checkoutError, data: checkoutData },
   ] = useMutation(GUEST_CHECKOUT_MUTATION);
+
+  const handleConfirmationChange = (component : string, value : boolean)  => {
+    setIsConfirmed((prevConfirmed) => {
+      const updatedConfirmed = {
+        ...prevConfirmed,
+        [component]: value,
+      };
+  
+      console.log("Updated Confirmation Values:", updatedConfirmed);
+  
+      return updatedConfirmed;
+    });
+  };
 
   const handleCheckout = async () => {
     try {
@@ -177,6 +198,8 @@ const CheckoutPage = () => {
               updateFormData={updateFormData}
               formData={formData}
               paymentGateways={paymentGateways}
+              onStorePickupChange={handleStorePickupChange}
+              handleConfirmationChange={handleConfirmationChange}
             />
           </div>
 
@@ -213,12 +236,15 @@ const CheckoutPage = () => {
                   {cart?.subtotal || "$0.00"}
                 </span>
               </div>
-              <div className="flex justify-between py-2.5">
-                <span>Shipping estimate</span>
-                <span className="font-semibold text-slate-900 dark:text-slate-200">
-                  {cart?.shippingTotal || "$0.00"}
-                </span>
-              </div>
+
+              {!isStorePickup && (
+                <div className="flex justify-between py-2.5">
+                  <span>Shipping estimate</span>
+                  <span className="font-semibold text-slate-900 dark:text-slate-200">
+                    {cart?.shippingTotal || "$0.00"}
+                  </span>
+                </div>)}
+
               {/* <div className="flex justify-between py-2.5">
                                 <span>Tax estimate</span>
                                 <span className="font-semibold text-slate-900 dark:text-slate-200">
@@ -232,8 +258,14 @@ const CheckoutPage = () => {
             </div>
             <ButtonPrimary
               onClick={handleCheckout}
-              // disabled={!canConfirmOrder}
-              // disabled={}
+              disabled={
+                !(
+                  isConfirmed.contactInfo &&
+                  isConfirmed.shippingAddress &&
+                  isConfirmed.billingAddress &&
+                  isConfirmed.paymentMethod
+                )
+              }
               className="mt-8 w-full"
             >
 
