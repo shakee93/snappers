@@ -87,6 +87,8 @@ const AccordionInfo: FC<Props> = ({
 
   if (techSpec) {
     specifications = JSON.parse(techSpec);
+  } else {
+    specifications = {};
   }
 
   return (
