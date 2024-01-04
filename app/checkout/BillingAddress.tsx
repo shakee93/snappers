@@ -15,6 +15,7 @@ interface Props {
   onOpenActive: () => void;
   updateFormData: (section: string, data: any) => void;
   initialData: CustomerAddress | null;
+  handleConfirmationChange: any;
 }
 
 const BillingAddress: FC<Props> = ({
@@ -23,6 +24,7 @@ const BillingAddress: FC<Props> = ({
   onOpenActive,
   updateFormData,
   initialData,
+  handleConfirmationChange
 }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -66,6 +68,7 @@ const BillingAddress: FC<Props> = ({
     updateFormData("billingAddress", billingAddressData);
     setIsConfirmed(true);
     onCloseActive();
+    handleConfirmationChange(true);
   };
 
   const renderBillingAddress = () => {

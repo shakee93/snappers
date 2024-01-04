@@ -16,6 +16,7 @@ interface Props {
   updateFormData: (section: string, data: any) => void;
   initialData: CustomerAddress | null;
   formData: any;
+  handleConfirmationChange : any;
 }
 
 const ShippingAddress: FC<Props> = ({
@@ -25,6 +26,7 @@ const ShippingAddress: FC<Props> = ({
   updateFormData,
   initialData,
   formData,
+  handleConfirmationChange
 }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -80,6 +82,7 @@ const ShippingAddress: FC<Props> = ({
     updateFormData("shippingAddress", shippingAddressData);
     setIsConfirmed(true);
     onCloseActive();
+    handleConfirmationChange(true);
   };
 
   const renderShippingAddress = () => {
@@ -90,7 +93,7 @@ const ShippingAddress: FC<Props> = ({
           <div className="sm:ml-8">
             <h3 className=" text-slate-700 items-center gap-2 dark:text-slate-300 flex ">
               <span className="uppercase">SHIPPING ADDRESS</span>
-              {!isConfirmed ? <RequiredTag/> : <Check />}
+              {!isConfirmed ? <RequiredTag/> : <Check color="#31b434" strokeWidth={3} />}
             </h3>
             <div className="font-semibold mt-1 text-sm">
               <span className="">

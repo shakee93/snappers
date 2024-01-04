@@ -14,6 +14,7 @@ interface Props {
   onCloseActive: () => void;
   updateFormData: (section: string, data: any) => void;
   initialData: contactInformation;
+  handleConfirmationChange : any;
 }
 
 const ContactInfo: FC<Props> = ({
@@ -22,6 +23,7 @@ const ContactInfo: FC<Props> = ({
   onOpenActive,
   updateFormData,
   initialData,
+  handleConfirmationChange
 }) => {
   const [phone, setPhone] = useState("+94");
   const [email, setEmail] = useState("");
@@ -48,6 +50,7 @@ const ContactInfo: FC<Props> = ({
       setEmail(initialData?.email);
       setIsConfirmed(true);
       onCloseActive();
+      handleConfirmationChange(true);
     } else {
       setIsConfirmed(false);
     }

@@ -7,6 +7,8 @@ import Radio from "shared/Radio/Radio";
 import Image from 'next/image';
 
 import { PaymentGateway } from "@/graphql/types/graphql";
+import { Check } from "lucide-react";
+import { RequiredTag } from "./CheckoutHelperComps";
 
 interface Props {
   isActive: boolean;
@@ -14,6 +16,7 @@ interface Props {
   onOpenActive: () => void;
   updateFormData: (section: string, data: any) => void;
   paymentGateways: PaymentGateway[];
+  handleConfirmationChange: any;
 }
 
 const PaymentMethod: FC<Props> = ({
@@ -22,6 +25,7 @@ const PaymentMethod: FC<Props> = ({
   onOpenActive,
   paymentGateways,
   updateFormData,
+  handleConfirmationChange
 }) => {
   const [methodActive, setMethodActive] = useState<
     "Credit-Card" | "Internet-banking" | "Wallet"
@@ -179,25 +183,19 @@ const PaymentMethod: FC<Props> = ({
             </svg>
           </span>
           <div className="sm:ml-8">
-            <h3 className=" text-slate-700 dark:text-slate-400 flex ">
+            <h3 className=" text-slate-700 items-center dark:text-slate-300 flex ">
               <span className="uppercase tracking-tight">PAYMENT METHOD</span>
-              <svg
-                fill="none"
-                viewBox="0 0 24 24"
-                strokeWidth="2.5"
-                stroke="currentColor"
-                className="w-5 h-5 ml-3 text-slate-900"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M4.5 12.75l6 6 9-13.5"
-                />
-              </svg>
+              <div className={`mx-4`}>
+                {isConfirmed ? (
+                  <Check color="#31b434" strokeWidth={3} />
+                ) : (
+                  <RequiredTag />
+                )}
+              </div>
             </h3>
             <div className="font-semibold mt-1 text-sm">
-              <span className="">Google / Apple Wallet</span>
-              <span className="ml-3">xxx-xxx-xx55</span>
+              <span className="">Select Payment Method</span>
+              <span className="ml-3 tracking-tighter"></span>
             </div>
           </div>
           <ButtonSecondary
@@ -234,6 +232,7 @@ const PaymentMethod: FC<Props> = ({
                 updateFormData("paymentMethod", paymethod);
                 setIsConfirmed(true);
                 onCloseActive();
+                handleConfirmationChange(true);
               }}
             >
               Confirm order
