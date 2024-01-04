@@ -112,7 +112,7 @@ const BillingForm: FC = () => {
   return (
     <div className="nc-AddressPage" data-nc-id="AccountPage">
       <div className="space-y-10 sm:space-y-12">
-        <h2 className="text-xl sm:text-2xl font-semibold">billing Details</h2>
+        <h2 className="text-xl sm:text-2xl font-semibold">Billing Details</h2>
         <form onSubmit={handleSubmit} className="gap-2">
           <div className="flex flex-col gap-2 md:flex-row">
             <div className="flex-grow mt-10 md:mt-0 max-w-3xl space-y-6">
@@ -197,7 +197,7 @@ const BillingForm: FC = () => {
               <Checkbox
                 defaultChecked={saveBothAddresses}
                 name="save for both addresses"
-                label="Include this in the Shipping as well"
+                label="Include this in the delivery as well"
                 onChange={() => setSaveBothAddresses(!saveBothAddresses)}
               />
             </div>

@@ -7,11 +7,6 @@ import React, { FC, useEffect, useState, ChangeEvent, FormEvent } from "react";
 // GraphQL and Apollo Imports
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { GET_ADDRESSES, UPDATE_ADDRESS } from "@/graphql/defs/order";
-
-// Component Imports
-import Input from "@/shared/Input/Input";
-import Label from "@/components/Label/Label";
-import Select from "@/shared/Select/Select";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 
 // Context and Utility Imports
@@ -28,7 +23,7 @@ const SRI_LANKAN_STATES = [
     "North Western", "North Central", "Uva", "Sabaragamuwa",
 ];
 
-const ShippingForm: FC = () => {
+const DeliveryForm: FC = () => {
     const { customer, fetchCustomer, updateCustomer } = useSession();
     const [getAddresses, { loading, data, error }] = useLazyQuery(GET_ADDRESSES, {
         fetchPolicy: 'no-cache'
@@ -106,7 +101,7 @@ const ShippingForm: FC = () => {
     return (
         <div className="nc-AddressPage" data-nc-id="AccountPage">
             <div className="space-y-10 sm:space-y-12">
-                <h2 className="text-xl sm:text-2xl font-semibold">Shipping Details</h2>
+                <h2 className="text-xl sm:text-2xl font-semibold">Delivery Details</h2>
                 <form onSubmit={handleSubmit} className="gap-2">
                     <div className="flex flex-col gap-2 md:flex-row">
                         <div className="flex-grow mt-10 md:mt-0 max-w-3xl space-y-6">
@@ -135,10 +130,10 @@ const ShippingForm: FC = () => {
                         defaultChecked={saveBothAddresses}
                         className="mt-1.5"
                         name="save for both addresses"
-                        label="Include this in the billing as well"
+                        label="Include this in the Billing as well"
                         onChange={() => setSaveBothAddresses(!saveBothAddresses)}
                     />
-                    <ButtonPrimary type="submit" className="mt-4">Save Shipping Address</ButtonPrimary>
+                    <ButtonPrimary type="submit" className="mt-4">Save Delivery Address</ButtonPrimary>
                 </form>
             </div>
         </div>
@@ -146,4 +141,4 @@ const ShippingForm: FC = () => {
 
 };
 
-export default ShippingForm;
+export default DeliveryForm;
