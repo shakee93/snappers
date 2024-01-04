@@ -6,7 +6,7 @@ import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Checkbox from "shared/Checkbox/Checkbox";
 import Input from "shared/Input/Input";
 import { BadgeMinus, Check } from "lucide-react";
-import { RequiredTag } from "./CheckoutHelperComps";
+import { CompletedTag, RequiredTag } from "./CheckoutHelperComps";
 
 interface Props {
   isActive: boolean;
@@ -96,7 +96,7 @@ const ContactInfo: FC<Props> = ({
               <span className="uppercase tracking-tight">CONTACT INFO</span>
               <div className={`mx-4`}>
                 {isConfirmed ? (
-                  <Check color="#31b434" strokeWidth={3} />
+                  <CompletedTag/>
                 ) : (
                   <RequiredTag />
                 )}
