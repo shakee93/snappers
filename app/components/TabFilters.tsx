@@ -1,5 +1,5 @@
 "use client";
-import React, {Fragment, useEffect, useState} from "react";
+import React, { Fragment, useEffect, useState } from "react";
 import { Dialog, Popover, Transition } from "@headlessui/react";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonThird from "shared/Button/ButtonThird";
@@ -9,9 +9,9 @@ import Slider from "rc-slider";
 import Radio from "shared/Radio/Radio";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import MySwitch from "components/MySwitch";
-import {useStore} from "@/store/store";
-import {Brand, ProductCategory} from "@/graphql/types/graphql";
-import {XIcon} from "lucide-react";
+import { useStore } from "@/store/store";
+import { Brand, ProductCategory } from "@/graphql/types/graphql";
+import { XIcon } from "lucide-react";
 import CategoryFilter from "@/app/components/Filters/CategoryFilter";
 import BrandFilter from "@/app/components/Filters/BrandFilter";
 import PriceFilter from "@/app/components/Filters/PriceFilter";
@@ -52,43 +52,67 @@ const DATA_sortOrderRadios = [
 const PRICE_RANGE = [1, 500];
 
 interface TabFilterProps {
-  categories?: ProductCategory[]
-  category?: ProductCategory
-  brands?: Brand[]
-  brand?: Brand
+  categories?: ProductCategory[];
+  category?: ProductCategory;
+  brands?: Brand[];
+  brand?: Brand;
 }
 
 //
 const TabFilters = ({
-                      categories = [],
-                      brands = [],
-    brand, category
-                    }: TabFilterProps) => {
+  categories = [],
+  brands = [],
+  brand,
+  category,
+}: TabFilterProps) => {
   const [isOpenMoreFilter, setisOpenMoreFilter] = useState(false);
+
   //
   const [isOnSale, setIsIsOnSale] = useState(true);
   const [rangePrices, setRangePrices] = useState([500, 500000]);
   const [colorsState, setColorsState] = useState<string[]>([]);
   const [sizesState, setSizesState] = useState<string[]>([]);
   const [sortOrderStates, setSortOrderStates] = useState<string>("");
-  const [brandsState, setBrandsState] = useState<string[]>([]);
+  const [brandsState, setBrandsState] = useState<number[]>([]);
+  const [categoriesState, setCategoriesState] = useState<number[]>([]);
 
-  const { sidebar, syncCategories, syncBrands, setMounted } = useStore()
+  const { sidebar, syncCategories, syncBrands, setMounted, synPriceRange } =
+    useStore();
 
-
+  useEffect(() => {
+    synPriceRange(rangePrices);
+  }, [rangePrices]);
   //
   const closeModalMoreFilter = () => setisOpenMoreFilter(false);
   const openModalMoreFilter = () => setisOpenMoreFilter(true);
 
   //
 
-
-  const handleChangeBrands = (checked: boolean, name: string) => {
-    console.log(checked, name);
+  const handleChangeCategories = (checked: boolean, name: number) => {
+    if (name === 0 && checked) {
+      setCategoriesState([]);
+      syncCategories([]);
+      return;
+    }
 
     checked
-        ? setBrandsState([...brandsState, name])
-        : setBrandsState(brandsState.filter((i) => i !== name));
+      ? setCategoriesState([...categoriesState, name])
+      : setCategoriesState(categoriesState.filter((i) => i !== name));
+
+    // syncCategories(categoriesState);
+    // closeModalMoreFilter();
+  };
+
+  const handleChangeBrands = (checked: boolean, name: number) => {
+    if (name === 0 && checked) {
+      setBrandsState([]);
+      syncBrands([]);
+      return;
+    }
+
+    checked
+      ? setBrandsState([...brandsState, name])
+      : setBrandsState(brandsState.filter((i) => i !== name));
   };
 
   const handleChangeColors = (checked: boolean, name: string) => {
@@ -109,7 +133,7 @@ const TabFilters = ({
   const renderXClear = () => {
     return (
       <span className="flex-shrink-0 w-4 h-4 rounded-full bg-primary-500 text-white flex items-center justify-center ml-3 cursor-pointer">
-        <XIcon className='p-0.5'/>
+        <XIcon className="p-0.5" />
       </span>
     );
   };
@@ -246,8 +270,6 @@ const TabFilters = ({
         }`}
         onClick={() => setIsIsOnSale(!isOnSale)}
       >
-
-
         <span className="line-clamp-1 ml-2">On sale</span>
         {isOnSale && renderXClear()}
       </div>
@@ -414,18 +436,125 @@ const TabFilters = ({
                     <div className="px-6 sm:px-8 md:px-10 divide-y divide-neutral-200 dark:divide-neutral-800">
                       {/* --------- */}
                       {/* ---- */}
-                      <div className="py-7">
-                        <h3 className="text-xl font-medium">Categories</h3>
-                        <div className="mt-6 relative ">
-                          {/*{renderMoreFilterItem(categories)}*/}
+                      {!category && (
+                        <div className="py-7">
+                          <h3 className="text-xl font-medium">Categories</h3>
+                          <div className="mt-6 relative ">
+                            {/* {renderMoreFilterItem(categories)} */}
+                            {/* {renderMoreFilterItem(categories.map(transformCategory))} */}
+                            <div className="relative flex flex-col px-5 py-6 space-y-5">
+                              <Checkbox
+                                name="All Categories"
+                                label="All Categories"
+                                defaultChecked={categoriesState.length === 0}
+                                onChange={(checked) =>
+                                  handleChangeCategories(checked, 0)
+                                }
+                              />
+                              <div className="w-full border-b  border-neutral-200 dark:border-neutral-700" />
+                              <div className="flex flex-col space-y-5">
+                                {categories.map((item) => (
+                                  <div key={item.databaseId} className="">
+                                    <Checkbox
+                                      name={item.slug || ""}
+                                      label={`${item.name} (${item.count})`}
+                                      defaultChecked={categoriesState.includes(
+                                        item.databaseId
+                                      )}
+                                      onChange={(checked) =>
+                                        handleChangeCategories(
+                                          checked,
+                                          item.databaseId
+                                        )
+                                      }
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                            <div className="p-5 bg-neutral-50 dark:bg-neutral-900 dark:border-t dark:border-neutral-800 flex items-center justify-between">
+                              <ButtonThird
+                                onClick={() => {
+                                  setCategoriesState([]);
+                                  syncCategories([]);
+                                }}
+                                sizeClass="px-4 py-2 sm:px-5"
+                              >
+                                Clear
+                              </ButtonThird>
+                              <ButtonPrimary
+                                onClick={() => {
+                                  syncCategories(categoriesState);
+                                  closeModalMoreFilter();
+                                }}
+                                sizeClass="px-4 py-2 sm:px-5"
+                              >
+                                Apply
+                              </ButtonPrimary>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                      <div className="py-7">
-                        <h3 className="text-xl font-medium">Brands</h3>
-                        <div className="mt-6 relative ">
-                          {/*{renderMoreFilterItem(categories)}*/}
+                      )}
+                      {!brand && (
+                        <div className="py-7">
+                          <h3 className="text-xl font-medium">Brands</h3>
+                          <div className="mt-6 relative ">
+                            {/*{renderMoreFilterItem(categories)}*/}
+                            <div className="relative flex flex-col px-5 py-6 space-y-5">
+                              <Checkbox
+                                name="All Brands"
+                                label="All Brands"
+                                defaultChecked={brandsState.length === 0}
+                                onChange={(checked) =>
+                                  handleChangeBrands(checked, 0)
+                                }
+                              />
+
+                              <div className="w-full border-b  border-neutral-200 dark:border-neutral-700" />
+                              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                                {brands.map((item) => (
+                                  <div key={item.databaseId} className="">
+                                    <Checkbox
+                                      name={item.slug || ""}
+                                      label={`${item.name} (${item.count})`}
+                                      defaultChecked={brandsState.includes(
+                                        item.databaseId
+                                      )}
+                                      onChange={(checked) =>
+                                        handleChangeBrands(
+                                          checked,
+                                          item.databaseId
+                                        )
+                                      }
+                                    />
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                            <div className="p-5 bg-neutral-50 dark:bg-neutral-900 dark:border-t dark:border-neutral-800 flex items-center justify-between">
+                              <ButtonThird
+                                onClick={() => {
+                                  setBrandsState([]);
+                                  syncBrands([]);
+                                }}
+                                sizeClass="px-4 py-2 sm:px-5"
+                              >
+                                Clear
+                              </ButtonThird>
+                              <ButtonPrimary
+                                onClick={() => {
+                                  syncBrands(brandsState);
+                                  closeModalMoreFilter();
+                                }}
+                                sizeClass="px-4 py-2 sm:px-5"
+                              >
+                                Apply
+                              </ButtonPrimary>
+                            </div>
+                          </div>
                         </div>
-                      </div>
+                      )}
+
                       {/* --------- */}
                       {/* ---- */}
                       <div className="py-7">
@@ -446,7 +575,7 @@ const TabFilters = ({
                       {/* --------- */}
                       {/* ---- */}
                       <div className="py-7">
-                        <h3 className="text-xl font-medium">Range Prices</h3>
+                        {/* <h3 className="text-xl font-medium">Range Prices</h3>
                         <div className="mt-6 relative ">
                           <div className="relative flex flex-col space-y-8">
                             <div className="space-y-5">
@@ -507,6 +636,88 @@ const TabFilters = ({
                                     id="maxPrice"
                                     className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-3 sm:text-sm border-neutral-200 rounded-full text-neutral-900"
                                     value={rangePrices[1]}
+                                  />
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div> */}
+                        <div className="overflow-hidden rounded-2xl shadow-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
+                          <div className="relative flex flex-col px-5 py-6 space-y-8">
+                            <div className="space-y-5">
+                              <span className="font-medium">Price range</span>
+                              <br />
+                              <span className="pt-1">
+                                LKR {rangePrices[0].toLocaleString()} - LKR{" "}
+                                {rangePrices[1].toLocaleString()}
+                              </span>
+                              <Slider
+                                range
+                                min={PRICE_RANGE[0]}
+                                max={PRICE_RANGE[1]}
+                                step={1}
+                                defaultValue={[rangePrices[0], rangePrices[1]]}
+                                allowCross={false}
+                                onChange={(_input: number | number[]) =>
+                                  setRangePrices(_input as number[])
+                                }
+                              />
+                            </div>
+
+                            <div className="flex justify-between space-x-5">
+                              <div>
+                                <label
+                                  htmlFor="minPrice"
+                                  className="block text-sm font-medium text-neutral-700 dark:text-neutral-300"
+                                >
+                                  Min price
+                                </label>
+                                <div className="mt-1 relative rounded-md">
+                                  <span className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-neutral-500 sm:text-sm">
+                                    LKR
+                                  </span>
+                                  <input
+                                    type="number"
+                                    max={PRICE_RANGE[1]}
+                                    min={PRICE_RANGE[0]}
+                                    name="minPrice"
+                                    id="minPrice"
+                                    className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
+                                    value={rangePrices[0]}
+                                    onChange={(e) =>
+                                      setRangePrices([
+                                        e.target.value as unknown as number,
+                                        rangePrices[1],
+                                      ])
+                                    }
+                                  />
+                                </div>
+                              </div>
+                              <div>
+                                <label
+                                  htmlFor="maxPrice"
+                                  className="block text-sm font-medium text-neutral-700 dark:text-neutral-300"
+                                >
+                                  Max price
+                                </label>
+                                <div className="mt-1 relative rounded-md">
+                                  <span className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-neutral-500 sm:text-sm">
+                                    LKR
+                                  </span>
+                                  <input
+                                    type="number"
+                                    max={PRICE_RANGE[1]}
+                                    min={PRICE_RANGE[0]}
+                                    name="maxPrice"
+                                    id="maxPrice"
+                                    className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
+                                    value={rangePrices[1]}
+                                    onChange={(e) =>
+                                      setRangePrices([
+                                        rangePrices[0],
+                                        e.target.value as unknown as number,
+                                      ])
+                                    }
                                   />
                                 </div>
                               </div>
@@ -579,29 +790,25 @@ const TabFilters = ({
     );
   };
 
-
   useEffect(() => {
-    setMounted()
-  }, [])
-
+    setMounted();
+  }, []);
 
   return (
     <div className="flex flex-col gap-3 lg:space-x-4">
       {/* FOR DESKTOP */}
       <div className="hidden lg:flex flex-1 space-x-4">
-        {!category && <CategoryFilter categories={categories}/>}
-        {!brand && <BrandFilter brands={brands}/>}
-        <PriceFilter/>
-        <OnSaleFilter/>
-        <InStockFilter/>
+        {!category && <CategoryFilter categories={categories} />}
+        {!brand && <BrandFilter brands={brands} />}
+        <PriceFilter />
+        <OnSaleFilter />
+        <InStockFilter />
         <div className="!ml-auto">
-          <SortOrderFilter/>
+          <SortOrderFilter />
         </div>
       </div>
 
-      <div>
-        {/*{JSON.stringify(sidebar)}*/}
-      </div>
+      <div>{/*{JSON.stringify(sidebar)}*/}</div>
 
       {/* FOR RESPONSIVE MOBILE */}
       <div className="flex overflow-x-auto lg:hidden space-x-4">
