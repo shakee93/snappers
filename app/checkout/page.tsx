@@ -96,7 +96,6 @@ const CheckoutPage = () => {
   };
 
   const handleStorePickupChange = (value: boolean) => {
-    // console.log('store pickup changed', value);
     setIsStorePickup(value);
   }
 

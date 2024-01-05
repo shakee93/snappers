@@ -18,7 +18,6 @@ interface Props {
   handleConfirmationChange: any;
   updateBillingVisibility: (isVisible: boolean) => void;
   isStorePickup: boolean;
-  updateStorePickupVisibility: (isVisible: boolean) => void;
 }
 
 const DeliveryAddress: FC<Props> = ({
@@ -30,7 +29,7 @@ const DeliveryAddress: FC<Props> = ({
   formData,
   handleConfirmationChange,
   updateBillingVisibility,
-  updateStorePickupVisibility
+
 }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -83,8 +82,6 @@ const DeliveryAddress: FC<Props> = ({
         });
       }
 
-      updateStorePickupVisibility(storepickupValue);
-
       return storepickupValue;
     });
   };
@@ -104,15 +101,15 @@ const DeliveryAddress: FC<Props> = ({
     }
   }, [initialData]);
 
-  useEffect(() => {
-    const isShippingAddressEmpty =
-      formData?.shippingAddress &&
-      Object.keys(formData?.shippingAddress).length === 0;
+  // useEffect(() => {
+  //   const isShippingAddressEmpty =
+  //     formData?.shippingAddress &&
+  //     Object.keys(formData?.shippingAddress).length === 0;
 
-    if (isShippingAddressEmpty) {
-      setIsConfirmed(false);
-    }
-  }, [formData]);
+  //   if (isShippingAddressEmpty) {
+  //     setIsConfirmed(false);
+  //   }
+  // }, [formData]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -134,8 +131,14 @@ const DeliveryAddress: FC<Props> = ({
     if (isBillingSameAsShipping) {
       console.log('same same');
       updateFormData("billingAddress", shippingAddressData);
-      handleConfirmationChange("billingAddress", true);
-      handleConfirmationChange("shippingAddress", true);
+    }
+    if (isStorePickup) {
+      console.log('store pickup true');
+      updateFormData("shippingDetails", {
+        "databaseId": "local_pickup",
+        "id": "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==",
+        "title": "StorePickup"
+      });
     }
   };
 
