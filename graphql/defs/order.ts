@@ -25,7 +25,6 @@ mutation guestCheckout ($paymentMethod: String!, , $lineItems: [LineItemInput!]!
   }) {
     clientMutationId
     order {
-      id
       orderKey
       total
       orderNumber
