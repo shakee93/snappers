@@ -1,4 +1,4 @@
-import ArchiveLayout from "@/app/components/ArchiveLayout";
+import ArchiveLayout from "@/app/components/archive/ArchiveLayout";
 import {Metadata, ResolvingMetadata} from "next";
 
 

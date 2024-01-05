@@ -4,7 +4,7 @@ import {
 } from "@/graphql/defs/products";
 import {notFound} from "next/navigation";
 
-import ArchiveLayout from "@/app/components/ArchiveLayout";
+import ArchiveLayout from "@/app/components/archive/ArchiveLayout";
 import {Brand} from "@/graphql/types/graphql";
 import {Metadata, ResolvingMetadata} from "next";
 
