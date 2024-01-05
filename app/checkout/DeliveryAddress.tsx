@@ -285,7 +285,7 @@ const DeliveryAddress: FC<Props> = ({
               </ButtonPrimary>
             </div>
 
-            <div className="flex justify-between">
+            <div className="flex justify-between gap-4">
               <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4">
                 <Checkbox
                 key={2}
