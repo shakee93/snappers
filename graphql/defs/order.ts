@@ -28,6 +28,8 @@ mutation guestCheckout ($paymentMethod: String!, , $lineItems: [LineItemInput!]!
       id
       orderKey
       total
+      orderNumber
+      paymentMethodTitle
     }
   }
 }`
