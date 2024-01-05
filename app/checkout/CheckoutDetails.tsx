@@ -58,7 +58,9 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
 
   useEffect(() => {
     setIsBillingAddressHidden(isBillingSameAsShipping || isStorePickup );
-    
+    if (isBillingSameAsShipping){
+      handleConfirmationChange('billingAddress', true)
+    }
   }, [isBillingSameAsShipping, isStorePickup]);
 
   useEffect(() => {
