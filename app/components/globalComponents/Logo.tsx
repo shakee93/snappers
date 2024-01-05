@@ -11,7 +11,7 @@ const Logo = ({ className = 'border-r'}:{ className?: string}) => {
         priority={true}
         src={SiteLogo}
         alt="logo"
-        className="h-20 lg:h-32 max-w-[80px] md:max-w-[320px] w-auto p-2 lg:p-4 relative z-50 rounded-b-2xl"
+        className="h-20 md:h-32 max-w-[80px] md:max-w-[320px] w-auto p-2 lg:p-4 relative z-50 rounded-b-2xl"
       ></Image>
     </Link>
   );

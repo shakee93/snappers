@@ -16,14 +16,13 @@ export const ProductContentSlice = gql`
         name
         slug
         type
-        purchasable 
-        terms {
+        purchasable
+        brands {
             nodes {
-                ... on Brand {
-                    id
-                    name
-                    slug
-                }
+                databaseId
+                name
+                slug
+                count
             }
         }
         image {

@@ -42,17 +42,24 @@ const Header = async () => {
             "backdrop-blur-md sticky top-0 flex flex-col justify-between bg-white/90 z-30 transition-all duration-1300 border-b"
           }
       >
-        <div className="flex justify-between items-center lg:items-stretch">
-          <div className="flex items-center relative">
+        <div className="flex justify-between items-center md:items-stretch">
+
+
+          <div className="flex md:hidden px-2 bg-primaryColor py-2 flex-1 justify-center items-center">
+            <SearchBar />
+          </div>
+
+          <div className="hidden md:flex items-center relative">
             <Logo />
           </div>
-          <div className='hidden lg:flex flex-1 flex-col justify-between'>
+
+          <div className='hidden md:flex flex-1 flex-col justify-between'>
             <div className='w-full flex flex-1'>
               <div className="flex pl-5 flex-1 justify-center items-center">
                 <SearchBar />
               </div>
               <div className="w-fit flex items-center justify-end pr-3">
-                <div className="hidden lg:block">
+                <div className="hidden md:block">
                   <NavLinks />
                 </div>
                 <div className="hidden md:flex">
@@ -63,7 +70,8 @@ const Header = async () => {
             </div>
             <BrandBar categories={productCategories} brands={brands}/>
           </div>
-          <MobileNavLinks/>
+
+          {/*<MobileNavLinks/>*/}
 
         </div>
       </header>
