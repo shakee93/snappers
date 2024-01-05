@@ -1,8 +1,9 @@
 import Link from "next/link";
 import Image from "next/image";
 import SiteLogo from "@/public/global/logo.webp";
+import {twMerge} from "tailwind-merge";
 
-const Logo = ({ className = 'border-r'}:{ className?: string}) => {
+const Logo = ({ className = 'border-r', imageClass = ''}:{ className?: string, imageClass?: string}) => {
   return (
     <Link href={"/"} className={className}>
       <Image
@@ -11,7 +12,10 @@ const Logo = ({ className = 'border-r'}:{ className?: string}) => {
         priority={true}
         src={SiteLogo}
         alt="logo"
-        className="h-20 md:h-32 max-w-[80px] md:max-w-[320px] w-auto p-2 lg:p-4 relative z-50 rounded-b-2xl"
+        className={twMerge(
+            "h-20 md:h-32 max-w-[80px] md:max-w-[320px] w-auto p-2 lg:p-4 relative z-50 rounded-b-2xl",
+            imageClass
+        )}
       ></Image>
     </Link>
   );

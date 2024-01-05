@@ -39,7 +39,7 @@ const Header = async () => {
     <>
       <header
           className={
-            "backdrop-blur-md sticky top-0 flex flex-col justify-between bg-white/90 z-30 transition-all duration-1300 border-b"
+            "backdrop-blur-md sticky top-0 flex flex-col justify-between bg-white/90 z-30 transition-all duration-1300 shadow-xl md:border-b"
           }
       >
         <div className="flex justify-between items-center md:items-stretch">
@@ -71,10 +71,11 @@ const Header = async () => {
             <BrandBar categories={productCategories} brands={brands}/>
           </div>
 
-          {/*<MobileNavLinks/>*/}
+
 
         </div>
       </header>
+      <MobileNavLinks/>
       <HeaderSearchResults productCategories={productCategories} brands={brands} />
       <div className="md:hidden">
         <MobileBottomNav categories={productCategories}/>
