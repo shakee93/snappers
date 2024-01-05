@@ -138,12 +138,10 @@ const DeliveryAddress: FC<Props> = ({
     onCloseActive();
     handleConfirmationChange(true);
     if (isBillingSameAsShipping) {
-      console.log("same same");
       updateFormData("billingAddress", shippingAddressData);
       toggleConfirmationBillingAddress(true);
     }
     if (isStorePickup) {
-      console.log("store pickup true");
       updateFormData("shippingDetails", {
         databaseId: "local_pickup",
         id: "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==",

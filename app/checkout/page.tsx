@@ -34,7 +34,7 @@ import MySwitch from "@/components/MySwitch"
 
 interface FormData {
   contactInfo: Record<string, any>;
-  shippingAddress: Record<string, any>;
+  deliveryAddress: Record<string, any>;
   billingAddress: Record<string, any>;
   paymentMethod: {
     selectedGateway?: {
@@ -49,21 +49,21 @@ const CheckoutPage = () => {
   const { loading, error, data, refetch } = useQuery(GET_PAYMENT_GATEWAYS);
   const paymentGateways: PaymentGateway[] = data?.paymentGateways.nodes;
   const [tabActive, setTabActive] = useState<
-    "ContactInfo" | "ShippingAddress" | "BillingAddress" | "PaymentMethod"
+    "ContactInfo" | "DeliveryAddress" | "BillingAddress" | "PaymentMethod"
   >("ContactInfo");
   const [canConfirmOrder, setcanConfirmOrder] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     contactInfo: {},
-    shippingAddress: {},
+    deliveryAddress: {},
     billingAddress: {},
     paymentMethod: {
       selectedGateway: {},
     },
   });
-  const [isStorePickup, setIsStorePickup] = useState(false);
+  const [isStorePickup, setIsStorePickup] = useState(true);
   const [isConfirmed, setIsConfirmed] = useState({
     contactInfo: false,
-    shippingAddress: false,
+    deliveryAddress: false,
     paymentMethod: false,
     billingAddress: false,
   });
@@ -100,8 +100,6 @@ const CheckoutPage = () => {
   }
 
   const handleConfirmationChange = (component: string, value: boolean) => {
-    console.log('value', value);
-    console.log('component', component);
 
     setIsConfirmed((prevConfirmed) => {
       const updatedConfirmed = {
@@ -202,7 +200,7 @@ const CheckoutPage = () => {
                 value:
                   | "ContactInfo"
                   | "BillingAddress"
-                  | "ShippingAddress"
+                  | "DeliveryAddress"
                   | "PaymentMethod"
               ) => setTabActive(value)}
               handleScrollToEl={handleScrollToEl}
@@ -212,7 +210,7 @@ const CheckoutPage = () => {
               onStorePickupChange={handleStorePickupChange}
               handleConfirmationChange={handleConfirmationChange}
               isStorePickup={isStorePickup}
-              setIsStorePickupHidden={(isVisible : boolean) => setIsStorePickup(isVisible)}
+              setIsStorePickupHidden={(isVisible: boolean) => setIsStorePickup(isVisible)}
             />
           </div>
 
@@ -266,8 +264,8 @@ const CheckoutPage = () => {
                             </div> */}
               <div className="flex justify-between font-semibold text-slate-900 dark:text-slate-200 text-base pt-4">
                 <span>Order total</span>
-                {!isStorePickup && (<span>{cart?.total || "$0.00"}</span>)}
-                {isStorePickup && (<span>{cart?.total || "$0.00"}</span>)}
+                <span>{cart?.total || "$0.00"}</span>
+
               </div>
             </div>
             <ButtonPrimary
@@ -275,7 +273,7 @@ const CheckoutPage = () => {
               disabled={
                 !(
                   isConfirmed.contactInfo &&
-                  isConfirmed.shippingAddress &&
+                  isConfirmed.deliveryAddress &&
                   isConfirmed.billingAddress &&
                   isConfirmed.paymentMethod
                 )

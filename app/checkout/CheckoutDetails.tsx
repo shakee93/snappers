@@ -15,14 +15,14 @@ import DeliveryAddress from "./DeliveryAddress";
 
 interface CheckoutLeftProps {
   tabActive:
-    | "ContactInfo"
-    | "ShippingAddress"
-    | "PaymentMethod"
-    | "BillingAddress";
+  | "ContactInfo"
+  | "DeliveryAddress"
+  | "PaymentMethod"
+  | "BillingAddress";
   setTabActive: (
     value:
       | "ContactInfo"
-      | "ShippingAddress"
+      | "DeliveryAddress"
       | "BillingAddress"
       | "PaymentMethod"
   ) => void;
@@ -61,18 +61,14 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
   const [isBillingAddressHidden, setIsBillingAddressHidden] = useState(false);
 
   useEffect(() => {
-    console.log("isStorePickup", isStorePickup);
-    console.log("isBillingSameAsShipping", isBillingSameAsShipping);
+    // console.log("isStorePickup", isStorePickup);
+    // console.log("isBillingSameAsShipping", isBillingSameAsShipping);
     if (isStorePickup == true) {
       handleConfirmationChange("billingAddress", true);
     }
-
     setIsBillingAddressHidden(isBillingSameAsShipping || isStorePickup);
-    console.log("isBillingAddressHidden", isBillingAddressHidden);
     if (!isBillingAddressHidden) {
-      console.log("started ");
       handleConfirmationChange("billingAddress", true);
-      console.log("hanldeConfirmation change worked ");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isStorePickup, isBillingSameAsShipping]);
@@ -111,8 +107,8 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
             handleScrollToEl("ContactInfo");
           }}
           onCloseActive={() => {
-            setTabActive("BillingAddress");
-            handleScrollToEl("BillingAddress");
+            setTabActive("DeliveryAddress");
+            handleScrollToEl("DeliveryAddress");
           }}
           updateFormData={(section, data) => {
             updateFormData(section, data);
@@ -124,12 +120,12 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
         />
       </div>
 
-      <div id="ShippingAddress" className="scroll-mt-24">
+      <div id="DeliveryAddress" className="scroll-mt-24">
         <DeliveryAddress
-          isActive={tabActive === "ShippingAddress"}
+          isActive={tabActive === "DeliveryAddress"}
           onOpenActive={() => {
-            setTabActive("ShippingAddress");
-            handleScrollToEl("ShippingAddress");
+            setTabActive("DeliveryAddress");
+            handleScrollToEl("DeliveryAddress");
           }}
           onCloseActive={() => {
             setTabActive("PaymentMethod");
@@ -141,7 +137,7 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
           initialData={shippingDetails!}
           formData={formData}
           handleConfirmationChange={(value: any) =>
-            handleConfirmationChange("shippingAddress", value)
+            handleConfirmationChange("deliveryAddress", value)
           }
           toggleConfirmationBillingAddress={(value: any) =>
             handleConfirmationChange("billingAddress", value)
@@ -164,7 +160,7 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
               handleScrollToEl("BillingAddress");
             }}
             onCloseActive={() => {
-              setTabActive("ShippingAddress");
+              setTabActive("DeliveryAddress");
               handleScrollToEl("");
             }}
             updateFormData={(section, data) => {
