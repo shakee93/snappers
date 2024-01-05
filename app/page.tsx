@@ -62,7 +62,7 @@ const getData = async () => {
 export default async function Home() {
 
   const { slides, newArrivals, mobiles, speakers, topSelling } = await getData()
-
+  const hi = "sahdeer";
   return (
     <main>
       <div className="nc-PageHome relative overflow-hidden">

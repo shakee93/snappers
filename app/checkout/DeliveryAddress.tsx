@@ -75,7 +75,6 @@ const DeliveryAddress: FC<Props> = ({
 
       if (storepickupValue) {
         setStorePickup(true);
-
         updateFormData("billingAddress", formData.shippingAddress);
         updateFormData("shippingDetails", {
           databaseId: "local_pickup",
@@ -138,7 +137,6 @@ const DeliveryAddress: FC<Props> = ({
     setIsConfirmed(true);
     onCloseActive();
     handleConfirmationChange(true);
-    toggleConfirmationBillingAddress(false);
     if (isBillingSameAsShipping) {
       console.log("same same");
       updateFormData("billingAddress", shippingAddressData);
