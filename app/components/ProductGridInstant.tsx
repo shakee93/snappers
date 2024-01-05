@@ -20,14 +20,14 @@ interface ProductGridProps {
 const ProductGridInstant = ({ products, brand, category }: ProductGridProps) => {
     const { hits, results } = useHits()
 
-    const { status: statusState } = useInstantSearch();
-    const { setSearchStatus, search, navigation } = useStore()
+    // const { status: statusState } = useInstantSearch();
+    const { setSearchStatus, search, search_status, navigation } = useStore()
 
     const grid = 8;
 
-    useEffect(() => {
-        setSearchStatus(statusState)
-    }, [statusState])
+    // useEffect(() => {
+    //     setSearchStatus(statusState)
+    // }, [statusState])
 
     // if ((search.length > 0 || navigation.length > 1) && (statusState === 'stalled' ) ) {
     //     return <div className='flex-1 grid  grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-5 lg:gap-x-8 lg:gap-y-10'>
@@ -44,7 +44,7 @@ const ProductGridInstant = ({ products, brand, category }: ProductGridProps) => 
 
     return (
         <>
-            {(results?.nbHits === 0 && statusState === 'idle') && <div className='text-center text-slate-500 flex flex-col items-center gap-20 py-12'>
+            {(results?.nbHits === 0) && <div className='text-center text-slate-500 flex flex-col items-center gap-20 py-12'>
                 <div>
                     <Image className='w-64' src={NotFound} alt='No Search Results'/>
                 </div>

@@ -36,7 +36,7 @@ const HeaderSearchResults = ({ brands, productCategories}: SearchBarProps) => {
     }
 
     return search.length > 0 ? <div className={twMerge(
-        `inset-0 p-5 md:pt-0 md:p-10 mt-[70px] lg:mt-[129px] bg-gray-100 z-[15] overflow-y-scroll`,
+        `inset-0 py-4 px-0 md:pt-0 md:p-10 mt-[62px] lg:mt-[129px] bg-gray-100 z-[15] overflow-y-scroll`,
         search.length > 0 ? 'fixed' : 'hidden'
     )}>
         <div className='container mx-auto'>

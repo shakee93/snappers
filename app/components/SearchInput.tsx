@@ -13,7 +13,7 @@ const SearchInput = ({ show = true, bindToStore = false } : { show?: boolean, bi
     } = useSearchBox();
 
     const { search } = useStore()
-    const [value] = useDebounce(search, 500);
+    const [value] = useDebounce(search, 300);
 
     useEffect(() => {
 
