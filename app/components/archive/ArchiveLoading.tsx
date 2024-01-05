@@ -20,11 +20,9 @@ const ArchiveLoading = () => {
                 <div className='flex justify-between'>
                     <div className='flex gap-2'>
                         <div className="h-10 bg-gray-300 rounded-full w-32 animate-pulse"></div>
-                        <div className='hidden md:block'>
-                            <div className="h-10 bg-gray-300 rounded-full w-32 animate-pulse"></div>
-                            <div className="h-10 bg-gray-300 rounded-full w-32 animate-pulse"></div>
-                            <div className="h-10 bg-gray-300 rounded-full w-32 animate-pulse"></div>
-                        </div>
+                        <div className="hidden md:block h-10 bg-gray-300 rounded-full w-32 animate-pulse"></div>
+                        <div className="hidden md:block h-10 bg-gray-300 rounded-full w-32 animate-pulse"></div>
+                        <div className="hidden md:block h-10 bg-gray-300 rounded-full w-32 animate-pulse"></div>
                     </div>
                     <div  className='hidden md:block' >
                         <div className="h-10 bg-gray-300 rounded-full w-32 animate-pulse"></div>
