@@ -1,4 +1,11 @@
-import ArchiveLayout from "@/app/components/ArchiveLayout";
+import ArchiveLayout from "@/app/components/archive/ArchiveLayout";
+import {Metadata, ResolvingMetadata} from "next";
+
+
+export const metadata: Metadata = {
+  title: 'Browse Shop'
+}
+
 
 const Page = () => {
 

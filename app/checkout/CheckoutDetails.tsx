@@ -15,10 +15,10 @@ import DeliveryAddress from "./DeliveryAddress";
 
 interface CheckoutLeftProps {
   tabActive:
-    | "ContactInfo"
-    | "DeliveryAddress"
-    | "PaymentMethod"
-    | "BillingAddress";
+  | "ContactInfo"
+  | "DeliveryAddress"
+  | "PaymentMethod"
+  | "BillingAddress";
   setTabActive: (
     value:
       | "ContactInfo"
@@ -127,9 +127,15 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
             setTabActive("DeliveryAddress");
             handleScrollToEl("DeliveryAddress");
           }}
+
           onCloseActive={() => {
-            setTabActive("PaymentMethod");
-            handleScrollToEl("PaymentMethod");
+            if (isBillingAddressHidden) {
+              setTabActive("PaymentMethod");
+              handleScrollToEl("PaymentMethod");
+            } else {
+              setTabActive("BillingAddress");
+              handleScrollToEl("BillingAddress");
+            }
           }}
           updateFormData={(section, data) => {
             updateFormData(section, data);

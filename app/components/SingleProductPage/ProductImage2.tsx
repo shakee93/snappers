@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from "react";
 import InnerImageZoom from "react-inner-image-zoom";
 import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react";
-import { Thumb } from "app/components/HomePage/EmblaCarouselThumbsButton";
+import { Thumb } from "app/components/SingleProductBlock/ProductCarouselThumb";
 import "styles/product_embla.css";
 import {
   MediaItem,
@@ -73,9 +73,9 @@ const EmblaCarousel: React.FC<PropType> = ({product}) => {
                <Image
                    width={1000}
                    height={1000}
-                className="embla__slide__img"
+                className="object-contain max-h-[330px] md:max-h-[410px]"
                 src={image?.sourceUrl || ''}
-                alt="Your alt text"
+                alt=""
               />
             </div>
           ))}

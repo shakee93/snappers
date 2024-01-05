@@ -10,20 +10,13 @@ import {usePathname} from "next/navigation";
 
 const SearchBar = () => {
 
-    const router = usePathname()
-
     const { search, setSearch, search_status } = useStore()
-
-
-    useEffect(() => {
-        setSearch('')
-    }, [router])
 
     return <div className='flex-1'>
         <form
-            className=" text-primary-700"
+            className="text-primary-700"
         >
-            <div className="bg-primaryColor/5 border border-primaryColor/20 py-2 flex items-center space-x-1.5 px-5 rounded-2xl h-full ">
+            <div className="bg-white lg:bg-primaryColor/5 border border-primaryColor/20 py-1 md:py-2 flex items-center space-x-1.5 px-5 rounded-lg lg:rounded-2xl h-full ">
                 {
                     (search_status === 'stalled' || search_status === 'loading') ? <Loader className='text-primaryColor animate-spin'/> : search.length > 0 ?
                         <button onClick={e => setSearch("")}>
