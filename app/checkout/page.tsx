@@ -103,7 +103,6 @@ const CheckoutPage = () => {
     console.log('value', value);
     console.log('component', component);
 
-
     setIsConfirmed((prevConfirmed) => {
       const updatedConfirmed = {
         ...prevConfirmed,
