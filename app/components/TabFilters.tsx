@@ -824,7 +824,7 @@ const TabFilters = ({
   }, []);
 
   return (
-    <div className="flex flex-col gap-3 lg:space-x-4">
+    <div className="flex flex-col gap-0 lg:gap-3 lg:space-x-4">
       {/* FOR DESKTOP */}
       <div className="hidden lg:flex flex-1 space-x-4">
         {!category && <CategoryFilter categories={categories} />}
