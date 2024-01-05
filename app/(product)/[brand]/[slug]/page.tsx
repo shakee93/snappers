@@ -29,7 +29,15 @@ import Link from "next/link";
 import ImageGallery from "@/app/[brand]/imageGallery";
 import ProductImage from "@/app/components/SingleProductPage/ProductImage2";
 import {Suspense} from "react";
+import {Metadata, ResolvingMetadata} from "next";
 
+
+type Props = {
+    params : {
+        slug: string
+        brand: string
+    }
+}
 export async function generateStaticParams() {
     const {
         data: {brands},
@@ -72,7 +80,20 @@ async function getData(slug: string, brand: string) {
     }
 }
 
-const Page = async ({params}: any) => {
+export async function generateMetadata(
+    { params }: Props,
+    parent: ResolvingMetadata
+): Promise<Metadata> {
+    // fetch data
+    const { product } = await getData(params.slug, params.brand)
+
+    return {
+        title: product.name,
+    }
+}
+
+const Page = async ({params}: Props) => {
+
     const {
         product,
         brand,

@@ -6,6 +6,7 @@ import {notFound} from "next/navigation";
 
 import ArchiveLayout from "@/app/components/ArchiveLayout";
 import {Brand} from "@/graphql/types/graphql";
+import {Metadata, ResolvingMetadata} from "next";
 
 // export const dynamic = 'force-dynamic';
 
@@ -20,6 +21,12 @@ import {Brand} from "@/graphql/types/graphql";
 //         brand: brand.slug,
 //     }))
 // }
+
+type Props = {
+    params: { brand: string }
+}
+
+
 
 async function getData(slug : string | null = null)  {
 
@@ -38,6 +45,21 @@ async function getData(slug : string | null = null)  {
 
     return {
         brand: data.brand,
+    }
+}
+
+export async function generateMetadata(
+    { params }: Props,
+    parent: ResolvingMetadata
+): Promise<Metadata> {
+    // read route params
+    const id = params.brand
+
+    // fetch data
+    const { brand } = await getData(id)
+
+    return {
+        title: brand.name,
     }
 }
 

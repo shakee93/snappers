@@ -10,6 +10,15 @@ import {Toaster} from "react-hot-toast";
 import Footer from "@/app/components/globalComponents/footer";
 import {Suspense} from "react";
 import {NavigationEvents} from "@/app/components/NavigationEvents";
+import {Metadata} from "next";
+
+export const metadata: Metadata = {
+    title: {
+        template: '%s - GQ Mobiles',
+        default: 'GQ Mobiles - Best mobile phones in the market', // a default is required when creating a template
+    },
+    description: ""
+}
 
 export default async function RootLayout({
                                              children,
