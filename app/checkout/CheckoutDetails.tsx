@@ -15,10 +15,10 @@ import DeliveryAddress from "./DeliveryAddress";
 
 interface CheckoutLeftProps {
   tabActive:
-  | "ContactInfo"
-  | "DeliveryAddress"
-  | "PaymentMethod"
-  | "BillingAddress";
+    | "ContactInfo"
+    | "DeliveryAddress"
+    | "PaymentMethod"
+    | "BillingAddress";
   setTabActive: (
     value:
       | "ContactInfo"
@@ -30,9 +30,8 @@ interface CheckoutLeftProps {
   updateFormData: (section: string, data: any) => void;
   formData: any;
   paymentGateways: any[];
-  onStorePickupChange: any;
+  setIsStorePickup: any;
   handleConfirmationChange: any;
-  setIsStorePickupHidden: any;
   isStorePickup: boolean;
 }
 
@@ -43,8 +42,9 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
   updateFormData,
   formData,
   paymentGateways,
-  onStorePickupChange,
+  setIsStorePickup,
   handleConfirmationChange,
+  isStorePickup
 }) => {
   const { data }: QueryResult = useQuery(GET_CHECKOUT_USER_DETAILS);
   const [shippingDetails, setShippingDetails] =
@@ -56,7 +56,6 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
     useState<contactInformation | null>(null);
 
   const [isBillingSameAsShipping, setIsBillingSameAsShipping] = useState(true);
-  const [isStorePickup, setIsStorePickup] = useState(true);
 
   const [isBillingAddressHidden, setIsBillingAddressHidden] = useState(false);
 
@@ -64,6 +63,7 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
     // console.log("isStorePickup", isStorePickup);
     // console.log("isBillingSameAsShipping", isBillingSameAsShipping);
     if (isStorePickup == true) {
+      setIsStorePickup(true);
       handleConfirmationChange("billingAddress", true);
     }
     setIsBillingAddressHidden(isBillingSameAsShipping || isStorePickup);
@@ -160,7 +160,7 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
               handleScrollToEl("BillingAddress");
             }}
             onCloseActive={() => {
-              setTabActive("DeliveryAddress");
+              setTabActive("PaymentMethod");
               handleScrollToEl("");
             }}
             updateFormData={(section, data) => {

@@ -60,7 +60,7 @@ const CheckoutPage = () => {
       selectedGateway: {},
     },
   });
-  const [isStorePickup, setIsStorePickup] = useState(true);
+  const [isStorePickup, setIsStorePickup] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState({
     contactInfo: false,
     deliveryAddress: false,
@@ -207,10 +207,9 @@ const CheckoutPage = () => {
               updateFormData={updateFormData}
               formData={formData}
               paymentGateways={paymentGateways}
-              onStorePickupChange={handleStorePickupChange}
               handleConfirmationChange={handleConfirmationChange}
+              setIsStorePickup={setIsStorePickup}
               isStorePickup={isStorePickup}
-              setIsStorePickupHidden={(isVisible: boolean) => setIsStorePickup(isVisible)}
             />
           </div>
 
@@ -246,7 +245,7 @@ const CheckoutPage = () => {
                 <span className="font-semibold text-slate-900 dark:text-slate-200">
                   {cart?.subtotal || "$0.00"}
                 </span>
-              </div>
+              </div>  
 
               {!isStorePickup && (
                 <div className="flex justify-between py-2.5">

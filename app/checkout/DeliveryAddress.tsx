@@ -10,6 +10,7 @@ import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Input from "shared/Input/Input";
 import Select from "shared/Select/Select";
 import Checkbox from "@/shared/Checkbox/Checkbox";
+import BillingAddress from 'app/checkout/BillingAddress';
 
 interface Props {
   isActive: boolean;
@@ -34,8 +35,8 @@ const DeliveryAddress: FC<Props> = ({
   initialData,
   formData,
   handleConfirmationChange,
-  updateBillingVisibility,
   toggleConfirmationBillingAddress,
+  isStorePickup,
   setStorePickup,
   setDeliveryAddress,
 }) => {
@@ -51,17 +52,17 @@ const DeliveryAddress: FC<Props> = ({
   const [isConfirmed, setIsConfirmed] = useState(false);
 
   const [isBillingSameAsShipping, setIsBillingSameAsShipping] = useState(true);
-  const [isStorePickup, setIsStorePickup] = useState(true);
 
+  useEffect(() => {}, []);
   const handleDeliverySame = () => {
     setIsBillingSameAsShipping((prevValue) => {
       const newValue = !prevValue;
 
       if (newValue) {
-        updateFormData("billingAddress", formData.shippingAddress);
-        setDeliveryAddress(true)
+        updateFormData("billingAddress", formData.billingAddress);
+        setDeliveryAddress(true);
       } else {
-        setDeliveryAddress(false)
+        setDeliveryAddress(false);
         updateFormData("billingAddress", {});
       }
 
@@ -70,30 +71,27 @@ const DeliveryAddress: FC<Props> = ({
   };
 
   const handleStorePickupChange = () => {
-    setIsStorePickup((prevValue) => {
-      const storepickupValue = !prevValue;
-
-      if (storepickupValue) {
-        setStorePickup(true);
-        updateFormData("billingAddress", formData.shippingAddress);
-        updateFormData("shippingDetails", {
-          databaseId: "local_pickup",
-          id: "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==",
-          title: "StorePickup",
-        });
-      } else {
-        setStorePickup(false);
-
-        updateFormData("shippingDetails", {
-          databaseId: null,
-          id: null,
-          title: null,
-        });
-      }
-
-      return storepickupValue;
-    });
+    console.log("inital value: ", isStorePickup);
+    if (!isStorePickup) {
+      setStorePickup(true);
+      console.log("store pickup Value: ", isStorePickup);
+      updateFormData("billingAddress", formData.BillingAddress)
+      updateFormData("shippingDetails", {
+        databaseId: "local_pickup",
+        id: "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==",
+        title: "StorePickup",
+      });
+    } else {
+      setStorePickup(false);
+      updateFormData("shippingDetails", {
+        databaseId: null,
+        id: null,
+        title: null,
+      });
+    }
+    console.log("final value: ", isStorePickup);
   };
+  
 
   useEffect(() => {
     if (initialData) {
@@ -133,7 +131,7 @@ const DeliveryAddress: FC<Props> = ({
       country,
       addressType,
     };
-    updateFormData("shippingAddress", shippingAddressData);
+    updateFormData("deliveryAddress", shippingAddressData);
     setIsConfirmed(true);
     onCloseActive();
     handleConfirmationChange(true);
@@ -284,7 +282,7 @@ const DeliveryAddress: FC<Props> = ({
             <div className="flex justify-between gap-4">
               <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4">
                 <Checkbox
-                key={2}
+                  key={2}
                   label=" Delivery address is the same as billing address"
                   name="deliverySame"
                   defaultChecked={isBillingSameAsShipping}
@@ -294,7 +292,7 @@ const DeliveryAddress: FC<Props> = ({
 
               <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4">
                 <Checkbox
-                key={1}
+                  key={1}
                   label="Store Pickup"
                   name="store pickup"
                   defaultChecked={isStorePickup}
