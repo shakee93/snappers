@@ -53,7 +53,7 @@ const TabFilters = ({
   const [isOpenMoreFilter, setisOpenMoreFilter] = useState(false);
 
   //
-  const [isOnSale, setIsIsOnSale] = useState(true);
+  const [isOnSale, setIsIsOnSale] = useState(false);
   const [rangePrices, setRangePrices] = useState([500, 500000]);
   const [colorsState, setColorsState] = useState<string[]>([]);
   const [sizesState, setSizesState] = useState<string[]>([]);
@@ -61,6 +61,7 @@ const TabFilters = ({
   const [brandsState, setBrandsState] = useState<number[]>([]);
   const [categoriesState, setCategoriesState] = useState<number[]>([]);
   const [inStock, setInStockState] = useState(false);
+  const [filterCount, setFilterCount] = useState<number>(0);
 
   const {
     sidebar,
@@ -72,6 +73,53 @@ const TabFilters = ({
     setInStock,
     setSort,
   } = useStore();
+
+  useEffect(() => {
+    // Calculate and set the initial filter count
+    const initialFilterCount =
+      categoriesState.length +
+      brandsState.length +
+      colorsState.length +
+      sizesState.length +
+      (isOnSale ? 1 : 0) +
+      (inStock ? 1 : 0) +
+      (sortOrderStates ? 1 : 0);
+
+    // Set the initial filter count
+    setFilterCount(initialFilterCount);
+  }, []);
+
+  useEffect(() => {
+    // Calculate the total number of selected filters
+    const totalFilters =
+      categoriesState.length +
+      brandsState.length +
+      colorsState.length +
+      sizesState.length +
+      (isOnSale ? 1 : 0) +
+      (inStock ? 1 : 0) +
+      (sortOrderStates ? 1 : 0);
+    // Check if the price range is different from the initial value
+    const isPriceRangeDifferent =
+      rangePrices[0] !== PRICE_RANGE[0] || rangePrices[1] !== PRICE_RANGE[1];
+
+    // Increment the filter count if the price range is different
+    const updatedFilterCount = isPriceRangeDifferent
+      ? totalFilters + 1
+      : totalFilters;
+
+    // Update the filter count
+    setFilterCount(updatedFilterCount);
+  }, [
+    categoriesState,
+    brandsState,
+    colorsState,
+    sizesState,
+    isOnSale,
+    inStock,
+    sortOrderStates,
+    rangePrices,
+  ]);
 
   useEffect(() => {
     synPriceRange(rangePrices);
@@ -92,7 +140,22 @@ const TabFilters = ({
   const closeModalMoreFilter = () => setisOpenMoreFilter(false);
   const openModalMoreFilter = () => setisOpenMoreFilter(true);
 
-  //
+  //Handling Clear Filters
+
+  const handleClearFilters = () => {
+    setRangePrices(PRICE_RANGE);
+    setColorsState([]);
+    setSortOrderStates("");
+    setBrandsState([]);
+    syncBrands([]);
+    setCategoriesState([]);
+    syncCategories([]);
+    setIsIsOnSale(false);
+    setInStockState(false);
+    setSortOrderStates("");
+    setSort("");
+    closeModalMoreFilter();
+  };
 
   const handleChangeCategories = (checked: boolean, name: number) => {
     if (name === 0 && checked) {
@@ -137,9 +200,12 @@ const TabFilters = ({
 
   // OK
   const renderXClear = () => {
+    const handleXClearClick = () => {
+      handleClearFilters();
+    };
     return (
       <span className="flex-shrink-0 w-4 h-4 rounded-full bg-primary-500 text-white flex items-center justify-center ml-3 cursor-pointer">
-        <XIcon className="p-0.5" />
+        <XIcon className="p-0.5" onClick={handleXClearClick} />
       </span>
     );
   };
@@ -328,7 +394,6 @@ const TabFilters = ({
       <div className="flex-shrink-0">
         <div
           className={`flex flex-shrink-0 items-center justify-center px-4 py-2 text-sm rounded-full border border-primary-500 bg-primary-50 text-primary-900 focus:outline-none cursor-pointer select-none`}
-          onClick={openModalMoreFilter}
         >
           <svg
             className="w-4 h-4"
@@ -386,7 +451,9 @@ const TabFilters = ({
             />
           </svg>
 
-          <span className="ml-2">Products filters (3)</span>
+          <span className="ml-2" onClick={openModalMoreFilter}>
+            Products filters ({filterCount})
+          </span>
           {renderXClear()}
         </div>
 
@@ -521,84 +588,87 @@ const TabFilters = ({
                       {/* --------- */}
                       {/* ---- */}
                       <div className="py-7">
-                        <div className="overflow-hidden rounded-2xl shadow-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
-                          <div className="relative flex flex-col px-5 py-6 space-y-8">
-                            <div className="space-y-5">
-                              <span className="font-medium">Price range</span>
-                              <br />
-                              <span className="pt-1">
-                                LKR {rangePrices[0].toLocaleString()} - LKR{" "}
-                                {rangePrices[1].toLocaleString()}
-                              </span>
-                              <Slider
-                                range
-                                min={PRICE_RANGE[0]}
-                                max={PRICE_RANGE[1]}
-                                step={1}
-                                defaultValue={[rangePrices[0], rangePrices[1]]}
-                                allowCross={false}
-                                onChange={(_input: number | number[]) =>
-                                  setRangePrices(_input as number[])
-                                }
-                              />
-                            </div>
+                        <div className="relative flex flex-col px-5 py-6 space-y-8">
+                          <div className="space-y-5">
+                            <span className="font-medium">Price range</span>
+                            <br />
+                            <span className="pt-1">
+                              LKR {rangePrices[0].toLocaleString()} - LKR{" "}
+                              {rangePrices[1].toLocaleString()}
+                            </span>
+                            <Slider
+                              range
+                              min={PRICE_RANGE[0]}
+                              max={PRICE_RANGE[1]}
+                              step={1}
+                              handleStyle={{
+                                height: 30,
+                                width: 30,
+                                marginTop: -13,
+                              }}
+                              defaultValue={[rangePrices[0], rangePrices[1]]}
+                              allowCross={false}
+                              onChange={(_input: number | number[]) =>
+                                setRangePrices(_input as number[])
+                              }
+                            />
+                          </div>
 
-                            <div className="flex justify-between space-x-5">
-                              <div>
-                                <label
-                                  htmlFor="minPrice"
-                                  className="block text-sm font-medium text-neutral-700 dark:text-neutral-300"
-                                >
-                                  Min price
-                                </label>
-                                <div className="mt-1 relative rounded-md">
-                                  <span className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-neutral-500 sm:text-sm">
-                                    LKR
-                                  </span>
-                                  <input
-                                    type="number"
-                                    max={PRICE_RANGE[1]}
-                                    min={PRICE_RANGE[0]}
-                                    name="minPrice"
-                                    id="minPrice"
-                                    className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
-                                    value={rangePrices[0]}
-                                    onChange={(e) =>
-                                      setRangePrices([
-                                        e.target.value as unknown as number,
-                                        rangePrices[1],
-                                      ])
-                                    }
-                                  />
-                                </div>
+                          <div className="flex justify-between space-x-5">
+                            <div>
+                              <label
+                                htmlFor="minPrice"
+                                className="block text-sm font-medium text-neutral-700 dark:text-neutral-300"
+                              >
+                                Min price
+                              </label>
+                              <div className="mt-1 relative rounded-md">
+                                <span className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-neutral-500 sm:text-sm">
+                                  LKR
+                                </span>
+                                <input
+                                  type="number"
+                                  max={PRICE_RANGE[1]}
+                                  min={PRICE_RANGE[0]}
+                                  name="minPrice"
+                                  id="minPrice"
+                                  className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
+                                  value={rangePrices[0]}
+                                  onChange={(e) =>
+                                    setRangePrices([
+                                      e.target.value as unknown as number,
+                                      rangePrices[1],
+                                    ])
+                                  }
+                                />
                               </div>
-                              <div>
-                                <label
-                                  htmlFor="maxPrice"
-                                  className="block text-sm font-medium text-neutral-700 dark:text-neutral-300"
-                                >
-                                  Max price
-                                </label>
-                                <div className="mt-1 relative rounded-md">
-                                  <span className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-neutral-500 sm:text-sm">
-                                    LKR
-                                  </span>
-                                  <input
-                                    type="number"
-                                    max={PRICE_RANGE[1]}
-                                    min={PRICE_RANGE[0]}
-                                    name="maxPrice"
-                                    id="maxPrice"
-                                    className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
-                                    value={rangePrices[1]}
-                                    onChange={(e) =>
-                                      setRangePrices([
-                                        rangePrices[0],
-                                        e.target.value as unknown as number,
-                                      ])
-                                    }
-                                  />
-                                </div>
+                            </div>
+                            <div>
+                              <label
+                                htmlFor="maxPrice"
+                                className="block text-sm font-medium text-neutral-700 dark:text-neutral-300"
+                              >
+                                Max price
+                              </label>
+                              <div className="mt-1 relative rounded-md">
+                                <span className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-neutral-500 sm:text-sm">
+                                  LKR
+                                </span>
+                                <input
+                                  type="number"
+                                  max={PRICE_RANGE[1]}
+                                  min={PRICE_RANGE[0]}
+                                  name="maxPrice"
+                                  id="maxPrice"
+                                  className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
+                                  value={rangePrices[1]}
+                                  onChange={(e) =>
+                                    setRangePrices([
+                                      rangePrices[0],
+                                      e.target.value as unknown as number,
+                                    ])
+                                  }
+                                />
                               </div>
                             </div>
                           </div>
@@ -682,12 +752,6 @@ const TabFilters = ({
                               </div>
                             )}
                           </div>
-                          {/* <MySwitch
-                            label="On sale!"
-                            desc="Products currently on sale"
-                            enabled={isOnSale}
-                            onChange={setIsIsOnSale}
-                          /> */}
                         </div>
                       </div>
 
@@ -719,20 +783,7 @@ const TabFilters = ({
 
                   <div className="p-6 flex-shrink-0 bg-neutral-50 dark:bg-neutral-900 dark:border-t dark:border-neutral-800 flex items-center justify-between">
                     <ButtonThird
-                      onClick={() => {
-                        setRangePrices(PRICE_RANGE);
-                        setColorsState([]);
-                        setSortOrderStates("");
-                        setBrandsState([]);
-                        syncBrands([]);
-                        setCategoriesState([]);
-                        syncCategories([]);
-                        setIsIsOnSale(false);
-                        setInStockState(false);
-                        setSortOrderStates("");
-                        setSort("");
-                        closeModalMoreFilter();
-                      }}
+                      onClick={handleClearFilters}
                       sizeClass="py-2.5 px-5"
                     >
                       Clear
