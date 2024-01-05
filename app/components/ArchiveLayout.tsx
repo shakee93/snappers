@@ -26,14 +26,14 @@ interface ArchiveLayoutProps {
 const ArchiveLayout = async ({ title, description, filters = false, search = false, brand, category}: ArchiveLayoutProps) => {
     const { productCategories, brands } = await getData();
     return (
-        <div className="container py-16 lg:pb-28 lg:pt-12 space-y-16 sm:space-y-20 lg:space-y-28">
-            <div className="space-y-10 lg:space-y-14">
+        <div className="container py-8 lg:py-12 space-y-16 sm:space-y-20 lg:space-y-28">
+            <div className="space-y-4 lg:space-y-14">
                 <div className="max-w-screen-sm">
                     <h2 className="block text-2xl sm:text-3xl lg:text-4xl font-semibold">{title}</h2>
-                    <span className="block mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">{description || " We not only help you design exceptional products, but also make it\n" +
+                    <span className="block mt-2 lg:mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">{description || " We not only help you design exceptional products, but also make it\n" +
                         "easy for you to share your designs with more like-minded people."}</span>
                 </div>
-                <hr className="border-slate-200 dark:border-slate-700" />
+                <hr className="border-slate-200 dark:border-slate-700 " />
                 <main>
                     <div className="flex flex-col lg:flex-row">
                         <div className="flex-1 ">

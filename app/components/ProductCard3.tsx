@@ -243,7 +243,7 @@ const ProductCard: FC<ProductCardProps> = ({
 
                 {/* <ProductStatus status={stockStatus} /> */}
 
-                <div className={"absolute top-3 cursor-pointer right-3"} onClick={e => handleCloseModalQuickView()}>
+                <div className={"absolute hidden md:block top-3 cursor-pointer right-3"} onClick={e => handleCloseModalQuickView()}>
                     <ArrowsPointingOutIcon className='w-5'/>
                     {/*<LikeButton liked={isLiked} className="" />*/}
                 </div>
@@ -262,23 +262,20 @@ const ProductCard: FC<ProductCardProps> = ({
 
             >
 
-                {/* {renderVariants()} */}
-
-
                 <div>
                     {renderGroupButtons()}
                 </div>
 
-                <div>
+                <Link className='block' href={link}>
                     <h2
                         className={`nc-ProductCard__title  text-xs lg:text-sm text-black line-clamp-2 font-semibold transition-colors whitespace-normal`}
                     >
                         {name}
                     </h2>
 
-                </div>
+                </Link>
 
-                <div className="flex m-0 mb-2 justify-between items-center">
+                <Link href={link} className="flex m-0 mb-2 justify-between items-center">
                     <Prices price={price} salePrice={regularPrice} className='lg:flex-row' />
                     {((salePrice === price || !salePrice) && !!reviewCount) && (
                         <div className="flex items-center mb-0.5">
@@ -300,14 +297,10 @@ const ProductCard: FC<ProductCardProps> = ({
                             </span>
                         </div>
                     )}
-                </div>
-
-
-
-
-
-
+                </Link>
             </div>
+
+
             < ModalQuickView
                 show={showModalQuickView}
                 onCloseModalQuickView={() => setShowModalQuickView(false)}

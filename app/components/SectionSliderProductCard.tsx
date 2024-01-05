@@ -30,6 +30,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
 }) => {
 
   const [_products, setProducts] = useState<(SimpleProduct & VariableProduct)[]>(products);
+  const [mounted, setMounted] = useState(false)
 
   const sliderRef = useRef(null);
   const id = useId();
@@ -62,7 +63,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
         },
         640: {
           gap: 20,
-          perView: 1.5,
+          perView: 2,
         },
         500: {
           gap: 20,
@@ -74,10 +75,13 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
     let slider = new Glide(`.${UNIQUE_CLASS}`, OPTIONS);
     slider.mount();
 
+    setMounted(true)
+
     return () => {
       slider.destroy();
+      setMounted(false)
     };
-  }, [sliderRef, UNIQUE_CLASS, _products]);
+  }, []);
 
   return (
     <div className={`nc-SectionSliderProductCard ${className}`}>
@@ -92,10 +96,10 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
         </Heading>
 
         <div className="glide__track" data-glide-el="track">
-          <ul className="glide__slides py-3">
+          <ul className="glide__slides">
             {_products?.map((item, index) => (
-              <li key={index} className={`w-2/4 ${itemClassName}`}>
-                <ProductCard key={item.slug} data={item} />
+              <li key={index} className={`w-[300px] ${itemClassName}`}>
+                <ProductCard className={!mounted ? 'opacity-0' : ''} key={item.slug} data={item} />
               </li>
             ))}
           </ul>
