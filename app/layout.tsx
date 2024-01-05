@@ -11,7 +11,6 @@ import Footer from "@/app/components/globalComponents/footer";
 import {Suspense} from "react";
 import {NavigationEvents} from "@/app/components/NavigationEvents";
 
-
 export default async function RootLayout({
                                              children,
                                          }: {
@@ -31,7 +30,6 @@ export default async function RootLayout({
                             <NavigationEvents></NavigationEvents>
                         </Suspense>
                         <Toaster/>
-
                         <Header/>
                         {children}
 

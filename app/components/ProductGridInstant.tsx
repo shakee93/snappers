@@ -62,7 +62,7 @@ const ProductGridInstant = ({ products, brand, category }: ProductGridProps) => 
 
             {(results && results?.nbHits > results?.hitsPerPage ) &&
                 <>
-                    <hr className="border-slate-200 my-8 dark:border-slate-700" />
+                    <hr className="border-slate-200 mb-2 -mx-3 lg:my-6 dark:border-slate-700" />
                     <Pagination />
                 </>
             }
