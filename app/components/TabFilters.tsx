@@ -11,7 +11,7 @@ import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import MySwitch from "components/MySwitch";
 import { useStore } from "@/store/store";
 import { Brand, ProductCategory } from "@/graphql/types/graphql";
-import { XIcon } from "lucide-react";
+import { XIcon, Package } from "lucide-react";
 import CategoryFilter from "@/app/components/Filters/CategoryFilter";
 import BrandFilter from "@/app/components/Filters/BrandFilter";
 import PriceFilter from "@/app/components/Filters/PriceFilter";
@@ -19,37 +19,22 @@ import OnSaleFilter from "@/app/components/Filters/OnSaleFilter";
 import SortOrderFilter from "@/app/components/Filters/SortOrderFilter";
 import InStockFilter from "@/app/components/Filters/InStockFilter";
 
-// DEMO DATA
-
-const DATA_colors = [
-  { name: "White" },
-  { name: "Beige" },
-  { name: "Blue" },
-  { name: "Black" },
-  { name: "Brown" },
-  { name: "Green" },
-  { name: "Navy" },
-];
-
-const DATA_sizes = [
-  { name: "XXS" },
-  { name: "XS" },
-  { name: "S" },
-  { name: "M" },
-  { name: "L" },
-  { name: "XL" },
-  { name: "2XL" },
-];
-
 const DATA_sortOrderRadios = [
-  { name: "Most Popular", id: "Most-Popular" },
-  { name: "Best Rating", id: "Best-Rating" },
-  { name: "Newest", id: "Newest" },
-  { name: "Price Low - Hight", id: "Price-low-hight" },
-  { name: "Price Hight - Low", id: "Price-hight-low" },
+  { name: "Name", id: "name:asc" },
+  { name: "Most Popular", id: "totalSales(missing_values: last):desc" },
+  { name: "Best Rating", id: "reviewCount(missing_values: last):desc" },
+  { name: "Newest", id: "databaseId:desc" },
+  {
+    name: "Price Low - High",
+    id: "rawPriceNumber(missing_values: last):asc",
+  },
+  {
+    name: "Price High - Low",
+    id: "rawPriceNumber(missing_values: last):desc",
+  },
 ];
 
-const PRICE_RANGE = [1, 500];
+const PRICE_RANGE = [500, 500000];
 
 interface TabFilterProps {
   categories?: ProductCategory[];
@@ -75,14 +60,35 @@ const TabFilters = ({
   const [sortOrderStates, setSortOrderStates] = useState<string>("");
   const [brandsState, setBrandsState] = useState<number[]>([]);
   const [categoriesState, setCategoriesState] = useState<number[]>([]);
+  const [inStock, setInStockState] = useState(false);
 
-  const { sidebar, syncCategories, syncBrands, setMounted, synPriceRange } =
-    useStore();
+  const {
+    sidebar,
+    syncCategories,
+    syncBrands,
+    setMounted,
+    synPriceRange,
+    syncOnSale,
+    setInStock,
+    setSort,
+  } = useStore();
 
   useEffect(() => {
     synPriceRange(rangePrices);
   }, [rangePrices]);
-  //
+
+  useEffect(() => {
+    syncOnSale(isOnSale);
+  }, [isOnSale]);
+
+  useEffect(() => {
+    setInStock(inStock);
+  }, [inStock]);
+
+  useEffect(() => {
+    setSort(sortOrderStates);
+  }, [sortOrderStates]);
+
   const closeModalMoreFilter = () => setisOpenMoreFilter(false);
   const openModalMoreFilter = () => setisOpenMoreFilter(true);
 
@@ -440,9 +446,7 @@ const TabFilters = ({
                         <div className="py-7">
                           <h3 className="text-xl font-medium">Categories</h3>
                           <div className="mt-6 relative ">
-                            {/* {renderMoreFilterItem(categories)} */}
-                            {/* {renderMoreFilterItem(categories.map(transformCategory))} */}
-                            <div className="relative flex flex-col px-5 py-6 space-y-5">
+                            <div className="relative flex flex-col  py-6 space-y-5">
                               <Checkbox
                                 name="All Categories"
                                 label="All Categories"
@@ -452,7 +456,7 @@ const TabFilters = ({
                                 }
                               />
                               <div className="w-full border-b  border-neutral-200 dark:border-neutral-700" />
-                              <div className="flex flex-col space-y-5">
+                              <div className="grid grid-cols-2  gap-2">
                                 {categories.map((item) => (
                                   <div key={item.databaseId} className="">
                                     <Checkbox
@@ -472,35 +476,15 @@ const TabFilters = ({
                                 ))}
                               </div>
                             </div>
-                            <div className="p-5 bg-neutral-50 dark:bg-neutral-900 dark:border-t dark:border-neutral-800 flex items-center justify-between">
-                              <ButtonThird
-                                onClick={() => {
-                                  setCategoriesState([]);
-                                  syncCategories([]);
-                                }}
-                                sizeClass="px-4 py-2 sm:px-5"
-                              >
-                                Clear
-                              </ButtonThird>
-                              <ButtonPrimary
-                                onClick={() => {
-                                  syncCategories(categoriesState);
-                                  closeModalMoreFilter();
-                                }}
-                                sizeClass="px-4 py-2 sm:px-5"
-                              >
-                                Apply
-                              </ButtonPrimary>
-                            </div>
                           </div>
                         </div>
                       )}
                       {!brand && (
                         <div className="py-7">
                           <h3 className="text-xl font-medium">Brands</h3>
-                          <div className="mt-6 relative ">
+                          <div className="mt-1 relative ">
                             {/*{renderMoreFilterItem(categories)}*/}
-                            <div className="relative flex flex-col px-5 py-6 space-y-5">
+                            <div className="relative flex flex-col  py-6 space-y-5">
                               <Checkbox
                                 name="All Brands"
                                 label="All Brands"
@@ -511,7 +495,7 @@ const TabFilters = ({
                               />
 
                               <div className="w-full border-b  border-neutral-200 dark:border-neutral-700" />
-                              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                              <div className="grid grid-cols-2 gap-2">
                                 {brands.map((item) => (
                                   <div key={item.databaseId} className="">
                                     <Checkbox
@@ -531,117 +515,12 @@ const TabFilters = ({
                                 ))}
                               </div>
                             </div>
-                            <div className="p-5 bg-neutral-50 dark:bg-neutral-900 dark:border-t dark:border-neutral-800 flex items-center justify-between">
-                              <ButtonThird
-                                onClick={() => {
-                                  setBrandsState([]);
-                                  syncBrands([]);
-                                }}
-                                sizeClass="px-4 py-2 sm:px-5"
-                              >
-                                Clear
-                              </ButtonThird>
-                              <ButtonPrimary
-                                onClick={() => {
-                                  syncBrands(brandsState);
-                                  closeModalMoreFilter();
-                                }}
-                                sizeClass="px-4 py-2 sm:px-5"
-                              >
-                                Apply
-                              </ButtonPrimary>
-                            </div>
                           </div>
                         </div>
                       )}
-
                       {/* --------- */}
                       {/* ---- */}
                       <div className="py-7">
-                        <h3 className="text-xl font-medium">Colors</h3>
-                        <div className="mt-6 relative ">
-                          {renderMoreFilterItem(DATA_colors)}
-                        </div>
-                      </div>
-                      {/* --------- */}
-                      {/* ---- */}
-                      <div className="py-7">
-                        <h3 className="text-xl font-medium">Size</h3>
-                        <div className="mt-6 relative ">
-                          {renderMoreFilterItem(DATA_sizes)}
-                        </div>
-                      </div>
-
-                      {/* --------- */}
-                      {/* ---- */}
-                      <div className="py-7">
-                        {/* <h3 className="text-xl font-medium">Range Prices</h3>
-                        <div className="mt-6 relative ">
-                          <div className="relative flex flex-col space-y-8">
-                            <div className="space-y-5">
-                              <Slider
-                                range
-                                className="text-red-400"
-                                min={PRICE_RANGE[0]}
-                                max={PRICE_RANGE[1]}
-                                defaultValue={rangePrices}
-                                allowCross={false}
-                                onChange={(_input: number | number[]) =>
-                                  setRangePrices(_input as number[])
-                                }
-                              />
-                            </div>
-
-                            <div className="flex justify-between space-x-5">
-                              <div>
-                                <label
-                                  htmlFor="minPrice"
-                                  className="block text-sm font-medium text-neutral-700 dark:text-neutral-300"
-                                >
-                                  Min price
-                                </label>
-                                <div className="mt-1 relative rounded-md">
-                                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <span className="text-neutral-500 sm:text-sm">
-                                      $
-                                    </span>
-                                  </div>
-                                  <input
-                                    type="text"
-                                    name="minPrice"
-                                    disabled
-                                    id="minPrice"
-                                    className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-3 sm:text-sm border-neutral-200 rounded-full text-neutral-900"
-                                    value={rangePrices[0]}
-                                  />
-                                </div>
-                              </div>
-                              <div>
-                                <label
-                                  htmlFor="maxPrice"
-                                  className="block text-sm font-medium text-neutral-700 dark:text-neutral-300"
-                                >
-                                  Max price
-                                </label>
-                                <div className="mt-1 relative rounded-md">
-                                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <span className="text-neutral-500 sm:text-sm">
-                                      $
-                                    </span>
-                                  </div>
-                                  <input
-                                    type="text"
-                                    disabled
-                                    name="maxPrice"
-                                    id="maxPrice"
-                                    className="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 pr-3 sm:text-sm border-neutral-200 rounded-full text-neutral-900"
-                                    value={rangePrices[1]}
-                                  />
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div> */}
                         <div className="overflow-hidden rounded-2xl shadow-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
                           <div className="relative flex flex-col px-5 py-6 space-y-8">
                             <div className="space-y-5">
@@ -739,7 +618,9 @@ const TabFilters = ({
                                 name="radioNameSort"
                                 label={item.name}
                                 defaultChecked={sortOrderStates === item.id}
-                                onChange={setSortOrderStates}
+                                onChange={(v) => {
+                                  setSortOrderStates(v);
+                                }}
                               />
                             ))}
                           </div>
@@ -751,12 +632,86 @@ const TabFilters = ({
                       <div className="py-7">
                         <h3 className="text-xl font-medium">On sale!</h3>
                         <div className="mt-6 relative ">
-                          <MySwitch
+                          <div
+                            className={`flex items-center justify-center px-4 py-2 text-sm rounded-full border focus:outline-none cursor-pointer select-none ${
+                              isOnSale
+                                ? "border-primary-500 bg-primary-50 text-primary-900"
+                                : "border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
+                            }`}
+                            onClick={() => setIsIsOnSale(!isOnSale)}
+                          >
+                            <svg
+                              className="w-4 h-4"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M3.9889 14.6604L2.46891 13.1404C1.84891 12.5204 1.84891 11.5004 2.46891 10.8804L3.9889 9.36039C4.2489 9.10039 4.4589 8.59038 4.4589 8.23038V6.08036C4.4589 5.20036 5.1789 4.48038 6.0589 4.48038H8.2089C8.5689 4.48038 9.0789 4.27041 9.3389 4.01041L10.8589 2.49039C11.4789 1.87039 12.4989 1.87039 13.1189 2.49039L14.6389 4.01041C14.8989 4.27041 15.4089 4.48038 15.7689 4.48038H17.9189C18.7989 4.48038 19.5189 5.20036 19.5189 6.08036V8.23038C19.5189 8.59038 19.7289 9.10039 19.9889 9.36039L21.5089 10.8804C22.1289 11.5004 22.1289 12.5204 21.5089 13.1404L19.9889 14.6604C19.7289 14.9204 19.5189 15.4304 19.5189 15.7904V17.9403C19.5189 18.8203 18.7989 19.5404 17.9189 19.5404H15.7689C15.4089 19.5404 14.8989 19.7504 14.6389 20.0104L13.1189 21.5304C12.4989 22.1504 11.4789 22.1504 10.8589 21.5304L9.3389 20.0104C9.0789 19.7504 8.5689 19.5404 8.2089 19.5404H6.0589C5.1789 19.5404 4.4589 18.8203 4.4589 17.9403V15.7904C4.4589 15.4204 4.2489 14.9104 3.9889 14.6604Z"
+                                stroke="currentColor"
+                                strokeWidth="1.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                              <path
+                                d="M9 15L15 9"
+                                stroke="currentColor"
+                                strokeWidth="1.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                              <path
+                                d="M14.4945 14.5H14.5035"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                              <path
+                                d="M9.49451 9.5H9.50349"
+                                stroke="currentColor"
+                                strokeWidth="2"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>{" "}
+                            <span className="line-clamp-1 ml-2">On sale</span>
+                            {isOnSale && (
+                              <div className="flex-shrink-0 w-4 h-4 rounded-full bg-primary-500 text-white flex items-center justify-center ml-3 cursor-pointer">
+                                <XIcon className="p-0.5" />
+                              </div>
+                            )}
+                          </div>
+                          {/* <MySwitch
                             label="On sale!"
                             desc="Products currently on sale"
                             enabled={isOnSale}
                             onChange={setIsIsOnSale}
-                          />
+                          /> */}
+                        </div>
+                      </div>
+
+                      {/* --------- */}
+                      {/* ---- */}
+                      <div className="py-7">
+                        <h3 className="text-xl font-medium">In Stock!</h3>
+                        <div className="mt-6 relative ">
+                          <div
+                            className={`flex items-center justify-center px-4 py-2 text-sm rounded-full border focus:outline-none cursor-pointer select-none ${
+                              inStock
+                                ? "border-primary-500 bg-primary-50 text-primary-900"
+                                : "border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
+                            }`}
+                            onClick={() => setInStockState(!inStock)}
+                          >
+                            <Package className="stroke-1 w-4" />
+                            <span className="line-clamp-1 ml-2">In Stock</span>
+                            {inStock && (
+                              <div className="flex-shrink-0 w-4 h-4 rounded-full bg-primary-500 text-white flex items-center justify-center ml-3 cursor-pointer">
+                                <XIcon className="p-0.5" />
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -768,6 +723,14 @@ const TabFilters = ({
                         setRangePrices(PRICE_RANGE);
                         setColorsState([]);
                         setSortOrderStates("");
+                        setBrandsState([]);
+                        syncBrands([]);
+                        setCategoriesState([]);
+                        syncCategories([]);
+                        setIsIsOnSale(false);
+                        setInStockState(false);
+                        setSortOrderStates("");
+                        setSort("");
                         closeModalMoreFilter();
                       }}
                       sizeClass="py-2.5 px-5"
@@ -775,7 +738,11 @@ const TabFilters = ({
                       Clear
                     </ButtonThird>
                     <ButtonPrimary
-                      onClick={closeModalMoreFilter}
+                      onClick={() => {
+                        syncBrands(brandsState);
+                        syncCategories(categoriesState);
+                        closeModalMoreFilter();
+                      }}
                       sizeClass="py-2.5 px-5"
                     >
                       Apply
