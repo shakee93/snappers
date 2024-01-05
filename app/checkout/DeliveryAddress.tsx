@@ -53,7 +53,7 @@ const DeliveryAddress: FC<Props> = ({
 
   const [isBillingSameAsShipping, setIsBillingSameAsShipping] = useState(true);
 
-  useEffect(() => {}, []);
+  useEffect(() => { }, []);
   const handleDeliverySame = () => {
     setIsBillingSameAsShipping((prevValue) => {
       const newValue = !prevValue;
@@ -91,7 +91,7 @@ const DeliveryAddress: FC<Props> = ({
     }
     console.log("final value: ", isStorePickup);
   };
-  
+
 
   useEffect(() => {
     if (initialData) {
@@ -131,7 +131,12 @@ const DeliveryAddress: FC<Props> = ({
       country,
       addressType,
     };
-    updateFormData("deliveryAddress", shippingAddressData);
+    if (isStorePickup){
+      updateFormData("deliveryAddress", shippingAddressData);
+      updateFormData("billingAddress", shippingAddressData);
+    } else {
+      updateFormData("deliveryAddress", shippingAddressData);
+    }
     setIsConfirmed(true);
     onCloseActive();
     handleConfirmationChange(true);
@@ -155,10 +160,12 @@ const DeliveryAddress: FC<Props> = ({
           <h1 className="text-2xl self-center  font-semibold">2</h1>
           <div className="sm:ml-8">
             <h3 className=" text-slate-700 items-center gap-2 dark:text-slate-300 flex ">
-              <span className="uppercase">DELIVERY ADDRESS*</span>
+              <span className="uppercase">
+                {isStorePickup ? "Billing Address" : "Delivery Address"}
+              </span>
             </h3>
             <div className="font-semibold mt-1 text-sm">
-              <span className="">{address || "Your Delivery Address"}</span>
+              <span className="">{address || isStorePickup ? "Your Billing Address" : "Your Delivery Address"}</span>
             </div>
           </div>
           <ButtonSecondary
@@ -172,10 +179,18 @@ const DeliveryAddress: FC<Props> = ({
         </div>
         <form onSubmit={handleSubmit}>
           <div
-            className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${
-              isActive ? "block" : "hidden"
-            }`}
+            className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${isActive ? "block" : "hidden"
+              }`}
           >
+            <div className="w-fit border border-slate-200 dark:border-slate-700 rounded-xl p-4">
+              <Checkbox
+                key={1}
+                label="Store Pickup"
+                name="store pickup"
+                defaultChecked={isStorePickup}
+                onChange={handleStorePickupChange}
+              />
+            </div>
             {/* ============ */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
               <div>
@@ -275,31 +290,23 @@ const DeliveryAddress: FC<Props> = ({
             {/* ============ */}
             <div className="flex flex-col sm:flex-row pt-6">
               <ButtonPrimary className="sm:!px-7 shadow-none" type="submit">
-                Save and next to Payment
+                {!isBillingSameAsShipping ? "Save and next to Billing" : "Save and next to Payment"}
               </ButtonPrimary>
             </div>
 
-            <div className="flex justify-between gap-4">
-              <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-                <Checkbox
-                  key={2}
-                  label=" Delivery address is the same as billing address"
-                  name="deliverySame"
-                  defaultChecked={isBillingSameAsShipping}
-                  onChange={handleDeliverySame}
-                />
-              </div>
+            {!isStorePickup && (
+              <div className="flex justify-between gap-4">
+                <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4">
+                  <Checkbox
+                    key={2}
+                    label=" Delivery address is the same as billing address"
+                    name="deliverySame"
+                    defaultChecked={isBillingSameAsShipping}
+                    onChange={handleDeliverySame}
+                  />
+                </div>
+              </div>)}
 
-              <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-                <Checkbox
-                  key={1}
-                  label="Store Pickup"
-                  name="store pickup"
-                  defaultChecked={isStorePickup}
-                  onChange={handleStorePickupChange}
-                />
-              </div>
-            </div>
           </div>
         </form>
       </div>
