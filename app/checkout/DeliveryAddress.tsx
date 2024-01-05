@@ -51,11 +51,9 @@ const DeliveryAddress: FC<Props> = ({
 
       if (newValue) {
         updateFormData("billingAddress", formData.shippingAddress);
-        handleConfirmationChange("billingAddress", true);
         updateBillingVisibility(true);
       } else {
         updateFormData("billingAddress", {});
-        handleConfirmationChange("billingAddress", false);
         updateBillingVisibility(false);
       }
 
