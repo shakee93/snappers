@@ -392,8 +392,17 @@ const TabFilters = ({
   const renderTabMobileFilter = () => {
     return (
       <div className="flex-shrink-0">
+        {/* <div
+          className={`flex flex-shrink-0 items-center justify-center px-4 py-2 text-sm rounded-full 
+          border border-primary-500 bg-primary-50 text-primary-900 focus:outline-none cursor-pointer select-none`}
+        > */}
         <div
-          className={`flex flex-shrink-0 items-center justify-center px-4 py-2 text-sm rounded-full border border-primary-500 bg-primary-50 text-primary-900 focus:outline-none cursor-pointer select-none`}
+          className={`flex flex-shrink-0 items-center justify-center px-4 py-2 text-sm rounded-full border focus:outline-none cursor-pointer select-none 
+          ${
+            filterCount
+              ? "border border-primary-500 bg-primary-50 text-primary-900 focus:outline-none cursor-pointer select-none"
+              : "border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
+          }`}
         >
           <svg
             className="w-4 h-4"
