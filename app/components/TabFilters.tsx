@@ -452,9 +452,11 @@ const TabFilters = ({
           </svg>
 
           <span className="ml-2" onClick={openModalMoreFilter}>
-            Products filters ({filterCount})
+            {filterCount > 0
+              ? `Products filters (${filterCount})`
+              : "Products filters"}
           </span>
-          {renderXClear()}
+          {filterCount > 0 && renderXClear()}
         </div>
 
         <Transition appear show={isOpenMoreFilter} as={Fragment}>
