@@ -21,6 +21,9 @@ interface Props {
   handleConfirmationChange: any;
   updateBillingVisibility: (isVisible: boolean) => void;
   isStorePickup: boolean;
+  toggleConfirmationBillingAddress: any;
+  setStorePickup: any;
+  setDeliveryAddress: any;
 }
 
 const DeliveryAddress: FC<Props> = ({
@@ -32,6 +35,9 @@ const DeliveryAddress: FC<Props> = ({
   formData,
   handleConfirmationChange,
   updateBillingVisibility,
+  toggleConfirmationBillingAddress,
+  setStorePickup,
+  setDeliveryAddress,
 }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -47,16 +53,16 @@ const DeliveryAddress: FC<Props> = ({
   const [isBillingSameAsShipping, setIsBillingSameAsShipping] = useState(true);
   const [isStorePickup, setIsStorePickup] = useState(true);
 
-  const handleCheckboxChange = () => {
+  const handleDeliverySame = () => {
     setIsBillingSameAsShipping((prevValue) => {
       const newValue = !prevValue;
 
       if (newValue) {
         updateFormData("billingAddress", formData.shippingAddress);
-        updateBillingVisibility(true);
+        setDeliveryAddress(true)
       } else {
+        setDeliveryAddress(false)
         updateFormData("billingAddress", {});
-        updateBillingVisibility(false);
       }
 
       return newValue;
@@ -68,6 +74,8 @@ const DeliveryAddress: FC<Props> = ({
       const storepickupValue = !prevValue;
 
       if (storepickupValue) {
+        setStorePickup(true);
+
         updateFormData("billingAddress", formData.shippingAddress);
         updateFormData("shippingDetails", {
           databaseId: "local_pickup",
@@ -75,6 +83,8 @@ const DeliveryAddress: FC<Props> = ({
           title: "StorePickup",
         });
       } else {
+        setStorePickup(false);
+
         updateFormData("shippingDetails", {
           databaseId: null,
           id: null,
@@ -128,9 +138,11 @@ const DeliveryAddress: FC<Props> = ({
     setIsConfirmed(true);
     onCloseActive();
     handleConfirmationChange(true);
+    toggleConfirmationBillingAddress(false);
     if (isBillingSameAsShipping) {
       console.log("same same");
       updateFormData("billingAddress", shippingAddressData);
+      toggleConfirmationBillingAddress(true);
     }
     if (isStorePickup) {
       console.log("store pickup true");
@@ -276,17 +288,19 @@ const DeliveryAddress: FC<Props> = ({
             <div className="flex justify-between">
               <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4">
                 <Checkbox
+                key={2}
                   label=" Delivery address is the same as billing address"
-                  name="checkbox"
+                  name="deliverySame"
                   defaultChecked={isBillingSameAsShipping}
-                  onChange={handleCheckboxChange}
+                  onChange={handleDeliverySame}
                 />
               </div>
 
               <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4">
                 <Checkbox
+                key={1}
                   label="Store Pickup"
-                  name="checkbox"
+                  name="store pickup"
                   defaultChecked={isStorePickup}
                   onChange={handleStorePickupChange}
                 />

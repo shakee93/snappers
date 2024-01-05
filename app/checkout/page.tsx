@@ -100,6 +100,10 @@ const CheckoutPage = () => {
   }
 
   const handleConfirmationChange = (component: string, value: boolean) => {
+    console.log('value', value);
+    console.log('component', component);
+
+
     setIsConfirmed((prevConfirmed) => {
       const updatedConfirmed = {
         ...prevConfirmed,

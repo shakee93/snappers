@@ -11,6 +11,7 @@ import { Customer, CustomerAddress } from "@/graphql/types/graphql";
 import { contactInformation } from "@/data/types";
 import BillingAddress from "./BillingAddress";
 import Checkbox from "@/shared/Checkbox/Checkbox";
+import DeliveryAddress from "./DeliveryAddress";
 
 interface CheckoutLeftProps {
   tabActive:
@@ -57,8 +58,10 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
   const [isBillingAddressHidden, setIsBillingAddressHidden] = useState(false);
 
   useEffect(() => {
+    console.log('isStorePickup', isStorePickup);
+    console.log('isBillingSameAsShipping', isBillingSameAsShipping);
     setIsBillingAddressHidden(isBillingSameAsShipping || isStorePickup );
-  }, [isBillingSameAsShipping, isStorePickup]);
+  }, [isStorePickup, isBillingSameAsShipping]);
 
   useEffect(() => {
     if (data) {
@@ -107,7 +110,7 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
       </div>
 
       <div id="ShippingAddress" className="scroll-mt-24">
-        <ShippingAddress
+        <DeliveryAddress
           isActive={tabActive === "ShippingAddress"}
           onOpenActive={() => {
             setTabActive("ShippingAddress");
@@ -123,8 +126,11 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
           initialData={shippingDetails!}
           formData={formData}
           handleConfirmationChange={(value: any) => handleConfirmationChange("shippingAddress", value)}
+          toggleConfirmationBillingAddress={(value: any) => handleConfirmationChange("billingAddress", value)}
           updateBillingVisibility={(isVisible: boolean) => setIsBillingAddressHidden(isVisible)}
           isStorePickup={isStorePickup}
+          setStorePickup={setIsStorePickup}
+          setDeliveryAddress={setIsBillingSameAsShipping}
         />
       </div>
 
