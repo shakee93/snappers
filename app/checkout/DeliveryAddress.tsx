@@ -1,4 +1,7 @@
-import { SRI_LANKAN_STATES, SelectField } from "@/components/AddressPageComps/HelperComps";
+import {
+  SRI_LANKAN_STATES,
+  SelectField,
+} from "@/components/AddressPageComps/HelperComps";
 import { CustomerAddress } from "@/graphql/types/graphql";
 import Label from "components/Label/Label";
 import React, { FC, useEffect, useState } from "react";
@@ -29,7 +32,6 @@ const DeliveryAddress: FC<Props> = ({
   formData,
   handleConfirmationChange,
   updateBillingVisibility,
-
 }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -70,15 +72,15 @@ const DeliveryAddress: FC<Props> = ({
       if (storepickupValue) {
         updateFormData("billingAddress", formData.shippingAddress);
         updateFormData("shippingDetails", {
-          "databaseId": "local_pickup",
-          "id": "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==",
-          "title": "StorePickup"
+          databaseId: "local_pickup",
+          id: "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==",
+          title: "StorePickup",
         });
       } else {
         updateFormData("shippingDetails", {
-          "databaseId": null,
-          "id": null,
-          "title": null
+          databaseId: null,
+          id: null,
+          title: null,
         });
       }
 
@@ -129,15 +131,15 @@ const DeliveryAddress: FC<Props> = ({
     onCloseActive();
     handleConfirmationChange(true);
     if (isBillingSameAsShipping) {
-      console.log('same same');
+      console.log("same same");
       updateFormData("billingAddress", shippingAddressData);
     }
     if (isStorePickup) {
-      console.log('store pickup true');
+      console.log("store pickup true");
       updateFormData("shippingDetails", {
-        "databaseId": "local_pickup",
-        "id": "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==",
-        "title": "StorePickup"
+        databaseId: "local_pickup",
+        id: "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==",
+        title: "StorePickup",
       });
     }
   };
@@ -166,8 +168,9 @@ const DeliveryAddress: FC<Props> = ({
         </div>
         <form onSubmit={handleSubmit}>
           <div
-            className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${isActive ? "block" : "hidden"
-              }`}
+            className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${
+              isActive ? "block" : "hidden"
+            }`}
           >
             {/* ============ */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
@@ -279,7 +282,6 @@ const DeliveryAddress: FC<Props> = ({
                   name="checkbox"
                   defaultChecked={isBillingSameAsShipping}
                   onChange={handleCheckboxChange}
-                  className=""
                 />
               </div>
 
