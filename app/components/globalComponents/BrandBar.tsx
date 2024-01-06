@@ -68,10 +68,10 @@ const BrandBar: React.FC<BrandBarProps> = ({ brands, categories }) => {
           {brands?.map((brand: Brand, index: number) => (
             <Link
               key={index}
-              href={`/${brand.slug}`}
+              href={`/brands/${brand.slug}`}
               className={twMerge(
                 "flex-1 hover:text-white hover:bg-primaryColor px-4 whitespace-nowrap py-4 uppercase text-center font-medium text-gray-700 tracking-wide text-sm border-l",
-                path === `/${brand.slug}` && "bg-primaryColor text-white"
+                path === `/brands/${brand.slug}` && "bg-primaryColor text-white"
               )}
             >
               {brand.name}

@@ -26,7 +26,7 @@ import ProductOverview from "@/app/components/SingleProductPage/ProductOverview"
 import SectionSliderProductCard from "@/app/components/SectionSliderProductCard";
 import {PRODUCTS, SPORT_PRODUCTS} from "@/data/data";
 import Link from "next/link";
-import ImageGallery from "@/app/[brand]/imageGallery";
+import ImageGallery from "@/app/brands/(archive)/[brand]/imageGallery";
 import ProductImage from "@/app/components/SingleProductPage/ProductImage2";
 import {Suspense} from "react";
 import {Metadata, ResolvingMetadata} from "next";
