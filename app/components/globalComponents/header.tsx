@@ -4,7 +4,7 @@ import {
   XIcon,
   Facebook,
   Instagram,
-  PhoneCall,
+  PhoneCall, ChevronLeft,
 } from "lucide-react";
 import AvatarDropdown from "../Header/AvatarDropdown";
 import CartDropdown from "../Header/CartDropdown";
@@ -45,7 +45,8 @@ const Header = async () => {
         <div className="flex justify-between items-center md:items-stretch">
 
 
-          <div className="flex md:hidden px-2 bg-primaryColor py-2 flex-1 justify-center items-center">
+          <div className="flex md:hidden px-2 gap-2 bg-primaryColor py-2 flex-1 justify-center items-center">
+
             <SearchBar />
           </div>
 

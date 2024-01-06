@@ -471,7 +471,7 @@ const TabFilters = ({
         <Transition appear show={isOpenMoreFilter} as={Fragment}>
           <Dialog
             as="div"
-            className="fixed inset-0 z-50 overflow-y-auto"
+            className="fixed inset-0 z-[200] overflow-y-auto"
             onClose={closeModalMoreFilter}
           >
             <div className="min-h-screen text-center">
