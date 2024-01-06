@@ -24,7 +24,7 @@ const ContactInfo: FC<Props> = ({
   initialData,
   handleConfirmationChange,
 }) => {
-  const [phone, setPhone] = useState("+94");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [displayName, setDisplayName] = useState("");
   const [isConfirmed, setIsConfirmed] = useState(false);

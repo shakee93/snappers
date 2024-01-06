@@ -11,6 +11,7 @@ import Input from "shared/Input/Input";
 import Select from "shared/Select/Select";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import BillingAddress from 'app/checkout/BillingAddress';
+import toast from "react-hot-toast";
 
 interface Props {
   isActive: boolean;
@@ -151,6 +152,7 @@ const DeliveryAddress: FC<Props> = ({
         title: "StorePickup",
       });
     }
+ 
   };
 
   const renderShippingAddress = () => {

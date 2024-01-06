@@ -30,7 +30,8 @@ import {
 
 import CheckoutDetails from "./CheckoutDetails";
 import CartItems from "./CartItems";
-import MySwitch from "@/components/MySwitch"
+import MySwitch from "@/components/MySwitch";
+import toast from "react-hot-toast";
 
 interface FormData {
   contactInfo: Record<string, any>;
@@ -44,7 +45,6 @@ interface FormData {
 }
 
 const CheckoutPage = () => {
-
   const { cart, removeFromCart, updateCart } = useCart();
   const { loading, error, data, refetch } = useQuery(GET_PAYMENT_GATEWAYS);
   const paymentGateways: PaymentGateway[] = data?.paymentGateways.nodes;
@@ -97,10 +97,9 @@ const CheckoutPage = () => {
 
   const handleStorePickupChange = (value: boolean) => {
     setIsStorePickup(value);
-  }
+  };
 
   const handleConfirmationChange = (component: string, value: boolean) => {
-
     setIsConfirmed((prevConfirmed) => {
       const updatedConfirmed = {
         ...prevConfirmed,
@@ -133,7 +132,7 @@ const CheckoutPage = () => {
           quantity: item?.quantity,
         })) || [];
 
-      console.log('form data final', formData)
+      console.log("form data final", formData);
       console.log(paymentMethodId, lineItems);
 
       if (paymentMethodId !== undefined) {
@@ -147,12 +146,15 @@ const CheckoutPage = () => {
 
           if (data && data.createOrder) {
             const orderDetails = data.createOrder.order;
-            console.log('order Details', orderDetails);
+            console.log("order Details", orderDetails);
+            toast("Order created successfully");
           } else {
             console.error("Failed to retrieve order details");
+            toast.error("Failed to retrieve order details");
           }
-        } catch (error: any) {
+      } catch (error: any) {
           console.log("Error:", error);
+          toast.error("Failed to the create order");
         }
       } else {
         console.error("Payment method ID is undefined");
@@ -245,7 +247,7 @@ const CheckoutPage = () => {
                 <span className="font-semibold text-slate-900 dark:text-slate-200">
                   {cart?.subtotal || "$0.00"}
                 </span>
-              </div>  
+              </div>
 
               {!isStorePickup && (
                 <div className="flex justify-between py-2.5">
@@ -253,7 +255,8 @@ const CheckoutPage = () => {
                   <span className="font-semibold text-slate-900 dark:text-slate-200">
                     {cart?.shippingTotal || "$0.00"}
                   </span>
-                </div>)}
+                </div>
+              )}
 
               {/* <div className="flex justify-between py-2.5">
                                 <span>Tax estimate</span>
@@ -264,7 +267,6 @@ const CheckoutPage = () => {
               <div className="flex justify-between font-semibold text-slate-900 dark:text-slate-200 text-base pt-4">
                 <span>Order total</span>
                 <span>{cart?.total || "$0.00"}</span>
-
               </div>
             </div>
             <ButtonPrimary
@@ -279,7 +281,6 @@ const CheckoutPage = () => {
               }
               className="mt-8 w-full"
             >
-
               Confirm order
             </ButtonPrimary>
 
