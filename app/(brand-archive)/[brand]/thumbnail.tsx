@@ -1,6 +1,6 @@
 import React from 'react';
 import Image from 'next/image';
-import { GalleryImage } from '@/types';
+import {GalleryImage} from '@/types';
 
 interface ThumbnailProps {
     image: GalleryImage;

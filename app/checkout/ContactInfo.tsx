@@ -1,11 +1,9 @@
-import { contactInformation } from "@/data/types";
+import {contactInformation} from "@/data/types";
 import Label from "components/Label/Label";
-import React, { FC, useEffect, useState } from "react";
+import React, {FC, useEffect, useState} from "react";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
-import Checkbox from "shared/Checkbox/Checkbox";
 import Input from "shared/Input/Input";
-import { BadgeMinus, Check } from "lucide-react";
 
 interface Props {
   isActive: boolean;
@@ -33,17 +31,20 @@ const ContactInfo: FC<Props> = ({
     if (initialData) {
       setPhone(initialData?.phone);
       setEmail(initialData?.email);
+      debugger;
       setDisplayName(initialData?.displayName);
     }
   }, [initialData]);
-
+  
   const handleContactSubmit = (e: any) => {
     e.preventDefault();
     if (phone && email) {
+
       const contactInfo = {
         phone,
         email,
       };
+
       updateFormData("contactInfo", contactInfo);
       setPhone(initialData?.phone);
       setEmail(initialData?.email);

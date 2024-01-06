@@ -1,11 +1,11 @@
 "use client";
-import React, { useEffect, useRef, useState } from "react";
+import React, {useEffect, useRef, useState} from "react";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
-import { usePathname } from "next/navigation";
-import { twMerge } from "tailwind-merge";
+import {ChevronLeft, ChevronRight} from "lucide-react";
+import {usePathname} from "next/navigation";
+import {twMerge} from "tailwind-merge";
 import CategoryDropdown from "./CategoryDropdown";
-import { Brand, ProductCategory } from "@/graphql/types/graphql";
+import {Brand, ProductCategory} from "@/graphql/types/graphql";
 
 interface BrandBarProps {
   brands: Brand[];
@@ -68,10 +68,10 @@ const BrandBar: React.FC<BrandBarProps> = ({ brands, categories }) => {
           {brands?.map((brand: Brand, index: number) => (
             <Link
               key={index}
-              href={`/brands/${brand.slug}`}
+              href={`/${brand.slug}`}
               className={twMerge(
                 "flex-1 hover:text-white hover:bg-primaryColor px-4 whitespace-nowrap py-4 uppercase text-center font-medium text-gray-700 tracking-wide text-sm border-l",
-                path === `/brands/${brand.slug}` && "bg-primaryColor text-white"
+                path === `/${brand.slug}` && "bg-primaryColor text-white"
               )}
             >
               {brand.name}

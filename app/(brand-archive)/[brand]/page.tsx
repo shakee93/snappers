@@ -1,13 +1,9 @@
 import {getClient} from "@/graphql/apollo-ssr";
-import {
-    GET_BRAND, GET_BRANDS,
-} from "@/graphql/defs/products";
+import {GET_BRAND,} from "@/graphql/defs/products";
 import {notFound} from "next/navigation";
 
 import ArchiveLayout from "@/app/components/archive/ArchiveLayout";
-import {Brand} from "@/graphql/types/graphql";
 import {Metadata, ResolvingMetadata} from "next";
-import ArchiveLoading from "@/app/components/archive/ArchiveLoading";
 
 // export const dynamic = 'force-dynamic';
 

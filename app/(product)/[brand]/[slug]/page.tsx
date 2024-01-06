@@ -1,32 +1,11 @@
 import {getClient} from "@/graphql/apollo-ssr";
-import {
-    GET_BRANDS,
-    GET_CATEGORY_SLUGS,
-    GET_PRODUCT,
-    GET_PRODUCT_SLUGS,
-    GET_TECH_SPEC,
-} from "@/graphql/defs/products";
-import {
-    Brand,
-    Product,
-    ProductCategory,
-    SimpleProduct,
-    VariableProduct,
-} from "@/graphql/types/graphql";
+import {GET_BRANDS, GET_PRODUCT,} from "@/graphql/defs/products";
+import {Brand, SimpleProduct, VariableProduct,} from "@/graphql/types/graphql";
 import {notFound} from "next/navigation";
-import Image from "next/image";
-import {EmblaOptionsType} from "embla-carousel-react";
-
-import {useQuery} from "@apollo/client";
-import AddToCart from "@/app/components/AddToCart";
-import InnerImageZoom from "react-inner-image-zoom";
 import ProductDetails from "@/app/components/SingleProductPage/ProductDetails";
 import Features from "@/app/components/SingleProductPage/FeatureCard";
 import ProductOverview from "@/app/components/SingleProductPage/ProductOverview";
-import SectionSliderProductCard from "@/app/components/SectionSliderProductCard";
-import {PRODUCTS, SPORT_PRODUCTS} from "@/data/data";
 import Link from "next/link";
-import ImageGallery from "@/app/brands/(archive)/[brand]/imageGallery";
 import ProductImage from "@/app/components/SingleProductPage/ProductImage2";
 import {Suspense} from "react";
 import {Metadata, ResolvingMetadata} from "next";

@@ -1,11 +1,11 @@
 'use client'
 
 import InnerImageZoom from "react-inner-image-zoom";
-import ImageGallery from "@/app/brands/(archive)/[brand]/imageGallery";
-import {useEffect, useState} from "react";
+import ImageGallery from "@/app/(brand-archive)/[brand]/imageGallery";
+import {useState} from "react";
 import {SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
 import 'react-inner-image-zoom/lib/InnerImageZoom/styles.min.css';
-import { GalleryImage } from "@/types";
+import {GalleryImage} from "@/types";
 
 interface ProductImageProps {
     product: SimpleProduct | VariableProduct

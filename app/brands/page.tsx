@@ -1,7 +1,6 @@
 import {getClient} from "@/graphql/apollo-ssr";
 import {GET_ALL_PRODUCTS} from "@/graphql/defs/products";
-import InstantSearchWrapper from "@/app/components/InstantSearchWrapper";
-import {Brand, Category} from "@/graphql/types/graphql";
+import {Brand} from "@/graphql/types/graphql";
 import Link from "next/link";
 
 
@@ -34,7 +33,7 @@ const Page = async () => {
                         <ul className="py-2 grid grid-cols-2 md:grid-cols-5 text-left text-sm text-gray-700 dark:text-gray-200">
                             {brands?.filter((brand: Brand) => brand.count && brand.count > 0 ).map((brand: Brand, index: number) => <li key={index}>
                                 <Link
-                                    href={`/brands/${brand.slug}`}
+                                    href={`/${brand.slug}`}
                                     className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white"
                                 >
                                     {brand.name} ({brand.count})
