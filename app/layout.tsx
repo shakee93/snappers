@@ -12,6 +12,8 @@ import {Suspense} from "react";
 import {NavigationEvents} from "@/app/components/NavigationEvents";
 import {Metadata} from "next";
 
+
+
 export const metadata: Metadata = {
     title: {
         template: '%s - GQ Mobiles',
@@ -25,6 +27,7 @@ export default async function RootLayout({
                                          }: {
     children: React.ReactNode;
 }) {
+
     return (
         <html lang="en">
         <head>
@@ -40,6 +43,7 @@ export default async function RootLayout({
                         </Suspense>
                         <Toaster/>
                         <Header/>
+
                         {children}
 
                         <Footer/>

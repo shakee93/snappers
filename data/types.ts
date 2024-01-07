@@ -22,3 +22,12 @@ export type contactInformation = {
   email: string;
   displayName: string;
 }
+
+export type Slug = {
+  'order-id': string;
+};
+
+export type OrderPaymentPageProps = {
+  params: Slug;
+};
+
