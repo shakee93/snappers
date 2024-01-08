@@ -15,18 +15,23 @@ const SearchBar = () => {
     const router = useRouter()
     const path = usePathname()
 
+
+    useEffect(() => {
+        setSearch('');
+    }, [path])
+
     return <div className='flex-1 flex items-center gap-1'>
 
         {path !== '/' &&
-            <button onClick={e => router.back()} className='w-12 h-12 flex items-center justify-center'>
+            <button onClick={e => router.back()} className='md:hidden w-12 h-12 flex items-center justify-center'>
                 <ChevronLeft className='text-white w-8'/>
             </button>
         }
 
-        <form
+        <div
             className="text-primary-700 flex-1"
         >
-            <div className="bg-white lg:bg-primaryColor/5 border border-primaryColor/20 py-1 md:py-2 flex items-center space-x-1.5 px-5 rounded-lg lg:rounded-2xl h-full ">
+            <div className="bg-white border border-primaryColor/20 py-1 md:py-2 flex items-center space-x-1.5 px-5 rounded-lg h-full ">
                 {
                     (search_status === 'stalled' || search_status === 'loading') ? <Loader className='text-primaryColor animate-spin'/> : search.length > 0 ?
                         <button onClick={e => setSearch("")}>
@@ -39,12 +44,10 @@ const SearchBar = () => {
                     onChange={e => setSearch(e.target.value)}
                     type="text"
                     placeholder="Type to Quick Search"
-                    className="border-none bg-transparent focus:outline-none focus:ring-0 w-full text-[16px]"
-                    autoFocus
+                    className="border-none bg-transparent w-full text-[16px]"
                 />
             </div>
-            <input type="submit" hidden value="" />
-        </form>
+        </div>
     </div>
 }
 

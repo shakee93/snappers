@@ -13,7 +13,7 @@ const Logo = ({ className = 'border-r', imageClass = ''}:{ className?: string, i
         src={SiteLogo}
         alt="logo"
         className={twMerge(
-            "h-20 md:h-32 max-w-[80px] md:max-w-[320px] w-auto p-2 lg:p-4 relative rounded-b-2xl",
+            "h-32 md:h-32 max-w-[80px] md:max-w-[320px] w-auto p-2 md:p-4 relative rounded-b-2xl",
             imageClass
         )}
       ></Image>
