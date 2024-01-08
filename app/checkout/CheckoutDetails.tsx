@@ -18,13 +18,15 @@ interface CheckoutLeftProps {
   | "ContactInfo"
   | "DeliveryAddress"
   | "PaymentMethod"
-  | "BillingAddress";
+  | "BillingAddress"
+  | "order-cart";
   setTabActive: (
     value:
       | "ContactInfo"
       | "DeliveryAddress"
       | "BillingAddress"
       | "PaymentMethod"
+      | "order-cart"
   ) => void;
   handleScrollToEl: (id: string) => void;
   updateFormData: (section: string, data: any) => void;
@@ -86,13 +88,13 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
       if (shipping) {
         setShippingDetails(shipping);
       } else {
-        console.log("shipping is null");
+        // console.log("shipping is null");
       }
 
       if (billing) {
         setBillingDetails(billing);
       } else {
-        console.log("billing is null");
+        // console.log("billing is null");
       }
     }
   }, [data]);
@@ -187,7 +189,7 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
             setTabActive("PaymentMethod");
             handleScrollToEl("PaymentMethod");
           }}
-          onCloseActive={() => setTabActive("PaymentMethod")}
+          onCloseActive={() => setTabActive("order-cart")}
           paymentGateways={paymentGateways}
           updateFormData={(section, data) => {
             updateFormData(section, data);

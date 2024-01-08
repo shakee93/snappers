@@ -26,7 +26,6 @@ async function getData(categories: number[] | null = null) {
   };
 }
 
-
 const Header = async () => {
   const { productCategories, brands } = await getData();
 
@@ -41,8 +40,8 @@ const Header = async () => {
           "backdrop-blur-md sticky top-0 flex flex-col justify-between bg-white/90 z-30 transition-all duration-1300 shadow-xl md:border-b"
         }
       >
-        <div className="flex justify-between items-center md:items-stretch">
-          <div className="flex md:hidden px-2 gap-2 bg-primaryColor py-2 flex-1 justify-center items-center">
+        <div className="flex justify-between items-center md:items-stretch bg-white">
+          <div className="flex md:hidden px-2 gap-2 bg-gradient-to-br from-sky-500 to-primaryColor py-2 flex-1 justify-center items-center">
             <SearchBar />
           </div>
 

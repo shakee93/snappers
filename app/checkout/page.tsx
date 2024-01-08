@@ -32,6 +32,7 @@ import CheckoutDetails from "./CheckoutDetails";
 import CartItems from "./CartItems";
 import MySwitch from "@/components/MySwitch";
 import toast from "react-hot-toast";
+import { useRouter } from 'next/navigation';
 
 interface FormData {
   contactInfo: Record<string, any>;
@@ -49,9 +50,8 @@ const CheckoutPage = () => {
   const { loading, error, data, refetch } = useQuery(GET_PAYMENT_GATEWAYS);
   const paymentGateways: PaymentGateway[] = data?.paymentGateways.nodes;
   const [tabActive, setTabActive] = useState<
-    "ContactInfo" | "DeliveryAddress" | "BillingAddress" | "PaymentMethod"
+    "ContactInfo" | "DeliveryAddress" | "BillingAddress" | "PaymentMethod" | "order-cart"
   >("ContactInfo");
-  const [canConfirmOrder, setcanConfirmOrder] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     contactInfo: {},
     deliveryAddress: {},
@@ -69,8 +69,8 @@ const CheckoutPage = () => {
   });
 
   useEffect(() => {
-    console.log("Form data changed");
-    console.log("formData", formData);
+    // console.log("Form data changed");
+    // console.log("formData", formData);
   }, [formData]);
 
   const updateFormData = (section: string, data: any) => {
@@ -95,10 +95,6 @@ const CheckoutPage = () => {
     });
   };
 
-  const handleStorePickupChange = (value: boolean) => {
-    setIsStorePickup(value);
-  };
-
   const handleConfirmationChange = (component: string, value: boolean) => {
     setIsConfirmed((prevConfirmed) => {
       const updatedConfirmed = {
@@ -106,7 +102,7 @@ const CheckoutPage = () => {
         [component]: value,
       };
 
-      console.log("Updated Confirmation Values:", updatedConfirmed);
+      // console.log("Updated Confirmation Values:", updatedConfirmed);
 
       return updatedConfirmed;
     });
@@ -117,10 +113,13 @@ const CheckoutPage = () => {
     { loading: checkoutLoading, error: checkoutError, data: checkoutData },
   ] = useMutation(GUEST_CHECKOUT_MUTATION);
 
-  // const [
-  //   exisitingUserMutation,
-  //   { loading: checkoutLoading, error: checkoutError, data: checkoutData },
-  // ] = useMutation(CHECKOUT_MUTATION);
+  useEffect(() => {
+    console.log("checkout returned data: ", checkoutData);
+  }, [checkoutData]);
+  
+  checkoutError && console.log("checkout error: ", checkoutError);
+
+  const router = useRouter();
 
   const handleCheckout = async () => {
     try {
@@ -132,8 +131,8 @@ const CheckoutPage = () => {
           quantity: item?.quantity,
         })) || [];
 
-      console.log("form data final", formData);
-      console.log(paymentMethodId, lineItems);
+      // console.log("form data final", formData);
+      // console.log(paymentMethodId, lineItems);
 
       if (paymentMethodId !== undefined) {
         try {
@@ -148,11 +147,14 @@ const CheckoutPage = () => {
             const orderDetails = data.createOrder.order;
             console.log("order Details", orderDetails);
             toast("Order created successfully");
+
+            // router.push(`/checkout/${orderDetails.orderNumber}/?key=${orderDetails?.orderKey}`);
+            router.push(`/checkout/${orderDetails.id}`);
           } else {
             console.error("Failed to retrieve order details");
             toast.error("Failed to retrieve order details");
           }
-      } catch (error: any) {
+        } catch (error: any) {
           console.log("Error:", error);
           toast.error("Failed to the create order");
         }
@@ -204,6 +206,7 @@ const CheckoutPage = () => {
                   | "BillingAddress"
                   | "DeliveryAddress"
                   | "PaymentMethod"
+                  | "order-cart"
               ) => setTabActive(value)}
               handleScrollToEl={handleScrollToEl}
               updateFormData={updateFormData}
@@ -217,7 +220,7 @@ const CheckoutPage = () => {
 
           <div className="flex-shrink-0 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-700 my-10 lg:my-0 lg:mx-10 xl:lg:mx-14 2xl:mx-16 "></div>
 
-          <div className="w-full lg:w-[36%] ">
+          <div id="order-cart" className="w-full lg:w-[36%] ">
             <h3 className="text-lg font-semibold">Order summary</h3>
             <div className="mt-8 divide-y divide-slate-200/70 dark:divide-slate-700 ">
               {cart?.contents?.nodes.map((item, index) => (
