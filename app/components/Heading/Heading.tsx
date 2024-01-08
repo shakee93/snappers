@@ -28,10 +28,10 @@ const solutions = [
 const Heading: React.FC<HeadingProps> = ({
   children,
   desc = "",
-  className = "mb-12 lg:mb-14 text-neutral-900 dark:text-neutral-50",
+  className = "mb-5 md:mb-10 text-neutral-900 dark:text-neutral-50",
   isCenter = false,
   hasNextPrev = false,
-  fontClass = "text-3xl md:text-4xl font-semibold",
+  fontClass = "text-2xl md:text-4xl font-semibold",
   rightDescText,
   rightPopoverOptions = solutions,
   ...args
@@ -68,7 +68,7 @@ const Heading: React.FC<HeadingProps> = ({
         )}
       </div>
       {hasNextPrev && !isCenter && (
-        <div className="mt-4 flex justify-end sm:ml-2 sm:mt-0 flex-shrink-0">
+        <div className="md:mt-4 flex justify-end sm:ml-2 sm:mt-0 flex-shrink-0">
           <NextPrev onClickNext={() => {}} onClickPrev={() => {}} />
         </div>
       )}
