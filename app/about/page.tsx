@@ -74,7 +74,7 @@ const AccountPage = () => {
             <h1 className="text-3xl !leading-tight font-semibold text-neutral-900 md:text-4xl xl:text-5xl dark:text-neutral-100">
               About Us.
             </h1>
-            <div className="block text-base xl:text-lg text-neutral-6000 dark:text-neutral-400 lg:text-justify">
+            <div className="block text-base xl:text-base text-neutral-6000 dark:text-neutral-400 lg:text-justify">
               For more than 20 years,{" "}
               <span className="text-primaryColor">
                 GQ-The mobile Store Unlimited
@@ -109,7 +109,7 @@ const AccountPage = () => {
               <div className="text-xl xl:text-3xl !leading-tight font-semibold  dark:text-neutral-400 ytext-primaryColor">
                 {item.title}
               </div>
-              <div className="text-base xl:text-lg text-neutral-6000 dark:text-neutral-400 ">
+              <div className="text-base xl:text-base text-neutral-6000 dark:text-neutral-400 ">
                 {item.desc}
               </div>
             </div>
@@ -124,7 +124,7 @@ const AccountPage = () => {
             <div className="text-primaryColor font-medium text-lg leading-tight md:text-xl">
               Online Ordering. Your phone delivered to your doorstep!
             </div>
-            <div className="text-base xl:text-lg text-neutral-6000 dark:text-neutral-400 ">
+            <div className="text-base xl:text-base text-neutral-6000 dark:text-neutral-400 ">
               Prefer to purchase online? Then visit our online store. You can
               search by Brand, budget, or even model name. Once you’ve decided
               just complete the payment details. We promise to deliver your
@@ -136,7 +136,7 @@ const AccountPage = () => {
             <div className="text-primaryColor font-medium text-lg leading-tight md:text-xl">
               After Sales support. Fast response and solutions that satisfy.
             </div>
-            <div className="text-base xl:text-lg text-neutral-6000 dark:text-neutral-400 ">
+            <div className="text-base xl:text-base text-neutral-6000 dark:text-neutral-400 ">
               Nothing more frustrating than when a phone starts playing up. We
               understand! That’s why we aim to provide you fast and reliable
               after-sales support. For any support just call us on 077 798 8665
