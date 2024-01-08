@@ -14,7 +14,7 @@ const PayhereBase = () => {
       >
         Continue to payment
       </Button>
-    <div className="bg-blue-500 p-8">
+    <div className="p-8">
         <div id="payhere-modal"></div>
 
     </div>
