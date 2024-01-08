@@ -23,7 +23,7 @@ const SearchBar = () => {
     return <div className='flex-1 flex items-center gap-1'>
 
         {path !== '/' &&
-            <button onClick={e => router.back()} className='md:hidden w-12 h-12 flex items-center justify-center'>
+            <button onClick={e => router.back()} className='md:hidden w-10 h-10 flex items-center justify-center'>
                 <ChevronLeft className='text-white w-8'/>
             </button>
         }
@@ -31,7 +31,8 @@ const SearchBar = () => {
         <div
             className="text-primary-700 flex-1"
         >
-            <div className="bg-white border border-primaryColor/20 py-1 md:py-2 flex items-center space-x-1.5 px-5 rounded-lg h-full ">
+            <div className="bg-white border-none lg:border border-primaryColor/20 py-0 md:py-2 flex
+            items-center space-x-0 lg:space-x-1.5 px-3 md:px-5 rounded-md md:rounded-lg h-full ">
                 {
                     (search_status === 'stalled' || search_status === 'loading') ? <Loader className='text-primaryColor animate-spin'/> : search.length > 0 ?
                         <button onClick={e => setSearch("")}>
@@ -44,7 +45,7 @@ const SearchBar = () => {
                     onChange={e => setSearch(e.target.value)}
                     type="text"
                     placeholder="Type to Quick Search"
-                    className="border-none bg-transparent w-full text-[16px]"
+                    className="border-none focus:ring-0 bg-transparent w-full text-[16px] transition-all"
                 />
             </div>
         </div>
