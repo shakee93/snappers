@@ -31,6 +31,7 @@ const ContactInfo: FC<Props> = ({
     if (initialData) {
       setPhone(initialData?.phone);
       setEmail(initialData?.email);
+      // debugger;
       setDisplayName(initialData?.displayName);
     }
   }, [initialData]);

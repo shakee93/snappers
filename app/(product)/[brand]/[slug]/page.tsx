@@ -10,6 +10,7 @@ import ProductImage from "@/app/components/SingleProductPage/ProductImage2";
 import {Suspense} from "react";
 import {Metadata, ResolvingMetadata} from "next";
 
+export const dynamic = 'force-static'
 
 type Props = {
     params : {

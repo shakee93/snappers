@@ -32,7 +32,7 @@ import CheckoutDetails from "./CheckoutDetails";
 import CartItems from "./CartItems";
 import MySwitch from "@/components/MySwitch";
 import toast from "react-hot-toast";
-import { GET_ACCOUNT_DETAILS } from "@/graphql/defs/auth";
+import { useRouter } from 'next/navigation';
 
 interface FormData {
   contactInfo: Record<string, any>;
@@ -68,6 +68,11 @@ const CheckoutPage = () => {
     billingAddress: false,
   });
 
+  useEffect(() => {
+    // console.log("Form data changed");
+    // console.log("formData", formData);
+  }, [formData]);
+
   const updateFormData = (section: string, data: any) => {
     setFormData((prevData) => {
       let updatedSection;
@@ -97,7 +102,7 @@ const CheckoutPage = () => {
         [component]: value,
       };
 
-      console.log("Updated Confirmation Values:", updatedConfirmed);
+      // console.log("Updated Confirmation Values:", updatedConfirmed);
 
       return updatedConfirmed;
     });
@@ -114,6 +119,8 @@ const CheckoutPage = () => {
   
   checkoutError && console.log("checkout error: ", checkoutError);
 
+  const router = useRouter();
+
   const handleCheckout = async () => {
     try {
       const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
@@ -123,6 +130,9 @@ const CheckoutPage = () => {
           productId: item?.product?.node?.databaseId,
           quantity: item?.quantity,
         })) || [];
+
+      // console.log("form data final", formData);
+      // console.log(paymentMethodId, lineItems);
 
       if (paymentMethodId !== undefined) {
         try {
@@ -137,6 +147,9 @@ const CheckoutPage = () => {
             const orderDetails = data.createOrder.order;
             console.log("order Details", orderDetails);
             toast("Order created successfully");
+
+            // router.push(`/checkout/${orderDetails.orderNumber}/?key=${orderDetails?.orderKey}`);
+            router.push(`/checkout/${orderDetails.id}`);
           } else {
             console.error("Failed to retrieve order details");
             toast.error("Failed to retrieve order details");

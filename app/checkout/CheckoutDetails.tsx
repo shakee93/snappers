@@ -86,13 +86,13 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
       if (shipping) {
         setShippingDetails(shipping);
       } else {
-        console.log("shipping is null");
+        // console.log("shipping is null");
       }
 
       if (billing) {
         setBillingDetails(billing);
       } else {
-        console.log("billing is null");
+        // console.log("billing is null");
       }
     }
   }, [data]);
