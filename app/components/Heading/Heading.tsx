@@ -28,7 +28,7 @@ const solutions = [
 const Heading: React.FC<HeadingProps> = ({
   children,
   desc = "",
-  className = "mb-5 md:mb-10 text-neutral-900 dark:text-neutral-50",
+  className = "mb-5 flex md:mb-10 text-neutral-900 dark:text-neutral-50",
   isCenter = false,
   hasNextPrev = false,
   fontClass = "text-2xl md:text-4xl font-semibold",
@@ -38,7 +38,7 @@ const Heading: React.FC<HeadingProps> = ({
 }) => {
   return (
     <div
-      className={`nc-Section-Heading relative flex flex-col sm:flex-row sm:items-end justify-between ${className}`}
+      className={`nc-Section-Heading relative flex flex-row sm:flex-row sm:items-end justify-between ${className}`}
     >
       <div
         className={
@@ -55,7 +55,7 @@ const Heading: React.FC<HeadingProps> = ({
           {rightDescText && (
             <>
               <span className="">{`. `}</span>
-              <span className="text-neutral-500 dark:text-neutral-400">
+              <span className="text-neutral-500 dark:text-neutral-400 hidden lg:flex">
                 {rightDescText}
               </span>
             </>

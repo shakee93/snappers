@@ -1,11 +1,30 @@
+"use client"
 import { BadgeCheck } from "lucide-react";
+import { OrderPaymentPageProps } from "@/data/types";
+import { useQuery } from "@apollo/client";
+import {
+  GET_SINGLE_ORDER
+} from "@/graphql/defs/order"
 
-const ThankYouPage = () => {
+
+const ThankYouPage = ({ params }: OrderPaymentPageProps) => {
   const dummyProducts = [
     { name: "Product A", quantity: 2, price: 20 },
     { name: "Product B", quantity: 1, price: 15 },
     { name: "Product C", quantity: 3, price: 25 },
   ];
+
+  // const orderId = params['order-id'];
+  const orderId = "b3JkZXI6NjQzOA==";
+
+  const { loading, error, data, refetch } = useQuery(GET_SINGLE_ORDER, {
+    variables: {
+      orderID: orderId,
+    }
+  });
+
+  console.log({data})
+
   return (
     <div className="container rounded-3xl lg:p-20 text-center mt-10">
       <div className="flex flex-col justify-center gap-4 items-center text-green-600">
@@ -26,7 +45,7 @@ const ThankYouPage = () => {
                   Order Id
                 </td>
                 <td className="px-6 py-2 text-right whitespace-nowrap  font-medium text-gray-800 dark:text-gray-200">
-                  00111
+                  {data?.order.orderNumber}
                 </td>
               </tr>
               <tr className="border-1 border-gray-400">
@@ -34,7 +53,7 @@ const ThankYouPage = () => {
                   Order Total
                 </td>
                 <td className="px-6 py-2  text-right whitespace-nowrap font-medium text-gray-800 dark:text-gray-200">
-                  $130
+                  {data?.order.total}
                 </td>
               </tr>
               <tr className="border-1 border-gray-400">
@@ -47,10 +66,10 @@ const ThankYouPage = () => {
               </tr>
               <tr className="border-1 border-gray-400">
                 <td className="px-6 py-2 text-left whitespace-nowrap  font-medium text-gray-800 dark:text-gray-200">
-                  Delivary Fee
+                  Delivery Fee
                 </td>
                 <td className="px-6 py-2  text-right whitespace-nowrap font-medium text-gray-800 dark:text-gray-200">
-                  $30
+                  {data?.order.shippingTax}
                 </td>
               </tr>
               <tr className="border-1 border-gray-400">
@@ -58,7 +77,7 @@ const ThankYouPage = () => {
                   Sub Total
                 </td>
                 <td className="px-6 py-2  text-right whitespace-nowrap font-medium text-gray-800 dark:text-gray-200">
-                  $130
+                  {data?.order.subtotal}
                 </td>
               </tr>
             </table>
@@ -146,16 +165,16 @@ const ThankYouPage = () => {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                          {dummyProducts.map((product, index) => (
+                          {data?.order.lineItems?.nodes?.map((item : any, index: any) => (
                             <tr key={index}>
                               <td className="px-6 text-left py-4  font-medium text-gray-800 dark:text-gray-200">
-                                {product.name}
+                                {item?.product.node.name}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap  text-gray-800 dark:text-gray-200">
-                                {product.quantity}
+                                {item?.product.node.quantity}
                               </td>
                               <td className="px-6 py-4 text-right whitespace-nowrap  text-gray-800 dark:text-gray-200">
-                                ${product.quantity * product.price}
+                                ${item?.subtotal}
                               </td>
                             </tr>
                           ))}
