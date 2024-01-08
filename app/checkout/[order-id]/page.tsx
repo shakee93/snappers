@@ -2,7 +2,8 @@
 import { OrderPaymentPageProps } from "@/data/types";
 import { useQuery } from "@apollo/client";
 import { GET_SINGLE_ORDER } from "@/graphql/defs/order";
-import PayhereBase from "@/app/components/Payhere/Base";
+import PayHerePayment from "@/app/components/Payhere/Base";
+
 
 export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   const orderId = params["order-id"];
@@ -18,7 +19,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   return (
     <div>
       <p>Post: {orderId}</p>
-      <PayhereBase/>
+      <PayHerePayment/>
     </div>
   );
 }

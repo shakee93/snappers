@@ -1,46 +1,108 @@
-import React, { useState } from "react"
-import "payhere-embed-sdk/dist/react.css"
-import Payhere from "payhere-embed-sdk/dist/react"
-import { Button } from "@nextui-org/react"
+"use client";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import Script from "next/script";
 
-const PayhereBase = () => {
-  const [success, setSuccess] = useState(false)
-  const [showPayhere, setShowPayhere] = useState(false)
+const PayHerePayment = ({ paymentDetails }: any) => {
+  const [hash, setHash] = useState(null);
 
+  const fakePaymentDetails = useMemo(() => {
+    return {
+      sandbox: true,
+      merchant_id: "1225436",
+      return_url: "http://localhost:3000/success",
+      cancel_url: "http://localhost:3000/cancel",
+      notify_url: "http://localhost:3000/notify",
+      order_id: "12345",
+      items: "gq mobiles",
+      hash: hash,
+      amount: "100.00",
+      currency: "LKR",
+      first_name: "John",
+      last_name: "Doe",
+      email: "johndoe@example.com",
+      phone: "0771234567",
+      address: "No.1, Galle Road",
+      city: "Colombo",
+      country: "Sri Lanka",
+    };
+  }, [hash]);
+
+  const initiatePayment = useCallback(async () => {
+    if (window?.payhere) {
+      window?.payhere.startPayment(fakePaymentDetails);
+      window.onError = function onError(error: any) {
+        console.log("Error:" + error);
+      };
+    } else {
+      debugger;
+    }
+  }, [fakePaymentDetails]);
+
+  useEffect(() => {
+    // Define event handlers
+    const onDismissed = () => {
+      console.log("Payment dismissed");
+    };
+
+    const onError = (error: any) => {
+      console.log("Error:", error);
+    };
+
+    // Attach event handlers
+    if (window.payhere) {
+      window.payhere.onDismissed = onDismissed;
+      window.payhere.onError = onError;
+    }
+
+    // Fetch the hash
+    const getPaymentHash = async () => {
+      try {
+        const response = await fetch("/api/payhere", { // Ensure the endpoint is correct
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            merchant_id: "1225436",
+            order_id: "12345",
+            amount: "100.00",
+            currency: "LKR",
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const data = await response.json();
+        setHash(data.hash);
+      } catch (error) {
+        console.error("Failed to fetch hash:", error);
+      }
+    };
+
+    getPaymentHash();
+
+    // Clean up event handlers
+    return () => {
+      if (window.payhere) {
+        window.payhere.onDismissed = null;
+        window.payhere.onError = null;
+      }
+    };
+  }, []);
   return (
-    <div>
-      <Button
-        onClick={() => setShowPayhere(true)}
-      >
-        Continue to payment
-      </Button>
-    <div className="p-8">
-        <div id="payhere-modal"></div>
-
-    </div>
-      <Payhere
-        selector="#payhere-modal"
-        embedURL={"https://app.payhere.co/altlabs/coffee"}
-        open={showPayhere}
-        onSuccess={data => {
-          console.log("Payhere success", data)
-          setSuccess(true)
-        }}
-        onFailure={err => {
-          console.log("Payhere failed", err)
-          setSuccess(true)
-        }}
-        onClose={() => {
-          setShowPayhere(false)
-          if (success) {
-            console.log("Payment success")
-          } else {
-            console.log("Payment failed")
-          }
-        }}
+    <>
+      <Script
+        type="text/javascript"
+        src="https://www.payhere.lk/lib/payhere.js"
+        strategy="beforeInteractive"
+        onLoad={() => console.log('PayHere script loaded')}
+        onError={() => console.error('Error loading PayHere script')}
       />
-    </div>
-  )
-}
+      <button onClick={initiatePayment}>Pay with PayHere</button>
+    </>
+  );
+};
 
-export default PayhereBase
+export default PayHerePayment;
