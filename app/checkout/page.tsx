@@ -32,6 +32,7 @@ import CheckoutDetails from "./CheckoutDetails";
 import CartItems from "./CartItems";
 import MySwitch from "@/components/MySwitch";
 import toast from "react-hot-toast";
+import { GET_ACCOUNT_DETAILS } from "@/graphql/defs/auth";
 
 interface FormData {
   contactInfo: Record<string, any>;
@@ -51,7 +52,6 @@ const CheckoutPage = () => {
   const [tabActive, setTabActive] = useState<
     "ContactInfo" | "DeliveryAddress" | "BillingAddress" | "PaymentMethod"
   >("ContactInfo");
-  const [canConfirmOrder, setcanConfirmOrder] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     contactInfo: {},
     deliveryAddress: {},
@@ -67,11 +67,6 @@ const CheckoutPage = () => {
     paymentMethod: false,
     billingAddress: false,
   });
-
-  useEffect(() => {
-    console.log("Form data changed");
-    console.log("formData", formData);
-  }, [formData]);
 
   const updateFormData = (section: string, data: any) => {
     setFormData((prevData) => {
@@ -95,10 +90,6 @@ const CheckoutPage = () => {
     });
   };
 
-  const handleStorePickupChange = (value: boolean) => {
-    setIsStorePickup(value);
-  };
-
   const handleConfirmationChange = (component: string, value: boolean) => {
     setIsConfirmed((prevConfirmed) => {
       const updatedConfirmed = {
@@ -117,10 +108,11 @@ const CheckoutPage = () => {
     { loading: checkoutLoading, error: checkoutError, data: checkoutData },
   ] = useMutation(GUEST_CHECKOUT_MUTATION);
 
-  // const [
-  //   exisitingUserMutation,
-  //   { loading: checkoutLoading, error: checkoutError, data: checkoutData },
-  // ] = useMutation(CHECKOUT_MUTATION);
+  useEffect(() => {
+    console.log("checkout returned data: ", checkoutData);
+  }, [checkoutData]);
+  
+  checkoutError && console.log("checkout error: ", checkoutError);
 
   const handleCheckout = async () => {
     try {
@@ -131,9 +123,6 @@ const CheckoutPage = () => {
           productId: item?.product?.node?.databaseId,
           quantity: item?.quantity,
         })) || [];
-
-      console.log("form data final", formData);
-      console.log(paymentMethodId, lineItems);
 
       if (paymentMethodId !== undefined) {
         try {
@@ -152,7 +141,7 @@ const CheckoutPage = () => {
             console.error("Failed to retrieve order details");
             toast.error("Failed to retrieve order details");
           }
-      } catch (error: any) {
+        } catch (error: any) {
           console.log("Error:", error);
           toast.error("Failed to the create order");
         }
