@@ -89,12 +89,41 @@ const hardcodedBrands: {
     { id: 'dGVybToyMzc=', slug: "green-lion" },
   ],
 };
-;
+const hardcodedBrandsMobile: {
+  [key: string]: {
+    id: string;
+    slug: string;
+  }[];
+} = {
+  Mobiles: [
+    { id: 'dGVybToyMTk=', slug: "samsung" },
+    { id: 'dGVybToyMjY=', slug: "apple" },
+    { id: 'dGVybToyMjk=', slug: "google" },
+    { id: 'dGVybToyMjA=', slug: "oneplus" },
+    { id: 'dGVybToyMjU=', slug: "huawei" },
+    { id: 'dGVybToyMzk=', slug: "nokia" },
+  ],
+  Watches: [
+    { id: 'dGVybToyMzI=', slug: "fitbit" },
+    { id: 'dGVybToyMjQ=', slug: "amazfit" },
+    { id: 'dGVybToyMjU=', slug: "huawei" },
+  ],
+  Laptops: [
+    { id: 'dGVybToyMjY=', slug: "apple" },
+    { id: 'dGVybToyMTk=', slug: "samsung" },
+  ],
+  Speakers: [
+    { id: 'dGVybToyNDE=', slug: "bose" },
+    { id: 'dGVybToyMzM=', slug: "beats" },
+    { id: 'dGVybToyNzA=', slug: "marshals" },
+  ],
+};
+
 
 const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
   className = "",
   boxCard = "box4",
-  gridClassName = "grid-cols-1 md:grid-cols-2 xl:grid-cols-3",
+  gridClassName = "grid-cols-2 md:grid-cols-2 xl:grid-cols-3",
 }) => {
 
   const [brands, setBrands] = useState<Brand[]>([]);
@@ -132,18 +161,40 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
     return (
       <div>
         <Heading
-          className="mb-12 lg:mb-14 text-neutral-900 dark:text-neutral-50"
-          fontClass="text-3xl md:text-4xl 2xl:text-5xl font-semibold"
+          className="mb-5 lg:mb-10 text-neutral-900 dark:text-neutral-50"
+          fontClass="text-2xl md:text-4xl 2xl:text-5xl font-semibold"
           isCenter
           desc=""
         >
           Start exploring.
         </Heading>
         <Nav
-          className="p-1 bg-white dark:bg-neutral-800 rounded-full shadow-lg overflow-x-auto hiddenScrollbar"
-          containerClassName="mb-12 lg:mb-14 relative flex justify-center w-full text-sm md:text-base"
+          className="hidden lg:flex p-1 bg-white dark:bg-neutral-800 rounded-full shadow-lg overflow-x-auto hiddenScrollbar"
+          containerClassName="relative flex justify-center w-full text-sm md:text-base"
         >
           {Object.keys(hardcodedBrands).map((item, index) => (
+            <NavItem2
+              key={index}
+              isActive={tabActive === item}
+              onClick={() => {
+                setTabActive(item as keyof typeof hardcodedBrands);
+              }}
+            >
+              <div className="flex items-center justify-center space-x-1.5 sm:space-x-2.5 text-xs sm:text-sm ">
+                {/* <span
+                  className="inline-block"
+                  dangerouslySetInnerHTML={{ __html: item.icon }}
+                ></span> */}
+                <span>{item}</span>
+              </div>
+            </NavItem2>
+          ))}
+        </Nav>
+        <Nav
+          className="lg:hidden p-1 bg-white dark:bg-neutral-800 rounded-full shadow-lg overflow-x-auto hiddenScrollbar"
+          containerClassName="mb-5 lg:mb-14 relative flex justify-center w-full text-sm md:text-base"
+        >
+          {Object.keys(hardcodedBrandsMobile).map((item, index) => (
             <NavItem2
               key={index}
               isActive={tabActive === item}
@@ -166,8 +217,9 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
   };
 
   return (
+   <>
     <div
-      className={`nc-SectionGridMoreExplore relative ${className}`}
+      className={ `bg-red-50 rounded-3xl p-10 hidden lg:block nc-SectionGridMoreExplore relative ${className}`}
       data-nc-id="SectionGridMoreExplore"
     >
       {renderHeading()}
@@ -187,6 +239,28 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
         ))}
       </div>
     </div>
+    <div
+      className={`bg-red-50 rounded-3xl p-3 md:p-5 lg:hidden nc-SectionGridMoreExplore relative ${className}`}
+      data-nc-id="SectionGridMoreExplore"
+    >
+      {renderHeading()}
+      <div className={`grid gap-4 md:gap-7 ${gridClassName}`}>
+        {hardcodedBrandsMobile[tabActive]
+            ?.map(brand => brands.find(b => b.id === brand.id) as Brand)
+            ?.filter(n => n !== undefined).map((brand, index) => (
+          <div key={brand.id + index}>
+            <CardCategory4
+              name={brand.name || ''}
+              desc={brand.description || ''}
+              key={brand.id}
+              slug={brand.slug || ''}
+              featuredImage={brand?.brandImage || ''}
+            />
+          </div>
+        ))}
+      </div>
+    </div>
+   </>
   );
 };
 

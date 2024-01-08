@@ -56,7 +56,9 @@ const MobileNavLinks = () => {
                 key={item.id}
                 className="rounded-3xl px-1 xl:px-3 py-1 "
               >
-                <Link href={item.href}>{item.name}</Link>
+                <Link
+                    onClick={e => toggleMobileMenu()}
+                    href={item.href}>{item.name}</Link>
               </li>
             ))}
           </ul>

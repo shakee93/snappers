@@ -50,7 +50,7 @@ const CheckoutPage = () => {
   const { loading, error, data, refetch } = useQuery(GET_PAYMENT_GATEWAYS);
   const paymentGateways: PaymentGateway[] = data?.paymentGateways.nodes;
   const [tabActive, setTabActive] = useState<
-    "ContactInfo" | "DeliveryAddress" | "BillingAddress" | "PaymentMethod"
+    "ContactInfo" | "DeliveryAddress" | "BillingAddress" | "PaymentMethod" | "order-cart"
   >("ContactInfo");
   const [formData, setFormData] = useState<FormData>({
     contactInfo: {},
@@ -206,6 +206,7 @@ const CheckoutPage = () => {
                   | "BillingAddress"
                   | "DeliveryAddress"
                   | "PaymentMethod"
+                  | "order-cart"
               ) => setTabActive(value)}
               handleScrollToEl={handleScrollToEl}
               updateFormData={updateFormData}
@@ -219,7 +220,7 @@ const CheckoutPage = () => {
 
           <div className="flex-shrink-0 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-700 my-10 lg:my-0 lg:mx-10 xl:lg:mx-14 2xl:mx-16 "></div>
 
-          <div className="w-full lg:w-[36%] ">
+          <div id="order-cart" className="w-full lg:w-[36%] ">
             <h3 className="text-lg font-semibold">Order summary</h3>
             <div className="mt-8 divide-y divide-slate-200/70 dark:divide-slate-700 ">
               {cart?.contents?.nodes.map((item, index) => (
