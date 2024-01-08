@@ -1,5 +1,5 @@
 import SectionHero2 from "@/app/components/HomePage/SectionHero";
-import CategoryBlockSection from "@/app/components/HomePage/CategoryBlocksSection"
+import CategoryBlockSection from "@/app/components/HomePage/CategoryBlocksSection";
 import SectionHero3 from "@/app/components/HomePage/SectionHero2";
 import DiscoverMoreSlider from "@/app/components/HomePage/DiscoverMoreSlider";
 import SectionSliderProductCard from "@/app/components/SectionSliderProductCard";
@@ -13,146 +13,119 @@ import SectionPromo1 from "@/app/components/HomePage/SectionPromo1";
 import SectionPromo2 from "@/app/components/HomePage/SectionPromo2";
 import SectionPromo3 from "@/app/components/HomePage/SectionPromo3";
 import SectionSliderLargeProduct from "@/components/SectionSliderLargeProduct";
-import Heading from "@/components/Heading/Heading";
+import Heading from "@/app/components/Heading/Heading";
 import SectionMagazine5 from "@/containers/BlogPage/SectionMagazine5";
-import {getClient} from "@/graphql/apollo-ssr";
-import {GET_SLIDES} from "@/graphql/defs/slides";
-import {GET_CATEGORY_ARCHIVE, GET_NEW_ARRIVALS, GET_PRODUCTS_NODES} from "@/graphql/defs/products";
+import { getClient } from "@/graphql/apollo-ssr";
+import { GET_SLIDES } from "@/graphql/defs/slides";
 import {
-    ProductConnectionEdge,
-    RootQuery,
-    RootQueryToProductUnionConnection,
-    SimpleProduct, VariableProduct
+  GET_CATEGORY_ARCHIVE,
+  GET_NEW_ARRIVALS,
+  GET_PRODUCTS_NODES,
+} from "@/graphql/defs/products";
+import {
+  ProductConnectionEdge,
+  RootQuery,
+  RootQueryToProductUnionConnection,
+  SimpleProduct,
+  VariableProduct,
 } from "@/graphql/types/graphql";
 
 const getData = async () => {
-
-    const [slides,
-        newArrivals,
-        mobiles,
-        speakers,
-        topSelling] = await Promise.all([
-        getClient().query({ query: GET_SLIDES }),
-        getClient().query({ query: GET_PRODUCTS_NODES }),
-        getClient().query({
-            query: GET_PRODUCTS_NODES,
-            variables: { first: 10, categoryIdIn: [165] },
-        }),
-        getClient().query({
-            query: GET_PRODUCTS_NODES,
-            variables: { first: 10, categoryIdIn: [71] },
-        }),
-        getClient().query({
-            query: GET_PRODUCTS_NODES,
-            variables: { first: 10, categoryIdIn: [86] },
-        }),
+  const [slides, newArrivals, mobiles, speakers, topSelling] =
+    await Promise.all([
+      getClient().query({ query: GET_SLIDES }),
+      getClient().query({ query: GET_PRODUCTS_NODES }),
+      getClient().query({
+        query: GET_PRODUCTS_NODES,
+        variables: { first: 10, categoryIdIn: [165] },
+      }),
+      getClient().query({
+        query: GET_PRODUCTS_NODES,
+        variables: { first: 10, categoryIdIn: [71] },
+      }),
+      getClient().query({
+        query: GET_PRODUCTS_NODES,
+        variables: { first: 10, categoryIdIn: [86] },
+      }),
     ]);
 
-    return {
-        slides: slides.data?.slides?.nodes,
-        newArrivals: newArrivals.data.products?.nodes as (SimpleProduct & VariableProduct)[],
-        mobiles: mobiles.data.products?.nodes  as (SimpleProduct & VariableProduct)[],
-        speakers: speakers.data.products?.nodes  as (SimpleProduct & VariableProduct)[],
-        topSelling: topSelling.data.products?.nodes  as (SimpleProduct & VariableProduct)[],
-    }
-
-}
-
+  return {
+    slides: slides.data?.slides?.nodes,
+    newArrivals: newArrivals.data.products?.nodes as (SimpleProduct &
+      VariableProduct)[],
+    mobiles: mobiles.data.products?.nodes as (SimpleProduct &
+      VariableProduct)[],
+    speakers: speakers.data.products?.nodes as (SimpleProduct &
+      VariableProduct)[],
+    topSelling: topSelling.data.products?.nodes as (SimpleProduct &
+      VariableProduct)[],
+  };
+};
 
 export default async function Home() {
-
-  const { slides, newArrivals, mobiles, speakers, topSelling } = await getData()
+  const { slides, newArrivals, mobiles, speakers, topSelling } =
+    await getData();
   const hi = "sahdeer";
   return (
     <main>
-      <div className="nc-PageHome relative overflow-hidden">
-        <div className="z-30">
-          {/* <SectionHero2 /> */}
+      <div className="nc-PageHome flex flex-col  relative overflow-hidden">
+        {/* hero section */}
+        <div className="z-0">
           <SectionHero3 slides={slides} />
         </div>
-        <div className=" gap-4 container m-auto">
-          <div className="my-10">
+        <div className="container flex flex-col gap-10 lg:gap-16">
+          
+          {/* new arrivals section */}
+          <div className="mt-5 md:mt-10">
             <SectionSliderProductCard
-                products={newArrivals}
-              // subHeading="New Sports equipment"
+              products={newArrivals}
               heading="New Arrivals"
             />
           </div>
-        </div>
-        <div className="mt-24 container lg:my-10">
-          {/* <DiscoverMoreSlider /> */}
-          <Heading>
-                Featured Categories
-              </Heading>
-          <CategoryBlockSection/>
-
-        </div>
-
-        <div className="container relative space-y-24 my-24 lg:space-y-32 lg:my-32">
-          {/* SECTION */}
-          <SectionSliderProductCard
-            products={mobiles}
-            subHeading= "Explore the Latest in Smartphone Innovation"
+          
+          {/*featured categoties */}
+          <div>
+            <Heading>Featured Categories</Heading>
+            <CategoryBlockSection />
+          </div>
+          
+          {/*mobile categoty */}
+          <div>
+            <SectionSliderProductCard
+              products={mobiles}
+              subHeading="Explore the Latest in Smartphone Innovation"
               heading="Mobiles"
-          />
-
-          {/* <div className="py-24 lg:py-32 border-t border-b border-slate-200 dark:border-slate-700">
-            <SectionHowItWork />
-          </div> */}
-
-          {/* SECTION */}
-          <div className="  ">
+            />
+          </div>
+          
+          {/* about section */}
+          <div>
             <SectionPromo1 />
           </div>
-
+          
+          {/* speakers category */}
           <div>
-          <SectionSliderProductCard
-            products={speakers}
-            subHeading= "Surround Yourself with Sound"
+            <SectionSliderProductCard
+              products={speakers}
+              subHeading="Surround Yourself with Sound"
               heading="Speakers"
-          />
+            />
           </div>
 
-          {/* SECTION */}
-          <div className="relative py-24 lg:py-32">
-            <BackgroundSection  />
+          {/* brand section */}
+          <div className="relative">
+            {/* <BackgroundSection /> */}
             <SectionGridMoreExplore />
           </div>
-
-          {/* SECTION */}
-          {/* <SectionGridFeatureItems /> */}
-
-          {/* <SectionPromo2 /> */}
-
-          {/* SECTION 3 */}
-          {/* <SectionSliderLargeProduct cardStyle="style2" /> */}
-
-          {/* SECTION */}
-          {/* <SectionSliderCategories /> */}
-
-          {/* <SectionPromo3 /> */}
-
-          <SectionSliderProductCard
+          
+          {/* smart watches section */}
+          <div>
+            <SectionSliderProductCard
               products={topSelling}
-            heading="Smart Watches"
-            subHeading="Best selling of the month"
-          />
-
-          {/* <div className="relative py-24 lg:py-32"> */}
-          {/* <BackgroundSection /> */}
-          {/* <div>
-              <Heading rightDescText="From the Ciseco blog">
-                The latest news
-              </Heading>
-              <SectionMagazine5 />
-              <div className="flex mt-16 justify-center">
-                <ButtonSecondary>Show all blog articles</ButtonSecondary>
-              </div>
-            </div> */}
-          {/* </div> */}
-
-          {/* SECTION */}
-          {/* <SectionClientSay /> */}
+              heading="Smart Watches"
+              subHeading="Best selling of the month"
+            />
+          </div>
         </div>
       </div>
     </main>

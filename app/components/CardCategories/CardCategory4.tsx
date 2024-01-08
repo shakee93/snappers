@@ -66,7 +66,7 @@ const CardCategory4: FC<CardCategory4Props> = ({
             </div>
 
             <div
-                className="flex items-center text-sm font-medium group-hover:text-primary-500 transition-colors"
+                className="flex items-center text-xs md:text-sm font-medium group-hover:text-primary-500 transition-colors"
             >
               <span>See Collection</span>
               <ArrowRightIcon className="w-4 h-4 ml-2.5" />
