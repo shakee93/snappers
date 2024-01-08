@@ -35,6 +35,7 @@
     "next": "14.0.3",
     "next-images": "^1.8.5",
     "next13-progressbar": "^1.1.3",
+    "payhere-embed-sdk": "^0.7.3",
     "plaiceholder": "^3.0.0",
     "rc-slider": "^10.1.0",
     "react": "^18",
