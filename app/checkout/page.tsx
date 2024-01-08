@@ -32,6 +32,7 @@ import CheckoutDetails from "./CheckoutDetails";
 import CartItems from "./CartItems";
 import MySwitch from "@/components/MySwitch";
 import toast from "react-hot-toast";
+import { useRouter } from 'next/navigation';
 
 interface FormData {
   contactInfo: Record<string, any>;
@@ -69,8 +70,8 @@ const CheckoutPage = () => {
   });
 
   useEffect(() => {
-    console.log("Form data changed");
-    console.log("formData", formData);
+    // console.log("Form data changed");
+    // console.log("formData", formData);
   }, [formData]);
 
   const updateFormData = (section: string, data: any) => {
@@ -106,7 +107,7 @@ const CheckoutPage = () => {
         [component]: value,
       };
 
-      console.log("Updated Confirmation Values:", updatedConfirmed);
+      // console.log("Updated Confirmation Values:", updatedConfirmed);
 
       return updatedConfirmed;
     });
@@ -122,6 +123,8 @@ const CheckoutPage = () => {
   //   { loading: checkoutLoading, error: checkoutError, data: checkoutData },
   // ] = useMutation(CHECKOUT_MUTATION);
 
+  const router = useRouter();
+
   const handleCheckout = async () => {
     try {
       const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
@@ -132,8 +135,8 @@ const CheckoutPage = () => {
           quantity: item?.quantity,
         })) || [];
 
-      console.log("form data final", formData);
-      console.log(paymentMethodId, lineItems);
+      // console.log("form data final", formData);
+      // console.log(paymentMethodId, lineItems);
 
       if (paymentMethodId !== undefined) {
         try {
@@ -148,6 +151,9 @@ const CheckoutPage = () => {
             const orderDetails = data.createOrder.order;
             console.log("order Details", orderDetails);
             toast("Order created successfully");
+
+            // router.push(`/checkout/${orderDetails.orderNumber}/?key=${orderDetails?.orderKey}`);
+            router.push(`/checkout/${orderDetails.id}`);
           } else {
             console.error("Failed to retrieve order details");
             toast.error("Failed to retrieve order details");

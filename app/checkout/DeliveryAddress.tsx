@@ -72,10 +72,10 @@ const DeliveryAddress: FC<Props> = ({
   };
 
   const handleStorePickupChange = () => {
-    console.log("inital value: ", isStorePickup);
+    // console.log("inital value: ", isStorePickup);
     if (!isStorePickup) {
       setStorePickup(true);
-      console.log("store pickup Value: ", isStorePickup);
+      // console.log("store pickup Value: ", isStorePickup);
       updateFormData("billingAddress", formData.BillingAddress)
       updateFormData("shippingDetails", {
         databaseId: "local_pickup",
@@ -90,13 +90,13 @@ const DeliveryAddress: FC<Props> = ({
         title: null,
       });
     }
-    console.log("final value: ", isStorePickup);
+    // console.log("final value: ", isStorePickup);
   };
 
 
   useEffect(() => {
     if (initialData) {
-      console.log("initalData: ", initialData);
+      // console.log("initalData: ", initialData);
       setFirstName(initialData.firstName || "");
       setLastName(initialData.lastName || "");
       setAddress(initialData.address1 || "");

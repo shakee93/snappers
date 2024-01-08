@@ -25,6 +25,7 @@ mutation guestCheckout ($paymentMethod: String!, , $lineItems: [LineItemInput!]!
   }) {
     clientMutationId
     order {
+      id
       orderKey
       total
       orderNumber
@@ -140,4 +141,38 @@ mutation updateCustomer($input: UpdateCustomerInput!) {
 
 ${CustomerAddressFragment}
 `;
+
+export const GET_SINGLE_ORDER = gql`
+query getOrder($orderID: ID = "") {
+  order(id: $orderID) {
+    id
+    hasBillingAddress
+    hasShippingAddress
+    needsPayment
+    needsProcessing
+    needsShippingAddress
+    status
+    lineItems {
+      nodes {
+        databaseId
+        product {
+          node {
+            databaseId
+            featuredImage {
+              node {
+                sourceUrl
+              }
+            }
+          }
+        }
+      }
+    }
+    subtotal
+    total
+    shippingTax
+  }
+}`
+
+
+
 
