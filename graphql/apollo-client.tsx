@@ -89,7 +89,7 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
           fetchAuthToken()
             .then(newToken => {
 
-              console.log('newToken', newToken);
+              // console.log('newToken', newToken);
               // Update the context with the new token
               operation.setContext(({ headers = {} }) => ({
                 headers: {
