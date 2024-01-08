@@ -6,15 +6,8 @@ import SectionSliderProductCard from "@/app/components/SectionSliderProductCard"
 import { PRODUCTS, SPORT_PRODUCTS } from "@/data/data";
 import BackgroundSection from "@/app/components/HomePage/BackgroundSection";
 import SectionGridMoreExplore from "@/app/components/HomePage/SectionGridMoreExplore";
-import SectionSliderCategories from "@/components/SectionSliderCategories/SectionSliderCategories";
-import SectionClientSay from "@/components/SectionClientSay/SectionClientSay";
-import SectionHowItWork from "@/app/components/HomePage/SectionHowItWork";
 import SectionPromo1 from "@/app/components/HomePage/SectionPromo1";
-import SectionPromo2 from "@/app/components/HomePage/SectionPromo2";
-import SectionPromo3 from "@/app/components/HomePage/SectionPromo3";
-import SectionSliderLargeProduct from "@/components/SectionSliderLargeProduct";
 import Heading from "@/app/components/Heading/Heading";
-import SectionMagazine5 from "@/containers/BlogPage/SectionMagazine5";
 import { getClient } from "@/graphql/apollo-ssr";
 import { GET_SLIDES } from "@/graphql/defs/slides";
 import {
@@ -31,7 +24,7 @@ import {
 } from "@/graphql/types/graphql";
 
 const getData = async () => {
-  const [slides, newArrivals, mobiles, speakers, topSelling] =
+  const [slides, newArrivals, mobiles, speakers, watches] =
     await Promise.all([
       getClient().query({ query: GET_SLIDES }),
       getClient().query({ query: GET_PRODUCTS_NODES }),
@@ -45,7 +38,7 @@ const getData = async () => {
       }),
       getClient().query({
         query: GET_PRODUCTS_NODES,
-        variables: { first: 10, categoryIdIn: [86] },
+        variables: { first: 10, categoryIdIn: [302] },
       }),
     ]);
 
@@ -57,13 +50,13 @@ const getData = async () => {
       VariableProduct)[],
     speakers: speakers.data.products?.nodes as (SimpleProduct &
       VariableProduct)[],
-    topSelling: topSelling.data.products?.nodes as (SimpleProduct &
+      watches: watches.data.products?.nodes as (SimpleProduct &
       VariableProduct)[],
   };
 };
 
 export default async function Home() {
-  const { slides, newArrivals, mobiles, speakers, topSelling } =
+  const { slides, newArrivals, mobiles, speakers, watches } =
     await getData();
   const hi = "sahdeer";
   return (
@@ -85,7 +78,7 @@ export default async function Home() {
           
           {/*featured categoties */}
           <div>
-            <Heading>Featured Categories</Heading>
+            <Heading>Featured Categories.</Heading>
             <CategoryBlockSection />
           </div>
           
@@ -93,8 +86,8 @@ export default async function Home() {
           <div>
             <SectionSliderProductCard
               products={mobiles}
-              subHeading="Explore the Latest in Smartphone Innovation"
-              heading="Mobiles"
+              // subHeading="Explore the Latest in Smartphone Innovation"
+              heading="Latest Smartphones"
             />
           </div>
           
@@ -107,8 +100,8 @@ export default async function Home() {
           <div>
             <SectionSliderProductCard
               products={speakers}
-              subHeading="Surround Yourself with Sound"
-              heading="Speakers"
+              // subHeading=""
+              heading="Explore Speakers"
             />
           </div>
 
@@ -121,9 +114,9 @@ export default async function Home() {
           {/* smart watches section */}
           <div>
             <SectionSliderProductCard
-              products={topSelling}
+              products={watches}
               heading="Smart Watches"
-              subHeading="Best selling of the month"
+              // subHeading="Best selling of the month"
             />
           </div>
         </div>
