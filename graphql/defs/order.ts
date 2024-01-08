@@ -162,6 +162,7 @@ query getOrder($orderID: ID = "") {
       nodes {
         databaseId
         subtotal
+        quantity
         product {
           node {
             name
@@ -174,6 +175,18 @@ query getOrder($orderID: ID = "") {
           }
         }
         
+      }
+    }
+    customer {
+      displayName
+      email
+      firstName
+      lastName
+      shipping {
+        city
+        address1
+        address2
+        phone
       }
     }
     orderKey
