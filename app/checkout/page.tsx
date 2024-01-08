@@ -52,7 +52,6 @@ const CheckoutPage = () => {
   const [tabActive, setTabActive] = useState<
     "ContactInfo" | "DeliveryAddress" | "BillingAddress" | "PaymentMethod" | "order-cart"
   >("ContactInfo");
-  const [canConfirmOrder, setcanConfirmOrder] = useState(false);
   const [formData, setFormData] = useState<FormData>({
     contactInfo: {},
     deliveryAddress: {},
@@ -96,10 +95,6 @@ const CheckoutPage = () => {
     });
   };
 
-  const handleStorePickupChange = (value: boolean) => {
-    setIsStorePickup(value);
-  };
-
   const handleConfirmationChange = (component: string, value: boolean) => {
     setIsConfirmed((prevConfirmed) => {
       const updatedConfirmed = {
@@ -118,10 +113,11 @@ const CheckoutPage = () => {
     { loading: checkoutLoading, error: checkoutError, data: checkoutData },
   ] = useMutation(GUEST_CHECKOUT_MUTATION);
 
-  // const [
-  //   exisitingUserMutation,
-  //   { loading: checkoutLoading, error: checkoutError, data: checkoutData },
-  // ] = useMutation(CHECKOUT_MUTATION);
+  useEffect(() => {
+    console.log("checkout returned data: ", checkoutData);
+  }, [checkoutData]);
+  
+  checkoutError && console.log("checkout error: ", checkoutError);
 
   const router = useRouter();
 
@@ -158,7 +154,7 @@ const CheckoutPage = () => {
             console.error("Failed to retrieve order details");
             toast.error("Failed to retrieve order details");
           }
-      } catch (error: any) {
+        } catch (error: any) {
           console.log("Error:", error);
           toast.error("Failed to the create order");
         }

@@ -26,7 +26,6 @@ async function getData(categories: number[] | null = null) {
   };
 }
 
-
 const Header = async () => {
   const { productCategories, brands } = await getData();
 

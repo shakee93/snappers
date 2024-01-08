@@ -1,27 +1,25 @@
-import { gql } from '@apollo/client';
-import { AccountDetailsFragment } from './auth.fragments';
+import { gql } from "@apollo/client";
+import { AccountDetailsFragment } from "./auth.fragments";
 
 export const REGISTER_CUSTOMER_MUTATION = gql`
-    mutation RegisterCustomer($input: RegisterCustomerInput!) {
-        registerCustomer(input: $input) {
-          authToken
-          refreshToken
-          customer {
-            email
-            jwtAuthToken
-            firstName
-            metaData {
-              key
-              value
-            }
-            sessionToken
-            displayName
-          }
+  mutation RegisterCustomer($input: RegisterCustomerInput!) {
+    registerCustomer(input: $input) {
+      authToken
+      refreshToken
+      customer {
+        email
+        jwtAuthToken
+        firstName
+        metaData {
+          key
+          value
         }
+        sessionToken
+        displayName
+      }
     }
+  }
 `;
-
-
 
 export const GET_AUTH_TOKEN = gql`
   mutation RefreshAuthToken($refreshToken: String!) {
@@ -47,7 +45,7 @@ export const CustomerFields = gql`
     # orders(first: 100) {
     #   nodes {
     #     ...OrderFields
-    #   } 
+    #   }
     # }
   }
 `;
@@ -65,31 +63,28 @@ export const Login = gql`
   ${CustomerFields}
 `;
 
-
-
 // metalist__
 // gender
 // about
 // date
 export const UPDATE_ACCOUNT_INFORMATION = gql`
-mutation updateCustomer($input: UpdateCustomerInput!) {
-  updateCustomer(input: $input) {
-    clientMutationId
-    customer {
-      displayName
-      email
-      shipping {
-        address1
-        phone
-      }
-      metaData {
-        key
-        value
+  mutation updateCustomer($input: UpdateCustomerInput!) {
+    updateCustomer(input: $input) {
+      clientMutationId
+      customer {
+        displayName
+        email
+        shipping {
+          address1
+          phone
+        }
+        metaData {
+          key
+          value
+        }
       }
     }
   }
-}
-
 `;
 
 // metalist__
@@ -97,50 +92,48 @@ mutation updateCustomer($input: UpdateCustomerInput!) {
 // about
 // date
 export const GET_ACCOUNT_DETAILS = gql`
-   query getAccountDetails {
-      customer {
-        displayName
-        email
-        metaData{
-          key
-          value
-        }
-        shipping {
-          address1
-          phone
-        }
+  query getAccountDetails {
+    customer {
+      displayName
+      email
+      metaData {
+        key
+        value
+      }
+      shipping {
+        address1
+        phone
+      }
+    }
   }
-}
 `;
 
 export const GET_DEFAULT_ACC_FOR_AVATAR = gql`
-   query getAccountDetails {
-      customer {
-        id
-        displayName
+  query getAccountDetails {
+    customer {
+      id
+      displayName
+    }
   }
-}
 `;
-
 
 export const LOGIN_CUSTOMER_MUTATION = gql`
-mutation LoginCustomer($input: LoginInput!) {
+  mutation LoginCustomer($input: LoginInput!) {
     login(input: $input) {
-        authToken
-        refreshToken
-        sessionToken
-        customer {
-            email
-            jwtAuthToken
-            firstName
-            metaData {
-                key
-                value
-            }
-            id
-            displayName
+      authToken
+      refreshToken
+      sessionToken
+      customer {
+        email
+        jwtAuthToken
+        firstName
+        metaData {
+          key
+          value
         }
+        id
+        displayName
+      }
     }
-}
+  }
 `;
-
