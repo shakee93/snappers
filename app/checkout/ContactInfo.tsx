@@ -38,15 +38,13 @@ const ContactInfo: FC<Props> = ({
   const handleContactSubmit = (e: any) => {
     e.preventDefault();
     if (phone && email) {
-
       const contactInfo = {
         phone,
         email,
       };
-
       updateFormData("contactInfo", contactInfo);
-      setPhone(initialData?.phone);
-      setEmail(initialData?.email);
+      // setPhone(initialData?.phone);
+      // setEmail(initialData?.email);
       setIsConfirmed(true);
       onCloseActive();
       handleConfirmationChange(true);
