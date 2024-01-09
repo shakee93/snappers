@@ -1,5 +1,5 @@
 "use client";
-import { Loader, ShoppingCart } from "lucide-react";
+import {Loader, Settings, Settings2, ShoppingCart} from "lucide-react";
 import React, { FC, useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -135,18 +135,20 @@ const ProductCard: FC<ProductCardProps> = ({
         setLoading(false);
     };
 
+
+
     const renderGroupButtons = () => {
         return (
-            <div className="flex justify-center opacity-100 visible transition-all">
+            <div className="absolute -top-12 right-1 flex justify-center opacity-100 visible transition-all">
 
 
                 {stockStatus === 'IN_STOCK' ?
                     <>
                         {(type === 'SIMPLE' && price && price?.length > 0) &&
                             <ButtonPrimary
-                                className="shadow-lg"
+                                className="shadow-md"
                                 fontSize="text-xs"
-                                sizeClass="py-2.5 px-5"
+                                sizeClass="py-2.5 px-3.5"
                                 onClick={handleAddToCart}
                                 disabled={loading}
                             >
@@ -155,19 +157,20 @@ const ProductCard: FC<ProductCardProps> = ({
                                 ) : (
                                     <ShoppingCart className='w-4' />
                                 )}
-                                <span className="ml-2">Add</span>
+                                {/*<span className="ml-2">Add</span>*/}
                             </ButtonPrimary>
                         }
 
                         {type === 'VARIABLE' &&
                             <Link href={link}>
                                 <ButtonPrimary
-                                    className="shadow-lg"
+                                    className="shadow-md"
                                     fontSize="text-xs"
-                                    sizeClass="py-2.5 px-5"
+                                    sizeClass="py-2.5 px-3.5"
                                 >
-                                    <AttributeIcon className='w-4 mr-1' name={attributes?.nodes[0].name}/>
-                                    <span className="ml-1">{attributes?.nodes[0].label || "Options" }</span>
+                                    {/*<AttributeIcon className='w-4 ' name={attributes?.nodes[0].name}/>*/}
+                                    <Settings2 className='w-4'/>
+                                    {/*<span className="ml-1">{attributes?.nodes[0].label || "Options" }</span>*/}
                                 </ButtonPrimary>
                             </Link>
                         }
@@ -180,7 +183,7 @@ const ProductCard: FC<ProductCardProps> = ({
                             sizeClass="py-3.5 px-5"
                         >
                             <ExternalLink className="w-3.5 h-3.5 mb-0.5"  />
-                            <span className="ml-1">Out of Stock</span>
+                            {/*<span className="ml-1">Out of Stock</span>*/}
                         </ButtonPrimary>
                     </Link>
                 }
@@ -192,11 +195,9 @@ const ProductCard: FC<ProductCardProps> = ({
         );
     };
 
-
-
     return (
         <div
-            className={`nc-ProductCard relative flex flex-col bg-white rounded-3xl p-2 group ${className}`}
+            className={`min-h-[270px] md:min-h-[365px] nc-ProductCard relative flex flex-col bg-white rounded-3xl p-1 group ${className}`}
             data-nc-id="ProductCard"
         >
             <div className="relative flex-shrink-0 bg-slate-50 rounded-2xl dark:bg-slate-300 overflow-hidden ">
@@ -258,7 +259,7 @@ const ProductCard: FC<ProductCardProps> = ({
                 </div>
             </div>
 
-            <div className="space-y-2 px-2.5 pt-1 pb-1 lg:pt-2 lg:pb-2.5"
+            <div className="space-y-2 px-2.5 pt-1 pb-1 lg:pt-2 lg:pb-2.5 relative"
 
             >
 
