@@ -1,4 +1,4 @@
-/** @type {import('next').NextConfig} */
+
 
 const path = require("path");
 
@@ -7,9 +7,10 @@ module.exports = {
     includePaths: [path.join(__dirname, "styles")],
   },
 };
-
+/** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
+    unoptimized: true,
     remotePatterns: [
       {
         protocol: "https",
