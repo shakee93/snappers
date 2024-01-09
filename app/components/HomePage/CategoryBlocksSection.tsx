@@ -15,11 +15,9 @@ import img5 from "@/public/homepage/laptop.webp";
 import Link from "next/link";
 
 export default function CategoryBlockSection() {
-
-
   return (
     <div className=" gap-5 grid grid-cols-12 grid-rows-2 py-5">
-      <Card className="col-span-12 sm:col-span-4 h-[300px]">
+      <Card className="col-span-12 sm:col-span-4 h-[200px] md:h-[300px]">
         <CardHeader className="absolute z-10 top-1 flex-col !items-start">
           <p className="text-base text-white/80 font-medium">
             Elevate Your Productivity
@@ -52,7 +50,7 @@ export default function CategoryBlockSection() {
           </Link>
         </CardFooter>
       </Card>
-      <Card className="col-span-12 sm:col-span-4 h-[300px]">
+      <Card className="col-span-12 sm:col-span-4 h-[200px] md:h-[300px]">
         <CardHeader className="absolute z-10 top-1 flex-col !items-start">
           <p className="text-base text-white/80 font-medium">
             Immerse Yourself in Sound
@@ -87,7 +85,7 @@ export default function CategoryBlockSection() {
           </Link>
         </CardFooter>
       </Card>
-      <Card className="col-span-12 sm:col-span-4 h-[300px]">
+      <Card className="col-span-12 sm:col-span-4 h-[200px] md:h-[300px]">
         <CardHeader className="absolute z-10 top-1 flex-col !items-start">
           <p className="text-base text-white/80 font-medium">
             Surround Yourself with Sound
@@ -124,15 +122,15 @@ export default function CategoryBlockSection() {
       </Card>
       <Card
         isFooterBlurred
-        className="w-full h-[300px] col-span-12 sm:col-span-5"
+        className="w-full h-[200px] md:h-[300px] col-span-12 sm:col-span-5"
       >
         <CardHeader className="absolute z-10 top-1 flex-col items-start">
           <p className="text-base text-white/80 font-medium">
-          Stay Connected, Stay Active
+            Stay Connected, Stay Active
           </p>
 
           <h4 className="text-white font-medium text-3xl">
-          Futuristic Smartwatches
+            Futuristic Smartwatches
           </h4>
         </CardHeader>
         <Image
@@ -146,7 +144,7 @@ export default function CategoryBlockSection() {
           <div className="flex flex-grow gap-2 items-center">
             <div className="flex flex-col">
               <p className="text-sm text-white/60 hidden lg:block">
-              Elevate Your Productivity
+                Elevate Your Productivity
               </p>
             </div>
           </div>
@@ -163,7 +161,7 @@ export default function CategoryBlockSection() {
       </Card>
       <Card
         isFooterBlurred
-        className="w-full h-[300px] col-span-12 sm:col-span-7"
+        className="w-full h-[200px] md:h-[300px] col-span-12 sm:col-span-7"
       >
         <CardHeader className="absolute z-10 top-1 flex-col items-start p-4">
           <p className="text-base text-white/80 font-medium">

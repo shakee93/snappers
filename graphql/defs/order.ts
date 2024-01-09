@@ -146,17 +146,26 @@ export const GET_SINGLE_ORDER = gql`
 query getOrder($orderID: ID = "") {
   order(id: $orderID) {
     id
+    subtotal
+    total
+    shippingTax
+    orderNumber
+    date
     hasBillingAddress
     hasShippingAddress
     needsPayment
     needsProcessing
     needsShippingAddress
     status
+    paymentMethod
     lineItems {
       nodes {
         databaseId
+        subtotal
+        quantity
         product {
           node {
+            name
             databaseId
             featuredImage {
               node {
@@ -165,11 +174,24 @@ query getOrder($orderID: ID = "") {
             }
           }
         }
+        
       }
     }
-    subtotal
-    total
-    shippingTax
+    customer {
+      displayName
+      email
+      firstName
+      lastName
+      shipping {
+        city
+        address1
+        address2
+        phone
+      }
+    }
+    orderKey
+    paymentMethodTitle
+  
   }
 }`
 
