@@ -70,9 +70,11 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
         </div>
 
         <div className="pt-6">
-          <button className="bg-blue-500 hover:bg-blue-700 text-white py-2 px-4 rounded">
-            {data?.order.paymentMethod === "payhere" ? "Continue with PayHere" : "Continue with Bank Transfer"}
-          </button>
+          <div className="">
+            {/* {data?.order.paymentMethod === "payhere" ? <PayHerePayment/> : "Continue with Bank Transfer"} */}
+            {/* CHECKING PAY HERE  */}
+            {true ? <PayHerePayment paymentDetails={data}/> : "Continue with Bank Transfer"}
+          </div>
         </div>
 
         <div>
