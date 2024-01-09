@@ -4,7 +4,7 @@ import ButtonSecondary from "shared/Button/ButtonSecondary";
 import SiteLogo from "@/public/global/logo.webp";
 import Image from "next/image";
 import StoreImageSlider from "./StoreImageSlide"
-import { EmblaOptionsType } from 'embla-carousel-react'
+import { EmblaOptionsType } from "embla-carousel";
 
 
 export interface SectionPromo1Props {

@@ -21,7 +21,7 @@ const Footer = async () => {
   const iconSize = 18;
 
   if (isPaymentPage()) {
-    return <p>Nothing to show</p>;
+    return <></>;
   }
 
   return (

@@ -69,9 +69,9 @@ export function SessionProvider({ children }: {
             localStorage.setItem(USER_DATA_KEY, JSON.stringify(data?.customer));
             setCustomer(data?.customer as Customer)
 
-            localStorage.setItem(AUTH_TOKEN_KEY, data.authToken || '');
-            localStorage.setItem(SESSION_TOKEN_KEY, data.sessionToken || '');
-            localStorage.setItem(REFRESH_TOKEN_KEY, data.refreshToken || '');
+            localStorage.setItem(AUTH_TOKEN_KEY, data?.authToken || '');
+            localStorage.setItem(SESSION_TOKEN_KEY, data?.sessionToken || '');
+            localStorage.setItem(REFRESH_TOKEN_KEY, data?.refreshToken || '');
         }
 
         if (type == "registerCustomer"){
@@ -79,7 +79,7 @@ export function SessionProvider({ children }: {
             localStorage.setItem(USER_DATA_KEY, JSON.stringify(data?.customer));
             setCustomer(data?.customer as Customer)
 
-            localStorage.setItem(AUTH_TOKEN_KEY, data.authToken || '');
+            localStorage.setItem(AUTH_TOKEN_KEY, data?.authToken || '');
             localStorage.setItem(SESSION_TOKEN_KEY, data?.customer?.sessionToken || '');
             localStorage.setItem(REFRESH_TOKEN_KEY, data.refreshToken || '');
         }

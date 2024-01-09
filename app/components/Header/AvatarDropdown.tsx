@@ -14,14 +14,14 @@ import { useSession } from "@/context/SessionProvider";
 import { Customer } from "@/graphql/types/graphql";
 
 export default function AvatarDropdown() {
-  // const { customer, fetchCustomer } = useSession();
-  const { data } = useQuery(GET_DEFAULT_ACC_FOR_AVATAR);
+  const { customer, fetchCustomer } = useSession();
+  const [currentCustomer, setCurrentCustomer] = useState<Customer | null>(null);
 
-  const [customer, setCustomer] = useState<Customer | null>(null);
+
   useEffect(() => {
-    let customer: Customer = data?.customer;
-    setCustomer(customer);
-  }, [data]);
+    fetchCustomer();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div className="AvatarDropdown ">
@@ -291,7 +291,7 @@ export default function AvatarDropdown() {
                           <p className="text-sm font-medium ">{"Help"}</p>
                         </div>
                       </Link> */}
-                      <LogoutButton set={setCustomer} customer={customer}/>
+                      <LogoutButton set={setCurrentCustomer} customer={currentCustomer} />
                     </div>
                   </div>
                 </Popover.Panel>
