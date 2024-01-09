@@ -114,7 +114,7 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
     return (
       <div
         key={index}
-        className={`relative w-full h-[650px] md:h-[400px] xl:h-[500px] justify-center  nc-SectionHero2Item--animation flex items-center transition-transform ease-in-out transform ${
+        className={`relative w-full h-[550px] md:h-[400px] xl:h-[500px] justify-center  nc-SectionHero2Item--animation flex items-center transition-transform ease-in-out transform ${
           isActive ? 'translate-y-0' : 'translate-y-10'
         }`}
         style={{ backgroundColor: backgroundColors[index] }}
@@ -143,13 +143,13 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
         </div>
 
         <Prev
-          className="absolute left-1 sm:left-5 top-3/4 sm:top-1/2 sm:-translate-y-1/2 z-10 !text-slate-700"
+          className="absolute left-1 sm:left-5 top-2/4 sm:top-1/2 sm:-translate-y-1/2 z-10 !text-slate-700"
           btnClassName="w-12 h-12 hover:border-slate-400 dark:hover:border-slate-400"
           svgSize="w-6 h-6"
           onClickPrev={handleClickPrev}
         />
         <Next
-          className="absolute right-1 sm:right-5 top-3/4 sm:top-1/2 sm:-translate-y-1/2 z-10 !text-slate-700"
+          className="absolute right-1 sm:right-5 top-2/4 sm:top-1/2 sm:-translate-y-1/2 z-10 !text-slate-700"
           btnClassName="w-12 h-12 hover:border-slate-400 dark:hover:border-slate-400"
           svgSize="w-6 h-6"
           onClickNext={handleClickNext}
@@ -205,7 +205,7 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
             <NcImage
                 priority={true}
               src={item.slideFields.featureImage.sourceUrl}
-              className="min-h-[400px] max-h-[500px] w-auto py-6 px-4"
+              className="max-h-[300px] md:max-h-[500px] w-auto py-6 px-4"
             />
           </motion.div>
         </div>
