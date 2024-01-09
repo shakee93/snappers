@@ -173,7 +173,7 @@ export function SessionProvider({ children }: {
 
         const { data } = await getUser();
         setCustomer(data.customer as Customer)
-        saveResponseToLocalStorage(data.customer, "login");
+        // saveResponseToLocalStorage(data.customer, "login");
         return data
     }
 
