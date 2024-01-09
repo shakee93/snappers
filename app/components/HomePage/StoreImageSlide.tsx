@@ -1,6 +1,6 @@
 "use client"
 import React, { useState, useEffect, useCallback } from "react";
-import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react";
+import useEmblaCarousel from "embla-carousel-react";
 import Image from "next/image";
 import StoreImg1 from "public/store/GqMobiles-Buy-geniune-branded-eletronics-from-GQMobiles-for-best-price-1-1.webp";
 import StoreImg2 from "public/store/GqMobiles-Buy-geniune-branded-eletronics-from-GQMobiles-for-best-price-2-1.webp";
@@ -8,6 +8,7 @@ import StoreImg3 from "public/store/GqMobiles-Buy-geniune-branded-eletronics-fro
 import StoreImg4 from "public/store/GqMobiles-Buy-geniune-branded-eletronics-from-GQMobiles-for-best-price-4-1.webp";
 import { Thumb } from "./EmblaCarouselThumbsButton";
 import "styles/embla.css";
+import { EmblaOptionsType } from "embla-carousel";
 
 type PropType = {
   slides: number[];

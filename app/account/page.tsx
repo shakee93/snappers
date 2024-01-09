@@ -7,6 +7,7 @@ import Select from "@/shared/Select/Select";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import { useSession } from "@/context/SessionProvider";
 import toast from "react-hot-toast";
+import { useRouter } from "next/navigation";
 
 const AccountPage: FC = () => {
   const { customer, fetchCustomer, updateCustomer } = useSession();
@@ -22,9 +23,16 @@ const AccountPage: FC = () => {
     about: "",
   });
 
+  const router = useRouter(); 
+  useEffect(() => {
+    if (!customer) {
+      router.push("/login");
+    }
+  }, [customer, router]);
+
+
   useEffect(() => {
     if (customer) {
-      // console.log("Customer details:", customer);
       const newFormData: any = {
         id: customer.id || "",
         displayName: customer.displayName || "",

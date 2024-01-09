@@ -1,7 +1,7 @@
 "use client"
 import React, { useState, useEffect, useCallback } from "react";
 import InnerImageZoom from "react-inner-image-zoom";
-import useEmblaCarousel, { EmblaOptionsType } from "embla-carousel-react";
+import useEmblaCarousel from "embla-carousel-react";
 import { Thumb } from "app/components/SingleProductBlock/ProductCarouselThumb";
 import "styles/product_embla.css";
 import {
@@ -13,6 +13,7 @@ import {
 } from "@/graphql/types/graphql";
 import {GalleryImage} from "@/types";
 import Image from "next/image";
+import { EmblaOptionsType } from "embla-carousel";
 
 
 type PropType = {
