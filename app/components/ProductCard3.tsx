@@ -135,6 +135,8 @@ const ProductCard: FC<ProductCardProps> = ({
         setLoading(false);
     };
 
+
+
     const renderGroupButtons = () => {
         return (
             <div className="absolute -top-12 right-1 flex justify-center opacity-100 visible transition-all">
@@ -192,8 +194,6 @@ const ProductCard: FC<ProductCardProps> = ({
 
         );
     };
-
-
 
     return (
         <div

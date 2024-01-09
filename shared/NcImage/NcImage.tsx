@@ -30,7 +30,6 @@ const NcImage: FC<NcImageProps> = ({
       className={`nc-NcImage ${containerClassName}`}
       data-nc-id="NcImage"
     >
-
       <Image src={src} className={className} alt={alt} width={500} height={500} priority={priority}  />
     </div>
   );
