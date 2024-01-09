@@ -1,5 +1,5 @@
 "use client";
-import { Loader, ShoppingCart } from "lucide-react";
+import {Loader, Settings, Settings2, ShoppingCart} from "lucide-react";
 import React, { FC, useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -144,7 +144,7 @@ const ProductCard: FC<ProductCardProps> = ({
                     <>
                         {(type === 'SIMPLE' && price && price?.length > 0) &&
                             <ButtonPrimary
-                                className="shadow-lg"
+                                className="shadow-md"
                                 fontSize="text-xs"
                                 sizeClass="py-2.5 px-3.5"
                                 onClick={handleAddToCart}
@@ -162,11 +162,12 @@ const ProductCard: FC<ProductCardProps> = ({
                         {type === 'VARIABLE' &&
                             <Link href={link}>
                                 <ButtonPrimary
-                                    className="shadow-lg"
+                                    className="shadow-md"
                                     fontSize="text-xs"
                                     sizeClass="py-2.5 px-3.5"
                                 >
-                                    <AttributeIcon className='w-4 ' name={attributes?.nodes[0].name}/>
+                                    {/*<AttributeIcon className='w-4 ' name={attributes?.nodes[0].name}/>*/}
+                                    <Settings2 className='w-4'/>
                                     {/*<span className="ml-1">{attributes?.nodes[0].label || "Options" }</span>*/}
                                 </ButtonPrimary>
                             </Link>
@@ -180,7 +181,7 @@ const ProductCard: FC<ProductCardProps> = ({
                             sizeClass="py-3.5 px-5"
                         >
                             <ExternalLink className="w-3.5 h-3.5 mb-0.5"  />
-                            <span className="ml-1">Out of Stock</span>
+                            {/*<span className="ml-1">Out of Stock</span>*/}
                         </ButtonPrimary>
                     </Link>
                 }
