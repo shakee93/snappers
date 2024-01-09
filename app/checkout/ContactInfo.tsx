@@ -1,6 +1,6 @@
-import {contactInformation} from "@/data/types";
+import { contactInformation } from "@/data/types";
 import Label from "components/Label/Label";
-import React, {FC, useEffect, useState} from "react";
+import React, { FC, useEffect, useState } from "react";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Input from "shared/Input/Input";
@@ -34,7 +34,7 @@ const ContactInfo: FC<Props> = ({
       setDisplayName(initialData?.displayName);
     }
   }, [initialData]);
-  
+
   const handleContactSubmit = (e: any) => {
     e.preventDefault();
     if (phone && email) {
@@ -59,16 +59,20 @@ const ContactInfo: FC<Props> = ({
     return (
       <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden z-0">
         <div className="flex flex-col sm:flex-row items-start p-6 ">
-          <h1 className="text-2xl self-center  font-semibold">1</h1>
-          <div className="sm:ml-8">
-            <h3 className=" text-slate-700 items-center dark:text-slate-300 flex ">
-              <span className="uppercase tracking-tight">CONTACT INFO*</span>
-            </h3>
-            <div className="font-semibold mt-1 text-sm">
-              <span className="">{email ?? ""}</span>
-              <span className="ml-3 tracking-tighter">{phone || ""}</span>
+
+          <div className="flex flex-row gap-4 md:gap-0">
+            <h1 className="text-2xl self-center border border-solid border-blue-700 leading-[10px] rounded-full p-[10px] text-blue-700 font-semibold border">1</h1>
+            <div className="sm:ml-8">
+              <h3 className=" text-slate-700 items-center dark:text-slate-300 flex ">
+                <span className="uppercase tracking-tight">CONTACT INFO*</span>
+              </h3>
+              <div className="md:block font-semibold mt-1 text-sm">
+                <span className="">{email ?? ""}</span>
+                <span className=" block ml-0 mt-2 md:mt-2 tracking-tighter">{phone || ""}</span>
+              </div>
             </div>
           </div>
+
           <ButtonSecondary
             sizeClass="py-2 px-4 "
             fontSize="text-sm font-medium"
@@ -80,9 +84,8 @@ const ContactInfo: FC<Props> = ({
         </div>
         <form onSubmit={handleContactSubmit}>
           <div
-            className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${
-              isActive ? "block" : "hidden"
-            }`}
+            className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${isActive ? "block" : "hidden"
+              }`}
           >
             <div className="flex justify-between flex-wrap items-baseline">
               <h3 className="text-lg font-semibold">Contact infomation</h3>

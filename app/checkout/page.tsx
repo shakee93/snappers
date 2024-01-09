@@ -177,7 +177,7 @@ const CheckoutPage = () => {
     <div className="nc-CheckoutPage">
       <title>Checkout</title>
 
-      <main className="container py-16 lg:pb-28 lg:pt-20 ">
+      <main className="container py-8 md:py-16 lg:pb-28 lg:pt-20 ">
         <div className="mb-16">
           <h2 className="block text-2xl sm:text-3xl lg:text-4xl font-semibold ">
             Checkout
