@@ -17,7 +17,7 @@ import ShippingAddress from "./DeliveryAddress";
 import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
 import { useQuery } from "@apollo/client";
-import { GET_PAYMENT_GATEWAYS } from "@/graphql/defs/cart";
+import { GET_PAYMENT_GATEWAYS, UPDATE_SHIPPING_TOTAL } from "@/graphql/defs/cart";
 import {
   CHECKOUT_MUTATION,
   GUEST_CHECKOUT_MUTATION,
@@ -46,6 +46,7 @@ interface FormData {
 }
 
 const CheckoutPage = () => {
+  const router = useRouter();
   const { cart, removeFromCart, updateCart } = useCart();
   const { loading, error, data, refetch } = useQuery(GET_PAYMENT_GATEWAYS);
   const paymentGateways: PaymentGateway[] = data?.paymentGateways.nodes;
@@ -68,9 +69,8 @@ const CheckoutPage = () => {
     billingAddress: false,
   });
 
+  console.log({ cart })
   useEffect(() => {
-    // console.log("Form data changed");
-    // console.log("formData", formData);
   }, [formData]);
 
   const updateFormData = (section: string, data: any) => {
@@ -109,17 +109,64 @@ const CheckoutPage = () => {
   };
 
   const [
+    updateCartShippingTotalMutation,
+    {
+      loading: updateCartShippingTotalLoading,
+      error: updateCartShippingTotalError,
+      data: updateCartShippingTotalData,
+    },
+  ] = useMutation(UPDATE_SHIPPING_TOTAL);
+
+  const [shippingTotal, setShippingTotal] = useState();
+  const [orderTotal, setOrderTotal] = useState();
+
+  useEffect(() => {
+    const updateShippingTotal = async () => {
+      try {
+        let shippingMethods;
+
+        if (isStorePickup) {
+          shippingMethods = "pickup_location:0";
+        } else {
+          shippingMethods = "wbs:0dd3bc79_weight_based_shipping";
+        }
+
+        const { data } = await updateCartShippingTotalMutation({
+          variables: {
+            input: { shippingMethods },
+          },
+        });
+
+        // console.log('shipping data', data);
+        setOrderTotal(data?.updateShippingMethod?.cart?.total);
+        setShippingTotal(data?.updateShippingMethod?.cart?.shippingTotal);
+
+        if (data) {
+          console.log("Cart shipping total updated successfully");
+        } else {
+          console.error("Failed to update cart shipping total");
+        }
+      } catch (error: any) {
+        console.log("Error:", error);
+      }
+    };
+
+    updateShippingTotal();
+
+  }, [isStorePickup]);
+
+
+  const [
     guestCheckoutMutation,
     { loading: checkoutLoading, error: checkoutError, data: checkoutData },
   ] = useMutation(GUEST_CHECKOUT_MUTATION);
 
+
   useEffect(() => {
     console.log("checkout returned data: ", checkoutData);
   }, [checkoutData]);
-  
-  checkoutError && console.log("checkout error: ", checkoutError);
 
-  const router = useRouter();
+  checkoutError && console.log("checkout error: ", checkoutError);
 
   const handleCheckout = async () => {
     try {
@@ -131,8 +178,11 @@ const CheckoutPage = () => {
           quantity: item?.quantity,
         })) || [];
 
-      // console.log("form data final", formData);
-      // console.log(paymentMethodId, lineItems);
+      const shipping = [{
+        methodId: shippingTotal === "0.00" ? "storepickup" : "wbs:0dd3bc79_weight_based_shipping",
+        methodTitle: shippingTotal === "0.00" ? "storepickup" : "Weight Based Shipping",
+        total: shippingTotal,
+      }]
 
       if (paymentMethodId !== undefined) {
         try {
@@ -140,7 +190,7 @@ const CheckoutPage = () => {
             variables: {
               paymentMethod: paymentMethodId,
               lineItems: lineItems,
-              isPaid: false,
+              shippingLines: shipping
             },
           });
 
@@ -149,8 +199,7 @@ const CheckoutPage = () => {
             console.log("order Details", orderDetails);
             toast("Order created successfully");
 
-            // router.push(`/checkout/${orderDetails.orderNumber}/?key=${orderDetails?.orderKey}`);
-            // router.push(`/checkout/${orderDetails.id}`);
+            router.push(`/checkout/${orderDetails.id}`);
           } else {
             console.error("Failed to retrieve order details");
             toast.error("Failed to retrieve order details");
@@ -178,7 +227,7 @@ const CheckoutPage = () => {
     <div className="nc-CheckoutPage">
       <title>Checkout</title>
 
-      <main className="container py-16 lg:pb-28 lg:pt-20 ">
+      <main className="container py-8 md:py-16 lg:pb-28 lg:pt-20 ">
         <div className="mb-16">
           <h2 className="block text-2xl sm:text-3xl lg:text-4xl font-semibold ">
             Checkout
@@ -270,7 +319,8 @@ const CheckoutPage = () => {
                             </div> */}
               <div className="flex justify-between font-semibold text-slate-900 dark:text-slate-200 text-base pt-4">
                 <span>Order total</span>
-                <span>{cart?.total || "$0.00"}</span>
+                {/* <span>{cart?.total || "$0.00"}</span> */}
+                <span>{orderTotal || "$0.00"}</span>
               </div>
             </div>
             <ButtonPrimary
@@ -283,7 +333,15 @@ const CheckoutPage = () => {
                   isConfirmed.paymentMethod
                 )
               }
-              className="mt-8 w-full"
+              className={`mt-8 w-full ${!(
+                isConfirmed.contactInfo &&
+                isConfirmed.deliveryAddress &&
+                isConfirmed.billingAddress &&
+                isConfirmed.paymentMethod
+              )
+                ? 'bg-slate-500 cursor-not-allowed'
+                : 'bg-primary hover:bg-primary-dark'
+                }`}
             >
               Confirm order
             </ButtonPrimary>

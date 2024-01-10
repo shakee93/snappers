@@ -36,9 +36,9 @@ const CartPage = () => {
 
   return (
     <div className="nc-CartPage">
-      <main className="container py-16 lg:pb-28 lg:pt-20 ">
+      <main className="container py-8 lg:py-12 space-y-5 sm:space-y-20 lg:space-y-20">
 
-        <div className="mb-12 sm:mb-16">
+        <div className="mb-5 sm:mb-16 border-slate-200 border-b-1 pb-5 md:pb-10">
           <h2 className="block text-2xl sm:text-3xl lg:text-4xl font-semibold ">
             Shopping Cart
           </h2>
@@ -50,9 +50,7 @@ const CartPage = () => {
             <span className="underline">Shopping Cart</span>
           </div>
         </div>
-
-        <hr className="border-slate-200 dark:border-slate-700 my-10 xl:my-12" />
-
+        {/* <hr className="border-slate-200 dark:border-slate-700 " /> */}
         <div className="flex flex-col lg:flex-row">
           <div className="relative w-full lg:w-[60%] xl:w-[55%] divide-y divide-slate-200 dark:divide-slate-700 lg:pr-10 xl:px-16 2xl:px-20 py-4">
 

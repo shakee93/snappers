@@ -4,9 +4,16 @@ import SiteLogo from "@/public/global/logo.webp";
 import { getClient } from "@/graphql/apollo-ssr";
 import { GET_BRANDS } from "@/graphql/defs/products";
 import { Brand } from "@/graphql/types/graphql";
-import { Menu, XIcon, Facebook, Instagram, PhoneCall } from "lucide-react";
+import { Divider } from "@nextui-org/react";
+import {
+  Menu,
+  XIcon,
+  Facebook,
+  Instagram,
+  PhoneCall,
+  MapPinned,
+} from "lucide-react";
 import { isPaymentPage } from "./paymentPageCheckUtils";
-
 
 const getData = async () => {
   const { data } = await getClient().query({
@@ -27,22 +34,64 @@ const Footer = async () => {
   return (
     <footer className="border-t text-black">
       <div className="container">
-        <div className=" py-16  grid grid-cols-1 gap-2 md:grid-cols-3 xl:grid-cols-4 justify-between">
-          <div className="hidden xl:flex gap-1 md:gap-2 p-2 flex-col items-center md:items-center justify-center">
-            <Link href={"/"}>
+        <div className=" py-16  grid grid-cols-12 gap-x-1 gap-y-3 md:grid-cols-12 xl:grid-cols-12 justify-between">
+          <div className=" xl:flex gap-1 col-span-12 md:col-span-4 lg:col-span-3 md:gap-3 p-2 flex-col items-center md:items-start justify-center">
+            <Link href={"/"} className="flex justify-center">
               <Image
-                width={200}
+                width={100}
                 src={SiteLogo}
                 alt="logo"
-                className="h-20 md:h-28  lg:h-32  w-auto rounded-b-2xl"
+                className="h-28 md:h-20  lg:h-24 pb-5   w-auto rounded-b-2xl"
               />
             </Link>
+            {/* <div className="text-base md:text-lg font-medium text-primaryColor">
+              Our Branches
+            </div> */}
+            {/* <div className="text-base md:text-base font-medium text-black">
+              Flagship Store
+            </div> */}
+            <ul className="flex text-xs flex-col gap-3 border-b-1 border-gray-300 pb-4">
+              <li className=" lg:text-sm text-gray-500 flex gap-3">
+                <div>
+                  <MapPinned size={iconSize} className="text-primaryColor" />
+                </div>
+                <div>250/54, Ground Floor, Liberty Plaza, Colombo 03.</div>
+              </li>
+              <li className="lg:text-sm text-gray-500 flex gap-3">
+                <div>
+                  <PhoneCall size={iconSize} className="text-primaryColor" />
+                </div>
+                <div>
+                  <Link href={"tel:0777555665"}> 077 755 5665</Link> /{" "}
+                  <Link href={"tel:0777988665"}> 077 798 8665</Link>
+                </div>
+              </li>
+            </ul>
+            {/* <div className="text-base md:text-base font-medium text-black">
+              Branch
+            </div> */}
+            <ul className="flex  text-xs pt-5 md:pt-3 flex-col gap-3 ">
+              <li className="lg:text-sm text-gray-500 flex gap-3">
+                <div>
+                  <MapPinned size={iconSize} className="text-primaryColor" />
+                </div>
+                <div>157, 2nd Cross Street, Colombo 11.</div>{" "}
+              </li>
+              <li className="lg:text-sm text-gray-500 flex gap-3">
+                <div>
+                  <PhoneCall size={iconSize} className="text-primaryColor" />
+                </div>
+                <div>
+                  <Link href={"tel:0777500511"}>077 750 0511</Link>
+                </div>
+              </li>
+            </ul>
           </div>
-          <div className="flex gap-1 md:gap-4 p-2 flex-col items-center md:items-center">
+          <div className="flex gap-1 md:gap-4 col-span-6 md:col-span-4 lg:col-span-3 p-2 flex-col items-start md:items-center">
             <div className="text-base md:text-lg font-medium text-primaryColor">
               Quick Links
             </div>
-            <ul className="text-xs text-center lg:text-sm text-gray-500 flex flex-col gap-3 ">
+            <ul className="text-xs text-left lg:text-sm text-gray-500 flex flex-col gap-3 ">
               <li className="hover:text-primaryColor">
                 <Link href={"/"}>Home</Link>
               </li>
@@ -63,24 +112,31 @@ const Footer = async () => {
               </li>
             </ul>
           </div>
-          <div className="flex gap-1 md:gap-4 p-2 flex-col items-center md:items-center">
+          <div className="flex gap-1 md:gap-4 col-span-6 md:col-span-4 p-2 flex-col items-start md:items-center">
             <div className="text-base pb-2 md:text-lg font-medium text-primaryColor">
               Top Brands
             </div>
-            <ul className="text-xs text-center lg:text-sm text-gray-500 grid grid-cols-3 md:grid-cols-3 gap-x-4 md:gap-x-3 gap-y-3">
-              {brands.slice(0, 15).map((brand: Brand, index: number) => (
+            <ul className="text-xs md:hidden text-left lg:text-sm text-gray-500 grid grid-cols-2 md:grid-cols-3 gap-x-4 md:gap-x-3 gap-y-3">
+              {brands.slice(0, 12).map((brand: Brand, index: number) => (
+                <li key={index} className="hover:text-primaryColor">
+                  <Link href={`/${brand.slug}`}>{brand.name}</Link>
+                </li>
+              ))}
+            </ul>
+            <ul className="hidden md:grid text-xs text-left lg:text-sm text-gray-500 grid grid-cols-2 md:grid-cols-3 gap-x-4 md:gap-x-3 gap-y-3">
+              {brands.slice(0, 20).map((brand: Brand, index: number) => (
                 <li key={index} className="hover:text-primaryColor">
                   <Link href={`/${brand.slug}`}>{brand.name}</Link>
                 </li>
               ))}
             </ul>
           </div>
-          <div className=" flex gap-3 md:gap-4 p-2 flex-col items-center md:items-center">
+          <div className=" flex gap-3 md:gap-4 md:hidden lg:flex md:col-span-2 col-span-12 p-2 flex-col items-start md:items-center">
             <div className="text-base md:text-lg font-medium text-primaryColor">
               Follow us
             </div>
 
-            <div className="flex flex-col gap-3 justify-center text-xs text-gray-500">
+            <div className="flex md:flex-col gap-3 justify-center text-xs text-gray-500">
               <Link
                 className="flex gap-2"
                 href={"https://www.facebook.com/gqmobilestore"}

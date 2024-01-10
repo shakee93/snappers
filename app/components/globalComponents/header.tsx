@@ -51,7 +51,7 @@ const Header = async () => {
 
           <div className="hidden md:flex flex-1 flex-col justify-between">
             <div className="w-full flex flex-1">
-              <div className="flex pl-5 flex-1 justify-center items-center">
+              <div className="flex flex-1 justify-center items-center">
                 <SearchBar />
               </div>
               <div className="w-fit flex items-center justify-end pr-3">
