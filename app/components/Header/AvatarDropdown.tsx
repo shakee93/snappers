@@ -24,38 +24,105 @@ export default function AvatarDropdown() {
   }, []);
 
   return (
-    <div className="AvatarDropdown ">
-      {!customer || customer?.id === "guest" ? (
-        <Link
-          href={"/login"}
-          className={`text-primaryColor w-10 h-10 sm:w-12 sm:h-12 rounded-full dark:text-slate-300
-        hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none flex items-center justify-center`}
-        >
-          <CircleUserRound />
-        </Link>
-      ) : (
-        <Popover className="relative">
-          {({ open, close }) => (
-            <>
-              <Popover.Button className={``}>
-                <div
-                  className={`text-primaryColor w-10 h-10 sm:w-12 sm:h-12 rounded-full dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none flex items-center justify-center`}
-                >
-                  <CircleUserRound />
-                </div>
-              </Popover.Button>
-              <Transition
-                as={Fragment}
-                enter="transition ease-out duration-200"
-                enterFrom="opacity-0 translate-y-1"
-                enterTo="opacity-100 translate-y-0"
-                leave="transition ease-in duration-150"
-                leaveFrom="opacity-100 translate-y-0"
-                leaveTo="opacity-0 translate-y-1"
+    <div className="AvatarDropdown">
+      <Popover className="relative">
+        {({ open, close }) => (
+          <>
+            <Popover.Button className={``}>
+              <div
+                className={`text-primaryColor w-10 h-10 sm:w-12 sm:h-12 rounded-full dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none flex items-center justify-center`}
               >
-                <Popover.Panel className="absolute z-[200] w-screen max-w-[260px] px-4 mt-3.5 -right-10 sm:right-0 sm:px-0">
-                  <div className="overflow-hidden rounded-3xl shadow-lg ring-1 ring-black ring-opacity-5">
-                    <div className="relative grid grid-cols-1 gap-6 bg-white dark:bg-neutral-800 py-7 px-6">
+                <CircleUserRound />
+              </div>
+            </Popover.Button>
+            <Transition
+              as={Fragment}
+              enter="transition ease-out duration-200"
+              enterFrom="opacity-0 translate-y-1"
+              enterTo="opacity-100 translate-y-0"
+              leave="transition ease-in duration-150"
+              leaveFrom="opacity-100 translate-y-0"
+              leaveTo="opacity-0 translate-y-1"
+            >
+              <Popover.Panel className="absolute z-[200] w-screen max-w-[260px] px-4 mt-3.5 -right-10 sm:right-0 sm:px-0">
+                <div className="overflow-hidden rounded-3xl shadow-lg ring-1 ring-black ring-opacity-5">
+                  <div className="relative grid grid-cols-1 gap-6 bg-white dark:bg-neutral-800 py-7 px-6">
+                    {(!customer || customer?.id === "guest") ? (
+                      <>
+                      <Link
+                          href={"/login"}
+                          className="flex items-center p-2 -m-3 transition duration-150 ease-in-out rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50"
+                          onClick={() => close()}
+                        >
+                          <div className="flex items-center justify-center flex-shrink-0 text-neutral-500 dark:text-neutral-300">
+                            <svg
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M12.1601 10.87C12.0601 10.86 11.9401 10.86 11.8301 10.87C9.45006 10.79 7.56006 8.84 7.56006 6.44C7.56006 3.99 9.54006 2 12.0001 2C14.4501 2 16.4401 3.99 16.4401 6.44C16.4301 8.84 14.5401 10.79 12.1601 10.87Z"
+                                stroke="currentColor"
+                                strokeWidth="1.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                              <path
+                                d="M7.15997 14.56C4.73997 16.18 4.73997 18.82 7.15997 20.43C9.90997 22.27 14.42 22.27 17.17 20.43C19.59 18.81 19.59 16.17 17.17 14.56C14.43 12.73 9.91997 12.73 7.15997 14.56Z"
+                                stroke="currentColor"
+                                strokeWidth="1.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </div>
+                          <div className="ml-4">
+                            <p className="text-sm font-medium ">
+                              {"Login"}
+                            </p>
+                          </div>
+                        </Link>
+                        <Link
+                          href={"/signup"}
+                          className="flex items-center p-2 -m-3 transition duration-150 ease-in-out rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50"
+                          onClick={() => close()}
+                        >
+                          <div className="flex items-center justify-center flex-shrink-0 text-neutral-500 dark:text-neutral-300">
+                            <svg
+                              width="24"
+                              height="24"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              xmlns="http://www.w3.org/2000/svg"
+                            >
+                              <path
+                                d="M12.1601 10.87C12.0601 10.86 11.9401 10.86 11.8301 10.87C9.45006 10.79 7.56006 8.84 7.56006 6.44C7.56006 3.99 9.54006 2 12.0001 2C14.4501 2 16.4401 3.99 16.4401 6.44C16.4301 8.84 14.5401 10.79 12.1601 10.87Z"
+                                stroke="currentColor"
+                                strokeWidth="1.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                              <path
+                                d="M7.15997 14.56C4.73997 16.18 4.73997 18.82 7.15997 20.43C9.90997 22.27 14.42 22.27 17.17 20.43C19.59 18.81 19.59 16.17 17.17 14.56C14.43 12.73 9.91997 12.73 7.15997 14.56Z"
+                                stroke="currentColor"
+                                strokeWidth="1.5"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </div>
+                          <div className="ml-4">
+                            <p className="text-sm font-medium ">
+                              {"Register"}
+                            </p>
+                          </div>
+                        </Link>
+                        </>
+                        
+                    ) : (
+                      <>
                       <div className="flex items-center space-x-3">
                         {/* <Avatar imgUrl={avatarImgs[7].src} sizeClass="w-12 h-12" /> */}
 
@@ -108,7 +175,7 @@ export default function AvatarDropdown() {
                       )}
 
                       {/* ------------------ 2 --------------------- */}
-                      {/* <Link
+                      <Link
                         href={"/checkout"}
                         className="flex items-center p-2 -m-3 transition duration-150 ease-in-out rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50"
                         onClick={() => close()}
@@ -157,7 +224,7 @@ export default function AvatarDropdown() {
                         <div className="ml-4">
                           <p className="text-sm font-medium ">{"My Order"}</p>
                         </div>
-                      </Link> */}
+                      </Link>
 
                       {/* ------------------ 2 --------------------- */}
                       {/* <Link
@@ -291,7 +358,10 @@ export default function AvatarDropdown() {
                           <p className="text-sm font-medium ">{"Help"}</p>
                         </div>
                       </Link> */}
-                      <LogoutButton set={setCurrentCustomer} customer={currentCustomer} />
+                       <LogoutButton set={setCurrentCustomer} customer={currentCustomer} />
+                       </>
+                    )}
+                     
                     </div>
                   </div>
                 </Popover.Panel>
@@ -299,7 +369,7 @@ export default function AvatarDropdown() {
             </>
           )}
         </Popover>
-      )}
+     
     </div>
   );
 }
