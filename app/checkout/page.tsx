@@ -140,6 +140,7 @@ const CheckoutPage = () => {
             variables: {
               paymentMethod: paymentMethodId,
               lineItems: lineItems,
+              isPaid: false,
             },
           });
 
@@ -149,7 +150,7 @@ const CheckoutPage = () => {
             toast("Order created successfully");
 
             // router.push(`/checkout/${orderDetails.orderNumber}/?key=${orderDetails?.orderKey}`);
-            router.push(`/checkout/${orderDetails.id}`);
+            // router.push(`/checkout/${orderDetails.id}`);
           } else {
             console.error("Failed to retrieve order details");
             toast.error("Failed to retrieve order details");

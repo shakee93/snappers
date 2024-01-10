@@ -25,7 +25,7 @@ mutation guestCheckout ($paymentMethod: String!, , $lineItems: [LineItemInput!]!
   }) {
     clientMutationId
     order {
-      id
+      # id
       orderKey
       total
       orderNumber
@@ -143,7 +143,7 @@ ${CustomerAddressFragment}
 `;
 
 export const GET_SINGLE_ORDER = gql`
-query getOrder($orderID: ID = "") {
+query getOrder($orderID: ID!) {
   order(id: $orderID) {
     id
     subtotal

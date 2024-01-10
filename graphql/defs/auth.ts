@@ -105,7 +105,7 @@ export const GET_ACCOUNT_DETAILS = gql`
         phone
       }
     }
-  }
+}
 `;
 
 export const GET_DEFAULT_ACC_FOR_AVATAR = gql`

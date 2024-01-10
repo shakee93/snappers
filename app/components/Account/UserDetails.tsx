@@ -15,6 +15,7 @@ const UserDetails = () => {
   useEffect(() => {
     // Fetch customer data
     fetchCustomer();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

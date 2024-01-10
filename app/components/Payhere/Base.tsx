@@ -2,7 +2,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import Script from "next/script";
 import { Button } from "@nextui-org/react";
-import { PaymentDetailsType } from "@/data/types";
+import { PaymentDetailsType, PaymentDetailsWithoutUrls } from "@/data/types";
+import { extractRawAmount } from "@/components/AddressPageComps/HelperComps";
 
 declare global {
   interface Window {
@@ -13,16 +14,19 @@ declare global {
     } | null;
   }
 }
+type PayHerePaymentProps = {
+  paymentDetails: PaymentDetailsWithoutUrls;
+};
 
-const PayHerePayment = ({ paymentDetails }: any) => {
-  const [hash, setHash] = useState(null);
+const PayHerePayment: React.FC<PayHerePaymentProps> = ({ paymentDetails }) => {
+  const [hash, setHash] = useState<string | null>(null);
 
-  const fakePaymentDetails: PaymentDetailsType = useMemo(() => {
+  const staticData: PaymentDetailsType = useMemo(() => {
     return {
       sandbox: true,
       merchant_id: "1225436",
       return_url: "http://localhost:3000/success",
-    cancel_url: "http://localhost:3000/cancel",
+      cancel_url: "http://localhost:3000/cancel",
       notify_url: "http://localhost:3000/notify",
       order_id: "12345",
       items: "gq mobiles",
@@ -39,16 +43,37 @@ const PayHerePayment = ({ paymentDetails }: any) => {
     };
   }, [hash]);
 
+  const dynamicData: PaymentDetailsType = useMemo(() => {
+    return {
+      sandbox: true,
+      merchant_id: "1225436",
+      return_url: "http://localhost:3000/success",
+      cancel_url: "http://localhost:3000/cancel",
+      notify_url: "http://localhost:3000/notify",
+      order_id: "12345",
+      items: paymentDetails.items,
+      hash: hash,
+      amount: extractRawAmount(paymentDetails?.amount ?? ""),
+      currency: "LKR",
+      first_name: paymentDetails.first_name,
+      last_name: paymentDetails.last_name,
+      email: paymentDetails.email,
+      phone: paymentDetails.phone,
+      address: paymentDetails.address,
+      city: "Colombo",
+      country: "Sri Lanka",
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [hash]);
+
   const initiatePayment = useCallback(async () => {
     if (window?.payhere) {
-      window?.payhere.startPayment(fakePaymentDetails);
+      window?.payhere.startPayment(dynamicData);
       window.onerror = function onError(error: any) {
         console.log("Error:" + error);
       };
-    } else {
-      debugger;
     }
-  }, [fakePaymentDetails]);
+  }, [dynamicData]);
 
   useEffect(() => {
     // Define event handlers
@@ -104,6 +129,11 @@ const PayHerePayment = ({ paymentDetails }: any) => {
       }
     };
   }, []);
+
+  if (!paymentDetails) {
+    return <p>No Amount found</p>;
+  }
+
   return (
     <>
       <Script

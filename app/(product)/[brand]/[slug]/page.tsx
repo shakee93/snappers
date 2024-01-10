@@ -82,7 +82,6 @@ const Page = async ({params}: Props) => {
         brand: Brand;
     } = await getData(params.slug, params.brand);
     
-
     return (
         <div className="mt-5 md:mt-16">
             <main className="container m-auto">
