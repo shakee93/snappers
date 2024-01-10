@@ -94,6 +94,7 @@ export const UPDATE_ACCOUNT_INFORMATION = gql`
 export const GET_ACCOUNT_DETAILS = gql`
   query getAccountDetails {
     customer {
+      id
       displayName
       email
       metaData {

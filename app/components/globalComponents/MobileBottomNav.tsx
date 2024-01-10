@@ -4,7 +4,7 @@ import {
     Search,
     ShoppingBag,
     LayoutGrid,
-    UserCircle, Codesandbox, Menu,
+    UserCircle, Codesandbox, Menu, CircleUser,
 } from "lucide-react";
 import Logo from "./Logo";
 import {XIcon} from "lucide-react";
@@ -28,7 +28,7 @@ const MobileBottomNav = ({categories}: { categories: any }) => {
 
     return (
         <div
-            className="fixed h-[82px] grid grid-cols-5 shadow-3xl items-center justify-center bottom-0 z-[100] bg-white border-slate-100 border-t-2 w-full  px-1">
+            className="fixed h-[82px] grid grid-cols-6 shadow-3xl items-center justify-center bottom-0 z-[100] bg-white border-slate-100 border-t-2 w-full  px-1">
             <div className='flex-1'>
                 <Logo className='flex  h-full items-center justify-center' imageClass='h-[45px] p-0'/>
             </div>
@@ -61,7 +61,13 @@ const MobileBottomNav = ({categories}: { categories: any }) => {
                 </div>
                 <div className="text-[11px]">Cart</div>
             </Link>
-
+            <Link
+                href="/login"
+                className="flex pt-2 flex-1 flex-col justify-center items-center text-primaryColor gap-1 cursor-pointer"
+            >
+                <CircleUser/>
+                <div className="text-[11px]">Account</div>
+            </Link>
             <div
                 onClick={e => toggleMobileMenu()}
                 className="flex pt-2 flex-col justify-center items-center text-primaryColor gap-1"
