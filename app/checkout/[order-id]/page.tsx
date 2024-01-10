@@ -1,135 +1,68 @@
 "use client";
-import { OrderPaymentPageProps } from "@/data/types";
-import { useQuery } from "@apollo/client";
-import { GET_SINGLE_ORDER } from "@/graphql/defs/order";
+import { OrderPaymentPageProps, PaymentDetailsWithoutUrls } from "@/data/types";
+import { useLazyQuery, useQuery } from "@apollo/client";
+import {
+  GET_CHECKOUT_USER_DETAILS,
+  GET_SINGLE_ORDER,
+} from "@/graphql/defs/order";
 import PayHerePayment from "@/app/components/Payhere/Base";
-
+import { useEffect, useMemo } from "react";
+import ProductTable, { OrderDetails } from "./Comps";
+import OrderPaymentPageSkeleton from "./Skeleton";
 
 export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   const orderId = params["order-id"];
 
-  const { loading, error, data, refetch } = useQuery(GET_SINGLE_ORDER, {
-    variables: {
-      orderID: orderId,
-    },
+  const [getUserData, { data: customerData }] = useLazyQuery(
+    GET_CHECKOUT_USER_DETAILS,
+    { fetchPolicy: "no-cache" }
+  );
+  const { data: orderData } = useQuery(GET_SINGLE_ORDER, {
+    variables: { orderID: orderId },
   });
 
-  console.log({ data });
+  useEffect(() => {
+    getUserData();
+  }, [getUserData]);
+
+  const temporaryPaymentDetails: PaymentDetailsWithoutUrls = useMemo(
+    () => ({
+      order_id: orderData?.order?.orderNumber ?? "",
+      items: orderData?.order?.lineItems?.nodes ?? [],
+      subtotal: orderData?.order?.subtotal ,
+      amount: orderData?.order?.total ?? "" ,
+      currency: "LKR",
+      first_name:
+        customerData?.customer?.shipping?.firstName ?? "no_first_name",
+      last_name: customerData?.customer?.shipping?.lastName ?? "no_last_name",
+      email: customerData?.customer?.email ?? "no_email",
+      phone: customerData?.customer?.shipping?.phone ?? "no_phone",
+      address: customerData?.customer?.shipping?.address1 ?? "no_address",
+      city: customerData?.customer?.shipping?.city ?? "no_city",
+      country: "Sri Lanka",
+    }),
+    [orderData, customerData]
+  );
+
+  // if(!orderData?.order){
+  //   return <OrderPaymentPageSkeleton/>
+  // }
 
   return (
-    <div className="container rounded-3xl lg:p-20 text-center mt-10">
+    <div className="container mx-auto rounded-3xl lg:p-20 text-center ">
       <div className="my-4 ">
-        <div className="grid grid-cols-1 lg:grid-cols-1 gap-20 py-4">
-          <div className="flex flex-col justify-start">
-            <span className="text-center text-primaryColor bg-gray-200 py-2 text-lg font-semibold">
-              Order details:
-            </span>
-            <table className="text-base divide-y divide-gray-200">
-              <tr className="border-1 border-gray-400">
-                <td className="border-1 border-gray-400 px-6 py-2 text-left whitespace-nowrap  font-medium text-gray-800 dark:text-gray-200">
-                  Order Id
-                </td>
-                <td className="px-6 py-2 text-right whitespace-nowrap  font-medium text-gray-800 dark:text-gray-200">
-                  {data?.order.orderNumber}
-                </td>
-              </tr>
-              <tr className="border-1 border-gray-400">
-                <td className="px-6 py-2 text-left whitespace-nowrap  font-medium text-gray-800 dark:text-gray-200">
-                  Order Total
-                </td>
-                <td className="px-6 py-2  text-right whitespace-nowrap font-medium text-gray-800 dark:text-gray-200">
-                  {data?.order.total}
-                </td>
-              </tr>
-              <tr className="border-1 border-gray-400">
-                <td className="px-6 py-2 text-left whitespace-nowrap  font-medium text-gray-800 dark:text-gray-200">
-                  Discount
-                </td>
-                <td className="px-6 py-2  text-right whitespace-nowrap font-medium text-gray-800 dark:text-gray-200">
-                  $30
-                </td>
-              </tr>
-              <tr className="border-1 border-gray-400">
-                <td className="px-6 py-2 text-left whitespace-nowrap  font-medium text-gray-800 dark:text-gray-200">
-                  Delivery Fee
-                </td>
-                <td className="px-6 py-2  text-right whitespace-nowrap font-medium text-gray-800 dark:text-gray-200">
-                  {data?.order.shippingTax}
-                </td>
-              </tr>
-              <tr className="border-1 border-gray-400">
-                <td className="px-6 py-2 text-left whitespace-nowrap  font-medium text-gray-800 dark:text-gray-200">
-                  Sub Total
-                </td>
-                <td className="px-6 py-2  text-right whitespace-nowrap font-medium text-gray-800 dark:text-gray-200">
-                  {data?.order.subtotal}
-                </td>
-              </tr>
-            </table>
-          </div>
-        </div>
+        <OrderDetails orderData={orderData} />
 
         <div className="pt-6">
           <div className="">
             {/* {data?.order.paymentMethod === "payhere" ? <PayHerePayment/> : "Continue with Bank Transfer"} */}
-            {/* CHECKING PAY HERE  */}
-            {true ? <PayHerePayment paymentDetails={data}/> : "Continue with Bank Transfer"}
+            {/* && data?.order.paymentMethod === "payhere" && */}
+            {temporaryPaymentDetails && (
+              <PayHerePayment paymentDetails={temporaryPaymentDetails} />
+            )}
           </div>
         </div>
-
-        <div>
-          <div className="w-full py-10">
-            <div className="flex flex-col">
-              <div className="flex flex-col">
-                <div className="-m-1.5 overflow-x-auto">
-                  <div className="p-1.5 min-w-full inline-block align-middle">
-                    <div className="overflow-hidden">
-                      <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead className="text-lg bg-gray-200 py-2 texy-primaryColor ">
-                          <tr>
-                            <th
-                              scope="col"
-                              className="px-6 py-3 text-center  font-medium"
-                            >
-                              Product
-                            </th>
-                            <th
-                              scope="col"
-                              className="px-6 py-3 text-center  font-medium"
-                            >
-                              Quantity
-                            </th>
-                            <th
-                              scope="col"
-                              className="px-6 py-3 text-center  font-medium "
-                            >
-                              Total
-                            </th>
-                          </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                          {data?.order.lineItems?.nodes?.map((item: any, index: any) => (
-                            <tr key={index}>
-                              <td className="px-6 text-left py-4  font-medium text-gray-800 dark:text-gray-200">
-                                {item?.product.node.name}
-                              </td>
-                              <td className="px-6 py-4 whitespace-nowrap  text-gray-800 dark:text-gray-200">
-                                {item?.product.node.quantity}
-                              </td>
-                              <td className="px-6 py-4 text-right whitespace-nowrap  text-gray-800 dark:text-gray-200">
-                                ${item?.subtotal}
-                              </td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        <ProductTable lineItems={orderData?.order?.lineItems?.nodes} />
       </div>
     </div>
   );

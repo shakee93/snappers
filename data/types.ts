@@ -34,23 +34,26 @@ export type OrderPaymentPageProps = {
 
 
 export type PaymentDetailsType = {
-  sandbox: boolean;
-  merchant_id: string;
-  return_url: string;
-  cancel_url: string;
-  notify_url: string;
-  order_id: string;
-  items: string;
-  hash: string | null; // Use the appropriate type for hash
-  amount: string;
-  currency: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone: string;
-  address: string;
-  city: string;
-  country: "Sri Lanka";
+  sandbox?: boolean;
+  merchant_id?: string;
+  return_url?: string;
+  cancel_url?: string;
+  notify_url?: string;
+  hash?: string | null;
+  order_id?: string;
+  items?: string;
+  amount?: string;
+  currency?: string;
+  first_name?: string;
+  last_name?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  country?: "Sri Lanka";
 };
+
+export type PaymentDetailsWithoutUrls = Omit<PaymentDetailsType,
+    'sandbox' | 'merchant_id' | 'return_url' | 'cancel_url' | 'notify_url' | 'hash'>;
 
 

@@ -53,9 +53,6 @@ interface CartItemsProps {
     const { product, quantity, key, subtotal, total, variation } = item;
     const { node } = product || {};
     const { name, price, image, terms, brands, type } = node || {};
-
-    // console.log({brands})
-
     const brandSlug = brands?.nodes[0]?.slug ;
 
     return (
@@ -135,7 +132,6 @@ interface CartItemsProps {
                             className="relative z-10"
                         />
                     </div>
-
                     <span
                         className="cursor-pointer relative z-10 flex items-center mt-3 font-medium text-primary-6000 hover:text-primary-500 text-sm"
                         onClick={async () => {

@@ -1,21 +1,14 @@
 'use client'
 import { Popover, Transition } from "@headlessui/react";
-import Prices from "@/app/components/Prices";
-import { Product, PRODUCTS } from "@/data/data";
 import { ShoppingBag } from "lucide-react";
-import {Fragment, useEffect} from "react";
+import {Fragment} from "react";
 import Link from "next/link";
-import Image from "next/image";
 import {useCart} from "@/context/CartProvider";
-import {CartItem, PaCapacity, ProductAllPaCapacityArgs, SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
-import AttributeIcon from "@/app/components/AttributeIcon";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import ButtonSecondary from "@/shared/Button/ButtonSecondary";
-import useProductLink from "@/hooks/useProductLink";
 import CartDropdownItem from "@/app/components/Header/CartDropdownItem";
 
 export default function CartDropdown() {
-
   const {cart} = useCart();
 
   return (

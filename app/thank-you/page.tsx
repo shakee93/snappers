@@ -23,7 +23,6 @@ const ThankYouPage = ({ params }: OrderPaymentPageProps) => {
     }
   });
 
-  console.log({data})
 
   return (
     <div className="container rounded-3xl lg:p-20 text-center mt-10">

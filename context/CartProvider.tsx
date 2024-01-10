@@ -1,14 +1,10 @@
 'use client';
 
-import React, {createContext, ReactNode, useContext, useEffect, useState} from 'react';
+import React, {createContext, ReactNode, useContext, useState} from 'react';
 import {
     useQuery,
-    useApolloClient,
     ApolloError,
-    ApolloQueryResult,
-    OperationVariables,
-    useMutation, FetchResult
-} from '@apollo/client';
+    useMutation} from '@apollo/client';
 import {
     ADD_TO_CART,
     GET_CART,

@@ -18,10 +18,11 @@ export const CHECKOUT_MUTATION = gql`
 `;
 
 export const GUEST_CHECKOUT_MUTATION = gql`
-mutation guestCheckout ($paymentMethod: String!, , $lineItems: [LineItemInput!]!) {
+mutation guestCheckout ( $paymentMethod: String! , $lineItems: [LineItemInput!]!, $shippingLines: [ShippingLineInput] ) {
   createOrder(input: {
     paymentMethod: $paymentMethod,
-    lineItems: $lineItems
+    lineItems: $lineItems,
+    shippingLines: $shippingLines
   }) {
     clientMutationId
     order {
@@ -143,7 +144,7 @@ ${CustomerAddressFragment}
 `;
 
 export const GET_SINGLE_ORDER = gql`
-query getOrder($orderID: ID = "") {
+query getOrder($orderID: ID!) {
   order(id: $orderID) {
     id
     subtotal
