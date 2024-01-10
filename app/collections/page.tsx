@@ -29,17 +29,19 @@ const Page = async () => {
             <h2 className="block text-2xl sm:text-3xl lg:text-4xl font-semibold">
               Browse Collections
             </h2>
+            
+            <span className="block mt-2 lg:mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
+              {
+                "Welcome to GQ Mobiles Collections – a tailored assortment of style and functionality. Explore unique product categories that exemplify excellence in every item. Elevate your experience with quality and diverse options at GQ Mobiles. Start shopping for a seamless blend of style and substance!"
+              }
+            </span>
             <div className="block mt-3 sm:mt-5 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-400">
-            <Link href={"/#"} className="">
-              Homepage
-            </Link>
-            <span className="text-xs mx-1 sm:mx-1.5">/</span>
-            <span className="underline">Collections</span>
-          </div>
-            {/* <span className="block mt-2 lg:mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
-              {" We not only help you design exceptional products, but also make it\n" +
-                "easy for you to share your designs with more like-minded people."}
-            </span> */}
+              <Link href={"/#"} className="">
+                Homepage
+              </Link>
+              <span className="text-xs mx-1 sm:mx-1.5">/</span>
+              <span className="underline">Collections</span>
+            </div>
           </div>
           <hr className="border-slate-200 dark:border-slate-700 " />
           <main>
