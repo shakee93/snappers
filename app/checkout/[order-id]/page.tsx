@@ -28,7 +28,8 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     () => ({
       order_id: orderData?.order?.orderNumber ?? "",
       items: orderData?.order?.lineItems?.nodes ?? [],
-      amount: orderData?.order?.total ?? "",
+      subtotal: orderData?.order?.subtotal ,
+      amount: orderData?.order?.total ?? "" ,
       currency: "LKR",
       first_name:
         customerData?.customer?.shipping?.firstName ?? "no_first_name",

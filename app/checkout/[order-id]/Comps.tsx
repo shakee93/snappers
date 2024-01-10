@@ -9,12 +9,17 @@ export const OrderDetails: React.FC<OrderDetailsProps> = ({ orderData }) => {
 
   console.log(orderData);
 
+  const subtotalValue = parseFloat(orderData.order.subtotal.replace(/[^0-9.-]+/g, ''));
+  const totalValue = parseFloat(orderData.order.total.replace(/[^0-9.-]+/g, ''));
+
+  const shippingCharges = totalValue - subtotalValue;
+
   const rows = [
     { label: 'Order Id', value: orderData.order.orderNumber ?? 'Not found' },
-    { label: 'Order Total', value: orderData.order.total },
+    { label: 'Order Total', value: orderData.order.subtotal },
     { label: 'Discount', value: orderData.order.total - orderData.order.subtotal, condition: orderData.order.total - orderData.order.subtotal > 0 },
-    { label: 'Delivery Fee', value: orderData.order.shippingTax },
-    { label: 'Sub Total', value: orderData.order.subtotal }
+    { label: 'Delivery Fee', value: shippingCharges ?  "රු" + shippingCharges : "රු" + 0  },
+    { label: 'Sub Total', value: orderData.order.total }
   ];
 
   return (
@@ -25,7 +30,7 @@ export const OrderDetails: React.FC<OrderDetailsProps> = ({ orderData }) => {
             Order details
           </span>
           <table className="text-base divide-y divide-gray-200">
-            {rows.map((row, index) => 
+            {rows.map((row, index) =>
               row.condition !== false ? (
                 <tr key={index} className="border-1 border-gray-200">
                   <td className="px-6 py-2 text-left whitespace-nowrap font-medium text-gray-800 dark:text-gray-200">
