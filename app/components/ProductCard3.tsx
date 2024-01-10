@@ -197,7 +197,7 @@ const ProductCard: FC<ProductCardProps> = ({
 
     return (
         <div
-            className={`min-h-[270px] md:min-h-[365px] nc-ProductCard relative flex flex-col bg-white rounded-3xl p-1 group ${className}`}
+            className={`min-h-[270px] md:min-h-[365px] nc-ProductCard relative flex flex-col bg-white rounded-2xl p-1 group ${className}`}
             data-nc-id="ProductCard"
         >
             <div className="relative flex-shrink-0 bg-slate-50 rounded-2xl dark:bg-slate-300 overflow-hidden ">
@@ -232,7 +232,7 @@ const ProductCard: FC<ProductCardProps> = ({
                                     src={image?.sourceUrl || ''}
                                     alt={name || ''}
                                     className={twMerge(
-                                        `object-cover object-center mx-auto my-auto rounded-3xl`,
+                                        `object-cover object-center mx-auto my-auto rounded-2xl`,
                                     )}
                                 />
                             </>
@@ -250,10 +250,10 @@ const ProductCard: FC<ProductCardProps> = ({
                 </div>
 
                 <div
-                    className={`absolute left-1.5 top-2 text-center text-xs lg:text-sm line-clamp-2 text-slate-800`}
+                    className={`absolute left-1.5 rounded-md top-2 bg-zinc-100/80 text-center text-xs lg:text-sm line-clamp-2 text-slate-800`}
                 >
                     {brands?.nodes?.map((brand: Brand, index) => (
-                        <Link className='bg-zinc-100/70 px-2 py-1 rounded-lg' href={`/${brand?.slug}`} key={index}>{brand?.name}</Link>
+                        <Link className=' px-2 py-1 rounded' href={`/${brand?.slug}`} key={index}>{brand?.name}</Link>
                     ))}
                     {/*- {type} - {databaseId}*/}
                 </div>
