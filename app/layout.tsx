@@ -44,7 +44,9 @@ export default async function RootLayout({
                         <Toaster/>
                         <Header/>
 
-                        {children}
+                        <div className='pb-8 md:pb-24'>
+                            {children}
+                        </div>
 
                         <Footer/>
                     </CartProvider>

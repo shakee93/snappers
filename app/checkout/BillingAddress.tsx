@@ -75,15 +75,18 @@ const BillingAddress: FC<Props> = ({
     return (
       <div className="border border-slate-200 dark:border-slate-700 rounded-xl ">
         <div className="p-6 flex flex-col sm:flex-row items-start">
-          <h1 className="text-2xl self-center  font-semibold">3</h1>
-          <div className="sm:ml-8">
-            <h3 className=" text-slate-700 items-center dark:text-slate-300 flex ">
-              <span className="uppercase">Billing ADDRESS*</span>
-            </h3>
-            <div className="font-semibold mt-1 text-sm">
-              <span className="">
-                {initialData?.address1 || "Your Address"}
-              </span>
+
+          <div className="flex flex-row gap-4 md:gap-0">
+            <h1 className="text-2xl self-center border border-solid border-blue-700 leading-4 rounded-full p-[10px] text-blue-700 font-semibold border">3</h1>
+            <div className="sm:ml-8">
+              <h3 className=" text-slate-700 items-center dark:text-slate-300 flex ">
+                <span className="uppercase">Billing ADDRESS*</span>
+              </h3>
+              <div className="font-semibold mt-1 text-sm">
+                <span className="">
+                  {initialData?.address1 || "Your Address"}
+                </span>
+              </div>
             </div>
           </div>
           <ButtonSecondary
@@ -97,9 +100,8 @@ const BillingAddress: FC<Props> = ({
         </div>
         <form onSubmit={handleSubmit}>
           <div
-            className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${
-              isActive ? "block" : "hidden"
-            }`}
+            className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${isActive ? "block" : "hidden"
+              }`}
           >
             {/* ============ */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
@@ -177,7 +179,7 @@ const BillingAddress: FC<Props> = ({
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
 
 
-            <SelectField
+              <SelectField
                 label="State"
                 name="state"
                 value={state}
