@@ -5,10 +5,11 @@ import {
   GET_CHECKOUT_USER_DETAILS,
   GET_SINGLE_ORDER,
 } from "@/graphql/defs/order";
-import PayHerePayment from "@/app/components/Payhere/Base";
+import PayHerePayment from "@/app/components/Payment/Payhere";
 import { useEffect, useMemo } from "react";
 import ProductTable, { OrderDetails } from "./Comps";
 import OrderPaymentPageSkeleton from "./Skeleton";
+import BankTransfer from "@/app/components/Payment/BankTransfer";
 
 export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   const orderId = params["order-id"];
@@ -60,6 +61,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
             {temporaryPaymentDetails && (
               <PayHerePayment paymentDetails={temporaryPaymentDetails} />
             )}
+            <BankTransfer/>
           </div>
         </div>
         <ProductTable lineItems={orderData?.order?.lineItems?.nodes} />

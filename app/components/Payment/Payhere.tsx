@@ -18,6 +18,7 @@ type PayHerePaymentProps = {
   paymentDetails: PaymentDetailsWithoutUrls;
 };
 
+// Test Card details are available at https://support.payhere.lk/sandbox-and-testing
 const PayHerePayment: React.FC<PayHerePaymentProps> = ({ paymentDetails }) => {
   const [hash, setHash] = useState<string | null>(null);
 
