@@ -46,7 +46,7 @@ const PayHerePayment = ({ paymentDetails }: any) => {
         console.log("Error:" + error);
       };
     } else {
-      debugger;
+      // debugger;
     }
   }, [fakePaymentDetails]);
 

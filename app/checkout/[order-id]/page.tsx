@@ -3,7 +3,7 @@ import { OrderPaymentPageProps } from "@/data/types";
 import { useQuery } from "@apollo/client";
 import { GET_SINGLE_ORDER } from "@/graphql/defs/order";
 import PayHerePayment from "@/app/components/Payhere/Base";
-
+import Prices from "@/app/components/Prices";
 
 export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   const orderId = params["order-id"];
@@ -13,6 +13,11 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
       orderID: orderId,
     },
   });
+
+  const subtotalValue = parseFloat(data?.order.subtotal.replace(/[^0-9.-]+/g, ''));
+  const totalValue = parseFloat(data?.order.total.replace(/[^0-9.-]+/g, ''));
+
+  const shippingCharges = totalValue - subtotalValue;
 
   console.log({ data });
 
@@ -35,10 +40,18 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
               </tr>
               <tr className="border-1 border-gray-400">
                 <td className="px-6 py-2 text-left whitespace-nowrap  font-medium text-gray-800 dark:text-gray-200">
-                  Order Total
+                  Sub Total
                 </td>
                 <td className="px-6 py-2  text-right whitespace-nowrap font-medium text-gray-800 dark:text-gray-200">
-                  {data?.order.total}
+                  {data?.order.subtotal}
+                </td>
+              </tr>
+              <tr className="border-1 border-gray-400">
+                <td className="px-6 py-2 text-left whitespace-nowrap  font-medium text-gray-800 dark:text-gray-200">
+                  Shipping
+                </td>
+                <td className="px-6 py-2  text-right whitespace-nowrap font-medium text-gray-800 dark:text-gray-200">
+                  රු{shippingCharges ? shippingCharges : 0}
                 </td>
               </tr>
               <tr className="border-1 border-gray-400">
@@ -46,15 +59,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
                   Discount
                 </td>
                 <td className="px-6 py-2  text-right whitespace-nowrap font-medium text-gray-800 dark:text-gray-200">
-                  $30
-                </td>
-              </tr>
-              <tr className="border-1 border-gray-400">
-                <td className="px-6 py-2 text-left whitespace-nowrap  font-medium text-gray-800 dark:text-gray-200">
-                  Delivery Fee
-                </td>
-                <td className="px-6 py-2  text-right whitespace-nowrap font-medium text-gray-800 dark:text-gray-200">
-                  {data?.order.shippingTax}
+                  රු{data?.order.shippingTotal ? data?.order.shippingTotal : 0}
                 </td>
               </tr>
               <tr className="border-1 border-gray-400">
@@ -62,7 +67,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
                   Sub Total
                 </td>
                 <td className="px-6 py-2  text-right whitespace-nowrap font-medium text-gray-800 dark:text-gray-200">
-                  {data?.order.subtotal}
+                  {data?.order.total}
                 </td>
               </tr>
             </table>
@@ -73,7 +78,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
           <div className="">
             {/* {data?.order.paymentMethod === "payhere" ? <PayHerePayment/> : "Continue with Bank Transfer"} */}
             {/* CHECKING PAY HERE  */}
-            {true ? <PayHerePayment paymentDetails={data}/> : "Continue with Bank Transfer"}
+            {true ? <PayHerePayment paymentDetails={data} /> : "Continue with Bank Transfer"}
           </div>
         </div>
 
@@ -114,10 +119,10 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
                                 {item?.product.node.name}
                               </td>
                               <td className="px-6 py-4 whitespace-nowrap  text-gray-800 dark:text-gray-200">
-                                {item?.product.node.quantity}
+                                {item?.quantity}
                               </td>
                               <td className="px-6 py-4 text-right whitespace-nowrap  text-gray-800 dark:text-gray-200">
-                                ${item?.subtotal}
+                                {item?.subtotal}
                               </td>
                             </tr>
                           ))}

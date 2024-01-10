@@ -75,4 +75,17 @@ query GetPayment {
       }
     }
   }
-`
+`;
+
+export const UPDATE_SHIPPING_TOTAL = gql`
+mutation updateShippingMethod($input: UpdateShippingMethodInput!){  
+    updateShippingMethod(input: $input){    
+        cart {
+                  ...CartContent    
+                }
+                clientMutationId  
+            }
+        }
+        ${CartContent}`
+
+ 
