@@ -8,6 +8,7 @@ import {
 import PayHerePayment from "@/app/components/Payhere/Base";
 import { useEffect, useMemo } from "react";
 import ProductTable, { OrderDetails } from "./Comps";
+import OrderPaymentPageSkeleton from "./Skeleton";
 
 export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   const orderId = params["order-id"];
@@ -42,8 +43,12 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     [orderData, customerData]
   );
 
+  // if(!orderData?.order){
+  //   return <OrderPaymentPageSkeleton/>
+  // }
+
   return (
-    <div className="container rounded-3xl lg:p-20 text-center mt-10">
+    <div className="container mx-auto rounded-3xl lg:p-20 text-center ">
       <div className="my-4 ">
         <OrderDetails orderData={orderData} />
 

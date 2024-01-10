@@ -7,14 +7,16 @@ interface OrderDetailsProps {
 export const OrderDetails: React.FC<OrderDetailsProps> = ({ orderData }) => {
   if (!orderData) return null;
 
-  console.log(orderData);
-
   const rows = [
-    { label: 'Order Id', value: orderData.order.orderNumber ?? 'Not found' },
-    { label: 'Order Total', value: orderData.order.total },
-    { label: 'Discount', value: orderData.order.total - orderData.order.subtotal, condition: orderData.order.total - orderData.order.subtotal > 0 },
-    { label: 'Delivery Fee', value: orderData.order.shippingTax },
-    { label: 'Sub Total', value: orderData.order.subtotal }
+    { label: "Order Id", value: orderData.order.orderNumber ?? "Not found" },
+    { label: "Order Total", value: orderData.order.total },
+    {
+      label: "Discount",
+      value: orderData.order.total - orderData.order.subtotal,
+      condition: orderData.order.total - orderData.order.subtotal > 0,
+    },
+    { label: "Delivery Fee", value: orderData.order.shippingTax },
+    { label: "Sub Total", value: orderData.order.subtotal },
   ];
 
   return (
@@ -25,25 +27,26 @@ export const OrderDetails: React.FC<OrderDetailsProps> = ({ orderData }) => {
             Order details
           </span>
           <table className="text-base divide-y divide-gray-200">
-            {rows.map((row, index) => 
-              row.condition !== false ? (
-                <tr key={index} className="border-1 border-gray-200">
-                  <td className="px-6 py-2 text-left whitespace-nowrap font-medium text-gray-800 dark:text-gray-200">
-                    {row.label}
-                  </td>
-                  <td className="px-6 py-2 text-right whitespace-nowrap font-medium text-gray-800 dark:text-gray-200">
-                    {row.value}
-                  </td>
-                </tr>
-              ) : null
-            )}
+            <tbody>
+              {rows.map((row, index) =>
+                row.condition !== false ? (
+                  <tr key={index} className="border-1 border-gray-200">
+                    <td className="px-6 py-2 text-left whitespace-nowrap font-medium text-gray-800 dark:text-gray-200">
+                      {row.label}
+                    </td>
+                    <td className="px-6 py-2 text-right whitespace-nowrap font-medium text-gray-800 dark:text-gray-200">
+                      {row.value}
+                    </td>
+                  </tr>
+                ) : null
+              )}
+            </tbody>
           </table>
         </div>
       </div>
     </div>
   );
 };
-
 
 type ProductTableProps = {
   lineItems: any[];
