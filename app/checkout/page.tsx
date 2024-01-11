@@ -1,38 +1,26 @@
 "use client";
 
-import Label from "components/Label/Label";
-import NcInputNumber from "components/NcInputNumber";
-import Prices from "components/Prices";
-import { Product, PRODUCTS } from "data/data";
 import { useState, useEffect } from "react";
-import { Helmet } from "react-helmet-async";
-import Image from "next/image";
 import { useMutation } from "@apollo/client";
-
 import ButtonPrimary from "shared/Button/ButtonPrimary";
-import Input from "shared/Input/Input";
-import ContactInfo from "./ContactInfo";
-import PaymentMethod from "./PaymentMethod";
-import ShippingAddress from "./DeliveryAddress";
 import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
 import { useQuery } from "@apollo/client";
-import { GET_PAYMENT_GATEWAYS, UPDATE_SHIPPING_TOTAL } from "@/graphql/defs/cart";
 import {
-  CHECKOUT_MUTATION,
+  GET_PAYMENT_GATEWAYS,
+  UPDATE_SHIPPING_TOTAL,
+} from "@/graphql/defs/cart";
+import {
   GUEST_CHECKOUT_MUTATION,
 } from "@/graphql/defs/order";
 import {
   PaymentGateway,
-  SimpleProduct,
-  VariableProduct,
 } from "@/graphql/types/graphql";
 
 import CheckoutDetails from "./CheckoutDetails";
 import CartItems from "./CartItems";
-import MySwitch from "@/components/MySwitch";
 import toast from "react-hot-toast";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 interface FormData {
   contactInfo: Record<string, any>;
@@ -51,7 +39,11 @@ const CheckoutPage = () => {
   const { loading, error, data, refetch } = useQuery(GET_PAYMENT_GATEWAYS);
   const paymentGateways: PaymentGateway[] = data?.paymentGateways.nodes;
   const [tabActive, setTabActive] = useState<
-    "ContactInfo" | "DeliveryAddress" | "BillingAddress" | "PaymentMethod" | "order-cart"
+    | "ContactInfo"
+    | "DeliveryAddress"
+    | "BillingAddress"
+    | "PaymentMethod"
+    | "order-cart"
   >("ContactInfo");
   const [formData, setFormData] = useState<FormData>({
     contactInfo: {},
@@ -69,9 +61,8 @@ const CheckoutPage = () => {
     billingAddress: false,
   });
 
-  console.log({ cart })
-  useEffect(() => {
-  }, [formData]);
+  console.log({ cart });
+  useEffect(() => {}, [formData]);
 
   const updateFormData = (section: string, data: any) => {
     setFormData((prevData) => {
@@ -153,14 +144,13 @@ const CheckoutPage = () => {
 
     updateShippingTotal();
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isStorePickup]);
-
 
   const [
     guestCheckoutMutation,
     { loading: checkoutLoading, error: checkoutError, data: checkoutData },
   ] = useMutation(GUEST_CHECKOUT_MUTATION);
-
 
   useEffect(() => {
     console.log("checkout returned data: ", checkoutData);
@@ -178,11 +168,17 @@ const CheckoutPage = () => {
           quantity: item?.quantity,
         })) || [];
 
-      const shipping = [{
-        methodId: shippingTotal === "0.00" ? "storepickup" : "wbs:0dd3bc79_weight_based_shipping",
-        methodTitle: shippingTotal === "0.00" ? "storepickup" : "Weight Based Shipping",
-        total: shippingTotal,
-      }]
+      const shipping = [
+        {
+          methodId:
+            shippingTotal === "0.00"
+              ? "storepickup"
+              : "wbs:0dd3bc79_weight_based_shipping",
+          methodTitle:
+            shippingTotal === "0.00" ? "storepickup" : "Weight Based Shipping",
+          total: shippingTotal,
+        },
+      ];
 
       if (paymentMethodId !== undefined) {
         try {
@@ -190,7 +186,7 @@ const CheckoutPage = () => {
             variables: {
               paymentMethod: paymentMethodId,
               lineItems: lineItems,
-              shippingLines: shipping
+              shippingLines: shipping,
             },
           });
 
@@ -333,15 +329,16 @@ const CheckoutPage = () => {
                   isConfirmed.paymentMethod
                 )
               }
-              className={`mt-8 w-full ${!(
-                isConfirmed.contactInfo &&
-                isConfirmed.deliveryAddress &&
-                isConfirmed.billingAddress &&
-                isConfirmed.paymentMethod
-              )
-                ? 'bg-slate-500 cursor-not-allowed'
-                : 'bg-primary hover:bg-primary-dark'
-                }`}
+              className={`mt-8 w-full ${
+                !(
+                  isConfirmed.contactInfo &&
+                  isConfirmed.deliveryAddress &&
+                  isConfirmed.billingAddress &&
+                  isConfirmed.paymentMethod
+                )
+                  ? "bg-slate-500 cursor-not-allowed"
+                  : "bg-primary hover:bg-primary-dark"
+              }`}
             >
               Confirm order
             </ButtonPrimary>

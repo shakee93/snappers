@@ -73,15 +73,16 @@ const ContactInfo: FC<Props> = ({
               </div>
             </div>
           </div>
-
-          <ButtonSecondary
-            sizeClass="py-2 px-4 "
-            fontSize="text-sm font-medium"
-            className="bg-slate-50 dark:bg-slate-800 mt-5 sm:mt-0 sm:ml-auto !rounded-lg"
-            onClick={() => onOpenActive()}
-          >
-            Change
-          </ButtonSecondary>
+          {!isActive && (
+            <ButtonSecondary
+              sizeClass="py-2 px-4 "
+              fontSize="text-sm font-medium"
+              className="bg-slate-50 dark:bg-slate-800 mt-5 sm:mt-0 sm:ml-auto !rounded-lg"
+              onClick={() => onOpenActive()}
+            >
+              Change
+            </ButtonSecondary>
+          )}
         </div>
         <form onSubmit={handleContactSubmit}>
           <div
