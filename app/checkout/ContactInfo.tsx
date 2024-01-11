@@ -55,50 +55,54 @@ const ContactInfo: FC<Props> = ({
     return (
       <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden z-0">
         <div className="flex flex-col sm:flex-row items-start p-6 ">
-
-          <div className="flex flex-row gap-4 md:gap-0">
-            <h1 className="text-2xl self-center border border-solid border-blue-700 leading-[10px] rounded-full p-[10px] text-blue-700 font-semibold border">1</h1>
+          <div className="flex flex-row items-center gap-4 md:gap-0">
+            <h1 className="h-10 w-10 border-blue-700 text-blue-700 rounded-xl border-2 flex items-center justify-center text-xl font-bold">
+              1
+            </h1>
             <div className="sm:ml-8">
               <h3 className=" text-slate-700 items-center dark:text-slate-300 flex ">
-                <span className="uppercase tracking-tight">CONTACT INFO*</span>
+                <h3 className="text-lg font-semibold">Contact infomation</h3>
               </h3>
-              <div className="md:block font-semibold mt-1 text-sm">
+              <div className="md:block  mt-1 text-sm">
                 <span className="">{email ?? ""}</span>
-                <span className=" block ml-0 mt-2 md:mt-2 tracking-tighter">{phone || ""}</span>
+                <span className=" block ml-0 mt-2 md:mt-2 tracking-tighter">
+                  {phone || ""}
+                </span>
               </div>
             </div>
           </div>
-
-          <ButtonSecondary
-            sizeClass="py-2 px-4 "
-            fontSize="text-sm font-medium"
-            className="bg-slate-50 dark:bg-slate-800 mt-5 sm:mt-0 sm:ml-auto !rounded-lg"
-            onClick={() => onOpenActive()}
-          >
-            Change
-          </ButtonSecondary>
+          {!isActive && (
+            <ButtonSecondary
+              sizeClass="py-2 px-4 "
+              fontSize="text-sm font-medium"
+              className="bg-slate-50 dark:bg-slate-800 mt-5 sm:mt-0 sm:ml-auto !rounded-lg"
+              onClick={() => onOpenActive()}
+            >
+              Change
+            </ButtonSecondary>
+          )}
         </div>
         <form onSubmit={handleContactSubmit}>
           <div
-            className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${isActive ? "block" : "hidden"
-              }`}
+            className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-2 sm:space-y-2 ${
+              isActive ? "block" : "hidden"
+            }`}
           >
             <div className="flex justify-between flex-wrap items-baseline">
-              <h3 className="text-lg font-semibold">Contact infomation</h3>
-
               {!initialData?.displayName && (
                 <span className="block text-sm my-1 md:my-0">
                   Do not have an account?{` `}
-                  <a href="##" className="text-primary-500 font-medium">
+                  <a href="" className="text-primary-500 font-medium">
                     Log in
                   </a>
                 </span>
               )}
             </div>
             <div className="max-w-lg">
-              <Label className="text-sm">Your phone number</Label>
+              {/* <Label className="text-sm">Your phone number</Label> */}
               <Input
-                className="mt-1.5"
+                className="mt-1.5  "
+                placeholder="Phone*"
                 value={phone}
                 type="tel"
                 onChange={(e) => setPhone(e.target.value)}
@@ -106,8 +110,9 @@ const ContactInfo: FC<Props> = ({
               />
             </div>
             <div className="max-w-lg">
-              <Label className="text-sm">Email address</Label>
+              {/* <Label className="text-sm">Email address</Label> */}
               <Input
+                placeholder="Email*"
                 className="mt-1.5"
                 value={email}
                 type="email"

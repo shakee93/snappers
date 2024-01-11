@@ -1,4 +1,7 @@
-import { SRI_LANKAN_STATES, SelectField } from "@/components/AddressPageComps/HelperComps";
+import {
+  SRI_LANKAN_STATES,
+  SelectField,
+} from "@/components/AddressPageComps/HelperComps";
 import { CustomerAddress } from "@/graphql/types/graphql";
 import Label from "components/Label/Label";
 import { BadgeMinus, Check, Receipt } from "lucide-react";
@@ -75,49 +78,55 @@ const BillingAddress: FC<Props> = ({
     return (
       <div className="border border-slate-200 dark:border-slate-700 rounded-xl ">
         <div className="p-6 flex flex-col sm:flex-row items-start">
-
-          <div className="flex flex-row gap-4 md:gap-0">
-            <h1 className="text-2xl self-center border border-solid border-blue-700 leading-4 rounded-full p-[10px] text-blue-700 font-semibold border">3</h1>
+          <div className="flex flex-row gap-4 items-center md:gap-0">
+            <h1 className="h-10 w-10 border-blue-700 text-blue-700 rounded-xl border-2 flex items-center justify-center text-xl font-bold">
+              3
+            </h1>
             <div className="sm:ml-8">
               <h3 className=" text-slate-700 items-center dark:text-slate-300 flex ">
-                <span className="uppercase">Billing ADDRESS*</span>
+                <span className="text-lg font-semibold">Billing Address</span>
               </h3>
-              <div className="font-semibold mt-1 text-sm">
+              <div className=" mt-1 text-sm">
                 <span className="">
                   {initialData?.address1 || "Your Address"}
                 </span>
               </div>
             </div>
           </div>
-          <ButtonSecondary
-            sizeClass="py-2 px-4 "
-            fontSize="text-sm font-medium"
-            className="bg-slate-50 dark:bg-slate-800 mt-5 sm:mt-0 sm:ml-auto !rounded-lg"
-            onClick={onOpenActive}
-          >
-            Change
-          </ButtonSecondary>
+          {isActive && (
+            <ButtonSecondary
+              sizeClass="py-2 px-4 "
+              fontSize="text-sm font-medium"
+              className="bg-slate-50 dark:bg-slate-800 mt-5 sm:mt-0 sm:ml-auto !rounded-lg"
+              onClick={onOpenActive}
+            >
+              Change
+            </ButtonSecondary>
+          )}
         </div>
         <form onSubmit={handleSubmit}>
           <div
-            className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${isActive ? "block" : "hidden"
-              }`}
+            className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-2 sm:space-y-2 ${
+              isActive ? "block" : "hidden"
+            }`}
           >
             {/* ============ */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
               <div>
-                <Label className="text-sm capitalize ">first name</Label>
+                {/* <Label className="text-sm capitalize ">first name</Label> */}
                 <Input
                   className="mt-1.5 capitalize"
+                  placeholder="First name*"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
                   required
                 />
               </div>
               <div>
-                <Label className="text-sm">Last name</Label>
+                {/* <Label className="text-sm">Last name</Label> */}
                 <Input
                   className="mt-1.5 capitalize"
+                  placeholder="Last name*"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
                   required
@@ -128,10 +137,10 @@ const BillingAddress: FC<Props> = ({
             {/* ============ */}
             <div className="sm:flex space-y-4 sm:space-y-0 sm:space-x-3">
               <div className="flex-1">
-                <Label className="text-sm">Address</Label>
+                {/* <Label className="text-sm">Address</Label> */}
                 <Input
                   className="mt-1.5 capitalize"
-                  placeholder=""
+                  placeholder="Address*"
                   name="address1"
                   value={address}
                   type={"text"}
@@ -140,9 +149,10 @@ const BillingAddress: FC<Props> = ({
                 />
               </div>
               <div className="sm:w-1/3">
-                <Label className="text-sm ">Apt, Suite *</Label>
+                {/* <Label className="text-sm ">Apt, Suite *</Label> */}
                 <Input
                   className="mt-1.5 capitalize"
+                  placeholder="Apt, Suite*"
                   value={apartment}
                   onChange={(e) => setApartment(e.target.value)}
                   required
@@ -153,20 +163,21 @@ const BillingAddress: FC<Props> = ({
             {/* ============ */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
               <div>
-                <Label className="text-sm   ">City</Label>
+                {/* <Label className="text-sm   ">City</Label> */}
                 <Input
                   className="mt-1.5  normal-case  "
+                  placeholder="City*"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   required
                 />
               </div>
               <div>
-                <Label className="text-sm">Country</Label>
+                {/* <Label className="text-sm">Country</Label> */}
                 <Select
                   value="LK"
                   className="mt-1.5 capitalize"
-                  placeholder="SRI LANKAJ"
+                  placeholder="Country (e.g., Sri Lanka)*"
                   onChange={(e) => setCountry(e.target.value)}
                   disabled={true}
                 >
@@ -177,10 +188,8 @@ const BillingAddress: FC<Props> = ({
 
             {/* ============ */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
-
-
               <SelectField
-                label="State"
+                // label="State"
                 name="state"
                 value={state}
                 options={SRI_LANKAN_STATES.map((state) => ({
@@ -190,9 +199,10 @@ const BillingAddress: FC<Props> = ({
                 onChange={(e: any) => setState(e.target.value)}
               />
               <div>
-                <Label className="text-sm">Postal code</Label>
+                {/* <Label className="text-sm">Postal code</Label> */}
                 <Input
                   className="mt-1.5 capitalize"
+                  placeholder="Postal code*"
                   required
                   value={postal}
                   onChange={(e) => setPostal(e.target.value)}

@@ -53,10 +53,10 @@ const Contact = () => {
                     <p className=" flex justify-center items-center text-base text-body-color dark:text-dark-6">
                       <PinIcon className="mr-3 h-4"/> 250/54, Ground Floor, Liberty Plaza, Colombo 03.
                     </p>
-                    <br />  
-                    <p className="flex justify-center items-center text-base text-body-color dark:text-dark-6">
-                    <PinIcon className="mr-3 h-4"/>  157, 2nd Cross Street, Colombo 11.
-                    </p>
+                    {/*<br />  */}
+                    {/*<p className="flex justify-center items-center text-base text-body-color dark:text-dark-6">*/}
+                    {/*<PinIcon className="mr-3 h-4"/>  157, 2nd Cross Street, Colombo 11.*/}
+                    {/*</p>*/}
                   </div>
                 </div>
 

@@ -1,5 +1,5 @@
 // BankTransfer.tsx
-import React, { useState, FormEvent } from 'react';
+import React, { useState, FormEvent } from "react";
 
 type BankTransferProps = {
   // Define any props you expect to pass into BankTransfer here
@@ -7,8 +7,8 @@ type BankTransferProps = {
 
 const BankTransfer: React.FC<BankTransferProps> = () => {
   const [file, setFile] = useState<File | null>(null);
-  const [orderId, setOrderId] = useState<string>('');
-  const [uploadStatus, setUploadStatus] = useState<string>('');
+  const [orderId, setOrderId] = useState<string>("");
+  const [uploadStatus, setUploadStatus] = useState<string>("");
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = event.target.files;
@@ -24,30 +24,31 @@ const BankTransfer: React.FC<BankTransferProps> = () => {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (!file) {
-      alert('Please select a file to upload.');
+      alert("Please select a file to upload.");
       return;
     }
 
     const formData = new FormData();
-    formData.append('file', file);
-    formData.append('order_id', orderId);
+    formData.append("file", file);
+    formData.append("order_id", orderId);
 
     try {
-      const response = await fetch('http://52.45.14.64/api/gq_mobile/v1', {
-        method: 'POST',
+      const response = await fetch("/api/banktransfer", {
+        method: "POST",
         body: formData,
       });
 
       const data = await response.json();
+      console.log("response", data);
 
-      if (data.message === 'File uploaded successfully') {
-        setUploadStatus('File uploaded successfully!');
+      if (data.message === "File uploaded successfully") {
+        setUploadStatus("File uploaded successfully!");
       } else {
-        setUploadStatus('File upload failed. Please try again.');
+        setUploadStatus("File upload failed. Please try again.");
       }
     } catch (error) {
-      console.error('Error:', error);
-      setUploadStatus('An error occurred. Please try again later.');
+      console.error("Error:", error);
+      setUploadStatus("An error occurred. Please try again later.");
     }
   };
 
@@ -55,19 +56,39 @@ const BankTransfer: React.FC<BankTransferProps> = () => {
     <div className="container mx-auto p-4">
       <form className="file-upload-form" onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="file">
+          <label
+            className="block text-gray-700 text-sm font-bold mb-2"
+            htmlFor="file"
+          >
             Upload Receipt
           </label>
-          <input className="shadow border rounded py-2 px-3 text-gray-700" id="file" type="file" onChange={handleFileChange} />
+          <input
+            className="shadow border rounded py-2 px-3 text-gray-700"
+            id="file"
+            type="file"
+            onChange={handleFileChange}
+          />
         </div>
         <div className="mb-6">
-          <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="order_id">
+          <label
+            className="block text-gray-700 text-sm font-bold mb-2"
+            htmlFor="order_id"
+          >
             Order ID
           </label>
-          <input className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight" id="order_id" type="text" value={orderId} onChange={handleOrderIdChange} />
+          <input
+            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight"
+            id="order_id"
+            type="text"
+            value={orderId}
+            onChange={handleOrderIdChange}
+          />
         </div>
         <div className="flex items-center justify-between">
-          <button className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded" type="submit">
+          <button
+            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            type="submit"
+          >
             Upload
           </button>
         </div>

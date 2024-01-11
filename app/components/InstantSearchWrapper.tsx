@@ -60,7 +60,7 @@ const InstantSearchWrapper = ({
 
     const getFilterQuery: () => string = () => {
         const f =[
-            sidebar.priceRange !== PRICE_RANGE ?
+            sidebar.priceRange.join('') !== PRICE_RANGE.join('') ?
                 `rawPrice:[${sidebar.priceRange[0]}..${sidebar.priceRange[1]}]` : null,
             category ?   `productCategories.edges.node.databaseId:${category.databaseId}`
                 :sidebar.categories.length > 0 ?

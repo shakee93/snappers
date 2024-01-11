@@ -219,7 +219,7 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
   return (
    <>
     <div
-      className={ `bg-red-50 rounded-3xl p-10 hidden lg:block nc-SectionGridMoreExplore relative ${className}`}
+      className={ `bg-slate-100 rounded-3xl p-10 hidden lg:block nc-SectionGridMoreExplore relative ${className}`}
       data-nc-id="SectionGridMoreExplore"
     >
       {renderHeading()}
@@ -240,7 +240,7 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
       </div>
     </div>
     <div
-      className={`bg-red-50 rounded-3xl p-3 md:p-5 lg:hidden nc-SectionGridMoreExplore relative ${className}`}
+      className={`bg-slate-100 rounded-3xl p-3 md:p-5 lg:hidden nc-SectionGridMoreExplore relative ${className}`}
       data-nc-id="SectionGridMoreExplore"
     >
       {renderHeading()}

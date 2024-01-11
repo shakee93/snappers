@@ -10,7 +10,7 @@ import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Input from "shared/Input/Input";
 import Select from "shared/Select/Select";
 import Checkbox from "@/shared/Checkbox/Checkbox";
-import BillingAddress from 'app/checkout/BillingAddress';
+import BillingAddress from "app/checkout/BillingAddress";
 import toast from "react-hot-toast";
 
 interface Props {
@@ -54,7 +54,7 @@ const DeliveryAddress: FC<Props> = ({
 
   const [isBillingSameAsShipping, setIsBillingSameAsShipping] = useState(true);
 
-  useEffect(() => { }, []);
+  useEffect(() => {}, []);
   const handleDeliverySame = () => {
     setIsBillingSameAsShipping((prevValue) => {
       const newValue = !prevValue;
@@ -76,7 +76,7 @@ const DeliveryAddress: FC<Props> = ({
     if (!isStorePickup) {
       setStorePickup(true);
       // console.log("store pickup Value: ", isStorePickup);
-      updateFormData("billingAddress", formData.BillingAddress)
+      updateFormData("billingAddress", formData.BillingAddress);
       updateFormData("shippingDetails", {
         databaseId: "local_pickup",
         id: "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==",
@@ -92,7 +92,6 @@ const DeliveryAddress: FC<Props> = ({
     }
     // console.log("final value: ", isStorePickup);
   };
-
 
   useEffect(() => {
     if (initialData) {
@@ -152,41 +151,52 @@ const DeliveryAddress: FC<Props> = ({
         title: "StorePickup",
       });
     }
-
   };
 
   const renderShippingAddress = () => {
     return (
       <div className="border border-slate-200 dark:border-slate-700 rounded-xl ">
         <div className="p-6 flex flex-col sm:flex-row items-start">
-
-          <div className="flex flex-row gap-4 md:gap-0">
-            <h1 className="text-2xl self-center border border-solid border-blue-700 leading-4 rounded-full p-[10px] text-blue-700 font-semibold border">2</h1>
+          <div className="flex flex-row items-center gap-4 md:gap-0">
+            <h1
+              className="h-10
+             w-10
+             border-blue-700 text-blue-700 rounded-xl border-2 flex items-center justify-center text-xl font-bold"
+            >
+              2
+            </h1>
             <div className="sm:ml-8">
               <h3 className=" text-slate-700 items-center gap-2 dark:text-slate-300 flex ">
-                <span className="uppercase">
+                <span className="text-lg font-semibold">
                   {isStorePickup ? "Billing Address" : "Delivery Address"}
                 </span>
               </h3>
-              <div className="font-semibold mt-1 text-sm">
-                <span className="">{address || isStorePickup ? "Your Billing Address" : "Your Delivery Address"}</span>
+              <div className=" mt-1 text-sm">
+                <span className="">
+                  {address || isStorePickup
+                    ? "Your Billing Address"
+                    : "Your Delivery Address"}
+                </span>
               </div>
             </div>
           </div>
 
-          <ButtonSecondary
-            sizeClass="py-2 px-4 "
-            fontSize="text-sm font-medium"
-            className="bg-slate-50 dark:bg-slate-800 mt-5 sm:mt-0 sm:ml-auto !rounded-lg"
-            onClick={onOpenActive}
-          >
-            Change
-          </ButtonSecondary>
+          {!isActive && (
+            <ButtonSecondary
+              sizeClass="py-2 px-4 "
+              fontSize="text-sm font-medium"
+              className="bg-slate-50 dark:bg-slate-800 mt-5 sm:mt-0 sm:ml-auto !rounded-lg"
+              onClick={onOpenActive}
+            >
+              Change
+            </ButtonSecondary>
+          )}
         </div>
         <form onSubmit={handleSubmit}>
           <div
-            className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${isActive ? "block" : "hidden"
-              }`}
+            className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-2 sm:space-y-2 ${
+              isActive ? "block" : "hidden"
+            }`}
           >
             <div className="w-fit border border-slate-200 dark:border-slate-700 rounded-xl p-4">
               <Checkbox
@@ -200,19 +210,21 @@ const DeliveryAddress: FC<Props> = ({
             {/* ============ */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
               <div>
-                <Label className="text-sm capitalize ">first name</Label>
+                {/* <Label className="text-sm capitalize ">first name</Label> */}
                 <Input
                   className="mt-1.5 capitalize"
                   value={firstName}
+                  placeholder="First name*"
                   onChange={(e) => setFirstName(e.target.value)}
                   required={true}
                 />
               </div>
               <div>
-                <Label className="text-sm">Last name</Label>
+                {/* <Label className="text-sm">Last name</Label> */}
                 <Input
                   className="mt-1.5 capitalize"
                   value={lastName}
+                  placeholder="Last name*"
                   onChange={(e) => setLastName(e.target.value)}
                   required={true}
                 />
@@ -222,10 +234,10 @@ const DeliveryAddress: FC<Props> = ({
             {/* ============ */}
             <div className="sm:flex space-y-4 sm:space-y-0 sm:space-x-3">
               <div className="flex-1">
-                <Label className="text-sm">Address</Label>
+                {/* <Label className="text-sm">Address</Label> */}
                 <Input
                   className="mt-1.5 capitalize"
-                  placeholder=""
+                  placeholder="Address*"
                   name="address1"
                   value={address}
                   type={"text"}
@@ -234,9 +246,10 @@ const DeliveryAddress: FC<Props> = ({
                 />
               </div>
               <div className="sm:w-1/3">
-                <Label className="text-sm ">Apt, Suite *</Label>
+                {/* <Label className="text-sm ">Apt, Suite *</Label> */}
                 <Input
                   className="mt-1.5 capitalize"
+                  placeholder="Apt, Suite **"
                   name="address2"
                   value={apartment}
                   onChange={(e) => setApartment(e.target.value)}
@@ -248,20 +261,21 @@ const DeliveryAddress: FC<Props> = ({
             {/* ============ */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
               <div>
-                <Label className="text-sm   ">City</Label>
+                {/* <Label className="text-sm   ">City</Label> */}
                 <Input
                   className="mt-1.5  normal-case  "
+                  placeholder="City*"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
                   required={true}
                 />
               </div>
               <div>
-                <Label className="text-sm">Country</Label>
+                {/* <Label className="text-sm">Country</Label> */}
                 <Select
                   value="LK"
                   className="mt-1.5 capitalize"
-                  placeholder="SRI LANKA"
+                  placeholder="Country (e.g., Sri Lanka)*"
                   onChange={(e) => setCountry(e.target.value)}
                   disabled={true}
                 >
@@ -273,7 +287,7 @@ const DeliveryAddress: FC<Props> = ({
             {/* ============ */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
               <SelectField
-                label="State"
+                // label="State"
                 name="state"
                 value={state}
                 options={SRI_LANKAN_STATES.map((state) => ({
@@ -283,9 +297,10 @@ const DeliveryAddress: FC<Props> = ({
                 onChange={(e: any) => setState(e.target.value)}
               />
               <div>
-                <Label className="text-sm">Postal code</Label>
+                {/* <Label className="text-sm">Postal code</Label> */}
                 <Input
                   className="mt-1.5 capitalize"
+                  placeholder="Postal code*"
                   value={postal}
                   onChange={(e) => setPostal(e.target.value)}
                   required={true}
@@ -296,7 +311,9 @@ const DeliveryAddress: FC<Props> = ({
             {/* ============ */}
             <div className="flex flex-col sm:flex-row pt-6">
               <ButtonPrimary className="sm:!px-7 shadow-none" type="submit">
-                {!isBillingSameAsShipping ? "Save and next to Billing" : "Save and next to Payment"}
+                {!isBillingSameAsShipping
+                  ? "Save and Proceed to Billing"
+                  : "Save and Proceed to Payment"}
               </ButtonPrimary>
             </div>
 
@@ -305,14 +322,14 @@ const DeliveryAddress: FC<Props> = ({
                 <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4">
                   <Checkbox
                     key={2}
-                    label=" Delivery address is the same as billing address"
+                    label="Delivery address is the same as billing address"
                     name="deliverySame"
                     defaultChecked={isBillingSameAsShipping}
                     onChange={handleDeliverySame}
                   />
                 </div>
-              </div>)}
-
+              </div>
+            )}
           </div>
         </form>
       </div>
