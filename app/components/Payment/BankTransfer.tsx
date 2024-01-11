@@ -1,5 +1,10 @@
 // BankTransfer.tsx
+import ButtonPrimary from "@/shared/Button/ButtonPrimary";
+import { Input } from "@nextui-org/react";
+import { Router } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React, { useState, FormEvent } from "react";
+import toast from "react-hot-toast";
 
 type BankTransferProps = {
   // Define any props you expect to pass into BankTransfer here
@@ -21,6 +26,8 @@ const BankTransfer: React.FC<BankTransferProps> = () => {
     setOrderId(event.target.value);
   };
 
+  const router = useRouter();
+
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (!file) {
@@ -39,12 +46,16 @@ const BankTransfer: React.FC<BankTransferProps> = () => {
       });
 
       const data = await response.json();
-      console.log("response", data);
+      
+      console.log("data",data)
 
-      if (data.message === "File uploaded successfully") {
-        setUploadStatus("File uploaded successfully!");
-      } else {
-        setUploadStatus("File upload failed. Please try again.");
+      if (data.message === "succuss") {
+        setUploadStatus("succuss");
+        router.push('/thank-you')
+      }
+      if(data.error) {
+        setUploadStatus("wrong");
+        toast.error("Something Went Wrong")
       }
     } catch (error) {
       console.error("Error:", error);
@@ -54,43 +65,31 @@ const BankTransfer: React.FC<BankTransferProps> = () => {
 
   return (
     <div className="container mx-auto p-4">
-      <form className="file-upload-form" onSubmit={handleSubmit}>
+      <form className="file-upload-form w-fit" onSubmit={handleSubmit}>
         <div className="mb-4">
           <label
             className="block text-gray-700 text-sm font-bold mb-2"
             htmlFor="file"
           >
-            Upload Receipt
+            Upload Bank Slip
           </label>
-          <input
-            className="shadow border rounded py-2 px-3 text-gray-700"
+          <Input
+            className=""
             id="file"
             type="file"
             onChange={handleFileChange}
+            
           />
+
         </div>
-        <div className="mb-6">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="order_id"
-          >
-            Order ID
-          </label>
-          <input
-            className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 mb-3 leading-tight"
-            id="order_id"
-            type="text"
-            value={orderId}
-            onChange={handleOrderIdChange}
-          />
-        </div>
+   
         <div className="flex items-center justify-between">
-          <button
+          <ButtonPrimary
             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
             type="submit"
           >
             Upload
-          </button>
+          </ButtonPrimary>
         </div>
         {uploadStatus && <p className="text-center my-4">{uploadStatus}</p>}
       </form>

@@ -4,6 +4,8 @@ import Script from "next/script";
 import { Button } from "@nextui-org/react";
 import { PaymentDetailsType, PaymentDetailsWithoutUrls } from "@/data/types";
 import { extractRawAmount } from "@/components/AddressPageComps/HelperComps";
+import ButtonPrimary from "@/shared/Button/ButtonPrimary";
+import ModalPayhere from "./ModalPayhere";
 
 declare global {
   interface Window {
@@ -144,7 +146,7 @@ const PayHerePayment: React.FC<PayHerePaymentProps> = ({ paymentDetails }) => {
         onLoad={() => console.log("PayHere script loaded")}
         onError={() => console.error("Error loading PayHere script")}
       />
-      <Button onClick={initiatePayment}>Pay with PayHere</Button>
+      <ButtonPrimary onClick={initiatePayment}>Pay with PayHere</ButtonPrimary>
     </>
   );
 };

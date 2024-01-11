@@ -22,6 +22,7 @@ import CheckoutDetails from "./CheckoutDetails";
 import CartItems from "./CartItems";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import ModalPayhere from "../components/Payment/ModalPayhere";
 
 interface FormData {
   contactInfo: Record<string, any>;
@@ -346,6 +347,7 @@ const CheckoutPage = () => {
             >
               Confirm order
             </ButtonPrimary>
+            <ModalPayhere />
 
             <div className="mt-5 text-sm text-slate-500 dark:text-slate-400 flex items-center justify-center">
               <p className="block relative pl-5">
