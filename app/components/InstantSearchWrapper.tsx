@@ -120,6 +120,8 @@ const InstantSearchWrapper = ({
     }, [])
 
     const Comp = useMemo(() => {
+        // TODO: Search on client size freezes when using useInstantSearch hook so switching between normal and next.
+        // when this gets fixed update the package
         return server ? InstantSearchNext : InstantSearch
     }, [])
 
