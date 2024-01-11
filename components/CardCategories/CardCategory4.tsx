@@ -29,7 +29,7 @@ const CardCategory4: FC<CardCategory4Props> = ({
     >
       <div>
         <div className="absolute bottom-0 right-0 max-w-[280px] opacity-80">
-          <img src={bgSVG} alt="" />
+          {/* <img src={bgSVG} alt="" /> */}
         </div>
 
         <div className="absolute inset-5 sm:inset-8 flex flex-col justify-between">

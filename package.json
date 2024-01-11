@@ -52,7 +52,7 @@
     "react-instantsearch-nextjs": "^0.1.7",
     "react-slick": "^0.29.0",
     "react-use": "^17.4.2",
-    "sharp": "^0.33.0",
+    "sharp": "^0.33.1",
     "slick-carousel": "^1.8.1",
     "swiper": "^11.0.5",
     "tailwind-merge": "^2.2.0",

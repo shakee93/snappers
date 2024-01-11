@@ -43,8 +43,6 @@ const ContactInfo: FC<Props> = ({
         email,
       };
       updateFormData("contactInfo", contactInfo);
-      // setPhone(initialData?.phone);
-      // setEmail(initialData?.email);
       setIsConfirmed(true);
       onCloseActive();
       handleConfirmationChange(true);
