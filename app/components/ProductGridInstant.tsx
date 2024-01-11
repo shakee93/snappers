@@ -46,13 +46,6 @@ const ProductGridInstant = ({
   //     </div>
   // }
 
-  const isBrowser = () => typeof window !== "undefined"; //The approach recommended by Next.js
-
-  function scrollToTop() {
-    if (!isBrowser()) return;
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  }
-
   return (
     <>
       {(results?.nbHits === 0 && search.length > 0) && (
@@ -77,7 +70,7 @@ const ProductGridInstant = ({
       {results && results?.nbHits > results?.hitsPerPage && (
         <>
           <hr className="border-slate-200 mb-2 -mx-3 lg:my-6 dark:border-slate-700" />
-          <Pagination onPageChange={scrollToTop} />
+          <Pagination  />
         </>
       )}
     </>
