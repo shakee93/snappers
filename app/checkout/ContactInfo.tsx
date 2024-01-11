@@ -1,5 +1,6 @@
 import { contactInformation } from "@/data/types";
 import Label from "components/Label/Label";
+import Link from "next/link";
 import React, { FC, useEffect, useState } from "react";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
@@ -71,16 +72,18 @@ const ContactInfo: FC<Props> = ({
               </div>
             </div>
           </div>
-          {!isActive && (
-            <ButtonSecondary
-              sizeClass="py-2 px-4 "
-              fontSize="text-sm font-medium"
-              className="bg-slate-50 dark:bg-slate-800 mt-5 sm:mt-0 sm:ml-auto !rounded-lg"
-              onClick={() => onOpenActive()}
-            >
-              Change
-            </ButtonSecondary>
-          )}
+
+            {!isActive && (
+              <ButtonSecondary
+                sizeClass="py-2 px-4 sm:w-fit w-full"
+                fontSize="text-sm font-medium"
+                className="bg-slate-50 dark:bg-slate-800 mt-5 sm:mt-0 sm:ml-auto !rounded-lg"
+                onClick={() => onOpenActive()}
+              >
+                Change
+              </ButtonSecondary>
+            )}
+
         </div>
         <form onSubmit={handleContactSubmit}>
           <div
@@ -92,9 +95,9 @@ const ContactInfo: FC<Props> = ({
               {!initialData?.displayName && (
                 <span className="block text-sm my-1 md:my-0">
                   Do not have an account?{` `}
-                  <a href="" className="text-primary-500 font-medium">
+                  <Link href="/login" className="text-primary-500 font-medium">
                     Log in
-                  </a>
+                  </Link>
                 </span>
               )}
             </div>
@@ -113,7 +116,7 @@ const ContactInfo: FC<Props> = ({
               {/* <Label className="text-sm">Email address</Label> */}
               <Input
                 placeholder="Email*"
-                className="mt-1.5"
+                className="mt-2"
                 value={email}
                 type="email"
                 onChange={(e) => setEmail(e.target.value)}

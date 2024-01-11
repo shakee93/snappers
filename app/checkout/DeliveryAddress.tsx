@@ -183,7 +183,7 @@ const DeliveryAddress: FC<Props> = ({
 
           {!isActive && (
             <ButtonSecondary
-              sizeClass="py-2 px-4 "
+              sizeClass="py-2 px-4 sm:w-fit w-full"
               fontSize="text-sm font-medium"
               className="bg-slate-50 dark:bg-slate-800 mt-5 sm:mt-0 sm:ml-auto !rounded-lg"
               onClick={onOpenActive}
@@ -208,7 +208,7 @@ const DeliveryAddress: FC<Props> = ({
               />
             </div>
             {/* ============ */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2  sm:gap-3">
               <div>
                 {/* <Label className="text-sm capitalize ">first name</Label> */}
                 <Input
@@ -232,7 +232,7 @@ const DeliveryAddress: FC<Props> = ({
             </div>
 
             {/* ============ */}
-            <div className="sm:flex space-y-4 sm:space-y-0 sm:space-x-3">
+            <div className="sm:flex  sm:space-x-3">
               <div className="flex-1">
                 {/* <Label className="text-sm">Address</Label> */}
                 <Input
@@ -259,11 +259,11 @@ const DeliveryAddress: FC<Props> = ({
             </div>
 
             {/* ============ */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
+            <div className="grid grid-cols-1 mt-0 sm:grid-cols-2 gap-0  sm:gap-3">
               <div>
                 {/* <Label className="text-sm   ">City</Label> */}
                 <Input
-                  className="mt-1.5  normal-case  "
+                  className=" sm:mt-1.5 mt-0 normal-case  "
                   placeholder="City*"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
@@ -285,9 +285,11 @@ const DeliveryAddress: FC<Props> = ({
             </div>
 
             {/* ============ */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
+            <div className="grid grid-cols-1 mt-0 sm:grid-cols-2  sm:gap-3">
               <SelectField
                 // label="State"
+                sizeClass="mt-0 sm:mt-1.5"
+                className="mt-0 sm:mt-1.5"
                 name="state"
                 value={state}
                 options={SRI_LANKAN_STATES.map((state) => ({

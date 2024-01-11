@@ -87,10 +87,7 @@ export const UPDATE_ACCOUNT_INFORMATION = gql`
   }
 `;
 
-// metalist__
-// gender
-// about
-// date
+// Rename one of these operations to have a unique name
 export const GET_ACCOUNT_DETAILS = gql`
   query getAccountDetails {
     customer {
@@ -106,17 +103,10 @@ export const GET_ACCOUNT_DETAILS = gql`
         phone
       }
     }
-}
-`;
-
-export const GET_DEFAULT_ACC_FOR_AVATAR = gql`
-  query getAccountDetails {
-    customer {
-      id
-      displayName
-    }
   }
 `;
+
+
 
 export const LOGIN_CUSTOMER_MUTATION = gql`
   mutation LoginCustomer($input: LoginInput!) {
