@@ -12,6 +12,7 @@ import {
     RegisterCustomerMutation,
     RegisterCustomerPayload
 } from "@/graphql/types/graphql";
+import {useCart} from "@/context/CartProvider";
 
 const SessionContext = createContext<Session>({
     sessionToken: null,
@@ -48,11 +49,12 @@ export function SessionProvider({ children }: {
     const [sessionToken, setSessionToken] = useState<string | null>(
         typeof window !== "undefined" ? localStorage.getItem(SESSION_TOKEN_KEY) : null);
 
-    const [customer, setCustomer] = useState<Customer>()
+    const { getCart, customer, setCustomer } = useCart()
 
     const { data, refetch } = useQuery(GET_CART, {
         skip: true
     })
+
     const [getUser] = useLazyQuery(GET_ACCOUNT_DETAILS, {
         fetchPolicy: 'no-cache'
     })
@@ -84,6 +86,7 @@ export function SessionProvider({ children }: {
             localStorage.setItem(REFRESH_TOKEN_KEY, data.refreshToken || '');
         }
 
+        getCart()
     }
 
     const signUp = async (email: string, password: string) => {
@@ -158,8 +161,8 @@ export function SessionProvider({ children }: {
         localStorage.removeItem(SESSION_TOKEN_KEY);
         localStorage.removeItem(USER_DATA_KEY);
 
-        setCustomer(undefined)
-        // setSessionToken(null);
+        setCustomer(null)
+        getCart()
     };
 
     const fetchCustomer = async () => {

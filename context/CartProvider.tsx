@@ -1,10 +1,11 @@
 'use client';
 
-import React, {createContext, ReactNode, useContext, useState} from 'react';
+import React, {createContext, ReactNode, useContext, useEffect, useState} from 'react';
 import {
     useQuery,
     ApolloError,
-    useMutation} from '@apollo/client';
+    useMutation, useLazyQuery
+} from '@apollo/client';
 import {
     ADD_TO_CART,
     GET_CART,
@@ -21,7 +22,9 @@ type CartSession = {
     error?: ApolloError
     updateCart: (key: string, quantity: number) => void
     removeFromCart: (keys : string[]) => void
+    getCart: () => void
     addToCart: (id : number, quantity?: number, variation?: number) => void | Promise<any>
+    setCustomer: React.Dispatch<React.SetStateAction<Customer | null>>
 }
 
 const CartContext = createContext<CartSession>({
@@ -30,7 +33,9 @@ const CartContext = createContext<CartSession>({
     loading: null,
     removeFromCart : (keys) => {},
     addToCart : (id) => {},
-    updateCart : (key, q) => {}
+    updateCart : (key, q) => {},
+    getCart : () => {},
+    setCustomer: () => {}
 });
 
 export function useCart() {
@@ -55,7 +60,7 @@ export function CartProvider({ children }: {
         setCustomer(data?.[key]?.customer || data.customer)
     }
 
-    const { data,  error } = useQuery(GET_CART, {
+    const [getCart, {  error }] = useLazyQuery(GET_CART, {
         fetchPolicy: 'no-cache',
         onCompleted: refreshData
     })
@@ -109,6 +114,10 @@ export function CartProvider({ children }: {
         }).finally(() => setLoading(false))
     }
 
+    useEffect(() => {
+        getCart()
+    }, [])
+
     return (
         <CartContext.Provider value={{
             cart,
@@ -117,7 +126,9 @@ export function CartProvider({ children }: {
             error,
             updateCart,
             removeFromCart,
-            addToCart
+            addToCart,
+            getCart,
+            setCustomer
         }}>
             {children}
         </CartContext.Provider>
