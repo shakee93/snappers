@@ -11,6 +11,7 @@ import Image from "next/image";
 
 import NotFound from "@/public/not_found.svg";
 import { usePathname } from "next/navigation";
+import ProductCardLoading from "@/components/Loading/ProductCardLoading";
 
 interface ProductGridProps {
   products?: { node: Product }[];
@@ -24,7 +25,7 @@ const ProductGridInstant = ({
 }: ProductGridProps) => {
   const { hits, results } = useHits();
 
-  // const { status: statusState } = useInstantSearch();
+  const { status: statusState } = useInstantSearch();
   const { setSearchStatus, search, search_status, navigation } = useStore();
 
   const grid = 8;
@@ -46,6 +47,11 @@ const ProductGridInstant = ({
   //     </div>
   // }
 
+
+  useEffect(() => {
+    console.log(statusState);
+  }, [statusState])
+
   return (
     <>
       {(results?.nbHits === 0 && search.length > 0) && (
@@ -57,15 +63,25 @@ const ProductGridInstant = ({
         </div>
       )}
 
-      <div className="flex-1 grid  grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-2 lg:gap-x-8 lg:gap-y-10">
-        {hits.map((item, index: number) => (
-          // <div key={index}></div>
-          <ProductCard
-            key={item.slug as unknown as string}
-            data={item as unknown as Product}
-          />
-        ))}
-      </div>
+      {statusState === 'idle' &&
+          <div className="flex-1 grid  grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-2 lg:gap-x-8 lg:gap-y-10">
+            {hits.map((item, index: number) => (
+                // <div key={index}></div>
+                <ProductCard
+                    key={item.slug as unknown as string}
+                    data={item as unknown as Product}
+                />
+            ))}
+          </div>
+      }
+
+      {(statusState === 'stalled' || statusState === 'loading') &&
+          <div className='flex-1 grid  grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-5 lg:gap-x-8 lg:gap-y-10'>
+            {Array(grid).fill(null).map((x, index) =>
+                <ProductCardLoading key={index}/>
+            )}
+          </div>
+      }
 
       {results && results?.nbHits > results?.hitsPerPage && (
         <>

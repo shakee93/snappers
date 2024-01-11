@@ -180,9 +180,9 @@ const ProductCard: FC<ProductCardProps> = ({
                         <ButtonPrimary
                             className="shadow-lg bg-zinc-500"
                             fontSize="text-xs"
-                            sizeClass="py-3.5 px-5"
+                            sizeClass="py-2.5 px-3.5"
                         >
-                            <ExternalLink className="w-3.5 h-3.5 mb-0.5"  />
+                            <ExternalLink className="w-4"  />
                             {/*<span className="ml-1">Out of Stock</span>*/}
                         </ButtonPrimary>
                     </Link>
