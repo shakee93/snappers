@@ -9,6 +9,7 @@ export const OrderDetails: React.FC<OrderDetailsProps> = ({ orderData }) => {
 
   const rows = [
     { label: "Order Id", value: orderData.order.orderNumber ?? "Not found" },
+    { label: "Date", value: orderData.orderDate ?? "2024/1/1" },
     { label: "Order Total", value: orderData.order.total },
     {
       label: "Discount",
@@ -21,28 +22,25 @@ export const OrderDetails: React.FC<OrderDetailsProps> = ({ orderData }) => {
 
   return (
     <div className="my-4">
-      <div className="grid grid-cols-1 lg:grid-cols-1 gap-20 py-4">
-        <div className="flex flex-col justify-start">
-          <span className="text-center text-primaryColor bg-gray-200 py-2 text-lg font-semibold">
-            Order details
-          </span>
-          <table className="text-base divide-y divide-gray-200">
-            <tbody>
-              {rows.map((row, index) =>
-                row.condition !== false ? (
-                  <tr key={index} className="border-1 border-gray-200">
-                    <td className="px-6 py-2 text-left whitespace-nowrap font-medium text-gray-800 dark:text-gray-200">
-                      {row.label}
-                    </td>
-                    <td className="px-6 py-2 text-right whitespace-nowrap font-medium text-gray-800 dark:text-gray-200">
-                      {row.value}
-                    </td>
-                  </tr>
-                ) : null
-              )}
-            </tbody>
-          </table>
+      <div className="grid grid-cols-1 lg:grid-cols-1 py-4">
+
+        <div className="flex flex-col justify-center items-start">
+          <h1 className="text-3xl font-regural ">Thank You. Your order has been receieved</h1>
         </div>
+
+        <div className="flex flex-row justify-between w-full py-8">
+
+          {rows.map((row, index) =>
+            row.condition !== false ? (
+              <div className="flex flex-col items-start">
+                <p className="font-semibold	">{row.label}</p>
+                <p className="mt-1">{row.value}</p>
+              </div>
+            ) : null
+          )}
+
+        </div>
+
       </div>
     </div>
   );
@@ -56,42 +54,97 @@ const ProductTable: React.FC<ProductTableProps> = ({ lineItems }) => {
   if (!lineItems) return null;
 
   return (
-    <div className="w-full py-10">
-      <div className="flex flex-col">
-        <div className="overflow-hidden">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="text-lg bg-gray-200 py-2 texy-primaryColor ">
-              <tr>
-                <th scope="col" className="px-6 py-3 text-center font-medium">
-                  Product
-                </th>
-                <th scope="col" className="px-6 py-3 text-center font-medium">
-                  Quantity
-                </th>
-                <th scope="col" className="px-6 py-3 text-center font-medium">
-                  Total
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {lineItems.map((item, index) => (
-                <tr key={index}>
-                  <td className="px-6 text-left py-4 font-medium text-gray-800 dark:text-gray-200">
-                    {item?.product.node.name}
+    <>
+      <div className="w-full">
+        <div className="flex flex-col">
+          <div className="overflow-hidden">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+              <thead className="text-lg bg-gray-200 py-2 texy-primaryColor ">
+                <tr>
+                  <th scope="col" className="px-6 py-3 text-center font-medium">
+                    Product
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-center font-medium">
+                    Quantity
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-center font-medium">
+                    Total
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+                {lineItems.map((item, index) => (
+                  <tr key={index}>
+                    <td className="px-6 text-left py-4 font-medium text-gray-800 dark:text-gray-200">
+                      {item?.product.node.name}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-gray-800 dark:text-gray-200">
+                      {item?.quantity}
+                    </td>
+                    <td className="px-6 py-4 text-right whitespace-nowrap text-gray-800 dark:text-gray-200">
+                      {item?.subtotal}
+                    </td>
+                  </tr>
+                ))}
+                <tr>
+                  <td className="px-6 text-left py-4  font-medium text-gray-800 dark:text-gray-200">
+                    Shipping
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-gray-800 dark:text-gray-200">
-                    {item?.quantity}
-                  </td>
-                  <td className="px-6 py-4 text-right whitespace-nowrap text-gray-800 dark:text-gray-200">
-                    {item?.subtotal}
+                  <td className="px-6 text-left py-4  font-medium text-gray-800 dark:text-gray-200">
+                    Collection from Store:
+                    148/1,
+                    Vihara Mawatha,
+                    Kolonnawa,
+                    Wellampitiya,
+                    Western,
+                    10600
+                    dadasd
                   </td>
                 </tr>
-              ))}
-            </tbody>
-          </table>
+                <tr>
+                  <td className="px-6 text-left py-4  font-medium text-gray-800 dark:text-gray-200">
+                    Total
+                  </td>
+                  <td></td>
+                  <td className="px-6 text-left py-4  font-medium text-gray-800 dark:text-gray-200">
+                    රු209,700.00
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
-    </div>
+
+      <div className="pt-8">
+        <p className="text-2xl text-left">Billing Address</p>
+        <div className="mt-8 border rounded" >
+          <div className="w-1/5 p-4 ">
+            sada asdas
+            zxczxc
+            asdasd
+            zxczxc
+            10800
+          </div>
+        </div>
+      </div>
+
+      <div className="pt-10">
+        <p className="text-2xl text-left">Our Bank Details</p>
+        <div className="" >
+          <h1 className="text-xl py-8 text-left ">GQ Mobile</h1>
+
+          <ul className="list-disc pl-4 ">
+            <li className="mb-2 text-left "><strong className="text-gray-600">Bank:</strong> Commercial</li>
+            <li className="mb-2 text-left "><strong className="text-gray-600">Account number:</strong> 34312421543545</li>
+            <li className="mb-2 text-left "><strong className="text-gray-600">Sort code:</strong> fsefsa</li>
+            <li className="mb-2 text-left "><strong className="text-gray-600">IBAN:</strong> asdfadsfasd</li>
+            <li className="mb-2 text-left "><strong className="text-gray-600">BIC:</strong> fsadfsdfasdf</li>
+          </ul>
+
+        </div>
+      </div>
+    </>
   );
 };
 

@@ -30,8 +30,8 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     () => ({
       order_id: orderData?.order?.orderNumber ?? "",
       items: orderData?.order?.lineItems?.nodes ?? [],
-      subtotal: orderData?.order?.subtotal,
-      amount: orderData?.order?.total ?? "",
+      subtotal: orderData?.order?.subtotal ,
+      amount: orderData?.order?.total ?? "" ,
       currency: "LKR",
       first_name:
         customerData?.customer?.shipping?.firstName ?? "no_first_name",
@@ -54,20 +54,17 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
       <div className="my-4 ">
         <OrderDetails orderData={orderData} />
 
-        <div className="">
+        <div className="pt-6">
           <div className="">
-
-            <ProductTable lineItems={orderData?.order?.lineItems?.nodes} />
-
             {/* {data?.order.paymentMethod === "payhere" ? <PayHerePayment/> : "Continue with Bank Transfer"} */}
             {/* && data?.order.paymentMethod === "payhere" && */}
             {temporaryPaymentDetails && (
               <PayHerePayment paymentDetails={temporaryPaymentDetails} />
             )}
-            <BankTransfer />
+            <BankTransfer/>
           </div>
         </div>
-
+        <ProductTable lineItems={orderData?.order?.lineItems?.nodes} />
       </div>
     </div>
   );

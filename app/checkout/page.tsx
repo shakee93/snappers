@@ -63,6 +63,13 @@ const CheckoutPage = () => {
   });
 
   console.log({ cart });
+
+  useEffect(() => {
+    if (cart && cart?.contents?.nodes?.length === 0) {
+      router.push('/');
+    }
+  }, [cart])
+
   useEffect(() => {}, [formData]);
 
   const updateFormData = (section: string, data: any) => {

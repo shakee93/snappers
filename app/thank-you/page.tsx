@@ -25,114 +25,47 @@ const ThankYouPage = ({ params }: OrderPaymentPageProps) => {
 
 
   return (
-    <div className="container rounded-3xl lg:p-20 text-center mt-10">
-      <div className="flex flex-col justify-center gap-4 items-center text-green-600">
-        <BadgeCheck size={80} className="" />
-        <h1 className="text-3xl font-regural ">Thank You for Your Purchase!</h1>
-        <p className="text-lg mb-2">Your order has been successfully placed.</p>
+    <div className="container rounded-3xl lg:p-20 text-center mt-4">
+
+      <div className="flex flex-col justify-center gap-4 items-start">
+        <h1 className="text-3xl font-regural ">Thank You. Your order has been receieved</h1>
       </div>
 
-      <div className="my-4 ">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-20 py-4">
-          <div className="flex flex-col justify-start">
-            <span className="text-center text-primaryColor bg-gray-200 py-2 text-lg font-semibold">
-              Order details:
-            </span>
-            <table className="text-base divide-y divide-gray-200">
-              <tr className="border-1 border-gray-400">
-                <td className="border-1 border-gray-400 px-6 py-2 text-left whitespace-nowrap  font-medium text-gray-800 dark:text-gray-200">
-                  Order Id
-                </td>
-                <td className="px-6 py-2 text-right whitespace-nowrap  font-medium text-gray-800 dark:text-gray-200">
-                  {data?.order.orderNumber}
-                </td>
-              </tr>
-              <tr className="border-1 border-gray-400">
-                <td className="px-6 py-2 text-left whitespace-nowrap  font-medium text-gray-800 dark:text-gray-200">
-                  Order Total
-                </td>
-                <td className="px-6 py-2  text-right whitespace-nowrap font-medium text-gray-800 dark:text-gray-200">
-                  {data?.order.total}
-                </td>
-              </tr>
-              <tr className="border-1 border-gray-400">
-                <td className="px-6 py-2 text-left whitespace-nowrap  font-medium text-gray-800 dark:text-gray-200">
-                  Discount
-                </td>
-                <td className="px-6 py-2  text-right whitespace-nowrap font-medium text-gray-800 dark:text-gray-200">
-                  $30
-                </td>
-              </tr>
-              <tr className="border-1 border-gray-400">
-                <td className="px-6 py-2 text-left whitespace-nowrap  font-medium text-gray-800 dark:text-gray-200">
-                  Delivery Fee
-                </td>
-                <td className="px-6 py-2  text-right whitespace-nowrap font-medium text-gray-800 dark:text-gray-200">
-                  {data?.order.shippingTax}
-                </td>
-              </tr>
-              <tr className="border-1 border-gray-400">
-                <td className="px-6 py-2 text-left whitespace-nowrap  font-medium text-gray-800 dark:text-gray-200">
-                  Sub Total
-                </td>
-                <td className="px-6 py-2  text-right whitespace-nowrap font-medium text-gray-800 dark:text-gray-200">
-                  {data?.order.subtotal}
-                </td>
-              </tr>
-            </table>
-          </div>
+      <div className="flex flex-row justify-between w-full py-12">
 
-          {/* customer details */}
-
-          <div className="flex flex-col justify-start">
-            <span className="text-center text-primaryColor bg-gray-200 py-2 text-lg font-semibold">
-              Customer details:
-            </span>
-            <table className="text-base divide-y divide-gray-200">
-              <tr className="border-1 border-gray-400">
-                <td className="border-1 border-gray-400 px-6 py-2 text-left whitespace-nowrap  font-medium text-gray-800 dark:text-gray-200">
-                  Customer Name
-                </td>
-                <td className="px-6 py-2 text-right whitespace-nowrap  font-medium text-gray-800 dark:text-gray-200">
-                  John Vijay
-                </td>
-              </tr>
-              <tr className="border-1 border-gray-400">
-                <td className="px-6 py-2 text-left whitespace-nowrap  font-medium text-gray-800 dark:text-gray-200">
-                  Contact Number
-                </td>
-                <td className="px-6 py-2  text-right whitespace-nowrap font-medium text-gray-800 dark:text-gray-200">
-                  0761234567
-                </td>
-              </tr>
-              <tr className="border-1 border-gray-400">
-                <td className="px-6 py-2 text-left whitespace-nowrap  font-medium text-gray-800 dark:text-gray-200">
-                  Email Address
-                </td>
-                <td className="px-6 py-2  text-right whitespace font-medium text-gray-800 dark:text-gray-200">
-                  vijay@gmail.com
-                </td>
-              </tr>
-              <tr className="border-1 border-gray-400">
-                <td className="px-6 py-2 text-left whitespace-nowrap  font-medium text-gray-800 dark:text-gray-200">
-                  Address
-                </td>
-                <td className="px-6 py-2  text-right whitespace font-medium text-gray-800 dark:text-gray-200">
-                  250, vihara mawatha, kolonnawa
-                </td>
-              </tr>
-              <tr className="border-1 border-gray-400">
-                <td className="px-6 py-2 text-left whitespace-nowrap  font-medium text-gray-800 dark:text-gray-200">
-                  City
-                </td>
-                <td className="px-6 py-2  text-right whitespace-nowrap font-medium text-gray-800 dark:text-gray-200">
-                  Kolonnawa
-                </td>
-              </tr>
-              
-            </table>
-          </div>
+        <div className="flex flex-col items-start">
+          <p className="font-semibold	">Order Number:</p>
+          <p className="mt-1">6485</p>
         </div>
+
+        <div className="flex flex-col items-start">
+          <p className="font-semibold	">Date</p>
+          <p className="mt-1">2024/10/11</p>
+        </div>
+
+        <div className="flex flex-col items-start">
+          <p className="font-semibold	">Total:</p>
+          <p className="mt-1">රු209,700.00</p>
+        </div>
+
+        <div className="flex flex-col items-start">
+          <p className="font-semibold	">Email: </p>
+          <p className="mt-1">azeezs2012@gmail.com</p>
+        </div>
+
+        <div className="flex flex-col items-start">
+          <p className="font-semibold	">Payment method:</p>
+          <p className="mt-1">Direct bank transfer</p>
+        </div>
+
+      </div>
+
+      <div>
+        <p className="text-2xl text-left">Order Details</p>
+      </div>
+
+
+      <div className="my-2">
         <div>
           <div className="w-full py-10">
             <div className="flex flex-col">
@@ -145,7 +78,7 @@ const ThankYouPage = ({ params }: OrderPaymentPageProps) => {
                           <tr>
                             <th
                               scope="col"
-                              className="px-6 py-3 text-center  font-medium"
+                              className="px-6 py-3 text-center font-medium"
                             >
                               Product
                             </th>
@@ -164,7 +97,7 @@ const ThankYouPage = ({ params }: OrderPaymentPageProps) => {
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                          {data?.order.lineItems?.nodes?.map((item : any, index: any) => (
+                          {data?.order.lineItems?.nodes?.map((item: any, index: any) => (
                             <tr key={index}>
                               <td className="px-6 text-left py-4  font-medium text-gray-800 dark:text-gray-200">
                                 {item?.product.node.name}
@@ -177,6 +110,30 @@ const ThankYouPage = ({ params }: OrderPaymentPageProps) => {
                               </td>
                             </tr>
                           ))}
+                          <tr>
+                            <td className="px-6 text-left py-4  font-medium text-gray-800 dark:text-gray-200">
+                              Shipping
+                            </td>
+                            <td className="px-6 text-left py-4  font-medium text-gray-800 dark:text-gray-200">
+                              Collection from Store:
+                              148/1,
+                              Vihara Mawatha,
+                              Kolonnawa,
+                              Wellampitiya,
+                              Western,
+                              10600
+                              dadasd
+                            </td>
+                          </tr>
+                          <tr>
+                            <td className="px-6 text-left py-4  font-medium text-gray-800 dark:text-gray-200">
+                              Total
+                            </td>
+                            <td></td>
+                            <td className="px-6 text-left py-4  font-medium text-gray-800 dark:text-gray-200">
+                              රු209,700.00
+                            </td>
+                          </tr>
                         </tbody>
                       </table>
                     </div>
@@ -188,7 +145,36 @@ const ThankYouPage = ({ params }: OrderPaymentPageProps) => {
           <div></div>
         </div>
       </div>
-      <p className="text-center text-primaryColor text-xl font-semibold mb-5">Thank you for shopping with us!</p>
+
+      <div>
+        <p className="text-2xl text-left">Billing Address</p>
+        <div className="mt-8 border rounded" >
+          <div className="w-1/5 p-4 ">
+            sada asdas
+            zxczxc
+            asdasd
+            zxczxc
+            10800
+          </div>
+        </div>
+      </div>
+
+      <div className="py-8">
+        <p className="text-2xl text-left">Our Bank Details</p>
+        <div className="" >
+          <h1 className="text-xl py-8 text-left ">GQ Mobile</h1>
+
+          <ul className="list-disc pl-4 ">
+            <li className="mb-2 text-left "><strong className="text-gray-600">Bank:</strong> Commercial</li>
+            <li className="mb-2 text-left "><strong className="text-gray-600">Account number:</strong> 34312421543545</li>
+            <li className="mb-2 text-left "><strong className="text-gray-600">Sort code:</strong> fsefsa</li>
+            <li className="mb-2 text-left "><strong className="text-gray-600">IBAN:</strong> asdfadsfasd</li>
+            <li className="mb-2 text-left "><strong className="text-gray-600">BIC:</strong> fsadfsdfasdf</li>
+          </ul>
+
+        </div>
+      </div>
+
     </div>
   );
 };
