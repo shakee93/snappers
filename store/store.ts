@@ -19,6 +19,7 @@ type State = {
     product: {
         attribute: any[]
     }
+    searchMounted: boolean
 }
 
 type Actions = {
@@ -33,6 +34,7 @@ type Actions = {
     syncBrands: (brands: number[]) => void
     synPriceRange: (brands: number[]) => void
     setMounted: () => void
+    setSearchMounted: () => void
     setAttribute: (attr: ProductAttribute | VariationAttribute, option: string) => void
 }
 
@@ -50,9 +52,14 @@ export const useStore = create<State & Actions>((set) => ({
         sort: "",
         in_stock: false
     },
+    searchMounted: false,
     product: {
         attribute: []
     },
+    setSearchMounted: () => set((state) => ({
+        ...state,
+        searchMounted: true
+    })),
     setSort: (sort: string) => set((state) => ({
         ...state,
         sidebar: {

@@ -26,6 +26,9 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     getUserData();
   }, [getUserData]);
 
+  console.log({orderData})
+  console.log({customerData})
+
   const temporaryPaymentDetails: PaymentDetailsWithoutUrls = useMemo(
     () => ({
       order_id: orderData?.order?.orderNumber ?? "",
@@ -39,6 +42,8 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
       email: customerData?.customer?.email ?? "no_email",
       phone: customerData?.customer?.shipping?.phone ?? "no_phone",
       address: customerData?.customer?.shipping?.address1 ?? "no_address",
+      billingAddress: customerData?.customer?.billing?.address1 ?? "no_address",
+      billingAddress2: customerData?.customer?.billing?.address2 ?? "no_address",
       city: customerData?.customer?.shipping?.city ?? "no_city",
       country: "Sri Lanka",
     }),
@@ -57,7 +62,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
         <div className="">
           <div className="">
 
-            <ProductTable lineItems={orderData?.order?.lineItems?.nodes} />
+            <ProductTable lineItems={orderData?.order?.lineItems?.nodes} orderData={orderData} paymentDetails={temporaryPaymentDetails} />
 
             {/* {data?.order.paymentMethod === "payhere" ? <PayHerePayment/> : "Continue with Bank Transfer"} */}
             {/* && data?.order.paymentMethod === "payhere" && */}

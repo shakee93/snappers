@@ -48,13 +48,18 @@ export const OrderDetails: React.FC<OrderDetailsProps> = ({ orderData }) => {
 
 type ProductTableProps = {
   lineItems: any[];
+  orderData: any;
+  paymentDetails: any;
 };
 
-const ProductTable: React.FC<ProductTableProps> = ({ lineItems }) => {
+const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData, paymentDetails }) => {
   if (!lineItems) return null;
 
   return (
     <>
+      <div>
+        <p className="text-2xl text-left pb-4">Order Details</p>
+      </div>
       <div className="w-full">
         <div className="flex flex-col">
           <div className="overflow-hidden">
@@ -90,15 +95,9 @@ const ProductTable: React.FC<ProductTableProps> = ({ lineItems }) => {
                   <td className="px-6 text-left py-4  font-medium text-gray-800 dark:text-gray-200">
                     Shipping
                   </td>
-                  <td className="px-6 text-left py-4  font-medium text-gray-800 dark:text-gray-200">
-                    Collection from Store:
-                    148/1,
-                    Vihara Mawatha,
-                    Kolonnawa,
-                    Wellampitiya,
-                    Western,
-                    10600
-                    dadasd
+                  <td></td>
+                  <td className="px-6 text-right py-4  font-medium text-gray-800 dark:text-gray-200">
+                    {paymentDetails.address}
                   </td>
                 </tr>
                 <tr>
@@ -106,8 +105,8 @@ const ProductTable: React.FC<ProductTableProps> = ({ lineItems }) => {
                     Total
                   </td>
                   <td></td>
-                  <td className="px-6 text-left py-4  font-medium text-gray-800 dark:text-gray-200">
-                    රු209,700.00
+                  <td className="px-6 text-right py-4 font-medium text-gray-800 dark:text-gray-200">
+                    {orderData.order?.total}
                   </td>
                 </tr>
               </tbody>
@@ -119,12 +118,9 @@ const ProductTable: React.FC<ProductTableProps> = ({ lineItems }) => {
       <div className="pt-8">
         <p className="text-2xl text-left">Billing Address</p>
         <div className="mt-8 border rounded" >
-          <div className="w-1/5 p-4 ">
-            sada asdas
-            zxczxc
-            asdasd
-            zxczxc
-            10800
+          <div className="text-left p-4 ">
+            <p>{paymentDetails.billingAddress2}</p>
+            <p>{paymentDetails.billingAddress}</p>
           </div>
         </div>
       </div>

@@ -1,3 +1,4 @@
+import ProductCardLoading from "@/components/Loading/ProductCardLoading";
 
 
 const ArchiveLoading = () => {
@@ -31,12 +32,7 @@ const ArchiveLoading = () => {
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-10 mt-6">
 
                     {Array(grid).fill(null).map((x, index) =>
-                        <div key={index} className="space-y-3">
-                            <div className="h-48 bg-gray-200 rounded-md animate-pulse"></div>
-                            <div className="h-4 bg-gray-300 rounded-md"></div>
-                            <div className="h-4 bg-gray-300 rounded-md w-2/3"></div>
-                            <div className="h-8 bg-gray-300 rounded-md w-1/4"></div>
-                        </div>
+                        <ProductCardLoading key={index}/>
                     )}
 
                 </div>
