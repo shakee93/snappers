@@ -35,23 +35,21 @@ export default async function RootLayout({
         </head>
         <body className="bg-gray-50 text-base dark:bg-slate-900 text-slate-900 dark:text-slate-200">
         <ApolloWrapper>
-            <SessionProvider>
-                <>
-                    <CartProvider>
-                        <Suspense fallback={null}>
-                            <NavigationEvents></NavigationEvents>
-                        </Suspense>
-                        <Toaster/>
-                        <Header/>
+            <CartProvider>
+                <SessionProvider>
+                    <Suspense fallback={null}>
+                        <NavigationEvents></NavigationEvents>
+                    </Suspense>
+                    <Toaster/>
+                    <Header/>
 
-                        <div className='pb-8 md:pb-24'>
-                            {children}
-                        </div>
+                    <div className='pb-8 md:pb-24'>
+                        {children}
+                    </div>
 
-                        <Footer/>
-                    </CartProvider>
-                </>
-            </SessionProvider>
+                    <Footer/>
+                </SessionProvider>
+            </CartProvider>
         </ApolloWrapper>
         </body>
         </html>

@@ -55,7 +55,7 @@ const ProductGridInstant = ({
 
   return (
     <>
-      {results?.nbHits === 0 && (
+      {(results?.nbHits === 0 && search.length > 0) && (
         <div className="text-center text-slate-500 flex flex-col items-center gap-20 py-12">
           <div>
             <Image className="w-64" src={NotFound} alt="No Search Results" />
@@ -64,7 +64,7 @@ const ProductGridInstant = ({
         </div>
       )}
 
-      <div className="flex-1 grid  grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-5 lg:gap-x-8 lg:gap-y-10">
+      <div className="flex-1 grid  grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-2 lg:gap-x-8 lg:gap-y-10">
         {hits.map((item, index: number) => (
           // <div key={index}></div>
           <ProductCard

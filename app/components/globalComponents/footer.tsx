@@ -70,7 +70,22 @@ const Footer = async () => {
             {/* <div className="text-base md:text-base font-medium text-black">
               Branch
             </div> */}
-            
+            {/*<ul className="flex  text-xs pt-5 md:pt-3 flex-col gap-3 ">*/}
+            {/*  <li className="lg:text-sm text-gray-500 flex gap-3">*/}
+            {/*    <div>*/}
+            {/*      <MapPinned size={iconSize} className="text-primaryColor" />*/}
+            {/*    </div>*/}
+            {/*    <div>157, 2nd Cross Street, Colombo 11.</div>{" "}*/}
+            {/*  </li>*/}
+            {/*  <li className="lg:text-sm text-gray-500 flex gap-3">*/}
+            {/*    <div>*/}
+            {/*      <PhoneCall size={iconSize} className="text-primaryColor" />*/}
+            {/*    </div>*/}
+            {/*    <div>*/}
+            {/*      <Link href={"tel:0777500511"}>077 750 0511</Link>*/}
+            {/*    </div>*/}
+            {/*  </li>*/}
+            {/*</ul>*/}
           </div>
           <div className="flex gap-1 md:gap-4 col-span-6 md:col-span-4 lg:col-span-3 p-2 flex-col items-start md:items-center">
             <div className="text-base md:text-lg font-medium text-primaryColor">

@@ -9,6 +9,7 @@ import {
 } from "react-instantsearch";
 import { twMerge } from "tailwind-merge";
 import { SearchResults } from "algoliasearch-helper";
+import {ChevronLast, ChevronLeft, ChevronRight} from "lucide-react";
 
 const DEMO_PAGINATION: CustomLink[] = [
   {
@@ -91,10 +92,10 @@ const Paginationx: FC<PaginationProps> = ({ className = "", onPageChange }) => {
                 handleClick();
               }}
               className={twMerge(
-                `inline-flex px-4 items-center justify-center rounded-full bg-white hover:bg-neutral-100 border border-neutral-200 text-neutral-6000 dark:text-neutral-400 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:border-neutral-700 ${twFocusClass()}`
+                `inline-flex px-2.5 items-center justify-center rounded-full bg-white hover:bg-neutral-100 border border-neutral-200 text-neutral-6000 dark:text-neutral-400 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:border-neutral-700 ${twFocusClass()}`
               )}
             >
-              Prev
+              <ChevronLeft/>
             </button>
           )}
 
@@ -124,10 +125,10 @@ const Paginationx: FC<PaginationProps> = ({ className = "", onPageChange }) => {
               handleClick();
             }}
             className={twMerge(
-              `inline-flex px-4 items-center justify-center rounded-full bg-white hover:bg-neutral-100 border border-neutral-200 text-neutral-6000 dark:text-neutral-400 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:border-neutral-700 ${twFocusClass()}`
+              `inline-flex px-2.5 items-center justify-center rounded-full bg-white hover:bg-neutral-100 border border-neutral-200 text-neutral-6000 dark:text-neutral-400 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:border-neutral-700 ${twFocusClass()}`
             )}
           >
-            Next
+            <ChevronRight/>
           </button>
 
           <button
@@ -138,10 +139,10 @@ const Paginationx: FC<PaginationProps> = ({ className = "", onPageChange }) => {
               handleClick();
             }}
             className={twMerge(
-              `inline-flex px-4 items-center justify-center rounded-full bg-white hover:bg-neutral-100 border border-neutral-200 text-neutral-6000 dark:text-neutral-400 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:border-neutral-700 ${twFocusClass()}`
+              `inline-flex px-2.5 items-center justify-center rounded-full bg-white hover:bg-neutral-100 border border-neutral-200 text-neutral-6000 dark:text-neutral-400 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:border-neutral-700 ${twFocusClass()}`
             )}
           >
-            Last
+            <ChevronLast/>
           </button>
         </>
       )}
