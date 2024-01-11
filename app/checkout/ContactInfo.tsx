@@ -102,8 +102,8 @@ const ContactInfo: FC<Props> = ({
             <div className="max-w-lg">
               {/* <Label className="text-sm">Your phone number</Label> */}
               <Input
-                className="mt-1  rounded-xl"
-                placeholder="Phone"
+                className="mt-1.5  "
+                placeholder="Phone*"
                 value={phone}
                 type="tel"
                 onChange={(e) => setPhone(e.target.value)}
@@ -113,8 +113,8 @@ const ContactInfo: FC<Props> = ({
             <div className="max-w-lg">
               {/* <Label className="text-sm">Email address</Label> */}
               <Input
-                placeholder="Email"
-                className=""
+                placeholder="Email*"
+                className="mt-1.5"
                 value={email}
                 type="email"
                 onChange={(e) => setEmail(e.target.value)}

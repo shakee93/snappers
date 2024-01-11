@@ -99,115 +99,119 @@ const BillingAddress: FC<Props> = ({
           </ButtonSecondary>
         </div>
         <form onSubmit={handleSubmit}>
-          <div
-            className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-4 sm:space-y-6 ${isActive ? "block" : "hidden"
-              }`}
-          >
-            {/* ============ */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
-              <div>
-                <Label className="text-sm capitalize ">first name</Label>
-                <Input
-                  className="mt-1.5 capitalize"
-                  value={firstName}
-                  onChange={(e) => setFirstName(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <Label className="text-sm">Last name</Label>
-                <Input
-                  className="mt-1.5 capitalize"
-                  value={lastName}
-                  onChange={(e) => setLastName(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
+  <div
+    className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-2 sm:space-y-2 ${isActive ? "block" : "hidden"
+      }`}
+  >
+    {/* ============ */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
+      <div>
+        {/* <Label className="text-sm capitalize ">first name</Label> */}
+        <Input
+          className="mt-1.5 capitalize"
+          placeholder="First name*"
+          value={firstName}
+          onChange={(e) => setFirstName(e.target.value)}
+          required
+        />
+      </div>
+      <div>
+        {/* <Label className="text-sm">Last name</Label> */}
+        <Input
+          className="mt-1.5 capitalize"
+          placeholder="Last name*"
+          value={lastName}
+          onChange={(e) => setLastName(e.target.value)}
+          required
+        />
+      </div>
+    </div>
 
-            {/* ============ */}
-            <div className="sm:flex space-y-4 sm:space-y-0 sm:space-x-3">
-              <div className="flex-1">
-                <Label className="text-sm">Address</Label>
-                <Input
-                  className="mt-1.5 capitalize"
-                  placeholder=""
-                  name="address1"
-                  value={address}
-                  type={"text"}
-                  onChange={(e) => setAddress(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="sm:w-1/3">
-                <Label className="text-sm ">Apt, Suite *</Label>
-                <Input
-                  className="mt-1.5 capitalize"
-                  value={apartment}
-                  onChange={(e) => setApartment(e.target.value)}
-                  required
-                />
-              </div>
-            </div>
+    {/* ============ */}
+    <div className="sm:flex space-y-4 sm:space-y-0 sm:space-x-3">
+      <div className="flex-1">
+        {/* <Label className="text-sm">Address</Label> */}
+        <Input
+          className="mt-1.5 capitalize"
+          placeholder="Address*"
+          name="address1"
+          value={address}
+          type={"text"}
+          onChange={(e) => setAddress(e.target.value)}
+          required
+        />
+      </div>
+      <div className="sm:w-1/3">
+        {/* <Label className="text-sm ">Apt, Suite *</Label> */}
+        <Input
+          className="mt-1.5 capitalize"
+          placeholder="Apt, Suite*"
+          value={apartment}
+          onChange={(e) => setApartment(e.target.value)}
+          required
+        />
+      </div>
+    </div>
 
-            {/* ============ */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
-              <div>
-                <Label className="text-sm   ">City</Label>
-                <Input
-                  className="mt-1.5  normal-case  "
-                  value={city}
-                  onChange={(e) => setCity(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <Label className="text-sm">Country</Label>
-                <Select
-                  value="LK"
-                  className="mt-1.5 capitalize"
-                  placeholder="SRI LANKAJ"
-                  onChange={(e) => setCountry(e.target.value)}
-                  disabled={true}
-                >
-                  <option value="Sri Lanka">Sri Lanka</option>
-                </Select>
-              </div>
-            </div>
+    {/* ============ */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
+      <div>
+        {/* <Label className="text-sm   ">City</Label> */}
+        <Input
+          className="mt-1.5  normal-case  "
+          placeholder="City*"
+          value={city}
+          onChange={(e) => setCity(e.target.value)}
+          required
+        />
+      </div>
+      <div>
+        {/* <Label className="text-sm">Country</Label> */}
+        <Select
+          value="LK"
+          className="mt-1.5 capitalize"
+          placeholder="Country (e.g., Sri Lanka)*"
+          onChange={(e) => setCountry(e.target.value)}
+          disabled={true}
+        >
+          <option value="Sri Lanka">Sri Lanka</option>
+        </Select>
+      </div>
+    </div>
 
-            {/* ============ */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
+    {/* ============ */}
+    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
+      <SelectField
+        // label="State"
+        name="state"
+        value={state}
+        options={SRI_LANKAN_STATES.map((state) => ({
+          value: state,
+          label: state,
+        }))}
+        onChange={(e: any) => setState(e.target.value)}
+      />
+      <div>
+        {/* <Label className="text-sm">Postal code</Label> */}
+        <Input
+          className="mt-1.5 capitalize"
+          placeholder="Postal code*"
+          required
+          value={postal}
+          onChange={(e) => setPostal(e.target.value)}
+        />
+      </div>
+    </div>
 
+    {/* ============ */}
+    <div className="flex flex-col sm:flex-row pt-6">
+      <ButtonPrimary className="sm:!px-7 shadow-none">
+        Save and next to Payment
+      </ButtonPrimary>
+    </div>
+  </div>
+</form>
 
-              <SelectField
-                label="State"
-                name="state"
-                value={state}
-                options={SRI_LANKAN_STATES.map((state) => ({
-                  value: state,
-                  label: state,
-                }))}
-                onChange={(e: any) => setState(e.target.value)}
-              />
-              <div>
-                <Label className="text-sm">Postal code</Label>
-                <Input
-                  className="mt-1.5 capitalize"
-                  required
-                  value={postal}
-                  onChange={(e) => setPostal(e.target.value)}
-                />
-              </div>
-            </div>
-
-            {/* ============ */}
-            <div className="flex flex-col sm:flex-row pt-6">
-              <ButtonPrimary className="sm:!px-7 shadow-none">
-                Save and next to Payment
-              </ButtonPrimary>
-            </div>
-          </div>
-        </form>
       </div>
     );
   };
