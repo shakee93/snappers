@@ -158,7 +158,9 @@ const DeliveryAddress: FC<Props> = ({
       <div className="border border-slate-200 dark:border-slate-700 rounded-xl ">
         <div className="p-6 flex flex-col sm:flex-row items-start">
           <div className="flex flex-row items-center gap-4 md:gap-0">
-            <h1 className="h-10 w-10 border-blue-700 text-blue-700 rounded-xl border-2 flex items-center justify-center text-xl font-bold">
+            <h1 className="h-10
+             w-10
+             border-blue-700 text-blue-700 rounded-xl border-2 flex items-center justify-center text-xl font-bold">
               2
             </h1>
             <div className="sm:ml-8">
