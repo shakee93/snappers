@@ -124,7 +124,7 @@ const PaymentMethod: FC<Props> = ({
           </div>
           {!isActive && (
             <ButtonSecondary
-              sizeClass="py-2 px-4 "
+            sizeClass="py-2 px-4 sm:w-fit w-full"
               fontSize="text-sm font-medium"
               className="bg-slate-50 dark:bg-slate-800 mt-5 sm:mt-0 sm:ml-auto !rounded-lg"
               onClick={onOpenActive}

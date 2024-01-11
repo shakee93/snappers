@@ -1,4 +1,5 @@
 import Label from "components/Label/Label";
+import Link from "next/link";
 import React, { FC } from "react";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
@@ -86,9 +87,9 @@ const ContactInfo: FC<Props> = ({ isActive, onCloseActive, onOpenActive }) => {
             <h3 className="text-lg font-semibold">Contact infomation</h3>
             <span className="block text-sm my-1 md:my-0">
               Do not have an account?{` `}
-              <a href="##" className="text-primary-500 font-medium">
+              <Link href="/login" className="text-primary-500 font-medium">
                 Log in
-              </a>
+              </Link>
             </span>
           </div>
           <div className="max-w-lg">
