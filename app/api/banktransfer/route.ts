@@ -13,7 +13,7 @@ export async function POST(request: Request) {
 
     const buffer = Buffer.from(await file.arrayBuffer());
     // console.log("buffer", buffer);
-    sendFileToUrl(buffer, file.name, url);
+    sendFileToUrl(buffer, file, url);
 
 
     // const fileName = await uploadFileToS3(buffer, file.name);
@@ -26,14 +26,14 @@ export async function POST(request: Request) {
   }
 }
 
-async function sendFileToUrl(file: Buffer, fileName: string, url: string) {
+async function sendFileToUrl(file: Buffer, fileName: any, url: string) {
     const formData = new FormData();
     
     // Create a Blob from the Buffer
     const blob = new Blob([file], { type: 'application/octet-stream' });
 
     formData.append('file', blob, fileName);
-  
+    formData.append("order_id", "23");
     const requestOptions = {
       method: 'POST',
       body: formData,

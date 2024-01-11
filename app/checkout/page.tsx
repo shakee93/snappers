@@ -11,6 +11,7 @@ import {
   UPDATE_SHIPPING_TOTAL,
 } from "@/graphql/defs/cart";
 import {
+  CHECKOUT,
   GUEST_CHECKOUT_MUTATION,
 } from "@/graphql/defs/order";
 import {
@@ -62,6 +63,13 @@ const CheckoutPage = () => {
   });
 
   console.log({ cart });
+
+  useEffect(() => {
+    if (cart && cart?.contents?.nodes?.length === 0) {
+      router.push('/');
+    }
+  }, [cart])
+
   useEffect(() => {}, [formData]);
 
   const updateFormData = (section: string, data: any) => {
@@ -152,6 +160,11 @@ const CheckoutPage = () => {
     { loading: checkoutLoading, error: checkoutError, data: checkoutData },
   ] = useMutation(GUEST_CHECKOUT_MUTATION);
 
+  const [
+    checkoutMutation,
+    { loading: realCheckoutLoading, error: realCheckoutError, data: realCheckoutData },
+  ] = useMutation(CHECKOUT);
+
   useEffect(() => {
     console.log("checkout returned data: ", checkoutData);
   }, [checkoutData]);
@@ -182,24 +195,15 @@ const CheckoutPage = () => {
 
       if (paymentMethodId !== undefined) {
         try {
-          const { data } = await guestCheckoutMutation({
+
+          const { data } = await checkoutMutation({
             variables: {
               paymentMethod: paymentMethodId,
-              lineItems: lineItems,
-              shippingLines: shipping,
+              shippingMethod: shipping[0].methodId
             },
           });
-
-          if (data && data.createOrder) {
-            const orderDetails = data.createOrder.order;
-            console.log("order Details", orderDetails);
-            toast("Order created successfully");
-
-            router.push(`/checkout/${orderDetails.id}`);
-          } else {
-            console.error("Failed to retrieve order details");
-            toast.error("Failed to retrieve order details");
-          }
+          console.log("checkout data: ", data);
+          toast.success("Order Created Succussfully")
         } catch (error: any) {
           console.log("Error:", error);
           toast.error("Failed to the create order");
