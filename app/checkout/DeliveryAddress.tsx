@@ -161,14 +161,14 @@ const DeliveryAddress: FC<Props> = ({
         <div className="p-6 flex flex-col sm:flex-row items-start">
 
           <div className="flex flex-row gap-4 md:gap-0">
-            <h1 className="text-2xl self-center border border-solid border-blue-700 leading-4 rounded-full p-[10px] text-blue-700 font-semibold border">2</h1>
+            <h1 className="text-2xl self-center  border-solid border-blue-700 leading-4 rounded-full p-[10px] text-blue-700 font-semibold border">2</h1>
             <div className="sm:ml-8">
               <h3 className=" text-slate-700 items-center gap-2 dark:text-slate-300 flex ">
-                <span className="uppercase">
+                <span className="text-lg font-semibold">
                   {isStorePickup ? "Billing Address" : "Delivery Address"}
                 </span>
               </h3>
-              <div className="font-semibold mt-1 text-sm">
+              <div className=" mt-1 text-sm">
                 <span className="">{address || isStorePickup ? "Your Billing Address" : "Your Delivery Address"}</span>
               </div>
             </div>

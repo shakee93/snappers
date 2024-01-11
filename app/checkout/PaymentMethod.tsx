@@ -47,7 +47,7 @@ const PaymentMethod: FC<Props> = ({
     return (
       <div className="flex items-start space-x-4 sm:space-x-6">
         <Radio
-          className="pt-3.5"
+          className=""
           name="payment-method"
           id={gateway.id}
           defaultChecked={active}
@@ -64,36 +64,7 @@ const PaymentMethod: FC<Props> = ({
             htmlFor={gateway.id}
             className="flex items-center space-x-4 sm:space-x-6"
           >
-            <div
-              className={`p-2.5 rounded-xl border-2 ${active
-                ? "border-slate-600 dark:border-slate-300"
-                : "border-gray-200 dark:border-slate-600"
-                }`}
-            >
-              {/* Use gateway-specific icon or default */}
-              {gateway.icon ? (
-                // <img
-                //   src={gateway.icon}
-                //   alt={`${gateway.title} Icon`}
-                //   className="w-6 h-6 sm:w-7 sm:h-7"
-                // />
-                <Image
-                  src={gateway?.icon}
-                  alt={`${gateway.title} Icon`}
-                  width={28} // Width for sm:w-7
-                  height={28} // Height for sm:h-7
-                  className="w-6 h-6 sm:w-7 sm:h-7"
-                />
-              ) : (
-                <svg
-                  className="w-6 h-6 sm:w-7 sm:h-7"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  xmlns="http://www.w3.org/2000/svg"
-                >
-                </svg>
-              )}
-            </div>
+            
             <p className="font-medium">{gateway.title}</p>
           </label>
           <div className={`mt-6 mb-4 ${active ? "block" : "hidden"}`}>
@@ -138,14 +109,14 @@ const PaymentMethod: FC<Props> = ({
         <div className="p-6 flex flex-col sm:flex-row items-start">
          
           <div className="flex flex-row gap-4 md:gap-0">
-            <h1 className="text-2xl self-center border border-solid border-blue-700 leading-4 rounded-full p-[10px] text-blue-700 font-semibold border">
+            <h1 className="text-2xl self-center  border-solid border-blue-700 leading-4 rounded-full p-[10px] text-blue-700 font-semibold border">
               {isBillingAddressEnabled ? "3" : "4"}
             </h1>
             <div className="sm:ml-8">
               <h3 className=" text-slate-700 items-center dark:text-slate-300 flex ">
-                <span className="uppercase tracking-tight">PAYMENT METHOD*</span>
+                <h3 className="text-lg font-semibold">Payment Method</h3>
               </h3>
-              <div className="font-semibold mt-1 text-sm">
+              <div className=" mt-1 text-sm">
                 <span className="">Select Payment Method</span>
                 <span className="ml-3 tracking-tighter"></span>
               </div>
