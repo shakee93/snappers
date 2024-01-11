@@ -1,5 +1,5 @@
 'use client'
-import {Configure, RefinementList, SortBy, useInstantSearch, useSortBy} from "react-instantsearch";
+import {Configure, InstantSearch, RefinementList, SortBy, useInstantSearch, useSortBy} from "react-instantsearch";
 import {InstantSearchNext} from "react-instantsearch-nextjs";
 import TypesenseInstantSearchAdapter from "typesense-instantsearch-adapter";
 import ProductGridInstant from "@/app/components/ProductGridInstant";
@@ -23,6 +23,7 @@ interface InstantSearchWrapperProps {
     category?: ProductCategory
     routing?: boolean
     bindToStore?: boolean
+    server?: boolean
 }
 
 const typesenseConfig = {
@@ -51,11 +52,12 @@ const InstantSearchWrapper = ({
                                   filters = false,
     routing = false,
                                   categories,
+    server = true,
                                   brands,
     brand,category
                               }: InstantSearchWrapperProps) => {
 
-    const { sidebar } = useStore()
+    const { sidebar, setSearchMounted } = useStore()
     const [differedSidebar] = useDebounce(sidebar, 500)
 
     const getFilterQuery: () => string = () => {
@@ -111,14 +113,24 @@ const InstantSearchWrapper = ({
     useEffect(() => {
         console.log(filterQuery);
     }, [filterQuery])
+    
+    
+    useEffect(() => {
+        setSearchMounted()
+    }, [])
+
+    const Comp = useMemo(() => {
+        return server ? InstantSearchNext : InstantSearch
+    }, [])
 
     return <div>
-        <InstantSearchNext 
+        <Comp
             stalledSearchDelay={200}
                            future={{
                                preserveSharedStateOnUnmount: true
                            }}
-                           routing={routing ? {
+                           // @ts-ignore
+                           routing={(routing && server) ? {
                                router: {
                                    cleanUrlOnDispose: true
                                }
@@ -132,7 +144,7 @@ const InstantSearchWrapper = ({
                 <Configure filters={filterQuery} hitsPerPage={12}/>
                 <ProductGridInstant/>
             </div>
-        </InstantSearchNext>
+        </Comp>
     </div>
 }
 

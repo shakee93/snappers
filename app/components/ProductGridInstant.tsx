@@ -54,14 +54,7 @@ const ProductGridInstant = ({
 
   return (
     <>
-      {(results?.nbHits === 0 && search.length > 0) && (
-        <div className="text-center text-slate-500 flex flex-col items-center gap-20 py-12">
-          <div>
-            <Image className="w-64" src={NotFound} alt="No Search Results" />
-          </div>
-          <div>We couldn&lsquo;t find any products :(</div>
-        </div>
-      )}
+
 
       {statusState === 'idle' &&
           <div className="flex-1 grid  grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-2 lg:gap-x-8 lg:gap-y-10">
@@ -82,6 +75,16 @@ const ProductGridInstant = ({
             )}
           </div>
       }
+
+      {(results?.nbHits === 0 ) && (
+          <div className="text-center text-slate-500 flex flex-col items-center gap-20 py-12">
+            <div>
+              <Image className="w-64" src={NotFound} alt="No Search Results" />
+            </div>
+            <div>We couldn&lsquo;t find any products :(</div>
+          </div>
+      )}
+
 
       {results && results?.nbHits > results?.hitsPerPage && (
         <>
