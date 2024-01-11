@@ -64,7 +64,7 @@ const ProductGridInstant = ({
         </div>
       )}
 
-      <div className="flex-1 grid  grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-5 lg:gap-x-8 lg:gap-y-10">
+      <div className="flex-1 grid  grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-2 lg:gap-x-8 lg:gap-y-10">
         {hits.map((item, index: number) => (
           // <div key={index}></div>
           <ProductCard
