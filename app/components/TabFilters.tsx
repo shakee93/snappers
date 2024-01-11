@@ -84,7 +84,7 @@ const TabFilters = ({
             (isOnSale ? 1 : 0) +
             (inStock ? 1 : 0) +
             (sortOrderStates ? 1 : 0) +
-            (rangePrices !== PRICE_RANGE ? 1 : 0);
+            (rangePrices.join('') !== PRICE_RANGE.join('') ? 1 : 0);
 
     }, [
         categoriesState,
@@ -100,7 +100,7 @@ const TabFilters = ({
 
     useEffect(() => {
 
-        if (rangePrices !== PRICE_RANGE) {
+        if (rangePrices.join('') === PRICE_RANGE.join('')) {
             return;
         }
 
