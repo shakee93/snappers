@@ -158,9 +158,11 @@ const DeliveryAddress: FC<Props> = ({
       <div className="border border-slate-200 dark:border-slate-700 rounded-xl ">
         <div className="p-6 flex flex-col sm:flex-row items-start">
           <div className="flex flex-row items-center gap-4 md:gap-0">
-            <h1 className="h-10
+            <h1
+              className="h-10
              w-10
-             border-blue-700 text-blue-700 rounded-xl border-2 flex items-center justify-center text-xl font-bold">
+             border-blue-700 text-blue-700 rounded-xl border-2 flex items-center justify-center text-xl font-bold"
+            >
               2
             </h1>
             <div className="sm:ml-8">
@@ -179,14 +181,16 @@ const DeliveryAddress: FC<Props> = ({
             </div>
           </div>
 
-          <ButtonSecondary
-            sizeClass="py-2 px-4 "
-            fontSize="text-sm font-medium"
-            className="bg-slate-50 dark:bg-slate-800 mt-5 sm:mt-0 sm:ml-auto !rounded-lg"
-            onClick={onOpenActive}
-          >
-            Change
-          </ButtonSecondary>
+          {!isActive && (
+            <ButtonSecondary
+              sizeClass="py-2 px-4 "
+              fontSize="text-sm font-medium"
+              className="bg-slate-50 dark:bg-slate-800 mt-5 sm:mt-0 sm:ml-auto !rounded-lg"
+              onClick={onOpenActive}
+            >
+              Change
+            </ButtonSecondary>
+          )}
         </div>
         <form onSubmit={handleSubmit}>
           <div
