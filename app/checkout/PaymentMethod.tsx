@@ -4,7 +4,7 @@ import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Input from "shared/Input/Input";
 import Radio from "shared/Radio/Radio";
-import Image from 'next/image';
+import Image from "next/image";
 
 import { PaymentGateway } from "@/graphql/types/graphql";
 import { Check } from "lucide-react";
@@ -16,7 +16,7 @@ interface Props {
   updateFormData: (section: string, data: any) => void;
   paymentGateways: PaymentGateway[];
   handleConfirmationChange: any;
-  isBillingAddressEnabled: any
+  isBillingAddressEnabled: any;
 }
 
 const PaymentMethod: FC<Props> = ({
@@ -26,13 +26,13 @@ const PaymentMethod: FC<Props> = ({
   paymentGateways,
   updateFormData,
   handleConfirmationChange,
-  isBillingAddressEnabled
+  isBillingAddressEnabled,
 }) => {
   const [methodActive, setMethodActive] = useState<
     "Credit-Card" | "Internet-banking" | "Wallet"
   >("Credit-Card");
 
-  useEffect(() => { }, [paymentGateways]);
+  useEffect(() => {}, [paymentGateways]);
 
   const [selectedGateway, setSelectedGateway] = useState<PaymentGateway>({
     id: "",
@@ -64,20 +64,21 @@ const PaymentMethod: FC<Props> = ({
             htmlFor={gateway.id}
             className="flex items-center space-x-4 sm:space-x-6"
           >
-            
             <p className="font-medium">{gateway.title}</p>
           </label>
           <div className={`mt-6 mb-4 ${active ? "block" : "hidden"}`}>
-            {gateway.icon ? (<Image
-              src={gateway?.icon}
-              alt="payment gateway"
-              width={1000}
-              height={1000}
-              className="pb-2"
-            />) : (
+            {gateway.icon ? (
+              <Image
+                src={gateway?.icon}
+                alt="payment gateway"
+                width={1000}
+                height={1000}
+                className="pb-2"
+              />
+            ) : (
               <></>
             )}
-            < p className="text-sm dark:text-slate-300">
+            <p className="text-sm dark:text-slate-300">
               Your order will be delivered to you after you{" "}
               {gateway.title || "transfer funds"} to:
             </p>
@@ -99,7 +100,7 @@ const PaymentMethod: FC<Props> = ({
             </ul>
           </div>
         </div>
-      </div >
+      </div>
     );
   };
 
@@ -107,9 +108,8 @@ const PaymentMethod: FC<Props> = ({
     return (
       <div className="border border-slate-200 dark:border-slate-700 rounded-xl ">
         <div className="p-6 flex flex-col sm:flex-row items-start">
-         
-          <div className="flex flex-row gap-4 md:gap-0">
-            <h1 className="text-2xl self-center  border-solid border-blue-700 leading-4 rounded-full p-[10px] text-blue-700 font-semibold border">
+          <div className="flex flex-row items-center gap-4 md:gap-0">
+            <h1 className="h-10 w-10 border-blue-700 text-blue-700 rounded-xl border-2 flex items-center justify-center text-xl font-bold">
               {isBillingAddressEnabled ? "3" : "4"}
             </h1>
             <div className="sm:ml-8">
@@ -134,8 +134,9 @@ const PaymentMethod: FC<Props> = ({
         </div>
 
         <div
-          className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-6 ${isActive ? "block" : "hidden"
-            }`}
+          className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-6 ${
+            isActive ? "block" : "hidden"
+          }`}
         >
           {/* ==================== */}
           {/* <div>{renderDebitCredit()}</div> */}

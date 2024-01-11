@@ -57,8 +57,8 @@ const ContactInfo: FC<Props> = ({
     return (
       <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden z-0">
         <div className="flex flex-col sm:flex-row items-start p-6 ">
-          <div className="flex flex-row gap-4 md:gap-0">
-            <h1 className="text-2xl self-center border border-solid border-blue-700 leading-[10px] rounded-full p-[10px] text-blue-700 font-semibold ">
+          <div className="flex flex-row items-center gap-4 md:gap-0">
+            <h1 className="h-10 w-10 border-blue-700 text-blue-700 rounded-xl border-2 flex items-center justify-center text-xl font-bold">
               1
             </h1>
             <div className="sm:ml-8">
