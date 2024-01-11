@@ -58,9 +58,9 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
           <div className="">
             {/* {data?.order.paymentMethod === "payhere" ? <PayHerePayment/> : "Continue with Bank Transfer"} */}
             {/* && data?.order.paymentMethod === "payhere" && */}
-            {temporaryPaymentDetails && (
+            {/* {temporaryPaymentDetails && ( */}
               <PayHerePayment paymentDetails={temporaryPaymentDetails} />
-            )}
+            {/* // )} */}
             <BankTransfer/>
           </div>
         </div>
