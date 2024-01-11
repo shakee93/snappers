@@ -55,7 +55,7 @@ const ProductGridInstant = ({
 
   return (
     <>
-      {results?.nbHits === 0 && (
+      {(results?.nbHits === 0 && search.length > 0) && (
         <div className="text-center text-slate-500 flex flex-col items-center gap-20 py-12">
           <div>
             <Image className="w-64" src={NotFound} alt="No Search Results" />
