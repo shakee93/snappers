@@ -19,6 +19,8 @@ import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 import ModalPayhere from "../components/Payment/PaymentModal";
 import PaymentModal from "../components/Payment/PaymentModal";
+import PayHerePayment from "../components/Payment/Payhere";
+import { PaymentDetailsWithoutUrls } from "@/data/types";
 
 interface FormData {
   contactInfo: Record<string, any>;
@@ -31,9 +33,9 @@ interface FormData {
   };
 }
 
-const FAKE_PAYMENT_DETAILS = {
+const FAKE_PAYMENT_DETAILS: PaymentDetailsWithoutUrls = {
   order_id: "6445",
-  items: [
+  items: JSON.stringify([
     {
       databaseId: 485,
       subtotal: "39500",
@@ -56,8 +58,8 @@ const FAKE_PAYMENT_DETAILS = {
       },
       __typename: "LineItem",
     },
-  ],
-  subtotal: "රු39,500.00",
+  ]),
+  // subtotal: "රු39,500.00",
   amount: "රු39,500.00",
   currency: "LKR",
   first_name: "Shakeeb",
@@ -65,8 +67,8 @@ const FAKE_PAYMENT_DETAILS = {
   email: "shadeersadikeen@gmail.com",
   phone: "+94755040038",
   address: "120/21/5B, Araliya Uyana, Megoda Kolonnawa",
-  billingAddress: "araliya uyana, megoda kolonnawa",
-  billingAddress2: "120/21/5b",
+  // address: "araliya uyana, megoda kolonnawa",
+  // billingAddress2: "120/21/5b",
   city: "Colombo",
   country: "Sri Lanka",
 };
@@ -269,12 +271,17 @@ const CheckoutPage = () => {
     }, 80);
   };
 
+  const ImplementPayhere = ()=>{
+    console.log("Implementing payhere")
+  }
+
   return (
     <div className="nc-CheckoutPage">
       <title>Checkout</title>
 
       <main className="container py-8 md:py-16 lg:pb-28 lg:pt-20 ">
         <div className="mb-16">
+          <PayHerePayment paymentDetails={FAKE_PAYMENT_DETAILS}/>
           <h2 className="block text-2xl sm:text-3xl lg:text-4xl font-semibold ">
             Checkout
           </h2>
@@ -389,6 +396,12 @@ const CheckoutPage = () => {
                   ? "bg-slate-500 cursor-not-allowed"
                   : "bg-primary hover:bg-primary-dark"
               }`}
+            >
+              Confirm order
+            </ButtonPrimary>
+
+            <ButtonPrimary
+              onClick={ImplementPayhere}
             >
               Confirm order
             </ButtonPrimary>

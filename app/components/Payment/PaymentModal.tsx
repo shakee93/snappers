@@ -6,7 +6,7 @@ import BankTransfer from "./BankTransfer";
 
 
 const PaymentModal = ({ show, paymentDetails, paymentMethod }: any) => {
-  const [showModal, setShowModal] = useState(true);
+  const [showModal, setShowModal] = useState(false);
 
   let onCloseModalQuickView = () => {
     setShowModal(false);

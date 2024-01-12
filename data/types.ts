@@ -50,7 +50,7 @@ export type PaymentDetailsType = {
   phone?: string;
   address?: string;
   city?: string;
-  country?: "Sri Lanka";
+  country?: string;
 };
 
 export type PaymentDetailsWithoutUrls = Omit<PaymentDetailsType,
