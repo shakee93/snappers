@@ -10,12 +10,14 @@ export interface ModalQuickViewProps {
   show: boolean;
   onCloseModalQuickView: () => void;
   productData: SimpleProduct & VariableProduct;
+  brands: any;
 }
 
 const ModalQuickView: FC<ModalQuickViewProps> = ({
   show,
   onCloseModalQuickView,
   productData,
+  brands
 }) => {
   
 
@@ -62,7 +64,7 @@ const ModalQuickView: FC<ModalQuickViewProps> = ({
                 </span>
 
                 <div className="flex-1 overflow-y-auto rounded-xl hiddenScrollbar">
-                    <ProductQuickView product={productData}/>
+                    <ProductQuickView product={productData} brands={brands}/>
                 </div>
               </div>
             </div>

@@ -11,7 +11,9 @@ interface ProductGridProps {
     brand?: Brand
     category?: Category
 }
+
 const ProductGrid = ({ products, brand, category }: ProductGridProps) => {
+
     const { sidebar: { categories, brands , mounted} } = useStore();
     const [_products, setProducts] = useState<{ node: Product }[]>(products);
     const [mounts, setMounts] = useState(0)
@@ -19,8 +21,6 @@ const ProductGrid = ({ products, brand, category }: ProductGridProps) => {
     let [getArchiveData, { loading, error }] = useLazyQuery(GET_BRAND_ARCHIVE, {
         fetchPolicy: 'no-cache'
     });
-
-
 
     useEffect(() => {
 
@@ -44,7 +44,6 @@ const ProductGrid = ({ products, brand, category }: ProductGridProps) => {
                 setProducts(data.products.edges)
             })();
         }
-
 
         
     }, [categories, brands]);
