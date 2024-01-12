@@ -83,7 +83,7 @@ const Page = async ({params}: Props) => {
         brand: Brand;
     } = await getData(params.slug, params.brand);
 
-    console.log('brandss', brand)
+    // console.log('brandss', brand)
     // console.log('productss', product)
     
     return (
