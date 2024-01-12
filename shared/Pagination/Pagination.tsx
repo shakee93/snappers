@@ -19,7 +19,9 @@ export interface PaginationProps {
 
 const Paginationx: FC<PaginationProps> = ({ className = "", onPageChange }) => {
   const { pages, refine, currentRefinement, isFirstPage, isLastPage, nbPages } =
-    usePagination();
+    usePagination({
+      padding: 2
+    });
 
   const firstPageIndex = 0;
   const previousPageIndex = currentRefinement - 1;
@@ -38,7 +40,7 @@ const Paginationx: FC<PaginationProps> = ({ className = "", onPageChange }) => {
 
   return (
     <nav
-      className={`nc-Pagination inline-flex space-x-1 text-base font-medium ${className}`}
+      className={`nc-Pagination inline-flex space-x-1 text-sm md:text-base font-medium ${className}`}
     >
       {["loading", "stalled"].includes("") ? (
         <div>
