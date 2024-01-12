@@ -2,8 +2,10 @@ import ButtonClose from "@/shared/ButtonClose/ButtonClose";
 import { Dialog, Transition } from "@headlessui/react";
 import React, { Fragment, useState } from "react";
 import PayHerePayment from "./Payhere";
+import BankTransfer from "./BankTransfer";
 
-const PaymentModal = ({ show, paymentDetails }: any) => {
+
+const PaymentModal = ({ show, paymentDetails, paymentMethod }: any) => {
   const [showModal, setShowModal] = useState(true);
 
   let onCloseModalQuickView = () => {
@@ -52,7 +54,8 @@ const PaymentModal = ({ show, paymentDetails }: any) => {
                   <ButtonClose onClick={onCloseModalQuickView} />
                 </span>
                 <div className="flex-1 overflow-y-auto rounded-xl hiddenScrollbar">
-                  <PayHerePayment paymentDetails={paymentDetails} />
+                  {/* <PayHerePayment paymentDetails={paymentDetails} /> */}
+                  <BankTransfer/>
                 </div>
               </div>
             </div>

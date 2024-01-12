@@ -17,7 +17,8 @@ import CheckoutDetails from "./CheckoutDetails";
 import CartItems from "./CartItems";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import ModalPayhere from "../components/Payment/ModalPayhere";
+import ModalPayhere from "../components/Payment/PaymentModal";
+import PaymentModal from "../components/Payment/PaymentModal";
 
 interface FormData {
   contactInfo: Record<string, any>;
@@ -29,6 +30,46 @@ interface FormData {
     };
   };
 }
+
+const FAKE_PAYMENT_DETAILS = {
+  order_id: "6445",
+  items: [
+    {
+      databaseId: 485,
+      subtotal: "39500",
+      quantity: 1,
+      product: {
+        node: {
+          name: "Xiaomi Redmi 10 (2022) | 6GB 128GB",
+          databaseId: 6337,
+          featuredImage: {
+            node: {
+              sourceUrl:
+                "https://gq.freshpixl.com/wp-content/uploads/2023/12/REDMI-10-GREY.jpg",
+              __typename: "MediaItem",
+            },
+            __typename: "NodeWithFeaturedImageToMediaItemConnectionEdge",
+          },
+          __typename: "SimpleProduct",
+        },
+        __typename: "LineItemToProductConnectionEdge",
+      },
+      __typename: "LineItem",
+    },
+  ],
+  subtotal: "රු39,500.00",
+  amount: "රු39,500.00",
+  currency: "LKR",
+  first_name: "Shakeeb",
+  last_name: "Sadikeen",
+  email: "shadeersadikeen@gmail.com",
+  phone: "+94755040038",
+  address: "120/21/5B, Araliya Uyana, Megoda Kolonnawa",
+  billingAddress: "araliya uyana, megoda kolonnawa",
+  billingAddress2: "120/21/5b",
+  city: "Colombo",
+  country: "Sri Lanka",
+};
 
 const CheckoutPage = () => {
   const router = useRouter();
@@ -58,14 +99,14 @@ const CheckoutPage = () => {
     billingAddress: false,
   });
 
-  console.log({ cart });
+  const [paymentInitialized, setPaymentInitialized] = useState(false);
 
-  useEffect(() => {
-    if (cart && cart?.contents?.nodes?.length === 0) {
-      router.push("/");
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cart]);
+  // useEffect(() => {
+  //   if (cart && cart?.contents?.nodes?.length === 0) {
+  //     router.push("/");
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [cart]);
 
   useEffect(() => { }, [formData]);
 
@@ -133,7 +174,6 @@ const CheckoutPage = () => {
           },
         });
 
-        // console.log('shipping data', data);
         setOrderTotal(data?.updateShippingMethod?.cart?.total);
         setShippingTotal(data?.updateShippingMethod?.cart?.shippingTotal);
 
@@ -202,7 +242,8 @@ const CheckoutPage = () => {
             shippingMethod: shipping[0].methodId,
           },
         };
-        console.log("obj: ", obj);
+
+        console.log("obj: ", FAKE_PAYMENT_DETAILS);
 
         try {
           const { data } = await checkoutMutation({
@@ -351,7 +392,7 @@ const CheckoutPage = () => {
             >
               Confirm order
             </ButtonPrimary>
-            <ModalPayhere />
+            <PaymentModal show={true} paymentDetails={FAKE_PAYMENT_DETAILS} />
 
             <div className="mt-5 text-sm text-slate-500 dark:text-slate-400 flex items-center justify-center">
               <p className="block relative pl-5">

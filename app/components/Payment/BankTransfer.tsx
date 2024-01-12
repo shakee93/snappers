@@ -1,10 +1,10 @@
 // BankTransfer.tsx
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import { Input } from "@nextui-org/react";
-import { Router } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useState, FormEvent } from "react";
 import toast from "react-hot-toast";
+import BankDetails from "./BankDetails";
 
 type BankTransferProps = {
   // Define any props you expect to pass into BankTransfer here
@@ -46,16 +46,16 @@ const BankTransfer: React.FC<BankTransferProps> = () => {
       });
 
       const data = await response.json();
-      
-      console.log("data",data)
+
+      console.log("data", data);
 
       if (data.message === "succuss") {
         setUploadStatus("succuss");
-        router.push('/thank-you')
+        router.push("/thank-you");
       }
-      if(data.error) {
+      if (data.error) {
         setUploadStatus("wrong");
-        toast.error("Something Went Wrong")
+        toast.error("Something Went Wrong");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -64,28 +64,28 @@ const BankTransfer: React.FC<BankTransferProps> = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
-      <form className="file-upload-form w-fit" onSubmit={handleSubmit}>
+    <div className="container grid sm:grid-cols-2 grid-cols-1 sm:divide-x-2 sm:divide-y-0 divide-y-2 mx-auto p-4">
+      <BankDetails />
+      <form className="file-upload-form sm:pl-8 w-fit" onSubmit={handleSubmit}>
         <div className="mb-4">
-          <label
-            className="block text-gray-700 text-sm font-bold mb-2"
-            htmlFor="file"
+          <h1
+            className="text-xl sm:py-8 py-4 text-left"
+
           >
             Upload Bank Slip
-          </label>
+          </h1>
           <Input
             className=""
             id="file"
             type="file"
             onChange={handleFileChange}
-            
           />
-
+          <p className="text-sm pt-2 text-gray-600">When you{`'`}ve completed the transfer to Our Bank, kindly upload your bank slip here</p>
         </div>
-   
+
         <div className="flex items-center justify-between">
           <ButtonPrimary
-            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-blue-500 w-full hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
             type="submit"
           >
             Upload

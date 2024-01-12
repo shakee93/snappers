@@ -50,6 +50,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     [orderData, customerData]
   );
 
+  console.log({ temporaryPaymentDetails })
   // if(!orderData?.order){
   //   return <OrderPaymentPageSkeleton/>
   // }
