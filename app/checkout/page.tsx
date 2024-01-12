@@ -110,7 +110,7 @@ const CheckoutPage = () => {
   //   // eslint-disable-next-line react-hooks/exhaustive-deps
   // }, [cart]);
 
-  useEffect(() => {}, [formData]);
+  useEffect(() => { }, [formData]);
 
   const updateFormData = (section: string, data: any) => {
     setFormData((prevData) => {
@@ -192,7 +192,7 @@ const CheckoutPage = () => {
     updateShippingTotal();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isStorePickup]);
+  }, [isStorePickup, updateCartShippingTotalMutation ]);
 
   const [
     guestCheckoutMutation,
@@ -224,14 +224,15 @@ const CheckoutPage = () => {
           quantity: item?.quantity,
         })) || [];
 
+      
       const shipping = [
         {
           methodId:
-            shippingTotal === "0.00"
-              ? "storepickup"
+            shippingTotal === "රු0.00"
+              ? "pickup_location:0"
               : "wbs:0dd3bc79_weight_based_shipping",
           methodTitle:
-            shippingTotal === "0.00" ? "storepickup" : "Weight Based Shipping",
+            shippingTotal === "0.00" ? "pickup_location:0" : "Weight Based Shipping",
           total: shippingTotal,
         },
       ];
@@ -386,8 +387,7 @@ const CheckoutPage = () => {
                   isConfirmed.paymentMethod
                 )
               }
-              className={`mt-8 w-full ${
-                !(
+              className={`mt-8 w-full ${!(
                   isConfirmed.contactInfo &&
                   isConfirmed.deliveryAddress &&
                   isConfirmed.billingAddress &&
@@ -395,7 +395,7 @@ const CheckoutPage = () => {
                 )
                   ? "bg-slate-500 cursor-not-allowed"
                   : "bg-primary hover:bg-primary-dark"
-              }`}
+                }`}
             >
               Confirm order
             </ButtonPrimary>

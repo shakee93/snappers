@@ -5,11 +5,6 @@ import { CircleUserRound } from "lucide-react";
 import { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
 import LogoutButton from "@/components/Header/LogoutButton";
-import { useLazyQuery, useQuery } from "@apollo/client";
-import {
-  GET_ACCOUNT_DETAILS,
-  GET_DEFAULT_ACC_FOR_AVATAR,
-} from "@/graphql/defs/auth";
 import { useSession } from "@/context/SessionProvider";
 import { Customer } from "@/graphql/types/graphql";
 

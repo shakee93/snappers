@@ -113,9 +113,9 @@ const PaymentMethod: FC<Props> = ({
               {isBillingAddressEnabled ? "3" : "4"}
             </h1>
             <div className="sm:ml-8">
-              <h3 className=" text-slate-700 items-center dark:text-slate-300 flex ">
-                <span className="text-lg font-semibold">Payment Method</span>
-              </h3>
+              <div className=" text-slate-700 items-center dark:text-slate-300 flex ">
+                <h3 className="text-lg font-semibold">Payment Method</h3>
+              </div>
               <div className=" mt-1 text-sm">
                 <span className="">Select Payment Method</span>
                 <span className="ml-3 tracking-tighter"></span>

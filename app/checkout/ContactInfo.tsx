@@ -61,9 +61,9 @@ const ContactInfo: FC<Props> = ({
               1
             </h1>
             <div className="sm:ml-8">
-              <h3 className=" text-slate-700 items-center dark:text-slate-300 flex ">
-                <span className="text-lg font-semibold">Contact infomation</span>
-              </h3>
+              <div className=" text-slate-700 items-center dark:text-slate-300 flex ">
+                <h3 className="text-lg font-semibold">Contact infomation</h3>
+              </div>
               <div className="md:block  mt-1 text-sm">
                 <span className="">{email ?? ""}</span>
                 <span className=" block ml-0 mt-2 md:mt-2 tracking-tighter">
