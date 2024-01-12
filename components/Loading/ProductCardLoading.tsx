@@ -4,7 +4,7 @@ const ProductCardLoading = () => {
 
     return (
         <div className="space-y-3">
-            <div className="relative h-60 bg-gray-200 rounded-xl animate-pulse">
+            <div className="relative h-[250px] bg-gray-200 rounded-xl animate-pulse">
                 <div className="absolute h-12 w-12 bg-gray-300 rounded-full animate-pulse bottom-3 right-3 " ></div>
             </div>
             <div className='space-y-2'>
