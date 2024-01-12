@@ -32,7 +32,7 @@ const Page = async () => {
             
             <span className="block mt-2 lg:mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
               {
-                "Welcome to GQ Mobiles Collections – a tailored assortment of style and functionality. Explore unique product categories that exemplify excellence in every item. Elevate your experience with quality and diverse options at GQ Mobiles. Start shopping for a seamless blend of style and substance!"
+                "Explore GQ Mobiles Collections – where style meets functionality. Elevate your experience with quality and diverse options. Shop now for a seamless blend of style and substance!"
               }
             </span>
             <div className="block mt-3 sm:mt-5 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-400">

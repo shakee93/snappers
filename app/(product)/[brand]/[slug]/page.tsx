@@ -74,7 +74,7 @@ export async function generateMetadata(
 }
 
 const Page = async ({params}: Props) => {
-
+    // return <LoadingBrands/>
     const {
         product,
         brand,
