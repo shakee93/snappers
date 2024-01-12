@@ -1,6 +1,6 @@
-import { gql } from "@apollo/client";
-import { ProductContentSlice } from "./products.fragments";
-import { CustomerAddressFragment } from "./order.fragments";
+import {gql} from "@apollo/client";
+import {ProductContentSlice} from "./products.fragments";
+import {CustomerAddressFragment} from "./order.fragments";
 
 // export const CHECKOUT_MUTATION = gql`
 //   mutation Checkout($paymentMethod: String!) {
@@ -132,8 +132,25 @@ export const CHECKOUT = gql`
       clientMutationId
       redirect
       result
+      customer{
+        displayName
+        shipping {
+          ...CustomerAddressFragment
+        }
+        billing {
+          ...CustomerAddressFragment
+        }
+        email
+      }
+      order {
+        total
+      }
+     
+
     }
   }
+  ${CustomerAddressFragment}
+  
 `;
 
 export const UPDATE_ADDRESS = gql`
