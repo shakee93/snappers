@@ -46,6 +46,8 @@ const ProductCard: FC<ProductCardProps> = ({
     name,
     price,
     type,
+    allPaColor,
+    allPaCapacity,
     purchasable,
         image,
         attributes,
@@ -68,8 +70,6 @@ const ProductCard: FC<ProductCardProps> = ({
     const [loading, setLoading] = useState(false)
 
     const link = useProductLink(data)
-
-
 
     const handleHoverOut = () => {
         setIsHovered(false);
@@ -306,6 +306,7 @@ const ProductCard: FC<ProductCardProps> = ({
                 show={showModalQuickView}
                 onCloseModalQuickView={() => setShowModalQuickView(false)}
                 productData={data}
+                brands={brands?.nodes[0]}
             />
         </div>
 

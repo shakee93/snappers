@@ -21,7 +21,6 @@ import useProductLink from "@/hooks/useProductLink";
 import ProductAddToCart from "./SingleProductPage/ProductAddToCart";
 import { twMerge } from "tailwind-merge";
 
-import ProductDetails from "./SingleProductPage/ProductDetails";
 import ProductSpecifications from "./SingleProductPage/ProductSpecifications";
 import BrandBar from "./globalComponents/BrandBar";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
@@ -35,13 +34,15 @@ import {
 
 import { GET_TECH_SPEC } from "@/graphql/defs/products";
 import { useQuery } from "@apollo/client";
+import ProductDetails from "@/app/components/SingleProductPage/ProductDetailsQuickView";
 
 export interface ProductQuickViewProps {
   className?: string;
   product: SimpleProduct & VariableProduct;
+  brands?: any;
 }
 
-const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }) => {
+const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product, brands }) => {
 
   const [variantActive, setVariantActive] = React.useState(0);
   const [sizeSelected, setSizeSelected] = React.useState("");
@@ -56,7 +57,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
 
   const link = useProductLink(product)
 
-  let brand = product?.brands?.nodes[0]?.name;
+  // let brand = product?.brands?.nodes[0]?.name;
 
   let product_images: string[] = [];
   product_images = [
@@ -179,14 +180,18 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
   };
 
   const renderSectionContent = () => {
+    console.log({ product })
+    console.log('sctivr vsaritation', activeVariation)
+    console.log('brands', brands)
     return (
       <div className="space-y-8">
 
         {/* <ProductDetails brand={brand} product={product} /> */}
         {/* ---------- 1 HEADING ----------  */}
 
+        <ProductDetails brand={brands} product={product}/>
 
-        <div>
+        {/* <div>
 
           <div className="flex gap-1  text-sm text-gray-500 pb-4">
             Brand : <span className="">{brand}</span>
@@ -219,6 +224,8 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
                             activeAttr(attr)?.val === option && ' border-blue-700 bg-white'
                           )
                         }>
+
+                        {option}
                         {
                           (typeof product[`allPa${attr.label}` as keyof typeof product] === 'object' &&
                             Array.isArray((product[`allPa${attr.label}` as keyof typeof product] as any)?.nodes) &&
@@ -237,20 +244,23 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
             </>
           }
 
-          {product.type === 'VARIABLE' && activeVariation ? <div>
-            <div className="flex gap-4 text-base py-2 flex-wrap md:text-lg font-medium text-gray-600">
-              <span>
-                {activeVariation.price}
-              </span>
+          {product.type === 'VARIABLE' && activeVariation ?
 
-              {(!!activeVariation.salePrice && activeVariation.salePrice !== activeVariation.regularPrice) &&
-                <span className="text-red-400">
-                  <s>{activeVariation.regularPrice}</s>
+            <div>
+              <div className="flex gap-4 text-base py-2 flex-wrap md:text-lg font-medium text-gray-600">
+                <span>
+                  {activeVariation.price}
                 </span>
-              }
 
-            </div>
-          </div> :
+                {(!!activeVariation.salePrice && activeVariation.salePrice !== activeVariation.regularPrice) &&
+                  <span className="text-red-400">
+                    <s>{activeVariation.regularPrice}</s>
+                  </span>
+                }
+
+              </div>
+            </div> :
+
             <div className="flex gap-2 text-base py-2 flex-wrap md:text-lg font-medium text-gray-600">
               <span>
                 {product.price}
@@ -265,7 +275,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
             </div>
           }
 
-          {(product.stockStatus !== 'IN_STOCK') &&
+          {(product.type === 'SIMPLE' && product.stockStatus !== 'IN_STOCK') &&
             <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1">
               Sold Out
             </div>
@@ -278,61 +288,16 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product }
           }
 
           <ProductAddToCart product={product} variation={activeVariation} />
-          <div className="flex gap-1 items-center py-2 text-sm md:text-base text-gray-500">
+          <div className="flex gap-1 items-center text-sm md:text-base text-gray-500">
             <div className="text-sm py-2">Category:</div>
-
-            {product.productCategories?.edges && product.productCategories?.edges.map((category: any, index: number) =>
-              <Link href={`/collections/${category.node.slug}`} key={index} 
-              className="bg-primary-100 inline-block py-1 px-2  text-xs md:text-sm rounded-3xl">
-                {category.node.name}
+            {product.productCategories?.nodes.map((category: any, index: number) =>
+              <Link href={`/collections/${category.slug}`} key={index} className="bg-primary-100 inline-block py-1 px-2  text-xs md:text-sm rounded-3xl">
+                {category.name}
               </Link>
             )}
 
           </div>
 
-          {/* <h2 className="text-2xl font-semibold hover:text-primary-6000 transition-colors">
-            <Link href={link}>{product.name}</Link>
-          </h2> */}
-
-          {/* <div className="flex items-center mt-5 space-x-4 sm:space-x-5">
-            <Prices
-              contentClass="py-1 px-2 md:py-1.5 md:px-3 text-lg font-semibold"
-              price={product.price}
-            />
-
-            <div className="h-6 border-l border-slate-300 dark:border-slate-700"></div>
-
-            <div className="flex items-center">
-              <Link
-                href={link}
-                className="flex items-center text-sm font-medium"
-              >
-                <StarIcon className="w-5 h-5 pb-[1px] text-yellow-400" />
-                <div className="ml-1.5 flex">
-                  <span>{product.averageRating}</span>
-                  <span className="block mx-2">·</span>
-                  <span className="text-slate-600 dark:text-slate-400 underline">
-                    {product.reviewCount} reviews
-                  </span>
-                </div>
-              </Link>
-              <span className="hidden sm:block mx-2.5">·</span>
-              <div className="hidden sm:flex items-center text-sm">
-                <SparklesIcon className="w-3.5 h-3.5" />
-                <span className="ml-1 leading-none">{status}</span>
-              </div>
-            </div>
-          </div> */}
-
-        </div>
-
-        {/* ---------- 3 VARIANTS AND SIZE LIST ----------  */}
-        {/* <div className="">{renderVariants()}</div> */}
-        {/* <div className="">{renderSizeList()}</div> */}
-
-        {/*  ---------- 4  QTY AND ADD TO CART BUTTON */}
-        {/* <div className="flex space-x-3.5">
-          <ProductAddToCart product={product} />
         </div> */}
 
         {/*  */}

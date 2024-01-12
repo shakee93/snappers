@@ -81,6 +81,9 @@ const Page = async ({params}: Props) => {
         product: SimpleProduct & VariableProduct;
         brand: Brand;
     } = await getData(params.slug, params.brand);
+
+    console.log('brandss', brand)
+    // console.log('productss', product)
     
     return (
         <div className="mt-5 md:mt-16">
