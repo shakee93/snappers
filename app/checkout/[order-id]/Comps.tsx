@@ -32,7 +32,7 @@ export const OrderDetails: React.FC<OrderDetailsProps> = ({ orderData }) => {
 
           {rows.map((row, index) =>
             row.condition !== false ? (
-              <div className="flex flex-col items-start">
+              <div key={index} className="flex flex-col items-start">
                 <p className="font-semibold	">{row.label}</p>
                 <p className="mt-1">{row.value}</p>
               </div>

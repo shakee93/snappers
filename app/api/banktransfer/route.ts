@@ -1,54 +1,57 @@
-const url = "http://52.45.14.64/wp-json/api/gq_mobile/v1/upload";
+const apiUrl = "http://52.45.14.64/wp-json/api/gq_mobile/v1/upload";
+
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
-    console.log('formData', formData);
-    
     const file = formData.get("file") as File;
-    // console.log("file", file);
+    const orderID = formData.get("order_id") as string;
 
     if (!file) {
-      return Response.json({ error: "File is required." }, { status: 400 });
+      return new Response(JSON.stringify({ error: "File is required." }), {
+        status: 400,
+      });
     }
 
-    const buffer = Buffer.from(await file.arrayBuffer());
-    // console.log("buffer", buffer);
-    sendFileToUrl(buffer, file, url);
+    const buffer = await readBufferFromFile(file);
+    await sendFileToUrl(file, buffer, orderID);
 
-
-    // const fileName = await uploadFileToS3(buffer, file.name);
-    const msg = "Got my file";
-
-    return Response.json({ msg });
-  } catch (error: any) {
-    const errMsg = `error: ${error}`;
-    return Response.json({ errMsg });
+    return new Response(JSON.stringify({ message: "succuss" }));
+  } catch (error) {
+    return new Response(JSON.stringify({ error: `Error: ${error}` }));
   }
 }
 
-async function sendFileToUrl(file: Buffer, fileName: any, url: string) {
-    const formData = new FormData();
-    
-    // Create a Blob from the Buffer
-    const blob = new Blob([file], { type: 'application/octet-stream' });
+async function readBufferFromFile(file: File): Promise<ArrayBuffer> {
+  return await file.arrayBuffer();
+}
 
-    formData.append('file', blob, fileName);
-    formData.append("order_id", "23");
-    const requestOptions = {
-      method: 'POST',
-      body: formData,
-    };
-  
-    const wpResponse = await fetch(url, requestOptions);
-    console.log("wpResponse", wpResponse);
-    
-    const wpData = await wpResponse.json()
+async function sendFileToUrl(
+  file: File,
+  buffer: ArrayBuffer,
+  order_id: string | null
+) {
+  const formData = new FormData();
+  formData.append("file", new Blob([buffer], { type: file.type }), file.name);
+  formData.append("order_id", order_id || "");
 
+  const requestOptions = {
+    method: "POST",
+    body: formData,
+  };
 
-    
+  let wpResponse;
+  try {
+    wpResponse = await fetch(apiUrl, requestOptions);
     if (!wpResponse.ok) {
-      throw new Error(`Failed to send file to ${url}`);
+      const errorText = await wpResponse.text();
+      throw new Error(
+        `Server responded with ${wpResponse.status}: ${errorText}`
+      );
     }
-  
-    return wpResponse.json(); // Assuming the server responds with JSON
+    const wpData = await wpResponse.json();
+    return wpData; // or process this as needed
+  } catch (error) {
+    console.error("Failed to send file:", error);
+    throw new Error(`Failed to send file to ${apiUrl}: ${error}`);
   }
+}

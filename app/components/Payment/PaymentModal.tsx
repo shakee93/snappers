@@ -1,26 +1,19 @@
-import { Dialog, Transition } from "@headlessui/react";
-import React, { FC, Fragment } from "react";
-import { useRouter } from "next/navigation";
 import ButtonClose from "@/shared/ButtonClose/ButtonClose";
-import ProductQuickView from "./ProductQuickView3";
-import ProductQuickView2 from "@/components/ProductQuickView";
-import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
+import { Dialog, Transition } from "@headlessui/react";
+import React, { Fragment, useState } from "react";
+import PayHerePayment from "./Payhere";
+import BankTransfer from "./BankTransfer";
 
-export interface ModalQuickViewProps {
-  show: boolean;
-  onCloseModalQuickView: () => void;
-  productData: SimpleProduct & VariableProduct;
-}
 
-const ModalQuickView: FC<ModalQuickViewProps> = ({
-  show,
-  onCloseModalQuickView,
-  productData,
-}) => {
-  
+const PaymentModal = ({ show, paymentDetails, paymentMethod }: any) => {
+  const [showModal, setShowModal] = useState(true);
+
+  let onCloseModalQuickView = () => {
+    setShowModal(false);
+  };
 
   return (
-    <Transition appear show={show} as={Fragment}>
+    <Transition appear show={showModal} as={Fragment}>
       <Dialog
         as="div"
         className="fixed inset-0 z-50"
@@ -60,9 +53,9 @@ const ModalQuickView: FC<ModalQuickViewProps> = ({
                 <span className="absolute right-3 top-3 z-50">
                   <ButtonClose onClick={onCloseModalQuickView} />
                 </span>
-
                 <div className="flex-1 overflow-y-auto rounded-xl hiddenScrollbar">
-                    <ProductQuickView product={productData}/>
+                  {/* <PayHerePayment paymentDetails={paymentDetails} /> */}
+                  <BankTransfer/>
                 </div>
               </div>
             </div>
@@ -73,4 +66,4 @@ const ModalQuickView: FC<ModalQuickViewProps> = ({
   );
 };
 
-export default ModalQuickView;
+export default PaymentModal;

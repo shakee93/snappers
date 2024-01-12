@@ -4,6 +4,9 @@ import Script from "next/script";
 import { Button } from "@nextui-org/react";
 import { PaymentDetailsType, PaymentDetailsWithoutUrls } from "@/data/types";
 import { extractRawAmount } from "@/components/AddressPageComps/HelperComps";
+import ButtonPrimary from "@/shared/Button/ButtonPrimary";
+import ModalPayhere from "./PaymentModal";
+import Image from "next/image";
 
 declare global {
   interface Window {
@@ -52,15 +55,15 @@ const PayHerePayment: React.FC<PayHerePaymentProps> = ({ paymentDetails }) => {
       cancel_url: "http://localhost:3000/cancel",
       notify_url: "http://localhost:3000/notify",
       order_id: "12345",
-      items: paymentDetails.items,
+      items: paymentDetails?.items,
       hash: hash,
       amount: extractRawAmount(paymentDetails?.amount ?? ""),
       currency: "LKR",
-      first_name: paymentDetails.first_name,
-      last_name: paymentDetails.last_name,
-      email: paymentDetails.email,
-      phone: paymentDetails.phone,
-      address: paymentDetails.address,
+      first_name: paymentDetails?.first_name,
+      last_name: paymentDetails?.last_name,
+      email: paymentDetails?.email,
+      phone: paymentDetails?.phone,
+      address: paymentDetails?.address,
       city: "Colombo",
       country: "Sri Lanka",
     };
@@ -132,7 +135,7 @@ const PayHerePayment: React.FC<PayHerePaymentProps> = ({ paymentDetails }) => {
   }, []);
 
   if (!paymentDetails) {
-    return <p>No Amount found</p>;
+    return <p>Payment Details not found</p>;
   }
 
   return (
@@ -140,11 +143,25 @@ const PayHerePayment: React.FC<PayHerePaymentProps> = ({ paymentDetails }) => {
       <Script
         type="text/javascript"
         src="https://www.payhere.lk/lib/payhere.js"
-        strategy="beforeInteractive"
         onLoad={() => console.log("PayHere script loaded")}
         onError={() => console.error("Error loading PayHere script")}
       />
-      <Button onClick={initiatePayment}>Pay with PayHere</Button>
+      <div className="grid items-center justify-center">
+        <ButtonPrimary className="w-fit my-8 mx-auto" onClick={initiatePayment}>
+          Pay with PayHere
+        </ButtonPrimary>
+        <Image
+          alt="payment gateway"
+          loading="lazy"
+          width={1000}
+          height={1000}
+          decoding="async"
+          src="https://payherestorage.blob.core.windows.net/payhere-resources/plugins/payhere_long_banner.png"
+          className="pb-2"
+          style={{ color: "transparent" }}
+        />
+      </div>
+
     </>
   );
 };

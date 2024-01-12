@@ -15,11 +15,11 @@ import DeliveryAddress from "./DeliveryAddress";
 
 interface CheckoutLeftProps {
   tabActive:
-  | "ContactInfo"
-  | "DeliveryAddress"
-  | "PaymentMethod"
-  | "BillingAddress"
-  | "order-cart";
+    | "ContactInfo"
+    | "DeliveryAddress"
+    | "PaymentMethod"
+    | "BillingAddress"
+    | "order-cart";
   setTabActive: (
     value:
       | "ContactInfo"
@@ -46,7 +46,7 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
   paymentGateways,
   setIsStorePickup,
   handleConfirmationChange,
-  isStorePickup
+  isStorePickup,
 }) => {
   const { data }: QueryResult = useQuery(GET_CHECKOUT_USER_DETAILS);
   const [shippingDetails, setShippingDetails] =
@@ -84,17 +84,11 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
         email: email || "",
         displayName: displayName || "",
       });
-
       if (shipping) {
         setShippingDetails(shipping);
-      } else {
-        // console.log("shipping is null");
       }
-
       if (billing) {
         setBillingDetails(billing);
-      } else {
-        // console.log("billing is null");
       }
     }
   }, [data]);
@@ -129,7 +123,6 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
             setTabActive("DeliveryAddress");
             handleScrollToEl("DeliveryAddress");
           }}
-
           onCloseActive={() => {
             if (isBillingAddressHidden) {
               setTabActive("PaymentMethod");

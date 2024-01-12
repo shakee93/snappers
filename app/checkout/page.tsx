@@ -10,18 +10,15 @@ import {
   GET_PAYMENT_GATEWAYS,
   UPDATE_SHIPPING_TOTAL,
 } from "@/graphql/defs/cart";
-import {
-  CHECKOUT,
-  GUEST_CHECKOUT_MUTATION,
-} from "@/graphql/defs/order";
-import {
-  PaymentGateway,
-} from "@/graphql/types/graphql";
+import { CHECKOUT, GUEST_CHECKOUT_MUTATION } from "@/graphql/defs/order";
+import { PaymentGateway } from "@/graphql/types/graphql";
 
 import CheckoutDetails from "./CheckoutDetails";
 import CartItems from "./CartItems";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import ModalPayhere from "../components/Payment/PaymentModal";
+import PaymentModal from "../components/Payment/PaymentModal";
 
 interface FormData {
   contactInfo: Record<string, any>;
@@ -33,6 +30,46 @@ interface FormData {
     };
   };
 }
+
+const FAKE_PAYMENT_DETAILS = {
+  order_id: "6445",
+  items: [
+    {
+      databaseId: 485,
+      subtotal: "39500",
+      quantity: 1,
+      product: {
+        node: {
+          name: "Xiaomi Redmi 10 (2022) | 6GB 128GB",
+          databaseId: 6337,
+          featuredImage: {
+            node: {
+              sourceUrl:
+                "https://gq.freshpixl.com/wp-content/uploads/2023/12/REDMI-10-GREY.jpg",
+              __typename: "MediaItem",
+            },
+            __typename: "NodeWithFeaturedImageToMediaItemConnectionEdge",
+          },
+          __typename: "SimpleProduct",
+        },
+        __typename: "LineItemToProductConnectionEdge",
+      },
+      __typename: "LineItem",
+    },
+  ],
+  subtotal: "රු39,500.00",
+  amount: "රු39,500.00",
+  currency: "LKR",
+  first_name: "Shakeeb",
+  last_name: "Sadikeen",
+  email: "shadeersadikeen@gmail.com",
+  phone: "+94755040038",
+  address: "120/21/5B, Araliya Uyana, Megoda Kolonnawa",
+  billingAddress: "araliya uyana, megoda kolonnawa",
+  billingAddress2: "120/21/5b",
+  city: "Colombo",
+  country: "Sri Lanka",
+};
 
 const CheckoutPage = () => {
   const router = useRouter();
@@ -62,15 +99,16 @@ const CheckoutPage = () => {
     billingAddress: false,
   });
 
-  console.log({ cart });
+  const [paymentInitialized, setPaymentInitialized] = useState(false);
 
-  useEffect(() => {
-    if (cart && cart?.contents?.nodes?.length === 0) {
-      router.push('/');
-    }
-  }, [cart])
+  // useEffect(() => {
+  //   if (cart && cart?.contents?.nodes?.length === 0) {
+  //     router.push("/");
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [cart]);
 
-  useEffect(() => {}, [formData]);
+  useEffect(() => { }, [formData]);
 
   const updateFormData = (section: string, data: any) => {
     setFormData((prevData) => {
@@ -136,7 +174,6 @@ const CheckoutPage = () => {
           },
         });
 
-        // console.log('shipping data', data);
         setOrderTotal(data?.updateShippingMethod?.cart?.total);
         setShippingTotal(data?.updateShippingMethod?.cart?.shippingTotal);
 
@@ -153,7 +190,7 @@ const CheckoutPage = () => {
     updateShippingTotal();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isStorePickup]);
+  }, [isStorePickup, updateCartShippingTotalMutation ]);
 
   const [
     guestCheckoutMutation,
@@ -162,7 +199,11 @@ const CheckoutPage = () => {
 
   const [
     checkoutMutation,
-    { loading: realCheckoutLoading, error: realCheckoutError, data: realCheckoutData },
+    {
+      loading: realCheckoutLoading,
+      error: realCheckoutError,
+      data: realCheckoutData,
+    },
   ] = useMutation(CHECKOUT);
 
   useEffect(() => {
@@ -181,29 +222,35 @@ const CheckoutPage = () => {
           quantity: item?.quantity,
         })) || [];
 
+      
       const shipping = [
         {
           methodId:
-            shippingTotal === "0.00"
-              ? "storepickup"
+            shippingTotal === "රු0.00"
+              ? "pickup_location:0"
               : "wbs:0dd3bc79_weight_based_shipping",
           methodTitle:
-            shippingTotal === "0.00" ? "storepickup" : "Weight Based Shipping",
+            shippingTotal === "0.00" ? "pickup_location:0" : "Weight Based Shipping",
           total: shippingTotal,
         },
       ];
 
       if (paymentMethodId !== undefined) {
-        try {
+        let obj = {
+          input: {
+            paymentMethod: paymentMethodId,
+            shippingMethod: shipping[0].methodId,
+          },
+        };
 
+        console.log("obj: ", FAKE_PAYMENT_DETAILS);
+
+        try {
           const { data } = await checkoutMutation({
-            variables: {
-              paymentMethod: paymentMethodId,
-              shippingMethod: shipping[0].methodId
-            },
+            variables: obj,
           });
           console.log("checkout data: ", data);
-          toast.success("Order Created Succussfully")
+          toast.success("Order Created Succussfully");
         } catch (error: any) {
           console.log("Error:", error);
           toast.error("Failed to the create order");
@@ -243,8 +290,8 @@ const CheckoutPage = () => {
             <span className="text-xs mx-1 sm:mx-1.5">/</span>
             <span className="underline">Checkout</span>
           </div>
-        </div>
-
+        </div>{" "}
+        .
         <div className="flex flex-col lg:flex-row">
           {/* Informations about user */}
           <div className="flex-1">
@@ -333,8 +380,7 @@ const CheckoutPage = () => {
                   isConfirmed.paymentMethod
                 )
               }
-              className={`mt-8 w-full ${
-                !(
+              className={`mt-8 w-full ${!(
                   isConfirmed.contactInfo &&
                   isConfirmed.deliveryAddress &&
                   isConfirmed.billingAddress &&
@@ -342,10 +388,11 @@ const CheckoutPage = () => {
                 )
                   ? "bg-slate-500 cursor-not-allowed"
                   : "bg-primary hover:bg-primary-dark"
-              }`}
+                }`}
             >
               Confirm order
             </ButtonPrimary>
+            <PaymentModal show={true} paymentDetails={FAKE_PAYMENT_DETAILS} />
 
             <div className="mt-5 text-sm text-slate-500 dark:text-slate-400 flex items-center justify-center">
               <p className="block relative pl-5">
