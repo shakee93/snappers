@@ -9,6 +9,7 @@ import Link from "next/link";
 import ProductImage from "@/app/components/SingleProductPage/ProductImage2";
 import {Suspense} from "react";
 import {Metadata, ResolvingMetadata} from "next";
+import LoadingBrands from "@/app/(product)/[brand]/[slug]/loading";
 
 export const dynamic = 'force-static'
 

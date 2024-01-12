@@ -1,15 +1,14 @@
 'use client'
-import {Configure, InstantSearch, RefinementList, SortBy, useInstantSearch, useSortBy} from "react-instantsearch";
+import {Configure, InstantSearch} from "react-instantsearch";
 import {InstantSearchNext} from "react-instantsearch-nextjs";
 import TypesenseInstantSearchAdapter from "typesense-instantsearch-adapter";
 import ProductGridInstant from "@/app/components/ProductGridInstant";
 import SearchInput from "@/app/components/SearchInput";
 import TabFilters from "@/app/components/TabFilters";
 import {Brand, ProductCategory} from "@/graphql/types/graphql";
-import {useCallback, useDeferredValue, useEffect, useMemo, useState} from "react";
+import {useEffect, useMemo, useState} from "react";
 import {useStore} from "@/store/store";
 import {PRICE_RANGE} from "@/app/components/Filters/PriceFilter";
-import Pagination from "@/shared/Pagination/Pagination";
 import SortInput from "@/app/components/SortInput";
 import { useDebounce } from 'use-debounce';
 
@@ -32,19 +31,6 @@ const typesenseConfig = {
     path: process.env.NEXT_PUBLIC_TYPESENSE_PATH || "/q-search",
     protocol: process.env.NEXT_PUBLIC_TYPESENSE_PROTOCOL || "http",
 };
-
-const typesenseInstantSearchAdapter = new TypesenseInstantSearchAdapter({
-    server: {
-        apiKey: "xyz", // Be sure to use an API key that only allows search operations
-        nodes: [
-            typesenseConfig
-        ],
-        cacheSearchResultsForSeconds: 2 * 60, // Cache search results from server. Defaults to 2 minutes. Set to 0 to disable caching.
-    },
-    additionalSearchParameters: {
-        query_by: "name, description",
-    },
-});
 
 const InstantSearchWrapper = ({
                                   bindToStore = false,
@@ -78,8 +64,6 @@ const InstantSearchWrapper = ({
     }
 
     const [filterQuery, setFilterQuery] = useState<string>(getFilterQuery)
-    const [page, setPage] = useState(1)
-    const [sortQuery, setSortQuery] = useState<undefined | string>("")
 
     const searchClient = useMemo(() => {
 
@@ -93,17 +77,15 @@ const InstantSearchWrapper = ({
             },
             additionalSearchParameters: {
                 query_by: "name, description",
-                // sort_by: sortQuery
             },
         });
 
         return typesenseInstantSearchAdapter.searchClient
 
-    }, [sortQuery])
+    }, [])
 
 
     useEffect(() => {
-
         setFilterQuery(getFilterQuery)
         // setSortQuery(differedSidebar.sort);
 

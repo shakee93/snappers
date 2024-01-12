@@ -22,7 +22,7 @@ export function isPaymentPage(): boolean {
 
   // const headersList = headers();
   // const fullUrl = headersList.get("referer") || "";
-  console.log('fullUrl', fullUrl);
+  // console.log('fullUrl', fullUrl);
   // const searchString = "checkout/";
 
 
