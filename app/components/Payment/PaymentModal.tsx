@@ -1,7 +1,6 @@
 import ButtonClose from "@/shared/ButtonClose/ButtonClose";
-import { Dialog, Transition } from "@headlessui/react";
-import React, { Fragment, useState } from "react";
-import PayHerePayment from "./Payhere";
+import {Dialog, Transition} from "@headlessui/react";
+import React, {Fragment, useState} from "react";
 import BankTransfer from "./BankTransfer";
 
 
