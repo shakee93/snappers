@@ -2,18 +2,18 @@ import { gql } from "@apollo/client";
 import { ProductContentSlice } from "./products.fragments";
 import { CustomerAddressFragment } from "./order.fragments";
 
-export const CHECKOUT_MUTATION = gql`
-  mutation Checkout($paymentMethod: String!) {
-    checkout(input: { paymentMethod: $paymentMethod }) {
-      clientMutationId
-      order {
-        id
-        orderKey
-        total
-      }
-    }
-  }
-`;
+// export const CHECKOUT_MUTATION = gql`
+//   mutation Checkout($paymentMethod: String!) {
+//     checkout(input: { paymentMethod: $paymentMethod }) {
+//       clientMutationId
+//       order {
+//         id
+//         orderKey
+//         total
+//       }
+//     }
+//   }
+// `;
 
 export const GUEST_CHECKOUT_MUTATION = gql`
   mutation guestCheckout(
