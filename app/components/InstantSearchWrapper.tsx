@@ -119,14 +119,14 @@ const InstantSearchWrapper = ({
         setSearchMounted()
     }, [])
 
-    const Comp = useMemo(() => {
+    const InstantSearchComponent = useMemo(() => {
         // TODO: Search on client size freezes when using useInstantSearch hook so switching between normal and next.
         // when this gets fixed update the package
         return server ? InstantSearchNext : InstantSearch
     }, [])
 
     return <div>
-        <Comp
+        <InstantSearchComponent
             stalledSearchDelay={200}
                            future={{
                                preserveSharedStateOnUnmount: true
@@ -143,10 +143,12 @@ const InstantSearchWrapper = ({
                 <SearchInput bindToStore={bindToStore} show={search}/>
                 <SortInput/>
                 {filters && <TabFilters category={category} brand={brand} categories={categories} brands={brands}/>}
-                <Configure filters={filterQuery} hitsPerPage={12}/>
+                <Configure
+                    // filters={filterQuery}
+                    hitsPerPage={12}/>
                 <ProductGridInstant/>
             </div>
-        </Comp>
+        </InstantSearchComponent>
     </div>
 }
 
