@@ -1,14 +1,9 @@
 "use client";
-import { OrderPaymentPageProps, PaymentDetailsWithoutUrls } from "@/data/types";
-import { useLazyQuery, useQuery } from "@apollo/client";
-import {
-  GET_CHECKOUT_USER_DETAILS,
-  GET_SINGLE_ORDER,
-} from "@/graphql/defs/order";
-import PayHerePayment from "@/app/components/Payment/Payhere";
-import { useEffect, useMemo } from "react";
-import ProductTable, { OrderDetails } from "./Comps";
-import OrderPaymentPageSkeleton from "./Skeleton";
+import {OrderPaymentPageProps, PaymentDetailsWithoutUrls} from "@/data/types";
+import {useLazyQuery, useQuery} from "@apollo/client";
+import {GET_CHECKOUT_USER_DETAILS, GET_SINGLE_ORDER,} from "@/graphql/defs/order";
+import {useEffect, useMemo} from "react";
+import ProductTable, {OrderDetails} from "./Comps";
 import BankTransfer from "@/app/components/Payment/BankTransfer";
 
 export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
@@ -23,7 +18,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   });
 
   useEffect(() => {
-    getUserData();
+    getUserData().then(r => r);
   }, [getUserData]);
 
   console.log({orderData})
@@ -67,9 +62,9 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
 
             {/* {data?.order.paymentMethod === "payhere" ? <PayHerePayment/> : "Continue with Bank Transfer"} */}
             {/* && data?.order.paymentMethod === "payhere" && */}
-            {temporaryPaymentDetails && (
-              <PayHerePayment paymentDetails={temporaryPaymentDetails} />
-            )}
+            {/*{temporaryPaymentDetails && (*/}
+            {/*  < paymentDetails={temporaryPaymentDetails} />*/}
+            {/*)}*/}
             <BankTransfer />
           </div>
         </div>

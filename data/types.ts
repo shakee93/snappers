@@ -40,9 +40,9 @@ export type PaymentDetailsType = {
   cancel_url?: string;
   notify_url?: string;
   hash?: string | null;
-  order_id?: string;
+  order_id: string;
   items?: string;
-  amount?: string;
+  amount: string;
   currency?: string;
   first_name?: string;
   last_name?: string;
