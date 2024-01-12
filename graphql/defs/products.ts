@@ -82,6 +82,18 @@ export const GET_VARIATIONS_PRODUCT = gql`
           }
           ... on VariableProduct {
             name
+            allPaCapacity {
+              nodes {
+                  name
+                  slug
+              }
+          }
+          allPaColor {
+              nodes {
+                  name
+                  slug
+              }
+          }
             productCategories {
               nodes {
                 name
@@ -287,6 +299,18 @@ export const GET_PRODUCTS = gql`
                 slug
               }
             }
+            allPaCapacity {
+              nodes {
+                  name
+                  slug
+              }
+          }
+          allPaColor {
+              nodes {
+                  name
+                  slug
+              }
+          }
             productCategories {
               nodes {
                 name
