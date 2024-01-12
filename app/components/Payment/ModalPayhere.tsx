@@ -3,11 +3,13 @@ import { Dialog, Transition } from "@headlessui/react";
 import React, { Fragment, useState } from "react";
 import PayHerePayment from "./Payhere";
 
-const  ModalPayhere = ({ show, paymentDetails }: any) => {
-    const [showModal, setShowModal] = useState(true);
+const PaymentModal = ({ show, paymentDetails }: any) => {
+  const [showModal, setShowModal] = useState(true);
+
   let onCloseModalQuickView = () => {
     setShowModal(false);
   };
+
   return (
     <Transition appear show={showModal} as={Fragment}>
       <Dialog
@@ -49,10 +51,8 @@ const  ModalPayhere = ({ show, paymentDetails }: any) => {
                 <span className="absolute right-3 top-3 z-50">
                   <ButtonClose onClick={onCloseModalQuickView} />
                 </span>
-
                 <div className="flex-1 overflow-y-auto rounded-xl hiddenScrollbar">
-                  {/* <ProductQuickView product={productData} /> */}
-                  <PayHerePayment paymentDetails={paymentDetails}/>
+                  <PayHerePayment paymentDetails={paymentDetails} />
                 </div>
               </div>
             </div>
@@ -63,5 +63,4 @@ const  ModalPayhere = ({ show, paymentDetails }: any) => {
   );
 };
 
-
-export default ModalPayhere;
+export default PaymentModal;

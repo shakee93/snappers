@@ -10,13 +10,8 @@ import {
   GET_PAYMENT_GATEWAYS,
   UPDATE_SHIPPING_TOTAL,
 } from "@/graphql/defs/cart";
-import {
-  CHECKOUT,
-  GUEST_CHECKOUT_MUTATION,
-} from "@/graphql/defs/order";
-import {
-  PaymentGateway,
-} from "@/graphql/types/graphql";
+import { CHECKOUT, GUEST_CHECKOUT_MUTATION } from "@/graphql/defs/order";
+import { PaymentGateway } from "@/graphql/types/graphql";
 
 import CheckoutDetails from "./CheckoutDetails";
 import CartItems from "./CartItems";
@@ -67,9 +62,10 @@ const CheckoutPage = () => {
 
   useEffect(() => {
     if (cart && cart?.contents?.nodes?.length === 0) {
-      router.push('/');
+      router.push("/");
     }
-  }, [cart])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cart]);
 
   useEffect(() => {}, [formData]);
 
@@ -163,7 +159,11 @@ const CheckoutPage = () => {
 
   const [
     checkoutMutation,
-    { loading: realCheckoutLoading, error: realCheckoutError, data: realCheckoutData },
+    {
+      loading: realCheckoutLoading,
+      error: realCheckoutError,
+      data: realCheckoutData,
+    },
   ] = useMutation(CHECKOUT);
 
   useEffect(() => {
@@ -195,16 +195,20 @@ const CheckoutPage = () => {
       ];
 
       if (paymentMethodId !== undefined) {
-        try {
+        let obj = {
+          input: {
+            paymentMethod: paymentMethodId,
+            shippingMethod: shipping[0].methodId,
+          },
+        };
+        console.log("obj: ", obj);
 
+        try {
           const { data } = await checkoutMutation({
-            variables: {
-              paymentMethod: paymentMethodId,
-              shippingMethod: shipping[0].methodId
-            },
+            variables: obj,
           });
           console.log("checkout data: ", data);
-          toast.success("Order Created Succussfully")
+          toast.success("Order Created Succussfully");
         } catch (error: any) {
           console.log("Error:", error);
           toast.error("Failed to the create order");
@@ -244,8 +248,8 @@ const CheckoutPage = () => {
             <span className="text-xs mx-1 sm:mx-1.5">/</span>
             <span className="underline">Checkout</span>
           </div>
-        </div>
-
+        </div>{" "}
+        .
         <div className="flex flex-col lg:flex-row">
           {/* Informations about user */}
           <div className="flex-1">
