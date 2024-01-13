@@ -65,7 +65,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
             {/*{temporaryPaymentDetails && (*/}
             {/*  < paymentDetails={temporaryPaymentDetails} />*/}
             {/*)}*/}
-            <BankTransfer />
+            <BankTransfer paymentDetails={temporaryPaymentDetails} />
           </div>
         </div>
 
