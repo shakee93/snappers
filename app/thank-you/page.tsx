@@ -25,7 +25,7 @@ const ThankYouPage = ({ params }: OrderPaymentPageProps) => {
     <div className="container rounded-3xl lg:p-20 text-center mt-4">
 
       <div className="flex flex-col justify-center gap-4 items-start">
-        <h1 className="text-3xl font-regural ">We've got your order. Thank you for choosing us.
+        <h1 className="text-3xl font-regural ">We{"'"}ve got your order. Thank you for choosing us.
         </h1>
       </div>
 
