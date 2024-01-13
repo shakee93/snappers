@@ -52,7 +52,15 @@ export type PaymentDetailsType = {
   city?: string;
   country?: string;
 };
-
+declare global {
+  interface Window {
+    payhere: {
+      startPayment: (paymentDetails: any) => void | null;
+      onDismissed: () => void | null;
+      onError: (error: any) => void | null;
+    } | null;
+  }
+}
 export type PaymentDetailsWithoutUrls = Omit<PaymentDetailsType,
     'sandbox' | 'merchant_id' | 'return_url' | 'cancel_url' | 'notify_url' | 'hash'>;
 

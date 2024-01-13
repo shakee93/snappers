@@ -1,7 +1,7 @@
 "use client";
 
-import {useEffect, useMemo, useState} from "react";
-import {FetchResult, useMutation, useQuery} from "@apollo/client";
+import React, {useEffect, useMemo, useState} from "react";
+import {useMutation, useQuery} from "@apollo/client";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import Link from "next/link";
 import {useCart} from "@/context/CartProvider";
@@ -15,6 +15,8 @@ import toast from "react-hot-toast";
 import {PaymentDetailsWithoutUrls} from "@/data/types";
 import Script from "next/script";
 import {usePayhere} from "../components/Payment/Payhere";
+import {useRouter} from "next/navigation";
+import PaymentModal from "@/app/components/Payment/PaymentModal";
 
 interface FormData {
     contactInfo: Record<string, any>;
@@ -26,7 +28,7 @@ interface FormData {
         };
     };
 }
-
+//
 const FAKE_PAYMENT_DETAILS: PaymentDetailsWithoutUrls | null = {
     order_id: "6445",
     items: JSON.stringify([
@@ -67,9 +69,53 @@ const FAKE_PAYMENT_DETAILS: PaymentDetailsWithoutUrls | null = {
     country: "Sri Lanka",
 };
 
+// const FAKE_CHECKOUT_DETAILS: any = {
+//     "checkout": {
+//         "clientMutationId": null,
+//         "redirect": "https://gq.freshpixl.com/checkout/order-received/6553/?key=wc_order_7pKYJMGpe5HOf",
+//         "result": "success",
+//         "customer": {
+//             "displayName": "shadeer",
+//             "shipping": {
+//                 "firstName": "Shakeeb",
+//                 "lastName": "Sadikeen",
+//                 "address1": "120/21/5B, Araliya Uyana, Megoda Kolonnawa",
+//                 "address2": "Wellampitiya",
+//                 "city": "Colombo",
+//                 "country": "LK",
+//                 "state": null,
+//                 "postcode": "10600",
+//                 "phone": "+94755040038",
+//                 "email": null,
+//                 "__typename": "CustomerAddress"
+//             },
+//             "billing": {
+//                 "firstName": "Shakeeb",
+//                 "lastName": "sadikeen",
+//                 "address1": "araliya uyana, megoda kolonnawa",
+//                 "address2": "120/21/5b",
+//                 "city": "wellampitiya , colombo",
+//                 "country": "LK",
+//                 "state": null,
+//                 "postcode": "00800",
+//                 "phone": "+94750278330",
+//                 "email": "shakee.zats@gmail.com",
+//                 "__typename": "CustomerAddress"
+//             },
+//             "email": "shadeersadikeen@gmail.com",
+//             "__typename": "Customer"
+//         },
+//         "order": {
+//             "total": "රු11,900.00",
+//             "__typename": "Order"
+//         },
+//         "__typename": "CheckoutPayload"
+//     }
+// }
+
 const CheckoutPage = () => {
     const {cart, removeFromCart, updateCart} = useCart();
-    const {error, data} = useQuery(GET_PAYMENT_GATEWAYS);
+    const {data} = useQuery(GET_PAYMENT_GATEWAYS);
     const paymentGateways: PaymentGateway[] = data?.paymentGateways.nodes;
     const [tabActive, setTabActive] = useState<
         | "ContactInfo"
@@ -98,7 +144,10 @@ const CheckoutPage = () => {
     const [orderTotal, setOrderTotal] = useState();
     const [paymentData, setPaymentData] =
         useState<PaymentDetailsWithoutUrls | null>(null)
+    const [showBankTransfer, setShowBankTransfer] = useState<boolean>(false)
+    const [wantToSHowBankTransfer, setWantToSHowBankTransfer] = useState(false)
 
+    // USE_CASE:  This is to redirect to home page if cart is empty
 
     // useEffect(() => {
     //   if (cart && cart?.contents?.nodes?.length === 0) {
@@ -148,10 +197,9 @@ const CheckoutPage = () => {
     const [
         checkoutMutation,
         {
-            data: realCheckoutData,
+            // data: realCheckoutData,
         },
     ] = useMutation(CHECKOUT);
-
 
     useEffect(() => {
         const updateShippingTotal = async () => {
@@ -193,14 +241,15 @@ const CheckoutPage = () => {
     //     {loading: checkoutLoading, error: checkoutError, data: checkoutData},
     // ] = useMutation(GUEST_CHECKOUT_MUTATION);
 
+    const paymentDetails = useMemo(() => {
+        console.log({paymentData});
+        return paymentData
+    }, [paymentData]);
 
-    // checkoutError && console.log("checkout error: ", checkoutError);
-
-    const paymentDetails = useMemo(() => paymentData, [paymentData]);
     const initiatePayment = usePayhere({paymentDetails});
 
     const ImplementPayhere = () => {
-        console.log("running the order")
+        console.log("initiate payment: ", initiatePayment);
         if (initiatePayment !== null) {
             initiatePayment().then(r => r);
         } else {
@@ -209,57 +258,15 @@ const CheckoutPage = () => {
     };
 
     const savePaymentDetails = (checkoutDetails: CheckoutPayload): PaymentDetailsWithoutUrls => {
-        // const FAKE_CHECKOUT_DETAILS: any = {
-        //     "checkout": {
-        //         "clientMutationId": null,
-        //         "redirect": "https://gq.freshpixl.com/checkout/order-received/6553/?key=wc_order_7pKYJMGpe5HOf",
-        //         "result": "success",
-        //         "customer": {
-        //             "displayName": "shadeer",
-        //             "shipping": {
-        //                 "firstName": "Shakeeb",
-        //                 "lastName": "Sadikeen",
-        //                 "address1": "120/21/5B, Araliya Uyana, Megoda Kolonnawa",
-        //                 "address2": "Wellampitiya",
-        //                 "city": "Colombo",
-        //                 "country": "LK",
-        //                 "state": null,
-        //                 "postcode": "10600",
-        //                 "phone": "+94755040038",
-        //                 "email": null,
-        //                 "__typename": "CustomerAddress"
-        //             },
-        //             "billing": {
-        //                 "firstName": "asdfasdfasdf",
-        //                 "lastName": "sadikeen",
-        //                 "address1": "araliya uyana, megoda kolonnawa",
-        //                 "address2": "120/21/5b",
-        //                 "city": "welllampitiya , colombo",
-        //                 "country": "LK",
-        //                 "state": null,
-        //                 "postcode": "00800",
-        //                 "phone": "+94750278330",
-        //                 "email": "shakee.zats@gmail.com",
-        //                 "__typename": "CustomerAddress"
-        //             },
-        //             "email": "shadeersadikeen@gmail.com",
-        //             "__typename": "Customer"
-        //         },
-        //         "order": {
-        //             "total": "රු11,900.00",
-        //             "__typename": "Order"
-        //         },
-        //         "__typename": "CheckoutPayload"
-        //     }
-        // }
-        console.log("started the logingg");
+
+        console.log("started the logging");
         console.log(checkoutDetails);
         let a: CheckoutPayload = checkoutDetails
 
         return {
             amount: a.order?.total ?? "no_amount",
             items: "Mobile Items",
-            order_id: "122",
+            order_id: a.order?.id ?? "no_order_id_found",
             first_name: a.customer?.billing?.firstName || "no_lastname",
             last_name: a.customer?.billing?.lastName || "no firstname",
             email: a.customer?.email || "no_email",
@@ -267,70 +274,85 @@ const CheckoutPage = () => {
         }
     }
 
+    function ImplementBankTransfer() {
+        setWantToSHowBankTransfer(false)
+        setShowBankTransfer(true)
+    }
+
+
+
+    const router = useRouter();
+
     const handleCheckout = async () => {
         try {
             const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
+            const isBankTransfer = formData?.paymentMethod?.selectedGateway?.id == "bacs"
+            const isPayhere = formData?.paymentMethod?.selectedGateway?.id == "payhere"
+            const isCashOnDelivery = formData?.paymentMethod?.selectedGateway?.id == "cod"
 
-            // const lineItems =
-            //     cart?.contents?.nodes.map((item) => ({
-            //         productId: item?.product?.node?.databaseId,
-            //         quantity: item?.quantity,
-            //     })) || [];
-
+            if(wantToSHowBankTransfer){
+                ImplementBankTransfer()
+                return
+            }
+            // debugger;
             const shipping = [
                 {
-                    methodId:
-                        shippingTotal === "රු0.00"
-                            ? "pickup_location:0"
-                            : "wbs:0dd3bc79_weight_based_shipping",
-                    methodTitle:
-                        shippingTotal === "0.00"
-                            ? "pickup_location:0"
-                            : "Weight Based Shipping",
+                    methodId: shippingTotal === "රු0.00" ? "pickup_location:0" : "wbs:0dd3bc79_weight_based_shipping",
+                    methodTitle: shippingTotal === "0.00" ? "pickup_location:0" : "Weight Based Shipping",
                     total: shippingTotal,
                 },
             ];
 
             if (paymentMethodId !== undefined) {
-                let obj = {
+                const obj = {
                     input: {
                         paymentMethod: paymentMethodId,
                         shippingMethod: shipping[0].methodId,
                     },
                 };
 
-                console.log("obj: ", FAKE_PAYMENT_DETAILS);
 
-                try {
-                    const {data}: FetchResult<CheckoutPayload> = await checkoutMutation({
-                        variables: obj,
-                    });
-                    // TODO: Implement the Saving Payment Details
-                    let checkoutDetails: CheckoutPayload | null | undefined = data;
+                const { data } = await checkoutMutation({ variables: obj });
 
-                    if (checkoutDetails) {
-                        let dataToSave = savePaymentDetails(checkoutDetails)
-                        setPaymentData(dataToSave);
-
-                        console.log("checkout data: ", data);
-                        toast.success("Order Created Successfully");
-                    } else {
-                        toast.error("Something Gone wrong While Checkout");
-
+                if (data) {
+                    const checkoutDetails = savePaymentDetails(data);
+                    setPaymentData(checkoutDetails);
+                    if(isPayhere){
+                        try {
+                            ImplementPayhere();
+                        } catch (e) {
+                            console.log("Error while creating Payhere:", e);
+                        }
                     }
-
-
-                } catch (error: any) {
-                    console.log("Error:", error);
-                    toast.error("Failed to the create order");
+                    if(isBankTransfer){
+                        try {
+                            ImplementBankTransfer();
+                        } catch (e) {
+                            console.log("Error while creating BankTransfer:", e);
+                            toast.error("Error on BankTransfer");
+                        }
+                    }
+                    if(isCashOnDelivery){
+                        let redirectUrl = `checkout/${checkoutDetails.order_id}`
+                        router.push(redirectUrl);
+                    }
+                    console.log("checkout data: ", data);
+                    toast.success("Order Created Successfully");
+                } else {
+                    toast.error("Something Went Wrong While Checkout");
                 }
             } else {
                 console.error("Payment method ID is undefined");
             }
-        } catch (error) {
-            console.error("Checkout failed:", error);
+        } catch (error: any) {
+            if(error.message == "Sorry, no session found."){
+                toast.error("No Items to checkout")
+             return;
+            }
+            toast.error("Failed to create the order");
         }
     };
+
 
     const handleScrollToEl = (id: string) => {
         const element = document.getElementById(id);
@@ -347,8 +369,10 @@ const CheckoutPage = () => {
                 onError={() => console.error("Error loading PayHere script")}
             />
             <title>Checkout</title>
-
             <main className="container py-8 md:py-16 lg:pb-28 lg:pt-20 ">
+                <PaymentModal show={showBankTransfer} setShowBankTransfer={setShowBankTransfer}
+                              setWantToSHowBankTransfer={setWantToSHowBankTransfer}
+                              paymentDetails={FAKE_PAYMENT_DETAILS} />
                 <div className="mb-16">
                     <h2 className="block text-2xl sm:text-3xl lg:text-4xl font-semibold ">
                         Checkout
@@ -369,7 +393,7 @@ const CheckoutPage = () => {
                 {" "}
                 .
                 <div className="flex flex-col lg:flex-row">
-                    {/* Informations about user */}
+                    {/* Information about user */}
                     <div className="flex-1">
                         <CheckoutDetails
                             tabActive={tabActive}
@@ -414,7 +438,6 @@ const CheckoutPage = () => {
                                 <Label className="text-sm">Discount code</Label>
                                 <div className="flex mt-1.5">
                                     <Input sizeClass="h-10 px-4 py-3" className="flex-1" />
-                                    <button className="text-neutral-700 dark:text-neutral-200 border border-neutral-200 dark:border-neutral-700 hover:bg-neutral-100 rounded-2xl px-4 ml-3 font-medium text-sm bg-neutral-200/70 dark:bg-neutral-700 dark:hover:bg-neutral-800 w-24 flex justify-center items-center transition-colors">
                                         Apply
                                     </button>
                                 </div>
@@ -449,6 +472,7 @@ const CheckoutPage = () => {
                                 <span>{orderTotal || "$0.00"}</span>
                             </div>
                         </div>
+                        <p>{JSON.stringify(paymentDetails)}</p>
                         <ButtonPrimary
                             onClick={handleCheckout}
                             disabled={
@@ -473,10 +497,12 @@ const CheckoutPage = () => {
                             Confirm order
                         </ButtonPrimary>
 
-                        <ButtonPrimary onClick={ImplementPayhere}>
-                            Confirm Order baiya
-                        </ButtonPrimary>
-                        {/* <PaymentModal show={true} paymentDetails={FAKE_PAYMENT_DETAILS} /> */}
+                        {/*<ButtonPrimary onClick={ImplementPayhere}>*/}
+                        {/*    Confirm Order With Payhere*/}
+                        {/*</ButtonPrimary>*/}
+                        {/*<ButtonPrimary onClick={ImplementBankTransfer}>*/}
+                        {/*    Do your Bank Transfer*/}
+                        {/*</ButtonPrimary>*/}
 
                         <div
                             className="mt-5 text-sm text-slate-500 dark:text-slate-400 flex items-center justify-center">

@@ -1,16 +1,18 @@
 // BankTransfer.tsx
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
-import { Input } from "@nextui-org/react";
-import { useRouter } from "next/navigation";
-import React, { useState, FormEvent } from "react";
+import {Input} from "@nextui-org/react";
+import {useRouter} from "next/navigation";
+import React, {FormEvent, useEffect, useState} from "react";
 import toast from "react-hot-toast";
 import BankDetails from "./BankDetails";
+import {PaymentDetailsWithoutUrls} from "@/data/types";
 
 type BankTransferProps = {
   // Define any props you expect to pass into BankTransfer here
+  paymentDetails: PaymentDetailsWithoutUrls;
 };
 
-const BankTransfer: React.FC<BankTransferProps> = () => {
+const BankTransfer: React.FC<BankTransferProps> = ({paymentDetails}) => {
   const [file, setFile] = useState<File | null>(null);
   const [orderId, setOrderId] = useState<string>("");
   const [uploadStatus, setUploadStatus] = useState<string>("");
@@ -24,7 +26,15 @@ const BankTransfer: React.FC<BankTransferProps> = () => {
 
   const handleOrderIdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setOrderId(event.target.value);
+
   };
+  useEffect(() => {
+    if (paymentDetails) {
+      setOrderId(paymentDetails.order_id);
+    }else{
+      alert("No payment Details provided for the bank transfer")
+    }
+  }, [paymentDetails]);
 
   const router = useRouter();
 

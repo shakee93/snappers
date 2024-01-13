@@ -1,13 +1,10 @@
-import Label from "components/Label/Label";
-import React, { FC, useState, useEffect } from "react";
+import React, {FC, useEffect, useState} from "react";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
-import Input from "shared/Input/Input";
 import Radio from "shared/Radio/Radio";
 import Image from "next/image";
 
-import { PaymentGateway } from "@/graphql/types/graphql";
-import { Check } from "lucide-react";
+import {PaymentGateway} from "@/graphql/types/graphql";
 
 interface Props {
   isActive: boolean;
@@ -38,6 +35,7 @@ const PaymentMethod: FC<Props> = ({
     id: "",
     title: null,
   });
+
 
   const [isConfirmed, setIsConfirmed] = useState(false);
 

@@ -1,30 +1,28 @@
 "use client";
-import {useState} from "react";
 import {PaymentDetailsType, PaymentDetailsWithoutUrls} from "@/data/types";
 import {extractRawAmount} from "@/components/AddressPageComps/HelperComps";
-
-declare global {
-    interface Window {
-        payhere: {
-            startPayment: (paymentDetails: any) => void | null;
-            onDismissed: () => void | null;
-            onError: (error: any) => void | null;
-        } | null;
-    }
-}
+import {useEffect, useState} from "react";
 
 
 type PayHerePaymentProps = {
     paymentDetails: PaymentDetailsWithoutUrls | null;
     // ref: React.Ref<{ initiatePayment: () => void } | null>;
 };
-;
+
 
 export const usePayhere = ({paymentDetails}: PayHerePaymentProps) => {
-    const [hash, setHash] = useState<string | null>(null);
-    if (!paymentDetails) {
-        return null
-    }
+    // const [hash, setHash] = useState<string | null>(null);
+    const [paymentDetails_, setPaymentDetails_] = useState(paymentDetails)
+    //
+    // // setPaymentDetails_(paymentDetails_)
+    useEffect(()=>{
+        console.log("payment details: ", paymentDetails_)
+
+    },[paymentDetails])
+    // if (!paymentDetails) {
+    //     // toast.error("No payment Details provided for the payhere")
+    //     return null
+    // }
 
     // const staticData: PaymentDetailsType = useMemo(() => {
     //   return {
@@ -85,11 +83,11 @@ export const usePayhere = ({paymentDetails}: PayHerePaymentProps) => {
             });
 
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                return  new Error(`HTTP error! status: ${response.status}`);
             }
 
             const data = await response.json();
-            setHash(data.hash);
+            // setHash(data.hash);
             return data.hash
         } catch (error) {
             console.error("Failed to fetch hash:", error);
@@ -98,6 +96,13 @@ export const usePayhere = ({paymentDetails}: PayHerePaymentProps) => {
 
 
     const initiatePayment = async () => {
+        // console.log("payment details on the initiate", paymentDetails_);
+        // if(!paymentDetails_){
+        //     console.log("payment Details not found")
+        //     return null
+        //
+        // }
+        //
         if (window?.payhere) {
             dynamicData['hash'] = await getPaymentHash();
             window?.payhere.startPayment(dynamicData);
