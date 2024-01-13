@@ -25,7 +25,7 @@ export const OrderDetails: React.FC<OrderDetailsProps> = ({ orderData }) => {
       <div className="grid grid-cols-1 lg:grid-cols-1 py-4">
 
         <div className="flex flex-col justify-center items-start">
-          <h1 className="text-3xl font-regural ">Thank You. Your order has been receieved</h1>
+          <h1 className="text-3xl font-regural ">We've got your order.  Thank you for choosing us.  📦</h1>
         </div>
 
         <div className="flex flex-row justify-between w-full py-8">
@@ -125,21 +125,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData, payme
         </div>
       </div>
 
-      <div className="pt-10">
-        <p className="text-2xl text-left">Our Bank Details</p>
-        <div className="" >
-          <h1 className="text-xl py-8 text-left ">GQ Mobile</h1>
 
-          <ul className="list-disc pl-4 ">
-            <li className="mb-2 text-left "><strong className="text-gray-600">Bank:</strong> Commercial</li>
-            <li className="mb-2 text-left "><strong className="text-gray-600">Account number:</strong> 34312421543545</li>
-            <li className="mb-2 text-left "><strong className="text-gray-600">Sort code:</strong> fsefsa</li>
-            <li className="mb-2 text-left "><strong className="text-gray-600">IBAN:</strong> asdfadsfasd</li>
-            <li className="mb-2 text-left "><strong className="text-gray-600">BIC:</strong> fsadfsdfasdf</li>
-          </ul>
-
-        </div>
-      </div>
     </>
   );
 };

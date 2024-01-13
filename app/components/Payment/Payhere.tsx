@@ -17,7 +17,6 @@ export const usePayhere = ({paymentDetails}: PayHerePaymentProps) => {
     // // setPaymentDetails_(paymentDetails_)
     useEffect(()=>{
         console.log("payment details: ", paymentDetails_)
-
     },[paymentDetails])
     // if (!paymentDetails) {
     //     // toast.error("No payment Details provided for the payhere")

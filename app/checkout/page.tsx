@@ -29,45 +29,45 @@ interface FormData {
     };
 }
 //
-const FAKE_PAYMENT_DETAILS: PaymentDetailsWithoutUrls | null = {
-    order_id: "6445",
-    items: JSON.stringify([
-        {
-            databaseId: 485,
-            subtotal: "39500",
-            quantity: 1,
-            product: {
-                node: {
-                    name: "Xiaomi Redmi 10 (2022) | 6GB 128GB",
-                    databaseId: 6337,
-                    featuredImage: {
-                        node: {
-                            sourceUrl:
-                                "https://gq.freshpixl.com/wp-content/uploads/2023/12/REDMI-10-GREY.jpg",
-                            __typename: "MediaItem",
-                        },
-                        __typename: "NodeWithFeaturedImageToMediaItemConnectionEdge",
-                    },
-                    __typename: "SimpleProduct",
-                },
-                __typename: "LineItemToProductConnectionEdge",
-            },
-            __typename: "LineItem",
-        },
-    ]),
-    // subtotal: "රු39,500.00",
-    amount: "රු39,500.00",
-    currency: "LKR",
-    first_name: "Shakeeb",
-    last_name: "Sadikeen",
-    email: "shadeersadikeen@gmail.com",
-    phone: "+94755040038",
-    address: "120/21/5B, Araliya Uyana, Megoda Kolonnawa",
-    // address: "araliya uyana, megoda kolonnawa",
-    // billingAddress2: "120/21/5b",
-    city: "Colombo",
-    country: "Sri Lanka",
-};
+// const FAKE_PAYMENT_DETAILS: PaymentDetailsWithoutUrls | null = {
+//     order_id: "6425",
+//     items: JSON.stringify([
+//         {
+//             databaseId: 485,
+//             subtotal: "39500",
+//             quantity: 1,
+//             product: {
+//                 node: {
+//                     name: "Xiaomi Redmi 10 (2022) | 6GB 128GB",
+//                     databaseId: 6337,
+//                     featuredImage: {
+//                         node: {
+//                             sourceUrl:
+//                                 "https://gq.freshpixl.com/wp-content/uploads/2023/12/REDMI-10-GREY.jpg",
+//                             __typename: "MediaItem",
+//                         },
+//                         __typename: "NodeWithFeaturedImageToMediaItemConnectionEdge",
+//                     },
+//                     __typename: "SimpleProduct",
+//                 },
+//                 __typename: "LineItemToProductConnectionEdge",
+//             },
+//             __typename: "LineItem",
+//         },
+//     ]),
+//     // subtotal: "රු39,500.00",
+//     amount: "රු39,500.00",
+//     currency: "LKR",
+//     first_name: "Shakeeb",
+//     last_name: "Sadikeen",
+//     email: "shadeersadikeen@gmail.com",
+//     phone: "+94755040038",
+//     address: "120/21/5B, Araliya Uyana, Megoda Kolonnawa",
+//     // address: "araliya uyana, megoda kolonnawa",
+//     // billingAddress2: "120/21/5b",
+//     city: "Colombo",
+//     country: "Sri Lanka",
+// };
 
 // const FAKE_CHECKOUT_DETAILS: any = {
 //     "checkout": {
@@ -149,12 +149,12 @@ const CheckoutPage = () => {
 
     // USE_CASE:  This is to redirect to home page if cart is empty
 
-    // useEffect(() => {
-    //   if (cart && cart?.contents?.nodes?.length === 0) {
-    //     router.push("/");
-    //   }
-    //   // eslint-disable-next-line react-hooks/exhaustive-deps
-    // }, [cart]);
+    useEffect(() => {
+      if (cart && cart?.contents?.nodes?.length === 0) {
+        router.push("/");
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [cart]);
 
     useEffect(() => {
     }, [formData]);
@@ -204,37 +204,27 @@ const CheckoutPage = () => {
     useEffect(() => {
         const updateShippingTotal = async () => {
             try {
-                let shippingMethods;
-
-                if (isStorePickup) {
-                    shippingMethods = "pickup_location:0";
-                } else {
-                    shippingMethods = "wbs:0dd3bc79_weight_based_shipping";
-                }
-
-                const {data} = await updateCartShippingTotalMutation({
-                    variables: {
-                        input: {shippingMethods},
-                    },
+                const shippingMethods = isStorePickup ? "pickup_location:0" : "wbs:0dd3bc79_weight_based_shipping";
+                const { data } = await updateCartShippingTotalMutation({
+                    variables: { input: { shippingMethods } },
                 });
 
-                setOrderTotal(data?.updateShippingMethod?.cart?.total);
-                setShippingTotal(data?.updateShippingMethod?.cart?.shippingTotal);
-
-                if (data) {
-                    console.log("Cart shipping total updated successfully");
+                if (data?.updateShippingMethod?.cart) {
+                    const { total, shippingTotal } = data.updateShippingMethod.cart;
+                    setOrderTotal(total);
+                    setShippingTotal(shippingTotal);
+                    // console.log("Cart shipping total updated successfully");
                 } else {
-                    console.error("Failed to update cart shipping total");
+                    console.error("Failed to update cart shipping total. No valid data returned.");
                 }
-            } catch (error: any) {
-                console.log("Error:", error);
+            } catch (error) {
+                console.error("An error occurred while updating shipping total:", error);
             }
         };
 
-        updateShippingTotal().then(r => r);
-
-        // eslint-disable-next-line react-hooks/exhaustive-deps
+        updateShippingTotal();
     }, [isStorePickup, updateCartShippingTotalMutation]);
+
 
     // const [
     //     guestCheckoutMutation,
@@ -242,7 +232,6 @@ const CheckoutPage = () => {
     // ] = useMutation(GUEST_CHECKOUT_MUTATION);
 
     const paymentDetails = useMemo(() => {
-        console.log({paymentData});
         return paymentData
     }, [paymentData]);
 
@@ -257,21 +246,21 @@ const CheckoutPage = () => {
         }
     };
 
-    const savePaymentDetails = (checkoutDetails: CheckoutPayload): PaymentDetailsWithoutUrls => {
+    const savePaymentDetails = (checkoutDetails: any): PaymentDetailsWithoutUrls => {
+        let orderDetails: CheckoutPayload = checkoutDetails?.checkout
+        let {order, customer} = orderDetails
 
-        console.log("started the logging");
-        console.log(checkoutDetails);
-        let a: CheckoutPayload = checkoutDetails
-
-        return {
-            amount: a.order?.total ?? "no_amount",
+        let saved_data =  {
+            amount: order?.total ?? "no_amount",
             items: "Mobile Items",
-            order_id: a.order?.id ?? "no_order_id_found",
-            first_name: a.customer?.billing?.firstName || "no_lastname",
-            last_name: a.customer?.billing?.lastName || "no firstname",
-            email: a.customer?.email || "no_email",
-            address: a.customer?.billing?.address1 || "no_address",
+            order_id: order?.databaseId?.toString() ?? "no_order_id_found",
+            first_name: customer?.billing?.firstName || "no_lastname",
+            last_name: customer?.billing?.lastName || "no firstname",
+            email: customer?.email || "no_email",
+            address: customer?.billing?.address1 || "no_address",
         }
+
+        return saved_data
     }
 
     function ImplementBankTransfer() {
@@ -315,6 +304,7 @@ const CheckoutPage = () => {
                 const { data } = await checkoutMutation({ variables: obj });
 
                 if (data) {
+                    console.log("type of Checkout data: ", typeof data);
                     const checkoutDetails = savePaymentDetails(data);
                     setPaymentData(checkoutDetails);
                     if(isPayhere){
@@ -336,7 +326,6 @@ const CheckoutPage = () => {
                         let redirectUrl = `checkout/${checkoutDetails.order_id}`
                         router.push(redirectUrl);
                     }
-                    console.log("checkout data: ", data);
                     toast.success("Order Created Successfully");
                 } else {
                     toast.error("Something Went Wrong While Checkout");
@@ -360,6 +349,7 @@ const CheckoutPage = () => {
             element?.scrollIntoView({behavior: "smooth"});
         }, 80);
     };
+
     return (
         <div className="nc-CheckoutPage">
             <Script
@@ -372,7 +362,7 @@ const CheckoutPage = () => {
             <main className="container py-8 md:py-16 lg:pb-28 lg:pt-20 ">
                 <PaymentModal show={showBankTransfer} setShowBankTransfer={setShowBankTransfer}
                               setWantToSHowBankTransfer={setWantToSHowBankTransfer}
-                              paymentDetails={FAKE_PAYMENT_DETAILS} />
+                              paymentDetails={paymentDetails} />
                 <div className="mb-16">
                     <h2 className="block text-2xl sm:text-3xl lg:text-4xl font-semibold ">
                         Checkout
@@ -472,7 +462,6 @@ const CheckoutPage = () => {
                                 <span>{orderTotal || "$0.00"}</span>
                             </div>
                         </div>
-                        <p>{JSON.stringify(paymentDetails)}</p>
                         <ButtonPrimary
                             onClick={handleCheckout}
                             disabled={

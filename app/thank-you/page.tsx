@@ -1,10 +1,7 @@
 "use client"
-import { BadgeCheck } from "lucide-react";
-import { OrderPaymentPageProps } from "@/data/types";
-import { useQuery } from "@apollo/client";
-import {
-  GET_SINGLE_ORDER
-} from "@/graphql/defs/order"
+import {OrderPaymentPageProps} from "@/data/types";
+import {useQuery} from "@apollo/client";
+import {GET_SINGLE_ORDER} from "@/graphql/defs/order"
 
 
 const ThankYouPage = ({ params }: OrderPaymentPageProps) => {
@@ -28,7 +25,8 @@ const ThankYouPage = ({ params }: OrderPaymentPageProps) => {
     <div className="container rounded-3xl lg:p-20 text-center mt-4">
 
       <div className="flex flex-col justify-center gap-4 items-start">
-        <h1 className="text-3xl font-regural ">Thank You. Your order has been receieved</h1>
+        <h1 className="text-3xl font-regural ">We've got your order. Thank you for choosing us.
+        </h1>
       </div>
 
       <div className="flex flex-row justify-between w-full py-12">

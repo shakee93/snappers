@@ -1,17 +1,11 @@
-import {
-  SRI_LANKAN_STATES,
-  SelectField,
-} from "@/components/AddressPageComps/HelperComps";
-import { CustomerAddress } from "@/graphql/types/graphql";
-import Label from "components/Label/Label";
-import React, { FC, useEffect, useState } from "react";
+import {SelectField, SRI_LANKAN_STATES,} from "@/components/AddressPageComps/HelperComps";
+import {CustomerAddress} from "@/graphql/types/graphql";
+import React, {FC, useEffect, useState} from "react";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Input from "shared/Input/Input";
 import Select from "shared/Select/Select";
 import Checkbox from "@/shared/Checkbox/Checkbox";
-import BillingAddress from "app/checkout/BillingAddress";
-import toast from "react-hot-toast";
 
 interface Props {
   isActive: boolean;
@@ -131,6 +125,7 @@ const DeliveryAddress: FC<Props> = ({
       country,
       addressType,
     };
+
     if (isStorePickup) {
       updateFormData("deliveryAddress", shippingAddressData);
       updateFormData("billingAddress", shippingAddressData);

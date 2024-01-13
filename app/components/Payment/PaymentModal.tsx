@@ -11,6 +11,8 @@ const PaymentModal = ({show, setShowBankTransfer, setWantToSHowBankTransfer, pay
         setShowBankTransfer(false);
     };
 
+    // console.log("Payment details in the payment modal: ", paymentDetails)
+
     return (
         <Transition appear show={show} as={Fragment}>
             <Dialog

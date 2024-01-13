@@ -24,11 +24,8 @@ const BankTransfer: React.FC<BankTransferProps> = ({paymentDetails}) => {
     }
   };
 
-  const handleOrderIdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setOrderId(event.target.value);
-
-  };
   useEffect(() => {
+    // setOrderId("6445");
     if (paymentDetails) {
       setOrderId(paymentDetails.order_id);
     }else{
@@ -41,7 +38,7 @@ const BankTransfer: React.FC<BankTransferProps> = ({paymentDetails}) => {
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (!file) {
-      alert("Please select a file to upload.");
+      toast.error("Kindly choose a file for uploading.");
       return;
     }
 
@@ -61,11 +58,12 @@ const BankTransfer: React.FC<BankTransferProps> = ({paymentDetails}) => {
 
       if (data.message === "succuss") {
         setUploadStatus("succuss");
-        router.push("/thank-you");
+        toast.success("You have successfully completed the upload of your bank slip.")
+        let thankYouUrl = `checkout/${orderId}`
+        router.push(thankYouUrl);
       }
       if (data.error) {
-        setUploadStatus("wrong");
-        toast.error("Something Went Wrong");
+        toast.error("An issue occurred during the bank slip upload process.");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -78,19 +76,21 @@ const BankTransfer: React.FC<BankTransferProps> = ({paymentDetails}) => {
       <BankDetails />
       <form className="file-upload-form sm:pl-8 w-fit" onSubmit={handleSubmit}>
         <div className="mb-4">
-          <h1
-            className="text-xl sm:py-8 py-4 text-left"
+          {/*<h1*/}
+          {/*    className="text-xl sm:py-8 py-4 text-left"*/}
 
-          >
-            Upload Bank Slip
-          </h1>
+          {/*>*/}
+          {/*  Upload Bank Slip*/}
+          {/*</h1>*/}
+          <p className="text-2xl font-bold text-left pb-4">Uplaod Bank Slip</p>
           <Input
-            className=""
-            id="file"
-            type="file"
-            onChange={handleFileChange}
+              className=""
+              id="file"
+              type="file"
+              onChange={handleFileChange}
           />
-          <p className="text-sm pt-2 text-gray-600">When you{`'`}ve completed the transfer to Our Bank, kindly upload your bank slip here</p>
+          <p className="text-sm pt-2 text-gray-600">When you{`'`}ve completed the transfer to Our Bank, kindly upload
+            your bank slip here</p>
         </div>
 
         <div className="flex items-center justify-between">
