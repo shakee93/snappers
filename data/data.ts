@@ -14,8 +14,6 @@ import productSport6 from "@/public/images/products/sport-6.png";
 import productSport7 from "@/public/images/products/sport-7.png";
 import productSport8 from "@/public/images/products/sport-8.png";
 
-//
-
 export interface ProductVariant {
     id: number;
     name: string;

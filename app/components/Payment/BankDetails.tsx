@@ -1,6 +1,13 @@
 import React, {useState} from 'react';
 
-const bankDetailsData = [
+type BankDetail = {
+  bank: string;
+  accName: string;
+  accNo: string;
+  branch: string;
+};
+
+const bankDetailsData: BankDetail[] = [
   {
     bank: 'Sampath Bank',
     accName: 'GQ Mobiles Pvt Ltd',
@@ -24,10 +31,8 @@ const bankDetailsData = [
     accName: 'GQ Mobile Store',
     accNo: '100030010564',
     branch: 'Bankshall Street Branch',
-  }
+  },
 ];
-
-
 
 const BankDetails: React.FC = () => {
   const [selectedBank, setSelectedBank] = useState(0);
@@ -36,19 +41,21 @@ const BankDetails: React.FC = () => {
     setSelectedBank(index);
   };
 
-  const renderBankTabs = () => {
-    return bankDetailsData.map((bank: any, index: any) => (
-        <div
-            key={index}
-            className={`cursor-pointer py-2 rounded-lg px-4 ${
-                selectedBank === index ? 'bg-blue-700 text-white' : 'bg-gray-100'
-            }`}
-            onClick={() => handleBankSelect(index)}
-        >
-          {bank.bank}
-        </div>
-    ));
-  };
+  const renderBankTabs = () => (
+      <div className="flex flex-wrap gap-2">
+        {bankDetailsData.map((bank: BankDetail, index: number) => (
+            <div
+                key={index}
+                className={`cursor-pointer py-2 rounded-lg px-4 ${
+                    selectedBank === index ? 'bg-blue-700 text-white' : 'bg-gray-100'
+                }`}
+                onClick={() => handleBankSelect(index)}
+            >
+              {bank.bank}
+            </div>
+        ))}
+      </div>
+  );
 
   const selectedBankDetails = bankDetailsData[selectedBank];
 
@@ -62,7 +69,7 @@ const BankDetails: React.FC = () => {
             <ul className="list-disc pl-4">
               {Object.entries(selectedBankDetails).map(([label, value]) => (
                   <li key={label} className="mb-2 text-left">
-                    <strong className="text-gray-600">{label}:</strong> {value as string}
+                    <strong className="text-gray-600">{label}:</strong> {value}
                   </li>
               ))}
             </ul>
