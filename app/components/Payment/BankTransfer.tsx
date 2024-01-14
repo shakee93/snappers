@@ -25,6 +25,8 @@ const BankTransfer: React.FC<BankTransferProps> = ({paymentDetails}) => {
   };
 
   useEffect(() => {
+
+    // use this id to the testing
     // setOrderId("6445");
     if (paymentDetails) {
       setOrderId(paymentDetails.order_id);
@@ -74,7 +76,7 @@ const BankTransfer: React.FC<BankTransferProps> = ({paymentDetails}) => {
   return (
     <div className="container grid sm:grid-cols-2 grid-cols-1 sm:divide-x-2 sm:divide-y-0 divide-y-2 mx-auto p-4">
       <BankDetails />
-      <form className="file-upload-form sm:pl-8 w-fit" onSubmit={handleSubmit}>
+      <form className="file-upload-form sm:pl-8 py-8 w-fit" onSubmit={handleSubmit}>
         <div className="mb-4">
           {/*<h1*/}
           {/*    className="text-xl sm:py-8 py-4 text-left"*/}
@@ -82,7 +84,7 @@ const BankTransfer: React.FC<BankTransferProps> = ({paymentDetails}) => {
           {/*>*/}
           {/*  Upload Bank Slip*/}
           {/*</h1>*/}
-          <p className="text-2xl font-bold text-left pb-4">Uplaod Bank Slip</p>
+          <p className="text-2xl font-bold text-left pb-4">Upload Bank Slip</p>
           <Input
               className=""
               id="file"

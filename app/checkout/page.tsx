@@ -17,6 +17,7 @@ import Script from "next/script";
 import {usePayhere} from "../components/Payment/Payhere";
 import {useRouter} from "next/navigation";
 import PaymentModal from "@/app/components/Payment/PaymentModal";
+import {useSession} from "@/context/SessionProvider";
 
 interface FormData {
     contactInfo: Record<string, any>;
@@ -115,6 +116,8 @@ interface FormData {
 
 const CheckoutPage = () => {
     const {cart, removeFromCart, updateCart} = useCart();
+    const { customer, fetchCustomer,  } = useSession();
+
     const {data} = useQuery(GET_PAYMENT_GATEWAYS);
     const paymentGateways: PaymentGateway[] = data?.paymentGateways.nodes;
     const [tabActive, setTabActive] = useState<
@@ -157,7 +160,8 @@ const CheckoutPage = () => {
     }, [cart]);
 
     useEffect(() => {
-    }, [formData]);
+        fetchCustomer()
+    }, []);
 
     const updateFormData = (section: string, data: any) => {
         setFormData((prevData) => {
@@ -268,6 +272,14 @@ const CheckoutPage = () => {
         setShowBankTransfer(true)
     }
 
+    const CreateOrderGuest = ()=> {
+        if(customer?.id == "guest"){
+            alert("You are a guest Customer")
+        }else{
+            alert("You are already logged in")
+        }
+
+    }
 
 
     const router = useRouter();
@@ -301,20 +313,20 @@ const CheckoutPage = () => {
                 };
 
 
-                const { data } = await checkoutMutation({ variables: obj });
+                const {data} = await checkoutMutation({variables: obj});
 
                 if (data) {
                     console.log("type of Checkout data: ", typeof data);
                     const checkoutDetails = savePaymentDetails(data);
                     setPaymentData(checkoutDetails);
-                    if(isPayhere){
+                    if (isPayhere) {
                         try {
                             ImplementPayhere();
                         } catch (e) {
                             console.log("Error while creating Payhere:", e);
                         }
                     }
-                    if(isBankTransfer){
+                    if (isBankTransfer) {
                         try {
                             ImplementBankTransfer();
                         } catch (e) {
@@ -322,7 +334,7 @@ const CheckoutPage = () => {
                             toast.error("Error on BankTransfer");
                         }
                     }
-                    if(isCashOnDelivery){
+                    if (isCashOnDelivery) {
                         let redirectUrl = `checkout/${checkoutDetails.order_id}`
                         router.push(redirectUrl);
                     }
@@ -338,7 +350,7 @@ const CheckoutPage = () => {
                 toast.error("No Items to checkout")
              return;
             }
-            toast.error("Failed to create the order");
+            toast.error("Failed to create the order"+error.message);
         }
     };
 
@@ -349,6 +361,7 @@ const CheckoutPage = () => {
             element?.scrollIntoView({behavior: "smooth"});
         }, 80);
     };
+
 
     return (
         <div className="nc-CheckoutPage">
@@ -484,6 +497,9 @@ const CheckoutPage = () => {
                             }`}
                         >
                             Confirm order
+                        </ButtonPrimary>
+                        <ButtonPrimary onClick={CreateOrderGuest}>
+                            GUEST CHECKOUT
                         </ButtonPrimary>
 
                         {/*<ButtonPrimary onClick={ImplementPayhere}>*/}

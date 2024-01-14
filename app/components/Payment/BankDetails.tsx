@@ -2,30 +2,32 @@ import React, {useState} from 'react';
 
 const bankDetailsData = [
   {
-    bank: 'Commercial',
-    accName: 'THARIQ BHAII',
-    accNo: '34312421543545',
-    sortCode: 'fsefsa',
-    iban: 'asdfadsfasd',
-    bic: 'fsadfsdfasdf',
+    bank: 'Sampath Bank',
+    accName: 'GQ Mobiles Pvt Ltd',
+    accNo: '004210015529',
+    branch: 'Mainstreet Branch',
   },
   {
-    bank: 'Bank 2',
-    accName: 'Account Name 2',
-    accNo: 'Account Number 2',
-    sortCode: 'Sort Code 2',
-    iban: 'IBAN 2',
-    bic: 'BIC 2',
+    bank: 'Commercial Bank',
+    accName: 'GQ Mobile Store',
+    accNo: '1720022600',
+    branch: 'Pettah Branch',
   },
   {
-    bank: 'Bank 3',
-    accName: 'Account Name 3',
-    accNo: 'Account Number 3',
-    sortCode: 'Sort Code 3',
-    iban: 'IBAN 3',
-    bic: 'BIC 3',
+    bank: 'HNB',
+    accName: 'GQ Mobile Store',
+    accNo: '007010313159',
+    branch: 'Mainstreet Branch',
   },
+  {
+    bank: 'NTB',
+    accName: 'GQ Mobile Store',
+    accNo: '100030010564',
+    branch: 'Bankshall Street Branch',
+  }
 ];
+
+
 
 const BankDetails: React.FC = () => {
   const [selectedBank, setSelectedBank] = useState(0);
@@ -35,7 +37,7 @@ const BankDetails: React.FC = () => {
   };
 
   const renderBankTabs = () => {
-    return bankDetailsData.map((bank, index) => (
+    return bankDetailsData.map((bank: any, index: any) => (
         <div
             key={index}
             className={`cursor-pointer py-2 rounded-lg px-4 ${
@@ -60,7 +62,7 @@ const BankDetails: React.FC = () => {
             <ul className="list-disc pl-4">
               {Object.entries(selectedBankDetails).map(([label, value]) => (
                   <li key={label} className="mb-2 text-left">
-                    <strong className="text-gray-600">{label}:</strong> {value}
+                    <strong className="text-gray-600">{label}:</strong> {value as string}
                   </li>
               ))}
             </ul>
