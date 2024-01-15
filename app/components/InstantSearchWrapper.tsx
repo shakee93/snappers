@@ -126,7 +126,7 @@ const InstantSearchWrapper = ({
                 <SortInput/>
                 {filters && <TabFilters category={category} brand={brand} categories={categories} brands={brands}/>}
                 <Configure
-                    // filters={filterQuery}
+                    filters={filterQuery}
                     hitsPerPage={12}/>
                 <ProductGridInstant/>
             </div>
