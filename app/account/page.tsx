@@ -1,13 +1,13 @@
 "use client";
 
-import React, {FC, useEffect, useState} from "react";
+import React, { FC, useEffect, useState } from "react";
 import Input from "@/shared/Input/Input";
 import Label from "@/components/Label/Label";
 import Select from "@/shared/Select/Select";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
-import {useSession} from "@/context/SessionProvider";
+import { useSession } from "@/context/SessionProvider";
 import toast from "react-hot-toast";
-import {useRouter} from "next/navigation";
+import { useRouter } from "next/navigation";
 
 const AccountPage: FC = () => {
   const { customer, fetchCustomer, updateCustomer } = useSession();
@@ -23,10 +23,14 @@ const AccountPage: FC = () => {
     about: "",
   });
 
-  const router = useRouter(); 
+  const router = useRouter();
+
   useEffect(() => {
-    if (customer?.id == "guest") {
-      router.push("/login");
+    if (customer?.id === "guest") {
+      const timeoutId = setTimeout(() => {
+        router.push("/login");
+      }, 1000);
+      return () => clearTimeout(timeoutId);
     }
   }, [customer, router]);
 
