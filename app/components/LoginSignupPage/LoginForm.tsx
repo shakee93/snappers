@@ -1,19 +1,17 @@
-"use client";
-
-import { useState } from "react";
-import gql from "graphql-tag";
+"use client"
+import {useState} from "react";
 import Input from "@/shared/Input/Input";
-import Link from "next/link";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
-import { LoginResponse } from "@/utils/type";
-import { useSession } from "@/context/SessionProvider";
-import { useRouter } from "next/navigation";
-import toast, { Toaster } from 'react-hot-toast';
-import { errorCodes } from "@apollo/client/invariantErrorCodes";
+import {LoginResponse} from "@/utils/type";
+import {useSession} from "@/context/SessionProvider";
+import {useRouter} from "next/navigation";
+import toast from 'react-hot-toast';
+import {Loader} from "lucide-react";
 
 const LoginForm = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [isLoading, setIsLoading] = useState(false); // Add loading state
 
     const { login } = useSession();
     const router = useRouter();
@@ -22,16 +20,20 @@ const LoginForm = () => {
         event.preventDefault();
 
         try {
+            setIsLoading(true); // Set loading state to true
             let response: LoginResponse = await login(email, password);
             if (response.error) {
-                let errorMessage = `${response.error}`
+                let errorMessage = `${response.error}`;
                 toast.error(errorMessage);
-                return
+                setIsLoading(false); // Set loading state to false on error
+                return;
             }
-            toast("Logged in  Successfully")
+            toast("Logged in Successfully");
             router.push("/account");
         } catch (error) {
             console.error("Error:", error);
+        } finally {
+            setIsLoading(false); // Set loading state to false after request completes
         }
     };
 
@@ -47,25 +49,29 @@ const LoginForm = () => {
                     required={true}
                     className="mt-1"
                     value={email}
-                    onChange={(e) => setEmail(e.target.value)} // Update email state on change
+                    onChange={(e) => setEmail(e.target.value)}
                 />
             </label>
             <label className="block">
                 <span className="flex justify-between items-center text-neutral-800 dark:text-neutral-200">
                     Password
-                    {/* <Link href="/forgot-pass" className="text-sm text-green-600">
-                        Forgot password?
-                    </Link> */}
                 </span>
                 <Input
                     type="password"
                     className="mt-1"
                     required={true}
                     value={password}
-                    onChange={(e) => setPassword(e.target.value)} // Update password state on change
+                    onChange={(e) => setPassword(e.target.value)}
                 />
             </label>
-            <ButtonPrimary type="submit">Continue</ButtonPrimary>
+            <ButtonPrimary type="submit" disabled={isLoading}>
+                {isLoading ?
+                    (
+                        <Loader className='animate-spin text-gray-100 '/>
+                    )
+
+                    : 'Continue'}
+            </ButtonPrimary>
         </form>
     );
 };

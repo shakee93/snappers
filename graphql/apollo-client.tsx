@@ -1,24 +1,19 @@
 "use client";
 
-import {
-  ApolloLink,
-  from,
-  HttpLink, Observable,
-  useMutation,
-} from "@apollo/client";
+import {ApolloLink, from, HttpLink, Observable,} from "@apollo/client";
 import {
   ApolloNextAppProvider,
-  NextSSRInMemoryCache,
   NextSSRApolloClient,
+  NextSSRInMemoryCache,
   SSRMultipartLink,
 } from "@apollo/experimental-nextjs-app-support/ssr";
-import { GraphQLClient } from 'graphql-request';
+import {GraphQLClient} from 'graphql-request';
 
-import { GET_AUTH_TOKEN } from "./defs/auth";
-import { AUTH_TOKEN_KEY, REFRESH_TOKEN_KEY, SESSION_TOKEN_KEY } from "@/context/SessionProvider";
-import { onError } from "@apollo/client/link/error";
-import { loadErrorMessages, loadDevMessages } from "@apollo/client/dev";
-import { Results } from "@/types";
+import {GET_AUTH_TOKEN} from "./defs/auth";
+import {AUTH_TOKEN_KEY, REFRESH_TOKEN_KEY, SESSION_TOKEN_KEY} from "@/context/SessionProvider";
+import {onError} from "@apollo/client/link/error";
+import {loadDevMessages, loadErrorMessages} from "@apollo/client/dev";
+import {Results} from "@/types";
 
 
 loadDevMessages();
@@ -115,7 +110,7 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
         });
       }
 
-      console.log(graphQLErrors);
+      // console.log(graphQLErrors);
 
       if (networkError) console.log(`[Network error]: ${networkError}`);
     });

@@ -1,16 +1,18 @@
 // BankTransfer.tsx
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
-import { Input } from "@nextui-org/react";
-import { useRouter } from "next/navigation";
-import React, { useState, FormEvent } from "react";
+import {Input} from "@nextui-org/react";
+import {useRouter} from "next/navigation";
+import React, {FormEvent, useEffect, useState} from "react";
 import toast from "react-hot-toast";
 import BankDetails from "./BankDetails";
+import {PaymentDetailsWithoutUrls} from "@/data/types";
 
 type BankTransferProps = {
   // Define any props you expect to pass into BankTransfer here
+  paymentDetails: PaymentDetailsWithoutUrls;
 };
 
-const BankTransfer: React.FC<BankTransferProps> = () => {
+const BankTransfer: React.FC<BankTransferProps> = ({paymentDetails}) => {
   const [file, setFile] = useState<File | null>(null);
   const [orderId, setOrderId] = useState<string>("");
   const [uploadStatus, setUploadStatus] = useState<string>("");
@@ -22,16 +24,23 @@ const BankTransfer: React.FC<BankTransferProps> = () => {
     }
   };
 
-  const handleOrderIdChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setOrderId(event.target.value);
-  };
+  useEffect(() => {
+
+    // use this id to the testing
+    // setOrderId("6445");
+    if (paymentDetails) {
+      setOrderId(paymentDetails.order_id);
+    }else{
+      alert("No payment Details provided for the bank transfer")
+    }
+  }, [paymentDetails]);
 
   const router = useRouter();
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     if (!file) {
-      alert("Please select a file to upload.");
+      toast.error("Kindly choose a file for uploading.");
       return;
     }
 
@@ -51,11 +60,12 @@ const BankTransfer: React.FC<BankTransferProps> = () => {
 
       if (data.message === "succuss") {
         setUploadStatus("succuss");
-        router.push("/thank-you");
+        toast.success("You have successfully completed the upload of your bank slip.")
+        let thankYouUrl = `checkout/${orderId}`
+        router.push(thankYouUrl);
       }
       if (data.error) {
-        setUploadStatus("wrong");
-        toast.error("Something Went Wrong");
+        toast.error("An issue occurred during the bank slip upload process.");
       }
     } catch (error) {
       console.error("Error:", error);
@@ -66,21 +76,23 @@ const BankTransfer: React.FC<BankTransferProps> = () => {
   return (
     <div className="container grid sm:grid-cols-2 grid-cols-1 sm:divide-x-2 sm:divide-y-0 divide-y-2 mx-auto p-4">
       <BankDetails />
-      <form className="file-upload-form sm:pl-8 w-fit" onSubmit={handleSubmit}>
+      <form className="file-upload-form sm:pl-8 py-8 w-fit" onSubmit={handleSubmit}>
         <div className="mb-4">
-          <h1
-            className="text-xl sm:py-8 py-4 text-left"
+          {/*<h1*/}
+          {/*    className="text-xl sm:py-8 py-4 text-left"*/}
 
-          >
-            Upload Bank Slip
-          </h1>
+          {/*>*/}
+          {/*  Upload Bank Slip*/}
+          {/*</h1>*/}
+          <p className="text-2xl font-bold text-left pb-4">Upload Bank Slip</p>
           <Input
-            className=""
-            id="file"
-            type="file"
-            onChange={handleFileChange}
+              className=""
+              id="file"
+              type="file"
+              onChange={handleFileChange}
           />
-          <p className="text-sm pt-2 text-gray-600">When you{`'`}ve completed the transfer to Our Bank, kindly upload your bank slip here</p>
+          <p className="text-sm pt-2 text-gray-600">When you{`'`}ve completed the transfer to Our Bank, kindly upload
+            your bank slip here</p>
         </div>
 
         <div className="flex items-center justify-between">

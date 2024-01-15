@@ -144,6 +144,8 @@ export const CHECKOUT = gql`
       }
       order {
         total
+        id
+        databaseId
       }
      
 
@@ -172,7 +174,7 @@ export const UPDATE_ADDRESS = gql`
 
 export const GET_SINGLE_ORDER = gql`
   query getOrder($orderID: ID!) {
-    order(id: $orderID) {
+    order(id: $orderID, idType: DATABASE_ID) {
       id
       subtotal
       total
