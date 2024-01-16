@@ -28,9 +28,9 @@ export default function OrderPaymentPage({params}: OrderPaymentPageProps) {
     // console.log({orderData})
     // console.log("Order Error", orderError)
     // console.log("+++++++++++++++++++++++++++++++")
-    //
+
     if(!orderId || orderId == "12345"){
-        toast.error("Invalid Order Id")
+        toast.error(`Order not found: ${orderId}`);
         redirect('/');
     }
 
