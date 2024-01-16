@@ -30,14 +30,44 @@ export const GUEST_CHECKOUT_MUTATION = gql`
     ) {
       clientMutationId
       order {
-        id
-        orderKey
+
         total
         orderNumber
         paymentMethodTitle
       }
     }
   }
+`;
+
+// id
+// orderKey
+
+export const GUEST_CHECKOUT = gql`
+  mutation checkout($input: CheckoutInput!) {
+    checkout(input: $input) {
+      clientMutationId
+      redirect
+      result
+      customer{
+        displayName
+        shipping {
+          ...CustomerAddressFragment
+        }
+        billing {
+          ...CustomerAddressFragment
+        }
+        email
+      }
+      order {
+        total
+        databaseId
+      }
+     
+
+    }
+  }
+  ${CustomerAddressFragment}
+  
 `;
 
 export const PAYMENT_DETAILS = gql`

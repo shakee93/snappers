@@ -58,6 +58,7 @@ declare global {
       startPayment: (paymentDetails: any) => void | null;
       onDismissed: () => void | null;
       onError: (error: any) => void | null;
+      onCompleted : (orderId: any) => void | null;
     } | null;
   }
 }

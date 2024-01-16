@@ -48,10 +48,10 @@ export const usePayhere = ({paymentDetails}: PayHerePaymentProps) => {
     const dynamicData: PaymentDetailsType = {
         sandbox: true,
         merchant_id: "1225436",
-        return_url: "http://localhost:3000/success",
+        return_url: "http://localhost:3000/checkout",
         cancel_url: "http://localhost:3000/cancel",
         notify_url: "http://localhost:3000/notify",
-        order_id: "12345",
+        order_id: paymentDetails?.order_id ?? "12345",
         items: paymentDetails?.items,
         hash: null,
         amount: extractRawAmount(paymentDetails?.amount ?? ""),
@@ -107,6 +107,16 @@ export const usePayhere = ({paymentDetails}: PayHerePaymentProps) => {
             window?.payhere.startPayment(dynamicData);
             window.onerror = function onError(error: any) {
                 console.log("Error:" + error);
+            };
+            window.onerror = function onError(error: any) {
+                console.log("Error:" + error);
+            };
+
+            // Payment completed. It can be a successful failure.
+            window.payhere.onCompleted = function onCompleted(orderId: any) {
+                console.log("Payment completed. OrderID:" + orderId);
+                window.location.href = `/checkout/${orderId}`;
+
             };
         }
 

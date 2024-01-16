@@ -6,7 +6,7 @@ import ButtonPrimary from "shared/Button/ButtonPrimary";
 import Link from "next/link";
 import {useCart} from "@/context/CartProvider";
 import {GET_PAYMENT_GATEWAYS, UPDATE_SHIPPING_TOTAL,} from "@/graphql/defs/cart";
-import {CHECKOUT} from "@/graphql/defs/order";
+import {CHECKOUT, GUEST_CHECKOUT, GUEST_CHECKOUT_MUTATION} from "@/graphql/defs/order";
 import {CheckoutPayload, PaymentGateway} from "@/graphql/types/graphql";
 
 import CheckoutDetails from "./CheckoutDetails";
@@ -196,7 +196,6 @@ const CheckoutPage = () => {
 
     const [
         updateCartShippingTotalMutation
-        ,
     ] = useMutation(UPDATE_SHIPPING_TOTAL);
     const [
         checkoutMutation,
@@ -204,29 +203,28 @@ const CheckoutPage = () => {
             // data: realCheckoutData,
         },
     ] = useMutation(CHECKOUT);
+    const updateShippingTotal = async () => {
+        try {
+            const shippingMethods = isStorePickup ? "pickup_location:0" : "wbs:0dd3bc79_weight_based_shipping";
+            const { data } = await updateCartShippingTotalMutation({
+                variables: { input: { shippingMethods } },
+            });
+
+            if (data?.updateShippingMethod?.cart) {
+                const { total, shippingTotal } = data.updateShippingMethod.cart;
+                setOrderTotal(total);
+                setShippingTotal(shippingTotal);
+                // console.log("Cart shipping total updated successfully");
+            } else {
+                console.error("Failed to update cart shipping total. No valid data returned.");
+            }
+        } catch (error) {
+            console.error("An error occurred while updating shipping total:", error);
+        }
+    };
 
     useEffect(() => {
-        const updateShippingTotal = async () => {
-            try {
-                const shippingMethods = isStorePickup ? "pickup_location:0" : "wbs:0dd3bc79_weight_based_shipping";
-                const { data } = await updateCartShippingTotalMutation({
-                    variables: { input: { shippingMethods } },
-                });
-
-                if (data?.updateShippingMethod?.cart) {
-                    const { total, shippingTotal } = data.updateShippingMethod.cart;
-                    setOrderTotal(total);
-                    setShippingTotal(shippingTotal);
-                    // console.log("Cart shipping total updated successfully");
-                } else {
-                    console.error("Failed to update cart shipping total. No valid data returned.");
-                }
-            } catch (error) {
-                console.error("An error occurred while updating shipping total:", error);
-            }
-        };
-
-        updateShippingTotal();
+        updateShippingTotal().then(r => r);
     }, [isStorePickup, updateCartShippingTotalMutation]);
 
 
@@ -272,9 +270,48 @@ const CheckoutPage = () => {
         setShowBankTransfer(true)
     }
 
-    const CreateOrderGuest = ()=> {
+    // Creating a Order using For Guest. Instead of using direct checkout mutation.
+    const  [createOrderGuest] = useMutation(GUEST_CHECKOUT_MUTATION)
+    const  [guestCheckout] = useMutation(GUEST_CHECKOUT)
+
+    const CreateOrderGuest = async ()=> {
+        const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
+
+
+        const shipping = [
+            {
+                methodId: shippingTotal === "රු0.00" ? "pickup_location:0" : "wbs:0dd3bc79_weight_based_shipping",
+                methodTitle: shippingTotal === "0.00" ? "pickup_location:0" : "Weight Based Shipping",
+                total: shippingTotal,
+            },
+        ];
+
+        const lineItems =
+            cart?.contents?.nodes.map((item) => ({
+                productId: item?.product?.node?.databaseId,
+                quantity: item?.quantity,
+            })) || [];
+
         if(customer?.id == "guest"){
-            alert("You are a guest Customer")
+            // For Create Order Mutation
+            const createOrderKeys = {
+                    paymentMethod: paymentMethodId,
+                    shippingMethod: shipping[0].methodId,
+                    lineItems: lineItems
+            };
+
+            // Using Real mutation without Output the order key and the order id.
+            const guestCheckoutKeys = {
+                input: {
+                    paymentMethod: paymentMethodId,
+                    shippingMethod: shipping[0].methodId,
+                },
+            };
+
+            const {data} = await guestCheckout({variables: guestCheckoutKeys});
+            if(data){
+                toast.success("Order created successfully for you! (GUEST) ")
+            }
         }else{
             alert("You are already logged in")
         }
@@ -285,6 +322,13 @@ const CheckoutPage = () => {
     const router = useRouter();
 
     const handleCheckout = async () => {
+        // Checkout for Guest.
+        if(customer?.id == "guest"){
+            await CreateOrderGuest()
+            return
+        }
+
+
         try {
             const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
             const isBankTransfer = formData?.paymentMethod?.selectedGateway?.id == "bacs"
@@ -498,9 +542,9 @@ const CheckoutPage = () => {
                         >
                             Confirm order
                         </ButtonPrimary>
-                        <ButtonPrimary onClick={CreateOrderGuest}>
-                            GUEST CHECKOUT
-                        </ButtonPrimary>
+                        {/*<ButtonPrimary onClick={CreateOrderGuest}>*/}
+                        {/*    GUEST CHECKOUT*/}
+                        {/*</ButtonPrimary>*/}
 
                         {/*<ButtonPrimary onClick={ImplementPayhere}>*/}
                         {/*    Confirm Order With Payhere*/}

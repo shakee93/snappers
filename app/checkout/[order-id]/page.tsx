@@ -4,6 +4,8 @@ import {useLazyQuery, useQuery} from "@apollo/client";
 import {GET_CHECKOUT_USER_DETAILS, GET_SINGLE_ORDER,} from "@/graphql/defs/order";
 import {useEffect, useMemo} from "react";
 import ProductTable, {OrderDetails} from "./Comps";
+import toast from "react-hot-toast";
+import {redirect} from "next/navigation";
 
 export default function OrderPaymentPage({params}: OrderPaymentPageProps) {
     const orderId = params["order-id"];
@@ -20,14 +22,17 @@ export default function OrderPaymentPage({params}: OrderPaymentPageProps) {
         getUserData().then(r => r);
     }, [getUserData]);
 
-
-    console.log("+++++++++++++++++++++++++++++++")
-    console.log({orderData})
-    console.log({customerData})
-    console.log({orderData})
-    console.log("Order Error", orderError)
-    console.log("+++++++++++++++++++++++++++++++")
-
+    // console.log("+++++++++++++++++++++++++++++++")
+    // console.log({orderData})
+    // console.log({customerData})
+    // console.log({orderData})
+    // console.log("Order Error", orderError)
+    // console.log("+++++++++++++++++++++++++++++++")
+    //
+    if(!orderId || orderId == "12345"){
+        toast.error("Invalid Order Id")
+        redirect('/');
+    }
 
     const temporaryPaymentDetails: PaymentDetailsWithoutUrls = useMemo(
         () => ({
