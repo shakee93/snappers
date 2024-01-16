@@ -29,7 +29,7 @@ const AccountPage: FC = () => {
     if (customer?.id === "guest") {
       const timeoutId = setTimeout(() => {
         router.push("/login");
-      }, 5000);
+      }, 1000);
       return () => clearTimeout(timeoutId);
     }
   }, [customer, router]);

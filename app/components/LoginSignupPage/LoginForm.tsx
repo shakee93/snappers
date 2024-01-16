@@ -1,12 +1,12 @@
 "use client"
-import {useState} from "react";
+import { useState } from "react";
 import Input from "@/shared/Input/Input";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
-import {LoginResponse} from "@/utils/type";
-import {useSession} from "@/context/SessionProvider";
-import {useRouter} from "next/navigation";
+import { LoginResponse } from "@/utils/type";
+import { useSession } from "@/context/SessionProvider";
+import { useRouter } from "next/navigation";
 import toast from 'react-hot-toast';
-import {Loader} from "lucide-react";
+import { Loader } from "lucide-react";
 
 const LoginForm = () => {
     const [email, setEmail] = useState("");
@@ -29,7 +29,9 @@ const LoginForm = () => {
                 return;
             }
             toast("Logged in Successfully");
-            router.push("/account");
+            setTimeout(() => {
+                router.push("/account");
+            }, 2000);
         } catch (error) {
             console.error("Error:", error);
         } finally {
@@ -67,7 +69,7 @@ const LoginForm = () => {
             <ButtonPrimary type="submit" disabled={isLoading}>
                 {isLoading ?
                     (
-                        <Loader className='animate-spin text-gray-100 '/>
+                        <Loader className='animate-spin text-gray-100 ' />
                     )
 
                     : 'Continue'}
