@@ -170,6 +170,7 @@ export function SessionProvider({ children }: {
         const userData = localStorage.getItem(USER_DATA_KEY);
 
         if (userData) {
+            console.log(JSON.parse(userData));
             setCustomer(JSON.parse(userData) as unknown as Customer)
             return userData
         }
