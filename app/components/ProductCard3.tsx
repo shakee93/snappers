@@ -1,5 +1,5 @@
 "use client";
-import {Loader, Settings, Settings2, ShoppingCart} from "lucide-react";
+import { Loader, Settings, Settings2, ShoppingCart } from "lucide-react";
 import React, { FC, useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -16,39 +16,39 @@ import Prices from "./Prices";
 import LikeButton from "./LikeButton";
 import useProductLink from "@/hooks/useProductLink";
 import {
-  Brand,
-  Edge,
-  Product,
-  ProductVariation,
-  SimpleProduct,
-  VariableProduct,
-  VariationAttribute,
+    Brand,
+    Edge,
+    Product,
+    ProductVariation,
+    SimpleProduct,
+    VariableProduct,
+    VariationAttribute,
 } from "@/graphql/types/graphql";
 import AddedToCart from "@/app/components/Notifications/added-to-cart";
 import { useCart } from "@/context/CartProvider";
-import {ExternalLink, List, MenuSquare, MoreHorizontal, MoreVertical, XIcon} from "lucide-react";
+import { ExternalLink, List, MenuSquare, MoreHorizontal, MoreVertical, XIcon } from "lucide-react";
 import AttributeIcon from "@/app/components/AttributeIcon";
-import {getBlurData} from "@/utils/blurPlaceholder";
-import {twMerge} from "tailwind-merge";
+import { getBlurData } from "@/utils/blurPlaceholder";
+import { twMerge } from "tailwind-merge";
 
 export interface ProductCardProps {
-  className?: string;
-  data: SimpleProduct & VariableProduct;
-  isLiked?: boolean;
+    className?: string;
+    data: SimpleProduct & VariableProduct;
+    isLiked?: boolean;
 }
 
 const ProductCard: FC<ProductCardProps> = ({
-  className = "",
-  data,
-  isLiked,
+    className = "",
+    data,
+    isLiked,
 }) => {
-  const {
-    name,
-    price,
-    type,
-    allPaColor,
-    allPaCapacity,
-    purchasable,
+    const {
+        name,
+        price,
+        type,
+        allPaColor,
+        allPaCapacity,
+        purchasable,
         image,
         attributes,
         productCategories,
@@ -59,7 +59,7 @@ const ProductCard: FC<ProductCardProps> = ({
         reviewCount,
         averageRating, featured,
         salePrice, databaseId,
-  } = data;
+    } = data;
 
     const [showModalQuickView, setShowModalQuickView] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false)
@@ -107,7 +107,7 @@ const ProductCard: FC<ProductCardProps> = ({
                     leaveTo="opacity-0 translate-x-20"
                 >
                     <div className="flex items-center w-full justify-between text-base font-semibold leading-none">
-                        Added to cart! <button onClick={e => toast.dismiss('nc-product-notify')}><XIcon/></button>
+                        Added to cart! <button onClick={e => toast.dismiss('nc-product-notify')}><XIcon /></button>
                     </div>
                     <div className="border-t border-slate-200 dark:border-slate-700 my-4" />
                     <AddedToCart product={data} quantity={quantity} />
@@ -122,20 +122,35 @@ const ProductCard: FC<ProductCardProps> = ({
         setQuantity(1)
     }
 
+    // const handleAddToCart = async () => {
+    //     // console.log(data.databaseId);
+    //     if (data.databaseId) {
+    //         addToCart(data.databaseId, quantity)?.then(cartCompleted);
+    //     } else {
+    //         notifyAddTocart(1);
+    //     }
+    //     setLoading(true);
+    //     await addToCart(data.databaseId, quantity);
+    //     cartCompleted();
+    //     setLoading(false);
+    //     toast.error("Something Went Wrong!");
+    // };
+
     const handleAddToCart = async () => {
-        // console.log(data.databaseId);
-        if (data.databaseId) {
-            addToCart(data.databaseId, quantity)?.then(cartCompleted);
-        } else {
-            notifyAddTocart(1);
-        }
         setLoading(true);
-        await addToCart(data.databaseId, quantity);
-        cartCompleted();
-        setLoading(false);
+        try {
+            if (data.databaseId) {
+                await addToCart(data.databaseId, quantity);
+                cartCompleted();
+            } else {
+                notifyAddTocart(1);
+            }
+        } catch (error) {
+            toast.error("This product is out of stock.");
+        } finally {
+            setLoading(false);
+        }
     };
-
-
 
     const renderGroupButtons = () => {
         return (
@@ -169,7 +184,7 @@ const ProductCard: FC<ProductCardProps> = ({
                                     sizeClass="py-2.5 px-3.5"
                                 >
                                     {/*<AttributeIcon className='w-4 ' name={attributes?.nodes[0].name}/>*/}
-                                    <Settings2 className='w-4'/>
+                                    <Settings2 className='w-4' />
                                     {/*<span className="ml-1">{attributes?.nodes[0].label || "Options" }</span>*/}
                                 </ButtonPrimary>
                             </Link>
@@ -182,7 +197,7 @@ const ProductCard: FC<ProductCardProps> = ({
                             fontSize="text-xs"
                             sizeClass="py-2.5 px-3.5"
                         >
-                            <ExternalLink className="w-4"  />
+                            <ExternalLink className="w-4" />
                             {/*<span className="ml-1">Out of Stock</span>*/}
                         </ButtonPrimary>
                     </Link>
@@ -245,7 +260,7 @@ const ProductCard: FC<ProductCardProps> = ({
                 {/* <ProductStatus status={stockStatus} /> */}
 
                 <div className={"absolute hidden md:block top-3 cursor-pointer right-3"} onClick={e => handleCloseModalQuickView()}>
-                    <ArrowsPointingOutIcon className='w-5'/>
+                    <ArrowsPointingOutIcon className='w-5' />
                     {/*<LikeButton liked={isLiked} className="" />*/}
                 </div>
 

@@ -14,7 +14,7 @@ export default function AvatarDropdown() {
 
 
   useEffect(() => {
-    fetchCustomer();
+    // fetchCustomer();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

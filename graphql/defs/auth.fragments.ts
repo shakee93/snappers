@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 
 
 
-export const AccountDetailsFragment = gql`
+export const CustomerFragment = gql`
    fragment CustomerFragment on Customer {
     email
     displayName

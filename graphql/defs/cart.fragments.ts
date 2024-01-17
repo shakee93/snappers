@@ -1,13 +1,6 @@
 import { gql } from '@apollo/client';
 import {ProductContentSlice, ProductVariationContentSlice} from "@/graphql/defs/products.fragments";
 
-export const CustomerContent = gql`
-    fragment CustomerContent on Customer {
-        id
-        sessionToken
-    }
-`;
-
 export const CartItemContent = gql`
     fragment CartItemContent on CartItem {
         key
