@@ -1,27 +1,13 @@
-import SectionHero2 from "@/app/components/HomePage/SectionHero";
 import CategoryBlockSection from "@/app/components/HomePage/CategoryBlocksSection";
 import SectionHero3 from "@/app/components/HomePage/SectionHero2";
-import DiscoverMoreSlider from "@/app/components/HomePage/DiscoverMoreSlider";
 import SectionSliderProductCard from "@/app/components/SectionSliderProductCard";
-import { PRODUCTS, SPORT_PRODUCTS } from "@/data/data";
-import BackgroundSection from "@/app/components/HomePage/BackgroundSection";
 import SectionGridMoreExplore from "@/app/components/HomePage/SectionGridMoreExplore";
 import SectionPromo1 from "@/app/components/HomePage/SectionPromo1";
 import Heading from "@/app/components/Heading/Heading";
-import { getClient } from "@/graphql/apollo-ssr";
-import { GET_SLIDES } from "@/graphql/defs/slides";
-import {
-  GET_CATEGORY_ARCHIVE,
-  GET_NEW_ARRIVALS,
-  GET_PRODUCTS_NODES,
-} from "@/graphql/defs/products";
-import {
-  ProductConnectionEdge,
-  RootQuery,
-  RootQueryToProductUnionConnection,
-  SimpleProduct,
-  VariableProduct,
-} from "@/graphql/types/graphql";
+import {getClient} from "@/graphql/apollo-ssr";
+import {GET_SLIDES} from "@/graphql/defs/slides";
+import {GET_PRODUCTS_NODES,} from "@/graphql/defs/products";
+import {SimpleProduct, VariableProduct,} from "@/graphql/types/graphql";
 
 const getData = async () => {
   const [slides, newArrivals, mobiles, speakers, watches] =

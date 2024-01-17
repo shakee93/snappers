@@ -151,13 +151,12 @@ const CheckoutPage = () => {
     const [wantToSHowBankTransfer, setWantToSHowBankTransfer] = useState(false)
 
     // USE_CASE:  This is to redirect to home page if cart is empty
-
-    useEffect(() => {
-      if (cart && cart?.contents?.nodes?.length === 0) {
-        router.push("/");
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [cart]);
+    // useEffect(() => {
+    //   if (cart && cart?.contents?.nodes?.length === 0) {
+    //     router.push("/");
+    //   }
+    //   // eslint-disable-next-line react-hooks/exhaustive-deps
+    // }, [cart]);
 
     useEffect(() => {
         fetchCustomer()
@@ -227,7 +226,6 @@ const CheckoutPage = () => {
         updateShippingTotal().then(r => r);
     }, [isStorePickup, updateCartShippingTotalMutation]);
 
-
     // const [
     //     guestCheckoutMutation,
     //     {loading: checkoutLoading, error: checkoutError, data: checkoutData},
@@ -237,12 +235,11 @@ const CheckoutPage = () => {
         return paymentData
     }, [paymentData]);
 
-    const initiatePayment = usePayhere({paymentDetails});
+    const initiatePayment = usePayhere();
 
-    const ImplementPayhere = () => {
-        console.log("initiate payment: ", initiatePayment);
+    const ImplementPayhere = (paymentDetails:any) => {
         if (initiatePayment !== null) {
-            initiatePayment().then(r => r);
+            initiatePayment(paymentDetails).then(r => r);
         } else {
             console.log("initiate payment become null");
         }
@@ -262,6 +259,7 @@ const CheckoutPage = () => {
             address: customer?.billing?.address1 || "no_address",
         }
 
+        console.log("saved data: ", saved_data)
         return saved_data
     }
 
@@ -276,7 +274,6 @@ const CheckoutPage = () => {
 
     const CreateOrderGuest = async ()=> {
         const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
-
 
         const shipping = [
             {
@@ -318,8 +315,48 @@ const CheckoutPage = () => {
 
     }
 
+    useEffect(() => {
+        if(!paymentDetails){
+            console.log("payment data not initiated yet!");
+            return;
+        }
+
+        const isBankTransfer = formData?.paymentMethod?.selectedGateway?.id == "bacs"
+        const isPayhere = formData?.paymentMethod?.selectedGateway?.id == "payhere"
+        const isCashOnDelivery = formData?.paymentMethod?.selectedGateway?.id == "cod"
+
+        let checkoutDetails = paymentDetails;
+
+        if (isPayhere) {
+            try {
+                ImplementPayhere(checkoutDetails);
+            } catch (e) {
+                console.log("Error while creating Payhere:", e);
+            }
+        }
+
+        if (isBankTransfer) {
+            try {
+                ImplementBankTransfer();
+            } catch (e) {
+                console.log("Error while creating BankTransfer:", e);
+                toast.error("Error on BankTransfer");
+            }
+        }
+
+        if (isCashOnDelivery) {
+            let redirectUrl = `checkout/${checkoutDetails.order_id}`
+            router.push(redirectUrl);
+        }
+
+    }, [paymentData]);
 
     const router = useRouter();
+
+    function handlePaymentMethod(checkoutDetails: any) {
+
+
+    }
 
     const handleCheckout = async () => {
         // Checkout for Guest.
@@ -328,18 +365,13 @@ const CheckoutPage = () => {
             return
         }
 
-
         try {
             const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
-            const isBankTransfer = formData?.paymentMethod?.selectedGateway?.id == "bacs"
-            const isPayhere = formData?.paymentMethod?.selectedGateway?.id == "payhere"
-            const isCashOnDelivery = formData?.paymentMethod?.selectedGateway?.id == "cod"
-
             if(wantToSHowBankTransfer){
                 ImplementBankTransfer()
                 return
             }
-            // debugger;
+
             const shipping = [
                 {
                     methodId: shippingTotal === "රු0.00" ? "pickup_location:0" : "wbs:0dd3bc79_weight_based_shipping",
@@ -356,32 +388,13 @@ const CheckoutPage = () => {
                     },
                 };
 
-
                 const {data} = await checkoutMutation({variables: obj});
 
                 if (data) {
                     console.log("type of Checkout data: ", typeof data);
-                    const checkoutDetails = savePaymentDetails(data);
+                    const checkoutDetails: PaymentDetailsWithoutUrls = savePaymentDetails(data);
                     setPaymentData(checkoutDetails);
-                    if (isPayhere) {
-                        try {
-                            ImplementPayhere();
-                        } catch (e) {
-                            console.log("Error while creating Payhere:", e);
-                        }
-                    }
-                    if (isBankTransfer) {
-                        try {
-                            ImplementBankTransfer();
-                        } catch (e) {
-                            console.log("Error while creating BankTransfer:", e);
-                            toast.error("Error on BankTransfer");
-                        }
-                    }
-                    if (isCashOnDelivery) {
-                        let redirectUrl = `checkout/${checkoutDetails.order_id}`
-                        router.push(redirectUrl);
-                    }
+                    handlePaymentMethod(checkoutDetails)
                     toast.success("Order Created Successfully");
                 } else {
                     toast.error("Something Went Wrong While Checkout");
@@ -405,7 +418,6 @@ const CheckoutPage = () => {
             element?.scrollIntoView({behavior: "smooth"});
         }, 80);
     };
-
 
     return (
         <div className="nc-CheckoutPage">

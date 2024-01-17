@@ -5,7 +5,6 @@ import {GET_CHECKOUT_USER_DETAILS, GET_SINGLE_ORDER,} from "@/graphql/defs/order
 import {useEffect, useMemo} from "react";
 import ProductTable, {OrderDetails} from "./Comps";
 import toast from "react-hot-toast";
-import {redirect} from "next/navigation";
 
 export default function OrderPaymentPage({params}: OrderPaymentPageProps) {
     const orderId = params["order-id"];
@@ -28,10 +27,11 @@ export default function OrderPaymentPage({params}: OrderPaymentPageProps) {
     // console.log({orderData})
     // console.log("Order Error", orderError)
     // console.log("+++++++++++++++++++++++++++++++")
-
+    console.log(`orderID: ${orderId}`);
     if(!orderId || orderId == "12345"){
+
         toast.error(`Order not found: ${orderId}`);
-        redirect('/');
+        // redirect('/');
     }
 
     const temporaryPaymentDetails: PaymentDetailsWithoutUrls = useMemo(

@@ -1,7 +1,7 @@
 "use client";
-import { useSession } from "@/context/SessionProvider";
-import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import {useSession} from "@/context/SessionProvider";
+import {useRouter} from "next/navigation";
+import React, {useEffect, useState} from "react";
 
 const UserDetails = () => {
   const { customer, fetchCustomer, updateCustomer } = useSession();
@@ -29,9 +29,9 @@ const UserDetails = () => {
       <h2 className="text-3xl xl:text-4xl font-semibold">Account</h2>
       <span className="block mt-4 text-neutral-500 dark:text-neutral-400 text-base sm:text-lg">
         <span className="text-slate-900 dark:text-slate-200 font-semibold">
-          {displayName}
+          {displayName}·
         </span>{" "}
-        {email} · {address}
+        {email}  {address}
       </span>
     </div>
   );

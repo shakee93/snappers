@@ -1,10 +1,11 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import { md5 } from "js-md5";
+import {NextApiResponse} from "next";
+import {md5} from "js-md5";
 
 export async function POST(req: Request , res: NextApiResponse) {
   const { merchant_id, order_id, amount, currency } = await req.json();
   const merchant_secret =
     "MTc5ODQyNDU0NjI3ODU3NTY4NjA5ODE3MTEyMzQxNDg5NjEzOTI1";
+
   if (!merchant_id || !order_id || !amount || !currency) {
     return Response.json({ error: "Missing required fields" }, { status: 400 });
   }
