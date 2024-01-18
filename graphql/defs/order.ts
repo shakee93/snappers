@@ -126,6 +126,20 @@ export const GET_ALL_ORDER_DETAILS = gql`
   ${ProductContentSlice}
 `;
 
+export const GET_GUEST_ORDER = gql`
+query getguestorder {
+  customer {
+    id
+    orders {
+      nodes {
+        date
+        id
+        orderNumber
+      }
+    }
+  }
+}`
+
 export const GET_ADDRESSES = gql`
   query getShippingDetails {
     customer {
