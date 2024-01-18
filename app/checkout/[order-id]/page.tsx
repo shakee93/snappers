@@ -5,9 +5,22 @@ import {GET_CHECKOUT_USER_DETAILS, GET_SINGLE_ORDER,} from "@/graphql/defs/order
 import {useEffect, useMemo} from "react";
 import ProductTable, {OrderDetails} from "./Comps";
 import toast from "react-hot-toast";
+import Link from "next/link";
 
 export default function OrderPaymentPage({params}: OrderPaymentPageProps) {
     const orderId = params["order-id"];
+
+    if (orderId == "ItemNo12345") {
+        return (
+            <div className={`container mx-auto grid items-center justify-center `}>
+                <h1 className={`text-2xl font-bold  py-20 text-center `}>📝 The page is unable to load
+                    the
+                    order ID since it's a Payhere testing ID.</h1>
+                <Link className={`text-center self-center text-blue-500 font-bold underline hover:cursor-pointer hover:text-blue-800 `} href={`/`}>Back to Home</Link>
+            </div>
+
+        )
+    }
 
     const [getUserData, {data: customerData}] = useLazyQuery(
         GET_CHECKOUT_USER_DETAILS,
@@ -28,7 +41,7 @@ export default function OrderPaymentPage({params}: OrderPaymentPageProps) {
     // console.log("Order Error", orderError)
     // console.log("+++++++++++++++++++++++++++++++")
     console.log(`orderID: ${orderId}`);
-    if(!orderId || orderId == "12345"){
+    if (!orderId || orderId == "12345") {
 
         toast.error(`Order not found: ${orderId}`);
         // redirect('/');

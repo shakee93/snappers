@@ -6,6 +6,7 @@ import React, {FormEvent, useEffect, useState} from "react";
 import toast from "react-hot-toast";
 import BankDetails from "./BankDetails";
 import {PaymentDetailsWithoutUrls} from "@/data/types";
+import {Loader} from "lucide-react";
 
 type BankTransferProps = {
   // Define any props you expect to pass into BankTransfer here
@@ -16,7 +17,7 @@ const BankTransfer: React.FC<BankTransferProps> = ({paymentDetails}) => {
   const [file, setFile] = useState<File | null>(null);
   const [orderId, setOrderId] = useState<string>("");
   const [uploadStatus, setUploadStatus] = useState<string>("");
-
+  const [loading, setLoading] = useState(false)
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = event.target.files;
     if (fileList) {
@@ -38,9 +39,11 @@ const BankTransfer: React.FC<BankTransferProps> = ({paymentDetails}) => {
   const router = useRouter();
 
   const handleSubmit = async (event: FormEvent) => {
+    setLoading(true)
     event.preventDefault();
     if (!file) {
       toast.error("Kindly choose a file for uploading.");
+      setLoading(false)
       return;
     }
 
@@ -64,10 +67,13 @@ const BankTransfer: React.FC<BankTransferProps> = ({paymentDetails}) => {
         let thankYouUrl = `checkout/${orderId}`
         router.push(thankYouUrl);
       }
+
       if (data.error) {
         toast.error("An issue occurred during the bank slip upload process.");
       }
+      setLoading(false)
     } catch (error) {
+      setLoading(false)
       console.error("Error:", error);
       setUploadStatus("An error occurred. Please try again later.");
     }
@@ -89,18 +95,26 @@ const BankTransfer: React.FC<BankTransferProps> = ({paymentDetails}) => {
               className=""
               id="file"
               type="file"
+              required={true}
               onChange={handleFileChange}
-          />
+              accept="image/png, image/gif, image/jpeg, image/heic, image/heif, image/webp, image/bmp, image/tiff" />
+
           <p className="text-sm pt-2 text-gray-600">When you{`'`}ve completed the transfer to Our Bank, kindly upload
             your bank slip here</p>
         </div>
 
         <div className="flex items-center justify-between">
           <ButtonPrimary
-            className="bg-blue-500 w-full hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+            className="bg-blue-500  w-full hover:bg-blue-700 text-white font-bold py-2 px-4"
             type="submit"
+            disabled={loading}
           >
-            Upload
+            {loading ?
+                (
+                    <Loader className='animate-spin text-gray-100 ' />
+                )
+
+                : 'Uplaod'}
           </ButtonPrimary>
         </div>
         {uploadStatus && <p className="text-center my-4">{uploadStatus}</p>}

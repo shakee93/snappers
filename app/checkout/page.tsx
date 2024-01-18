@@ -530,6 +530,7 @@ const CheckoutPage = () => {
                                 <span>{orderTotal || "$0.00"}</span>
                             </div>
                         </div>
+
                         <ButtonPrimary
                             onClick={handleCheckout}
                             disabled={
