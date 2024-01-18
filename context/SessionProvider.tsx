@@ -1,14 +1,19 @@
 'use client';
 
-import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { ApolloError, FetchResult, useLazyQuery, useMutation, useQuery } from '@apollo/client';
-import { GET_CART } from "@/graphql/defs/cart";
-import { GET_ACCOUNT_DETAILS, LOGIN_CUSTOMER_MUTATION, REGISTER_CUSTOMER_MUTATION, UPDATE_ACCOUNT_INFORMATION } from '@/graphql/defs/auth';
-import { LoginResponse, Session } from "@/utils/type";
+import React, {createContext, ReactNode, useContext, useEffect, useState} from 'react';
+import {ApolloError, FetchResult, useLazyQuery, useMutation, useQuery} from '@apollo/client';
+import {GET_CART} from "@/graphql/defs/cart";
+import {
+    GET_ACCOUNT_DETAILS,
+    LOGIN_CUSTOMER_MUTATION,
+    REGISTER_CUSTOMER_MUTATION,
+    UPDATE_ACCOUNT_INFORMATION
+} from '@/graphql/defs/auth';
+import {LoginResponse, Session} from "@/utils/type";
 import {
     Customer,
     LoginCustomerMutation,
-    LoginPayload, Maybe,
+    LoginPayload,
     RegisterCustomerMutation,
     RegisterCustomerPayload
 } from "@/graphql/types/graphql";
@@ -40,9 +45,6 @@ export const AUTH_TOKEN_KEY = 'wp_auth_token';
 
 export const USER_DATA_KEY = 'wp_user'
 
-
-
-
 export function SessionProvider({ children }: {
     children: ReactNode
 }) {
@@ -67,7 +69,6 @@ export function SessionProvider({ children }: {
         const data: LoginPayload & RegisterCustomerPayload = response?.data?.[type]
 
         if (type === "login") {
-
             localStorage.setItem(USER_DATA_KEY, JSON.stringify(data?.customer));
             setCustomer(data?.customer as Customer)
 
@@ -77,7 +78,6 @@ export function SessionProvider({ children }: {
         }
 
         if (type == "registerCustomer"){
-            console.log("data register",data);
             localStorage.setItem(USER_DATA_KEY, JSON.stringify(data?.customer));
             setCustomer(data?.customer as Customer)
 
@@ -123,7 +123,8 @@ export function SessionProvider({ children }: {
     };
 
     const login = async (email: string, password: string): Promise<LoginResponse> => {
-        logout()
+        console.log("how are you oding")
+        await logout()
         try {
             const response: FetchResult<LoginCustomerMutation> = await loginCustomer({
                 variables: {
@@ -134,6 +135,7 @@ export function SessionProvider({ children }: {
                 },
             })
 
+            console.log("data login",response);
             saveResponseToLocalStorage(response, "login");
 
             return { data: "logged_in", error: null };
@@ -169,6 +171,8 @@ export function SessionProvider({ children }: {
 
         const userData = localStorage.getItem(USER_DATA_KEY);
 
+
+        console.log("userData", JSON.parse(userData!));
         if (userData) {
             console.log(JSON.parse(userData));
             setCustomer(JSON.parse(userData) as unknown as Customer)

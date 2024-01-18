@@ -1,5 +1,4 @@
-import { gql } from "@apollo/client";
-import { AccountDetailsFragment } from "./auth.fragments";
+import {gql} from "@apollo/client";
 
 export const REGISTER_CUSTOMER_MUTATION = gql`
   mutation RegisterCustomer($input: RegisterCustomerInput!) {
@@ -123,6 +122,11 @@ export const LOGIN_CUSTOMER_MUTATION = gql`
           value
         }
         id
+        orders {
+          nodes {
+           id 
+          }
+        }
         displayName
       }
     }

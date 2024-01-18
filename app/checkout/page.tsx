@@ -391,7 +391,6 @@ const CheckoutPage = () => {
                 const {data} = await checkoutMutation({variables: obj});
 
                 if (data) {
-                    console.log("type of Checkout data: ", typeof data);
                     const checkoutDetails: PaymentDetailsWithoutUrls = savePaymentDetails(data);
                     setPaymentData(checkoutDetails);
                     handlePaymentMethod(checkoutDetails)

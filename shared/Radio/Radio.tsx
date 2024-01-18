@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React, {FC} from "react";
 
 export interface RadioProps {
   className?: string;
@@ -20,7 +20,7 @@ const Radio: FC<RadioProps> = ({
   defaultChecked,
 }) => {
   return (
-    <div className={`flex items-center text-sm sm:text-base ${className}`}>
+    <div className={`flex items-center text-sm sm:text-base cursor-pointer ${className}`}>
       <input
         id={id}
         name={name}

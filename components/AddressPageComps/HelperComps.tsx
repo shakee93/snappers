@@ -66,7 +66,7 @@ const SelectField = React.memo(function SelectField({
   );
 });
 
-const extractRawAmount = (amountString: string, test: boolean = true) =>
-  test ? "100" : parseFloat(amountString.replace(/[^0-9.]/g, "")).toString();
+const extractRawAmount = (amountString: string) =>
+   parseFloat(amountString.replace(/[^0-9.]/g, "")).toString();
 
 export { InputField, SelectField, SRI_LANKAN_STATES, extractRawAmount };
