@@ -28,11 +28,11 @@ export const OrderDetails: React.FC<OrderDetailsProps> = ({ orderData }) => {
           <h1 className="text-3xl font-regural ">We{"'"}ve got your order.  Thank you for choosing us.  📦</h1>
         </div>
 
-        <div className="flex flex-row justify-between w-full py-8">
+        <div className="flex flex-col items-center gap-3 text-center justify-between w-full py-8 md:flex-row">
 
           {rows.map((row, index) =>
             row.condition !== false ? (
-              <div key={index} className="flex flex-col items-start">
+              <div key={index} className="flex flex-col items-center md:items-start ">
                 <p className="font-semibold	">{row.label}</p>
                 <p className="mt-1">{row.value}</p>
               </div>
@@ -54,6 +54,8 @@ type ProductTableProps = {
 
 const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData, paymentDetails }) => {
   if (!lineItems) return null;
+
+  console.log({paymentDetails});
 
   return (
     <>
