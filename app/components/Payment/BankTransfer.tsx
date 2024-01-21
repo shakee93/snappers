@@ -42,7 +42,8 @@ const BankTransfer: React.FC<BankTransferProps> = ({paymentDetails}) => {
     setLoading(true)
     event.preventDefault();
     if (!file) {
-      toast.error("Kindly choose a file for uploading.");
+      toast.error("Kindly choose a file for uploading.", { duration: 7000 });
+
       setLoading(false)
       return;
     }
@@ -61,8 +62,8 @@ const BankTransfer: React.FC<BankTransferProps> = ({paymentDetails}) => {
 
       console.log("data", data);
 
-      if (data.message === "succuss") {
-        setUploadStatus("succuss");
+      if (data.message === "success") {
+        setUploadStatus("success");
         toast.success("You have successfully completed the upload of your bank slip.")
         let thankYouUrl = `checkout/${orderId}`
         router.push(thankYouUrl);
@@ -100,7 +101,7 @@ const BankTransfer: React.FC<BankTransferProps> = ({paymentDetails}) => {
               accept="image/png, image/gif, image/jpeg, image/heic, image/heif, image/webp, image/bmp, image/tiff" />
 
           <p className="text-sm pt-2 text-gray-600">When you{`'`}ve completed the transfer to Our Bank, kindly upload
-            your bank slip here</p>
+            your bank slip here.</p>
         </div>
 
         <div className="flex items-center justify-between">
@@ -114,10 +115,10 @@ const BankTransfer: React.FC<BankTransferProps> = ({paymentDetails}) => {
                     <Loader className='animate-spin text-gray-100 ' />
                 )
 
-                : 'Uplaod'}
+                : 'Upload'}
           </ButtonPrimary>
         </div>
-        {uploadStatus && <p className="text-center my-4">{uploadStatus}</p>}
+        {/*{uploadStatus && <p className="text-center my-4">{uploadStatus}</p>}*/}
       </form>
     </div>
   );

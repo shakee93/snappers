@@ -33,9 +33,8 @@ export const OrderDetails: React.FC<OrderDetailsProps> = ({ orderData }) => {
           {rows.map((row, index) =>
             row.condition !== false ? (
               <div key={index} className="flex flex-col items-center md:items-start ">
-
                 <p className="font-semibold	">{row.label}</p>
-                {row.label == "Order Id" ? <p className="font-semibold	text-4xl font-bold">{row.value}</p> :    <p className="mt-1">{row.value}</p>}
+                {row.label == "Order Id" ? <p className="	text-4xl font-bold">{row.value}</p> :    <p className="mt-1">{row.value}</p>}
               </div>
             ) : null
           )}

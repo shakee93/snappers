@@ -6,7 +6,7 @@ import ButtonPrimary from "shared/Button/ButtonPrimary";
 import Link from "next/link";
 import {useCart} from "@/context/CartProvider";
 import {GET_PAYMENT_GATEWAYS, UPDATE_SHIPPING_TOTAL,} from "@/graphql/defs/cart";
-import {CHECKOUT, GUEST_CHECKOUT, GUEST_CHECKOUT_MUTATION} from "@/graphql/defs/order";
+import {CHECKOUT, COMPLETE_ORDER_PAYMENT, GUEST_CHECKOUT, GUEST_CHECKOUT_MUTATION} from "@/graphql/defs/order";
 import {CheckoutPayload, PaymentGateway} from "@/graphql/types/graphql";
 
 import CheckoutDetails from "./CheckoutDetails";
@@ -202,6 +202,18 @@ const CheckoutPage = () => {
             // data: realCheckoutData,
         },
     ] = useMutation(CHECKOUT);
+
+    const [completeOrderPayment] = useMutation(COMPLETE_ORDER_PAYMENT);
+
+    const completePaymentMutationHandle = async () =>{
+        const { data } = await completeOrderPayment({
+            variables: { orderId: 10, status: "COMPLETED" },
+        });
+        console.log("data on the complete order Mutation: ", data);
+        return data;
+    }
+
+
     const updateShippingTotal = async () => {
         try {
             const shippingMethods = isStorePickup ? "pickup_location:0" : "wbs:0dd3bc79_weight_based_shipping";

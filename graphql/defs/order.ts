@@ -267,3 +267,15 @@ export const GET_SINGLE_ORDER = gql`
     }
   }
 `;
+
+// = {orderId: 10, status: COMPLETED}
+export const COMPLETE_ORDER_PAYMENT = gql`
+ mutation updatePayment($input: UpdateOrderInput! ) {
+  updateOrder(input: $input) {
+    clientMutationId
+    order {
+      status
+    }
+  }
+}
+    `

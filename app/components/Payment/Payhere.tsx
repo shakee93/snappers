@@ -1,6 +1,8 @@
 "use client";
 import {PaymentDetailsWithoutUrls} from "@/data/types";
 import {extractRawAmount} from "@/components/AddressPageComps/HelperComps";
+import {useMutation} from "@apollo/client";
+import {COMPLETE_ORDER_PAYMENT} from "@/graphql/defs/order";
 
 const MERCHANT_ID = "1225436";
 const TEST: boolean = true;
@@ -104,6 +106,15 @@ const getPaymentHash = async (dynamicData: any) => {
 
 export const usePayhere = () => {
 
+    const [completeOrderPayment] = useMutation(COMPLETE_ORDER_PAYMENT);
+
+    const completePaymentWithOrder = async (orderId: string) =>{
+        const { data } = await completeOrderPayment({
+            variables: { orderId: orderId, status: "COMPLETED" },
+        });
+        console.log("data on the complete order Mutation: ", data);
+        return data;
+    }
 
     const initiatePayment = async (paymentDetails: PaymentDetailsWithoutUrls | null) => {
         if (window?.payhere) {
@@ -128,7 +139,7 @@ export const usePayhere = () => {
             };
             // Payment completed. It can be a successful failure.
             window.payhere.onCompleted = function onCompleted(orderId: any) {
-                console.log("Payment completed. OrderID:" + orderId);
+                completePaymentWithOrder(orderId)
                 window.location.href = `/checkout/${orderId}`;
             };
         }
