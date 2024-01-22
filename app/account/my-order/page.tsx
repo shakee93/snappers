@@ -6,15 +6,15 @@ import { GET_ALL_ORDER_DETAILS, GET_GUEST_ORDER } from "@/graphql/defs/order";
 import OrderItemProduct from "@/app/containers/ProductDetailPage/OrderItem";
 import LoadingSkeleton from "@/components/OrderPageSkeleton";
 
-// import { useSession } from "@/context/SessionProvider";
+import { useSession } from "@/context/SessionProvider";
 
 const AccountOrder = () => {
     const { loading, error, data } = useQuery(GET_GUEST_ORDER);
 
     // console.log({data});
 
-    // const { customer, updateCustomer } = useSession();
-    // console.log({customer});
+    const { customer, updateCustomer } = useSession();
+    console.log({customer});
 
     if (error) return <p>Error: {error.message}</p>;
     if (loading) return <LoadingSkeleton />;
