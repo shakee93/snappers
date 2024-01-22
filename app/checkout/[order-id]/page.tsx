@@ -43,7 +43,7 @@ export default function OrderPaymentPage({params}: OrderPaymentPageProps) {
     // console.log({orderData})
     // console.log("Order Error", orderError)
     // console.log("+++++++++++++++++++++++++++++++")
-    console.log(`orderID: ${orderId}`);
+    // console.log(`orderID: ${orderId}`);
     if (!orderId || orderId == "12345") {
 
         toast.error(`Order not found: ${orderId}`);
@@ -71,7 +71,7 @@ export default function OrderPaymentPage({params}: OrderPaymentPageProps) {
         [orderData, customerData]
     );
 
-    console.log({temporaryPaymentDetails})
+    // console.log({temporaryPaymentDetails})
     // if(!orderData?.order){
     //   return <OrderPaymentPageSkeleton/>
     // }
