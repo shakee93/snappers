@@ -22,9 +22,9 @@ const ProductAddToCart = ({product, variation} : {
   const [loading, setLoading] = useState(false);
   const { addToCart } = useCart()
 
-  useEffect(() => {
-    console.log(product);
-  }, [product])
+  // useEffect(() => {
+  //   console.log(product);
+  // }, [product])
   const notifyAddTocart = (quantity:number) => {
     toast.custom(
         (t : any) => (

@@ -80,7 +80,9 @@ const AccordionInfo: FC<Props> = ({
 
   console.log({ techspecs });
 
-  const techSpec = techspecs?.product?.metaData.find(item => item?.key === 'tech_spec')?.value;
+  const techSpec = techspecs?.product?.metaData?.find(item => item?.key === 'tech_spec')?.value;
+
+  
   
   let specifications = {
     items: []

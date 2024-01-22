@@ -29,7 +29,24 @@ const ProductDetails = ({
         !!product?.variations?.nodes?.length ? product?.variations?.nodes[0].attributes?.nodes[0].value : null
     )
 
+    useEffect(() => {
+        // console.log("Initial product: ", attribute);
+        
+        console.log("active variation: ", activeVariation);
+        if(activeVariation == null){
+            setActiveVariation(product?.variations?.nodes[0])
+            setActiveOption(product?.variations?.nodes[0].attributes?.nodes[0].value)
+        }else{
+            console.log(
+                "active variation is on",
+            )
+        }
 
+        // let stockStatus =   activeVariation?.stockStatus !== 'IN_STOCK'
+        // console.log("stock status: ", stockStatus);
+    }, [activeVariation]);
+
+    
     useEffect(() => {
 
         if (product.type === 'VARIABLE') {
@@ -45,16 +62,13 @@ const ProductDetails = ({
             })
         }
 
-    }, []);
-
+    }, [product, setAttribute]);
 
     const activeAttr = useCallback((attr: ProductAttribute) => {
         return attribute.find(a => a.name === attr.name)
     }, [attribute])
 
     useEffect(() => {
-
-
         if (product.type === 'VARIABLE') {
 
             let variation = (product as VariableProduct).variations?.nodes as unknown as ProductVariation[];
@@ -76,10 +90,7 @@ const ProductDetails = ({
                 setActiveVariation(null)
             }
         }
-
-
-
-    }, [attribute])
+    }, [])
     // console.log('singel rpdocut',product)
     // console.log('sctivr vsaritation',activeVariation)
 
@@ -151,7 +162,7 @@ const ProductDetails = ({
 
                 </div>
             }
-
+            <h1 className="text-2xl font-bold">{JSON.stringify(activeVariation?.stockStatus)}</h1>
             {(product.type === 'SIMPLE' && product.stockStatus !== 'IN_STOCK') &&
                 <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1">
                     Sold Out

@@ -181,8 +181,6 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product, 
 
   const renderSectionContent = () => {
     console.log({ product })
-    console.log('sctivr vsaritation', activeVariation)
-    console.log('brands', brands)
     return (
       <div className="space-y-8">
 
