@@ -31,7 +31,7 @@ const ProductDetails = ({
 
     useEffect(() => {
         // console.log("Initial product: ", attribute);
-        
+
         console.log("active variation: ", activeVariation);
         if(activeVariation == null){
             setActiveVariation(product?.variations?.nodes[0])
@@ -162,7 +162,7 @@ const ProductDetails = ({
 
                 </div>
             }
-            <h1 className="text-2xl font-bold">{JSON.stringify(activeVariation?.stockStatus)}</h1>
+            {/* <h1 className="text-2xl font-bold">{JSON.stringify(activeVariation?.stockStatus)}</h1> */}
             {(product.type === 'SIMPLE' && product.stockStatus !== 'IN_STOCK') &&
                 <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1">
                     Sold Out
