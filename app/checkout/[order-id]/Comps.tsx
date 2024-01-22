@@ -25,7 +25,7 @@ export const OrderDetails: React.FC<OrderDetailsProps> = ({ orderData }) => {
       <div className="grid grid-cols-1 lg:grid-cols-1 py-4">
 
         <div className="flex flex-col justify-center items-start">
-          <h1 className="text-3xl font-regural ">We{"'"}ve got your order.  Thank you for choosing us.  📦</h1>
+          <h1 className="text-3xl font-regural ">We{"'"}ve got your order.Thank you for choosing us.  📦</h1>
         </div>
 
         <div className="flex flex-col items-center gap-3 text-center justify-between w-full py-8 md:flex-row">

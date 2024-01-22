@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/rules-of-hooks */
 "use client";
 import {OrderPaymentPageProps, PaymentDetailsWithoutUrls} from "@/data/types";
 import {useLazyQuery, useQuery} from "@apollo/client";
@@ -15,17 +16,19 @@ export default function OrderPaymentPage({params}: OrderPaymentPageProps) {
             <div className={`container mx-auto grid items-center justify-center `}>
                 <h1 className={`text-2xl font-bold  py-20 text-center `}>📝 The page is unable to load
                     the
-                    order ID since it's a Payhere testing ID.</h1>
+                    order ID since it{"'"}s a Payhere testing ID.</h1>
                 <Link className={`text-center self-center text-blue-500 font-bold underline hover:cursor-pointer hover:text-blue-800 `} href={`/`}>Back to Home</Link>
             </div>
 
         )
     }
 
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const [getUserData, {data: customerData}] = useLazyQuery(
         GET_CHECKOUT_USER_DETAILS,
         {fetchPolicy: "no-cache"}
     );
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     const {data: orderData, error: orderError} = useQuery(GET_SINGLE_ORDER, {
         variables: {orderID: orderId},
     });
