@@ -4,69 +4,80 @@ import Label from "../Label/Label";
 import React from "react";
 
 const SRI_LANKAN_STATES = [
-  "Western",
-  "Central",
-  "Southern",
-  "Northern",
-  "Eastern",
-  "North Western",
-  "North Central",
-  "Uva",
-  "Sabaragamuwa",
+    "Western",
+    "Central",
+    "Southern",
+    "Northern",
+    "Eastern",
+    "North Western",
+    "North Central",
+    "Uva",
+    "Sabaragamuwa",
 ];
 // Smaller Components
 const InputField = React.memo(function InputField({
-  label,
-  name,
-  placeholder,
-  value,
-  onChange,
-}: any) {
-  return (
-    <div className="flex-1">
-      <Label>{label}</Label>
-      <Input
-        required={true}
-        className="w-full"
-        name={name}
-        placeholder={placeholder}
-        value={value}
-        onChange={onChange}
-      />
-    </div>
-  );
+                                                      label,
+                                                      name,
+                                                      placeholder,
+                                                      value,
+                                                      onChange,
+                                                  }: any) {
+    return (
+        <div className="flex-1">
+            <Label>{label}</Label>
+            <Input
+                required={true}
+                className="w-full"
+                name={name}
+                placeholder={placeholder}
+                value={value}
+                onChange={onChange}
+            />
+        </div>
+    );
 });
 
 const SelectField = React.memo(function SelectField({
-  label,
-  name,
-  value,
-  options,
-  onChange,
-  disabled = false,
-}: any) {
-  return (
-    <div className="flex-1">
-      <Label>{label}</Label>
-      <Select
-        required={true}
-        className="mt-1.5"
-        value={value || ""}
-        name={name}
-        onChange={onChange}
-        disabled={disabled}
-      >
-        {options.map((option: any) => (
-          <option key={option.value} value={option.value}>
-            {option.label}
-          </option>
-        ))}
-      </Select>
-    </div>
-  );
+                                                        label,
+                                                        name,
+                                                        value,
+                                                        options,
+                                                        onChange,
+                                                        disabled = false,
+                                                    }: any) {
+    return (
+        <div className="flex-1">
+            <Label>{label}</Label>
+            <Select
+                required={true}
+                className="mt-1.5"
+                value={value || ""}
+                name={name}
+                onChange={onChange}
+                disabled={disabled}
+            >
+                {options.map((option: any) => (
+                    <option key={option.value} value={option.value}>
+                        {option.label}
+                    </option>
+                ))}
+            </Select>
+        </div>
+    );
 });
 
 const extractRawAmount = (amountString: string) =>
-   parseFloat(amountString.replace(/[^0-9.]/g, "")).toString();
+    parseFloat(amountString.replace(/[^0-9.]/g, "")).toString();
 
-export { InputField, SelectField, SRI_LANKAN_STATES, extractRawAmount };
+const LoggedInAvatar = ({ name = 'N' }) => {
+  const initial = name.charAt(0).toUpperCase() || 'N';
+
+  return (
+      <div className="rounded-full border-4 flex items-center bg-blue-700 justify-center border-blue-700 h-8 w-8">
+        <p className="font-bold text-white">{initial}</p>
+      </div>
+  );
+};
+
+
+export {InputField, SelectField, SRI_LANKAN_STATES, extractRawAmount, LoggedInAvatar};

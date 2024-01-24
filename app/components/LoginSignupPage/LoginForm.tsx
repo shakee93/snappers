@@ -1,12 +1,14 @@
 "use client"
-import { useState } from "react";
+
+
+import {useState} from "react";
 import Input from "@/shared/Input/Input";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
-import { LoginResponse } from "@/utils/type";
-import { useSession } from "@/context/SessionProvider";
-import { useRouter } from "next/navigation";
+import {LoginResponse} from "@/utils/type";
+import {useSession} from "@/context/SessionProvider";
+import {useRouter} from "next/navigation";
 import toast from 'react-hot-toast';
-import { Loader } from "lucide-react";
+import {Loader} from "lucide-react";
 
 const LoginForm = () => {
     const [email, setEmail] = useState("");
@@ -30,7 +32,7 @@ const LoginForm = () => {
             }
             toast("Logged in Successfully");
             setTimeout(() => {
-                router.push("/account");
+                router.push("/account/my-order");
             }, 2000);
         } catch (error) {
             console.error("Error:", error);
