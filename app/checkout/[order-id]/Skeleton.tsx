@@ -43,4 +43,31 @@ const OrderPaymentPageSkeleton = () => {
   );
 };
 
+export const CheckoutDetailsSkeleton = ()=>{
+    return (
+        <div className="container mx-auto gap-4 space-y-8">
+            <div className="animate-pulse space-y-4">
+                <div className="h-16 w-1/4 rounded bg-gray-300"></div>
+                <div className="h-8 rounded bg-gray-300"></div>
+                <div className="h-8 rounded bg-gray-300"></div>
+                <div className="h-10 bg-gray-300 w-32 rounded-full"></div>
+            </div>
+
+            <div className="animate-pulse space-y-4">
+                <div className="h-16 w-1/4 rounded bg-gray-200"></div>
+                <div className="h-8 rounded bg-gray-300"></div>
+                <div className="h-8 rounded bg-gray-300"></div>
+                <div className="h-10 bg-gray-300 w-32 rounded-full"></div>
+            </div>
+
+            <div className="animate-pulse space-y-4">
+                <div className="h-16 w-1/4 rounded bg-gray-300"></div>
+                <div className="h-8 rounded bg-gray-300"></div>
+                <div className="h-8 rounded bg-gray-300"></div>
+                <div className="h-10 bg-gray-300 w-32 rounded-full"></div>
+            </div>
+        </div>
+    )
+}
+
 export default OrderPaymentPageSkeleton;

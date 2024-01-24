@@ -1,17 +1,15 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, {useEffect, useState} from "react";
 import ContactInfo from "./ContactInfo";
-import ShippingAddress from "./DeliveryAddress";
-import PaymentMethod from "./PaymentMethod";
-import { QueryResult, useLazyQuery, useQuery } from "@apollo/client";
-import { useSession } from "@/context/SessionProvider";
-import { GET_CHECKOUT_USER_DETAILS } from "@/graphql/defs/order";
-import { Customer, CustomerAddress } from "@/graphql/types/graphql";
-import { contactInformation } from "@/data/types";
-import BillingAddress from "./BillingAddress";
-import Checkbox from "@/shared/Checkbox/Checkbox";
 import DeliveryAddress from "./DeliveryAddress";
+import PaymentMethod from "./PaymentMethod";
+import {QueryResult, useQuery} from "@apollo/client";
+import {GET_CHECKOUT_USER_DETAILS} from "@/graphql/defs/order";
+import {Customer, CustomerAddress} from "@/graphql/types/graphql";
+import {contactInformation} from "@/data/types";
+import BillingAddress from "./BillingAddress";
+import {CheckoutDetailsSkeleton} from "@/app/checkout/[order-id]/Skeleton";
 
 interface CheckoutLeftProps {
   tabActive:
@@ -48,12 +46,14 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
   handleConfirmationChange,
   isStorePickup,
 }) => {
-  const { data }: QueryResult = useQuery(GET_CHECKOUT_USER_DETAILS);
+
+  const { data, loading: dataLoading }: QueryResult = useQuery(GET_CHECKOUT_USER_DETAILS);
   const [shippingDetails, setShippingDetails] =
     useState<CustomerAddress | null>(null);
   const [billingDetails, setBillingDetails] = useState<CustomerAddress | null>(
     null
   );
+
   const [initContactInformation, setInitContactInformation] =
     useState<contactInformation | null>(null);
 
@@ -75,6 +75,7 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isStorePickup, isBillingSameAsShipping]);
 
+
   useEffect(() => {
     if (data) {
       const { displayName, email, shipping, billing } =
@@ -93,9 +94,15 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
     }
   }, [data]);
 
+  if(dataLoading){
+      return <CheckoutDetailsSkeleton/>
+  }
+
   return (
     <div className="space-y-8">
+      {/*{JSON.stringify(dataLoading)}*/}
       <div id="ContactInfo" className="scroll-mt-24">
+
         <ContactInfo
           isActive={tabActive === "ContactInfo"}
           onOpenActive={() => {

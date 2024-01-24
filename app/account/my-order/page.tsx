@@ -5,6 +5,7 @@ import OrderItemProduct from "@/app/containers/ProductDetailPage/OrderItem";
 import LoadingSkeleton from "@/components/OrderPageSkeleton";
 
 import {useSession} from "@/context/SessionProvider";
+import Link from "next/link";
 
 const AccountOrder = () => {
     const { loading, error, data } = useQuery(GET_GUEST_ORDER);
@@ -26,14 +27,22 @@ const AccountOrder = () => {
             {/* <p>{JSON.stringify(data)}</p> */}
             
             {hasOrders ? data.customer?.orders?.nodes?.map((order: any, index:any) => (
-                
                 <div key={index} className="border border-slate-200 dark:border-slate-700
                  rounded-lg overflow-hidden z-0">
                     <OrderHeader order={order} />
                     <OrderItems lineItems={order?.lineItems?.nodes} />
                 </div>
 
-            )) : <p>No orders found.</p>}
+            )) :
+                (
+                    <div className={`container mx-auto grid items-center justify-center `}><h1
+                        className={`text-2xl font-bold  py-20 text-center`}>No Orders Placed Yet.</h1>
+                        <Link
+                            className={`text-center self-center text-blue-500 font-bold underline hover:cursor-pointer hover:text-blue-800 `}
+                            href={`/`}>Back to Home</Link>
+                    </div>
+                )
+            }
         </div>
     );
 };
@@ -41,13 +50,13 @@ const AccountOrder = () => {
 const formatDate = (date: any) => {
     date = new Date(date);
 
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
 
-  const hours = String(date.getHours() % 12).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
+    const hours = String(date.getHours() % 12).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const ampm = date.getHours() >= 12 ? 'PM' : 'AM';
 
   const formattedDate = `${year}-${month}-${day} ${hours}:${minutes} ${ampm}`;
   return formattedDate
