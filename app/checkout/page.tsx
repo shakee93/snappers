@@ -1,7 +1,7 @@
 "use client";
 
 import React, {useEffect, useMemo, useState} from "react";
-import {useMutation, useQuery} from "@apollo/client";
+import {FetchResult, useMutation, useQuery} from "@apollo/client";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import Link from "next/link";
 import {useCart} from "@/context/CartProvider";
@@ -18,6 +18,7 @@ import {usePayhere} from "../components/Payment/Payhere";
 import {useRouter} from "next/navigation";
 import PaymentModal from "@/app/components/Payment/PaymentModal";
 import {useSession} from "@/context/SessionProvider";
+import {Loader} from "lucide-react";
 
 interface FormData {
     contactInfo: Record<string, any>;
@@ -119,7 +120,7 @@ const CheckoutPage = () => {
     const { customer, fetchCustomer,  } = useSession();
 
     const {data} = useQuery(GET_PAYMENT_GATEWAYS);
-    const paymentGateways: PaymentGateway[] = data?.paymentGateways.nodes;
+    const paymentGateways: PaymentGateway[] = data?.paymentGateways?.nodes;
     const [tabActive, setTabActive] = useState<
         | "ContactInfo"
         | "DeliveryAddress"
@@ -149,7 +150,7 @@ const CheckoutPage = () => {
         useState<PaymentDetailsWithoutUrls | null>(null)
     const [showBankTransfer, setShowBankTransfer] = useState<boolean>(false)
     const [wantToSHowBankTransfer, setWantToSHowBankTransfer] = useState(false)
-
+    const [loading, setLoading] = useState<boolean>(false);
     // USE_CASE:  This is to redirect to home page if cart is empty
     // useEffect(() => {
     //   if (cart && cart?.contents?.nodes?.length === 0) {
@@ -161,6 +162,31 @@ const CheckoutPage = () => {
     useEffect(() => {
         fetchCustomer()
     }, []);
+
+    // MUTATIONS
+    const [
+        updateCartShippingTotalMutation
+    ] = useMutation(UPDATE_SHIPPING_TOTAL);
+    const [
+        checkoutMutation,
+        {
+            // data: realCheckoutData,
+        },
+    ] = useMutation(CHECKOUT);
+    const [completeOrderPayment] = useMutation(COMPLETE_ORDER_PAYMENT);
+    // const  [createOrderGuest] = useMutation(GUEST_CHECKOUT_MUTATION)
+    const  [guestCheckout] = useMutation(GUEST_CHECKOUT)
+    // Creating a Order using For Guest. Instead of using direct checkout mutation.
+
+    const [
+        createOrderGuest,
+        {loading: checkoutLoading, error: checkoutError, data: checkoutData},
+    ] = useMutation(GUEST_CHECKOUT_MUTATION);
+
+
+    // Contexts
+    const router = useRouter();
+    const initiatePayment = usePayhere();
 
     const updateFormData = (section: string, data: any) => {
         setFormData((prevData) => {
@@ -193,18 +219,6 @@ const CheckoutPage = () => {
         });
     };
 
-    const [
-        updateCartShippingTotalMutation
-    ] = useMutation(UPDATE_SHIPPING_TOTAL);
-    const [
-        checkoutMutation,
-        {
-            // data: realCheckoutData,
-        },
-    ] = useMutation(CHECKOUT);
-
-    const [completeOrderPayment] = useMutation(COMPLETE_ORDER_PAYMENT);
-
     const completePaymentMutationHandle = async () =>{
         const { data } = await completeOrderPayment({
             variables: { orderId: 10, status: "COMPLETED" },
@@ -212,7 +226,6 @@ const CheckoutPage = () => {
         console.log("data on the complete order Mutation: ", data);
         return data;
     }
-
 
     const updateShippingTotal = async () => {
         try {
@@ -238,16 +251,9 @@ const CheckoutPage = () => {
         updateShippingTotal().then(r => r);
     }, [isStorePickup, updateCartShippingTotalMutation]);
 
-    // const [
-    //     guestCheckoutMutation,
-    //     {loading: checkoutLoading, error: checkoutError, data: checkoutData},
-    // ] = useMutation(GUEST_CHECKOUT_MUTATION);
-
     const paymentDetails = useMemo(() => {
         return paymentData
     }, [paymentData]);
-
-    const initiatePayment = usePayhere();
 
     const ImplementPayhere = (paymentDetails:any) => {
         if (initiatePayment !== null) {
@@ -280,52 +286,53 @@ const CheckoutPage = () => {
         setShowBankTransfer(true)
     }
 
-    // Creating a Order using For Guest. Instead of using direct checkout mutation.
-    const  [createOrderGuest] = useMutation(GUEST_CHECKOUT_MUTATION)
-    const  [guestCheckout] = useMutation(GUEST_CHECKOUT)
-
-    const CreateOrderGuest = async ()=> {
+    const CreateOrderGuest = async () => {
         const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
+        const shippingMethodId = shippingTotal === "රු0.00" ? "pickup_location:0" : "wbs:0dd3bc79_weight_based_shipping";
+        const shippingMethodTitle = shippingTotal === "0.00" ? "pickup_location:0" : "Weight Based Shipping";
+        const total = shippingTotal;
 
-        const shipping = [
-            {
-                methodId: shippingTotal === "රු0.00" ? "pickup_location:0" : "wbs:0dd3bc79_weight_based_shipping",
-                methodTitle: shippingTotal === "0.00" ? "pickup_location:0" : "Weight Based Shipping",
-                total: shippingTotal,
-            },
-        ];
+        const lineItems = (cart?.contents?.nodes || []).map((item) => ({
+            productId: item?.product?.node?.databaseId,
+            quantity: item?.quantity,
+        }));
 
-        const lineItems =
-            cart?.contents?.nodes.map((item) => ({
-                productId: item?.product?.node?.databaseId,
-                quantity: item?.quantity,
-            })) || [];
-
-        if(customer?.id == "guest"){
-            // For Create Order Mutation
-            const createOrderKeys = {
+        if (customer?.id === "guest") {
+            try {
+                const createOrderKeys = {
                     paymentMethod: paymentMethodId,
-                    shippingMethod: shipping[0].methodId,
-                    lineItems: lineItems
-            };
+                    shippingMethod: shippingMethodId,
+                    lineItems: lineItems,
+                };
 
-            // Using Real mutation without Output the order key and the order id.
-            const guestCheckoutKeys = {
-                input: {
-                    paymentMethod: paymentMethodId,
-                    shippingMethod: shipping[0].methodId,
-                },
-            };
+                const guestCheckoutKeys = {
+                    input: {
+                        paymentMethod: paymentMethodId,
+                        shippingMethod: shippingMethodId,
+                    },
+                };
 
-            const {data} = await guestCheckout({variables: guestCheckoutKeys});
-            if(data){
-                toast.success("Order created successfully for you! (GUEST) ")
+                const { data }: FetchResult<any> = await createOrderGuest({ variables: createOrderKeys });
+
+                if (checkoutError) {
+                    alert("Checkout Error: " + checkoutError);
+                }
+
+                if (data) {
+                    toast.success("Order created successfully for you! (GUEST)");
+                }
+                setLoading(false);
+            } catch (e: any) {
+                console.log("Checkout Error: " + e.message);
+                toast.error("Sorry! " + e.message);
+                setLoading(false)
             }
-        }else{
-            alert("You are already logged in")
+        } else {
+            alert("You are already logged in");
         }
+        setLoading(false)
+    };
 
-    }
 
     useEffect(() => {
         if(!paymentDetails){
@@ -363,14 +370,8 @@ const CheckoutPage = () => {
 
     }, [paymentData]);
 
-    const router = useRouter();
-
-    function handlePaymentMethod(checkoutDetails: any) {
-
-
-    }
-
     const handleCheckout = async () => {
+        setLoading(true)
         // Checkout for Guest.
         if(customer?.id == "guest"){
             await CreateOrderGuest()
@@ -405,19 +406,22 @@ const CheckoutPage = () => {
                 if (data) {
                     const checkoutDetails: PaymentDetailsWithoutUrls = savePaymentDetails(data);
                     setPaymentData(checkoutDetails);
-                    handlePaymentMethod(checkoutDetails)
                     toast.success("Order Created Successfully");
                 } else {
                     toast.error("Something Went Wrong While Checkout");
                 }
             } else {
+
                 console.error("Payment method ID is undefined");
             }
+            setLoading(false)
         } catch (error: any) {
             if(error.message == "Sorry, no session found."){
+                setLoading(false)
                 toast.error("No Items to checkout")
              return;
             }
+            setLoading(false)
             toast.error("Failed to create the order"+error.message);
         }
     };
@@ -539,7 +543,7 @@ const CheckoutPage = () => {
                                 className="flex justify-between font-semibold text-slate-900 dark:text-slate-200 text-base pt-4">
                                 <span>Order total</span>
                                 {/* <span>{cart?.total || "$0.00"}</span> */}
-                                <span>{orderTotal || "$0.00"}</span>
+                                <span>{orderTotal || "0.00"}</span>
                             </div>
                         </div>
 
@@ -564,8 +568,12 @@ const CheckoutPage = () => {
                                     : "bg-primary hover:bg-primary-dark"
                             }`}
                         >
-                            Confirm order
+
+                            {loading ?
+                                (<Loader className='animate-spin text-gray-100 ' />)
+                                : 'Confirm Order'}
                         </ButtonPrimary>
+
                         {/*<ButtonPrimary onClick={CreateOrderGuest}>*/}
                         {/*    GUEST CHECKOUT*/}
                         {/*</ButtonPrimary>*/}
@@ -573,6 +581,7 @@ const CheckoutPage = () => {
                         {/*<ButtonPrimary onClick={ImplementPayhere}>*/}
                         {/*    Confirm Order With Payhere*/}
                         {/*</ButtonPrimary>*/}
+
                         {/*<ButtonPrimary onClick={ImplementBankTransfer}>*/}
                         {/*    Do your Bank Transfer*/}
                         {/*</ButtonPrimary>*/}

@@ -1,9 +1,5 @@
-import React, { FC, useState } from "react";
-import {
-  NoSymbolIcon,
-  ClockIcon,
-  SparklesIcon,
-} from "@heroicons/react/24/outline";
+import React, {FC, useState} from "react";
+import {ClockIcon, NoSymbolIcon, SparklesIcon,} from "@heroicons/react/24/outline";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
 import NcImage from "shared/NcImage/NcImage";
@@ -14,19 +10,18 @@ import detail21JPG from "@/app/public/images/products/detail3-1.webp";
 import detail22JPG from "@/app/public/images/products/detail3-2.webp";
 import detail23JPG from "@/app/public/images/products/detail3-3.webp";
 import detail24JPG from "@/app/public/images/products/detail3-4.webp";
-import { PRODUCTS } from "data/data";
+import {PRODUCTS} from "data/data";
 import IconDiscount from "components/IconDiscount";
 import NcInputNumber from "components/NcInputNumber";
 import BagIcon from "components/BagIcon";
 import AccordionInfo from "./AccordionInfo";
 import Policy from "./Policy";
 import toast from "react-hot-toast";
-import { StarIcon } from "@heroicons/react/24/solid";
+import {StarIcon} from "@heroicons/react/24/solid";
 import SectionSliderProductCard from "components/SectionSliderProductCard";
 import ModalViewAllReviews from "./ModalViewAllReviews";
 import NotifyAddTocart from "components/NotifyAddTocart";
-import {StaticImageData} from "next/image";
-import Image from "next/image";
+import Image, {StaticImageData} from "next/image";
 
 export interface ProductDetailPage2Props {
   className?: string;
@@ -224,7 +219,7 @@ const ProductDetailPage2: FC<ProductDetailPage2Props> = ({
             {/* ---------- 1 HEADING ----------  */}
             <div className="flex items-center justify-between space-x-5">
               <div className="flex text-2xl font-semibold">
-                ${PRICE.toFixed(2)}
+                {PRICE.toFixed(2)}
               </div>
 
               <a

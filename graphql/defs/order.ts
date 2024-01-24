@@ -28,9 +28,7 @@ export const GUEST_CHECKOUT_MUTATION = gql`
         shippingLines: $shippingLines
       }
     ) {
-      clientMutationId
       order {
-
         total
         orderNumber
         paymentMethodTitle
@@ -59,11 +57,9 @@ export const GUEST_CHECKOUT = gql`
         email
       }
       order {
-        total
+        id
         databaseId
       }
-     
-
     }
   }
   ${CustomerAddressFragment}
@@ -130,11 +126,44 @@ export const GET_GUEST_ORDER = gql`
 query getguestorder {
   customer {
     id
+    databaseId
+    orderCount
     orders {
       nodes {
         date
         id
         orderNumber
+        total
+        lineItems {
+            nodes {
+              databaseId
+              id
+              orderId
+              productId
+              quantity
+              subtotal
+              product {
+                node {
+                  databaseId
+                  featuredImage {
+                    node {
+                      sourceUrl
+                    }
+                  }
+                  id
+                  name
+                  slug
+                  productId
+                  brands {
+                    nodes {
+                      name
+                      slug
+                    }
+                  }
+                }
+              }
+            }
+          }
       }
     }
   }
@@ -190,6 +219,24 @@ export const CHECKOUT = gql`
         total
         id
         databaseId
+        lineItems {
+        nodes {
+          databaseId
+          subtotal
+          quantity
+          product {
+            node {
+              name
+              databaseId
+              featuredImage {
+                node {
+                  sourceUrl
+                }
+              }
+            }
+          }
+        }
+      }
       }
      
 

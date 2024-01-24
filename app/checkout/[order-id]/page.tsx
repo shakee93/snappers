@@ -14,7 +14,7 @@ export default function OrderPaymentPage({params}: OrderPaymentPageProps) {
     if (orderId == "ItemNo12345") {
         return (
             <div className={`container mx-auto grid items-center justify-center `}>
-                <h1 className={`text-2xl font-bold  py-20 text-center `}>📝 The page is unable to load
+                <h1 className={`text-2xl font-bold  py-20 text-center`}>📝 The page is unable to load
                     the
                     order ID since it{"'"}s a Payhere testing ID.</h1>
                 <Link className={`text-center self-center text-blue-500 font-bold underline hover:cursor-pointer hover:text-blue-800 `} href={`/`}>Back to Home</Link>
