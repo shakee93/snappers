@@ -1,8 +1,4 @@
-import {
-    PaCapacity,
-    SimpleProduct,
-    VariableProduct,
-} from "@/graphql/types/graphql";
+import {PaCapacity, SimpleProduct, VariableProduct,} from "@/graphql/types/graphql";
 import Image from "next/image";
 import Link from "next/link";
 import Prices from "@/app/components/Prices";
@@ -25,8 +21,10 @@ const OrderItemProduct = ({
     if (!orderItem?.node) {
         return <p></p>;
     }
+    console.log('order item', orderItem.node)
     
-    const { name, image, price, slug, salePrice, type, stockQuantity, regularPrice }: SimpleProduct & VariableProduct = orderItem.node;
+    const { name, image, price, slug, salePrice, type, stockQuantity, regularPrice, featuredImage }: SimpleProduct & VariableProduct = orderItem.node;
+    // console.log({variation})
 
     return (
         <div
@@ -34,7 +32,7 @@ const OrderItemProduct = ({
         >
             <div className="relative h-36 w-24 sm:w-32 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
                 <Image fill style={{ objectFit: 'cover' }}
-                    src={image?.sourceUrl || ''}
+                    src={featuredImage?.node?.sourceUrl || ''}
                     alt={name || ''}
                     className="h-full w-full object-contain object-center"
                 />

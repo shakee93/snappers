@@ -1,29 +1,28 @@
 'use client'
-import { MousePointerClick } from "lucide-react";
 import Link from "next/link";
 import ProductAddToCart from "./ProductAddToCart";
 import {
-    Attribute,
     Brand,
-    Category, GlobalProductAttribute, PaCapacity,
-    Product,
-    ProductAttribute, ProductUnion, ProductVariation,
+    PaCapacity,
+    ProductAttribute,
+    ProductVariation,
     SimpleProduct,
-    VariableProduct, VariationAttribute
+    VariableProduct,
+    VariationAttribute
 } from "@/graphql/types/graphql";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useStore } from "@/store/store";
-import { twMerge } from "tailwind-merge";
+import {useCallback, useEffect, useState} from "react";
+import {useStore} from "@/store/store";
+import {twMerge} from "tailwind-merge";
 
 
 const ProductDetails = ({
-    product, brand
-}: {
+                            product, brand
+                        }: {
     product: VariableProduct & SimpleProduct
     brand: Brand
 }) => {
 
-    const { product: { attribute }, setAttribute } = useStore()
+    const {product: {attribute}, setAttribute} = useStore()
     const [activeVariation, setActiveVariation] = useState<any>(!!product?.variations?.nodes?.length ? product?.variations?.nodes[0] : null)
     const [activeOption, setActiveOption] = useState(
         !!product?.variations?.nodes?.length ? product?.variations?.nodes[0].attributes?.nodes[0].value : null
@@ -32,21 +31,20 @@ const ProductDetails = ({
     useEffect(() => {
         // console.log("Initial product: ", attribute);
 
-        console.log("active variation: ", activeVariation);
-        if(activeVariation == null){
-            setActiveVariation(product?.variations?.nodes[0])
-            setActiveOption(product?.variations?.nodes[0].attributes?.nodes[0].value)
-        }else{
-            console.log(
-                "active variation is on",
-            )
-        }
+        // console.log("active variation: ", activeVariation);
+        // if (activeVariation == null) {
+        //     setActiveVariation(product?.variations?.nodes[0])
+        //     // setActiveOption(product?.variations?.nodes[0].attributes?.nodes[0].value)
+        // } else {
+        //     console.log(
+        //         "active variation is on",
+        //     )
+        // }
 
         // let stockStatus =   activeVariation?.stockStatus !== 'IN_STOCK'
         // console.log("stock status: ", stockStatus);
     }, [activeVariation]);
 
-    
     useEffect(() => {
 
         if (product.type === 'VARIABLE') {
@@ -65,6 +63,7 @@ const ProductDetails = ({
     }, [product, setAttribute]);
 
     const activeAttr = useCallback((attr: ProductAttribute) => {
+        console.log("active attr: ", attribute.find(a => a.name === attr.name));
         return attribute.find(a => a.name === attr.name)
     }, [attribute])
 
@@ -109,13 +108,26 @@ const ProductDetails = ({
                 <>
                     {product.attributes?.nodes.map((attr: ProductAttribute, index: number) =>
                         <div key={index} className="text-gray-500">
-                            <div className="text-sm py-2">{attr.label}: <span className='font-medium text-gray-700'>{(product as unknown as VariableProduct)[`allPa${attr?.label as unknown as 'Capacity'}`]?.nodes.find((node: PaCapacity) => node.slug === activeAttr(attr)?.val)?.name}</span> </div>
+                            <div className="text-sm py-2">{attr.label}: <span
+                                className='font-medium text-gray-700'>{(product as unknown as VariableProduct)[`allPa${attr?.label as unknown as 'Capacity'}`]?.nodes.find((node: PaCapacity) => node.slug === activeAttr(attr)?.val)?.name}</span>
+                            </div>
 
                             <ul className="flex gap-2 flex-wrap text-sm items-center">
 
                                 {attr.options?.map((option, index) =>
                                     <li key={index}
-                                        onClick={e => setAttribute(attr, option || '')}
+                                        // onClick={e => (
+                                        //     setAttribute(attr, option || '')
+                                        //     )}
+                                        onClick={
+                                            (v: any) => {
+                                                console.log("current Selected Value: ", option)
+                                                setAttribute(attr, option || '')
+
+
+                                            }
+                                        }
+
                                         className={
                                             twMerge(
                                                 "border bg-gray-200/80 cursor-pointer text-black inline-block py-2 px-3.5  text-xs md:text-sm rounded",
@@ -136,19 +148,19 @@ const ProductDetails = ({
 
 
             {product.type === 'VARIABLE' && activeVariation ? <div>
-                <div className="flex gap-4 text-base py-4 flex-wrap md:text-lg font-medium text-gray-600">
+                    <div className="flex gap-4 text-base py-4 flex-wrap md:text-lg font-medium text-gray-600">
                     <span>
                         {activeVariation.price}
                     </span>
 
-                    {(!!activeVariation.salePrice && activeVariation.salePrice !== activeVariation.regularPrice) &&
-                        <span className="text-red-400">
+                        {(!!activeVariation.salePrice && activeVariation.salePrice !== activeVariation.regularPrice) &&
+                            <span className="text-red-400">
                             <s>{activeVariation.regularPrice}</s>
                         </span>
-                    }
+                        }
 
-                </div>
-            </div> :
+                    </div>
+                </div> :
                 <div className="flex gap-2 text-base py-2 flex-wrap md:text-lg font-medium text-gray-600">
                     <span>
                         {product.price}
@@ -175,17 +187,19 @@ const ProductDetails = ({
                 </div>
             }
 
-            <ProductAddToCart product={product} variation={activeVariation} />
+            <ProductAddToCart product={product} variation={activeVariation}/>
             <div className="flex gap-1 items-center text-sm md:text-base text-gray-500">
                 <div className="text-sm py-2">Category:</div>
                 {product.productCategories?.edges
                     ? product.productCategories.edges.map((category: any, index: number) => (
-                        <Link href={`/collections/${category.node.slug}`} key={index} className="bg-primary-100 inline-block py-1 px-2  text-xs md:text-sm rounded-3xl">
+                        <Link href={`/collections/${category.node.slug}`} key={index}
+                              className="bg-primary-100 inline-block py-1 px-2  text-xs md:text-sm rounded-3xl">
                             {category.node.name}
                         </Link>
                     ))
                     : product.productCategories?.nodes.map((category: any, index: number) => (
-                        <Link href={`/collections/${category.slug}`} key={index} className="bg-primary-100 inline-block py-1 px-2  text-xs md:text-sm rounded-3xl">
+                        <Link href={`/collections/${category.slug}`} key={index}
+                              className="bg-primary-100 inline-block py-1 px-2  text-xs md:text-sm rounded-3xl">
                             {category.name}
                         </Link>
                     ))

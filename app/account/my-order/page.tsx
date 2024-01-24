@@ -1,12 +1,10 @@
 "use client";
-import { useQuery } from "@apollo/client";
-import { useEffect } from "react";
-import ButtonSecondary from "shared/Button/ButtonSecondary";
-import { GET_ALL_ORDER_DETAILS, GET_GUEST_ORDER } from "@/graphql/defs/order";
+import {useQuery} from "@apollo/client";
+import {GET_GUEST_ORDER} from "@/graphql/defs/order";
 import OrderItemProduct from "@/app/containers/ProductDetailPage/OrderItem";
 import LoadingSkeleton from "@/components/OrderPageSkeleton";
 
-import { useSession } from "@/context/SessionProvider";
+import {useSession} from "@/context/SessionProvider";
 
 const AccountOrder = () => {
     const { loading, error, data } = useQuery(GET_GUEST_ORDER);
@@ -14,21 +12,27 @@ const AccountOrder = () => {
     // console.log({data});
 
     const { customer, updateCustomer } = useSession();
-    console.log({customer});
 
     if (error) return <p>Error: {error.message}</p>;
     if (loading) return <LoadingSkeleton />;
 
-    const hasOrders = data?.orders?.edges?.length > 0;
+    const hasOrders = data?.customer?.orders?.nodes?.length > 0;
 
+    console.log("order data: ", data);
+    // debugger;
     return (
         <div className="space-y-10 sm:space-y-12">
             <h2 className="text-2xl sm:text-3xl font-semibold">Order History</h2>
-            {hasOrders ? data.orders.edges.map((order: any, index:any) => (
-                <div key={index} className="border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden z-0">
-                    <OrderHeader order={order.node} />
-                    <OrderItems lineItems={order.node.lineItems.nodes} />
+            {/* <p>{JSON.stringify(data)}</p> */}
+            
+            {hasOrders ? data.customer?.orders?.nodes?.map((order: any, index:any) => (
+                
+                <div key={index} className="border border-slate-200 dark:border-slate-700
+                 rounded-lg overflow-hidden z-0">
+                    <OrderHeader order={order} />
+                    <OrderItems lineItems={order?.lineItems?.nodes} />
                 </div>
+
             )) : <p>No orders found.</p>}
         </div>
     );
@@ -53,13 +57,13 @@ const formatDate = (date: any) => {
 const OrderHeader = ({ order }: any) => (
     <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 sm:p-8 bg-slate-50 dark:bg-slate-500/5">
         <div>
-            <p className="text-lg font-semibold">#{order.orderNumber}</p>
+            <p className="text-lg font-semibold">#{order?.orderNumber}</p>
             <p className="text-slate-500 dark:text-slate-400 text-sm mt-1.5 sm:mt-2">
-                <span>{ formatDate(order.date)}</span>
+                <span>{ formatDate(order?.date)}</span>
                 <span className="mx-2">·</span>
-                <span className="text-primary-500">{order.status}</span>
+                <span className="text-primary-500">{order?.status}</span>
             </p>
-            <p className=" text-sm mt-1.5 sm:mt-2"><strong>Total:</strong> {order.total}</p>
+            <p className=" text-sm mt-1.5 sm:mt-2"><strong>Total:</strong> {order?.total}</p>
         </div>
         {/* <ButtonSecondary sizeClass="py-2.5 px-4 sm:px-6" fontSize="text-sm font-medium">View Order</ButtonSecondary> */}
     </div>
@@ -67,7 +71,7 @@ const OrderHeader = ({ order }: any) => (
 
 const OrderItems = ({ lineItems }: any) => (
     <div className="border-t border-slate-200 dark:border-slate-700 p-2 sm:p-8 divide-y divide-y-slate-200 dark:divide-slate-700">
-        {lineItems.map((item: any, index: any) => <OrderItemProduct key={index} index={index} orderItem={item.product} />)}
+        {lineItems?.map((item: any, index: any) => <OrderItemProduct key={index} index={index} orderItem={item?.product} />)}
     </div>
 );
 
