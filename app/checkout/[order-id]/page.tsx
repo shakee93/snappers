@@ -79,6 +79,16 @@ export default function OrderPaymentPage({params}: OrderPaymentPageProps) {
     // }
 
     console.log('paymentDetails', temporaryPaymentDetails);
+    if(orderError) {
+        return(
+            <div className={`container mx-auto grid items-center justify-center `}>
+                <h1 className={`text-2xl font-bold  py-20 text-center`}>Not authorized to view this order</h1>
+                <Link
+                    className={`text-center self-center text-blue-500 font-bold underline hover:cursor-pointer hover:text-blue-800 `}
+                    href={`/`}>Back to Home</Link>
+            </div>
+        )
+    }
 
     return (
         <div className="container mx-auto rounded-3xl lg:p-20 text-center ">
