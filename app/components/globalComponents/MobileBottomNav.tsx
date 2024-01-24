@@ -7,22 +7,20 @@ import {
     UserCircle, Codesandbox, Menu, CircleUser,
 } from "lucide-react";
 import Logo from "./Logo";
-import {XIcon} from "lucide-react";
-import {useState} from "react";
-import {Category} from "@/graphql/types/graphql";
-import {useRouter} from "next/navigation";
+import { XIcon } from "lucide-react";
+import { useState } from "react";
+import { Category } from "@/graphql/types/graphql";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
-import {useCart} from "@/context/CartProvider";
-import {useStore} from "@/store/store";
+import { useCart } from "@/context/CartProvider";
+import { useStore } from "@/store/store";
 import { useSession } from "@/context/SessionProvider";
 
-const MobileBottomNav = ({categories}: { categories: any }) => {
+const MobileBottomNav = ({ categories }: { categories: any }) => {
     const [openCat, setOpenCat] = useState(false);
-    const {cart} = useCart();
-    const {mobileMenu, toggleMobileMenu} = useStore()
+    const { cart } = useCart();
+    const { mobileMenu, toggleMobileMenu } = useStore()
     const { customer, fetchCustomer, updateCustomer } = useSession();
-
-    console.log({customer});
 
     const handleCat = () => {
         setOpenCat(!openCat);
@@ -34,20 +32,20 @@ const MobileBottomNav = ({categories}: { categories: any }) => {
         <div
             className="fixed h-[82px] grid grid-cols-6 shadow-3xl items-center justify-center bottom-0 z-[100] bg-white border-slate-100 border-t-2 w-full  px-1">
             <div className='flex-1'>
-                <Logo className='flex  h-full items-center justify-center' imageClass='h-[45px] p-0'/>
+                <Logo className='flex  h-full items-center justify-center' imageClass='h-[45px] p-0' />
             </div>
             <Link
                 href="/collections"
                 className="flex-1 pt-2 flex flex-col justify-center items-center text-primaryColor gap-1 cursor-pointer"
             >
-                <LayoutGrid/>
+                <LayoutGrid />
                 <div className="text-[11px]">Collections</div>
             </Link>
             <Link
                 href="/brands"
                 className="flex pt-2 flex-1 flex-col justify-center items-center text-primaryColor gap-1 cursor-pointer"
             >
-                <Codesandbox/>
+                <Codesandbox />
                 <div className="text-[11px]">Brands</div>
             </Link>
             <Link
@@ -61,7 +59,7 @@ const MobileBottomNav = ({categories}: { categories: any }) => {
                             <span className="mt-[1px]">{cart?.contents?.itemCount}</span>
                         </div>
                     }
-                    <ShoppingBag/>
+                    <ShoppingBag />
                 </div>
                 <div className="text-[11px]">Cart</div>
             </Link>
@@ -69,14 +67,14 @@ const MobileBottomNav = ({categories}: { categories: any }) => {
                 href={customer?.id === 'guest' ? '/login' : '/account'}
                 className="flex pt-2 flex-1 flex-col justify-center items-center text-primaryColor gap-1 cursor-pointer"
             >
-                <CircleUser/>
+                <CircleUser />
                 <div className="text-[11px]">Account</div>
             </Link>
             <div
                 onClick={e => toggleMobileMenu()}
                 className="flex pt-2 flex-col justify-center items-center text-primaryColor gap-1"
             >
-                {mobileMenu ? <XIcon/> : <Menu/>}
+                {mobileMenu ? <XIcon /> : <Menu />}
                 <div className="text-[11px]">Menu</div>
             </div>
 

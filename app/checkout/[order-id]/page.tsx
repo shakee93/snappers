@@ -50,6 +50,8 @@ export default function OrderPaymentPage({params}: OrderPaymentPageProps) {
         // redirect('/');
     }
 
+    // console.log('Order Data', orderData);
+
     const temporaryPaymentDetails: PaymentDetailsWithoutUrls = useMemo(
         () => ({
             order_id: orderData?.order?.orderNumber ?? "",
@@ -62,7 +64,7 @@ export default function OrderPaymentPage({params}: OrderPaymentPageProps) {
             last_name: customerData?.customer?.shipping?.lastName ?? "no_last_name",
             email: customerData?.customer?.email ?? "no_email",
             phone: customerData?.customer?.shipping?.phone ?? "no_phone",
-            address: customerData?.customer?.shipping?.address1 ?? "no_address",
+            address: customerData?.customer?.shipping?.address2 ?? "no_address",
             billingAddress: customerData?.customer?.billing?.address1 ?? "no_address",
             billingAddress2: customerData?.customer?.billing?.address2 ?? "no_address",
             city: customerData?.customer?.shipping?.city ?? "no_city",
@@ -75,6 +77,8 @@ export default function OrderPaymentPage({params}: OrderPaymentPageProps) {
     // if(!orderData?.order){
     //   return <OrderPaymentPageSkeleton/>
     // }
+
+    console.log('paymentDetails', temporaryPaymentDetails);
 
     return (
         <div className="container mx-auto rounded-3xl lg:p-20 text-center ">

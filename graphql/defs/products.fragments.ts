@@ -170,6 +170,7 @@ export const ProductContentFull = gql`
             regularPrice
             salePrice
             stockStatus
+            purchasable
             stockQuantity
             soldIndividually
             productCategories {
@@ -231,6 +232,7 @@ export const ProductContentFull = gql`
             regularPrice
             salePrice
             stockStatus
+            purchasable
             stockQuantity
             soldIndividually
             defaultAttributes {
