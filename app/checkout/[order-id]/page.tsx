@@ -50,7 +50,7 @@ export default function OrderPaymentPage({params}: OrderPaymentPageProps) {
         // redirect('/');
     }
 
-    // console.log('Order Data', orderData);
+    console.log('Order Data', orderData);
 
     const temporaryPaymentDetails: PaymentDetailsWithoutUrls = useMemo(
         () => ({

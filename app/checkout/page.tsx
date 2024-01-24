@@ -213,6 +213,9 @@ const CheckoutPage = () => {
         return data;
     }
 
+    
+    console.log('cart', cart);
+
 
     const updateShippingTotal = async () => {
         try {
@@ -221,11 +224,12 @@ const CheckoutPage = () => {
                 variables: { input: { shippingMethods } },
             });
 
+
             if (data?.updateShippingMethod?.cart) {
                 const { total, shippingTotal } = data.updateShippingMethod.cart;
                 setOrderTotal(total);
                 setShippingTotal(shippingTotal);
-                // console.log("Cart shipping total updated successfully");
+                console.log("Cart shipping total updated successfully", shippingTotal);
             } else {
                 console.error("Failed to update cart shipping total. No valid data returned.");
             }
