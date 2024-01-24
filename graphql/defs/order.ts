@@ -270,6 +270,7 @@ export const GET_SINGLE_ORDER = gql`
       subtotal
       total
       shippingTax
+      shippingTotal
       orderNumber
       date
       hasBillingAddress

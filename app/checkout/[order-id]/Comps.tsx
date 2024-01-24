@@ -16,7 +16,7 @@ export const OrderDetails: React.FC<OrderDetailsProps> = ({ orderData }) => {
       value: orderData.order.total - orderData.order.subtotal,
       condition: orderData.order.total - orderData.order.subtotal > 0,
     },
-    { label: "Delivery Fee", value: orderData.order.shippingTax },
+    { label: "Delivery Fee", value: orderData.order.shippingTotal },
     { label: "Sub Total", value: orderData.order.subtotal },
   ];
 

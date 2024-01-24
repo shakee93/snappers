@@ -154,7 +154,6 @@ const ProductCard: FC<ProductCardProps> = ({
 
     const renderGroupButtons = () => {
         
-        // console.log('sdas', name , stockStatus, databaseId);
 
         return (
             <div className="absolute -top-12 right-1 flex justify-center opacity-100 visible transition-all">
