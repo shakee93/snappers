@@ -14,11 +14,15 @@ import {useRouter} from "next/navigation";
 import Link from "next/link";
 import {useCart} from "@/context/CartProvider";
 import {useStore} from "@/store/store";
+import { useSession } from "@/context/SessionProvider";
 
 const MobileBottomNav = ({categories}: { categories: any }) => {
     const [openCat, setOpenCat] = useState(false);
     const {cart} = useCart();
     const {mobileMenu, toggleMobileMenu} = useStore()
+    const { customer, fetchCustomer, updateCustomer } = useSession();
+
+    console.log({customer});
 
     const handleCat = () => {
         setOpenCat(!openCat);
@@ -62,7 +66,7 @@ const MobileBottomNav = ({categories}: { categories: any }) => {
                 <div className="text-[11px]">Cart</div>
             </Link>
             <Link
-                href="/login"
+                href={customer?.id === 'guest' ? '/login' : '/account'}
                 className="flex pt-2 flex-1 flex-col justify-center items-center text-primaryColor gap-1 cursor-pointer"
             >
                 <CircleUser/>
