@@ -3,31 +3,41 @@ import {GET_ALL_PRODUCTS} from "@/graphql/defs/products";
 import InstantSearchWrapper from "@/app/components/InstantSearchWrapper";
 
 async function getData(categories: number[] | null = null) {
+    const startTime = new Date().getTime(); // Record the start time
+
     const { data, error } = await getClient().query({
         query: GET_ALL_PRODUCTS,
-        fetchPolicy: 'no-cache',
-        context:{
-            fetchOptions:{
-                next: {
-                    revalidate: 60
-                }
-            }
-        }
+        // fetchPolicy: 'standby',
+        // context:{
+        //     fetchOptions:{
+        //         next: {
+        //             revalidate: 10
+        //         }
+        //     }
+        // },
     });
+
+    const endTime = new Date().getTime();
+    const executionTime = endTime - startTime; 
+
+    console.log(`getData function execution time: ${executionTime}ms`);
 
     return {
         productCategories: data.productCategories.nodes,
         brands: data.brands.nodes,
+        executionTime
     };
 }
 
+
 async function Page() {
 
-    const { productCategories, brands } = await getData();
+    const { productCategories, brands, executionTime } = await getData();
+    console.log("execution time: ", executionTime);
 
 
     return <div className='container py-16'>
-
+        {executionTime}
         <div className="max-w-screen-sm mb-10">
             <h2 className="block text-2xl sm:text-3xl lg:text-4xl font-semibold">
                 Search
