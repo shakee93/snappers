@@ -1,24 +1,24 @@
 "use client";
 
-import React, {useEffect, useMemo, useState} from "react";
-import {FetchResult, useMutation, useQuery} from "@apollo/client";
+import React, { useEffect, useMemo, useState } from "react";
+import { FetchResult, useMutation, useQuery } from "@apollo/client";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import Link from "next/link";
-import {useCart} from "@/context/CartProvider";
-import {GET_PAYMENT_GATEWAYS, UPDATE_SHIPPING_TOTAL,} from "@/graphql/defs/cart";
-import {CHECKOUT, COMPLETE_ORDER_PAYMENT, GUEST_CHECKOUT, GUEST_CHECKOUT_MUTATION} from "@/graphql/defs/order";
-import {CheckoutPayload, PaymentGateway} from "@/graphql/types/graphql";
+import { useCart } from "@/context/CartProvider";
+import { GET_PAYMENT_GATEWAYS, UPDATE_SHIPPING_TOTAL, } from "@/graphql/defs/cart";
+import { CHECKOUT, COMPLETE_ORDER_PAYMENT, GUEST_CHECKOUT, GUEST_CHECKOUT_MUTATION } from "@/graphql/defs/order";
+import { CheckoutPayload, PaymentGateway } from "@/graphql/types/graphql";
 
 import CheckoutDetails from "./CheckoutDetails";
 import CartItems from "./CartItems";
 import toast from "react-hot-toast";
-import {PaymentDetailsWithoutUrls} from "@/data/types";
+import { PaymentDetailsWithoutUrls } from "@/data/types";
 import Script from "next/script";
-import {usePayhere} from "../components/Payment/Payhere";
-import {useRouter} from "next/navigation";
+import { usePayhere } from "../components/Payment/Payhere";
+import { useRouter } from "next/navigation";
 import PaymentModal from "@/app/components/Payment/PaymentModal";
-import {useSession} from "@/context/SessionProvider";
-import {Loader} from "lucide-react";
+import { useSession } from "@/context/SessionProvider";
+import { Loader } from "lucide-react";
 
 interface FormData {
     contactInfo: Record<string, any>;
@@ -30,6 +30,7 @@ interface FormData {
         };
     };
 }
+
 //
 // const FAKE_PAYMENT_DETAILS: PaymentDetailsWithoutUrls | null = {
 //     order_id: "6425",
@@ -116,10 +117,11 @@ interface FormData {
 // }
 
 const CheckoutPage = () => {
-    const {cart, removeFromCart, updateCart} = useCart();
-    const { customer, fetchCustomer,  } = useSession();
+    const { cart, removeFromCart, updateCart } = useCart();
 
-    const {data} = useQuery(GET_PAYMENT_GATEWAYS);
+    const { customer, fetchCustomer, } = useSession();
+
+    const { data } = useQuery(GET_PAYMENT_GATEWAYS);
     const paymentGateways: PaymentGateway[] = data?.paymentGateways?.nodes;
     const [tabActive, setTabActive] = useState<
         | "ContactInfo"
@@ -164,23 +166,20 @@ const CheckoutPage = () => {
     }, []);
 
     // MUTATIONS
-    const [
-        updateCartShippingTotalMutation
-    ] = useMutation(UPDATE_SHIPPING_TOTAL);
-    const [
-        checkoutMutation,
+    const [updateCartShippingTotalMutation] = useMutation(UPDATE_SHIPPING_TOTAL);
+    const [checkoutMutation,
         {
             // data: realCheckoutData,
         },
     ] = useMutation(CHECKOUT);
     const [completeOrderPayment] = useMutation(COMPLETE_ORDER_PAYMENT);
     // const  [createOrderGuest] = useMutation(GUEST_CHECKOUT_MUTATION)
-    const  [guestCheckout] = useMutation(GUEST_CHECKOUT)
+    const [guestCheckout] = useMutation(GUEST_CHECKOUT)
     // Creating a Order using For Guest. Instead of using direct checkout mutation.
 
     const [
         createOrderGuest,
-        {loading: checkoutLoading, error: checkoutError, data: checkoutData},
+        { loading: checkoutLoading, error: checkoutError, data: checkoutData },
     ] = useMutation(GUEST_CHECKOUT_MUTATION);
 
 
@@ -219,7 +218,7 @@ const CheckoutPage = () => {
         });
     };
 
-    const completePaymentMutationHandle = async () =>{
+    const completePaymentMutationHandle = async () => {
         const { data } = await completeOrderPayment({
             variables: { orderId: 10, status: "COMPLETED" },
         });
@@ -230,6 +229,19 @@ const CheckoutPage = () => {
     const updateShippingTotal = async () => {
         try {
             const shippingMethods = isStorePickup ? "pickup_location:0" : "wbs:0dd3bc79_weight_based_shipping";
+            const total: any = cart?.total;
+            setOrderTotal(total);
+
+            if (customer?.id === "guest") {
+                const subtotal: any = cart?.subtotal;
+
+                if (isStorePickup) {
+                    setOrderTotal(subtotal);
+                } else {
+                    setOrderTotal(total);
+                }
+            }
+
             const { data } = await updateCartShippingTotalMutation({
                 variables: { input: { shippingMethods } },
             });
@@ -256,7 +268,7 @@ const CheckoutPage = () => {
         return paymentData
     }, [paymentData]);
 
-    const ImplementPayhere = (paymentDetails:any) => {
+    const ImplementPayhere = (paymentDetails: any) => {
         if (initiatePayment !== null) {
             initiatePayment(paymentDetails).then(r => r);
         } else {
@@ -266,9 +278,9 @@ const CheckoutPage = () => {
 
     const savePaymentDetails = (checkoutDetails: any): PaymentDetailsWithoutUrls => {
         let orderDetails: CheckoutPayload = checkoutDetails?.checkout
-        let {order, customer} = orderDetails
+        let { order, customer } = orderDetails
 
-        let saved_data =  {
+        let saved_data = {
             amount: order?.total ?? "no_amount",
             items: "Mobile Items",
             order_id: order?.databaseId?.toString() ?? "no_order_id_found",
@@ -336,7 +348,7 @@ const CheckoutPage = () => {
 
 
     useEffect(() => {
-        if(!paymentDetails){
+        if (!paymentDetails) {
             console.log("payment data not initiated yet!");
             return;
         }
@@ -374,14 +386,14 @@ const CheckoutPage = () => {
     const handleCheckout = async () => {
         setLoading(true)
         // Checkout for Guest.
-        if(customer?.id == "guest"){
+        if (customer?.id == "guest") {
             await CreateOrderGuest()
             return
         }
 
         try {
             const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
-            if(wantToSHowBankTransfer){
+            if (wantToSHowBankTransfer) {
                 ImplementBankTransfer()
                 return
             }
@@ -402,7 +414,7 @@ const CheckoutPage = () => {
                     },
                 };
 
-                const {data} = await checkoutMutation({variables: obj});
+                const { data } = await checkoutMutation({ variables: obj });
 
                 if (data) {
                     const checkoutDetails: PaymentDetailsWithoutUrls = savePaymentDetails(data);
@@ -417,13 +429,13 @@ const CheckoutPage = () => {
             }
             setLoading(false)
         } catch (error: any) {
-            if(error.message == "Sorry, no session found."){
+            if (error.message == "Sorry, no session found.") {
                 setLoading(false)
                 toast.error("No Items to checkout")
-             return;
+                return;
             }
             setLoading(false)
-            toast.error("Failed to create the order"+error.message);
+            toast.error("Failed to create the order" + error.message);
         }
     };
 
@@ -431,7 +443,7 @@ const CheckoutPage = () => {
     const handleScrollToEl = (id: string) => {
         const element = document.getElementById(id);
         setTimeout(() => {
-            element?.scrollIntoView({behavior: "smooth"});
+            element?.scrollIntoView({ behavior: "smooth" });
         }, 80);
     };
 
@@ -446,8 +458,8 @@ const CheckoutPage = () => {
             <title>Checkout</title>
             <main className="container py-8 md:py-16 lg:pb-28 lg:pt-20 ">
                 <PaymentModal show={showBankTransfer} setShowBankTransfer={setShowBankTransfer}
-                              setWantToSHowBankTransfer={setWantToSHowBankTransfer}
-                              paymentDetails={paymentDetails} />
+                    setWantToSHowBankTransfer={setWantToSHowBankTransfer}
+                    paymentDetails={paymentDetails} />
                 <div className="mb-16">
                     <h2 className="block text-2xl sm:text-3xl lg:text-4xl font-semibold ">
                         Checkout
@@ -521,16 +533,16 @@ const CheckoutPage = () => {
                             <div className="mt-4 flex justify-between py-2.5">
                                 <span>Subtotal</span>
                                 <span className="font-semibold text-slate-900 dark:text-slate-200">
-                  {cart?.subtotal || "$0.00"}
-                </span>
+                                    {cart?.subtotal || "$0.00"}
+                                </span>
                             </div>
 
                             {!isStorePickup && (
                                 <div className="flex justify-between py-2.5">
                                     <span>Shipping estimate</span>
                                     <span className="font-semibold text-slate-900 dark:text-slate-200">
-                    {cart?.shippingTotal || "$0.00"}
-                  </span>
+                                        {cart?.shippingTotal || "$0.00"}
+                                    </span>
                                 </div>
                             )}
 
@@ -558,16 +570,15 @@ const CheckoutPage = () => {
                                     isConfirmed.paymentMethod
                                 )
                             }
-                            className={`mt-8 w-full ${
-                                !(
-                                    isConfirmed.contactInfo &&
-                                    isConfirmed.deliveryAddress &&
-                                    isConfirmed.billingAddress &&
-                                    isConfirmed.paymentMethod
-                                )
-                                    ? "bg-slate-500 cursor-not-allowed"
-                                    : "bg-primary hover:bg-primary-dark"
-                            }`}
+                            className={`mt-8 w-full ${!(
+                                isConfirmed.contactInfo &&
+                                isConfirmed.deliveryAddress &&
+                                isConfirmed.billingAddress &&
+                                isConfirmed.paymentMethod
+                            )
+                                ? "bg-slate-500 cursor-not-allowed"
+                                : "bg-primary hover:bg-primary-dark"
+                                }`}
                         >
 
                             {loading ?
@@ -627,8 +638,8 @@ const CheckoutPage = () => {
                                     Terms and Conditions
                                 </Link>
                                 <span>
-                  {` `}and{` `}
-                </span>
+                                    {` `}and{` `}
+                                </span>
                                 <Link
                                     target="_blank"
                                     rel="noopener noreferrer"
