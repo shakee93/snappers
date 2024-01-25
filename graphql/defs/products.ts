@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client";
+import {gql} from "@apollo/client";
 import {ProductContentFull, ProductSpecs} from "@/graphql/defs/products.fragments";
 
 export const GET_BRANDS = gql`
@@ -238,6 +238,7 @@ export const GET_PRODUCTS = gql`
           image {
             mediaItemUrl
             sourceUrl
+            databaseId
           }
           type
           ... on SimpleProduct {
@@ -250,6 +251,7 @@ export const GET_PRODUCTS = gql`
                 node {
                   mediaItemUrl
                   sourceUrl
+                  databaseId
                 }
               }
             }
@@ -345,6 +347,7 @@ export const GET_PRODUCTS = gql`
                     mediaItemUrl
                     sourceUrl
                     sizes
+                    databaseId
                   }
                   name
                   price

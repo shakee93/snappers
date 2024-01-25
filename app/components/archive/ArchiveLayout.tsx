@@ -34,6 +34,7 @@ const ArchiveLayout = async ({ title, description, filters = false, search = fal
                         "easy for you to share your designs with more like-minded people."}</span>
                 </div>
                 <hr className="border-slate-200 dark:border-slate-700 " />
+
                 <main>
                     <div className="flex flex-col lg:flex-row">
                         <div className="flex-1 ">

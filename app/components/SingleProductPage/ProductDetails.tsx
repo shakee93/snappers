@@ -1,20 +1,20 @@
 'use client'
-import { MousePointerClick } from "lucide-react";
 import Link from "next/link";
 import ProductAddToCart from "./ProductAddToCart";
 import {
-    Attribute,
     Brand,
-    Category, GlobalProductAttribute, PaCapacity,
-    Product,
-    ProductAttribute, ProductUnion, ProductVariation,
+    PaCapacity,
+    ProductAttribute,
+    ProductVariation,
     SimpleProduct,
-    VariableProduct, VariationAttribute
+    VariableProduct,
+    VariationAttribute
 } from "@/graphql/types/graphql";
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { useStore } from "@/store/store";
-import { twMerge } from "tailwind-merge";
+import {useCallback, useEffect, useState} from "react";
+import {useStore} from "@/store/store";
+import {twMerge} from "tailwind-merge";
 import parseHtml from 'html-react-parser'
+import {useImage} from "@/context/ImageChangeGrabber";
 
 
 const ProductDetails = ({
@@ -30,9 +30,10 @@ const ProductDetails = ({
         !!product?.variations?.nodes?.length ? product?.variations?.nodes[0].attributes?.nodes[0].value : null
     )
 
+    const {setVariationId} = useImage();
+
 
     useEffect(() => {
-
         if (product.type === 'VARIABLE') {
 
             const defAttributes = product?.defaultAttributes?.nodes;
@@ -54,19 +55,15 @@ const ProductDetails = ({
     }, [attribute])
 
     useEffect(() => {
-
-
+        // console.log("product on change", product)
+        // console.log("activeVariation", activeVariation)
+        setVariationId(activeVariation.image.databaseId)
         if (product.type === 'VARIABLE') {
-
             let variation = (product as VariableProduct).variations?.nodes as unknown as ProductVariation[];
-
             let vProduct = variation.find(v => {
-
                 let nodes = v.attributes?.nodes as unknown as VariationAttribute[];
-
                 let attrKey = attribute.map(a => `${a.name}:${a.val}`).join('+');
                 let variationKey = nodes?.map(a => `${a.name}:${a.value}`).join('+')
-
                 return attrKey === variationKey
             });
 
@@ -77,9 +74,6 @@ const ProductDetails = ({
                 setActiveVariation(null)
             }
         }
-
-
-
     }, [attribute])
     // console.log('singel rpdocut',product)
     // console.log('sctivr vsaritation',activeVariation)
@@ -117,7 +111,9 @@ const ProductDetails = ({
                                                 activeAttr(attr)?.val === option && ' border-blue-700 bg-white'
                                             )
                                         }>
-                                        {(product as unknown as VariableProduct)[`allPa${attr?.label as unknown as 'Capacity'}`]?.nodes.find((node: PaCapacity) => node.slug === option)?.name || 'Option'}
+                                        {(product as unknown as VariableProduct)
+                                        [`allPa${attr?.label as unknown as 'Capacity'}`]?.nodes.find((node: PaCapacity) => 
+                                        node.slug === option)?.name || 'Option'}
                                     </li>
                                 )}
 
@@ -164,7 +160,7 @@ const ProductDetails = ({
             }
 
             {product.type === 'VARIABLE' && activeVariation?.stockStatus !== 'IN_STOCK' &&
-                <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1">
+                <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 tex-xs md:text-sm py-1">
                     Sold Out
                 </div>
             }

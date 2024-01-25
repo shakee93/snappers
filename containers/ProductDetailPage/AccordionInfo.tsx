@@ -1,9 +1,6 @@
-import { Disclosure } from "@headlessui/react";
-import { MinusIcon, PlusIcon } from "@heroicons/react/24/outline";
-import { FC } from "react";
-import ReactDOMServer from "react-dom/server";
-import { GET_TECH_SPEC } from "@/graphql/defs/products";
-import { useQuery } from "@apollo/client";
+import {Disclosure} from "@headlessui/react";
+import {MinusIcon, PlusIcon} from "@heroicons/react/24/outline";
+import {FC} from "react";
 
 import ProductSpecifications from "@/app/components/SingleProductPage/ProductSpecifications";
 
@@ -117,7 +114,6 @@ const AccordionInfo: FC<Props> = ({
                   as="div"
                 >
 
-                  {/* TODO: pass the techspecs prop to ProductSpecifications */}
                   {specifications && specifications?.items && specifications?.items.length > 0 && item.name === "Specifications" &&
                     <ProductSpecifications techspecs={specifications} />
                   }
