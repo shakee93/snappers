@@ -10,8 +10,6 @@ import Link from "next/link";
 const AccountOrder = () => {
     const { loading, error, data } = useQuery(GET_GUEST_ORDER);
 
-    // console.log({data});
-
     const { customer, updateCustomer } = useSession();
 
     if (error) return <p>Error: {error.message}</p>;
