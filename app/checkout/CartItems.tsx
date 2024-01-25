@@ -48,7 +48,7 @@ interface CartItemsProps {
     onRemove: (keys: string[]) => void;
   }
 
-  const cartItems: React.FC<CartItemsProps> = ({ item, index, onQuantityChange, onRemove }) => {
+  const artItems: React.FC<CartItemsProps> = ({ item, index, onQuantityChange, onRemove }) => {
 
     const { product, quantity, key, subtotal, total, variation } = item;
     const { node } = product || {};

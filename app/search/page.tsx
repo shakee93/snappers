@@ -5,7 +5,14 @@ import InstantSearchWrapper from "@/app/components/InstantSearchWrapper";
 async function getData(categories: number[] | null = null) {
     const { data, error } = await getClient().query({
         query: GET_ALL_PRODUCTS,
-        fetchPolicy: 'no-cache'
+        fetchPolicy: 'no-cache',
+        context:{
+            fetchOptions:{
+                next: {
+                    revalidate: 60
+                }
+            }
+        }
     });
 
     return {
