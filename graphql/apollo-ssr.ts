@@ -19,12 +19,26 @@ export const { getClient } = registerApolloClient(() => {
         ]),
         defaultOptions : {
             watchQuery: {
-                fetchPolicy: 'no-cache',
+                // fetchPolicy: 'no-cache',
                 // errorPolicy: 'ignore',
+                context:{
+                    fetchOptions:{
+                        next: {
+                            revalidate: 10
+                        }
+                    }
+                },
             },
             query: {
-                fetchPolicy: 'no-cache',
+                // fetchPolicy: 'no-cache',
                 // errorPolicy: 'all',
+                context:{
+                    fetchOptions:{
+                        next: {
+                            revalidate: 10
+                        }
+                    }
+                },
             },
         }
     });

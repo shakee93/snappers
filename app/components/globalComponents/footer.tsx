@@ -105,6 +105,9 @@ const Footer = async () => {
                 <Link href={"/contact"}>Contact Us</Link>
               </li>
               <li className="hover:text-primaryColor">
+                <Link href={"/search"}>Search Products</Link>
+              </li>
+              <li className="hover:text-primaryColor">
                 <Link href={"/privacy"}>Privacy Policy</Link>
               </li>
               <li className="hover:text-primaryColor">

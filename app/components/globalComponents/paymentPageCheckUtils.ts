@@ -17,7 +17,7 @@ export function isPaymentPage(): boolean {
     let paymentPage = partAfterCheckout.length == 16;
     return paymentPage;
   } else {
-    console.log("Pattern 'checkout/' not found in the URL.");
+    // console.log("Pattern 'checkout/' not found in the URL.");
   }
 
   // const headersList = headers();
