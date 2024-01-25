@@ -32,32 +32,27 @@ const ProductDetails = ({
 
     const {setVariationId} = useImage();
 
-
     useEffect(() => {
         if (product.type === 'VARIABLE') {
-
             const defAttributes = product?.defaultAttributes?.nodes;
-
             product?.attributes?.nodes.map((attr: ProductAttribute) => {
                 setAttribute(attr, attr?.options && attr?.options[0] || '')
             })
-
             defAttributes?.forEach((defAttr: VariationAttribute) => {
                 setAttribute(defAttr, defAttr.value || '')
             })
         }
-
     }, []);
 
+    useEffect(() => {
+        setVariationId(activeVariation.image.databaseId);
+    }, [activeVariation]);
 
     const activeAttr = useCallback((attr: ProductAttribute) => {
         return attribute.find(a => a.name === attr.name)
     }, [attribute])
 
     useEffect(() => {
-        // console.log("product on change", product)
-        // console.log("activeVariation", activeVariation)
-        setVariationId(activeVariation.image.databaseId)
         if (product.type === 'VARIABLE') {
             let variation = (product as VariableProduct).variations?.nodes as unknown as ProductVariation[];
             let vProduct = variation.find(v => {
@@ -67,7 +62,6 @@ const ProductDetails = ({
                 return attrKey === variationKey
             });
 
-
             if (vProduct) {
                 setActiveVariation(vProduct);
             } else {
@@ -75,8 +69,7 @@ const ProductDetails = ({
             }
         }
     }, [attribute])
-    // console.log('singel rpdocut',product)
-    // console.log('sctivr vsaritation',activeVariation)
+
 
     return (
         <>

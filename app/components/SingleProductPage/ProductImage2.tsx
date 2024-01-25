@@ -20,26 +20,11 @@ const EmblaCarousel: React.FC<PropType> = ({product}) => {
         containScroll: "keepSnaps",
         dragFree: true,
     });
-
-    const [productImage, setproductImage] = useState(product.image);
-
     const {variationId} = useImage();
 
     useEffect(() => {
         onThumbClickCalculated(null, variationId)
-
     }, [variationId])
-
-    // TODO : use this to change the variation image
-    const onThumbClick = useCallback(
-        (index: number) => {
-            console.log("product inside onThumbClick: ", product)
-            console.log("index: ", index);
-            if (!emblaMainApi || !emblaThumbsApi) return;
-            emblaMainApi.scrollTo(index);
-        },
-        [emblaMainApi, emblaThumbsApi]
-    );
 
     const onThumbClickCalculated = useCallback((data: any, variationId: string | null = null) => {
         if (!emblaMainApi || !emblaThumbsApi) return;
@@ -61,12 +46,7 @@ const EmblaCarousel: React.FC<PropType> = ({product}) => {
             emblaMainApi.scrollTo(0);
         } else if (galleryImagesIndex !== -1) {
             emblaMainApi.scrollTo(galleryImagesIndex);
-            console.log(`Scrolling to the image with index: ${galleryImagesIndex}`);
         }
-
-        console.log({variations, galleryImagesIndex});
-
-        if (!variationId) console.log("Variation ID is not provided.");
     }, [emblaMainApi, emblaThumbsApi, product]);
 
     const onSelect = useCallback(() => {
@@ -82,33 +62,18 @@ const EmblaCarousel: React.FC<PropType> = ({product}) => {
         emblaMainApi.on("reInit", onSelect);
     }, [emblaMainApi, onSelect]);
 
+    let productsArray = product.variations?.nodes;
 
     return (
         <div className="embla">
             <div className="embla__viewport" ref={emblaMainRef}>
-                {/*{JSON.stringify(productImage?.sourceUrl)}*/}
-                {/* <code>
-          <pre className="bg-gray-100 p-4 rounded">
-            {product && <code>{JSON.stringify(product.image, null, 2)}</code>}
-          </pre>
-        </code> */}
                 <div className="embla__container">
-                    {/*{[*/}
-                    {/*    ...([product.image as MediaItem] || []),*/}
-                    {/*    ...(product.galleryImages?.nodes || []),*/}
-                    {/*].map((image: MediaItem, index) => (*/}
-                    {product.variations?.nodes.map((variation: any, index: number) => (
+                    {productsArray?.map((variation: any, index: number) => (
                         <div className="embla__slide" key={index}>
                             <div className="embla__slide__number">
                                 <span>{index + 1}</span>
                             </div>
-                            {/*<InnerImageZoom*/}
-                            {/*      src={image.sourceUrl || ''}*/}
-                            {/*      zoomSrc={image.sourceUrl || ''}*/}
-                            {/*      zoomType="hover"*/}
-                            {/*      zoomPreload={false}*/}
-                            {/*      className="embla__slide__img"*/}
-                            {/*  />*/}
+
 
                             <Image
                                 width={1000}
@@ -125,18 +90,7 @@ const EmblaCarousel: React.FC<PropType> = ({product}) => {
             <div className="embla-thumbs">
                 <div className="embla-thumbs__viewport" ref={emblaThumbsRef}>
                     <div className="embla-thumbs__container">
-                        {/*Updated image Array with real Images*/}
-                        {/*{product?.variations.nodes.map((variation: MediaItem, index: number) => (*/}
-                        {/*    <Thumb*/}
-                        {/*        onClick={() => onThumbClickCalculated(variation, variation?.databaseId || null)}*/}
-                        {/*        selected={index === selectedIndex}*/}
-                        {/*        index={index}*/}
-                        {/*        imgSrc={variation?.sourceUrl || ""}*/}
-                        {/*        key={index}*/}
-                        {/*    />*/}
-                        {/*))}*/}
-
-                        {product.variations?.nodes.map((variation: any, index: number) => (
+                        {productsArray?.map((variation: any, index: number) => (
                             <Thumb
                                 onClick={() => onThumbClickCalculated(variation, null)}
                                 selected={index === selectedIndex}
@@ -145,26 +99,7 @@ const EmblaCarousel: React.FC<PropType> = ({product}) => {
                                 key={index}
                             />
                         ))}
-                        {/*{[*/}
-                        {/*    ...([product.image as MediaItem] || []),*/}
-                        {/*    ...(product.galleryImages?.nodes || []),*/}
-                        {/*].map((image: MediaItem, index) => (*/}
-                        {/*    // <div key={index}>*/}
-                        {/*    //   <div>*/}
 
-                        {/*    //   {JSON.stringify(product.galleryImages?.nodes[0]?.sourceUrl)}*/}
-
-                        {/*    //   </div>*/}
-                        {/*    <Thumb*/}
-                        {/*        onClick={() => onThumbClickCalculated(image)}*/}
-                        {/*        selected={index === selectedIndex}*/}
-                        {/*        index={index}*/}
-                        {/*        imgSrc={image?.sourceUrl || ""}*/}
-                        {/*        key={index}*/}
-                        {/*    />*/}
-
-                        {/*    // </div>*/}
-                        {/*))}*/}
                     </div>
                 </div>
             </div>
