@@ -8,13 +8,13 @@ async function getData(categories: number[] | null = null) {
     const { data, error } = await getClient().query({
         query: GET_ALL_PRODUCTS,
         // fetchPolicy: 'standby',
-        context:{
-            fetchOptions:{
-                next: {
-                    revalidate: 10
-                }
-            }
-        },
+        // context:{
+        //     fetchOptions:{
+        //         next: {
+        //             revalidate: 10
+        //         }
+        //     }
+        // },
     });
 
     const endTime = new Date().getTime();
