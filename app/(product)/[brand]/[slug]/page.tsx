@@ -19,6 +19,7 @@ type Props = {
     brand: string;
   };
 };
+
 export async function generateStaticParams() {
   const {
     data: { brands },

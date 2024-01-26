@@ -75,7 +75,6 @@ const ProductAddToCart = ({product, variation} : {
     return <></>
   }
 
-
   return (
     <>
       <div className="flex items-center justify-center md:justify-start gap-4 md:gap-0 md:space-x-3.5 py-2 px-2 md:py-4 fixed
