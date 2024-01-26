@@ -15,7 +15,7 @@ const OrderItemProduct = ({
     index: number
 }) => {
 
-    const { product, quantity, variation, key } = orderItem.node; 
+    const { product, quantity, variation, key } = orderItem?.node; 
     const link = useProductLink(orderItem?.node)
 
     if (!orderItem?.node) {

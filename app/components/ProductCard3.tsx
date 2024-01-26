@@ -153,14 +153,14 @@ const ProductCard: FC<ProductCardProps> = ({
     };
 
     const renderGroupButtons = () => {
-        
+
 
         return (
             <div className="absolute -top-12 right-1 flex justify-center opacity-100 visible transition-all">
 
 
                 {stockStatus === 'IN_STOCK' ?
-                    
+
                     <>
                         {(type === 'SIMPLE' && price && price?.length > 0) &&
                             <ButtonPrimary
@@ -295,7 +295,21 @@ const ProductCard: FC<ProductCardProps> = ({
                 </Link>
 
                 <Link href={link} className="flex m-0 mb-2 justify-between items-center">
-                    <Prices price={price} salePrice={regularPrice} className='lg:flex-row' />
+                    <Prices
+                        price={
+                            type === 'VARIABLE'
+                                ? variations?.nodes[0].price || 0
+                                : price || 0
+                        }
+                        salePrice={
+                            type === 'VARIABLE'
+                                ? variations?.nodes[0].regularPrice || 0
+                                : regularPrice
+                        }
+                        className='lg:flex-row'
+                    />
+                   
+                    {/* <Prices price={price} salePrice={regularPrice} className='lg:flex-row' /> */}
                     {((salePrice === price || !salePrice) && !!reviewCount) && (
                         <div className="flex items-center mb-0.5">
                             <StarIcon className="w-4 h-4 pb-[1px] text-amber-400" />

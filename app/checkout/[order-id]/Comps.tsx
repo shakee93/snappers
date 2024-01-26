@@ -63,9 +63,10 @@ const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData, payme
         <p className="text-2xl text-left pb-4">Order Details</p>
       </div>
       <div className="w-full">
-        <div className="flex flex-col">
-          <div className="overflow-hidden">
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <div className="flex flex-col overflow-hidden">
+          <div className="overflow-x-auto">
+            
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 ">
               <thead className="text-lg bg-gray-200 py-2 texy-primaryColor ">
                 <tr>
                   <th scope="col" className="px-6 py-3 text-center font-medium">
@@ -113,6 +114,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData, payme
                 </tr>
               </tbody>
             </table>
+
           </div>
         </div>
       </div>
