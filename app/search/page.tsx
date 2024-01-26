@@ -2,28 +2,28 @@ import {getClient} from "@/graphql/apollo-ssr";
 import {GET_ALL_PRODUCTS} from "@/graphql/defs/products";
 import InstantSearchWrapper from "@/app/components/InstantSearchWrapper";
 
-
-const fetchData = async () => {
-    const startTime = new Date().getTime();
-
-    const response = await fetch('https://randomuser.me/api/',
-        // {
-        { cache: 'no-store' }
-        //     next: {
-        //         revalidate: 10
-        //     }
-        // }
-        );
-    const jsonData = await response.json();
-
-    const endTime = new Date().getTime();
-    const executionedTime = endTime - startTime;
-
-    return {
-        jsonData,
-        executionedTime
-    }
-};
+//
+// const fetchData = async () => {
+//     const startTime = new Date().getTime();
+//
+//     const response = await fetch('https://randomuser.me/api/',
+//         // {
+//         { cache: 'no-store' }
+//         //     next: {
+//         //         revalidate: 10
+//         //     }
+//         // }
+//         );
+//     const jsonData = await response.json();
+//
+//     const endTime = new Date().getTime();
+//     const executionedTime = endTime - startTime;
+//
+//     return {
+//         jsonData,
+//         executionedTime
+//     }
+// };
 async function getData(categories: number[] | null = null) {
     const startTime = new Date().getTime(); // Record the start time
 
@@ -66,7 +66,9 @@ async function Page() {
     // console.log("execution time for fetch: ", executionedTime);
 
     return <div className='container py-16'>
+
         {executionTime}
+
         <div className="max-w-screen-sm mb-10">
             <h2 className="block text-2xl sm:text-3xl lg:text-4xl font-semibold">
                 Search
