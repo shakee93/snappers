@@ -75,14 +75,12 @@ async function Page() {
                 Discover your next favorite find in just a few taps! Our mobile e-commerce platform is engineered for speed, bringing you a seamless shopping experience.
             </span>
         </div>
-
         <InstantSearchWrapper
             search
             filters
             categories={productCategories}
             brands={brands}
         >
-
         </InstantSearchWrapper>
 
     </div>
