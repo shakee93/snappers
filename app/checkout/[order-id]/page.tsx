@@ -1,14 +1,15 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 "use client";
-import {OrderPaymentPageProps, PaymentDetailsWithoutUrls} from "@/data/types";
-import {useLazyQuery, useQuery} from "@apollo/client";
-import {GET_CHECKOUT_USER_DETAILS, GET_SINGLE_ORDER,} from "@/graphql/defs/order";
-import {useEffect, useMemo} from "react";
-import ProductTable, {OrderDetails} from "./Comps";
+import { OrderPaymentPageProps, PaymentDetailsWithoutUrls } from "@/data/types";
+import { useLazyQuery, useQuery } from "@apollo/client";
+import { GET_CHECKOUT_USER_DETAILS, GET_SINGLE_ORDER, } from "@/graphql/defs/order";
+import { useEffect, useMemo } from "react";
+import ProductTable, { OrderDetails } from "./Comps";
 import toast from "react-hot-toast";
 import Link from "next/link";
+import ButtonPrimary from "shared/Button/ButtonPrimary";
 
-export default function OrderPaymentPage({params}: OrderPaymentPageProps) {
+export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     const orderId = params["order-id"];
 
     if (orderId == "ItemNo12345") {
@@ -24,13 +25,13 @@ export default function OrderPaymentPage({params}: OrderPaymentPageProps) {
     }
 
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    const [getUserData, {data: customerData}] = useLazyQuery(
+    const [getUserData, { data: customerData }] = useLazyQuery(
         GET_CHECKOUT_USER_DETAILS,
-        {fetchPolicy: "no-cache"}
+        { fetchPolicy: "no-cache" }
     );
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    const {data: orderData, error: orderError} = useQuery(GET_SINGLE_ORDER, {
-        variables: {orderID: orderId},
+    const { data: orderData, error: orderError } = useQuery(GET_SINGLE_ORDER, {
+        variables: { orderID: orderId },
     });
 
     useEffect(() => {
@@ -50,7 +51,7 @@ export default function OrderPaymentPage({params}: OrderPaymentPageProps) {
         // redirect('/');
     }
 
-  // console.log('Order Data', orderData);
+    // console.log('Order Data', orderData);
 
     const temporaryPaymentDetails: PaymentDetailsWithoutUrls = useMemo(
         () => ({
@@ -79,8 +80,8 @@ export default function OrderPaymentPage({params}: OrderPaymentPageProps) {
     // }
 
     console.log('paymentDetails', temporaryPaymentDetails);
-    if(orderError) {
-        return(
+    if (orderError) {
+        return (
             <div className={`container mx-auto grid items-center justify-center `}> <h1 className={`text-2xl font-bold  py-20 text-center`}>Not authorized to view this order</h1>
                 <Link
                     className={`text-center self-center text-blue-500 font-bold underline hover:cursor-pointer hover:text-blue-800 `}
@@ -92,13 +93,13 @@ export default function OrderPaymentPage({params}: OrderPaymentPageProps) {
     return (
         <div className="container mx-auto rounded-3xl lg:p-20 text-center ">
             <div className="my-4 ">
-                <OrderDetails orderData={orderData}/>
+                <OrderDetails orderData={orderData} />
 
                 <div className="">
                     <div className="">
 
                         <ProductTable lineItems={orderData?.order?.lineItems?.nodes} orderData={orderData}
-                                      paymentDetails={temporaryPaymentDetails}/>
+                            paymentDetails={temporaryPaymentDetails} />
 
                         {/* {data?.order.paymentMethod === "payhere" ? <PayHerePayment/> : "Continue with Bank Transfer"} */}
                         {/* && data?.order.paymentMethod === "payhere" && */}
@@ -110,6 +111,15 @@ export default function OrderPaymentPage({params}: OrderPaymentPageProps) {
                 </div>
 
             </div>
+
+
+            <Link href={`/`}>
+                <ButtonPrimary>
+                    Shop More
+                </ButtonPrimary>
+            </Link>
+
+
         </div>
     );
 }
