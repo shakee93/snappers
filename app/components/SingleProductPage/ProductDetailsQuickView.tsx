@@ -13,6 +13,8 @@ import {
 import {useCallback, useEffect, useState} from "react";
 import {useStore} from "@/store/store";
 import {twMerge} from "tailwind-merge";
+import parseHtml from 'html-react-parser'
+import {useImage} from "@/context/ImageChangeGrabber";
 
 
 const ProductDetails = ({
@@ -28,6 +30,8 @@ const ProductDetails = ({
         !!product?.variations?.nodes?.length ? product?.variations?.nodes[0].attributes?.nodes[0].value : null
     )
 
+    // Change only in Quick View
+    
     useEffect(() => {
 
         if (activeVariation == null) {
@@ -42,6 +46,8 @@ const ProductDetails = ({
         let stockStatus =   activeVariation?.stockStatus !== 'IN_STOCK'
         console.log("stock status: ", stockStatus);
     }, [activeVariation]);
+
+    //
 
     useEffect(() => {
 
@@ -80,14 +86,13 @@ const ProductDetails = ({
                 return attrKey === variationKey
             });
 
-
             if (vProduct) {
                 setActiveVariation(vProduct);
             } else {
                 setActiveVariation(null)
             }
         }
-    }, [])
+    }, [attribute])
     // console.log('singel rpdocut',product)
     // console.log('sctivr vsaritation',activeVariation)
 
@@ -172,7 +177,7 @@ const ProductDetails = ({
 
                 </div>
             }
-            <h1 className="text-2xl font-bold">{JSON.stringify(activeVariation?.stockStatus)}</h1>
+        
             {(product.type === 'SIMPLE' && product.stockStatus !== 'IN_STOCK') &&
                 <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1">
                     Sold Out

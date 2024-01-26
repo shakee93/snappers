@@ -55,6 +55,12 @@ const nextConfig = {
         port: "",
         pathname: "/*/**",
       },
+      {
+        protocol: "https",
+        hostname: "api.gq.freshpixl.com",
+        port: "",
+        pathname: "/*/**",
+      },
     ],
   },
 };

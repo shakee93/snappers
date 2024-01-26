@@ -45,7 +45,7 @@ const ProductDetails = ({
     }, []);
 
     useEffect(() => {
-        setVariationId(activeVariation.image.databaseId);
+        setVariationId(activeVariation?.image?.databaseId);
     }, [activeVariation]);
 
     const activeAttr = useCallback((attr: ProductAttribute) => {

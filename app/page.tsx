@@ -28,6 +28,9 @@ const getData = async () => {
       }),
     ]);
 
+    // console.log('new', newArrivals?.data?.products);
+    // console.log('smart', mobiles?.data?.products?.nodes[0]);
+
   return {
     slides: slides.data?.slides?.nodes,
     newArrivals: newArrivals.data.products?.nodes as (SimpleProduct &

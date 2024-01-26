@@ -36,8 +36,6 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
   const id = useId();
   const UNIQUE_CLASS = "glidejs" + id.replace(/:/g, "_");
 
-  // console.log('asdasczxczxc', _products);
-
   useEffect(() => {
     if (!sliderRef.current) {
       console.error('Slider reference is not assigned properly.');

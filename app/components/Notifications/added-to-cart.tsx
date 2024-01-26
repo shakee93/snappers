@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Prices from "@/app/components/Prices";
 import Link from "next/link";
-import React, {Fragment} from "react";
+import React, { Fragment } from "react";
 import {
     PaCapacity,
     ProductVariation,
@@ -18,14 +18,28 @@ const AddedToCart = ({ quantity, product, variation }: {
 }) => {
     return <div className="flex">
         <div className="h-24 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
+
             <Image
+                style={{ objectFit: 'cover' }}
+                src={
+                    product.type === 'VARIABLE'
+                        ? variation?.image?.sourceUrl || ''
+                        : product.image?.sourceUrl || product.image?.mediaItemUrl || ''
+                }
+                alt={product.name || ''}
+                width={280}
+                height={305}
+                className="h-full w-full object-cover object-center"
+            />
+
+            {/* <Image
                 style={{ objectFit: 'cover' }}
                 src={product.image?.sourceUrl || product.image?.mediaItemUrl || ''}
                 alt={product.name || ''}
                 width={280}
                 height={305}
                 className="h-full w-full object-cover object-center"
-            />
+            /> */}
         </div>
 
         <div className="ml-4 flex flex-1 flex-col">
@@ -42,7 +56,7 @@ const AddedToCart = ({ quantity, product, variation }: {
                                     {variation?.attributes?.nodes.map((attr: VariationAttribute, index) =>
                                         <Fragment key={index}>
                                             <div className='flex items-center gap-1'>
-                                                <AttributeIcon name={attr?.name || ''} className='w-4'/> <span key={attr?.value}> {product[`allPa${attr?.label as unknown as 'Capacity'}`]?.nodes.find((node: PaCapacity) => node.slug === attr?.value)?.name}</span>
+                                                <AttributeIcon name={attr?.name || ''} className='w-4' /> <span key={attr?.value}> {product[`allPa${attr?.label as unknown as 'Capacity'}`]?.nodes.find((node: PaCapacity) => node.slug === attr?.value)?.name}</span>
                                             </div>
                                         </Fragment>
                                     )}
@@ -50,7 +64,7 @@ const AddedToCart = ({ quantity, product, variation }: {
                                 </p>
                             }
 
-                            {product.productCategories && (
+                            {/* {product.productCategories && (
                                 product.productCategories.edges ? (
                                     product.productCategories.edges.map((category: any, index: number) => (
                                         <Link
@@ -73,13 +87,13 @@ const AddedToCart = ({ quantity, product, variation }: {
                                         </Link>
                                     ))
                                 )
-                            )}
+                            )} */}
 
                         </p>
                     </div>
                     <Prices salePrice={product.type === 'VARIABLE' ? variation?.regularPrice : product.regularPrice}
-                            price={product.type === 'VARIABLE' ? variation?.price : product.price}
-                            className="mt-0.5 flex-col" />
+                        price={product.type === 'VARIABLE' ? variation?.price : product.price}
+                        className="mt-0.5 flex-col" />
                 </div>
             </div>
             <div className="flex flex-1 items-end justify-between text-sm">
