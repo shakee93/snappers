@@ -22,6 +22,9 @@ export interface ProductVariant {
     featuredImage: string;
 }
 
+
+
+
 export interface Product {
     id: number;
     name: string;
