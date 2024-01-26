@@ -1,19 +1,16 @@
 import AvatarDropdown from "../Header/AvatarDropdown";
 import CartDropdown from "../Header/CartDropdown";
-import Link from "next/link";
 import Logo from "./Logo";
 import NavLinks from "./NavLinks";
 import BrandBar from "./BrandBar";
 import SearchBar from "@/app/components/globalComponents/SearchBar";
 import MobileNavLinks from "./MobileNavLinks";
-import { getClient } from "@/graphql/apollo-ssr";
-import { GET_ALL_PRODUCTS } from "@/graphql/defs/products";
+import {getClient} from "@/graphql/apollo-ssr";
+import {GET_ALL_PRODUCTS} from "@/graphql/defs/products";
 import HeaderSearchResults from "@/app/components/globalComponents/HeaderSearchResults";
-import { Brand } from "@/graphql/types/graphql";
-import BackdropSpinner from "@/app/components/BackdropSpinner";
+import {Brand} from "@/graphql/types/graphql";
 import MobileBottomNav from "@/app/components/globalComponents/MobileBottomNav";
-import { headers } from "next/headers";
-import { isPaymentPage } from "./paymentPageCheckUtils";
+import {isPaymentPage} from "./paymentPageCheckUtils";
 
 async function getData(categories: number[] | null = null) {
   const { data, error } = await getClient().query({
@@ -21,8 +18,8 @@ async function getData(categories: number[] | null = null) {
   });
 
   return {
-    productCategories: data.productCategories.nodes,
-    brands: data.brands.nodes as Brand[],
+    productCategories: data.productCategories?.nodes,
+    brands: data.brands?.nodes as Brand[],
   };
 }
 

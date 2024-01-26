@@ -145,10 +145,10 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
       ]),
       defaultOptions: {
         watchQuery: {
-          fetchPolicy: 'no-cache',
+          // fetchPolicy: 'no-cache',
         },
         query: {
-          fetchPolicy: 'no-cache',
+          // fetchPolicy: 'no-cache',
         },
       },
     });

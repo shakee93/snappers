@@ -1,26 +1,18 @@
 import Link from "next/link";
 import Image from "next/image";
 import SiteLogo from "@/public/global/logo.webp";
-import { getClient } from "@/graphql/apollo-ssr";
-import { GET_BRANDS } from "@/graphql/defs/products";
-import { Brand } from "@/graphql/types/graphql";
-import { Divider } from "@nextui-org/react";
-import {
-  Menu,
-  XIcon,
-  Facebook,
-  Instagram,
-  PhoneCall,
-  MapPinned,
-} from "lucide-react";
-import { isPaymentPage } from "./paymentPageCheckUtils";
+import {getClient} from "@/graphql/apollo-ssr";
+import {GET_BRANDS} from "@/graphql/defs/products";
+import {Brand} from "@/graphql/types/graphql";
+import {Facebook, Instagram, MapPinned, PhoneCall,} from "lucide-react";
+import {isPaymentPage} from "./paymentPageCheckUtils";
 
 const getData = async () => {
   const { data } = await getClient().query({
     query: GET_BRANDS,
   });
 
-  return data.brands.nodes;
+  return data.brands?.nodes;
 };
 
 const Footer = async () => {
