@@ -56,11 +56,11 @@ async function Page() {
 
     const { productCategories, brands, executionTime } = await getData();
     console.log("execution time: ", executionTime);
-    const [client] = await Promise.all([getClient()]);
-    let resetStore = true
-    if (resetStore) await client.clearStore();
-    if (resetStore) await client.resetStore();
-    resetStore && console.log("Resettled Store");
+    // const [client] = await Promise.all([getClient()]);
+    // let resetStore = true
+    // if (resetStore) await client.clearStore();
+    // if (resetStore) await client.resetStore();
+    // resetStore && console.log("Resettled Store");
 
     // const { jsonData, executionedTime } = await fetchData();
     // console.log("execution time for fetch: ", executionedTime);
