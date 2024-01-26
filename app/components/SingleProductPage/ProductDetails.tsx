@@ -78,6 +78,7 @@ const ProductDetails = ({
         setActiveVariation(product?.variations?.nodes[0]);
     } else if (product.type === "SIMPLE") {
       // Handle simple product case
+      setActiveVariation(product);
     }
   }, [product]);
   
@@ -191,18 +192,18 @@ const ProductDetails = ({
             )}
         </div>
       )}
-      {JSON.stringify(product.stockStatus)}
+      {/* {JSON.stringify(product.stockStatus)} */}
 
       {product.type === "SIMPLE" && product.stockStatus !== "IN_STOCK" && (
         <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1">
           Sold Out
         </div>
       )}
-        <p>Variable</p>
+        {/* <p>Variable</p>
         {JSON.stringify(product.type === "VARIABLE" )}
         <p>Stock Status</p>
         {JSON.stringify(activeVariation?.stockStatus !== "IN_STOCK")}
-        <p>value before assigning</p>
+        <p>value before assigning</p> */}
       {product.type === "VARIABLE" &&
         activeVariation?.stockStatus !== "IN_STOCK" && (
           <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 tex-xs md:text-sm py-1">

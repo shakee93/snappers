@@ -62,8 +62,8 @@ const EmblaCarousel: React.FC<PropType> = ({product}) => {
         emblaMainApi.on("reInit", onSelect);
     }, [emblaMainApi, onSelect]);
 
-    let productsArray = product.variations?.nodes;
-
+    let productsArray = product.type == "SIMPLE" ? [product] :  product.variations?.nodes;
+    
     return (
         <div className="embla">
             <div className="embla__viewport" ref={emblaMainRef}>
@@ -73,8 +73,6 @@ const EmblaCarousel: React.FC<PropType> = ({product}) => {
                             <div className="embla__slide__number">
                                 <span>{index + 1}</span>
                             </div>
-
-
                             <Image
                                 width={1000}
                                 height={1000}
