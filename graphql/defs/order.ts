@@ -2,6 +2,7 @@ import {gql} from "@apollo/client";
 import {ProductContentSlice} from "./products.fragments";
 import {CustomerAddressFragment} from "./order.fragments";
 
+
 // export const CHECKOUT_MUTATION = gql`
 //   mutation Checkout($paymentMethod: String!) {
 //     checkout(input: { paymentMethod: $paymentMethod }) {
@@ -86,7 +87,7 @@ export const PAYMENT_DETAILS = gql`
 `;
 
 export const GET_ALL_ORDER_DETAILS = gql`
-  query MyQuery2 {
+  query GET_ORDRE_DETAILS {
     orders {
       edges {
         node {
@@ -142,6 +143,7 @@ query getguestorder {
               productId
               quantity
               subtotal
+              total
               product {
                 node {
                   databaseId

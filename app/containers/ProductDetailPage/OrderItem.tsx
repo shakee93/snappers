@@ -1,39 +1,54 @@
-import {PaCapacity, SimpleProduct, VariableProduct,} from "@/graphql/types/graphql";
+import {LineItem, PaCapacity, SimpleProduct, VariableProduct,} from "@/graphql/types/graphql";
 import Image from "next/image";
 import Link from "next/link";
 import Prices from "@/app/components/Prices";
 import useProductLink from "@/hooks/useProductLink";
-import {Fragment} from "react";
+import React, {Fragment} from "react";
 import AttributeIcon from "@/app/components/AttributeIcon";
 
-
 const OrderItemProduct = ({
-    orderItem,
-    index
-}:{
-    orderItem: any,
-    index: number
+                              orderItem,
+                              index,
+                          }: {
+    orderItem: LineItem;
+    index: number;
 }) => {
+    console.log("order item", orderItem);
 
-    const { product, quantity, variation, key } = orderItem?.node; 
-    const link = useProductLink(orderItem?.node)
+    const link = useProductLink(orderItem.product?.node);
 
-    if (!orderItem?.node) {
-        return <p></p>;
+    const {variation} = orderItem;
+    const {total} = orderItem;
+    console.log("orderItem", orderItem);
+    if (!orderItem.product?.node) {
+        // console.log("orderItem.product?.node: ", orderItem);
+        return <></>;
     }
-    console.log('order item', orderItem.node)
-    
-    const { name, image, price, slug, salePrice, type, stockQuantity, regularPrice, featuredImage }: SimpleProduct & VariableProduct = orderItem.node;
-    // console.log({variation})
 
+
+    const {
+        name,
+        image,
+        price,
+        slug,
+        salePrice,
+        type,
+        stockQuantity,
+        regularPrice,
+
+        featuredImage,
+    }: VariableProduct & SimpleProduct = orderItem?.product?.node;
+    // console.log({variation})
+    let a = "";
+    debugger;
     return (
-        <div
-            className="relative flex py-8 sm:py-10 xl:py-12 first:pt-0 last:pb-0"
-        >
+        <div className="relative flex py-8 sm:py-10 xl:py-12 first:pt-0 last:pb-0">
             <div className="relative h-36 w-24 sm:w-32 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
-                <Image fill style={{ objectFit: 'cover' }}
-                    src={featuredImage?.node?.sourceUrl || ''}
-                    alt={name || ''}
+                <Image
+                    fill
+                    style={{objectFit: "cover"}}
+                    src={featuredImage?.node?.sourceUrl || ""}
+                    alt={name || ""}
                     className="h-full w-full object-contain object-center"
                 />
                 <Link href={`${link}`} className="absolute inset-0"></Link>
@@ -47,55 +62,81 @@ const OrderItemProduct = ({
                                 <Link href={`${link}`}>{name}</Link>
                             </h3>
 
-                            {type === 'VARIABLE' &&
+                            {type === "VARIABLE" && (
                                 <div className="mt-1.5 sm:mt-2.5 flex text-sm text-slate-600 dark:text-slate-300">
-                                    {type === 'VARIABLE' &&
+                                    {type === "VARIABLE" && (
                                         <div className="my-1 text-sm text-slate-500 dark:text-slate-400">
-
-                                            {variation?.attributes?.map((attr: any, index: any) =>
-                                                <Fragment key={index}>
-                                                    <div className='flex items-center gap-1'>
-                                                        <AttributeIcon name={attr?.name || ''} 
-                                                        
-                                                        className='w-4'/> <span key={attr?.value}> {(orderItem.node as unknown as VariableProduct)[`allPa${attr?.label as unknown as 'Capacity'}`
-                                                        ]?.nodes.find((node: PaCapacity) => node.slug === attr?.value)?.name}</span>
-                                                    </div>
-                                                </Fragment>
-                                            )}
-
+                                            {variation?.node?.attributes &&
+                                                [variation.node.attributes].map(
+                                                    (attr: any, index: any) => (
+                                                        <Fragment key={index}>
+                                                            <div className="flex items-center gap-1">
+                                                                <AttributeIcon
+                                                                    name={attr?.name || ""}
+                                                                    className="w-4"
+                                                                />{" "}
+                                                                <span key={attr?.value}>
+                                  {" "}
+                                                                    {
+                                                                        (
+                                                                            orderItem?.product
+                                                                                ?.node as unknown as VariableProduct
+                                                                        )[
+                                                                            `allPa${
+                                                                                attr?.label as unknown as "Capacity"
+                                                                            }`
+                                                                            ]?.nodes.find(
+                                                                            (node: PaCapacity) =>
+                                                                                node.slug === attr?.value
+                                                                        )?.name
+                                                                    }
+                                </span>
+                                                            </div>
+                                                        </Fragment>
+                                                    )
+                                                )}
                                         </div>
-                                    }
-
+                                    )}
                                 </div>
+                            )}
+                            <div
+                                className={`flex items-center mt-2 border-2 w-fit border-gray-300 rounded-lg p-2 `}
+                            >
+                                <span className="text-slate-950 text-xs lg:text-sm font-bold !leading-none">
+                                    Rs.{total}
+                                </span>
+                            </div>
 
-                            }
                             <div className="mt-3 flex justify-between w-full sm:hidden relative">
-                           
+
                                 <Prices
                                     contentClass="py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium h-full"
-                                    price={price}
-                                    salePrice={salePrice}
+                                    price={total}
+                                    salePrice={total}
                                 />
                             </div>
                         </div>
 
-
                         <div className="hidden flex-1 sm:flex justify-end">
-                            <Prices salePrice={type === 'VARIABLE' ? variation?.node.regularPrice : regularPrice}
-                                    price={type === 'VARIABLE' ? variation?.node.price : price}
-                                    className="mt-0.5 flex-col" />
+                            <Prices
+                                salePrice={
+                                    type === "VARIABLE"
+                                        ? variation?.node.regularPrice
+                                        : regularPrice
+                                }
+                                price={type === "VARIABLE" ? variation?.node.price : price}
+                                className="mt-0.5 flex-col"
+                            />
                         </div>
                     </div>
                 </div>
 
                 <div className="flex mt-auto pt-4 items-end justify-between text-sm">
-                
                     <div></div>
-
                 </div>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default OrderItemProduct
+export default OrderItemProduct;

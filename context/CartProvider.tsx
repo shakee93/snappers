@@ -1,17 +1,8 @@
 'use client';
 
 import React, {createContext, ReactNode, useContext, useEffect, useState} from 'react';
-import {
-    useQuery,
-    ApolloError,
-    useMutation, useLazyQuery
-} from '@apollo/client';
-import {
-    ADD_TO_CART,
-    GET_CART,
-    REMOVE_ITEMS_FROM_CART,
-    UPDATE_CART_ITEM_QUANTITY
-} from "@/graphql/defs/cart";
+import {ApolloError, useLazyQuery, useMutation} from '@apollo/client';
+import {ADD_TO_CART, GET_CART, REMOVE_ITEMS_FROM_CART, UPDATE_CART_ITEM_QUANTITY} from "@/graphql/defs/cart";
 import {Cart, Customer} from "@/graphql/types/graphql";
 
 
@@ -71,6 +62,7 @@ export function CartProvider({ children }: {
     })
 
     const [_addToCart] = useMutation(ADD_TO_CART, {
+        fetchPolicy: 'no-cache',
         onCompleted: refreshData
     });
 

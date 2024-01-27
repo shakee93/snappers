@@ -1,5 +1,5 @@
-import React, { FC } from "react";
-import { Maybe } from "@/graphql/types/graphql";
+import React, {FC} from "react";
+import {Maybe} from "@/graphql/types/graphql";
 import {twMerge} from "tailwind-merge";
 
 export interface PricesProps {
@@ -15,11 +15,13 @@ const Prices: FC<PricesProps> = ({
     salePrice = null,
     contentClass = " text-base font-medium",
 }) => {
+    console.log("prices", price, salePrice);
     return (
         <div className={twMerge(
             `flex flex-col lg:gap-3 gap-1 items-center`,
             className
         )}>
+            {/*{JSON.stringify(price)}*/}
             {price &&
                 <div
                     className={`flex items-center border-2 border-gray-300 rounded-lg p-2 ${contentClass}`}

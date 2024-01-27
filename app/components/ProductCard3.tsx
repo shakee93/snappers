@@ -1,35 +1,20 @@
 "use client";
-import { Loader, Settings, Settings2, ShoppingCart } from "lucide-react";
-import React, { FC, useState, useEffect, useRef } from "react";
+import {ExternalLink, Loader, Settings2, ShoppingCart, XIcon} from "lucide-react";
+import React, {FC, useEffect, useRef, useState} from "react";
 import Link from "next/link";
 import Image from "next/image";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
-import ButtonSecondary from "@/shared/Button/ButtonSecondary";
-import { ArrowsPointingOutIcon } from "@heroicons/react/24/outline";
-import BagIcon from "./BagIcon";
-import { StarIcon } from "@heroicons/react/24/solid";
-import toast, { Toaster } from "react-hot-toast";
-import { Transition } from "@headlessui/react";
+import {ArrowsPointingOutIcon} from "@heroicons/react/24/outline";
+import {StarIcon} from "@heroicons/react/24/solid";
+import toast from "react-hot-toast";
+import {Transition} from "@headlessui/react";
 import ModalQuickView from "./ModalQuickView";
-import ProductStatus from "./ProductStatus";
 import Prices from "./Prices";
-import LikeButton from "./LikeButton";
 import useProductLink from "@/hooks/useProductLink";
-import {
-    Brand,
-    Edge,
-    Product,
-    ProductVariation,
-    SimpleProduct,
-    VariableProduct,
-    VariationAttribute,
-} from "@/graphql/types/graphql";
+import {Brand, ProductVariation, SimpleProduct, VariableProduct,} from "@/graphql/types/graphql";
 import AddedToCart from "@/app/components/Notifications/added-to-cart";
-import { useCart } from "@/context/CartProvider";
-import { ExternalLink, List, MenuSquare, MoreHorizontal, MoreVertical, XIcon } from "lucide-react";
-import AttributeIcon from "@/app/components/AttributeIcon";
-import { getBlurData } from "@/utils/blurPlaceholder";
-import { twMerge } from "tailwind-merge";
+import {useCart} from "@/context/CartProvider";
+import {twMerge} from "tailwind-merge";
 
 export interface ProductCardProps {
     className?: string;
@@ -298,12 +283,12 @@ const ProductCard: FC<ProductCardProps> = ({
                     <Prices
                         price={
                             type === 'VARIABLE'
-                                ? variations?.nodes[0].price || 0
+                                ? variations?.nodes[0]?.price || 0
                                 : price || 0
                         }
                         salePrice={
                             type === 'VARIABLE'
-                                ? variations?.nodes[0].regularPrice || 0
+                                ? variations?.nodes[0]?.regularPrice || 0
                                 : regularPrice
                         }
                         className='lg:flex-row'
