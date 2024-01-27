@@ -3,6 +3,7 @@ import React, { FC, SelectHTMLAttributes } from "react";
 export interface SelectProps extends SelectHTMLAttributes<HTMLSelectElement> {
   className?: string;
   sizeClass?: string;
+  placeholder?: string;
 }
 
 const Select: FC<SelectProps> = ({

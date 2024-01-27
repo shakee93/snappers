@@ -177,7 +177,7 @@ const BillingAddress: FC<Props> = ({
                 <Select
                   value="LK"
                   className="mt-1.5 capitalize"
-                  placeholder="Country (e.g., Sri Lanka)*"
+                  placeholder="Country (e.g., Sri Lanka)"
                   onChange={(e) => setCountry(e.target.value)}
                   disabled={true}
                 >
