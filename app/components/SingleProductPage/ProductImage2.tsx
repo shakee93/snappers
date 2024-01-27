@@ -20,11 +20,11 @@ const EmblaCarousel: React.FC<PropType> = ({product}) => {
         containScroll: "keepSnaps",
         dragFree: true,
     });
-    const {variationId} = useImage();
+    // const {variationId} = useImage();
 
-    useEffect(() => {
-        onThumbClickCalculated(null, variationId)
-    }, [variationId])
+    // useEffect(() => {
+    //     onThumbClickCalculated(null, variationId)
+    // }, [variationId])
 
     const onThumbClickCalculated = useCallback((data: any, variationId: string | null = null) => {
         if (!emblaMainApi || !emblaThumbsApi) return;

@@ -34,7 +34,7 @@ const ProductDetails = ({
       : null
   );
 
-  const { setVariationId } = useImage();
+  // const { setVariationId } = useImage();
 
 //   useEffect(() => {
 
@@ -63,7 +63,7 @@ const ProductDetails = ({
   }, []);
 
   useEffect(() => {
-    setVariationId(activeVariation?.image.databaseId);
+    // setVariationId(activeVariation?.image.databaseId);
   }, [activeVariation]);
 
   const activeAttr = useCallback(
@@ -84,7 +84,7 @@ const ProductDetails = ({
   
   useEffect(() => {
     if (product.type === "VARIABLE" && activeVariation) {
-      setVariationId(activeVariation?.image.databaseId);
+      // setVariationId(activeVariation?.image.databaseId);
     }
   }, [activeVariation]);
 

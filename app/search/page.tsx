@@ -66,9 +66,7 @@ async function Page() {
     // console.log("execution time for fetch: ", executionedTime);
 
     return <div className='container py-16'>
-
-        {executionTime}
-
+        {/*{executionTime}*/}
         <div className="max-w-screen-sm mb-10">
             <h2 className="block text-2xl sm:text-3xl lg:text-4xl font-semibold">
                 Search
