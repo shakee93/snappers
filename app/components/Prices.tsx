@@ -15,7 +15,6 @@ const Prices: FC<PricesProps> = ({
     salePrice = null,
     contentClass = " text-base font-medium",
 }) => {
-    console.log("prices", price, salePrice);
     return (
         <div className={twMerge(
             `flex flex-col lg:gap-3 gap-1 items-center`,

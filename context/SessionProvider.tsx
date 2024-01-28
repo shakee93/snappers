@@ -212,11 +212,13 @@ export function SessionProvider({ children }: {
             try {
                 const { data } = await refetch()
 
+
                 if (data && data?.customer?.sessionToken) {
                     const newSessionToken = data.customer.sessionToken;
                     setSessionToken(newSessionToken)
                     localStorage.setItem(SESSION_TOKEN_KEY, newSessionToken);
                 }
+
             } catch (error) {
                 console.error('Error fetching session token:', error);
             }

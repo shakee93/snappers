@@ -6,6 +6,7 @@ export const CustomerFragment = gql`
    fragment CustomerFragment on Customer {
     email
     displayName
+    sessionToken
     billing {
       address1
       phone

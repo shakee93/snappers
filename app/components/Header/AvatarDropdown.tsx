@@ -1,7 +1,7 @@
 "use client";
 
 import { Popover, Transition } from "@headlessui/react";
-import { CircleUserRound, User ,LogIn} from "lucide-react";
+import { CircleUserRound, User, LogIn } from "lucide-react";
 import { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
 import LogoutButton from "@/components/Header/LogoutButton";
@@ -16,7 +16,13 @@ export default function AvatarDropdown() {
   useEffect(() => {
     // fetchCustomer();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    if (customer) {
+      currentCustomer && setCurrentCustomer(customer);
+      fetchCustomer();
+    }3
+  }, [currentCustomer, customer]);
+
+  console.log("currentCustomer", customer);
 
   return (
     <div className="AvatarDropdown">
@@ -27,10 +33,10 @@ export default function AvatarDropdown() {
               <div
                 className={`text-primaryColor w-10 h-10 sm:w-12 sm:h-12 rounded-full dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none flex items-center justify-center`}
               >
-                {customer?.id != "guest" ? (
-                  <LoggedInAvatar name={customer?.displayName?.toString()} />
-                ) : (
+                {!customer || customer?.id === "guest" ? (
                   <CircleUserRound />
+                ) : (
+                  <LoggedInAvatar name={customer?.displayName?.toString()} />
                 )}
               </div>
             </Popover.Button>
@@ -54,7 +60,7 @@ export default function AvatarDropdown() {
                           onClick={() => close()}
                         >
                           <div className="flex items-center justify-center flex-shrink-0 text-neutral-500 dark:text-neutral-300">
-                          <LogIn />
+                            <LogIn />
                           </div>
                           <div className="ml-4">
                             <p className="text-sm font-medium ">{"Login"}</p>
@@ -67,7 +73,6 @@ export default function AvatarDropdown() {
                         >
                           <div className="flex items-center justify-center flex-shrink-0 text-neutral-500 dark:text-neutral-300">
                             <User />
-                       
                           </div>
                           <div className="ml-4">
                             <p className="text-sm font-medium ">{"Register"}</p>
@@ -77,11 +82,9 @@ export default function AvatarDropdown() {
                     ) : (
                       <>
                         <div className="flex items-center space-x-3">
-                          {/* <Avatar imgUrl={avatarImgs[7].src} sizeClass="w-12 h-12" /> */}
-
                           <div className="flex-grow">
                             <h4 className="font-semibold">
-                              {customer?.displayName ?? "Username"}
+                              {customer?.displayName ?? ""}
                             </h4>
                           </div>
                         </div>
