@@ -1,7 +1,6 @@
-import {gql} from "@apollo/client";
-import {ProductContentSlice} from "./products.fragments";
-import {CustomerAddressFragment} from "./order.fragments";
-
+import { gql } from "@apollo/client";
+import { ProductContentSlice } from "./products.fragments";
+import { CustomerAddressFragment } from "./order.fragments";
 
 // export const CHECKOUT_MUTATION = gql`
 //   mutation Checkout($paymentMethod: String!) {
@@ -47,7 +46,7 @@ export const GUEST_CHECKOUT = gql`
       clientMutationId
       redirect
       result
-      customer{
+      customer {
         displayName
         shipping {
           ...CustomerAddressFragment
@@ -58,13 +57,11 @@ export const GUEST_CHECKOUT = gql`
         email
       }
       order {
-        id
         databaseId
       }
     }
   }
   ${CustomerAddressFragment}
-  
 `;
 
 export const PAYMENT_DETAILS = gql`
@@ -124,18 +121,18 @@ export const GET_ALL_ORDER_DETAILS = gql`
 `;
 
 export const GET_GUEST_ORDER = gql`
-query getguestorder {
-  customer {
-    id
-    databaseId
-    orderCount
-    orders {
-      nodes {
-        date
-        id
-        orderNumber
-        total
-        lineItems {
+  query getguestorder {
+    customer {
+      id
+      databaseId
+      orderCount
+      orders {
+        nodes {
+          date
+          id
+          orderNumber
+          total
+          lineItems {
             nodes {
               databaseId
               id
@@ -166,10 +163,11 @@ query getguestorder {
               }
             }
           }
+        }
       }
     }
   }
-}`
+`;
 
 export const GET_ADDRESSES = gql`
   query getShippingDetails {
@@ -207,7 +205,7 @@ export const CHECKOUT = gql`
       clientMutationId
       redirect
       result
-      customer{
+      customer {
         displayName
         shipping {
           ...CustomerAddressFragment
@@ -222,30 +220,27 @@ export const CHECKOUT = gql`
         id
         databaseId
         lineItems {
-        nodes {
-          databaseId
-          subtotal
-          quantity
-          product {
-            node {
-              name
-              databaseId
-              featuredImage {
-                node {
-                  sourceUrl
+          nodes {
+            databaseId
+            subtotal
+            quantity
+            product {
+              node {
+                name
+                databaseId
+                featuredImage {
+                  node {
+                    sourceUrl
+                  }
                 }
               }
             }
           }
         }
       }
-      }
-     
-
     }
   }
   ${CustomerAddressFragment}
-  
 `;
 
 export const UPDATE_ADDRESS = gql`
@@ -320,12 +315,12 @@ export const GET_SINGLE_ORDER = gql`
 
 // = {orderId: 10, status: COMPLETED}
 export const COMPLETE_ORDER_PAYMENT = gql`
- mutation updatePayment($input: UpdateOrderInput! ) {
-  updateOrder(input: $input) {
-    clientMutationId
-    order {
-      status
+  mutation updatePayment($input: UpdateOrderInput!) {
+    updateOrder(input: $input) {
+      clientMutationId
+      order {
+        status
+      }
     }
   }
-}
-    `
+`;

@@ -100,7 +100,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData, payme
                   </td>
                   <td></td>
                   <td className="px-6 text-right py-4  font-medium text-gray-800 dark:text-gray-200">
-                    {paymentDetails.address}
+                    {`${paymentDetails.shippingAddress1}  ${paymentDetails.shippingAddress2}`}
                   </td>
                 </tr>
                 <tr>
@@ -123,8 +123,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData, payme
         <p className="text-2xl text-left">Billing Address</p>
         <div className="mt-8 border rounded" >
           <div className="text-left p-4 ">
-            <p>{paymentDetails.billingAddress2}</p>
-            <p>{paymentDetails.billingAddress}</p>
+            {`${paymentDetails.billingAddress1}  ${paymentDetails.billingAddress2}`}
           </div>
         </div>
       </div>

@@ -15,7 +15,11 @@ import {
   GUEST_CHECKOUT,
   GUEST_CHECKOUT_MUTATION,
 } from "@/graphql/defs/order";
-import { CheckoutPayload, PaymentGateway } from "@/graphql/types/graphql";
+import {
+  CheckoutPayload,
+  CustomerAddressInput,
+  PaymentGateway,
+} from "@/graphql/types/graphql";
 
 import CheckoutDetails from "./CheckoutDetails";
 import CartItems from "./CartItems";
@@ -27,11 +31,12 @@ import { useRouter } from "next/navigation";
 import PaymentModal from "@/app/components/Payment/PaymentModal";
 import { useSession } from "@/context/SessionProvider";
 import { Loader } from "lucide-react";
+import { transformAddress } from "@/components/AddressPageComps/HelperComps";
 
 interface FormData {
   contactInfo: Record<string, any>;
-  deliveryAddress: Record<string, any>;
-  billingAddress: Record<string, any>;
+  deliveryAddress: CustomerAddressInput;
+  billingAddress: CustomerAddressInput;
   paymentMethod: {
     selectedGateway?: {
       id?: string;
@@ -408,46 +413,33 @@ const CheckoutPage = () => {
 
   const handleCheckout = async () => {
     setLoading(true);
-    // Checkout for Guest.
-    if (customer?.id == "guest") {
-      await CreateOrderGuest();
-      return;
-    }
-
+  
     try {
       const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
+  
       if (wantToSHowBankTransfer) {
         ImplementBankTransfer();
         return;
       }
-
-      const shipping = [
-        {
-          methodId:
-            shippingTotal === "රු0.00"
-              ? "pickup_location:0"
-              : "wbs:0dd3bc79_weight_based_shipping",
-          methodTitle:
-            shippingTotal === "0.00"
-              ? "pickup_location:0"
-              : "Weight Based Shipping",
-          total: shippingTotal,
-        },
-      ];
-
+  
+      const shippingMethod = getShippingMethod(shippingTotal);
+      const shippingDetails = transformAddress(formData.deliveryAddress);
+      const billingDetails = transformAddress(formData.billingAddress);
+  
       if (paymentMethodId !== undefined) {
-        const obj = {
+        const variables = {
           input: {
             paymentMethod: paymentMethodId,
-            shippingMethod: shipping[0].methodId,
+            shippingMethod,
+            shipping: shippingDetails,
+            billing: billingDetails,
           },
         };
-
-        const { data } = await checkoutMutation({ variables: obj });
- 
+  
+        const { data } = await checkoutMutation({ variables });
+  
         if (data) {
-          const checkoutDetails: PaymentDetailsWithoutUrls =
-            savePaymentDetails(data);
+          const checkoutDetails = savePaymentDetails(data);
           setPaymentData(checkoutDetails);
           toast.success("Order Created Successfully");
         } else {
@@ -456,17 +448,38 @@ const CheckoutPage = () => {
       } else {
         console.error("Payment method ID is undefined");
       }
+    } catch (error) {
+      handleCheckoutError(error);
+    } finally {
       setLoading(false);
-    } catch (error: any) {
-      if (error.message == "Sorry, no session found.") {
-        setLoading(false);
-        toast.error("No Items to checkout");
-        return;
-      }
-      setLoading(false);
-      toast.error("Failed to create the order" + error.message);
     }
   };
+  
+  const getShippingMethod = (shippingTotal: any) => {
+    const methodId =
+      shippingTotal === "රු0.00"
+        ? "pickup_location:0"
+        : "wbs:0dd3bc79_weight_based_shipping";
+  
+    const methodTitle =
+      shippingTotal === "0.00"
+        ? "pickup_location:0"
+        : "Weight Based Shipping";
+  
+    const total = shippingTotal;
+  
+    return { methodId, methodTitle, total };
+  };
+  
+  const handleCheckoutError = (error: any) => {
+    setLoading(false);
+    if (error.message === "Sorry, no session found.") {
+      toast.error("No Items to checkout");
+    } else {
+      toast.error("Failed to create the order: " + error.message);
+    }
+  };
+  
 
   const handleScrollToEl = (id: string) => {
     const element = document.getElementById(id);
@@ -499,10 +512,6 @@ const CheckoutPage = () => {
             <Link href={"/#"} className="">
               Homepage
             </Link>
-            {/* <span className="text-xs mx-1 sm:mx-1.5">/</span> */}
-            {/* <Link href={"/#"} className="">
-                            Clothing Categories
-                        </Link> */}
             <span className="text-xs mx-1 sm:mx-1.5">/</span>
             <span className="underline">Checkout</span>
           </div>

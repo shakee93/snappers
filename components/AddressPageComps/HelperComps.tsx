@@ -2,6 +2,7 @@ import Input from "@/shared/Input/Input";
 import Select from "@/shared/Select/Select";
 import Label from "../Label/Label";
 import React from "react";
+import { CustomerAddressInput } from "@/graphql/types/graphql";
 
 const SRI_LANKAN_STATES = [
     "Western",
@@ -79,5 +80,18 @@ const LoggedInAvatar = ({ name = 'N' }) => {
   );
 };
 
+const transformAddress = (originalAddress: any): CustomerAddressInput => {
+    return {
+      address1: originalAddress.address,
+      address2: originalAddress.apartment,
+      city: originalAddress.city,
+      country: originalAddress.country , 
+      firstName: originalAddress.firstName,
+      lastName: originalAddress.lastName,
+      state: originalAddress.state,
+      postcode: originalAddress.postal,
+    };
+  };
 
-export {InputField, SelectField, SRI_LANKAN_STATES, extractRawAmount, LoggedInAvatar};
+
+export {InputField, SelectField, SRI_LANKAN_STATES, extractRawAmount, LoggedInAvatar, transformAddress};

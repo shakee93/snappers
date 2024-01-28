@@ -14,7 +14,7 @@ const DropdownButton = ({ categories }: { categories: any }) => {
   const sortedCategories = [...categories].sort((a, b) =>
     a.name.localeCompare(b.name)
   );
-    
+
   return (
     <div className="relative text-center">
       <Popover className="relative">
@@ -43,24 +43,28 @@ const DropdownButton = ({ categories }: { categories: any }) => {
                   "absolute z-[350] w-screen max-w-sm mt-3 lg:max-w-5xl  shadow-2xl bg-white rounded-lg"
                 )}
               >
-                <ul className="py-4 px-4 text-left   grid-flow-col text-sm font-normal \
-                 text-gray-700 grid grid-rows-12 dark:text-gray-200">
-                  {sortedCategories?.map((category: Category, index: number) => (
-                    <li key={index} className="w-full">
-                      <Link
-                        onClick={(e) => close()}
-                        href={`/collections/${category.slug}`}
-                        className={twMerge(
-                          "transition-all block px-4 py-3 hover:pl-6 rounded \
+                <ul
+                  className="py-4 px-4 text-left   grid-flow-col text-sm font-normal \
+                 text-gray-700 grid grid-rows-12 dark:text-gray-200"
+                >
+                  {sortedCategories?.map(
+                    (category: Category, index: number) => (
+                      <li key={index} className="w-full">
+                        <Link
+                          onClick={(e) => close()}
+                          href={`/collections/${category.slug}`}
+                          className={twMerge(
+                            "transition-all block px-4 py-3 hover:pl-6 rounded \
                            hover:text-white hover:bg-primaryColor dark:hover:bg-gray-600 dark:hover:text-white",
-                          path === `/collections/${category.slug}` &&
-                            "text-white bg-primaryColor pl-6"
-                        )}
-                      >
-                        {category.name}
-                      </Link>
-                    </li>
-                  ))}
+                            path === `/collections/${category.slug}` &&
+                              "text-white bg-primaryColor pl-6"
+                          )}
+                        >
+                          {category.name}
+                        </Link>
+                      </li>
+                    )
+                  )}
                 </ul>
               </Popover.Panel>
             </Transition>
