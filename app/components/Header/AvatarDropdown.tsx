@@ -1,13 +1,13 @@
 "use client";
 
-import {Popover, Transition} from "@headlessui/react";
-import {CircleUserRound} from "lucide-react";
-import {Fragment, useEffect, useState} from "react";
+import { Popover, Transition } from "@headlessui/react";
+import { CircleUserRound, User ,LogIn} from "lucide-react";
+import { Fragment, useEffect, useState } from "react";
 import Link from "next/link";
 import LogoutButton from "@/components/Header/LogoutButton";
-import {useSession} from "@/context/SessionProvider";
-import {Customer} from "@/graphql/types/graphql";
-import {LoggedInAvatar} from "@/components/AddressPageComps/HelperComps";
+import { useSession } from "@/context/SessionProvider";
+import { Customer } from "@/graphql/types/graphql";
+import { LoggedInAvatar } from "@/components/AddressPageComps/HelperComps";
 
 export default function AvatarDropdown() {
   const { customer, fetchCustomer } = useSession();
@@ -18,7 +18,6 @@ export default function AvatarDropdown() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-
   return (
     <div className="AvatarDropdown">
       <Popover className="relative">
@@ -28,7 +27,6 @@ export default function AvatarDropdown() {
               <div
                 className={`text-primaryColor w-10 h-10 sm:w-12 sm:h-12 rounded-full dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none flex items-center justify-center`}
               >
-
                 {customer?.id != "guest" ? (
                   <LoggedInAvatar name={customer?.displayName?.toString()} />
                 ) : (
@@ -48,7 +46,7 @@ export default function AvatarDropdown() {
               <Popover.Panel className="absolute z-[200] w-screen max-w-[260px] px-4 mt-3.5 -right-10 sm:right-0 sm:px-0">
                 <div className="overflow-hidden rounded-3xl shadow-lg ring-1 ring-black ring-opacity-5">
                   <div className="relative grid grid-cols-1 gap-6 bg-white dark:bg-neutral-800 py-7 px-6">
-                    {!customer || customer?.id === "guest" ? (
+                    {customer?.id === "guest" ? (
                       <>
                         <Link
                           href={"/login"}
@@ -56,28 +54,7 @@ export default function AvatarDropdown() {
                           onClick={() => close()}
                         >
                           <div className="flex items-center justify-center flex-shrink-0 text-neutral-500 dark:text-neutral-300">
-                            <svg
-                              width="24"
-                              height="24"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M12.1601 10.87C12.0601 10.86 11.9401 10.86 11.8301 10.87C9.45006 10.79 7.56006 8.84 7.56006 6.44C7.56006 3.99 9.54006 2 12.0001 2C14.4501 2 16.4401 3.99 16.4401 6.44C16.4301 8.84 14.5401 10.79 12.1601 10.87Z"
-                                stroke="currentColor"
-                                strokeWidth="1.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                              <path
-                                d="M7.15997 14.56C4.73997 16.18 4.73997 18.82 7.15997 20.43C9.90997 22.27 14.42 22.27 17.17 20.43C19.59 18.81 19.59 16.17 17.17 14.56C14.43 12.73 9.91997 12.73 7.15997 14.56Z"
-                                stroke="currentColor"
-                                strokeWidth="1.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
+                          <LogIn />
                           </div>
                           <div className="ml-4">
                             <p className="text-sm font-medium ">{"Login"}</p>
@@ -89,28 +66,8 @@ export default function AvatarDropdown() {
                           onClick={() => close()}
                         >
                           <div className="flex items-center justify-center flex-shrink-0 text-neutral-500 dark:text-neutral-300">
-                            <svg
-                              width="24"
-                              height="24"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M12.1601 10.87C12.0601 10.86 11.9401 10.86 11.8301 10.87C9.45006 10.79 7.56006 8.84 7.56006 6.44C7.56006 3.99 9.54006 2 12.0001 2C14.4501 2 16.4401 3.99 16.4401 6.44C16.4301 8.84 14.5401 10.79 12.1601 10.87Z"
-                                stroke="currentColor"
-                                strokeWidth="1.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                              <path
-                                d="M7.15997 14.56C4.73997 16.18 4.73997 18.82 7.15997 20.43C9.90997 22.27 14.42 22.27 17.17 20.43C19.59 18.81 19.59 16.17 17.17 14.56C14.43 12.73 9.91997 12.73 7.15997 14.56Z"
-                                stroke="currentColor"
-                                strokeWidth="1.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
+                            <User />
+                       
                           </div>
                           <div className="ml-4">
                             <p className="text-sm font-medium ">{"Register"}</p>

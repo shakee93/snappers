@@ -352,6 +352,8 @@ const CheckoutPage = () => {
 
         if (data) {
           toast.success("Order created successfully for you! (GUEST)");
+          console.log("data on the before thank you page: ", data);
+
           let redirectUrl = `checkout/${data.order_id}`;
           router.push(redirectUrl);
         }

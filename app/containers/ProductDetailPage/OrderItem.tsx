@@ -35,12 +35,11 @@ const OrderItemProduct = ({
         type,
         stockQuantity,
         regularPrice,
-
         featuredImage,
     }: VariableProduct & SimpleProduct = orderItem?.product?.node;
     // console.log({variation})
     let a = "";
-    debugger;
+
     return (
         <div className="relative flex py-8 sm:py-10 xl:py-12 first:pt-0 last:pb-0">
             <div className="relative h-36 w-24 sm:w-32 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
