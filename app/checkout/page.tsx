@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import React, { useEffect, useMemo, useState } from "react";
@@ -31,7 +32,10 @@ import { useRouter } from "next/navigation";
 import PaymentModal from "@/app/components/Payment/PaymentModal";
 import { useSession } from "@/context/SessionProvider";
 import { Loader } from "lucide-react";
-import { transformAddress } from "@/components/AddressPageComps/HelperComps";
+import {
+  savePaymentDetails,
+  transformAddress,
+} from "@/components/AddressPageComps/HelperComps";
 
 interface FormData {
   contactInfo: Record<string, any>;
@@ -222,21 +226,11 @@ const CheckoutPage = () => {
 
   const handleConfirmationChange = (component: string, value: boolean) => {
     setIsConfirmed((prevConfirmed) => {
-      // console.log("Updated Confirmation Values:", updatedConfirmed);
-
       return {
         ...prevConfirmed,
         [component]: value,
       };
     });
-  };
-
-  const completePaymentMutationHandle = async () => {
-    const { data } = await completeOrderPayment({
-      variables: { orderId: 10, status: "COMPLETED" },
-    });
-    console.log("data on the complete order Mutation: ", data);
-    return data;
   };
 
   const updateShippingTotal = async () => {
@@ -290,26 +284,6 @@ const CheckoutPage = () => {
     } else {
       console.log("initiate payment become null");
     }
-  };
-
-  const savePaymentDetails = (
-    checkoutDetails: any
-  ): PaymentDetailsWithoutUrls => {
-    let orderDetails: CheckoutPayload = checkoutDetails?.checkout;
-    let { order, customer } = orderDetails;
-
-    let saved_data = {
-      amount: order?.total ?? "no_amount",
-      items: "Mobile Items",
-      order_id: order?.databaseId?.toString() ?? "no_order_id_found",
-      first_name: customer?.billing?.firstName || "no_lastname",
-      last_name: customer?.billing?.lastName || "no firstname",
-      email: customer?.email || "no_email",
-      address: customer?.billing?.address1 || "no_address",
-    };
-
-    console.log("saved data: ", saved_data);
-    return saved_data;
   };
 
   function ImplementBankTransfer() {
@@ -406,6 +380,14 @@ const CheckoutPage = () => {
     }
 
     if (isCashOnDelivery) {
+      if ((checkoutDetails.order_id == "no_order_id_found")) {
+        let email = formData?.contactInfo?.email;
+        console.log("formData no checkout: ", formData)
+        let redirectUrl = `/checkout/${checkoutDetails.order_id}?email=${email}`;
+        router.push(redirectUrl);
+        return;
+        
+      }
       let redirectUrl = `checkout/${checkoutDetails.order_id}`;
       router.push(redirectUrl);
     }
@@ -413,40 +395,44 @@ const CheckoutPage = () => {
 
   const handleCheckout = async () => {
     setLoading(true);
-  
+
     try {
-      const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
-  
       if (wantToSHowBankTransfer) {
         ImplementBankTransfer();
         return;
       }
-  
+
+      const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
+      if (paymentMethodId === undefined) {
+        console.error("Payment method ID is undefined");
+        toast.error("Payment Method was not chosen.");
+        return;
+      }
+
       const shippingMethod = getShippingMethod(shippingTotal);
       const shippingDetails = transformAddress(formData.deliveryAddress);
       const billingDetails = transformAddress(formData.billingAddress);
-  
-      if (paymentMethodId !== undefined) {
-        const variables = {
-          input: {
-            paymentMethod: paymentMethodId,
-            shippingMethod,
-            shipping: shippingDetails,
-            billing: billingDetails,
-          },
-        };
-  
-        const { data } = await checkoutMutation({ variables });
-  
-        if (data) {
-          const checkoutDetails = savePaymentDetails(data);
-          setPaymentData(checkoutDetails);
-          toast.success("Order Created Successfully");
-        } else {
-          toast.error("Something Went Wrong While Checkout");
-        }
+
+      const variables = {
+        input: {
+          paymentMethod: paymentMethodId,
+          shippingMethod,
+          shipping: shippingDetails,
+          billing: billingDetails,
+        },
+      };
+
+      const { data } =
+        customer?.id === "guest"
+          ? await guestCheckout({ variables })
+          : await checkoutMutation({ variables });
+
+      if (data) {
+        const checkoutDetails = savePaymentDetails(data);
+        setPaymentData(checkoutDetails);
+        toast.success("Order Created Successfully");
       } else {
-        console.error("Payment method ID is undefined");
+        toast.error("Something Went Wrong While Checkout");
       }
     } catch (error) {
       handleCheckoutError(error);
@@ -454,23 +440,21 @@ const CheckoutPage = () => {
       setLoading(false);
     }
   };
-  
+
   const getShippingMethod = (shippingTotal: any) => {
     const methodId =
       shippingTotal === "රු0.00"
         ? "pickup_location:0"
         : "wbs:0dd3bc79_weight_based_shipping";
-  
+
     const methodTitle =
-      shippingTotal === "0.00"
-        ? "pickup_location:0"
-        : "Weight Based Shipping";
-  
+      shippingTotal === "0.00" ? "pickup_location:0" : "Weight Based Shipping";
+
     const total = shippingTotal;
-  
+
     return { methodId, methodTitle, total };
   };
-  
+
   const handleCheckoutError = (error: any) => {
     setLoading(false);
     if (error.message === "Sorry, no session found.") {
@@ -479,7 +463,6 @@ const CheckoutPage = () => {
       toast.error("Failed to create the order: " + error.message);
     }
   };
-  
 
   const handleScrollToEl = (id: string) => {
     const element = document.getElementById(id);

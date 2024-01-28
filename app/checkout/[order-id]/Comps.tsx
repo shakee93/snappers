@@ -55,7 +55,6 @@ type ProductTableProps = {
 const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData, paymentDetails }) => {
   if (!lineItems) return null;
 
-  console.log({paymentDetails});
 
   return (
     <>
