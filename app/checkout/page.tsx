@@ -171,12 +171,12 @@ const CheckoutPage = () => {
   const [wantToSHowBankTransfer, setWantToSHowBankTransfer] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   // USE_CASE:  This is to redirect to home page if cart is empty
-  // useEffect(() => {
-  //   if (cart && cart?.contents?.nodes?.length === 0) {
-  //     router.push("/");
-  //   }
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [cart]);
+  useEffect(() => {
+    if (cart && cart?.contents?.nodes?.length === 0) {
+      router.push("/");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cart]);
 
   useEffect(() => {
     fetchCustomer();
