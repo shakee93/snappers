@@ -22,7 +22,7 @@ export default function AvatarDropdown() {
     }3
   }, [currentCustomer, customer]);
 
-  console.log("currentCustomer", customer);
+  // console.log("currentCustomer", customer);
 
   return (
     <div className="AvatarDropdown">
