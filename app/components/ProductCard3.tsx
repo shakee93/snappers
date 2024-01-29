@@ -121,7 +121,6 @@ const ProductCard: FC<ProductCardProps> = ({
     //     toast.error("Something Went Wrong!");
     // };
 
-    console.log('asda', price, name);
 
     const handleAddToCart = async () => {
         setLoading(true);
