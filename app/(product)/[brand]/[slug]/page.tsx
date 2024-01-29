@@ -36,7 +36,7 @@ async function getData(slug: string, brand: string) {
       variables: {
         productId: slug,
       },
-      // fetchPolicy: "no-cache",
+      fetchPolicy: "no-cache",
     });
 
 
