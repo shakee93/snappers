@@ -13,7 +13,7 @@ const ImageGallery: React.FC<ImageGalleryProps> = ({ images, onThumbnailClick, s
     const [startIndex, setStartIndex] = useState(0);
 
 
-    if (!images) {
+    if (!images ) {
         return <div></div>
     }
 
