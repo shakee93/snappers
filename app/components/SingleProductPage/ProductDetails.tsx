@@ -34,6 +34,8 @@ const ProductDetails = ({
       : null
   );
 
+  console.log('product details', product);
+
   const { setVariationId } = useImage();
 
 //   useEffect(() => {

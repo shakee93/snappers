@@ -282,7 +282,7 @@ const CartPage = () => {
                   <a
                     target="_blank"
                     rel="noopener noreferrer"
-                    href="##"
+                    href="/"
                     className="text-slate-900 dark:text-slate-200 underline font-medium"
                   >
                     Taxes
@@ -293,7 +293,7 @@ const CartPage = () => {
                   <a
                     target="_blank"
                     rel="noopener noreferrer"
-                    href="##"
+                    href="/terms-and-conditions"
                     className="text-slate-900 dark:text-slate-200 underline font-medium"
                   >
                     Shipping
