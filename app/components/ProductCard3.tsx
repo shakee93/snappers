@@ -121,6 +121,8 @@ const ProductCard: FC<ProductCardProps> = ({
     //     toast.error("Something Went Wrong!");
     // };
 
+    console.log('asda', price, name);
+
     const handleAddToCart = async () => {
         setLoading(true);
         try {
@@ -281,15 +283,15 @@ const ProductCard: FC<ProductCardProps> = ({
 
                 <Link href={link} className="flex m-0 mb-2 justify-between items-center">
                     <Prices
-                        price={
+                         price={
                             type === 'VARIABLE'
-                                ? variations?.nodes[0]?.price || 0
-                                : price || 0
+                                ? variations?.nodes[0]?.price !== null ? variations?.nodes[0]?.price : price
+                                : price !== null && price !== undefined ? price : 0
                         }
                         salePrice={
                             type === 'VARIABLE'
-                                ? variations?.nodes[0]?.regularPrice || 0
-                                : regularPrice
+                                ? variations?.nodes[0]?.regularPrice !== null ? variations?.nodes[0]?.regularPrice : price
+                                : regularPrice !== null && regularPrice !== undefined ? regularPrice : 0
                         }
                         className='lg:flex-row'
                     />
