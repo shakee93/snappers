@@ -132,7 +132,6 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
   const { loading, error, data, refetch } = useQuery(GET_BRANDS);
 
   const fetchBrandsForCategory = async (category: keyof typeof hardcodedBrands) => {
-    try {
       const allSlugs = [];
 
       for (const category in hardcodedBrands) {
@@ -147,9 +146,7 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
       });
 
       setBrands(fetchedData.brands.nodes as Brand[]);
-    } catch (error) {
-      console.error(`Error fetching brands for ${category}`, error);
-    }
+
 
   };
 

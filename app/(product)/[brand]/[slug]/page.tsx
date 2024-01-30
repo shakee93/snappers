@@ -10,7 +10,9 @@ import ProductImage from "@/app/components/SingleProductPage/ProductImage2";
 import {Suspense} from "react";
 import {Metadata, ResolvingMetadata} from "next";
 import {ImageProvider} from "@/context/ImageChangeGrabber";
-export const dynamic = "force-static";
+
+export const dynamic = 'force-dynamic'
+
 type Props = {
   params: {
     slug: string;
