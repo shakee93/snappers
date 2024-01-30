@@ -4,33 +4,32 @@ import SectionSliderProductCard from "@/app/components/SectionSliderProductCard"
 import SectionGridMoreExplore from "@/app/components/HomePage/SectionGridMoreExplore";
 import SectionPromo1 from "@/app/components/HomePage/SectionPromo1";
 import Heading from "@/app/components/Heading/Heading";
-import {getClient} from "@/graphql/apollo-ssr";
-import {GET_SLIDES} from "@/graphql/defs/slides";
-import {GET_PRODUCTS_NODES,} from "@/graphql/defs/products";
-import {SimpleProduct, VariableProduct,} from "@/graphql/types/graphql";
+import { getClient } from "@/graphql/apollo-ssr";
+import { GET_SLIDES } from "@/graphql/defs/slides";
+import { GET_PRODUCTS_NODES } from "@/graphql/defs/products";
+import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import "styles/embla.css";
 
 const getData = async () => {
-  const [slides, newArrivals, mobiles, speakers, watches] =
-    await Promise.all([
-      getClient().query({ query: GET_SLIDES }),
-      getClient().query({ query: GET_PRODUCTS_NODES }),
-      getClient().query({
-        query: GET_PRODUCTS_NODES,
-        variables: { first: 10, categoryIdIn: [165] },
-      }),
-      getClient().query({
-        query: GET_PRODUCTS_NODES,
-        variables: { first: 10, categoryIdIn: [71] },
-      }),
-      getClient().query({
-        query: GET_PRODUCTS_NODES,
-        variables: { first: 10, categoryIdIn: [302] },
-      }),
-    ]);
+  const [slides, newArrivals, mobiles, speakers, watches] = await Promise.all([
+    getClient().query({ query: GET_SLIDES }),
+    getClient().query({ query: GET_PRODUCTS_NODES }),
+    getClient().query({
+      query: GET_PRODUCTS_NODES,
+      variables: { first: 10, categoryIdIn: [165] },
+    }),
+    getClient().query({
+      query: GET_PRODUCTS_NODES,
+      variables: { first: 10, categoryIdIn: [71] },
+    }),
+    getClient().query({
+      query: GET_PRODUCTS_NODES,
+      variables: { first: 10, categoryIdIn: [302] },
+    }),
+  ]);
 
-    // console.log('new', newArrivals?.data?.products);
-    // console.log('smart', mobiles?.data?.products?.nodes[0]);
+  // console.log('new', newArrivals?.data?.products);
+  // console.log('smart', mobiles?.data?.products?.nodes[0]);
 
   return {
     slides: slides.data?.slides?.nodes,
@@ -40,15 +39,21 @@ const getData = async () => {
       VariableProduct)[],
     speakers: speakers.data.products?.nodes as (SimpleProduct &
       VariableProduct)[],
-      watches: watches.data.products?.nodes as (SimpleProduct &
+    watches: watches.data.products?.nodes as (SimpleProduct &
       VariableProduct)[],
   };
 };
 
 export default async function Home() {
-  const { slides, newArrivals, mobiles, speakers, watches } =
-    await getData();
-  const hi = "sahdeer";
+
+  // const startTime = performance.now(); // Log the start time
+
+  const { slides, newArrivals, mobiles, speakers, watches } = await getData();
+  // const endTime = performance.now(); // Log the end time
+  // console.log(
+  //   `getData function took ${endTime - startTime} milliseconds to execute.`
+  // );
+
   return (
     <main>
       <div className="nc-PageHome flex flex-col  relative overflow-hidden">
@@ -57,7 +62,6 @@ export default async function Home() {
           <SectionHero3 slides={slides} />
         </div>
         <div className="container flex flex-col gap-10 lg:gap-16">
-          
           {/* new arrivals section */}
           <div className="mt-5 md:mt-10">
             <SectionSliderProductCard
@@ -65,13 +69,13 @@ export default async function Home() {
               heading="New Arrivals"
             />
           </div>
-          
+
           {/*featured categoties */}
           <div>
             <Heading>Featured Categories.</Heading>
             <CategoryBlockSection />
           </div>
-          
+
           {/*mobile categoty */}
           <div>
             <SectionSliderProductCard
@@ -80,12 +84,12 @@ export default async function Home() {
               heading="Latest Smartphones"
             />
           </div>
-          
+
           {/* about section */}
           <div>
             <SectionPromo1 />
           </div>
-          
+
           {/* speakers category */}
           <div>
             <SectionSliderProductCard
@@ -100,7 +104,7 @@ export default async function Home() {
             {/* <BackgroundSection /> */}
             <SectionGridMoreExplore />
           </div>
-          
+
           {/* smart watches section */}
           <div>
             <SectionSliderProductCard
