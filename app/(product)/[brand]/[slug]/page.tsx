@@ -11,8 +11,6 @@ import {Suspense} from "react";
 import {Metadata, ResolvingMetadata} from "next";
 import {ImageProvider} from "@/context/ImageChangeGrabber";
 
-export const dynamic = "force-static";
-
 type Props = {
   params: {
     slug: string;

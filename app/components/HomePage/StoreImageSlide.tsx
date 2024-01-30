@@ -7,7 +7,6 @@ import StoreImg2 from "public/store/GqMobiles-Buy-geniune-branded-eletronics-fro
 import StoreImg3 from "public/store/GqMobiles-Buy-geniune-branded-eletronics-from-GQMobiles-for-best-price-3.webp";
 import StoreImg4 from "public/store/GqMobiles-Buy-geniune-branded-eletronics-from-GQMobiles-for-best-price-4-1.webp";
 import { Thumb } from "./EmblaCarouselThumbsButton";
-import "styles/embla.css";
 import { EmblaOptionsType } from "embla-carousel";
 
 type PropType = {
