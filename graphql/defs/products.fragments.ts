@@ -125,6 +125,11 @@ export const ProductContentFull = gql`
     description
     shortDescription(format: RAW)
     reviewCount
+    metaData(key: "tech_spec_data") {
+      id
+      key
+      value
+    }
     image {
       id
       sourceUrl
@@ -183,6 +188,11 @@ export const ProductContentFull = gql`
           }
         }
       }
+      metaData(key: "tech_spec_data") {
+        id
+        key
+        value
+      }
       galleryImages {
         nodes {
           id
@@ -204,6 +214,11 @@ export const ProductContentFull = gql`
           name
           slug
         }
+      }
+      metaData(key: "tech_spec_data") {
+        id
+        key
+        value
       }
       allPaColour {
         nodes {

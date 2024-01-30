@@ -2,13 +2,41 @@ import React, { FC } from "react";
 import Link from "next/link";
 
 
+async function measureRequestDuration() {
+  try {
+    const start = performance.now(); // Start timing
 
-export default function PagePrivacy() {
+    const response = await fetch("https://httpbin.org/delay/3",
+        { cache: 'force-cache' }
+    ); // Send the fetch request
+
+    // Check if the fetch request was successful
+    if (!response.ok) {
+      throw new Error(`HTTP error!     status: ${response.status}`);
+    }
+
+    const end = performance.now(); // End timing
+
+    const duration = end - start; // Calculate the duration
+
+    console.log(`Request to took ${duration.toFixed(0)}ms`); // Log duration to console
+
+    return await response.json()
+  } catch (error: any) {
+    console.error('Fetch error:', error.message); // Log any errors that occur
+  }
+}
+export default async function PagePrivacy() {
+
+  let data = await measureRequestDuration()
+
   return (
     <div
       className={`overflow-hidden relative`}
       data-nc-id="PageAbout"
     >
+
+      {JSON.stringify(data)}
       <title>Privacy Policy </title>
 
       <div className="container py-10 lg:py-10 space-y-16 lg:space-y-28">

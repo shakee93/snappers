@@ -8,6 +8,8 @@ const ProductOverview = ({
   product: SimpleProduct | VariableProduct
 }) => {
 
+  console.log({product});
+
   const techValue = product.metaData?.find(meta => meta?.key === 'tech_spec')?.value;
   const techSpecs = JSON.parse(techValue || 'false')
 
