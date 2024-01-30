@@ -93,7 +93,7 @@ const InstantSearchWrapper = ({
 
 
     useEffect(() => {
-        console.log(filterQuery);
+        // console.log(filterQuery);
     }, [filterQuery])
     
     

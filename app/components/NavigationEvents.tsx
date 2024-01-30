@@ -7,10 +7,11 @@ import {Next13ProgressBar} from "next13-progressbar";
 
 export function NavigationEvents() {
     const pathname = usePathname()
-    const { pushNavigation } = useStore()
+    const { pushNavigation, setSearch } = useStore()
 
     useEffect(() => {
         pushNavigation(pathname);
+        setSearch('')
     }, [pathname])
 
     return <div>

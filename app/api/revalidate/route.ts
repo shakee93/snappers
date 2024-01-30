@@ -5,7 +5,13 @@ export async function GET(request: NextRequest) {
     const path = request.nextUrl.searchParams.get('path')
 
     if (path) {
-        revalidatePath(path)
+
+        if (path === 'all') {
+            revalidatePath('/', 'layout');
+            return Response.json({ revalidated: 'all', now: Date.now() })
+        }
+
+        revalidatePath(path);
         return Response.json({ revalidated: true, now: Date.now() })
     }
 
