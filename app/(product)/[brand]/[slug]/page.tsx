@@ -39,7 +39,6 @@ async function getData(slug: string, brand: string) {
       fetchPolicy: "no-cache",
     });
 
-
     if (!data.product) {
       return notFound();
     }

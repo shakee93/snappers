@@ -32,7 +32,7 @@ const LoginForm = () => {
             }
             toast("Logged in Successfully");
             setTimeout(() => {
-                router.push("/account/my-order");
+                router.push("/");
             }, 2000);
         } catch (error) {
             console.error("Error:", error);
