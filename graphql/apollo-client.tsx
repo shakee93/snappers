@@ -10,7 +10,7 @@ import {
 import {GraphQLClient} from 'graphql-request';
 
 import {GET_AUTH_TOKEN} from "./defs/auth";
-import {AUTH_TOKEN_KEY, REFRESH_TOKEN_KEY, SESSION_TOKEN_KEY} from "@/context/SessionProvider";
+import {AUTH_TOKEN_KEY, REFRESH_TOKEN_KEY, SESSION_TOKEN_KEY, USER_DATA_KEY} from "@/context/SessionProvider";
 import {onError} from "@apollo/client/link/error";
 import {loadDevMessages, loadErrorMessages} from "@apollo/client/dev";
 import {Results} from "@/types";
@@ -72,12 +72,13 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
     const errorLink = onError(({ graphQLErrors, operation, forward, networkError }) => {
       const targetErrors = [
         'The iss do not match with this server',
-        'invalid-secret-key | Expired token',  
+        'invalid-secret-key | Expired token',
         'invalid-secret-key | Signature verification failed',
         'Expired token',
         'Wrong number of segments',
       ];
 
+      // console.log(graphQLErrors);
 
       if (graphQLErrors && graphQLErrors.some((err: any) => targetErrors.includes(err?.debugMessage))) {
         return new Observable(observer => {
@@ -94,6 +95,7 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
               }));
             })
             .then(() => {
+
               const subscriber = {
                 next: observer.next.bind(observer),
                 error: observer.error.bind(observer),
@@ -104,7 +106,11 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
               forward(operation).subscribe(subscriber);
             })
             .catch(error => {
-              // Handle token refresh errors
+              localStorage.removeItem(AUTH_TOKEN_KEY);
+              localStorage.removeItem(REFRESH_TOKEN_KEY);
+              localStorage.removeItem(SESSION_TOKEN_KEY);
+              localStorage.removeItem(USER_DATA_KEY);
+
               observer.error(error);
             });
         });
