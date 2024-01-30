@@ -1,14 +1,17 @@
-import {revalidateTag} from 'next/cache'
+import { revalidatePath } from 'next/cache'
+import { NextRequest } from 'next/server'
 
-export async function POST(request: Request, response: Response) {
-    try {
-        const formData = await request.formData();
-        // const file = formData.get("file") as File;
-        const tagID = formData.get("id") as string;
-        await revalidateTag(tagID);
+export async function GET(request: NextRequest) {
+    const path = request.nextUrl.searchParams.get('path')
 
-        return new Response(JSON.stringify({ message: `revalidated ${tagID} done succussfully` }));
-    } catch (error) {
-        return new Response(JSON.stringify({ error: `Error: ${error}` }));
+    if (path) {
+        revalidatePath(path)
+        return Response.json({ revalidated: true, now: Date.now() })
     }
+
+    return Response.json({
+        revalidated: false,
+        now: Date.now(),
+        message: 'Missing path to revalidate',
+    })
 }

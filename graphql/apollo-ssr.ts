@@ -9,7 +9,7 @@ export const { getClient } = registerApolloClient(() => {
     const httpLink = new HttpLink({
         uri: process.env.NEXT_PUBLIC_WP_GRAPHQL,
         fetchOptions: {
-            cache: 'no-store'
+            cache: 'force-cache'
         }
     })
 
