@@ -8,6 +8,7 @@ import {getClient} from "@/graphql/apollo-ssr";
 import {GET_SLIDES} from "@/graphql/defs/slides";
 import {GET_PRODUCTS_NODES,} from "@/graphql/defs/products";
 import {SimpleProduct, VariableProduct,} from "@/graphql/types/graphql";
+import "styles/embla.css";
 
 const getData = async () => {
   const [slides, newArrivals, mobiles, speakers, watches] =
