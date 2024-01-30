@@ -10,16 +10,13 @@ import ProductImage from "@/app/components/SingleProductPage/ProductImage2";
 import {Suspense} from "react";
 import {Metadata, ResolvingMetadata} from "next";
 import {ImageProvider} from "@/context/ImageChangeGrabber";
-
 export const dynamic = "force-static";
-
 type Props = {
   params: {
     slug: string;
     brand: string;
   };
 };
-
 export async function generateStaticParams() {
   const {
     data: { brands },
@@ -28,7 +25,6 @@ export async function generateStaticParams() {
   });
   return brands.nodes.map((p: Brand) => p.slug);
 }
-
 async function getData(slug: string, brand: string) {
   try {
     const { data } = await getClient().query({
@@ -38,21 +34,16 @@ async function getData(slug: string, brand: string) {
       },
       fetchPolicy: "no-cache",
     });
-
-
     if (!data.product) {
       return notFound();
     }
-
     const productBrand = data.product.brands?.nodes[0] || {
       name: "Product",
       slug: "product",
     };
-
     if (productBrand.slug !== brand) {
       return notFound();
     }
-
     return {
       product: data.product,
       brand: productBrand,
@@ -62,22 +53,18 @@ async function getData(slug: string, brand: string) {
     return notFound();
   }
 }
-
 export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   // fetch data
   const { product } = await getData(params.slug, params.brand);
-
   return {
     title: product.name,
   };
 }
-
 const Page = async ({ params }: Props) => {
   // return <LoadingBrands/>
-
   const {
     product,
     brand,
@@ -85,7 +72,6 @@ const Page = async ({ params }: Props) => {
     product: SimpleProduct & VariableProduct;
     brand: Brand;
   } = await getData(params.slug, params.brand);
-
   return (
     <div className="mt-5 md:mt-16">
       <main className="container m-auto">

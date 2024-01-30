@@ -255,6 +255,11 @@ export const GET_PRODUCTS = gql`
                 }
               }
             }
+            metaData(key: "tech_spec_data") {
+              id
+              key
+              value
+            }
             brands {
               nodes {
                 id
@@ -300,6 +305,11 @@ export const GET_PRODUCTS = gql`
                 name
                 slug
               }
+            }
+            metaData(key: "tech_spec_data") {
+              id
+              key
+              value
             }
             allPaCapacity {
               nodes {
