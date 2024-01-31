@@ -17,8 +17,13 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   const orderId = params["order-id"];
   const searchParams = useSearchParams().get("email");
 
-  if (searchParams == null) {
-    return <p>Not Found</p>;
+  if (orderId === "no_order_id_found" || searchParams == null) {
+
+    return (
+      <h1 className="text-2xl font-bold py-20 text-center">
+        📝 The page is unable to load 
+      </h1>
+    );
   }
 
   const router = useRouter();
@@ -27,7 +32,8 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     return (
       <div className="container mx-auto grid items-center justify-center">
         <h1 className="text-2xl font-bold py-20 text-center">
-          📝 The page is unable to load the order ID since it{"'"}s a Payhere testing ID.
+          📝 The page is unable to load the order ID since it{"'"}s a Payhere
+          testing ID.
         </h1>
         <Link href={`/`} passHref>
           <a className="text-center self-center text-blue-500 font-bold underline hover:cursor-pointer hover:text-blue-800">
@@ -62,14 +68,19 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
       subtotal: orderData?.order?.subtotal,
       amount: orderData?.order?.total ?? "",
       currency: "LKR",
-      first_name: customerData?.customer?.shipping?.firstName ?? "no_first_name",
+      first_name:
+        customerData?.customer?.shipping?.firstName ?? "no_first_name",
       last_name: customerData?.customer?.shipping?.lastName ?? "no_last_name",
       email: customerData?.customer?.email ?? "no_email",
       phone: customerData?.customer?.shipping?.phone ?? "no_phone",
-      shippingAddress1: customerData?.customer?.shipping?.address1 ?? "no_shipping_address1",
-      shippingAddress2: customerData?.customer?.shipping?.address2 ?? "no_shipping_address2",
-      billingAddress1: customerData?.customer?.billing?.address1 ?? "no_billing_address1",
-      billingAddress2: customerData?.customer?.billing?.address2 ?? "no_billing_address2",
+      shippingAddress1:
+        customerData?.customer?.shipping?.address1 ?? "no_shipping_address1",
+      shippingAddress2:
+        customerData?.customer?.shipping?.address2 ?? "no_shipping_address2",
+      billingAddress1:
+        customerData?.customer?.billing?.address1 ?? "no_billing_address1",
+      billingAddress2:
+        customerData?.customer?.billing?.address2 ?? "no_billing_address2",
       city: customerData?.customer?.shipping?.city ?? "no_city",
       country: "Sri Lanka",
     }),
@@ -82,7 +93,9 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
         <h1 className="text-2xl font-bold pt-20 text-center">
           Thank you! Your order has been successfully placed📦
         </h1>
-        <p className="text-center py-4">Please check your email({searchParams}) for further details.</p>
+        <p className="text-center py-4">
+          Please check your email({searchParams}) for further details.
+        </p>
         <Link href={`/`} passHref>
           <p className="text-center self-center text-blue-500 font-bold underline hover:cursor-pointer hover:text-blue-800">
             Back to Home
@@ -95,7 +108,9 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   if (orderError) {
     return (
       <div className="container mx-auto grid items-center justify-center">
-        <h1 className="text-2xl font-bold py-20 text-center">Not authorized to view this order</h1>
+        <h1 className="text-2xl font-bold py-20 text-center">
+          Not authorized to view this order
+        </h1>
         <Link href={`/`} passHref>
           <a className="text-center self-center text-blue-500 font-bold underline hover:cursor-pointer hover:text-blue-800">
             Back to Home
@@ -121,7 +136,9 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
         </div>
       </div>
 
-      <h1 className="text-2xl font-bold pt-20 pb-4 text-center">To Explore Our Product Range Further!</h1>
+      <h1 className="text-2xl font-bold pt-20 pb-4 text-center">
+        To Explore Our Product Range Further!
+      </h1>
       <Link href={`/`} passHref>
         <ButtonPrimary>Shop More</ButtonPrimary>
       </Link>
