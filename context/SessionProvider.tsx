@@ -174,7 +174,7 @@ export function SessionProvider({ children }: {
 
         // console.log("userData", JSON.parse(userData!));
         if (userData) {
-            console.log(JSON.parse(userData));
+            // console.log(JSON.parse(userData));
             setCustomer(JSON.parse(userData) as unknown as Customer)
             return userData
         }

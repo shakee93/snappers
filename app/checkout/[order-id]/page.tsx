@@ -12,6 +12,7 @@ import toast from "react-hot-toast";
 import Link from "next/link";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useCart } from "@/context/CartProvider";
 
 export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   const orderId = params["order-id"];
@@ -25,7 +26,17 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     );
   }
 
-  const router = useRouter();
+  const { getCart } = useCart();
+
+  const refreshCart = async () => {
+    try {
+      await getCart();
+    } catch (error: any) {
+      console.error("Error refreshing the cart:", error);
+      throw error
+    }
+  };
+
 
   if (orderId == "ItemNo12345") {
     return (
@@ -54,6 +65,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
 
   useEffect(() => {
     getUserData();
+    refreshCart();
   }, [getUserData]);
 
   if (!orderId || orderId == "12345") {

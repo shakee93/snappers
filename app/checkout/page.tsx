@@ -233,17 +233,7 @@ const CheckoutPage = () => {
     });
   };
 
-  const { getCart } = useCart();
-
-  const refreshCart = async () => {
-    try {
-      await getCart();
-    } catch (error: any) {
-      console.error("Error refreshing the cart:", error);
-      throw error
-    }
-  };
-
+ 
   const updateShippingTotal = async () => {
     try {
       const shippingMethods = isStorePickup
@@ -398,7 +388,9 @@ const CheckoutPage = () => {
         router.push(redirectUrl);
         return;
       }
+      
       let redirectUrl = `checkout/${checkoutDetails.order_id}`;
+      
       router.push(redirectUrl);
     }
   }, [paymentData]);
@@ -440,7 +432,6 @@ const CheckoutPage = () => {
       if (data) {
         const checkoutDetails = savePaymentDetails(data);
         setPaymentData(checkoutDetails);
-        await refreshCart()
         toast.success("Order Created Successfully");
       } else {
         toast.error("Something Went Wrong While Checkout");
