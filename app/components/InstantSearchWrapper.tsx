@@ -77,6 +77,9 @@ const InstantSearchWrapper = ({
             },
             additionalSearchParameters: {
                 query_by: "name, description",
+                exclude_fields: "description, productTags, shortDescription, productCategories, galleryImages, attributes",
+                use_cache: true,
+
             },
         });
 
