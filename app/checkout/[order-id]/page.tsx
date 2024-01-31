@@ -17,8 +17,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   const orderId = params["order-id"];
   const searchParams = useSearchParams().get("email");
 
-  if (orderId === "no_order_id_found" || searchParams == null) {
-
+  if (orderId === "no_order_id_found" && searchParams == null) {
     return (
       <h1 className="text-2xl font-bold py-20 text-center">
         📝 The page is unable to load 
@@ -119,6 +118,10 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
       </div>
     );
   }
+  // Relaod this page
+  useEffect(() => {
+    window.location.reload()
+  } ,[])
 
   return (
     <div className="container mx-auto rounded-3xl lg:p-20 text-center">
