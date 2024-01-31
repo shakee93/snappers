@@ -30,7 +30,7 @@ const ProductOverview = ({
             </div>
           </div>
           <div className="md:w-2/5">
-            {(techSpecs && techSpecs.items && techSpecs.items > 0 || manualTechSpecs && manualTechSpecs.length > 0) && (
+            {(techSpecs && techSpecs.items || manualTechSpecs && manualTechSpecs.length > 0) && (
               <ProductSpecifications techspecs={techSpecs} manualSpecs={manualTechSpecs} />
             )}
           </div>
