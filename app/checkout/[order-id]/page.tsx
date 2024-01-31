@@ -118,9 +118,9 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
       </div>
     );
   }
-  // Relaod this page
+
   useEffect(() => {
-    window.location.reload()
+    // window.location.reload()
   } ,[])
 
   return (
