@@ -17,6 +17,8 @@ export const ProductContentSlice = gql`
     slug
     type
     purchasable
+    description
+    shortDescription(format: RAW)
     brands {
       nodes {
         databaseId
@@ -125,7 +127,7 @@ export const ProductContentFull = gql`
     description
     shortDescription(format: RAW)
     reviewCount
-    metaData(key: "tech_spec_data") {
+    metaData {
       id
       key
       value
@@ -188,7 +190,7 @@ export const ProductContentFull = gql`
           }
         }
       }
-      metaData(key: "tech_spec_data") {
+      metaData {
         id
         key
         value
@@ -215,7 +217,7 @@ export const ProductContentFull = gql`
           slug
         }
       }
-      metaData(key: "tech_spec_data") {
+      metaData {
         id
         key
         value

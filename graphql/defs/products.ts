@@ -232,7 +232,7 @@ export const GET_PRODUCTS = gql`
           featured
           onSale
           description
-
+          shortDescription(format: RAW)
           image {
             mediaItemUrl
             sourceUrl
