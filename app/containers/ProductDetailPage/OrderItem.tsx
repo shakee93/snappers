@@ -13,13 +13,13 @@ const OrderItemProduct = ({
     orderItem: LineItem;
     index: number;
 }) => {
-    console.log("order item", orderItem);
+    // console.log("order item", orderItem);
 
     const link = useProductLink(orderItem.product?.node);
 
     const {variation} = orderItem;
     const {total} = orderItem;
-    console.log("orderItem", orderItem);
+    // console.log("orderItem", orderItem);
     if (!orderItem.product?.node) {
         // console.log("orderItem.product?.node: ", orderItem);
         return <></>;

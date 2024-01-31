@@ -18,6 +18,7 @@ type CartSession = {
     setCustomer: React.Dispatch<React.SetStateAction<Customer | null>>
 }
 
+
 const CartContext = createContext<CartSession>({
     cart: null,
     customer: null,

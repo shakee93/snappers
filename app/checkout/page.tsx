@@ -170,12 +170,12 @@ const CheckoutPage = () => {
   const [showBankTransfer, setShowBankTransfer] = useState<boolean>(false);
   const [wantToSHowBankTransfer, setWantToSHowBankTransfer] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
-  // USE_CASE:  This is to redirect to home page if cart is empty
+
+
   useEffect(() => {
     if (cart && cart?.contents?.nodes?.length === 0) {
       router.push("/");
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cart]);
 
   useEffect(() => {
@@ -231,6 +231,17 @@ const CheckoutPage = () => {
         [component]: value,
       };
     });
+  };
+
+  const { getCart } = useCart();
+
+  const refreshCart = async () => {
+    try {
+      await getCart();
+    } catch (error: any) {
+      console.error("Error refreshing the cart:", error);
+      throw error
+    }
   };
 
   const updateShippingTotal = async () => {
@@ -429,6 +440,7 @@ const CheckoutPage = () => {
       if (data) {
         const checkoutDetails = savePaymentDetails(data);
         setPaymentData(checkoutDetails);
+        await refreshCart()
         toast.success("Order Created Successfully");
       } else {
         toast.error("Something Went Wrong While Checkout");
@@ -479,6 +491,8 @@ const CheckoutPage = () => {
         onError={() => console.error("Error loading PayHere script")}
       />
       <title>Checkout</title>
+     
+
       <main className="container py-8 md:py-16 lg:pb-28 lg:pt-20 ">
         <PaymentModal
           show={showBankTransfer}
@@ -490,6 +504,7 @@ const CheckoutPage = () => {
           <h2 className="block text-2xl sm:text-3xl lg:text-4xl font-semibold ">
             Checkout
           </h2>
+          
           <div className="block mt-3 sm:mt-5 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-400">
             <Link href={"/#"} className="">
               Homepage
@@ -498,7 +513,7 @@ const CheckoutPage = () => {
             <span className="underline">Checkout</span>
           </div>
         </div>{" "}
-        .
+
         <div className="flex flex-col lg:flex-row">
           {/* Information about user */}
           <div className="flex-1">

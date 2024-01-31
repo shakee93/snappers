@@ -8,6 +8,9 @@ import {useSession} from "@/context/SessionProvider";
 import Link from "next/link";
 
 const AccountOrder = () => {
+    // TODO: have  fix the with correct order mutation after therier github fix
+    // TODO: https://github.com/wp-graphql/wp-graphql-woocommerce/issues/467
+    
     const {loading, error, data} = useQuery(GET_GUEST_ORDER);
 
     const {customer, updateCustomer} = useSession();

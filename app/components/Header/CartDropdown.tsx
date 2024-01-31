@@ -1,15 +1,16 @@
-'use client'
+"use client";
 import { Popover, Transition } from "@headlessui/react";
 import { ShoppingBag } from "lucide-react";
-import {Fragment} from "react";
+import { Fragment } from "react";
 import Link from "next/link";
-import {useCart} from "@/context/CartProvider";
+import { useCart } from "@/context/CartProvider";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import ButtonSecondary from "@/shared/Button/ButtonSecondary";
 import CartDropdownItem from "@/app/components/Header/CartDropdownItem";
 
 export default function CartDropdown() {
-  const {cart} = useCart();
+  const { cart } = useCart();
+  let empty = cart?.contents?.itemCount == 0;
 
   return (
     <Popover className="relative">
@@ -20,16 +21,15 @@ export default function CartDropdown() {
                 ${open ? "" : "text-opacity-90"}
                  group w-10 h-10 sm:w-12 sm:h-12 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full inline-flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 relative`}
           >
-            {!!cart?.contents?.itemCount &&
-                <div className="w-3.5 h-3.5 flex items-center justify-center bg-primary-500 absolute top-1.5 right-1.5 rounded-full text-[10px] leading-none text-white font-medium">
-                  <span className="mt-[1px]">{cart?.contents?.itemCount}</span>
-                </div>
-            }
+            {!!cart?.contents?.itemCount && (
+              <div className="w-3.5 h-3.5 flex items-center justify-center bg-primary-500 absolute top-1.5 right-1.5 rounded-full text-[10px] leading-none text-white font-medium">
+                <span className="mt-[1px]">{cart?.contents?.itemCount}</span>
+              </div>
+            )}
 
             <div className="text-primaryColor">
-              <ShoppingBag/>
+              <ShoppingBag />
             </div>
-
 
             <Link className="block md:hidden absolute inset-0" href={"/cart"} />
           </Popover.Button>
@@ -48,9 +48,13 @@ export default function CartDropdown() {
                   <div className="max-h-[60vh] p-5 overflow-y-auto hiddenScrollbar">
                     <h3 className="text-xl font-semibold">Shopping cart</h3>
                     <div className="divide-y divide-slate-100 dark:divide-slate-700">
-                      {cart?.contents?.nodes?.map(
-                        (item, index) => <CartDropdownItem item={item} key={index} close={close}/>
-                      )}
+                      {cart?.contents?.nodes?.map((item, index) => (
+                        <CartDropdownItem
+                          item={item}
+                          key={index}
+                          close={close}
+                        />
+                      ))}
                     </div>
                   </div>
                   <div className="bg-neutral-50 dark:bg-slate-900 p-5">
@@ -71,13 +75,28 @@ export default function CartDropdown() {
                       >
                         View cart
                       </ButtonSecondary>
+                      <Link className="flex-1" href={"/checkout"}>
+                        <button
+                          disabled={empty}
+                          onClick={close}
+                          className={
+                            "relative w-full h-auto flex-1  items-center justify-center rounded-full \
+    transition-colors disabled:cursor-not-allowed text-sm sm:text-base font-medium py-3 px-4 sm:py-3 sm:px-6  \
+    disabled:bg-opacity-90 bg-primaryColor text-white"
+                          }
+                        >
+                          <span className="">Checkout</span>
+                        </button>
+                      </Link>
+                      {/* 
                       <ButtonPrimary
                         href="/checkout"
                         onClick={close}
-                        className="flex-1"
+                        className="flex-1 disabled:opacity-90 disabled:cursor-not-allowed"
+                        disabled={true}
                       >
-                        Checkout
-                      </ButtonPrimary>
+                        Checkout {JSON.stringify(empty)}
+                      </ButtonPrimary> */}
                     </div>
                   </div>
                 </div>
