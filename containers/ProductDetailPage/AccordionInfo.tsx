@@ -91,7 +91,6 @@ const AccordionInfo: FC<Props> = ({
     };
   }
 
-  console.log({ specifications });
 
   return (
     <div className="w-full rounded-2xl space-y-2.5">

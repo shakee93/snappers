@@ -123,7 +123,6 @@ export function SessionProvider({ children }: {
     };
 
     const login = async (email: string, password: string): Promise<LoginResponse> => {
-        console.log("how are you oding")
         await logout()
         try {
             const response: FetchResult<LoginCustomerMutation> = await loginCustomer({
@@ -135,9 +134,8 @@ export function SessionProvider({ children }: {
                 },
             })
 
-            console.log("data login",response);
             saveResponseToLocalStorage(response, "login");
-
+            fetchCustomer();
             return { data: "logged_in", error: null };
         } catch (error) {
             let errorMessage = "An error occurred while login.";
@@ -170,8 +168,6 @@ export function SessionProvider({ children }: {
     const fetchCustomer = async () => {
 
         const userData = localStorage.getItem(USER_DATA_KEY);
-
-
         // console.log("userData", JSON.parse(userData!));
         if (userData) {
             // console.log(JSON.parse(userData));

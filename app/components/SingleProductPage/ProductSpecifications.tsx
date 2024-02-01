@@ -3,7 +3,6 @@ import Link from "next/link";
 
 const ProductSpecifications = ({ techspecs, manualSpecs }: { techspecs?: any; manualSpecs?: any }) => {
 
-  console.log('insidetecspecs');
 
   return (
     <>

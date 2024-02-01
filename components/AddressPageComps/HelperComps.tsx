@@ -113,6 +113,26 @@ const savePaymentDetails = (
   return saved_data;
 };
 
+
+const WelcomeMessages = [
+  "Welcome back! We're delighted to see you again.",
+  "Hello again! It's great to have you back with us.",
+  "Welcome back to our Shop.",
+  "You're back! We missed you. Welcome!",
+  "We've been waiting for you! Welcome back!",
+  "Welcome to GQ Mobiles once more.",
+  "Welcome back, valued customer! Your presence brightens our day.",
+  "Guess who's back? It's you! Welcome!",
+  "It's a pleasure to have you back! Welcome to GQ Mobiles."
+];
+
+const getRandomWelcomeMessage = () => {
+  const randomIndex = Math.floor(Math.random() * WelcomeMessages.length);
+  return WelcomeMessages[randomIndex];
+};
+
+
+
 export {
   InputField,
   SelectField,
@@ -120,5 +140,6 @@ export {
   extractRawAmount,
   LoggedInAvatar,
   transformAddress,
-  savePaymentDetails
+  savePaymentDetails,
+  getRandomWelcomeMessage
 };

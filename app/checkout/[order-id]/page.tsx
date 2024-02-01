@@ -66,6 +66,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   useEffect(() => {
     getUserData();
     refreshCart();
+    console.log("Cart refreshed");
   }, [getUserData]);
 
   if (!orderId || orderId == "12345") {

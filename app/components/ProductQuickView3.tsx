@@ -66,7 +66,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product, 
     product?.galleryImages?.nodes[1]?.sourceUrl ?? ""
   ];
 
-  console.log({ product });
+  // console.log({ product });
 
   const { loading, error, data } = useQuery(GET_TECH_SPEC, {
     variables: {
