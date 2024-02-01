@@ -114,8 +114,8 @@ const ProductAddToCart = ({
         >
           {loading ? <Loader className="animate-spin" /> : <ShoppingCart />}
           <span className="md:ml-3 cursor-pointer">Add to cart</span>
-        </button>fix
-        
+        </button>
+
       </div>
     </>
   );
