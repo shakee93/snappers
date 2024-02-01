@@ -11,18 +11,14 @@ import { LoggedInAvatar } from "@/components/AddressPageComps/HelperComps";
 
 export default function AvatarDropdown() {
   const { customer, fetchCustomer } = useSession();
-  const [currentCustomer, setCurrentCustomer] = useState<Customer | null>(null);
+
 
   useEffect(() => {
     setInterval(() => {
       fetchCustomer()
     },5000)
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    if (customer) {
-      currentCustomer && setCurrentCustomer(customer);
-    }
-  }, [customer]);
+  }, [ fetchCustomer]);
 
   // console.log("currentCustomer", customer);
 
@@ -317,8 +313,6 @@ export default function AvatarDropdown() {
                         </div>
                       </Link> */}
                         <LogoutButton
-                          set={setCurrentCustomer}
-                          customer={currentCustomer}
                         />
                       </>
                     )}
