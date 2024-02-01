@@ -14,13 +14,15 @@ export default function AvatarDropdown() {
   const [currentCustomer, setCurrentCustomer] = useState<Customer | null>(null);
 
   useEffect(() => {
+    setInterval(() => {
       fetchCustomer()
-    // fetchCustomer();
+    },5000)
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
     if (customer) {
       currentCustomer && setCurrentCustomer(customer);
     }
-  }, [currentCustomer]);
+  }, [customer]);
 
   // console.log("currentCustomer", customer);
 
