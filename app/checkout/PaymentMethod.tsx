@@ -43,9 +43,9 @@ const PaymentMethod: FC<Props> = ({
     const active = methodActive === gateway.id;
 
     return (
-      <div className="flex items-start space-x-4 sm:space-x-6">
+      <div className="flex items-start cursor-pointer space-x-4 sm:space-x-6">
         <Radio
-          className=""
+          className="cursor-pointer"
           name="payment-method"
           id={gateway.id}
           defaultChecked={active}

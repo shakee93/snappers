@@ -383,7 +383,6 @@ const CheckoutPage = () => {
     if (isCashOnDelivery) {
       if (checkoutDetails.order_id == "no_order_id_found") {
         let email = formData?.contactInfo?.email;
-        console.log("formData no checkout: ", formData);
         let redirectUrl = `/checkout/${checkoutDetails.order_id}?email=${email}`;
         router.push(redirectUrl);
         return;
@@ -624,7 +623,7 @@ const CheckoutPage = () => {
             {/*</ButtonPrimary>*/}
 
             <div className="mt-5 text-sm text-slate-500 dark:text-slate-400 flex items-center justify-center">
-              <p className=" flex gap-2 relative pl-5">
+              <div className=" flex gap-2 relative pl-5">
                 <Info />
 
                 <div>
@@ -650,7 +649,7 @@ const CheckoutPage = () => {
                   </Link>
                   {` `}.
                 </div>
-              </p>
+              </div>
             </div>
           </div>
         </div>

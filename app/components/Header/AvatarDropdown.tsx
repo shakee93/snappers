@@ -12,22 +12,30 @@ import { LoggedInAvatar } from "@/components/AddressPageComps/HelperComps";
 export default function AvatarDropdown() {
   const { customer, fetchCustomer } = useSession();
 
+  const fetchData = async () => {
+    await fetchCustomer();
+  };
 
   useEffect(() => {
-    setInterval(() => {
-      fetchCustomer()
-    },5000)
+    if (customer == null) {
+      fetchData();
+    }
+  }, []);
 
-  }, [ fetchCustomer]);
-
-  // console.log("currentCustomer", customer);
 
   return (
     <div className="AvatarDropdown">
+      {/* <button onClick={() => fetchCustomer()}>Refetch</button> */}
       <Popover className="relative">
         {({ open, close }) => (
           <>
-            <Popover.Button className={``}>
+            <Popover.Button
+              className={``}
+              onClick={() => {
+                console.log("open");
+                fetchCustomer();
+              }}
+            >
               <div
                 className={`text-primaryColor w-10 h-10 sm:w-12 sm:h-12 rounded-full dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none flex items-center justify-center`}
               >
@@ -312,8 +320,7 @@ export default function AvatarDropdown() {
                           <p className="text-sm font-medium ">{"Help"}</p>
                         </div>
                       </Link> */}
-                        <LogoutButton
-                        />
+                        <LogoutButton />
                       </>
                     )}
                   </div>
