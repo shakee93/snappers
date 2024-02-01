@@ -409,3 +409,214 @@ export const GET_NEW_ARRIVALS = gql`
   }
   ${ProductContentFull}
 `;
+
+//productContentFull fragment is not working
+export const GET_QUICK_VIEW_PRODUCT = gql`
+  query quickview_product($productId: ID!) {
+    product(id: $productId, idType: DATABASE_ID) {
+      id
+      databaseId
+      slug
+      name
+      type
+      description
+      shortDescription(format: RAW)
+      reviewCount
+      metaData {
+        id
+        key
+        value
+      }
+      image {
+        id
+        sourceUrl
+        altText
+        databaseId
+      }
+      brands {
+        nodes {
+          databaseId
+          name
+          slug
+          count
+        }
+      }
+      galleryImages {
+        nodes {
+          id
+          sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
+          altText
+          databaseId
+        }
+      }
+      productTags(first: 20) {
+        nodes {
+          id
+          slug
+          name
+        }
+      }
+      attributes {
+        nodes {
+          id
+          attributeId
+          name
+          label
+          options
+        }
+      }
+      ... on SimpleProduct {
+        onSale
+        stockStatus
+        price
+        rawPrice: price(format: RAW)
+        regularPrice
+        salePrice
+        stockStatus
+        purchasable
+        stockQuantity
+        soldIndividually
+        productCategories {
+          edges {
+            node {
+              id
+              name
+              slug
+            }
+          }
+        }
+        metaData {
+          id
+          key
+          value
+        }
+        galleryImages {
+          nodes {
+            id
+            sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
+            altText
+            databaseId
+          }
+        }
+      }
+      ... on VariableProduct {
+        allPaCapacity {
+          nodes {
+            name
+            slug
+          }
+        }
+        allPaColor {
+          nodes {
+            name
+            slug
+          }
+        }
+        metaData {
+          id
+          key
+          value
+        }
+        allPaColour {
+          nodes {
+            name
+            slug
+          }
+        }
+        allPaSpecification {
+          nodes {
+            name
+            slug
+          }
+        }
+        allPaVariant {
+          nodes {
+            name
+            slug
+          }
+        }
+        allPaWarranty {
+          nodes {
+            name
+            slug
+          }
+        }
+        allPaWatchSize {
+          nodes {
+            name
+            slug
+          }
+        }
+        onSale
+        price
+        rawPrice: price(format: RAW)
+        regularPrice
+        salePrice
+        stockStatus
+        purchasable
+        stockQuantity
+        soldIndividually
+        defaultAttributes {
+          nodes {
+            name
+            label
+            value
+          }
+        }
+        globalAttributes {
+          nodes {
+            slug
+            name
+            label
+          }
+        }
+        productCategories {
+          edges {
+            node {
+              id
+              databaseId
+              name
+              slug
+            }
+          }
+        }
+        galleryImages {
+          nodes {
+            id
+            sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
+            altText
+            databaseId
+          }
+        }
+        variations(first: 50) {
+          nodes {
+            id
+            databaseId
+            name
+            price
+            stockStatus
+            rawPrice: price(format: RAW)
+            regularPrice
+            salePrice
+            onSale
+            image {
+                sourceUrl
+                id
+                databaseId
+            }
+            attributes {
+              nodes {
+                name
+                label
+                value
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+`;
+
+

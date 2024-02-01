@@ -23,11 +23,10 @@ const ProductDetails = ({
   product: VariableProduct & SimpleProduct;
   brand: Brand;
 }) => {
-  const {
-    product: { attribute },
-    setAttribute,
-  } = useStore();
-  const [activeVariation, setActiveVariation] = useState<any>(null);
+  
+  const { product: { attribute }, setAttribute } = useStore();
+
+  const [activeVariation, setActiveVariation] = useState<any>(product?.variations?.nodes[0]);
   const [activeOption, setActiveOption] = useState(
     !!product?.variations?.nodes?.length
       ? product?.variations?.nodes[0].attributes?.nodes[0].value
@@ -109,6 +108,8 @@ const { setVariationId } = useImage();
     //   }
     }
   }, [attribute]);
+
+  console.log({product});
 
   return (
     <>

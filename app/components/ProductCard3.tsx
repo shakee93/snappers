@@ -1,20 +1,23 @@
 "use client";
-import {ExternalLink, Loader, Settings2, ShoppingCart, XIcon} from "lucide-react";
-import React, {FC, useEffect, useRef, useState} from "react";
+import { ExternalLink, Loader, Settings2, ShoppingCart, XIcon } from "lucide-react";
+import React, { FC, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
-import {ArrowsPointingOutIcon} from "@heroicons/react/24/outline";
-import {StarIcon} from "@heroicons/react/24/solid";
+import { ArrowsPointingOutIcon } from "@heroicons/react/24/outline";
+import { StarIcon } from "@heroicons/react/24/solid";
 import toast from "react-hot-toast";
-import {Transition} from "@headlessui/react";
+import { Transition } from "@headlessui/react";
 import ModalQuickView from "./ModalQuickView";
 import Prices from "./Prices";
 import useProductLink from "@/hooks/useProductLink";
-import {Brand, ProductVariation, SimpleProduct, VariableProduct,} from "@/graphql/types/graphql";
+import { Brand, ProductVariation, SimpleProduct, VariableProduct, } from "@/graphql/types/graphql";
 import AddedToCart from "@/app/components/Notifications/added-to-cart";
-import {useCart} from "@/context/CartProvider";
-import {twMerge} from "tailwind-merge";
+import { useCart } from "@/context/CartProvider";
+import { twMerge } from "tailwind-merge";
+import { GET_QUICK_VIEW_PRODUCT } from "@/graphql/defs/products";
+import { useQuery } from "@apollo/client";
+
 
 export interface ProductCardProps {
     className?: string;
@@ -31,6 +34,8 @@ const ProductCard: FC<ProductCardProps> = ({
         name,
         price,
         type,
+        description,
+        shortDescription,
         allPaColor,
         allPaCapacity,
         purchasable,
@@ -55,6 +60,15 @@ const ProductCard: FC<ProductCardProps> = ({
     const [loading, setLoading] = useState(false)
 
     const link = useProductLink(data)
+
+    const singleProduct = useQuery(GET_QUICK_VIEW_PRODUCT, {
+        variables: {
+            productId: databaseId,
+        },
+    })
+
+    const quickviewData = singleProduct?.data?.product
+    // console.log({quickviewData});
 
     const handleHoverOut = () => {
         setIsHovered(false);
@@ -282,7 +296,7 @@ const ProductCard: FC<ProductCardProps> = ({
 
                 <Link href={link} className="flex m-0 mb-2 justify-between items-center">
                     <Prices
-                         price={
+                        price={
                             type === 'VARIABLE'
                                 ? variations?.nodes[0]?.price !== null ? variations?.nodes[0]?.price : price
                                 : price !== null && price !== undefined ? price : 0
@@ -294,7 +308,7 @@ const ProductCard: FC<ProductCardProps> = ({
                         }
                         className='lg:flex-row'
                     />
-                   
+
                     {/* <Prices price={price} salePrice={regularPrice} className='lg:flex-row' /> */}
                     {((salePrice === price || !salePrice) && !!reviewCount) && (
                         <div className="flex items-center mb-0.5">
@@ -323,7 +337,7 @@ const ProductCard: FC<ProductCardProps> = ({
             < ModalQuickView
                 show={showModalQuickView}
                 onCloseModalQuickView={() => setShowModalQuickView(false)}
-                productData={data}
+                productData={quickviewData}
                 brands={brands?.nodes[0]}
             />
         </div>

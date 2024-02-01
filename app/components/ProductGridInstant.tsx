@@ -13,6 +13,7 @@ import NotFound from "@/public/not_found.svg";
 import { usePathname } from "next/navigation";
 import ProductCardLoading from "@/components/Loading/ProductCardLoading";
 
+
 interface ProductGridProps {
   products?: { node: Product }[];
   brand?: Brand;
@@ -57,39 +58,39 @@ const ProductGridInstant = ({
       <div className='h-[185px] md:h-60 bottom-3 right-3 hidden'></div>
 
       {statusState === 'idle' &&
-          <div className="flex-1 grid  grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-2 lg:gap-x-8 lg:gap-y-10">
-            {hits.map((item, index: number) => (
-                // <div key={index}></div>
-                <ProductCard
-                    key={item.slug as unknown as string}
-                    data={item as unknown as Product}
-                />
-            ))}
-          </div>
+        <div className="flex-1 grid  grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-2 lg:gap-x-8 lg:gap-y-10">
+          {hits.map((item, index: number) => (
+            // <div key={index}></div>
+            <ProductCard
+              key={item?.slug as unknown as string}
+              data={item as unknown as Product}
+            />
+          ))}
+        </div>
       }
 
       {(statusState === 'stalled' || statusState === 'loading') &&
-          <div className='flex-1 grid grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-2 lg:gap-x-8 lg:gap-y-10'>
-            {Array(grid).fill(null).map((x, index) =>
-                <ProductCardLoading key={index}/>
-            )}
-          </div>
+        <div className='flex-1 grid grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-2 lg:gap-x-8 lg:gap-y-10'>
+          {Array(grid).fill(null).map((x, index) =>
+            <ProductCardLoading key={index} />
+          )}
+        </div>
       }
 
-      {(results?.nbHits === 0 ) && (
-          <div className="text-center text-slate-500 flex flex-col items-center gap-20 py-12">
-            <div>
-              <Image className="w-64" src={NotFound} alt="No Search Results" />
-            </div>
-            <div>We couldn&lsquo;t find any products :(</div>
+      {(results?.nbHits === 0) && (
+        <div className="text-center text-slate-500 flex flex-col items-center gap-20 py-12">
+          <div>
+            <Image className="w-64" src={NotFound} alt="No Search Results" />
           </div>
+          <div>We couldn&lsquo;t find any products :(</div>
+        </div>
       )}
 
 
       {results && results?.nbHits > results?.hitsPerPage && (
         <>
           <hr className="border-slate-200 mb-2 -mx-3 lg:my-6 dark:border-slate-700" />
-          <Pagination  />
+          <Pagination />
         </>
       )}
     </>
