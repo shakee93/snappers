@@ -472,6 +472,8 @@ const CheckoutPage = () => {
     }, 80);
   };
 
+
+
   return (
     <div className="nc-CheckoutPage">
       <Script
@@ -482,7 +484,6 @@ const CheckoutPage = () => {
       />
       <title>Checkout</title>
      
-
       <main className="container py-8 md:py-16 lg:pb-28 lg:pt-20 ">
         <PaymentModal
           show={showBankTransfer}
