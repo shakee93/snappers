@@ -61,6 +61,7 @@ const ProductAddToCart = ({
   };
 
   const addItemToCart = async () => {
+
     if (
       (product?.type === "VARIABLE" && variation?.stockStatus !== "IN_STOCK") ||
       (product?.type === "SIMPLE" && product?.stockStatus !== "IN_STOCK")
@@ -69,9 +70,10 @@ const ProductAddToCart = ({
     }
   
     setLoading(true);
-  
+    let variationId = product.type == "SIMPLE" ? undefined : variation.databaseId;
+
     try {
-      await addToCart(product?.databaseId, quantity, undefined);
+      await addToCart(product?.databaseId, quantity, variationId);
       cartCompleted();
     } catch (error) {
       console.error("Error:", error);

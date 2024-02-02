@@ -30,7 +30,7 @@ const EmblaCarousel: React.FC<PropType> = ({product}) => {
         if (!emblaMainApi || !emblaThumbsApi) return;
 
         const variations = product?.variations?.nodes;
-        const galleryImagesIndex = variations?.findIndex((image: any) => image?.databaseId === data?.databaseId);
+        const variationGalleryImagesIndex = variations?.findIndex((image: any) => image?.databaseId === data?.databaseId);
 
         if (variationId) {
             const variationIndex = variations?.findIndex((variation: any) => variation?.image?.databaseId === variationId);
@@ -42,12 +42,12 @@ const EmblaCarousel: React.FC<PropType> = ({product}) => {
             return;
         }
 
-        if (galleryImagesIndex === 0 || galleryImagesIndex === undefined) {
+        if (variationGalleryImagesIndex === 0 || variationGalleryImagesIndex === undefined) {
             emblaMainApi.scrollTo(0);
-        } else if (galleryImagesIndex !== -1) {
-            emblaMainApi.scrollTo(galleryImagesIndex);
+        } else if (variationGalleryImagesIndex !== -1) {
+            emblaMainApi.scrollTo(variationGalleryImagesIndex);
         }
-        
+
     }, [emblaMainApi, emblaThumbsApi, product]);
 
     const onSelect = useCallback(() => {
@@ -67,7 +67,6 @@ const EmblaCarousel: React.FC<PropType> = ({product}) => {
     let productsArray = product.type == "SIMPLE" ? [product] :  product.variations?.nodes;
     let combinedImages = [...galleryImage, ...product.variations?.nodes ?? []];
     
-    debugger;
     return (
         <div className="embla">
             <div className="embla__viewport" ref={emblaMainRef}>
