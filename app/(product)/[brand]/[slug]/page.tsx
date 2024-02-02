@@ -19,6 +19,7 @@ type Props = {
     brand: string;
   };
 };
+
 export async function generateStaticParams() {
   const {
     data: { brands },
@@ -27,6 +28,7 @@ export async function generateStaticParams() {
   });
   return brands.nodes.map((p: Brand) => p.slug);
 }
+
 async function getData(slug: string, brand: string) {
   try {
     const { data } = await getClient().query({
@@ -57,6 +59,7 @@ async function getData(slug: string, brand: string) {
     return notFound();
   }
 }
+
 export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata

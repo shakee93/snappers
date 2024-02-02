@@ -3,7 +3,7 @@ import React, {useCallback, useEffect, useState} from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import {Thumb} from "app/components/SingleProductBlock/ProductCarouselThumb";
 import "styles/product_embla.css";
-import {SimpleProduct, VariableProduct,} from "@/graphql/types/graphql";
+import {MediaItem, SimpleProduct, VariableProduct,} from "@/graphql/types/graphql";
 import Image from "next/image";
 import {EmblaOptionsType} from "embla-carousel";
 import {useImage} from "@/context/ImageChangeGrabber";
@@ -47,6 +47,7 @@ const EmblaCarousel: React.FC<PropType> = ({product}) => {
         } else if (galleryImagesIndex !== -1) {
             emblaMainApi.scrollTo(galleryImagesIndex);
         }
+        
     }, [emblaMainApi, emblaThumbsApi, product]);
 
     const onSelect = useCallback(() => {
@@ -62,8 +63,11 @@ const EmblaCarousel: React.FC<PropType> = ({product}) => {
         emblaMainApi.on("reInit", onSelect);
     }, [emblaMainApi, onSelect]);
 
+    let galleryImage = product.galleryImages?.nodes ?? [];
     let productsArray = product.type == "SIMPLE" ? [product] :  product.variations?.nodes;
+    let combinedImages = [...galleryImage, ...product.variations?.nodes ?? []];
     
+    debugger;
     return (
         <div className="embla">
             <div className="embla__viewport" ref={emblaMainRef}>

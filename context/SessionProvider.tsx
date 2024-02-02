@@ -208,7 +208,6 @@ export function SessionProvider({ children }: {
             try {
                 const { data } = await refetch()
 
-
                 if (data && data?.customer?.sessionToken) {
                     const newSessionToken = data.customer.sessionToken;
                     setSessionToken(newSessionToken)

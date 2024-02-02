@@ -35,9 +35,10 @@ const LoginForm = () => {
     } catch (error) {
       console.error("Error:", error);
     } finally {
+      await fetchCustomer();
         router.push("/");
       setIsLoading(false);
-      fetchCustomer();
+   
     }
   };
 

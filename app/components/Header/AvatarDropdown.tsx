@@ -21,6 +21,10 @@ export default function AvatarDropdown() {
       fetchData();
     }
   }, []);
+  
+  useEffect(() => {
+    console.log("customer: ", customer);
+  },[customer])
 
 
   return (
