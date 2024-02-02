@@ -95,7 +95,7 @@ const ProductSpecifications = ({ techspecs, manualSpecs }: { techspecs?: any; ma
                   </td>
                 </tr>)}
 
-              {techspecs && techspecs?.items[0]?.inside?.storage?.capacity &&
+              {/* {techspecs && techspecs?.items[0]?.inside?.storage?.capacity &&
                 (<tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
                   <td className="px-3 py-2 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                     Internal Memory
@@ -103,7 +103,7 @@ const ProductSpecifications = ({ techspecs, manualSpecs }: { techspecs?: any; ma
                   <td className="px-3 py-2">
                     {techspecs?.items[0]?.inside?.storage?.capacity || ""}
                   </td>
-                </tr>)}
+                </tr>)} */}
 
               {techspecs && techspecs?.items[0]?.display.refresh_rate &&
                 (<tr className="odd:bg-white odd:dark:bg-gray-900 even:bg-gray-50 even:dark:bg-gray-800 border-b dark:border-gray-700">
