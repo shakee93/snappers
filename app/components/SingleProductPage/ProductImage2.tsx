@@ -118,7 +118,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
                                 key={index}
                             />
                         ))}
-
+fix:
                     </div>
                 </div>
             </div>
