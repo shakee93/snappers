@@ -62,8 +62,8 @@ const ProductAddToCart = ({
 
   const addItemToCart = async () => {
     if (
-      (product.type === "VARIABLE" && variation?.stockStatus !== "IN_STOCK") ||
-      (product.type === "SIMPLE" && product.stockStatus !== "IN_STOCK")
+      (product?.type === "VARIABLE" && variation?.stockStatus !== "IN_STOCK") ||
+      (product?.type === "SIMPLE" && product?.stockStatus !== "IN_STOCK")
     ) {
       return;
     }
@@ -71,7 +71,7 @@ const ProductAddToCart = ({
     setLoading(true);
   
     try {
-      await addToCart(product.databaseId, quantity, undefined);
+      await addToCart(product?.databaseId, quantity, undefined);
       cartCompleted();
     } catch (error) {
       console.error("Error:", error);
@@ -82,7 +82,7 @@ const ProductAddToCart = ({
   };
   
 
-  if (product.type === "VARIABLE" && !variation) {
+  if (product?.type === "VARIABLE" && !variation) {
     return <></>;
   }
 
@@ -106,8 +106,8 @@ const ProductAddToCart = ({
           className={twMerge(
             "relative w-auto grow md:flex-none  h-auto inline-flex\
             cursor-pointer items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-primaryColor dark:bg-slate-100 text-slate-50 dark:text-slate-800 shadow-xl  flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0",
-            (product.stockStatus !== "IN_STOCK" ||
-              (product.type === "VARIABLE" &&
+            (product?.stockStatus !== "IN_STOCK" ||
+              (product?.type === "VARIABLE" &&
                 variation?.stockStatus !== "IN_STOCK")) &&
               "opacity-50 disabled:cursor-not-allowed"
           )}
@@ -115,6 +115,7 @@ const ProductAddToCart = ({
           {loading ? <Loader className="animate-spin" /> : <ShoppingCart />}
           <span className="md:ml-3 cursor-pointer">Add to cart</span>
         </button>
+
       </div>
     </>
   );

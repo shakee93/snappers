@@ -70,9 +70,14 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product, 
 
   const { loading, error, data } = useQuery(GET_TECH_SPEC, {
     variables: {
-      productId: product.databaseId,
+      productId: product?.databaseId,
     }
   });
+
+  const manualMeta = product?.metaData;
+  const techSpecDataObject = manualMeta?.find(item => item?.key === 'tech_spec_data');
+  const parsedMetaData = techSpecDataObject?.value ? JSON.parse(techSpecDataObject.value) : null;
+  const manualTechSpecs = parsedMetaData ? Object.entries(parsedMetaData) : [];
 
   useEffect(() => {
     if (data) {
@@ -115,7 +120,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product, 
           </span>
         </label>
         <div className="flex mt-2.5">
-          {product.variations.nodes?.map((variant: ProductVariation, index) => (
+          {product?.variations?.nodes?.map((variant: ProductVariation, index) => (
             <div
               key={index}
               onClick={() => setVariantActive(index)}
@@ -126,7 +131,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product, 
             >
               <div className="absolute inset-0.5 rounded-full overflow-hidden z-0">
                 <Image fill style={{ objectFit: 'cover' }}
-                  src={variant.image?.sourceUrl || ''}
+                  src={variant?.image?.sourceUrl || ''}
                   alt=""
                   className="absolute w-full h-full object-cover"
                 />
@@ -180,14 +185,14 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product, 
   };
 
   const renderSectionContent = () => {
-    console.log({ product })
+ 
     return (
       <div className="space-y-8">
 
         {/* <ProductDetails brand={brand} product={product} /> */}
         {/* ---------- 1 HEADING ----------  */}
 
-        <ProductDetails brand={brands} product={product}/>
+        <ProductDetails brand={brands} product={product} />
 
         {/* <div>
 
@@ -307,14 +312,15 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product, 
           data={[
             {
               name: "Description",
-              content: product.description ?? "",
+              content: product?.description ?? "",
             },
             {
               name: "Specifications",
-              content: product.description ?? "",
+              content: product?.description ?? "",
             }
           ]}
           techspecs={techspecs}
+          manualSpecs={manualTechSpecs}
         />
       </div>
     );
@@ -343,16 +349,19 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product, 
           </div>
           {(product?.galleryImages?.nodes || (product?.galleryImages?.edges && product?.galleryImages?.edges?.length > 0)) && (
             <div className="hidden lg:grid grid-cols-2 gap-3 mt-3 sm:gap-6 sm:mt-6 xl:gap-5 xl:mt-5">
-              {[product_images[1], product_images[2]].map((item, index) => {
-                return (
-                  <div key={index} className="aspect-w-3 aspect-h-4">
-                    <Image fill style={{ objectFit: 'contain' }}
-                      src={item}
-                      className="w-full rounded-xl object-contain"
-                      alt={`product detail ${index + 2}`}
-                    />
-                  </div>
-                );
+              {product_images.slice(1).map((item, index) => {
+                if (item) {
+                  return (
+                    <div key={index} className="aspect-w-3 aspect-h-4">
+                      <Image fill style={{ objectFit: 'contain' }}
+                        src={item}
+                        className="w-full rounded-xl object-contain"
+                        alt={`product detail ${index + 2}`}
+                      />
+                    </div>
+                  );
+                }
+                return null;
               })}
             </div>
           )}

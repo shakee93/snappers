@@ -1,6 +1,6 @@
-import {Disclosure} from "@headlessui/react";
-import {MinusIcon, PlusIcon} from "@heroicons/react/24/outline";
-import {FC} from "react";
+import { Disclosure } from "@headlessui/react";
+import { MinusIcon, PlusIcon } from "@heroicons/react/24/outline";
+import { FC } from "react";
 
 import ProductSpecifications from "@/app/components/SingleProductPage/ProductSpecifications";
 
@@ -55,7 +55,7 @@ type techSpech = {
   product: {
     metaData: Array<{
       value: string;
-      key?: string; 
+      key?: string;
     }>;
   };
 };
@@ -64,6 +64,7 @@ interface Props {
   panelClassName?: string;
   data?: typeof DEMO_DATA;
   techspecs?: techSpech | null;
+  manualSpecs?: any;
 }
 
 
@@ -72,15 +73,12 @@ let specifications: { [key: string]: any } = {};
 const AccordionInfo: FC<Props> = ({
   panelClassName = "p-4 pt-3 last:pb-0 text-slate-600 text-sm dark:text-slate-300 leading-6",
   data = DEMO_DATA,
-  techspecs
+  techspecs,
+  manualSpecs
 }) => {
-
-  // console.log({ techspecs });
 
   const techSpec = techspecs?.product?.metaData?.find(item => item?.key === 'tech_spec')?.value;
 
-  
-  
   let specifications = {
     items: []
   };
@@ -92,6 +90,7 @@ const AccordionInfo: FC<Props> = ({
       items: []
     };
   }
+
 
   return (
     <div className="w-full rounded-2xl space-y-2.5">
@@ -114,12 +113,18 @@ const AccordionInfo: FC<Props> = ({
                   as="div"
                 >
 
-                  {specifications && specifications?.items && specifications?.items.length > 0 && item.name === "Specifications" &&
-                    <ProductSpecifications techspecs={specifications} />
+                  {specifications?.items.length > 0 && item.name === "Specifications" &&
+                    <ProductSpecifications techspecs={specifications} manualSpecs={manualSpecs} />
                   }
+
+                  {manualSpecs?.length > 0 && item.name === "Specifications" &&
+                    <ProductSpecifications techspecs={specifications} manualSpecs={manualSpecs} />
+                  }
+
                   {item.name !== "Specifications" && (
                     <div dangerouslySetInnerHTML={{ __html: item.content }} />
                   )}
+
                 </Disclosure.Panel>
               </>
             )}
