@@ -109,7 +109,6 @@ const { setVariationId } = useImage();
     }
   }, [attribute]);
 
-  console.log({product});
 
   return (
     <>

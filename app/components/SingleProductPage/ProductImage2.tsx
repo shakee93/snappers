@@ -1,26 +1,26 @@
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
+import React, {useCallback, useEffect, useState} from "react";
 import useEmblaCarousel from "embla-carousel-react";
-import { Thumb } from "app/components/SingleProductBlock/ProductCarouselThumb";
+import {Thumb} from "app/components/SingleProductBlock/ProductCarouselThumb";
 import "styles/product_embla.css";
-import { MediaItem, SimpleProduct, VariableProduct, } from "@/graphql/types/graphql";
+import {MediaItem, SimpleProduct, VariableProduct,} from "@/graphql/types/graphql";
 import Image from "next/image";
-import { EmblaOptionsType } from "embla-carousel";
-import { useImage } from "@/context/ImageChangeGrabber";
+import {EmblaOptionsType} from "embla-carousel";
+import {useImage} from "@/context/ImageChangeGrabber";
 
 type PropType = {
     options?: EmblaOptionsType;
     product: SimpleProduct & VariableProduct;
 };
 
-const EmblaCarousel: React.FC<PropType> = ({ product }) => {
+const EmblaCarousel: React.FC<PropType> = ({product}) => {
     const [selectedIndex, setSelectedIndex] = useState(0);
     const [emblaMainRef, emblaMainApi] = useEmblaCarousel({});
     const [emblaThumbsRef, emblaThumbsApi] = useEmblaCarousel({
         containScroll: "keepSnaps",
         dragFree: true,
     });
-    const { variationId } = useImage();
+    const {variationId} = useImage();
 
     useEffect(() => {
         onThumbClickCalculated(null, variationId)
@@ -30,36 +30,23 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
         if (!emblaMainApi || !emblaThumbsApi) return;
 
         const variations = product?.variations?.nodes;
-        const galleryImages = product?.galleryImages?.nodes;
-        const variationobjects = variations ? variations.map((item) => item?.image) : [];
-        const combinedNodes = [...variationobjects, ...galleryImages];
-
-        const uniqueCombinedNodes = combinedNodes.filter((item, index, array) =>
-            array.findIndex((other) => other?.databaseId === item?.databaseId) === index
-        );
-
-        console.log(uniqueCombinedNodes);
-
-        const galleryimagesIndex = uniqueCombinedNodes?.findIndex((item: any) => item?.databaseId === data?.databaseId);
-
-        console.log('galeeryimageindex', galleryimagesIndex);
-
+        const galleryImagesIndex = variations?.findIndex((image: any) => image?.databaseId === data?.databaseId);
+        console.log("variationId", variationId);
         if (variationId) {
             const variationIndex = variations?.findIndex((variation: any) => variation?.image?.databaseId === variationId);
             if (variationIndex !== -1 && variationIndex !== undefined) {
                 emblaMainApi.scrollTo(variationIndex);
             } else {
-                console.log("Image with Variation ID not found in gallery.");
+                // console.log("Image with Variation ID not found in gallery.");
             }
             return;
         }
 
-        if (galleryimagesIndex === 0 || galleryimagesIndex === undefined) {
+        if (galleryImagesIndex === 0 || galleryImagesIndex === undefined) {
             emblaMainApi.scrollTo(0);
-        } else if (galleryimagesIndex !== -1) {
-            emblaMainApi.scrollTo(galleryimagesIndex);
+        } else if (galleryImagesIndex !== -1) {
+            emblaMainApi.scrollTo(galleryImagesIndex);
         }
-
     }, [emblaMainApi, emblaThumbsApi, product]);
 
     const onSelect = useCallback(() => {
@@ -75,21 +62,24 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
         emblaMainApi.on("reInit", onSelect);
     }, [emblaMainApi, onSelect]);
 
+    
     let galleryImage = product.galleryImages?.nodes ?? [];
-    let productsArray = product.type == "SIMPLE" ? [product] : product.variations?.nodes;
-    const productImageObjects = productsArray ? productsArray.map((item) => item?.image) : [];
+    console.log('galleryImage', galleryImage);
+    let productsArray = product.type == "SIMPLE" ? [product] :  product.variations?.nodes;
 
-    let combinedImages = [...galleryImage, ...productImageObjects ?? []];
-    const uniqueCombinedImages = combinedImages.filter((item, index, array) =>
-        array.findIndex((other) => other?.databaseId === item?.databaseId) === index
-    );
+    let combinedImages = [...galleryImage, ...product.variations?.nodes ?? []];
+    let transformedVariationImages = product.variations?.nodes?.map((variation: any) => {
+        return variation.image
+    })
 
-    // debugger;
+    let finalCombinedImages = [...galleryImage, ...transformedVariationImages?? []];
+    console.log('finalCombinedImages', finalCombinedImages);
+
     return (
         <div className="embla">
             <div className="embla__viewport" ref={emblaMainRef}>
                 <div className="embla__container">
-                    {uniqueCombinedImages?.map((variation: any, index: number) => (
+                    {finalCombinedImages?.map((variation: any, index: number) => (
                         <div className="embla__slide" key={index}>
                             <div className="embla__slide__number">
                                 <span>{index + 1}</span>
@@ -109,7 +99,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
             <div className="embla-thumbs">
                 <div className="embla-thumbs__viewport" ref={emblaThumbsRef}>
                     <div className="embla-thumbs__container">
-                        {uniqueCombinedImages?.map((variation: any, index: number) => (
+                        {finalCombinedImages?.map((variation: any, index: number) => (
                             <Thumb
                                 onClick={() => onThumbClickCalculated(variation, null)}
                                 selected={index === selectedIndex}
@@ -118,7 +108,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
                                 key={index}
                             />
                         ))}
-fix:
+
                     </div>
                 </div>
             </div>
