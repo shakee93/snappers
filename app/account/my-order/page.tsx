@@ -69,7 +69,7 @@ const OrderHeader = ({order}: any) => (
             <p className="text-slate-500 dark:text-slate-400 text-sm mt-1.5 sm:mt-2">
                 <span>{formatDate(order?.date)}</span>
                 <span className="mx-2">·</span>
-                <span className="text-primary-500">{order?.status}</span>
+                <span className={` ${order?.status == "CANCELLED" ? "text-red-500" : "text-primary-500"}`}>{order?.status}</span>
             </p>
             <p className=" text-sm mt-1.5 sm:mt-2"><strong>Total:</strong> {order?.total}</p>
         </div>

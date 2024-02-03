@@ -132,6 +132,7 @@ export const GET_GUEST_ORDER = gql`
           id
           orderNumber
           total
+          status
           lineItems {
             nodes {
               databaseId
