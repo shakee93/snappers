@@ -15,7 +15,7 @@ import Prices from "@/app/components/Prices";
 import toast from "react-hot-toast";
 import NotifyAddTocart from "./NotifyAddTocart";
 import AccordionInfo from "@/containers/ProductDetailPage/AccordionInfo";
-import Link from 'next/link';
+import Link from "next/link";
 import Image from "next/image";
 import useProductLink from "@/hooks/useProductLink";
 import ProductAddToCart from "./SingleProductPage/ProductAddToCart";
@@ -27,9 +27,12 @@ import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import {
   Attribute,
   Brand,
-  Category, GlobalProductAttribute,
+  Category,
+  GlobalProductAttribute,
   Product,
-  ProductAttribute, ProductUnion, ProductVariation,
+  ProductAttribute,
+  ProductUnion,
+  ProductVariation,
 } from "@/graphql/types/graphql";
 
 import { GET_TECH_SPEC } from "@/graphql/defs/products";
@@ -42,20 +45,26 @@ export interface ProductQuickViewProps {
   brands?: any;
 }
 
-const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product, brands }) => {
-
+const ProductQuickView: FC<ProductQuickViewProps> = ({
+  className = "",
+  product,
+  brands,
+}) => {
   const [variantActive, setVariantActive] = React.useState(0);
   const [sizeSelected, setSizeSelected] = React.useState("");
   const [qualitySelected, setQualitySelected] = React.useState(1);
-  const { product: { attribute }, setAttribute } = useStore()
+  const {
+    product: { attribute },
+    setAttribute,
+  } = useStore();
   const [techspecs, setTechSpecs] = React.useState(null);
   const [activeVariation, setActiveVariation] = useState<any>(
-    !!product && 'variations' in product && product.variations?.nodes?.length
+    !!product && "variations" in product && product.variations?.nodes?.length
       ? product.variations.nodes[0]
       : null
   );
 
-  const link = useProductLink(product)
+  const link = useProductLink(product);
 
   // let brand = product?.brands?.nodes[0]?.name;
 
@@ -63,7 +72,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product, 
   product_images = [
     product?.image?.sourceUrl ?? "",
     product?.galleryImages?.nodes[0]?.sourceUrl ?? "",
-    product?.galleryImages?.nodes[1]?.sourceUrl ?? ""
+    product?.galleryImages?.nodes[1]?.sourceUrl ?? "",
   ];
 
   // console.log({ product });
@@ -71,12 +80,16 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product, 
   const { loading, error, data } = useQuery(GET_TECH_SPEC, {
     variables: {
       productId: product?.databaseId,
-    }
+    },
   });
 
   const manualMeta = product?.metaData;
-  const techSpecDataObject = manualMeta?.find(item => item?.key === 'tech_spec_data');
-  const parsedMetaData = techSpecDataObject?.value ? JSON.parse(techSpecDataObject.value) : null;
+  const techSpecDataObject = manualMeta?.find(
+    (item) => item?.key === "tech_spec_data"
+  );
+  const parsedMetaData = techSpecDataObject?.value
+    ? JSON.parse(techSpecDataObject.value)
+    : null;
   const manualTechSpecs = parsedMetaData ? Object.entries(parsedMetaData) : [];
 
   useEffect(() => {
@@ -85,9 +98,12 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product, 
     }
   }, [data]);
 
-  const activeAttr = useCallback((attr: ProductAttribute) => {
-    return attribute.find(a => a.name === attr.name)
-  }, [attribute])
+  const activeAttr = useCallback(
+    (attr: ProductAttribute) => {
+      return attribute.find((a) => a.name === attr.name);
+    },
+    [attribute]
+  );
 
   const notifyAddTocart = () => {
     toast.custom(
@@ -120,24 +136,29 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product, 
           </span>
         </label>
         <div className="flex mt-2.5">
-          {product?.variations?.nodes?.map((variant: ProductVariation, index) => (
-            <div
-              key={index}
-              onClick={() => setVariantActive(index)}
-              className={`w-auto relative flex-1 max-w-[75px] h-16 rounded-full border-2 cursor-pointer ${variantActive === index
-                ? "border-primary-6000 dark:border-primary-500"
-                : "border-transparent"
+          {product?.variations?.nodes?.map(
+            (variant: ProductVariation, index) => (
+              <div
+                key={index}
+                onClick={() => setVariantActive(index)}
+                className={`w-auto relative flex-1 max-w-[75px] h-16 rounded-full border-2 cursor-pointer ${
+                  variantActive === index
+                    ? "border-primary-6000 dark:border-primary-500"
+                    : "border-transparent"
                 }`}
-            >
-              <div className="absolute inset-0.5 rounded-full overflow-hidden z-0">
-                <Image fill style={{ objectFit: 'cover' }}
-                  src={variant?.image?.sourceUrl || ''}
-                  alt=""
-                  className="absolute w-full h-full object-cover"
-                />
+              >
+                <div className="absolute inset-0.5 rounded-full overflow-hidden z-0">
+                  <Image
+                    fill
+                    style={{ objectFit: "cover" }}
+                    src={variant?.image?.sourceUrl || ""}
+                    alt=""
+                    className="absolute w-full h-full object-cover"
+                  />
+                </div>
               </div>
-            </div>
-          ))}
+            )
+          )}
         </div>
       </div>
     );
@@ -184,11 +205,12 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product, 
     return null;
   };
 
+
+  console.log("product", product);
+
   const renderSectionContent = () => {
- 
     return (
       <div className="space-y-8">
-
         {/* <ProductDetails brand={brand} product={product} /> */}
         {/* ---------- 1 HEADING ----------  */}
 
@@ -317,7 +339,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product, 
             {
               name: "Specifications",
               content: product?.description ?? "",
-            }
+            },
           ]}
           techspecs={techspecs}
           manualSpecs={manualTechSpecs}
@@ -335,7 +357,9 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product, 
           {/* HEADING */}
           <div className="relative">
             <div className="aspect-w-16 aspect-h-16">
-              <Image fill style={{ objectFit: 'contain' }}
+              <Image
+                fill
+                style={{ objectFit: "contain" }}
                 src={product_images[0]}
                 className="w-full rounded-xl object-cover"
                 alt="product detail 1"
@@ -347,13 +371,17 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "", product, 
             {/* META FAVORITES */}
             <LikeButton className="absolute right-3 top-3 " />
           </div>
-          {(product?.galleryImages?.nodes || (product?.galleryImages?.edges && product?.galleryImages?.edges?.length > 0)) && (
+          {(product?.galleryImages?.nodes ||
+            (product?.galleryImages?.edges &&
+              product?.galleryImages?.edges?.length > 0)) && (
             <div className="hidden lg:grid grid-cols-2 gap-3 mt-3 sm:gap-6 sm:mt-6 xl:gap-5 xl:mt-5">
               {product_images.slice(1).map((item, index) => {
                 if (item) {
                   return (
                     <div key={index} className="aspect-w-3 aspect-h-4">
-                      <Image fill style={{ objectFit: 'contain' }}
+                      <Image
+                        fill
+                        style={{ objectFit: "contain" }}
                         src={item}
                         className="w-full rounded-xl object-contain"
                         alt={`product detail ${index + 2}`}

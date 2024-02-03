@@ -1,119 +1,124 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-import React, {useCallback, useEffect, useState} from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
-import {Thumb} from "app/components/SingleProductBlock/ProductCarouselThumb";
+import { Thumb } from "app/components/SingleProductBlock/ProductCarouselThumb";
 import "styles/product_embla.css";
-import {MediaItem, SimpleProduct, VariableProduct,} from "@/graphql/types/graphql";
+import {
+  MediaItem,
+  SimpleProduct,
+  VariableProduct,
+} from "@/graphql/types/graphql";
 import Image from "next/image";
-import {EmblaOptionsType} from "embla-carousel";
-import {useImage} from "@/context/ImageChangeGrabber";
+import { EmblaOptionsType } from "embla-carousel";
+import { useImage } from "@/context/ImageChangeGrabber";
 
 type PropType = {
-    options?: EmblaOptionsType;
-    product: SimpleProduct & VariableProduct;
+  options?: EmblaOptionsType;
+  product: SimpleProduct & VariableProduct;
 };
 
-const EmblaCarousel: React.FC<PropType> = ({product}) => {
-    const [selectedIndex, setSelectedIndex] = useState(0);
-    const [emblaMainRef, emblaMainApi] = useEmblaCarousel({});
-    const [emblaThumbsRef, emblaThumbsApi] = useEmblaCarousel({
-        containScroll: "keepSnaps",
-        dragFree: true,
-    });
-    const {variationId} = useImage();
+const EmblaCarousel: React.FC<PropType> = ({ product }) => {
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [emblaMainRef, emblaMainApi] = useEmblaCarousel({});
+  const [emblaThumbsRef, emblaThumbsApi] = useEmblaCarousel({
+    containScroll: "keepSnaps",
+    dragFree: true,
+  });
+  const { variationId } = useImage();
 
-    useEffect(() => {
-        onThumbClickCalculated(null, variationId)
-    }, [variationId])
+  const galleryImages = product.galleryImages?.nodes ?? [];
+  const variationImages = product.variations?.nodes?.map((variation: any ) => variation.image) ?? [];
 
-    const onThumbClickCalculated = useCallback((data: any, variationId: string | null = null) => {
-        if (!emblaMainApi || !emblaThumbsApi) return;
+  const combinedImages = [...variationImages, ...galleryImages];
 
-        const variations = product?.variations?.nodes;
-        const galleryImagesIndex = variations?.findIndex((image: any) => image?.databaseId === data?.databaseId);
-        console.log("variationId", variationId);
-        if (variationId) {
-            const variationIndex = variations?.findIndex((variation: any) => variation?.image?.databaseId === variationId);
-            if (variationIndex !== -1 && variationIndex !== undefined) {
-                emblaMainApi.scrollTo(variationIndex);
-            } else {
-                // console.log("Image with Variation ID not found in gallery.");
-            }
-            return;
+  useEffect(() => {
+    onThumbClickCalculated(null, variationId, null);
+  }, [variationId]);
+
+  const onThumbClickCalculated = useCallback(
+    (
+      data: any,
+      variationId: string | null = null,
+      thumbIndex: number | null
+    ) => {
+      if (!emblaMainApi || !emblaThumbsApi) return;
+
+      if (thumbIndex !== -1 && thumbIndex !== null) {
+        emblaMainApi.scrollTo(thumbIndex ?? 0);
+        return;
+      }
+
+      if (variationId) {
+        const variationIndex = combinedImages.findIndex(
+          (image: any) => image.databaseId === parseInt(variationId)
+        );
+        console.log("Variation Index:", variationIndex);
+
+        if (variationIndex !== -1) {
+          emblaMainApi.scrollTo(variationIndex);
+        } else {
+          console.log("Image with Variation ID not found in gallery.");
         }
+        return;
+      }
+      return;
 
-        if (galleryImagesIndex === 0 || galleryImagesIndex === undefined) {
-            emblaMainApi.scrollTo(0);
-        } else if (galleryImagesIndex !== -1) {
-            emblaMainApi.scrollTo(galleryImagesIndex);
-        }
-    }, [emblaMainApi, emblaThumbsApi, product]);
+    },
+    [emblaMainApi, emblaThumbsApi, product]
+  );
 
-    const onSelect = useCallback(() => {
-        if (!emblaMainApi || !emblaThumbsApi) return;
-        setSelectedIndex(emblaMainApi.selectedScrollSnap());
-        emblaThumbsApi.scrollTo(emblaMainApi.selectedScrollSnap());
-    }, [emblaMainApi, emblaThumbsApi, setSelectedIndex]);
+  const onSelect = useCallback(() => {
+    if (!emblaMainApi || !emblaThumbsApi) return;
+    setSelectedIndex(emblaMainApi.selectedScrollSnap());
+    emblaThumbsApi.scrollTo(emblaMainApi.selectedScrollSnap());
+  }, [emblaMainApi, emblaThumbsApi, setSelectedIndex]);
 
-    useEffect(() => {
-        if (!emblaMainApi) return;
-        onSelect();
-        emblaMainApi.on("select", onSelect);
-        emblaMainApi.on("reInit", onSelect);
-    }, [emblaMainApi, onSelect]);
+  useEffect(() => {
+    if (!emblaMainApi) return;
+    onSelect();
+    emblaMainApi.on("select", onSelect);
+    emblaMainApi.on("reInit", onSelect);
+  }, [emblaMainApi, onSelect]);
 
-    
-    let galleryImage = product.galleryImages?.nodes ?? [];
-    console.log('galleryImage', galleryImage);
-    let productsArray = product.type == "SIMPLE" ? [product] :  product.variations?.nodes;
-
-    let combinedImages = [...galleryImage, ...product.variations?.nodes ?? []];
-    let transformedVariationImages = product.variations?.nodes?.map((variation: any) => {
-        return variation.image
-    })
-
-    let finalCombinedImages = [...galleryImage, ...transformedVariationImages?? []];
-    console.log('finalCombinedImages', finalCombinedImages);
-
-    return (
-        <div className="embla">
-            <div className="embla__viewport" ref={emblaMainRef}>
-                <div className="embla__container">
-                    {finalCombinedImages?.map((variation: any, index: number) => (
-                        <div className="embla__slide" key={index}>
-                            <div className="embla__slide__number">
-                                <span>{index + 1}</span>
-                            </div>
-                            <Image
-                                width={1000}
-                                height={1000}
-                                className="object-contain max-h-[330px] md:max-h-[410px]"
-                                src={variation?.sourceUrl || ""}
-                                alt=""
-                            />
-                        </div>
-                    ))}
-                </div>
+  return (
+    <div className="embla">
+      <div className="embla__viewport" ref={emblaMainRef}>
+        <div className="embla__container">
+          {combinedImages?.map((variation: any, index: number) => (
+            <div className="embla__slide" key={index}>
+              <div className="embla__slide__number">
+                <span>{index + 1}</span>
+              </div>
+              <Image
+                width={1000}
+                height={1000}
+                className="object-contain max-h-[330px] md:max-h-[410px]"
+                src={variation?.sourceUrl || ""}
+                alt=""
+              />
             </div>
-
-            <div className="embla-thumbs">
-                <div className="embla-thumbs__viewport" ref={emblaThumbsRef}>
-                    <div className="embla-thumbs__container">
-                        {finalCombinedImages?.map((variation: any, index: number) => (
-                            <Thumb
-                                onClick={() => onThumbClickCalculated(variation, null)}
-                                selected={index === selectedIndex}
-                                index={index}
-                                imgSrc={variation?.sourceUrl || ""}
-                                key={index}
-                            />
-                        ))}
-
-                    </div>
-                </div>
-            </div>
+          ))}
         </div>
-    );
+      </div>
+
+      <div className="embla-thumbs">
+        <div className="embla-thumbs__viewport" ref={emblaThumbsRef}>
+          <div className="embla-thumbs__container">
+            {combinedImages?.map((variation: any, index: number) => (
+              <Thumb
+                onClick={() => onThumbClickCalculated(null, null, index)}
+                selected={index === selectedIndex}
+                index={index}
+                imgSrc={variation?.sourceUrl || ""}
+                key={index}
+              />
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default EmblaCarousel;
