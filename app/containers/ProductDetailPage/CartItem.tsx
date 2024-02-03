@@ -12,7 +12,7 @@ import Prices from "@/app/components/Prices";
 import NcInputNumber from "@/components/NcInputNumber";
 import { useCart } from "@/context/CartProvider";
 import useProductLink from "@/hooks/useProductLink";
-import {Fragment} from "react";
+import { Fragment } from "react";
 import AttributeIcon from "@/app/components/AttributeIcon";
 
 
@@ -32,7 +32,7 @@ const CartItemProduct = ({
     if (!product?.node) {
         return <p>No product found. {JSON.stringify(cartItem)} </p>;
     }
-    
+
 
     const { name, image, price, slug, salePrice, type, stockQuantity, regularPrice }: SimpleProduct & VariableProduct = product.node;
 
@@ -65,7 +65,7 @@ const CartItemProduct = ({
                                             {variation?.attributes?.map((attr, index) =>
                                                 <Fragment key={index}>
                                                     <div className='flex items-center gap-1'>
-                                                        <AttributeIcon name={attr?.name || ''} className='w-4'/> <span key={attr?.value}> {(product.node as unknown as VariableProduct)[`allPa${attr?.label as unknown as 'Capacity'}`]?.nodes.find((node: PaCapacity) => node.slug === attr?.value)?.name}</span>
+                                                        <AttributeIcon name={attr?.name || ''} className='w-4' /> <span key={attr?.value}> {(product.node as unknown as VariableProduct)[`allPa${attr?.label as unknown as 'Capacity'}`]?.nodes.find((node: PaCapacity) => node.slug === attr?.value)?.name}</span>
                                                     </div>
                                                 </Fragment>
                                             )}
@@ -125,7 +125,7 @@ const CartItemProduct = ({
                         onClick={e => removeFromCart([
                             key
                         ])
-                    }
+                        }
                         className="relative z-10 flex items-center mt-3 font-medium text-primary-6000 hover:text-primary-500 text-sm "
                     >
                         <span>Remove</span>

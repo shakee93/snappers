@@ -96,8 +96,7 @@ const cartItems: React.FC<CartItemsProps> = ({
                                 {" "}
                                 {
                                   (product.node as unknown as VariableProduct)[
-                                    `allPa${
-                                      attr?.label as unknown as "Capacity"
+                                    `allPa${attr?.label as unknown as "Capacity"
                                     }`
                                   ]?.nodes.find(
                                     (node: PaCapacity) =>
@@ -136,7 +135,9 @@ const cartItems: React.FC<CartItemsProps> = ({
             </div>
 
             <div className="hidden flex-1 sm:flex justify-end">
-              <Prices price={price} className="mt-0.5" />
+              <Prices
+                price={type === 'VARIABLE' ? variation?.node.price : price}
+                className="mt-0.5" />
             </div>
           </div>
         </div>
