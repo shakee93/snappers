@@ -1,19 +1,19 @@
 // BankTransfer.tsx
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
-import {Input} from "@nextui-org/react";
-import {useRouter} from "next/navigation";
-import React, {FormEvent, useEffect, useState} from "react";
+import { Input } from "@nextui-org/react";
+import { useRouter } from "next/navigation";
+import React, { FormEvent, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import BankDetails from "./BankDetails";
-import {PaymentDetailsWithoutUrls} from "@/data/types";
-import {Loader} from "lucide-react";
+import { PaymentDetailsWithoutUrls } from "@/data/types";
+import { Loader } from "lucide-react";
 
 type BankTransferProps = {
   // Define any props you expect to pass into BankTransfer here
   paymentDetails: PaymentDetailsWithoutUrls;
 };
 
-const BankTransfer: React.FC<BankTransferProps> = ({paymentDetails}) => {
+const BankTransfer: React.FC<BankTransferProps> = ({ paymentDetails }) => {
   const [file, setFile] = useState<File | null>(null);
   const [orderId, setOrderId] = useState<string>("");
   const [uploadStatus, setUploadStatus] = useState<string>("");
@@ -31,7 +31,7 @@ const BankTransfer: React.FC<BankTransferProps> = ({paymentDetails}) => {
     // setOrderId("6445");
     if (paymentDetails) {
       setOrderId(paymentDetails.order_id);
-    }else{
+    } else {
       alert("No payment Details provided for the bank transfer")
     }
   }, [paymentDetails]);
@@ -92,13 +92,13 @@ const BankTransfer: React.FC<BankTransferProps> = ({paymentDetails}) => {
           {/*  Upload Bank Slip*/}
           {/*</h1>*/}
           <p className="text-2xl font-bold text-left pb-4">Upload Bank Slip</p>
-          <Input
-              className=""
-              id="file"
-              type="file"
-              required={true}
-              onChange={handleFileChange}
-              accept="image/png, image/gif, image/jpeg, image/heic, image/heif, image/webp, image/bmp, image/tiff" />
+          <input
+            className=""
+            id="file"
+            type="file"
+            required={true}
+            onChange={handleFileChange}
+            accept="image/png, image/gif, image/jpeg, image/heic, image/heif, image/webp, image/bmp, image/tiff" />
 
           <p className="text-sm pt-2 text-gray-600">When you{`'`}ve completed the transfer to Our Bank, kindly upload
             your bank slip here.</p>
@@ -111,11 +111,11 @@ const BankTransfer: React.FC<BankTransferProps> = ({paymentDetails}) => {
             disabled={loading}
           >
             {loading ?
-                (
-                    <Loader className='animate-spin text-gray-100 ' />
-                )
+              (
+                <Loader className='animate-spin text-gray-100 ' />
+              )
 
-                : 'Upload'}
+              : 'Upload'}
           </ButtonPrimary>
         </div>
         {/*{uploadStatus && <p className="text-center my-4">{uploadStatus}</p>}*/}
