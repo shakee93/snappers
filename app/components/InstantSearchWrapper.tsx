@@ -1,14 +1,14 @@
 'use client'
-import {Configure, InstantSearch} from "react-instantsearch";
-import {InstantSearchNext} from "react-instantsearch-nextjs";
+import { Configure, InstantSearch } from "react-instantsearch";
+import { InstantSearchNext } from "react-instantsearch-nextjs";
 import TypesenseInstantSearchAdapter from "typesense-instantsearch-adapter";
 import ProductGridInstant from "@/app/components/ProductGridInstant";
 import SearchInput from "@/app/components/SearchInput";
 import TabFilters from "@/app/components/TabFilters";
-import {Brand, ProductCategory} from "@/graphql/types/graphql";
-import {useEffect, useMemo, useState} from "react";
-import {useStore} from "@/store/store";
-import {PRICE_RANGE} from "@/app/components/Filters/PriceFilter";
+import { Brand, ProductCategory } from "@/graphql/types/graphql";
+import { useEffect, useMemo, useState } from "react";
+import { useStore } from "@/store/store";
+import { PRICE_RANGE } from "@/app/components/Filters/PriceFilter";
 import SortInput from "@/app/components/SortInput";
 import { useDebounce } from 'use-debounce';
 
@@ -33,31 +33,31 @@ const typesenseConfig = {
 };
 
 const InstantSearchWrapper = ({
-                                  bindToStore = false,
-                                  search = false,
-                                  filters = false,
+    bindToStore = false,
+    search = false,
+    filters = false,
     routing = false,
-                                  categories,
+    categories,
     server = true,
-                                  brands,
-    brand,category
-                              }: InstantSearchWrapperProps) => {
+    brands,
+    brand, category
+}: InstantSearchWrapperProps) => {
 
     const { sidebar, setSearchMounted } = useStore()
     const [differedSidebar] = useDebounce(sidebar, 500)
-
+    
     const getFilterQuery: () => string = () => {
-        const f =[
+        const f = [
             sidebar.priceRange.join('') !== PRICE_RANGE.join('') ?
                 `rawPrice:[${sidebar.priceRange[0]}..${sidebar.priceRange[1]}]` : null,
-            category ?   `productCategories.edges.node.databaseId:${category.databaseId}`
-                :sidebar.categories.length > 0 ?
-                `productCategories.edges.node.databaseId:[${sidebar.categories.join(',')}]` : null,
+            category ? `productCategories.edges.node.databaseId:${category.databaseId}`
+                : sidebar.categories.length > 0 ?
+                    `productCategories.edges.node.databaseId:[${sidebar.categories.join(',')}]` : null,
             brand ? `brands.nodes.databaseId:${brand.databaseId}` :
                 sidebar.brands.length > 0 ?
                     `brands.nodes.databaseId:[${sidebar.brands.join(',')}]` : null,
-            sidebar.on_sale ? 'onSale:true': null,
-            sidebar.in_stock ? 'stockStatus:IN_STOCK': null,
+            sidebar.on_sale ? 'onSale:true' : null,
+            sidebar.in_stock ? 'stockStatus:IN_STOCK' : null,
         ]
 
         return f.filter(n => n).join(" && ")
@@ -98,8 +98,8 @@ const InstantSearchWrapper = ({
     useEffect(() => {
         // console.log(filterQuery);
     }, [filterQuery])
-    
-    
+
+
     useEffect(() => {
         setSearchMounted()
     }, [])
@@ -113,25 +113,25 @@ const InstantSearchWrapper = ({
     return <div>
         <InstantSearchComponent
             stalledSearchDelay={200}
-                           future={{
-                               preserveSharedStateOnUnmount: true
-                           }}
-                           // @ts-ignore
-                           routing={(routing && server) ? {
-                               router: {
-                                   cleanUrlOnDispose: true
-                               }
-                           } : undefined}
-                           searchClient={searchClient}
-                           indexName='product'>
+            future={{
+                preserveSharedStateOnUnmount: true
+            }}
+            // @ts-ignore
+            routing={(routing && server) ? {
+                router: {
+                    cleanUrlOnDispose: true
+                }
+            } : undefined}
+            searchClient={searchClient}
+            indexName='product'>
             <div className='flex gap-6 flex-col'>
-                <SearchInput bindToStore={bindToStore} show={search}/>
-                <SortInput/>
-                {filters && <TabFilters category={category} brand={brand} categories={categories} brands={brands}/>}
+                <SearchInput bindToStore={bindToStore} show={search} />
+                <SortInput />
+                {filters && <TabFilters category={category} brand={brand} categories={categories} brands={brands} />}
                 <Configure
                     filters={filterQuery}
-                    hitsPerPage={12}/>
-                <ProductGridInstant/>
+                    hitsPerPage={12} />
+                <ProductGridInstant />
             </div>
         </InstantSearchComponent>
     </div>

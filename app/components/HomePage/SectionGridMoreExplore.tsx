@@ -213,6 +213,13 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
     );
   };
 
+  const modifySlugForLaptops = (brandSlug: string): string => {
+    if (brandSlug === "apple" && tabActive === "Laptops") {
+      return "collections/macbooks";
+    }
+    return brandSlug;
+  };
+
   return (
    <>
     <div
@@ -229,7 +236,7 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
               name={brand.name || ''}
               desc={brand.description || ''}
               key={brand.id}
-              slug={brand.slug || ''}
+              slug={modifySlugForLaptops(brand.slug || '')}
               featuredImage={brand?.brandImage || ''}
             />
           </div>
@@ -250,7 +257,7 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
               name={brand.name || ''}
               desc={brand.description || ''}
               key={brand.id}
-              slug={brand.slug || ''}
+              slug={modifySlugForLaptops(brand.slug || '')}
               featuredImage={brand?.brandImage || ''}
             />
           </div>

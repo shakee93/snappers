@@ -26,7 +26,7 @@ const CardCategory4: FC<CardCategory4Props> = ({
   name,
   desc,
   color = "",
-  slug = ""
+  slug = "",
 }) => {
 
   return (

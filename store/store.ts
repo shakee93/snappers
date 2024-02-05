@@ -50,7 +50,7 @@ export const useStore = create<State & Actions>((set) => ({
         priceRange: PRICE_RANGE,
         on_sale: false,
         sort: "",
-        in_stock: false
+        in_stock: true
     },
     searchMounted: false,
     product: {
