@@ -1,21 +1,24 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-import React, { useCallback, useEffect, useState } from "react";
-import useEmblaCarousel from "embla-carousel-react";
-import { Thumb } from "app/components/SingleProductBlock/ProductCarouselThumb";
-import "styles/product_embla.css";
-import {
-  MediaItem,
-  SimpleProduct,
-  VariableProduct,
-} from "@/graphql/types/graphql";
-import Image from "next/image";
-import { EmblaOptionsType } from "embla-carousel";
 import { useImage } from "@/context/ImageChangeGrabber";
+import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
+import { Divider } from "@nextui-org/react";
+import {
+  CoreVariationThumb,
+  Thumb,
+} from "app/components/SingleProductBlock/ProductCarouselThumb";
+import { EmblaOptionsType } from "embla-carousel";
+import useEmblaCarousel from "embla-carousel-react";
+import Image from "next/image";
+import React, { useCallback, useEffect, useState } from "react";
+import "styles/product_embla.css";
 
 type PropType = {
   options?: EmblaOptionsType;
   product: SimpleProduct & VariableProduct;
+};
+type selectedVariationType = {
+  sourceUrl: string;
 };
 
 const EmblaCarousel: React.FC<PropType> = ({ product }) => {
@@ -26,44 +29,65 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
     dragFree: true,
   });
   const { variationId } = useImage();
+  const [selectedVariation, setSelectedVariation] =
+    useState<selectedVariationType>({
+      sourceUrl:
+        "https://gq.freshpixl.com/wp-content/uploads/2024/01/S24-Ultra-5G-T-Yellow-300x300.jpg",
+    });
+  let selectedGalleryImage = false;
+  const [variationImageEnabled, setVariationImageEnabled] = useState(false);
+  const galleryImages = product.galleryImages?.nodes.length === 0 ? product.galleryImages?.nodes : [product.image];
 
-  const galleryImages = product.galleryImages?.nodes ?? [];
-  const variationImages = product.variations?.nodes?.map((variation: any ) => variation.image) ?? [];
-
+  const variationImages =
+    product.variations?.nodes?.map((variation: any) => variation.image) ?? [product.image];
   const combinedImages = [...variationImages, ...galleryImages];
 
+  console.log("galleryImages", galleryImages);
+  console.log("combinedImages", combinedImages);
+  console.log("variationImages", variationImages);
+
   useEffect(() => {
-    onThumbClickCalculated(null, variationId, null);
+    onThumbVariationClick(null, variationId, null);
   }, [variationId]);
 
+  // Variation changed
+  const onThumbVariationClick = (
+    data: any,
+    variationId: string | null = null,
+    thumbIndex: number | null
+  ) => {
+    if (!emblaMainApi || !emblaThumbsApi) return;
+
+    setVariationImageEnabled(false);
+    if (variationId) {
+      const variationIndex = combinedImages.findIndex(
+        (image: any) => image.databaseId === parseInt(variationId)
+      );
+      combinedImages[variationIndex] &&
+        setSelectedVariation(combinedImages[variationIndex]);
+
+      if (variationIndex !== -1) {
+        emblaMainApi.scrollTo(variationIndex);
+      } else {
+        console.log("Image with Variation ID not found in gallery.");
+      }
+      return;
+    }
+    return;
+  };
+
+  // Thumb click change
   const onThumbClickCalculated = useCallback(
-    (
-      data: any,
-      variationId: string | null = null,
-      thumbIndex: number | null
-    ) => {
+    (thumbIndex: number | null) => {
       if (!emblaMainApi || !emblaThumbsApi) return;
+      setVariationImageEnabled(true);
 
       if (thumbIndex !== -1 && thumbIndex !== null) {
+        thumbIndex += variationImages.length;
         emblaMainApi.scrollTo(thumbIndex ?? 0);
         return;
       }
-
-      if (variationId) {
-        const variationIndex = combinedImages.findIndex(
-          (image: any) => image.databaseId === parseInt(variationId)
-        );
-        console.log("Variation Index:", variationIndex);
-
-        if (variationIndex !== -1) {
-          emblaMainApi.scrollTo(variationIndex);
-        } else {
-          console.log("Image with Variation ID not found in gallery.");
-        }
-        return;
-      }
       return;
-
     },
     [emblaMainApi, emblaThumbsApi, product]
   );
@@ -93,7 +117,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
               <Image
                 width={1000}
                 height={1000}
-                className="object-contain max-h-[330px] md:max-h-[410px]"
+                className="max-h-[330px] object-contain md:max-h-[410px]"
                 src={variation?.sourceUrl || ""}
                 alt=""
               />
@@ -105,10 +129,28 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
       <div className="embla-thumbs">
         <div className="embla-thumbs__viewport" ref={emblaThumbsRef}>
           <div className="embla-thumbs__container">
-            {combinedImages?.map((variation: any, index: number) => (
+            {/* Variation Thumb */}
+            {product.type === "VARIABLE" && (
+              <CoreVariationThumb
+                onClick={() => {
+                  // onThumbClickCalculated(null, null, null)
+                  onThumbVariationClick(null, null, null);
+                }}
+                selected={variationImageEnabled == false}
+                index={0}
+                imgSrc={selectedVariation?.sourceUrl || ""}
+                key={0}
+              />
+            )}
+
+            {/* Gallery Image */}
+            {galleryImages?.map((variation: any, index: number) => (
               <Thumb
-                onClick={() => onThumbClickCalculated(null, null, index)}
-                selected={index === selectedIndex}
+                onClick={() => onThumbClickCalculated(index)}
+                selected={
+                  variationImageEnabled &&
+                  index + variationImages.length === selectedIndex
+                }
                 index={index}
                 imgSrc={variation?.sourceUrl || ""}
                 key={index}

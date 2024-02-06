@@ -4,11 +4,11 @@ import { useQuery } from "@apollo/client";
 import { GET_SINGLE_ORDER } from "@/graphql/defs/order";
 
 const ThankYouPage = ({ params }: OrderPaymentPageProps) => {
-  const dummyProducts = [
-    { name: "Product A", quantity: 2, price: 20 },
-    { name: "Product B", quantity: 1, price: 15 },
-    { name: "Product C", quantity: 3, price: 25 },
-  ];
+  // const dummyProducts = [
+  //   { name: "Product A", quantity: 2, price: 20 },
+  //   { name: "Product B", quantity: 1, price: 15 },
+  //   { name: "Product C", quantity: 3, price: 25 },
+  // ];
 
   // const orderId = params['order-id'];
   const orderId = "b3JkZXI6NjQzOA==";

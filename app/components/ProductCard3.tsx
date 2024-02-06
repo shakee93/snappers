@@ -205,9 +205,6 @@ const ProductCard: FC<ProductCardProps> = ({
                         </ButtonPrimary>
                     </Link>
                 }
-
-
-
             </div>
 
         );
@@ -234,6 +231,7 @@ const ProductCard: FC<ProductCardProps> = ({
                                         width={300}
                                         height={300}
                                         alt={name || ''}
+                                        placeholder="blur"
                                         className="object-contain w-auto h-full mx-auto my-auto"
                                     />
                                 </div>

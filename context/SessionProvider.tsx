@@ -70,6 +70,7 @@ export function SessionProvider({ children }: {
 
         if (type === "login") {
             localStorage.setItem(USER_DATA_KEY, JSON.stringify(data?.customer));
+            console.log("setting customer: ", data?.customer)
             setCustomer(data?.customer as Customer)
 
             localStorage.setItem(AUTH_TOKEN_KEY, data?.authToken || '');
@@ -87,6 +88,7 @@ export function SessionProvider({ children }: {
         }
 
         getCart()
+        fetchCustomer()
     }
 
     const signUp = async (email: string, password: string) => {
