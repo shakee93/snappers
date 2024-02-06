@@ -8,7 +8,7 @@ import {Package, XIcon} from "lucide-react";
 const InStockFilter = () => {
 
     const { setInStock, sidebar: {on_sale} } = useStore()
-    const [inStock, setInStockState] = useState(false);
+    const [inStock, setInStockState] = useState(true);
 
 
     useEffect(() => {

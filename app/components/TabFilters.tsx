@@ -60,7 +60,7 @@ const TabFilters = ({
     const [sortOrderStates, setSortOrderStates] = useState<string>("");
     const [brandsState, setBrandsState] = useState<number[]>([]);
     const [categoriesState, setCategoriesState] = useState<number[]>([]);
-    const [inStock, setInStockState] = useState(false);
+    const [inStock, setInStockState] = useState(true);
     // const [filterCount, setFilterCount] = useState<number>(0);
 
     const {

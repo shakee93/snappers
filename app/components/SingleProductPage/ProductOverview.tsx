@@ -16,6 +16,8 @@ const ProductOverview = ({
   const techValue = product.metaData?.find(meta => meta?.key === 'tech_spec')?.value;
   const techSpecs = JSON.parse(techValue || 'false')
 
+  console.log('asdavzx', product.description);
+
   return (
     <>
       <div className="bg-white p-5 rounded-3xl md:p-10 my-5">
