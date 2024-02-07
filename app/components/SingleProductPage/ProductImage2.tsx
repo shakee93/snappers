@@ -42,9 +42,9 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   ) ?? [product.image];
   const combinedImages = [...variationImages, ...galleryImages || []];
 
-  console.log("galleryImages", galleryImages);
-  console.log("combinedImages", combinedImages);
-  console.log("variationImages", variationImages);
+  // console.log("galleryImages", galleryImages);
+  // console.log("combinedImages", combinedImages);
+  // console.log("variationImages", variationImages);
 
   useEffect(() => {
     onThumbVariationClick( variationId);
@@ -87,7 +87,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
     },
     [emblaMainApi, emblaThumbsApi, product]
   );
-
+  
   const onSelect = useCallback(() => {
     if (!emblaMainApi || !emblaThumbsApi) return;
     setSelectedIndex(emblaMainApi.selectedScrollSnap());
@@ -100,7 +100,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
     emblaMainApi.on("select", onSelect);
     emblaMainApi.on("reInit", onSelect);
   }, [emblaMainApi, onSelect]);
-  console.log("gallery images: ", galleryImages)
+
 
   return (
     <div className="embla">
