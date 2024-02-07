@@ -2,7 +2,6 @@
 "use client";
 import { useImage } from "@/context/ImageChangeGrabber";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
-import { Divider } from "@nextui-org/react";
 import {
   CoreVariationThumb,
   Thumb,
@@ -30,31 +29,29 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   });
   const { variationId } = useImage();
   const [selectedVariation, setSelectedVariation] =
-    useState<selectedVariationType>({
-      sourceUrl:
-        "https://gq.freshpixl.com/wp-content/uploads/2024/01/S24-Ultra-5G-T-Yellow-300x300.jpg",
-    });
-  let selectedGalleryImage = false;
+    useState<selectedVariationType | null>(null);
   const [variationImageEnabled, setVariationImageEnabled] = useState(false);
-  const galleryImages = product.galleryImages?.nodes.length === 0 ? product.galleryImages?.nodes : [product.image];
 
-  const variationImages =
-    product.variations?.nodes?.map((variation: any) => variation.image) ?? [product.image];
-  const combinedImages = [...variationImages, ...galleryImages];
+  const galleryImages =
+    product.galleryImages?.nodes.length !== 0
+      ? product.galleryImages?.nodes
+      : [];
+
+  const variationImages = product.variations?.nodes?.map(
+    (variation: any) => variation.image
+  ) ?? [product.image];
+  const combinedImages = [...variationImages, ...galleryImages || []];
 
   console.log("galleryImages", galleryImages);
   console.log("combinedImages", combinedImages);
   console.log("variationImages", variationImages);
 
   useEffect(() => {
-    onThumbVariationClick(null, variationId, null);
+    onThumbVariationClick( variationId);
   }, [variationId]);
 
-  // Variation changed
   const onThumbVariationClick = (
-    data: any,
     variationId: string | null = null,
-    thumbIndex: number | null
   ) => {
     if (!emblaMainApi || !emblaThumbsApi) return;
 
@@ -76,7 +73,6 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
     return;
   };
 
-  // Thumb click change
   const onThumbClickCalculated = useCallback(
     (thumbIndex: number | null) => {
       if (!emblaMainApi || !emblaThumbsApi) return;
@@ -104,6 +100,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
     emblaMainApi.on("select", onSelect);
     emblaMainApi.on("reInit", onSelect);
   }, [emblaMainApi, onSelect]);
+  console.log("gallery images: ", galleryImages)
 
   return (
     <div className="embla">
@@ -134,7 +131,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
               <CoreVariationThumb
                 onClick={() => {
                   // onThumbClickCalculated(null, null, null)
-                  onThumbVariationClick(null, null, null);
+                  onThumbVariationClick(variationImages[0].databaseId);
                 }}
                 selected={variationImageEnabled == false}
                 index={0}
