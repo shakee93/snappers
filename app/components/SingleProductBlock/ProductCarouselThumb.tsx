@@ -10,7 +10,15 @@ type PropType = {
 
 export const Thumb: React.FC<PropType> = (props) => {
   const { selected, imgSrc, index, onClick } = props
+  let transform = (url: string) => {
+    if (url.includes("300x300")) {
+      // Remove '300x300' from the URL
+      url = url.replace("-300x300", "");
+    }
+    return url;
+  };
 
+  
   return (
     <div
       className={'embla-thumbs__slide '.concat(
@@ -30,7 +38,7 @@ export const Thumb: React.FC<PropType> = (props) => {
            max-h-[75px] min-h-[75px] md:max-h-[100px] md:min-h-[100px]
            min-w-[75px] md:max-w-[100px] md:min-w-[100px]
            "
-          src={imgSrc}
+          src={transform(imgSrc)}
           width={100}
           height={100}
           alt="Your alt text"
@@ -65,7 +73,7 @@ export const CoreVariationThumb: React.FC<PropType> = (props) => {
           src={imgSrc}
           width={100}
           height={100}
-          alt="Your alt text"
+          alt="Variation Image"
         />
       </button>
     </div>

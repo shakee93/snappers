@@ -39,8 +39,6 @@ async function getData(slug: string, brand: string) {
       fetchPolicy: "no-cache",
     });
 
-    console.log("data on the query: ", data);
-
     if (!data.product) {
       return notFound();
     }
@@ -80,6 +78,9 @@ const Page = async ({ params }: Props) => {
     product: SimpleProduct & VariableProduct;
     brand: Brand;
   } = await getData(params.slug, params.brand);
+
+  
+
   return (
     <div className="mt-5 md:mt-16">
       <main className="container m-auto">

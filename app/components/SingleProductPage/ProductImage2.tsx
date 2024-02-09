@@ -29,7 +29,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   });
   const { variationId } = useImage();
   const [selectedVariation, setSelectedVariation] =
-    useState<selectedVariationType | null>(null);
+    useState<selectedVariationType | null>();
   const [variationImageEnabled, setVariationImageEnabled] = useState(false);
 
   const galleryImages =
@@ -42,13 +42,14 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   ) ?? [product.image];
   const combinedImages = [...variationImages, ...galleryImages || []];
 
-  // console.log("galleryImages", galleryImages);
-  // console.log("combinedImages", combinedImages);
-  // console.log("variationImages", variationImages);
+  console.log("galleryImages", galleryImages);
+  console.log("combinedImages", combinedImages);
+  console.log("variationImages", variationImages);
 
   useEffect(() => {
     onThumbVariationClick( variationId);
   }, [variationId]);
+
 
   const onThumbVariationClick = (
     variationId: string | null = null,
@@ -100,7 +101,6 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
     emblaMainApi.on("select", onSelect);
     emblaMainApi.on("reInit", onSelect);
   }, [emblaMainApi, onSelect]);
-
 
   return (
     <div className="embla">
