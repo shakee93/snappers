@@ -12,6 +12,7 @@ import Image from "next/image";
 import React, { useCallback, useEffect, useState } from "react";
 import "styles/product_embla.css";
 
+
 type PropType = {
   options?: EmblaOptionsType;
   product: SimpleProduct & VariableProduct;
@@ -47,7 +48,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   console.log("variationImages", variationImages);
 
   useEffect(() => {
-    onThumbVariationClick( variationId);
+    onThumbVariationClick(variationId);
   }, [variationId]);
 
 
@@ -88,7 +89,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
     },
     [emblaMainApi, emblaThumbsApi, product]
   );
-  
+
   const onSelect = useCallback(() => {
     if (!emblaMainApi || !emblaThumbsApi) return;
     setSelectedIndex(emblaMainApi.selectedScrollSnap());
@@ -102,6 +103,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
     emblaMainApi.on("reInit", onSelect);
   }, [emblaMainApi, onSelect]);
 
+
   return (
     <div className="embla">
       <div className="embla__viewport" ref={emblaMainRef}>
@@ -112,11 +114,13 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
                 <span>{index + 1}</span>
               </div>
               <Image
-                width={1000}
-                height={1000}
-                className="max-h-[330px] object-contain md:max-h-[410px]"
-                src={variation?.sourceUrl || ""}
-                alt=""
+                 width={1000}
+                 height={1000}
+                 className="max-h-[330px] object-contain md:max-h-[410px] image transform transition-transform duration-300"
+                 src={variation?.sourceUrl || ""}
+                 alt=""
+                 onMouseEnter={handleZoom}
+                 onMouseLeave={handleResetZoom}
               />
             </div>
           ))}
