@@ -43,9 +43,17 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   ) ?? [product.image];
   const combinedImages = [...variationImages, ...galleryImages || []];
 
-  console.log("galleryImages", galleryImages);
-  console.log("combinedImages", combinedImages);
-  console.log("variationImages", variationImages);
+  // console.log("galleryImages", galleryImages);
+  // console.log("combinedImages", combinedImages);
+  // console.log("variationImages", variationImages);
+
+  combinedImages.forEach(image => {
+    if (image?.sourceUrl?.includes("300x300")) {
+      image.sourceUrl = image?.sourceUrl?.replace("-300x300", "");
+    }
+  });
+  
+  // console.log("combinedImages after transformation:", combinedImages);
 
   useEffect(() => {
     onThumbVariationClick(variationId);
@@ -103,23 +111,6 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
     emblaMainApi.on("reInit", onSelect);
   }, [emblaMainApi, onSelect]);
 
-  const handleZoom = (e : any) => {
-    const image = e.target;
-    const containerRect = e.currentTarget.getBoundingClientRect();
-    const x = (e.nativeEvent.offsetX / containerRect.width) * 100;
-    const y = (e.nativeEvent.offsetY / containerRect.height) * 100;
-  
-    image.style.transformOrigin = `${x}% ${y}%`;
-    image.style.transition = 'transform 0.2s ease-in-out'; // Adding transition effect
-    image.style.transform = 'scale(1.5)'; // Adjust the scale factor as needed
-  };
-
-  const handleResetZoom = (e : any) => {
-    const image = e.target;
-    image.style.transformOrigin = 'center';
-    image.style.transition = 'transform 0.2s ease-in-out'; // Adding transition effect
-    image.style.transform = 'scale(1)';
-  };
 
   return (
     <div className="embla">
@@ -136,8 +127,6 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
                  className="max-h-[330px] object-contain md:max-h-[410px] image transform transition-transform duration-300"
                  src={variation?.sourceUrl || ""}
                  alt=""
-                 onMouseEnter={handleZoom}
-                 onMouseLeave={handleResetZoom}
               />
             </div>
           ))}
