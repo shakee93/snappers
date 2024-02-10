@@ -11,6 +11,8 @@ import {Suspense} from "react";
 import {Metadata, ResolvingMetadata} from "next";
 import {ImageProvider} from "@/context/ImageChangeGrabber";
 import "styles/embla.css";
+import Test from "@/components/ImageMagnifier";
+import ImageEffect from "@/components/ImageMagnifier";
 export const dynamic = 'force-dynamic'
 
 type Props = {
@@ -91,6 +93,7 @@ const Page = async ({ params }: Props) => {
         </div>
         <div></div>
         <div className="flex flex-col md:flex-row p-3 rounded-3xl mt-5 md:mt-6 md:p-10 bg-white">
+
           <ImageProvider>
             <div className="w-full md:w-2/5 flex-col gap-2 md:pr-10">
               <Suspense fallback={<>loading...</>}>
