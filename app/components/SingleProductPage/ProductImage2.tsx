@@ -47,13 +47,11 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   // console.log("combinedImages", combinedImages);
   // console.log("variationImages", variationImages);
 
-  combinedImages.forEach(image => {
+  combinedImages.forEach((image) => {
     if (image?.sourceUrl?.includes("300x300")) {
       image.sourceUrl = image?.sourceUrl?.replace("-300x300", "");
     }
   });
-  
-  // console.log("combinedImages after transformation:", combinedImages);
 
   useEffect(() => {
     onThumbVariationClick(variationId);
@@ -135,10 +133,10 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
               <div className="embla__slide__number">
                 <span>{index + 1}</span>
               </div>
-              <ImageEffect 
+              <ImageEffect
                 src={variation?.sourceUrl || ""}
                 classNames="max-h-[330px] object-contain md:max-h-[410px] image transform transition-transform duration-300"
-               />
+              />
               {/* <Image
                 width={1000}
                 height={1000}
@@ -159,13 +157,16 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
             {/* Variation Thumb */}
             {product.type === "VARIABLE" && (
               <CoreVariationThumb
-                onClick={() => {
-                  // onThumbClickCalculated(null, null, null)
-                  onThumbVariationClick(variationImages[0].databaseId);
-                }}
-                selected={variationImageEnabled == false}
+                onClick={() =>
+                  onThumbVariationClick(variationImages[0]?.databaseId)
+                }
+                selected={!variationImageEnabled}
                 index={0}
-                imgSrc={selectedVariation?.sourceUrl || ""}
+                imgSrc={
+                  selectedVariation?.sourceUrl ||
+                  variationImages[0]?.sourceUrl ||
+                  ""
+                }
                 key={0}
               />
             )}

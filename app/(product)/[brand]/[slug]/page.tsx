@@ -11,8 +11,6 @@ import {Suspense} from "react";
 import {Metadata, ResolvingMetadata} from "next";
 import {ImageProvider} from "@/context/ImageChangeGrabber";
 import "styles/embla.css";
-import Test from "@/components/ImageMagnifier";
-import ImageEffect from "@/components/ImageMagnifier";
 export const dynamic = 'force-dynamic'
 
 type Props = {
