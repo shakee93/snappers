@@ -1,11 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
 import SiteLogo from "@/public/global/logo.webp";
-import {getClient} from "@/graphql/apollo-ssr";
-import {GET_BRANDS} from "@/graphql/defs/products";
-import {Brand} from "@/graphql/types/graphql";
-import {Facebook, Instagram, MapPinned, PhoneCall,} from "lucide-react";
-import {isPaymentPage} from "./paymentPageCheckUtils";
+import { getClient } from "@/graphql/apollo-ssr";
+import { GET_BRANDS } from "@/graphql/defs/products";
+import { Brand } from "@/graphql/types/graphql";
+import { Facebook, Instagram, MapPinned, PhoneCall } from "lucide-react";
+import { isPaymentPage } from "./paymentPageCheckUtils";
 
 const getData = async () => {
   const { data } = await getClient().query({
@@ -80,72 +80,78 @@ const Footer = async () => {
             {/*</ul>*/}
           </div>
           <div className="flex gap-1 md:gap-4 col-span-6 md:col-span-4 lg:col-span-3 p-2 flex-col items-start md:items-center">
-            <div className="text-base md:text-lg font-medium text-primaryColor">
-              Quick Links
+            <div className="grid gap-2 md:gap-4">
+              <div className="text-base md:text-lg text-left font-medium text-primaryColor">
+                Quick Links
+              </div>
+              <ul className="text-xs text-left lg:text-sm text-gray-500 flex flex-col gap-3 ">
+                <li className="hover:text-primaryColor">
+                  <Link href={"/"}>Home</Link>
+                </li>
+                <li className="hover:text-primaryColor">
+                  <Link href={"/about"}>About us</Link>
+                </li>
+                <li className="hover:text-primaryColor">
+                  <Link href={"/collections/all"}>Shop</Link>
+                </li>
+                <li className="hover:text-primaryColor">
+                  <Link href={"/contact"}>Contact Us</Link>
+                </li>
+                <li className="hover:text-primaryColor">
+                  <Link href={"/search"}>Search Products</Link>
+                </li>
+                <li className="hover:text-primaryColor">
+                  <Link href={"/privacy"}>Privacy Policy</Link>
+                </li>
+                <li className="hover:text-primaryColor">
+                  <Link href={"/terms-and-conditions"}>Terms & Conditions</Link>
+                </li>
+              </ul>
             </div>
-            <ul className="text-xs text-left lg:text-sm text-gray-500 flex flex-col gap-3 ">
-              <li className="hover:text-primaryColor">
-                <Link href={"/"}>Home</Link>
-              </li>
-              <li className="hover:text-primaryColor">
-                <Link href={"/about"}>About us</Link>
-              </li>
-              <li className="hover:text-primaryColor">
-                <Link href={"/collections/all"}>Shop</Link>
-              </li>
-              <li className="hover:text-primaryColor">
-                <Link href={"/contact"}>Contact Us</Link>
-              </li>
-              <li className="hover:text-primaryColor">
-                <Link href={"/search"}>Search Products</Link>
-              </li>
-              <li className="hover:text-primaryColor">
-                <Link href={"/privacy"}>Privacy Policy</Link>
-              </li>
-              <li className="hover:text-primaryColor">
-                <Link href={"/terms-and-conditions"}>Terms & Conditions</Link>
-              </li>
-            </ul>
           </div>
-          <div className="flex gap-1 md:gap-4 col-span-6 md:col-span-4 p-2 flex-col items-start md:items-center">
-            <div className="text-base pb-2 md:text-lg font-medium text-primaryColor">
-              Top Brands
+          <div className="flex gap-1 md:gap-4 col-span-6 md:col-span-4 pt-2 px-2 flex-col items-start md:items-center">
+            <div className="grid gap-2 md:gap-4">
+              <div className="text-base  md:text-lg font-medium text-primaryColor">
+                Top Brands
+              </div>
+              <ul className="text-xs md:hidden text-left lg:text-sm text-gray-500 grid grid-cols-2 md:grid-cols-3 gap-x-4 md:gap-x-3 gap-y-3">
+                {brands.slice(0, 12).map((brand: Brand, index: number) => (
+                  <li key={index} className="hover:text-primaryColor">
+                    <Link href={`/${brand.slug}`}>{brand.name}</Link>
+                  </li>
+                ))}
+              </ul>
+              <ul className="hidden md:grid text-xs text-left lg:text-sm text-gray-500 grid grid-cols-2 md:grid-cols-3 gap-x-4 md:gap-x-3 gap-y-3">
+                {brands.slice(0, 20).map((brand: Brand, index: number) => (
+                  <li key={index} className="hover:text-primaryColor">
+                    <Link href={`/${brand.slug}`}>{brand.name}</Link>
+                  </li>
+                ))}
+              </ul>
             </div>
-            <ul className="text-xs md:hidden text-left lg:text-sm text-gray-500 grid grid-cols-2 md:grid-cols-3 gap-x-4 md:gap-x-3 gap-y-3">
-              {brands.slice(0, 12).map((brand: Brand, index: number) => (
-                <li key={index} className="hover:text-primaryColor">
-                  <Link href={`/${brand.slug}`}>{brand.name}</Link>
-                </li>
-              ))}
-            </ul>
-            <ul className="hidden md:grid text-xs text-left lg:text-sm text-gray-500 grid grid-cols-2 md:grid-cols-3 gap-x-4 md:gap-x-3 gap-y-3">
-              {brands.slice(0, 20).map((brand: Brand, index: number) => (
-                <li key={index} className="hover:text-primaryColor">
-                  <Link href={`/${brand.slug}`}>{brand.name}</Link>
-                </li>
-              ))}
-            </ul>
           </div>
           <div className=" flex gap-3 md:gap-4 md:hidden lg:flex md:col-span-2 col-span-12 p-2 flex-col items-start md:items-center">
-            <div className="text-base md:text-lg font-medium text-primaryColor">
-              Follow us
-            </div>
+            <div className="grid gap-2 md:gap-4">
+              <div className="text-base md:text-lg font-medium text-primaryColor">
+                Follow us
+              </div>
 
-            <div className="flex md:flex-col gap-3 justify-center text-xs text-gray-500">
-              <Link
-                className="flex gap-2"
-                href={"https://www.facebook.com/gqmobilestore"}
-              >
-                <Facebook size={iconSize} className="text-primaryColor" />
-                <span>Facebook</span>
-              </Link>
-              <Link
-                className="flex gap-2"
-                href={"https://www.instagram.com/gqthemobilestoreunlimited"}
-              >
-                <Instagram size={iconSize} className="text-primaryColor" />
-                <span>Instagram</span>
-              </Link>
+              <div className="flex md:flex-col gap-3 justify-center text-xs text-gray-500">
+                <Link
+                  className="flex gap-2"
+                  href={"https://www.facebook.com/gqmobilestore"}
+                >
+                  <Facebook size={iconSize} className="text-primaryColor" />
+                  <span>Facebook</span>
+                </Link>
+                <Link
+                  className="flex gap-2"
+                  href={"https://www.instagram.com/gqthemobilestoreunlimited"}
+                >
+                  <Instagram size={iconSize} className="text-primaryColor" />
+                  <span>Instagram</span>
+                </Link>
+              </div>
             </div>
             {/* <div className="relative w-full flex">
               <input
