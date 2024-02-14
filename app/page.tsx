@@ -4,10 +4,10 @@ import SectionSliderProductCard from "@/app/components/SectionSliderProductCard"
 import SectionGridMoreExplore from "@/app/components/HomePage/SectionGridMoreExplore";
 import SectionPromo1 from "@/app/components/HomePage/SectionPromo1";
 import Heading from "@/app/components/Heading/Heading";
-import { getClient } from "@/graphql/apollo-ssr";
-import { GET_SLIDES } from "@/graphql/defs/slides";
-import { GET_PRODUCTS_NODES } from "@/graphql/defs/products";
-import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
+import {getClient} from "@/graphql/apollo-ssr";
+import {GET_SLIDES} from "@/graphql/defs/slides";
+import {GET_PRODUCTS_NODES} from "@/graphql/defs/products";
+import {SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
 import "styles/embla.css";
 
 const getData = async () => {
@@ -27,6 +27,7 @@ const getData = async () => {
       variables: { first: 10, categoryIdIn: [302] },
     }),
   ]);
+
 
   // console.log('new', newArrivals?.data?.products);
   // console.log('smart', mobiles?.data?.products?.nodes[0]);
