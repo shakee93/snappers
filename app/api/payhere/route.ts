@@ -3,10 +3,10 @@ import {md5} from "js-md5";
 
 export async function POST(req: Request , res: NextApiResponse) {
   const { merchant_id, order_id, amount, currency } = await req.json();
-  const merchant_secret = process.env.NEXT_PUBLIC_PAYHERE_MERCHANT_KEY  as string;
-  console.log("merchant_secret: ", merchant_secret);
+  const merchant_secret = process.env.PAYHERE_MERCHANT_KEY  as string;
+  // console.log("merchant_secret: ", merchant_secret);
   // "MTc2MTg0ODIyMTMwNTM4NTM0MDgzODI2MTg1MDQ2NDE5MjA1MTI0MA==";
-
+    
   if(merchant_secret === ""){
     return Response.json({ error: "Merchant Secret Key not found" }, { status: 400 });
   }

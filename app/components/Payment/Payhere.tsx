@@ -1,14 +1,17 @@
 "use client";
-import { PaymentDetailsWithoutUrls } from "@/data/types";
-import { extractRawAmount } from "@/components/AddressPageComps/HelperComps";
-import { useMutation } from "@apollo/client";
-import { COMPLETE_ORDER_PAYMENT } from "@/graphql/defs/order";
+import {PaymentDetailsWithoutUrls} from "@/data/types";
+import {extractRawAmount} from "@/components/AddressPageComps/HelperComps";
+import {useMutation} from "@apollo/client";
+import {COMPLETE_ORDER_PAYMENT} from "@/graphql/defs/order";
 
 const MERCHANT_ID = "1225436";
 const TEST: boolean = true;
+
 // NOTES: Constant to follow while testing the payhere.
 //  order_id : "ItemNo12345"
 //  amount : "100.00"
+
+// TODO: use env variables FOR SITE URLS
 const staticData = {
   sandbox: true,
   merchant_id: "1225436",
@@ -82,7 +85,6 @@ const getPaymentHash = async (dynamicData: any) => {
       currency: "LKR",
     };
 
-    console.log("Data sent to create hash:", requestData);
 
     const response = await fetch("/api/payhere", {
       method: "POST",
