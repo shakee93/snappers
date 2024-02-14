@@ -28,7 +28,6 @@ const getData = async () => {
     }),
   ]);
 
-
   // console.log('new', newArrivals?.data?.products);
   // console.log('smart', mobiles?.data?.products?.nodes[0]);
 
