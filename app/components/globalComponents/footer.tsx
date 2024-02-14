@@ -6,6 +6,7 @@ import { GET_BRANDS } from "@/graphql/defs/products";
 import { Brand } from "@/graphql/types/graphql";
 import { Facebook, Instagram, MapPinned, PhoneCall } from "lucide-react";
 import { isPaymentPage } from "./paymentPageCheckUtils";
+import { Divider } from "@nextui-org/react";
 
 const getData = async () => {
   const { data } = await getClient().query({
@@ -175,7 +176,16 @@ const Footer = async () => {
       </div>
 
       <div className="text-center text-xs text-white py-2 bg-primaryColor">
-        <div className="container">Copyright ©️ 2024 GQ Mobiles (Pvt) Ltd.</div>
+        <div className="container flex gap-4 justify-center flex-wrap">
+          <div>Copyright ©️ 2024 GQ Mobiles (Pvt) Ltd.</div>
+          <div>{" | "} </div>
+          <div>
+            Designed by{" "}
+            <Link className="font-semibold" href={`https://freshpixl.com/`}>
+              Freshpixl Creative Agency
+            </Link>{" "}
+          </div>
+        </div>
       </div>
     </footer>
   );
