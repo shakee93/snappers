@@ -36,7 +36,7 @@ export default async function PagePrivacy() {
       data-nc-id="PageAbout"
     >
 
-      {JSON.stringify(data)}
+      {/* {JSON.stringify(data)} */}
       <title>Privacy Policy </title>
 
       <div className="container py-10 lg:py-10 space-y-16 lg:space-y-28">

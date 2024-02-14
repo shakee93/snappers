@@ -55,9 +55,9 @@ const DropdownButton = ({ categories }: { categories: any }) => {
                           href={`/collections/${category.slug}`}
                           className={twMerge(
                             "transition-all block px-4 py-3 hover:pl-6 rounded \
-                           hover:text-white hover:bg-primaryColor dark:hover:bg-gray-600 dark:hover:text-white",
+                           hover:text-white hover:bg-primaryColor dark:hover:bg-gray-600 dark:hover:text-white my-1 mx-1",
                             path === `/collections/${category.slug}` &&
-                              "text-white bg-primaryColor pl-6"
+                              "text-white bg-primaryColor pl-6 "
                           )}
                         >
                           {category.name}

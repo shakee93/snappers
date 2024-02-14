@@ -110,6 +110,11 @@ const { setVariationId } = useImage();
   }, [attribute]);
 
 
+  const applyListStyleDisc = (htmlContent : any) => {
+    return htmlContent.replace(/<ul>/g, '<ul class="list-disc">');
+  };
+  
+
   return (
     <>
       <div className="flex gap-1  text-sm text-gray-500">
@@ -121,9 +126,12 @@ const { setVariationId } = useImage();
       </div>
 
       {product.shortDescription && (
-        <div className="text-xs md:text-sm text-gray-600">
-          {parseHtml(product.shortDescription || "")}
-        </div>
+        <div
+          className="text-xs md:text-sm text-gray-600"
+          dangerouslySetInnerHTML={{
+            __html: applyListStyleDisc(product.shortDescription)
+          }}
+        />
       )}
       {/* <h1 className="text-2xl font-bold">{JSON.stringify(activeVariation)}</h1> */}
       {product.type === "VARIABLE" && (

@@ -295,7 +295,7 @@ const CheckoutPage = () => {
   const CreateOrderGuest = async () => {
     const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
     const shippingMethodId =
-      shippingTotal === "රු0.00"
+      shippingTotal === "Rs.0.00"
         ? "pickup_location:0"
         : "wbs:0dd3bc79_weight_based_shipping";
     const shippingMethodTitle =
@@ -444,7 +444,7 @@ const CheckoutPage = () => {
 
   const getShippingMethod = (shippingTotal: any) => {
     const methodId =
-      shippingTotal === "රු0.00"
+      shippingTotal === "Rs.0.00"
         ? "pickup_location:0"
         : "wbs:0dd3bc79_weight_based_shipping";
 
