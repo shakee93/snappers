@@ -181,7 +181,7 @@ const Footer = async () => {
           <div>{" | "} </div>
           <div>
             Designed by{" "}
-            <Link className="font-semibold" href={`https://freshpixl.com/`}>
+            <Link target="_blank" className="font-semibold" href={`https://freshpixl.com/`}>
               Freshpixl Creative Agency
             </Link>{" "}
           </div>
