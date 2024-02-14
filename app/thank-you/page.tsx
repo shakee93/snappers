@@ -120,7 +120,7 @@ const ThankYouPage = ({ params }: OrderPaymentPageProps) => {
                             </td>
                             <td></td>
                             <td className="px-6 py-4 text-left  font-medium text-gray-800 dark:text-gray-200">
-                              රු209,700.00
+                              Rs.209,700.00
                             </td>
                           </tr>
                         </tbody>

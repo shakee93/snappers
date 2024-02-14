@@ -89,7 +89,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData, payme
                       {item?.quantity}
                     </td>
                     <td className="px-6 py-4 text-right whitespace-nowrap text-gray-800 dark:text-gray-200">
-                      රු {item?.subtotal}
+                      Rs. {item?.subtotal}
                     </td>
                   </tr>
                 ))}
