@@ -25,6 +25,8 @@ export default async function Home() {
             </Link>
         );
     };
+
+
     return (
         <section key="1" className="w-full h-screen flex items-center justify-center bg-mobile-pattern">
             <div className="container px-4 md:px-6">
