@@ -1,5 +1,5 @@
-import {gql} from "@apollo/client";
-import {ProductContentFull, ProductSpecs} from "@/graphql/defs/products.fragments";
+import { gql } from "@apollo/client";
+import { ProductContentFull, ProductSpecs } from "@/graphql/defs/products.fragments";
 
 export const GET_BRANDS = gql`
   query getBrands($slug: [String] = []) {
@@ -210,6 +210,20 @@ export const GET_PRODUCTS_NODES = gql`
         stockStatus: IN_STOCK
         orderby: { field: DATE, order: DESC }
       }
+    ) {
+      nodes {
+        ...ProductContentFull
+      }
+    }
+  }
+  ${ProductContentFull}
+`;
+
+export const GET_PRODUCTS_NODES_BACK_IN_STOCK = gql`
+  query getProductsNode($first: Int = 10) {
+    products(
+      first: $first
+      where: {stockStatus: IN_STOCK, orderby: {field: DATE, order: DESC}, tagId: 536}
     ) {
       nodes {
         ...ProductContentFull
