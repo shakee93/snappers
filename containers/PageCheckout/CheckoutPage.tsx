@@ -9,7 +9,7 @@ import Image from "next/image";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import Input from "shared/Input/Input";
 import ContactInfo from "./ContactInfo";
-import PaymentMethod from "./PaymentMethod";
+importPaymentMethod from "./PaymentMethod";
 import ShippingAddress from "./ShippingAddress";
 import Link from "next/link";
 
@@ -290,7 +290,7 @@ const CheckoutPage = () => {
             <ButtonPrimary href="/account-my-order" className="mt-8 w-full">
               Confirm order
             </ButtonPrimary>
-            
+
             <div className="mt-5 text-sm text-slate-500 dark:text-slate-400 flex items-center justify-center">
               <p className="block relative pl-5">
                 <svg

@@ -1,8 +1,9 @@
 "use client";
-import {PaymentDetailsWithoutUrls} from "@/data/types";
-import {extractRawAmount} from "@/components/AddressPageComps/HelperComps";
-import {useMutation} from "@apollo/client";
-import {COMPLETE_ORDER_PAYMENT} from "@/graphql/defs/order";
+import { PaymentDetailsWithoutUrls } from "@/data/types";
+import { extractRawAmount } from "@/components/AddressPageComps/HelperComps";
+import { useMutation } from "@apollo/client";
+import { COMPLETE_ORDER_PAYMENT } from "@/graphql/defs/order";
+import { randomUUID } from "crypto";
 
 const MERCHANT_ID = "1225436";
 const TEST: boolean = true;
@@ -111,7 +112,7 @@ export const usePayhere = () => {
   const completePaymentWithOrder = async (orderId: string) => {
     const { data } = await completeOrderPayment({
       variables: {
-        input: { orderId: TEST? 1234: orderId, status: "COMPLETED" }
+        input: { orderId: TEST ? 1234 : orderId, status: "COMPLETED" }
       },
     });
     console.log("data on the complete order Mutation: ", data);

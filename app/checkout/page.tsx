@@ -36,6 +36,7 @@ import {
   savePaymentDetails,
   transformAddress,
 } from "@/components/AddressPageComps/HelperComps";
+import { randomUUID } from "crypto";
 
 interface FormData {
   contactInfo: Record<string, any>;
@@ -171,12 +172,12 @@ const CheckoutPage = () => {
   const [wantToSHowBankTransfer, setWantToSHowBankTransfer] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
 
-
-  useEffect(() => {
-    if (cart && cart?.contents?.nodes?.length === 0) {
-      router.push("/");
-    }
-  }, [cart]);
+  // TODO: Un comment this for the redirect on cart free
+  // useEffect(() => {
+  //   if (cart && cart?.contents?.nodes?.length === 0) {
+  //     router.push("/");
+  //   }
+  // }, [cart]);
 
   useEffect(() => {
     fetchCustomer();
@@ -224,6 +225,9 @@ const CheckoutPage = () => {
     });
   };
 
+  // let uuid = crypto.randomUUID();
+  // console.log("uuid: ", uuid);
+
   const handleConfirmationChange = (component: string, value: boolean) => {
     setIsConfirmed((prevConfirmed) => {
       return {
@@ -233,7 +237,6 @@ const CheckoutPage = () => {
     });
   };
 
- 
   const updateShippingTotal = async () => {
     try {
       const shippingMethods = isStorePickup
@@ -263,7 +266,7 @@ const CheckoutPage = () => {
         console.log("Cart shipping total updated successfully", shippingTotal);
       } else {
         console.error(
-          "Failed to update cart shipping total. No valid data returned."
+          "Failed to update cart shipping total. No valid data returned.",
         );
       }
     } catch (error) {
@@ -357,19 +360,19 @@ const CheckoutPage = () => {
 
     const isBankTransfer =
       formData?.paymentMethod?.selectedGateway?.id == "bacs";
-    const isPayhere = formData?.paymentMethod?.selectedGateway?.id == "payhere";
+    // const isPayhere = formData?.paymentMethod?.selectedGateway?.id == "payhere";
     const isCashOnDelivery =
       formData?.paymentMethod?.selectedGateway?.id == "cod";
 
     let checkoutDetails = paymentDetails;
 
-    if (isPayhere) {
-      try {
-        ImplementPayhere(checkoutDetails);
-      } catch (e) {
-        console.log("Error while creating Payhere:", e);
-      }
-    }
+    // if (isPayhere) {
+    //   try {
+    //     ImplementPayhere(checkoutDetails);
+    //   } catch (e) {
+    //     console.log("Error while creating Payhere:", e);
+    //   }
+    // }
 
     if (isBankTransfer) {
       try {
@@ -387,9 +390,9 @@ const CheckoutPage = () => {
         router.push(redirectUrl);
         return;
       }
-      
+
       let redirectUrl = `checkout/${checkoutDetails.order_id}`;
-      
+
       router.push(redirectUrl);
     }
   }, [paymentData]);
@@ -472,8 +475,6 @@ const CheckoutPage = () => {
     }, 80);
   };
 
-
-
   return (
     <div className="nc-CheckoutPage">
       <Script
@@ -483,7 +484,7 @@ const CheckoutPage = () => {
         onError={() => console.error("Error loading PayHere script")}
       />
       <title>Checkout</title>
-     
+
       <main className="container py-8 md:py-16 lg:pb-28 lg:pt-20 ">
         <PaymentModal
           show={showBankTransfer}
@@ -492,19 +493,18 @@ const CheckoutPage = () => {
           paymentDetails={paymentDetails}
         />
         <div className="mb-16">
-          <h2 className="block text-2xl sm:text-3xl lg:text-4xl font-semibold ">
+          <h2 className="block text-2xl font-semibold sm:text-3xl lg:text-4xl ">
             Checkout
           </h2>
-          
-          <div className="block mt-3 sm:mt-5 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-400">
+
+          <div className="mt-3 block text-xs font-medium text-slate-700 sm:mt-5 sm:text-sm dark:text-slate-400">
             <Link href={"/#"} className="">
               Homepage
             </Link>
-            <span className="text-xs mx-1 sm:mx-1.5">/</span>
+            <span className="mx-1 text-xs sm:mx-1.5">/</span>
             <span className="underline">Checkout</span>
           </div>
         </div>{" "}
-
         <div className="flex flex-col lg:flex-row">
           {/* Information about user */}
           <div className="flex-1">
@@ -516,7 +516,7 @@ const CheckoutPage = () => {
                   | "BillingAddress"
                   | "DeliveryAddress"
                   | "PaymentMethod"
-                  | "order-cart"
+                  | "order-cart",
               ) => setTabActive(value)}
               handleScrollToEl={handleScrollToEl}
               updateFormData={updateFormData}
@@ -528,7 +528,7 @@ const CheckoutPage = () => {
             />
           </div>
 
-          <div className="flex-shrink-0 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-700 my-10 lg:my-0 lg:mx-10 xl:lg:mx-14 2xl:mx-16 "></div>
+          <div className="my-10 flex-shrink-0 border-t border-slate-200 lg:mx-10 lg:my-0 lg:border-l lg:border-t-0 xl:lg:mx-14 2xl:mx-16 dark:border-slate-700 "></div>
 
           <div id="order-cart" className="w-full lg:w-[36%] ">
             <h3 className="text-lg font-semibold">Order summary</h3>
@@ -544,7 +544,7 @@ const CheckoutPage = () => {
               ))}
             </div>
 
-            <div className="mt-10 pt-6 text-sm text-slate-500 dark:text-slate-400 border-t border-slate-200/70 dark:border-slate-700 ">
+            <div className="mt-10 border-t border-slate-200/70 pt-6 text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400 ">
               {/* <div>
                                 <Label className="text-sm">Discount code</Label>
                                 <div className="flex mt-1.5">
@@ -576,7 +576,7 @@ const CheckoutPage = () => {
                                     {cart?.totalTax || "$0.00"}
                                 </span>
                             </div> */}
-              <div className="flex justify-between font-semibold text-slate-900 dark:text-slate-200 text-base pt-4">
+              <div className="flex justify-between pt-4 text-base font-semibold text-slate-900 dark:text-slate-200">
                 <span>Order total</span>
                 {/* <span>{cart?.total || "$0.00"}</span> */}
                 <span>{orderTotal || "0.00"}</span>
@@ -600,7 +600,7 @@ const CheckoutPage = () => {
                   isConfirmed.billingAddress &&
                   isConfirmed.paymentMethod
                 )
-                  ? "bg-slate-500 cursor-not-allowed"
+                  ? "cursor-not-allowed bg-slate-500"
                   : "bg-primary hover:bg-primary-dark"
               }`}
             >
@@ -623,8 +623,8 @@ const CheckoutPage = () => {
             {/*    Do your Bank Transfer*/}
             {/*</ButtonPrimary>*/}
 
-            <div className="mt-5 text-sm text-slate-500 dark:text-slate-400 flex items-center justify-center">
-              <div className=" flex gap-2 relative pl-5">
+            <div className="mt-5 flex items-center justify-center text-sm text-slate-500 dark:text-slate-400">
+              <div className=" relative flex gap-2 pl-5">
                 <Info />
 
                 <div>
@@ -633,7 +633,7 @@ const CheckoutPage = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     href={"/terms-and-conditions"}
-                    className="text-slate-900 dark:text-slate-200 underline font-medium"
+                    className="font-medium text-slate-900 underline dark:text-slate-200"
                   >
                     Terms and Conditions
                   </Link>
@@ -644,7 +644,7 @@ const CheckoutPage = () => {
                     target="_blank"
                     rel="noopener noreferrer"
                     href={"/privacy"}
-                    className="text-slate-900 dark:text-slate-200 underline font-medium"
+                    className="font-medium text-slate-900 underline dark:text-slate-200"
                   >
                     Privacy Policy
                   </Link>
