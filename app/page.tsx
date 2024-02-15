@@ -31,6 +31,7 @@ const getData = async () => {
       query: GET_PRODUCTS_NODES,
       variables: { first: 10, categoryIdIn: [302] },
     }),
+
     //Back In Stock
     getClient().query({
       query: GET_PRODUCTS_NODES_BACK_IN_STOCK,

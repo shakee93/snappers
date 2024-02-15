@@ -16,6 +16,30 @@ const ProductOverview = ({
   const techValue = product.metaData?.find(meta => meta?.key === 'tech_spec')?.value;
   const techSpecs = JSON.parse(techValue || 'false')
 
+  function addParagraphSpacing(htmlString) {
+    // Split the HTML string by paragraph tags
+    const paragraphs = htmlString.split('</p>');
+
+    // Join the paragraphs with an empty paragraph in between
+    const parsedHtml = paragraphs.map(paragraph => {
+      // Trim leading and trailing spaces from each paragraph
+      const trimmedParagraph = paragraph.trim();
+      // Skip empty paragraphs
+      if (trimmedParagraph !== '') {
+        return trimmedParagraph + '</p><p>&nbsp;</p><p>';
+      } else {
+        return '';
+      }
+    }).join('');
+
+    // Remove the extra empty paragraph at the end
+    const finalHtml = parsedHtml.slice(0, -('<p>&nbsp;</p><p>'.length));
+
+    // Return the modified HTML string
+    return finalHtml;
+  }
+
+  const formattedDescription = addParagraphSpacing(product.description);
 
   return (
     <>
@@ -27,7 +51,7 @@ const ProductOverview = ({
           <div className="md:w-3/5 p-2 md:p-4">
 
             <div className="text-xs md:text-sm text-gray-600">
-              {parseHtml(product.description || '')}
+              {parseHtml(formattedDescription || '')}
             </div>
           </div>
           <div className="md:w-2/5">
