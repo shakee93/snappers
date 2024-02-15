@@ -20,7 +20,7 @@ function PageHome2() {
         <SectionHero3 />
       </div>
 
-      <div className="container relative space-y-24 my-24 lg:space-y-32 lg:my-32">
+      <div className="container relative my-24 space-y-24 lg:my-32 lg:space-y-32">
         <SectionHowItWork />
 
         {/* SECTION */}

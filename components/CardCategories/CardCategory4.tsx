@@ -1,9 +1,9 @@
 import React, { FC } from "react";
 import NcImage from "shared/NcImage/NcImage";
-import Link from "next/link"
+import Link from "next/link";
 import explore1Svg from "@/public/images/collections/explore1.svg";
 import { ArrowRightIcon } from "@heroicons/react/24/outline";
-import {StaticImageData} from "next/image";
+import { StaticImageData } from "next/image";
 
 export interface CardCategory4Props {
   className?: string;
@@ -24,7 +24,7 @@ const CardCategory4: FC<CardCategory4Props> = ({
 }) => {
   return (
     <div
-      className={`nc-CardCategory4 relative w-full aspect-w-12 aspect-h-11 h-0 rounded-3xl overflow-hidden bg-white dark:bg-neutral-900 group hover:nc-shadow-lg transition-shadow ${className}`}
+      className={`nc-CardCategory4 aspect-w-12 aspect-h-11 hover:nc-shadow-lg group relative h-0 w-full overflow-hidden rounded-3xl bg-white transition-shadow dark:bg-neutral-900 ${className}`}
       data-nc-id="CardCategory4"
     >
       <div>
@@ -32,32 +32,32 @@ const CardCategory4: FC<CardCategory4Props> = ({
           {/* <img src={bgSVG} alt="" /> */}
         </div>
 
-        <div className="absolute inset-5 sm:inset-8 flex flex-col justify-between">
-          <div className="flex justify-between items-center">
+        <div className="absolute inset-5 flex flex-col justify-between sm:inset-8">
+          <div className="flex items-center justify-between">
             <NcImage
               src={featuredImage}
               containerClassName={`w-20 h-20 rounded-full overflow-hidden z-0 ${color}`}
             />
-            <span className="text-xs text-slate-700 dark:text-neutral-300 font-medium">
-             products
+            <span className="text-xs font-medium text-slate-700 dark:text-neutral-300">
+              products
             </span>
           </div>
 
           <div className="">
             <span
-              className={`block mb-2 text-sm text-slate-500 dark:text-slate-400`}
+              className={`mb-2 block text-sm text-slate-500 dark:text-slate-400`}
             >
               {desc}
             </span>
-            <h2 className={`text-2xl sm:text-3xl font-semibold`}>{name}</h2>
+            <h2 className={`text-2xl font-semibold sm:text-3xl`}>{name}</h2>
           </div>
 
           <Link
             href={"/page-collection"}
-            className="flex items-center text-sm font-medium group-hover:text-primary-500 transition-colors"
+            className="group-hover:text-primary-500 flex items-center text-sm font-medium transition-colors"
           >
             <span>See Collection</span>
-            <ArrowRightIcon className="w-4 h-4 ml-2.5" />
+            <ArrowRightIcon className="ml-2.5 h-4 w-4" />
           </Link>
         </div>
       </div>

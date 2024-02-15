@@ -4,10 +4,10 @@ import SectionSliderProductCard from "@/app/components/SectionSliderProductCard"
 import SectionGridMoreExplore from "@/app/components/HomePage/SectionGridMoreExplore";
 import SectionPromo1 from "@/app/components/HomePage/SectionPromo1";
 import Heading from "@/app/components/Heading/Heading";
-import {getClient} from "@/graphql/apollo-ssr";
-import {GET_SLIDES} from "@/graphql/defs/slides";
-import {GET_PRODUCTS_NODES} from "@/graphql/defs/products";
-import {SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
+import { getClient } from "@/graphql/apollo-ssr";
+import { GET_SLIDES } from "@/graphql/defs/slides";
+import { GET_PRODUCTS_NODES } from "@/graphql/defs/products";
+import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import "styles/embla.css";
 
 const getData = async () => {
@@ -45,7 +45,6 @@ const getData = async () => {
 };
 
 export default async function Home() {
-
   // const startTime = performance.now(); // Log the start time
 
   const { slides, newArrivals, mobiles, speakers, watches } = await getData();
@@ -56,7 +55,7 @@ export default async function Home() {
 
   return (
     <main>
-      <div className="nc-PageHome flex flex-col  relative overflow-hidden">
+      <div className="nc-PageHome relative flex  flex-col overflow-hidden">
         {/* hero section */}
         <div className="z-0">
           <SectionHero3 slides={slides} />
