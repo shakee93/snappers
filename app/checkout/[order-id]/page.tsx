@@ -20,8 +20,8 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
 
   if (orderId === "no_order_id_found" && searchParams == null) {
     return (
-      <h1 className="text-2xl font-bold py-20 text-center">
-        📝 The page is unable to load 
+      <h1 className="py-20 text-center text-2xl font-bold">
+        📝 The page is unable to load
       </h1>
     );
   }
@@ -33,20 +33,19 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
       await getCart();
     } catch (error: any) {
       console.error("Error refreshing the cart:", error);
-      throw error
+      throw error;
     }
   };
-
 
   if (orderId == "ItemNo12345") {
     return (
       <div className="container mx-auto grid items-center justify-center">
-        <h1 className="text-2xl font-bold py-20 text-center">
+        <h1 className="py-20 text-center text-2xl font-bold">
           📝 The page is unable to load the order ID since it{"'"}s a Payhere
           testing ID.
         </h1>
         <Link href={`/`} passHref>
-          <a className="text-center self-center text-blue-500 font-bold underline hover:cursor-pointer hover:text-blue-800">
+          <a className="self-center text-center font-bold text-blue-500 underline hover:cursor-pointer hover:text-blue-800">
             Back to Home
           </a>
         </Link>
@@ -56,7 +55,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
 
   const [getUserData, { data: customerData }] = useLazyQuery(
     GET_CHECKOUT_USER_DETAILS,
-    { fetchPolicy: "no-cache" }
+    { fetchPolicy: "no-cache" },
   );
 
   const { data: orderData, error: orderError } = useQuery(GET_SINGLE_ORDER, {
@@ -96,20 +95,20 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
       city: customerData?.customer?.shipping?.city ?? "no_city",
       country: "Sri Lanka",
     }),
-    [orderData, customerData]
+    [orderData, customerData],
   );
 
   if (orderId === "no_order_id_found" && searchParams) {
     return (
       <div className="container mx-auto grid items-center justify-center">
-        <h1 className="text-2xl font-bold pt-20 text-center">
+        <h1 className="pt-20 text-center text-2xl font-bold">
           Thank you! Your order has been successfully placed📦
         </h1>
-        <p className="text-center py-4">
+        <p className="py-4 text-center">
           Please check your email({searchParams}) for further details.
         </p>
         <Link href={`/`} passHref>
-          <p className="text-center self-center text-blue-500 font-bold underline hover:cursor-pointer hover:text-blue-800">
+          <p className="self-center text-center font-bold text-blue-500 underline hover:cursor-pointer hover:text-blue-800">
             Back to Home
           </p>
         </Link>
@@ -120,11 +119,11 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   if (orderError) {
     return (
       <div className="container mx-auto grid items-center justify-center">
-        <h1 className="text-2xl font-bold py-20 text-center">
+        <h1 className="py-20 text-center text-2xl font-bold">
           Not authorized to view this order
         </h1>
         <Link href={`/`} passHref>
-          <a className="text-center self-center text-blue-500 font-bold underline hover:cursor-pointer hover:text-blue-800">
+          <a className="self-center text-center font-bold text-blue-500 underline hover:cursor-pointer hover:text-blue-800">
             Back to Home
           </a>
         </Link>
@@ -134,10 +133,10 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
 
   useEffect(() => {
     // window.location.reload()
-  } ,[])
+  }, []);
 
   return (
-    <div className="container mx-auto rounded-3xl lg:p-20 text-center">
+    <div className="container mx-auto rounded-3xl text-center lg:p-20">
       <div className="my-4">
         <OrderDetails orderData={orderData} />
 
@@ -152,7 +151,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
         </div>
       </div>
 
-      <h1 className="text-2xl font-bold pt-20 pb-4 text-center">
+      <h1 className="pb-4 pt-20 text-center text-2xl font-bold">
         To Explore Our Product Range Further!
       </h1>
       <Link href={`/`} passHref>

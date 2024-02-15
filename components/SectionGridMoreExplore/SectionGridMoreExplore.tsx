@@ -24,7 +24,7 @@ import explore7Png from "@/public/images/collections/explore7.png";
 import explore8Png from "@/public/images/collections/explore8.png";
 import explore9Png from "@/public/images/collections/explore9.png";
 import CardCategory6 from "components/CardCategories/CardCategory6";
-import {StaticImageData} from "next/image";
+import { StaticImageData } from "next/image";
 
 interface ExploreType {
   id: number;
@@ -178,7 +178,7 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
     return (
       <div>
         <Heading
-          className="mb-12 lg:mb-14 text-neutral-900 dark:text-neutral-50"
+          className="mb-12 text-neutral-900 lg:mb-14 dark:text-neutral-50"
           fontClass="text-3xl md:text-4xl 2xl:text-5xl font-semibold"
           isCenter
           desc=""
@@ -186,7 +186,7 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
           Start exploring.
         </Heading>
         <Nav
-          className="p-1 bg-white dark:bg-neutral-800 rounded-full shadow-lg overflow-x-auto hiddenScrollbar"
+          className="hiddenScrollbar overflow-x-auto rounded-full bg-white p-1 shadow-lg dark:bg-neutral-800"
           containerClassName="mb-12 lg:mb-14 relative flex justify-center w-full text-sm md:text-base"
         >
           {[
@@ -226,7 +226,7 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
               <path d="M22.5 14.5V9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               <path d="M1.5 14.5V9.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
               </svg>
-              
+
                `,
             },
             {
@@ -252,7 +252,7 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
               isActive={tabActive === item.name}
               onClick={() => setTabActive(item.name)}
             >
-              <div className="flex items-center justify-center space-x-1.5 sm:space-x-2.5 text-xs sm:text-sm ">
+              <div className="flex items-center justify-center space-x-1.5 text-xs sm:space-x-2.5 sm:text-sm ">
                 <span
                   className="inline-block"
                   dangerouslySetInnerHTML={{ __html: item.icon }}

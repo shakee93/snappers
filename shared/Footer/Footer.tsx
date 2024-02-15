@@ -64,7 +64,7 @@ const Footer: React.FC = () => {
             <li key={index}>
               <a
                 key={index}
-                className="text-neutral-6000 dark:text-neutral-300 hover:text-black dark:hover:text-white"
+                className="text-neutral-6000 hover:text-black dark:text-neutral-300 dark:hover:text-white"
                 href={item.href}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -79,14 +79,14 @@ const Footer: React.FC = () => {
   };
 
   return (
-    <div className="nc-Footer relative py-20 lg:pt-28 lg:pb-24 border-t border-neutral-200 dark:border-neutral-700">
-      <div className="container grid grid-cols-2 gap-y-10 gap-x-5 sm:gap-x-8 md:grid-cols-4 lg:grid-cols-5 lg:gap-x-10 ">
-        <div className="grid grid-cols-4 gap-5 col-span-2 md:col-span-4 lg:md:col-span-1 lg:flex lg:flex-col">
+    <div className="nc-Footer relative border-t border-neutral-200 py-20 lg:pb-24 lg:pt-28 dark:border-neutral-700">
+      <div className="container grid grid-cols-2 gap-x-5 gap-y-10 sm:gap-x-8 md:grid-cols-4 lg:grid-cols-5 lg:gap-x-10 ">
+        <div className="col-span-2 grid grid-cols-4 gap-5 md:col-span-4 lg:md:col-span-1 lg:flex lg:flex-col">
           <div className="col-span-2 md:col-span-1">
             <Logo />
           </div>
           <div className="col-span-2 flex items-center md:col-span-3">
-            <SocialsList1 className="flex items-center space-x-2 lg:space-x-0 lg:flex-col lg:space-y-3 lg:items-start" />
+            <SocialsList1 className="flex items-center space-x-2 lg:flex-col lg:items-start lg:space-x-0 lg:space-y-3" />
           </div>
         </div>
         {widgetMenus.map(renderWidgetMenuItem)}

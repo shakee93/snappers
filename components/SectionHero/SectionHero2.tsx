@@ -9,7 +9,7 @@ import Next from "shared/NextPrev/Next";
 import Prev from "shared/NextPrev/Prev";
 import useInterval from "react-use/lib/useInterval";
 import useBoolean from "react-use/lib/useBoolean";
-import Image, {StaticImageData} from "next/image";
+import Image, { StaticImageData } from "next/image";
 
 interface Hero2DataType {
   image: StaticImageData;
@@ -27,22 +27,22 @@ const DATA: Hero2DataType[] = [
     image: imageRightPng2,
     heading: "Exclusive collection for everyone",
     subHeading: "In this season, find the best 🔥",
-    btnText: "Explore now",
-    btnLink: "/",
+    btnText: "Explore now ",
+    btnLink: "/collections/all",
   },
   {
     image: imageRightPng3,
     heading: "Exclusive collection for everyone",
     subHeading: "In this season, find the best 🔥",
     btnText: "Explore now",
-    btnLink: "/",
+    btnLink: "/collections/all",
   },
   {
     image: imageRightPng,
     heading: "Exclusive collection for everyone",
     subHeading: "In this season, find the best 🔥",
     btnText: "Explore now",
-    btnLink: "/",
+    btnLink: "/collections/all",
   },
 ];
 let TIME_OUT: NodeJS.Timeout | null = null;
@@ -56,7 +56,7 @@ const SectionHero2: FC<SectionHero2Props> = ({ className = "" }) => {
     () => {
       handleAutoNext();
     },
-    isRunning ? 5500 : null
+    isRunning ? 5500 : null,
   );
   //
 
@@ -108,10 +108,10 @@ const SectionHero2: FC<SectionHero2Props> = ({ className = "" }) => {
     }
     return (
       <div
-        className={`nc-SectionHero2Item nc-SectionHero2Item--animation flex flex-col-reverse lg:flex-col relative overflow-hidden ${className}`}
+        className={`nc-SectionHero2Item nc-SectionHero2Item--animation relative flex flex-col-reverse overflow-hidden lg:flex-col ${className}`}
         key={index}
       >
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-20 flex justify-center">
+        <div className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 justify-center">
           {DATA.map((_, index) => {
             const isActive = indexActive === index;
             return (
@@ -121,14 +121,14 @@ const SectionHero2: FC<SectionHero2Props> = ({ className = "" }) => {
                   setIndexActive(index);
                   handleAfterClick();
                 }}
-                className={`relative px-1 py-1.5 cursor-pointer`}
+                className={`relative cursor-pointer px-1 py-1.5`}
               >
                 <div
-                  className={`relative w-20 h-1 shadow-sm rounded-md bg-white`}
+                  className={`relative h-1 w-20 rounded-md bg-white shadow-sm`}
                 >
                   {isActive && (
                     <div
-                      className={`nc-SectionHero2Item__dot absolute inset-0 bg-slate-900 rounded-md ${
+                      className={`nc-SectionHero2Item__dot absolute inset-0 rounded-md bg-slate-900 ${
                         isActive ? " " : " "
                       }`}
                     ></div>
@@ -140,13 +140,13 @@ const SectionHero2: FC<SectionHero2Props> = ({ className = "" }) => {
         </div>
 
         <Prev
-          className="absolute left-1 sm:left-5 top-3/4 sm:top-1/2 sm:-translate-y-1/2 z-10 !text-slate-700"
+          className="absolute left-1 top-3/4 z-10 !text-slate-700 sm:left-5 sm:top-1/2 sm:-translate-y-1/2"
           btnClassName="w-12 h-12 hover:border-slate-400 dark:hover:border-slate-400"
           svgSize="w-6 h-6"
           onClickPrev={handleClickPrev}
         />
         <Next
-          className="absolute right-1 sm:right-5 top-3/4 sm:top-1/2 sm:-translate-y-1/2 z-10 !text-slate-700"
+          className="absolute right-1 top-3/4 z-10 !text-slate-700 sm:right-5 sm:top-1/2 sm:-translate-y-1/2"
           btnClassName="w-12 h-12 hover:border-slate-400 dark:hover:border-slate-400"
           svgSize="w-6 h-6"
           onClickNext={handleClickNext}
@@ -155,22 +155,24 @@ const SectionHero2: FC<SectionHero2Props> = ({ className = "" }) => {
         {/* BG */}
         <div className="absolute inset-0 bg-[#E3FFE6]">
           {/* <div className="absolute inset-0 bg-[#F7F0EA]"> */}
-          <Image fill style={{ objectFit: 'cover' }}
-            className="absolute w-full h-full object-contain"
+          <Image
+            fill
+            style={{ objectFit: "cover" }}
+            className="absolute h-full w-full object-contain"
             src={backgroundLineSvg}
             alt="hero"
           />
         </div>
 
-        <div className="relative container pb-0 pt-14 sm:pt-20 lg:py-44">
+        <div className="container relative pb-0 pt-14 sm:pt-20 lg:py-44">
           <div
-            className={`relative z-[1] w-full max-w-3xl space-y-8 sm:space-y-14 nc-SectionHero2Item__left`}
+            className={`nc-SectionHero2Item__left relative z-[1] w-full max-w-3xl space-y-8 sm:space-y-14`}
           >
             <div className="space-y-5 sm:space-y-6">
-              <span className="nc-SectionHero2Item__subheading block text-base md:text-xl text-slate-700 font-medium">
+              <span className="nc-SectionHero2Item__subheading block text-base font-medium text-slate-700 md:text-xl">
                 {item.subHeading}
               </span>
-              <h2 className="nc-SectionHero2Item__heading font-semibold text-3xl sm:text-4xl md:text-5xl xl:text-6xl 2xl:text-7xl !leading-[114%] text-slate-900">
+              <h2 className="nc-SectionHero2Item__heading text-3xl font-semibold !leading-[114%] text-slate-900 sm:text-4xl md:text-5xl xl:text-6xl 2xl:text-7xl">
                 {item.heading}
               </h2>
             </div>
@@ -182,7 +184,7 @@ const SectionHero2: FC<SectionHero2Props> = ({ className = "" }) => {
             >
               <span>{item.btnText}</span>
               <span>
-                <svg className="w-5 h-5 ml-2.5" viewBox="0 0 24 24" fill="none">
+                <svg className="ml-2.5 h-5 w-5" viewBox="0 0 24 24" fill="none">
                   <path
                     d="M11.5 21C16.7467 21 21 16.7467 21 11.5C21 6.25329 16.7467 2 11.5 2C6.25329 2 2 6.25329 2 11.5C2 16.7467 6.25329 21 11.5 21Z"
                     stroke="currentColor"
@@ -201,9 +203,9 @@ const SectionHero2: FC<SectionHero2Props> = ({ className = "" }) => {
               </span>
             </ButtonPrimary>
           </div>
-          <div className="mt-10 lg:mt-0 lg:absolute right-0 bottom-0 top-0 w-full max-w-2xl xl:max-w-3xl 2xl:max-w-4xl">
-           <Image
-              className="w-full h-full object-contain object-right-bottom nc-SectionHero2Item__image"
+          <div className="bottom-0 right-0 top-0 mt-10 w-full max-w-2xl lg:absolute lg:mt-0 xl:max-w-3xl 2xl:max-w-4xl">
+            <Image
+              className="nc-SectionHero2Item__image h-full w-full object-contain object-right-bottom"
               src={item.image}
               alt={item.heading}
             />

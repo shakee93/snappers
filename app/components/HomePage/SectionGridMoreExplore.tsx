@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import CardCategory1 from "@/app/components/CardCategories/CardCategory1";
 import CardCategory4 from "@/app/components/CardCategories/CardCategory4";
@@ -30,7 +30,6 @@ import { GET_PRODUCTS, GET_BRANDS } from "@/graphql/defs/products";
 import { GET_BRAND_DETAILS } from "@/graphql/defs/products";
 import { Brand } from "@/graphql/types/graphql";
 
-
 interface ExploreType {
   id: number;
   name: string;
@@ -49,7 +48,6 @@ export interface SectionGridMoreExploreProps {
   data?: ExploreType[];
 }
 
-
 const hardcodedBrands: {
   [key: string]: {
     id: string;
@@ -57,36 +55,36 @@ const hardcodedBrands: {
   }[];
 } = {
   Mobiles: [
-    { id: 'dGVybToyMTk=', slug: "samsung" },
-    { id: 'dGVybToyMjY=', slug: "apple" },
-    { id: 'dGVybToyMjk=', slug: "google" },
-    { id: 'dGVybToyMjA=', slug: "oneplus" },
-    { id: 'dGVybToyMjU=', slug: "huawei" },
-    { id: 'dGVybToyMzk=', slug: "nokia" },
+    { id: "dGVybToyMTk=", slug: "samsung" },
+    { id: "dGVybToyMjY=", slug: "apple" },
+    { id: "dGVybToyMjk=", slug: "google" },
+    { id: "dGVybToyMjA=", slug: "oneplus" },
+    { id: "dGVybToyMjU=", slug: "huawei" },
+    { id: "dGVybToyMzk=", slug: "nokia" },
   ],
   Watches: [
-    { id: 'dGVybToyMzI=', slug: "fitbit" },
-    { id: 'dGVybToyMjQ=', slug: "amazfit" },
-    { id: 'dGVybToyMjU=', slug: "huawei" },
+    { id: "dGVybToyMzI=", slug: "fitbit" },
+    { id: "dGVybToyMjQ=", slug: "amazfit" },
+    { id: "dGVybToyMjU=", slug: "huawei" },
   ],
   Laptops: [
-    { id: 'dGVybToyMjY=', slug: "apple" },
-    { id: 'dGVybToyMTk=', slug: "samsung" },
+    { id: "dGVybToyMjY=", slug: "apple" },
+    { id: "dGVybToyMTk=", slug: "samsung" },
   ],
   Speakers: [
-    { id: 'dGVybToyNDE=', slug: "bose" },
-    { id: 'dGVybToyMzM=', slug: "beats" },
-    { id: 'dGVybToyNzA=', slug: "marshals" },
+    { id: "dGVybToyNDE=", slug: "bose" },
+    { id: "dGVybToyMzM=", slug: "beats" },
+    { id: "dGVybToyNzA=", slug: "marshals" },
   ],
   PowerBanks: [
-    { id: 'dGVybToyNDA=', slug: "porodo" },
-    { id: 'dGVybToyMzg=', slug: "belkin" },
+    { id: "dGVybToyNDA=", slug: "porodo" },
+    { id: "dGVybToyMzg=", slug: "belkin" },
   ],
   Gaming: [
-    { id: 'dGVybToyMzQ=', slug: "logitech" },
-    { id: 'dGVybToyNTg=', slug: "tecno" },
-    { id: 'dGVybToyMjE=', slug: "skullcandy" },
-    { id: 'dGVybToyMzc=', slug: "green-lion" },
+    { id: "dGVybToyMzQ=", slug: "logitech" },
+    { id: "dGVybToyNTg=", slug: "tecno" },
+    { id: "dGVybToyMjE=", slug: "skullcandy" },
+    { id: "dGVybToyMzc=", slug: "green-lion" },
   ],
 };
 const hardcodedBrandsMobile: {
@@ -96,58 +94,57 @@ const hardcodedBrandsMobile: {
   }[];
 } = {
   Mobiles: [
-    { id: 'dGVybToyMTk=', slug: "samsung" },
-    { id: 'dGVybToyMjY=', slug: "apple" },
-    { id: 'dGVybToyMjk=', slug: "google" },
-    { id: 'dGVybToyMjA=', slug: "oneplus" },
-    { id: 'dGVybToyMjU=', slug: "huawei" },
-    { id: 'dGVybToyMzk=', slug: "nokia" },
+    { id: "dGVybToyMTk=", slug: "samsung" },
+    { id: "dGVybToyMjY=", slug: "apple" },
+    { id: "dGVybToyMjk=", slug: "google" },
+    { id: "dGVybToyMjA=", slug: "oneplus" },
+    { id: "dGVybToyMjU=", slug: "huawei" },
+    { id: "dGVybToyMzk=", slug: "nokia" },
   ],
   Watches: [
-    { id: 'dGVybToyMzI=', slug: "fitbit" },
-    { id: 'dGVybToyMjQ=', slug: "amazfit" },
-    { id: 'dGVybToyMjU=', slug: "huawei" },
+    { id: "dGVybToyMzI=", slug: "fitbit" },
+    { id: "dGVybToyMjQ=", slug: "amazfit" },
+    { id: "dGVybToyMjU=", slug: "huawei" },
   ],
   Laptops: [
-    { id: 'dGVybToyMjY=', slug: "apple" },
-    { id: 'dGVybToyMTk=', slug: "samsung" },
+    { id: "dGVybToyMjY=", slug: "apple" },
+    { id: "dGVybToyMTk=", slug: "samsung" },
   ],
   Speakers: [
-    { id: 'dGVybToyNDE=', slug: "bose" },
-    { id: 'dGVybToyMzM=', slug: "beats" },
-    { id: 'dGVybToyNzA=', slug: "marshals" },
+    { id: "dGVybToyNDE=", slug: "bose" },
+    { id: "dGVybToyMzM=", slug: "beats" },
+    { id: "dGVybToyNzA=", slug: "marshals" },
   ],
 };
-
 
 const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
   className = "",
   boxCard = "box4",
   gridClassName = "grid-cols-2 md:grid-cols-2 xl:grid-cols-3",
 }) => {
-
   const [brands, setBrands] = useState<Brand[]>([]);
-  const [tabActive, setTabActive] = useState<keyof typeof hardcodedBrands>("Mobiles");
+  const [tabActive, setTabActive] =
+    useState<keyof typeof hardcodedBrands>("Mobiles");
 
   const { loading, error, data, refetch } = useQuery(GET_BRANDS);
 
-  const fetchBrandsForCategory = async (category: keyof typeof hardcodedBrands) => {
-      const allSlugs = [];
+  const fetchBrandsForCategory = async (
+    category: keyof typeof hardcodedBrands,
+  ) => {
+    const allSlugs = [];
 
-      for (const category in hardcodedBrands) {
-        const brandsInCategory = hardcodedBrands[category] ;
-        for (const brand of brandsInCategory) {
-          allSlugs.push(brand.slug);
-        }
+    for (const category in hardcodedBrands) {
+      const brandsInCategory = hardcodedBrands[category];
+      for (const brand of brandsInCategory) {
+        allSlugs.push(brand.slug);
       }
+    }
 
-      const { data: fetchedData } = await refetch({
-          slug: allSlugs
-      });
+    const { data: fetchedData } = await refetch({
+      slug: allSlugs,
+    });
 
-      setBrands(fetchedData.brands.nodes as Brand[]);
-
-
+    setBrands(fetchedData.brands.nodes as Brand[]);
   };
 
   useEffect(() => {
@@ -158,7 +155,7 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
     return (
       <div>
         <Heading
-          className="mb-5 lg:mb-10 text-neutral-900 dark:text-neutral-50"
+          className="mb-5 text-neutral-900 lg:mb-10 dark:text-neutral-50"
           fontClass="text-2xl md:text-4xl 2xl:text-5xl font-semibold"
           isCenter
           desc=""
@@ -166,7 +163,7 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
           Start exploring.
         </Heading>
         <Nav
-          className="hidden lg:flex p-1 bg-white dark:bg-neutral-800 rounded-full shadow-lg overflow-x-auto hiddenScrollbar"
+          className="hiddenScrollbar hidden overflow-x-auto rounded-full bg-white p-1 shadow-lg lg:flex dark:bg-neutral-800"
           containerClassName="relative flex justify-center w-full text-sm md:text-base"
         >
           {Object.keys(hardcodedBrands).map((item, index) => (
@@ -177,7 +174,7 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
                 setTabActive(item as keyof typeof hardcodedBrands);
               }}
             >
-              <div className="flex items-center justify-center space-x-1.5 sm:space-x-2.5 text-xs sm:text-sm ">
+              <div className="flex items-center justify-center space-x-1.5 text-xs sm:space-x-2.5 sm:text-sm ">
                 {/* <span
                   className="inline-block"
                   dangerouslySetInnerHTML={{ __html: item.icon }}
@@ -188,7 +185,7 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
           ))}
         </Nav>
         <Nav
-          className="lg:hidden p-1 bg-white dark:bg-neutral-800 rounded-full shadow-lg overflow-x-auto hiddenScrollbar"
+          className="hiddenScrollbar overflow-x-auto rounded-full bg-white p-1 shadow-lg lg:hidden dark:bg-neutral-800"
           containerClassName="mb-5 lg:mb-14 relative flex justify-center w-full text-sm md:text-base"
         >
           {Object.keys(hardcodedBrandsMobile).map((item, index) => (
@@ -199,7 +196,7 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
                 setTabActive(item as keyof typeof hardcodedBrands);
               }}
             >
-              <div className="flex items-center justify-center space-x-1.5 sm:space-x-2.5 text-xs sm:text-sm ">
+              <div className="flex items-center justify-center space-x-1.5 text-xs sm:space-x-2.5 sm:text-sm ">
                 {/* <span
                   className="inline-block"
                   dangerouslySetInnerHTML={{ __html: item.icon }}
@@ -221,50 +218,52 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
   };
 
   return (
-   <>
-    <div
-      className={ `bg-slate-100 rounded-3xl p-10 hidden lg:block nc-SectionGridMoreExplore relative ${className}`}
-      data-nc-id="SectionGridMoreExplore"
-    >
-      {renderHeading()}
-      <div className={`grid gap-4 md:gap-7 ${gridClassName}`}>
-        {hardcodedBrands[tabActive]
-            ?.map(brand => brands.find(b => b.id === brand.id) as Brand)
-            ?.filter(n => n !== undefined).map((brand, index) => (
-          <div key={brand.id + index}>
-            <CardCategory4
-              name={brand.name || ''}
-              desc={brand.description || ''}
-              key={brand.id}
-              slug={modifySlugForLaptops(brand.slug || '')}
-              featuredImage={brand?.brandImage || ''}
-            />
-          </div>
-        ))}
+    <>
+      <div
+        className={`nc-SectionGridMoreExplore relative hidden rounded-3xl bg-slate-100 p-10 lg:block ${className}`}
+        data-nc-id="SectionGridMoreExplore"
+      >
+        {renderHeading()}
+        <div className={`grid gap-4 md:gap-7 ${gridClassName}`}>
+          {hardcodedBrands[tabActive]
+            ?.map((brand) => brands.find((b) => b.id === brand.id) as Brand)
+            ?.filter((n) => n !== undefined)
+            .map((brand, index) => (
+              <div key={brand.id + index}>
+                <CardCategory4
+                  name={brand.name || ""}
+                  desc={brand.description || ""}
+                  key={brand.id}
+                  slug={modifySlugForLaptops(brand.slug || "")}
+                  featuredImage={brand?.brandImage || ""}
+                />
+              </div>
+            ))}
+        </div>
       </div>
-    </div>
-    <div
-      className={`bg-slate-100 rounded-3xl p-3 md:p-5 lg:hidden nc-SectionGridMoreExplore relative ${className}`}
-      data-nc-id="SectionGridMoreExplore"
-    >
-      {renderHeading()}
-      <div className={`grid gap-4 md:gap-7 ${gridClassName}`}>
-        {hardcodedBrandsMobile[tabActive]
-            ?.map(brand => brands.find(b => b.id === brand.id) as Brand)
-            ?.filter(n => n !== undefined).map((brand, index) => (
-          <div key={brand.id + index}>
-            <CardCategory4
-              name={brand.name || ''}
-              desc={brand.description || ''}
-              key={brand.id}
-              slug={modifySlugForLaptops(brand.slug || '')}
-              featuredImage={brand?.brandImage || ''}
-            />
-          </div>
-        ))}
+      <div
+        className={`nc-SectionGridMoreExplore relative rounded-3xl bg-slate-100 p-3 md:p-5 lg:hidden ${className}`}
+        data-nc-id="SectionGridMoreExplore"
+      >
+        {renderHeading()}
+        <div className={`grid gap-4 md:gap-7 ${gridClassName}`}>
+          {hardcodedBrandsMobile[tabActive]
+            ?.map((brand) => brands.find((b) => b.id === brand.id) as Brand)
+            ?.filter((n) => n !== undefined)
+            .map((brand, index) => (
+              <div key={brand.id + index}>
+                <CardCategory4
+                  name={brand.name || ""}
+                  desc={brand.description || ""}
+                  key={brand.id}
+                  slug={modifySlugForLaptops(brand.slug || "")}
+                  featuredImage={brand?.brandImage || ""}
+                />
+              </div>
+            ))}
+        </div>
       </div>
-    </div>
-   </>
+    </>
   );
 };
 

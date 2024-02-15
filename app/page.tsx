@@ -57,7 +57,6 @@ const getData = async () => {
 };
 
 export default async function Home() {
-
   // const startTime = performance.now(); // Log the start time
 
   const { slides, newArrivals, mobiles, speakers, watches, backInStock } = await getData();
@@ -68,7 +67,7 @@ export default async function Home() {
 
   return (
     <main>
-      <div className="nc-PageHome flex flex-col  relative overflow-hidden">
+      <div className="nc-PageHome relative flex  flex-col overflow-hidden">
         {/* hero section */}
         <div className="z-0">
           <SectionHero3 slides={slides} />
