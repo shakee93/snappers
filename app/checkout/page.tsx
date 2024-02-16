@@ -202,9 +202,42 @@ const CheckoutPage = () => {
     { loading: checkoutLoading, error: checkoutError, data: checkoutData },
   ] = useMutation(GUEST_CHECKOUT_MUTATION);
 
+  const handlePaymentCompleted = async (paymentDetails: PaymentDetailsWithoutUrls, orderId: string) => {
+    try {
+      console.log('paymentDetails after successful payhere: ', paymentDetails);
+      console.log('OrderId after successful payhere: ', orderId);
+      
+      const shippingMethod = getShippingMethod(shippingTotal);
+      const shippingDetails = transformAddress(formData.deliveryAddress);
+      const billingDetails = transformAddress(formData.billingAddress);
+  
+      const variables = {
+        input: {
+          paymentMethod: formData?.paymentMethod?.selectedGateway?.id,
+          shippingMethod,
+          shipping: shippingDetails,
+          billing: billingDetails,
+        },
+      };
+  
+      const { data } = await checkoutMutation({ variables });
+  
+      if (data) {
+        console.log("Order created successfully:", data);
+        // Handle success
+      } else {
+        console.error("Failed to create order.");
+        // Handle failure
+      }
+    } catch (error) {
+      console.error("Error creating order:", error);
+      // Handle error
+    }
+  };
+
   // Contexts
   const router = useRouter();
-  const initiatePayment = usePayhere();
+  const initiatePayment = usePayhere(handlePaymentCompleted);
 
   const updateFormData = (section: string, data: any) => {
     setFormData((prevData) => {
@@ -295,7 +328,7 @@ const CheckoutPage = () => {
     };
 
     if (initiatePayment !== null) {
-        initiatePayment(fakeData).then((r) => r);
+      initiatePayment(fakeData).then((r) => r);
     } else {
       console.log("initiate payment become null");
     }
@@ -619,16 +652,15 @@ const CheckoutPage = () => {
                   isConfirmed.paymentMethod
                 )
               }
-              className={`mt-8 w-full ${
-                !(
-                  isConfirmed.contactInfo &&
-                  isConfirmed.deliveryAddress &&
-                  isConfirmed.billingAddress &&
-                  isConfirmed.paymentMethod
-                )
-                  ? "cursor-not-allowed bg-slate-500"
-                  : "bg-primary hover:bg-primary-dark"
-              }`}
+              className={`mt-8 w-full ${!(
+                isConfirmed.contactInfo &&
+                isConfirmed.deliveryAddress &&
+                isConfirmed.billingAddress &&
+                isConfirmed.paymentMethod
+              )
+                ? "cursor-not-allowed bg-slate-500"
+                : "bg-primary hover:bg-primary-dark"
+                }`}
             >
               {loading ? (
                 <Loader className="animate-spin text-gray-100 " />

@@ -101,7 +101,7 @@ const getPaymentHash = async (dynamicData: any) => {
   }
 };
 
-export const usePayhere = () => {
+export const usePayhere = (onPaymentCompleted : any) => {
   // const [completeOrderPayment] = useMutation(COMPLETE_ORDER_PAYMENT);
 
   // const completePaymentWithOrder = async (orderId: string) => {
@@ -132,16 +132,23 @@ export const usePayhere = () => {
       // this for real data
       // let dynamicData = await getDynamicData(paymentDetails);
       console.log("dynamic data: ", dynamicData);
+
+      // onPaymentCompleted(paymentDetails, "1234");
+
       window?.payhere.startPayment(dynamicData);
+      
       window.onerror = function onError(error: any) {
         console.log("Error:" + error);
       };
+
       window.onerror = function onError(error: any) {
         console.log("Error:" + error);
       };
 
       // Payment completed. It can be a successful failure.
       window.payhere.onCompleted = function onCompleted(orderId: any) {
+        console.log('completed succesffully`', orderId);
+        onPaymentCompleted(paymentDetails, orderId);
         // completePaymentWithOrder(orderId)
         // .then((data: any) => {
         //   console.log("Payhere Completion data: ", data);
