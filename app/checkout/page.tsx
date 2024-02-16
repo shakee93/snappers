@@ -206,7 +206,7 @@ const CheckoutPage = () => {
     try {
       console.log('paymentDetails after successful payhere: ', paymentDetails);
       console.log('OrderId after successful payhere: ', orderId);
-      
+
       const shippingMethod = getShippingMethod(shippingTotal);
       const shippingDetails = transformAddress(formData.deliveryAddress);
       const billingDetails = transformAddress(formData.billingAddress);
@@ -257,6 +257,8 @@ const CheckoutPage = () => {
         [section as keyof FormData]: updatedSection,
       };
     });
+
+    console.log('formData', formData);
   };
 
   // let uuid = crypto.randomUUID();
@@ -319,13 +321,16 @@ const CheckoutPage = () => {
   const ImplementPayhere = () => {
     let fakeData:  PaymentDetailsWithoutUrls = {
       amount: cart?.total ?? "123",
-      first_name: formData.contactInfo.first_name,
-      last_name: "Sadikeen",
-      email: "shadeersadikeen@gmail.com",
+      first_name: formData?.billingAddress?.firstName ?? "",
+      last_name: formData?.billingAddress?.lastName ??  "",
+      email: formData?.contactInfo?.email,
       items: "safsf",
       order_id: "123",
       address: formData.billingAddress as string,
+      phone: formData.contactInfo?.phone,
     };
+
+    console.log('fakeData', fakeData);
 
     if (initiatePayment !== null) {
       initiatePayment(fakeData).then((r) => r);

@@ -35,7 +35,7 @@ const staticData = {
   custom_2: "",
 };
 
-const tranformDataForPayhere = async (paymentDetails_: PaymentDetailsWithoutUrls)  => {
+const tranformDataForPayhere = async (paymentDetails_: PaymentDetailsWithoutUrls) => {
   let hash = await getPaymentHash(paymentDetails_);
   if (!hash) {
     alert("hash Can not be generated");
@@ -101,7 +101,7 @@ const getPaymentHash = async (dynamicData: any) => {
   }
 };
 
-export const usePayhere = (onPaymentCompleted : any) => {
+export const usePayhere = (onPaymentCompleted: any) => {
   // const [completeOrderPayment] = useMutation(COMPLETE_ORDER_PAYMENT);
 
   // const completePaymentWithOrder = async (orderId: string) => {
@@ -115,10 +115,10 @@ export const usePayhere = (onPaymentCompleted : any) => {
   // };
 
   const initiatePayment = async (
-    paymentDetails: PaymentDetailsWithoutUrls |  null,
+    paymentDetails: PaymentDetailsWithoutUrls | null,
   ) => {
 
-    console.log("paymentDetails in initatePayment: ", paymentDetails); 
+    console.log("paymentDetails in initatePayment: ", paymentDetails);
 
     // Continue from here
     if (window?.payhere) {
@@ -126,7 +126,6 @@ export const usePayhere = (onPaymentCompleted : any) => {
         alert("No payment details provided");
         return null;
       }
-      // console.log("initiate Payment paymentDetails: ", paymentDetails);
 
       // use staticData var for the check the payhere integration
       let dynamicData = await tranformDataForPayhere(paymentDetails);
@@ -138,7 +137,7 @@ export const usePayhere = (onPaymentCompleted : any) => {
       // onPaymentCompleted(paymentDetails, "1234");
 
       window?.payhere.startPayment(dynamicData);
-      
+
       window.onerror = function onError(error: any) {
         console.log("Error:" + error);
       };
