@@ -1,9 +1,6 @@
 "use client";
-import { PaymentDetailsWithoutUrls } from "@/data/types";
+import { CheckoutDataExample, PaymentDetailsWithoutUrls } from "@/data/types";
 import { extractRawAmount } from "@/components/AddressPageComps/HelperComps";
-import { useMutation } from "@apollo/client";
-import { COMPLETE_ORDER_PAYMENT } from "@/graphql/defs/order";
-import { randomUUID } from "crypto";
 
 const MERCHANT_ID = "1225436";
 const TEST: boolean = true;
@@ -54,7 +51,6 @@ const getDynamicData = async (paymentDetails_: PaymentDetailsWithoutUrls) => {
 
   let order_id = TEST ? "ItemNo12345" : paymentDetails_?.order_id;
   let amount = TEST ? "100.00" : extractRawAmount(paymentDetails_?.amount);
-
   return {
     sandbox: true,
     merchant_id: MERCHANT_ID,
@@ -86,7 +82,6 @@ const getPaymentHash = async (dynamicData: any) => {
       currency: "LKR",
     };
 
-
     const response = await fetch("/api/payhere", {
       method: "POST",
       headers: {
@@ -107,27 +102,29 @@ const getPaymentHash = async (dynamicData: any) => {
 };
 
 export const usePayhere = () => {
-  const [completeOrderPayment] = useMutation(COMPLETE_ORDER_PAYMENT);
+  // const [completeOrderPayment] = useMutation(COMPLETE_ORDER_PAYMENT);
 
-  const completePaymentWithOrder = async (orderId: string) => {
-    const { data } = await completeOrderPayment({
-      variables: {
-        input: { orderId: TEST ? 1234 : orderId, status: "COMPLETED" }
-      },
-    });
-    console.log("data on the complete order Mutation: ", data);
-    return data;
-  };
+  // const completePaymentWithOrder = async (orderId: string) => {
+  //   const { data } = await completeOrderPayment({
+  //     variables: {
+  //       input: { orderId: TEST ? 1234 : orderId, status: "COMPLETED" }
+  //     },
+  //   });
+  //   console.log("data on the complete order Mutation: ", data);
+  //   return data;
+  // };
 
   const initiatePayment = async (
-    paymentDetails: PaymentDetailsWithoutUrls | null
+    paymentDetails: PaymentDetailsWithoutUrls | CheckoutDataExample |  null,
   ) => {
+
+    // Continue from here
     if (window?.payhere) {
       if (!paymentDetails) {
         alert("No payment details provided");
         return null;
       }
-      console.log("initiate Payment paymentDetails: ", paymentDetails);
+      // console.log("initiate Payment paymentDetails: ", paymentDetails);
 
       // use staticData var for the check the payhere integration
       let dynamicData = await getDynamicData(staticData);
@@ -142,17 +139,18 @@ export const usePayhere = () => {
       window.onerror = function onError(error: any) {
         console.log("Error:" + error);
       };
+
       // Payment completed. It can be a successful failure.
       window.payhere.onCompleted = function onCompleted(orderId: any) {
-        completePaymentWithOrder(orderId)
-          .then((data: any) => {
-            console.log("Payhere Completion data: ", data);
-            window.location.href = `/checkout/${orderId}`;
-          })
-          .catch((e: any) => {
-            console.log("Error on payhere Complete: ", e);
-            alert("Something went wrong on the PAYHERE PAYMENT PROCESS");
-          });
+        // completePaymentWithOrder(orderId)
+        // .then((data: any) => {
+        //   console.log("Payhere Completion data: ", data);
+        // })
+        // .catch((e: any) => {
+        //   console.log("Error on payhere Complete: ", e);
+        //   alert("Something went wrong on the PAYHERE PAYMENT PROCESS");
+        // });
+        window.location.href = `/checkout/${orderId}`;
       };
     }
   };

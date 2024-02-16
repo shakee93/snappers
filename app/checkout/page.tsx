@@ -25,7 +25,7 @@ import {
 import CheckoutDetails from "./CheckoutDetails";
 import CartItems from "./CartItems";
 import toast from "react-hot-toast";
-import { PaymentDetailsWithoutUrls } from "@/data/types";
+import { CheckoutDataExample, PaymentDetailsWithoutUrls } from "@/data/types";
 import Script from "next/script";
 import { usePayhere } from "../components/Payment/Payhere";
 import { useRouter } from "next/navigation";
@@ -49,6 +49,7 @@ interface FormData {
   };
 }
 
+const TEST = true;
 //
 // const FAKE_PAYMENT_DETAILS: PaymentDetailsWithoutUrls | null = {
 //     order_id: "6425",
@@ -266,7 +267,7 @@ const CheckoutPage = () => {
         console.log("Cart shipping total updated successfully", shippingTotal);
       } else {
         console.error(
-          "Failed to update cart shipping total. No valid data returned.",
+          "Failed to update cart shipping total. No valid data returned."
         );
       }
     } catch (error) {
@@ -282,9 +283,19 @@ const CheckoutPage = () => {
     return paymentData;
   }, [paymentData]);
 
-  const ImplementPayhere = (paymentDetails: any) => {
+  const ImplementPayhere = () => {
+    let fakeData: CheckoutDataExample | PaymentDetailsWithoutUrls = {
+      amount: cart?.total ?? "123",
+      first_name: "Shakeeb",
+      last_name: "Sadikeen",
+      email: "shadeersadikeen@gmail.com",
+      items: ["safsf"],
+      order_id: "123",
+      address: formData.billingAddress as string,
+    };
+
     if (initiatePayment !== null) {
-      initiatePayment(paymentDetails).then((r) => r);
+        initiatePayment(fakeData).then((r) => r);
     } else {
       console.log("initiate payment become null");
     }
@@ -360,19 +371,10 @@ const CheckoutPage = () => {
 
     const isBankTransfer =
       formData?.paymentMethod?.selectedGateway?.id == "bacs";
-    // const isPayhere = formData?.paymentMethod?.selectedGateway?.id == "payhere";
     const isCashOnDelivery =
       formData?.paymentMethod?.selectedGateway?.id == "cod";
 
     let checkoutDetails = paymentDetails;
-
-    // if (isPayhere) {
-    //   try {
-    //     ImplementPayhere(checkoutDetails);
-    //   } catch (e) {
-    //     console.log("Error while creating Payhere:", e);
-    //   }
-    // }
 
     if (isBankTransfer) {
       try {
@@ -400,12 +402,33 @@ const CheckoutPage = () => {
   const handleCheckout = async () => {
     setLoading(true);
 
+    const isPayhere = formData?.paymentMethod?.selectedGateway?.id == "payhere";
+
     try {
       if (wantToSHowBankTransfer) {
         ImplementBankTransfer();
         return;
       }
 
+      let fakeOrderId = crypto.randomUUID();
+      if (isPayhere) {
+        // let payhereCheckoutDetails: PaymentDetailsWithoutUrls = {
+        //   order_id: fakeOrderId as string,
+        //   email: formData.billingAddress.email as string,
+        //   amount: TEST ? "100.00": fakeOrderId as string,
+        //   currency: "LKR",
+        // };
+        // return;
+
+        try {
+          ImplementPayhere();
+          return;
+        } catch (e) {
+          console.log("Error while creating Payhere:", e);
+        }
+      }
+
+      return;
       const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
       if (paymentMethodId === undefined) {
         console.error("Payment method ID is undefined");
@@ -432,7 +455,10 @@ const CheckoutPage = () => {
           : await checkoutMutation({ variables });
 
       if (data) {
+        console.log("data on the before thank you page: ", data);
         const checkoutDetails = savePaymentDetails(data);
+        console.log("tranformedData:", checkoutDetails);
+
         setPaymentData(checkoutDetails);
         toast.success("Order Created Successfully");
       } else {
@@ -516,7 +542,7 @@ const CheckoutPage = () => {
                   | "BillingAddress"
                   | "DeliveryAddress"
                   | "PaymentMethod"
-                  | "order-cart",
+                  | "order-cart"
               ) => setTabActive(value)}
               handleScrollToEl={handleScrollToEl}
               updateFormData={updateFormData}

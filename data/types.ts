@@ -21,17 +21,15 @@ export type contactInformation = {
   phone: string;
   email: string;
   displayName: string;
-}
+};
 
 export type Slug = {
-  'order-id': string;
+  "order-id": string;
 };
 
 export type OrderPaymentPageProps = {
   params: Slug;
 };
-
-
 
 export type PaymentDetailsType = {
   sandbox?: boolean;
@@ -58,11 +56,26 @@ declare global {
       startPayment: (paymentDetails: any) => void | null;
       onDismissed: () => void | null;
       onError: (error: any) => void | null;
-      onCompleted : (orderId: any) => void | null;
+      onCompleted: (orderId: any) => void | null;
     } | null;
   }
 }
-export type PaymentDetailsWithoutUrls = Omit<PaymentDetailsType,
-    'sandbox' | 'merchant_id' | 'return_url' | 'cancel_url' | 'notify_url' | 'hash'>;
+export type PaymentDetailsWithoutUrls = Omit<
+  PaymentDetailsType,
+  | "sandbox"
+  | "merchant_id"
+  | "return_url"
+  | "cancel_url"
+  | "notify_url"
+  | "hash"
+>;
 
-
+export type CheckoutDataExample = {
+  amount: String;
+  items: String[];
+  order_id: String;
+  first_name: String;
+  last_name: String;
+  email: String;
+  address: String;
+};
