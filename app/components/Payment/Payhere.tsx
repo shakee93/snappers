@@ -67,7 +67,7 @@ const tranformDataForPayhere = async (paymentDetails_: PaymentDetailsWithoutUrls
     email: paymentDetails_?.email,
     phone: paymentDetails_?.phone ?? "0771234567",
     address: paymentDetails_?.address,
-    city: "Colombo",
+    city: paymentDetails_?.city,
     country: "Sri Lanka",
   };
 };

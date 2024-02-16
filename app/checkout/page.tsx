@@ -258,7 +258,6 @@ const CheckoutPage = () => {
       };
     });
 
-    console.log('formData', formData);
   };
 
   // let uuid = crypto.randomUUID();
@@ -328,6 +327,7 @@ const CheckoutPage = () => {
       order_id: "123",
       address: formData.billingAddress as string,
       phone: formData.contactInfo?.phone,
+      city: formData.billingAddress?.city ?? "",
     };
 
     console.log('fakeData', fakeData);
