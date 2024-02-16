@@ -317,12 +317,12 @@ const CheckoutPage = () => {
   }, [paymentData]);
 
   const ImplementPayhere = () => {
-    let fakeData: CheckoutDataExample | PaymentDetailsWithoutUrls = {
+    let fakeData:  PaymentDetailsWithoutUrls = {
       amount: cart?.total ?? "123",
-      first_name: "Shakeeb",
+      first_name: formData.contactInfo.first_name,
       last_name: "Sadikeen",
       email: "shadeersadikeen@gmail.com",
-      items: ["safsf"],
+      items: "safsf",
       order_id: "123",
       address: formData.billingAddress as string,
     };

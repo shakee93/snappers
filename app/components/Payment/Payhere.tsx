@@ -1,5 +1,5 @@
 "use client";
-import { CheckoutDataExample, PaymentDetailsWithoutUrls } from "@/data/types";
+import { CheckoutDataExample, PaymentDetailsType, PaymentDetailsWithoutUrls } from "@/data/types";
 import { extractRawAmount } from "@/components/AddressPageComps/HelperComps";
 
 const MERCHANT_ID = "1225436";
@@ -35,7 +35,7 @@ const staticData = {
   custom_2: "",
 };
 
-const getDynamicData = async (paymentDetails_: PaymentDetailsWithoutUrls) => {
+const tranformDataForPayhere = async (paymentDetails_: PaymentDetailsWithoutUrls)  => {
   let hash = await getPaymentHash(paymentDetails_);
   if (!hash) {
     alert("hash Can not be generated");
@@ -115,8 +115,10 @@ export const usePayhere = (onPaymentCompleted : any) => {
   // };
 
   const initiatePayment = async (
-    paymentDetails: PaymentDetailsWithoutUrls | CheckoutDataExample |  null,
+    paymentDetails: PaymentDetailsWithoutUrls |  null,
   ) => {
+
+    console.log("paymentDetails in initatePayment: ", paymentDetails); 
 
     // Continue from here
     if (window?.payhere) {
@@ -127,7 +129,7 @@ export const usePayhere = (onPaymentCompleted : any) => {
       // console.log("initiate Payment paymentDetails: ", paymentDetails);
 
       // use staticData var for the check the payhere integration
-      let dynamicData = await getDynamicData(staticData);
+      let dynamicData = await tranformDataForPayhere(paymentDetails);
 
       // this for real data
       // let dynamicData = await getDynamicData(paymentDetails);
