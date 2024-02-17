@@ -45,9 +45,9 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
           testing ID.
         </h1>
         <Link href={`/`} passHref>
-          <a className="self-center text-center font-bold text-blue-500 underline hover:cursor-pointer hover:text-blue-800">
+          <div className="self-center text-center font-bold text-blue-500 underline hover:cursor-pointer hover:text-blue-800">
             Back to Home
-          </a>
+          </div>
         </Link>
       </div>
     );
@@ -123,9 +123,9 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
           Not authorized to view this order
         </h1>
         <Link href={`/`} passHref>
-          <a className="self-center text-center font-bold text-blue-500 underline hover:cursor-pointer hover:text-blue-800">
+          <div className="self-center text-center font-bold text-blue-500 underline hover:cursor-pointer hover:text-blue-800">
             Back to Home
-          </a>
+          </div>
         </Link>
       </div>
     );

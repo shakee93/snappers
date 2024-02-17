@@ -25,7 +25,7 @@ import {
 import CheckoutDetails from "./CheckoutDetails";
 import CartItems from "./CartItems";
 import toast from "react-hot-toast";
-import { CheckoutDataExample, PaymentDetailsWithoutUrls } from "@/data/types";
+import { PaymentDetailsWithoutUrls } from "@/data/types";
 import Script from "next/script";
 import { usePayhere } from "../components/Payment/Payhere";
 import { useRouter } from "next/navigation";
@@ -49,7 +49,6 @@ interface FormData {
   };
 }
 
-const TEST = true;
 //
 // const FAKE_PAYMENT_DETAILS: PaymentDetailsWithoutUrls | null = {
 //     order_id: "6425",
@@ -202,42 +201,9 @@ const CheckoutPage = () => {
     { loading: checkoutLoading, error: checkoutError, data: checkoutData },
   ] = useMutation(GUEST_CHECKOUT_MUTATION);
 
-  const handlePaymentCompleted = async (paymentDetails: PaymentDetailsWithoutUrls, orderId: string) => {
-    try {
-      console.log('paymentDetails after successful payhere: ', paymentDetails);
-      console.log('OrderId after successful payhere: ', orderId);
-
-      const shippingMethod = getShippingMethod(shippingTotal);
-      const shippingDetails = transformAddress(formData.deliveryAddress);
-      const billingDetails = transformAddress(formData.billingAddress);
-  
-      const variables = {
-        input: {
-          paymentMethod: formData?.paymentMethod?.selectedGateway?.id,
-          shippingMethod,
-          shipping: shippingDetails,
-          billing: billingDetails,
-        },
-      };
-  
-      const { data } = await checkoutMutation({ variables });
-  
-      if (data) {
-        console.log("Order created successfully:", data);
-        // Handle success
-      } else {
-        console.error("Failed to create order.");
-        // Handle failure
-      }
-    } catch (error) {
-      console.error("Error creating order:", error);
-      // Handle error
-    }
-  };
-
   // Contexts
   const router = useRouter();
-  const initiatePayment = usePayhere(handlePaymentCompleted);
+  const initiatePayment = usePayhere();
 
   const updateFormData = (section: string, data: any) => {
     setFormData((prevData) => {
@@ -257,7 +223,6 @@ const CheckoutPage = () => {
         [section as keyof FormData]: updatedSection,
       };
     });
-
   };
 
   // let uuid = crypto.randomUUID();
@@ -318,22 +283,48 @@ const CheckoutPage = () => {
   }, [paymentData]);
 
   const ImplementPayhere = () => {
-    let fakeData:  PaymentDetailsWithoutUrls = {
-      amount: cart?.total ?? "123",
-      first_name: formData?.billingAddress?.firstName ?? "",
-      last_name: formData?.billingAddress?.lastName ??  "",
-      email: formData?.contactInfo?.email,
-      items: "safsf",
-      order_id: "123",
-      address: formData.billingAddress as string,
-      phone: formData.contactInfo?.phone,
-      city: formData.billingAddress?.city ?? "",
+    let fakeOrderId = "ItemNo12345";
+
+    let { firstName, lastName, city, apartment } =
+      formData.billingAddress as any;
+
+    let { email, phone } = formData.contactInfo;
+
+    // console.log("Keys extracted from billingAddress:", {
+    //   firstName,
+    //   lastName,
+    //   email,
+    //   phone,
+    //   apartment,
+    //   city,
+    // });
+
+    if (
+      !orderTotal ||
+      !firstName ||
+      !lastName ||
+      !email ||
+      !phone ||
+      !apartment ||
+      !city
+    ) {
+      alert("No order found");
+      return;
+    }
+
+    let checkoutDetails: PaymentDetailsWithoutUrls = {
+      amount: orderTotal,
+      order_id: fakeOrderId,
+      first_name: firstName,
+      last_name: lastName,
+      email: email,
+      phone: phone,
+      items: "gq mobiles",
+      address: city + apartment,
+      city: city,
     };
-
-    console.log('fakeData', fakeData);
-
     if (initiatePayment !== null) {
-      initiatePayment(fakeData).then((r) => r);
+      initiatePayment(checkoutDetails).then((r) => r);
     } else {
       console.log("initiate payment become null");
     }
@@ -344,63 +335,6 @@ const CheckoutPage = () => {
     setShowBankTransfer(true);
   }
 
-  const CreateOrderGuest = async () => {
-    const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
-    const shippingMethodId =
-      shippingTotal === "Rs.0.00"
-        ? "pickup_location:0"
-        : "wbs:0dd3bc79_weight_based_shipping";
-    const shippingMethodTitle =
-      shippingTotal === "0.00" ? "pickup_location:0" : "Weight Based Shipping";
-    const total = shippingTotal;
-
-    const lineItems = (cart?.contents?.nodes || []).map((item) => ({
-      productId: item?.product?.node?.databaseId,
-      quantity: item?.quantity,
-    }));
-
-    if (customer?.id === "guest") {
-      try {
-        const createOrderKeys = {
-          paymentMethod: paymentMethodId,
-          shippingMethod: shippingMethodId,
-          lineItems: lineItems,
-        };
-
-        const guestCheckoutKeys = {
-          input: {
-            paymentMethod: paymentMethodId,
-            shippingMethod: shippingMethodId,
-          },
-        };
-
-        const { data }: FetchResult<any> = await createOrderGuest({
-          variables: createOrderKeys,
-        });
-
-        if (checkoutError) {
-          alert("Checkout Error: " + checkoutError);
-        }
-
-        if (data) {
-          toast.success("Order created successfully for you! (GUEST)");
-          console.log("data on the before thank you page: ", data);
-
-          let redirectUrl = `checkout/${data.order_id}`;
-          router.push(redirectUrl);
-        }
-        setLoading(false);
-      } catch (e: any) {
-        console.log("Checkout Error: " + e.message);
-        toast.error("Sorry! " + e.message);
-        setLoading(false);
-      }
-    } else {
-      alert("You are already logged in");
-    }
-    setLoading(false);
-  };
-
   useEffect(() => {
     if (!paymentDetails) {
       console.log("payment data not initiated yet!");
@@ -409,10 +343,20 @@ const CheckoutPage = () => {
 
     const isBankTransfer =
       formData?.paymentMethod?.selectedGateway?.id == "bacs";
+    // const isPayhere = formData?.paymentMethod?.selectedGateway?.id == "payhere";
     const isCashOnDelivery =
       formData?.paymentMethod?.selectedGateway?.id == "cod";
 
     let checkoutDetails = paymentDetails;
+
+    // if (isPayhere) {
+    //   try {
+    //     ImplementPayhere(checkoutDetails);
+    //     return;
+    //   } catch (e) {
+    //     console.log("Error while creating Payhere:", e);
+    //   }
+    // }
 
     if (isBankTransfer) {
       try {
@@ -440,33 +384,28 @@ const CheckoutPage = () => {
   const handleCheckout = async () => {
     setLoading(true);
 
-    const isPayhere = formData?.paymentMethod?.selectedGateway?.id == "payhere";
-
     try {
       if (wantToSHowBankTransfer) {
         ImplementBankTransfer();
         return;
       }
 
-      let fakeOrderId = crypto.randomUUID();
-      if (isPayhere) {
-        // let payhereCheckoutDetails: PaymentDetailsWithoutUrls = {
-        //   order_id: fakeOrderId as string,
-        //   email: formData.billingAddress.email as string,
-        //   amount: TEST ? "100.00": fakeOrderId as string,
-        //   currency: "LKR",
-        // };
-        // return;
+      //Payhere integration for new
 
+      const isPayhere =
+        formData?.paymentMethod?.selectedGateway?.id == "payhere";
+
+      if (isPayhere) {
         try {
+          // ImplementPayhere(checkoutDetails);
           ImplementPayhere();
+
           return;
         } catch (e) {
           console.log("Error while creating Payhere:", e);
         }
       }
 
-      return;
       const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
       if (paymentMethodId === undefined) {
         console.error("Payment method ID is undefined");
@@ -493,10 +432,7 @@ const CheckoutPage = () => {
           : await checkoutMutation({ variables });
 
       if (data) {
-        console.log("data on the before thank you page: ", data);
         const checkoutDetails = savePaymentDetails(data);
-        console.log("tranformedData:", checkoutDetails);
-
         setPaymentData(checkoutDetails);
         toast.success("Order Created Successfully");
       } else {
@@ -657,15 +593,16 @@ const CheckoutPage = () => {
                   isConfirmed.paymentMethod
                 )
               }
-              className={`mt-8 w-full ${!(
-                isConfirmed.contactInfo &&
-                isConfirmed.deliveryAddress &&
-                isConfirmed.billingAddress &&
-                isConfirmed.paymentMethod
-              )
-                ? "cursor-not-allowed bg-slate-500"
-                : "bg-primary hover:bg-primary-dark"
-                }`}
+              className={`mt-8 w-full ${
+                !(
+                  isConfirmed.contactInfo &&
+                  isConfirmed.deliveryAddress &&
+                  isConfirmed.billingAddress &&
+                  isConfirmed.paymentMethod
+                )
+                  ? "cursor-not-allowed bg-slate-500"
+                  : "bg-primary hover:bg-primary-dark"
+              }`}
             >
               {loading ? (
                 <Loader className="animate-spin text-gray-100 " />
