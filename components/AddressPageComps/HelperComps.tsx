@@ -113,7 +113,6 @@ const savePaymentDetails = (
   return saved_data;
 };
 
-
 const WelcomeMessages = [
   "Welcome back! We're delighted to see you again.",
   "Hello again! It's great to have you back with us.",
@@ -123,7 +122,7 @@ const WelcomeMessages = [
   "Welcome to GQ Mobiles once more.",
   "Welcome back, valued customer! Your presence brightens our day.",
   "Guess who's back? It's you! Welcome!",
-  "It's a pleasure to have you back! Welcome to GQ Mobiles."
+  "It's a pleasure to have you back! Welcome to GQ Mobiles.",
 ];
 
 const getRandomWelcomeMessage = () => {
@@ -131,7 +130,112 @@ const getRandomWelcomeMessage = () => {
   return WelcomeMessages[randomIndex];
 };
 
+//PAYMENT FUNCTIONS
 
+const domain = process.env.NEXT_PUBLIC_DOMAIN;
+const MERCHANT_ID = "1225436";
+const TEST: boolean = true;
+
+const STATIC_DATA = {
+  sandbox: true,
+  merchant_id: MERCHANT_ID,
+  return_url: `${domain}/success`,
+  cancel_url: `${domain}/cancel`,
+  notify_url: `${domain}/notify`,
+  order_id: "ItemNo12345",
+  items: "gq mobiles",
+  hash: null,
+  amount: "100.00",
+  currency: "LKR",
+  first_name: "Saman",
+  last_name: "Perera",
+  email: "samanp@gmail.com",
+  phone: "0771234567",
+  address: "No.1, Galle Road",
+  city: "Colombo",
+  country: "Sri Lanka",
+  delivery_address: "No. 46, Galle road, Kalutara South",
+  delivery_city: "Kalutara",
+  delivery_country: "Sri Lanka",
+};
+
+const TEST_STATIC_DATA = {
+  sandbox: true,
+  merchant_id: "1225436",
+  return_url: `${domain}/success`,
+  cancel_url: `${domain}/cancel`,
+  notify_url: `${domain}/notify`,
+  order_id: "ItemNo12345",
+  items: "gq mobiles",
+  hash: null,
+  amount: "100.00",
+  currency: "LKR",
+  first_name: "shadeer",
+  last_name: "sadikeen",
+  email: "how@gmail.com",
+  phone: "0771234567",
+  address: "welllampitiya , colombodasf",
+  city: "Colombo",
+  country: "Sri Lanka",
+  iframe: true
+};
+
+const NOT_WORKING_DATA = {
+  sandbox: true,
+  merchant_id: "1225436",
+  return_url: "http://localhost:3000/checkout",
+  cancel_url: "http://localhost:3000/cancel",
+  notify_url: "http://localhost:3000/notify",
+  order_id: "ItemNo12345",
+  items: '"gq mobiles"',
+  hash: "D6C7FDBDA0D958994943EE7FD860D648",
+  amount: "100.00",
+  currency: "LKR",
+  first_name: "shadeer",
+  last_name: "sadikeen",
+  email: "how@gmail.com",
+  phone: "0771234567",
+  address: "welllampitiya , colombodasf",
+  city: "Colombo",
+  country: "Sri Lanka",
+  iframe: true,
+};
+
+const getPaymentHash = async (dynamicData: any) => {
+
+  try {
+    const amount = TEST ? "100.00" : extractRawAmount(dynamicData?.amount);
+    const order_id = TEST ? "ItemNo12345" : extractRawAmount(dynamicData?.order_id);
+    
+    const requestData = {
+      merchant_id: MERCHANT_ID,
+      order_id:  order_id,
+      amount: amount,
+      currency: "LKR",
+    };
+    console.log("requestData: ", requestData);
+    // let oneHash = extractRawAmount(dynamicData?.amount);
+    // console.log("oneHash", parseFloat(oneHash));
+
+    const response = await fetch("/api/payhere", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+
+      body: JSON.stringify(requestData),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.hash;
+  } catch (error) {
+    console.error("Failed to fetch hash:", error);
+  }
+};
 
 export {
   InputField,
@@ -141,5 +245,8 @@ export {
   LoggedInAvatar,
   transformAddress,
   savePaymentDetails,
-  getRandomWelcomeMessage
+  getRandomWelcomeMessage,
+  STATIC_DATA,
+  TEST_STATIC_DATA,
+  getPaymentHash,
 };

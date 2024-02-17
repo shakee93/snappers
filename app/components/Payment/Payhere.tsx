@@ -3,7 +3,7 @@ import {
   PayhereTransactionData,
   PaymentDetailsWithoutUrls,
 } from "@/data/types";
-import { extractRawAmount } from "@/components/AddressPageComps/HelperComps";
+import { STATIC_DATA, TEST_STATIC_DATA, extractRawAmount, getPaymentHash } from "@/components/AddressPageComps/HelperComps";
 
 const MERCHANT_ID = "1225436";
 const TEST: boolean = true;
@@ -12,59 +12,8 @@ const TEST: boolean = true;
 //  order_id : "ItemNo12345"
 //  amount : "100.00"
 
-const domain = process.env.NEXT_PUBLIC_DOMAIN;
 
-const STATIC_DATA = {
-  sandbox: true,
-  merchant_id: MERCHANT_ID,
-  return_url: `${domain}/success`,
-  cancel_url: `${domain}/cancel`,
-  notify_url: `${domain}/notify`,
-  order_id: "ItemNo12345",
-  items: "gq mobiles",
-  hash: null,
-  amount: "100.00",
-  currency: "LKR",
-  first_name: "Saman",
-  last_name: "Perera",
-  email: "samanp@gmail.com",
-  phone: "0771234567",
-  address: "No.1, Galle Road",
-  city: "Colombo",
-  country: "Sri Lanka",
-  delivery_address: "No. 46, Galle road, Kalutara South",
-  delivery_city: "Kalutara",
-  delivery_country: "Sri Lanka",
-};
 
-const getPaymentHash = async (dynamicData: any) => {
-  try {
-    const amount = TEST ? "100.00" : extractRawAmount(dynamicData?.amount);
-    const requestData = {
-      merchant_id: MERCHANT_ID,
-      order_id: dynamicData.order_id,
-      amount: amount,
-      currency: "LKR",
-    };
-
-    const response = await fetch("/api/payhere", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(requestData),
-    });
-
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-
-    const data = await response.json();
-    return data.hash;
-  } catch (error) {
-    console.error("Failed to fetch hash:", error);
-  }
-};
 
 const tranformDataForPayhere = async (
   paymentDetails_: PaymentDetailsWithoutUrls
@@ -75,12 +24,12 @@ const tranformDataForPayhere = async (
     return null;
   }
 
-  console.log("final Data which pushed to the payhere:", {
-    merchant_id: MERCHANT_ID,
-    order_id: paymentDetails_.order_id,
-    amount: extractRawAmount(paymentDetails_?.amount ?? ""),
-    currency: "LKR",
-  });
+  // console.log("final Data which pushed to the payhere:", {
+  //   merchant_id: MERCHANT_ID,
+  //   order_id: paymentDetails_.order_id,
+  //   amount: extractRawAmount(paymentDetails_?.amount ?? ""),
+  //   currency: "LKR",
+  // });
 
   let order_id: string | undefined = TEST
     ? "ItemNo12345"
@@ -89,16 +38,7 @@ const tranformDataForPayhere = async (
     ? "100.00"
     : extractRawAmount(paymentDetails_?.amount);
 
-  if (TEST && false) {
-    if (hash === null) {
-      return null;
-    }
-    const dataWithHash = {
-      ...STATIC_DATA,
-      hash: hash as string,
-    };
-    return dataWithHash;
-  }
+
 
   return {
     sandbox: true,
@@ -141,21 +81,15 @@ export const usePayhere = () => {
 
     // Continue from here
     if (window?.payhere) {
-      let TESTING_PAYHERE = false;
-
-      if (!paymentDetails && TESTING_PAYHERE) {
+      if (!paymentDetails) {
         alert("No payment details provided");
         return null;
       }
 
-      // let dynamicData = await tranformDataForPayhere(paymentDetails);
-
-      // use STATIC_DATA var for the test the payhere integration
-      let dynamicData = await tranformDataForPayhere(STATIC_DATA);
-
       // this for real data
-      // let dynamicData = await getDynamicData(paymentDetails);
-      // onPaymentCompleted(paymentDetails, "1234");
+      let dynamicData = await tranformDataForPayhere(paymentDetails);
+      // let dynamicData = await tranformDataForPayhere(TEST_STATIC_DATA);
+      console.log("finalData which goes to the payhere: ", dynamicData);
 
       window?.payhere.startPayment(dynamicData);
 

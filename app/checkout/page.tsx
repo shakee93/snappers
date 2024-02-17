@@ -283,7 +283,7 @@ const CheckoutPage = () => {
   }, [paymentData]);
 
   const ImplementPayhere = () => {
-    let fakeOrderId = "ItemNo12345";
+    let generatedOrderId = crypto.randomUUID();
 
     let { firstName, lastName, city, apartment } =
       formData.billingAddress as any;
@@ -314,7 +314,7 @@ const CheckoutPage = () => {
 
     let checkoutDetails: PaymentDetailsWithoutUrls = {
       amount: orderTotal,
-      order_id: fakeOrderId,
+      order_id: generatedOrderId,
       first_name: firstName,
       last_name: lastName,
       email: email,
@@ -323,6 +323,7 @@ const CheckoutPage = () => {
       address: city + apartment,
       city: city,
     };
+
     if (initiatePayment !== null) {
       initiatePayment(checkoutDetails).then((r) => r);
     } else {
