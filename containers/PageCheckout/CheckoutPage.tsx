@@ -9,7 +9,7 @@ import Image from "next/image";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import Input from "shared/Input/Input";
 import ContactInfo from "./ContactInfo";
-importPaymentMethod from "./PaymentMethod";
+import PaymentMethod from "./PaymentMethod";
 import ShippingAddress from "./ShippingAddress";
 import Link from "next/link";
 
