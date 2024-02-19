@@ -6,7 +6,7 @@ import SectionPromo1 from "@/app/components/HomePage/SectionPromo1";
 import Heading from "@/app/components/Heading/Heading";
 import { getClient } from "@/graphql/apollo-ssr";
 import { GET_SLIDES } from "@/graphql/defs/slides";
-import { GET_PRODUCTS_NODES, GET_PRODUCTS_NODES_BACK_IN_STOCK } from "@/graphql/defs/products";
+import { GET_PRODUCTS_NODES, GET_PRODUCTS_NODES_HOMEPAGE } from "@/graphql/defs/products";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import "styles/embla.css";
 
@@ -23,8 +23,8 @@ const getData = async () => {
     }),
     //Speakers
     getClient().query({
-      query: GET_PRODUCTS_NODES,
-      variables: { first: 10, categoryIdIn: [71] },
+      query: GET_PRODUCTS_NODES_HOMEPAGE,
+      variables: { first: 10,  tagId: 538 },
     }),
     //Watches
     getClient().query({
@@ -34,8 +34,8 @@ const getData = async () => {
 
     //Back In Stock
     getClient().query({
-      query: GET_PRODUCTS_NODES_BACK_IN_STOCK,
-      variables: { first: 10 },
+      query: GET_PRODUCTS_NODES_HOMEPAGE,
+      variables: { first: 10,  tagId: 536 },
     }),
   ]);
 
@@ -52,6 +52,7 @@ const getData = async () => {
     backInStock: backInStock.data.products?.nodes as (SimpleProduct &
       VariableProduct)[],
   };
+
 };
 
 export default async function Home() {

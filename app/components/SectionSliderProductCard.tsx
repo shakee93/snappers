@@ -83,6 +83,8 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
     };
   }, []);
 
+  console.log('productss', _products);
+
   return (
     <div className={`nc-SectionSliderProductCard ${className}`}>
       <div className={`glide ${UNIQUE_CLASS} flow-root`} ref={sliderRef}>
