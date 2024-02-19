@@ -25,7 +25,7 @@ import {
 import CheckoutDetails from "./CheckoutDetails";
 import CartItems from "./CartItems";
 import toast from "react-hot-toast";
-import { PaymentDetailsWithoutUrls } from "@/data/types";
+import { PayhereStatus, PaymentDetailsWithoutUrls } from "@/data/types";
 import Script from "next/script";
 import { usePayhere } from "../components/Payment/Payhere";
 import { useRouter } from "next/navigation";
@@ -156,6 +156,10 @@ const CheckoutPage = () => {
       selectedGateway: {},
     },
   });
+
+  const [payhereHandleStatus, setPayhereHandleStatus] =
+    useState<PayhereStatus>("idle");
+
   const [isStorePickup, setIsStorePickup] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState({
     contactInfo: false,
@@ -236,6 +240,64 @@ const CheckoutPage = () => {
       };
     });
   };
+
+  const implementCheckoutAfterPayhere = async () => {
+    const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
+    if (paymentMethodId === undefined) {
+      console.error("Payment method ID is undefined");
+      toast.error("Payment Method was not chosen.");
+      return;
+    }
+
+    const shippingMethod = getShippingMethod(shippingTotal);
+    const shippingDetails = transformAddress(formData.deliveryAddress);
+    const billingDetails = transformAddress(formData.billingAddress);
+
+    const variables = {
+      input: {
+        paymentMethod: paymentMethodId,
+        shippingMethod,
+        shipping: shippingDetails,
+        billing: billingDetails,
+      },
+    };
+
+    const { data } =
+      customer?.id === "guest"
+        ? await guestCheckout({ variables })
+        : await checkoutMutation({ variables });
+
+    if (data) {
+      const checkoutDetails = savePaymentDetails(data);
+      setPaymentData(checkoutDetails);
+      let orderid = data?.checkout.order.databaseId
+      toast.success("Order Created Successfully");
+      router.push(`/checkout/${orderid}`);
+    } else {
+      toast.error("Something Went Wrong While Checkout");
+    }
+  }
+
+  useEffect(() => {
+    // let redirectUrl = `checkout/${checkoutDetails.order_id}`;
+
+    // router.push(redirectUrl);
+    switch (payhereHandleStatus) {
+      case "finished":
+        implementCheckoutAfterPayhere()
+        setLoading(false);
+        break;
+      case "dismissed":
+        console.log("Dismissed Payhere.");
+        break;
+      case "error":
+        alert("error");
+        break;
+
+      default:
+        break;
+    }
+  }, [payhereHandleStatus]);
 
   const updateShippingTotal = async () => {
     try {
@@ -325,7 +387,8 @@ const CheckoutPage = () => {
     };
 
     if (initiatePayment !== null) {
-      initiatePayment(checkoutDetails).then((r) => r);
+      setPayhereHandleStatus("loading");
+      initiatePayment(checkoutDetails, setPayhereHandleStatus).then((r) => r);
     } else {
       console.log("initiate payment become null");
     }
@@ -400,7 +463,6 @@ const CheckoutPage = () => {
         try {
           // ImplementPayhere(checkoutDetails);
           ImplementPayhere();
-
           return;
         } catch (e) {
           console.log("Error while creating Payhere:", e);

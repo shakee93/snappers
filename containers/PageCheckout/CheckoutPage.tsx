@@ -13,6 +13,9 @@ import PaymentMethod from "./PaymentMethod";
 import ShippingAddress from "./ShippingAddress";
 import Link from "next/link";
 
+
+// Payhere docs; https://support.payhere.lk/api-&-mobile-sdk/authorize-api
+
 const CheckoutPage = () => {
   const [tabActive, setTabActive] = useState<
     "ContactInfo" | "ShippingAddress" | "PaymentMethod"

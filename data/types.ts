@@ -100,3 +100,7 @@ export interface PayhereTransactionData {
   city?: string;
   country: string;
 }
+
+export type PayhereStatus = "idle" | "loading" | "started" | "error" | "finished" | "dismissed";
+
+
