@@ -13,15 +13,13 @@ const TEST: boolean = true;
 //  order_id : "ItemNo12345"
 //  amount : "100.00"
 
+
+
 // NOTE: 4916217501611292 use this visa card for testing.
 
 const tranformDataForPayhere = async (
   paymentDetails_: PaymentDetailsWithoutUrls
 ): Promise<PayhereTransactionData | null> => {
-
-  paymentDetails_['order_id'] = TEST ? "ItemNo12345" : paymentDetails_?.order_id;
-  paymentDetails_['amount'] = TEST ? "100.00" : paymentDetails_?.amount;
-  
   let hash: string | null = await getPaymentHash(paymentDetails_);
   if (!hash) {
     alert("hash Can not be generated");
@@ -35,7 +33,14 @@ const tranformDataForPayhere = async (
   //   currency: "LKR",
   // });
 
-  let amount: string | undefined =  extractRawAmount(paymentDetails_?.amount);
+  let order_id: string | undefined = TEST
+    ? "ItemNo12345"
+    : paymentDetails_?.order_id;
+  let amount: string | undefined = TEST
+    ? "100.00"
+    : extractRawAmount(paymentDetails_?.amount);
+
+
 
   return {
     sandbox: true,
@@ -43,7 +48,7 @@ const tranformDataForPayhere = async (
     return_url: "http://localhost:3000/checkout",
     cancel_url: "http://localhost:3000/cancel",
     notify_url: "http://localhost:3000/notify",
-    order_id: paymentDetails_?.order_id,
+    order_id: order_id,
     items: JSON.stringify(paymentDetails_?.items) ?? "gq mobiles",
     hash: hash,
     amount: amount,
@@ -78,6 +83,7 @@ export const usePayhere = () => {
     console.log("paymentDetails in initatePayment: ", paymentDetails);
 
 
+    // Continue from here
     if (window?.payhere ) {
       if (!paymentDetails) {
         alert("No payment details provided");
