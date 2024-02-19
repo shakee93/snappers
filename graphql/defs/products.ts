@@ -219,11 +219,15 @@ export const GET_PRODUCTS_NODES = gql`
   ${ProductContentFull}
 `;
 
-export const GET_PRODUCTS_NODES_BACK_IN_STOCK = gql`
-  query getProductsNode($first: Int = 10) {
+
+export const GET_PRODUCTS_NODES_HOMEPAGE = gql`
+  query getProductsNode($first: Int = 10, $tagId: Int!) {
     products(
       first: $first
-      where: {stockStatus: IN_STOCK, orderby: {field: DATE, order: DESC}, tagId: 536}
+      where: {
+      stockStatus: IN_STOCK, 
+      tagId: $tagId
+    }
     ) {
       nodes {
         ...ProductContentFull
