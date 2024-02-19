@@ -271,6 +271,7 @@ const CheckoutPage = () => {
       const checkoutDetails = savePaymentDetails(data);
       setPaymentData(checkoutDetails);
       let orderid = data?.checkout.order.databaseId
+      
       toast.success("Order Created Successfully");
       router.push(`/checkout/${orderid}`);
     } else {
