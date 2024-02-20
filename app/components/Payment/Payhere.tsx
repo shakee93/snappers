@@ -40,8 +40,6 @@ const tranformDataForPayhere = async (
     ? "100.00"
     : extractRawAmount(paymentDetails_?.amount);
 
-
-
   return {
     sandbox: true,
     merchant_id: MERCHANT_ID,

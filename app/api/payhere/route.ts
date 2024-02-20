@@ -1,14 +1,25 @@
-import {NextApiResponse} from "next";
-import {md5} from "js-md5";
+import { NextApiResponse } from "next";
+import { md5 } from "js-md5";
 
-export async function POST(req: Request , res: NextApiResponse) {
+export async function POST(req: Request, res: NextApiResponse) {
   const { merchant_id, order_id, amount, currency } = await req.json();
-  const merchant_secret = process.env.PAYHERE_MERCHANT_KEY  as string;
-  // console.log("merchant_secret: ", merchant_secret);
-  // "MTc2MTg0ODIyMTMwNTM4NTM0MDgzODI2MTg1MDQ2NDE5MjA1MTI0MA==";
-    
-  if(merchant_secret === ""){
-    return Response.json({ error: "Merchant Secret Key not found" }, { status: 400 });
+
+  let host = window.location.hostname;
+  let live = false;
+  if (host == "https://gqmobiles.lk/") {
+    live = true;
+  }
+
+  
+  const merchant_secret = live
+    ? (process.env.GQ_PAYHERE_MERCHANT_SECRET_KEY as string)
+    : (process.env.PAYHERE_MERCHANT_KEY_TEST as string);
+
+  if (merchant_secret === "") {
+    return Response.json(
+      { error: "Merchant Secret Key not found" },
+      { status: 400 }
+    );
   }
 
   if (!merchant_id || !order_id || !amount || !currency) {
@@ -20,8 +31,8 @@ export async function POST(req: Request , res: NextApiResponse) {
     order_id,
     amount,
     currency,
-    merchant_secret
-  }
+    merchant_secret,
+  };
 
   console.log("hashCreatedObj: ", hashCreatedObj);
 

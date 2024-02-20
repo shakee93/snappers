@@ -40,7 +40,7 @@ const Features = () => (
       description="On orders over LKR.50000.00"
     />
 
-    <FeatureCard
+    {/* <FeatureCard
       color="blue"
       icon={
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -56,7 +56,7 @@ const Features = () => (
       }
       title="Very easy to return"
       description="Just phone number."
-    />
+    /> */}
 
     <FeatureCard
       color="green"
@@ -73,7 +73,7 @@ const Features = () => (
       description="Fast delivery nationwide."
     />
 
-    <FeatureCard
+    {/* <FeatureCard
       color="yellow"
       icon={
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -86,7 +86,7 @@ const Features = () => (
       }
       title="Refunds policy"
       description="60 days return for any reason"
-    />
+    /> */}
   </div>
 );
 
