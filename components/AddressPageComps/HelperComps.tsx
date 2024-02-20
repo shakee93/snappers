@@ -213,7 +213,8 @@ const getPaymentHash = async (dynamicData: any) => {
       amount: amount,
       currency: "LKR",
     };
-    console.log("requestData: ", requestData);
+
+    // console.log("requestData: ", requestData);
     // let oneHash = extractRawAmount(dynamicData?.amount);
     // console.log("oneHash", parseFloat(oneHash));
 
@@ -222,9 +223,10 @@ const getPaymentHash = async (dynamicData: any) => {
       headers: {
         "Content-Type": "application/json",
       },
-
       body: JSON.stringify(requestData),
     });
+
+    console.log("Response from the payment route: ", response);
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
