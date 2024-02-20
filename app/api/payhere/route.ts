@@ -4,16 +4,20 @@ import { md5 } from "js-md5";
 export async function POST(req: Request, res: NextApiResponse) {
   const { merchant_id, order_id, amount, currency } = await req.json();
 
-  let host = window.location.hostname;
+  const host = req.headers.get("host") as string;
+  console.log("host", host);
   let live = false;
   if (host == "https://gqmobiles.lk/") {
     live = true;
   }
-
   
-  const merchant_secret = live
-    ? (process.env.GQ_PAYHERE_MERCHANT_SECRET_KEY as string)
-    : (process.env.PAYHERE_MERCHANT_KEY_TEST as string);
+  const localKey = process.env.PAYHERE_MERCHANT_KEY;
+  const liveKey = process.env.GQ_PAYHERE_MERCHANT_SECRET_KEY;
+
+  const merchant_secret = live ? liveKey : localKey;
+
+  console.log("gq secret", liveKey);
+  console.log("payhere secret", localKey);
 
   if (merchant_secret === "") {
     return Response.json(
@@ -24,6 +28,13 @@ export async function POST(req: Request, res: NextApiResponse) {
 
   if (!merchant_id || !order_id || !amount || !currency) {
     return Response.json({ error: "Missing required fields" }, { status: 400 });
+  }
+
+  if (!merchant_secret) {
+    return Response.json(
+      { error: "Merchant Secret Key not found" },
+      { status: 400 }
+    );
   }
 
   let hashCreatedObj = {
