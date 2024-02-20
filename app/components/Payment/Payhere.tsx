@@ -109,7 +109,8 @@ export const usePayhere = () => {
       // Payment completed. It can be a successful failure.
       window.payhere.onCompleted = function onCompleted(orderId: any) {
         console.log("completed succesffully`", orderId);
-        setPayhereHandleStatus("finished");
+        alert("succussfull")
+        // setPayhereHandleStatus("finished");
         
         // onPaymentCompleted(paymentDetails, orderId);
         // completePaymentWithOrder(orderId)

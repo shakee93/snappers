@@ -352,15 +352,6 @@ const CheckoutPage = () => {
 
     let { email, phone } = formData.contactInfo;
 
-    // console.log("Keys extracted from billingAddress:", {
-    //   firstName,
-    //   lastName,
-    //   email,
-    //   phone,
-    //   apartment,
-    //   city,
-    // });
-
     if (
       !orderTotal ||
       !firstName ||
@@ -461,7 +452,7 @@ const CheckoutPage = () => {
 
       if (isPayhere) {
         try {
-          // ImplementPayhere(checkoutDetails);
+
           ImplementPayhere();
           return;
         } catch (e) {
