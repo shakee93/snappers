@@ -133,11 +133,11 @@ const getRandomWelcomeMessage = () => {
 //PAYMENT FUNCTIONS
 
 const domain = process.env.NEXT_PUBLIC_DOMAIN;
-const MERCHANT_ID = "1225436";
+const MERCHANT_ID = "215650";
 const TEST: boolean = true;
 
 const STATIC_DATA = {
-  sandbox: true,
+  sandbox: false,
   merchant_id: MERCHANT_ID,
   return_url: `${domain}/success`,
   cancel_url: `${domain}/cancel`,
@@ -160,8 +160,8 @@ const STATIC_DATA = {
 };
 
 const TEST_STATIC_DATA = {
-  sandbox: true,
-  merchant_id: "1225436",
+  sandbox: false,
+  merchant_id: MERCHANT_ID,
   return_url: `${domain}/success`,
   cancel_url: `${domain}/cancel`,
   notify_url: `${domain}/notify`,
@@ -181,8 +181,8 @@ const TEST_STATIC_DATA = {
 };
 
 const NOT_WORKING_DATA = {
-  sandbox: true,
-  merchant_id: "1225436",
+  sandbox: false,
+  merchant_id: MERCHANT_ID,
   return_url: "http://localhost:3000/checkout",
   cancel_url: "http://localhost:3000/cancel",
   notify_url: "http://localhost:3000/notify",

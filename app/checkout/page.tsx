@@ -333,7 +333,7 @@ const CheckoutPage = () => {
       }
     } catch (error) {
       console.error("An error occurred while updating shipping total:", error);
-    }
+    } 
   };
 
   useEffect(() => {

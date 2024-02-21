@@ -6,7 +6,8 @@ import {
 } from "@/data/types";
 import { STATIC_DATA, TEST_STATIC_DATA, extractRawAmount, getPaymentHash } from "@/components/AddressPageComps/HelperComps";
 
-const MERCHANT_ID = "1225436";
+// const MERCHANT_ID = "1225436";
+const MERCHANT_ID = "215650";
 const TEST: boolean = true;
 
 // NOTES: Constant to follow while testing the payhere.
@@ -41,7 +42,7 @@ const tranformDataForPayhere = async (
     : extractRawAmount(paymentDetails_?.amount);
 
   return {
-    sandbox: true,
+    sandbox: false,
     merchant_id: MERCHANT_ID,
     return_url: "http://localhost:3000/checkout",
     cancel_url: "http://localhost:3000/cancel",
