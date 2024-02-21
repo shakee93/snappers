@@ -40,8 +40,8 @@ import { randomUUID } from "crypto";
 
 interface FormData {
   contactInfo: Record<string, any>;
-  deliveryAddress: CustomerAddressInput;
-  billingAddress: CustomerAddressInput;
+  deliveryAddress: any;
+  billingAddress: any;
   paymentMethod: {
     selectedGateway?: {
       id?: string;
@@ -467,9 +467,14 @@ const CheckoutPage = () => {
         return;
       }
 
+      formData.billingAddress.country = "SR";
+      formData.deliveryAddress.country = "SR";
+
       const shippingMethod = getShippingMethod(shippingTotal);
       const shippingDetails = transformAddress(formData.deliveryAddress);
       const billingDetails = transformAddress(formData.billingAddress);
+
+      console.log('asdasdzcz0', billingDetails);
 
       const variables = {
         input: {
