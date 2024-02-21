@@ -133,7 +133,7 @@ const getRandomWelcomeMessage = () => {
 //PAYMENT FUNCTIONS
 
 const domain = process.env.NEXT_PUBLIC_DOMAIN;
-const MERCHANT_ID = "215650";
+const MERCHANT_ID = process.env.NEXT_PUBLIC_MERCHANT_ID;
 const TEST: boolean = true;
 
 const STATIC_DATA = {

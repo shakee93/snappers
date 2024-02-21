@@ -4,17 +4,11 @@ import {
   PayhereTransactionData,
   PaymentDetailsWithoutUrls,
 } from "@/data/types";
-import { STATIC_DATA, TEST_STATIC_DATA, extractRawAmount, getPaymentHash } from "@/components/AddressPageComps/HelperComps";
+import { extractRawAmount, getPaymentHash } from "@/components/AddressPageComps/HelperComps";
 
 // const MERCHANT_ID = "1225436";
-const MERCHANT_ID = "215650";
-const TEST: boolean = true;
-
-// NOTES: Constant to follow while testing the payhere.
-//  order_id : "ItemNo12345"
-//  amount : "100.00"
-
-
+const MERCHANT_ID = process.env.NEXT_PUBLIC_MERCHANT_ID;
+const TEST: boolean = process.env.NEXT_PUBLIC_PAYHERE_IS_LIVE === "true" ? true : false;
 
 // NOTE: 4916217501611292 use this visa card for testing.
 
@@ -41,12 +35,15 @@ const tranformDataForPayhere = async (
     ? "100.00"
     : extractRawAmount(paymentDetails_?.amount);
 
+  let host = window.location.host 
+  console.log('host', host);
+
   return {
-    sandbox: false,
-    merchant_id: MERCHANT_ID,
-    return_url: "https://www.gqmobiles.lk/checkout",
-    cancel_url: "http://www.gqmobiles.lk/cancel",
-    notify_url: "http://www.gqmobiles.lk/notify",
+    sandbox: true,
+    merchant_id: MERCHANT_ID ?? "1225436",
+    return_url: `http://${host}/checkout`,
+    cancel_url: `http://${host}/cancel`,
+    notify_url: `http://${host}/notify`,
     order_id: order_id,
     items: JSON.stringify(paymentDetails_?.items) ?? "gq mobiles",
     hash: hash,
