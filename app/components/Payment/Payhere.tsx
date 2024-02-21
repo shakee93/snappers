@@ -44,9 +44,9 @@ const tranformDataForPayhere = async (
   return {
     sandbox: false,
     merchant_id: MERCHANT_ID,
-    return_url: "http://localhost:3000/checkout",
-    cancel_url: "http://localhost:3000/cancel",
-    notify_url: "http://localhost:3000/notify",
+    return_url: "https://www.gqmobiles.lk/checkout",
+    cancel_url: "http://www.gqmobiles.lk/cancel",
+    notify_url: "http://www.gqmobiles.lk/notify",
     order_id: order_id,
     items: JSON.stringify(paymentDetails_?.items) ?? "gq mobiles",
     hash: hash,
@@ -98,6 +98,10 @@ export const usePayhere = () => {
       window?.payhere.startPayment(dynamicData);
 
       window.onerror = function onError(error: any) {
+        setPayhereHandleStatus("error");
+        console.log("Error:" + error);
+      };
+      window.payhere.onError = function onError(error: any) {
         setPayhereHandleStatus("error");
         console.log("Error:" + error);
       };
