@@ -49,8 +49,15 @@ export async function POST(req: Request, res: NextApiResponse) {
     currency,
     merchant_secret
   );
+  let data = {
+    merchant_id,
+    order_id,
+    amount,
+    currency,
+    hash,
+  };
 
-  return Response.json({ hash }, { status: 200 });
+  return Response.json({ hash, external_data: data }, { status: 200 });
 }
 
 export async function GET() {
