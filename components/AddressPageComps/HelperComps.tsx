@@ -198,7 +198,7 @@ const getPaymentHash = async (dynamicData: any) => {
     };
 
 
-    console.log("data sent to the payhere hash: ", requestData);
+    // console.log("data sent to the payhere hash: ", requestData);
     // console.log("requestData: ", requestData);
     // let oneHash = extractRawAmount(dynamicData?.amount);
     // console.log("oneHash", parseFloat(oneHash));

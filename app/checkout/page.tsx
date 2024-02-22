@@ -345,7 +345,7 @@ const CheckoutPage = () => {
 
   const ImplementPayhere = () => {
     let generatedOrderId = crypto.randomUUID();
-    console.log("Generated Random Order Id: ", generatedOrderId);
+    // console.log("Generated Random Order Id: ", generatedOrderId);
 
     let { firstName, lastName, city, apartment } =
       formData.billingAddress as any;

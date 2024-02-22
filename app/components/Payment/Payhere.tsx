@@ -84,7 +84,7 @@ export const usePayhere = () => {
       // this for real data
       let dynamicData = await tranformDataForPayhere(paymentDetails);
       // let dynamicData = await tranformDataForPayhere(TEST_STATIC_DATA);
-      console.log("finalData which goes to the payhere: ", dynamicData);
+      // console.log("finalData which goes to the payhere: ", dynamicData);
 
       setPayhereHandleStatus("loading");
       window?.payhere.startPayment(dynamicData);
