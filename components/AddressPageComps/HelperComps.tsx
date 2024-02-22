@@ -228,7 +228,7 @@ const getPaymentHash = async (dynamicData: any) => {
       body: JSON.stringify(requestData),
     });
 
-    console.log("Response from the payment route: ",await response.json());
+    // console.log("Response from the payment route: ",await response.json());
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
