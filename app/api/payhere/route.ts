@@ -5,7 +5,7 @@ export async function POST(req: Request, res: NextApiResponse) {
   const { merchant_id, order_id, amount, currency } = await req.json();
 
   const host = req.headers.get("host") as string;
-  // console.log("host", host);
+  
   let live = false;
   if (host == "https://gqmobiles.lk/") {
     live = true;

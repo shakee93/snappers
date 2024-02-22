@@ -8,7 +8,12 @@ import { extractRawAmount, getPaymentHash } from "@/components/AddressPageComps/
 
 // const MERCHANT_ID = "1225436";
 const MERCHANT_ID = process.env.NEXT_PUBLIC_MERCHANT_ID;
-const TEST: boolean = process.env.NEXT_PUBLIC_PAYHERE_IS_LIVE === "true" ? true : false;
+// const TEST: boolean = process.env.NEXT_PUBLIC_PAYHERE_IS_LIVE === "true" ? true : false;
+const TEST: boolean = true;
+
+// DOCS:
+// https://support.payhere.lk/api-&-mobile-sdk/javascript-sdk
+// https://www.payhere.lk/merchant/domains
 
 // NOTE: 4916217501611292 use this visa card for testing.
 
@@ -20,6 +25,8 @@ const tranformDataForPayhere = async (
     alert("hash Can not be generated");
     return null;
   }
+
+
 
   // console.log("final Data which pushed to the payhere:", {
   //   merchant_id: MERCHANT_ID,
@@ -39,7 +46,7 @@ const tranformDataForPayhere = async (
   console.log('host', host);
 
   return {
-    sandbox: true,
+    sandbox: false,
     merchant_id: MERCHANT_ID ?? "1225436",
     return_url: `http://${host}/checkout`,
     cancel_url: `http://${host}/cancel`,
