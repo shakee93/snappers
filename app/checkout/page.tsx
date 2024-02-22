@@ -36,7 +36,6 @@ import {
   savePaymentDetails,
   transformAddress,
 } from "@/components/AddressPageComps/HelperComps";
-import { randomUUID } from "crypto";
 
 interface FormData {
   contactInfo: Record<string, any>;
@@ -229,8 +228,6 @@ const CheckoutPage = () => {
     });
   };
 
-  // let uuid = crypto.randomUUID();
-  // console.log("uuid: ", uuid);
 
   const handleConfirmationChange = (component: string, value: boolean) => {
     setIsConfirmed((prevConfirmed) => {
@@ -348,6 +345,7 @@ const CheckoutPage = () => {
 
   const ImplementPayhere = () => {
     let generatedOrderId = crypto.randomUUID();
+    console.log("Generated Random Order Id: ", generatedOrderId);
 
     let { firstName, lastName, city, apartment } =
       formData.billingAddress as any;

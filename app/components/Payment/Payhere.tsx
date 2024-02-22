@@ -26,15 +26,6 @@ const tranformDataForPayhere = async (
     return null;
   }
 
-
-
-  // console.log("final Data which pushed to the payhere:", {
-  //   merchant_id: MERCHANT_ID,
-  //   order_id: paymentDetails_.order_id,
-  //   amount: extractRawAmount(paymentDetails_?.amount ?? ""),
-  //   currency: "LKR",
-  // });
-
   let order_id: string | undefined = TEST
     ? "ItemNo12345"
     : paymentDetails_?.order_id;

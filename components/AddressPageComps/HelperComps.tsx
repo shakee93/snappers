@@ -187,7 +187,8 @@ const getPaymentHash = async (dynamicData: any) => {
 
   try {
     const amount = TEST ? "100.00" : extractRawAmount(dynamicData?.amount);
-    const order_id = TEST ? "ItemNo12345" : extractRawAmount(dynamicData?.order_id);
+    const order_id = TEST ? "ItemNo12345" : dynamicData?.order_id
+    
     
     const requestData = {
       merchant_id: MERCHANT_ID,
