@@ -197,7 +197,7 @@ const getPaymentHash = async (dynamicData: any) => {
     };
 
 
-    // console.log("data sent to the payhere hash: ", requestData);
+    console.log("data sent to the payhere hash: ", requestData);
     // console.log("requestData: ", requestData);
     // let oneHash = extractRawAmount(dynamicData?.amount);
     // console.log("oneHash", parseFloat(oneHash));
@@ -217,7 +217,7 @@ const getPaymentHash = async (dynamicData: any) => {
     }
 
     const data = await response.json();
-    // console.log("after hash with external data: :", data);
+    console.log("after hash with external data: :", data);
     return data.hash;
   } catch (error) {
     console.error("Failed to fetch hash:", error);

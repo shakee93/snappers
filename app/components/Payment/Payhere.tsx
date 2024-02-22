@@ -85,8 +85,6 @@ export const usePayhere = () => {
   ) => {
     // console.log("paymentDetails in initatePayment: ", paymentDetails);
 
-
-    // Continue from here
     if (window?.payhere ) {
       if (!paymentDetails) {
         alert("No payment details provided");
