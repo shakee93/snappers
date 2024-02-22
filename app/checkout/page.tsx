@@ -321,6 +321,8 @@ const CheckoutPage = () => {
         variables: { input: { shippingMethods } },
       });
 
+      console.log('data in shippng', data);
+
       if (data?.updateShippingMethod?.cart) {
         const { total, shippingTotal } = data.updateShippingMethod.cart;
         setOrderTotal(total);
@@ -473,8 +475,7 @@ const CheckoutPage = () => {
       const shippingMethod = getShippingMethod(shippingTotal);
       const shippingDetails = transformAddress(formData.deliveryAddress);
       const billingDetails = transformAddress(formData.billingAddress);
-
-      console.log('asdasdzcz0', billingDetails);
+      
 
       const variables = {
         input: {
@@ -506,12 +507,12 @@ const CheckoutPage = () => {
 
   const getShippingMethod = (shippingTotal: any) => {
     const methodId =
-      shippingTotal === "Rs.0.00"
+      shippingTotal === "₨0.00"
         ? "pickup_location:0"
         : "wbs:0dd3bc79_weight_based_shipping";
 
     const methodTitle =
-      shippingTotal === "0.00" ? "pickup_location:0" : "Weight Based Shipping";
+      shippingTotal === "₨0.00" ? "pickup_location:0" : "Weight Based Shipping";
 
     const total = shippingTotal;
 
