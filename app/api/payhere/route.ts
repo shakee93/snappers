@@ -7,7 +7,7 @@ export async function POST(req: Request, res: NextApiResponse) {
   const host = req.headers.get("host") as string;
   
   let live = false;
-  if (host == "https://gqmobiles.lk/") {
+  if (host.includes("gqmobiles")) {
     live = true;
   }
 
