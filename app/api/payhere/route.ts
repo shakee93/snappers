@@ -55,6 +55,10 @@ export async function POST(req: Request, res: NextApiResponse) {
     amount,
     currency,
     hash,
+    live,
+    liveKey,
+    localKey,
+    host
   };
 
   return Response.json({ hash, external_data: data }, { status: 200 });
