@@ -4,7 +4,7 @@ import {
   PayhereTransactionData,
   PaymentDetailsWithoutUrls,
 } from "@/data/types";
-import { extractRawAmount, getPaymentHash } from "@/components/AddressPageComps/HelperComps";
+import { extractRawAmount, getPaymentHash, numberFormat } from "@/components/AddressPageComps/HelperComps";
 
 // const MERCHANT_ID = "1225436";
 const MERCHANT_ID = process.env.NEXT_PUBLIC_MERCHANT_ID;
@@ -31,10 +31,9 @@ const tranformDataForPayhere = async (
     : paymentDetails_?.order_id;
   let amount: string | undefined = TEST
     ? "100.00"
-    : extractRawAmount(paymentDetails_?.amount);
+    : numberFormat(extractRawAmount(paymentDetails_?.amount), 2, ".", ""); 
 
   let host = window.location.host 
-  console.log('host', host);
 
   return {
     sandbox: false,

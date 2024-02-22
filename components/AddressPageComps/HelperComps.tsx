@@ -186,7 +186,7 @@ const TEST_STATIC_DATA = {
 const getPaymentHash = async (dynamicData: any) => {
 
   try {
-    const amount = TEST ? "100.00" : extractRawAmount(dynamicData?.amount);
+    const amount = TEST ? "100.00" : numberFormat(extractRawAmount(dynamicData?.amount), 2, ".", "");
     const order_id = TEST ? "ItemNo12345" : dynamicData?.order_id
     
     
@@ -225,6 +225,20 @@ const getPaymentHash = async (dynamicData: any) => {
   }
 };
 
+function numberFormat(amount: any, decimals: any, decimalPoint: any, thousandsSeparator: any) {
+  // Format the number with the specified number of decimals
+  let number = parseFloat(amount).toFixed(decimals);
+
+  // Split the number into integer and decimal parts
+  let parts = number.split('.');
+
+  // Replace the thousands separator
+  parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousandsSeparator);
+
+  // Reassemble the number and return it
+  return parts.join(decimalPoint);
+}
+
 export {
   InputField,
   SelectField,
@@ -237,4 +251,6 @@ export {
   STATIC_DATA,
   TEST_STATIC_DATA,
   getPaymentHash,
+numberFormat
 };
+
