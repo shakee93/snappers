@@ -134,10 +134,11 @@ const getRandomWelcomeMessage = () => {
 
 const domain = process.env.NEXT_PUBLIC_DOMAIN;
 const MERCHANT_ID = process.env.NEXT_PUBLIC_MERCHANT_ID;
-const TEST: boolean = true;
+const TEST: boolean = false;
+const SANDBOX: boolean = false
 
 const STATIC_DATA = {
-  sandbox: false,
+  sandbox: SANDBOX,
   merchant_id: MERCHANT_ID,
   return_url: `${domain}/success`,
   cancel_url: `${domain}/cancel`,
@@ -160,7 +161,7 @@ const STATIC_DATA = {
 };
 
 const TEST_STATIC_DATA = {
-  sandbox: false,
+  sandbox: SANDBOX,
   merchant_id: MERCHANT_ID,
   return_url: `${domain}/success`,
   cancel_url: `${domain}/cancel`,
@@ -180,26 +181,7 @@ const TEST_STATIC_DATA = {
   iframe: true
 };
 
-const NOT_WORKING_DATA = {
-  sandbox: false,
-  merchant_id: MERCHANT_ID,
-  return_url: "http://localhost:3000/checkout",
-  cancel_url: "http://localhost:3000/cancel",
-  notify_url: "http://localhost:3000/notify",
-  order_id: "ItemNo12345",
-  items: '"gq mobiles"',
-  hash: "D6C7FDBDA0D958994943EE7FD860D648",
-  amount: "100.00",
-  currency: "LKR",
-  first_name: "shadeer",
-  last_name: "sadikeen",
-  email: "how@gmail.com",
-  phone: "0771234567",
-  address: "welllampitiya , colombodasf",
-  city: "Colombo",
-  country: "Sri Lanka",
-  iframe: true,
-};
+
 
 const getPaymentHash = async (dynamicData: any) => {
 
@@ -215,7 +197,7 @@ const getPaymentHash = async (dynamicData: any) => {
     };
 
 
-    console.log("data sent to the payhere hash: ", requestData);
+    // console.log("data sent to the payhere hash: ", requestData);
     // console.log("requestData: ", requestData);
     // let oneHash = extractRawAmount(dynamicData?.amount);
     // console.log("oneHash", parseFloat(oneHash));
@@ -235,7 +217,7 @@ const getPaymentHash = async (dynamicData: any) => {
     }
 
     const data = await response.json();
-    console.log("after hash with external data: :", data);
+    // console.log("after hash with external data: :", data);
     return data.hash;
   } catch (error) {
     console.error("Failed to fetch hash:", error);
