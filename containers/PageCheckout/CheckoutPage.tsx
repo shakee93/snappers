@@ -14,7 +14,8 @@ import ShippingAddress from "./ShippingAddress";
 import Link from "next/link";
 
 
-// Payhere docs; https://support.payhere.lk/api-&-mobile-sdk/authorize-api
+// Payhere docs; https://support.payhere.lk/api-&-mobile-sdk/javascript-sdk
+// https://support.payhere.lk/sandbox-and-testing
 
 const CheckoutPage = () => {
   const [tabActive, setTabActive] = useState<

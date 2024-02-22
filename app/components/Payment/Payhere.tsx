@@ -9,7 +9,7 @@ import { extractRawAmount, getPaymentHash } from "@/components/AddressPageComps/
 // const MERCHANT_ID = "1225436";
 const MERCHANT_ID = process.env.NEXT_PUBLIC_MERCHANT_ID;
 // const TEST: boolean = process.env.NEXT_PUBLIC_PAYHERE_IS_LIVE === "true" ? true : false;
-const TEST: boolean = true;
+const TEST: boolean = false;
 
 // DOCS:
 // https://support.payhere.lk/api-&-mobile-sdk/javascript-sdk
