@@ -5,6 +5,7 @@ import SiteLogo from "@/public/global/logo.webp";
 import Image from "next/image";
 import StoreImageSlider from "./StoreImageSlide"
 import { EmblaOptionsType } from "embla-carousel";
+import Link from "next/link";
 
 
 export interface SectionPromo1Props {
@@ -14,7 +15,7 @@ const OPTIONS: EmblaOptionsType = {}
 const SLIDE_COUNT = 4
 const SLIDES = Array.from(Array(SLIDE_COUNT).keys())
 const SectionPromo1: FC<SectionPromo1Props> = ({ className = "" }) => {
- 
+
   return (
     <div className="  bg-blue-100 flex flex-col justify-between p-5 md:p-12 lg:flex-row gap-5 lg:gap-3 rounded-3xl">
       <div className="lg:w-1/2 w-full gap-4 justify-center flex flex-col">
@@ -38,19 +39,22 @@ const SectionPromo1: FC<SectionPromo1Props> = ({ className = "" }) => {
           Sri Lanka for an affordable price
         </span>
         <div className="flex space-x-2 sm:space-x-5 ">
-          <ButtonPrimary href="/page-collection" className="">
-            Shop Now
-          </ButtonPrimary>
-          <ButtonSecondary
-            href="/page-search"
-            className="border border-slate-100 dark:border-slate-700"
-          >
-            Discover more
-          </ButtonSecondary>
+          <Link href="/collections/all">
+            <ButtonPrimary className="">
+              Shop Now
+            </ButtonPrimary>
+          </Link>
+          <Link href="/collections/all">
+            <ButtonSecondary
+              className="border border-slate-100 dark:border-slate-700"
+            >
+              Discover more
+            </ButtonSecondary>
+          </Link>
         </div>
       </div>
       <div className="w-full lg:w-1/2 m-auto">
-        <StoreImageSlider slides={SLIDES} options={OPTIONS}/>
+        <StoreImageSlider slides={SLIDES} options={OPTIONS} />
       </div>
     </div>
   );
