@@ -36,6 +36,7 @@ import {
   savePaymentDetails,
   transformAddress,
 } from "@/components/AddressPageComps/HelperComps";
+import { useStats } from "react-instantsearch";
 
 interface FormData {
   contactInfo: Record<string, any>;
@@ -155,6 +156,9 @@ const CheckoutPage = () => {
       selectedGateway: {},
     },
   });
+// create state for the payhere random id
+  const [payherPaymentID , setPayherPaymentID] = useState<string | null>(null)
+  
 
   const [payhereHandleStatus, setPayhereHandleStatus] =
     useState<PayhereStatus>("idle");
@@ -250,12 +254,17 @@ const CheckoutPage = () => {
     const shippingDetails = transformAddress(formData.deliveryAddress);
     const billingDetails = transformAddress(formData.billingAddress);
 
+    if(payherPaymentID == null) {
+      toast("payhere payment not initiated");
+      return;
+    }
     const variables = {
       input: {
         paymentMethod: paymentMethodId,
         shippingMethod,
         shipping: shippingDetails,
         billing: billingDetails,
+        customerNote: `Payhere Payment ID: ${payherPaymentID} `,
       },
     };
 
@@ -345,7 +354,7 @@ const CheckoutPage = () => {
 
   const ImplementPayhere = () => {
     let generatedOrderId = crypto.randomUUID();
-    // console.log("Generated Random Order Id: ", generatedOrderId);
+    setPayherPaymentID(generatedOrderId)
 
     let { firstName, lastName, city, apartment } =
       formData.billingAddress as any;

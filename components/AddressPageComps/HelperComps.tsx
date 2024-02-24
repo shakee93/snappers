@@ -218,7 +218,6 @@ const getPaymentHash = async (dynamicData: any) => {
     }
 
     const data = await response.json();
-    console.log("after hash with external data: :", data);
     return data.hash;
   } catch (error) {
     console.error("Failed to fetch hash:", error);
