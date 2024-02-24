@@ -277,7 +277,7 @@ const CheckoutPage = () => {
       const checkoutDetails = savePaymentDetails(data);
       setPaymentData(checkoutDetails);
       let orderid = data?.checkout.order.databaseId
-      toast.success("Order Created Successfully");
+      toast.success("🌟 Order Placed Successfully! 🚀");
       router.push(`/checkout/${orderid}`);
     } else {
       toast.error("Something Went Wrong While Checkout");
@@ -295,9 +295,10 @@ const CheckoutPage = () => {
         break;
       case "dismissed":
         console.log("Dismissed Payhere.");
+        setLoading(false)
         break;
       case "error":
-        alert("error");
+        toast.error("error while initiate payment");
         break;
 
       default:
@@ -370,7 +371,7 @@ const CheckoutPage = () => {
       !apartment ||
       !city
     ) {
-      alert("No order found");
+      toast.error("No order found");
       return;
     }
 
@@ -463,6 +464,7 @@ const CheckoutPage = () => {
         try {
 
           ImplementPayhere();
+          setLoading(true)
           return;
         } catch (e) {
           console.log("Error while creating Payhere:", e);
@@ -501,7 +503,7 @@ const CheckoutPage = () => {
       if (data) {
         const checkoutDetails = savePaymentDetails(data);
         setPaymentData(checkoutDetails);
-        toast.success("Order Created Successfully");
+        toast.success("🌟 Order Placed Successfully! 🚀");
       } else {
         toast.error("Something Went Wrong While Checkout");
       }
