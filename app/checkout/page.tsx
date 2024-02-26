@@ -137,6 +137,8 @@ interface FormData {
 const CheckoutPage = () => {
   const { cart, removeFromCart, updateCart } = useCart();
 
+  // console.log('cartttt', cart);
+
   const { customer, fetchCustomer } = useSession();
 
   const { data } = useQuery(GET_PAYMENT_GATEWAYS);
@@ -314,6 +316,8 @@ const CheckoutPage = () => {
       const total: any = cart?.total;
       setOrderTotal(total);
 
+      // console.log('total in udpate shiipping', total);
+
       if (customer?.id === "guest") {
         const subtotal: any = cart?.subtotal;
 
@@ -328,7 +332,7 @@ const CheckoutPage = () => {
         variables: { input: { shippingMethods } },
       });
 
-      console.log('data in shippng', data);
+      // console.log('data in shippng', data);
 
       if (data?.updateShippingMethod?.cart) {
         const { total, shippingTotal } = data.updateShippingMethod.cart;

@@ -22,8 +22,6 @@ const MobileBottomNav = ({ categories }: { categories: any }) => {
     const { mobileMenu, toggleMobileMenu } = useStore()
     const { customer, fetchCustomer, updateCustomer } = useSession();
 
-    console.log(customer)
-
     const fetchData = async () => {
         await fetchCustomer();
     };

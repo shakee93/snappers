@@ -25,13 +25,13 @@ const AccountPage = () => {
       id: 3,
       img: Img3,
       title: "Company History",
-      desc: "GQ mobiles pvt Ltd was founded in 2002. We have now expanded our operations into two branches to better serve our loyal customers.",
+      desc: "GQ mobiles Pvt Ltd at Liberty Plaza was founded in 2002. We have now expanded our operations into two branches to better serve our loyal customers.",
     },
   ];
   const stats = [
     { id: 1, name: "Products", value: "500+" },
-    { id: 2, name: "Customers", value: "2000+" },
-    { id: 3, name: "Orders Completed", value: "1200+" },
+    // { id: 2, name: "Customers", value: "2000+" },
+    { id: 2, name: "Orders Completed", value: "1200+" },
   ];
 
   const testimonialData = [
@@ -139,14 +139,14 @@ const AccountPage = () => {
             <div className="text-base xl:text-base text-neutral-6000 dark:text-neutral-400 ">
               Nothing more frustrating than when a phone starts playing up. We
               understand! That’s why we aim to provide you fast and reliable
-              after-sales support. For any support just call us on 077 798 8665
+              after-sales support. For any support just call us on +94 75 455 5665
             </div>
           </div>
         </div>
 
         <div className="bg-transparent py-16 lg:py-20 rounded-3xl">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
-            <dl className="grid grid-cols-1 gap-x-8 gap-y-16 text-center md:grid-cols-3">
+            <dl className="grid grid-cols-1 gap-x-8 gap-y-16 text-center md:grid-cols-2">
               {stats.map((stat) => (
                 <div
                   key={stat.id}
@@ -180,7 +180,7 @@ const AccountPage = () => {
                 <h5 className="mb-4 text-xl font-semibold">
                   {testimonial.name}
                 </h5>
-                <h6 className="mb-4 font-semibold text-primary dark:text-primary-500 ">
+                <h6 className="mb-4 px-4 font-semibold text-primary dark:text-primary-500 ">
                   {testimonial.role}
                 </h6>
                 <p className="mb-4 ">{testimonial.content}</p>
