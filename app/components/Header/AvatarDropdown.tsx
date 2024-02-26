@@ -10,6 +10,7 @@ import { Customer } from "@/graphql/types/graphql";
 import { LoggedInAvatar } from "@/components/AddressPageComps/HelperComps";
 
 export default function AvatarDropdown() {
+  
   const { customer, fetchCustomer } = useSession();
 
   const fetchData = async () => {

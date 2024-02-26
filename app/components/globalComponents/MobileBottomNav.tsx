@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import Logo from "./Logo";
 import { XIcon } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Category } from "@/graphql/types/graphql";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -21,6 +21,18 @@ const MobileBottomNav = ({ categories }: { categories: any }) => {
     const { cart } = useCart();
     const { mobileMenu, toggleMobileMenu } = useStore()
     const { customer, fetchCustomer, updateCustomer } = useSession();
+
+    console.log(customer)
+
+    const fetchData = async () => {
+        await fetchCustomer();
+    };
+
+    useEffect(() => {
+        if (customer == null) {
+            fetchData();
+        }
+    }, [customer]);
 
     const handleCat = () => {
         setOpenCat(!openCat);
@@ -63,13 +75,21 @@ const MobileBottomNav = ({ categories }: { categories: any }) => {
                 </div>
                 <div className="text-[11px]">Cart</div>
             </Link>
-            <Link
-                href={customer?.id === 'guest' ? '/login' : '/account'}
+            <div
                 className="flex pt-2 flex-1 flex-col justify-center items-center text-primaryColor gap-1 cursor-pointer"
+                onClick={async () => {
+                    const fetchedCustomer = await fetchCustomer();
+                    if (!fetchedCustomer || fetchedCustomer?.id === "guest") {
+                        router.push('/login');
+                    } else {
+                        router.push('/account');
+                    }
+                }}
             >
                 <CircleUser />
-                <div className="text-[11px]">Account</div>
-            </Link>
+                <div className="text-[11px]">{!customer || customer?.id === "guest" ? 'Login' : 'Account'}</div>
+
+            </div>
             <div
                 onClick={e => toggleMobileMenu()}
                 className="flex pt-2 flex-col justify-center items-center text-primaryColor gap-1"

@@ -11,7 +11,8 @@ import { Menu, XIcon, Facebook, Instagram, PhoneCall } from "lucide-react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import {useStore} from "@/store/store";
+import { useStore } from "@/store/store";
+import { useSession } from "@/context/SessionProvider";
 
 const MobileNavLinks = () => {
   const iconSize = 18;
@@ -36,15 +37,20 @@ const MobileNavLinks = () => {
 
   const { mobileMenu, toggleMobileMenu } = useStore()
 
+  let { logout } = useSession();
+  const router = useRouter();
+  const handleLogout = async () => {
+    logout();
+    router.push("/login");
+  };
 
   return (
     <div className='w-full'>
       <div
-        className={`${
-            mobileMenu ?
-                "bottom-[95px] translate-y-0 opacity-1 scale-100" : 
-                "translate-y-full opacity-0 bottom-0 scale-50"
-        } fixed left-0  shadow-xl rounded-3xl left-1/2 -translate-x-1/2 w-11/12 border border-gray-30
+        className={`${mobileMenu ?
+          "bottom-[95px] translate-y-0 opacity-1 scale-100" :
+          "translate-y-full opacity-0 bottom-0 scale-50"
+          } fixed left-0  shadow-xl rounded-3xl left-1/2 -translate-x-1/2 w-11/12 border border-gray-30
         0 h-fit pt-4 pb-8 bg-white ease-in-out duration-150 transform origin-center z-50`}
       >
         <div className="bg-gray-300 m-auto py-0.5 w-1/5 rounded-xl"></div>
@@ -57,14 +63,23 @@ const MobileNavLinks = () => {
                 className="rounded-3xl px-1 xl:px-3 py-1 "
               >
                 <Link
-                    onClick={e => toggleMobileMenu()}
-                    href={item.href}>{item.name}</Link>
+                  onClick={e => toggleMobileMenu()}
+                  href={item.href}>{item.name}
+                </Link>
               </li>
             ))}
           </ul>
 
+          <div
+            className="gap-1 text-base text-center items-center font-medium  text-primaryColor "
+            onClick={handleLogout}
+          >
+            Log Out
+          </div>
+
 
           <div className="flex  justify-center text-primaryColor text-base gap-2 items-center">
+
             <Link
               href={"tel:0777555665"}
               className="flex  gap-2 items-center justify-center"
