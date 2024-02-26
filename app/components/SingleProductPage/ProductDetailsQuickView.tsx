@@ -125,20 +125,6 @@ const ProductDetails = ({
                     {product?.attributes?.nodes.map(
                         (attr: ProductAttribute, index: number) => (
                             <div key={index} className="py-2 text-gray-500">
-                                {/* <div className="text-sm py-2">
-                                    {attr.label}:{" "}
-                                    <span className="font-medium text-gray-700">
-                                        {
-                                            (product as unknown as VariableProduct)[
-                                                `allPa${attr?.label as unknown as "Capacity"}`
-                                            ]?.nodes.find(
-                                                (node: PaCapacity) =>
-                                                    node.slug === activeAttr(attr)?.val
-                                            )?.name
-                                        }
-                                    </span>{" "}
-                                </div> */}
-
                                 <div className="text-sm py-2">
                                     {attr.label}:{" "}
                                     <span className="font-medium text-gray-700">
@@ -154,22 +140,30 @@ const ProductDetails = ({
                                 </div>
 
                                 <ul className="flex gap-2 flex-wrap text-sm items-center">
-                                    {attr.options?.map((option, index) => (
-                                        <li
-                                            key={index}
-                                            onClick={(e) => setAttribute(attr, option || "")}
-                                            className={twMerge(
-                                                "border bg-gray-200/80 cursor-pointer text-black inline-block py-2 px-3.5  text-xs md:text-sm rounded",
-                                                activeAttr(attr)?.val === option &&
-                                                " border-blue-700 bg-white"
-                                            )}
-                                        >
-                                            {(product as unknown as VariableProduct)[
-                                                `allPa${attr?.label as unknown as "Capacity"}`
-                                            ]?.nodes.find((node: PaCapacity) => node.slug === option)
-                                                ?.name || "Option"}
-                                        </li>
-                                    ))}
+                                    {attr.options?.map((option, index) => {
+                                        return (
+                                            <li
+                                                key={index}
+                                                onClick={(e) => setAttribute(attr, option || "")}
+                                                className={twMerge(
+                                                    "border bg-gray-200/80 cursor-pointer text-black inline-block py-2 px-3.5  text-xs md:text-sm rounded",
+                                                    activeAttr(attr)?.val === option &&
+                                                    " border-blue-700 bg-white"
+                                                )}
+                                            >
+                                                {
+                                                    (product as unknown as VariableProduct)
+                                                    [
+                                                        `allPa${(attr?.label as unknown as "Capacity")?.split(' ').join('')}`
+                                                    ]?.nodes.find((node: PaCapacity) => {
+                                                        return node.slug === option;
+                                                    })?.name || "OPTION"
+                                                }
+                                                
+    
+                                            </li>
+                                        )
+                                    } )}
                                 </ul>
                             </div>
                         )

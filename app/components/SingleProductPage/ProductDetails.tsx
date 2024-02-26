@@ -23,7 +23,7 @@ const ProductDetails = ({
   product: VariableProduct & SimpleProduct;
   brand: Brand;
 }) => {
-  
+
   const { product: { attribute }, setAttribute } = useStore();
 
   const [activeVariation, setActiveVariation] = useState<any>(product?.variations?.nodes[0]);
@@ -35,21 +35,21 @@ const ProductDetails = ({
 
 
 
-const { setVariationId } = useImage();
+  const { setVariationId } = useImage();
 
-//   useEffect(() => {
+  //   useEffect(() => {
 
-//     console.log("product: ", product?.variations?.nodes);
-//     if (product?.variations?.nodes[0]) {
-//       setActiveVariation(
-//         !!product?.variations?.nodes?.length
-//           ? product?.variations?.nodes[0]
-//           : null
-//       );
-//     } else {
-//       alert("NODE NOT FOUNDJ");
-//     }
-//   }, []);
+  //     console.log("product: ", product?.variations?.nodes);
+  //     if (product?.variations?.nodes[0]) {
+  //       setActiveVariation(
+  //         !!product?.variations?.nodes?.length
+  //           ? product?.variations?.nodes[0]
+  //           : null
+  //       );
+  //     } else {
+  //       alert("NODE NOT FOUNDJ");
+  //     }
+  //   }, []);
 
   useEffect(() => {
     if (product.type === "VARIABLE") {
@@ -76,13 +76,13 @@ const { setVariationId } = useImage();
 
   useEffect(() => {
     if (product.type === "VARIABLE" && product?.variations?.nodes?.length !== undefined && product.variations.nodes.length > 0) {
-        setActiveVariation(product?.variations?.nodes[0]);
+      setActiveVariation(product?.variations?.nodes[0]);
     } else if (product.type === "SIMPLE") {
       // Handle simple product case
       setActiveVariation(product);
     }
   }, [product]);
-  
+
   useEffect(() => {
     if (product.type === "VARIABLE" && activeVariation) {
       setVariationId(activeVariation?.image.databaseId);
@@ -102,18 +102,18 @@ const { setVariationId } = useImage();
 
       if (vProduct) {
         setActiveVariation(vProduct);
-      } 
-    //   else {
-    //     setActiveVariation(null);
-    //   }
+      }
+      //   else {
+      //     setActiveVariation(null);
+      //   }
     }
   }, [attribute]);
 
 
-  const applyListStyleDisc = (htmlContent : any) => {
+  const applyListStyleDisc = (htmlContent: any) => {
     return htmlContent.replace(/<ul>/g, '<ul class="list-disc">');
   };
-  
+
 
   return (
     <>
@@ -161,13 +161,17 @@ const { setVariationId } = useImage();
                       className={twMerge(
                         "border bg-gray-200/80 cursor-pointer text-black inline-block py-2 px-3.5  text-xs md:text-sm rounded",
                         activeAttr(attr)?.val === option &&
-                          " border-blue-700 bg-white"
+                        " border-blue-700 bg-white"
                       )}
                     >
-                      {(product as unknown as VariableProduct)[
-                        `allPa${attr?.label as unknown as "Capacity"}`
-                      ]?.nodes.find((node: PaCapacity) => node.slug === option)
-                        ?.name || "Option"}
+                      {
+                        (product as unknown as VariableProduct)
+                        [
+                          `allPa${(attr?.label as unknown as "Capacity")?.split(' ').join('')}`
+                        ]?.nodes.find((node: PaCapacity) => {
+                          return node.slug === option;
+                        })?.name || "OPTION"
+                      }
                     </li>
                   ))}
                 </ul>
@@ -209,7 +213,7 @@ const { setVariationId } = useImage();
           Sold Out
         </div>
       )}
-        {/* <p>Variable</p>
+      {/* <p>Variable</p>
         {JSON.stringify(product.type === "VARIABLE" )}
         <p>Stock Status</p>
         {JSON.stringify(activeVariation?.stockStatus !== "IN_STOCK")}
