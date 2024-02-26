@@ -66,6 +66,12 @@ const nextConfig = {
         port: "",
         pathname: "/*/**",
       },
+      {
+        protocol: "https",
+        hostname: "api.gqmobiles.lk",
+        port: "",
+        pathname: "/*/**",
+      },
     ],
   },
 };
