@@ -26,7 +26,7 @@ interface InstantSearchWrapperProps {
 }
 
 const typesenseConfig = {
-    host: process.env.NEXT_PUBLIC_TYPESENSE_HOST || "gq.freshpixl.com",
+    host: process.env.NEXT_PUBLIC_TYPESENSE_HOST || "api.gqmobiles.lk",
     port: process.env.NEXT_PUBLIC_TYPESENSE_PORT as unknown as number || 80,
     path: process.env.NEXT_PUBLIC_TYPESENSE_PATH || "/q-search",
     protocol: process.env.NEXT_PUBLIC_TYPESENSE_PROTOCOL || "http",

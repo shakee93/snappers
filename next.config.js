@@ -30,12 +30,12 @@ const nextConfig = {
         pathname: "/*/**",
       },
 
-      {
-        protocol: "http",
-        hostname: "gq.freshpixl.com",
-        port: "",
-        pathname: "/*/**",
-      },
+      // {
+      //   protocol: "http",
+      //   hostname: "gq.freshpixl.com",
+      //   port: "",
+      //   pathname: "/*/**",
+      // },
       {
         protocol: "http",
         hostname: "localhost",
@@ -54,18 +54,18 @@ const nextConfig = {
         port: "",
         pathname: "/*/**",
       },
-      {
-        protocol: "https",
-        hostname: "gq.freshpixl.com",
-        port: "",
-        pathname: "/*/**",
-      },
-      {
-        protocol: "https",
-        hostname: "api.gq.freshpixl.com",
-        port: "",
-        pathname: "/*/**",
-      },
+      // {
+      //   protocol: "https",
+      //   hostname: "gq.freshpixl.com",
+      //   port: "",
+      //   pathname: "/*/**",
+      // },
+      // {
+      //   protocol: "https",
+      //   hostname: "api.gq.freshpixl.com",
+      //   port: "",
+      //   pathname: "/*/**",
+      // },
       {
         protocol: "https",
         hostname: "api.gqmobiles.lk",
