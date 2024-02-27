@@ -23,7 +23,7 @@ const UserDetails = () => {
     setEmail(customer?.email || "");
   }, [customer]);
 
-  console.log("address", customer);
+  // console.log("address", customer);
   return (
     <div className="max-w-2xl">
       <h2 className="text-3xl xl:text-4xl font-semibold">Account</h2>

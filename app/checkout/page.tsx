@@ -137,7 +137,7 @@ interface FormData {
 const CheckoutPage = () => {
   const { cart, removeFromCart, updateCart } = useCart();
 
-  console.log('cartttt', cart);
+  // console.log('cartttt', cart);
 
   const { customer, fetchCustomer } = useSession();
 
@@ -332,13 +332,13 @@ const CheckoutPage = () => {
         variables: { input: { shippingMethods } },
       });
 
-      console.log('data in shippng', data);
+      // console.log('data in shippng', data);
 
       if (data?.updateShippingMethod?.cart) {
         const { total, shippingTotal } = data.updateShippingMethod.cart;
         setOrderTotal(total);
         setShippingTotal(shippingTotal);
-        console.log("Cart shipping total updated successfully", shippingTotal);
+        // console.log("Cart shipping total updated successfully", shippingTotal);
       } else {
         console.error(
           "Failed to update cart shipping total. No valid data returned."
