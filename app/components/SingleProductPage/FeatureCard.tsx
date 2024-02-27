@@ -36,8 +36,8 @@ const Features = () => (
         </svg>
         
       }
-      title="Free shipping"
-      description="On orders over LKR.50000.00"
+      title="Cash on delivery"
+      description="Pay on delivery."
     />
 
     {/* <FeatureCard
@@ -69,8 +69,8 @@ const Features = () => (
       <path d="M3 9.0001C8.84 7.0501 15.16 7.0501 21 9.0001" stroke="#292D32" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>
         </svg>
       }
-      title="Nationwide Delivery"
-      description="Fast delivery nationwide."
+      title="Island Wide Delivery"
+      description="Fast delivery Island wide."
     />
 
     {/* <FeatureCard
