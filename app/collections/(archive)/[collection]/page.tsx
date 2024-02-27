@@ -4,7 +4,7 @@ import {
     GET_CATEGORY, GET_CATEGORY_ARCHIVE,
     GET_VARIATIONS_PRODUCT,
 } from "@/graphql/defs/products";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import ArchiveLayout from "@/app/components/archive/ArchiveLayout";
 import {Metadata, ResolvingMetadata} from "next";
 
@@ -22,7 +22,8 @@ async function getData(slug : string | null = null)  {
     );
 
     if (!data.productCategory) {
-        return notFound()
+        // redirect to "/"
+        return redirect('/')
     }
 
     return {
