@@ -624,7 +624,7 @@ const TabFilters = ({
     return (
         <div className="flex flex-col gap-0 lg:gap-3 lg:space-x-4">
             {/* FOR DESKTOP */}
-            <div className="hidden lg:flex flex-1 space-x-4">
+            <div className="hidden lg:flex flex-1 lg:space-x-2 xl:flex xl:space-x-4">
                 {!category && <CategoryFilter categories={categories}/>}
                 {!brand && <BrandFilter brands={brands}/>}
                 <PriceFilter/>

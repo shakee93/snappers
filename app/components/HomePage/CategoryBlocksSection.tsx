@@ -17,7 +17,43 @@ import Link from "next/link";
 export default function CategoryBlockSection() {
   return (
     <div className=" grid grid-cols-12 grid-rows-2 gap-5 py-5">
+
       <Card className="col-span-12 h-[200px] sm:col-span-4 md:h-[300px]">
+        <CardHeader className="absolute top-1 z-10 flex-col !items-start">
+          <p className="text-base font-medium text-white/80">
+            Infinite Possibilities
+          </p>
+
+          <h4 className="text-3xl font-medium text-white">Innovative Smartphones</h4>
+        </CardHeader>
+        <Image
+          removeWrapper
+          alt="Card background"
+          className="z-0 h-full w-full object-cover"
+          src={img1.src}
+        />
+        <CardFooter className="border-default-600 dark:border-default-100 absolute bottom-0 z-10 bg-black/40">
+          <div className="flex flex-grow items-center gap-2">
+            <div className="flex flex-col">
+              <p className="hidden text-sm text-white/60 lg:block">
+                {/* Explore our collection of innovative smartphones that offer infinite possibilities. */}
+                Experience the Power of innovative smartphones
+              </p>
+            </div>
+          </div>
+          <Link href={"/collections/smart-phones"}>
+            <Button
+              className="bg-primaryColor text-sm text-white"
+              radius="full"
+              size="md"
+            >
+              Explore Mobiles
+            </Button>
+          </Link>
+        </CardFooter>
+      </Card>
+
+      {/* <Card className="col-span-12 h-[200px] sm:col-span-4 md:h-[300px]">
         <CardHeader className="absolute top-1 z-10 flex-col !items-start">
           <p className="text-base font-medium text-white/80">
             Elevate Your Productivity
@@ -50,6 +86,7 @@ export default function CategoryBlockSection() {
           </Link>
         </CardFooter>
       </Card>
+       */}
       <Card className="col-span-12 h-[200px] sm:col-span-4 md:h-[300px]">
         <CardHeader className="absolute top-1 z-10 flex-col !items-start">
           <p className="text-base font-medium text-white/80">
@@ -159,7 +196,7 @@ export default function CategoryBlockSection() {
           </Link>
         </CardFooter>
       </Card>
-      <Card
+      {/* <Card
         isFooterBlurred
         className="col-span-12 h-[200px] w-full sm:col-span-7 md:h-[300px]"
       >
@@ -197,7 +234,47 @@ export default function CategoryBlockSection() {
             </Button>
           </Link>
         </CardFooter>
+      </Card> */}
+
+      <Card
+        isFooterBlurred
+        className="col-span-12 h-[200px] w-full sm:col-span-7 md:h-[300px]"
+      >
+        <CardHeader className="absolute top-1 z-10 flex-col items-start p-4">
+          <p className="text-base font-medium text-white/80">
+            Elevate Your Productivity
+          </p>
+
+          <h4 className="text-3xl font-medium text-white">
+            MacBooks
+          </h4>
+        </CardHeader>
+        <Image
+          removeWrapper
+          alt="Relaxing app background"
+          className="z-0 h-full w-full object-cover"
+          src={img5.src}
+        />
+        <CardFooter className="border-default-600 dark:border-default-100 absolute bottom-0 z-10 bg-black/40">
+          <div className="flex flex-grow items-center gap-2">
+            <div className="flex flex-col">
+              <p className="hidden text-sm text-white/60 lg:block">
+                Explore our collection of MacBooks that would boost your productivity.
+              </p>
+            </div>
+          </div>
+          <Link href={"/collections/macbooks"}>
+            <Button
+              className="bg-primaryColor text-sm text-white"
+              radius="full"
+              size="md"
+            >
+              Get a Mackbook
+            </Button>
+          </Link>
+        </CardFooter>
       </Card>
+
     </div>
   );
 }

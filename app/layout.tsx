@@ -3,14 +3,15 @@ import "./index.css";
 import "../fonts/line-awesome-1.3.0/css/line-awesome.css";
 import "rc-slider/assets/index.css";
 import ApolloWrapper from "@/graphql/apollo-client";
-import {SessionProvider} from "@/context/SessionProvider";
-import {CartProvider} from "@/context/CartProvider";
+import { SessionProvider } from "@/context/SessionProvider";
+import { CartProvider } from "@/context/CartProvider";
 import Header from "@/app/components/globalComponents/header";
-import {Toaster} from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
 import Footer from "@/app/components/globalComponents/footer";
-import {Suspense} from "react";
-import {NavigationEvents} from "@/app/components/NavigationEvents";
-import {Metadata} from "next";
+import { Suspense } from "react";
+import { NavigationEvents } from "@/app/components/NavigationEvents";
+import { Metadata } from "next";
+import WhatsappLogoComponent from "./components/WhatsAppLogo";
 
 
 
@@ -23,32 +24,33 @@ export const metadata: Metadata = {
 }
 
 export default async function RootLayout({
-                                             children,
-                                         }: {
+    children,
+}: {
     children: React.ReactNode;
 }) {
 
     return (
         <html lang="en">
-        <body className="bg-gray-50 text-base dark:bg-slate-900 text-slate-900 dark:text-slate-200">
-        <ApolloWrapper>
-            <CartProvider>
-                <SessionProvider>
-                    <Suspense fallback={null}>
-                        <NavigationEvents></NavigationEvents>
-                    </Suspense>
-                    <Toaster/>
-                    <Header/>
+            <body className="bg-gray-50 text-base dark:bg-slate-900 text-slate-900 dark:text-slate-200">
+                <ApolloWrapper>
+                    <CartProvider>
+                        <SessionProvider>
+                            <Suspense fallback={null}>
+                                <NavigationEvents></NavigationEvents>
+                            </Suspense>
+                            <Toaster />
+                            <Header />
 
-                    <div className='pb-8 md:pb-24'>
-                        {children}
-                    </div>
+                            <div className='pb-8 md:pb-24'>
+                                {children}
+                            </div>
+                            <WhatsappLogoComponent />
 
-                    <Footer/>
-                </SessionProvider>
-            </CartProvider>
-        </ApolloWrapper>
-        </body>
+                            <Footer />
+                        </SessionProvider>
+                    </CartProvider>
+                </ApolloWrapper>
+            </body>
         </html>
     );
 }

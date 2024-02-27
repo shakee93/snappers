@@ -24,7 +24,7 @@ const getData = async () => {
     //Speakers
     getClient().query({
       query: GET_PRODUCTS_NODES_HOMEPAGE,
-      variables: { first: 10,  tagId: 538 },
+      variables: { first: 10, tagId: 538 },
     }),
     //Watches
     getClient().query({
@@ -35,7 +35,7 @@ const getData = async () => {
     //Back In Stock
     getClient().query({
       query: GET_PRODUCTS_NODES_HOMEPAGE,
-      variables: { first: 10,  tagId: 536 },
+      variables: { first: 10, tagId: 536 },
     }),
   ]);
 
