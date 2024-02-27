@@ -7,6 +7,7 @@ import {
 import { notFound, redirect } from "next/navigation";
 import ArchiveLayout from "@/app/components/archive/ArchiveLayout";
 import {Metadata, ResolvingMetadata} from "next";
+import { useRouter } from "next/router";
 
 type Props = { params: { collection: string}}
 
@@ -20,9 +21,7 @@ async function getData(slug : string | null = null)  {
             },
         }
     );
-
     if (!data.productCategory) {
-        // redirect to "/"
         return redirect('/')
     }
 
