@@ -11,7 +11,7 @@ import Footer from "@/app/components/globalComponents/footer";
 import { Suspense } from "react";
 import { NavigationEvents } from "@/app/components/NavigationEvents";
 import { Metadata } from "next";
-import WhatsappLogoComponent from "./components/WhatsAppLogo";
+import WhatsappLogoComponent from "@/app/components/WhatsAppLogo";
 
 
 

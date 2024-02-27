@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image";
-import whatsappLogo from "public/images/whatsapplogo.webp";
+import whatsappLogo from "@/public/images/whatsapplogo.webp";
 import Link from "next/link";
 import { useState } from "react";
 
