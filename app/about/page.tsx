@@ -25,7 +25,7 @@ const AccountPage = () => {
       id: 3,
       img: Img3,
       title: "Company History",
-      desc: "GQ mobiles Pvt Ltd at Liberty Plaza was founded in 2002. We have now expanded our operations into two branches to better serve our loyal customers.",
+      desc: "GQ mobiles Pvt Ltd was founded in 2002. We have now expanded our operations into main branch at Liberty Plaza to better serve our loyal customers.",
     },
   ];
   const stats = [
