@@ -268,7 +268,7 @@ const PageTerm = () => {
 
             {/* Return & Refund Policy section */}
             <div className="mb-6">
-              <h2 className="text-3xl font-semibold mb-4">
+              {/* <h2 className="text-3xl font-semibold mb-4">
                 Return Policy
               </h2>
               <p className="mb-4 leading-8">
@@ -279,9 +279,9 @@ const PageTerm = () => {
                 </Link>
                 . If you are not entirely satisfied with your purchase, we’re
                 here to help.
-              </p>
+              </p> */}
               {/* Returns section */}
-              <h3 className="text-xl font-semibold mb-2">Returns</h3>
+              {/* <h3 className="text-xl font-semibold mb-2">Returns</h3>
               <ul className="list-disc pl-5 mb-4 leading-8">
                 <li>
                   You have 7 calendar days to return an item from the date you
@@ -295,7 +295,7 @@ const PageTerm = () => {
                 <li>
                   Your item needs to have the receipt or proof of purchase.
                 </li>
-              </ul>
+              </ul> */}
               {/* Refunds section */}
               {/* <h3 className="text-xl font-semibold mb-2">Refunds</h3>
               <p className="mb-4 leading-8">
