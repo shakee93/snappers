@@ -105,7 +105,7 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
     const isActive = indexActive === index;
     const item = slides[index];
 
-    const backgroundColors = ['#CCE0EF', '#F4E7E7', '#E2F1F0']; // Add more colors as needed
+    const backgroundColors = ['#CCE0EF', '#F4E7E7', '#E2F1F0', '#CCE0EF']; // Add more colors as needed
 
     if (!isActive) {
       return null;
