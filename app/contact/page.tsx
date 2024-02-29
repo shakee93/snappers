@@ -200,7 +200,7 @@ const Contact = () => {
                     <div>
                       <p className="flex flex-col items-center gap-y-3.5 text-xl font-bold text-primaryColor mb-6 text-center">
                         <CheckCircle2 className="text-center w-8 h-8" />
-                        Just confirming that we got your message. We're on it.
+                        Just confirming that we got your message. We&apos;re on it.
                       </p>
                       <div>
                         <ContactBg />
