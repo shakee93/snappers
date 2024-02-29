@@ -269,7 +269,7 @@ const PageTerm = () => {
             {/* Return & Refund Policy section */}
             <div className="mb-6">
               <h2 className="text-3xl font-semibold mb-4">
-                Return & Refund Policy
+                Return Policy
               </h2>
               <p className="mb-4 leading-8">
                 Thanks for shopping at the{" "}
@@ -297,7 +297,7 @@ const PageTerm = () => {
                 </li>
               </ul>
               {/* Refunds section */}
-              <h3 className="text-xl font-semibold mb-2">Refunds</h3>
+              {/* <h3 className="text-xl font-semibold mb-2">Refunds</h3>
               <p className="mb-4 leading-8">
                 Once we receive your item, we will inspect it and notify you
                 that we have received your returned item. We will immediately
@@ -307,7 +307,7 @@ const PageTerm = () => {
                 receive the credit within a certain amount of days, depending on
                 your card issuer’s policies. If you have any questions on how to
                 return your item to us, <Link href={"/contact"}> COntact</Link>.
-              </p>
+              </p> */}
             </div>
 
             {/* Copyright section */}
