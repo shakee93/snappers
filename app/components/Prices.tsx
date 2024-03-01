@@ -30,7 +30,7 @@ const Prices: FC<PricesProps> = ({
                 >
                 <span className="text-slate-950 text-xs lg:text-sm font-bold !leading-none">
                     {/* {price} */}
-                    {/* html parse the cleaned price */}
+                    {/* html parse the cleaned price */} 
                     <span dangerouslySetInnerHTML={{ __html: price || '' }} />
                 </span>
                 </div>
@@ -38,9 +38,7 @@ const Prices: FC<PricesProps> = ({
 
             {salePrice && salePrice !== price && (
                 <div className={`flex ${contentClass}`}>
-                    <s className="text-red-400 font-bold text-xs lg:text-sm">
-                        {salePrice}
-                    </s>
+                    <span className="text-red-400 font-bold line-through text-xs lg:text-sm" dangerouslySetInnerHTML={{ __html: salePrice || '' }} />
                 </div>
             )}
 
