@@ -292,7 +292,7 @@ const ProductCard: FC<ProductCardProps> = ({
               key={index}
             >
               <div className="bg-gradient-to-b w-fit  from-blue-500/30 font-semibold to-blue-400/5 text-xs text-blue-900 px-4 py-2 rounded-full ">
-                {brand?.name}
+                {brand?.name} 
               </div>
             </Link>
           ))}
