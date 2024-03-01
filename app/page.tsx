@@ -73,7 +73,7 @@ export default async function Home() {
         <div className="z-0">
           <SectionHero3 slides={slides} />
         </div>
-        <div className="bg-gray-200 py-4 md:p-2">
+        <div className="bg-[#e5e7eb] py-4 md:p-2">
           <div className="container flex md:items-center gap-3 flex-col md:flex-row items-start ">
             <Image src={Scam} alt="" height={20} className="w-56 md:w-40 h-auto"/>
             <div>
