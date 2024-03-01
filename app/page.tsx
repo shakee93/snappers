@@ -9,6 +9,8 @@ import { GET_SLIDES } from "@/graphql/defs/slides";
 import { GET_PRODUCTS_NODES, GET_PRODUCTS_NODES_HOMEPAGE } from "@/graphql/defs/products";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import "styles/embla.css";
+import Image from "next/image";
+import Scam from "@/public/homepage/scam.webp";
 
 const getData = async () => {
   const [slides, newArrivals, mobiles, speakers, watches, backInStock] = await Promise.all([
@@ -71,6 +73,17 @@ export default async function Home() {
         <div className="z-0">
           <SectionHero3 slides={slides} />
         </div>
+        <div className="bg-gray-200 py-4 md:p-2">
+          <div className="container flex md:items-center gap-3 flex-col md:flex-row items-start ">
+            <Image src={Scam} alt="" height={20} className="w-56 md:w-40 h-auto"/>
+            <div>
+              <p className="text-base md:text-lg font-medium">Fraud Alert : Rajagiriya & Kurunegala Scam Warning!</p>
+              <p className="text-sm md:text-base">We have no branches in Rajagiriya or Kurunegala. Beware of scams. Your safety is our priority.</p>
+            </div>
+          </div>
+        </div>
+        
+       
         <div className="container flex flex-col gap-10 lg:gap-16">
           {/* new arrivals section */}
           <div className="mt-5 md:mt-10">
