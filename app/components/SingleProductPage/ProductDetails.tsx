@@ -165,22 +165,13 @@ const ProductDetails = ({
                       )}
                     >
                       {
-                        (product as unknown as VariableProduct)
-                        [
-                          `allPa${attr?.label as unknown as "Capacity"}`
-                        ]?.nodes.find((node: PaCapacity) => {
-                          return node.slug === option;
-                        })?.name || option
-                      }
-
-                      {/* {
-                        (product as unknown as VariableProduct)
+                        (product as any)
                         [
                           `allPa${(attr?.label as unknown as "Capacity")?.split(' ').join('')}`
                         ]?.nodes.find((node: PaCapacity) => {
                           return node.slug === option;
                         })?.name || "OPTION"
-                      } */}
+                      }
                     </li>
                   ))}
                 </ul>
@@ -198,19 +189,22 @@ const ProductDetails = ({
             {!!activeVariation.salePrice &&
               activeVariation.salePrice !== activeVariation.regularPrice && (
                 <span className="text-red-400">
-                  <s>{activeVariation.regularPrice}</s>
+                  {/* <s>{activeVariation.regularPrice}</s> */}
+                <span dangerouslySetInnerHTML={{ __html: activeVariation.price }} />
                 </span>
               )}
           </div>
         </div>
       ) : (
         <div className="flex gap-2 text-base py-2 flex-wrap md:text-lg font-medium text-gray-600">
-          <span>{product.price}</span>
-
+          {/* <span>{product.price}</span> */}
+                          <span dangerouslySetInnerHTML={{ __html: product.price  || ''}} />
+          
           {!!product.salePrice &&
             product.salePrice !== product.regularPrice && (
               <span className="text-red-400">
-                <s>{product.regularPrice}</s>
+                {/* <s>{product.regularPrice}</s> */}
+                          <span dangerouslySetInnerHTML={{ __html: product.regularPrice ||  '' }} />
               </span>
             )}
         </div>
