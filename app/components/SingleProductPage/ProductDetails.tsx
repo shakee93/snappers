@@ -165,22 +165,13 @@ const ProductDetails = ({
                       )}
                     >
                       {
-                        (product as unknown as VariableProduct)
-                        [
-                          `allPa${attr?.label as unknown as "Capacity"}`
-                        ]?.nodes.find((node: PaCapacity) => {
-                          return node.slug === option;
-                        })?.name || option
-                      }
-
-                      {/* {
-                        (product as unknown as VariableProduct)
+                        (product as any)
                         [
                           `allPa${(attr?.label as unknown as "Capacity")?.split(' ').join('')}`
                         ]?.nodes.find((node: PaCapacity) => {
                           return node.slug === option;
                         })?.name || "OPTION"
-                      } */}
+                      }
                     </li>
                   ))}
                 </ul>
