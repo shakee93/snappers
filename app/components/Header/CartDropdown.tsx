@@ -65,7 +65,8 @@ export default function CartDropdown() {
                           Shipping and taxes calculated at checkout.
                         </span>
                       </span>
-                      <span className="">{cart?.subtotal}</span>
+                      {/* <span className="">{cart?.subtotal}</span> */}
+                      <span dangerouslySetInnerHTML={{ __html: cart?.subtotal || '' }} />
                     </p>
                     <div className="flex space-x-2 mt-5">
                       <ButtonSecondary

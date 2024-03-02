@@ -630,7 +630,7 @@ const CheckoutPage = () => {
               <div className="mt-4 flex justify-between py-2.5">
                 <span>Subtotal</span>
                 <span className="font-semibold text-slate-900 dark:text-slate-200">
-                  {cart?.subtotal || "$0.00"}
+                  <span dangerouslySetInnerHTML={{ __html: cart?.subtotal || "0.00" }} />
                 </span>
               </div>
 
@@ -638,11 +638,10 @@ const CheckoutPage = () => {
                 <div className="flex justify-between py-2.5">
                   <span>Shipping estimate</span>
                   <span className="font-semibold text-slate-900 dark:text-slate-200">
-                    {cart?.shippingTotal || "$0.00"}
+                    <span dangerouslySetInnerHTML={{ __html: cart?.shippingTotal || "0.00" }} />
                   </span>
                 </div>
               )}
-
               {/* <div className="flex justify-between py-2.5">
                                 <span>Tax estimate</span>
                                 <span className="font-semibold text-slate-900 dark:text-slate-200">
@@ -651,8 +650,9 @@ const CheckoutPage = () => {
                             </div> */}
               <div className="flex justify-between pt-4 text-base font-semibold text-slate-900 dark:text-slate-200">
                 <span>Order total</span>
-                {/* <span>{cart?.total || "$0.00"}</span> */}
-                <span>{orderTotal || "0.00"}</span>
+
+                {/* <span>{orderTotal || "0.00"}</span> */}
+                <span dangerouslySetInnerHTML={{ __html: orderTotal || "0.00" }} />
               </div>
             </div>
 

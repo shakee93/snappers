@@ -186,9 +186,10 @@ const ProductDetails = ({
           <div className="flex gap-4 text-base py-2 flex-wrap md:text-lg font-medium text-gray-600">
             <span>{activeVariation.price}</span>
 
+
             {!!activeVariation.salePrice &&
               activeVariation.salePrice !== activeVariation.regularPrice && (
-                <span className="text-red-400">
+                <span className="text-red-400 line-through">
                   {/* <s>{activeVariation.regularPrice}</s> */}
                 <span dangerouslySetInnerHTML={{ __html: activeVariation.price }} />
                 </span>
@@ -202,7 +203,7 @@ const ProductDetails = ({
           
           {!!product.salePrice &&
             product.salePrice !== product.regularPrice && (
-              <span className="text-red-400">
+              <span className="text-red-400 line-through">
                 {/* <s>{product.regularPrice}</s> */}
                           <span dangerouslySetInnerHTML={{ __html: product.regularPrice ||  '' }} />
               </span>
