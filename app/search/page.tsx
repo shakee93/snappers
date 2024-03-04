@@ -42,7 +42,7 @@ async function getData(categories: number[] | null = null) {
     const endTime = new Date().getTime();
     const executionTime = endTime - startTime; 
 
-    console.log(`getData function execution time: ${executionTime}ms`);
+    // console.log(`getData function execution time: ${executionTime}ms`);
 
     return {
         productCategories: data.productCategories.nodes,
@@ -55,7 +55,7 @@ async function getData(categories: number[] | null = null) {
 async function Page() {
 
     const { productCategories, brands, executionTime } = await getData();
-    console.log("execution time: ", executionTime);
+    // console.log("execution time: ", executionTime);
     // const [client] = await Promise.all([getClient()]);
     // let resetStore = true
     // if (resetStore) await client.clearStore();

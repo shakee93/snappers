@@ -59,7 +59,7 @@ const SidebarFilters = ({
   };
 
   const handleChangeBrands = (checked: boolean, name: number) => {
-    console.log(checked, name);
+    // console.log(checked, name);
 
     checked
         ? setBrandsState([...brandsState, name])

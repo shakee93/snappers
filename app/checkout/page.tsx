@@ -296,7 +296,7 @@ const CheckoutPage = () => {
         setLoading(false);
         break;
       case "dismissed":
-        console.log("Dismissed Payhere.");
+        // console.log("Dismissed Payhere.");
         setLoading(false)
         break;
       case "error":
@@ -395,7 +395,7 @@ const CheckoutPage = () => {
       setPayhereHandleStatus("loading");
       initiatePayment(checkoutDetails, setPayhereHandleStatus).then((r) => r);
     } else {
-      console.log("initiate payment become null");
+      // console.log("initiate payment become null");
     }
   };
 
@@ -406,7 +406,7 @@ const CheckoutPage = () => {
 
   useEffect(() => {
     if (!paymentDetails) {
-      console.log("payment data not initiated yet!");
+      // console.log("payment data not initiated yet!");
       return;
     }
 
@@ -431,7 +431,7 @@ const CheckoutPage = () => {
       try {
         ImplementBankTransfer();
       } catch (e) {
-        console.log("Error while creating BankTransfer:", e);
+        // console.log("Error while creating BankTransfer:", e);
         toast.error("Error on BankTransfer");
       }
     }

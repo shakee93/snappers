@@ -103,7 +103,7 @@ export function SessionProvider({ children }: {
                 },
             });
 
-            console.log("Sign up",response);
+            // console.log("Sign up",response);
 
             saveResponseToLocalStorage(response);
 

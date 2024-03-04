@@ -44,11 +44,11 @@ const ProductDetails = ({
       setActiveVariation(product?.variations?.nodes[0]);
       // setActiveOption(product?.variations?.nodes[0].attributes?.nodes[0].value)
     } else {
-      console.log("active variation is on");
+      // console.log("active variation is on");
     }
 
     let stockStatus = activeVariation?.stockStatus !== "IN_STOCK";
-    console.log("stock status: ", stockStatus);
+    // console.log("stock status: ", stockStatus);
   }, [activeVariation]);
 
   //
