@@ -161,10 +161,9 @@ const ProductDetails = ({
                                                     })?.name || option
                                                 } */}
 
-                        {(product as any)[
-                          `allPa${(attr?.label as unknown as "Capacity")
-                            ?.split(" ")
-                            .join("")}`
+                        {(product as any)
+                        [
+                          `allPa${(attr?.label as unknown as "Capacity")?.split(" ").join("")}`
                         ]?.nodes.find((node: PaCapacity) => {
                           return node.slug === option;
                         })?.name || "OPTION"}

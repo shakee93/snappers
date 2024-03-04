@@ -520,16 +520,19 @@ const CheckoutPage = () => {
 
   const getShippingMethod = (shippingTotal: any) => {
     const methodId =
-      shippingTotal === "₨0.00"
+      shippingTotal === "₨&nbsp;0.00"
         ? "pickup_location:0"
         : "wbs:0dd3bc79_weight_based_shipping";
 
     const methodTitle =
-      shippingTotal === "₨0.00" ? "pickup_location:0" : "Weight Based Shipping";
+      shippingTotal === "₨&nbsp;0.00" ? "pickup_location:0" : "Weight Based Shipping";
 
     const total = shippingTotal;
 
+    // console.log("Shipping Method: ", { methodId, methodTitle, total });
+
     return { methodId, methodTitle, total };
+
   };
 
   const handleCheckoutError = (error: any) => {

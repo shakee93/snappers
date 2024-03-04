@@ -34,7 +34,7 @@ export const OrderDetails: React.FC<OrderDetailsProps> = ({ orderData }) => {
             row.condition !== false ? (
               <div key={index} className="flex flex-col items-center md:items-start ">
                 <p className="font-semibold	">{row.label}</p>
-                {row.label == "Order Id" ? <p className="	text-4xl font-bold">{row.value}</p> : <p className="mt-1">{row.value}</p>}
+                {row.label == "Order Id" ? <p className="	text-4xl font-bold"><span dangerouslySetInnerHTML={{ __html: row.value || '' }} /></p> : <p className="mt-1"><span dangerouslySetInnerHTML={{ __html: row.value || '' }} /> </p>}
               </div>
             ) : null
           )}
@@ -64,7 +64,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData, payme
       <div className="w-full">
         <div className="flex flex-col overflow-hidden">
           <div className="overflow-x-auto">
-            
+
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 ">
               <thead className="text-lg bg-gray-200 py-2 texy-primaryColor ">
                 <tr>
@@ -108,7 +108,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData, payme
                   </td>
                   <td></td>
                   <td className="px-6 text-right py-4 font-medium text-gray-800 dark:text-gray-200">
-                    {orderData.order?.total}
+                    <span dangerouslySetInnerHTML={{ __html: orderData.order?.total || '' }} />
                   </td>
                 </tr>
               </tbody>
