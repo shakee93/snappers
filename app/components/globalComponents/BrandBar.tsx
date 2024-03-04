@@ -74,7 +74,7 @@ const BrandBar: React.FC<BrandBarProps> = ({ brands, categories }) => {
                 path.includes(`/${brand.slug}`) && "bg-primaryColor text-white"
               )}
             >
-              {brand.name}
+              {brand.name} 
             </Link>
           ))}
         </div>
