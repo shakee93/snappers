@@ -165,7 +165,8 @@ const SidebarFilters = ({
             <div key={item.databaseId} className="">
               <Checkbox
                   name={item.databaseId}
-                  label={`${item.name} (${item.count})`}
+                  // label={`${item.name} (${item.count})`}
+                  label={`${item.name}`}
                   defaultChecked={categoriesState.includes(item.databaseId)}
                   sizeClassName="w-5 h-5"
                   labelClassName="text-sm font-normal"
@@ -181,7 +182,8 @@ const SidebarFilters = ({
                 <div key={item.databaseId} className="">
                   <Checkbox
                       name={item.databaseId}
-                      label={`${item.name} (${item.count})`}
+                      // label={`${item.name} (${item.count})`}
+                      label={`${item.name}`}
                       defaultChecked={brandsState.includes(item.databaseId)}
                       sizeClassName="w-5 h-5"
                       labelClassName="text-sm font-normal"
