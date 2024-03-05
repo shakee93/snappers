@@ -78,9 +78,8 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
         'Wrong number of segments',
       ];
 
-      // console.log(graphQLErrors);
 
-      if (graphQLErrors && graphQLErrors.some((err: any) => targetErrors.includes(err?.debugMessage))) {
+      if (graphQLErrors && graphQLErrors.some((err: any) => targetErrors.includes(err?.message || err?.debugMessage))) {
         return new Observable(observer => {
           fetchAuthToken()
             .then(newToken => {
