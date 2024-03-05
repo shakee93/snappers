@@ -38,14 +38,14 @@ export default async function RootLayout({
                             <Suspense fallback={null}>
                                 <NavigationEvents></NavigationEvents>
                             </Suspense>
-                            <Toaster />
+
                             <Header />
 
                             <div className='pb-8 md:pb-24'>
                                 {children}
                             </div>
                             <WhatsappLogoComponent />
-
+                            <Toaster />
                             <Footer />
                         </SessionProvider>
                     </CartProvider>

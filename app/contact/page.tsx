@@ -51,7 +51,7 @@ const Contact = () => {
       phone: formData.phone,
       details: formData.details
     };
-    console.log("Form Data:", formDataToSend);
+    // console.log("Form Data:", formDataToSend);
 
     const response = await fetch('https://api.gqmobiles.lk/wp-json/contact-form/v1/submit', {
       method: 'POST',
@@ -65,7 +65,7 @@ const Contact = () => {
     const responseData = await response.json();
     if (response.ok) {
       // Success: Handle successful submission
-      console.log(responseData); // Log the response data
+      // console.log(responseData); // Log the response data
       // Show success message or redirect user
     } else {
       // Error: Handle submission error

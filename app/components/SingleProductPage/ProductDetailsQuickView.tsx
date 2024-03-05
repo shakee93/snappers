@@ -44,11 +44,11 @@ const ProductDetails = ({
       setActiveVariation(product?.variations?.nodes[0]);
       // setActiveOption(product?.variations?.nodes[0].attributes?.nodes[0].value)
     } else {
-      console.log("active variation is on");
+      // console.log("active variation is on");
     }
 
     let stockStatus = activeVariation?.stockStatus !== "IN_STOCK";
-    console.log("stock status: ", stockStatus);
+    // console.log("stock status: ", stockStatus);
   }, [activeVariation]);
 
   //
@@ -149,7 +149,7 @@ const ProductDetails = ({
                         className={twMerge(
                           "border bg-gray-200/80 cursor-pointer text-black inline-block py-2 px-3.5  text-xs md:text-sm rounded",
                           activeAttr(attr)?.val === option &&
-                            " border-blue-700 bg-white"
+                          " border-blue-700 bg-white"
                         )}
                       >
                         {/* {
@@ -161,10 +161,9 @@ const ProductDetails = ({
                                                     })?.name || option
                                                 } */}
 
-                        {(product as any)[
-                          `allPa${(attr?.label as unknown as "Capacity")
-                            ?.split(" ")
-                            .join("")}`
+                        {(product as any)
+                        [
+                          `allPa${(attr?.label as unknown as "Capacity")?.split(" ").join("")}`
                         ]?.nodes.find((node: PaCapacity) => {
                           return node.slug === option;
                         })?.name || "OPTION"}
@@ -187,19 +186,22 @@ const ProductDetails = ({
             {!!activeVariation.salePrice &&
               activeVariation.salePrice !== activeVariation.regularPrice && (
                 <span className="text-red-400">
-                  <s>{activeVariation.regularPrice}</s>
+                  {/* <s>{activeVariation.regularPrice}</s> */}
+                  <s dangerouslySetInnerHTML={{ __html: activeVariation?.price }} />
                 </span>
               )}
           </div>
         </div>
       ) : (
         <div className="flex gap-2 text-base py-2 flex-wrap md:text-lg font-medium text-gray-600">
-          <span>{product?.price}</span>
+          {/* <span>{product?.price}</span> */}
+          <span dangerouslySetInnerHTML={{ __html: product.price || '' }} />
 
           {!!product?.salePrice &&
             product?.salePrice !== product?.regularPrice && (
               <span className="text-red-400">
-                <s>{product?.regularPrice}</s>
+                {/* <s>{product?.regularPrice}</s> */}
+                <s dangerouslySetInnerHTML={{ __html: product?.regularPrice || '' }} />
               </span>
             )}
         </div>
@@ -223,27 +225,27 @@ const ProductDetails = ({
         <div className="text-sm py-2">Category:</div>
         {product?.productCategories?.edges
           ? product?.productCategories?.edges.map(
-              (category: any, index: number) => (
-                <Link
-                  href={`/collections/${category.node.slug}`}
-                  key={index}
-                  className="bg-primary-100 inline-block py-1 px-2  text-xs md:text-sm rounded-3xl"
-                >
-                  {category.node.name}
-                </Link>
-              )
+            (category: any, index: number) => (
+              <Link
+                href={`/collections/${category.node.slug}`}
+                key={index}
+                className="bg-primary-100 inline-block py-1 px-2  text-xs md:text-sm rounded-3xl"
+              >
+                {category.node.name}
+              </Link>
             )
+          )
           : product?.productCategories?.nodes.map(
-              (category: any, index: number) => (
-                <Link
-                  href={`/collections/${category.slug}`}
-                  key={index}
-                  className="bg-primary-100 inline-block py-1 px-2  text-xs md:text-sm rounded-3xl"
-                >
-                  {category.name}
-                </Link>
-              )
-            )}
+            (category: any, index: number) => (
+              <Link
+                href={`/collections/${category.slug}`}
+                key={index}
+                className="bg-primary-100 inline-block py-1 px-2  text-xs md:text-sm rounded-3xl"
+              >
+                {category.name}
+              </Link>
+            )
+          )}
       </div>
     </div>
   );

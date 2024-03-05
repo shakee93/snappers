@@ -5,17 +5,61 @@ import SectionGridMoreExplore from "@/app/components/HomePage/SectionGridMoreExp
 import SectionPromo1 from "@/app/components/HomePage/SectionPromo1";
 import Heading from "@/app/components/Heading/Heading";
 import { getClient } from "@/graphql/apollo-ssr";
-import { GET_SLIDES } from "@/graphql/defs/slides";
 import { GET_PRODUCTS_NODES, GET_PRODUCTS_NODES_HOMEPAGE } from "@/graphql/defs/products";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import "styles/embla.css";
 import Image from "next/image";
 import Scam from "@/public/homepage/scam.webp";
 
+const slidesData = [
+  {
+    id: "2",
+    slideFields: {
+      mainHeading: "Exclusive Offers Just for You!",
+      subHeading: "Save Big on Your Favorite Brands",
+      buttonText: "Best Deals",
+      buttonLink: "/collections/all",
+      backgroundColor:"#CCE0EF",
+      featureImage: {
+        id: "2",
+        sourceUrl: "https://api.gqmobiles.lk/wp-content/uploads/2023/12/marshall-300x231.png"
+      }
+    }
+  },
+  {
+    id: "3",
+    slideFields: {
+      mainHeading: "Embrace the Future of Accessories",
+      subHeading: "Step into Tomorrow's Style",
+      buttonText: "Explore Products",
+      buttonLink: "/collections/all",
+      backgroundColor:"#F4E7E7",
+      featureImage: {
+        id: "3",
+        sourceUrl: "https://api.gqmobiles.lk/wp-content/uploads/2023/12/dlcdnwebimgs.asus_-300x300.png"
+      }
+    }
+  },
+  {
+    id: "4",
+    slideFields: {
+      mainHeading: "Hot Picks of the Month!",
+      subHeading: "Explore Our Top-Selling Products",
+      buttonText: "Explore Now",
+      buttonLink: "/collections/all",
+      backgroundColor:"#E2F1F0",
+      featureImage: {
+        id: "4",
+        sourceUrl: "https://api.gqmobiles.lk/wp-content/uploads/2023/12/Layer-1-1-278x300.png"
+      }
+    }
+  }
+];
+
 const getData = async () => {
-  const [slides, newArrivals, mobiles, speakers, watches, backInStock] = await Promise.all([
+  const [ newArrivals, mobiles, speakers, watches, backInStock] = await Promise.all([
     //Slides
-    getClient().query({ query: GET_SLIDES }),
+    // getClient().query({ query: GET_SLIDES }),
     //New Arrivals
     getClient().query({ query: GET_PRODUCTS_NODES }),
     //Mobiles
@@ -42,7 +86,7 @@ const getData = async () => {
   ]);
 
   return {
-    slides: slides.data?.slides?.nodes,
+    // slides: slides.data?.slides?.nodes,
     newArrivals: newArrivals.data.products?.nodes as (SimpleProduct &
       VariableProduct)[],
     mobiles: mobiles.data.products?.nodes as (SimpleProduct &
@@ -60,7 +104,7 @@ const getData = async () => {
 export default async function Home() {
   // const startTime = performance.now(); // Log the start time
 
-  const { slides, newArrivals, mobiles, speakers, watches, backInStock } = await getData();
+  const {  newArrivals, mobiles, speakers, watches, backInStock } = await getData();
   // const endTime = performance.now(); // Log the end time
   // console.log(
   //   `getData function took ${endTime - startTime} milliseconds to execute.`
@@ -71,7 +115,7 @@ export default async function Home() {
       <div className="nc-PageHome relative flex  flex-col overflow-hidden">
         {/* hero section */}
         <div className="z-0">
-          <SectionHero3 slides={slides} />
+          <SectionHero3 slides={slidesData} />
         </div>
         <div className="bg-[#e5e7eb] py-4 md:p-2">
           <div className="container flex md:items-center gap-3 flex-col md:flex-row items-start ">

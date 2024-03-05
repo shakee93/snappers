@@ -5,7 +5,7 @@ import { useQuery } from '@apollo/client';
 import useBoolean from 'react-use/lib/useBoolean';
 import useInterval from 'react-use/lib/useInterval';
 import Image, { StaticImageData } from 'next/image';
-import { GET_SLIDES } from '@/graphql/defs/slides';
+// import { GET_SLIDES } from '@/graphql/defs/slides';
 import { useStore } from '@/store/store';
 import backgroundLineSvg from '@/public/images/Moon.svg';
 import ButtonPrimary from 'shared/Button/ButtonPrimary';
@@ -28,6 +28,7 @@ interface SlideType {
     subHeading: string;
     buttonText: string;
     buttonLink: string;
+    backgroundColor: string;
     featureImage: {
       id: string;
       sourceUrl: string;
@@ -105,8 +106,6 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
     const isActive = indexActive === index;
     const item = slides[index];
 
-    const backgroundColors = ['#CCE0EF', '#F4E7E7', '#E2F1F0', '#CCE0EF']; // Add more colors as needed
-
     if (!isActive) {
       return null;
     }
@@ -117,7 +116,7 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
         className={`relative w-full h-[550px] md:h-[400px] xl:h-[500px] justify-center  nc-SectionHero2Item--animation flex items-center transition-transform ease-in-out transform ${
           isActive ? 'translate-y-0' : 'translate-y-10'
         }`}
-        style={{ backgroundColor: backgroundColors[index] }}
+        style={{ backgroundColor: item.slideFields.backgroundColor}}
       >
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 flex justify-center">
           {slides.map((_, dotIndex) => (
@@ -154,7 +153,7 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
           svgSize="w-6 h-6"
           onClickNext={handleClickNext}
         />
-        <div className={`absolute inset-0 bg-${backgroundColors[index]}`}>
+        <div className={`absolute inset-0 bg-${item.slideFields.backgroundColor}`}>
           <NcImage
             className="absolute w-full h-full object-contain"
             src={backgroundLineSvg}

@@ -26,11 +26,6 @@ const ProductGridInstant = ({
 }: ProductGridProps) => {
   const { hits, results } = useHits();
 
-  console.log('results', JSON.stringify(results, null, 2));
-  console.log('hits', JSON.stringify(hits, null, 2));
-
-  debugger;
-
   const { status: statusState } = useInstantSearch();
   const { setSearchStatus, search, search_status, navigation } = useStore();
 

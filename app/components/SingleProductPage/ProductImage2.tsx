@@ -71,7 +71,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
       if (variationIndex !== -1) {
         emblaMainApi.scrollTo(variationIndex);
       } else {
-        console.log("Image with Variation ID not found in gallery.");
+        // console.log("Image with Variation ID not found in gallery.");
       }
       return;
     }

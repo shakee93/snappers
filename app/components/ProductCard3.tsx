@@ -12,7 +12,7 @@ import Image from "next/image";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import { ArrowsPointingOutIcon } from "@heroicons/react/24/outline";
 import { StarIcon } from "@heroicons/react/24/solid";
-import toast from "react-hot-toast";
+import toast, {Toast} from "react-hot-toast";
 import { Transition } from "@headlessui/react";
 import ModalQuickView from "./ModalQuickView";
 import Prices from "./Prices";
@@ -103,8 +103,8 @@ const ProductCard: FC<ProductCardProps> = ({
   const { addToCart } = useCart();
 
   const notifyAddTocart = (quantity: number) => {
-    toast.custom(
-      (t: any) => (
+    const toastId = toast.custom(
+      (t: Toast) => (
         <Transition
           appear
           show={t.visible}
@@ -117,17 +117,22 @@ const ProductCard: FC<ProductCardProps> = ({
           leaveTo="opacity-0 translate-x-20"
         >
           <div className="flex items-center w-full justify-between text-base font-semibold leading-none">
-            Added to cart!{" "}
-            <button onClick={(e) => toast.dismiss("nc-product-notify")}>
-              <XIcon />
-            </button>
+            Added to cart!
+            {/*<button onClick={(e) => {*/}
+            {/*  console.log('here');*/}
+            {/*  toast.dismiss(t.id)*/}
+            {/*}}>*/}
+            {/*  <XIcon />*/}
+            {/*</button>*/}
           </div>
           <div className="border-t border-slate-200 dark:border-slate-700 my-4" />
           <AddedToCart product={data} quantity={quantity} />
         </Transition>
       ),
-      { position: "top-right", id: "nc-product-notify", duration: 3000 }
+      { position: "top-right", id: "nc-product-notify-cart-" + data.databaseId, duration: 3000 }
     );
+
+    console.log(toastId);
   };
 
   const cartCompleted = () => {
