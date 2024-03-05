@@ -57,6 +57,7 @@ const BankTransfer: React.FC<BankTransferProps> = ({ paymentDetails }) => {
         method: "POST",
         body: formData,
       });
+      
 
       const data = await response.json();
 

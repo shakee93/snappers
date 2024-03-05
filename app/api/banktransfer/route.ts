@@ -14,7 +14,6 @@ export async function POST(request: Request) {
 
     const buffer = await readBufferFromFile(file);
     await sendFileToUrl(file, buffer, orderID);
-
     return new Response(JSON.stringify({ message: "success" }));
   } catch (error) {
     return new Response(JSON.stringify({ error: `Error: ${error}` }));

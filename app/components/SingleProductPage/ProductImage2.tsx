@@ -43,9 +43,9 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   ) ?? [product.image];
   const combinedImages = [...variationImages, ...(galleryImages || [])];
 
-  // console.log("galleryImages", galleryImages);
-  // console.log("combinedImages", combinedImages);
-  // console.log("variationImages", variationImages);
+  console.log("galleryImages", galleryImages);
+  console.log("combinedImages", combinedImages);
+  console.log("variationImages", variationImages);
 
   combinedImages.forEach((image) => {
     if (image?.sourceUrl?.includes("300x300")) {
