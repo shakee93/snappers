@@ -69,18 +69,21 @@ const CartPage = () => {
                 <div className="flex justify-between pb-4">
                   <span>Subtotal</span>
                   <span className="font-semibold text-slate-900 dark:text-slate-200">
-                    {cart?.subtotal}
+                    <span dangerouslySetInnerHTML={{ __html: cart?.subtotal ?? "" }} />
+                    
                   </span>
                 </div>
                 <div className="flex justify-between py-4">
                   <span>Shpping estimate</span>
                   <span className="font-semibold text-slate-900 dark:text-slate-200">
-                    {cart?.shippingTotal}
+                    <span dangerouslySetInnerHTML={{ __html: cart?.shippingTotal ?? "" }} />
                   </span>
                 </div>
                 <div className="flex justify-between font-semibold text-slate-900 dark:text-slate-200 text-base pt-4">
                   <span>Order total</span>
-                  <span>{cart?.total}</span>
+                  <span className="font-semibold text-slate-900 dark:text-slate-200">
+                    <span dangerouslySetInnerHTML={{ __html: cart?.total ?? "" }} />
+                  </span>
                 </div>
               </div>
               <ButtonPrimary href="/checkout" className="mt-8 w-full">

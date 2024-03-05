@@ -84,6 +84,7 @@ const cartItems: React.FC<CartItemsProps> = ({
                 <div className="mt-1.5 sm:mt-2.5 flex text-sm text-slate-600 dark:text-slate-300">
                   {type === "VARIABLE" && (
                     <div className="my-1 text-sm text-slate-500 dark:text-slate-400">
+
                       {variation?.attributes?.map(
                         (attr: any, index: number) => (
                           <Fragment key={index}>
@@ -103,6 +104,7 @@ const cartItems: React.FC<CartItemsProps> = ({
                                       node.slug === attr?.value
                                   )?.name
                                 }
+
                               </span>
                             </div>
                           </Fragment>
@@ -131,6 +133,7 @@ const cartItems: React.FC<CartItemsProps> = ({
                   contentClass="py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium h-full"
                   price={price}
                 />
+
               </div>
             </div>
 

@@ -60,7 +60,7 @@ const BankTransfer: React.FC<BankTransferProps> = ({ paymentDetails }) => {
 
       const data = await response.json();
 
-      console.log("data", data);
+      // console.log("data", data);
 
       if (data.message === "success") {
         setUploadStatus("success");

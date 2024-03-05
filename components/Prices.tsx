@@ -18,9 +18,11 @@ const Prices: FC<PricesProps> = ({
       <div
         className={`flex items-center border-2 border-green-500 rounded-lg ${contentClass}`}
       >
-        <span className="text-green-500 !leading-none">
+        {/* <span className="text-green-500 !leading-none">
           {price}
-        </span>
+        </span> */}
+        {/* dangeroue html price */}
+        <span dangerouslySetInnerHTML={{ __html: price as string }} />
       </div>
     </div>
   );

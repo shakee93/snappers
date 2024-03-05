@@ -19,7 +19,7 @@ async function measureRequestDuration() {
 
     const duration = end - start; // Calculate the duration
 
-    console.log(`Request to took ${duration.toFixed(0)}ms`); // Log duration to console
+    // console.log(`Request to took ${duration.toFixed(0)}ms`); // Log duration to console
 
     return await response.json()
   } catch (error: any) {

@@ -112,7 +112,8 @@ const CategoryFilter = ({categories}: CategoryFilterProps) => {
                                     <div key={item.databaseId} className="">
                                         <Checkbox
                                             name={item.slug || ''}
-                                            label={`${item.name} (${item.count})`}
+                                            // label={`${item.name} (${item.count})`}
+                                            label={`${item.name}`}
                                             defaultChecked={categoriesState.includes(item.databaseId)}
                                             onChange={(checked) =>
                                                 handleChangeCategories(checked, item.databaseId)

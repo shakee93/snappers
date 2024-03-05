@@ -17,10 +17,10 @@ const ProductOverview = ({
   const techSpecs = JSON.parse(techValue || 'false')
 
   function addParagraphSpacing(htmlString : any) {
-    const paragraphs = htmlString.split('</p>');
+    const paragraphs = htmlString?.split('</p>');
 
-    const parsedHtml = paragraphs.map( (paragraph : any) => {
-      const trimmedParagraph = paragraph.trim();
+    const parsedHtml = paragraphs?.map( (paragraph : any) => {
+      const trimmedParagraph = paragraph?.trim();
       if (trimmedParagraph !== '') {
         return trimmedParagraph + '</p><p>';
       } else {
@@ -28,7 +28,7 @@ const ProductOverview = ({
       }
     }).join('');
 
-    const finalHtml = parsedHtml.slice(0, -('<p>'.length));
+    const finalHtml = parsedHtml?.slice(0, -('<p>'.length));
 
     return finalHtml;
   }

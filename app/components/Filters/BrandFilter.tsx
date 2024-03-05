@@ -108,7 +108,8 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
                   <div key={item.databaseId} className="">
                     <Checkbox
                       name={item.slug || ""}
-                      label={`${item.name} (${item.count})`}
+                      //label={`${item.name} (${item.count})`}
+                      label={`${item.name}`}
                       defaultChecked={brandsState.includes(item.databaseId)}
                       onChange={(checked) =>
                         handleChange(checked, item.databaseId)

@@ -296,7 +296,7 @@ const CheckoutPage = () => {
         setLoading(false);
         break;
       case "dismissed":
-        console.log("Dismissed Payhere.");
+        // console.log("Dismissed Payhere.");
         setLoading(false)
         break;
       case "error":
@@ -395,7 +395,7 @@ const CheckoutPage = () => {
       setPayhereHandleStatus("loading");
       initiatePayment(checkoutDetails, setPayhereHandleStatus).then((r) => r);
     } else {
-      console.log("initiate payment become null");
+      // console.log("initiate payment become null");
     }
   };
 
@@ -406,7 +406,7 @@ const CheckoutPage = () => {
 
   useEffect(() => {
     if (!paymentDetails) {
-      console.log("payment data not initiated yet!");
+      // console.log("payment data not initiated yet!");
       return;
     }
 
@@ -431,7 +431,7 @@ const CheckoutPage = () => {
       try {
         ImplementBankTransfer();
       } catch (e) {
-        console.log("Error while creating BankTransfer:", e);
+        // console.log("Error while creating BankTransfer:", e);
         toast.error("Error on BankTransfer");
       }
     }
@@ -520,16 +520,19 @@ const CheckoutPage = () => {
 
   const getShippingMethod = (shippingTotal: any) => {
     const methodId =
-      shippingTotal === "₨0.00"
+      shippingTotal === "₨&nbsp;0.00"
         ? "pickup_location:0"
         : "wbs:0dd3bc79_weight_based_shipping";
 
     const methodTitle =
-      shippingTotal === "₨0.00" ? "pickup_location:0" : "Weight Based Shipping";
+      shippingTotal === "₨&nbsp;0.00" ? "pickup_location:0" : "Weight Based Shipping";
 
     const total = shippingTotal;
 
+    // console.log("Shipping Method: ", { methodId, methodTitle, total });
+
     return { methodId, methodTitle, total };
+
   };
 
   const handleCheckoutError = (error: any) => {
@@ -630,7 +633,7 @@ const CheckoutPage = () => {
               <div className="mt-4 flex justify-between py-2.5">
                 <span>Subtotal</span>
                 <span className="font-semibold text-slate-900 dark:text-slate-200">
-                  {cart?.subtotal || "$0.00"}
+                  <span dangerouslySetInnerHTML={{ __html: cart?.subtotal || "0.00" }} />
                 </span>
               </div>
 
@@ -638,11 +641,10 @@ const CheckoutPage = () => {
                 <div className="flex justify-between py-2.5">
                   <span>Shipping estimate</span>
                   <span className="font-semibold text-slate-900 dark:text-slate-200">
-                    {cart?.shippingTotal || "$0.00"}
+                    <span dangerouslySetInnerHTML={{ __html: cart?.shippingTotal || "0.00" }} />
                   </span>
                 </div>
               )}
-
               {/* <div className="flex justify-between py-2.5">
                                 <span>Tax estimate</span>
                                 <span className="font-semibold text-slate-900 dark:text-slate-200">
@@ -651,8 +653,9 @@ const CheckoutPage = () => {
                             </div> */}
               <div className="flex justify-between pt-4 text-base font-semibold text-slate-900 dark:text-slate-200">
                 <span>Order total</span>
-                {/* <span>{cart?.total || "$0.00"}</span> */}
-                <span>{orderTotal || "0.00"}</span>
+
+                {/* <span>{orderTotal || "0.00"}</span> */}
+                <span dangerouslySetInnerHTML={{ __html: orderTotal || "0.00" }} />
               </div>
             </div>
 
