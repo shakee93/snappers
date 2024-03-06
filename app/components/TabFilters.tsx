@@ -305,7 +305,7 @@ const TabFilters = ({
                     </span>
                                     </div>
 
-                                    <div className="overflow-y-auto h-[calc(100vh-120px)] mt-12">
+                                    <div className="overflow-y-auto h-[calc(100vh-70px)] pt-12">
                                         <div
                                             className="px-6 sm:px-8 md:px-10 divide-y divide-neutral-200 dark:divide-neutral-800">
                                             {/* --------- */}
@@ -505,7 +505,7 @@ const TabFilters = ({
                                             </div>
 
 
-                                            <div className='flex gap-4 w-full justify-between'>
+                                            <div className='flex gap-4 pb-24 w-full justify-between'>
                                                 <div className="py-7 w-1/2">
                                                     <h3 className="text-md font-medium">On sale!</h3>
                                                     <div className="mt-3 relative ">
