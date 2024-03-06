@@ -102,9 +102,8 @@
     padding: 0;
     margin: 0;
     width: 100%;
-    opacity: 0.5;
-    transition: opacity 0.2s;
-    
+    opacity: 1;
+
   }
   .embla-thumbs__slide--selected .embla-thumbs__slide__button {
     opacity: 1;

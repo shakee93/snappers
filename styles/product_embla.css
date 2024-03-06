@@ -109,7 +109,8 @@
     transition: opacity 0.2s;
     
   }
-  .embla-thumbs__slide--selected .embla-thumbs__slide__button {
+  .embla-thumbs__slide--selected .embla-thumbs__slide__button .embla-thumbs__slide__img {
+    border: 3px solid #1b41b0 ;
     opacity: 1;
   }
   .embla-thumbs__slide__img {
@@ -117,7 +118,8 @@
     width: 100%;
     object-fit: contain;
     border-radius: 10px;
-    border: 3px solid rgba(28, 73, 163, 0.447);
+    border: 3px solid #CFD8DC;
+    opacity: 0.8;
 
   }
   .embla-thumbs__slide__number {
