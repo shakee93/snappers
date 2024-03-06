@@ -2,47 +2,18 @@ import {getClient} from "@/graphql/apollo-ssr";
 import {GET_ALL_PRODUCTS} from "@/graphql/defs/products";
 import InstantSearchWrapper from "@/app/components/InstantSearchWrapper";
 
-//
-// const fetchData = async () => {
-//     const startTime = new Date().getTime();
-//
-//     const response = await fetch('https://randomuser.me/api/',
-//         // {
-//         { cache: 'no-store' }
-//         //     next: {
-//         //         revalidate: 10
-//         //     }
-//         // }
-//         );
-//     const jsonData = await response.json();
-//
-//     const endTime = new Date().getTime();
-//     const executionedTime = endTime - startTime;
-//
-//     return {
-//         jsonData,
-//         executionedTime
-//     }
-// };
+export const dynamic = 'force-dynamic'
+
 async function getData(categories: number[] | null = null) {
     const startTime = new Date().getTime(); // Record the start time
 
     const { data, error } = await getClient().query({
         query: GET_ALL_PRODUCTS,
-        // fetchPolicy: 'cache-and-network',
-        // context:{
-        //     fetchOptions:{
-        //         next: {
-        //             revalidate: 10
-        //         }
-        //     }
-        // },
+
     });
 
     const endTime = new Date().getTime();
     const executionTime = endTime - startTime; 
-
-    // console.log(`getData function execution time: ${executionTime}ms`);
 
     return {
         productCategories: data.productCategories.nodes,
@@ -55,15 +26,7 @@ async function getData(categories: number[] | null = null) {
 async function Page() {
 
     const { productCategories, brands, executionTime } = await getData();
-    // console.log("execution time: ", executionTime);
-    // const [client] = await Promise.all([getClient()]);
-    // let resetStore = true
-    // if (resetStore) await client.clearStore();
-    // if (resetStore) await client.resetStore();
-    // resetStore && console.log("Resettled Store");
 
-    // const { jsonData, executionedTime } = await fetchData();
-    // console.log("execution time for fetch: ", executionedTime);
 
     return <div className='container py-16'>
         {/*{executionTime}*/}
