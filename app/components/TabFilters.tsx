@@ -82,7 +82,6 @@ const TabFilters = ({
             colorsState.length +
             sizesState.length +
             (isOnSale ? 1 : 0) +
-            (inStock ? 1 : 0) +
             (sortOrderStates ? 1 : 0) +
             (rangePrices.join('') !== PRICE_RANGE.join('') ? 1 : 0);
 
@@ -564,28 +563,28 @@ const TabFilters = ({
                                                     </div>
                                                 </div>
 
-                                                <div className="py-7 w-1/2">
-                                                    <h3 className="text-md font-medium">In Stock!</h3>
-                                                    <div className="mt-3 relative ">
-                                                        <div
-                                                            className={`flex items-center justify-center px-4 py-2 text-sm rounded-full border focus:outline-none cursor-pointer select-none ${
-                                                                inStock
-                                                                    ? "border-primary-500 bg-primary-50 text-primary-900"
-                                                                    : "border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
-                                                            }`}
-                                                            onClick={() => setInStockState(!inStock)}
-                                                        >
-                                                            <Package className="stroke-1 w-4"/>
-                                                            <span className="line-clamp-1 ml-2">In Stock</span>
-                                                            {inStock && (
-                                                                <div
-                                                                    className="flex-shrink-0 w-4 h-4 rounded-full bg-primary-500 text-white flex items-center justify-center ml-3 cursor-pointer">
-                                                                    <XIcon className="p-0.5"/>
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                </div>
+                                                {/*<div className="py-7 w-1/2">*/}
+                                                {/*    <h3 className="text-md font-medium">In Stock!</h3>*/}
+                                                {/*    <div className="mt-3 relative ">*/}
+                                                {/*        <div*/}
+                                                {/*            className={`flex items-center justify-center px-4 py-2 text-sm rounded-full border focus:outline-none cursor-pointer select-none ${*/}
+                                                {/*                inStock*/}
+                                                {/*                    ? "border-primary-500 bg-primary-50 text-primary-900"*/}
+                                                {/*                    : "border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"*/}
+                                                {/*            }`}*/}
+                                                {/*            onClick={() => setInStockState(!inStock)}*/}
+                                                {/*        >*/}
+                                                {/*            <Package className="stroke-1 w-4"/>*/}
+                                                {/*            <span className="line-clamp-1 ml-2">In Stock</span>*/}
+                                                {/*            {inStock && (*/}
+                                                {/*                <div*/}
+                                                {/*                    className="flex-shrink-0 w-4 h-4 rounded-full bg-primary-500 text-white flex items-center justify-center ml-3 cursor-pointer">*/}
+                                                {/*                    <XIcon className="p-0.5"/>*/}
+                                                {/*                </div>*/}
+                                                {/*            )}*/}
+                                                {/*        </div>*/}
+                                                {/*    </div>*/}
+                                                {/*</div>*/}
                                             </div>
                                         </div>
                                     </div>
@@ -633,7 +632,7 @@ const TabFilters = ({
                 {!brand && <BrandFilter brands={brands}/>}
                 <PriceFilter/>
                 <OnSaleFilter/>
-                <InStockFilter/>
+                {/*<InStockFilter/>*/}
                 <div className="!ml-auto">
                     <SortOrderFilter/>
                 </div>

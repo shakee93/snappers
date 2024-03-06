@@ -4,14 +4,18 @@ import { useEffect } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import {useStore} from "@/store/store";
 import {Next13ProgressBar} from "next13-progressbar";
+import {PRICE_RANGE} from "@/app/components/Filters/PriceFilter";
 
 export function NavigationEvents() {
     const pathname = usePathname()
-    const { pushNavigation, setSearch } = useStore()
+    const { pushNavigation, setSearch, syncCategories, syncBrands, synPriceRange } = useStore()
 
     useEffect(() => {
         pushNavigation(pathname);
         setSearch('')
+        syncCategories([])
+        syncBrands([])
+        synPriceRange(PRICE_RANGE)
     }, [pathname])
 
     return <div>
