@@ -29,7 +29,7 @@ const Checkbox: FC<CheckboxProps> = ({
   }, [defaultChecked])
 
   return (
-    <div className={`flex text-sm sm:text-base ${className}`}>
+    <div className={`flex text-sm sm:text-xs ${className}`}>
       <input
         id={name}
         name={name}

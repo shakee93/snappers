@@ -8,7 +8,7 @@ import { useState } from "react";
 const WhatsappLogoComponent = () => {
   const [isHovered, setIsHovered] = useState(false);
   return (
-    <div className="fixed md:bottom-4  md:left-12 bottom-28 left-4 h-8 w-12 z-50 mb-16 md:mb-5">
+    <div className="fixed md:bottom-8  md:left-10 bottom-28 left-4 h-8 w-12 z-50 md:mb-5">
       <Link href={"https://wa.me/94777555665"} target="_blank">
         <div className="relative flex items-center">
           <Image
