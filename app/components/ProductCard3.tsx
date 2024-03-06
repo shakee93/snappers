@@ -74,15 +74,6 @@ const ProductCard: FC<ProductCardProps> = ({
 
   const link = useProductLink(data);
 
-  const singleProduct = useQuery(GET_QUICK_VIEW_PRODUCT, {
-    variables: {
-      productId: databaseId,
-    },
-  });
-
-  const quickviewData = singleProduct?.data?.product;
-  // console.log({quickviewData});
-
   const handleHoverOut = () => {
     setIsHovered(false);
     setCurrentVariation(0);
@@ -374,7 +365,7 @@ const ProductCard: FC<ProductCardProps> = ({
       <ModalQuickView
         show={showModalQuickView}
         onCloseModalQuickView={() => setShowModalQuickView(false)}
-        productData={quickviewData}
+        productData={databaseId}
         brands={brands?.nodes[0]}
       />
     </div>

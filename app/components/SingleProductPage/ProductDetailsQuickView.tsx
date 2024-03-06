@@ -195,7 +195,7 @@ const ProductDetails = ({
       ) : (
         <div className="flex gap-2 text-base py-2 flex-wrap md:text-lg font-medium text-gray-600">
           {/* <span>{product?.price}</span> */}
-          <span dangerouslySetInnerHTML={{ __html: product.price || '' }} />
+          <span dangerouslySetInnerHTML={{ __html: product?.price || '' }} />
 
           {!!product?.salePrice &&
             product?.salePrice !== product?.regularPrice && (

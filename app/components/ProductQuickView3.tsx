@@ -36,8 +36,9 @@ import {
 } from "@/graphql/types/graphql";
 
 import { GET_TECH_SPEC } from "@/graphql/defs/products";
-import { useQuery } from "@apollo/client";
+import {useLazyQuery, useQuery} from "@apollo/client";
 import ProductDetails from "@/app/components/SingleProductPage/ProductDetailsQuickView";
+import {Loader} from "lucide-react";
 
 export interface ProductQuickViewProps {
   className?: string;
@@ -58,6 +59,9 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({
     setAttribute,
   } = useStore();
   const [techspecs, setTechSpecs] = React.useState(null);
+  
+  const [manualTechSpecs, setManualTechSpecs] = useState<any>([]);
+  
   const [activeVariation, setActiveVariation] = useState<any>(
     !!product && "variations" in product && product.variations?.nodes?.length
       ? product.variations.nodes[0]
@@ -77,25 +81,40 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({
 
   // console.log({ product });
 
-  const { loading, error, data } = useQuery(GET_TECH_SPEC, {
+  const [getTechSpec, { loading, error, data }] = useLazyQuery(GET_TECH_SPEC, {
     variables: {
       productId: product?.databaseId,
     },
   });
 
-  const manualMeta = product?.metaData;
-  const techSpecDataObject = manualMeta?.find(
-    (item) => item?.key === "tech_spec_data"
-  );
-  const parsedMetaData = techSpecDataObject?.value
-    ? JSON.parse(techSpecDataObject.value)
-    : null;
-  const manualTechSpecs = parsedMetaData ? Object.entries(parsedMetaData) : [];
+  
 
   useEffect(() => {
-    if (data) {
-      setTechSpecs(data);
-    }
+
+    (async () => {
+
+
+      const { data: dataIn} = await getTechSpec()
+
+      if (dataIn) {
+        setTechSpecs(dataIn);
+        
+        console.log(dataIn);
+
+        const manualMeta = dataIn?.product?.metaData;
+        const techSpecDataObject = manualMeta?.find(
+            (item: any) => item?.key === "tech_spec_data"
+        );
+        const parsedMetaData = techSpecDataObject?.value
+            ? JSON.parse(techSpecDataObject.value)
+            : null;
+        
+        setManualTechSpecs(parsedMetaData ? Object.entries(parsedMetaData) : [])
+        
+      }
+
+    })()
+
   }, [data]);
 
   const activeAttr = useCallback(
@@ -350,7 +369,12 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({
 
   return (
     <div className={`nc-ProductQuickView ${className}`}>
-      {/* MAIn */}
+
+      {!product ? <div className='min-h-[500px]'>
+        <div className='absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2'>
+          <Loader className='animate-spin '/>
+        </div>
+          </div> :
       <div className="lg:flex">
         {/* CONTENT */}
         <div className="w-full lg:w-[50%] ">
@@ -399,7 +423,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({
         <div className="w-full lg:w-[50%] pt-6 lg:pt-0 lg:pl-7 xl:pl-8">
           {renderSectionContent()}
         </div>
-      </div>
+      </div>}
     </div>
   );
 };

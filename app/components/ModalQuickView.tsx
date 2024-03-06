@@ -1,15 +1,17 @@
 import { Dialog, Transition } from "@headlessui/react";
-import React, { FC, Fragment } from "react";
+import React, {FC, Fragment, useEffect, useState} from "react";
 import { useRouter } from "next/navigation";
 import ButtonClose from "@/shared/ButtonClose/ButtonClose";
 import ProductQuickView from "./ProductQuickView3";
 import ProductQuickView2 from "@/components/ProductQuickView";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
+import {useLazyQuery, useQuery} from "@apollo/client";
+import {GET_QUICK_VIEW_PRODUCT} from "@/graphql/defs/products";
 
 export interface ModalQuickViewProps {
   show: boolean;
   onCloseModalQuickView: () => void;
-  productData: SimpleProduct & VariableProduct;
+  productData: number;
   brands: any;
 }
 
@@ -19,7 +21,24 @@ const ModalQuickView: FC<ModalQuickViewProps> = ({
   productData,
   brands
 }) => {
-  
+
+  const [product, setProduct] = useState()
+
+  const [getProduct, { loading, error, data }] = useLazyQuery(GET_QUICK_VIEW_PRODUCT, {
+    variables: {
+      productId: productData,
+    },
+  });
+
+
+  useEffect(() => {
+
+    if (show) {
+      getProduct()
+    }
+
+  }, [show])
+
 
   return (
     <Transition appear show={show} as={Fragment}>
@@ -63,9 +82,11 @@ const ModalQuickView: FC<ModalQuickViewProps> = ({
                   <ButtonClose onClick={onCloseModalQuickView} />
                 </span>
 
-                <div className="flex-1 overflow-y-auto rounded-xl hiddenScrollbar">
-                    <ProductQuickView product={productData} brands={brands}/>
-                </div>
+                {show &&
+                    <div className="flex-1 overflow-y-auto rounded-xl hiddenScrollbar">
+                      <ProductQuickView product={data?.product} brands={brands}/>
+                    </div>
+                }
               </div>
             </div>
           </Transition.Child>
