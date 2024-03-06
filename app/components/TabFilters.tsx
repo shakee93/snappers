@@ -566,7 +566,7 @@ const TabFilters = ({
 
                                             {/* --------- */}
                                             {/* ---- */}
-                                            <div className="py-7">
+                                            <div className="py-7 mb-24">
                                                 <h3 className="text-xl font-medium">In Stock!</h3>
                                                 <div className="mt-6 relative ">
                                                     <div
@@ -592,7 +592,10 @@ const TabFilters = ({
                                     </div>
 
                                     <div
-                                        className="p-6 flex-shrink-0 bg-neutral-50 dark:bg-neutral-900 dark:border-t dark:border-neutral-800 flex items-center justify-between">
+                                        className="p-6 flex-shrink-0 bg-neutral-50
+                                        dark:bg-neutral-900 dark:border-t dark:border-neutral-800 flex
+                                         fixed bottom-0 w-full
+                                         items-center justify-between">
                                         <ButtonThird
                                             onClick={handleClearFilters}
                                             sizeClass="py-2.5 px-5"
