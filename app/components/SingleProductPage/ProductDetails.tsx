@@ -232,14 +232,14 @@ const ProductDetails = ({
         )}
 
       <ProductAddToCart product={product} variation={activeVariation} />
-      <div className="flex gap-1 items-center text-sm md:text-base text-gray-500">
+      <div className="flex gap-1 w-full items-center flex-wrap text-sm md:text-base text-gray-500">
         <div className="text-sm py-2">Category:</div>
         {product.productCategories?.edges.map(
           (category: any, index: number) => (
             <Link
               href={`/collections/${category.node.slug}`}
               key={index}
-              className="bg-primary-100 inline-block py-1 px-2  text-xs md:text-sm rounded-3xl"
+              className="bg-primary-100 inline-block py-1 px-2 min-w-max  text-xs md:text-sm rounded-3xl"
             >
               {category.node.name}
             </Link>
