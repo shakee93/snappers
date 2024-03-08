@@ -406,7 +406,7 @@ const TabFilters = ({
                                                                                 <Checkbox
                                                                                     name={item.slug || ""}
                                                                                     // label={`${item.name} (${item.count})`}
-                                                                                    label={`${item.name}`}
+                                                                                    label={`${item.name} (${brandsFacet.find(f => item.databaseId === Number(f.value))?.count})`}
                                                                                     defaultChecked={brandsState.includes(
                                                                                         item.databaseId
                                                                                     )}
