@@ -1,12 +1,13 @@
 import { Popover, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import React, { Fragment, useState } from "react";
+import React, {Fragment, useMemo, useState} from "react";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonThird from "@/shared/Button/ButtonThird";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import { Brand, ProductCategory } from "@/graphql/types/graphql";
 import { useStore } from "@/store/store";
 import FilterPopover from "@/app/components/Filters/FilterPopover";
+import {useRefinementList} from "react-instantsearch";
 
 interface BrandFilterProps {
   brands: Brand[];
@@ -18,6 +19,9 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
     sidebar: { brands: brandStore },
   } = useStore();
   const [brandsState, setBrandsState] = useState<number[]>([]);
+  const {items: brandsFacet} = useRefinementList({
+    attribute: 'brands_facet',
+  });
 
   const handleChange = (checked: boolean, name: number) => {
     if (name === 0 && checked) {
@@ -30,6 +34,12 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
       ? setBrandsState([...brandsState, name])
       : setBrandsState(brandsState.filter((i) => i !== name));
   };
+
+  const facetedBrands = useMemo(() => {
+    return brands.filter(b =>
+        brandsFacet.map(f =>  Number(f.value)).includes(b.databaseId)
+    )
+  }, [brands, brandsFacet])
 
   const icon = (
     <svg
@@ -103,21 +113,26 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
               />
 
               <div className="w-full border-b  border-neutral-200 dark:border-neutral-700" />
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {brands.map((item) => (
-                  <div key={item.databaseId} className="">
-                    <Checkbox
-                      name={item.slug || ""}
-                      //label={`${item.name} (${item.count})`}
-                      label={`${item.name}`}
-                      defaultChecked={brandsState.includes(item.databaseId)}
-                      onChange={(checked) =>
-                        handleChange(checked, item.databaseId)
-                      }
-                    />
-                  </div>
-                ))}
-              </div>
+
+              {facetedBrands.length > 0 ?
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                    {facetedBrands.map((item) => (
+                        <div key={item.databaseId} className="">
+                          <Checkbox
+                              name={item.slug || ""}
+                              //label={`${item.name} (${item.count})`}
+                              label={`${item.name} (${brandsFacet.find(f => item.databaseId === Number(f.value))?.count})`}
+                              defaultChecked={brandsState.includes(item.databaseId)}
+                              onChange={(checked) =>
+                                  handleChange(checked, item.databaseId)
+                              }
+                          />
+                        </div>
+                    ))}
+                  </div> :
+                  <div className='text-sm'>No Brands found for this search.</div>
+              }
+
             </div>
             <div className="p-5 bg-neutral-50 dark:bg-neutral-900 dark:border-t dark:border-neutral-800 flex items-center justify-between">
               <ButtonThird

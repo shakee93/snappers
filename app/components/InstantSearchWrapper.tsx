@@ -1,5 +1,5 @@
 "use client";
-import { Configure, InstantSearch } from "react-instantsearch";
+import {Configure, InstantSearch, RefinementList} from "react-instantsearch";
 import { InstantSearchNext } from "react-instantsearch-nextjs";
 import TypesenseInstantSearchAdapter from "typesense-instantsearch-adapter";
 import ProductGridInstant from "@/app/components/ProductGridInstant";
@@ -27,7 +27,7 @@ interface InstantSearchWrapperProps {
 const typesenseConfig = {
   host: process.env.NEXT_PUBLIC_TYPESENSE_HOST || "api.gqmobiles.lk",
   port: (process.env.NEXT_PUBLIC_TYPESENSE_PORT as unknown as number) || 80,
-  path: process.env.NEXT_PUBLIC_TYPESENSE_PATH || "/q-search",
+  path: process.env.NEXT_PUBLIC_TYPESENSE_PATH || "",
   protocol: process.env.NEXT_PUBLIC_TYPESENSE_PROTOCOL || "https",
 };
 
@@ -82,7 +82,7 @@ const InstantSearchWrapper = ({
         query_by: "name, description",
         exclude_fields:
           "description, productTags, shortDescription, galleryImages, attributes",
-        // use_cache: false,
+        use_cache: false,
       },
     });
 

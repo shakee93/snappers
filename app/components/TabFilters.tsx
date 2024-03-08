@@ -18,6 +18,7 @@ import PriceFilter from "@/app/components/Filters/PriceFilter";
 import OnSaleFilter from "@/app/components/Filters/OnSaleFilter";
 import SortOrderFilter from "@/app/components/Filters/SortOrderFilter";
 import InStockFilter from "@/app/components/Filters/InStockFilter";
+import {useRefinementList} from "react-instantsearch";
 
 const DATA_sortOrderRadios = [
     {name: "Name", id: "name:asc"},
@@ -50,9 +51,8 @@ const TabFilters = ({
                         brand,
                         category,
                     }: TabFilterProps) => {
-    const [isOpenMoreFilter, setisOpenMoreFilter] = useState(false);
 
-    //
+    const [isOpenMoreFilter, setisOpenMoreFilter] = useState(false);
     const [isOnSale, setIsIsOnSale] = useState(false);
     const [rangePrices, setRangePrices] = useState([500, 500000]);
     const [colorsState, setColorsState] = useState<string[]>([]);
@@ -627,6 +627,8 @@ const TabFilters = ({
     return (
         <div className="flex flex-col gap-0 lg:gap-3 lg:space-x-4">
             {/* FOR DESKTOP */}
+
+
             <div className="hidden lg:flex flex-1 lg:space-x-2 xl:flex xl:space-x-4">
                 {!category && <CategoryFilter categories={categories}/>}
                 {!brand && <BrandFilter brands={brands}/>}

@@ -1,12 +1,13 @@
 import {Popover, Transition} from "@headlessui/react";
 import {ChevronDownIcon} from "@heroicons/react/24/outline";
-import React, {Fragment, useState} from "react";
+import React, {Fragment, useMemo, useState} from "react";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonThird from "@/shared/Button/ButtonThird";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import {ProductCategory} from "@/graphql/types/graphql";
 import {useStore} from "@/store/store";
 import FilterPopover from "@/app/components/Filters/FilterPopover";
+import {useRefinementList} from "react-instantsearch";
 
 interface CategoryFilterProps {
     categories: ProductCategory[]
@@ -15,6 +16,9 @@ interface CategoryFilterProps {
 const CategoryFilter = ({categories}: CategoryFilterProps) => {
     const { syncCategories, sidebar: {categories : catState } } = useStore()
     const [categoriesState, setCategoriesState] = useState<number[]>([]);
+    const {items: categoriesFacet} = useRefinementList({
+        attribute: 'categories_facet',
+    });
 
     const handleChangeCategories = (checked: boolean, name: number) => {
 
@@ -31,6 +35,12 @@ const CategoryFilter = ({categories}: CategoryFilterProps) => {
 
         // syncCategories(categoriesState);
     };
+
+    const facetedCategories = useMemo(() => {
+        return categories.filter(b =>
+            categoriesFacet.map(f =>  Number(f.value)).includes(b.databaseId)
+        )
+    }, [categoriesFacet, categories])
 
     const icon =  <svg
         className="w-4 h-4"
@@ -107,13 +117,15 @@ const CategoryFilter = ({categories}: CategoryFilterProps) => {
                             />
 
                             <div className="w-full border-b  border-neutral-200 dark:border-neutral-700" />
+
+                            {facetedCategories.length > 0 ?
                             <div className='grid grid-cols-2 gap-2'>
-                                {categories.map((item) => (
+                                {facetedCategories.map((item) => (
                                     <div key={item.databaseId} className="">
                                         <Checkbox
                                             name={item.slug || ''}
                                             // label={`${item.name} (${item.count})`}
-                                            label={`${item.name}`}
+                                            label={`${item.name} (${categoriesFacet.find(f => item.databaseId === Number(f.value))?.count})`}
                                             defaultChecked={categoriesState.includes(item.databaseId)}
                                             onChange={(checked) =>
                                                 handleChangeCategories(checked, item.databaseId)
@@ -121,7 +133,9 @@ const CategoryFilter = ({categories}: CategoryFilterProps) => {
                                         />
                                     </div>
                                 ))}
-                            </div>
+                            </div> :
+                                <div className='text-sm'>No Categories found for this search.</div>
+                            }
                         </div>
                         <div className="p-5 bg-neutral-50 dark:bg-neutral-900 dark:border-t dark:border-neutral-800 flex items-center justify-between">
                             <ButtonThird
