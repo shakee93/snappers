@@ -28,17 +28,18 @@ import { useCart } from "@/context/CartProvider";
 import { twMerge } from "tailwind-merge";
 import { GET_QUICK_VIEW_PRODUCT } from "@/graphql/defs/products";
 import { useQuery } from "@apollo/client";
+import {Highlight} from "react-instantsearch";
 
 export interface ProductCardProps {
   className?: string;
   data: SimpleProduct & VariableProduct;
-  isLiked?: boolean;
+  fromSearch?: boolean;
 }
 
 const ProductCard: FC<ProductCardProps> = ({
   className = "",
   data,
-  isLiked,
+    fromSearch = false
 }) => {
   const {
     name,
@@ -307,7 +308,9 @@ const ProductCard: FC<ProductCardProps> = ({
           <h2
             className={`nc-ProductCard__title  text-xs lg:text-sm text-black line-clamp-2 font-semibold transition-colors whitespace-normal`}
           >
-            {name}
+            {fromSearch ?
+            <Highlight attribute="name" hit={data as any} /> : <>{name}</>
+            }
           </h2>
         </Link>
 

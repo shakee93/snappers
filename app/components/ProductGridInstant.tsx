@@ -63,6 +63,7 @@ const ProductGridInstant = ({
             <ProductCard
               key={item?.slug as unknown as string}
               data={item as unknown as Product}
+              fromSearch
             />
           ))}
         </div>

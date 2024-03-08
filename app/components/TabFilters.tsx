@@ -18,6 +18,8 @@ import PriceFilter from "@/app/components/Filters/PriceFilter";
 import OnSaleFilter from "@/app/components/Filters/OnSaleFilter";
 import SortOrderFilter from "@/app/components/Filters/SortOrderFilter";
 import InStockFilter from "@/app/components/Filters/InStockFilter";
+import {useRefinementList} from "react-instantsearch";
+import {twMerge} from "tailwind-merge";
 
 const DATA_sortOrderRadios = [
     {name: "Name", id: "name:asc"},
@@ -50,9 +52,8 @@ const TabFilters = ({
                         brand,
                         category,
                     }: TabFilterProps) => {
-    const [isOpenMoreFilter, setisOpenMoreFilter] = useState(false);
 
-    //
+    const [isOpenMoreFilter, setisOpenMoreFilter] = useState(false);
     const [isOnSale, setIsIsOnSale] = useState(false);
     const [rangePrices, setRangePrices] = useState([500, 500000]);
     const [colorsState, setColorsState] = useState<string[]>([]);
@@ -62,6 +63,26 @@ const TabFilters = ({
     const [categoriesState, setCategoriesState] = useState<number[]>([]);
     const [inStock, setInStockState] = useState(true);
     // const [filterCount, setFilterCount] = useState<number>(0);
+
+    const {items: categoriesFacet} = useRefinementList({
+        attribute: 'categories_facet',
+    });
+
+    const {items: brandsFacet} = useRefinementList({
+        attribute: 'brands_facet',
+    });
+
+    const facetedBrands = useMemo(() => {
+        return brands.filter(b =>
+            brandsFacet.map(f =>  Number(f.value)).includes(b.databaseId)
+        )
+    }, [brands, brandsFacet])
+
+    const facetedCategories = useMemo(() => {
+        return categories.filter(b =>
+            categoriesFacet.map(f =>  Number(f.value)).includes(b.databaseId)
+        )
+    }, [categoriesFacet, categories])
 
     const {
         sidebar,
@@ -324,25 +345,33 @@ const TabFilters = ({
                                                             />
                                                             <div
                                                                 className="w-full border-b  border-neutral-200 dark:border-neutral-700"/>
-                                                            <div className="grid grid-cols-2  gap-2">
-                                                                {categories.map((item) => (
-                                                                    <div key={item.databaseId} className="">
-                                                                        <Checkbox
-                                                                            name={item.slug || ""}
-                                                                            // label={`${item.name} (${item.count})`}
-                                                                            label={`${item.name}`}
-                                                                            defaultChecked={categoriesState.includes(
-                                                                                item.databaseId
-                                                                            )}
-                                                                            onChange={(checked) =>
-                                                                                handleChangeCategories(
-                                                                                    checked,
-                                                                                    item.databaseId
-                                                                                )
-                                                                            }
-                                                                        />
-                                                                    </div>
-                                                                ))}
+                                                            <div className={twMerge(
+                                                                "grid grid-cols-1 gap-2",
+                                                                facetedCategories.length > 4 && 'grid-cols-2'
+                                                            )}>
+                                                                {facetedCategories.length > 0 ?
+                                                                    <>
+                                                                        {facetedCategories.map((item) => (
+                                                                            <div key={item.databaseId} className="">
+                                                                                <Checkbox
+                                                                                    name={item.slug || ""}
+                                                                                    label={`${item.name} (${categoriesFacet.find(f => item.databaseId === Number(f.value))?.count})`}
+                                                                                    defaultChecked={categoriesState.includes(
+                                                                                        item.databaseId
+                                                                                    )}
+                                                                                    onChange={(checked) =>
+                                                                                        handleChangeCategories(
+                                                                                            checked,
+                                                                                            item.databaseId
+                                                                                        )
+                                                                                    }
+                                                                                />
+                                                                            </div>
+                                                                        ))}
+                                                                    </>
+                                                                :
+                                                                    <div className='text-sm'>No Categories found for this search.</div>
+                                                                }
                                                             </div>
                                                         </div>
                                                     </div>
@@ -365,25 +394,35 @@ const TabFilters = ({
 
                                                             <div
                                                                 className="w-full border-b  border-neutral-200 dark:border-neutral-700"/>
-                                                            <div className="grid grid-cols-2 gap-2">
-                                                                {brands.map((item) => (
-                                                                    <div key={item.databaseId} className="">
-                                                                        <Checkbox
-                                                                            name={item.slug || ""}
-                                                                            // label={`${item.name} (${item.count})`}
-                                                                            label={`${item.name}`}
-                                                                            defaultChecked={brandsState.includes(
-                                                                                item.databaseId
-                                                                            )}
-                                                                            onChange={(checked) =>
-                                                                                handleChangeBrands(
-                                                                                    checked,
-                                                                                    item.databaseId
-                                                                                )
-                                                                            }
-                                                                        />
-                                                                    </div>
-                                                                ))}
+                                                            <div className={twMerge(
+                                                                "grid grid-cols-1 gap-2",
+                                                                facetedBrands.length > 4 && 'grid-cols-2'
+                                                            )}>
+                                                                {facetedBrands.length > 0 ?
+                                                                    <>
+
+                                                                        {facetedBrands.map((item) => (
+                                                                            <div key={item.databaseId} className="">
+                                                                                <Checkbox
+                                                                                    name={item.slug || ""}
+                                                                                    // label={`${item.name} (${item.count})`}
+                                                                                    label={`${item.name} (${brandsFacet.find(f => item.databaseId === Number(f.value))?.count})`}
+                                                                                    defaultChecked={brandsState.includes(
+                                                                                        item.databaseId
+                                                                                    )}
+                                                                                    onChange={(checked) =>
+                                                                                        handleChangeBrands(
+                                                                                            checked,
+                                                                                            item.databaseId
+                                                                                        )
+                                                                                    }
+                                                                                />
+                                                                            </div>
+                                                                        ))}
+                                                                    </> :
+                                                                    <div className='text-sm'>No Brands found for this search.</div>
+                                                                }
+
                                                             </div>
                                                         </div>
                                                     </div>
@@ -627,6 +666,8 @@ const TabFilters = ({
     return (
         <div className="flex flex-col gap-0 lg:gap-3 lg:space-x-4">
             {/* FOR DESKTOP */}
+
+
             <div className="hidden lg:flex flex-1 lg:space-x-2 xl:flex xl:space-x-4">
                 {!category && <CategoryFilter categories={categories}/>}
                 {!brand && <BrandFilter brands={brands}/>}
