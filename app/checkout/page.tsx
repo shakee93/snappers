@@ -137,7 +137,7 @@ interface FormData {
 const CheckoutPage = () => {
   const { cart, removeFromCart, updateCart } = useCart();
 
-  // console.log('cartttt', cart);
+  const [finalOrderTotal , setFinalOrderTotal] = useState(null);
 
   const { customer, fetchCustomer } = useSession();
 
@@ -182,11 +182,11 @@ const CheckoutPage = () => {
   const [loading, setLoading] = useState<boolean>(false);
 
   // TODO: Un comment this for the redirect on cart free
-  // useEffect(() => {
-  //   if (cart && cart?.contents?.nodes?.length === 0) {
-  //     router.push("/");
-  //   }
-  // }, [cart]);
+  useEffect(() => {
+    if (cart && cart?.contents?.nodes?.length === 0) {
+      router.push("/");
+    }
+  }, [cart]);
 
   useEffect(() => {
     fetchCustomer();
@@ -203,8 +203,8 @@ const CheckoutPage = () => {
   const [completeOrderPayment] = useMutation(COMPLETE_ORDER_PAYMENT);
   // const  [createOrderGuest] = useMutation(GUEST_CHECKOUT_MUTATION)
   const [guestCheckout] = useMutation(GUEST_CHECKOUT);
-  // Creating a Order using For Guest. Instead of using direct checkout mutation.
 
+  // Creating a Order using For Guest. Instead of using direct checkout mutation.
   const [
     createOrderGuest,
     { loading: checkoutLoading, error: checkoutError, data: checkoutData },
@@ -316,7 +316,7 @@ const CheckoutPage = () => {
       const total: any = cart?.total;
       setOrderTotal(total);
 
-      // console.log('total in udpate shiipping', total);
+      console.log('total in udpate shiipping', total);
 
       if (customer?.id === "guest") {
         const subtotal: any = cart?.subtotal;
@@ -328,11 +328,12 @@ const CheckoutPage = () => {
         }
       }
 
-      const { data } = await updateCartShippingTotalMutation({
+      const { data,  } = await updateCartShippingTotalMutation({
         variables: { input: { shippingMethods } },
       });
+      
 
-      // console.log('data in shippng', data);
+    console.log("data in shippng", data);
 
       if (data?.updateShippingMethod?.cart) {
         const { total, shippingTotal } = data.updateShippingMethod.cart;
@@ -403,6 +404,13 @@ const CheckoutPage = () => {
     setWantToSHowBankTransfer(false);
     setShowBankTransfer(true);
   }
+
+useEffect(() => {
+  if(orderTotal){
+    console.log("Order Total: ", orderTotal)
+  }
+}, [formData])
+
 
   useEffect(() => {
     if (!paymentDetails) {
@@ -529,7 +537,7 @@ const CheckoutPage = () => {
 
     const total = shippingTotal;
 
-    // console.log("Shipping Method: ", { methodId, methodTitle, total });
+    console.log("Shipping Method: ", { methodId, methodTitle, total });
 
     return { methodId, methodTitle, total };
 
