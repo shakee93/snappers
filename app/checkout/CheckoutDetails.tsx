@@ -1,23 +1,23 @@
 "use client";
 
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import ContactInfo from "./ContactInfo";
 import DeliveryAddress from "./DeliveryAddress";
 import PaymentMethod from "./PaymentMethod";
-import {QueryResult, useQuery} from "@apollo/client";
-import {GET_CHECKOUT_USER_DETAILS} from "@/graphql/defs/order";
-import {Customer, CustomerAddress} from "@/graphql/types/graphql";
-import {contactInformation} from "@/data/types";
+import { QueryResult, useQuery } from "@apollo/client";
+import { GET_CHECKOUT_USER_DETAILS } from "@/graphql/defs/order";
+import { Customer, CustomerAddress } from "@/graphql/types/graphql";
+import { contactInformation } from "@/data/types";
 import BillingAddress from "./BillingAddress";
-import {CheckoutDetailsSkeleton} from "@/app/checkout/[order-id]/Skeleton";
+import { CheckoutDetailsSkeleton } from "@/app/checkout/[order-id]/Skeleton";
 
 interface CheckoutLeftProps {
   tabActive:
-    | "ContactInfo"
-    | "DeliveryAddress"
-    | "PaymentMethod"
-    | "BillingAddress"
-    | "order-cart";
+  | "ContactInfo"
+  | "DeliveryAddress"
+  | "PaymentMethod"
+  | "BillingAddress"
+  | "order-cart";
   setTabActive: (
     value:
       | "ContactInfo"
@@ -33,6 +33,8 @@ interface CheckoutLeftProps {
   setIsStorePickup: any;
   handleConfirmationChange: any;
   isStorePickup: boolean;
+  isCardPayment: boolean;
+  setIsCardPayment: any;
 }
 
 const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
@@ -45,6 +47,8 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
   setIsStorePickup,
   handleConfirmationChange,
   isStorePickup,
+  isCardPayment,
+  setIsCardPayment
 }) => {
 
   const { data, loading: dataLoading }: QueryResult = useQuery(GET_CHECKOUT_USER_DETAILS);
@@ -94,8 +98,8 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
     }
   }, [data]);
 
-  if(dataLoading){
-      return <CheckoutDetailsSkeleton/>
+  if (dataLoading) {
+    return <CheckoutDetailsSkeleton />
   }
 
   return (
@@ -198,6 +202,8 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
           handleConfirmationChange={(value: any) =>
             handleConfirmationChange("paymentMethod", value)
           }
+          isCardPayment={isCardPayment}
+          setIsCardPayment={setIsCardPayment}
         />
       </div>
     </div>

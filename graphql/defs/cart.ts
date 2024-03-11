@@ -89,4 +89,29 @@ mutation updateShippingMethod($input: UpdateShippingMethodInput!){
         }
         ${CartContent}`
 
+export const UPDATE_CART_FEE = gql `
+mutation UpdateFee($orderId: Int!, $feeAmount: String!, $feeName: String!, $feeTotal: String!) {
+    updateOrder(input: {
+      orderId: $orderId
+      feeLines: [{ amount: $feeAmount, name: $feeName, total: $feeTotal }]
+    }) {
+    order {
+      databaseId
+      dateCompleted
+      needsPayment
+      shippingTax
+      shippingTotal
+      taxLines {
+        nodes {
+          databaseId
+          id
+          orderId
+        }
+      }
+      total
+      totalTax
+    }
+  }
+}
+` 
  

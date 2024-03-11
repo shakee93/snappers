@@ -19,6 +19,7 @@ type PropType = {
 };
 type selectedVariationType = {
   sourceUrl: string;
+  databaseId: any;
 };
 
 const EmblaCarousel: React.FC<PropType> = ({ product }) => {
@@ -29,8 +30,6 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
     dragFree: true,
   });
   const { variationId } = useImage();
-  const [selectedVariation, setSelectedVariation] =
-    useState<selectedVariationType | null>();
   const [variationImageEnabled, setVariationImageEnabled] = useState(false);
 
   const galleryImages =
@@ -41,11 +40,25 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   const variationImages = product.variations?.nodes?.map(
     (variation: any) => variation.image
   ) ?? [product.image];
+
   const combinedImages = [...variationImages, ...(galleryImages || [])];
+  const [selectedVariation, setSelectedVariation] =
+  useState<selectedVariationType | null>(combinedImages[0]);
+
+  const uniqueVariations = combinedImages.filter((variation, index, self) => {
+    return (
+      index === self.findIndex((t) => t.databaseId === variation.databaseId) &&
+      variation.databaseId !== selectedVariation?.databaseId
+    );
+  });
+  
+
 
   console.log("galleryImages", galleryImages);
   console.log("combinedImages", combinedImages);
   console.log("variationImages", variationImages);
+  console.log('selected variation', selectedVariation);
+  console.log('unique variations', uniqueVariations);
 
   combinedImages.forEach((image) => {
     if (image?.sourceUrl?.includes("300x300")) {
@@ -172,7 +185,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
             )}
 
             {/* Gallery Image */}
-            {galleryImages?.map((variation: any, index: number) => (
+            {uniqueVariations?.map((variation: any, index: number) => (
               <Thumb
                 onClick={() => onThumbClickCalculated(index)}
                 selected={
@@ -183,6 +196,16 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
                 imgSrc={variation?.sourceUrl || ""}
                 key={index}
               />
+              // <Thumb
+              //   onClick={() => onThumbClickCalculated(index)}
+              //   selected={
+              //     variationImageEnabled &&
+              //     index + variationImages.length === selectedIndex
+              //   }
+              //   index={index}
+              //   imgSrc={variation?.sourceUrl || ""}
+              //   key={index}
+              // />
             ))}
           </div>
         </div>

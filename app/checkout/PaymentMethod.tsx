@@ -1,10 +1,10 @@
-import React, {FC, useEffect, useState} from "react";
+import React, { FC, useEffect, useState } from "react";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Radio from "shared/Radio/Radio";
 import Image from "next/image";
 
-import {PaymentGateway} from "@/graphql/types/graphql";
+import { PaymentGateway } from "@/graphql/types/graphql";
 
 interface Props {
   isActive: boolean;
@@ -14,6 +14,8 @@ interface Props {
   paymentGateways: PaymentGateway[];
   handleConfirmationChange: any;
   isBillingAddressEnabled: any;
+  isCardPayment: any;
+  setIsCardPayment: any;
 }
 
 const PaymentMethod: FC<Props> = ({
@@ -24,12 +26,14 @@ const PaymentMethod: FC<Props> = ({
   updateFormData,
   handleConfirmationChange,
   isBillingAddressEnabled,
+  isCardPayment,
+  setIsCardPayment
 }) => {
   const [methodActive, setMethodActive] = useState<
     "Credit-Card" | "Internet-banking" | "Wallet"
   >("Credit-Card");
 
-  useEffect(() => {}, [paymentGateways]);
+  useEffect(() => { }, [paymentGateways]);
 
   const [selectedGateway, setSelectedGateway] = useState<PaymentGateway>({
     id: "",
@@ -40,6 +44,7 @@ const PaymentMethod: FC<Props> = ({
   const [isConfirmed, setIsConfirmed] = useState(false);
 
   const PaymentMethods: FC<{ gateway: PaymentGateway }> = ({ gateway }) => {
+    
     const active = methodActive === gateway.id;
 
     return (
@@ -55,6 +60,14 @@ const PaymentMethod: FC<Props> = ({
               id: gateway.id,
               title: gateway.title,
             });
+            
+            if (gateway.id === "payhere") {
+              setIsCardPayment(true);
+              console.log('cardpayment', isCardPayment)
+            } else {
+              setIsCardPayment(false);
+            }
+
           }}
         />
         <div className="flex-1">
@@ -122,7 +135,7 @@ const PaymentMethod: FC<Props> = ({
           </div>
           {!isActive && (
             <ButtonSecondary
-            sizeClass="py-2 px-4 sm:w-fit w-full"
+              sizeClass="py-2 px-4 sm:w-fit w-full"
               fontSize="text-sm font-medium"
               className="bg-slate-50 dark:bg-slate-800 mt-5 sm:mt-0 sm:ml-auto !rounded-lg"
               onClick={onOpenActive}
@@ -133,9 +146,8 @@ const PaymentMethod: FC<Props> = ({
         </div>
 
         <div
-          className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-6 ${
-            isActive ? "block" : "hidden"
-          }`}
+          className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-6 ${isActive ? "block" : "hidden"
+            }`}
         >
           {/* ==================== */}
           {/* <div>{renderDebitCredit()}</div> */}

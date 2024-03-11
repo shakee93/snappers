@@ -42,7 +42,7 @@ const ArchiveLayout = async ({
           <span className="block mt-2 lg:mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
             {description ||
               " We not only help you design exceptional products, but also make it\n" +
-                "easy for you to share your designs with more like-minded people."}
+              "easy for you to share your designs with more like-minded people."}
           </span>
         </div>
         <hr className="border-slate-200 dark:border-slate-700 " />

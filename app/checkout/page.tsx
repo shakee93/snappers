@@ -9,6 +9,7 @@ import { useCart } from "@/context/CartProvider";
 import {
   GET_PAYMENT_GATEWAYS,
   UPDATE_SHIPPING_TOTAL,
+  UPDATE_CART_FEE
 } from "@/graphql/defs/cart";
 import {
   CHECKOUT,
@@ -137,7 +138,7 @@ interface FormData {
 const CheckoutPage = () => {
   const { cart, removeFromCart, updateCart } = useCart();
 
-  const [finalOrderTotal , setFinalOrderTotal] = useState(null);
+  const [finalOrderTotal, setFinalOrderTotal] = useState(null);
 
   const { customer, fetchCustomer } = useSession();
 
@@ -158,20 +159,22 @@ const CheckoutPage = () => {
       selectedGateway: {},
     },
   });
-// create state for the payhere random id
-  const [payherPaymentID , setPayherPaymentID] = useState<string | null>(null)
-  
+  // create state for the payhere random id
+  const [payherPaymentID, setPayherPaymentID] = useState<string | null>(null)
+
 
   const [payhereHandleStatus, setPayhereHandleStatus] =
     useState<PayhereStatus>("idle");
 
   const [isStorePickup, setIsStorePickup] = useState(false);
+  const [isCardPayment, setIsCardPayment] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState({
     contactInfo: false,
     deliveryAddress: false,
     paymentMethod: false,
     billingAddress: false,
   });
+
 
   const [shippingTotal, setShippingTotal] = useState();
   const [orderTotal, setOrderTotal] = useState();
@@ -194,12 +197,11 @@ const CheckoutPage = () => {
 
   // MUTATIONS
   const [updateCartShippingTotalMutation] = useMutation(UPDATE_SHIPPING_TOTAL);
-  const [
-    checkoutMutation,
-    {
-      // data: realCheckoutData,
-    },
+  const [checkoutMutation, {
+    // data: realCheckoutData,
+  },
   ] = useMutation(CHECKOUT);
+  const [updateCartFee] = useMutation(UPDATE_CART_FEE);
   const [completeOrderPayment] = useMutation(COMPLETE_ORDER_PAYMENT);
   // const  [createOrderGuest] = useMutation(GUEST_CHECKOUT_MUTATION)
   const [guestCheckout] = useMutation(GUEST_CHECKOUT);
@@ -256,7 +258,7 @@ const CheckoutPage = () => {
     const shippingDetails = transformAddress(formData.deliveryAddress);
     const billingDetails = transformAddress(formData.billingAddress);
 
-    if(payherPaymentID == null) {
+    if (payherPaymentID == null) {
       toast("payhere payment not initiated");
       return;
     }
@@ -316,7 +318,7 @@ const CheckoutPage = () => {
       const total: any = cart?.total;
       setOrderTotal(total);
 
-      console.log('total in udpate shiipping', total);
+      // console.log('total in udpate shiipping', total);
 
       if (customer?.id === "guest") {
         const subtotal: any = cart?.subtotal;
@@ -328,18 +330,18 @@ const CheckoutPage = () => {
         }
       }
 
-      const { data,  } = await updateCartShippingTotalMutation({
+
+      const { data, } = await updateCartShippingTotalMutation({
         variables: { input: { shippingMethods } },
       });
-      
 
-    console.log("data in shippng", data);
+
+      console.log("data in shippng", data);
 
       if (data?.updateShippingMethod?.cart) {
         const { total, shippingTotal } = data.updateShippingMethod.cart;
         setOrderTotal(total);
         setShippingTotal(shippingTotal);
-        // console.log("Cart shipping total updated successfully", shippingTotal);
       } else {
         console.error(
           "Failed to update cart shipping total. No valid data returned."
@@ -347,12 +349,13 @@ const CheckoutPage = () => {
       }
     } catch (error) {
       console.error("An error occurred while updating shipping total:", error);
-    } 
+    }
   };
 
   useEffect(() => {
     updateShippingTotal().then((r) => r);
   }, [isStorePickup, updateCartShippingTotalMutation]);
+
 
   const paymentDetails = useMemo(() => {
     return paymentData;
@@ -405,11 +408,11 @@ const CheckoutPage = () => {
     setShowBankTransfer(true);
   }
 
-useEffect(() => {
-  if(orderTotal){
-    console.log("Order Total: ", orderTotal)
-  }
-}, [formData])
+  useEffect(() => {
+    if (orderTotal) {
+      console.log("Order Total: ", orderTotal)
+    }
+  }, [formData])
 
 
   useEffect(() => {
@@ -496,7 +499,6 @@ useEffect(() => {
       const shippingMethod = getShippingMethod(shippingTotal);
       const shippingDetails = transformAddress(formData.deliveryAddress);
       const billingDetails = transformAddress(formData.billingAddress);
-      
 
       const variables = {
         input: {
@@ -559,6 +561,28 @@ useEffect(() => {
     }, 80);
   };
 
+  const replaceStringinInt = (orderTotalString: any) => {
+    const numericString = orderTotalString?.replace(/₨|&nbsp;|,|[^0-9.]/g, '');
+    const orderTotalNumber = parseFloat(numericString);
+    return orderTotalNumber;
+  };
+
+  const numericOrderTotal = replaceStringinInt(orderTotal);
+
+  const threePercentFromTotal = numericOrderTotal * 0.03;
+
+  const taxWithTotal = (numericOrderTotal + threePercentFromTotal).toFixed(2);
+  console.log('inttotal', parseInt(taxWithTotal));
+  console.log('orderTotal', orderTotal);
+
+  useEffect(() => {
+    if (isCardPayment) {
+      // setOrderTotal()
+    }
+  }, orderTotal)
+
+  console.log('afeter effet', orderTotal);
+
   return (
     <div className="nc-CheckoutPage">
       <Script
@@ -609,6 +633,8 @@ useEffect(() => {
               handleConfirmationChange={handleConfirmationChange}
               setIsStorePickup={setIsStorePickup}
               isStorePickup={isStorePickup}
+              setIsCardPayment={setIsCardPayment}
+              isCardPayment={isCardPayment}
             />
           </div>
 
@@ -653,18 +679,33 @@ useEffect(() => {
                   </span>
                 </div>
               )}
-              {/* <div className="flex justify-between py-2.5">
-                                <span>Tax estimate</span>
-                                <span className="font-semibold text-slate-900 dark:text-slate-200">
-                                    {cart?.totalTax || "$0.00"}
-                                </span>
-                            </div> */}
-              <div className="flex justify-between pt-4 text-base font-semibold text-slate-900 dark:text-slate-200">
-                <span>Order total</span>
 
-                {/* <span>{orderTotal || "0.00"}</span> */}
-                <span dangerouslySetInnerHTML={{ __html: orderTotal || "0.00" }} />
-              </div>
+              {isCardPayment && (
+                <div className="flex justify-between py-2.5">
+                  <span>Card Tax</span>
+                  <span className="font-semibold text-slate-900 dark:text-slate-200">
+                    {/* {JSON.stringify(orderTotal)} */}
+                    {/* <span dangerouslySetInnerHTML={{ __html: `₨&nbsp;threePercentFromTotal` || "0.00" }} /> */}
+                    <span>Rs {(threePercentFromTotal).toFixed(2) || "0.00"}</span>
+                  </span>
+                </div>
+              )}
+
+              {isCardPayment && (
+                <div className="flex justify-between pt-4 text-base font-semibold text-slate-900 dark:text-slate-200">
+                  <span>Order total</span>
+                  <span dangerouslySetInnerHTML={{ __html: `Rs ${(numericOrderTotal + threePercentFromTotal).toFixed(2)}` || "0.00" }} />
+                </div>)}
+
+
+              {!isCardPayment && (
+                <div className="flex justify-between pt-4 text-base font-semibold text-slate-900 dark:text-slate-200">
+                  <span>Order total</span>
+                  <span dangerouslySetInnerHTML={{ __html: orderTotal || "0.00" }} />
+                </div>)}
+
+
+
             </div>
 
             <ButtonPrimary
@@ -677,16 +718,15 @@ useEffect(() => {
                   isConfirmed.paymentMethod
                 )
               }
-              className={`mt-8 w-full ${
-                !(
-                  isConfirmed.contactInfo &&
-                  isConfirmed.deliveryAddress &&
-                  isConfirmed.billingAddress &&
-                  isConfirmed.paymentMethod
-                )
-                  ? "cursor-not-allowed bg-slate-500"
-                  : "bg-primary hover:bg-primary-dark"
-              }`}
+              className={`mt-8 w-full ${!(
+                isConfirmed.contactInfo &&
+                isConfirmed.deliveryAddress &&
+                isConfirmed.billingAddress &&
+                isConfirmed.paymentMethod
+              )
+                ? "cursor-not-allowed bg-slate-500"
+                : "bg-primary hover:bg-primary-dark"
+                }`}
             >
               {loading ? (
                 <Loader className="animate-spin text-gray-100 " />
