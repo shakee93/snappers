@@ -36,6 +36,7 @@ const MobileNavLinks = () => {
   ];
 
   const { mobileMenu, toggleMobileMenu } = useStore()
+  const { customer, fetchCustomer, updateCustomer } = useSession();
 
   let { logout } = useSession();
   const router = useRouter();
@@ -70,6 +71,8 @@ const MobileNavLinks = () => {
             ))}
           </ul>
 
+          {/* {!customer || customer?.id === "guest" ? 'Login' : 'Account'} */}
+          
           <div
             className="gap-1 text-base text-center items-center font-medium  text-primaryColor "
             onClick={handleLogout}
