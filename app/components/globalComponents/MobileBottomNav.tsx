@@ -36,7 +36,7 @@ const MobileBottomNav = ({ categories }: { categories: any }) => {
         setOpenCat(!openCat);
     };
 
-    const router = useRouter();
+    const router = useRouter();    
 
     return (
         <div

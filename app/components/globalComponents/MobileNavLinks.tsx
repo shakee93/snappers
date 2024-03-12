@@ -71,14 +71,14 @@ const MobileNavLinks = () => {
             ))}
           </ul>
 
-          {/* {!customer || customer?.id === "guest" ? 'Login' : 'Account'} */}
-          
-          <div
-            className="gap-1 text-base text-center items-center font-medium  text-primaryColor "
-            onClick={handleLogout}
-          >
-            Log Out
-          </div>
+          {customer && customer?.id !== "guest" && (
+            <div
+              className="gap-1 text-base text-center items-center font-medium  text-primaryColor "
+              onClick={handleLogout}
+            >
+              Log Out
+            </div>
+          )}
 
 
           <div className="flex  justify-center text-primaryColor text-base gap-2 items-center">

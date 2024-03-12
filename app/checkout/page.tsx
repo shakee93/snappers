@@ -694,7 +694,7 @@ const CheckoutPage = () => {
               {isCardPayment && (
                 <div className="flex justify-between pt-4 text-base font-semibold text-slate-900 dark:text-slate-200">
                   <span>Order total</span>
-                  <span dangerouslySetInnerHTML={{ __html: `Rs ${(numericOrderTotal + threePercentFromTotal).toFixed(2)}` || "0.00" }} />
+                  <span dangerouslySetInnerHTML={{ __html: `Rs ${new Intl.NumberFormat('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(numericOrderTotal + threePercentFromTotal)}` || "0.00" }} />
                 </div>)}
 
 
