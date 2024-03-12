@@ -45,20 +45,10 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   const [selectedVariation, setSelectedVariation] =
   useState<selectedVariationType | null>(combinedImages[0]);
 
-  const uniqueVariations = combinedImages.filter((variation, index, self) => {
-    return (
-      index === self.findIndex((t) => t.databaseId === variation.databaseId) &&
-      variation.databaseId !== selectedVariation?.databaseId
-    );
-  });
-  
-
 
   console.log("galleryImages", galleryImages);
   console.log("combinedImages", combinedImages);
   console.log("variationImages", variationImages);
-  console.log('selected variation', selectedVariation);
-  console.log('unique variations', uniqueVariations);
 
   combinedImages.forEach((image) => {
     if (image?.sourceUrl?.includes("300x300")) {
@@ -185,7 +175,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
             )}
 
             {/* Gallery Image */}
-            {uniqueVariations?.map((variation: any, index: number) => (
+            {galleryImages?.map((variation: any, index: number) => (
               <Thumb
                 onClick={() => onThumbClickCalculated(index)}
                 selected={

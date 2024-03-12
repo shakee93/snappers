@@ -8,8 +8,7 @@ import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
 import {
   GET_PAYMENT_GATEWAYS,
-  UPDATE_SHIPPING_TOTAL,
-  UPDATE_CART_FEE
+  UPDATE_SHIPPING_TOTAL
 } from "@/graphql/defs/cart";
 import {
   CHECKOUT,
@@ -201,7 +200,6 @@ const CheckoutPage = () => {
     // data: realCheckoutData,
   },
   ] = useMutation(CHECKOUT);
-  const [updateCartFee] = useMutation(UPDATE_CART_FEE);
   const [completeOrderPayment] = useMutation(COMPLETE_ORDER_PAYMENT);
   // const  [createOrderGuest] = useMutation(GUEST_CHECKOUT_MUTATION)
   const [guestCheckout] = useMutation(GUEST_CHECKOUT);
@@ -410,7 +408,7 @@ const CheckoutPage = () => {
 
   useEffect(() => {
     if (orderTotal) {
-      console.log("Order Total: ", orderTotal)
+      // console.log("Order Total: ", orderTotal)
     }
   }, [formData])
 
@@ -572,16 +570,6 @@ const CheckoutPage = () => {
   const threePercentFromTotal = numericOrderTotal * 0.03;
 
   const taxWithTotal = (numericOrderTotal + threePercentFromTotal).toFixed(2);
-  console.log('inttotal', parseInt(taxWithTotal));
-  console.log('orderTotal', orderTotal);
-
-  useEffect(() => {
-    if (isCardPayment) {
-      // setOrderTotal()
-    }
-  }, orderTotal)
-
-  console.log('afeter effet', orderTotal);
 
   return (
     <div className="nc-CheckoutPage">
