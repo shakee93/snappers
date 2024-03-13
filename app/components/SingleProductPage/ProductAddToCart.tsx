@@ -40,7 +40,7 @@ const ProductAddToCart = ({
           <div className="flex items-center w-full justify-between text-base font-semibold leading-none">
             Added to cart!{" "}
             <button onClick={(e) => toast.dismiss("nc-product-notify")}>
-              <XIcon />
+              {/* <XIcon /> */}
             </button>
           </div>
           <div className="border-t border-slate-200 dark:border-slate-700 my-4" />

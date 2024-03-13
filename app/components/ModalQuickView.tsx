@@ -32,7 +32,6 @@ const ModalQuickView: FC<ModalQuickViewProps> = ({
 
 
   useEffect(() => {
-
     if (show) {
       getProduct()
     }

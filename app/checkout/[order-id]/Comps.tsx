@@ -55,6 +55,7 @@ type ProductTableProps = {
 const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData, paymentDetails }) => {
   if (!lineItems) return null;
 
+  // console.log('orderData', orderData);
 
   return (
     <>
@@ -102,6 +103,31 @@ const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData, payme
                     {`${paymentDetails.shippingAddress1}  ${paymentDetails.shippingAddress2}`}
                   </td>
                 </tr>
+
+                {orderData?.order?.customerNote !== null ? (
+                  <tr>
+                    <td className="px-6 text-left py-4 font-medium text-gray-800 dark:text-gray-200">
+                      3% Card Tax
+                    </td>
+                    <td></td>
+                    <td className="px-6 text-right py-4 font-medium text-gray-800 dark:text-gray-200">
+                      {(() => {
+                        const cleanString = (str: any) => str?.replace(/[^0-9.]+/g, "");
+
+                        const subtotal = orderData?.order?.subtotal
+                        const total = orderData?.order?.total
+
+                        const subtotalNumeric = parseFloat(cleanString(subtotal));
+                        const totalNumeric = parseFloat(cleanString(total));
+
+                        const difference = totalNumeric - subtotalNumeric;
+
+                        return `₨ ${difference.toFixed(2)}`;
+                      })()}
+                    </td>
+                  </tr>
+                ) : null}
+
                 <tr>
                   <td className="px-6 text-left py-4  font-medium text-gray-800 dark:text-gray-200">
                     Total

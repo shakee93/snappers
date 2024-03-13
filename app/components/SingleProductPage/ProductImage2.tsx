@@ -27,7 +27,8 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   const [emblaMainRef, emblaMainApi] = useEmblaCarousel({});
   const [emblaThumbsRef, emblaThumbsApi] = useEmblaCarousel({
     containScroll: "keepSnaps",
-    dragFree: true,
+    // dragFree: true,
+    skipSnaps: true,
     // watchDrag: false
   });
   const { variationId } = useImage();
@@ -157,7 +158,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
 
       <div className="embla-thumbs">
         <div className="embla-thumbs__viewport " ref={emblaThumbsRef}>
-          <div className="embla-thumbs__container" >
+          <div className="embla-thumbs__container	" >
             {/* Variation Thumb */}
             {product.type === "VARIABLE" && (
               <CoreVariationThumb
