@@ -597,7 +597,7 @@ const CheckoutPage = () => {
 
               {isCardPayment && (
                 <div className="flex justify-between py-2.5">
-                  <span>Card Tax</span>
+                  <span>Bank Charge 3%</span>
                   <span className="font-semibold text-slate-900 dark:text-slate-200">
                     {/* {JSON.stringify(orderTotal)} */}
                     {/* <span dangerouslySetInnerHTML={{ __html: `₨&nbsp;threePercentFromTotal` || "0.00" }} /> */}

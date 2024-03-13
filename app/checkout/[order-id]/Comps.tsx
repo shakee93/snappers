@@ -107,7 +107,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData, payme
                 {orderData?.order?.customerNote !== null ? (
                   <tr>
                     <td className="px-6 text-left py-4 font-medium text-gray-800 dark:text-gray-200">
-                      3% Card Tax
+                      3% Bank Charge
                     </td>
                     <td></td>
                     <td className="px-6 text-right py-4 font-medium text-gray-800 dark:text-gray-200">
