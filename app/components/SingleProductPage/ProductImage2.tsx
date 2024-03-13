@@ -28,6 +28,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   const [emblaThumbsRef, emblaThumbsApi] = useEmblaCarousel({
     containScroll: "keepSnaps",
     dragFree: true,
+    // watchDrag: false
   });
   const { variationId } = useImage();
   const [variationImageEnabled, setVariationImageEnabled] = useState(false);
@@ -46,9 +47,9 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   useState<selectedVariationType | null>(combinedImages[0]);
 
 
-  console.log("galleryImages", galleryImages);
-  console.log("combinedImages", combinedImages);
-  console.log("variationImages", variationImages);
+  // console.log("galleryImages", galleryImages);
+  // console.log("combinedImages", combinedImages);
+  // console.log("variationImages", variationImages);
 
   combinedImages.forEach((image) => {
     if (image?.sourceUrl?.includes("300x300")) {
@@ -130,7 +131,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   return (
     <div className="embla">
       <div className="embla__viewport" ref={emblaMainRef}>
-        <div className="embla__container">
+        <div className="embla__container ">
           {combinedImages?.map((variation: any, index: number) => (
             <div className="embla__slide" key={index}>
               <div className="embla__slide__number">
@@ -155,8 +156,8 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
       </div>
 
       <div className="embla-thumbs">
-        <div className="embla-thumbs__viewport" ref={emblaThumbsRef}>
-          <div className="embla-thumbs__container">
+        <div className="embla-thumbs__viewport " ref={emblaThumbsRef}>
+          <div className="embla-thumbs__container" >
             {/* Variation Thumb */}
             {product.type === "VARIABLE" && (
               <CoreVariationThumb

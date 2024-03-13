@@ -140,11 +140,19 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
       }
     }
 
+    // console.log('all slugs', allSlugs);
+
     const { data: fetchedData } = await refetch({
       slug: allSlugs,
     });
 
-    setBrands(fetchedData.brands.nodes as Brand[]);
+    // console.log('data', fetchedData);
+
+    if (fetchedData?.brands) {
+      setBrands(fetchedData.brands.nodes as Brand[]);
+    } else {
+      console.log("No brands found for the given slug.");
+    }
   };
 
   useEffect(() => {

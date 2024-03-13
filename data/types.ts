@@ -40,7 +40,7 @@ export type PaymentDetailsType = {
   hash?: string | null;
   order_id: string;
   items?: string;
-  amount: string;
+  amount: any;
   currency?: string;
   first_name?: string;
   last_name?: string;
