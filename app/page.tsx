@@ -15,14 +15,14 @@ const slidesData = [
   {
     id: "2",
     slideFields: {
-      mainHeading: "Exclusive Offers Just for You!",
-      subHeading: "Save Big on Your Favorite Brands",
-      buttonText: "Best Deals",
-      buttonLink: "/collections/all",
+      mainHeading: "Experience gaming at its finest",
+      subHeading: "Sony PS5 Slim: Gaming Redefined",
+      buttonText: "Buy Now",
+      buttonLink: "/sony/sony-playstation-5-slim-disc-edition",
       backgroundColor:"#CCE0EF",
       featureImage: {
         id: "2",
-        sourceUrl: "https://api.gqmobiles.lk/wp-content/uploads/2023/12/marshall-300x231.png"
+        sourceUrl: "http://api.gqmobiles.lk/wp-content/uploads/2024/03/Untitled-design-2024-03-13T155550.163-removebg-preview.png"
       }
     }
   },
