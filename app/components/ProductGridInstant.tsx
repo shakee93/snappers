@@ -61,11 +61,12 @@ const ProductGridInstant = ({
           {hits.map((item, index: number) => (
             // <div key={index}></div>
             item?.price && item.price !== '00' && (
-            <ProductCard
-              key={item?.slug as unknown as string}
-              data={item as unknown as Product}
-              fromSearch
-            />)
+              <ProductCard
+                key={item?.slug as unknown as string}
+                data={item as unknown as Product}
+                fromSearch
+              />
+            )
           ))}
         </div>
       }
