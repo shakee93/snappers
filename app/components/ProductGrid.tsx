@@ -1,9 +1,9 @@
 "use client"
-import {Brand, Category, Product} from "@/graphql/types/graphql";
-import {useStore} from "@/store/store";
-import {useEffect, useState} from "react";
-import {GET_BRAND_ARCHIVE} from "@/graphql/defs/products";
-import {useLazyQuery} from "@apollo/client";
+import { Brand, Category, Product } from "@/graphql/types/graphql";
+import { useStore } from "@/store/store";
+import { useEffect, useState } from "react";
+import { GET_BRAND_ARCHIVE } from "@/graphql/defs/products";
+import { useLazyQuery } from "@apollo/client";
 import ProductCard from "./ProductCard3";
 
 interface ProductGridProps {
@@ -14,7 +14,7 @@ interface ProductGridProps {
 
 const ProductGrid = ({ products, brand, category }: ProductGridProps) => {
 
-    const { sidebar: { categories, brands , mounted} } = useStore();
+    const { sidebar: { categories, brands, mounted } } = useStore();
     const [_products, setProducts] = useState<{ node: Product }[]>(products);
     const [mounts, setMounts] = useState(0)
 
@@ -33,7 +33,7 @@ const ProductGrid = ({ products, brand, category }: ProductGridProps) => {
 
         if (mounts >= 0) {
             (async () => {
-                let { data } = await  getArchiveData({
+                let { data } = await getArchiveData({
                     variables: {
                         categoryIdIn: category && categories.length === 0 && brands.length === 0 ? [category.databaseId] : categories,
                         brandId: brand && categories.length === 0 && brands.length === 0 ? [brand.databaseId] : brands
@@ -45,7 +45,7 @@ const ProductGrid = ({ products, brand, category }: ProductGridProps) => {
             })();
         }
 
-        
+
     }, [categories, brands]);
 
 
@@ -54,7 +54,9 @@ const ProductGrid = ({ products, brand, category }: ProductGridProps) => {
     ) : (
         <div className="flex-1 grid  sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10">
             {_products.map((item, index: number) =>
-                <ProductCard  key={item.node.slug} data={item.node} />
+                // item?.node?.price && item?.node?.price !== '00' && (
+                    <ProductCard key={item.node.slug} data={item.node} />
+                // )
             )}
         </div>
     );
