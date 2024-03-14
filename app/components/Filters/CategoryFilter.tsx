@@ -104,7 +104,7 @@ const CategoryFilter = ({categories}: CategoryFilterProps) => {
             {({ open, close }) => (
                 <>
 
-                    <div className="overflow-hidden rounded-2xl shadow-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
+                    <div className="overflow-hidden relative  z-10 rounded-2xl shadow-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
 
                         <div className="relative flex flex-col px-5 py-6 space-y-5">
                             <Checkbox
