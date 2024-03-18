@@ -171,7 +171,14 @@ const CheckoutPage = () => {
 
     const shippingMethod = getShippingMethod(shippingTotal);
     const shippingDetails = transformAddress(formData.deliveryAddress);
-    const billingDetails = transformAddress(formData.billingAddress);
+    // const billingDetails = transformAddress(formData.billingAddress);
+
+    const email = formData?.contactInfo?.email;
+
+    const billingDetails = {
+      ...transformAddress(formData.billingAddress),
+      email: formData?.contactInfo?.email,
+    };
 
     if (payherPaymentID == null) {
       toast("payhere payment not initiated");
@@ -368,9 +375,10 @@ const CheckoutPage = () => {
     }
 
     if (isCashOnDelivery) {
-      if (checkoutDetails.order_id == "no_order_id_found") {
+      if (customer?.id === "guest" || checkoutDetails.order_id == "no_order_id_found") {
         let email = formData?.contactInfo?.email;
-        let redirectUrl = `/checkout/${checkoutDetails.order_id}?email=${email}`;
+        // let redirectUrl = `/checkout/${checkoutDetails.order_id}?email=${email}`;
+        let redirectUrl = `/checkout/no_order_id_found?email=${email}`;
         router.push(redirectUrl);
         return;
       }
@@ -418,7 +426,16 @@ const CheckoutPage = () => {
 
       const shippingMethod = getShippingMethod(shippingTotal);
       const shippingDetails = transformAddress(formData.deliveryAddress);
-      const billingDetails = transformAddress(formData.billingAddress);
+      // const billingDetails = transformAddress(formData.billingAddress);
+      const email = formData?.contactInfo?.email;
+
+      const billingDetails = {
+        ...transformAddress(formData.billingAddress),
+        email: formData?.contactInfo?.email,
+      };
+
+      // console.log('biliing', billingDetails);
+
 
       const variables = {
         input: {
@@ -426,6 +443,7 @@ const CheckoutPage = () => {
           shippingMethod,
           shipping: shippingDetails,
           billing: billingDetails,
+          // customerNote: `Customer Email is: ${email} and Phone Number is ${formData?.contactInfo?.phone}`,
         },
       };
 
@@ -433,6 +451,8 @@ const CheckoutPage = () => {
         customer?.id === "guest"
           ? await guestCheckout({ variables })
           : await checkoutMutation({ variables });
+
+      // console.log('data after cecheckout', data);
 
       if (data) {
         const checkoutDetails = savePaymentDetails(data);
