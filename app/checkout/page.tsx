@@ -443,7 +443,7 @@ const CheckoutPage = () => {
           shippingMethod,
           shipping: shippingDetails,
           billing: billingDetails,
-          // customerNote: `Customer Email is: ${email} and Phone Number is ${formData?.contactInfo?.phone}`,
+          customerNote: `Customer Email is: ${email} and Phone Number is ${formData?.contactInfo?.phone}`,
         },
       };
 
