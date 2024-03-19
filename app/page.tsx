@@ -1,5 +1,5 @@
 import CategoryBlockSection from "@/app/components/HomePage/CategoryBlocksSection";
-import SectionHero3 from "@/app/components/HomePage/SectionHero2";
+import SectionHero3 from "@/app/components/HomePage/SectionHero3";
 import SectionSliderProductCard from "@/app/components/SectionSliderProductCard";
 import SectionGridMoreExplore from "@/app/components/HomePage/SectionGridMoreExplore";
 import SectionPromo1 from "@/app/components/HomePage/SectionPromo1";
@@ -10,6 +10,7 @@ import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import "styles/embla.css";
 import Image from "next/image";
 import Scam from "@/public/homepage/scam.webp";
+import SectionHero2 from "./components/HomePage/SectionHero2";
 
 const slidesData = [
   {
@@ -115,7 +116,8 @@ export default async function Home() {
       <div className="nc-PageHome relative flex  flex-col overflow-hidden">
         {/* hero section */}
         <div className="z-0">
-          <SectionHero3 slides={slidesData} />
+          {/* <SectionHero3 /> */}
+          <SectionHero2 slides={slidesData}/>
         </div>
         <div className="bg-[#e5e7eb] py-4 md:p-2">
           <div className="container flex md:items-center gap-3 flex-col md:flex-row items-start ">
