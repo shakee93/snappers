@@ -57,7 +57,27 @@ export const GUEST_CHECKOUT = gql`
         email
       }
       order {
+        total
+        id
         databaseId
+        lineItems {
+          nodes {
+            databaseId
+            subtotal
+            quantity
+            product {
+              node {
+                name
+                databaseId
+                featuredImage {
+                  node {
+                    sourceUrl
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   }

@@ -180,7 +180,7 @@ export default async function Home() {
           {/* brand section */}
           <div className="relative">
             {/* <BackgroundSection /> */}
-            {/* <SectionGridMoreExplore /> */}
+            <SectionGridMoreExplore />
           </div>
 
           {/* smart watches section */}
