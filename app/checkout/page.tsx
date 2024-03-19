@@ -184,13 +184,20 @@ const CheckoutPage = () => {
       toast("payhere payment not initiated");
       return;
     }
+
+    const customerNoteHTML = `
+            <p><strong>Customer Email:</strong> ${email}</p>
+            <p><strong>Phone Number:</strong> ${formData?.contactInfo?.phone}</p>
+            <p><strong>Payhere Payment ID:</strong> ${payherPaymentID}</p>
+        `;
+
     const variables = {
       input: {
         paymentMethod: paymentMethodId,
         shippingMethod,
         shipping: shippingDetails,
         billing: billingDetails,
-        customerNote: `Payhere Payment ID: ${payherPaymentID} `,
+        customerNote: customerNoteHTML,
       },
     };
 
@@ -421,8 +428,8 @@ const CheckoutPage = () => {
         return;
       }
 
-      formData.billingAddress.country = "SR";
-      formData.deliveryAddress.country = "SR";
+      formData.billingAddress.country = "LK";
+      formData.deliveryAddress.country = "LK";
 
       const shippingMethod = getShippingMethod(shippingTotal);
       const shippingDetails = transformAddress(formData.deliveryAddress);
@@ -434,8 +441,10 @@ const CheckoutPage = () => {
         email: formData?.contactInfo?.email,
       };
 
-      // console.log('biliing', billingDetails);
-
+      const customerNoteHTML = `
+            <p><strong>Customer Email:</strong> ${email}</p>
+            <p><strong>Phone Number:</strong> ${formData?.contactInfo?.phone}</p>
+        `;
 
       const variables = {
         input: {
@@ -443,7 +452,7 @@ const CheckoutPage = () => {
           shippingMethod,
           shipping: shippingDetails,
           billing: billingDetails,
-          customerNote: `Customer Email is: ${email} and Phone Number is ${formData?.contactInfo?.phone}`,
+          customerNote: customerNoteHTML,
         },
       };
 

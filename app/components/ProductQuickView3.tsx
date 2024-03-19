@@ -223,7 +223,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({
     return null;
   };
 
-  console.log("product", product);
+  // console.log("product", product);
 
   const renderSectionContent = () => {
     return (
