@@ -49,7 +49,7 @@
     "react-inner-image-zoom": "^3.0.2",
     "react-instantsearch": "^7.5.0",
     "react-instantsearch-nextjs": "^0.1.7",
-    "react-slick": "^0.29.0",
+    "react-simple-image-slider": "^2.4.1",
     "react-use": "^17.4.2",
     "resend": "^3.1.0",
     "sharp": "^0.33.2",

@@ -20,9 +20,9 @@ import {
 } from "@/graphql/types/graphql";
 
 import { GET_TECH_SPEC } from "@/graphql/defs/products";
-import {useLazyQuery} from "@apollo/client";
+import { useLazyQuery, useQuery } from "@apollo/client";
 import ProductDetails from "@/app/components/SingleProductPage/ProductDetailsQuickView";
-import {Loader} from "lucide-react";
+import { Loader } from "lucide-react";
 
 export interface ProductQuickViewProps {
   className?: string;
@@ -43,9 +43,9 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({
     setAttribute,
   } = useStore();
   const [techspecs, setTechSpecs] = React.useState(null);
-  
+
   const [manualTechSpecs, setManualTechSpecs] = useState<any>([]);
-  
+
   const [activeVariation, setActiveVariation] = useState<any>(
     !!product && "variations" in product && product.variations?.nodes?.length
       ? product.variations.nodes[0]
@@ -71,30 +71,30 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({
     },
   });
 
-  
+
 
   useEffect(() => {
 
     (async () => {
 
 
-      const { data: dataIn} = await getTechSpec()
+      const { data: dataIn } = await getTechSpec()
 
       if (dataIn) {
         setTechSpecs(dataIn);
-        
+
         console.log(dataIn);
 
         const manualMeta = dataIn?.product?.metaData;
         const techSpecDataObject = manualMeta?.find(
-            (item: any) => item?.key === "tech_spec_data"
+          (item: any) => item?.key === "tech_spec_data"
         );
         const parsedMetaData = techSpecDataObject?.value
-            ? JSON.parse(techSpecDataObject.value)
-            : null;
-        
+          ? JSON.parse(techSpecDataObject.value)
+          : null;
+
         setManualTechSpecs(parsedMetaData ? Object.entries(parsedMetaData) : [])
-        
+
       }
 
     })()
@@ -141,11 +141,10 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({
               <div
                 key={index}
                 onClick={() => setVariantActive(index)}
-                className={`w-auto relative flex-1 max-w-[75px] h-16 rounded-full border-2 cursor-pointer ${
-                  variantActive === index
-                    ? "border-primary-6000 dark:border-primary-500"
-                    : "border-transparent"
-                }`}
+                className={`w-auto relative flex-1 max-w-[75px] h-16 rounded-full border-2 cursor-pointer ${variantActive === index
+                  ? "border-primary-6000 dark:border-primary-500"
+                  : "border-transparent"
+                  }`}
               >
                 <div className="absolute inset-0.5 rounded-full overflow-hidden z-0">
                   <Image
@@ -205,131 +204,16 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({
     return null;
   };
 
-
-  // console.log("product", product);
+  console.log("product", product);
 
   const renderSectionContent = () => {
     return (
       <div className="space-y-8">
-        {/* <ProductDetails brand={brand} product={product} /> */}
-        {/* ---------- 1 HEADING ----------  */}
 
         <ProductDetails brand={brands} product={product} />
 
-        {/* <div>
-
-          <div className="flex gap-1  text-sm text-gray-500 pb-4">
-            Brand : <span className="">{brand}</span>
-          </div>
-
-          <div className="text-base md:text-lg font-medium ">
-            <Link href={link}> {product.name} - {product.databaseId} </Link>
-          </div>
-
-
-          {product.type === 'VARIABLE' &&
-            <>
-              {product.attributes?.nodes.map((attr: ProductAttribute, index: number) =>
-                <div key={index} className="py-2 text-gray-500">
-                  <div className="text-sm py-2"> {attr.label}:{" "}
-                    <span className="font-medium text-gray-700">
-                      {(product as any)[`allPa${attr.label}`]?.nodes.find(
-                        (node: any) => node.slug === activeAttr(attr)?.val
-                      )?.name}
-                    </span>{" "}</div>
-
-                  <ul className="flex gap-2 flex-wrap text-sm items-center">
-
-                    {attr.options?.map((option, index) =>
-                      <li key={index}
-                        onClick={e => setAttribute(attr, option ?? "")}
-                        className={
-                          twMerge(
-                            "border bg-gray-200/80 cursor-pointer text-black inline-block py-2 px-3.5  text-xs md:text-sm rounded",
-                            activeAttr(attr)?.val === option && ' border-blue-700 bg-white'
-                          )
-                        }>
-
-                        {option}
-                        {
-                          (typeof product[`allPa${attr.label}` as keyof typeof product] === 'object' &&
-                            Array.isArray((product[`allPa${attr.label}` as keyof typeof product] as any)?.nodes) &&
-                            (product[`allPa${attr.label}` as keyof typeof product] as any)?.nodes.find(
-                              (node: any) => node.slug === option
-                            )?.name || 'Option')
-                        }
-
-                      </li>
-                    )}
-
-                  </ul>
-                </div>
-              )}
-
-            </>
-          }
-
-          {product.type === 'VARIABLE' && activeVariation ?
-
-            <div>
-              <div className="flex gap-4 text-base py-2 flex-wrap md:text-lg font-medium text-gray-600">
-                <span>
-                  {activeVariation.price}
-                </span>
-
-                {(!!activeVariation.salePrice && activeVariation.salePrice !== activeVariation.regularPrice) &&
-                  <span className="text-red-400">
-                    <s>{activeVariation.regularPrice}</s>
-                  </span>
-                }
-
-              </div>
-            </div> :
-
-            <div className="flex gap-2 text-base py-2 flex-wrap md:text-lg font-medium text-gray-600">
-              <span>
-                {product.price}
-              </span>
-
-              {(!!product.salePrice && product.salePrice !== product.regularPrice) &&
-                <span className="text-red-400">
-                  <s>{product.regularPrice}</s>
-                </span>
-              }
-
-            </div>
-          }
-
-          {(product.type === 'SIMPLE' && product.stockStatus !== 'IN_STOCK') &&
-            <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1">
-              Sold Out
-            </div>
-          }
-
-          {product.type === 'VARIABLE' && activeVariation?.stockStatus !== 'IN_STOCK' &&
-            <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1">
-              Sold Out
-            </div>
-          }
-
-          <ProductAddToCart product={product} variation={activeVariation} />
-          <div className="flex gap-1 items-center text-sm md:text-base text-gray-500">
-            <div className="text-sm py-2">Category:</div>
-            {product.productCategories?.nodes.map((category: any, index: number) =>
-              <Link href={`/collections/${category.slug}`} key={index} className="bg-primary-100 inline-block py-1 px-2  text-xs md:text-sm rounded-3xl">
-                {category.name}
-              </Link>
-            )}
-
-          </div>
-
-        </div> */}
-
-        {/*  */}
         <hr className=" border-slate-200 dark:border-slate-700"></hr>
-        {/*  */}
 
-        {/* ---------- 5 ----------  */}
         <AccordionInfo
           data={[
             {
@@ -353,58 +237,58 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({
 
       {!product ? <div className='min-h-[500px]'>
         <div className='absolute left-1/2 top-1/2 -translate-y-1/2 -translate-x-1/2'>
-          <Loader className='animate-spin '/>
+          <Loader className='animate-spin ' />
         </div>
-          </div> :
-      <div className="lg:flex">
-        {/* CONTENT */}
-        <div className="w-full lg:w-[50%] ">
-          {/* HEADING */}
-          <div className="relative">
-            <div className="aspect-w-16 aspect-h-16">
-              <Image
-                fill
-                style={{ objectFit: "contain" }}
-                src={product_images[0]}
-                className="w-full rounded-xl object-cover"
-                alt="product detail 1"
-              />
-            </div>
+      </div> :
+        <div className="lg:flex">
+          {/* CONTENT */}
+          <div className="w-full lg:w-[50%] ">
+            {/* HEADING */}
+            <div className="relative">
+              <div className="aspect-w-16 aspect-h-16">
+                <Image
+                  fill
+                  style={{ objectFit: "contain" }}
+                  src={product_images[0]}
+                  className="w-full rounded-xl object-cover"
+                  alt="product detail 1"
+                />
+              </div>
 
-            {/* STATUS */}
-            {renderStatus()}
-            {/* META FAVORITES */}
-            <LikeButton className="absolute right-3 top-3 " />
+              {/* STATUS */}
+              {renderStatus()}
+              {/* META FAVORITES */}
+              <LikeButton className="absolute right-3 top-3 " />
+            </div>
+            {(product?.galleryImages?.nodes ||
+              (product?.galleryImages?.edges &&
+                product?.galleryImages?.edges?.length > 0)) && (
+                <div className="hidden lg:grid grid-cols-2 gap-3 mt-3 sm:gap-6 sm:mt-6 xl:gap-5 xl:mt-5">
+                  {product_images.slice(1).map((item, index) => {
+                    if (item) {
+                      return (
+                        <div key={index} className="aspect-w-3 aspect-h-4">
+                          <Image
+                            fill
+                            style={{ objectFit: "contain" }}
+                            src={item}
+                            className="w-full rounded-xl object-contain"
+                            alt={`product detail ${index + 2}`}
+                          />
+                        </div>
+                      );
+                    }
+                    return null;
+                  })}
+                </div>
+              )}
           </div>
-          {(product?.galleryImages?.nodes ||
-            (product?.galleryImages?.edges &&
-              product?.galleryImages?.edges?.length > 0)) && (
-            <div className="hidden lg:grid grid-cols-2 gap-3 mt-3 sm:gap-6 sm:mt-6 xl:gap-5 xl:mt-5">
-              {product_images.slice(1).map((item, index) => {
-                if (item) {
-                  return (
-                    <div key={index} className="aspect-w-3 aspect-h-4">
-                      <Image
-                        fill
-                        style={{ objectFit: "contain" }}
-                        src={item}
-                        className="w-full rounded-xl object-contain"
-                        alt={`product detail ${index + 2}`}
-                      />
-                    </div>
-                  );
-                }
-                return null;
-              })}
-            </div>
-          )}
-        </div>
 
-        {/* SIDEBAR */}
-        <div className="w-full lg:w-[50%] pt-6 lg:pt-0 lg:pl-7 xl:pl-8">
-          {renderSectionContent()}
-        </div>
-      </div>}
+          {/* SIDEBAR */}
+          <div className="w-full lg:w-[50%] pt-6 lg:pt-0 lg:pl-7 xl:pl-8">
+            {renderSectionContent()}
+          </div>
+        </div>}
     </div>
   );
 };

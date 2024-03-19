@@ -1,5 +1,5 @@
 import CategoryBlockSection from "@/app/components/HomePage/CategoryBlocksSection";
-import SectionHero3 from "@/app/components/HomePage/SectionHero2";
+import SectionHero3 from "@/app/components/HomePage/SectionHero3";
 import SectionSliderProductCard from "@/app/components/SectionSliderProductCard";
 import SectionGridMoreExplore from "@/app/components/HomePage/SectionGridMoreExplore";
 import SectionPromo1 from "@/app/components/HomePage/SectionPromo1";
@@ -10,19 +10,20 @@ import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import "styles/embla.css";
 import Image from "next/image";
 import Scam from "@/public/homepage/scam.webp";
+import SectionHero2 from "./components/HomePage/SectionHero2";
 
 const slidesData = [
   {
     id: "2",
     slideFields: {
-      mainHeading: "Exclusive Offers Just for You!",
-      subHeading: "Save Big on Your Favorite Brands",
-      buttonText: "Best Deals",
-      buttonLink: "/collections/all",
+      mainHeading: "Experience gaming at its finest",
+      subHeading: "Sony PS5 Slim: Gaming Redefined",
+      buttonText: "Buy Now",
+      buttonLink: "/sony/sony-playstation-5-slim-disc-edition",
       backgroundColor:"#CCE0EF",
       featureImage: {
         id: "2",
-        sourceUrl: "https://api.gqmobiles.lk/wp-content/uploads/2023/12/marshall-300x231.png"
+        sourceUrl: "http://api.gqmobiles.lk/wp-content/uploads/2024/03/Untitled-design-2024-03-13T155550.163-removebg-preview.png"
       }
     }
   },
@@ -115,7 +116,8 @@ export default async function Home() {
       <div className="nc-PageHome relative flex  flex-col overflow-hidden">
         {/* hero section */}
         <div className="z-0">
-          <SectionHero3 slides={slidesData} />
+          {/* <SectionHero3 /> */}
+          <SectionHero2 slides={slidesData}/>
         </div>
         <div className="bg-[#e5e7eb] py-4 md:p-2">
           <div className="container flex md:items-center gap-3 flex-col md:flex-row items-start ">

@@ -3,17 +3,17 @@
 import Image from "next/image";
 import whatsappLogo from "@/public/images/whatsapplogo.webp";
 import Link from "next/link";
-import {useEffect, useMemo, useState} from "react";
-import {useStore} from "@/store/store";
-import {useParams, usePathname, useRouter} from "next/navigation";
-import {twMerge} from "tailwind-merge";
+import { useEffect, useMemo, useState } from "react";
+import { useStore } from "@/store/store";
+import { useParams, usePathname, useRouter } from "next/navigation";
+import { twMerge } from "tailwind-merge";
 
 const WhatsappLogoComponent = () => {
   const [isHovered, setIsHovered] = useState(false);
-    const { navigation } = useStore()
+  const { navigation } = useStore()
 
   const params = useParams()
-  
+
   const isProduct = useMemo(() => {
 
     if (!params) {
@@ -25,10 +25,10 @@ const WhatsappLogoComponent = () => {
 
   return (
     <div className={twMerge(
-        "transition-transform fixed z-[1000] md:bottom-8 md:right-10 bottom-28 right-4 h-8 w-12 md:mb-5",
-        isProduct && 'bottom-44'
+      "transition-transform fixed z-[1000] md:bottom-8 md:right-10 bottom-28 right-4 h-8 w-12 md:mb-5",
+      isProduct && 'bottom-44'
     )}>
-      <Link href={"https://wa.me/94777555665"} target="_blank">
+      <Link href={"https://wa.me/94722299944"} target="_blank">
         <div className="relative flex items-center">
           <Image
             src={whatsappLogo}

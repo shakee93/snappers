@@ -128,23 +128,36 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
 
   const { loading, error, data, refetch } = useQuery(GET_BRANDS);
 
-  const fetchBrandsForCategory = async (
-    category: keyof typeof hardcodedBrands,
-  ) => {
-    const allSlugs = [];
+  const fetchBrandsForCategory = async (category: keyof typeof hardcodedBrands) => {
 
-    for (const category in hardcodedBrands) {
-      const brandsInCategory = hardcodedBrands[category];
-      for (const brand of brandsInCategory) {
-        allSlugs.push(brand.slug);
+    try {
+
+      const allSlugs = [];
+
+      for (const category in hardcodedBrands) {
+        const brandsInCategory = hardcodedBrands[category];
+        for (const brand of brandsInCategory) {
+          allSlugs.push(brand.slug);
+        }
       }
+
+      console.log('all slugs', allSlugs);
+
+      const { data: fetchedData } = await refetch({
+        slug: allSlugs,
+      });
+
+      console.log('data', fetchedData);
+
+      if (fetchedData?.brands) {
+        setBrands(fetchedData.brands.nodes as Brand[]);
+      } else {
+        console.log("No brands found for the given slug.");
+      }
+    } catch (error) {
+      console.error('cannot fetch data',error);
     }
 
-    const { data: fetchedData } = await refetch({
-      slug: allSlugs,
-    });
-
-    setBrands(fetchedData.brands.nodes as Brand[]);
   };
 
   useEffect(() => {
@@ -175,10 +188,6 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
               }}
             >
               <div className="flex items-center justify-center space-x-1.5 text-xs sm:space-x-2.5 sm:text-sm ">
-                {/* <span
-                  className="inline-block"
-                  dangerouslySetInnerHTML={{ __html: item.icon }}
-                ></span> */}
                 <span>{item}</span>
               </div>
             </NavItem2>
@@ -197,10 +206,6 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
               }}
             >
               <div className="flex items-center justify-center space-x-1.5 text-xs sm:space-x-2.5 sm:text-sm ">
-                {/* <span
-                  className="inline-block"
-                  dangerouslySetInnerHTML={{ __html: item.icon }}
-                ></span> */}
                 <span>{item}</span>
               </div>
             </NavItem2>

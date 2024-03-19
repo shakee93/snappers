@@ -57,7 +57,27 @@ export const GUEST_CHECKOUT = gql`
         email
       }
       order {
+        total
+        id
         databaseId
+        lineItems {
+          nodes {
+            databaseId
+            subtotal
+            quantity
+            product {
+              node {
+                name
+                databaseId
+                featuredImage {
+                  node {
+                    sourceUrl
+                  }
+                }
+              }
+            }
+          }
+        }
       }
     }
   }
@@ -270,6 +290,7 @@ export const GET_SINGLE_ORDER = gql`
       shippingTax
       shippingTotal
       orderNumber
+      customerNote
       date
       hasBillingAddress
       hasShippingAddress

@@ -41,8 +41,7 @@ const ArchiveLayout = async ({
           </h2>
           <span className="block mt-2 lg:mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
             {description ||
-              " We not only help you design exceptional products, but also make it\n" +
-              "easy for you to share your designs with more like-minded people."}
+              "Explore GQ Mobiles Collections – where style meets functionality. Elevate your experience with quality and diverse options. Shop now for a seamless blend of style and substance!"}
           </span>
         </div>
         <hr className="border-slate-200 dark:border-slate-700 " />

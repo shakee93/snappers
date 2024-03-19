@@ -49,90 +49,6 @@ interface FormData {
   };
 }
 
-//
-// const FAKE_PAYMENT_DETAILS: PaymentDetailsWithoutUrls | null = {
-//     order_id: "6425",
-//     items: JSON.stringify([
-//         {
-//             databaseId: 485,
-//             subtotal: "39500",
-//             quantity: 1,
-//             product: {
-//                 node: {
-//                     name: "Xiaomi Redmi 10 (2022) | 6GB 128GB",
-//                     databaseId: 6337,
-//                     featuredImage: {
-//                         node: {
-//                             sourceUrl:
-//                                 "https://gq.freshpixl.com/wp-content/uploads/2023/12/REDMI-10-GREY.jpg",
-//                             __typename: "MediaItem",
-//                         },
-//                         __typename: "NodeWithFeaturedImageToMediaItemConnectionEdge",
-//                     },
-//                     __typename: "SimpleProduct",
-//                 },
-//                 __typename: "LineItemToProductConnectionEdge",
-//             },
-//             __typename: "LineItem",
-//         },
-//     ]),
-//     // subtotal: "රු39,500.00",
-//     amount: "රු39,500.00",
-//     currency: "LKR",
-//     first_name: "Shakeeb",
-//     last_name: "Sadikeen",
-//     email: "shadeersadikeen@gmail.com",
-//     phone: "+94755040038",
-//     address: "120/21/5B, Araliya Uyana, Megoda Kolonnawa",
-//     // address: "araliya uyana, megoda kolonnawa",
-//     // billingAddress2: "120/21/5b",
-//     city: "Colombo",
-//     country: "Sri Lanka",
-// };
-
-// const FAKE_CHECKOUT_DETAILS: any = {
-//     "checkout": {
-//         "clientMutationId": null,
-//         "redirect": "https://gq.freshpixl.com/checkout/order-received/6553/?key=wc_order_7pKYJMGpe5HOf",
-//         "result": "success",
-//         "customer": {
-//             "displayName": "shadeer",
-//             "shipping": {
-//                 "firstName": "Shakeeb",
-//                 "lastName": "Sadikeen",
-//                 "address1": "120/21/5B, Araliya Uyana, Megoda Kolonnawa",
-//                 "address2": "Wellampitiya",
-//                 "city": "Colombo",
-//                 "country": "LK",
-//                 "state": null,
-//                 "postcode": "10600",
-//                 "phone": "+94755040038",
-//                 "email": null,
-//                 "__typename": "CustomerAddress"
-//             },
-//             "billing": {
-//                 "firstName": "Shakeeb",
-//                 "lastName": "sadikeen",
-//                 "address1": "araliya uyana, megoda kolonnawa",
-//                 "address2": "120/21/5b",
-//                 "city": "wellampitiya , colombo",
-//                 "country": "LK",
-//                 "state": null,
-//                 "postcode": "00800",
-//                 "phone": "+94750278330",
-//                 "email": "shakee.zats@gmail.com",
-//                 "__typename": "CustomerAddress"
-//             },
-//             "email": "shadeersadikeen@gmail.com",
-//             "__typename": "Customer"
-//         },
-//         "order": {
-//             "total": "රු11,900.00",
-//             "__typename": "Order"
-//         },
-//         "__typename": "CheckoutPayload"
-//     }
-// }
 
 const CheckoutPage = () => {
   const { cart, removeFromCart, updateCart } = useCart();
@@ -182,6 +98,7 @@ const CheckoutPage = () => {
   const [showBankTransfer, setShowBankTransfer] = useState<boolean>(false);
   const [wantToSHowBankTransfer, setWantToSHowBankTransfer] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [totalWithTax, setTotalWithTax] = useState<string | null>();
 
   // TODO: Un comment this for the redirect on cart free
   useEffect(() => {
@@ -254,7 +171,14 @@ const CheckoutPage = () => {
 
     const shippingMethod = getShippingMethod(shippingTotal);
     const shippingDetails = transformAddress(formData.deliveryAddress);
-    const billingDetails = transformAddress(formData.billingAddress);
+    // const billingDetails = transformAddress(formData.billingAddress);
+
+    const email = formData?.contactInfo?.email;
+
+    const billingDetails = {
+      ...transformAddress(formData.billingAddress),
+      email: formData?.contactInfo?.email,
+    };
 
     if (payherPaymentID == null) {
       toast("payhere payment not initiated");
@@ -316,7 +240,8 @@ const CheckoutPage = () => {
       const total: any = cart?.total;
       setOrderTotal(total);
 
-      // console.log('total in udpate shiipping', total);
+      // console.log('shippingMethods', shippingMethods);
+
 
       if (customer?.id === "guest") {
         const subtotal: any = cart?.subtotal;
@@ -368,6 +293,9 @@ const CheckoutPage = () => {
 
     let { email, phone } = formData.contactInfo;
 
+    // console.log('console.log', orderTotal);
+    // console.log('totalwd', totalWithTax);
+
     if (
       !orderTotal ||
       !firstName ||
@@ -382,7 +310,8 @@ const CheckoutPage = () => {
     }
 
     let checkoutDetails: PaymentDetailsWithoutUrls = {
-      amount: orderTotal,
+      // amount: orderTotal,
+      amount: isCardPayment ? totalWithTax : orderTotal,
       order_id: generatedOrderId,
       first_name: firstName,
       last_name: lastName,
@@ -446,9 +375,10 @@ const CheckoutPage = () => {
     }
 
     if (isCashOnDelivery) {
-      if (checkoutDetails.order_id == "no_order_id_found") {
+      if (customer?.id === "guest" || checkoutDetails.order_id == "no_order_id_found") {
         let email = formData?.contactInfo?.email;
-        let redirectUrl = `/checkout/${checkoutDetails.order_id}?email=${email}`;
+        // let redirectUrl = `/checkout/${checkoutDetails.order_id}?email=${email}`;
+        let redirectUrl = `/checkout/no_order_id_found?email=${email}`;
         router.push(redirectUrl);
         return;
       }
@@ -496,7 +426,16 @@ const CheckoutPage = () => {
 
       const shippingMethod = getShippingMethod(shippingTotal);
       const shippingDetails = transformAddress(formData.deliveryAddress);
-      const billingDetails = transformAddress(formData.billingAddress);
+      // const billingDetails = transformAddress(formData.billingAddress);
+      const email = formData?.contactInfo?.email;
+
+      const billingDetails = {
+        ...transformAddress(formData.billingAddress),
+        email: formData?.contactInfo?.email,
+      };
+
+      // console.log('biliing', billingDetails);
+
 
       const variables = {
         input: {
@@ -504,6 +443,7 @@ const CheckoutPage = () => {
           shippingMethod,
           shipping: shippingDetails,
           billing: billingDetails,
+          customerNote: `Customer Email is: ${email} and Phone Number is ${formData?.contactInfo?.phone}`,
         },
       };
 
@@ -511,6 +451,8 @@ const CheckoutPage = () => {
         customer?.id === "guest"
           ? await guestCheckout({ variables })
           : await checkoutMutation({ variables });
+
+      // console.log('data after cecheckout', data);
 
       if (data) {
         const checkoutDetails = savePaymentDetails(data);
@@ -570,6 +512,11 @@ const CheckoutPage = () => {
   const threePercentFromTotal = numericOrderTotal * 0.03;
 
   const taxWithTotal = (numericOrderTotal + threePercentFromTotal).toFixed(2);
+
+  useEffect(() => {
+    setTotalWithTax(taxWithTotal);
+  }, [taxWithTotal])
+
 
   return (
     <div className="nc-CheckoutPage">
@@ -670,7 +617,7 @@ const CheckoutPage = () => {
 
               {isCardPayment && (
                 <div className="flex justify-between py-2.5">
-                  <span>Card Tax</span>
+                  <span>Bank Charge 3%</span>
                   <span className="font-semibold text-slate-900 dark:text-slate-200">
                     {/* {JSON.stringify(orderTotal)} */}
                     {/* <span dangerouslySetInnerHTML={{ __html: `₨&nbsp;threePercentFromTotal` || "0.00" }} /> */}
