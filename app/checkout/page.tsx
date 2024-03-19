@@ -24,7 +24,7 @@ import {
 
 import CheckoutDetails from "./CheckoutDetails";
 import CartItems from "./CartItems";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { PayhereStatus, PaymentDetailsWithoutUrls } from "@/data/types";
 import Script from "next/script";
 import { usePayhere } from "../components/Payment/Payhere";

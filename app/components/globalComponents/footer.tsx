@@ -25,7 +25,7 @@ const Footer = async () => {
   }
 
   return (
-    <footer className="border-t text-black">
+    <footer className="border-t pb-20 md:pb-0 text-black">
       <div className="container">
         <div className=" py-16  grid grid-cols-12 gap-x-1 gap-y-3 md:grid-cols-12 xl:grid-cols-12 justify-between">
           <div className=" xl:flex gap-1 col-span-12 md:col-span-4 lg:col-span-3 md:gap-3 p-2 flex-col items-center md:items-start justify-center">

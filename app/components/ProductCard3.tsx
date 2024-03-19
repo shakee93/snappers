@@ -1,19 +1,12 @@
 "use client";
-import {
-  ExternalLink,
-  Loader,
-  Settings2,
-  ShoppingCart,
-  XIcon,
-} from "lucide-react";
+import { ExternalLink, Loader, Settings2, ShoppingCart } from "lucide-react";
 import React, { FC, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import { ArrowsPointingOutIcon } from "@heroicons/react/24/outline";
 import { StarIcon } from "@heroicons/react/24/solid";
-import toast, { Toast } from "react-hot-toast";
-import { Transition } from "@headlessui/react";
+import { Toaster, toast } from "sonner";
 import ModalQuickView from "./ModalQuickView";
 import Prices from "./Prices";
 import useProductLink from "@/hooks/useProductLink";
@@ -28,7 +21,7 @@ import { useCart } from "@/context/CartProvider";
 import { twMerge } from "tailwind-merge";
 import { GET_QUICK_VIEW_PRODUCT } from "@/graphql/defs/products";
 import { useQuery } from "@apollo/client";
-import { Highlight } from "react-instantsearch";
+import {  Highlight  } from "react-instantsearch";
 
 export interface ProductCardProps {
   className?: string;
@@ -39,28 +32,19 @@ export interface ProductCardProps {
 const ProductCard: FC<ProductCardProps> = ({
   className = "",
   data,
-  fromSearch = false
+  fromSearch = false,
 }) => {
   const {
     name,
     price,
     type,
-    description,
-    shortDescription,
-    allPaColor,
-    allPaCapacity,
-    purchasable,
     image,
-    attributes,
-    productCategories,
-    slug,
     stockStatus,
     variations,
     regularPrice,
     brands,
     reviewCount,
     averageRating,
-    featured,
     salePrice,
     databaseId,
   } = data;
@@ -95,56 +79,26 @@ const ProductCard: FC<ProductCardProps> = ({
   const { addToCart } = useCart();
 
   const notifyAddTocart = (quantity: number) => {
-    const toastId = toast.custom(
-      (t: Toast) => (
-        <Transition
-          appear
-          show={t.visible}
-          className="p-4 max-w-md w-full bg-white dark:bg-slate-800 shadow-lg rounded-2xl pointer-events-auto ring-1 ring-black/5 dark:ring-white/10 text-slate-900 dark:text-slate-200"
-          enter="transition-all duration-150"
-          enterFrom="opacity-0 translate-x-20"
-          enterTo="opacity-100 translate-x-0"
-          leave="transition-all duration-150"
-          leaveFrom="opacity-100 translate-x-0"
-          leaveTo="opacity-0 translate-x-20"
-        >
-          <div className="flex items-center w-full justify-between text-base font-semibold leading-none">
-            Added to cart!
-            {/*<button onClick={(e) => {*/}
-            {/*  console.log('here');*/}
-            {/*  toast.dismiss(t.id)*/}
-            {/*}}>*/}
-            {/*  <XIcon />*/}
-            {/*</button>*/}
-          </div>
-          <div className="border-t border-slate-200 dark:border-slate-700 my-4" />
-          <AddedToCart product={data} quantity={quantity} />
-        </Transition>
-      ),
-      { position: "top-right", id: "nc-product-notify-cart-" + data.databaseId, duration: 3000 }
+    toast(
+      <div className="">
+        <div className="flex   items-center  justify-between text-base font-semibold leading-none">
+          Added to cart!
+        </div>
+        <div className="border-t border-slate-200 dark:border-slate-700 my-4" />
+        <AddedToCart product={data} quantity={quantity} />
+      </div>,
+      {
+        // position: "top-center",
+        duration: 5000,
+      }
     );
 
-    console.log(toastId);
   };
 
   const cartCompleted = () => {
     notifyAddTocart(quantity);
     setQuantity(1);
   };
-
-  // const handleAddToCart = async () => {
-  //     // console.log(data.databaseId);
-  //     if (data.databaseId) {
-  //         addToCart(data.databaseId, quantity)?.then(cartCompleted);
-  //     } else {
-  //         notifyAddTocart(1);
-  //     }
-  //     setLoading(true);
-  //     await addToCart(data.databaseId, quantity);
-  //     cartCompleted();
-  //     setLoading(false);
-  //     toast.error("Something Went Wrong!");
-  // };
 
   const handleAddToCart = async () => {
     setLoading(true);
@@ -153,6 +107,8 @@ const ProductCard: FC<ProductCardProps> = ({
         await addToCart(data.databaseId, quantity);
         cartCompleted();
       } else {
+        toast("Wow so easy !");
+
         notifyAddTocart(1);
       }
     } catch (error) {
@@ -297,7 +253,7 @@ const ProductCard: FC<ProductCardProps> = ({
 
         <div
           className={"absolute hidden md:block top-3 cursor-pointer right-3"}
-          onClick={(e) => handleCloseModalQuickView()}
+          onClick={() => handleCloseModalQuickView()}
         >
           <ArrowsPointingOutIcon className="w-5" />
           {/*<LikeButton liked={isLiked} className="" />*/}

@@ -16,7 +16,7 @@ import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 
 // Context and Utility Imports
 import { useSession } from "@/context/SessionProvider";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 // Types and Interfaces
 import { Customer } from "@/graphql/types/graphql";
