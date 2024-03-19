@@ -99,7 +99,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({
       if (dataIn) {
         setTechSpecs(dataIn);
 
-        console.log(dataIn);
+        // console.log(dataIn);
 
         const manualMeta = dataIn?.product?.metaData;
         const techSpecDataObject = manualMeta?.find(
