@@ -6,7 +6,7 @@ import ApolloWrapper from "@/graphql/apollo-client";
 import { SessionProvider } from "@/context/SessionProvider";
 import { CartProvider } from "@/context/CartProvider";
 import Header from "@/app/components/globalComponents/header";
-import { Toaster } from "react-hot-toast";
+import { Toaster, toast } from "sonner";
 import Footer from "@/app/components/globalComponents/footer";
 import { Suspense } from "react";
 import { NavigationEvents } from "@/app/components/NavigationEvents";
@@ -31,6 +31,7 @@ export default async function RootLayout({
 
     return (
         <html lang="en">
+
             <body className="bg-gray-50 text-base dark:bg-slate-900 text-slate-900 dark:text-slate-200">
                 <ApolloWrapper>
                     <CartProvider>

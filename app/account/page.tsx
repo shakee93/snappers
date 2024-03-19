@@ -6,8 +6,8 @@ import Label from "@/components/Label/Label";
 import Select from "@/shared/Select/Select";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import { useSession } from "@/context/SessionProvider";
-import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 const AccountPage: FC = () => {
   const { customer, fetchCustomer, updateCustomer } = useSession();
@@ -95,7 +95,6 @@ const AccountPage: FC = () => {
 
     try {
       await updateCustomer(input);
-      toast.remove();
       toast.success("Account details updated successfully");
     } catch (error: any) {
       toast.error("Something Went Wrong!");

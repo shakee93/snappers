@@ -20,7 +20,7 @@ const Prices: FC<PricesProps> = ({
 
     return (
         <div className={twMerge(
-            `flex flex-col lg:gap-3 gap-1 items-center`,
+            `flex flex-col lg:gap-3 gap-1 items-center justify-start`,
             className
         )}>
             {/*{JSON.stringify(price)}*/}

@@ -27,7 +27,7 @@ import AccountOrder from "containers/AccountPage/AccountOrder";
 import CartPage from "containers/ProductDetailPage/CartPage";
 import CheckoutPage from "containers/PageCheckout/CheckoutPage";
 import PageCollection2 from "containers/PageCollection2";
-import { Toaster } from "react-hot-toast";
+import { Toaster } from "sonner";
 
 export const pages: Page[] = [
   { path: "/", component: PageHome },

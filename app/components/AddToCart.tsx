@@ -19,7 +19,6 @@ const AddToCart = ({ product }: {product: Product}) => {
         }
 
         {product.type === 'VARIABLE' &&
-
             <div>
                 <button className='border px-2 py-2 bg-blue-500 rounded'>
                     SEE OPTIONS

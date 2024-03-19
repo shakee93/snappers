@@ -16,7 +16,7 @@ import NcInputNumber from "components/NcInputNumber";
 import BagIcon from "components/BagIcon";
 import AccordionInfo from "./AccordionInfo";
 import Policy from "./Policy";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import {StarIcon} from "@heroicons/react/24/solid";
 import SectionSliderProductCard from "components/SectionSliderProductCard";
 import ModalViewAllReviews from "./ModalViewAllReviews";
@@ -100,17 +100,14 @@ const ProductDetailPage2: FC<ProductDetailPage2Props> = ({
   };
 
   const notifyAddTocart = () => {
-    toast.custom(
-      (t) => (
+    toast(
         <NotifyAddTocart
           productImage={LIST_IMAGES_DEMO[0]}
           qualitySelected={qualitySelected}
-          show={t.visible}
+          show={true}
           sizeSelected={sizeSelected}
           variantActive={variantActive}
         />
-      ),
-      { position: "top-right", id: "nc-product-notify", duration: 3000 }
     );
   };
 

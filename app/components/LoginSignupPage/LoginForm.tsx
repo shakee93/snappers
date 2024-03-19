@@ -6,7 +6,7 @@ import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import { LoginResponse } from "@/utils/type";
 import { useSession } from "@/context/SessionProvider";
 import { useRouter } from "next/navigation";
-import toast from "react-hot-toast";
+import {toast} from "sonner";
 import { Loader } from "lucide-react";
 import { getRandomWelcomeMessage } from "@/components/AddressPageComps/HelperComps";
 
