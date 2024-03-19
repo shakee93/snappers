@@ -92,7 +92,7 @@ const CheckoutPage = () => {
 
 
   const [shippingTotal, setShippingTotal] = useState();
-  const [orderTotal, setOrderTotal] = useState();
+  const [orderTotal, setOrderTotal] = useState<string | null>(null);
   const [paymentData, setPaymentData] =
     useState<PaymentDetailsWithoutUrls | null>(null);
   const [showBankTransfer, setShowBankTransfer] = useState<boolean>(false);
@@ -105,11 +105,15 @@ const CheckoutPage = () => {
     if (cart && cart?.contents?.nodes?.length === 0) {
       router.push("/");
     }
+    if (cart?.total !== null && cart?.total !== undefined) {
+      setOrderTotal(cart?.total);
+    }
   }, [cart]);
 
   useEffect(() => {
     fetchCustomer();
   }, []);
+
 
   // MUTATIONS
   const [updateCartShippingTotalMutation] = useMutation(UPDATE_SHIPPING_TOTAL);
