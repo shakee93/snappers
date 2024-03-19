@@ -13,7 +13,7 @@ import {
 } from "@heroicons/react/24/outline";
 import IconDiscount from "components/IconDiscount";
 import Prices from "components/Prices";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import SectionSliderProductCard from "components/SectionSliderProductCard";
 import detail1JPG from "@/app/public/images/products/detail1.jpg";
 import detail2JPG from "@/app/public/images/products/detail2.jpg";
@@ -41,17 +41,14 @@ const ProductDetailPage: FC<ProductDetailPageProps> = ({ className = "" }) => {
     useState(false);
 
   const notifyAddTocart = () => {
-    toast.custom(
-      (t) => (
+    toast(
         <NotifyAddTocart
           productImage={LIST_IMAGES_DEMO[0].src}
           qualitySelected={qualitySelected}
-          show={t.visible}
+          show={true}
           sizeSelected={sizeSelected}
           variantActive={variantActive}
         />
-      ),
-      { position: "top-right", id: "nc-product-notify", duration: 3000 }
     );
   };
 

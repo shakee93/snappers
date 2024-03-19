@@ -4,7 +4,7 @@ import {useCart} from "@/context/CartProvider";
 import {ProductVariation, SimpleProduct, VariableProduct,} from "@/graphql/types/graphql";
 import NcInputNumber from "@/components/NcInputNumber";
 import React, {useState} from "react";
-import toast from "react-hot-toast";
+import {toast} from "sonner";
 import {Transition} from "@headlessui/react";
 import AddedToCart from "@/app/components/Notifications/added-to-cart";
 import {twMerge} from "tailwind-merge";
@@ -24,36 +24,56 @@ const ProductAddToCart = ({
   //   console.log(product);
   // }, [product])
   const notifyAddTocart = (quantity: number) => {
-    toast.custom(
-      (t: any) => (
-        <Transition
-          appear
-          show={t.visible}
-          className="p-4 max-w-md w-full bg-white dark:bg-slate-800 shadow-lg rounded-2xl pointer-events-auto ring-1 ring-black/5 dark:ring-white/10 text-slate-900 dark:text-slate-200"
-          enter="transition-all duration-150"
-          enterFrom="opacity-0 translate-x-20"
-          enterTo="opacity-100 translate-x-0"
-          leave="transition-all duration-150"
-          leaveFrom="opacity-100 translate-x-0"
-          leaveTo="opacity-0 translate-x-20"
-        >
-          <div className="flex items-center w-full justify-between text-base font-semibold leading-none">
-            Added to cart!{" "}
-            <button onClick={(e) => toast.dismiss("nc-product-notify")}>
-              <XIcon />
-            </button>
-          </div>
-          <div className="border-t border-slate-200 dark:border-slate-700 my-4" />
-          <AddedToCart
+    toast(
+      <div className="">
+        <div className="flex   items-center  justify-between text-base font-semibold leading-none">
+          Added to cart!
+        </div>
+        <div className="border-t border-slate-200 dark:border-slate-700 my-4" />
+        <AddedToCart
             product={product}
             variation={variation}
             quantity={quantity}
           />
-        </Transition>
-      ),
-      { position: "top-right", id: "nc-product-notify", duration: 3000 }
+      </div>,
+      {
+        // position: "top-center",
+        duration: 5000,
+      }
     );
+
   };
+  // const notifyAddTocart = (quantity: number) => {
+  //   toast.custom(
+  //     (t: any) => (
+  //       <Transition
+  //         appear
+  //         show={t.visible}
+  //         className="p-4 max-w-md w-full bg-white dark:bg-slate-800 shadow-lg rounded-2xl pointer-events-auto ring-1 ring-black/5 dark:ring-white/10 text-slate-900 dark:text-slate-200"
+  //         enter="transition-all duration-150"
+  //         enterFrom="opacity-0 translate-x-20"
+  //         enterTo="opacity-100 translate-x-0"
+  //         leave="transition-all duration-150"
+  //         leaveFrom="opacity-100 translate-x-0"
+  //         leaveTo="opacity-0 translate-x-20"
+  //       >
+  //         <div className="flex items-center w-full justify-between text-base font-semibold leading-none">
+  //           Added to cart!{" "}
+  //           <button onClick={(e) => toast.dismiss("nc-product-notify")}>
+  //             <XIcon />
+  //           </button>
+  //         </div>
+  //         <div className="border-t border-slate-200 dark:border-slate-700 my-4" />
+  //         <AddedToCart
+  //           product={product}
+  //           variation={variation}
+  //           quantity={quantity}
+  //         />
+  //       </Transition>
+  //     ),
+  //     { position: "top-right", id: "nc-product-notify", duration: 3000 }
+  //   );
+  // };
 
   const cartCompleted = () => {
     notifyAddTocart(quantity);

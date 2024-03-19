@@ -8,7 +8,7 @@ import {
 } from "@/graphql/defs/order";
 import { useEffect, useMemo } from "react";
 import ProductTable, { OrderDetails } from "./Comps";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import Link from "next/link";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import { useRouter, useSearchParams } from "next/navigation";

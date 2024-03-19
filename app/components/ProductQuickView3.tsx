@@ -1,42 +1,26 @@
 import React, { FC, useState, useCallback, useEffect } from "react";
 import { useStore } from "@/store/store";
-import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import LikeButton from "@/app/components/LikeButton";
-import { StarIcon } from "@heroicons/react/24/solid";
-import BagIcon from "@/app/components/BagIcon";
-import NcInputNumber from "@/components/NcInputNumber";
 import {
   NoSymbolIcon,
   ClockIcon,
   SparklesIcon,
 } from "@heroicons/react/24/outline";
 import IconDiscount from "@/components/IconDiscount";
-import Prices from "@/app/components/Prices";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import NotifyAddTocart from "./NotifyAddTocart";
 import AccordionInfo from "@/containers/ProductDetailPage/AccordionInfo";
-import Link from "next/link";
 import Image from "next/image";
 import useProductLink from "@/hooks/useProductLink";
-import ProductAddToCart from "./SingleProductPage/ProductAddToCart";
-import { twMerge } from "tailwind-merge";
 
-import ProductSpecifications from "./SingleProductPage/ProductSpecifications";
-import BrandBar from "./globalComponents/BrandBar";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import {
-  Attribute,
-  Brand,
-  Category,
-  GlobalProductAttribute,
-  Product,
   ProductAttribute,
-  ProductUnion,
   ProductVariation,
 } from "@/graphql/types/graphql";
 
 import { GET_TECH_SPEC } from "@/graphql/defs/products";
-import {useLazyQuery, useQuery} from "@apollo/client";
+import {useLazyQuery} from "@apollo/client";
 import ProductDetails from "@/app/components/SingleProductPage/ProductDetailsQuickView";
 import {Loader} from "lucide-react";
 
@@ -125,17 +109,14 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({
   );
 
   const notifyAddTocart = () => {
-    toast.custom(
-      (t) => (
+    toast(
         <NotifyAddTocart
           productImage={product_images[0]}
           qualitySelected={qualitySelected}
-          show={t.visible}
+          show={true}
           sizeSelected={sizeSelected}
           variantActive={variantActive}
         />
-      ),
-      { position: "top-right", id: "nc-product-notify", duration: 3000 }
     );
   };
 

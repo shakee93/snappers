@@ -3,7 +3,7 @@ import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import { Input } from "@nextui-org/react";
 import { useRouter } from "next/navigation";
 import React, { FormEvent, useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import BankDetails from "./BankDetails";
 import { PaymentDetailsWithoutUrls } from "@/data/types";
 import { Loader } from "lucide-react";

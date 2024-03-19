@@ -6,7 +6,7 @@ import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import {useSession} from "@/context/SessionProvider";
 import {SignUpResponse} from "@/utils/type";
 import {useRouter} from "next/navigation";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import {Loader} from "lucide-react";
 
 const SignUpForm = () => {
