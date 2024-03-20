@@ -114,6 +114,8 @@ const ProductDetails = ({
     return htmlContent.replace(/<ul>/g, '<ul class="list-disc">');
   };
 
+  console.log('product details', product);
+
 
   return (
     <>
@@ -184,35 +186,29 @@ const ProductDetails = ({
       {product.type === "VARIABLE" && activeVariation ? (
         <div>
           <div className="flex gap-4 text-base py-2 flex-wrap md:text-lg font-medium text-gray-600">
-            {/* <span>{activeVariation.price}</span> */}
-          
-                <span dangerouslySetInnerHTML={{ __html: activeVariation.price }} />
-
+            <span dangerouslySetInnerHTML={{ __html: activeVariation.price }} />
 
             {!!activeVariation.salePrice &&
               activeVariation.salePrice !== activeVariation.regularPrice && (
                 <span className="text-red-400 line-through">
-                  {/* <s>{activeVariation.regularPrice}</s> */}
-                <span dangerouslySetInnerHTML={{ __html: activeVariation.price }} />
+                  <span dangerouslySetInnerHTML={{ __html: activeVariation.regularPrice }} />
                 </span>
               )}
+
           </div>
         </div>
       ) : (
         <div className="flex gap-2 text-base py-2 flex-wrap md:text-lg font-medium text-gray-600">
-          {/* <span>{product.price}</span> */}
-                          <span dangerouslySetInnerHTML={{ __html: product.price  || ''}} />
-          
+          <span dangerouslySetInnerHTML={{ __html: product.price || '' }} />
+
           {!!product.salePrice &&
             product.salePrice !== product.regularPrice && (
               <span className="text-red-400 line-through">
-                {/* <s>{product.regularPrice}</s> */}
-                          <span dangerouslySetInnerHTML={{ __html: product.regularPrice ||  '' }} />
+                <span dangerouslySetInnerHTML={{ __html: product.regularPrice || '' }} />
               </span>
             )}
         </div>
       )}
-      {/* {JSON.stringify(product.stockStatus)} */}
 
       {product.type === "SIMPLE" && product.stockStatus !== "IN_STOCK" && (
         <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1">
