@@ -118,7 +118,7 @@ const ProductDetails = ({
   return (
     <>
       <div className="flex gap-1  text-sm text-gray-500">
-        Brand : <span className="">{brand?.name}</span>
+        Brand : <Link href={`/${brand?.slug}`} target="_blank">{brand?.name}</Link>
       </div>
 
       <div className="text-base md:text-lg font-medium ">
