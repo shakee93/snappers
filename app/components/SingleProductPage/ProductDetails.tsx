@@ -114,8 +114,6 @@ const ProductDetails = ({
     return htmlContent.replace(/<ul>/g, '<ul class="list-disc">');
   };
 
-  console.log('product details', product);
-
 
   return (
     <>
