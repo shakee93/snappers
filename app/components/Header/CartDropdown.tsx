@@ -1,7 +1,7 @@
 "use client";
 import { Popover, Transition } from "@headlessui/react";
 import { ShoppingBag } from "lucide-react";
-import { Fragment } from "react";
+import { Fragment, useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
@@ -12,11 +12,29 @@ export default function CartDropdown() {
   const { cart } = useCart();
   let empty = cart?.contents?.itemCount == 0;
 
+
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const handleClickOutside = (event: any) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setIsOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
   return (
-    <Popover className="relative">
+    <Popover className="relative" ref={dropdownRef}>
       {({ open, close }) => (
         <>
           <Popover.Button
+            onClick={() => setIsOpen(!isOpen)}
             className={`
                 ${open ? "" : "text-opacity-90"}
                  group w-10 h-10 sm:w-12 sm:h-12 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full inline-flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 relative`}
@@ -35,6 +53,7 @@ export default function CartDropdown() {
           </Popover.Button>
           <Transition
             as={Fragment}
+            show={isOpen}
             enter="transition ease-out duration-200"
             enterFrom="opacity-0 translate-y-1"
             enterTo="opacity-100 translate-y-0"

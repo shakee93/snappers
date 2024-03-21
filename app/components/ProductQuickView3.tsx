@@ -83,7 +83,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({
       if (dataIn) {
         setTechSpecs(dataIn);
 
-        console.log(dataIn);
+        // console.log(dataIn);
 
         const manualMeta = dataIn?.product?.metaData;
         const techSpecDataObject = manualMeta?.find(
@@ -204,7 +204,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({
     return null;
   };
 
-  console.log("product", product);
+  // console.log("product", product);
 
   const renderSectionContent = () => {
     return (

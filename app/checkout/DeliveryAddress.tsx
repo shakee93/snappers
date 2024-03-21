@@ -295,13 +295,13 @@ const DeliveryAddress: FC<Props> = ({
               />
               <div>
                 {/* <Label className="text-sm">Postal code</Label> */}
-                <Input
+                {/* <Input
                   className="mt-1.5 capitalize"
                   placeholder="Postal code*"
                   value={postal}
                   onChange={(e) => setPostal(e.target.value)}
                   required={true}
-                />
+                /> */}
               </div>
             </div>
 

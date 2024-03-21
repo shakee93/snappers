@@ -40,12 +40,12 @@ const DropdownButton = ({ categories }: { categories: any }) => {
             >
               <Popover.Panel
                 className={twMerge(
-                  "absolute z-[350] w-screen max-w-sm mt-3 lg:max-w-5xl  shadow-2xl bg-white rounded-lg"
+                  "absolute z-[350] w-screen max-w-sm mt-3 lg:max-w-5xl shadow-2xl bg-white rounded-lg max-h-[600px] overflow-y-auto"
                 )}
               >
                 <ul
-                  className="py-4 px-4 text-left   grid-flow-col text-sm font-normal \
-                 text-gray-700 grid grid-rows-12 dark:text-gray-200"
+                  className="py-4 px-4 text-left grid-flow-col text-sm font-normal \
+                 text-gray-700 grid grid-rows-12 dark:text-gray-200 " 
                 >
                   {sortedCategories?.map(
                     (category: Category, index: number) => (

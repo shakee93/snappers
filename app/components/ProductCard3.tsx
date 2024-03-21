@@ -19,7 +19,9 @@ import {
 import AddedToCart from "@/app/components/Notifications/added-to-cart";
 import { useCart } from "@/context/CartProvider";
 import { twMerge } from "tailwind-merge";
-import { Highlight } from "react-instantsearch";
+import { GET_QUICK_VIEW_PRODUCT } from "@/graphql/defs/products";
+import { useQuery } from "@apollo/client";
+import {  Highlight  } from "react-instantsearch";
 
 export interface ProductCardProps {
   className?: string;
@@ -167,6 +169,30 @@ const ProductCard: FC<ProductCardProps> = ({
       </div>
     );
   };
+  function parsePrice(priceString: any) {
+    return parseFloat(priceString.replace(/[^\d.]/g, ''));
+  }
+
+  let lowestPriceIndex = -1;
+  let lowestSalePriceIndex = -1;
+
+  if (type === "VARIABLE" && variations) {
+    variations.nodes.forEach((variation, index) => {
+      const variationPrice = parsePrice((variation as { price?: any })?.price || '');
+      const variationSalePrice = parsePrice((variation as { regularPrice?: any })?.regularPrice || '');
+
+      if (lowestPriceIndex === -1 || variationPrice < parsePrice(variations.nodes[lowestPriceIndex]?.price)) {
+        lowestPriceIndex = index;
+      }
+
+      if (lowestSalePriceIndex === -1 || variationSalePrice < parsePrice(variations.nodes[lowestSalePriceIndex]?.regularPrice)) {
+        lowestSalePriceIndex = index;
+      }
+    });
+  }
+
+  const lowestPrice = lowestPriceIndex !== -1 ? variations?.nodes[lowestPriceIndex]?.price : (price !== null && price !== undefined ? price : 0);
+  const lowestSalePrice = lowestSalePriceIndex !== -1 ? variations?.nodes[lowestSalePriceIndex]?.regularPrice : (regularPrice !== null && regularPrice !== undefined ? regularPrice : 0);
 
   return (
     <div
@@ -177,10 +203,10 @@ const ProductCard: FC<ProductCardProps> = ({
         <Link href={link}>
           <div className="flex items-center justify-center h-[150px] sm:h-[250px]">
             {variations?.edges &&
-            variations.edges.some(
-              (variation: { node: ProductVariation }) =>
-                variation.node?.image?.sourceUrl
-            ) ? (
+              variations.edges.some(
+                (variation: { node: ProductVariation }) =>
+                  variation.node?.image?.sourceUrl
+              ) ? (
               variations.edges.map(
                 (
                   variation: {
@@ -262,11 +288,9 @@ const ProductCard: FC<ProductCardProps> = ({
           <h2
             className={`nc-ProductCard__title  text-xs lg:text-sm text-black line-clamp-2 font-semibold transition-colors whitespace-normal`}
           >
-            {fromSearch ? (
-              <Highlight attribute="name" hit={data as any} />
-            ) : (
-              <>{name}</>
-            )}
+            {fromSearch ?
+              <Highlight attribute="name" hit={data as any} /> : <>{name}</>
+            }
           </h2>
         </Link>
 
@@ -274,25 +298,37 @@ const ProductCard: FC<ProductCardProps> = ({
           href={link}
           className="flex m-0 mb-2 justify-between  items-center"
         >
+
+          {/* {JSON.stringify(lowestPrice)} */}
           <Prices
-            price={
-              type === "VARIABLE"
-                ? variations?.nodes[0]?.price !== null
-                  ? variations?.nodes[0]?.price
-                  : price
-                : price !== null && price !== undefined
-                ? price
-                : 0
-            }
-            salePrice={
-              type === "VARIABLE"
-                ? variations?.nodes[0]?.regularPrice !== null
-                  ? variations?.nodes[0]?.regularPrice
-                  : price
-                : regularPrice !== null && regularPrice !== undefined
-                ? regularPrice
-                : 0
-            }
+            price={lowestPrice}
+            salePrice={lowestSalePrice}
+            // price={
+            //   type === "VARIABLE"
+            //     ? variations?.nodes.reduce((lowestPrice, variation) => {
+            //       const variationPrice = variation?.price;
+            //       return variationPrice !== null &&
+            //         (lowestPrice === null || variationPrice < lowestPrice)
+            //         ? variationPrice
+            //         : lowestPrice;
+            //     }, null)
+            //     : price !== null && price !== undefined
+            //       ? price
+            //       : 0
+            // }
+            // salePrice={
+            //   type === "VARIABLE"
+            //     ? variations?.nodes.reduce((lowestRegularPrice, variation) => {
+            //       const variationRegularPrice = variation?.regularPrice;
+            //       return variationRegularPrice !== null &&
+            //         (lowestRegularPrice === null || variationRegularPrice < lowestRegularPrice)
+            //         ? variationRegularPrice
+            //         : lowestRegularPrice;
+            //     }, null)
+            //     : regularPrice !== null && regularPrice !== undefined
+            //       ? regularPrice
+            //       : 0
+            // }
             className="lg:flex-row"
           />
 

@@ -2,7 +2,7 @@
 
 import { Popover, Transition } from "@headlessui/react";
 import { CircleUserRound, User, LogIn } from "lucide-react";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useState, useRef } from "react";
 import Link from "next/link";
 import LogoutButton from "@/components/Header/LogoutButton";
 import { useSession } from "@/context/SessionProvider";
@@ -10,6 +10,9 @@ import { Customer } from "@/graphql/types/graphql";
 import { LoggedInAvatar } from "@/components/AddressPageComps/HelperComps";
 
 export default function AvatarDropdown() {
+
+  const [isOpen, setIsOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
   
   const { customer, fetchCustomer } = useSession();
 
@@ -24,9 +27,23 @@ export default function AvatarDropdown() {
   }, [customer]);
 
 
+  const handleClickOutside = (event : any) => {
+    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+      setIsOpen(false);
+    }
+  };
+
+  useEffect(() => {
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+
 
   return (
-    <div className="AvatarDropdown">
+    <div className="AvatarDropdown" ref={dropdownRef}>
       {/* <button onClick={() => fetchCustomer()}>Refetch</button> */}
       <Popover className="relative">
         {({ open, close }) => (
@@ -35,6 +52,7 @@ export default function AvatarDropdown() {
               className={``}
               onClick={() => {
                 fetchCustomer();
+                setIsOpen(!isOpen);
               }}
             >
               <div
@@ -49,6 +67,7 @@ export default function AvatarDropdown() {
             </Popover.Button>
             <Transition
               as={Fragment}
+              show={isOpen}
               enter="transition ease-out duration-200"
               enterFrom="opacity-0 translate-y-1"
               enterTo="opacity-100 translate-y-0"
