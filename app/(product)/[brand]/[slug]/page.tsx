@@ -82,9 +82,9 @@ const Page = async ({ params }: Props) => {
   
 
   return (
-    <div className="mt-5 md:mt-16">
+    <div className="mt-5 md:mt-10">
       <main className="container m-auto">
-        <div className="md:mt-5 text-xs md:px-5 md:text-base">
+        <div className="md:mt-0 text-sm md:px-5 md:text-lg">
           <Link href="/">Home</Link> &gt;{" "}
           <Link href={`/${brand.slug}`}>{brand.name}</Link> &gt;{" "}
           <Link href={`/${brand.slug}/${product.slug}`}>{product.name}</Link>
