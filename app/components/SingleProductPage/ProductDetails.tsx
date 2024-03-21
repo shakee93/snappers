@@ -101,6 +101,7 @@ const ProductDetails = ({
 
   const brandColorClass = brand?.name && brandColors[brand?.name.toLowerCase()];
 
+
   return (
     <>
       <div className="flex gap-1  text-sm text-gray-500">
@@ -207,6 +208,22 @@ const ProductDetails = ({
             Sold Out
           </div>
         )}
+
+      {product.type === "VARIABLE" &&
+        activeVariation?.stockStatus == "IN_STOCK" && activeVariation?.stockQuantity &&
+        activeVariation?.stockQuantity <= 2 && (
+          <div className="w-max px-4 bg-yellow-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1 mb-1">
+            Low Stock
+          </div>
+        )}
+
+      {product.type === "SIMPLE" && product.stockStatus == "IN_STOCK" && product?.stockQuantity &&
+        product?.stockQuantity <= 2 && (
+          <div className="w-max px-4 bg-yellow-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1 mb-1">
+            Low Stock
+          </div>
+        )}
+
 
 
       <ProductAddToCart product={product} variation={activeVariation} />
