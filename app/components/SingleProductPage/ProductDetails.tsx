@@ -15,6 +15,9 @@ import { useStore } from "@/store/store";
 import { twMerge } from "tailwind-merge";
 import parseHtml from "html-react-parser";
 import { useImage } from "@/context/ImageChangeGrabber";
+import brandColors from '@/data/brandColors';
+
+
 
 const ProductDetails = ({
   product,
@@ -34,22 +37,7 @@ const ProductDetails = ({
   );
 
 
-
   const { setVariationId } = useImage();
-
-  //   useEffect(() => {
-
-  //     console.log("product: ", product?.variations?.nodes);
-  //     if (product?.variations?.nodes[0]) {
-  //       setActiveVariation(
-  //         !!product?.variations?.nodes?.length
-  //           ? product?.variations?.nodes[0]
-  //           : null
-  //       );
-  //     } else {
-  //       alert("NODE NOT FOUNDJ");
-  //     }
-  //   }, []);
 
   useEffect(() => {
     if (product.type === "VARIABLE") {
@@ -103,9 +91,7 @@ const ProductDetails = ({
       if (vProduct) {
         setActiveVariation(vProduct);
       }
-      //   else {
-      //     setActiveVariation(null);
-      //   }
+
     }
   }, [attribute]);
 
@@ -114,16 +100,18 @@ const ProductDetails = ({
     return htmlContent.replace(/<ul>/g, '<ul class="list-disc">');
   };
 
+  const brandColorClass = brand?.name && brandColors[brand?.name.toLowerCase()];
 
   return (
     <>
       <div className="flex gap-1  text-sm text-gray-500">
-        Brand : <Link href={`/${brand?.slug}`} target="_blank">{brand?.name}</Link>
+        Brand : <Link href={`/${brand?.slug}`} target="_blank" className={`${brandColorClass}`} >{brand?.name}</Link>
       </div>
 
       <div className="text-base md:text-lg font-medium ">
         {product.name} - {product.databaseId}
       </div>
+
 
       {product.shortDescription && (
         <div
@@ -213,17 +201,14 @@ const ProductDetails = ({
           Sold Out
         </div>
       )}
-      {/* <p>Variable</p>
-        {JSON.stringify(product.type === "VARIABLE" )}
-        <p>Stock Status</p>
-        {JSON.stringify(activeVariation?.stockStatus !== "IN_STOCK")}
-        <p>value before assigning</p> */}
+
       {product.type === "VARIABLE" &&
         activeVariation?.stockStatus !== "IN_STOCK" && (
-          <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 tex-xs md:text-sm py-1">
+          <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1 mb-1">
             Sold Out
           </div>
         )}
+
 
       <ProductAddToCart product={product} variation={activeVariation} />
       <div className="flex gap-1 w-full items-center flex-wrap text-sm md:text-base text-gray-500">
