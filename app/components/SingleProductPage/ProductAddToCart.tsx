@@ -1,13 +1,13 @@
 "use client";
-import {Loader, ShoppingCart, XIcon} from "lucide-react";
-import {useCart} from "@/context/CartProvider";
-import {ProductVariation, SimpleProduct, VariableProduct,} from "@/graphql/types/graphql";
+import { Loader, ShoppingCart, XIcon } from "lucide-react";
+import { useCart } from "@/context/CartProvider";
+import { ProductVariation, SimpleProduct, VariableProduct, } from "@/graphql/types/graphql";
 import NcInputNumber from "@/components/NcInputNumber";
-import React, {useState} from "react";
-import {toast} from "sonner";
-import {Transition} from "@headlessui/react";
+import React, { useState } from "react";
+import { toast } from "sonner";
+import { Transition } from "@headlessui/react";
 import AddedToCart from "@/app/components/Notifications/added-to-cart";
-import {twMerge} from "tailwind-merge";
+import { twMerge } from "tailwind-merge";
 
 const ProductAddToCart = ({
   product,
@@ -31,14 +31,14 @@ const ProductAddToCart = ({
         </div>
         <div className="border-t border-slate-200 dark:border-slate-700 my-4" />
         <AddedToCart
-            product={product}
-            variation={variation}
-            quantity={quantity}
-          />
+          product={product}
+          variation={variation}
+          quantity={quantity}
+        />
       </div>,
       {
         // position: "top-center",
-        duration: 5000,
+        duration: 2000,
       }
     );
 
@@ -88,7 +88,7 @@ const ProductAddToCart = ({
     ) {
       return;
     }
-  
+
     setLoading(true);
     let variationId = product.type == "SIMPLE" ? undefined : variation.databaseId;
 
@@ -102,7 +102,7 @@ const ProductAddToCart = ({
       setLoading(false);
     }
   };
-  
+
 
   if (product?.type === "VARIABLE" && !variation) {
     return <></>;
@@ -131,7 +131,7 @@ const ProductAddToCart = ({
             (product?.stockStatus !== "IN_STOCK" ||
               (product?.type === "VARIABLE" &&
                 variation?.stockStatus !== "IN_STOCK")) &&
-              "opacity-50 disabled:cursor-not-allowed"
+            "opacity-50 disabled:cursor-not-allowed"
           )}
         >
           {loading ? <Loader className="animate-spin" /> : <ShoppingCart />}
