@@ -300,6 +300,7 @@ export const ProductContentFull = gql`
           name
           price
           stockStatus
+          stockQuantity
           rawPrice: price(format: RAW)
           regularPrice
           salePrice
