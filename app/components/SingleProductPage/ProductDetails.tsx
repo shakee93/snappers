@@ -101,7 +101,6 @@ const ProductDetails = ({
 
   const brandColorClass = brand?.name && brandColors[brand?.name.toLowerCase()];
 
-
   return (
     <>
       <div className="flex gap-1  text-sm text-gray-500">
@@ -196,6 +195,8 @@ const ProductDetails = ({
         </div>
       )}
 
+      {/* Sold Out Badge */}
+
       {product.type === "SIMPLE" && product.stockStatus !== "IN_STOCK" && (
         <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1">
           Sold Out
@@ -209,6 +210,27 @@ const ProductDetails = ({
           </div>
         )}
 
+      {/* In Stock Badge */}
+
+      {product.type === "VARIABLE" &&
+        activeVariation?.stockStatus == "IN_STOCK" && (
+          (activeVariation?.stockQuantity && activeVariation?.stockQuantity >= 3) || (!activeVariation.stockQuantity && activeVariation?.stockStatus === "IN_STOCK")
+        ) && (
+          <div className="w-max px-4 bg-green-200 text-center rounded-full text-gray-800 text-xs md:text-sm py-1">
+            In Stock
+          </div>
+        )}
+
+      {product.type === "SIMPLE" && product.stockStatus === "IN_STOCK" && (
+        (product?.stockQuantity && product?.stockQuantity >= 3) || (!product.stockQuantity && product.stockStatus === "IN_STOCK")
+      ) && (
+          <div className="w-max px-4 bg-green-200 text-center rounded-full text-gray-800 text-xs md:text-sm py-1">
+            In Stock
+          </div>
+        )}
+
+
+      {/* Low Stock Badge */}
       {product.type === "VARIABLE" &&
         activeVariation?.stockStatus == "IN_STOCK" && activeVariation?.stockQuantity &&
         activeVariation?.stockQuantity <= 2 && (
