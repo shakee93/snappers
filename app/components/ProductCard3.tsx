@@ -89,7 +89,7 @@ const ProductCard: FC<ProductCardProps> = ({
       </div>,
       {
         // position: "top-center",
-        duration: 5000,
+        duration: 2000,
       }
     );
 
@@ -170,7 +170,7 @@ const ProductCard: FC<ProductCardProps> = ({
     );
   };
   function parsePrice(priceString: any) {
-    return parseFloat(priceString.replace(/[^\d.]/g, ''));
+    return parseFloat(priceString?.replace(/[^\d.]/g, ''));
   }
 
   let lowestPriceIndex = -1;
