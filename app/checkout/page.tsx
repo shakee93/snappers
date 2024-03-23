@@ -52,9 +52,7 @@ interface FormData {
 
 const CheckoutPage = () => {
   const { cart, removeFromCart, updateCart } = useCart();
-
   const [finalOrderTotal, setFinalOrderTotal] = useState(null);
-
   const { customer, fetchCustomer } = useSession();
 
   const { data } = useQuery(GET_PAYMENT_GATEWAYS);
@@ -77,7 +75,6 @@ const CheckoutPage = () => {
   // create state for the payhere random id
   const [payherPaymentID, setPayherPaymentID] = useState<string | null>(null)
 
-
   const [payhereHandleStatus, setPayhereHandleStatus] =
     useState<PayhereStatus>("idle");
 
@@ -90,7 +87,6 @@ const CheckoutPage = () => {
     billingAddress: false,
   });
 
-
   const [shippingTotal, setShippingTotal] = useState();
   const [orderTotal, setOrderTotal] = useState<string | null>(null);
   const [paymentData, setPaymentData] =
@@ -100,7 +96,7 @@ const CheckoutPage = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [totalWithTax, setTotalWithTax] = useState<string | null>();
 
-  // TODO: Un comment this for the redirect on cart free
+  // TODO: Uncomment this for the redirect on cart free
   useEffect(() => {
     if (cart && cart?.contents?.nodes?.length === 0) {
       router.push("/");
@@ -320,6 +316,8 @@ const CheckoutPage = () => {
       return;
     }
 
+    const productNames = cart?.contents?.nodes.map((node) => node?.product?.node.name).join(" , ");
+
     let checkoutDetails: PaymentDetailsWithoutUrls = {
       // amount: orderTotal,
       amount: isCardPayment ? totalWithTax : orderTotal,
@@ -328,11 +326,11 @@ const CheckoutPage = () => {
       last_name: lastName,
       email: email,
       phone: phone,
-      items: "gq mobiles",
+      items: productNames,
       address: city + apartment,
       city: city,
     };
-
+ 
     if (initiatePayment !== null) {
       setPayhereHandleStatus("loading");
       initiatePayment(checkoutDetails, setPayhereHandleStatus).then((r) => r);
