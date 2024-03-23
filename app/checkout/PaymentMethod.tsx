@@ -47,8 +47,12 @@ const PaymentMethod: FC<Props> = ({
     
     const active = methodActive === gateway.id;
 
+    console.log("activeMethod: ", gateway.id);
+
+    let is_tab_or_mobile = gateway.id == "payhere"
+
     return (
-      <div className="flex items-start cursor-pointer space-x-4 sm:space-x-6">
+      <div className={` items-start cursor-pointer space-x-4 sm:space-x-6 ${is_tab_or_mobile ? "hidden md:flex " : "flex"}`}>
         <Radio
           className="cursor-pointer"
           name="payment-method"
@@ -154,6 +158,9 @@ const PaymentMethod: FC<Props> = ({
 
           {/* ==================== */}
           <div className="flex flex-col gap-6">
+            {/* {paymentGateways?.map((gateway) => (
+              <p key={gateway.id}>{ JSON.stringify(gateway) }</p>
+            ))} */}
             {paymentGateways?.map((gateway) => (
               <PaymentMethods key={gateway.id} gateway={gateway} />
             ))}
