@@ -65,7 +65,7 @@ const Page = async ({ params } : {
         brand: string
     }
 }) => {
-
+    console.log("page is runnnig")
     const { brand } = await getData(params.brand)
 
     return (
