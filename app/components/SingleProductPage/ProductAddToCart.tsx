@@ -96,7 +96,7 @@ const ProductAddToCart = ({
       await addToCart(product?.databaseId, quantity, variationId);
       cartCompleted();
     } catch (error) {
-      console.error("Error:", error);
+      console.log("Error:", error);
       toast.error("Unable to add to cart");
     } finally {
       setLoading(false);
