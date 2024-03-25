@@ -51,6 +51,12 @@ export const ProductContentSlice = gql`
           slug
         }
       }
+      allPaConnectivity {
+        nodes {
+          name
+          slug
+        }
+      }
       allPaColor {
         nodes {
           name
@@ -247,6 +253,12 @@ export const ProductContentFull = gql`
         }
       }
       allPaWatchSize {
+        nodes {
+          name
+          slug
+        }
+      }
+      allPaConnectivity {
         nodes {
           name
           slug

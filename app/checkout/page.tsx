@@ -4,6 +4,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { FetchResult, useMutation, useQuery } from "@apollo/client";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
+import Checkbox from "@/shared/Checkbox/Checkbox";
 import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
 import {
@@ -95,7 +96,16 @@ const CheckoutPage = () => {
   const [wantToSHowBankTransfer, setWantToSHowBankTransfer] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [totalWithTax, setTotalWithTax] = useState<string | null>();
+  const [isTOC, setTOC] = useState<boolean>(false);
 
+  const handleTOC = () => {
+    // Toggle the state and get the updated value
+    const updatedTOC = !isTOC;
+    setTOC(updatedTOC);
+
+    // Log the updated value
+    // console.log({ updatedTOC });
+  }
   // TODO: Uncomment this for the redirect on cart free
   useEffect(() => {
     if (cart && cart?.contents?.nodes?.length === 0) {
@@ -330,7 +340,7 @@ const CheckoutPage = () => {
       address: city + apartment,
       city: city,
     };
- 
+
     if (initiatePayment !== null) {
       setPayhereHandleStatus("loading");
       initiatePayment(checkoutDetails, setPayhereHandleStatus).then((r) => r);
@@ -661,14 +671,16 @@ const CheckoutPage = () => {
                   isConfirmed.contactInfo &&
                   isConfirmed.deliveryAddress &&
                   isConfirmed.billingAddress &&
-                  isConfirmed.paymentMethod
+                  isConfirmed.paymentMethod &&
+                  isTOC
                 )
               }
               className={`mt-8 w-full ${!(
                 isConfirmed.contactInfo &&
                 isConfirmed.deliveryAddress &&
                 isConfirmed.billingAddress &&
-                isConfirmed.paymentMethod
+                isConfirmed.paymentMethod &&
+                isTOC
               )
                 ? "cursor-not-allowed bg-slate-500"
                 : "bg-primary hover:bg-primary-dark"
@@ -695,7 +707,15 @@ const CheckoutPage = () => {
 
             <div className="mt-5 flex items-center justify-center text-sm text-slate-500 dark:text-slate-400">
               <div className=" relative flex gap-2 pl-5">
-                <Info />
+                <Checkbox
+                  key={1}
+                  label=""
+                  name="toc"
+                  defaultChecked={isTOC}
+                  onChange={handleTOC}
+                  sizeClassName="w-4 h-4"
+                  className="pt-1"
+                />
 
                 <div>
                   <div>By proceeding with your purchase you agree to our </div>

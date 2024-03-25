@@ -10,16 +10,18 @@ const ProductOverview = ({
 
   const manualMeta = product?.metaData;
   const techSpecDataObject = manualMeta?.find(item => item?.key === 'tech_spec_data');
+  const warrantyType = manualMeta?.find(item => item?.key === 'warranty_type')?.value;
+  const warrantyPeriod = manualMeta?.find(item => item?.key === 'warranty_period')?.value;
   const parsedMetaData = techSpecDataObject?.value ? JSON.parse(techSpecDataObject.value) : null;
   const manualTechSpecs = parsedMetaData ? Object.entries(parsedMetaData) : [];
 
   const techValue = product.metaData?.find(meta => meta?.key === 'tech_spec')?.value;
   const techSpecs = JSON.parse(techValue || 'false')
 
-  function addParagraphSpacing(htmlString : any) {
+  function addParagraphSpacing(htmlString: any) {
     const paragraphs = htmlString?.split('</p>');
 
-    const parsedHtml = paragraphs?.map( (paragraph : any) => {
+    const parsedHtml = paragraphs?.map((paragraph: any) => {
       const trimmedParagraph = paragraph?.trim();
       if (trimmedParagraph !== '') {
         return trimmedParagraph + '</p><p>';
