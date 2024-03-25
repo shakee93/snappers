@@ -35,6 +35,9 @@ const ProductDetails = ({
       : null
   );
 
+  const manualMeta = product?.metaData;
+  const warrantyType = manualMeta?.find(item => item?.key === 'warranty_type')?.value;
+  const warrantyPeriod = manualMeta?.find(item => item?.key === 'warranty_period')?.value;
 
   const { setVariationId } = useImage();
 
@@ -245,6 +248,17 @@ const ProductDetails = ({
             Low Stock
           </div>
         )}
+
+      {warrantyType && warrantyPeriod && (
+        <div className="flex flex-col gap-2 w-full items-left flex-wrap text-xs md:text-sm text-gray-500 py-2">
+          <div className="">
+            <span className="font-medium">Warranty Type :</span> {warrantyType}
+          </div>
+          <div className="">
+            <span className="font-medium">Warranty period :</span> {warrantyPeriod} Months
+          </div>
+        </div>
+      )}
 
 
 
