@@ -6,10 +6,12 @@ interface OrderDetailsProps {
 
 export const OrderDetails: React.FC<OrderDetailsProps> = ({ orderData }) => {
   if (!orderData) return null;
+  
+  const date = orderData.order.date ? orderData.order.date.substring(0, 10) : "2024/01/01";
 
   const rows = [
     { label: "Order Id", value: orderData.order.orderNumber ?? "Not found" },
-    { label: "Date", value: orderData.orderDate ?? "2024/1/1" },
+    { label: "Date", value: date },
     { label: "Order Total", value: orderData.order.total },
     {
       label: "Discount",

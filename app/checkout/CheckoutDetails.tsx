@@ -163,7 +163,7 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
         />
       </div>
 
-      {!isBillingAddressHidden && (
+      {/* {!isBillingAddressHidden && (
         <div id="BillingAddress" className="scroll-mt-24">
           <BillingAddress
             isActive={tabActive === "BillingAddress"}
@@ -184,7 +184,7 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
             }
           />
         </div>
-      )}
+      )} */}
 
       <div id="PaymentMethod" className="scroll-mt-24">
         <PaymentMethod

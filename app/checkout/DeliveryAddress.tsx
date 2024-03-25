@@ -314,7 +314,7 @@ const DeliveryAddress: FC<Props> = ({
               </ButtonPrimary>
             </div>
 
-            {!isStorePickup && (
+            {/* {!isStorePickup && (
               <div className="flex justify-between gap-4">
                 <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4">
                   <Checkbox
@@ -326,7 +326,7 @@ const DeliveryAddress: FC<Props> = ({
                   />
                 </div>
               </div>
-            )}
+            )} */}
           </div>
         </form>
       </div>
