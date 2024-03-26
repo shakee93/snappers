@@ -6,6 +6,8 @@ import {usePathname} from "next/navigation";
 import {twMerge} from "tailwind-merge";
 import CategoryDropdown from "./CategoryDropdown";
 import {Brand, ProductCategory} from "@/graphql/types/graphql";
+import CategoryWithSubcategories from "./CategoryWithSubcategories";
+
 
 interface BrandBarProps {
   brands: Brand[];
@@ -52,6 +54,7 @@ const BrandBar: React.FC<BrandBarProps> = ({ brands, categories }) => {
       <div className="relative w-full flex justify-between items-center">
         <div className="items-center text-primaryColor font-semibold flex h-full">
           <CategoryDropdown categories={categories} />
+          {/* <CategoryWithSubcategories/> */}
         </div>
         {scrolled > 0 && (
           <button

@@ -11,6 +11,7 @@ import "styles/embla.css";
 import Image from "next/image";
 import Scam from "@/public/homepage/scam.webp";
 import SectionHero2 from "./components/HomePage/SectionHero2";
+import CategoryWithSubcategories from "./components/globalComponents/CategoryWithSubcategories";
 
 const slidesData = [
   {
@@ -118,6 +119,7 @@ export default async function Home() {
         <div className="z-0">
           {/* <SectionHero3 /> */}
           <SectionHero2 slides={slidesData}/>
+          <CategoryWithSubcategories/>
         </div>
         <div className="bg-[#e5e7eb] py-4 md:p-2">
           <div className="container flex md:items-center gap-3 flex-col md:flex-row items-start ">
