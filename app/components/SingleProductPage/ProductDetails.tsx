@@ -80,6 +80,7 @@ const ProductDetails = ({
   }, [activeVariation]);
 
   useEffect(() => {
+    // console.log("attribute change")
     if (product.type === "VARIABLE") {
       let variation = (product as VariableProduct).variations
         ?.nodes as unknown as ProductVariation[];
@@ -92,6 +93,8 @@ const ProductDetails = ({
 
       if (vProduct) {
         setActiveVariation(vProduct);
+      }else{
+        setActiveVariation(null)
       }
 
     }
@@ -175,7 +178,7 @@ const ProductDetails = ({
         <div>
           <div className="flex items-center gap-4 text-base py-2 flex-wrap md:text-xl font-medium text-gray-600">
             <span dangerouslySetInnerHTML={{ __html: activeVariation.price }} />
-
+        
             {!!activeVariation.salePrice &&
               activeVariation.salePrice !== activeVariation.regularPrice && (
                 <span className="text-red-400 line-through md:text-sm">
@@ -189,12 +192,11 @@ const ProductDetails = ({
         <div className="flex items-center gap-2 text-base py-2 flex-wrap md:text-xl font-medium text-gray-600">
           <span dangerouslySetInnerHTML={{ __html: product.price || '' }} />
 
-          {!!product.salePrice &&
-            product.salePrice !== product.regularPrice && (
-              <span className="text-red-400 line-through md:text-sm">
-                <span dangerouslySetInnerHTML={{ __html: product.regularPrice || '' }} />
-              </span>
-            )}
+          {product.salePrice && product.salePrice !== product.price && activeVariation === null && (
+            <span className="text-red-400 line-through md:text-sm">
+              <span dangerouslySetInnerHTML={{ __html: product.regularPrice || '' }} />
+            </span>
+          )}
         </div>
       )}
 
