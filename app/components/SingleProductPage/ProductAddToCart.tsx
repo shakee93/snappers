@@ -1,13 +1,18 @@
 "use client";
-import {Loader, ShoppingCart, XIcon} from "lucide-react";
-import {useCart} from "@/context/CartProvider";
-import {ProductVariation, SimpleProduct, VariableProduct,} from "@/graphql/types/graphql";
+import { Loader, ShoppingCart, XIcon } from "lucide-react";
+import { useCart } from "@/context/CartProvider";
+import {
+  ProductVariation,
+  SimpleProduct,
+  VariableProduct,
+} from "@/graphql/types/graphql";
 import NcInputNumber from "@/components/NcInputNumber";
-import React, {useState} from "react";
-import {toast} from "sonner";
-import {Transition} from "@headlessui/react";
+import React, { useState } from "react";
+import { toast } from "sonner";
+import { Transition } from "@headlessui/react";
 import AddedToCart from "@/app/components/Notifications/added-to-cart";
-import {twMerge} from "tailwind-merge";
+import { twMerge } from "tailwind-merge";
+import { useRouter } from "next/navigation";
 
 const ProductAddToCart = ({
   product,
@@ -19,6 +24,7 @@ const ProductAddToCart = ({
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(false);
   const { addToCart } = useCart();
+  const ROUTER = useRouter();
 
   // useEffect(() => {
   //   console.log(product);
@@ -31,17 +37,16 @@ const ProductAddToCart = ({
         </div>
         <div className="border-t border-slate-200 dark:border-slate-700 my-4" />
         <AddedToCart
-            product={product}
-            variation={variation}
-            quantity={quantity}
-          />
+          product={product}
+          variation={variation}
+          quantity={quantity}
+        />
       </div>,
       {
         // position: "top-center",
-        duration: 5000,
+        duration: 2000,
       }
     );
-
   };
   // const notifyAddTocart = (quantity: number) => {
   //   toast.custom(
@@ -81,28 +86,36 @@ const ProductAddToCart = ({
   };
 
   const addItemToCart = async () => {
-
     if (
       (product?.type === "VARIABLE" && variation?.stockStatus !== "IN_STOCK") ||
       (product?.type === "SIMPLE" && product?.stockStatus !== "IN_STOCK")
     ) {
       return;
     }
-  
+
     setLoading(true);
-    let variationId = product.type == "SIMPLE" ? undefined : variation.databaseId;
+    let variationId =
+      product.type == "SIMPLE" ? undefined : variation.databaseId;
 
     try {
       await addToCart(product?.databaseId, quantity, variationId);
       cartCompleted();
-    } catch (error) {
-      console.error("Error:", error);
-      toast.error("Unable to add to cart");
+    } catch (error: any) {
+      console.log("Error:", error);
+
+      let isTokenExpired =
+        error.graphQLErrors[0]?.debugMessage ===
+        "invalid-secret-key | Expired token";
+      if (isTokenExpired) {
+        toast.error("You've been logged out. Please sign in again.");
+        ROUTER.push("/login");
+      } else {
+        toast.error("Unable to add to cart");
+      }
     } finally {
       setLoading(false);
     }
   };
-  
 
   if (product?.type === "VARIABLE" && !variation) {
     return <></>;
@@ -137,7 +150,6 @@ const ProductAddToCart = ({
           {loading ? <Loader className="animate-spin" /> : <ShoppingCart />}
           <span className="md:ml-3 cursor-pointer">Add to cart</span>
         </button>
-
       </div>
     </>
   );

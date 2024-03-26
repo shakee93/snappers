@@ -51,6 +51,12 @@ export const ProductContentSlice = gql`
           slug
         }
       }
+      allPaConnectivity {
+        nodes {
+          name
+          slug
+        }
+      }
       allPaColor {
         nodes {
           name
@@ -252,6 +258,12 @@ export const ProductContentFull = gql`
           slug
         }
       }
+      allPaConnectivity {
+        nodes {
+          name
+          slug
+        }
+      }
       onSale
       price
       rawPrice: price(format: RAW)
@@ -300,6 +312,7 @@ export const ProductContentFull = gql`
           name
           price
           stockStatus
+          stockQuantity
           rawPrice: price(format: RAW)
           regularPrice
           salePrice

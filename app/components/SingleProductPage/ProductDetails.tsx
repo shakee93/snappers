@@ -15,6 +15,8 @@ import { useStore } from "@/store/store";
 import { twMerge } from "tailwind-merge";
 import parseHtml from "html-react-parser";
 import { useImage } from "@/context/ImageChangeGrabber";
+import brandColors from '@/data/brandColors';
+
 
 const ProductDetails = ({
   product,
@@ -33,23 +35,11 @@ const ProductDetails = ({
       : null
   );
 
-
+  const manualMeta = product?.metaData;
+  const warrantyType = manualMeta?.find(item => item?.key === 'warranty_type')?.value;
+  const warrantyPeriod = manualMeta?.find(item => item?.key === 'warranty_period')?.value;
 
   const { setVariationId } = useImage();
-
-  //   useEffect(() => {
-
-  //     console.log("product: ", product?.variations?.nodes);
-  //     if (product?.variations?.nodes[0]) {
-  //       setActiveVariation(
-  //         !!product?.variations?.nodes?.length
-  //           ? product?.variations?.nodes[0]
-  //           : null
-  //       );
-  //     } else {
-  //       alert("NODE NOT FOUNDJ");
-  //     }
-  //   }, []);
 
   useEffect(() => {
     if (product.type === "VARIABLE") {
@@ -103,9 +93,7 @@ const ProductDetails = ({
       if (vProduct) {
         setActiveVariation(vProduct);
       }
-      //   else {
-      //     setActiveVariation(null);
-      //   }
+
     }
   }, [attribute]);
 
@@ -114,16 +102,18 @@ const ProductDetails = ({
     return htmlContent.replace(/<ul>/g, '<ul class="list-disc">');
   };
 
+  const brandColorClass = brand?.name && brandColors[brand?.name.toLowerCase()];
 
   return (
     <>
       <div className="flex gap-1  text-sm text-gray-500">
-        Brand : <Link href={`/${brand?.slug}`} target="_blank">{brand?.name}</Link>
+        Brand : <Link href={`/${brand?.slug}`} target="_blank" className={`${brandColorClass}`} >{brand?.name}</Link>
       </div>
 
       <div className="text-base md:text-lg font-medium ">
         {product.name} - {product.databaseId}
       </div>
+
 
       {product.shortDescription && (
         <div
@@ -183,12 +173,12 @@ const ProductDetails = ({
 
       {product.type === "VARIABLE" && activeVariation ? (
         <div>
-          <div className="flex gap-4 text-base py-2 flex-wrap md:text-lg font-medium text-gray-600">
+          <div className="flex items-center gap-4 text-base py-2 flex-wrap md:text-xl font-medium text-gray-600">
             <span dangerouslySetInnerHTML={{ __html: activeVariation.price }} />
 
             {!!activeVariation.salePrice &&
               activeVariation.salePrice !== activeVariation.regularPrice && (
-                <span className="text-red-400 line-through">
+                <span className="text-red-400 line-through md:text-sm">
                   <span dangerouslySetInnerHTML={{ __html: activeVariation.regularPrice }} />
                 </span>
               )}
@@ -196,34 +186,81 @@ const ProductDetails = ({
           </div>
         </div>
       ) : (
-        <div className="flex gap-2 text-base py-2 flex-wrap md:text-lg font-medium text-gray-600">
+        <div className="flex items-center gap-2 text-base py-2 flex-wrap md:text-xl font-medium text-gray-600">
           <span dangerouslySetInnerHTML={{ __html: product.price || '' }} />
 
           {!!product.salePrice &&
             product.salePrice !== product.regularPrice && (
-              <span className="text-red-400 line-through">
+              <span className="text-red-400 line-through md:text-sm">
                 <span dangerouslySetInnerHTML={{ __html: product.regularPrice || '' }} />
               </span>
             )}
         </div>
       )}
 
+      {/* Sold Out Badge */}
+
       {product.type === "SIMPLE" && product.stockStatus !== "IN_STOCK" && (
         <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1">
           Sold Out
         </div>
       )}
-      {/* <p>Variable</p>
-        {JSON.stringify(product.type === "VARIABLE" )}
-        <p>Stock Status</p>
-        {JSON.stringify(activeVariation?.stockStatus !== "IN_STOCK")}
-        <p>value before assigning</p> */}
+
       {product.type === "VARIABLE" &&
         activeVariation?.stockStatus !== "IN_STOCK" && (
-          <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 tex-xs md:text-sm py-1">
+          <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1 mb-1">
             Sold Out
           </div>
         )}
+
+      {/* In Stock Badge */}
+
+      {product.type === "VARIABLE" &&
+        activeVariation?.stockStatus == "IN_STOCK" && (
+          (activeVariation?.stockQuantity && activeVariation?.stockQuantity >= 3) || (!activeVariation.stockQuantity && activeVariation?.stockStatus === "IN_STOCK")
+        ) && (
+          <div className="w-max px-4 bg-green-200 text-center rounded-full text-gray-800 text-xs md:text-sm py-1">
+            In Stock
+          </div>
+        )}
+
+      {product.type === "SIMPLE" && product.stockStatus === "IN_STOCK" && (
+        (product?.stockQuantity && product?.stockQuantity >= 3) || (!product.stockQuantity && product.stockStatus === "IN_STOCK")
+      ) && (
+          <div className="w-max px-4 bg-green-200 text-center rounded-full text-gray-800 text-xs md:text-sm py-1">
+            In Stock
+          </div>
+        )}
+
+
+      {/* Low Stock Badge */}
+      {product.type === "VARIABLE" &&
+        activeVariation?.stockStatus == "IN_STOCK" && activeVariation?.stockQuantity &&
+        activeVariation?.stockQuantity <= 2 && (
+          <div className="w-max px-4 bg-yellow-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1 mb-1">
+            Low Stock
+          </div>
+        )}
+
+      {product.type === "SIMPLE" && product.stockStatus == "IN_STOCK" && product?.stockQuantity &&
+        product?.stockQuantity <= 2 && (
+          <div className="w-max px-4 bg-yellow-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1 mb-1">
+            Low Stock
+          </div>
+        )}
+
+      {warrantyType && warrantyPeriod && (
+        <div className="flex flex-col gap-2 w-full items-left flex-wrap text-xs md:text-sm text-gray-500 py-2">
+          <div className="">
+            <span className="font-medium">Warranty Type :</span> {warrantyType}
+          </div>
+          <div className="">
+            <span className="font-medium">Warranty period :</span> {warrantyPeriod} Months
+          </div>
+        </div>
+      )}
+
+
 
       <ProductAddToCart product={product} variation={activeVariation} />
       <div className="flex gap-1 w-full items-center flex-wrap text-sm md:text-base text-gray-500">

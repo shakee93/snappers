@@ -54,10 +54,14 @@ const Footer = async () => {
                 <div>
                   <PhoneCall size={iconSize} className="text-primaryColor" />
                 </div>
-                <div>
-                  <Link href={"tel:0777555665"}> 077 755 5665</Link> /{" "}
-                  <Link href={"tel:0777988665"}> 077 798 8665</Link> /{" "}
-                  <Link href={"tel:0112372665"}> 011 237 2665</Link>
+                <div className="flex flex-col">
+                  <div>
+                    <Link href={"tel:0777555665"}> 077 755 5665</Link> /{" "}
+                    <Link href={"tel:0777988665"}> 077 798 8665</Link>{" "}
+                  </div>
+                  <div>
+                    <Link href={"tel:0112372665"}> / 011 237 2665</Link>
+                  </div>
                 </div>
               </li>
             </ul>

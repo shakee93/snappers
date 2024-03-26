@@ -1,6 +1,6 @@
-import {SelectField, SRI_LANKAN_STATES,} from "@/components/AddressPageComps/HelperComps";
-import {CustomerAddress} from "@/graphql/types/graphql";
-import React, {FC, useEffect, useState} from "react";
+import { SelectField, SRI_LANKAN_STATES, } from "@/components/AddressPageComps/HelperComps";
+import { CustomerAddress } from "@/graphql/types/graphql";
+import React, { FC, useEffect, useState } from "react";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Input from "shared/Input/Input";
@@ -48,7 +48,7 @@ const DeliveryAddress: FC<Props> = ({
 
   const [isBillingSameAsShipping, setIsBillingSameAsShipping] = useState(true);
 
-  useEffect(() => {}, []);
+  useEffect(() => { }, []);
   const handleDeliverySame = () => {
     setIsBillingSameAsShipping((prevValue) => {
       const newValue = !prevValue;
@@ -163,14 +163,12 @@ const DeliveryAddress: FC<Props> = ({
             <div className="sm:ml-8">
               <h3 className=" text-slate-700 items-center gap-2 dark:text-slate-300 flex ">
                 <span className="text-lg font-semibold">
-                  {isStorePickup ? "Billing Address" : "Delivery Address"}
+                  Shipping Address
                 </span>
               </h3>
               <div className=" mt-1 text-sm">
                 <span className="">
-                  {address || isStorePickup
-                    ? "Your Billing Address"
-                    : "Your Delivery Address"}
+                  Your Shipping Address
                 </span>
               </div>
             </div>
@@ -189,9 +187,8 @@ const DeliveryAddress: FC<Props> = ({
         </div>
         <form onSubmit={handleSubmit}>
           <div
-            className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-2 sm:space-y-2 ${
-              isActive ? "block" : "hidden"
-            }`}
+            className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-2 sm:space-y-2 ${isActive ? "block" : "hidden"
+              }`}
           >
             <div className="w-fit border border-slate-200 dark:border-slate-700 rounded-xl p-4">
               <Checkbox
@@ -314,7 +311,7 @@ const DeliveryAddress: FC<Props> = ({
               </ButtonPrimary>
             </div>
 
-            {!isStorePickup && (
+            {/* {!isStorePickup && (
               <div className="flex justify-between gap-4">
                 <div className="border border-slate-200 dark:border-slate-700 rounded-xl p-4">
                   <Checkbox
@@ -326,7 +323,7 @@ const DeliveryAddress: FC<Props> = ({
                   />
                 </div>
               </div>
-            )}
+            )} */}
           </div>
         </form>
       </div>

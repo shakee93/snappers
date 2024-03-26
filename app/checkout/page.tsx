@@ -4,6 +4,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { FetchResult, useMutation, useQuery } from "@apollo/client";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
+import Checkbox from "@/shared/Checkbox/Checkbox";
 import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
 import {
@@ -52,9 +53,7 @@ interface FormData {
 
 const CheckoutPage = () => {
   const { cart, removeFromCart, updateCart } = useCart();
-
   const [finalOrderTotal, setFinalOrderTotal] = useState(null);
-
   const { customer, fetchCustomer } = useSession();
 
   const { data } = useQuery(GET_PAYMENT_GATEWAYS);
@@ -77,7 +76,6 @@ const CheckoutPage = () => {
   // create state for the payhere random id
   const [payherPaymentID, setPayherPaymentID] = useState<string | null>(null)
 
-
   const [payhereHandleStatus, setPayhereHandleStatus] =
     useState<PayhereStatus>("idle");
 
@@ -90,7 +88,6 @@ const CheckoutPage = () => {
     billingAddress: false,
   });
 
-
   const [shippingTotal, setShippingTotal] = useState();
   const [orderTotal, setOrderTotal] = useState<string | null>(null);
   const [paymentData, setPaymentData] =
@@ -99,8 +96,17 @@ const CheckoutPage = () => {
   const [wantToSHowBankTransfer, setWantToSHowBankTransfer] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [totalWithTax, setTotalWithTax] = useState<string | null>();
+  const [isTOC, setTOC] = useState<boolean>(false);
 
-  // TODO: Un comment this for the redirect on cart free
+  const handleTOC = () => {
+    // Toggle the state and get the updated value
+    const updatedTOC = !isTOC;
+    setTOC(updatedTOC);
+
+    // Log the updated value
+    // console.log({ updatedTOC });
+  }
+  // TODO: Uncomment this for the redirect on cart free
   useEffect(() => {
     if (cart && cart?.contents?.nodes?.length === 0) {
       router.push("/");
@@ -320,6 +326,8 @@ const CheckoutPage = () => {
       return;
     }
 
+    const productNames = cart?.contents?.nodes.map((node) => node?.product?.node.name).join(" , ");
+
     let checkoutDetails: PaymentDetailsWithoutUrls = {
       // amount: orderTotal,
       amount: isCardPayment ? totalWithTax : orderTotal,
@@ -328,7 +336,7 @@ const CheckoutPage = () => {
       last_name: lastName,
       email: email,
       phone: phone,
-      items: "gq mobiles",
+      items: productNames,
       address: city + apartment,
       city: city,
     };
@@ -663,14 +671,16 @@ const CheckoutPage = () => {
                   isConfirmed.contactInfo &&
                   isConfirmed.deliveryAddress &&
                   isConfirmed.billingAddress &&
-                  isConfirmed.paymentMethod
+                  isConfirmed.paymentMethod &&
+                  isTOC
                 )
               }
               className={`mt-8 w-full ${!(
                 isConfirmed.contactInfo &&
                 isConfirmed.deliveryAddress &&
                 isConfirmed.billingAddress &&
-                isConfirmed.paymentMethod
+                isConfirmed.paymentMethod &&
+                isTOC
               )
                 ? "cursor-not-allowed bg-slate-500"
                 : "bg-primary hover:bg-primary-dark"
@@ -697,7 +707,15 @@ const CheckoutPage = () => {
 
             <div className="mt-5 flex items-center justify-center text-sm text-slate-500 dark:text-slate-400">
               <div className=" relative flex gap-2 pl-5">
-                <Info />
+                <Checkbox
+                  key={1}
+                  label=""
+                  name="toc"
+                  defaultChecked={isTOC}
+                  onChange={handleTOC}
+                  sizeClassName="w-4 h-4"
+                  className="pt-1"
+                />
 
                 <div>
                   <div>By proceeding with your purchase you agree to our </div>
