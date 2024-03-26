@@ -117,9 +117,9 @@ export default async function Home() {
       <div className="nc-PageHome relative flex  flex-col overflow-hidden">
         {/* hero section */}
         <div className="z-0">
-          {/* <SectionHero3 /> */}
-          <SectionHero2 slides={slidesData}/>
-          <CategoryWithSubcategories/>
+          <SectionHero3 />
+          {/* <SectionHero2 slides={slidesData}/> */}
+          {/* <CategoryWithSubcategories/> */}
         </div>
         <div className="bg-[#e5e7eb] py-4 md:p-2">
           <div className="container flex md:items-center gap-3 flex-col md:flex-row items-start ">

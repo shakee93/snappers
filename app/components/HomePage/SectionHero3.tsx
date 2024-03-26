@@ -5,57 +5,46 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 
 const desktopSlidesData = [
   {
-    id: "2",
-    backgroundColor: "#CCE0EF",
+    id: "1",
+    backgroundColor: "#ffffff",
     featureImage:
-      "http://api.gqmobiles.lk/wp-content/uploads/2024/03/Untitled-design-2024-03-13T155550.163-removebg-preview.png",
+      "http://api.gqmobiles.lk/wp-content/uploads/2024/03/Desktop.jpg",
   },
+];
+
+const tabletSlidesData = [
   {
-    id: "3",
-    backgroundColor: "#F4E7E7",
+    id: "1",
+    backgroundColor: "#ffffff",
     featureImage:
-      "https://api.gqmobiles.lk/wp-content/uploads/2023/12/dlcdnwebimgs.asus_-300x300.png",
-  },
-  {
-    id: "4",
-    backgroundColor: "#E2F1F0",
-    featureImage:
-      "https://api.gqmobiles.lk/wp-content/uploads/2023/12/Layer-1-1-278x300.png",
+      "http://api.gqmobiles.lk/wp-content/uploads/2024/03/Tab.jpg",
   },
 ];
 
 const mobileSlidesData = [
   {
-    id: "2",
-    backgroundColor: "#CCE0EF",
+    id: "1",
+    backgroundColor: "#ffffff",
     featureImage:
-      "http://api.gqmobiles.lk/wp-content/uploads/2024/03/Untitled-design-2024-03-13T155550.163-removebg-preview-mobile.png",
+      "http://api.gqmobiles.lk/wp-content/uploads/2024/03/Moble.jpg",
   },
-  {
-    id: "3",
-    backgroundColor: "#F4E7E7",
-    featureImage:
-      "https://api.gqmobiles.lk/wp-content/uploads/2023/12/dlcdnwebimgs.asus_-300x300-mobile.png",
-  },
-  {
-    id: "4",
-    backgroundColor: "#E2F1F0",
-    featureImage:
-      "https://api.gqmobiles.lk/wp-content/uploads/2023/12/Layer-1-1-278x300-mobile.png",
-  },
+ 
 ];
 
 const SectionHero3 = () => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isHovering, setIsHovering] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth <= 768); // Adjust the width threshold according to your mobile breakpoint
+      const width = window.innerWidth;
+      setIsMobile(width <= 600);
+      setIsTablet(width >= 601 && width <= 768); // Assuming tablet width range
     };
 
-    handleResize(); // Initialize isMobile on mount
+    handleResize(); // Initialize isMobile and isTablet on mount
 
     window.addEventListener("resize", handleResize);
 
@@ -64,7 +53,11 @@ const SectionHero3 = () => {
     };
   }, []);
 
-  const slidesData = isMobile ? mobileSlidesData : desktopSlidesData;
+  const slidesData = isMobile
+    ? mobileSlidesData
+    : isTablet
+    ? tabletSlidesData
+    : desktopSlidesData;
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
@@ -97,7 +90,7 @@ const SectionHero3 = () => {
 
   return (
     <div
-      className="relative max-h-[500px] min-h-[450px] overflow-hidden"
+      className="relative max-h-[550px] min-h-[450px] md:min-h-[500px] lg:min-h-[550px]  overflow-hidden"
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
     >
@@ -148,6 +141,3 @@ const SectionHero3 = () => {
 };
 
 export default SectionHero3;
-
-
-
