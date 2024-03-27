@@ -9,7 +9,7 @@ import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
 import {
   GET_PAYMENT_GATEWAYS,
-  UPDATE_SHIPPING_TOTAL
+  UPDATE_SHIPPING_TOTAL,
 } from "@/graphql/defs/cart";
 import {
   CHECKOUT,
@@ -50,7 +50,6 @@ interface FormData {
   };
 }
 
-
 const CheckoutPage = () => {
   const { cart, removeFromCart, updateCart } = useCart();
   const [finalOrderTotal, setFinalOrderTotal] = useState(null);
@@ -74,7 +73,7 @@ const CheckoutPage = () => {
     },
   });
   // create state for the payhere random id
-  const [payherPaymentID, setPayherPaymentID] = useState<string | null>(null)
+  const [payherPaymentID, setPayherPaymentID] = useState<string | null>(null);
 
   const [payhereHandleStatus, setPayhereHandleStatus] =
     useState<PayhereStatus>("idle");
@@ -105,7 +104,7 @@ const CheckoutPage = () => {
 
     // Log the updated value
     // console.log({ updatedTOC });
-  }
+  };
   // TODO: Uncomment this for the redirect on cart free
   useEffect(() => {
     if (cart && cart?.contents?.nodes?.length === 0) {
@@ -120,12 +119,13 @@ const CheckoutPage = () => {
     fetchCustomer();
   }, []);
 
-
   // MUTATIONS
   const [updateCartShippingTotalMutation] = useMutation(UPDATE_SHIPPING_TOTAL);
-  const [checkoutMutation, {
-    // data: realCheckoutData,
-  },
+  const [
+    checkoutMutation,
+    {
+      // data: realCheckoutData,
+    },
   ] = useMutation(CHECKOUT);
   const [completeOrderPayment] = useMutation(COMPLETE_ORDER_PAYMENT);
   // const  [createOrderGuest] = useMutation(GUEST_CHECKOUT_MUTATION)
@@ -160,7 +160,6 @@ const CheckoutPage = () => {
       };
     });
   };
-
 
   const handleConfirmationChange = (component: string, value: boolean) => {
     setIsConfirmed((prevConfirmed) => {
@@ -219,13 +218,13 @@ const CheckoutPage = () => {
     if (data) {
       const checkoutDetails = savePaymentDetails(data);
       setPaymentData(checkoutDetails);
-      let orderid = data?.checkout.order.databaseId
+      let orderid = data?.checkout.order.databaseId;
       toast.success("🌟 Order Placed Successfully! 🚀");
       router.push(`/checkout/${orderid}`);
     } else {
       toast.error("Something Went Wrong While Checkout");
     }
-  }
+  };
 
   useEffect(() => {
     // let redirectUrl = `checkout/${checkoutDetails.order_id}`;
@@ -233,12 +232,12 @@ const CheckoutPage = () => {
     // router.push(redirectUrl);
     switch (payhereHandleStatus) {
       case "finished":
-        implementCheckoutAfterPayhere()
+        implementCheckoutAfterPayhere();
         setLoading(false);
         break;
       case "dismissed":
         // console.log("Dismissed Payhere.");
-        setLoading(false)
+        setLoading(false);
         break;
       case "error":
         toast.error("error while initiate payment");
@@ -259,7 +258,6 @@ const CheckoutPage = () => {
 
       // console.log('shippingMethods', shippingMethods);
 
-
       if (customer?.id === "guest") {
         const subtotal: any = cart?.subtotal;
 
@@ -270,11 +268,9 @@ const CheckoutPage = () => {
         }
       }
 
-
-      const { data, } = await updateCartShippingTotalMutation({
+      const { data } = await updateCartShippingTotalMutation({
         variables: { input: { shippingMethods } },
       });
-
 
       console.log("data in shippng", data);
 
@@ -296,21 +292,20 @@ const CheckoutPage = () => {
     updateShippingTotal().then((r) => r);
   }, [isStorePickup, updateCartShippingTotalMutation]);
 
-
   const paymentDetails = useMemo(() => {
     return paymentData;
   }, [paymentData]);
 
   const ImplementPayhere = () => {
     let generatedOrderId = crypto.randomUUID();
-    setPayherPaymentID(generatedOrderId)
+    setPayherPaymentID(generatedOrderId);
 
     let { firstName, lastName, city, apartment } =
       formData.billingAddress as any;
 
     let { email, phone } = formData.contactInfo;
 
-    // console.log('console.log', orderTotal);
+    // console.log('console.log', orderTotal);2
     // console.log('totalwd', totalWithTax);
 
     if (
@@ -326,9 +321,26 @@ const CheckoutPage = () => {
       return;
     }
 
-    const productNames = cart?.contents?.nodes.map((node) => node?.product?.node.name).join(" , ");
-    console.log("cart: ", cart);
-    console.log("productNames: ", productNames);
+    const products = cart?.contents?.nodes;
+
+    // Generate the list of products as strings
+    const productList = products?.map((product: any) => {
+      const productName = product.product.node.name;
+      const varProduct = product.product.node.type;
+      const color =
+        varProduct === "VARIABLE"
+          ? product.product.node.allPaColor.nodes[0].name
+          : "";
+      const capacity =
+        varProduct === "VARIABLE"
+          ? product.product.node.allPaCapacity.nodes[0].name
+          : "";
+      const productString =
+        varProduct === "VARIABLE"
+          ? `${productName} ${color} | ${capacity}`
+          : productName;
+      return productString;
+    });
 
     let checkoutDetails: PaymentDetailsWithoutUrls = {
       // amount: orderTotal,
@@ -338,18 +350,17 @@ const CheckoutPage = () => {
       last_name: lastName,
       email: email,
       phone: phone,
-      items: productNames,
+      items: productList?.join(" , "),
       address: city + apartment,
       city: city,
     };
 
-    return;
 
     if (initiatePayment !== null) {
       setPayhereHandleStatus("loading");
       initiatePayment(checkoutDetails, setPayhereHandleStatus).then((r) => r);
     } else {
-      // console.log("initiate payment become null");
+      console.log("initiate payment become null");
     }
   };
 
@@ -362,8 +373,7 @@ const CheckoutPage = () => {
     if (orderTotal) {
       // console.log("Order Total: ", orderTotal)
     }
-  }, [formData])
-
+  }, [formData]);
 
   useEffect(() => {
     if (!paymentDetails) {
@@ -398,7 +408,10 @@ const CheckoutPage = () => {
     }
 
     if (isCashOnDelivery) {
-      if (customer?.id === "guest" || checkoutDetails.order_id == "no_order_id_found") {
+      if (
+        customer?.id === "guest" ||
+        checkoutDetails.order_id == "no_order_id_found"
+      ) {
         let email = formData?.contactInfo?.email;
         // let redirectUrl = `/checkout/${checkoutDetails.order_id}?email=${email}`;
         let redirectUrl = `/checkout/no_order_id_found?email=${email}`;
@@ -428,9 +441,8 @@ const CheckoutPage = () => {
 
       if (isPayhere) {
         try {
-
           ImplementPayhere();
-          setLoading(true)
+          setLoading(true);
           return;
         } catch (e) {
           console.log("Error while creating Payhere:", e);
@@ -500,14 +512,15 @@ const CheckoutPage = () => {
         : "wbs:0dd3bc79_weight_based_shipping";
 
     const methodTitle =
-      shippingTotal === "₨&nbsp;0.00" ? "pickup_location:0" : "Weight Based Shipping";
+      shippingTotal === "₨&nbsp;0.00"
+        ? "pickup_location:0"
+        : "Weight Based Shipping";
 
     const total = shippingTotal;
 
     console.log("Shipping Method: ", { methodId, methodTitle, total });
 
     return { methodId, methodTitle, total };
-
   };
 
   const handleCheckoutError = (error: any) => {
@@ -527,7 +540,7 @@ const CheckoutPage = () => {
   };
 
   const replaceStringinInt = (orderTotalString: any) => {
-    const numericString = orderTotalString?.replace(/₨|&nbsp;|,|[^0-9.]/g, '');
+    const numericString = orderTotalString?.replace(/₨|&nbsp;|,|[^0-9.]/g, "");
     const orderTotalNumber = parseFloat(numericString);
     return orderTotalNumber;
   };
@@ -540,8 +553,7 @@ const CheckoutPage = () => {
 
   useEffect(() => {
     setTotalWithTax(taxWithTotal);
-  }, [taxWithTotal])
-
+  }, [taxWithTotal]);
 
   return (
     <div className="nc-CheckoutPage">
@@ -627,7 +639,11 @@ const CheckoutPage = () => {
               <div className="mt-4 flex justify-between py-2.5">
                 <span>Subtotal</span>
                 <span className="font-semibold text-slate-900 dark:text-slate-200">
-                  <span dangerouslySetInnerHTML={{ __html: cart?.subtotal || "0.00" }} />
+                  <span
+                    dangerouslySetInnerHTML={{
+                      __html: cart?.subtotal || "0.00",
+                    }}
+                  />
                 </span>
               </div>
 
@@ -635,7 +651,11 @@ const CheckoutPage = () => {
                 <div className="flex justify-between py-2.5">
                   <span>Shipping estimate</span>
                   <span className="font-semibold text-slate-900 dark:text-slate-200">
-                    <span dangerouslySetInnerHTML={{ __html: cart?.shippingTotal || "0.00" }} />
+                    <span
+                      dangerouslySetInnerHTML={{
+                        __html: cart?.shippingTotal || "0.00",
+                      }}
+                    />
                   </span>
                 </div>
               )}
@@ -646,7 +666,7 @@ const CheckoutPage = () => {
                   <span className="font-semibold text-slate-900 dark:text-slate-200">
                     {/* {JSON.stringify(orderTotal)} */}
                     {/* <span dangerouslySetInnerHTML={{ __html: `₨&nbsp;threePercentFromTotal` || "0.00" }} /> */}
-                    <span>Rs {(threePercentFromTotal).toFixed(2) || "0.00"}</span>
+                    <span>Rs {threePercentFromTotal.toFixed(2) || "0.00"}</span>
                   </span>
                 </div>
               )}
@@ -654,18 +674,28 @@ const CheckoutPage = () => {
               {isCardPayment && (
                 <div className="flex justify-between pt-4 text-base font-semibold text-slate-900 dark:text-slate-200">
                   <span>Order total</span>
-                  <span dangerouslySetInnerHTML={{ __html: `Rs ${new Intl.NumberFormat('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(numericOrderTotal + threePercentFromTotal)}` || "0.00" }} />
-                </div>)}
-
+                  <span
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        `Rs ${new Intl.NumberFormat("en-IN", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }).format(
+                          numericOrderTotal + threePercentFromTotal
+                        )}` || "0.00",
+                    }}
+                  />
+                </div>
+              )}
 
               {!isCardPayment && (
                 <div className="flex justify-between pt-4 text-base font-semibold text-slate-900 dark:text-slate-200">
                   <span>Order total</span>
-                  <span dangerouslySetInnerHTML={{ __html: orderTotal || "0.00" }} />
-                </div>)}
-
-
-
+                  <span
+                    dangerouslySetInnerHTML={{ __html: orderTotal || "0.00" }}
+                  />
+                </div>
+              )}
             </div>
 
             <div className="mt-5 flex  text-sm text-slate-500 dark:text-slate-400">
@@ -716,16 +746,17 @@ const CheckoutPage = () => {
                   isTOC
                 )
               }
-              className={`mt-8 w-full ${!(
-                isConfirmed.contactInfo &&
-                isConfirmed.deliveryAddress &&
-                isConfirmed.billingAddress &&
-                isConfirmed.paymentMethod &&
-                isTOC
-              )
-                ? "cursor-not-allowed bg-slate-500"
-                : "bg-primary hover:bg-primary-dark"
-                }`}
+              className={`mt-8 w-full ${
+                !(
+                  isConfirmed.contactInfo &&
+                  isConfirmed.deliveryAddress &&
+                  isConfirmed.billingAddress &&
+                  isConfirmed.paymentMethod &&
+                  isTOC
+                )
+                  ? "cursor-not-allowed bg-slate-500"
+                  : "bg-primary hover:bg-primary-dark"
+              }`}
             >
               {loading ? (
                 <Loader className="animate-spin text-gray-100 " />
@@ -745,7 +776,6 @@ const CheckoutPage = () => {
             {/*<ButtonPrimary onClick={ImplementBankTransfer}>*/}
             {/*    Do your Bank Transfer*/}
             {/*</ButtonPrimary>*/}
-
           </div>
         </div>
       </main>
