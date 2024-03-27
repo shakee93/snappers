@@ -327,6 +327,8 @@ const CheckoutPage = () => {
     }
 
     const productNames = cart?.contents?.nodes.map((node) => node?.product?.node.name).join(" , ");
+    console.log("cart: ", cart);
+    console.log("productNames: ", productNames);
 
     let checkoutDetails: PaymentDetailsWithoutUrls = {
       // amount: orderTotal,
@@ -340,6 +342,8 @@ const CheckoutPage = () => {
       address: city + apartment,
       city: city,
     };
+
+    return;
 
     if (initiatePayment !== null) {
       setPayhereHandleStatus("loading");
@@ -664,6 +668,43 @@ const CheckoutPage = () => {
 
             </div>
 
+            <div className="mt-5 flex  text-sm text-slate-500 dark:text-slate-400">
+              <div className=" relative flex gap-2 ">
+                <Checkbox
+                  key={1}
+                  label=""
+                  name="toc"
+                  defaultChecked={isTOC}
+                  onChange={handleTOC}
+                  sizeClassName="w-4 h-4"
+                  className="pt-1"
+                />
+
+                <div>
+                  <div>By proceeding with your purchase you agree to our </div>
+                  <Link
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href={"/terms-and-conditions"}
+                    className="font-medium text-slate-900 underline dark:text-slate-200"
+                  >
+                    Terms and Conditions
+                  </Link>
+                  <span>
+                    {` `}and{` `}
+                  </span>
+                  <Link
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href={"/privacy"}
+                    className="font-medium text-slate-900 underline dark:text-slate-200"
+                  >
+                    Privacy Policy
+                  </Link>
+                  {` `}.
+                </div>
+              </div>
+            </div>
             <ButtonPrimary
               onClick={handleCheckout}
               disabled={
@@ -705,43 +746,6 @@ const CheckoutPage = () => {
             {/*    Do your Bank Transfer*/}
             {/*</ButtonPrimary>*/}
 
-            <div className="mt-5 flex items-center justify-center text-sm text-slate-500 dark:text-slate-400">
-              <div className=" relative flex gap-2 pl-5">
-                <Checkbox
-                  key={1}
-                  label=""
-                  name="toc"
-                  defaultChecked={isTOC}
-                  onChange={handleTOC}
-                  sizeClassName="w-4 h-4"
-                  className="pt-1"
-                />
-
-                <div>
-                  <div>By proceeding with your purchase you agree to our </div>
-                  <Link
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href={"/terms-and-conditions"}
-                    className="font-medium text-slate-900 underline dark:text-slate-200"
-                  >
-                    Terms and Conditions
-                  </Link>
-                  <span>
-                    {` `}and{` `}
-                  </span>
-                  <Link
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href={"/privacy"}
-                    className="font-medium text-slate-900 underline dark:text-slate-200"
-                  >
-                    Privacy Policy
-                  </Link>
-                  {` `}.
-                </div>
-              </div>
-            </div>
           </div>
         </div>
       </main>
