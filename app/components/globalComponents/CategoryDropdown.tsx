@@ -44,7 +44,7 @@ const DropdownButton = ({ categories }: { categories: any }) => {
                 )}
               >
                 <ul
-                  className="py-4 px-4 text-left max-h-[500px] overflow-y-auto  grid-flow-row text-sm font-normal \
+                  className="py-4 px-4 text-left max-h-[350px] overflow-y-auto  grid-flow-row text-sm font-normal \
                  text-gray-700 grid grid-cols-1 dark:text-gray-200"
                 >
                   {sortedCategories?.map(
@@ -54,7 +54,7 @@ const DropdownButton = ({ categories }: { categories: any }) => {
                           onClick={(e) => close()}
                           href={`/collections/${category.slug}`}
                           className={twMerge(
-                            "transition-all block px-4 py-2 hover:pl-6 rounded \
+                            "transition-all block px-4 py-2  rounded \
                            hover:text-white hover:bg-primaryColor dark:hover:bg-gray-600 dark:hover:text-white my-1 mx-1",
                             path === `/collections/${category.slug}` &&
                               "text-white bg-primaryColor pl-6 "
