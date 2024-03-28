@@ -337,6 +337,16 @@ export const GET_PRODUCTS = gql`
               key
               value
             }
+            metaData(key: "warranty_period") {
+              id
+              key
+              value
+            }
+            metaData(key: "warranty_type") {
+              id
+              key
+              value
+            }
             allPaCapacity {
               nodes {
                   name

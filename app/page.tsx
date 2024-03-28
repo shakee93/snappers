@@ -5,11 +5,18 @@ import SectionGridMoreExplore from "@/app/components/HomePage/SectionGridMoreExp
 import SectionPromo1 from "@/app/components/HomePage/SectionPromo1";
 import Heading from "@/app/components/Heading/Heading";
 import { getClient } from "@/graphql/apollo-ssr";
-import { GET_PRODUCTS_NODES, GET_PRODUCTS_NODES_HOMEPAGE } from "@/graphql/defs/products";
+import {
+  GET_PRODUCTS_NODES,
+  GET_PRODUCTS_NODES_HOMEPAGE,
+} from "@/graphql/defs/products";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import "styles/embla.css";
 import Image from "next/image";
 import Scam from "@/public/homepage/scam.webp";
+import Sampath from "@/public/images/bank logos/sampath.png";
+import Commercial from "@/public/images/bank logos/commercial.png";
+import Hnb from "@/public/images/bank logos/hnb.png";
+import Standard from "@/public/images/bank logos/standard-chartered-2021-logo-freelogovectors.net_.png";
 import SectionHero2 from "./components/HomePage/SectionHero2";
 import CategoryWithSubcategories from "./components/globalComponents/CategoryWithSubcategories";
 
@@ -21,12 +28,13 @@ const slidesData = [
       subHeading: "Sony PS5 Slim: Gaming Redefined",
       buttonText: "Buy Now",
       buttonLink: "/sony/sony-playstation-5-slim-disc-edition",
-      backgroundColor:"#CCE0EF",
+      backgroundColor: "#CCE0EF",
       featureImage: {
         id: "2",
-        sourceUrl: "http://api.gqmobiles.lk/wp-content/uploads/2024/03/Untitled-design-2024-03-13T155550.163-removebg-preview.png"
-      }
-    }
+        sourceUrl:
+          "http://api.gqmobiles.lk/wp-content/uploads/2024/03/Untitled-design-2024-03-13T155550.163-removebg-preview.png",
+      },
+    },
   },
   {
     id: "3",
@@ -35,12 +43,13 @@ const slidesData = [
       subHeading: "Step into Tomorrow's Style",
       buttonText: "Explore Products",
       buttonLink: "/collections/all",
-      backgroundColor:"#F4E7E7",
+      backgroundColor: "#F4E7E7",
       featureImage: {
         id: "3",
-        sourceUrl: "https://api.gqmobiles.lk/wp-content/uploads/2023/12/dlcdnwebimgs.asus_-300x300.png"
-      }
-    }
+        sourceUrl:
+          "https://api.gqmobiles.lk/wp-content/uploads/2023/12/dlcdnwebimgs.asus_-300x300.png",
+      },
+    },
   },
   {
     id: "4",
@@ -49,43 +58,45 @@ const slidesData = [
       subHeading: "Explore Our Top-Selling Products",
       buttonText: "Explore Now",
       buttonLink: "/collections/all",
-      backgroundColor:"#E2F1F0",
+      backgroundColor: "#E2F1F0",
       featureImage: {
         id: "4",
-        sourceUrl: "https://api.gqmobiles.lk/wp-content/uploads/2023/12/Layer-1-1-278x300.png"
-      }
-    }
-  }
+        sourceUrl:
+          "https://api.gqmobiles.lk/wp-content/uploads/2023/12/Layer-1-1-278x300.png",
+      },
+    },
+  },
 ];
 
 const getData = async () => {
-  const [ newArrivals, mobiles, speakers, watches, backInStock] = await Promise.all([
-    //Slides
-    // getClient().query({ query: GET_SLIDES }),
-    //New Arrivals
-    getClient().query({ query: GET_PRODUCTS_NODES }),
-    //Mobiles
-    getClient().query({
-      query: GET_PRODUCTS_NODES,
-      variables: { first: 10, categoryIdIn: [165] },
-    }),
-    //Speakers
-    getClient().query({
-      query: GET_PRODUCTS_NODES_HOMEPAGE,
-      variables: { first: 10, tagId: 538 },
-    }),
-    //Watches
-    getClient().query({
-      query: GET_PRODUCTS_NODES,
-      variables: { first: 10, categoryIdIn: [302] },
-    }),
+  const [newArrivals, mobiles, speakers, watches, backInStock] =
+    await Promise.all([
+      //Slides
+      // getClient().query({ query: GET_SLIDES }),
+      //New Arrivals
+      getClient().query({ query: GET_PRODUCTS_NODES }),
+      //Mobiles
+      getClient().query({
+        query: GET_PRODUCTS_NODES,
+        variables: { first: 10, categoryIdIn: [165] },
+      }),
+      //Speakers
+      getClient().query({
+        query: GET_PRODUCTS_NODES_HOMEPAGE,
+        variables: { first: 10, tagId: 538 },
+      }),
+      //Watches
+      getClient().query({
+        query: GET_PRODUCTS_NODES,
+        variables: { first: 10, categoryIdIn: [302] },
+      }),
 
-    //Back In Stock
-    getClient().query({
-      query: GET_PRODUCTS_NODES_HOMEPAGE,
-      variables: { first: 10, tagId: 536 },
-    }),
-  ]);
+      //Back In Stock
+      getClient().query({
+        query: GET_PRODUCTS_NODES_HOMEPAGE,
+        variables: { first: 10, tagId: 536 },
+      }),
+    ]);
 
   return {
     // slides: slides.data?.slides?.nodes,
@@ -100,13 +111,13 @@ const getData = async () => {
     backInStock: backInStock.data.products?.nodes as (SimpleProduct &
       VariableProduct)[],
   };
-
 };
 
 export default async function Home() {
   // const startTime = performance.now(); // Log the start time
 
-  const {  newArrivals, mobiles, speakers, watches, backInStock } = await getData();
+  const { newArrivals, mobiles, speakers, watches, backInStock } =
+    await getData();
   // const endTime = performance.now(); // Log the end time
   // console.log(
   //   `getData function took ${endTime - startTime} milliseconds to execute.`
@@ -117,21 +128,70 @@ export default async function Home() {
       <div className="nc-PageHome relative flex  flex-col overflow-hidden">
         {/* hero section */}
         <div className="z-0">
-          <SectionHero3 />
-          {/* <SectionHero2 slides={slidesData}/> */}
+          {/* <SectionHero3 /> */}
+          <SectionHero2 slides={slidesData} />
           {/* <CategoryWithSubcategories/> */}
         </div>
-        <div className="bg-[#e5e7eb] py-4 md:p-2">
+        {/* <div className="bg-[#e5e7eb] py-4 md:p-2">
           <div className="container flex md:items-center gap-3 flex-col md:flex-row items-start ">
-            <Image src={Scam} alt="" height={20} className="w-56 md:w-40 h-auto"/>
+            <Image
+              src={Scam}
+              alt=""
+              height={20}
+              className="w-56 md:w-40 h-auto"
+            />
             <div>
-              <p className="text-base md:text-lg font-medium">Fraud Alert : Rajagiriya & Kurunegala Scam Warning!</p>
-              <p className="text-sm md:text-base">We have no branches in Rajagiriya or Kurunegala. Beware of scams. Your safety is our priority.</p>
+              <p className="text-base md:text-lg font-medium">
+                Fraud Alert : Rajagiriya & Kurunegala Scam Warning!
+              </p>
+              <p className="text-sm md:text-base">
+                We have no branches in Rajagiriya or Kurunegala. Beware of
+                scams. Your safety is our priority.
+              </p>
+            </div>
+          </div>
+        </div> */}
+        <div className="bg-[#e5e7eb] py-4 md:p-2">
+          <div className="container flex md:items-center gap-4 md:gap-3 flex-col md:flex-row items-between ">
+            <div className="flex flex-col md:flex-row gap-2 justify-between items-center w-full">
+              <div>
+                <p className="text-3xl md:text-xl lg:text-3xl xl:text-5xl -skew-x-[20deg] font-bold bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent bg-clip-text">
+                  0% Installment
+                </p>
+              </div>
+              <div className="flex flex-col gap-0">
+                <p className="text-xl md:text-lg xl:text-3xl text-center font-bold ">For All Products...!!!</p>
+                <p className="flex w-full gap-2 md:gap-1  justify-between items-baseline ">
+                  <span className="text-sm md:text-xs xl:text-xl font-bold text-gray-500">06 Months | 12 Months</span>
+                  <span className="text-[10px]  xl:text-xs font-semibold text-gray-400">T & C Apply</span>
+                </p>
+              </div>
+
+              <div className="flex py-1 px-4 border-5 border-blue-500 gap-2 md:gap-5 bg-white rounded-3xl">
+                <Image
+                  src={Sampath}
+                  alt=""
+                  height={20}
+                  className="w-auto h-8 md:h-6 xl:h-10 "
+                />
+                <Image src={Hnb} alt="" height={20} className="w-auto h-8 md:h-6 xl:h-10" />
+                <Image
+                  src={Commercial}
+                  alt=""
+                  height={20}
+                  className="w-auto h-8 md:h-6 xl:h-10"
+                />
+                <Image
+                  src={Standard}
+                  alt=""
+                  height={20}
+                  className="w-auto h-8 md:h-6 xl:h-10"
+                />
+              </div>
             </div>
           </div>
         </div>
-        
-       
+
         <div className="container flex flex-col gap-10 lg:gap-16">
           {/* new arrivals section */}
           <div className="mt-5 md:mt-10">
@@ -190,7 +250,7 @@ export default async function Home() {
             <SectionSliderProductCard
               products={watches}
               heading="Smart Watches"
-            // subHeading="Best selling of the month"
+              // subHeading="Best selling of the month"
             />
           </div>
         </div>
