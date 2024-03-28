@@ -31,6 +31,17 @@ export default async function RootLayout({
 
     return (
         <html lang="en">
+             <head>
+                    <script async src="https://www.googletagmanager.com/gtag/js?id=G-LS3EVR93ZH"></script>
+                    <script>
+                        {`
+                            window.dataLayer = window.dataLayer || [];
+                            function gtag(){dataLayer.push(arguments);}
+                            gtag('js', new Date());
+                            gtag('config', 'G-LS3EVR93ZH');
+                        `}
+                    </script>
+                </head>
 
             <body className="bg-gray-50 text-base dark:bg-slate-900 text-slate-900 dark:text-slate-200">
                 <ApolloWrapper>
