@@ -152,40 +152,40 @@ export default async function Home() {
           </div>
         </div> */}
         <div className="bg-[#e5e7eb] py-4 md:p-2">
-          <div className="container flex md:items-center gap-3 flex-col md:flex-row items-between ">
-            <div className="flex justify-between items-center w-full">
+          <div className="container flex md:items-center gap-4 md:gap-3 flex-col md:flex-row items-between ">
+            <div className="flex flex-col md:flex-row gap-2 justify-between items-center w-full">
               <div>
-                <p className="text-5xl -skew-x-[20deg] font-bold bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent bg-clip-text">
+                <p className="text-3xl md:text-xl lg:text-3xl xl:text-5xl -skew-x-[20deg] font-bold bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent bg-clip-text">
                   0% Installment
                 </p>
               </div>
-              <div>
-                <p className="text-3xl font-bold ">For All Products...!!!</p>
-                <p className="flex w-full justify-between items-baseline ">
-                  <span className="text-xl font-bold text-gray-500">06 Months | 12 Months</span>
-                  <span className="text-xs font-semibold text-gray-400">T & C Apply</span>
+              <div className="flex flex-col gap-0">
+                <p className="text-xl md:text-lg xl:text-3xl text-center font-bold ">For All Products...!!!</p>
+                <p className="flex w-full gap-2 md:gap-1  justify-between items-baseline ">
+                  <span className="text-sm md:text-xs xl:text-xl font-bold text-gray-500">06 Months | 12 Months</span>
+                  <span className="text-[10px]  xl:text-xs font-semibold text-gray-400">T & C Apply</span>
                 </p>
               </div>
 
-              <div className="flex py-1 px-4 border-5 border-blue-500 gap-5 bg-white rounded-3xl">
+              <div className="flex py-1 px-4 border-5 border-blue-500 gap-2 md:gap-5 bg-white rounded-3xl">
                 <Image
                   src={Sampath}
                   alt=""
                   height={20}
-                  className="w-auto h-10"
+                  className="w-auto h-8 md:h-6 xl:h-10 "
                 />
-                <Image src={Hnb} alt="" height={20} className="w-auto h-10" />
+                <Image src={Hnb} alt="" height={20} className="w-auto h-8 md:h-6 xl:h-10" />
                 <Image
                   src={Commercial}
                   alt=""
                   height={20}
-                  className="w-auto h-10"
+                  className="w-auto h-8 md:h-6 xl:h-10"
                 />
                 <Image
                   src={Standard}
                   alt=""
                   height={20}
-                  className="w-auto h-10"
+                  className="w-auto h-8 md:h-6 xl:h-10"
                 />
               </div>
             </div>
