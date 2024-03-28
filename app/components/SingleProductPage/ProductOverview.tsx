@@ -37,6 +37,10 @@ const ProductOverview = ({
 
   const formattedDescription = addParagraphSpacing(product.description);
 
+  const increaseH1Font = (htmlContent: any) => {
+    return htmlContent.replace(/<h1>/g, '<h1 class="text-lg py-2">');
+  };
+
   return (
     <>
       <div className="bg-white p-5 rounded-3xl md:p-10 my-5">
@@ -47,7 +51,7 @@ const ProductOverview = ({
           <div className="md:w-3/5 p-2 md:p-4">
 
             <div className="text-xs md:text-sm text-gray-600">
-              {parseHtml(formattedDescription || '')}
+              {parseHtml(increaseH1Font(formattedDescription) || '')}
             </div>
           </div>
           <div className="md:w-2/5">
