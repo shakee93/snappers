@@ -28,14 +28,12 @@ export default async function RootLayout({
 }) {
   const isLocalhost =
     typeof window !== "undefined" && window.location.hostname === "localhost";
-    console.log('isLocalhost', JSON.stringify(isLocalhost, null, 2));
-
-    
+  console.log("isLocalhost", JSON.stringify(isLocalhost, null, 2));
 
   return (
     <html lang="en">
       <head>
-      {!isLocalhost && (
+        {!isLocalhost && (
           <>
             <script
               async
