@@ -266,13 +266,13 @@ export default function CategoryBlockSection() {
               </p>
             </div>
           </div>
-          <Link href={"/collections/macbooks"}>
+          <Link href={"/collections/tablets"}>
             <Button
               className="bg-primaryColor text-sm text-white"
               radius="full"
               size="md"
             >
-              Get a Mackbook
+              Get a Tablet
             </Button>
           </Link>
         </CardFooter>
