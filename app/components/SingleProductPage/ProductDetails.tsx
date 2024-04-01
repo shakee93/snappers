@@ -265,7 +265,7 @@ const ProductDetails = ({
 
 
       <ProductAddToCart product={product} variation={activeVariation} />
-      <div className="flex gap-1 w-full items-center flex-wrap text-sm md:text-base text-gray-500">
+      <div className="flex gap-1 w-full items-center flex-wrap text-sm md:text-base text-g ray-500">
         <div className="text-sm py-2">Category:</div>
         {product.productCategories?.edges.map(
           (category: any, index: number) => (

@@ -698,8 +698,8 @@ const CheckoutPage = () => {
               )}
             </div>
 
-            <div className="mt-5 flex  text-sm text-slate-500 dark:text-slate-400">
-              <div className=" relative flex gap-2 ">
+            <div className="mt-5 flex justify-center items-center text-sm text-slate-500 dark:text-slate-400">
+              <div className=" relative flex gap-2">
                 <Checkbox
                   key={1}
                   label=""

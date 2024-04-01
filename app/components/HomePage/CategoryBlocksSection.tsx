@@ -13,6 +13,8 @@ import img2 from "@/public/homepage/buds.jpg";
 import img3 from "@/public/homepage/speaker.jpg";
 import img4 from "@/public/homepage/watch.jpg";
 import img5 from "@/public/homepage/laptop.webp";
+import tablet1 from "@/public/homepage/tablet1.jpg";
+import tablet2 from "@/public/homepage/tablet2.jpg";
 import Link from "next/link";
 
 export default function CategoryBlockSection() {
@@ -247,30 +249,30 @@ export default function CategoryBlockSection() {
           </p>
 
           <h4 className="text-3xl font-medium text-white">
-            MacBooks
+            Tablets
           </h4>
         </CardHeader>
         <Image
           removeWrapper
           alt="Relaxing app background"
           className="z-0 h-full w-full object-cover"
-          src={img5.src}
+          src={tablet2.src}
         />
         <CardFooter className="border-default-600 dark:border-default-100 absolute bottom-0 z-10 bg-black/40">
           <div className="flex flex-grow items-center gap-2">
             <div className="flex flex-col">
               <p className="hidden text-sm text-white/60 lg:block">
-                Explore our collection of MacBooks that would boost your productivity.
+                Explore our collection of Tablets that would boost your productivity.
               </p>
             </div>
           </div>
-          <Link href={"/collections/macbooks"}>
+          <Link href={"/collections/tablets"}>
             <Button
               className="bg-primaryColor text-sm text-white"
               radius="full"
               size="md"
             >
-              Get a Mackbook
+              Get a Tablet
             </Button>
           </Link>
         </CardFooter>
