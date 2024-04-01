@@ -2,7 +2,7 @@
 import { Popover, Transition } from "@headlessui/react";
 import React, { Fragment, useState } from "react";
 import { twMerge } from "tailwind-merge";
-import Link from "next/link"
+import Link from "next/link";
 import { ChevronDown } from "lucide-react";
 
 const categories: {
@@ -13,11 +13,11 @@ const categories: {
     };
   };
 } = {
-  "Mobile Phones": {
+  "All Headphones": {
     link: "/collections/smart-phones",
     subcategories: {
-      "Samsung": "/samsung",
-      "Apple": "/apple",
+      "On-ear Headphones": "/samsung",
+      "Over-Ear Headphones": "/apple",
       "Redmi": "/redmi",
       "Google Pixel": "/google-pixel",
       "OnePlus": "/oneplus",
@@ -79,9 +79,9 @@ const categories: {
 };
 
 const CategoryWithSubcategories = () => {
-  const [activeTab, setActiveTab] = useState<
-    keyof typeof categories | null
-  >(null);
+  const [activeTab, setActiveTab] = useState<keyof typeof categories | null>(
+    null
+  );
 
   const handleMouseEnter = (tabName: keyof typeof categories) => {
     setActiveTab(tabName);
@@ -96,59 +96,74 @@ const CategoryWithSubcategories = () => {
       {({ open, close }) => (
         <>
           <Popover.Button className="hidden uppercase md:flex whitespace-nowrap focus:outline-0 py-4 pl-6  pr-4 h-full justify-center text-xs xl:text-sm items-center">
-            All Categories 
+            All Categories
             <ChevronDown
-                className={twMerge(
-                  `h-5 ml-1 transition-all duration-500`,
-                  open && "rotate-180"
-                )}
-              />
+              className={twMerge(
+                `h-5 ml-1 transition-all duration-500`,
+                open && "rotate-180"
+              )}
+            />
           </Popover.Button>
           <Transition
             as={React.Fragment}
             enter="transition ease-out duration-200"
             enterFrom="opacity-0 translate-y-1"
             enterTo="opacity-100 translate-y-0"
-            leave="transition ease-in duration-150"
+            leave="transition ease-in duration-200"
             leaveFrom="opacity-100 translate-y-0"
             leaveTo="opacity-0 translate-y-1"
           >
             <Popover.Panel
               className={twMerge(
-                "absolute z-[350] w-screen max-w-sm mt-3   lg:max-w-max p-3 shadow-2xl text-sm font-normal bg-white rounded-lg"
+                "absolute z-[350] mt-3 transition-all p-3 shadow-2xl text-sm font-normal bg-white rounded-lg"
               )}
             >
-              
               <div className="flex min-w-max" onMouseLeave={handleMouseLeave}>
                 <div className="min-w-[200px]">
                   <ul className="">
                     {Object.keys(categories).map((category) => (
-                      <li
-                        key={category}
-                        className={`cursor-pointer py-2 px-4 border-l-4 ${
-                          activeTab === category
-                            ? "border-blue-500 bg-blue-100"
-                            : "border-transparent"
-                        }`}
-                        onMouseEnter={() =>
-                          handleMouseEnter(category as keyof typeof categories)
-                        }
-                      >
-                        {category}
-                      </li>
+                      <Link key={category} href={categories[category].link}>
+                        <li
+                          className={`cursor-pointer hover:pl-6 transition-all py-2 px-4 border-l-4 ${
+                            activeTab === category
+                              ? "border-blue-500 bg-blue-100"
+                              : "border-transparent"
+                          }`}
+                          onMouseEnter={() =>
+                            handleMouseEnter(
+                              category as keyof typeof categories
+                            )
+                          }
+                        >
+                          {category}
+                        </li>
+                      </Link>
                     ))}
                   </ul>
                 </div>
-                
-                <div className={`w-full  ${activeTab ? 'block' : 'hidden'}`}>
+
+                <div
+                  className={`w-[300px] ${
+                    activeTab ? "transition-all" : "w-0"
+                  }`}
+                  style={{
+                    transition: activeTab
+                      ? "width 0.1s ease-in-out"
+                      : "width 0.1s ease-in-out",
+                  }}
+                >
                   {/* Content for the active tab */}
                   {activeTab && (
-                    <ul className=" grid grid-rows-6 grid-flow-col bg-blue-100" >
+                    <ul className="grid grid-rows-6 transition-all grid-flow-col">
                       {Object.entries(categories[activeTab].subcategories).map(
                         ([subcategory, link]) => (
-                          <li key={subcategory} className="py-2 px-4 min-w-max hover:bg-primaryColor hover:text-white">
-                            <Link href={link}>{subcategory}</Link>
-                          </li>
+                          <Link key={subcategory} href={link}>
+                            <li
+                              className="py-2 px-4 transition-all min-w-max hover:bg-primaryColor hover:text-white"
+                            >
+                              {subcategory}
+                            </li>
+                          </Link>
                         )
                       )}
                     </ul>

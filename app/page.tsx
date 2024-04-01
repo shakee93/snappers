@@ -16,6 +16,11 @@ import Scam from "@/public/homepage/scam.webp";
 import Sampath from "@/public/images/bank logos/sampath.png";
 import Commercial from "@/public/images/bank logos/commercial.png";
 import Hnb from "@/public/images/bank logos/hnb.png";
+import Dfcc from "@/public/images/bank logos/logo-dfccbank.png";
+import Ntb from "@/public/images/bank logos/Nations_Trust_Bank_logo.png";
+import Hsbc from "@/public/images/bank logos/2560px-HSBC_logo_(2018).svg.png";
+import Peaple from "@/public/images/bank logos/Peoplesbanklk.png";
+import Seylan from "@/public/images/bank logos/Seylan_Bank_logo.png";
 import Standard from "@/public/images/bank logos/standard-chartered-2021-logo-freelogovectors.net_.png";
 import SectionHero2 from "./components/HomePage/SectionHero2";
 import CategoryWithSubcategories from "./components/globalComponents/CategoryWithSubcategories";
@@ -66,6 +71,18 @@ const slidesData = [
       },
     },
   },
+];
+
+const Banks = [
+  Sampath,
+  Dfcc,
+  Ntb,
+  Peaple,
+  Hnb,
+  Commercial,
+  Standard,
+  Seylan,
+  Hsbc,
 ];
 
 const getData = async () => {
@@ -126,6 +143,44 @@ export default async function Home() {
   return (
     <main>
       <div className="nc-PageHome relative flex  flex-col overflow-hidden">
+        <div className="bg-[#285f38] py-4 md:p-3">
+          <div className="flex md:items-center gap-4 md:gap-3 flex-col md:flex-row items-between ">
+            <div className="flex flex-col md:flex-row gap-2 justify-center items-center w-full">
+              {/* <div>
+                <p className="text-3xl md:text-xl lg:text-3xl xl:text-5xl -skew-x-[20deg] font-bold bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent bg-clip-text">
+                  0% Installment
+                </p>
+              </div> */}
+              <div className="flex flex-col gap-0">
+                <p className="text-xl md:text-lg lg:text-2xl text-white text-center font-bold ">
+                  Up to 12 Month Installment Plans
+                </p>
+                {/* <p className="flex w-full gap-2 md:gap-1  justify-between items-baseline ">
+                  <span className="text-sm md:text-xs xl:text-xl font-bold text-gray-500">
+                    06 Months | 12 Months
+                  </span>
+                  <span className="text-[10px]  xl:text-xs font-semibold text-gray-400">
+                    T & C Apply
+                  </span>
+                </p> */}
+              </div>
+
+              <div className="flex py-2 mx-4 md:mx-0 px-2 md:px-4   gap-2 xl:gap-5 bg-white rounded-xl">
+                <div className="flex flex-wrap justify-center gap-2 xl:gap-4">
+                  {Banks.map((bank, index) => (
+                    <div key={index} className="">
+                      <Image
+                        src={bank}
+                        alt={`Bank Logo ${index}`}
+                        className="w-auto h-5 lg:h-7"
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
         {/* hero section */}
         <div className="z-0">
           {/* <SectionHero3 /> */}
@@ -151,46 +206,6 @@ export default async function Home() {
             </div>
           </div>
         </div> */}
-        <div className="bg-[#e5e7eb] py-4 md:p-2">
-          <div className="container flex md:items-center gap-4 md:gap-3 flex-col md:flex-row items-between ">
-            <div className="flex flex-col md:flex-row gap-2 justify-between items-center w-full">
-              <div>
-                <p className="text-3xl md:text-xl lg:text-3xl xl:text-5xl -skew-x-[20deg] font-bold bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent bg-clip-text">
-                  0% Installment
-                </p>
-              </div>
-              <div className="flex flex-col gap-0">
-                <p className="text-xl md:text-lg xl:text-3xl text-center font-bold ">For All Products...!!!</p>
-                <p className="flex w-full gap-2 md:gap-1  justify-between items-baseline ">
-                  <span className="text-sm md:text-xs xl:text-xl font-bold text-gray-500">06 Months | 12 Months</span>
-                  <span className="text-[10px]  xl:text-xs font-semibold text-gray-400">T & C Apply</span>
-                </p>
-              </div>
-
-              <div className="flex py-1 px-4 border-5 border-blue-500 gap-2 md:gap-5 bg-white rounded-3xl">
-                <Image
-                  src={Sampath}
-                  alt=""
-                  height={20}
-                  className="w-auto h-8 md:h-6 xl:h-10 "
-                />
-                <Image src={Hnb} alt="" height={20} className="w-auto h-8 md:h-6 xl:h-10" />
-                <Image
-                  src={Commercial}
-                  alt=""
-                  height={20}
-                  className="w-auto h-8 md:h-6 xl:h-10"
-                />
-                <Image
-                  src={Standard}
-                  alt=""
-                  height={20}
-                  className="w-auto h-8 md:h-6 xl:h-10"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
 
         <div className="container flex flex-col gap-10 lg:gap-16">
           {/* new arrivals section */}
