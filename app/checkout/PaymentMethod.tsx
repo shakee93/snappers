@@ -47,7 +47,7 @@ const PaymentMethod: FC<Props> = ({
     
     const active = methodActive === gateway.id;
 
-    console.log("activeMethod: ", gateway.id);
+    // console.log("activeMethod: ", gateway.id);
 
     let is_tab_or_mobile = gateway.id == "payhere"
 
