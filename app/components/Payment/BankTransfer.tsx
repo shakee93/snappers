@@ -53,7 +53,7 @@ const BankTransfer: React.FC<BankTransferProps> = ({ paymentDetails }) => {
     formData.append("order_id", orderId);
 
     try {
-      const response = await fetch("/api/gq_mobile/v1/upload", {
+      const response = await fetch("/wp-json/api/gq_mobile/v1/upload", {
         method: "POST",
         body: formData,
       });
