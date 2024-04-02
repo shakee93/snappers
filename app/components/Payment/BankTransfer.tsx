@@ -57,13 +57,12 @@ const BankTransfer: React.FC<BankTransferProps> = ({ paymentDetails }) => {
         method: "POST",
         body: formData,
       });
-      
 
       const data = await response.json();
 
       console.log("data", data);
 
-      if (data.message === "success") {
+      if (data.message === "File uploaded successfully") {
         setUploadStatus("success");
         toast.success("You have successfully completed the upload of your bank slip.")
         let thankYouUrl = `checkout/${orderId}`
