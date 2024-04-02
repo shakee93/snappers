@@ -143,7 +143,7 @@ export default async function Home() {
   return (
     <main>
       <div className="nc-PageHome relative flex  flex-col overflow-hidden">
-        <div className="bg-[#285f38] py-4 md:p-3">
+        <div className="bg-[#285f38] py-4 px-2 md:p-3">
           <div className="flex md:items-center gap-4 md:gap-3 flex-col md:flex-row items-between ">
             <div className="flex flex-col md:flex-row gap-2 justify-center items-center w-full">
               {/* <div>
@@ -151,28 +151,27 @@ export default async function Home() {
                   0% Installment
                 </p>
               </div> */}
-              <div className="flex flex-col gap-0">
-                <p className="text-xl md:text-lg lg:text-2xl text-white text-center font-bold ">
-                  Up to 12 Month Installment Plans
+              <div className="flex flex-col shrink-0 gap-0">
+                <p className="text-lg md:text-lg lg:text-2xl text-white text-left font-semibold ">
+                  Up to 24 Month Installment Plans
+                  <span className="text-[10px]  flex leading-none justify-center md:justify-start shrink-0 xl:text-xs font-semibold text-gray-400">
+                    (T & C Apply)
+                  </span>
                 </p>
-                {/* <p className="flex w-full gap-2 md:gap-1  justify-between items-baseline ">
-                  <span className="text-sm md:text-xs xl:text-xl font-bold text-gray-500">
-                    06 Months | 12 Months
-                  </span>
-                  <span className="text-[10px]  xl:text-xs font-semibold text-gray-400">
-                    T & C Apply
-                  </span>
-                </p> */}
+                <p className="flex w-full gap-2 md:gap-1  justify-end items-baseline ">
+            
+                 
+                </p>
               </div>
 
-              <div className="flex py-2 mx-4 md:mx-0 px-2 md:px-4   gap-2 xl:gap-5 bg-white rounded-xl">
-                <div className="flex flex-wrap justify-center gap-2 xl:gap-4">
+              <div className="flex py-2 mx-4 md:mx-0 px-2 md:px-4  shrink  gap-2 xl:gap-5 bg-white rounded-xl">
+                <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 md:gap-x-7 md:gap-y-2 xl:gap-4">
                   {Banks.map((bank, index) => (
                     <div key={index} className="">
                       <Image
                         src={bank}
                         alt={`Bank Logo ${index}`}
-                        className="w-auto h-5 lg:h-7"
+                        className="w-auto h-5 md:h-6 lg:h-7"
                       />
                     </div>
                   ))}
