@@ -158,13 +158,13 @@ const ThankYouPage = ({ params }: OrderPaymentPageProps) => {
               34312421543545
             </li>
             <li className="mb-2 text-left ">
-              <strong className="text-gray-600">Sort code:</strong> fsefsa
+              <strong className="text-gray-600">Sort code:</strong> -
             </li>
             <li className="mb-2 text-left ">
-              <strong className="text-gray-600">IBAN:</strong> asdfadsfasd
+              <strong className="text-gray-600">IBAN:</strong> -
             </li>
             <li className="mb-2 text-left ">
-              <strong className="text-gray-600">BIC:</strong> fsadfsdfasdf
+              <strong className="text-gray-600">BIC:</strong> -
             </li>
           </ul>
         </div>

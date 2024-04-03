@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import BankDetails from "./BankDetails";
 import { PaymentDetailsWithoutUrls } from "@/data/types";
 import { Loader } from "lucide-react";
+import { useSession } from "@/context/SessionProvider";
 
 type BankTransferProps = {
   // Define any props you expect to pass into BankTransfer here
@@ -18,6 +19,7 @@ const BankTransfer: React.FC<BankTransferProps> = ({ paymentDetails }) => {
   const [orderId, setOrderId] = useState<string>("");
   const [uploadStatus, setUploadStatus] = useState<string>("");
   const [loading, setLoading] = useState(false)
+  const { customer, fetchCustomer } = useSession();
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = event.target.files;
     if (fileList) {
@@ -31,6 +33,7 @@ const BankTransfer: React.FC<BankTransferProps> = ({ paymentDetails }) => {
     // setOrderId("6445");
     if (paymentDetails) {
       setOrderId(paymentDetails.order_id);
+      // console.log('payment email', paymentDetails.email);
     } else {
       alert("No payment Details provided for the bank transfer")
     }
@@ -65,8 +68,17 @@ const BankTransfer: React.FC<BankTransferProps> = ({ paymentDetails }) => {
       if (data.message === "File uploaded successfully") {
         setUploadStatus("success");
         toast.success("You have successfully completed the upload of your bank slip.")
-        let thankYouUrl = `checkout/${orderId}`
-        router.push(thankYouUrl);
+        if (
+          customer?.id === "guest"
+        ) {
+          let email = paymentDetails.email;
+          let redirectUrl = `/checkout/no_order_id_found?email=${email}`;
+          router.push(redirectUrl);
+          return;
+        } else {
+          let redirectUrl = `checkout/${orderId}`;
+          router.push(redirectUrl);
+        }
       }
 
       if (data.error) {
