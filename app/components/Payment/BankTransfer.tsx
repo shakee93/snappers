@@ -46,7 +46,6 @@ const BankTransfer: React.FC<BankTransferProps> = ({ paymentDetails }) => {
     event.preventDefault();
     if (!file) {
       toast.error("Kindly choose a file for uploading.", { duration: 7000 });
-
       setLoading(false)
       return;
     }
@@ -63,11 +62,30 @@ const BankTransfer: React.FC<BankTransferProps> = ({ paymentDetails }) => {
 
       const data = await response.json();
 
-      console.log("data", data);
+      // console.log("data", data);
 
       if (data.message === "File uploaded successfully") {
         setUploadStatus("success");
         toast.success("You have successfully completed the upload of your bank slip.")
+
+        const confirmationResponse = await fetch("https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/order-confirmation", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            order_id: orderId,
+            order_status: "completed"
+          })
+        });
+
+        if (!confirmationResponse.ok) {
+          throw new Error("Failed to confirm order status");
+        }
+
+        const orderConfirmationdata = await confirmationResponse.json();
+        console.log("orderConfirmation", orderConfirmationdata);
+
         if (
           customer?.id === "guest"
         ) {

@@ -316,8 +316,7 @@ const CheckoutPage = () => {
   const paymentDetails = useMemo(() => {
     return paymentData;
   }, [paymentData]);
-
-  const ImplementPayhere = () => {
+  const ImplementPayhere = async () => {
     let generatedOrderId = crypto.randomUUID();
     setPayherPaymentID(generatedOrderId);
 
@@ -380,6 +379,25 @@ const CheckoutPage = () => {
     if (initiatePayment !== null) {
       setPayhereHandleStatus("loading");
       initiatePayment(checkoutDetails, setPayhereHandleStatus).then((r) => r);
+
+      const confirmationResponse = await fetch("https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/order-confirmation", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          order_id: checkoutDetails.order_id,
+          order_status: "completed"
+        })
+      });
+
+      if (!confirmationResponse.ok) {
+        throw new Error("Failed to confirm order status");
+      }
+
+      const orderConfirmationdata = await confirmationResponse.json();
+      console.log("orderConfirmation", orderConfirmationdata);
+
     } else {
       console.log("initiate payment become null");
     }
