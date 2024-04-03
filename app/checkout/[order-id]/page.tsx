@@ -18,6 +18,9 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   const orderId = params["order-id"];
   const searchParams = useSearchParams().get("email");
 
+  // console.log({orderId});
+  // console.log({searchParams});
+
   if (orderId === "no_order_id_found" && searchParams == null) {
     return (
       <h1 className="py-20 text-center text-2xl font-bold">
@@ -65,7 +68,6 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   useEffect(() => {
     getUserData();
     refreshCart();
-    // console.log("Cart refreshed");
   }, [getUserData]);
 
   if (!orderId || orderId == "12345") {

@@ -96,6 +96,7 @@ const CheckoutPage = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [totalWithTax, setTotalWithTax] = useState<string | null>();
   const [isTOC, setTOC] = useState<boolean>(false);
+  const [freeShipping, setFreeShipping] = useState<boolean>(false);
 
   const handleTOC = () => {
     // Toggle the state and get the updated value
@@ -140,6 +141,16 @@ const CheckoutPage = () => {
   // Contexts
   const router = useRouter();
   const initiatePayment = usePayhere();
+
+  // console.log('cart', cart);
+
+  useEffect(() => {
+    const hasFreeShipping: any = cart?.appliedCoupons?.some(coupon => coupon?.code === "free-shipping");
+    if (hasFreeShipping) {
+      setFreeShipping(true);
+    }
+  }, [cart]);
+
 
   const updateFormData = (section: string, data: any) => {
     setFormData((prevData) => {
@@ -249,19 +260,24 @@ const CheckoutPage = () => {
   }, [payhereHandleStatus]);
 
   const updateShippingTotal = async () => {
+    const hasFreeShipping: any = cart?.appliedCoupons?.some(coupon => coupon?.code === "free-shipping");
+    if (hasFreeShipping) {
+      setFreeShipping(true);
+    }
     try {
       const shippingMethods = isStorePickup
         ? "pickup_location:0"
-        : "wbs:0dd3bc79_weight_based_shipping";
-      const total: any = cart?.total;
-      setOrderTotal(total);
+        : freeShipping
+          ? "wbs:5c9bd062_free_shipping"
+          : "wbs:0dd3bc79_weight_based_shipping";
 
-      // console.log('shippingMethods', shippingMethods);
+      const total: any = cart?.total;
+      setOrderTotal(freeShipping ? cart?.subtotal : total);
 
       if (customer?.id === "guest") {
         const subtotal: any = cart?.subtotal;
 
-        if (isStorePickup) {
+        if (isStorePickup || freeShipping) {
           setOrderTotal(subtotal);
         } else {
           setOrderTotal(total);
@@ -272,12 +288,17 @@ const CheckoutPage = () => {
         variables: { input: { shippingMethods } },
       });
 
-      console.log("data in shippng", data);
+      // console.log("data in shippng", data);
 
       if (data?.updateShippingMethod?.cart) {
-        const { total, shippingTotal } = data.updateShippingMethod.cart;
-        setOrderTotal(total);
-        setShippingTotal(shippingTotal);
+        const { total, shippingTotal, subtotal } = data.updateShippingMethod.cart;
+        if (freeShipping) {
+          setOrderTotal(subtotal)
+          setShippingTotal(shippingTotal);
+        } else {
+          setOrderTotal(total)
+          setShippingTotal(shippingTotal);
+        };
       } else {
         console.error(
           "Failed to update cart shipping total. No valid data returned."
@@ -290,7 +311,7 @@ const CheckoutPage = () => {
 
   useEffect(() => {
     updateShippingTotal().then((r) => r);
-  }, [isStorePickup, updateCartShippingTotalMutation]);
+  }, [isStorePickup, updateCartShippingTotalMutation, freeShipping]);
 
   const paymentDetails = useMemo(() => {
     return paymentData;
@@ -506,19 +527,21 @@ const CheckoutPage = () => {
   };
 
   const getShippingMethod = (shippingTotal: any) => {
-    const methodId =
-      shippingTotal === "₨&nbsp;0.00"
-        ? "pickup_location:0"
+    const methodId = isStorePickup
+      ? "pickup_location:0"
+      : freeShipping
+        ? "wbs:5c9bd062_free_shipping"
         : "wbs:0dd3bc79_weight_based_shipping";
 
-    const methodTitle =
-      shippingTotal === "₨&nbsp;0.00"
-        ? "pickup_location:0"
-        : "Weight Based Shipping";
+    const methodTitle = isStorePickup
+      ? "pickup_location:0"
+      : freeShipping
+        ? "wbs:5c9bd062_free_shipping"
+        : "wbs:0dd3bc79_weight_based_shipping";
 
     const total = shippingTotal;
 
-    console.log("Shipping Method: ", { methodId, methodTitle, total });
+    // console.log("Shipping Method: ", { methodId, methodTitle, total });
 
     return { methodId, methodTitle, total };
   };
@@ -571,6 +594,7 @@ const CheckoutPage = () => {
           setShowBankTransfer={setShowBankTransfer}
           setWantToSHowBankTransfer={setWantToSHowBankTransfer}
           paymentDetails={paymentDetails}
+          customerEmail={formData?.contactInfo?.email}
         />
         <div className="mb-16">
           <h2 className="block text-2xl font-semibold sm:text-3xl lg:text-4xl ">
@@ -649,13 +673,21 @@ const CheckoutPage = () => {
 
               {!isStorePickup && (
                 <div className="flex justify-between py-2.5">
-                  <span>Shipping estimate</span>
+                  <span>{freeShipping ? `Free Shipping` : `Shipping estimate`}</span>
                   <span className="font-semibold text-slate-900 dark:text-slate-200">
-                    <span
-                      dangerouslySetInnerHTML={{
-                        __html: cart?.shippingTotal || "0.00",
-                      }}
-                    />
+                    {freeShipping ? (
+                      <span
+                        dangerouslySetInnerHTML={{
+                          __html: "0.00",
+                        }}
+                      />
+                    ) : (
+                      <span
+                        dangerouslySetInnerHTML={{
+                          __html: cart?.shippingTotal || "0.00",
+                        }}
+                      />
+                    )}
                   </span>
                 </div>
               )}
@@ -746,17 +778,16 @@ const CheckoutPage = () => {
                   isTOC
                 )
               }
-              className={`mt-8 w-full ${
-                !(
-                  isConfirmed.contactInfo &&
-                  isConfirmed.deliveryAddress &&
-                  isConfirmed.billingAddress &&
-                  isConfirmed.paymentMethod &&
-                  isTOC
-                )
-                  ? "cursor-not-allowed bg-slate-500"
-                  : "bg-primary hover:bg-primary-dark"
-              }`}
+              className={`mt-8 w-full ${!(
+                isConfirmed.contactInfo &&
+                isConfirmed.deliveryAddress &&
+                isConfirmed.billingAddress &&
+                isConfirmed.paymentMethod &&
+                isTOC
+              )
+                ? "cursor-not-allowed bg-slate-500"
+                : "bg-primary hover:bg-primary-dark"
+                }`}
             >
               {loading ? (
                 <Loader className="animate-spin text-gray-100 " />

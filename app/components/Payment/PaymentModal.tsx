@@ -4,14 +4,18 @@ import React, {Fragment} from "react";
 import BankTransfer from "./BankTransfer";
 
 
-const PaymentModal = ({show, setShowBankTransfer, setWantToSHowBankTransfer, paymentDetails}: any) => {
+const PaymentModal = ({show, setShowBankTransfer, setWantToSHowBankTransfer, paymentDetails, customerEmail}: any) => {
 
     let onCloseModalQuickView = () => {
         setWantToSHowBankTransfer(true);
         setShowBankTransfer(false);
     };
 
-    // console.log("Payment details in the payment modal: ", paymentDetails)
+    let updatedPaymentDetails = paymentDetails ? { ...paymentDetails } : null; // Create a copy of paymentDetails
+
+    if (updatedPaymentDetails) {
+        updatedPaymentDetails.email = customerEmail; // Update the email property
+    }
 
     return (
         <Transition appear show={show} as={Fragment}>
@@ -55,7 +59,7 @@ const PaymentModal = ({show, setShowBankTransfer, setWantToSHowBankTransfer, pay
                   <ButtonClose onClick={onCloseModalQuickView}/>
                 </span>
                                 <div className="flex-1 overflow-y-auto rounded-xl hiddenScrollbar">
-                                    <BankTransfer paymentDetails={paymentDetails}/>
+                                    <BankTransfer paymentDetails={updatedPaymentDetails}/>
                                 </div>
                             </div>
                         </div>
