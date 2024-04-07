@@ -56,11 +56,11 @@ const Footer = async () => {
                 </div>
                 <div className="flex flex-col">
                   <div>
-                    <Link href={"tel:0777555665"}> 077 755 5665</Link> /{" "}
-                    <Link href={"tel:0777988665"}> 077 798 8665</Link>{" "}
+                    <Link href={"tel:0777555665"}> 0777 555 665</Link> /{" "}
+                    <Link href={"tel:0777988665"}> 0777 988 665</Link>{" "}
                   </div>
                   <div>
-                    <Link href={"tel:0112372665"}> / 011 237 2665</Link>
+                    <Link href={"tel:0112372665"}> / 0112 372 665</Link>
                   </div>
                 </div>
               </li>
