@@ -44,15 +44,15 @@ const slidesData = [
   {
     id: "3",
     slideFields: {
-      mainHeading: "Embrace the Future of Accessories",
-      subHeading: "Step into Tomorrow's Style",
+      mainHeading: " Immersive Sound, Effortless Charging",
+      subHeading: "AirPods Pro 2 with MagSafe Charging",
       buttonText: "Explore Products",
-      buttonLink: "/collections/all",
+      buttonLink: "/apple/airpods-pro-2nd-generation-with-magsafe-charging-case-usbc-2023",
       backgroundColor: "#F4E7E7",
       featureImage: {
         id: "3",
         sourceUrl:
-          "https://api.gqmobiles.lk/wp-content/uploads/2023/12/dlcdnwebimgs.asus_-300x300.png",
+          "http://api.gqmobiles.lk/wp-content/uploads/2024/04/Untitled-design-74.png",
       },
     },
   },
