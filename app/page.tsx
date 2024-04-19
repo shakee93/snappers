@@ -29,15 +29,15 @@ const slidesData = [
   {
     id: "2",
     slideFields: {
-      mainHeading: "Experience gaming at its finest",
-      subHeading: "Sony PS5 Slim: Gaming Redefined",
+      mainHeading: "Power and Performance, Anywhere",
+      subHeading: "Redmi Note 12 Pro (4G) - Your Ultimate Everyday Companion",
       buttonText: "Buy Now",
-      buttonLink: "/sony/sony-playstation-5-slim-disc-edition",
+      buttonLink: "/xiaomi/xiaomi-redmi-note-12-pro-8gb-256gb",
       backgroundColor: "#CCE0EF",
       featureImage: {
         id: "2",
         sourceUrl:
-          "http://api.gqmobiles.lk/wp-content/uploads/2024/03/Untitled-design-2024-03-13T155550.163-removebg-preview.png",
+          "http://api.gqmobiles.lk/wp-content/uploads/2024/04/12-pro-4g-removebg-preview.png",
       },
     },
   },
