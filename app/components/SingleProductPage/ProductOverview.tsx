@@ -38,8 +38,15 @@ const ProductOverview = ({
   const formattedDescription = addParagraphSpacing(product.description);
 
   const increaseH1Font = (htmlContent: any) => {
-    return htmlContent.replace(/<h1>/g, '<h1 class="text-lg py-2">');
-  };
+    // Check if htmlContent is defined
+    if (typeof htmlContent !== 'undefined') {
+        return htmlContent.replace(/<h1>/g, '<h1 class="text-lg py-2">');
+    } else {
+        // Return an empty string or handle the undefined case according to your logic
+        return '';
+    }
+};
+
 
   return (
     <>
