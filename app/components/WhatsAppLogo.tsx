@@ -25,7 +25,7 @@ const WhatsappLogoComponent = () => {
 
   return (
     <div className={twMerge(
-      "transition-transform fixed  z-[1000] md:bottom-10 md:right-10 bottom-28 right-4 h-8 w-12 md:mb-5",
+      "transition-transform fixed  z-[1000] md:bottom-10 md:right-10 bottom-[120px] right-7 h-8 w-12 md:mb-5",
       isProduct && 'bottom-44'
     )}>
       <Link href={"https://wa.me/94722299944"} target="_blank">
