@@ -114,13 +114,13 @@ export default function CategoryBlockSection() {
               </p>
             </div>
           </div>
-          <Link href={"/collections/all-headphones"}>
+          <Link href={"/collections/headphones-and-headsets"}>
             <Button
               className="bg-primaryColor text-sm text-white"
               radius="full"
               size="md"
             >
-              All Headphones
+              All Headphones 
             </Button>
           </Link>
         </CardFooter>
