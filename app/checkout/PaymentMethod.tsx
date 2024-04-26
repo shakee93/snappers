@@ -52,8 +52,8 @@ const PaymentMethod: FC<Props> = ({
     let is_tab_or_mobile = gateway.id == "payhere"
 
     return (
-      // <div className={` items-start cursor-pointer space-x-4 sm:space-x-6 ${is_tab_or_mobile ? "hidden md:flex " : "flex"}`}>
-      <div className={`flex items-start cursor-pointer space-x-4 sm:space-x-6 `}>
+      <div className={` items-start cursor-pointer space-x-4 sm:space-x-6 ${is_tab_or_mobile ? "hidden md:flex " : "flex"}`}>
+      {/* <div className={`flex items-start cursor-pointer space-x-4 sm:space-x-6 `}> */}
         <Radio
           className="cursor-pointer"
           name="payment-method"
