@@ -15,8 +15,7 @@ import { useStore } from "@/store/store";
 import { twMerge } from "tailwind-merge";
 import parseHtml from "html-react-parser";
 import { useImage } from "@/context/ImageChangeGrabber";
-import brandColors from '@/data/brandColors';
-
+import brandColors from "@/data/brandColors";
 
 const ProductDetails = ({
   product,
@@ -25,10 +24,14 @@ const ProductDetails = ({
   product: VariableProduct & SimpleProduct;
   brand: Brand;
 }) => {
+  const {
+    product: { attribute },
+    setAttribute,
+  } = useStore();
 
-  const { product: { attribute }, setAttribute } = useStore();
-
-  const [activeVariation, setActiveVariation] = useState<any>(product?.variations?.nodes[0]);
+  const [activeVariation, setActiveVariation] = useState<any>(
+    product?.variations?.nodes[0]
+  );
   const [activeOption, setActiveOption] = useState(
     !!product?.variations?.nodes?.length
       ? product?.variations?.nodes[0].attributes?.nodes[0].value
@@ -36,8 +39,12 @@ const ProductDetails = ({
   );
 
   const manualMeta = product?.metaData;
-  const warrantyType = manualMeta?.find(item => item?.key === 'warranty_type')?.value;
-  const warrantyPeriod = manualMeta?.find(item => item?.key === 'warranty_period')?.value;
+  const warrantyType = manualMeta?.find(
+    (item) => item?.key === "warranty_type"
+  )?.value;
+  const warrantyPeriod = manualMeta?.find(
+    (item) => item?.key === "warranty_period"
+  )?.value;
 
   const { setVariationId } = useImage();
 
@@ -65,7 +72,11 @@ const ProductDetails = ({
   );
 
   useEffect(() => {
-    if (product.type === "VARIABLE" && product?.variations?.nodes?.length !== undefined && product.variations.nodes.length > 0) {
+    if (
+      product.type === "VARIABLE" &&
+      product?.variations?.nodes?.length !== undefined &&
+      product.variations.nodes.length > 0
+    ) {
       setActiveVariation(product?.variations?.nodes[0]);
     } else if (product.type === "SIMPLE") {
       // Handle simple product case
@@ -93,13 +104,11 @@ const ProductDetails = ({
 
       if (vProduct) {
         setActiveVariation(vProduct);
-      }else{
-        setActiveVariation(null)
+      } else {
+        setActiveVariation(null);
       }
-
     }
   }, [attribute]);
-
 
   const applyListStyleDisc = (htmlContent: any) => {
     return htmlContent.replace(/<ul>/g, '<ul class="list-disc">');
@@ -110,19 +119,25 @@ const ProductDetails = ({
   return (
     <>
       <div className="flex gap-1  text-sm text-gray-500">
-        Brand : <Link href={`/${brand?.slug}`} target="_blank" className={`${brandColorClass}`} >{brand?.name}</Link>
+        Brand :{" "}
+        <Link
+          href={`/${brand?.slug}`}
+          target="_blank"
+          className={`${brandColorClass}`}
+        >
+          {brand?.name}
+        </Link>
       </div>
 
       <div className="text-base md:text-lg font-medium ">
         {product.name} - {product.databaseId}
       </div>
 
-
       {product.shortDescription && (
         <div
           className="text-xs md:text-sm text-gray-600"
           dangerouslySetInnerHTML={{
-            __html: applyListStyleDisc(product.shortDescription)
+            __html: applyListStyleDisc(product.shortDescription),
           }}
         />
       )}
@@ -135,18 +150,20 @@ const ProductDetails = ({
                 <div className="text-sm py-2">
                   {attr.label}:{" "}
                   <span className="font-medium text-gray-700">
-                    {
-                      (product as unknown as VariableProduct)[
+                    {activeAttr(attr)?.val}
+                    {/* {
+                      (product as unknown as Record<string, any>)[
                         `allPa${attr?.label as unknown as "Capacity"}`
                       ]?.nodes.find(
                         (node: PaCapacity) =>
                           node.slug === activeAttr(attr)?.val
                       )?.name
-                    }
+                    } */}
                   </span>{" "}
                 </div>
 
                 <ul className="flex gap-2 flex-wrap text-sm items-center">
+                  {/* Options are: {attr.options} */}
                   {attr.options?.map((option, index) => (
                     <li
                       key={index}
@@ -154,17 +171,28 @@ const ProductDetails = ({
                       className={twMerge(
                         "border bg-gray-200/80 cursor-pointer text-black inline-block py-2 px-3.5  text-xs md:text-sm rounded",
                         activeAttr(attr)?.val === option &&
-                        " border-blue-700 bg-white"
+                          " border-blue-700 bg-white"
                       )}
                     >
-                      {
+                      {/* {
                         (product as any)
                         [
                           `allPa${(attr?.label as unknown as "Capacity")?.split(' ').join('')}`
                         ]?.nodes.find((node: PaCapacity) => {
                           return node.slug === option;
-                        })?.name || "OPTION"
-                      }
+                        // })?.name || "OPTION" 
+                        })?.name || "OPTION" 
+                      } */}
+                      {option}
+                      {/* {(product as any)[
+                        `allPa${(attr?.label as unknown as "Capacity")
+                          ?.split(" ")
+                          .join("")}`
+                      ]?.nodes.find((node: PaCapacity) => {
+                        return node.slug === option;
+                      })?.name ||
+                        attr?.name ||
+                        ""} */}
                     </li>
                   ))}
                 </ul>
@@ -178,25 +206,34 @@ const ProductDetails = ({
         <div>
           <div className="flex items-center gap-4 text-base py-2 flex-wrap md:text-xl font-medium text-gray-600">
             <span dangerouslySetInnerHTML={{ __html: activeVariation.price }} />
-        
+
             {!!activeVariation.salePrice &&
               activeVariation.salePrice !== activeVariation.regularPrice && (
                 <span className="text-red-400 line-through md:text-sm">
-                  <span dangerouslySetInnerHTML={{ __html: activeVariation.regularPrice }} />
+                  <span
+                    dangerouslySetInnerHTML={{
+                      __html: activeVariation.regularPrice,
+                    }}
+                  />
                 </span>
               )}
-
           </div>
         </div>
       ) : (
         <div className="flex items-center gap-2 text-base py-2 flex-wrap md:text-xl font-medium text-gray-600">
-          <span dangerouslySetInnerHTML={{ __html: product.price || '' }} />
+          <span dangerouslySetInnerHTML={{ __html: product.price || "" }} />
 
-          {product.salePrice && product.salePrice !== product.price && activeVariation === null && (
-            <span className="text-red-400 line-through md:text-sm">
-              <span dangerouslySetInnerHTML={{ __html: product.regularPrice || '' }} />
-            </span>
-          )}
+          {product.salePrice &&
+            product.salePrice !== product.price &&
+            activeVariation === null && (
+              <span className="text-red-400 line-through md:text-sm">
+                <span
+                  dangerouslySetInnerHTML={{
+                    __html: product.regularPrice || "",
+                  }}
+                />
+              </span>
+            )}
         </div>
       )}
 
@@ -218,33 +255,38 @@ const ProductDetails = ({
       {/* In Stock Badge */}
 
       {product.type === "VARIABLE" &&
-        activeVariation?.stockStatus == "IN_STOCK" && (
-          (activeVariation?.stockQuantity && activeVariation?.stockQuantity >= 3) || (!activeVariation.stockQuantity && activeVariation?.stockStatus === "IN_STOCK")
-        ) && (
+        activeVariation?.stockStatus == "IN_STOCK" &&
+        ((activeVariation?.stockQuantity &&
+          activeVariation?.stockQuantity >= 3) ||
+          (!activeVariation.stockQuantity &&
+            activeVariation?.stockStatus === "IN_STOCK")) && (
           <div className="w-max px-4 bg-green-200 text-center rounded-full text-gray-800 text-xs md:text-sm py-1">
             In Stock
           </div>
         )}
 
-      {product.type === "SIMPLE" && product.stockStatus === "IN_STOCK" && (
-        (product?.stockQuantity && product?.stockQuantity >= 3) || (!product.stockQuantity && product.stockStatus === "IN_STOCK")
-      ) && (
+      {product.type === "SIMPLE" &&
+        product.stockStatus === "IN_STOCK" &&
+        ((product?.stockQuantity && product?.stockQuantity >= 3) ||
+          (!product.stockQuantity && product.stockStatus === "IN_STOCK")) && (
           <div className="w-max px-4 bg-green-200 text-center rounded-full text-gray-800 text-xs md:text-sm py-1">
             In Stock
           </div>
         )}
-
 
       {/* Low Stock Badge */}
       {product.type === "VARIABLE" &&
-        activeVariation?.stockStatus == "IN_STOCK" && activeVariation?.stockQuantity &&
+        activeVariation?.stockStatus == "IN_STOCK" &&
+        activeVariation?.stockQuantity &&
         activeVariation?.stockQuantity <= 2 && (
           <div className="w-max px-4 bg-yellow-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1 mb-1">
             Low Stock
           </div>
         )}
 
-      {product.type === "SIMPLE" && product.stockStatus == "IN_STOCK" && product?.stockQuantity &&
+      {product.type === "SIMPLE" &&
+        product.stockStatus == "IN_STOCK" &&
+        product?.stockQuantity &&
         product?.stockQuantity <= 2 && (
           <div className="w-max px-4 bg-yellow-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1 mb-1">
             Low Stock
@@ -257,12 +299,11 @@ const ProductDetails = ({
             <span className="font-medium">Warranty Type :</span> {warrantyType}
           </div>
           <div className="">
-            <span className="font-medium">Warranty period :</span> {warrantyPeriod} Months
+            <span className="font-medium">Warranty period :</span>{" "}
+            {warrantyPeriod} Months
           </div>
         </div>
       )}
-
-
 
       <ProductAddToCart product={product} variation={activeVariation} />
       <div className="flex gap-1 w-full items-center flex-wrap text-sm md:text-base text-g ray-500">
