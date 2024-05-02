@@ -49,7 +49,8 @@ const PaymentMethod: FC<Props> = ({
 
     // console.log("activeMethod: ", gateway.id);
 
-    let is_tab_or_mobile = gateway.id == "payhere"
+    // let is_tab_or_mobile = gateway.id == "payhere"
+    let is_tab_or_mobile = false
 
     return (
       <div className={` items-start cursor-pointer space-x-4 sm:space-x-6 ${is_tab_or_mobile ? "hidden md:flex " : "flex"}`}>
