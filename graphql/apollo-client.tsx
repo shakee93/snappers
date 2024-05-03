@@ -1,31 +1,38 @@
 "use client";
 
-import {ApolloLink, from, HttpLink, Observable,} from "@apollo/client";
+import { ApolloLink, from, HttpLink, Observable } from "@apollo/client";
 import {
   ApolloNextAppProvider,
   NextSSRApolloClient,
   NextSSRInMemoryCache,
   SSRMultipartLink,
 } from "@apollo/experimental-nextjs-app-support/ssr";
-import {GraphQLClient} from 'graphql-request';
+import { GraphQLClient } from "graphql-request";
 
-import {GET_AUTH_TOKEN} from "./defs/auth";
-import {AUTH_TOKEN_KEY, REFRESH_TOKEN_KEY, SESSION_TOKEN_KEY, USER_DATA_KEY} from "@/context/SessionProvider";
-import {onError} from "@apollo/client/link/error";
-import {loadDevMessages, loadErrorMessages} from "@apollo/client/dev";
-import {Results} from "@/types";
-
+import { GET_AUTH_TOKEN } from "./defs/auth";
+import {
+  AUTH_TOKEN_KEY,
+  REFRESH_TOKEN_KEY,
+  SESSION_TOKEN_KEY,
+  USER_DATA_KEY,
+} from "@/context/SessionProvider";
+import { onError } from "@apollo/client/link/error";
+import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
+import { Results } from "@/types";
 
 loadDevMessages();
 loadErrorMessages();
 
 export default function ApolloWrapper({ children }: React.PropsWithChildren) {
   function makeClient() {
-
     async function refreshAuthToken(refreshToken?: string) {
-      const graphQLClient = new GraphQLClient(process.env.NEXT_PUBLIC_WP_GRAPHQL || "");
+      const graphQLClient = new GraphQLClient(
+        process.env.NEXT_PUBLIC_WP_GRAPHQL || ""
+      );
 
-      const results = await graphQLClient.request(GET_AUTH_TOKEN, { refreshToken }) as Results;
+      const results = (await graphQLClient.request(GET_AUTH_TOKEN, {
+        refreshToken,
+      })) as Results;
 
       const authToken = results?.refreshJwtAuthToken?.authToken;
 
@@ -33,7 +40,7 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
         throw new Error("Failed to retrieve a new auth token");
       }
 
-      localStorage.setItem(AUTH_TOKEN_KEY, authToken)
+      localStorage.setItem(AUTH_TOKEN_KEY, authToken);
 
       return authToken;
     }
@@ -43,82 +50,84 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
       const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
 
       if (!refreshToken) {
-        new Error('refresh token missing');
+        new Error("refresh token missing");
       }
 
       return await refreshAuthToken(refreshToken || undefined);
     }
 
     const authLink = new ApolloLink((operation, forward) => {
-
       const sessionToken = localStorage.getItem(SESSION_TOKEN_KEY);
       const authToken = localStorage.getItem(AUTH_TOKEN_KEY);
 
       operation.setContext({
         headers: {
           ...(sessionToken && {
-            'woocommerce-session': `Session ${sessionToken}`,
+            "woocommerce-session": `Session ${sessionToken}`,
           }),
           ...(authToken && {
-            Authorization: `Bearer ${authToken}`
-          })
+            Authorization: `Bearer ${authToken}`,
+          }),
         },
       });
 
       return forward(operation);
     });
 
+    const errorLink = onError(
+      ({ graphQLErrors, operation, forward, networkError }) => {
+        const targetErrors = [
+          "The iss do not match with this server",
+          "invalid-secret-key | Expired token",
+          "invalid-secret-key | Signature verification failed",
+          "Expired token",
+          "Wrong number of segments",
+        ];
 
-    const errorLink = onError(({ graphQLErrors, operation, forward, networkError }) => {
-      const targetErrors = [
-        'The iss do not match with this server',
-        'invalid-secret-key | Expired token',
-        'invalid-secret-key | Signature verification failed',
-        'Expired token',
-        'Wrong number of segments',
-      ];
+        if (
+          graphQLErrors &&
+          graphQLErrors.some((err: any) =>
+            targetErrors.includes(err?.message || err?.debugMessage)
+          )
+        ) {
+          return new Observable((observer) => {
+            fetchAuthToken()
+              .then((newToken) => {
+                // console.log('newToken', newToken);
+                // Update the context with the new token
+                operation.setContext(({ headers = {} }) => ({
+                  headers: {
+                    ...headers,
+                    authorization: `Bearer ${newToken}`, // Update the authorization header
+                  },
+                }));
+              })
+              .then(() => {
+                const subscriber = {
+                  next: observer.next.bind(observer),
+                  error: observer.error.bind(observer),
+                  complete: observer.complete.bind(observer),
+                };
 
+                // Retry the request
+                forward(operation).subscribe(subscriber);
+              })
+              .catch((error) => {
+                localStorage.removeItem(AUTH_TOKEN_KEY);
+                localStorage.removeItem(REFRESH_TOKEN_KEY);
+                localStorage.removeItem(SESSION_TOKEN_KEY);
+                localStorage.removeItem(USER_DATA_KEY);
 
-      if (graphQLErrors && graphQLErrors.some((err: any) => targetErrors.includes(err?.message || err?.debugMessage))) {
-        return new Observable(observer => {
-          fetchAuthToken()
-            .then(newToken => {
+                observer.error(error);
+              });
+          });
+        }
 
-              // console.log('newToken', newToken);
-              // Update the context with the new token
-              operation.setContext(({ headers = {} }) => ({
-                headers: {
-                  ...headers,
-                  authorization: `Bearer ${newToken}`, // Update the authorization header
-                },
-              }));
-            })
-            .then(() => {
+        // console.log(graphQLErrors);
 
-              const subscriber = {
-                next: observer.next.bind(observer),
-                error: observer.error.bind(observer),
-                complete: observer.complete.bind(observer),
-              };
-
-              // Retry the request
-              forward(operation).subscribe(subscriber);
-            })
-            .catch(error => {
-              localStorage.removeItem(AUTH_TOKEN_KEY);
-              localStorage.removeItem(REFRESH_TOKEN_KEY);
-              localStorage.removeItem(SESSION_TOKEN_KEY);
-              localStorage.removeItem(USER_DATA_KEY);
-
-              observer.error(error);
-            });
-        });
+        if (networkError) console.log(`[Network error]: ${networkError}`);
       }
-
-      // console.log(graphQLErrors);
-
-      if (networkError) console.log(`[Network error]: ${networkError}`);
-    });
+    );
 
     const httpLink = new HttpLink({
       // This needs to be an absolute URL, as relative URLs cannot be used in SSR
@@ -135,18 +144,21 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
       // const { data } = useSuspenseQuery(MY_QUERY, { context: { fetchOptions: { cache: "force-cache" }}});
     });
 
-
     return new NextSSRApolloClient({
       // Use the `NextSSRInMemoryCache`, not the normal `InMemoryCache`
       connectToDevTools: true,
       cache: new NextSSRInMemoryCache(),
       link: from([
-        ...(typeof window === "undefined" ? [new SSRMultipartLink({
-          stripDefer: true,
-        })] : []),
+        ...(typeof window === "undefined"
+          ? [
+              new SSRMultipartLink({
+                stripDefer: true,
+              }),
+            ]
+          : []),
         authLink,
         errorLink,
-        httpLink
+        httpLink,
       ]),
       defaultOptions: {
         watchQuery: {

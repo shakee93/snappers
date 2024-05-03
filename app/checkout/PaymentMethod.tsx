@@ -4,7 +4,7 @@ import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Radio from "shared/Radio/Radio";
 import Image from "next/image";
 
-import { PaymentGateway } from "@/graphql/types/graphql";
+import { Cart, PaymentGateway } from "@/graphql/types/graphql";
 import { useCart } from "@/context/CartProvider";
 import { GET_PRODUCT } from "@/graphql/defs/products";
 import { useQuery } from "@apollo/client";
@@ -30,45 +30,64 @@ const PaymentMethod: FC<Props> = ({
   handleConfirmationChange,
   isBillingAddressEnabled,
   isCardPayment,
-  setIsCardPayment
+  setIsCardPayment,
 }) => {
   const [methodActive, setMethodActive] = useState<
     "Credit-Card" | "Internet-banking" | "Wallet"
   >("Credit-Card");
 
-  useEffect(() => { }, [paymentGateways]);
+  useEffect(() => {}, [paymentGateways]);
 
   const [selectedGateway, setSelectedGateway] = useState<PaymentGateway>({
     id: "",
     title: null,
   });
 
-  const { cart, loading } = useCart()
-  console.log("cart: ", cart)
+  const { cart, loading } = useCart();
+  console.log("cart: ", cart);
 
-   const removePayhereOnMobileAndTab =async  (currentCart: any) => {
-    let product = currentCart.contents.nodes[0].product.node.slug
-    console.log("product: ", product)
-
-    return product
-  }
-
-  removePayhereOnMobileAndTab(cart);
-
+  const removePayhereOnMobileAndTab =  () => {
+    try {
+      const currentCart =  cart;
+      if (!currentCart || !currentCart.contents || !currentCart.contents.nodes) {
+        return false; // Return false if cart or its contents are undefined
+      }
+  
+      const categoryNames = currentCart.contents.nodes
+        .map((node: any) => node.product?.node?.productCategories?.nodes[0]?.name)
+        .filter(Boolean); // Filter out undefined values
+  
+      console.log("categoryNames: ", categoryNames);
+  
+      const containsMobileOrTablet = categoryNames.some(
+        (name: string) => name === "Smartphones" || name === "Tablets"
+      );
+  
+      return containsMobileOrTablet;
+    } catch (error) {
+      console.error("Error while processing cart:", error);
+      return false;
+    }
+  };
+  
+  let hidePayhere =  removePayhereOnMobileAndTab();
   const [isConfirmed, setIsConfirmed] = useState(false);
 
   const PaymentMethods: FC<{ gateway: PaymentGateway }> = ({ gateway }) => {
-    
     const active = methodActive === gateway.id;
 
     // console.log("activeMethod: ", gateway.id);
 
-    // let is_tab_or_mobile = gateway.id == "payhere"
-    let is_tab_or_mobile = false
+    let is_tab_or_mobile = gateway.id == "payhere" && hidePayhere ;
+    // let is_tab_or_mobile = hidePayhere;
 
     return (
-      <div className={` items-start cursor-pointer space-x-4 sm:space-x-6 ${is_tab_or_mobile ? "hidden md:flex " : "flex"}`}>
-      {/* <div className={`flex items-start cursor-pointer space-x-4 sm:space-x-6 `}> */}
+      <div
+        className={` items-start cursor-pointer space-x-4 sm:space-x-6 ${
+          is_tab_or_mobile ? "hidden  " : "flex"
+        }`}
+      >
+        {/* <div className={`flex items-start cursor-pointer space-x-4 sm:space-x-6 `}> */}
         <Radio
           className="cursor-pointer"
           name="payment-method"
@@ -80,14 +99,13 @@ const PaymentMethod: FC<Props> = ({
               id: gateway.id,
               title: gateway.title,
             });
-            
+
             if (gateway.id === "payhere") {
               setIsCardPayment(true);
-              console.log('cardpayment', isCardPayment)
+              console.log("cardpayment", isCardPayment);
             } else {
               setIsCardPayment(false);
             }
-
           }}
         />
         <div className="flex-1">
@@ -166,8 +184,9 @@ const PaymentMethod: FC<Props> = ({
         </div>
 
         <div
-          className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-6 ${isActive ? "block" : "hidden"
-            }`}
+          className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-6 ${
+            isActive ? "block" : "hidden"
+          }`}
         >
           {/* ==================== */}
           {/* <div>{renderDebitCredit()}</div> */}

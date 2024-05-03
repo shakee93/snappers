@@ -44,6 +44,12 @@ export const ProductContentSlice = gql`
         }
       }
     }
+    productCategories {
+      nodes {
+        id
+        name
+      }
+    }
     ... on VariableProduct {
       allPaCapacity {
         nodes {

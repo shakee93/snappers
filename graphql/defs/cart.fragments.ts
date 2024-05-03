@@ -36,7 +36,7 @@ export const CartItemContent = gql`
 
 export const CartContent = gql`
   fragment CartContent on Cart {
-      
+  
     contents(first: 100) {
       itemCount
       nodes {
