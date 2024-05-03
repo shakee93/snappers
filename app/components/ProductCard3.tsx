@@ -113,11 +113,13 @@ const ProductCard: FC<ProductCardProps> = ({
         notifyAddTocart(1);
       }
     } catch (error: any) {
+      console.log("error", error);
       let isTokenExpired = error.graphQLErrors[0]?.debugMessage === "invalid-secret-key | Expired token";
       if (isTokenExpired) {
         toast.error("You've been logged out. Please sign in again.");
         ROUTER.push("/login");
       } else {
+        // toast.error("Something went wrong. Please try again.");
         toast.error("This product is out of stock.");
       }
     } finally {
