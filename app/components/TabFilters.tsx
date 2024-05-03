@@ -72,7 +72,7 @@ const TabFilters = ({
         attribute: 'brands_facet',
     });
 
-    const facetedBrands = useMemo(() => {
+    const facetedBrands = useMemo(() => { 
         return brands.filter(b =>
             brandsFacet.map(f =>  Number(f.value)).includes(b.databaseId)
         )

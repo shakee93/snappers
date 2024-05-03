@@ -49,6 +49,7 @@ export const CartContent = gql`
       discountTax
     }
     needsShippingAddress
+    productTags
     availableShippingMethods {
       packageDetails
       supportsShippingCalculator
@@ -60,6 +61,7 @@ export const CartContent = gql`
         cost
       }
     }
+
     subtotal
     subtotalTax
     shippingTax

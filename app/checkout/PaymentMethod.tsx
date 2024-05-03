@@ -5,6 +5,9 @@ import Radio from "shared/Radio/Radio";
 import Image from "next/image";
 
 import { PaymentGateway } from "@/graphql/types/graphql";
+import { useCart } from "@/context/CartProvider";
+import { GET_PRODUCT } from "@/graphql/defs/products";
+import { useQuery } from "@apollo/client";
 
 interface Props {
   isActive: boolean;
@@ -40,6 +43,17 @@ const PaymentMethod: FC<Props> = ({
     title: null,
   });
 
+  const { cart, loading } = useCart()
+  console.log("cart: ", cart)
+
+   const removePayhereOnMobileAndTab =async  (currentCart: any) => {
+    let product = currentCart.contents.nodes[0].product.node.slug
+    console.log("product: ", product)
+
+    return product
+  }
+
+  removePayhereOnMobileAndTab(cart);
 
   const [isConfirmed, setIsConfirmed] = useState(false);
 
