@@ -150,15 +150,14 @@ const ProductDetails = ({
                 <div className="text-sm py-2">
                   {attr.label}:{" "}
                   <span className="font-medium text-gray-700">
-                    {activeAttr(attr)?.val}
-                    {/* {
+                    {
                       (product as unknown as Record<string, any>)[
                         `allPa${attr?.label as unknown as "Capacity"}`
                       ]?.nodes.find(
                         (node: PaCapacity) =>
                           node.slug === activeAttr(attr)?.val
                       )?.name
-                    } */}
+                    }
                   </span>{" "}
                 </div>
 
@@ -174,25 +173,14 @@ const ProductDetails = ({
                           " border-blue-700 bg-white"
                       )}
                     >
-                      {/* {
+                      {
                         (product as any)
                         [
                           `allPa${(attr?.label as unknown as "Capacity")?.split(' ').join('')}`
                         ]?.nodes.find((node: PaCapacity) => {
                           return node.slug === option;
-                        // })?.name || "OPTION" 
-                        })?.name || "OPTION" 
-                      } */}
-                      {option}
-                      {/* {(product as any)[
-                        `allPa${(attr?.label as unknown as "Capacity")
-                          ?.split(" ")
-                          .join("")}`
-                      ]?.nodes.find((node: PaCapacity) => {
-                        return node.slug === option;
-                      })?.name ||
-                        attr?.name ||
-                        ""} */}
+                        })?.name || "OPTION"
+                      }
                     </li>
                   ))}
                 </ul>

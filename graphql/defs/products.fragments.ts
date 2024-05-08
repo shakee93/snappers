@@ -93,6 +93,12 @@ export const ProductContentSlice = gql`
           slug
         }
       }
+     allPaPacks {
+        nodes {
+          name
+          slug
+        }
+      } 
       allPaWatchSize {
         nodes {
           name
@@ -270,6 +276,12 @@ export const ProductContentFull = gql`
           slug
         }
       }
+     allPaPacks {
+        nodes {
+          name
+          slug
+        }
+      }  
       onSale
       price
       rawPrice: price(format: RAW)
