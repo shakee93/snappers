@@ -43,7 +43,7 @@ const InstantSearchWrapper = ({
   category,
 }: InstantSearchWrapperProps) => {
   const { sidebar, setSearchMounted } = useStore();
-  const [differedSidebar] = useDebounce(sidebar, 5000);
+  const [differedSidebar] = useDebounce(sidebar, 800);
 
   const getFilterQuery: () => string = () => {
     const f = [
