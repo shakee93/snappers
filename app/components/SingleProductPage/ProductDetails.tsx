@@ -173,14 +173,14 @@ const ProductDetails = ({
         <div>
 
           {product.type === "SIMPLE" && product.stockStatus !== "IN_STOCK" && (
-              <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1">
-                Sold Out
+              <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs py-1.5 font-medium">
+                Sold Out x
               </div>
           )}
 
           {product.type === "VARIABLE" &&
               activeVariation?.stockStatus !== "IN_STOCK" && (
-                  <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1 mb-1">
+                  <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs py-1.5 font-medium mb-1">
                     Sold Out
                   </div>
               )}
@@ -193,7 +193,7 @@ const ProductDetails = ({
                       activeVariation?.stockQuantity >= 3) ||
                   (!activeVariation.stockQuantity &&
                       activeVariation?.stockStatus === "IN_STOCK")) && (
-                  <div className="w-max px-4 bg-green-200 text-center rounded-full text-gray-800 text-xs md:text-sm py-1">
+                  <div className="w-max px-4 bg-green-200 text-center rounded-full text-gray-800 text-xs py-1.5 font-medium">
                     In Stock
                   </div>
               )}
@@ -202,7 +202,7 @@ const ProductDetails = ({
               product.stockStatus === "IN_STOCK" &&
               ((product?.stockQuantity && product?.stockQuantity >= 3) ||
                   (!product.stockQuantity && product.stockStatus === "IN_STOCK")) && (
-                  <div className="w-max px-4 bg-green-200 text-center rounded-full text-gray-800 text-xs md:text-sm py-1">
+                  <div className="w-max px-4 bg-green-200 text-center rounded-full text-gray-800 text-xs py-1.5 font-medium">
                     In Stock
                   </div>
               )}
@@ -212,7 +212,7 @@ const ProductDetails = ({
               activeVariation?.stockStatus == "IN_STOCK" &&
               activeVariation?.stockQuantity &&
               activeVariation?.stockQuantity <= 2 && (
-                  <div className="w-max px-4 bg-yellow-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1 mb-1">
+                  <div className="w-max px-3 bg-yellow-200  text-center rounded-full  text-gray-800 text-xs py-1.5 font-medium mb-1">
                     Low Stock
                   </div>
               )}
