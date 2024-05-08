@@ -122,7 +122,7 @@ const ProductDetails = ({
         <Link
           href={`/${brand?.slug}`}
           target="_blank"
-          className={`${brandColorClass}`}
+          className='bg-primaryColor text-white px-2.5 py-1 rounded-xl'
         >
           {brand?.name}
         </Link>
