@@ -30,9 +30,6 @@ export const Thumb: React.FC<PropType> = (props) => {
         className="embla-thumbs__slide__button flex items-center"
         type="button"
       >
-        <div className="embla-thumbs__slide__number">
-          <span>{index + 1}</span>
-        </div>
         <Image
           className="embla-thumbs__slide__img object-contain
            max-h-[75px] min-h-[75px] md:max-h-[100px] md:min-h-[100px]
@@ -62,9 +59,6 @@ export const CoreVariationThumb: React.FC<PropType> = (props) => {
         className="embla-thumbs__slide__button flex items-center"
         type="button"
       >
-        <div className="embla-thumbs__slide__number">
-          <span>{index + 1}</span>
-        </div>
         <Image
           className="embla-thumbs__slide__img object-contain
            max-h-[75px] min-h-[75px]  md:max-h-[100px] md:min-h-[100px]

@@ -24,7 +24,7 @@ const Prices: FC<PricesProps> = ({
             className
         )}>
             {/*{JSON.stringify(price)}*/}
-            {price &&
+            {price ?
                 <div
                     className={`flex items-center border-2 border-gray-300 rounded-lg p-2 ${contentClass}`}
                 >
@@ -33,14 +33,14 @@ const Prices: FC<PricesProps> = ({
                     {/* html parse the cleaned price */} 
                     <span dangerouslySetInnerHTML={{ __html: price || '' }} />
                 </span>
-                </div>
+                </div> : <></>
             }
 
-            {salePrice && salePrice !== price && (
+            {(salePrice && salePrice !== price) ? (
                 <div className={`flex ${contentClass}`}>
                     <span className="text-red-400 font-bold line-through text-xs lg:text-sm" dangerouslySetInnerHTML={{ __html: salePrice || '' }} />
                 </div>
-            )}
+            ): <></>}
 
         </div>
 

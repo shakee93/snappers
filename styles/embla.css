@@ -59,8 +59,8 @@
     bottom: 0;
   }
   .embla-thumbs {
-    --thumbs-slide-spacing: 0.8rem;
-    --thumbs-slide-height: 9rem;
+    --thumbs-slide-spacing: 0.3rem;
+    --thumbs-slide-height: 8rem;
     margin-top: var(--thumbs-slide-spacing);
   }
   .embla-thumbs__viewport {

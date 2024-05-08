@@ -128,8 +128,8 @@ const ProductDetails = ({
         </Link>
       </div>
 
-      <div className="text-base md:text-lg font-medium ">
-        {product.name} - {product.databaseId}
+      <div className="text-2xl md:text-3xl font-medium ">
+        {product.name}
       </div>
 
       <div className='flex gap-2 items-center'>

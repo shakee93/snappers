@@ -22,9 +22,6 @@ export const Thumb: React.FC<PropType> = (props) => {
         className="embla-thumbs__slide__button"
         type="button"
       >
-        <div className="embla-thumbs__slide__number">
-          <span>{index + 1}</span>
-        </div>
         <Image
           className="embla-thumbs__slide__img w-1/4"
           src={imgSrc}
