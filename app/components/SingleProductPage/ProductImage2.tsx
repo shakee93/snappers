@@ -158,7 +158,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
 
       <div className="embla-thumbs">
         <div className="embla-thumbs__viewport " ref={emblaThumbsRef}>
-          <div className="embla-thumbs__container pl-20	" >
+          <div className="embla-thumbs__container" >
             {/* Variation Thumb */}
             {product.type === "VARIABLE" && (
               <CoreVariationThumb

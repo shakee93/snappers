@@ -98,7 +98,7 @@ const Page = async ({ params }: Props) => {
                 <ProductImage product={product} />
               </Suspense>
             </div>
-            <div className="md:w-2/5 flex flex-col p-2 gap-y-1 md:gap-y-3">
+            <div className="md:w-2/5 flex flex-col p-2 gap-y-1 md:gap-y-1.5">
               <ProductDetails brand={brand} product={product} />
             </div>
           </ImageProvider>

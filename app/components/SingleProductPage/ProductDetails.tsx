@@ -119,7 +119,6 @@ const ProductDetails = ({
   return (
     <>
       <div className="flex gap-1  text-sm text-gray-500">
-        Brand :{" "}
         <Link
           href={`/${brand?.slug}`}
           target="_blank"
@@ -133,9 +132,118 @@ const ProductDetails = ({
         {product.name} - {product.databaseId}
       </div>
 
+      <div className='flex gap-2 items-center'>
+        {product.type === "VARIABLE" && activeVariation ? (
+            <div>
+              <div className="flex items-center gap-4 text-base py-2 flex-wrap md:text-xl font-medium text-gray-600">
+                <span dangerouslySetInnerHTML={{ __html: activeVariation.price }} />
+
+                {!!activeVariation.salePrice &&
+                    activeVariation.salePrice !== activeVariation.regularPrice && (
+                        <span className="text-red-400 line-through md:text-sm">
+                  <span
+                      dangerouslySetInnerHTML={{
+                        __html: activeVariation.regularPrice,
+                      }}
+                  />
+                </span>
+                    )}
+              </div>
+            </div>
+        ) : (
+            <div className="flex items-center gap-2 text-base py-2 flex-wrap md:text-xl font-medium text-gray-600">
+              <span dangerouslySetInnerHTML={{ __html: product.price || "" }} />
+
+              {product.salePrice &&
+                  product.salePrice !== product.price &&
+                  activeVariation === null && (
+                      <span className="text-red-400 line-through md:text-sm">
+                <span
+                    dangerouslySetInnerHTML={{
+                      __html: product.regularPrice || "",
+                    }}
+                />
+              </span>
+                  )}
+            </div>
+        )}
+
+        {/* Sold Out Badge */}
+
+        <div>
+
+          {product.type === "SIMPLE" && product.stockStatus !== "IN_STOCK" && (
+              <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1">
+                Sold Out
+              </div>
+          )}
+
+          {product.type === "VARIABLE" &&
+              activeVariation?.stockStatus !== "IN_STOCK" && (
+                  <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1 mb-1">
+                    Sold Out
+                  </div>
+              )}
+
+          {/* In Stock Badge */}
+
+          {product.type === "VARIABLE" &&
+              activeVariation?.stockStatus == "IN_STOCK" &&
+              ((activeVariation?.stockQuantity &&
+                      activeVariation?.stockQuantity >= 3) ||
+                  (!activeVariation.stockQuantity &&
+                      activeVariation?.stockStatus === "IN_STOCK")) && (
+                  <div className="w-max px-4 bg-green-200 text-center rounded-full text-gray-800 text-xs md:text-sm py-1">
+                    In Stock
+                  </div>
+              )}
+
+          {product.type === "SIMPLE" &&
+              product.stockStatus === "IN_STOCK" &&
+              ((product?.stockQuantity && product?.stockQuantity >= 3) ||
+                  (!product.stockQuantity && product.stockStatus === "IN_STOCK")) && (
+                  <div className="w-max px-4 bg-green-200 text-center rounded-full text-gray-800 text-xs md:text-sm py-1">
+                    In Stock
+                  </div>
+              )}
+
+          {/* Low Stock Badge */}
+          {product.type === "VARIABLE" &&
+              activeVariation?.stockStatus == "IN_STOCK" &&
+              activeVariation?.stockQuantity &&
+              activeVariation?.stockQuantity <= 2 && (
+                  <div className="w-max px-4 bg-yellow-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1 mb-1">
+                    Low Stock
+                  </div>
+              )}
+
+          {product.type === "SIMPLE" &&
+              product.stockStatus == "IN_STOCK" &&
+              product?.stockQuantity &&
+              product?.stockQuantity <= 2 && (
+                  <div className="w-max px-4 bg-yellow-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1 mb-1">
+                    Low Stock
+                  </div>
+              )}
+
+          {warrantyType && warrantyPeriod && (
+              <div className="flex flex-col gap-2 w-full items-left flex-wrap text-xs md:text-sm text-gray-500 py-2">
+                <div className="">
+                  <span className="font-medium">Warranty Type :</span> {warrantyType}
+                </div>
+                <div className="">
+                  <span className="font-medium">Warranty period :</span>{" "}
+                  {warrantyPeriod} Months
+                </div>
+              </div>
+          )}
+        </div>
+
+      </div>
+
       {product.shortDescription && (
         <div
-          className="text-xs md:text-sm text-gray-600"
+          className="text-xs md:text-sm text-gray-600 px-6"
           dangerouslySetInnerHTML={{
             __html: applyListStyleDisc(product.shortDescription),
           }}
@@ -190,108 +298,7 @@ const ProductDetails = ({
         </>
       )}
 
-      {product.type === "VARIABLE" && activeVariation ? (
-        <div>
-          <div className="flex items-center gap-4 text-base py-2 flex-wrap md:text-xl font-medium text-gray-600">
-            <span dangerouslySetInnerHTML={{ __html: activeVariation.price }} />
 
-            {!!activeVariation.salePrice &&
-              activeVariation.salePrice !== activeVariation.regularPrice && (
-                <span className="text-red-400 line-through md:text-sm">
-                  <span
-                    dangerouslySetInnerHTML={{
-                      __html: activeVariation.regularPrice,
-                    }}
-                  />
-                </span>
-              )}
-          </div>
-        </div>
-      ) : (
-        <div className="flex items-center gap-2 text-base py-2 flex-wrap md:text-xl font-medium text-gray-600">
-          <span dangerouslySetInnerHTML={{ __html: product.price || "" }} />
-
-          {product.salePrice &&
-            product.salePrice !== product.price &&
-            activeVariation === null && (
-              <span className="text-red-400 line-through md:text-sm">
-                <span
-                  dangerouslySetInnerHTML={{
-                    __html: product.regularPrice || "",
-                  }}
-                />
-              </span>
-            )}
-        </div>
-      )}
-
-      {/* Sold Out Badge */}
-
-      {product.type === "SIMPLE" && product.stockStatus !== "IN_STOCK" && (
-        <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1">
-          Sold Out
-        </div>
-      )}
-
-      {product.type === "VARIABLE" &&
-        activeVariation?.stockStatus !== "IN_STOCK" && (
-          <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1 mb-1">
-            Sold Out
-          </div>
-        )}
-
-      {/* In Stock Badge */}
-
-      {product.type === "VARIABLE" &&
-        activeVariation?.stockStatus == "IN_STOCK" &&
-        ((activeVariation?.stockQuantity &&
-          activeVariation?.stockQuantity >= 3) ||
-          (!activeVariation.stockQuantity &&
-            activeVariation?.stockStatus === "IN_STOCK")) && (
-          <div className="w-max px-4 bg-green-200 text-center rounded-full text-gray-800 text-xs md:text-sm py-1">
-            In Stock
-          </div>
-        )}
-
-      {product.type === "SIMPLE" &&
-        product.stockStatus === "IN_STOCK" &&
-        ((product?.stockQuantity && product?.stockQuantity >= 3) ||
-          (!product.stockQuantity && product.stockStatus === "IN_STOCK")) && (
-          <div className="w-max px-4 bg-green-200 text-center rounded-full text-gray-800 text-xs md:text-sm py-1">
-            In Stock
-          </div>
-        )}
-
-      {/* Low Stock Badge */}
-      {product.type === "VARIABLE" &&
-        activeVariation?.stockStatus == "IN_STOCK" &&
-        activeVariation?.stockQuantity &&
-        activeVariation?.stockQuantity <= 2 && (
-          <div className="w-max px-4 bg-yellow-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1 mb-1">
-            Low Stock
-          </div>
-        )}
-
-      {product.type === "SIMPLE" &&
-        product.stockStatus == "IN_STOCK" &&
-        product?.stockQuantity &&
-        product?.stockQuantity <= 2 && (
-          <div className="w-max px-4 bg-yellow-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1 mb-1">
-            Low Stock
-          </div>
-        )}
-
-      {warrantyType && warrantyPeriod && (
-        <div className="flex flex-col gap-2 w-full items-left flex-wrap text-xs md:text-sm text-gray-500 py-2">
-          <div className="">
-            <span className="font-medium">Warranty Type :</span> {warrantyType}
-          </div>
-          <div className="">
-            <span className="font-medium">Warranty period :</span>{" "}
-            {warrantyPeriod} Months
-          </div>
-        </div>
-      )}
 
       <ProductAddToCart product={product} variation={activeVariation} />
       <div className="flex gap-1 w-full items-center flex-wrap text-sm md:text-base text-g ray-500">
