@@ -4,13 +4,15 @@ import {createContext, useContext, useState} from 'react';
 
 // Define a type for your context state
 type ImageContextType = {
-    variationId: string | null;
+    variationId: number | string | null;
+    activeVariation: any;
     setVariationId: (id: string | null) => void;
 };
 
 // Create a default context value
 const defaultImageContext: ImageContextType = {
     variationId: null,
+    activeVariation: null,
     setVariationId: () => {},
 };
 
@@ -24,10 +26,13 @@ export function useImage() {
 
 export function ImageProvider({ children }:{children : React.ReactNode}) {
     const [variationId, setVariationId] = useState<string | null>(null);
+    const [activeVariation, setActiveVariation] = useState<string | null>(null);
 
     const value = {
         variationId,
         setVariationId,
+        activeVariation,
+        setActiveVariation
     };
 
     return (

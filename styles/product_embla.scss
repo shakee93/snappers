@@ -29,7 +29,7 @@
   }
 
   .embla-thumbs {
-    --thumbs-slide-spacing: 0.2rem;
+    --thumbs-slide-spacing: 0.4rem;
     --thumbs-slide-height: 9rem;
     margin-top: var(--thumbs-slide-spacing);
   }
@@ -52,11 +52,16 @@
     padding-left: calc(var(--thumbs-slide-spacing) * 0.5);
     position: relative;
 
+    &:first-child {
+      padding-left: 0.6;
+    }
+
   }
 
   @media (min-width: 576px) {
     .embla-thumbs {
-      --thumbs-slide-spacing: 1rem;
+      --thumbs-slide-spacing: 1.2rem;
+      margin-top: 0.8rem;
     }
 
     .embla-thumbs__slide {
@@ -89,7 +94,7 @@
     width: 100%;
     object-fit: contain;
     border-radius: 10px;
-    border: 2px solid #CFD8DC;
+    border: 1px solid #CFD8DC;
   }
 
   .embla-thumbs__slide__number {

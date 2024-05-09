@@ -55,12 +55,12 @@ const ImageEffect = ({ src, classNames }: ImageEffectProps) => {
 
   // Render method
   return (
-    <div className="flex justify-center items-center">
+    <div className="flex justify-center items-center p-2 py-4">
       <div
         onMouseLeave={handleMouseLeave}
         onMouseEnter={handleMouseEnter}
         onMouseMove={handleMouseMove}
-        className="w-full h-full relative overflow-hidden"
+        className="w-full h-full relative overflow-hidden "
       >
         <Image
           //   className="object-cover border z-10 h-full h-full"

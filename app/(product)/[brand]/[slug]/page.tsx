@@ -90,7 +90,7 @@ const Page = async ({ params }: Props) => {
           <Link href={`/${brand.slug}/${product.slug}`}>{product.name}</Link>
         </div>
         <div></div>
-        <div className="flex flex-col md:flex-row p-3 rounded-3xl mt-5 md:mt-3 md:p-6 md:py-4 bg-white">
+        <div className="flex flex-col md:flex-row p-3 rounded-3xl mt-5 md:mt-3 md:p-6 md:py-6 bg-white">
 
           <ImageProvider>
             <div className="w-full md:w-6/12 flex-col gap-6 md:pr-10">

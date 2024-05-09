@@ -28,15 +28,15 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   const [emblaMainRef, emblaMainApi] = useEmblaCarousel({});
   const [emblaThumbsRef, emblaThumbsApi] = useEmblaCarousel({
     containScroll: 'keepSnaps',
-    dragFree: true
+    dragFree: true,
+    align: "center"
   });
-  const { variationId } = useImage();
+  const { variationId, activeVariation } = useImage();
   const [variationImageEnabled, setVariationImageEnabled] = useState(false);
 
-  const galleryImages =
-    product.galleryImages?.nodes.length !== 0
+  const [galleryImages, setGalleryImages]  = useState(product.galleryImages?.nodes.length !== 0
       ? product.galleryImages?.nodes
-      : [];
+      : [] || [])
 
   const variationImages = product.variations?.nodes?.map(
     (variation: any) => variation.image
@@ -47,10 +47,6 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   useState<selectedVariationType | null>(combinedImages[0]);
 
 
-  // console.log("galleryImages", galleryImages);
-  // console.log("combinedImages", combinedImages);
-  // console.log("variationImages", variationImages);
-
   combinedImages.forEach((image) => {
     if (image?.sourceUrl?.includes("300x300")) {
       image.sourceUrl = image?.sourceUrl?.replace("-300x300", "");
@@ -58,7 +54,31 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   });
 
   useEffect(() => {
-    onThumbVariationClick(variationId);
+
+    const activeVariationImage = variationImages.find(i => i.databaseId === variationId);
+
+    setGalleryImages(previousImages => {
+
+      if (!previousImages) {
+        return []
+      }
+
+      if (activeVariationImage) {
+        if (previousImages.length > 0 && previousImages[0].databaseId === activeVariationImage.databaseId) {
+          return previousImages;
+        } else {
+
+          emblaThumbsApi?.scrollTo(0);
+          setSelectedIndex(0);
+          emblaMainApi?.scrollTo(0);
+
+          return [activeVariationImage, ...previousImages.slice(1)];
+        }
+      }
+      return previousImages;
+    });
+
+
   }, [variationId]);
 
   const onThumbVariationClick = (variationId: string | null = null) => {
@@ -86,12 +106,10 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
     (thumbIndex: number | null) => {
       if (!emblaMainApi || !emblaThumbsApi) return;
       setVariationImageEnabled(true);
+      setSelectedIndex(thumbIndex as number)
+      emblaThumbsApi.scrollTo(thumbIndex as number)
+      emblaMainApi.scrollTo(thumbIndex as number);
 
-      if (thumbIndex !== -1 && thumbIndex !== null) {
-        thumbIndex += variationImages.length;
-        emblaMainApi.scrollTo(thumbIndex ?? 0);
-        return;
-      }
       return;
     },
     [emblaMainApi, emblaThumbsApi, product]
@@ -99,8 +117,6 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
 
   const onSelect = useCallback(() => {
     if (!emblaMainApi || !emblaThumbsApi) return;
-    setSelectedIndex(emblaMainApi.selectedScrollSnap());
-    emblaThumbsApi.scrollTo(emblaMainApi.selectedScrollSnap());
   }, [emblaMainApi, emblaThumbsApi, setSelectedIndex]);
 
   useEffect(() => {
@@ -110,43 +126,16 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
     emblaMainApi.on("reInit", onSelect);
   }, [emblaMainApi, onSelect]);
 
-  const handleZoom = (e: any) => {
-    const image = e.target;
-    const containerRect = e.currentTarget.getBoundingClientRect();
-    const x = (e.nativeEvent.offsetX / containerRect.width) * 100;
-    const y = (e.nativeEvent.offsetY / containerRect.height) * 100;
-
-    image.style.transformOrigin = `${x}% ${y}%`;
-    image.style.transition = "transform 0.2s ease-in-out"; // Adding transition effect
-    image.style.transform = "scale(1.5)"; // Adjust the scale factor as needed
-  };
-
-  const handleResetZoom = (e: any) => {
-    const image = e.target;
-    image.style.transformOrigin = "center";
-    image.style.transition = "transform 0.2s ease-in-out"; // Adding transition effect
-    image.style.transform = "scale(1)";
-  };
-
   return (
     <div className="embla" id='product-image'>
-      <div className="embla__viewport" ref={emblaMainRef}>
+      <div className="embla__viewport border rounded-2xl" ref={emblaMainRef}>
         <div className="embla__container ">
-          {combinedImages?.map((variation: any, index: number) => (
+          {galleryImages?.map((variation: any, index: number) => (
             <div className="embla__slide" key={index}>
               <ImageEffect
                 src={variation?.sourceUrl || ""}
                 classNames="max-h-[330px] object-contain md:max-h-[410px] image transform transition-transform duration-300"
               />
-              {/* <Image
-                width={1000}
-                height={1000}
-                className="max-h-[330px] object-contain md:max-h-[410px] image transform transition-transform duration-300"
-                src={variation?.sourceUrl || ""}
-                alt=""
-                onMouseEnter={handleZoom}
-                onMouseLeave={handleResetZoom}
-              /> */}
             </div>
           ))}
         </div>
@@ -155,45 +144,18 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
       <div className="embla-thumbs">
         <div className="embla-thumbs__viewport " ref={emblaThumbsRef}>
           <div className="embla-thumbs__container" >
-            {/* Variation Thumb */}
-            {product.type === "VARIABLE" && (
-              <CoreVariationThumb
-                onClick={() =>
-                  onThumbVariationClick(variationImages[0]?.databaseId)
-                }
-                selected={!variationImageEnabled}
-                index={0}
-                imgSrc={
-                  selectedVariation?.sourceUrl ||
-                  variationImages[0]?.sourceUrl ||
-                  ""
-                }
-                key={0}
-              />
-            )}
 
             {/* Gallery Image */}
             {galleryImages?.map((variation: any, index: number) => (
               <Thumb
                 onClick={() => onThumbClickCalculated(index)}
                 selected={
-                  variationImageEnabled &&
-                  index + variationImages.length === selectedIndex
+                    index === selectedIndex
                 }
                 index={index}
                 imgSrc={variation?.sourceUrl || ""}
                 key={index}
               />
-              // <Thumb
-              //   onClick={() => onThumbClickCalculated(index)}
-              //   selected={
-              //     variationImageEnabled &&
-              //     index + variationImages.length === selectedIndex
-              //   }
-              //   index={index}
-              //   imgSrc={variation?.sourceUrl || ""}
-              //   key={index}
-              // />
             ))}
           </div>
         </div>

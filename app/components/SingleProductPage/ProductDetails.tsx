@@ -39,10 +39,6 @@ const ProductDetails = ({
       : null
   );
 
-  useEffect(() => {
-    console.log(activeVariation);
-  }, [activeVariation])
-
   const manualMeta = product?.metaData;
   const warrantyType = manualMeta?.find(
     (item) => item?.key === "warranty_type"
@@ -67,6 +63,7 @@ const ProductDetails = ({
 
   useEffect(() => {
     setVariationId(activeVariation?.image.databaseId);
+    setActiveVariation(activeVariation)
   }, [activeVariation]);
 
   const activeAttr = useCallback(
@@ -92,6 +89,7 @@ const ProductDetails = ({
   useEffect(() => {
     if (product.type === "VARIABLE" && activeVariation) {
       setVariationId(activeVariation?.image.databaseId);
+      setActiveVariation(activeVariation)
     }
   }, [activeVariation]);
 
@@ -108,7 +106,6 @@ const ProductDetails = ({
       });
 
       if (vProduct) {
-        console.log('set', vProduct);
         setActiveVariation(vProduct);
       } else {
         setActiveVariation(null);
