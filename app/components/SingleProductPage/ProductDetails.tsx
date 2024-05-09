@@ -10,12 +10,13 @@ import {
   VariableProduct,
   VariationAttribute,
 } from "@/graphql/types/graphql";
-import { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useStore } from "@/store/store";
 import { twMerge } from "tailwind-merge";
 import parseHtml from "html-react-parser";
 import { useImage } from "@/context/ImageChangeGrabber";
 import brandColors from "@/data/brandColors";
+import AttributeIcon from "@/app/components/AttributeIcon";
 
 const ProductDetails = ({
   product,
@@ -260,8 +261,13 @@ const ProductDetails = ({
           {product.attributes?.nodes.map(
             (attr: ProductAttribute, index: number) => (
               <div key={index} className="py-2 text-gray-500">
-                <div className="text-sm py-2">
-                  {attr.label}:{" "}
+                <div className="flex items-center gap-1 text-sm py-2">
+                  <span className='flex gap-1 items-center'>
+                    <AttributeIcon
+                        name={attr?.name || ""}
+                        className="w-4"
+                    />  {attr.label}:
+                  </span>
                   <span className="font-medium text-gray-700">
                     {
                       (product as unknown as Record<string, any>)[

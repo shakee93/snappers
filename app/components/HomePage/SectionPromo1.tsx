@@ -7,6 +7,7 @@ import StoreImageSlider from "./StoreImageSlide"
 import { EmblaOptionsType } from "embla-carousel";
 import Link from "next/link";
 
+import "styles/embla.css";
 
 export interface SectionPromo1Props {
   className?: string;

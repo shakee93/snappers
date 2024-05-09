@@ -10,7 +10,7 @@ import ProductImage from "@/app/components/SingleProductPage/ProductImage2";
 import {Suspense} from "react";
 import {Metadata, ResolvingMetadata} from "next";
 import {ImageProvider} from "@/context/ImageChangeGrabber";
-import "styles/embla.css";
+
 export const dynamic = 'force-dynamic'
 
 type Props = {

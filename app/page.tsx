@@ -10,7 +10,7 @@ import {
   GET_PRODUCTS_NODES_HOMEPAGE,
 } from "@/graphql/defs/products";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
-import "styles/embla.css";
+
 import Image from "next/image";
 import Scam from "@/public/homepage/scam.webp";
 import Sampath from "@/public/images/bank logos/sampath.png";

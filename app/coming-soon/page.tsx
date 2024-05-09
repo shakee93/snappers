@@ -1,4 +1,4 @@
-import "styles/embla.css";
+
 // @ts-ignore
 import Link from "next/link";
 import Image from "next/image";

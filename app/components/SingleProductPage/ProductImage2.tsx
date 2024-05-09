@@ -11,7 +11,8 @@ import { EmblaOptionsType } from "embla-carousel";
 import useEmblaCarousel from "embla-carousel-react";
 import Image from "next/image";
 import React, { useCallback, useEffect, useState } from "react";
-import "styles/product_embla.css";
+// import "styles/embla.css";
+import "styles/product_embla.scss";
 
 type PropType = {
   options?: EmblaOptionsType;
@@ -26,10 +27,8 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [emblaMainRef, emblaMainApi] = useEmblaCarousel({});
   const [emblaThumbsRef, emblaThumbsApi] = useEmblaCarousel({
-    containScroll: "keepSnaps",
-    // dragFree: true,
-    skipSnaps: true,
-    // watchDrag: false
+    containScroll: 'keepSnaps',
+    dragFree: true
   });
   const { variationId } = useImage();
   const [variationImageEnabled, setVariationImageEnabled] = useState(false);
@@ -130,14 +129,11 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   };
 
   return (
-    <div className="embla">
+    <div className="embla" id='product-image'>
       <div className="embla__viewport" ref={emblaMainRef}>
         <div className="embla__container ">
           {combinedImages?.map((variation: any, index: number) => (
             <div className="embla__slide" key={index}>
-              <div className="embla__slide__number">
-                <span>{index + 1}</span>
-              </div>
               <ImageEffect
                 src={variation?.sourceUrl || ""}
                 classNames="max-h-[330px] object-contain md:max-h-[410px] image transform transition-transform duration-300"
