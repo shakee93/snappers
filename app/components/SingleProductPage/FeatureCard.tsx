@@ -8,21 +8,22 @@ interface FeatureCardProps {
   }
 
   const FeatureCard: React.FC<FeatureCardProps> = ({ color, icon, title, description }) => (
-  <div className={`flex flex-col p-3 rounded-2xl bg-${color}-50 dark:bg-opacity-90`}>
-    <div>
+  <div className={`flex flex-col p-3 rounded-2xl bg-${color}-300 border  dark:bg-opacity-90`}>
+    <div className='flex gap-2'>
       {icon}
+        <p className="font-semibold text-sm lg:text-base text-slate-900">{title}</p>
     </div>
-    <div className="mt-2.5">
-      <p className="font-semibold text-sm lg:text-base text-slate-900">{title}</p>
+    <div className="">
+
       <p className="text-slate-500 text-xs lg:textsm mt-0.5 ">{description}</p>
     </div>
   </div>
 );
 
 const Features = () => (
-  <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-1 gap-3 relative">
+  <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 gap-3 relative">
     <FeatureCard
-      color="red"
+      color="zinc"
       icon={
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M12 14H13C14.1 14 15 13.1 15 12V2H6C4.5 2 3.19001 2.82999 2.51001 4.04999" stroke="#292D32" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"></path>

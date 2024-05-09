@@ -38,6 +38,10 @@ const ProductDetails = ({
       : null
   );
 
+  useEffect(() => {
+    console.log(activeVariation);
+  }, [activeVariation])
+
   const manualMeta = product?.metaData;
   const warrantyType = manualMeta?.find(
     (item) => item?.key === "warranty_type"
@@ -103,6 +107,7 @@ const ProductDetails = ({
       });
 
       if (vProduct) {
+        console.log('set', vProduct);
         setActiveVariation(vProduct);
       } else {
         setActiveVariation(null);
@@ -174,7 +179,7 @@ const ProductDetails = ({
 
           {product.type === "SIMPLE" && product.stockStatus !== "IN_STOCK" && (
               <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs py-1.5 font-medium">
-                Sold Out x
+                Sold Out
               </div>
           )}
 

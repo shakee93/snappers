@@ -84,27 +84,28 @@ const Page = async ({ params }: Props) => {
   return (
     <div className="mt-5 md:mt-10">
       <main className="container m-auto">
-        <div className="md:mt-0 text-sm md:px-5 md:text-[0.95rem]">
+        <div className="md:mt-0 text-sm md:px-5 md:text-[0.95rem] md:ml-4">
           <Link href="/">Home</Link> &gt;{" "}
           <Link href={`/${brand.slug}`}>{brand.name}</Link> &gt;{" "}
           <Link href={`/${brand.slug}/${product.slug}`}>{product.name}</Link>
         </div>
         <div></div>
-        <div className="flex flex-col md:flex-row p-3 rounded-3xl mt-5 md:mt-6 md:p-10 bg-white">
+        <div className="flex flex-col md:flex-row p-3 rounded-3xl mt-5 md:mt-3 md:p-6 md:py-4 bg-white">
 
           <ImageProvider>
-            <div className="w-full md:w-2/5 flex-col gap-2 md:pr-10">
+            <div className="w-full md:w-6/12 flex-col gap-6 md:pr-10">
               <Suspense fallback={<>loading...</>}>
                 <ProductImage product={product} />
               </Suspense>
+              <div className="hidden lg:block w-full mt-6">
+                <Features />
+              </div>
             </div>
-            <div className="md:w-2/5 flex flex-col p-2 gap-y-1 md:gap-y-1.5">
+            <div className="md:w-6/12 flex flex-col p-2 gap-y-1 md:gap-y-1.5">
               <ProductDetails brand={brand} product={product} />
             </div>
           </ImageProvider>
-          <div className="hidden lg:block w-full md:w-1/5 ">
-            <Features />
-          </div>
+
         </div>
         {/* Image Gallery */}
         <ProductOverview product={product} />
