@@ -105,6 +105,12 @@ export const ProductContentSlice = gql`
           slug
         }
       }
+      allPaSize {
+        nodes {
+          name
+          slug
+        }
+      } 
       price
       regularPrice
       soldIndividually
@@ -277,6 +283,12 @@ export const ProductContentFull = gql`
         }
       }
      allPaPacks {
+        nodes {
+          name
+          slug
+        }
+      }  
+     allPaSize {
         nodes {
           name
           slug

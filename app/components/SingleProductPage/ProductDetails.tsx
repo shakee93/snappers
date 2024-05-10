@@ -10,7 +10,7 @@ import {
   VariableProduct,
   VariationAttribute,
 } from "@/graphql/types/graphql";
-import React, { useCallback, useEffect, useState } from "react";
+import React, {useCallback, useEffect, useMemo, useState} from "react";
 import { useStore } from "@/store/store";
 import { twMerge } from "tailwind-merge";
 import parseHtml from "html-react-parser";
@@ -126,8 +126,14 @@ const ProductDetails = ({
   };
 
   useEffect(() => {
-    // console.log(activeVariation);
-  }, [activeVariation])
+    // console.log(attribute, product.variations?.nodes.map((v) => v.attributes.nodes));
+  }, [attribute])
+
+
+  const productAttributes = useMemo(() => {
+
+    return []
+  }, [product.attributes])
 
   const brandColorClass = brand?.name && brandColors[brand?.name.toLowerCase()];
 
