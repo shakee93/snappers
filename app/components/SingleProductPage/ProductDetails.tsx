@@ -94,16 +94,24 @@ const ProductDetails = ({
   }, [activeVariation]);
 
   useEffect(() => {
-    // console.log("attribute change")
+    // This function determines which is the variation for selected attributes
     if (product.type === "VARIABLE") {
       let variation = (product as VariableProduct).variations
         ?.nodes as unknown as ProductVariation[];
+
       let vProduct = variation.find((v) => {
         let nodes = v.attributes?.nodes as unknown as VariationAttribute[];
-        let attrKey = attribute.map((a) => `${a.name}:${a.val}`).join("+");
-        let variationKey = nodes?.map((a) => `${a.name}:${a.value}`).join("+");
+        let attrKey = attribute
+            .sort((a, b) => a.id.localeCompare(b.id))
+            .map((a) => `${a.name}:${a.val}`).join("+");
+        let variationKey = (nodes || [])
+            .sort((a, b) => a.id.localeCompare(b?.id))
+            ?.map((a) => `${a.name}:${a.value}`).join("+");
+
         return attrKey === variationKey;
+
       });
+
 
       if (vProduct) {
         setActiveVariation(vProduct);
@@ -111,11 +119,15 @@ const ProductDetails = ({
         setActiveVariation(null);
       }
     }
-  }, [attribute]);
+  }, [attribute, product]);
 
   const applyListStyleDisc = (htmlContent: any) => {
     return htmlContent.replace(/<ul>/g, '<ul class="list-disc">');
   };
+
+  useEffect(() => {
+    // console.log(activeVariation);
+  }, [activeVariation])
 
   const brandColorClass = brand?.name && brandColors[brand?.name.toLowerCase()];
 

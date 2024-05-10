@@ -293,6 +293,7 @@ export const ProductContentFull = gql`
       soldIndividually
       defaultAttributes {
         nodes {
+          id
           name
           label
           value
@@ -300,6 +301,7 @@ export const ProductContentFull = gql`
       }
       globalAttributes {
         nodes {
+          id
           slug
           name
           label
@@ -342,6 +344,7 @@ export const ProductContentFull = gql`
           }
           attributes {
             nodes {
+              id
               name
               label
               value
