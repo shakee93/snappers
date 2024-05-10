@@ -28,6 +28,7 @@ const ProductDetails = ({
   const {
     product: { attribute },
     setAttribute,
+      clearAttributes
   } = useStore();
 
   const [activeVariation, setActiveVariation] = useState<any>(
@@ -50,6 +51,9 @@ const ProductDetails = ({
   const { setVariationId } = useImage();
 
   useEffect(() => {
+
+    clearAttributes();
+
     if (product.type === "VARIABLE") {
       const defAttributes = product?.defaultAttributes?.nodes;
       product?.attributes?.nodes.map((attr: ProductAttribute) => {
@@ -94,11 +98,12 @@ const ProductDetails = ({
   }, [activeVariation]);
 
   useEffect(() => {
+
     // This function determines which is the variation for selected attributes
     if (product.type === "VARIABLE") {
       let variation = (product as VariableProduct).variations
         ?.nodes as unknown as ProductVariation[];
-
+      
       let vProduct = variation.find((v) => {
         let nodes = v.attributes?.nodes as unknown as VariationAttribute[];
         let attrKey = attribute
@@ -108,6 +113,8 @@ const ProductDetails = ({
             .sort((a, b) => a.id.localeCompare(b?.id))
             ?.map((a) => `${a.name}:${a.value}`).join("+");
 
+        console.log(attrKey, variationKey);
+        
         return attrKey === variationKey;
 
       });
@@ -277,10 +284,10 @@ const ProductDetails = ({
             (attr: ProductAttribute, index: number) => (
               <div key={index} className="py-2 text-gray-500">
                 <div className="flex items-center gap-1 text-sm py-2">
-                  <span className='flex gap-1 items-center'>
+                  <span className='flex gap-1 items-center text-primaryColor'>
                     <AttributeIcon
                         name={attr?.name || ""}
-                        className="w-4"
+                        className="w-4 "
                     />  {attr.label}:
                   </span>
                   <span className="font-medium text-gray-700">
@@ -304,7 +311,7 @@ const ProductDetails = ({
                       className={twMerge(
                         "border bg-gray-200/80 cursor-pointer text-black inline-block py-2 px-3.5  text-xs md:text-sm rounded",
                         activeAttr(attr)?.val === option &&
-                          " border-blue-700 bg-white"
+                          " border-primaryColor text-primaryColor bg-white shadow-md"
                       )}
                     >
                       {

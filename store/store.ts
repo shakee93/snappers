@@ -35,6 +35,7 @@ type Actions = {
     synPriceRange: (brands: number[]) => void
     setMounted: () => void
     setSearchMounted: () => void
+    clearAttributes: () => void
     setAttribute: (attr: ProductAttribute | VariationAttribute, option: string) => void
 }
 
@@ -163,6 +164,12 @@ export const useStore = create<State & Actions>((set) => ({
             ...state,
             product : product
         }
-    })
+    }),
+    clearAttributes: () => set((state) => ({
+        ...state,
+        product: {
+            attribute: []
+        }
+    }))
 
 }))

@@ -127,7 +127,7 @@ const ProductAddToCart = ({
         className="flex items-center justify-center md:justify-start gap-4 md:gap-0 md:space-x-3.5 py-2 px-2 md:py-4 fixed
       bottom-[82px] left-0 z-10 md:z-10 bg-white border-t md:bg-transparent w-full md:static"
       >
-        <div className="flex items-center justify-center bg-slate-100/70 dark:bg-slate-800/70 px-2 py-1 sm:p-2 rounded-full">
+        <div className="flex border border-primaryColor/20 items-center justify-center dark:bg-slate-800/70 px-2 py-1 sm:p-2 rounded-full">
           <div className=" flex items-center justify-between space-x-5 w-full">
             <NcInputNumber
               onChange={(v) => setQuantity(v)}
