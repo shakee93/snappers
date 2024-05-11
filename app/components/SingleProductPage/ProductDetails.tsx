@@ -107,10 +107,10 @@ const ProductDetails = ({
       let vProduct = variation.find((v) => {
         let nodes = v.attributes?.nodes as unknown as VariationAttribute[];
         let attrKey = attribute
-            .sort((a, b) => a.id.localeCompare(b.id))
+            .sort((a, b) => a.name.localeCompare(b.name))
             .map((a) => `${a.name}:${a.val}`).join("+");
         let variationKey = (nodes || [])
-            .sort((a, b) => a.id.localeCompare(b?.id))
+            .sort((a, b) => a?.name?.localeCompare(b?.name || '') || 0)
             ?.map((a) => `${a.name}:${a.value}`).join("+");
 
         console.log(attrKey, variationKey);
