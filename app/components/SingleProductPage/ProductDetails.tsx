@@ -113,8 +113,6 @@ const ProductDetails = ({
             .sort((a, b) => a?.name?.localeCompare(b?.name || '') || 0)
             ?.map((a) => `${a.name}:${a.value}`).join("+");
 
-        console.log(attrKey, variationKey);
-        
         return attrKey === variationKey;
 
       });
