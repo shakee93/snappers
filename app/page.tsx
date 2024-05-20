@@ -152,9 +152,9 @@ export default async function Home() {
                 </p>
               </div> */}
               <div className="flex flex-col shrink-0 gap-0">
-                <p className="text-lg md:text-lg lg:text-2xl text-white text-left font-semibold ">
-                  Up to 24 Month Installment Plans
-                  <span className="text-[10px]  flex leading-none justify-center md:justify-start shrink-0 xl:text-xs font-semibold text-gray-400">
+                <p className="text-lg items-center justify-center md:text-lg lg:text-2xl text-white text-center font-semibold">
+                  Up to 24 Month Bank Installment Plans
+                  <span className="text-[10px] mt-2 flex leading-none justify-center md:mt-0 md:justify-center shrink-0 xl:text-xs font-semibold text-gray-400">
                     (T & C Apply)
                   </span>
                 </p>
@@ -164,7 +164,7 @@ export default async function Home() {
                 </p>
               </div>
 
-              <div className="flex py-2 mx-4 md:mx-0 px-2 md:px-4  shrink  gap-2 xl:gap-5 bg-white rounded-xl">
+              {/* <div className="flex py-2 mx-4 md:mx-0 px-2 md:px-4  shrink  gap-2 xl:gap-5 bg-white rounded-xl">
                 <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 md:gap-x-7 md:gap-y-2 xl:gap-4">
                   {Banks.map((bank, index) => (
                     <div key={index} className="">
@@ -176,7 +176,7 @@ export default async function Home() {
                     </div>
                   ))}
                 </div>
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
