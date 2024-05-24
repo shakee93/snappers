@@ -69,7 +69,7 @@ export async function generateMetadata(
     title: product.name,
     openGraph: {
       title: product.name,
-      description: product.shortDescription || product.description || "Check out this product!",
+      // description: product.shortDescription || product.description || "Check out this product!",
       url: `http://localhost:3000/${params.brand}/${params.slug}`,
       images: [
         {
