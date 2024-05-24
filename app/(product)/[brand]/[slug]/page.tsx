@@ -70,10 +70,10 @@ export async function generateMetadata(
     openGraph: {
       title: product.name,
       // description: product.shortDescription || product.description || "Check out this product!",
-      url: `http://localhost:3000/${params.brand}/${params.slug}`,
+      url: `https://gqmobiles.lk/${params.brand}/${params.slug}`,
       images: [
         {
-          url: product.image?.sourceUrl || 'http://localhost:3000/default-og-image.jpg',
+          url: product.image?.sourceUrl || 'https://gqmobiles.lk/default-og-image.jpg',
           width: 800,
           height: 600,
           alt: product.name,
