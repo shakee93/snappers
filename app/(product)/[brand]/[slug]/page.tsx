@@ -69,14 +69,14 @@ export async function generateMetadata(
     title: product.name,
     openGraph: {
       title: product.name,
-      // description: product.shortDescription || product.description || "Check out this product!",
+      description:  "Check out this product!",
       url: `https://gqmobiles.lk/${params.brand}/${params.slug}`,
       images: [
         {
           url: product.image?.sourceUrl || 'https://gqmobiles.lk/default-og-image.jpg',
           width: 800,
           height: 600,
-          alt: product.name,
+          alt: "GQ Mobiles",
         },
       ],
     },
