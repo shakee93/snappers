@@ -137,10 +137,11 @@ const ProductDetails = ({
   }, [product.attributes]);
 
   const brandColorClass = brand?.name && brandColors[brand?.name.toLowerCase()];
-  console.log("activeVariation", activeVariation);
+  console.log("product", product);
+
   return (
     <>
-      <div className="flex gap-1  text-sm text-gray-500">
+      <div className="flex gap-1 text-sm text-gray-500">
         <Link
           href={`/${brand?.slug}`}
           target="_blank"
@@ -194,14 +195,14 @@ const ProductDetails = ({
 
         <div>
           {product.type === "SIMPLE" && product.stockStatus !== "IN_STOCK" && (
-            <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs py-1.5 font-medium">
+            <div className="w-max px-4 bg-red-200 text-center rounded-full text-gray-800 text-xs py-1.5 font-medium">
               Sold Out
             </div>
           )}
 
           {product.type === "VARIABLE" &&
             activeVariation?.stockStatus !== "IN_STOCK" && (
-              <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs py-1.5 font-medium mb-1">
+              <div className="w-max px-4 bg-red-200 text-center rounded-full text-gray-800 text-xs py-1.5 font-medium mb-1">
                 Sold Out
               </div>
             )}
@@ -234,7 +235,7 @@ const ProductDetails = ({
             activeVariation?.stockStatus == "IN_STOCK" &&
             activeVariation?.stockQuantity &&
             activeVariation?.stockQuantity <= 2 && (
-              <div className="w-max px-3 bg-yellow-200  text-center rounded-full  text-gray-800 text-xs py-1.5 font-medium mb-1">
+              <div className="w-max px-3 bg-yellow-200 text-center rounded-full text-gray-800 text-xs py-1.5 font-medium mb-1">
                 Low Stock
               </div>
             )}
@@ -243,7 +244,7 @@ const ProductDetails = ({
             product.stockStatus == "IN_STOCK" &&
             product?.stockQuantity &&
             product?.stockQuantity <= 2 && (
-              <div className="w-max px-4 bg-yellow-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1 mb-1">
+              <div className="w-max px-4 bg-yellow-200 text-center rounded-full text-gray-800 text-xs md:text-sm py-1 mb-1">
                 Low Stock
               </div>
             )}
@@ -272,7 +273,6 @@ const ProductDetails = ({
         />
       )}
 
-
       {product.type === "VARIABLE" && (
         <>
           {product.attributes?.nodes.map(
@@ -296,52 +296,81 @@ const ProductDetails = ({
                 </div>
 
                 <ul className="flex gap-2 flex-wrap text-sm items-center">
-                  {attr.options?.map((option, optionIndex) => {
-                    // Find the variation matching the current attribute option
-                    const variation = (
+                  {/* {attr.options?.map((option, optionIndex) => {
+                    // Find the variations that match the current attribute option
+                    const matchingVariations = (
                       product as VariableProduct
-                    ).variations?.nodes.find((v: ProductVariation) => {
-                      let nodes = (v.attributes?.nodes ||
-                        []) as VariationAttribute[];
-                      let attrKey = attribute
-                        .sort((a, b) => a.name.localeCompare(b.name))
-                        .map((a) => `${a.name}:${a.val}`)
-                        .join("+");
-                      let variationKey = nodes
-                        .sort(
-                          (a, b) => a?.name?.localeCompare(b?.name || "") || 0
-                        )
-                        ?.map((a) => `${a.name}:${a.value}`)
-                        .join("+");
-
-                      return (
-                        attrKey === variationKey &&
-                        nodes.some(
-                          (node) =>
-                            node.name === attr.name && node.value === option
-                        )
+                    ).variations?.nodes.filter((v: ProductVariation) => {
+                      return v.attributes?.nodes.some(
+                        (node: any) =>
+                          node.name === attr.name && node.value === option
                       );
                     });
 
-                    const isOutOfStock =
-                      variation && variation.stockStatus !== "IN_STOCK";
+                    const allOutOfStock = matchingVariations?.every(
+                      (v) => v.stockStatus !== "IN_STOCK"
+                    );
 
                     return (
                       <li
                         key={optionIndex}
-                        onClick={(e) =>
-                          !isOutOfStock && setAttribute(attr, option || "")
-                        }
+                        onClick={(e) => {
+                          console.log("e");
+                          !allOutOfStock && setAttribute(attr, option || "");
+                        }}
                         className={twMerge(
                           "border bg-gray-200/80 cursor-pointer text-black inline-block py-2 px-3.5 text-xs md:text-sm rounded",
                           activeAttr(attr)?.val === option &&
                             "border-primaryColor text-primaryColor bg-white shadow-md",
-                          isOutOfStock &&
-                            // "bg-gray-100 text-gray-400 cursor-not-allowed"
+                          allOutOfStock && "bg-gray-100 text-gray-400 "
+                        )}
+                        style={{ opacity: allOutOfStock ? 0.5 : 1 }}
+                        title={allOutOfStock ? "Out of stock" : ""}
+                      >
+                        {(product as any)[
+                          `allPa${(attr?.label as unknown as "Capacity")
+                            ?.split(" ")
+                            .join("")}`
+                        ]?.nodes.find((node: PaCapacity) => {
+                          return node.slug === option;
+                        })?.name || "OPTION"}
+                      </li>
+                    );
+                  })} */}
+                  {attr.options?.map((option, optionIndex) => {
+                    // Find the variations that match the current attribute option
+                    const matchingVariations = (
+                      product as VariableProduct
+                    ).variations?.nodes.filter((v: ProductVariation) => {
+                      return v.attributes?.nodes.some(
+                        (node: any) =>
+                          node.name === attr.name && node.value === option
+                      );
+                    });
+
+                    const allOutOfStock = matchingVariations?.every(
+                      (v) => v.stockStatus !== "IN_STOCK"
+                    );
+
+                    return (
+                      <li
+                        key={optionIndex}
+                        onClick={(e) => {
+                          if (matchingVariations && matchingVariations.length > 0) {
+                            const variation = matchingVariations[0];
+                            setVariationId(variation?.image?.databaseId?.toString() || null);
+                            !allOutOfStock && setAttribute(attr, option || "");
+                          }
+                        }}
+                        className={twMerge(
+                          "border bg-gray-200/80 cursor-pointer text-black inline-block py-2 px-3.5 text-xs md:text-sm rounded",
+                          activeAttr(attr)?.val === option &&
+                            "border-primaryColor text-primaryColor bg-white shadow-md",
+                          allOutOfStock &&
                             "bg-gray-100 text-gray-400 "
                         )}
-                        style={{ opacity: isOutOfStock ? 0.5 : 1 }}
-                        title={isOutOfStock ? "Out of stock" : ""}
+                        style={{ opacity: allOutOfStock ? 0.5 : 1 }}
+                        title={allOutOfStock ? "Out of stock" : ""}
                       >
                         {(product as any)[
                           `allPa${(attr?.label as unknown as "Capacity")
@@ -361,14 +390,14 @@ const ProductDetails = ({
       )}
 
       <ProductAddToCart product={product} variation={activeVariation} />
-      <div className="flex gap-1 w-full items-center flex-wrap text-sm md:text-base text-g ray-500">
+      <div className="flex gap-1 w-full items-center flex-wrap text-sm md:text-base text-gray-500">
         <div className="text-sm py-2">Category:</div>
         {product.productCategories?.edges.map(
           (category: any, index: number) => (
             <Link
               href={`/collections/${category.node.slug}`}
               key={index}
-              className="bg-primary-100 inline-block py-1 px-2 min-w-max  text-xs md:text-sm rounded-3xl"
+              className="bg-primary-100 inline-block py-1 px-2 min-w-max text-xs md:text-sm rounded-3xl"
             >
               {category.node.name}
             </Link>
