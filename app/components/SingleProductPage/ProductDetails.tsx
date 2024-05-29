@@ -319,13 +319,13 @@ const ProductDetails = ({
                           setAttribute(attr, option || "");
                         }}
                         className={twMerge(
-                          "border bg-gray-200/80 cursor-pointer text-black inline-block py-2 px-3.5 text-xs md:text-sm rounded",
+                          "border bg-gray-200/80  cursor-pointer text-black inline-block py-2 px-3.5 text-xs md:text-sm rounded relative",
                           activeAttr(attr)?.val === option &&
                             "border-primaryColor text-primaryColor bg-white shadow-md",
                           allOutOfStock &&
-                            "bg-gray-100 text-gray-400 border-dashed"
+                            "bg-gray-100 text-gray-500 diag-line "
                         )}
-                        style={{ opacity: allOutOfStock ? 0.5 : 1 }}
+                        style={{ opacity: allOutOfStock ? 0.9 : 1 }}
                         title={allOutOfStock ? "Out of stock" : ""}
                       >
                         {(product as any)[
@@ -335,6 +335,14 @@ const ProductDetails = ({
                         ]?.nodes.find((node: PaCapacity) => {
                           return node.slug === option;
                         })?.name || "OPTION"}
+                        {/* {allOutOfStock && (
+                          <span
+                            className="absolute inset-0 flex items-center justify-center"
+                            aria-hidden="true"
+                          >
+                            <span className="w-full h-0.5 bg-gray-400 transform rotate-45"></span>
+                          </span>
+                        )} */}
                       </li>
                     );
                   })}

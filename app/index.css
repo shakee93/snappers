@@ -27,3 +27,14 @@
   ::-webkit-scrollbar-thumb:hover {
     background: #1d4ed8; 
   }
+
+
+.diag-line {
+    background: 
+    linear-gradient(to top left,
+        rgba(0,0,0,0) 0%,
+        rgba(0,0,0,0) calc(50% - 0.8px),
+        rgba(0, 0, 0, 0.228) 50%,
+        rgba(0,0,0,0) calc(50% + 0.8px),
+        rgba(0,0,0,0) 100%)
+}
