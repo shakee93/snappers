@@ -296,47 +296,6 @@ const ProductDetails = ({
                 </div>
 
                 <ul className="flex gap-2 flex-wrap text-sm items-center">
-                  {/* {attr.options?.map((option, optionIndex) => {
-                    // Find the variations that match the current attribute option
-                    const matchingVariations = (
-                      product as VariableProduct
-                    ).variations?.nodes.filter((v: ProductVariation) => {
-                      return v.attributes?.nodes.some(
-                        (node: any) =>
-                          node.name === attr.name && node.value === option
-                      );
-                    });
-
-                    const allOutOfStock = matchingVariations?.every(
-                      (v) => v.stockStatus !== "IN_STOCK"
-                    );
-
-                    return (
-                      <li
-                        key={optionIndex}
-                        onClick={(e) => {
-                          console.log("e");
-                          !allOutOfStock && setAttribute(attr, option || "");
-                        }}
-                        className={twMerge(
-                          "border bg-gray-200/80 cursor-pointer text-black inline-block py-2 px-3.5 text-xs md:text-sm rounded",
-                          activeAttr(attr)?.val === option &&
-                            "border-primaryColor text-primaryColor bg-white shadow-md",
-                          allOutOfStock && "bg-gray-100 text-gray-400 "
-                        )}
-                        style={{ opacity: allOutOfStock ? 0.5 : 1 }}
-                        title={allOutOfStock ? "Out of stock" : ""}
-                      >
-                        {(product as any)[
-                          `allPa${(attr?.label as unknown as "Capacity")
-                            ?.split(" ")
-                            .join("")}`
-                        ]?.nodes.find((node: PaCapacity) => {
-                          return node.slug === option;
-                        })?.name || "OPTION"}
-                      </li>
-                    );
-                  })} */}
                   {attr.options?.map((option, optionIndex) => {
                     // Find the variations that match the current attribute option
                     const matchingVariations = (
@@ -356,18 +315,15 @@ const ProductDetails = ({
                       <li
                         key={optionIndex}
                         onClick={(e) => {
-                          if (matchingVariations && matchingVariations.length > 0) {
-                            const variation = matchingVariations[0];
-                            setVariationId(variation?.image?.databaseId?.toString() || null);
-                            !allOutOfStock && setAttribute(attr, option || "");
-                          }
+                          console.log("e");
+                          setAttribute(attr, option || "");
                         }}
                         className={twMerge(
                           "border bg-gray-200/80 cursor-pointer text-black inline-block py-2 px-3.5 text-xs md:text-sm rounded",
                           activeAttr(attr)?.val === option &&
                             "border-primaryColor text-primaryColor bg-white shadow-md",
                           allOutOfStock &&
-                            "bg-gray-100 text-gray-400 "
+                            "bg-gray-100 text-gray-400 border-dashed"
                         )}
                         style={{ opacity: allOutOfStock ? 0.5 : 1 }}
                         title={allOutOfStock ? "Out of stock" : ""}

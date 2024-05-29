@@ -118,7 +118,23 @@ const ProductAddToCart = ({
   };
 
   if (product?.type === "VARIABLE" && !variation) {
-    return <></>;
+    return (
+      <button
+        disabled={loading}
+        onClick={(e) => addItemToCart()}
+        className={twMerge(
+          "relative w-auto grow md:flex-none  h-auto inline-flex\
+      cursor-pointer items-center justify-center rounded-full transition-colors text-sm sm:text-base\
+       font-medium py-3 px-4 sm:py-3 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-primaryColor\
+        dark:bg-slate-100 text-slate-50 dark:text-slate-800 shadow-xl  flex-shrink-0 focus:outline-none\
+         focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0",
+            "opacity-50 disabled:cursor-not-allowed"
+        )}
+      >
+        {/* {loading ? <Loader className="animate-spin" /> : <ShoppingCart />} */}
+        <span className="md:ml-3 cursor-pointer">Not Available</span>
+      </button>
+    );
   }
 
   return (
@@ -135,12 +151,16 @@ const ProductAddToCart = ({
             />
           </div>
         </div>
+
         <button
           disabled={loading}
           onClick={(e) => addItemToCart()}
           className={twMerge(
             "relative w-auto grow md:flex-none  h-auto inline-flex\
-            cursor-pointer items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-primaryColor dark:bg-slate-100 text-slate-50 dark:text-slate-800 shadow-xl  flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0",
+            cursor-pointer items-center justify-center rounded-full transition-colors text-sm sm:text-base\
+             font-medium py-3 px-4 sm:py-3 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-primaryColor\
+              dark:bg-slate-100 text-slate-50 dark:text-slate-800 shadow-xl  flex-shrink-0 focus:outline-none\
+               focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0",
             (product?.stockStatus !== "IN_STOCK" ||
               (product?.type === "VARIABLE" &&
                 variation?.stockStatus !== "IN_STOCK")) &&
