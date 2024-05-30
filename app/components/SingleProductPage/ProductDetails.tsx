@@ -2,6 +2,7 @@
 import Link from "next/link";
 import ProductAddToCart from "./ProductAddToCart";
 import {
+  Attribute,
   Brand,
   PaCapacity,
   ProductAttribute,
@@ -34,11 +35,7 @@ const ProductDetails = ({
   const [activeVariation, setActiveVariation] = useState<any>(
     product?.variations?.nodes[0]
   );
-  const [activeOption, setActiveOption] = useState(
-    !!product?.variations?.nodes?.length
-      ? product?.variations?.nodes[0].attributes?.nodes[0].value
-      : null
-  );
+
 
   const manualMeta = product?.metaData;
   const warrantyType = manualMeta?.find(
@@ -97,6 +94,29 @@ const ProductDetails = ({
   }, [activeVariation]);
 
   useEffect(() => {
+    const firstInStockVariation = product.variations?.nodes.find(
+      (v: ProductVariation) => v.stockStatus === "IN_STOCK"
+    );
+
+    if (firstInStockVariation) {
+      firstInStockVariation.attributes?.nodes.forEach((attr: Attribute) => {
+        const option = attr.value;
+        setAttribute(attr, option || "");
+      });
+      if (firstInStockVariation?.image) {
+        setActiveVariation(firstInStockVariation);
+        setVariationId(firstInStockVariation?.image.databaseId.toString());
+      } else {
+        const firstVariation = product?.variations?.nodes[0];
+        if (firstVariation) {
+          setActiveVariation(firstVariation); // Fallback to the first variation if none are in stock
+          setVariationId(firstVariation?.image?.databaseId.toString());
+        }
+      }
+    }
+  }, []);
+
+  useEffect(() => {
     // This function determines which is the variation for selected attributes
     if (product.type === "VARIABLE") {
       let variation = (product as VariableProduct).variations
@@ -129,7 +149,6 @@ const ProductDetails = ({
   };
 
   useEffect(() => {
-    // console.log(attribute, product.variations?.nodes.map((v) => v.attributes.nodes));
   }, [attribute]);
 
   const productAttributes = useMemo(() => {
@@ -137,7 +156,6 @@ const ProductDetails = ({
   }, [product.attributes]);
 
   const brandColorClass = brand?.name && brandColors[brand?.name.toLowerCase()];
-  console.log("product", product);
 
   return (
     <>
@@ -315,7 +333,15 @@ const ProductDetails = ({
                       <li
                         key={optionIndex}
                         onClick={(e) => {
-                          console.log("e");
+                          // Set the first in-stock variation as the active variation
+
+                          //   "attirbute is clicked",
+                          //   firstInStockVariation?.attributes,
+                          //   firstInStockVariation?.attributes?.nodes[0].name
+                          // );
+
+                          // option = firstInStockVariation?.attributes?.nodes[1].value || ""
+
                           setAttribute(attr, option || "");
                         }}
                         className={twMerge(
