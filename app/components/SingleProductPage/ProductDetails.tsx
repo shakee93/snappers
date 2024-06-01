@@ -15,10 +15,10 @@ import {
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useStore } from "@/store/store";
 import { twMerge } from "tailwind-merge";
-import parseHtml from "html-react-parser";
 import { useImage } from "@/context/ImageChangeGrabber";
 import brandColors from "@/data/brandColors";
 import AttributeIcon from "@/app/components/AttributeIcon";
+import ProductDescription from "./ProductDescription";
 
 const ProductDetails = ({
   product,
@@ -34,16 +34,15 @@ const ProductDetails = ({
   } = useStore();
 
   const [activeVariation, setActiveVariation] = useState<any>(
-    product?.variations?.nodes[0]
+    product?.variations?.nodes[0],
   );
-
 
   const manualMeta = product?.metaData;
   const warrantyType = manualMeta?.find(
-    (item) => item?.key === "warranty_type"
+    (item) => item?.key === "warranty_type",
   )?.value;
   const warrantyPeriod = manualMeta?.find(
-    (item) => item?.key === "warranty_period"
+    (item) => item?.key === "warranty_period",
   )?.value;
 
   const { setVariationId } = useImage();
@@ -71,7 +70,7 @@ const ProductDetails = ({
     (attr: ProductAttribute) => {
       return attribute.find((a) => a.name === attr.name);
     },
-    [attribute]
+    [attribute],
   );
 
   useEffect(() => {
@@ -96,7 +95,7 @@ const ProductDetails = ({
 
   useEffect(() => {
     const firstInStockVariation = product.variations?.nodes.find(
-      (v: ProductVariation) => v.stockStatus === "IN_STOCK"
+      (v: ProductVariation) => v.stockStatus === "IN_STOCK",
     );
 
     if (firstInStockVariation) {
@@ -145,18 +144,7 @@ const ProductDetails = ({
     }
   }, [attribute, product]);
 
-  const applyListStyleDisc = (htmlContent: any) => {
-    return htmlContent.replace(/<ul>/g, '<ul class="list-disc">');
-  };
-
-  useEffect(() => {
-  }, [attribute]);
-
-  const productAttributes = useMemo(() => {
-    return [];
-  }, [product.attributes]);
-
-  const brandColorClass = brand?.name && brandColors[brand?.name.toLowerCase()];
+  useEffect(() => {}, [attribute]);
 
   return (
     <>
@@ -164,18 +152,18 @@ const ProductDetails = ({
         <Link
           href={`/${brand?.slug}`}
           target="_blank"
-          className="bg-primaryColor text-white px-2.5 py-1 rounded-xl"
+          className="bg-primaryColor rounded-xl px-2.5 py-1 text-white"
         >
           {brand?.name}
         </Link>
       </div>
 
-      <div className="text-2xl md:text-3xl font-medium ">{product.name}</div>
+      <div className="text-2xl font-medium md:text-3xl">{product.name}</div>
 
-      <div className="flex gap-2 items-center">
+      <div className="flex items-center gap-2">
         {product.type === "VARIABLE" && activeVariation ? (
           <div>
-            <div className="flex items-center gap-4 text-base py-2 flex-wrap md:text-xl font-medium text-gray-600">
+            <div className="flex flex-wrap items-center gap-4 py-2 text-base font-medium text-gray-600 md:text-xl">
               <span
                 dangerouslySetInnerHTML={{ __html: activeVariation.price }}
               />
@@ -193,7 +181,7 @@ const ProductDetails = ({
             </div>
           </div>
         ) : (
-          <div className="flex items-center gap-2 text-base py-2 flex-wrap md:text-xl font-medium text-gray-600">
+          <div className="flex flex-wrap items-center gap-2 py-2 text-base font-medium text-gray-600 md:text-xl">
             <span dangerouslySetInnerHTML={{ __html: product.price || "" }} />
 
             {product.salePrice &&
@@ -214,14 +202,14 @@ const ProductDetails = ({
 
         <div>
           {product.type === "SIMPLE" && product.stockStatus !== "IN_STOCK" && (
-            <div className="w-max px-4 bg-red-200 text-center rounded-full text-gray-800 text-xs py-1.5 font-medium">
+            <div className="w-max rounded-full bg-red-200 px-4 py-1.5 text-center text-xs font-medium text-gray-800">
               Sold Out
             </div>
           )}
 
           {product.type === "VARIABLE" &&
             activeVariation?.stockStatus !== "IN_STOCK" && (
-              <div className="w-max px-4 bg-red-200 text-center rounded-full text-gray-800 text-xs py-1.5 font-medium mb-1">
+              <div className="mb-1 w-max rounded-full bg-red-200 px-4 py-1.5 text-center text-xs font-medium text-gray-800">
                 Sold Out
               </div>
             )}
@@ -234,7 +222,7 @@ const ProductDetails = ({
               activeVariation?.stockQuantity >= 3) ||
               (!activeVariation.stockQuantity &&
                 activeVariation?.stockStatus === "IN_STOCK")) && (
-              <div className="w-max px-4 bg-green-200 text-center rounded-full text-gray-800 text-xs py-1.5 font-medium">
+              <div className="w-max rounded-full bg-green-200 px-4 py-1.5 text-center text-xs font-medium text-gray-800">
                 In Stock
               </div>
             )}
@@ -244,7 +232,7 @@ const ProductDetails = ({
             ((product?.stockQuantity && product?.stockQuantity >= 3) ||
               (!product.stockQuantity &&
                 product.stockStatus === "IN_STOCK")) && (
-              <div className="w-max px-4 bg-green-200 text-center rounded-full text-gray-800 text-xs py-1.5 font-medium">
+              <div className="w-max rounded-full bg-green-200 px-4 py-1.5 text-center text-xs font-medium text-gray-800">
                 In Stock
               </div>
             )}
@@ -254,7 +242,7 @@ const ProductDetails = ({
             activeVariation?.stockStatus == "IN_STOCK" &&
             activeVariation?.stockQuantity &&
             activeVariation?.stockQuantity <= 2 && (
-              <div className="w-max px-3 bg-yellow-200 text-center rounded-full text-gray-800 text-xs py-1.5 font-medium mb-1">
+              <div className="mb-1 w-max rounded-full bg-yellow-200 px-3 py-1.5 text-center text-xs font-medium text-gray-800">
                 Low Stock
               </div>
             )}
@@ -263,13 +251,13 @@ const ProductDetails = ({
             product.stockStatus == "IN_STOCK" &&
             product?.stockQuantity &&
             product?.stockQuantity <= 2 && (
-              <div className="w-max px-4 bg-yellow-200 text-center rounded-full text-gray-800 text-xs md:text-sm py-1 mb-1">
+              <div className="mb-1 w-max rounded-full bg-yellow-200 px-4 py-1 text-center text-xs text-gray-800 md:text-sm">
                 Low Stock
               </div>
             )}
 
           {warrantyType && warrantyPeriod && (
-            <div className="flex flex-col gap-2 w-full items-left flex-wrap text-xs md:text-sm text-gray-500 py-2">
+            <div className="items-left flex w-full flex-col flex-wrap gap-2 py-2 text-xs text-gray-500 md:text-sm">
               <div className="">
                 <span className="font-medium">Warranty Type :</span>{" "}
                 {warrantyType}
@@ -283,23 +271,16 @@ const ProductDetails = ({
         </div>
       </div>
 
-      {product.shortDescription && (
-        <div
-          className="text-xs md:text-sm text-gray-600 px-6"
-          dangerouslySetInnerHTML={{
-            __html: applyListStyleDisc(product.shortDescription),
-          }}
-        />
-      )}
+      {product.shortDescription && <ProductDescription product={product} />}
 
       {product.type === "VARIABLE" && (
         <>
           {product.attributes?.nodes.map(
             (attr: ProductAttribute, index: number) => (
               <div key={index} className="py-2 text-gray-500">
-                <div className="flex items-center gap-1 text-sm py-2">
-                  <span className="flex gap-1 items-center text-primaryColor">
-                    <AttributeIcon name={attr?.name || ""} className="w-4 " />
+                <div className="flex items-center gap-1 py-2 text-sm">
+                  <span className="text-primaryColor flex items-center gap-1">
+                    <AttributeIcon name={attr?.name || ""} className="w-4" />
                     {attr.label}:
                   </span>
                   <span className="font-medium text-gray-700">
@@ -308,13 +289,13 @@ const ProductDetails = ({
                         `allPa${attr?.label as unknown as "Capacity"}`
                       ]?.nodes.find(
                         (node: PaCapacity) =>
-                          node.slug === activeAttr(attr)?.val
+                          node.slug === activeAttr(attr)?.val,
                       )?.name
                     }
                   </span>{" "}
                 </div>
 
-                <ul className="flex gap-2 flex-wrap text-sm items-center">
+                <ul className="flex flex-wrap items-center gap-2 text-sm">
                   {attr.options?.map((option, optionIndex) => {
                     // Find the variations that match the current attribute option
                     const matchingVariations = (
@@ -322,18 +303,18 @@ const ProductDetails = ({
                     ).variations?.nodes.filter((v: ProductVariation) => {
                       return v.attributes?.nodes.some(
                         (node: any) =>
-                          node.name === attr.name && node.value === option
+                          node.name === attr.name && node.value === option,
                       );
                     });
 
                     const allOutOfStock = matchingVariations?.every(
-                      (v) => v.stockStatus !== "IN_STOCK"
+                      (v) => v.stockStatus !== "IN_STOCK",
                     );
 
                     return (
                       <li
                         key={optionIndex}
-                        onClick={(e) => {
+                        onClick={() => {
                           // Set the first in-stock variation as the active variation
 
                           //   "attirbute is clicked",
@@ -346,11 +327,11 @@ const ProductDetails = ({
                           setAttribute(attr, option || "");
                         }}
                         className={twMerge(
-                          "border bg-gray-200/80  cursor-pointer text-black inline-block py-2 px-3.5 text-xs md:text-sm rounded relative",
+                          "relative inline-block cursor-pointer rounded border bg-gray-200/80 px-3.5 py-2 text-xs text-black md:text-sm",
                           activeAttr(attr)?.val === option &&
                             "border-primaryColor text-primaryColor bg-white shadow-md",
                           allOutOfStock &&
-                            "bg-gray-100 text-gray-500 diag-line "
+                            "diag-line bg-gray-100 text-gray-500",
                         )}
                         style={{ opacity: allOutOfStock ? 0.9 : 1 }}
                         title={allOutOfStock ? "Out of stock" : ""}
@@ -375,24 +356,24 @@ const ProductDetails = ({
                   })}
                 </ul>
               </div>
-            )
+            ),
           )}
         </>
       )}
 
       <ProductAddToCart product={product} variation={activeVariation} />
-      <div className="flex gap-1 w-full items-center flex-wrap text-sm md:text-base text-gray-500">
-        <div className="text-sm py-2">Category:</div>
+      <div className="flex w-full flex-wrap items-center gap-1 text-sm text-gray-500 md:text-base">
+        <div className="py-2 text-sm">Category:</div>
         {product.productCategories?.edges.map(
           (category: any, index: number) => (
             <Link
               href={`/collections/${category.node.slug}`}
               key={index}
-              className="bg-primary-100 inline-block py-1 px-2 min-w-max text-xs md:text-sm rounded-3xl"
+              className="bg-primary-100 inline-block min-w-max rounded-3xl px-2 py-1 text-xs md:text-sm"
             >
               {category.node.name}
             </Link>
-          )
+          ),
         )}
       </div>
     </>
