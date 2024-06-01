@@ -94,18 +94,41 @@ const ProductDetails = ({
   }, [activeVariation]);
 
   useEffect(() => {
-    const firstInStockVariation = product.variations?.nodes.find(
-      (v: ProductVariation) => v.stockStatus === "IN_STOCK",
-    );
+    console.log("running");
 
-    if (firstInStockVariation) {
-      firstInStockVariation.attributes?.nodes.forEach((attr: Attribute) => {
-        const option = attr.value;
-        setAttribute(attr, option || "");
-      });
-      if (firstInStockVariation?.image) {
-        setActiveVariation(firstInStockVariation);
-        setVariationId(firstInStockVariation?.image.databaseId.toString());
+    const lowestPriceInStockVariation: any | undefined =
+      product.variations?.nodes
+        .filter((v: ProductVariation) => v.stockStatus === "IN_STOCK")
+        .reduce(
+          (lowest: any, v: any | undefined) => {
+            const currentPrice = parseFloat(v?.rawPrice || "0");
+            const lowestPrice = parseFloat(lowest?.rawPrice || "Infinity");
+            return currentPrice < lowestPrice ? v : lowest;
+          },
+          undefined as ProductVariation | undefined,
+        );
+    console.log("firstIn: ", product);
+    // Example usage:
+    if (lowestPriceInStockVariation) {
+      console.log(
+        `Lowest price in-stock variation: ${lowestPriceInStockVariation.name} at ${lowestPriceInStockVariation.rawPrice}`,
+      );
+    } else {
+      console.log("No in-stock variations available.");
+    }
+
+    if (lowestPriceInStockVariation) {
+      lowestPriceInStockVariation.attributes?.nodes.forEach(
+        (attr: Attribute) => {
+          const option = attr.value;
+          setAttribute(attr, option || "");
+        },
+      );
+      if (lowestPriceInStockVariation?.image) {
+        setActiveVariation(lowestPriceInStockVariation);
+        setVariationId(
+          lowestPriceInStockVariation?.image.databaseId.toString(),
+        );
       } else {
         const firstVariation = product?.variations?.nodes[0];
         if (firstVariation) {

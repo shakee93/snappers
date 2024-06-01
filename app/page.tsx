@@ -47,7 +47,8 @@ const slidesData = [
       mainHeading: " Immersive Sound, Effortless Charging",
       subHeading: "AirPods Pro 2 with MagSafe Charging",
       buttonText: "Explore Products",
-      buttonLink: "/apple/airpods-pro-2nd-generation-with-magsafe-charging-case-usbc-2023",
+      buttonLink:
+        "/apple/airpods-pro-2nd-generation-with-magsafe-charging-case-usbc-2023",
       backgroundColor: "#F4E7E7",
       featureImage: {
         id: "3",
@@ -142,26 +143,23 @@ export default async function Home() {
 
   return (
     <main>
-      <div className="nc-PageHome relative flex  flex-col overflow-hidden">
-        <div className="bg-[#285f38] py-4 px-2 md:p-3">
-          <div className="flex md:items-center gap-4 md:gap-3 flex-col md:flex-row items-between ">
-            <div className="flex flex-col md:flex-row gap-2 justify-center items-center w-full">
+      <div className="nc-PageHome relative flex flex-col overflow-hidden">
+        <div className="bg-[#285f38] px-2 py-4 md:p-3">
+          <div className="items-between flex flex-col gap-4 md:flex-row md:items-center md:gap-3">
+            <div className="flex w-full flex-col items-center justify-center gap-2 md:flex-row">
               {/* <div>
                 <p className="text-3xl md:text-xl lg:text-3xl xl:text-5xl -skew-x-[20deg] font-bold bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent bg-clip-text">
                   0% Installment
                 </p>
               </div> */}
-              <div className="flex flex-col shrink-0 gap-0">
-                <p className="text-lg items-center justify-center md:text-lg lg:text-2xl text-white text-center font-semibold">
+              <div className="flex shrink-0 flex-col gap-0">
+                <p className="items-center justify-center text-center text-lg font-semibold text-white md:text-lg lg:text-2xl">
                   Up to 24 Month Bank Installment Plans
-                  <span className="text-[10px] mt-2 flex leading-none justify-center md:mt-0 md:justify-center shrink-0 xl:text-xs font-semibold text-gray-400">
+                  <span className="mt-2 flex shrink-0 justify-center text-[10px] font-semibold leading-none text-gray-400 md:mt-0 md:justify-center xl:text-xs">
                     (T & C Apply)
                   </span>
                 </p>
-                <p className="flex w-full gap-2 md:gap-1  justify-end items-baseline ">
-            
-                 
-                </p>
+                <p className="flex w-full items-baseline justify-end gap-2 md:gap-1"></p>
               </div>
 
               {/* <div className="flex py-2 mx-4 md:mx-0 px-2 md:px-4  shrink  gap-2 xl:gap-5 bg-white rounded-xl">
