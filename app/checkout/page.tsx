@@ -608,8 +608,8 @@ const CheckoutPage = () => {
 
       <main className="container py-8 md:py-16 lg:pb-28 lg:pt-20 ">
         <PaymentModal
-          // show={showBankTransfer}
-          show={true}
+          show={showBankTransfer}
+          // show={true}
           setShowBankTransfer={setShowBankTransfer}
           setWantToSHowBankTransfer={setWantToSHowBankTransfer}
           paymentDetails={paymentDetails}
