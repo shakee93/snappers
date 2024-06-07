@@ -18,7 +18,7 @@ const BankTransfer: React.FC<BankTransferProps> = ({ paymentDetails }) => {
   const [file, setFile] = useState<File | null>(null);
   const [orderId, setOrderId] = useState<string>("");
   const [uploadStatus, setUploadStatus] = useState<string>("");
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
   const { customer, fetchCustomer } = useSession();
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = event.target.files;
@@ -28,25 +28,24 @@ const BankTransfer: React.FC<BankTransferProps> = ({ paymentDetails }) => {
   };
 
   useEffect(() => {
-
     // use this id to the testing
     // setOrderId("6445");
     if (paymentDetails) {
       setOrderId(paymentDetails.order_id);
       // console.log('payment email', paymentDetails.email);
     } else {
-      alert("No payment Details provided for the bank transfer")
+      alert("No payment Details provided for the bank transfer");
     }
   }, [paymentDetails]);
 
   const router = useRouter();
 
   const handleSubmit = async (event: FormEvent) => {
-    setLoading(true)
+    setLoading(true);
     event.preventDefault();
     if (!file) {
       toast.error("Kindly choose a file for uploading.", { duration: 7000 });
-      setLoading(false)
+      setLoading(false);
       return;
     }
 
@@ -55,10 +54,13 @@ const BankTransfer: React.FC<BankTransferProps> = ({ paymentDetails }) => {
     formData.append("order_id", orderId);
 
     try {
-      const response = await fetch("https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/upload", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/upload",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
 
       const data = await response.json();
 
@@ -66,18 +68,23 @@ const BankTransfer: React.FC<BankTransferProps> = ({ paymentDetails }) => {
 
       if (data.message === "File uploaded successfully") {
         setUploadStatus("success");
-        toast.success("You have successfully completed the upload of your bank slip.")
+        toast.success(
+          "You have successfully completed the upload of your bank slip."
+        );
 
-        const confirmationResponse = await fetch("https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/order-confirmation", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json"
-          },
-          body: JSON.stringify({
-            order_id: orderId,
-            order_status: "completed"
-          })
-        });
+        const confirmationResponse = await fetch(
+          "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/order-confirmation",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              order_id: orderId,
+              order_status: "completed",
+            }),
+          }
+        );
 
         if (!confirmationResponse.ok) {
           throw new Error("Failed to confirm order status");
@@ -86,9 +93,7 @@ const BankTransfer: React.FC<BankTransferProps> = ({ paymentDetails }) => {
         const orderConfirmationdata = await confirmationResponse.json();
         console.log("orderConfirmation", orderConfirmationdata);
 
-        if (
-          customer?.id === "guest"
-        ) {
+        if (customer?.id === "guest") {
           let email = paymentDetails.email;
           let redirectUrl = `/checkout/no_order_id_found?email=${email}`;
           router.push(redirectUrl);
@@ -102,54 +107,69 @@ const BankTransfer: React.FC<BankTransferProps> = ({ paymentDetails }) => {
       if (data.error) {
         toast.error("An issue occurred during the bank slip upload process.");
       }
-      setLoading(false)
+      setLoading(false);
     } catch (error) {
-      setLoading(false)
+      setLoading(false);
       console.error("Error:", error);
       setUploadStatus("An error occurred. Please try again later.");
     }
   };
 
   return (
-    <div className="container grid sm:grid-cols-2 grid-cols-1 sm:divide-x-2 sm:divide-y-0 divide-y-2 mx-auto p-4">
-      <BankDetails />
-      <form className="file-upload-form sm:pl-8 py-8 w-fit" onSubmit={handleSubmit}>
-        <div className="mb-4">
-          {/*<h1*/}
-          {/*    className="text-xl sm:py-8 py-4 text-left"*/}
+    <div className="">
+      <div className="container grid sm:grid-cols-2 grid-cols-1 sm:divide-x-2 sm:divide-y-0 divide-y-2 mx-auto p-4">
+        <BankDetails />
+        <form
+          className="file-upload-form sm:pl-8 py-8 w-fit"
+          onSubmit={handleSubmit}
+        >
+          <div className="mb-4">
+            {/*<h1*/}
+            {/*    className="text-xl sm:py-8 py-4 text-left"*/}
 
-          {/*>*/}
-          {/*  Upload Bank Slip*/}
-          {/*</h1>*/}
-          <p className="text-2xl font-bold text-left pb-4">Upload Bank Slip</p>
-          <input
-            className=""
-            id="file"
-            type="file"
-            required={true}
-            onChange={handleFileChange}
-            accept="image/png, image/gif, image/jpeg, image/heic, image/heif, image/webp, image/bmp, image/tiff" />
+            {/*>*/}
+            {/*  Upload Bank Slip*/}
+            {/*</h1>*/}
+            <p className="text-2xl font-bold text-left pb-4">
+              Upload Bank Slip
+            </p>
+            <input
+              className=""
+              id="file"
+              type="file"
+              required={true}
+              onChange={handleFileChange}
+              accept="image/png, image/gif, image/jpeg, image/heic, image/heif, image/webp, image/bmp, image/tiff"
+            />
 
-          <p className="text-sm pt-2 text-gray-600">When you{`'`}ve completed the transfer to Our Bank, kindly upload
-            your bank slip here.</p>
+            <p className="text-sm pt-2 text-gray-600">
+              When you{`'`}ve completed the transfer to Our Bank, kindly upload
+              your bank slip here.
+            </p>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <ButtonPrimary
+              className="bg-blue-500  w-full hover:bg-blue-700 text-white font-bold py-2 px-4"
+              type="submit"
+              disabled={loading}
+            >
+              {loading ? (
+                <Loader className="animate-spin text-gray-100 " />
+              ) : (
+                "Upload"
+              )}
+            </ButtonPrimary>
+          </div>
+          {/*{uploadStatus && <p className="text-center my-4">{uploadStatus}</p>}*/}
+        </form>
+      </div>
+      <div>
+        <div className="text-red-900 rounded-2xl font-medium px-8 bg-red-100 text-center  text-xl py-8">
+          Please note, <span className="font-semibold">orders will be canceled</span> if the slip is not
+          uploaded within 30 minutes or if you leave the page without uploading.
         </div>
-
-        <div className="flex items-center justify-between">
-          <ButtonPrimary
-            className="bg-blue-500  w-full hover:bg-blue-700 text-white font-bold py-2 px-4"
-            type="submit"
-            disabled={loading}
-          >
-            {loading ?
-              (
-                <Loader className='animate-spin text-gray-100 ' />
-              )
-
-              : 'Upload'}
-          </ButtonPrimary>
-        </div>
-        {/*{uploadStatus && <p className="text-center my-4">{uploadStatus}</p>}*/}
-      </form>
+      </div>
     </div>
   );
 };

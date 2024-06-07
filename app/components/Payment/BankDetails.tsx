@@ -75,7 +75,6 @@ const BankDetails: React.FC = () => {
             </ul>
           </div>
         </div>
-        <div className='text-red-500 text-center mt-2'>Please Upload the Bank Slip within 30 mins of confirming your order</div>
       </div>
   );
 };
