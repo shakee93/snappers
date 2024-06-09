@@ -19,7 +19,7 @@ const ProductAddToCart = ({
   variation,
 }: {
   product: SimpleProduct & VariableProduct;
-  variation: ProductVariation;
+  variation: ProductVariation & { rawPrice: string };
 }) => {
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -48,8 +48,9 @@ const ProductAddToCart = ({
       }
     );
   };
-  // const notifyAddTocart = (quantity: number) => {
-  //   toast.custom(
+
+  // console.log("variation", variation, "type:", typeof variation?.rawPrice, "old value:", variation?.rawPrice);
+  // console.log("product", product, "type:", typeof product);
   //     (t: any) => (
   //       <Transition
   //         appear
@@ -151,7 +152,7 @@ const ProductAddToCart = ({
         </div>
 
         <button
-          disabled={loading}
+          disabled={loading || variation.rawPrice === "0.00"}
           onClick={(e) => addItemToCart()}
           className={twMerge(
             "relative w-auto grow md:flex-none  h-auto inline-flex\
@@ -159,7 +160,7 @@ const ProductAddToCart = ({
              font-medium py-3 px-4 sm:py-3 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-primaryColor\
               dark:bg-slate-100 text-slate-50 dark:text-slate-800 shadow-xl  flex-shrink-0 focus:outline-none\
                focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0",
-            (product?.stockStatus !== "IN_STOCK" ||
+            (product?.stockStatus !== "IN_STOCK" || variation.rawPrice === "0.00" ||
               (product?.type === "VARIABLE" &&
                 variation?.stockStatus !== "IN_STOCK")) &&
               "opacity-50 disabled:cursor-not-allowed"

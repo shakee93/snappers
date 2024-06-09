@@ -94,7 +94,6 @@ const ProductDetails = ({
   }, [activeVariation]);
 
   useEffect(() => {
-    console.log("running");
 
     const lowestPriceInStockVariation: any | undefined =
       product.variations?.nodes
@@ -107,15 +106,13 @@ const ProductDetails = ({
           },
           undefined as ProductVariation | undefined,
         );
-    console.log("firstIn: ", product);
-    // Example usage:
-    if (lowestPriceInStockVariation) {
-      console.log(
-        `Lowest price in-stock variation: ${lowestPriceInStockVariation.name} at ${lowestPriceInStockVariation.rawPrice}`,
-      );
-    } else {
-      console.log("No in-stock variations available.");
-    }
+    // if (lowestPriceInStockVariation) {
+    //   console.log(
+    //     `Lowest price in-stock variation: ${lowestPriceInStockVariation.name} at ${lowestPriceInStockVariation.rawPrice}`,
+    //   );
+    // } else {
+    //   console.log("No in-stock variations available.");
+    // }
 
     if (lowestPriceInStockVariation) {
       lowestPriceInStockVariation.attributes?.nodes.forEach(
