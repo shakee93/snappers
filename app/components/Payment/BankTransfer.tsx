@@ -6,6 +6,7 @@ import BankDetails from "./BankDetails";
 import { PaymentDetailsWithoutUrls } from "@/data/types";
 import { Loader } from "lucide-react";
 import { useSession } from "@/context/SessionProvider";
+import Image from "next/image";
 
 type BankTransferProps = {
   paymentDetails: PaymentDetailsWithoutUrls;
@@ -159,9 +160,18 @@ const BankTransfer: React.FC<BankTransferProps> = ({
             {previewUrl && (
               <div className="pt-4">
                 <p className="text-sm pt-2 text-gray-600">Preview:</p>
-                <img
+                {/* <img
                   src={previewUrl}
                   alt="Preview"
+                  className="mt-2 w-full max-h-52 object-contain h-auto"
+                /> */}
+
+                <Image
+                  src={previewUrl}
+                  alt="Preview"
+                  layout="responsive"
+                  width={500}
+                  height={200}
                   className="mt-2 w-full max-h-52 object-contain h-auto"
                 />
               </div>
@@ -174,7 +184,11 @@ const BankTransfer: React.FC<BankTransferProps> = ({
 
           <div className="flex items-center justify-between">
             <ButtonPrimary
-              className={!file ? "cursor-not-allowed bg-blue-500  w-full opacity-75 hover:bg-blue-700 text-white font-bold py-2 px-4" : "bg-blue-500  w-full hover:bg-blue-700 text-white font-bold py-2 px-4"}
+              className={
+                !file
+                  ? "cursor-not-allowed bg-blue-500  w-full opacity-75 hover:bg-blue-700 text-white font-bold py-2 px-4"
+                  : "bg-blue-500  w-full hover:bg-blue-700 text-white font-bold py-2 px-4"
+              }
               type="submit"
               disabled={loading || !file}
             >
