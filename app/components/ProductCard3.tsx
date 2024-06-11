@@ -32,7 +32,7 @@ import { redirect, useRouter } from "next/navigation";
 
 export interface ProductCardProps {
   className?: string;
-  data: { rawPrice: string } & SimpleProduct & VariableProduct;
+  data: SimpleProduct  & VariableProduct | any;
   fromSearch?: boolean;
 }
 
@@ -199,7 +199,7 @@ const ProductCard: FC<ProductCardProps> = ({
   let lowestSalePriceIndex = -1;
 
   if (type === "VARIABLE" && variations) {
-    variations.nodes.forEach((variation, index) => {
+    variations.nodes.forEach((variation: any, index: number) => {
       const variationPrice = parsePrice(
         (variation as { price?: any })?.price || ""
       );
@@ -255,7 +255,7 @@ const ProductCard: FC<ProductCardProps> = ({
                   variation: {
                     node: ProductVariation;
                   },
-                  index
+                  index: number
                 ) => (
                   <div
                     key={index}
@@ -305,7 +305,7 @@ const ProductCard: FC<ProductCardProps> = ({
         <div
           className={`absolute left-1.5  top-2 bg-zinc-100/80 text-center text-xs lg:text-sm line-clamp-2 rounded-full text-slate-800`}
         >
-          {brands?.nodes?.map((brand: Brand, index) => (
+          {brands?.nodes?.map((brand: Brand, index: number) => (
             <Link
               //   className=" px-2 py-1 rounded"
               href={`/${brand?.slug}`}
