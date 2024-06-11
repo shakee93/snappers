@@ -127,7 +127,7 @@ const ProductAddToCart = ({
        font-medium py-3 px-4 sm:py-3 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 \
         dark:bg-slate-100 text-slate-50 dark:text-slate-800 shadow-xl  flex-shrink-0 focus:outline-none\
          focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0",
-            "opacity-50 disabled:cursor-not-allowed"
+          "opacity-50 disabled:cursor-not-allowed"
         )}
       >
         {/* {loading ? <Loader className="animate-spin" /> : <ShoppingCart />} */}
@@ -152,7 +152,7 @@ const ProductAddToCart = ({
         </div>
 
         <button
-          disabled={loading || variation?.rawPrice === "0.00"}
+          disabled={loading || variation?.rawPrice === "0.00" || variation?.rawPrice == null}
           onClick={(e) => addItemToCart()}
           className={twMerge(
             "relative w-auto grow md:flex-none  h-auto inline-flex\
@@ -160,14 +160,16 @@ const ProductAddToCart = ({
              font-medium py-3 px-4 sm:py-3 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-primaryColor\
               dark:bg-slate-100 text-slate-50 dark:text-slate-800 shadow-xl  flex-shrink-0 focus:outline-none\
                focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0",
-            (product?.stockStatus !== "IN_STOCK" || variation?.rawPrice === "0.00" || variation?.rawPrice == null ||
+            (product?.stockStatus !== "IN_STOCK" ||
+              variation?.rawPrice === "0.00" ||
+              variation?.rawPrice == null ||
               (product?.type === "VARIABLE" &&
                 variation?.stockStatus !== "IN_STOCK")) &&
               "opacity-50 disabled:cursor-not-allowed"
           )}
         >
           {loading ? <Loader className="animate-spin" /> : <ShoppingCart />}
-          <span className="md:ml-3 cursor-pointer">Add to cart</span>
+          <span className="md:ml-3 cursor-pointer">Add to disabled cart</span>
         </button>
       </div>
     </>

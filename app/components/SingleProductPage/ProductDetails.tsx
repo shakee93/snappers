@@ -47,6 +47,7 @@ const ProductDetails = ({
 
   const { setVariationId } = useImage();
 
+  console.log("ProductDetails", product);
   useEffect(() => {
     clearAttributes();
 
