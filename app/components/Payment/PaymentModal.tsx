@@ -1,10 +1,11 @@
 import ButtonClose from "@/shared/ButtonClose/ButtonClose";
 import { Dialog, Transition } from "@headlessui/react";
-import React, { Fragment } from "react";
+import React, { Fragment, useEffect } from "react";
 import BankTransfer from "./BankTransfer";
 
 const PaymentModal = ({
   show,
+  handleCheckout,
   setShowBankTransfer,
   setWantToSHowBankTransfer,
   paymentDetails,
@@ -12,17 +13,28 @@ const PaymentModal = ({
 }: any) => {
   let onCloseModalQuickView = () => {
     setWantToSHowBankTransfer(true);
-    setShowBankTransfer(false);
+    setShowBankTransfer(true);
   };
 
-  let updatedPaymentDetails = paymentDetails ? { ...paymentDetails } : null;
+  const [isOpen, setIsOpen] = React.useState(false);
+  useEffect(() => {
+    setIsOpen(show);
+  },[show])
 
-  if (updatedPaymentDetails) {
-    updatedPaymentDetails.email = customerEmail;
-  }
+  // useEffect(() => {
+  //   // paymentDetails.email = customerEmail;
+  //   console.log("use Effect Payment Details:", paymentDetails);
+  // }, [paymentDetails]);
+
+  // let updatedPaymentDetails = paymentDetails ? { ...paymentDetails } : null;
+  // console.log("updatedPaymentDetails: ", paymentDetails);
+
+  // if (updatedPaymentDetails) {
+  //   updatedPaymentDetails.email = customerEmail;
+  // }
 
   return (
-    <Transition appear show={show} as={Fragment}>
+    <Transition appear show={isOpen} as={Fragment}>
       <Dialog
         as="div"
         className="fixed inset-0 z-50"
@@ -63,7 +75,7 @@ const PaymentModal = ({
                   <ButtonClose onClick={onCloseModalQuickView} />
                 </span>
                 <div className="flex-1 overflow-y-auto rounded-xl hiddenScrollbar">
-                  <BankTransfer paymentDetails={updatedPaymentDetails} />
+                  <BankTransfer handleCheckout={handleCheckout} paymentDetails={paymentDetails} />
                 </div>
               </div>
             </div>

@@ -145,12 +145,13 @@ const CheckoutPage = () => {
   // console.log('cart', cart);
 
   useEffect(() => {
-    const hasFreeShipping: any = cart?.appliedCoupons?.some(coupon => coupon?.code === "free-shipping");
+    const hasFreeShipping: any = cart?.appliedCoupons?.some(
+      (coupon) => coupon?.code === "free-shipping"
+    );
     if (hasFreeShipping) {
       setFreeShipping(true);
     }
   }, [cart]);
-
 
   const updateFormData = (section: string, data: any) => {
     setFormData((prevData) => {
@@ -260,7 +261,9 @@ const CheckoutPage = () => {
   }, [payhereHandleStatus]);
 
   const updateShippingTotal = async () => {
-    const hasFreeShipping: any = cart?.appliedCoupons?.some(coupon => coupon?.code === "free-shipping");
+    const hasFreeShipping: any = cart?.appliedCoupons?.some(
+      (coupon) => coupon?.code === "free-shipping"
+    );
     if (hasFreeShipping) {
       setFreeShipping(true);
     }
@@ -268,8 +271,8 @@ const CheckoutPage = () => {
       const shippingMethods = isStorePickup
         ? "pickup_location:0"
         : freeShipping
-          ? "wbs:5c9bd062_free_shipping"
-          : "wbs:0dd3bc79_weight_based_shipping";
+        ? "wbs:5c9bd062_free_shipping"
+        : "wbs:0dd3bc79_weight_based_shipping";
 
       const total: any = cart?.total;
       setOrderTotal(freeShipping ? cart?.subtotal : total);
@@ -291,14 +294,15 @@ const CheckoutPage = () => {
       // console.log("data in shippng", data);
 
       if (data?.updateShippingMethod?.cart) {
-        const { total, shippingTotal, subtotal } = data.updateShippingMethod.cart;
+        const { total, shippingTotal, subtotal } =
+          data.updateShippingMethod.cart;
         if (freeShipping) {
-          setOrderTotal(subtotal)
+          setOrderTotal(subtotal);
           setShippingTotal(shippingTotal);
         } else {
-          setOrderTotal(total)
+          setOrderTotal(total);
           setShippingTotal(shippingTotal);
-        };
+        }
       } else {
         console.error(
           "Failed to update cart shipping total. No valid data returned."
@@ -375,29 +379,30 @@ const CheckoutPage = () => {
       city: city,
     };
 
-
     if (initiatePayment !== null) {
       setPayhereHandleStatus("loading");
       initiatePayment(checkoutDetails, setPayhereHandleStatus).then((r) => r);
 
-      const confirmationResponse = await fetch("https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/order-confirmation", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          order_id: checkoutDetails.order_id,
-          order_status: "completed"
-        })
-      });
+      const confirmationResponse = await fetch(
+        "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/order-confirmation",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            order_id: checkoutDetails.order_id,
+            order_status: "completed",
+          }),
+        }
+      );
 
       if (!confirmationResponse.ok) {
         throw new Error("Failed to confirm order status");
       }
 
       const orderConfirmationdata = await confirmationResponse.json();
-      console.log("orderConfirmation", orderConfirmationdata);
-
+      // console.log("orderConfirmation", orderConfirmationdata);
     } else {
       console.log("initiate payment become null");
     }
@@ -420,8 +425,8 @@ const CheckoutPage = () => {
       return;
     }
 
-    const isBankTransfer =
-      formData?.paymentMethod?.selectedGateway?.id == "bacs";
+    // const isBankTransfer =
+    //   formData?.paymentMethod?.selectedGateway?.id == "bacs";
     // const isPayhere = formData?.paymentMethod?.selectedGateway?.id == "payhere";
     const isCashOnDelivery =
       formData?.paymentMethod?.selectedGateway?.id == "cod";
@@ -437,14 +442,14 @@ const CheckoutPage = () => {
     //   }
     // }
 
-    if (isBankTransfer) {
-      try {
-        ImplementBankTransfer();
-      } catch (e) {
-        // console.log("Error while creating BankTransfer:", e);
-        toast.error("Error on BankTransfer");
-      }
-    }
+    // if (isBankTransfer) {
+    //   try {
+    //     ImplementBankTransfer();
+    //   } catch (e) {
+    //     // console.log("Error while creating BankTransfer:", e);
+    //     toast.error("Error on BankTransfer");
+    //   }
+    // }
 
     if (isCashOnDelivery) {
       if (
@@ -458,23 +463,38 @@ const CheckoutPage = () => {
         return;
       }
 
+      toast.info("You'll be on the thank you page in just a moment.")
+
       let redirectUrl = `checkout/${checkoutDetails.order_id}`;
 
       router.push(redirectUrl);
     }
   }, [paymentData]);
 
+  const handleCheckoutProcess = async () => {
+    const isBankTransfer =
+      formData?.paymentMethod?.selectedGateway?.id == "bacs";
+    if (wantToSHowBankTransfer) {
+      ImplementBankTransfer();
+      return;
+    }
+    if (isBankTransfer) {
+      try {
+        ImplementBankTransfer();
+      } catch (e) {
+        toast.error(
+          "Sorry to hear that you are facing an issue with Bank Transfer. Please try again later."
+        );
+      }
+    } else {
+      await handleCheckout();
+    }
+  };
+
   const handleCheckout = async () => {
     setLoading(true);
 
     try {
-      if (wantToSHowBankTransfer) {
-        ImplementBankTransfer();
-        return;
-      }
-
-      //Payhere integration for new
-
       const isPayhere =
         formData?.paymentMethod?.selectedGateway?.id == "payhere";
 
@@ -489,6 +509,7 @@ const CheckoutPage = () => {
       }
 
       const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
+
       if (paymentMethodId === undefined) {
         console.error("Payment method ID is undefined");
         toast.error("Payment Method was not chosen.");
@@ -500,7 +521,7 @@ const CheckoutPage = () => {
 
       const shippingMethod = getShippingMethod(shippingTotal);
       const shippingDetails = transformAddress(formData.deliveryAddress);
-      // const billingDetails = transformAddress(formData.billingAddress);
+
       const email = formData?.contactInfo?.email;
 
       const billingDetails = {
@@ -528,14 +549,21 @@ const CheckoutPage = () => {
           ? await guestCheckout({ variables })
           : await checkoutMutation({ variables });
 
-      // console.log('data after cecheckout', data);
+      const isBankTransfer =
+        formData?.paymentMethod?.selectedGateway?.id == "bacs";
 
       if (data) {
         const checkoutDetails = savePaymentDetails(data);
         setPaymentData(checkoutDetails);
-        toast.success("🌟 Order Placed Successfully! 🚀");
+        if (isBankTransfer) {
+          return checkoutDetails;
+        } else {
+          toast.success("🌟 Order Placed Successfully! 🚀");
+          return null;
+        }
       } else {
         toast.error("Something Went Wrong While Checkout");
+        return null;
       }
     } catch (error) {
       handleCheckoutError(error);
@@ -548,14 +576,14 @@ const CheckoutPage = () => {
     const methodId = isStorePickup
       ? "pickup_location:0"
       : freeShipping
-        ? "wbs:5c9bd062_free_shipping"
-        : "wbs:0dd3bc79_weight_based_shipping";
+      ? "wbs:5c9bd062_free_shipping"
+      : "wbs:0dd3bc79_weight_based_shipping";
 
     const methodTitle = isStorePickup
       ? "pickup_location:0"
       : freeShipping
-        ? "wbs:5c9bd062_free_shipping"
-        : "wbs:0dd3bc79_weight_based_shipping";
+      ? "wbs:5c9bd062_free_shipping"
+      : "wbs:0dd3bc79_weight_based_shipping";
 
     const total = shippingTotal;
 
@@ -608,6 +636,7 @@ const CheckoutPage = () => {
 
       <main className="container py-8 md:py-16 lg:pb-28 lg:pt-20 ">
         <PaymentModal
+          handleCheckout={handleCheckout}
           show={showBankTransfer}
           // show={true}
           setShowBankTransfer={setShowBankTransfer}
@@ -692,7 +721,9 @@ const CheckoutPage = () => {
 
               {!isStorePickup && (
                 <div className="flex justify-between py-2.5">
-                  <span>{freeShipping ? `Free Shipping` : `Shipping estimate`}</span>
+                  <span>
+                    {freeShipping ? `Free Shipping` : `Shipping estimate`}
+                  </span>
                   <span className="font-semibold text-slate-900 dark:text-slate-200">
                     {freeShipping ? (
                       <span
@@ -787,7 +818,7 @@ const CheckoutPage = () => {
               </div>
             </div>
             <ButtonPrimary
-              onClick={handleCheckout}
+              onClick={handleCheckoutProcess}
               disabled={
                 !(
                   isConfirmed.contactInfo &&
@@ -797,16 +828,17 @@ const CheckoutPage = () => {
                   isTOC
                 )
               }
-              className={`mt-8 w-full ${!(
-                isConfirmed.contactInfo &&
-                isConfirmed.deliveryAddress &&
-                isConfirmed.billingAddress &&
-                isConfirmed.paymentMethod &&
-                isTOC
-              )
-                ? "cursor-not-allowed bg-slate-500"
-                : "bg-primary hover:bg-primary-dark"
-                }`}
+              className={`mt-8 w-full ${
+                !(
+                  isConfirmed.contactInfo &&
+                  isConfirmed.deliveryAddress &&
+                  isConfirmed.billingAddress &&
+                  isConfirmed.paymentMethod &&
+                  isTOC
+                )
+                  ? "cursor-not-allowed bg-slate-500"
+                  : "bg-primary hover:bg-primary-dark"
+              }`}
             >
               {loading ? (
                 <Loader className="animate-spin text-gray-100 " />

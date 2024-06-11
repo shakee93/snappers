@@ -44,33 +44,39 @@ const PaymentMethod: FC<Props> = ({
   });
 
   const { cart, loading } = useCart();
-  console.log("cart: ", cart);
+  // console.log("cart: ", cart);
 
-  const removePayhereOnMobileAndTab =  () => {
+  const removePayhereOnMobileAndTab = () => {
     try {
-      const currentCart =  cart;
-      if (!currentCart || !currentCart.contents || !currentCart.contents.nodes) {
+      const currentCart = cart;
+      if (
+        !currentCart ||
+        !currentCart.contents ||
+        !currentCart.contents.nodes
+      ) {
         return false; // Return false if cart or its contents are undefined
       }
-  
+
       const categoryNames = currentCart.contents.nodes
-        .map((node: any) => node.product?.node?.productCategories?.nodes[0]?.name)
+        .map(
+          (node: any) => node.product?.node?.productCategories?.nodes[0]?.name
+        )
         .filter(Boolean); // Filter out undefined values
-  
-      console.log("categoryNames: ", categoryNames);
-  
+
+      // console.log("categoryNames: ", categoryNames);
+
       const containsMobileOrTablet = categoryNames.some(
         (name: string) => name === "Smartphones" || name === "Tablets"
       );
-  
+
       return containsMobileOrTablet;
     } catch (error) {
       console.error("Error while processing cart:", error);
       return false;
     }
   };
-  
-  let hidePayhere =  removePayhereOnMobileAndTab();
+
+  let hidePayhere = removePayhereOnMobileAndTab();
   const [isConfirmed, setIsConfirmed] = useState(false);
 
   const PaymentMethods: FC<{ gateway: PaymentGateway }> = ({ gateway }) => {
@@ -78,7 +84,7 @@ const PaymentMethod: FC<Props> = ({
 
     // console.log("activeMethod: ", gateway.id);
 
-    let is_tab_or_mobile = gateway.id == "payhere" && hidePayhere ;
+    let is_tab_or_mobile = gateway.id == "payhere" && hidePayhere;
     // let is_tab_or_mobile = hidePayhere;
 
     return (
