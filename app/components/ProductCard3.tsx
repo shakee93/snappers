@@ -1,5 +1,11 @@
 "use client";
-import { ExternalLink, Loader, Settings2, ShoppingCart } from "lucide-react";
+import {
+  ExternalLink,
+  Loader,
+  Settings2,
+  ShoppingCart,
+  XIcon,
+} from "lucide-react";
 import React, { FC, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
@@ -26,7 +32,7 @@ import { redirect, useRouter } from "next/navigation";
 
 export interface ProductCardProps {
   className?: string;
-  data: SimpleProduct & VariableProduct;
+  data: { rawPrice: string } & SimpleProduct & VariableProduct;
   fromSearch?: boolean;
 }
 
@@ -47,6 +53,7 @@ const ProductCard: FC<ProductCardProps> = ({
     reviewCount,
     averageRating,
     salePrice,
+    rawPrice,
     databaseId,
   } = data;
 
@@ -114,7 +121,9 @@ const ProductCard: FC<ProductCardProps> = ({
       }
     } catch (error: any) {
       console.log("error", error);
-      let isTokenExpired = error.graphQLErrors[0]?.debugMessage === "invalid-secret-key | Expired token";
+      let isTokenExpired =
+        error.graphQLErrors[0]?.debugMessage ===
+        "invalid-secret-key | Expired token";
       if (isTokenExpired) {
         toast.error("You've been logged out. Please sign in again.");
         ROUTER.push("/login");
@@ -126,6 +135,9 @@ const ProductCard: FC<ProductCardProps> = ({
     }
   };
 
+  // console.log("salePrice", salePrice);
+  // console.log("data", data);
+  // console.log("rawPrice", rawPrice);
   const renderGroupButtons = () => {
     return (
       <div className="absolute -top-12 right-1 flex justify-center opacity-100 visible transition-all">
@@ -133,11 +145,13 @@ const ProductCard: FC<ProductCardProps> = ({
           <>
             {type === "SIMPLE" && price && price?.length > 0 && (
               <ButtonPrimary
-                className="shadow-md"
+                className={`shadow-md ${
+                  rawPrice === "0.00" ? "opacity-60 cursor-not-allowed" : ""
+                }`}
                 fontSize="text-xs"
                 sizeClass="py-2.5 px-3.5"
                 onClick={handleAddToCart}
-                disabled={loading}
+                disabled={loading || rawPrice === "0.00"}
               >
                 {loading ? (
                   <Loader className="animate-spin w-4" />
