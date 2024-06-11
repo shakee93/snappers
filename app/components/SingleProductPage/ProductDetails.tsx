@@ -203,7 +203,11 @@ const ProductDetails = ({
         ) : (
           <div className="flex flex-wrap items-center gap-2 py-2 text-base font-medium text-gray-600 md:text-xl">
             <span dangerouslySetInnerHTML={{ __html: product.price || "" }} />
-
+            {!!product.price ? (
+              <span dangerouslySetInnerHTML={{ __html: product.price || "" }} />
+            ) : (
+              <span>Can not be purchased now</span>
+            )}
             {product.salePrice &&
               product.salePrice !== product.price &&
               activeVariation === null && (
