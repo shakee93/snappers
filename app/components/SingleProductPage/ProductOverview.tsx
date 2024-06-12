@@ -50,7 +50,7 @@ const ProductOverview = ({
 
   return (
     <>
-      <div className="bg-white p-5 rounded-3xl md:p-10 my-5">
+      <div className="bg-white p-5 rounded-3xl md:p-10 my-5 max-w-screen overflow-hidden">
         <div className="pb-3 border-b-2 border-gray-200">
           <h3 className="text-lg md:text-xl">Overview</h3>
         </div>
