@@ -1,5 +1,5 @@
 "use client";
-import {Configure, InstantSearch, RefinementList} from "react-instantsearch";
+import { Configure, InstantSearch, RefinementList } from "react-instantsearch";
 import { InstantSearchNext } from "react-instantsearch-nextjs";
 import TypesenseInstantSearchAdapter from "typesense-instantsearch-adapter";
 import ProductGridInstant from "@/app/components/ProductGridInstant";
@@ -22,6 +22,7 @@ interface InstantSearchWrapperProps {
   routing?: boolean;
   bindToStore?: boolean;
   server?: boolean;
+  sort?:boolean;
 }
 
 const typesenseConfig = {
@@ -34,13 +35,14 @@ const typesenseConfig = {
 const InstantSearchWrapper = ({
   bindToStore = false,
   search = false,
-  filters = false,
+  filters = true,
   routing = false,
   categories,
   server = true,
   brands,
   brand,
   category,
+  sort
 }: InstantSearchWrapperProps) => {
   const { sidebar, setSearchMounted } = useStore();
   const [differedSidebar] = useDebounce(sidebar, 800);
@@ -53,21 +55,22 @@ const InstantSearchWrapper = ({
       category
         ? `productCategories.edges.node.databaseId:${category.databaseId}`
         : sidebar.categories.length > 0
-        ? `productCategories.edges.node.databaseId:[${sidebar.categories.join(
+          ? `productCategories.edges.node.databaseId:[${sidebar.categories.join(
             ","
           )}]`
-        : null,
+          : null,
       brand
         ? `brands.nodes.databaseId:${brand.databaseId}`
         : sidebar.brands.length > 0
-        ? `brands.nodes.databaseId:[${sidebar.brands.join(",")}]`
-        : null,
+          ? `brands.nodes.databaseId:[${sidebar.brands.join(",")}]`
+          : null,
       sidebar.on_sale ? "onSale:true" : null,
       sidebar.in_stock ? "stockStatus:IN_STOCK" : null,
     ];
 
     return f.filter((n) => n).join(" && ");
   };
+
 
   const [filterQuery, setFilterQuery] = useState<string>(getFilterQuery);
 
@@ -95,7 +98,7 @@ const InstantSearchWrapper = ({
   }, [differedSidebar]);
 
   useEffect(() => {
-    // console.log(filterQuery);
+    console.log(filterQuery);
   }, [filterQuery]);
 
   useEffect(() => {
@@ -119,10 +122,10 @@ const InstantSearchWrapper = ({
         routing={
           routing && server
             ? {
-                router: {
-                  cleanUrlOnDispose: true,
-                },
-              }
+              router: {
+                cleanUrlOnDispose: true,
+              },
+            }
             : undefined
         }
         searchClient={searchClient}
@@ -137,6 +140,7 @@ const InstantSearchWrapper = ({
               brand={brand}
               categories={categories}
               brands={brands}
+              sort={sort}
             />
           )}
           <Configure filters={filterQuery} hitsPerPage={12} />

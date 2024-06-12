@@ -18,9 +18,9 @@ const DATA_sortOrderRadios = [
     { name: "Price High - Low", id: "rawPriceNumber(missing_values: last):desc" },
 ];
 
-const CategoryFilter = () => {
+const CategoryFilter = ({ sorts }: { sorts: any }) => {
     const { setSort, sidebar: {sort } } = useStore()
-    const [sortOrderStates, setSortOrderStates] = useState<string>("");
+    const [sortOrderStates, setSortOrderStates] = useState<string>(sorts ? "databaseId:desc" : "");
 
 
     useEffect(() => {
@@ -99,6 +99,7 @@ const CategoryFilter = () => {
                                     label={item.name}
                                     defaultChecked={sortOrderStates === item.id}
                                     onChange={v => {
+                                        console.log({v});
                                         setSortOrderStates(v)
                                         close()
                                     }}

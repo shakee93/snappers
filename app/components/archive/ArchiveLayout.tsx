@@ -21,6 +21,7 @@ interface ArchiveLayoutProps {
   search?: boolean;
   brand?: Brand;
   category?: ProductCategory;
+  sort?: boolean;
 }
 
 const ArchiveLayout = async ({
@@ -30,6 +31,7 @@ const ArchiveLayout = async ({
   search = false,
   brand,
   category,
+  sort
 }: ArchiveLayoutProps) => {
   const { productCategories, brands } = await getData();
   return (
@@ -59,6 +61,7 @@ const ArchiveLayout = async ({
                 category={category}
                 filters={filters}
                 search={search}
+                sort={sort}
               />
             </div>
           </div>

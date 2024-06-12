@@ -43,14 +43,16 @@ interface TabFilterProps {
     category?: ProductCategory;
     brands?: Brand[];
     brand?: Brand;
+    sort?:Boolean; 
 }
 
-//
+
 const TabFilters = ({
                         categories = [],
                         brands = [],
                         brand,
                         category,
+                        sort,
                     }: TabFilterProps) => {
 
     const [isOpenMoreFilter, setisOpenMoreFilter] = useState(false);
@@ -58,7 +60,9 @@ const TabFilters = ({
     const [rangePrices, setRangePrices] = useState([500, 500000]);
     const [colorsState, setColorsState] = useState<string[]>([]);
     const [sizesState, setSizesState] = useState<string[]>([]);
-    const [sortOrderStates, setSortOrderStates] = useState<string>("");
+    const [sortOrderStates, setSortOrderStates] = useState<string>(
+        sort ? "databaseId:desc" : ""
+    );
     const [brandsState, setBrandsState] = useState<number[]>([]);
     const [categoriesState, setCategoriesState] = useState<number[]>([]);
     const [inStock, setInStockState] = useState(true);
@@ -675,7 +679,7 @@ const TabFilters = ({
                 <OnSaleFilter/>
                 {/*<InStockFilter/>*/}
                 <div className="!ml-auto">
-                    <SortOrderFilter/>
+                    <SortOrderFilter sorts={sort}/>
                 </div>
             </div>
 
