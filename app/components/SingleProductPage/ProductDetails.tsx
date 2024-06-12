@@ -203,7 +203,7 @@ const ProductDetails = ({
           </div>
         ) : (
           <div className="flex flex-wrap items-center gap-2 py-2 text-base font-medium text-gray-600 md:text-xl">
-            <span dangerouslySetInnerHTML={{ __html: product.price || "" }} />
+            {/* <span dangerouslySetInnerHTML={{ __html: product.price || "" }} /> */}
             {!!product.price ? (
               <span dangerouslySetInnerHTML={{ __html: product.price || "" }} />
             ) : (
