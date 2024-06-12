@@ -27,48 +27,63 @@ import CategoryWithSubcategories from "./components/globalComponents/CategoryWit
 
 const slidesData = [
   {
-    id: "2",
+    id: "1",
     slideFields: {
-      mainHeading: "Power and Performance, Anywhere",
-      subHeading: "Redmi Note 12 Pro (4G) - Your Ultimate Everyday Companion",
+      mainHeading: "Innovation at Its Best",
+      subHeading: "Tecno Spark 20 Pro: Sleek, Powerful, Connected",
       buttonText: "Buy Now",
-      buttonLink: "/xiaomi/xiaomi-redmi-note-12-pro-8gb-256gb",
+      buttonLink: "/tecno/tecno-spark-20-pro",
       backgroundColor: "#CCE0EF",
       featureImage: {
         id: "2",
         sourceUrl:
-          "http://api.gqmobiles.lk/wp-content/uploads/2024/04/12-pro-4g-removebg-preview.png",
+          "http://gq.freshpixl.com/wp-content/uploads/2024/06/Wild-Green-2024-03-31T131534.300.png",
+      },
+    },
+  },
+  {
+    id: "2",
+    slideFields: {
+      mainHeading: " Immersive Sound, Mastery of Performance",
+      subHeading: "Bose S1 Pro: Portable, Powerful, Versatile",
+      buttonText: "Buy Now",
+      buttonLink:
+        "/bose",
+      backgroundColor: "#F4E7E7",
+      featureImage: {
+        id: "2",
+        sourceUrl:
+          "http://gq.freshpixl.com/wp-content/uploads/2024/06/filebose.png",
       },
     },
   },
   {
     id: "3",
     slideFields: {
-      mainHeading: " Immersive Sound, Effortless Charging",
-      subHeading: "AirPods Pro 2 with MagSafe Charging",
-      buttonText: "Explore Products",
-      buttonLink:
-        "/apple/airpods-pro-2nd-generation-with-magsafe-charging-case-usbc-2023",
-      backgroundColor: "#F4E7E7",
+      mainHeading: "Pulse of Performance",
+      subHeading: "Beats Fit Pro: Unleash Your Rhythm",
+      buttonText: "Buy Now",
+      buttonLink: "/beats/beats-fit-pro-true-wireless-noise-cancelling-earbuds",
+      backgroundColor: "#E2F1F0",
       featureImage: {
         id: "3",
         sourceUrl:
-          "http://api.gqmobiles.lk/wp-content/uploads/2024/04/Untitled-design-74.png",
+          "http://gq.freshpixl.com/wp-content/uploads/2024/06/10-10.png",
       },
     },
   },
   {
     id: "4",
     slideFields: {
-      mainHeading: "Hot Picks of the Month!",
-      subHeading: "Explore Our Top-Selling Products",
-      buttonText: "Explore Now",
-      buttonLink: "/collections/all",
+      mainHeading: "Embark on Your Fitness Journey",
+      subHeading: "Fitbit Charge 5: Elevate Your Fitness",
+      buttonText: "Buy Now",
+      buttonLink: "/fitbit/google-fitbit-charge-5-gift-pack",
       backgroundColor: "#E2F1F0",
       featureImage: {
         id: "4",
         sourceUrl:
-          "https://api.gqmobiles.lk/wp-content/uploads/2023/12/Layer-1-1-278x300.png",
+          "http://gq.freshpixl.com/wp-content/uploads/2024/06/2-35.png",
       },
     },
   },
