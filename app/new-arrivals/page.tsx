@@ -1,16 +1,16 @@
 import ArchiveLayout from "@/app/components/archive/ArchiveLayout";
-import {Metadata, ResolvingMetadata} from "next";
-
+import { Metadata, ResolvingMetadata } from "next";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
-  title: 'Browse Shop'
-}
-
+  title: "Browse Shop",
+};
 
 const Page = () => {
-
   return (
-      <ArchiveLayout title="New Arrivals" filters sort={true}/>
+    <Suspense>
+      <ArchiveLayout title="New Arrivals" filters sort={true} />
+    </Suspense>
   );
 };
 
