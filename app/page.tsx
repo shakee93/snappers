@@ -41,22 +41,22 @@ const slidesData = [
       },
     },
   },
-  {
-    id: "2",
-    slideFields: {
-      mainHeading: " Immersive Sound, Mastery of Performance",
-      subHeading: "Bose S1 Pro: Portable, Powerful, Versatile",
-      buttonText: "Buy Now",
-      buttonLink:
-        "/bose",
-      backgroundColor: "#F4E7E7",
-      featureImage: {
-        id: "2",
-        sourceUrl:
-          "http://gq.freshpixl.com/wp-content/uploads/2024/06/filebose.png",
-      },
-    },
-  },
+  // {
+  //   id: "2",
+  //   slideFields: {
+  //     mainHeading: " Immersive Sound, Mastery of Performance",
+  //     subHeading: "Bose S1 Pro: Portable, Powerful, Versatile",
+  //     buttonText: "Buy Now",
+  //     buttonLink:
+  //       "/bose",
+  //     backgroundColor: "#F4E7E7",
+  //     featureImage: {
+  //       id: "2",
+  //       sourceUrl:
+  //         "http://gq.freshpixl.com/wp-content/uploads/2024/06/filebose.png",
+  //     },
+  //   },
+  // },
   {
     id: "3",
     slideFields: {
