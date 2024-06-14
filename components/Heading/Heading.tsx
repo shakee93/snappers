@@ -1,5 +1,6 @@
 import React, { HTMLAttributes, ReactNode } from "react";
 import NextPrev from "shared/NextPrev/NextPrev";
+import Link from 'next/link';
 
 export interface HeadingProps extends HTMLAttributes<HTMLHeadingElement> {
   fontClass?: string;
@@ -8,6 +9,7 @@ export interface HeadingProps extends HTMLAttributes<HTMLHeadingElement> {
   desc?: ReactNode;
   hasNextPrev?: boolean;
   isCenter?: boolean;
+  link?: boolean;
 }
 
 const solutions = [
@@ -34,8 +36,10 @@ const Heading: React.FC<HeadingProps> = ({
   fontClass = "text-3xl md:text-4xl font-semibold",
   rightDescText,
   rightPopoverOptions = solutions,
+  link,
   ...args
 }) => {
+
   return (
     <div
       className={`nc-Section-Heading relative flex flex-col sm:flex-row sm:items-end justify-between ${className}`}
@@ -47,20 +51,40 @@ const Heading: React.FC<HeadingProps> = ({
             : ""
         }
       >
-        <h2
-          className={`${isCenter ? "justify-center" : ""} ${fontClass}`}
-          {...args}
-        >
-          {children || `Section Heading`}
-          {rightDescText && (
-            <>
-              <span className="">{`. `}</span>
-              <span className="text-neutral-500 dark:text-neutral-400">
-                {rightDescText}
-              </span>
-            </>
-          )}
-        </h2>
+
+        {link ? (
+          <Link href='/new-arrivals'>
+            <h2
+              className={`${isCenter ? "justify-center" : ""} ${fontClass}`}
+              {...args}
+            >
+              {children || `Section Heading`}
+              {rightDescText && (
+                <>
+                  <span className="">{`. `}</span>
+                  <span className="text-neutral-500 dark:text-neutral-400 hidden lg:flex">
+                    {rightDescText}
+                  </span>
+                </>
+              )}
+            </h2>
+          </Link>
+        ) : (
+          <h2
+            className={`${isCenter ? "justify-center" : ""} ${fontClass}`}
+            {...args}
+          >
+            {children || `Section Heading`}
+            {rightDescText && (
+              <>
+                <span className="">{`. `}</span>
+                <span className="text-neutral-500 dark:text-neutral-400 hidden lg:flex">
+                  {rightDescText}
+                </span>
+              </>
+            )}
+          </h2>
+        )}
         {!!desc && (
           <span className="mt-2 md:mt-3 font-normal block text-base sm:text-xl text-neutral-500 dark:text-neutral-400">
             {desc}
@@ -69,7 +93,7 @@ const Heading: React.FC<HeadingProps> = ({
       </div>
       {hasNextPrev && !isCenter && (
         <div className="mt-4 flex justify-end sm:ml-2 sm:mt-0 flex-shrink-0">
-          <NextPrev onClickNext={() => {}} onClickPrev={() => {}} />
+          <NextPrev onClickNext={() => { }} onClickPrev={() => { }} />
         </div>
       )}
     </div>

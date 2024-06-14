@@ -12,6 +12,7 @@ export interface SectionSliderProductCardProps {
   headingClassName?: string;
   subHeading?: string;
   data?: Product[];
+  link?: boolean;
 }
 
 const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
@@ -22,6 +23,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
   heading,
   subHeading = "REY backpacks & bags",
   data = PRODUCTS.filter((_, i) => i < 8 && i > 2),
+  link,
 }) => {
   const sliderRef = useRef(null);
   const id = useId();
@@ -75,6 +77,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
           fontClass={headingFontClassName}
           rightDescText={subHeading}
           hasNextPrev
+          link={link}
         >
           {heading || `New Arrivals`}
         </Heading>

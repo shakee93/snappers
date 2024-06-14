@@ -22,7 +22,8 @@ interface InstantSearchWrapperProps {
   routing?: boolean;
   bindToStore?: boolean;
   server?: boolean;
-  sort?:boolean;
+  sort?: boolean;
+  tag?: string;
 }
 
 const typesenseConfig = {
@@ -42,7 +43,8 @@ const InstantSearchWrapper = ({
   brands,
   brand,
   category,
-  sort
+  sort,
+  tag
 }: InstantSearchWrapperProps) => {
   const { sidebar, setSearchMounted } = useStore();
   const [differedSidebar] = useDebounce(sidebar, 800);
@@ -66,11 +68,17 @@ const InstantSearchWrapper = ({
           : null,
       sidebar.on_sale ? "onSale:true" : null,
       sidebar.in_stock ? "stockStatus:IN_STOCK" : null,
+      tag
+        ? `productTags.nodes.slug:${tag}`
+        : null,
     ];
+
+    // console.log({ f });
 
     return f.filter((n) => n).join(" && ");
   };
 
+  // console.log({ category });
 
   const [filterQuery, setFilterQuery] = useState<string>(getFilterQuery);
 
@@ -98,7 +106,7 @@ const InstantSearchWrapper = ({
   }, [differedSidebar]);
 
   useEffect(() => {
-    console.log(filterQuery);
+    // console.log(filterQuery);
   }, [filterQuery]);
 
   useEffect(() => {
