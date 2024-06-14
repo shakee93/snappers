@@ -52,7 +52,7 @@ const Heading: React.FC<HeadingProps> = ({
         }
       >
         {link ? (
-          <Link href={link}>
+          <Link href={link} target="_blank" rel="noopener noreferrer">
             <h2
               className={`${isCenter ? "justify-center" : ""} ${fontClass}`}
               {...args}
