@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 const Page = () => {
   return (
     <Suspense>
-      <ArchiveLayout title="New Arrivals" filters tag="back-in-stock"/>
+      <ArchiveLayout title="Back In Stock" filters tag="back-in-stock"/>
     </Suspense>
   );
 };
