@@ -11,7 +11,6 @@ const ProductDescription: React.FC<ProductDescriptionProps> = ({ product }) => {
     return htmlContent.replace(/<ul>/g, '<ul class="list-disc pb-4 sm">');
   };
 
-  console.log({ product });
 
   const insideTheBoxMeta = product?.metaData?.find(meta => meta?.key === 'inside_the_box');
   const insideTheBoxValue = insideTheBoxMeta?.value || ''; // Default to an empty string if undefined
