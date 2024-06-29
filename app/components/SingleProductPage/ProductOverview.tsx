@@ -36,7 +36,7 @@ const ProductOverview = ({
   }
 
   const centerImages = (htmlContent: string) => {
-    return htmlContent.replace(/<img/g, '<img style="display:block; margin:auto;"');
+    return htmlContent?.replace(/<img/g, '<img style="display:block; margin:auto;"');
   };
 
   const formattedDescription = centerImages(addParagraphSpacing(product.description));
