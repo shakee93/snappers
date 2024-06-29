@@ -97,9 +97,20 @@ const Heading: React.FC<HeadingProps> = ({
         )}
       </div>
       {hasNextPrev && !isCenter && (
-        <div className="md:mt-4 flex justify-end sm:ml-2 sm:mt-0 flex-shrink-0">
-          <NextPrev onClickNext={() => { }} onClickPrev={() => { }} />
+        <div className="flex flex-row items-center justify-center">
+          <div className="md:mt-4 flex justify-end sm:ml-2 sm:mt-0 flex-shrink-0">
+            <NextPrev onClickNext={() => { }} onClickPrev={() => { }} />
+          </div>
+          {link ? (
+            <Link href={link} target="_blank" rel="noopener noreferrer"
+              className="text-xs md:text-sm md:mt-4 md:ml-4 flex p-2 justify-end sm:ml-2 sm:mt-0 flex-shrink-0 border border-slate-200 rounded-lg">
+              See More
+            </Link>
+          ) : <>
+          </>
+          }
         </div>
+
       )}
     </div>
   );
