@@ -265,6 +265,7 @@ export default async function Home() {
               products={speakers}
               // subHeading=""
               heading="Explore Speakers"
+              link="explore-speakers"
             />
           </div>
 
@@ -279,6 +280,7 @@ export default async function Home() {
             <SectionSliderProductCard
               products={watches}
               heading="Smart Watches"
+              link="smartwatches"
               // subHeading="Best selling of the month"
             />
           </div>
