@@ -35,19 +35,21 @@ const ProductOverview = ({
     return finalHtml;
   }
 
-  const formattedDescription = addParagraphSpacing(product.description);
+  const centerImages = (htmlContent: string) => {
+    return htmlContent?.replace(/<img/g, '<img style="display:block; margin:auto;"');
+  };
+
+  const formattedDescription = centerImages(addParagraphSpacing(product.description));
 
   const increaseH1Font = (htmlContent: any) => {
-    // Check if htmlContent is defined
     if (typeof htmlContent !== 'undefined') {
-        return htmlContent.replace(/<h1>/g, '<h1 class="text-lg py-2">');
+      return htmlContent.replace(/<h1>/g, '<h1 class="text-lg py-2">');
     } else {
-        // Return an empty string or handle the undefined case according to your logic
-        return '';
+      return '';
     }
-};
+  };
 
-
+ 
   return (
     <>
       <div className="bg-white p-5 rounded-3xl md:p-10 my-5 max-w-screen overflow-hidden">

@@ -17,6 +17,7 @@ export interface SectionSliderProductCardProps {
   headingClassName?: string;
   subHeading?: string;
   products?: (SimpleProduct & VariableProduct)[];
+  link?: string;
 }
 
 const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
@@ -26,7 +27,8 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
   headingClassName,
   heading,
   subHeading = " ",
-  products = []
+  products = [],
+  link
 }) => {
 
   const [_products, setProducts] = useState<(SimpleProduct & VariableProduct)[]>(products);
@@ -93,6 +95,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
             fontClass={headingFontClassName}
             rightDescText={subHeading}
             hasNextPrev
+            link={link}
           >
             {heading}
           </Heading>

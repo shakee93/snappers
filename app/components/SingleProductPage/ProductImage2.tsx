@@ -47,12 +47,19 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   useState<selectedVariationType | null>(combinedImages[0]);
 
 
+  // combinedImages.forEach((image) => {
+  //   if (image?.sourceUrl?.includes("300x300")) {
+  //     image.sourceUrl = image?.sourceUrl?.replace("-300x300", "");
+  //   }
+  // });
+
   combinedImages.forEach((image) => {
-    if (image?.sourceUrl?.includes("300x300")) {
-      image.sourceUrl = image?.sourceUrl?.replace("-300x300", "");
+    if (image?.sourceUrl && image.sourceUrl.includes("300x300")) {
+      image.sourceUrl = image.sourceUrl.replace("-300x300", "");
     }
   });
 
+  
   useEffect(() => {
 
     const activeVariationImage = variationImages.find(i => i.databaseId === variationId);

@@ -286,6 +286,11 @@ export const GET_PRODUCTS = gql`
               key
               value
             }
+            metaData(key: "inside_the_box") {
+              id
+              key
+              value
+            }
             brands {
               nodes {
                 id
@@ -343,6 +348,11 @@ export const GET_PRODUCTS = gql`
               value
             }
             metaData(key: "warranty_type") {
+              id
+              key
+              value
+            }
+              metaData(key: "inside_the_box") {
               id
               key
               value

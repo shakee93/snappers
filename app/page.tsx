@@ -225,6 +225,7 @@ export default async function Home() {
             <SectionSliderProductCard
               products={newArrivals}
               heading="New Arrivals"
+              link="new-arrivals"
             />
           </div>
 
@@ -234,6 +235,7 @@ export default async function Home() {
               products={backInStock}
               // subHeading=""
               heading="Back In Stock"
+              link="back-in-stock"
             />
           </div>
 
