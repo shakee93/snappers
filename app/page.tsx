@@ -37,7 +37,7 @@ const slidesData = [
       featureImage: {
         id: "2",
         sourceUrl:
-          "http://gq.freshpixl.com/wp-content/uploads/2024/06/Wild-Green-2024-03-31T131534.300.png",
+          "http://api.gqmobiles.lk/wp-content/uploads/2024/07/lv.webp",
       },
     },
   },
@@ -68,7 +68,7 @@ const slidesData = [
       featureImage: {
         id: "3",
         sourceUrl:
-          "http://gq.freshpixl.com/wp-content/uploads/2024/06/10-10.png",
+          "http://api.gqmobiles.lk/wp-content/uploads/2024/07/file.png",
       },
     },
   },
@@ -83,7 +83,7 @@ const slidesData = [
       featureImage: {
         id: "4",
         sourceUrl:
-          "http://gq.freshpixl.com/wp-content/uploads/2024/06/2-35.png",
+          "http://api.gqmobiles.lk/wp-content/uploads/2024/07/file-1.png",
       },
     },
   },
