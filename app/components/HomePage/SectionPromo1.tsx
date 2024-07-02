@@ -2,7 +2,6 @@ import React, { FC } from "react"
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
 import SiteLogo from "@/public/global/logo.webp";
-import SiteLogoNew from "@/public/global/logoNew.webp";
 import Image from "next/image";
 import StoreImageSlider from "./StoreImageSlide"
 import { EmblaOptionsType } from "embla-carousel";
@@ -25,7 +24,7 @@ const SectionPromo1: FC<SectionPromo1Props> = ({ className = "" }) => {
           <Image
             width={320}
             height={266}
-            src={SiteLogoNew}
+            src={SiteLogo}
             alt="logo"
             className="h-20 lg:h-20 w-auto"
           />
