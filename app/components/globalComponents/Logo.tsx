@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import SiteLogo from "@/public/global/logo.webp";
-import SiteLogoNew from "@/public/global/logoNew.webp";
+import SiteLogoNew from "@/public/global/LogoNew.webp";
 import {twMerge} from "tailwind-merge";
 
 const Logo = ({ className = 'border-r', imageClass = ''}:{ className?: string, imageClass?: string}) => {
