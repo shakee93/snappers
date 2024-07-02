@@ -11,6 +11,7 @@ import {
 } from "@/graphql/defs/products";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 
+
 import Image from "next/image";
 import Scam from "@/public/homepage/scam.webp";
 import Sampath from "@/public/images/bank logos/sampath.png";
