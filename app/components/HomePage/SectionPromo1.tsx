@@ -29,7 +29,6 @@ const SectionPromo1: FC<SectionPromo1Props> = ({ className = "" }) => {
             className="h-20 lg:h-20 w-auto"
           />
         </div>
-
         <h2 className="font-semibold text-2xl sm:text-4xl leading-[1.2] tracking-tight">
           This is Our Store! <br />
           Together We Shine.
