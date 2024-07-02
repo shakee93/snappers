@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import SiteLogo from "@/public/global/logo.webp";
-import SiteLogoNew from "@/public/global/logoNew.webp";
+import SiteLogoNew from "@/public/global/LogoNew.webp";
 import { getClient } from "@/graphql/apollo-ssr";
 import { GET_BRANDS } from "@/graphql/defs/products";
 import { Brand } from "@/graphql/types/graphql";
