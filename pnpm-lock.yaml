@@ -75,7 +75,7 @@ importers:
         specifier: ^8.0.0-rc17
         version: 8.1.6(embla-carousel@8.1.6)
       embla-carousel-react:
-        specifier: ^8.0.0-rc17
+        specifier: ^8.1.6
         version: 8.1.6(react@18.3.1)
       framer-motion:
         specifier: ^10.17.0
