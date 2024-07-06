@@ -8,6 +8,7 @@ import { Facebook, Instagram, MapPinned, PhoneCall } from "lucide-react";
 import { isPaymentPage } from "./paymentPageCheckUtils";
 import { Divider } from "@nextui-org/react";
 
+
 const getData = async () => {
   const { data } = await getClient().query({
     query: GET_BRANDS,

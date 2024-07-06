@@ -32,7 +32,7 @@
     "@types/react-router-dom": "^5.3.3",
     "embla-carousel": "^8.1.6",
     "embla-carousel-autoplay": "^8.0.0-rc17",
-    "embla-carousel-react": "^8.0.0-rc17",
+    "embla-carousel-react": "^8.1.6",
     "framer-motion": "^10.17.0",
     "html-react-parser": "^5.0.7",
     "js-md5": "^0.8.3",

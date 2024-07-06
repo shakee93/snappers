@@ -49,7 +49,7 @@ const ProductOverview = ({
     }
   };
 
- 
+
   return (
     <>
       <div className="bg-white p-5 rounded-3xl md:p-10 my-5 max-w-screen overflow-hidden">
@@ -57,17 +57,16 @@ const ProductOverview = ({
           <h3 className="text-lg md:text-xl">Overview</h3>
         </div>
         <div className="flex flex-col md:flex-row py-2 md:py-5">
-          <div className="md:w-3/5 p-2 md:p-4">
-
+          <div className={`${techSpecs && techSpecs.items ? "md:w-3/5" : "md:w-full"} p-2 md:p-4`}>
             <div className="text-xs md:text-sm text-gray-600">
               {parseHtml(increaseH1Font(formattedDescription) || '')}
             </div>
           </div>
-          <div className="md:w-2/5">
-            {(techSpecs && techSpecs.items || manualTechSpecs && manualTechSpecs.length > 0) && (
+          {(techSpecs && techSpecs.items || manualTechSpecs && manualTechSpecs.length > 0) && (
+            <div className="md:w-2/5">
               <ProductSpecifications techspecs={techSpecs} manualSpecs={manualTechSpecs} />
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
     </>
