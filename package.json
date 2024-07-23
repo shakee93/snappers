@@ -13,6 +13,7 @@
     "@apollo/client": "^3.11.0",
     "@apollo/experimental-nextjs-app-support": "^0.5.2",
     "@glidejs/glide": "^3.6.2",
+    "@graphql-typed-document-node/core": "^3.2.0",
     "@headlessui/react": "^1.7.19",
     "@heroicons/react": "^2.1.5",
     "@nextui-org/accordion": "^2.0.38",

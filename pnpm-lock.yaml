@@ -14,6 +14,9 @@ dependencies:
   '@glidejs/glide':
     specifier: ^3.6.2
     version: 3.6.2
+  '@graphql-typed-document-node/core':
+    specifier: ^3.2.0
+    version: 3.2.0(graphql@16.9.0)
   '@headlessui/react':
     specifier: ^1.7.19
     version: 1.7.19(react-dom@18.3.1)(react@18.3.1)
