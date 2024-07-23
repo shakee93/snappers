@@ -1,5 +1,36 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
+
+
+
+# Adding New Attributes to the UI (Development Guide)
+
+When you need to add a new attribute to the UI, follow these steps:
+
+1. Navigate to the following file:
+   ```
+   /Users/shadeer/Desktop/HOME/Frameworks/NextJS/gq-headless/graphql/defs/products.fragments.ts
+   ```
+
+2. Add the variant name to the GraphQL query. For example:
+   ```graphql
+   allPaWarranty {
+     nodes {
+       name
+       slug
+     }
+   }
+   ```
+
+3. The attribute name (e.g., `alPaWarrenty`) can be found in the GraphQL IDE:
+   [https://api.gqmobiles.lk/wp-admin/admin.php?page=graphiql-ide](https://api.gqmobiles.lk/wp-admin/admin.php?page=graphiql-ide)
+
+4. Reason for adding: When you encounter an "OPTION" on the [slug] page, your task is to add the correct attribute name (e.g., `alPaWarrenty`) in the specified file.
+
+Note: Ensure you use the correct attribute name as found in the GraphQL IDE.
+
+
+
 ## Getting Started
 
 First, run the development server:
@@ -39,3 +70,5 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+
+

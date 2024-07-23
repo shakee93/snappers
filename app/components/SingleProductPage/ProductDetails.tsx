@@ -34,20 +34,20 @@ const ProductDetails = ({
   } = useStore();
 
   const [activeVariation, setActiveVariation] = useState<any>(
-    product?.variations?.nodes[0],
+    product?.variations?.nodes[0]
   );
 
   const manualMeta = product?.metaData;
   const warrantyType = manualMeta?.find(
-    (item) => item?.key === "warranty_type",
+    (item) => item?.key === "warranty_type"
   )?.value;
   const warrantyPeriod = manualMeta?.find(
-    (item) => item?.key === "warranty_period",
+    (item) => item?.key === "warranty_period"
   )?.value;
 
   const { setVariationId } = useImage();
 
-  console.log("ProductDetails", product);
+  // console.log("ProductDetails", product);
   useEffect(() => {
     clearAttributes();
 
@@ -71,7 +71,7 @@ const ProductDetails = ({
     (attr: ProductAttribute) => {
       return attribute.find((a) => a.name === attr.name);
     },
-    [attribute],
+    [attribute]
   );
 
   useEffect(() => {
@@ -95,18 +95,14 @@ const ProductDetails = ({
   }, [activeVariation]);
 
   useEffect(() => {
-
     const lowestPriceInStockVariation: any | undefined =
       product.variations?.nodes
         .filter((v: ProductVariation) => v.stockStatus === "IN_STOCK")
-        .reduce(
-          (lowest: any, v: any | undefined) => {
-            const currentPrice = parseFloat(v?.rawPrice || "0");
-            const lowestPrice = parseFloat(lowest?.rawPrice || "Infinity");
-            return currentPrice < lowestPrice ? v : lowest;
-          },
-          undefined as ProductVariation | undefined,
-        );
+        .reduce((lowest: any, v: any | undefined) => {
+          const currentPrice = parseFloat(v?.rawPrice || "0");
+          const lowestPrice = parseFloat(lowest?.rawPrice || "Infinity");
+          return currentPrice < lowestPrice ? v : lowest;
+        }, undefined as ProductVariation | undefined);
     // if (lowestPriceInStockVariation) {
     //   console.log(
     //     `Lowest price in-stock variation: ${lowestPriceInStockVariation.name} at ${lowestPriceInStockVariation.rawPrice}`,
@@ -120,12 +116,12 @@ const ProductDetails = ({
         (attr: Attribute) => {
           const option = attr.value;
           setAttribute(attr, option || "");
-        },
+        }
       );
       if (lowestPriceInStockVariation?.image) {
         setActiveVariation(lowestPriceInStockVariation);
         setVariationId(
-          lowestPriceInStockVariation?.image.databaseId.toString(),
+          lowestPriceInStockVariation?.image.databaseId.toString()
         );
       } else {
         const firstVariation = product?.variations?.nodes[0];
@@ -166,6 +162,7 @@ const ProductDetails = ({
   }, [attribute, product]);
 
   useEffect(() => {}, [attribute]);
+
 
   return (
     <>
@@ -314,7 +311,7 @@ const ProductDetails = ({
                         `allPa${attr?.label as unknown as "Capacity"}`
                       ]?.nodes.find(
                         (node: PaCapacity) =>
-                          node.slug === activeAttr(attr)?.val,
+                          node.slug === activeAttr(attr)?.val
                       )?.name
                     }
                   </span>{" "}
@@ -328,12 +325,12 @@ const ProductDetails = ({
                     ).variations?.nodes.filter((v: ProductVariation) => {
                       return v.attributes?.nodes.some(
                         (node: any) =>
-                          node.name === attr.name && node.value === option,
+                          node.name === attr.name && node.value === option
                       );
                     });
 
                     const allOutOfStock = matchingVariations?.every(
-                      (v) => v.stockStatus !== "IN_STOCK",
+                      (v) => v.stockStatus !== "IN_STOCK"
                     );
 
                     return (
@@ -355,8 +352,7 @@ const ProductDetails = ({
                           "relative inline-block cursor-pointer rounded border bg-gray-200/80 px-3.5 py-2 text-xs text-black md:text-sm",
                           activeAttr(attr)?.val === option &&
                             "border-primaryColor text-primaryColor bg-white shadow-md",
-                          allOutOfStock &&
-                            "diag-line bg-gray-100 text-gray-500",
+                          allOutOfStock && "diag-line bg-gray-100 text-gray-500"
                         )}
                         style={{ opacity: allOutOfStock ? 0.9 : 1 }}
                         title={allOutOfStock ? "Out of stock" : ""}
@@ -367,7 +363,9 @@ const ProductDetails = ({
                             .join("")}`
                         ]?.nodes.find((node: PaCapacity) => {
                           return node.slug === option;
-                        })?.name || "OPTION"}
+                        })?.name || "OPTION" }
+
+                      
                         {/* {allOutOfStock && (
                           <span
                             className="absolute inset-0 flex items-center justify-center"
@@ -381,7 +379,7 @@ const ProductDetails = ({
                   })}
                 </ul>
               </div>
-            ),
+            )
           )}
         </>
       )}
@@ -398,7 +396,7 @@ const ProductDetails = ({
             >
               {category.node.name}
             </Link>
-          ),
+          )
         )}
       </div>
     </>
