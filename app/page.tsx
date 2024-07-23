@@ -30,6 +30,37 @@ const slidesData = [
   {
     id: "1",
     slideFields: {
+      mainHeading: "Pioneering Excellence",
+      subHeading: "Samsung Galaxy Watch 7: Smart, Stylish, Superior",
+      buttonText: "Buy Now",
+      buttonLink: "/samsung/samsung-galaxy-watch7",
+      backgroundColor: "#CCE0EF",
+      featureImage: {
+        id: "2",
+        sourceUrl:
+          "http://api.gqmobiles.lk/wp-content/uploads/2024/07/ph-galaxy-watch7-l310-sm-l310nzgaasa-542245338.avif",
+      },
+    },
+  },
+  {
+    id: "2",
+    slideFields: {
+      mainHeading: "Ultimate Precision",
+      subHeading: "Samsung Galaxy Watch Ultra: Style Meets Performance",
+      buttonText: "Buy Now",
+      buttonLink: "/samsung/samsung-galaxy-watch-ultra",
+      backgroundColor: "#CCE0EF",
+      featureImage: {
+        id: "2",
+        sourceUrl:
+          "http://api.gqmobiles.lk/wp-content/uploads/2024/07/Samsung-Galaxy-Watch-Ultra-47mm-Titanium-Grey-C-small-removebg-preview.png",
+      },
+    },
+  },
+
+  {
+    id: "3",
+    slideFields: {
       mainHeading: "Innovation at Its Best",
       subHeading: "Tecno Spark 20 Pro: Sleek, Powerful, Connected",
       buttonText: "Buy Now",
@@ -42,7 +73,8 @@ const slidesData = [
       },
     },
   },
-  
+
+
   // {
   //   id: "2",
   //   slideFields: {
@@ -60,7 +92,7 @@ const slidesData = [
   //   },
   // },
   {
-    id: "3",
+    id: "4",
     slideFields: {
       mainHeading: "Pulse of Performance",
       subHeading: "Beats Fit Pro: Unleash Your Rhythm",
@@ -75,7 +107,7 @@ const slidesData = [
     },
   },
   {
-    id: "4",
+    id: "5",
     slideFields: {
       mainHeading: "Embark on Your Fitness Journey",
       subHeading: "Fitbit Charge 5: Elevate Your Fitness",
@@ -283,7 +315,7 @@ export default async function Home() {
               products={watches}
               heading="Smart Watches"
               link="smartwatches"
-              // subHeading="Best selling of the month"
+            // subHeading="Best selling of the month"
             />
           </div>
         </div>
