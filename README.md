@@ -25,7 +25,8 @@ When you need to add a new attribute to the UI, follow these steps:
 3. The attribute name (e.g., `alPaWarrenty`) can be found in the GraphQL IDE:
    [https://api.gqmobiles.lk/wp-admin/admin.php?page=graphiql-ide](https://api.gqmobiles.lk/wp-admin/admin.php?page=graphiql-ide)
 
-4. Reason for adding: When you encounter an "OPTION" on the [slug] page, your task is to add the correct attribute name (e.g., `alPaWarrenty`) in the specified file.
+4. Reason for adding: When you enco
+unter an "OPTION" on the [slug] page, your task is to add the correct attribute name (e.g., `alPaWarrenty`) in the specified file.
 
 Note: Ensure you use the correct attribute name as found in the GraphQL IDE.
 
