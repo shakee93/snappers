@@ -68,6 +68,9 @@ dependencies:
   '@types/react-router-dom':
     specifier: ^5.3.3
     version: 5.3.3
+  algoliasearch-helper:
+    specifier: ^3.22.3
+    version: 3.22.3(algoliasearch@4.24.0)
   dotenv:
     specifier: ^16.4.5
     version: 16.4.5
