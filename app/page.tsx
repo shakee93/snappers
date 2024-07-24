@@ -109,45 +109,30 @@ const slidesData = [
   {
     id: "6",
     slideFields: {
-      mainHeading: "Innovation at Its Best",
-      subHeading: "Tecno Spark 20 Pro: Sleek, Powerful, Connected",
+      mainHeading: "Sound Revolutionized",
+      subHeading: "Samsung Galaxy Buds 3: Immerse in Crystal-Clear Audio",
       buttonText: "Buy Now",
-      buttonLink: "/tecno/tecno-spark-20-pro",
+      buttonLink: "/samsung/samsung-galaxy-buds-3",
       backgroundColor: "#CCE0EF",
       featureImage: {
         id: "2",
         sourceUrl:
-          "http://api.gqmobiles.lk/wp-content/uploads/2024/07/lv.webp",
+          "http://api.gqmobiles.lk/wp-content/uploads/2024/07/Samsung-Galaxy-Buds-3-removebg-preview.png",
       },
     },
   },
   {
     id: "7",
     slideFields: {
-      mainHeading: "Pulse of Performance",
-      subHeading: "Beats Fit Pro: Unleash Your Rhythm",
+      mainHeading: "Sound Elevated",
+      subHeading: "Samsung Galaxy Buds 3 Pro: Premium Audio, Exceptional Clarity",
       buttonText: "Buy Now",
-      buttonLink: "/beats/beats-fit-pro-true-wireless-noise-cancelling-earbuds",
+      buttonLink: "/samsung/samsung-galaxy-buds-3-pro",
       backgroundColor: "#E2F1F0",
       featureImage: {
         id: "3",
         sourceUrl:
-          "http://api.gqmobiles.lk/wp-content/uploads/2024/07/file.png",
-      },
-    },
-  },
-  {
-    id: "8",
-    slideFields: {
-      mainHeading: "Embark on Your Fitness Journey",
-      subHeading: "Fitbit Charge 5: Elevate Your Fitness",
-      buttonText: "Buy Now",
-      buttonLink: "/fitbit/google-fitbit-charge-5-gift-pack",
-      backgroundColor: "#E2F1F0",
-      featureImage: {
-        id: "4",
-        sourceUrl:
-          "http://api.gqmobiles.lk/wp-content/uploads/2024/07/file-1.png",
+          "http://api.gqmobiles.lk/wp-content/uploads/2024/07/new-project-32-20240711150949286-removebg-preview.png",
       },
     },
   },
