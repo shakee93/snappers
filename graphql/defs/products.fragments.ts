@@ -300,6 +300,12 @@ export const ProductContentFull = gql`
           slug
         }
       }
+      allPaShape {
+        nodes {
+          name
+          slug
+        }
+      }
       onSale
       price
       rawPrice: price(format: RAW)
