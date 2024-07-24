@@ -1,15 +1,15 @@
-import {getClient} from "@/graphql/apollo-ssr";
-import {GET_BRANDS, GET_PRODUCT} from "@/graphql/defs/products";
-import {Brand, SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
-import {notFound} from "next/navigation";
+import { getClient } from "@/graphql/apollo-ssr";
+import { GET_BRANDS, GET_PRODUCT } from "@/graphql/defs/products";
+import { Brand, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
+import { notFound } from "next/navigation";
 import ProductDetails from "@/app/components/SingleProductPage/ProductDetails";
 import Features from "@/app/components/SingleProductPage/FeatureCard";
 import ProductOverview from "@/app/components/SingleProductPage/ProductOverview";
 import Link from "next/link";
 import ProductImage from "@/app/components/SingleProductPage/ProductImage2";
-import {Suspense} from "react";
-import {Metadata, ResolvingMetadata} from "next";
-import {ImageProvider} from "@/context/ImageChangeGrabber";
+import { Suspense } from "react";
+import { Metadata, ResolvingMetadata } from "next";
+import { ImageProvider } from "@/context/ImageChangeGrabber";
 
 export const dynamic = 'force-dynamic'
 
@@ -64,9 +64,15 @@ export async function generateMetadata(
   parent: ResolvingMetadata
 ): Promise<Metadata> {
   // fetch data
-  const { product } = await getData(params.slug, params.brand);
+  const { product, brand } = await getData(params.slug, params.brand);
+  // const price = product.price || "the best price";
+  const price = product.price ? product.price.replace(/₨|&nbsp;/g, '') : "the best price";
+
   return {
     title: product.name,
+    // description: `This ${product.name} is at GQMobile.lk. The best price in Sri Lanka for ${brand.name} priced at ${price}.`,
+    description: `This ${product.name} is at GQMobile.lk. The best price in Sri Lanka for ${brand.name} priced at Rs.${price}.`,
+
     openGraph: {
       title: product.name,
       description:  "Check out this product!",
@@ -82,6 +88,7 @@ export async function generateMetadata(
     },
   };
 }
+
 const Page = async ({ params }: Props) => {
   // return <LoadingBrands/>
   const {
@@ -91,6 +98,7 @@ const Page = async ({ params }: Props) => {
     product: SimpleProduct & VariableProduct;
     brand: Brand;
   } = await getData(params.slug, params.brand);
+
 
   return (
     <div className="mt-5 md:mt-10">
@@ -102,7 +110,6 @@ const Page = async ({ params }: Props) => {
         </div>
         <div></div>
         <div className="flex flex-col md:flex-row p-3 rounded-3xl mt-5 md:mt-3 md:p-6 md:py-6 bg-white ">
-
           <ImageProvider>
             <div className="w-full md:w-6/12 flex-col gap-6 md:pr-10">
               <Suspense fallback={<>loading...</>}>
@@ -116,7 +123,6 @@ const Page = async ({ params }: Props) => {
               <ProductDetails brand={brand} product={product} />
             </div>
           </ImageProvider>
-
         </div>
         {/* Image Gallery */}
         <ProductOverview product={product} />
