@@ -61,6 +61,54 @@ const slidesData = [
   {
     id: "3",
     slideFields: {
+      mainHeading: "Innovation Redefined",
+      subHeading: "CMF Phone 1: Simple, Elegant, Powerful",
+      buttonText: "Buy Now",
+      buttonLink: "/cmf/cmf-phone-1",
+      backgroundColor: "#CCE0EF",
+      featureImage: {
+        id: "2",
+        sourceUrl:
+          "http://api.gqmobiles.lk/wp-content/uploads/2024/07/CMF-Phone-1-orange-removebg-preview.png",
+      },
+    },
+  },
+
+  {
+    id: "4",
+    slideFields: {
+      mainHeading: "Flip Your World",
+      subHeading: "Samsung Galaxy Z Flip 6: Elegance Redefined in Every Flip",
+      buttonText: "Buy Now",
+      buttonLink: "/samsung/samsung-galaxy-z-flip6-5g",
+      backgroundColor: "#CCE0EF",
+      featureImage: {
+        id: "2",
+        sourceUrl:
+          "http://api.gqmobiles.lk/wp-content/uploads/2024/07/Galaxy-Z-Flip-6-4-removebg-preview.png",
+      },
+    },
+  },
+
+  {
+    id: "5",
+    slideFields: {
+      mainHeading: "Unfold Excellence",
+      subHeading: "Z Fold 6 : Cutting-Edge Innovation, Unmatched Sophistication",
+      buttonText: "Buy Now",
+      buttonLink: "/samsung/samsung-galaxy-z-fold6-5g",
+      backgroundColor: "#CCE0EF",
+      featureImage: {
+        id: "2",
+        sourceUrl:
+          "http://api.gqmobiles.lk/wp-content/uploads/2024/07/uk-galaxy-z-fold6-f956-sm-f956bzsneub-542454423.avif",
+      },
+    },
+  },
+
+  {
+    id: "6",
+    slideFields: {
       mainHeading: "Innovation at Its Best",
       subHeading: "Tecno Spark 20 Pro: Sleek, Powerful, Connected",
       buttonText: "Buy Now",
@@ -73,26 +121,8 @@ const slidesData = [
       },
     },
   },
-
-
-  // {
-  //   id: "2",
-  //   slideFields: {
-  //     mainHeading: " Immersive Sound, Mastery of Performance",
-  //     subHeading: "Bose S1 Pro: Portable, Powerful, Versatile",
-  //     buttonText: "Buy Now",
-  //     buttonLink:
-  //       "/bose",
-  //     backgroundColor: "#F4E7E7",
-  //     featureImage: {
-  //       id: "2",
-  //       sourceUrl:
-  //         "http://gq.freshpixl.com/wp-content/uploads/2024/06/filebose.png",
-  //     },
-  //   },
-  // },
   {
-    id: "4",
+    id: "7",
     slideFields: {
       mainHeading: "Pulse of Performance",
       subHeading: "Beats Fit Pro: Unleash Your Rhythm",
@@ -107,7 +137,7 @@ const slidesData = [
     },
   },
   {
-    id: "5",
+    id: "8",
     slideFields: {
       mainHeading: "Embark on Your Fitness Journey",
       subHeading: "Fitbit Charge 5: Elevate Your Fitness",
