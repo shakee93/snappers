@@ -109,33 +109,48 @@ const slidesData = [
   {
     id: "6",
     slideFields: {
-      mainHeading: "Sound Revolutionized",
-      subHeading: "Samsung Galaxy Buds 3: Immerse in Crystal-Clear Audio",
+      mainHeading: "Power Up Swiftly",
+      subHeading: "Apple 20W USB-C Power Adapter",
       buttonText: "Buy Now",
-      buttonLink: "/samsung/samsung-galaxy-buds-3",
+      buttonLink: "/apple/apple-20w-usb-c-power-adapter",
       backgroundColor: "#CCE0EF",
       featureImage: {
         id: "2",
         sourceUrl:
-          "http://api.gqmobiles.lk/wp-content/uploads/2024/07/Samsung-Galaxy-Buds-3-removebg-preview.png",
+          "http://api.gqmobiles.lk/wp-content/uploads/2024/08/apple-1607949659-removebg-preview.png",
       },
     },
   },
-  {
-    id: "7",
-    slideFields: {
-      mainHeading: "Sound Elevated",
-      subHeading: "Samsung Galaxy Buds 3 Pro: Premium Audio, Exceptional Clarity",
-      buttonText: "Buy Now",
-      buttonLink: "/samsung/samsung-galaxy-buds-3-pro",
-      backgroundColor: "#E2F1F0",
-      featureImage: {
-        id: "3",
-        sourceUrl:
-          "http://api.gqmobiles.lk/wp-content/uploads/2024/07/new-project-32-20240711150949286-removebg-preview.png",
-      },
-    },
-  },
+  // {
+  //   id: "6",
+  //   slideFields: {
+  //     mainHeading: "Sound Revolutionized",
+  //     subHeading: "Samsung Galaxy Buds 3: Immerse in Crystal-Clear Audio",
+  //     buttonText: "Buy Now",
+  //     buttonLink: "/samsung/samsung-galaxy-buds-3",
+  //     backgroundColor: "#CCE0EF",
+  //     featureImage: {
+  //       id: "2",
+  //       sourceUrl:
+  //         "http://api.gqmobiles.lk/wp-content/uploads/2024/07/Samsung-Galaxy-Buds-3-removebg-preview.png",
+  //     },
+  //   },
+  // },
+  // {
+  //   id: "7",
+  //   slideFields: {
+  //     mainHeading: "Sound Elevated",
+  //     subHeading: "Samsung Galaxy Buds 3 Pro: Premium Audio, Exceptional Clarity",
+  //     buttonText: "Buy Now",
+  //     buttonLink: "/samsung/samsung-galaxy-buds-3-pro",
+  //     backgroundColor: "#E2F1F0",
+  //     featureImage: {
+  //       id: "3",
+  //       sourceUrl:
+  //         "http://api.gqmobiles.lk/wp-content/uploads/2024/07/new-project-32-20240711150949286-removebg-preview.png",
+  //     },
+  //   },
+  // },
 ];
 
 const Banks = [
