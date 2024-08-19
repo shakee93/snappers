@@ -4,10 +4,9 @@ import SiteLogo from "@/public/global/logo.webp";
 import { getClient } from "@/graphql/apollo-ssr";
 import { GET_BRANDS } from "@/graphql/defs/products";
 import { Brand } from "@/graphql/types/graphql";
-import { Facebook, Instagram, MapPinned, PhoneCall } from "lucide-react";
+import { Clock, Facebook, Instagram, Mail, MapPinned, PhoneCall } from "lucide-react";
 import { isPaymentPage } from "./paymentPageCheckUtils";
 import { Divider } from "@nextui-org/react";
-
 
 const getData = async () => {
   const { data } = await getClient().query({
@@ -44,7 +43,7 @@ const Footer = async () => {
             {/* <div className="text-base md:text-base font-medium text-black">
               Flagship Store
             </div> */}
-            <ul className="flex text-xs flex-col gap-3 pb-4">
+            {/* <ul className="flex text-xs flex-col gap-3 pb-4">
               <li className=" lg:text-sm text-gray-500 flex gap-3">
                 <div>
                   <MapPinned size={iconSize} className="text-primaryColor" />
@@ -65,7 +64,64 @@ const Footer = async () => {
                   </div>
                 </div>
               </li>
+            </ul> */}
+
+            <ul className="flex text-xs flex-col gap-3 pb-4">
+              <li className="lg:text-sm text-gray-500 flex gap-3">
+                <div>
+                  <MapPinned size={iconSize} className="text-primaryColor" />
+                </div>
+                <div className="flex flex-col">
+                  <div>GQ — The Mobile Store</div>
+                  <div>
+                    No. 250 | 53 - 54 Ground Floor, Liberty Plaza, Colombo 03.
+                  </div>
+                  <div className="flex flex-col mt-2">
+                    <Link href={"tel:0777555665"}>0777 555 665</Link>
+                    <Link href={"tel:0112372665"}>0112 372 665</Link>
+                  </div>
+                </div>
+              </li>
+              <li className="lg:text-sm text-gray-500 flex gap-3">
+                <div>
+                  <MapPinned size={iconSize} className="text-primaryColor" />
+                </div>
+                <div className="flex flex-col">
+                  <div>GQ — The Authentic Store</div>
+                  <div>
+                    No. 250 | 1 | 161 First Floor, Liberty Plaza, Colombo 03.
+                  </div>
+                  <div className="flex flex-col mt-2">
+                    <Link href={"tel:0777988665"}>0777 988 665</Link>
+                    <Link href={"tel:0754555665"}>0754 555 665</Link>
+                    <Link href={"tel:0112447489"}>0112 447 489</Link>
+                  </div>
+                </div>
+              </li>
+              <li className="lg:text-sm text-gray-500 flex gap-3">
+                <div>
+                  <Clock size={iconSize} className="text-primaryColor" />
+                </div>
+                <div className="flex flex-col">
+                  <div>Business Hours:</div>
+                  <div>Mon - Sat (10.00AM - 08.00PM)</div>
+                  <div>Sundays & Poya’s (10.00AM - 05.00PM)</div>
+                </div>
+              </li>
+              <li className="lg:text-sm text-gray-500 flex gap-3">
+                <div>
+                  <Mail size={iconSize} className="text-primaryColor" />
+                </div>
+                <div className="flex flex-col">
+                  <div>
+                    <Link href={"mailto:Inquires@gqmobiles.lk"}>
+                      Inquires@gqmobiles.lk
+                    </Link>
+                  </div>
+                </div>
+              </li>
             </ul>
+
             {/* <div className="text-base md:text-base font-medium text-black">
               Branch
             </div> */}
@@ -187,7 +243,11 @@ const Footer = async () => {
           <div>{" | "} </div>
           <div>
             Designed by{" "}
-            <Link target="_blank" className="font-semibold" href={`https://freshpixl.com/`}>
+            <Link
+              target="_blank"
+              className="font-semibold"
+              href={`https://freshpixl.com/`}
+            >
               Freshpixl Creative Agency
             </Link>{" "}
           </div>
