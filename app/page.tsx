@@ -197,15 +197,15 @@ const getData = async () => {
 
   return {
     // slides: slides.data?.slides?.nodes,
-    newArrivals: newArrivals.data.products?.nodes as (SimpleProduct &
+    newArrivals: newArrivals.data?.products?.nodes as (SimpleProduct &
       VariableProduct)[],
-    mobiles: mobiles.data.products?.nodes as (SimpleProduct &
+    mobiles: mobiles.data?.products?.nodes as (SimpleProduct &
       VariableProduct)[],
-    speakers: speakers.data.products?.nodes as (SimpleProduct &
+    speakers: speakers.data?.products?.nodes as (SimpleProduct &
       VariableProduct)[],
-    watches: watches.data.products?.nodes as (SimpleProduct &
+    watches: watches.data?.products?.nodes as (SimpleProduct &
       VariableProduct)[],
-    backInStock: backInStock.data.products?.nodes as (SimpleProduct &
+    backInStock: backInStock?.data?.products?.nodes as (SimpleProduct &
       VariableProduct)[],
   };
 };
