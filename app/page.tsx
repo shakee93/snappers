@@ -25,8 +25,14 @@ import Seylan from "@/public/images/bank logos/Seylan_Bank_logo.png";
 import Standard from "@/public/images/bank logos/standard-chartered-2021-logo-freelogovectors.net_.png";
 import SectionHero2 from "./components/HomePage/SectionHero2";
 import CategoryWithSubcategories from "./components/globalComponents/CategoryWithSubcategories";
-import bgSlide from '@/public/homepage/slider/slide-bg-1.png';
-import bgSlide2 from '@/public/homepage/slider/slide-bg-2.jpg';
+import bgSlide from '@/public/homepage/slider/bg-2.jpg';
+import bgSlide2 from '@/public/homepage/slider/bg-1.jpg';
+import bgSlide3 from '@/public/homepage/slider/bg-3.jpg';
+import bgSlide4 from '@/public/homepage/slider/bg-4.jpg';
+import bgSlide5 from '@/public/homepage/slider/bg-5.jpg';
+import bgSlide6 from '@/public/homepage/slider/bg-6.jpg';
+import bgSlide7 from '@/public/homepage/slider/slide-bg-1.png';
+import bgSlide8 from '@/public/homepage/slider/slide-bg-2.jpg';
 
 const slidesData = [
   {
@@ -37,7 +43,7 @@ const slidesData = [
       buttonText: "Buy Now",
       buttonLink: "/samsung/samsung-galaxy-watch7",
       backgroundColor: "#CCE0EF",
-      backgroundImage:bgSlide2.src,
+      backgroundImage:bgSlide.src,
       featureImage: {
         id: "2",
         sourceUrl:
@@ -70,7 +76,7 @@ const slidesData = [
       buttonText: "Buy Now",
       buttonLink: "/cmf/cmf-phone-1",
       backgroundColor: "#CCE0EF",
-      backgroundImage:bgSlide2.src,
+      backgroundImage:bgSlide4.src,
       featureImage: {
         id: "2",
         sourceUrl:
@@ -87,7 +93,7 @@ const slidesData = [
       buttonText: "Buy Now",
       buttonLink: "/samsung/samsung-galaxy-z-flip6-5g",
       backgroundColor: "#CCE0EF",
-      backgroundImage:bgSlide2.src,
+      backgroundImage:bgSlide8.src,
 
       featureImage: {
         id: "2",
@@ -105,7 +111,7 @@ const slidesData = [
       buttonText: "Buy Now",
       buttonLink: "/samsung/samsung-galaxy-z-fold6-5g",
       backgroundColor: "#CCE0EF",
-      backgroundImage:bgSlide2.src,
+      backgroundImage:bgSlide5.src,
 
       featureImage: {
         id: "2",
@@ -123,7 +129,7 @@ const slidesData = [
       buttonText: "Buy Now",
       buttonLink: "/apple/apple-20w-usb-c-power-adapter",
       backgroundColor: "#CCE0EF",
-      backgroundImage:bgSlide2.src,
+      backgroundImage:bgSlide3.src,
 
       featureImage: {
         id: "2",

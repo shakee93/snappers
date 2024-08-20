@@ -142,20 +142,20 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
 
         {/* Previous & Next Buttons */}
         <Prev
-          className="absolute left-1 sm:left-5 top-2/4 sm:top-1/2 sm:-translate-y-1/2 z-10 !text-slate-700"
-          btnClassName="w-12 h-12 hover:border-slate-400 dark:hover:border-slate-400"
+          className="absolute left-1 sm:left-5 top-2/4 sm:top-1/2 sm:-translate-y-1/2 z-10 !text-gray-200"
+          btnClassName="w-12 h-12 hover:border-gray-400 dark:hover:border-gray-400"
           svgSize="w-6 h-6"
           onClickPrev={handleClickPrev}
         />
         <Next
-          className="absolute right-1 sm:right-5 top-2/4 sm:top-1/2 sm:-translate-y-1/2 z-10 !text-slate-700"
-          btnClassName="w-12 h-12 hover:border-slate-400 dark:hover:border-slate-400"
+          className="absolute right-1 sm:right-5 top-2/4 sm:top-1/2 sm:-translate-y-1/2 z-10 !text-gray-200"
+          btnClassName="w-12 h-12 hover:border-gray-400 dark:hover:border-gray-400"
           svgSize="w-6 h-6"
           onClickNext={handleClickNext}
         />
 
         {/* Overlay Behind Text */}
-        {/* <div className="absolute inset-0 bg-black opacity-30"></div> */}
+        <div className="absolute inset-0 bg-black opacity-50"></div>
 
         {/* Text & Image Content */}
         <div className="flex-col md:flex-row container flex justify-between items-center z-[1] w-full">
@@ -163,7 +163,7 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
             <span className="nc-SectionHero2Item__subheading block text-base md:text-xl font-medium">
               {item.slideFields.subHeading}
             </span>
-            <h2 className="nc-SectionHero2Item__heading font-semibold text-3xl sm:text-4xl md:text-4xl xl:text-5xl 2xl:text-5xl !leading-[114%]">
+            <h2 className="nc-SectionHero2Item__heading font-semibold text-3xl sm:text-4xl md:text-4xl xl:text-5xl 2xl:text-5xl uppercase !leading-[114%]">
               {item.slideFields.mainHeading}
             </h2>
             <ButtonPrimary
