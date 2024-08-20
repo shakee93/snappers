@@ -25,6 +25,8 @@ import Seylan from "@/public/images/bank logos/Seylan_Bank_logo.png";
 import Standard from "@/public/images/bank logos/standard-chartered-2021-logo-freelogovectors.net_.png";
 import SectionHero2 from "./components/HomePage/SectionHero2";
 import CategoryWithSubcategories from "./components/globalComponents/CategoryWithSubcategories";
+import bgSlide from '@/public/homepage/slider/slide-bg-1.png';
+import bgSlide2 from '@/public/homepage/slider/slide-bg-2.jpg';
 
 const slidesData = [
   {
