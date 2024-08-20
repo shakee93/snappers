@@ -35,6 +35,7 @@ const slidesData = [
       buttonText: "Buy Now",
       buttonLink: "/samsung/samsung-galaxy-watch7",
       backgroundColor: "#CCE0EF",
+      backgroundImage:bgSlide2.src,
       featureImage: {
         id: "2",
         sourceUrl:
@@ -50,6 +51,7 @@ const slidesData = [
       buttonText: "Buy Now",
       buttonLink: "/samsung/samsung-galaxy-watch-ultra",
       backgroundColor: "#CCE0EF",
+      backgroundImage:bgSlide2.src,
       featureImage: {
         id: "2",
         sourceUrl:
@@ -66,6 +68,7 @@ const slidesData = [
       buttonText: "Buy Now",
       buttonLink: "/cmf/cmf-phone-1",
       backgroundColor: "#CCE0EF",
+      backgroundImage:bgSlide2.src,
       featureImage: {
         id: "2",
         sourceUrl:
