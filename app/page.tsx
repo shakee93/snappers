@@ -87,6 +87,8 @@ const slidesData = [
       buttonText: "Buy Now",
       buttonLink: "/samsung/samsung-galaxy-z-flip6-5g",
       backgroundColor: "#CCE0EF",
+      backgroundImage:bgSlide2.src,
+
       featureImage: {
         id: "2",
         sourceUrl:
@@ -103,6 +105,8 @@ const slidesData = [
       buttonText: "Buy Now",
       buttonLink: "/samsung/samsung-galaxy-z-fold6-5g",
       backgroundColor: "#CCE0EF",
+      backgroundImage:bgSlide2.src,
+
       featureImage: {
         id: "2",
         sourceUrl:
@@ -119,6 +123,8 @@ const slidesData = [
       buttonText: "Buy Now",
       buttonLink: "/apple/apple-20w-usb-c-power-adapter",
       backgroundColor: "#CCE0EF",
+      backgroundImage:bgSlide2.src,
+
       featureImage: {
         id: "2",
         sourceUrl:

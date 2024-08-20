@@ -1,20 +1,15 @@
-"use client"
+"use client";
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { useQuery } from '@apollo/client';
-import useBoolean from 'react-use/lib/useBoolean';
+import { useBoolean } from 'react-use';
 import useInterval from 'react-use/lib/useInterval';
-import Image, { StaticImageData } from 'next/image';
-// import { GET_SLIDES } from '@/graphql/defs/slides';
-import { useStore } from '@/store/store';
-import backgroundLineSvg from '@/public/images/Moon.svg';
 import ButtonPrimary from 'shared/Button/ButtonPrimary';
 import Next from 'shared/NextPrev/Next';
 import Prev from 'shared/NextPrev/Prev';
 import NcImage from '@/shared/NcImage/NcImage';
 
 interface Hero2DataType {
-  image: StaticImageData;
+  image: string;
   heading: string;
   subHeading: string;
   btnText: string;
@@ -29,6 +24,7 @@ interface SlideType {
     buttonText: string;
     buttonLink: string;
     backgroundColor: string;
+    backgroundImage: string; // URL of the background image
     featureImage: {
       id: string;
       sourceUrl: string;
@@ -56,7 +52,6 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
 
   const handleAutoNext = () => {
     setIndexActive((state) => {
-
       if (state >= slides.length - 1) {
         return 0;
       }
@@ -67,7 +62,7 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
   const handleClickNext = () => {
     setIndexActive((state) => {
       if (!slides) {
-        return state
+        return state;
       }
 
       if (state >= slides.length - 1) {
@@ -81,7 +76,7 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
   const handleClickPrev = () => {
     setIndexActive((state) => {
       if (!slides) {
-        return state
+        return state;
       }
 
       if (state === 0) {
@@ -113,11 +108,17 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
     return (
       <div
         key={index}
-        className={`relative w-full h-[550px] md:h-[400px] xl:h-[500px] justify-center  nc-SectionHero2Item--animation flex items-center transition-transform ease-in-out transform ${
+        className={`relative w-full h-[550px] md:h-[400px] xl:h-[600px] justify-center nc-SectionHero2Item--animation flex items-center transition-transform ease-in-out transform ${
           isActive ? 'translate-y-0' : 'translate-y-10'
         }`}
-        style={{ backgroundColor: item.slideFields.backgroundColor}}
+        style={{ 
+          // backgroundColor: item.slideFields.backgroundColor, 
+          backgroundImage: `url(${item.slideFields.backgroundImage})`, // Use the background image
+          backgroundSize: 'cover', 
+          backgroundPosition: 'center' 
+        }}
       >
+        {/* Dots Navigation */}
         <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 flex justify-center">
           {slides.map((_, dotIndex) => (
             <div
@@ -128,11 +129,9 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
               }}
               className={`relative px-1 py-1.5 cursor-pointer`}
             >
-              <div
-                className={`relative w-20 h-1 shadow-sm rounded-md bg-white`}
-              >
+              <div className={`relative w-20 h-1 shadow-sm rounded-md bg-white`}>
                 <div
-                  className={` absolute inset-0 bg-black rounded-md ${
+                  className={`absolute inset-0 bg-black rounded-md ${
                     dotIndex === indexActive ? 'opacity-100 nc-SectionHero2Item__dot' : 'opacity-0'
                   }`}
                 ></div>
@@ -141,6 +140,7 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
           ))}
         </div>
 
+        {/* Previous & Next Buttons */}
         <Prev
           className="absolute left-1 sm:left-5 top-2/4 sm:top-1/2 sm:-translate-y-1/2 z-10 !text-slate-700"
           btnClassName="w-12 h-12 hover:border-slate-400 dark:hover:border-slate-400"
@@ -153,19 +153,17 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
           svgSize="w-6 h-6"
           onClickNext={handleClickNext}
         />
-        <div className={`absolute inset-0 bg-${item.slideFields.backgroundColor}`}>
-          <NcImage
-            className="absolute w-full h-full object-contain"
-            src={backgroundLineSvg}
-            alt="hero"
-          />
-        </div>
-        <div className="flex-col md:flex-row container flex justify-between items-center z-[1] w-full ">
-          <div className="space-y-3 sm:space-y-4">
-            <span className="nc-SectionHero2Item__subheading block text-base md:text-xl text-slate-700 font-medium">
+
+        {/* Overlay Behind Text */}
+        {/* <div className="absolute inset-0 bg-black opacity-30"></div> */}
+
+        {/* Text & Image Content */}
+        <div className="flex-col md:flex-row container flex justify-between items-center z-[1] w-full">
+          <div className="relative z-10 space-y-3 sm:space-y-4 text-white px-6">
+            <span className="nc-SectionHero2Item__subheading block text-base md:text-xl font-medium">
               {item.slideFields.subHeading}
             </span>
-            <h2 className="nc-SectionHero2Item__heading font-semibold text-3xl sm:text-4xl md:text-4xl xl:text-5xl 2xl:text-5xl !leading-[114%] text-slate-900">
+            <h2 className="nc-SectionHero2Item__heading font-semibold text-3xl sm:text-4xl md:text-4xl xl:text-5xl 2xl:text-5xl !leading-[114%]">
               {item.slideFields.mainHeading}
             </h2>
             <ButtonPrimary
@@ -195,14 +193,15 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
             </ButtonPrimary>
           </div>
 
+          {/* Feature Image */}
           <motion.div
             initial={{ opacity: 0, translateY: 100 }}
             animate={{ opacity: 1, translateY: 0 }}
             transition={{ duration: 0.8 }}
-            className="feature-image"
+            className="feature-image relative z-10"
           >
             <NcImage
-                priority={true}
+              priority={true}
               src={item.slideFields.featureImage.sourceUrl}
               className="max-h-[300px] md:max-h-[500px] w-auto py-6 px-4"
             />
