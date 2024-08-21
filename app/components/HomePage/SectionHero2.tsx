@@ -119,7 +119,7 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
         }}
       >
         {/* Dots Navigation */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50 flex justify-center">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-50  flex justify-center">
           {slides.map((_, dotIndex) => (
             <div
               key={dotIndex}
@@ -127,12 +127,12 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
                 setIndexActive(dotIndex);
                 handleAfterClick();
               }}
-              className={`relative px-1 py-1.5 cursor-pointer`}
+              className={`relative px-1 py-1.5 cursor-pointer `}
             >
-              <div className={`relative w-20 h-1 shadow-sm rounded-md bg-white`}>
+              <div className={`relative w-5 md:w-20 h-1 shadow-sm rounded-md bg-white`}>
                 <div
-                  className={`absolute inset-0 bg-black rounded-md ${
-                    dotIndex === indexActive ? 'opacity-100 nc-SectionHero2Item__dot' : 'opacity-0'
+                  className={`absolute inset-0 bg-gray-700 rounded-md ${
+                    dotIndex === indexActive ? 'opacity-100 nc-SectionHero2Item__dot rounded-md' : 'opacity-0'
                   }`}
                 ></div>
               </div>
