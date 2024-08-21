@@ -25,14 +25,16 @@ import Seylan from "@/public/images/bank logos/Seylan_Bank_logo.png";
 import Standard from "@/public/images/bank logos/standard-chartered-2021-logo-freelogovectors.net_.png";
 import SectionHero2 from "./components/HomePage/SectionHero2";
 import CategoryWithSubcategories from "./components/globalComponents/CategoryWithSubcategories";
-import bgSlide from '@/public/homepage/slider/bg-2.jpg';
-import bgSlide2 from '@/public/homepage/slider/bg-1.jpg';
-import bgSlide3 from '@/public/homepage/slider/bg-3.jpg';
-import bgSlide4 from '@/public/homepage/slider/bg-4.jpg';
-import bgSlide5 from '@/public/homepage/slider/bg-5.jpg';
-import bgSlide6 from '@/public/homepage/slider/bg-6.jpg';
-import bgSlide7 from '@/public/homepage/slider/slide-bg-1.png';
-import bgSlide8 from '@/public/homepage/slider/slide-bg-2.jpg';
+import bgSlide2 from '@/public/homepage/slider/Layer_2.png';
+import bgSlide3 from '@/public/homepage/slider/Layer_3.png';
+import bgSlide4 from '@/public/homepage/slider/Layer_4.png';
+import bgSlide5 from '@/public/homepage/slider/Layer_5.png';
+import bgSlide6 from '@/public/homepage/slider/Layer_6.png';
+import bgSlide7 from '@/public/homepage/slider/Layer_7.png';
+import bgSlide8 from '@/public/homepage/slider/Layer_8.png';
+import bgSlide9 from '@/public/homepage/slider/Layer_9.png';
+import bgSlide10 from '@/public/homepage/slider/Layer_10.png';
+import bgSlide11 from '@/public/homepage/slider/Layer_11.png';
 
 const slidesData = [
   {
@@ -43,7 +45,7 @@ const slidesData = [
       buttonText: "Buy Now",
       buttonLink: "/samsung/samsung-galaxy-watch7",
       backgroundColor: "#CCE0EF",
-      backgroundImage:bgSlide.src,
+      backgroundImage:bgSlide10.src,
       featureImage: {
         id: "2",
         sourceUrl:
@@ -59,7 +61,7 @@ const slidesData = [
       buttonText: "Buy Now",
       buttonLink: "/samsung/samsung-galaxy-watch-ultra",
       backgroundColor: "#CCE0EF",
-      backgroundImage:bgSlide2.src,
+      backgroundImage:bgSlide8.src,
       featureImage: {
         id: "2",
         sourceUrl:
@@ -93,7 +95,7 @@ const slidesData = [
       buttonText: "Buy Now",
       buttonLink: "/samsung/samsung-galaxy-z-flip6-5g",
       backgroundColor: "#CCE0EF",
-      backgroundImage:bgSlide8.src,
+      backgroundImage:bgSlide9.src,
 
       featureImage: {
         id: "2",
@@ -111,7 +113,7 @@ const slidesData = [
       buttonText: "Buy Now",
       buttonLink: "/samsung/samsung-galaxy-z-fold6-5g",
       backgroundColor: "#CCE0EF",
-      backgroundImage:bgSlide5.src,
+      backgroundImage:bgSlide6.src,
 
       featureImage: {
         id: "2",
@@ -129,7 +131,7 @@ const slidesData = [
       buttonText: "Buy Now",
       buttonLink: "/apple/apple-20w-usb-c-power-adapter",
       backgroundColor: "#CCE0EF",
-      backgroundImage:bgSlide3.src,
+      backgroundImage:bgSlide2.src,
 
       featureImage: {
         id: "2",
@@ -138,36 +140,7 @@ const slidesData = [
       },
     },
   },
-  // {
-  //   id: "6",
-  //   slideFields: {
-  //     mainHeading: "Sound Revolutionized",
-  //     subHeading: "Samsung Galaxy Buds 3: Immerse in Crystal-Clear Audio",
-  //     buttonText: "Buy Now",
-  //     buttonLink: "/samsung/samsung-galaxy-buds-3",
-  //     backgroundColor: "#CCE0EF",
-  //     featureImage: {
-  //       id: "2",
-  //       sourceUrl:
-  //         "http://api.gqmobiles.lk/wp-content/uploads/2024/07/Samsung-Galaxy-Buds-3-removebg-preview.png",
-  //     },
-  //   },
-  // },
-  // {
-  //   id: "7",
-  //   slideFields: {
-  //     mainHeading: "Sound Elevated",
-  //     subHeading: "Samsung Galaxy Buds 3 Pro: Premium Audio, Exceptional Clarity",
-  //     buttonText: "Buy Now",
-  //     buttonLink: "/samsung/samsung-galaxy-buds-3-pro",
-  //     backgroundColor: "#E2F1F0",
-  //     featureImage: {
-  //       id: "3",
-  //       sourceUrl:
-  //         "http://api.gqmobiles.lk/wp-content/uploads/2024/07/new-project-32-20240711150949286-removebg-preview.png",
-  //     },
-  //   },
-  // },
+  
 ];
 
 const Banks = [
