@@ -66,6 +66,7 @@ const TabFilters = ({
     const [brandsState, setBrandsState] = useState<number[]>([]);
     const [categoriesState, setCategoriesState] = useState<number[]>([]);
     const [inStock, setInStockState] = useState(true);
+
     // const [filterCount, setFilterCount] = useState<number>(0);
 
     const {items: categoriesFacet} = useRefinementList({
@@ -681,12 +682,6 @@ const TabFilters = ({
             </div>
 
             <div>{/*{JSON.stringify(sidebar)}*/}</div>
-
-            {/* FOR RESPONSIVE MOBILE */}
-            <div className="flex overflow-x-auto lg:hidden space-x-4">
-                {renderTabMobileFilter()}
-            </div>
-
         </div>
     );
 };
