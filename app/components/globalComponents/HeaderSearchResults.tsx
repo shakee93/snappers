@@ -13,7 +13,7 @@ interface SearchBarProps {
 
 const HeaderSearchResults = ({ brands, productCategories}: SearchBarProps) => {
 
-    const { search } = useStore()
+    const { search, syncBrands, syncCategories } = useStore()
     const [mounted, setMounted] = useState(false)
 
     useEffect(() => {
@@ -41,6 +41,10 @@ const HeaderSearchResults = ({ brands, productCategories}: SearchBarProps) => {
     )}>
         <div className='container mx-auto'>
             <Suspense fallback={'loading...'}>
+                <h2 className="mb-4 ml-6 block text-sm md:text-lg font-semibold">
+                    Search Results for <span className='text-primaryColor'>{search}</span>
+                </h2>
+
                 <InstantSearchWrapper
                     filters
                     categories={productCategories}

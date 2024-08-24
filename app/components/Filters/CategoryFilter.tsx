@@ -16,7 +16,7 @@ interface CategoryFilterProps {
 }
 
 const CategoryFilter = ({categories}: CategoryFilterProps) => {
-    const { syncCategories, sidebar: {categories : catState } } = useStore()
+    const { syncCategories, search, sidebar: {categories : catState } } = useStore()
     const [firstCategoryFacets, setFirstCategoryFacets] = useState<RefinementListItem[]>([]);
     const { brand } = useParams()
 
@@ -32,6 +32,16 @@ const CategoryFilter = ({categories}: CategoryFilterProps) => {
 
     }, [categoriesFacet, brand])
 
+
+
+
+    useEffect(() => {
+
+        if (!search) {
+            setFirstCategoryFacets(categoriesFacet);
+        }
+
+    }, [search])
 
 
     const handleChangeCategories = useCallback(

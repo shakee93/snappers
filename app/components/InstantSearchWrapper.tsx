@@ -107,6 +107,14 @@ const InstantSearchWrapper = ({
   }, [differedSidebar]);
 
   useEffect(() => {
+
+    if (!search) {
+      setFilterQuery(getFilterQuery);
+    }
+    // setSortQuery(differedSidebar.sort);
+  }, [search]);
+
+  useEffect(() => {
     // console.log(filterQuery);
   }, [filterQuery]);
 

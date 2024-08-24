@@ -16,6 +16,7 @@ interface BrandFilterProps {
 const BrandFilter = ({ brands }: BrandFilterProps) => {
   const {
     syncBrands,
+      search,
     sidebar: { brands: brandsState },
   } = useStore();
   const [firstFacets, setFirstFacets] = useState<RefinementListItem[]>([]);
@@ -36,6 +37,11 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
     }
 
   }, [brandsFacet, category])
+
+  useEffect(() => {
+    setFirstFacets([])
+  }, [search])
+
 
   const handleChange = useCallback((checked: boolean, name: number) => {
     if (name === 0 && checked) {

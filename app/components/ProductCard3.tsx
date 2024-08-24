@@ -262,7 +262,7 @@ const ProductCard: FC<ProductCardProps> = ({
                     className="w-full flex-shrink-0 bg-[#fefefe]"
                   >
                     <Image
-                      src={variation?.node?.image?.sourceUrl || ""}
+                      src={variation?.node?.image?.sourceUrl?.replace('http://', 'https://') || ""}
                       width={300}
                       height={300}
                       alt={name || ""}
@@ -281,7 +281,7 @@ const ProductCard: FC<ProductCardProps> = ({
                 <Image
                   width={300}
                   height={300}
-                  src={image?.sourceUrl || ""}
+                  src={image?.sourceUrl?.replace('http://', 'https://') || ""}
                   alt={name || ""}
                   className={twMerge(
                     `object-cover object-center mx-auto my-auto rounded-2xl`
