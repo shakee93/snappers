@@ -671,16 +671,13 @@ const TabFilters = ({
         <div className="flex flex-col gap-0 lg:gap-3 lg:space-x-4">
             {/* FOR DESKTOP */}
 
-
-            <div className="hidden lg:flex flex-1 lg:space-x-2 xl:flex xl:space-x-4">
+            <div className="hidden lg:flex flex-col justify-start items-start flex-1 space-y-3">
                 {!category && <CategoryFilter categories={categories}/>}
                 {!brand && <BrandFilter brands={brands}/>}
                 <PriceFilter/>
                 <OnSaleFilter/>
                 {/*<InStockFilter/>*/}
-                <div className="!ml-auto">
-                    <SortOrderFilter sorts={sort}/>
-                </div>
+                <SortOrderFilter sorts={sort}/>
             </div>
 
             <div>{/*{JSON.stringify(sidebar)}*/}</div>
@@ -689,6 +686,7 @@ const TabFilters = ({
             <div className="flex overflow-x-auto lg:hidden space-x-4">
                 {renderTabMobileFilter()}
             </div>
+
         </div>
     );
 };

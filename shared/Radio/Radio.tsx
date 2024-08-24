@@ -33,7 +33,7 @@ const Radio: FC<RadioProps> = ({
       {label && (
         <label
           htmlFor={id}
-          className="pl-2.5 sm:pl-3 block text-slate-900 dark:text-slate-100 select-none"
+          className="pl-2.5 sm:pl-3 block text-slate-900 text-sm dark:text-slate-100 select-none"
           dangerouslySetInnerHTML={{ __html: label }}
         ></label>
       )}

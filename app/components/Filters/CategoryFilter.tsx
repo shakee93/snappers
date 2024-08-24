@@ -33,7 +33,7 @@ const CategoryFilter = ({categories}: CategoryFilterProps) => {
             : setCategoriesState(categoriesState.filter((i) => i !== name));
 
 
-        // syncCategories(categoriesState);
+        syncCategories(categoriesState);
     };
 
     const facetedCategories = useMemo(() => {
@@ -91,77 +91,42 @@ const CategoryFilter = ({categories}: CategoryFilterProps) => {
     </svg>
 
     return (
-        <FilterPopover
-            title='Categories'
-            icon={icon}
-            active={!!catState.length}
-            onClear={() =>{
-                setCategoriesState([])
-                syncCategories([])
-            }}
+        <div className="overflow-hidden relative w-full z-10 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
 
-        >
-            {({ open, close }) => (
-                <>
 
-                    <div className="overflow-hidden relative  z-10 rounded-2xl shadow-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
+            <div className="relative flex flex-col px-4 py-4 w-full space-y-5">
+                <span className='font-medium'>Categories</span>
+                <Checkbox
+                    name="All Categories"
+                    label="All Categories"
+                    defaultChecked={categoriesState.length === 0}
+                    onChange={(checked) =>
+                        handleChangeCategories(checked, 0)
+                    }
+                />
 
-                        <div className="relative flex flex-col px-5 py-6 space-y-5">
-                            <Checkbox
-                                name="All Categories"
-                                label="All Categories"
-                                defaultChecked={categoriesState.length === 0}
-                                onChange={(checked) =>
-                                    handleChangeCategories(checked, 0)
-                                }
-                            />
+                <div className="w-full border-b  border-neutral-200 dark:border-neutral-700" />
 
-                            <div className="w-full border-b  border-neutral-200 dark:border-neutral-700" />
-
-                            {facetedCategories.length > 0 ?
-                            <div className='grid grid-cols-2 gap-2'>
-                                {facetedCategories.map((item) => (
-                                    <div key={item.databaseId} className="">
-                                        <Checkbox
-                                            name={item.slug || ''}
-                                            // label={`${item.name} (${item.count})`}
-                                            label={`${item.name} (${categoriesFacet.find(f => item.databaseId === Number(f.value))?.count})`}
-                                            defaultChecked={categoriesState.includes(item.databaseId)}
-                                            onChange={(checked) =>
-                                                handleChangeCategories(checked, item.databaseId)
-                                            }
-                                        />
-                                    </div>
-                                ))}
-                            </div> :
-                                <div className='text-sm'>No Categories found for this search.</div>
-                            }
-                        </div>
-                        <div className="p-5 bg-neutral-50 dark:bg-neutral-900 dark:border-t dark:border-neutral-800 flex items-center justify-between">
-                            <ButtonThird
-                                onClick={() => {
-                                    close();
-                                    setCategoriesState([]);
-                                    syncCategories([])
-                                }}
-                                sizeClass="px-4 py-2 sm:px-5"
-                            >
-                                Clear
-                            </ButtonThird>
-                            <ButtonPrimary
-                                onClick={() => {
-                                    syncCategories(categoriesState)
-                                    close()
-                                }}
-                                sizeClass="px-4 py-2 sm:px-5"
-                            >
-                                Apply
-                            </ButtonPrimary>
-                        </div>
-                    </div>
-                </>
-            )}
-        </FilterPopover>
+                {facetedCategories.length > 0 ?
+                    <div className='grid grid-cols-1 gap-2'>
+                        {facetedCategories.map((item) => (
+                            <div key={item.databaseId} className="">
+                                <Checkbox
+                                    name={item.slug || ''}
+                                    // label={`${item.name} (${item.count})`}
+                                    label={`${item.name} (${categoriesFacet.find(f => item.databaseId === Number(f.value))?.count})`}
+                                    defaultChecked={categoriesState.includes(item.databaseId)}
+                                    onChange={(checked) =>
+                                        handleChangeCategories(checked, item.databaseId)
+                                    }
+                                />
+                            </div>
+                        ))}
+                    </div> :
+                    <div className='text-sm'>No Categories found for this search.</div>
+                }
+            </div>
+        </div>
     );
 }
 

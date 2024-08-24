@@ -57,7 +57,7 @@ const ProductGridInstant = ({
     <>
       <div className='h-[185px] md:h-60 bottom-3 right-3 hidden'></div>
       {statusState === 'idle' &&
-        <div className="flex-1 grid  grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-2 lg:gap-x-8 lg:gap-y-10">
+        <div className="flex-1 grid  grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-2 lg:gap-x-3 lg:gap-y-4">
           {hits.map((item, index) => (
             <ProductCard
               key={item?.slug as unknown as string}

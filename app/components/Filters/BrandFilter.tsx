@@ -33,6 +33,8 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
     checked
       ? setBrandsState([...brandsState, name])
       : setBrandsState(brandsState.filter((i) => i !== name));
+
+    syncBrands(brandsState);
   };
 
   const facetedBrands = useMemo(() => {
@@ -92,19 +94,10 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
   );
 
   return (
-    <FilterPopover
-      title="Brands"
-      icon={icon}
-      active={!!brandStore.length}
-      onClear={() => {
-        setBrandsState([]);
-        syncBrands([]);
-      }}
-    >
-      {({ open, close }) => (
-        <>
-          <div className="overflow-hidden rounded-2xl shadow-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
-            <div className="relative flex flex-col px-5 py-6 space-y-5">
+     <div className="overflow-hidden rounded-2xl w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
+            <div className="relative flex flex-col w-full px-5 py-4 pb-5 space-y-5">
+
+              <span className='font-medium'>Brands</span>
               <Checkbox
                 name="All Brands"
                 label="All Brands"
@@ -115,7 +108,7 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
               <div className="w-full border-b  border-neutral-200 dark:border-neutral-700" />
 
               {facetedBrands.length > 0 ?
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  <div className="grid grid-cols-1 md:grid-cols-1 gap-2">
                     {facetedBrands.map((item) => (
                         <div key={item.databaseId} className="">
                           <Checkbox
@@ -134,31 +127,8 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
               }
 
             </div>
-            <div className="p-5 bg-neutral-50 dark:bg-neutral-900 dark:border-t dark:border-neutral-800 flex items-center justify-between">
-              <ButtonThird
-                onClick={() => {
-                  close();
-                  setBrandsState([]);
-                  syncBrands([]);
-                }}
-                sizeClass="px-4 py-2 sm:px-5"
-              >
-                Clear
-              </ButtonThird>
-              <ButtonPrimary
-                onClick={() => {
-                  syncBrands(brandsState);
-                  close();
-                }}
-                sizeClass="px-4 py-2 sm:px-5"
-              >
-                Apply
-              </ButtonPrimary>
-            </div>
           </div>
-        </>
-      )}
-    </FilterPopover>
+
   );
 };
 

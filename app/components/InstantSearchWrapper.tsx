@@ -141,18 +141,25 @@ const InstantSearchWrapper = ({
       >
         <div className="flex gap-6 flex-col">
           <SearchInput bindToStore={bindToStore} show={search} />
-          <SortInput />
-          {filters && (
-            <TabFilters
-              category={category}
-              brand={brand}
-              categories={categories}
-              brands={brands}
-              sort={sort}
-            />
-          )}
-          <Configure filters={filterQuery} hitsPerPage={12} />
-          <ProductGridInstant />
+
+          <div className='grid grid-cols-12 gap-4'>
+            <div className='col-span-3'>
+              <SortInput />
+              {filters && (
+                  <TabFilters
+                      category={category}
+                      brand={brand}
+                      categories={categories}
+                      brands={brands}
+                      sort={sort}
+                  />
+              )}
+              <Configure filters={filterQuery} hitsPerPage={12} />
+            </div>
+            <div className='col-span-9'>
+              <ProductGridInstant />
+            </div>
+          </div>
         </div>
       </InstantSearchComponent>
     </div>
