@@ -1,5 +1,3 @@
-import { Popover, Transition } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import React, {Fragment, useCallback, useEffect, useMemo, useState} from "react";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonThird from "@/shared/Button/ButtonThird";
@@ -47,7 +45,7 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
 
     checked
         ? syncBrands([...brandsState, name])
-        : syncBrands(brandsState.filter((i) => i !== name));
+        : syncBrands(brandsState.filter((i: any) => i !== name));
 
   }, [brandsState])
 
