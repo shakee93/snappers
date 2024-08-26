@@ -32,7 +32,7 @@ import { redirect, useRouter } from "next/navigation";
 
 export interface ProductCardProps {
   className?: string;
-  data: SimpleProduct  & VariableProduct | any;
+  data: (SimpleProduct & VariableProduct) | any;
   fromSearch?: boolean;
 }
 
@@ -59,14 +59,14 @@ const ProductCard: FC<ProductCardProps> = ({
 
   const [showModalQuickView, setShowModalQuickView] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
-
   const [isHovered, setIsHovered] = useState(false);
   const [currentVariation, setCurrentVariation] = useState(0);
   const hoverIntervalRef = useRef<number | null>(null);
   const [loading, setLoading] = useState(false);
+  const [quantity, setQuantity] = useState(1);
 
+  const { addToCart } = useCart();
   const link = useProductLink(data);
-
   const ROUTER = useRouter();
 
   const handleHoverOut = () => {
@@ -85,9 +85,6 @@ const ProductCard: FC<ProductCardProps> = ({
     }
   }, [showModalQuickView]);
 
-  const [quantity, setQuantity] = useState(1);
-  const { addToCart } = useCart();
-
   const notifyAddTocart = (quantity: number) => {
     toast(
       <div className="">
@@ -98,7 +95,6 @@ const ProductCard: FC<ProductCardProps> = ({
         <AddedToCart product={data} quantity={quantity} />
       </div>,
       {
-        // position: "top-center",
         duration: 2000,
       }
     );
@@ -135,9 +131,37 @@ const ProductCard: FC<ProductCardProps> = ({
     }
   };
 
-  console.log("salePrice", salePrice);
-  console.log("data", data);
-  console.log("rawPrice", rawPrice);
+  const parsePrice = (priceString: any) => {
+    return parseFloat(priceString?.replace(/[^\d.]/g, ""));
+  };
+
+  // Calculate the lowest price and sale price among in-stock variations
+  let lowestPrice = price;
+  let lowestSalePrice = regularPrice;
+
+  if (type === "VARIABLE" && variations?.nodes) {
+    const inStockVariations = variations.nodes.filter(
+      (variation: ProductVariation) => variation.stockStatus === "IN_STOCK"
+    );
+
+    if (inStockVariations.length > 0) {
+      const lowestPriceVariation = inStockVariations.reduce((prev: any, curr: any) => {
+        return parsePrice(curr.price) < parsePrice(prev.price) ? curr : prev;
+      });
+
+      const lowestSalePriceVariation = inStockVariations.reduce(
+        (prev: any, curr: any) => {
+          return parsePrice(curr.regularPrice) < parsePrice(prev.regularPrice)
+            ? curr
+            : prev;
+        }
+      );
+
+      lowestPrice = lowestPriceVariation?.price || price;
+      lowestSalePrice = lowestSalePriceVariation?.regularPrice || regularPrice;
+    }
+  }
+
   const renderGroupButtons = () => {
     return (
       <div className="absolute -top-12 right-1 flex justify-center opacity-100 visible transition-all">
@@ -158,7 +182,6 @@ const ProductCard: FC<ProductCardProps> = ({
                 ) : (
                   <ShoppingCart className="w-4" />
                 )}
-                {/*<span className="ml-2">Add</span>*/}
               </ButtonPrimary>
             )}
 
@@ -169,9 +192,7 @@ const ProductCard: FC<ProductCardProps> = ({
                   fontSize="text-xs"
                   sizeClass="py-2.5 px-3.5"
                 >
-                  {/*<AttributeIcon className='w-4 ' name={attributes?.nodes[0].name}/>*/}
                   <Settings2 className="w-4" />
-                  {/*<span className="ml-1">{attributes?.nodes[0].label || "Options" }</span>*/}
                 </ButtonPrimary>
               </Link>
             )}
@@ -184,71 +205,18 @@ const ProductCard: FC<ProductCardProps> = ({
               sizeClass="py-2.5 px-3.5"
             >
               <ExternalLink className="w-4" />
-              {/*<span className="ml-1">Out of Stock</span>*/}
             </ButtonPrimary>
           </Link>
         )}
       </div>
     );
   };
-  function parsePrice(priceString: any) {
-    return parseFloat(priceString?.replace(/[^\d.]/g, ""));
-  }
-
-  let lowestPriceIndex = -1;
-  let lowestSalePriceIndex = -1;
-
-  if (type === "VARIABLE" && variations) {
-    variations.nodes.forEach((variation: any, index: number) => {
-      const variationPrice = parsePrice(
-        (variation as { price?: any })?.price || ""
-      );
-      const variationSalePrice = parsePrice(
-        (variation as { regularPrice?: any })?.regularPrice || ""
-      );
-
-      if (
-        lowestPriceIndex === -1 ||
-        variationPrice < parsePrice(variations.nodes[lowestPriceIndex]?.price)
-      ) {
-        lowestPriceIndex = index;
-      }
-
-      if (
-        lowestSalePriceIndex === -1 ||
-        variationSalePrice <
-          parsePrice(variations.nodes[lowestSalePriceIndex]?.regularPrice)
-      ) {
-        lowestSalePriceIndex = index;
-      }
-    });
-  }
-
-  const lowestPrice =
-    lowestPriceIndex !== -1
-      ? variations?.nodes[lowestPriceIndex]?.price
-      : price !== null && price !== undefined
-      ? price
-      : price;
-
-
-  
-  const lowestSalePrice =
-    lowestSalePriceIndex !== -1
-      ? variations?.nodes[lowestSalePriceIndex]?.regularPrice
-      : regularPrice !== null && regularPrice !== undefined
-      ? regularPrice
-      : 0;
 
   return (
     <div
       className={`min-h-[270px] md:min-h-[365px] nc-ProductCard relative flex flex-col bg-white rounded-2xl p-1 group ${className}`}
       data-nc-id="ProductCard"
     >
-      {/* <div>{lowestPriceIndex}</div>
-      <div>Price: {price}</div>
-      <div>{variations?.nodes[lowestPriceIndex]?.price}</div> */}
-      {/* <div dangerouslySetInnerHTML={{ __html: `Price: ${price}` }}></div> */}
       <div className="relative flex-shrink-0 bg-slate-50 rounded-2xl dark:bg-slate-300 overflow-hidden ">
         <Link href={link}>
           <div className="flex items-center justify-center h-[150px] sm:h-[250px]">
@@ -280,54 +248,38 @@ const ProductCard: FC<ProductCardProps> = ({
                 )
               )
             ) : (
-              <>
-                {/*{!imageLoaded &&*/}
-                {/*    <div className="h-full w-full bg-gray-200 rounded-3xl animate-pulse"></div>*/}
-                {/*}*/}
-
-                <Image
-                  width={300}
-                  height={300}
-                  src={image?.sourceUrl || ""}
-                  alt={name || ""}
-                  className={twMerge(
-                    `object-cover object-center mx-auto my-auto rounded-2xl`
-                  )}
-                />
-              </>
+              <Image
+                width={300}
+                height={300}
+                src={image?.sourceUrl || ""}
+                alt={name || ""}
+                className={twMerge(
+                  `object-cover object-center mx-auto my-auto rounded-2xl`
+                )}
+              />
             )}
           </div>
         </Link>
-
-        {/* <ProductStatus status={stockStatus} /> */}
 
         <div
           className={"absolute hidden md:block top-3 cursor-pointer right-3"}
           onClick={() => handleCloseModalQuickView()}
         >
           <ArrowsPointingOutIcon className="w-5" />
-          {/*<LikeButton liked={isLiked} className="" />*/}
         </div>
 
         <div
-          className={`absolute left-1.5  top-2 bg-zinc-100/80 text-center text-xs lg:text-sm line-clamp-2 rounded-full text-slate-800`}
+          className={`absolute left-1.5  top-2 bg-zinc-100/80 text-center text-xs lg:text-sm
+
+ line-clamp-2 rounded-full text-slate-800`}
         >
           {brands?.nodes?.map((brand: Brand, index: number) => (
-            <Link
-              //   className=" px-2 py-1 rounded"
-              href={`/${brand?.slug}`}
-              key={index}
-            >
+            <Link href={`/${brand?.slug}`} key={index}>
               <div className="bg-gradient-to-b w-fit  from-blue-500/30 font-semibold to-blue-400/5 text-xs text-blue-900 px-4 py-2 rounded-full ">
                 {brand?.name}
               </div>
             </Link>
           ))}
-          {/* <button className="bg-gradient-to-b w-fit from-blue-500/50 font-semibold to-blue-600/10 text-blue-900 px-6 py-2 rounded-full ">
-            Haylou
-          </button> */}
-
-          {/*- {type} - {databaseId}*/}
         </div>
       </div>
 
@@ -350,43 +302,12 @@ const ProductCard: FC<ProductCardProps> = ({
           href={link}
           className="flex m-0 mb-2 justify-between  items-center"
         >
-          {/* {JSON.stringify(lowestPrice)} */}
           <Prices
-            price={price}
-            // price={20000}
-            // salePrice={lowestSalePrice}
-            // salePrice={20000}
-            
-            // price={
-            //   type === "VARIABLE"
-            //     ? variations?.nodes.reduce((lowestPrice, variation) => {
-            //       const variationPrice = variation?.price;
-            //       return variationPrice !== null &&
-            //         (lowestPrice === null || variationPrice < lowestPrice)
-            //         ? variationPrice
-            //         : lowestPrice;
-            //     }, null)
-            //     : price !== null && price !== undefined
-            //       ? price
-            //       : 0
-            // }
-            // salePrice={
-            //   type === "VARIABLE"
-            //     ? variations?.nodes.reduce((lowestRegularPrice, variation) => {
-            //       const variationRegularPrice = variation?.regularPrice;
-            //       return variationRegularPrice !== null &&
-            //         (lowestRegularPrice === null || variationRegularPrice < lowestRegularPrice)
-            //         ? variationRegularPrice
-            //         : lowestRegularPrice;
-            //     }, null)
-            //     : regularPrice !== null && regularPrice !== undefined
-            //       ? regularPrice
-            //       : 0
-            // }
+            price={lowestPrice}
+            salePrice={lowestSalePrice}
             className="lg:flex-row"
           />
 
-          {/* <Prices price={price} salePrice={regularPrice} className='lg:flex-row' /> */}
           {(salePrice === price || !salePrice) && !!reviewCount && (
             <div className="flex items-center mb-0.5">
               <StarIcon className="w-4 h-4 pb-[1px] text-amber-400" />
