@@ -135,9 +135,9 @@ const ProductCard: FC<ProductCardProps> = ({
     }
   };
 
-  // console.log("salePrice", salePrice);
-  // console.log("data", data);
-  // console.log("rawPrice", rawPrice);
+  console.log("salePrice", salePrice);
+  console.log("data", data);
+  console.log("rawPrice", rawPrice);
   const renderGroupButtons = () => {
     return (
       <div className="absolute -top-12 right-1 flex justify-center opacity-100 visible transition-all">
@@ -229,7 +229,10 @@ const ProductCard: FC<ProductCardProps> = ({
       ? variations?.nodes[lowestPriceIndex]?.price
       : price !== null && price !== undefined
       ? price
-      : 0;
+      : price;
+
+
+  
   const lowestSalePrice =
     lowestSalePriceIndex !== -1
       ? variations?.nodes[lowestSalePriceIndex]?.regularPrice
@@ -242,6 +245,10 @@ const ProductCard: FC<ProductCardProps> = ({
       className={`min-h-[270px] md:min-h-[365px] nc-ProductCard relative flex flex-col bg-white rounded-2xl p-1 group ${className}`}
       data-nc-id="ProductCard"
     >
+      {/* <div>{lowestPriceIndex}</div>
+      <div>Price: {price}</div>
+      <div>{variations?.nodes[lowestPriceIndex]?.price}</div> */}
+      {/* <div dangerouslySetInnerHTML={{ __html: `Price: ${price}` }}></div> */}
       <div className="relative flex-shrink-0 bg-slate-50 rounded-2xl dark:bg-slate-300 overflow-hidden ">
         <Link href={link}>
           <div className="flex items-center justify-center h-[150px] sm:h-[250px]">
@@ -345,8 +352,11 @@ const ProductCard: FC<ProductCardProps> = ({
         >
           {/* {JSON.stringify(lowestPrice)} */}
           <Prices
-            price={lowestPrice}
-            salePrice={lowestSalePrice}
+            price={price}
+            // price={20000}
+            // salePrice={lowestSalePrice}
+            // salePrice={20000}
+            
             // price={
             //   type === "VARIABLE"
             //     ? variations?.nodes.reduce((lowestPrice, variation) => {
