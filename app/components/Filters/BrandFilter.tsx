@@ -22,7 +22,7 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
   const [firstFacets, setFirstFacets] = useState<RefinementListItem[]>([]);
   const { category } = useParams()
 
-  const {items: brandsFacet} = useRefinementList({
+  const {items: brandsFacet, refine} = useRefinementList({
     attribute: 'brands_facet',
   });
 
@@ -38,9 +38,17 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
 
   }, [brandsFacet, category])
 
+
+  //TODO: bug - when a category is selected it will show up in search as well
   useEffect(() => {
-    setFirstFacets([])
-  }, [search])
+
+    if (search.length === 0) {
+    } else {
+      setFirstFacets(brandsFacet);
+    }
+
+
+  }, [brandsFacet, search])
 
 
   const handleChange = useCallback((checked: boolean, name: number) => {

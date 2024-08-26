@@ -29,6 +29,9 @@ module.exports = {
         xl: "10px",
         "2xl": "128px",
       },
+      maxWidth: {
+        lg: '1224px'
+      }
     },
     fontFamily: {
       display: ["var(--font-display)", ...defaultTheme.fontFamily.sans],

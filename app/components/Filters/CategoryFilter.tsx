@@ -1,13 +1,13 @@
 import {Popover, Transition} from "@headlessui/react";
 import {ChevronDownIcon} from "@heroicons/react/24/outline";
-import React, {Fragment, useCallback, useEffect, useMemo, useState} from "react";
+import React, {Fragment, useCallback, useEffect, useMemo, useRef, useState} from "react";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonThird from "@/shared/Button/ButtonThird";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import {ProductCategory} from "@/graphql/types/graphql";
 import {useStore} from "@/store/store";
 import FilterPopover from "@/app/components/Filters/FilterPopover";
-import {useRefinementList} from "react-instantsearch";
+import {useHits, useRefinementList} from "react-instantsearch";
 import {RefinementListItem} from "instantsearch.js/es/connectors/refinement-list/connectRefinementList";
 import {useParams} from "next/navigation";
 
@@ -19,6 +19,8 @@ const CategoryFilter = ({categories}: CategoryFilterProps) => {
     const { syncCategories, search, sidebar: {categories : catState } } = useStore()
     const [firstCategoryFacets, setFirstCategoryFacets] = useState<RefinementListItem[]>([]);
     const { brand } = useParams()
+    const { hits, results } = useHits();
+
 
     const {items: categoriesFacet} = useRefinementList({
         attribute: 'categories_facet',
@@ -33,15 +35,17 @@ const CategoryFilter = ({categories}: CategoryFilterProps) => {
     }, [categoriesFacet, brand])
 
 
-
-
+    //TODO: bug - when a category is selected it will show up in search as well
     useEffect(() => {
 
-        if (!search) {
+        if (search.length === 0) {
+
+        } else {
             setFirstCategoryFacets(categoriesFacet);
         }
 
-    }, [search])
+
+    }, [categoriesFacet, search])
 
 
     const handleChangeCategories = useCallback(
