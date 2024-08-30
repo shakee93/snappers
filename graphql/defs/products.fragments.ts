@@ -297,6 +297,12 @@ export const ProductContentFull = gql`
           slug
         }
       }
+      allPaNetwork {
+        nodes {
+          name
+          slug
+        }
+      }
       onSale
       price
       rawPrice: price(format: RAW)
