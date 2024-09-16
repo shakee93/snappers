@@ -1,31 +1,31 @@
 "use client";
-import React, {Fragment, useEffect, useMemo, useState} from "react";
-import {Dialog, Popover, Transition} from "@headlessui/react";
+import React, { Fragment, useEffect, useMemo, useState } from "react";
+import { Dialog, Popover, Transition } from "@headlessui/react";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonThird from "shared/Button/ButtonThird";
 import ButtonClose from "shared/ButtonClose/ButtonClose";
 import Checkbox from "shared/Checkbox/Checkbox";
 import Slider from "rc-slider";
 import Radio from "shared/Radio/Radio";
-import {ChevronDownIcon} from "@heroicons/react/24/outline";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import MySwitch from "components/MySwitch";
-import {useStore} from "@/store/store";
-import {Brand, ProductCategory} from "@/graphql/types/graphql";
-import {XIcon, Package} from "lucide-react";
+import { useStore } from "@/store/store";
+import { Brand, ProductCategory } from "@/graphql/types/graphql";
+import { XIcon, Package } from "lucide-react";
 import CategoryFilter from "@/app/components/Filters/CategoryFilter";
 import BrandFilter from "@/app/components/Filters/BrandFilter";
 import PriceFilter from "@/app/components/Filters/PriceFilter";
 import OnSaleFilter from "@/app/components/Filters/OnSaleFilter";
 import SortOrderFilter from "@/app/components/Filters/SortOrderFilter";
 import InStockFilter from "@/app/components/Filters/InStockFilter";
-import {useRefinementList} from "react-instantsearch";
-import {twMerge} from "tailwind-merge";
+import { useRefinementList } from "react-instantsearch";
+import { twMerge } from "tailwind-merge";
 
 const DATA_sortOrderRadios = [
-    {name: "Name", id: "name:asc"},
-    {name: "Most Popular", id: "totalSales(missing_values: last):desc"},
-    {name: "Best Rating", id: "reviewCount(missing_values: last):desc"},
-    {name: "Newest", id: "databaseId:desc"},
+    { name: "Name", id: "name:asc" },
+    { name: "Most Popular", id: "totalSales(missing_values: last):desc" },
+    { name: "Best Rating", id: "reviewCount(missing_values: last):desc" },
+    { name: "Newest", id: "databaseId:desc" },
     {
         name: "Price Low - High",
         id: "rawPriceNumber(missing_values: last):asc",
@@ -43,17 +43,17 @@ interface TabFilterProps {
     category?: ProductCategory;
     brands?: Brand[];
     brand?: Brand;
-    sort?:Boolean; 
+    sort?: Boolean;
 }
 
 
 const TabFilters = ({
-                        categories = [],
-                        brands = [],
-                        brand,
-                        category,
-                        sort,
-                    }: TabFilterProps) => {
+    categories = [],
+    brands = [],
+    brand,
+    category,
+    sort,
+}: TabFilterProps) => {
 
     const [isOpenMoreFilter, setisOpenMoreFilter] = useState(false);
     const [isOnSale, setIsIsOnSale] = useState(false);
@@ -68,23 +68,23 @@ const TabFilters = ({
     const [inStock, setInStockState] = useState(true);
     // const [filterCount, setFilterCount] = useState<number>(0);
 
-    const {items: categoriesFacet} = useRefinementList({
+    const { items: categoriesFacet } = useRefinementList({
         attribute: 'categories_facet',
     });
 
-    const {items: brandsFacet} = useRefinementList({
+    const { items: brandsFacet } = useRefinementList({
         attribute: 'brands_facet',
     });
 
     const facetedBrands = useMemo(() => {
         return brands.filter(b =>
-            brandsFacet.map(f =>  Number(f.value)).includes(b.databaseId)
+            brandsFacet.map(f => Number(f.value)).includes(b.databaseId)
         )
     }, [brands, brandsFacet])
 
     const facetedCategories = useMemo(() => {
         return categories.filter(b =>
-            categoriesFacet.map(f =>  Number(f.value)).includes(b.databaseId)
+            categoriesFacet.map(f => Number(f.value)).includes(b.databaseId)
         )
     }, [categoriesFacet, categories])
 
@@ -197,8 +197,8 @@ const TabFilters = ({
         return (
             <span
                 className="flex-shrink-0 w-4 h-4 rounded-full bg-primary-500 text-white flex items-center justify-center ml-3 cursor-pointer">
-        <XIcon className="p-0.5" onClick={handleXClearClick}/>
-      </span>
+                <XIcon className="p-0.5" onClick={handleXClearClick} />
+            </span>
         );
     };
 
@@ -209,11 +209,10 @@ const TabFilters = ({
             <div className="flex-shrink-0">
                 <div
                     className={`flex bg-white flex-shrink-0 items-center justify-center px-4 py-2 text-sm rounded-full border focus:outline-none cursor-pointer select-none
-          ${
-                        filterCount
+          ${filterCount
                             ? "border border-primary-500 bg-primary-50 text-primary-900 focus:outline-none cursor-pointer select-none"
                             : "border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
-                    }`}
+                        }`}
                 >
                     <svg
                         className="w-4 h-4"
@@ -272,10 +271,10 @@ const TabFilters = ({
                     </svg>
 
                     <span className="ml-2" onClick={openModalMoreFilter}>
-            {filterCount > 0
-                ? `Products filters (${filterCount})`
-                : "Products filters"}
-          </span>
+                        {filterCount > 0
+                            ? `Products filters (${filterCount})`
+                            : "Products filters"}
+                    </span>
                     {filterCount > 0 && renderXClear()}
                 </div>
 
@@ -295,7 +294,7 @@ const TabFilters = ({
                                 leaveFrom="opacity-100"
                                 leaveTo="opacity-0"
                             >
-                                <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-40 dark:bg-opacity-60"/>
+                                <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-40 dark:bg-opacity-60" />
                             </Transition.Child>
 
                             {/* This element is to trick the browser into centering the modal contents. */}
@@ -303,8 +302,8 @@ const TabFilters = ({
                                 className="inline-block h-screen align-middle"
                                 aria-hidden="true"
                             >
-                &#8203;
-              </span>
+                                &#8203;
+                            </span>
                             <Transition.Child
                                 className="fixed inset-0 h-screen w-full max-w-4xl"
                                 enter="ease-out duration-300"
@@ -325,8 +324,8 @@ const TabFilters = ({
                                             Products filters
                                         </Dialog.Title>
                                         <span className="absolute left-3 top-3">
-                      <ButtonClose onClick={closeModalMoreFilter}/>
-                    </span>
+                                            <ButtonClose onClick={closeModalMoreFilter} />
+                                        </span>
                                     </div>
 
                                     <div className="overflow-y-auto h-[calc(100vh-70px)] pt-12">
@@ -335,10 +334,10 @@ const TabFilters = ({
                                             {/* --------- */}
                                             {/* ---- */}
                                             {!category && (
-                                                <div className="py-7">
+                                                <div className="pt-7 ">
                                                     <h3 className="text-md font-medium">Categories</h3>
                                                     <div className="relative ">
-                                                        <div className="relative flex flex-col  py-6 space-y-5">
+                                                        <div className="relative flex flex-col py-6 space-y-5">
                                                             <Checkbox
                                                                 name="All Categories"
                                                                 label="All Categories"
@@ -348,10 +347,10 @@ const TabFilters = ({
                                                                 }
                                                             />
                                                             <div
-                                                                className="w-full border-b  border-neutral-200 dark:border-neutral-700"/>
+                                                                className="w-full border-b border-neutral-200 dark:border-neutral-700" />
                                                             <div className={twMerge(
-                                                                "grid grid-cols-1 gap-2",
-                                                                facetedCategories.length > 4 && 'grid-cols-2'
+                                                                "grid gap-3",
+                                                                facetedCategories.length > 4 && 'grid-cols-1'
                                                             )}>
                                                                 {facetedCategories.length > 0 ?
                                                                     <>
@@ -373,7 +372,7 @@ const TabFilters = ({
                                                                             </div>
                                                                         ))}
                                                                     </>
-                                                                :
+                                                                    :
                                                                     <div className='text-sm'>No Categories found for this search.</div>
                                                                 }
                                                             </div>
@@ -397,7 +396,7 @@ const TabFilters = ({
                                                             />
 
                                                             <div
-                                                                className="w-full border-b  border-neutral-200 dark:border-neutral-700"/>
+                                                                className="w-full border-b  border-neutral-200 dark:border-neutral-700" />
                                                             <div className={twMerge(
                                                                 "grid grid-cols-1 gap-2",
                                                                 facetedBrands.length > 4 && 'grid-cols-2'
@@ -435,30 +434,32 @@ const TabFilters = ({
                                             {/* --------- */}
                                             {/* ---- */}
                                             <div className="py-7">
-                                                <div className="relative flex flex-col px-5  space-y-8">
+                                                <div className="relative flex flex-col pr-5 space-y-8">
                                                     <div className="space-y-5">
                                                         <span className="text-md font-medium">Price range</span>
-                                                        <br/>
+                                                        <br />
                                                         <span className="pt-1">
-                              LKR {rangePrices[0].toLocaleString()} - LKR{" "}
+                                                            LKR {rangePrices[0].toLocaleString()} - LKR{" "}
                                                             {rangePrices[1].toLocaleString()}
-                            </span>
-                                                        <Slider
-                                                            range
-                                                            min={PRICE_RANGE[0]}
-                                                            max={PRICE_RANGE[1]}
-                                                            step={1}
-                                                            handleStyle={{
-                                                                height: 30,
-                                                                width: 30,
-                                                                marginTop: -13,
-                                                            }}
-                                                            defaultValue={[rangePrices[0], rangePrices[1]]}
-                                                            allowCross={false}
-                                                            onChange={(_input: number | number[]) =>
-                                                                setRangePrices(_input as number[])
-                                                            }
-                                                        />
+                                                        </span>
+                                                        <div className="pl-4">
+                                                            <Slider
+                                                                range
+                                                                min={PRICE_RANGE[0]}
+                                                                max={PRICE_RANGE[1]}
+                                                                step={1}
+                                                                handleStyle={{
+                                                                    height: 30,
+                                                                    width: 30,
+                                                                    marginTop: -13,
+                                                                }}
+                                                                defaultValue={[rangePrices[0], rangePrices[1]]}
+                                                                allowCross={false}
+                                                                onChange={(_input: number | number[]) =>
+                                                                    setRangePrices(_input as number[])
+                                                                }
+                                                            />
+                                                        </div>
                                                     </div>
 
                                                     <div className="flex justify-between space-x-5">
@@ -470,10 +471,10 @@ const TabFilters = ({
                                                                 Min price
                                                             </label>
                                                             <div className="mt-1 relative rounded-md">
-                                <span
-                                    className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-neutral-500 sm:text-sm">
-                                  LKR
-                                </span>
+                                                                <span
+                                                                    className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-neutral-500 sm:text-sm">
+                                                                    LKR
+                                                                </span>
                                                                 <input
                                                                     type="number"
                                                                     max={PRICE_RANGE[1]}
@@ -499,10 +500,10 @@ const TabFilters = ({
                                                                 Max price
                                                             </label>
                                                             <div className="mt-1 relative rounded-md">
-                                <span
-                                    className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-neutral-500 sm:text-sm">
-                                  LKR
-                                </span>
+                                                                <span
+                                                                    className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-neutral-500 sm:text-sm">
+                                                                    LKR
+                                                                </span>
                                                                 <input
                                                                     type="number"
                                                                     max={PRICE_RANGE[1]}
@@ -552,11 +553,10 @@ const TabFilters = ({
                                                     <h3 className="text-md font-medium">On sale!</h3>
                                                     <div className="mt-3 relative ">
                                                         <div
-                                                            className={`flex h-[42px] items-center justify-center px-4 py-2 text-sm rounded-full border focus:outline-none cursor-pointer select-none ${
-                                                                isOnSale
-                                                                    ? "border-primary-500 bg-primary-50 text-primary-900"
-                                                                    : "border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
-                                                            }`}
+                                                            className={`flex h-[42px] items-center justify-center px-4 py-2 text-sm rounded-full border focus:outline-none cursor-pointer select-none ${isOnSale
+                                                                ? "border-primary-500 bg-primary-50 text-primary-900"
+                                                                : "border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
+                                                                }`}
                                                             onClick={() => setIsIsOnSale(!isOnSale)}
                                                         >
                                                             <svg
@@ -599,7 +599,7 @@ const TabFilters = ({
                                                             {isOnSale && (
                                                                 <div
                                                                     className="flex-shrink-0 w-4 h-4 rounded-full bg-primary-500 text-white flex items-center justify-center ml-3 cursor-pointer">
-                                                                    <XIcon className="p-0.5"/>
+                                                                    <XIcon className="p-0.5" />
                                                                 </div>
                                                             )}
                                                         </div>
@@ -673,13 +673,13 @@ const TabFilters = ({
 
 
             <div className="hidden lg:flex flex-1 lg:space-x-2 xl:flex xl:space-x-4">
-                {!category && <CategoryFilter categories={categories}/>}
-                {!brand && <BrandFilter brands={brands}/>}
-                <PriceFilter/>
-                <OnSaleFilter/>
+                {!category && <CategoryFilter categories={categories} />}
+                {!brand && <BrandFilter brands={brands} />}
+                <PriceFilter />
+                <OnSaleFilter />
                 {/*<InStockFilter/>*/}
                 <div className="!ml-auto">
-                    <SortOrderFilter sorts={sort}/>
+                    <SortOrderFilter sorts={sort} />
                 </div>
             </div>
 
