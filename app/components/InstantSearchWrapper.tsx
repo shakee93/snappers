@@ -141,11 +141,6 @@ const InstantSearchWrapper = ({
         }
         searchClient={searchClient}
         indexName="product"
-        onStateChange={(state) => {
-          if (state.error) {
-            console.error('Search error:', state.error);
-          }
-        }}
       >
         <div className="flex gap-6 flex-col">
           <SearchInput bindToStore={bindToStore} show={search} />
