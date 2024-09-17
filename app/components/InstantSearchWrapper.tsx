@@ -83,11 +83,13 @@ const InstantSearchWrapper = ({
   const [filterQuery, setFilterQuery] = useState<string>(getFilterQuery);
 
   const searchClient = useMemo(() => {
+    console.log('Creating Typesense client with config:', typesenseConfig);
     const typesenseInstantSearchAdapter = new TypesenseInstantSearchAdapter({
       server: {
         apiKey: "xyz", // Be sure to use an API key that only allows search operations
         nodes: [typesenseConfig],
-        cacheSearchResultsForSeconds: 2 * 60, // Cache search results from server. Defaults to 2 minutes. Set to 0 to disable caching.
+        cacheSearchResultsForSeconds: 2 * 60, // Cache search results from server. Defaults to 2 minutes. Set to 0 to disable caching.,
+        retryIntervalSeconds: 0 // Set to 0 to disable retries
       },
       additionalSearchParameters: {
         query_by: "name, description",
@@ -97,6 +99,7 @@ const InstantSearchWrapper = ({
       },
     });
 
+    console.log('Typesense client created successfully');
     return typesenseInstantSearchAdapter.searchClient;
   }, []);
 
@@ -138,6 +141,11 @@ const InstantSearchWrapper = ({
         }
         searchClient={searchClient}
         indexName="product"
+        onStateChange={(state) => {
+          if (state.error) {
+            console.error('Search error:', state.error);
+          }
+        }}
       >
         <div className="flex gap-6 flex-col">
           <SearchInput bindToStore={bindToStore} show={search} />
