@@ -26,11 +26,13 @@ module.exports = {
       center: true,
       padding: {
         DEFAULT: "1rem",
-        xl: "10px",
+        xl: "48px",
         "2xl": "128px",
       },
-      maxWidth: {
-        lg: '1224px'
+      screens: {
+        // md: '745px',
+        lg: '1220px',
+        // xl: "1220px",
       }
     },
     fontFamily: {

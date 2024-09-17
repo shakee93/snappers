@@ -1,23 +1,23 @@
-import {Popover, Transition} from "@headlessui/react";
-import {ChevronDownIcon} from "@heroicons/react/24/outline";
-import React, {Fragment, useEffect, useState} from "react";
+import { Popover, Transition } from "@headlessui/react";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import React, { Fragment, useEffect, useState } from "react";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonThird from "@/shared/Button/ButtonThird";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
-import {Brand, ProductCategory} from "@/graphql/types/graphql";
-import {useStore} from "@/store/store";
+import { Brand, ProductCategory } from "@/graphql/types/graphql";
+import { useStore } from "@/store/store";
 import FilterPopover from "@/app/components/Filters/FilterPopover";
 import Slider from "rc-slider";
-import {XIcon} from "lucide-react";
+import { XIcon } from "lucide-react";
 
 interface BrandFilterProps {
 }
 
 
 
-const OnSaleFilter = ({}: BrandFilterProps) => {
+const OnSaleFilter = ({ }: BrandFilterProps) => {
 
-    const { syncOnSale, sidebar: {on_sale} } = useStore()
+    const { syncOnSale, sidebar: { on_sale } } = useStore()
     const [isOnSale, setIsIsOnSale] = useState(false);
 
 
@@ -27,9 +27,8 @@ const OnSaleFilter = ({}: BrandFilterProps) => {
 
     return (
         <div
-            className={`flex flex-col items-start justify-start px-4 py-4 text-sm rounded-xl w-full border focus:outline-none cursor-pointer select-none bg-white ${
-                     "border-neutral-200 gap-4 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
-            }`}
+            className={`flex flex-col items-start justify-start px-4 py-4 text-sm rounded-xl w-full border focus:outline-none cursor-pointer select-none bg-white ${"border-neutral-200 gap-4 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
+                }`}
             onClick={() => setIsIsOnSale(!isOnSale)}
         >
             <div className='flex hidden items-center'>

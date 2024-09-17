@@ -1,11 +1,11 @@
-import {Popover, Transition} from "@headlessui/react";
-import {ChevronDownIcon} from "@heroicons/react/24/outline";
-import React, {Fragment, useEffect, useState} from "react";
+import { Popover, Transition } from "@headlessui/react";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import React, { Fragment, useEffect, useState } from "react";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonThird from "@/shared/Button/ButtonThird";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
-import {Brand, ProductCategory} from "@/graphql/types/graphql";
-import {useStore} from "@/store/store";
+import { Brand, ProductCategory } from "@/graphql/types/graphql";
+import { useStore } from "@/store/store";
 import FilterPopover from "@/app/components/Filters/FilterPopover";
 import Slider from "rc-slider";
 
@@ -15,7 +15,7 @@ interface BrandFilterProps {
 export const PRICE_RANGE = [500, 500000];
 
 
-const BrandFilter = ({}: BrandFilterProps) => {
+const BrandFilter = ({ }: BrandFilterProps) => {
 
     const { synPriceRange, sidebar: { priceRange } } = useStore()
     const [rangePrices, setRangePrices] = useState(priceRange || PRICE_RANGE);
@@ -25,7 +25,7 @@ const BrandFilter = ({}: BrandFilterProps) => {
         synPriceRange(rangePrices)
     }, [rangePrices])
 
-    const icon =  <svg
+    const icon = <svg
         className="w-4 h-4"
         viewBox="0 0 24 24"
         fill="none"
@@ -57,75 +57,77 @@ const BrandFilter = ({}: BrandFilterProps) => {
     return (
 
 
-    <div className="overflow-hidden rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
-        <div className="relative flex flex-col px-4 py-4 w-full space-y-8">
-            <div className="space-y-5">
-                <span className="font-medium">Price range</span>
-                <br/>
-                <span className='pt-1'>LKR {rangePrices[0].toLocaleString()} - LKR {rangePrices[1].toLocaleString()}</span>
-                <Slider
-                    range
-                    min={PRICE_RANGE[0]}
-                    max={PRICE_RANGE[1]}
-                    step={1}
-                    defaultValue={[rangePrices[0], rangePrices[1]]}
-                    allowCross={false}
-                    onChange={(_input: number | number[]) =>
-                        setRangePrices(_input as number[])
-                    }
-                />
-            </div>
-
-            <div className="flex justify-between space-x-5">
-                <div>
-                    <label
-                        htmlFor="minPrice"
-                        className="block text-sm font-medium text-neutral-700 dark:text-neutral-300"
-                    >
-                        Min price
-                    </label>
-                    <div className="mt-1 relative rounded-md">
-                          <span className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-neutral-500 sm:text-sm">
-                            LKR
-                          </span>
-                        <input
-                            type="number"
-                            max={PRICE_RANGE[1]}
+        <div className="overflow-hidden w-full rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
+            <div className="relative flex flex-col px-4 py-4 w-full space-y-4">
+                <div className="space-y-5">
+                    <span className="font-medium">Price range</span>
+                    <br />
+                    <span className='pt-1'>LKR {rangePrices[0].toLocaleString()} - LKR {rangePrices[1].toLocaleString()}</span>
+                    <div className="w-48">
+                        <Slider
+                            range
                             min={PRICE_RANGE[0]}
-                            name="minPrice"
-                            id="minPrice"
-                            className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
-                            value={rangePrices[0]}
-                            onChange={e => setRangePrices([e.target.value as unknown as number, rangePrices[1]])}
+                            max={PRICE_RANGE[1]}
+                            step={1}
+                            defaultValue={[rangePrices[0], rangePrices[1]]}
+                            allowCross={false}
+                            onChange={(_input: number | number[]) =>
+                                setRangePrices(_input as number[])
+                            }
                         />
                     </div>
                 </div>
-                <div>
-                    <label
-                        htmlFor="maxPrice"
-                        className="block text-sm font-medium text-neutral-700 dark:text-neutral-300"
-                    >
-                        Max price
-                    </label>
-                    <div className="mt-1 relative rounded-md">
-                          <span className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-neutral-500 sm:text-sm">
-                            LKR
-                          </span>
-                        <input
-                            type="number"
-                            max={PRICE_RANGE[1]}
-                            min={PRICE_RANGE[0]}
-                            name="maxPrice"
-                            id="maxPrice"
-                            className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
-                            value={rangePrices[1]}
-                            onChange={e => setRangePrices([rangePrices[0], e.target.value as unknown as number] )}
-                        />
+
+                <div className="flex flex-col gap-4">
+                    <div>
+                        <label
+                            htmlFor="minPrice"
+                            className="block text-sm font-medium text-neutral-700 dark:text-neutral-300"
+                        >
+                            Min price
+                        </label>
+                        <div className="mt-1 flex flex-row items-center gap-4 rounded-md">
+                            <span className="pointer-events-none text-neutral-500 sm:text-sm">
+                                LKR
+                            </span>
+                            <input
+                                type="number"
+                                max={PRICE_RANGE[1]}
+                                min={PRICE_RANGE[0]}
+                                name="minPrice"
+                                id="minPrice"
+                                className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
+                                value={rangePrices[0]}
+                                onChange={e => setRangePrices([e.target.value as unknown as number, rangePrices[1]])}
+                            />
+                        </div>
+                    </div>
+                    <div>
+                        <label
+                            htmlFor="maxPrice"
+                            className="block text-sm font-medium text-neutral-700 dark:text-neutral-300"
+                        >
+                            Max price
+                        </label>
+                        <div className="mt-1 flex flex-row items-center gap-4 rounded-md">
+                            <span className="pointer-events-none text-neutral-500 sm:text-sm">
+                                LKR
+                            </span>
+                            <input
+                                type="number"
+                                max={PRICE_RANGE[1]}
+                                min={PRICE_RANGE[0]}
+                                name="maxPrice"
+                                id="maxPrice"
+                                className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
+                                value={rangePrices[1]}
+                                onChange={e => setRangePrices([rangePrices[0], e.target.value as unknown as number])}
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </div>
     );
 }
 

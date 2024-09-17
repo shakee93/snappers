@@ -324,7 +324,7 @@ const ProductCard: FC<ProductCardProps> = ({
         </div>
       </div>
 
-      <div className="space-y-2 flex flex-col space-between  h-[100px] px-2.5 justify-between  lg:pt-2 lg:pb-2.5 relative">
+      <div className="space-y-2 flex flex-col space-between min-h-[100px] px-2.5 justify-between  lg:pt-2 lg:pb-2.5 relative">
         <div>{renderGroupButtons()}</div>
 
         <Link className="block " href={link}>
@@ -373,7 +373,7 @@ const ProductCard: FC<ProductCardProps> = ({
             //       ? regularPrice
             //       : 0
             // }
-            className="lg:flex-row"
+            className="lg:flex-col-reverse"
           />
 
           {/* <Prices price={price} salePrice={regularPrice} className='lg:flex-row' /> */}
