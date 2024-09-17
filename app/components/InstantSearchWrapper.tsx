@@ -88,8 +88,10 @@ const InstantSearchWrapper = ({
       server: {
         apiKey: "xyz", // Be sure to use an API key that only allows search operations
         nodes: [typesenseConfig],
-        cacheSearchResultsForSeconds: 2 * 60, // Cache search results from server. Defaults to 2 minutes. Set to 0 to disable caching.,
-        retryIntervalSeconds: 0 // Set to 0 to disable retries
+        cacheSearchResultsForSeconds: 2 * 60, // Cache search results from server. Defaults to 2 minutes. Set to 0 to disable caching.
+        retryIntervalSeconds: 500, // Set to 0 to disable retries
+        numRetries: 100,
+        connectionTimeoutSeconds: 10,
       },
       additionalSearchParameters: {
         query_by: "name, description",
