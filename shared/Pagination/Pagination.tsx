@@ -1,5 +1,5 @@
 import { CustomLink } from "@/data/types";
-import React, {FC, useEffect} from "react";
+import React, { FC, useEffect } from "react";
 import Link from "next/link";
 import twFocusClass from "@/utils/twFocusClass";
 import {
@@ -9,7 +9,7 @@ import {
 } from "react-instantsearch";
 import { twMerge } from "tailwind-merge";
 import { SearchResults } from "algoliasearch-helper";
-import {ChevronLast, ChevronLeft, ChevronRight} from "lucide-react";
+import { ChevronLast, ChevronLeft, ChevronRight } from "lucide-react";
 
 
 export interface PaginationProps {
@@ -39,94 +39,96 @@ const Paginationx: FC<PaginationProps> = ({ className = "", onPageChange }) => {
   }
 
   return (
-    <nav
-      className={`nc-Pagination inline-flex space-x-1 text-sm md:text-base font-medium ${className}`}
-    >
-      {["loading", "stalled"].includes("") ? (
-        <div>
-          <div className="flex gap-1">
-            <div className="h-11 bg-gray-300 rounded-full w-11 animate-pulse"></div>
-            <div className="h-11 bg-gray-300 rounded-full w-11 animate-pulse"></div>
-            <div className="h-11 bg-gray-300 rounded-full w-11 animate-pulse"></div>
+    <div className="overflow-x-auto scrollbar-hide">
+      <nav
+        className={`nc-Pagination inline-flex space-x-1 text-sm md:text-base font-medium ${className}`}
+      >
+        {["loading", "stalled"].includes("") ? (
+          <div>
+            <div className="flex gap-1">
+              <div className="h-11 bg-gray-300 rounded-full w-11 animate-pulse"></div>
+              <div className="h-11 bg-gray-300 rounded-full w-11 animate-pulse"></div>
+              <div className="h-11 bg-gray-300 rounded-full w-11 animate-pulse"></div>
+            </div>
           </div>
-        </div>
-      ) : (
-        <>
-          {currentRefinement > 3 && (
-            <button
-              disabled={isFirstPage}
-              onClick={(event) => {
-                event.preventDefault();
-                refine(firstPageIndex);
-              }}
-              className={twMerge(
-                `inline-flex px-4 items-center justify-center rounded-full bg-white hover:bg-neutral-100 border border-neutral-200 text-neutral-6000 dark:text-neutral-400 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:border-neutral-700 ${twFocusClass()}`
-              )}
-            >
-              First
-            </button>
-          )}
+        ) : (
+          <>
+            {currentRefinement > 3 && (
+              <button
+                disabled={isFirstPage}
+                onClick={(event) => {
+                  event.preventDefault();
+                  refine(firstPageIndex);
+                }}
+                className={twMerge(
+                  `inline-flex px-4 items-center justify-center rounded-full bg-white hover:bg-neutral-100 border border-neutral-200 text-neutral-6000 dark:text-neutral-400 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:border-neutral-700 ${twFocusClass()}`
+                )}
+              >
+                First
+              </button>
+            )}
 
-          {!isFirstPage && (
+            {!isFirstPage && (
+              <button
+                disabled={isFirstPage}
+                onClick={(event) => {
+                  event.preventDefault();
+                  refine(previousPageIndex);
+                }}
+                className={twMerge(
+                  `inline-flex px-2.5 items-center justify-center rounded-full bg-white hover:bg-neutral-100 border border-neutral-200 text-neutral-6000 dark:text-neutral-400 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:border-neutral-700 ${twFocusClass()}`
+                )}
+              >
+                <ChevronLeft />
+              </button>
+            )}
+
+            {pages.map((page) => (
+              <button
+                key={page}
+                onClick={(event) => {
+                  event.preventDefault();
+                  refine(page);
+                }}
+                className={twMerge(
+                  currentRefinement === page
+                    ? `inline-flex w-11 h-11 items-center justify-center rounded-full bg-primaryColor text-white ${twFocusClass()}`
+                    : `inline-flex w-11 h-11 items-center justify-center rounded-full bg-white hover:bg-neutral-100 border border-neutral-200 text-neutral-6000 dark:text-neutral-400 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:border-neutral-700 ${twFocusClass()}`
+                )}
+              >
+                {page + 1}
+              </button>
+            ))}
+
             <button
-              disabled={isFirstPage}
+              disabled={isLastPage}
               onClick={(event) => {
                 event.preventDefault();
-                refine(previousPageIndex);
+                refine(nextPageIndex);
               }}
               className={twMerge(
                 `inline-flex px-2.5 items-center justify-center rounded-full bg-white hover:bg-neutral-100 border border-neutral-200 text-neutral-6000 dark:text-neutral-400 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:border-neutral-700 ${twFocusClass()}`
               )}
             >
-              <ChevronLeft/>
+              <ChevronRight />
             </button>
-          )}
 
-          {pages.map((page) => (
             <button
-              key={page}
+              disabled={isLastPage}
               onClick={(event) => {
                 event.preventDefault();
-                refine(page);
+                refine(lastPageIndex);
               }}
               className={twMerge(
-                currentRefinement === page
-                  ? `inline-flex w-11 h-11 items-center justify-center rounded-full bg-primaryColor text-white ${twFocusClass()}`
-                  : `inline-flex w-11 h-11 items-center justify-center rounded-full bg-white hover:bg-neutral-100 border border-neutral-200 text-neutral-6000 dark:text-neutral-400 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:border-neutral-700 ${twFocusClass()}`
+                `inline-flex px-2.5 items-center justify-center rounded-full bg-white hover:bg-neutral-100 border border-neutral-200 text-neutral-6000 dark:text-neutral-400 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:border-neutral-700 ${twFocusClass()}`
               )}
             >
-              {page + 1}
+              <ChevronLast />
             </button>
-          ))}
-
-          <button
-            disabled={isLastPage}
-            onClick={(event) => {
-              event.preventDefault();
-              refine(nextPageIndex);
-            }}
-            className={twMerge(
-              `inline-flex px-2.5 items-center justify-center rounded-full bg-white hover:bg-neutral-100 border border-neutral-200 text-neutral-6000 dark:text-neutral-400 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:border-neutral-700 ${twFocusClass()}`
-            )}
-          >
-            <ChevronRight/>
-          </button>
-
-          <button
-            disabled={isLastPage}
-            onClick={(event) => {
-              event.preventDefault();
-              refine(lastPageIndex);
-            }}
-            className={twMerge(
-              `inline-flex px-2.5 items-center justify-center rounded-full bg-white hover:bg-neutral-100 border border-neutral-200 text-neutral-6000 dark:text-neutral-400 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:border-neutral-700 ${twFocusClass()}`
-            )}
-          >
-            <ChevronLast/>
-          </button>
-        </>
-      )}
-    </nav>
+          </>
+        )}
+      </nav>
+    </div>
   );
 };
 

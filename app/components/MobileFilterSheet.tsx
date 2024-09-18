@@ -1,30 +1,30 @@
-import {Dialog, Transition} from "@headlessui/react";
-import React, {Fragment, useEffect, useMemo, useState} from "react";
+import { Dialog, Transition } from "@headlessui/react";
+import React, { Fragment, useEffect, useMemo, useState } from "react";
 import ButtonClose from "@/shared/ButtonClose/ButtonClose";
 import Checkbox from "@/shared/Checkbox/Checkbox";
-import {twMerge} from "tailwind-merge";
+import { twMerge } from "tailwind-merge";
 import Slider from "rc-slider";
 import Radio from "@/shared/Radio/Radio";
-import {XIcon} from "lucide-react";
+import { XIcon } from "lucide-react";
 import ButtonThird from "@/shared/Button/ButtonThird";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
-import {useStore} from "@/store/store";
-import {Brand, ProductCategory} from "@/graphql/types/graphql";
-import {useRefinementList} from "react-instantsearch";
+import { useStore } from "@/store/store";
+import { Brand, ProductCategory } from "@/graphql/types/graphql";
+import { useRefinementList } from "react-instantsearch";
 
 interface TabFilterProps {
     categories?: ProductCategory[];
     category?: ProductCategory;
     brands?: Brand[];
     brand?: Brand;
-    sort?:Boolean;
+    sort?: Boolean;
 }
 
 const DATA_sortOrderRadios = [
-    {name: "Name", id: "name:asc"},
-    {name: "Most Popular", id: "totalSales(missing_values: last):desc"},
-    {name: "Best Rating", id: "reviewCount(missing_values: last):desc"},
-    {name: "Newest", id: "databaseId:desc"},
+    { name: "Name", id: "name:asc" },
+    { name: "Most Popular", id: "totalSales(missing_values: last):desc" },
+    { name: "Best Rating", id: "reviewCount(missing_values: last):desc" },
+    { name: "Newest", id: "databaseId:desc" },
     {
         name: "Price Low - High",
         id: "rawPriceNumber(missing_values: last):asc",
@@ -38,12 +38,12 @@ const DATA_sortOrderRadios = [
 const PRICE_RANGE = [500, 500000];
 
 const MobileFilterSheet = ({
-                               categories = [],
-                               brands = [],
-                               brand,
-                               category,
-                               sort,
-                           }: TabFilterProps) => {
+    categories = [],
+    brands = [],
+    brand,
+    category,
+    sort,
+}: TabFilterProps) => {
 
 
     const [isOpenMoreFilter, setisOpenMoreFilter] = useState(false);
@@ -91,23 +91,23 @@ const MobileFilterSheet = ({
         rangePrices,
     ])
 
-    const {items: categoriesFacet} = useRefinementList({
+    const { items: categoriesFacet } = useRefinementList({
         attribute: 'categories_facet',
     });
 
-    const {items: brandsFacet} = useRefinementList({
+    const { items: brandsFacet } = useRefinementList({
         attribute: 'brands_facet',
     });
 
     const facetedBrands = useMemo(() => {
         return brands.filter(b =>
-            brandsFacet.map(f =>  Number(f.value)).includes(b.databaseId)
+            brandsFacet.map(f => Number(f.value)).includes(b.databaseId)
         )
     }, [brands, brandsFacet])
 
     const facetedCategories = useMemo(() => {
         return categories.filter(b =>
-            categoriesFacet.map(f =>  Number(f.value)).includes(b.databaseId)
+            categoriesFacet.map(f => Number(f.value)).includes(b.databaseId)
         )
     }, [categoriesFacet, categories])
 
@@ -186,8 +186,8 @@ const MobileFilterSheet = ({
         return (
             <span
                 className="flex-shrink-0 w-4 h-4 rounded-full bg-primary-500 text-white flex items-center justify-center ml-3 cursor-pointer">
-        <XIcon className="p-0.5" onClick={handleXClearClick}/>
-      </span>
+                <XIcon className="p-0.5" onClick={handleXClearClick} />
+            </span>
         );
     };
 
@@ -197,11 +197,10 @@ const MobileFilterSheet = ({
         <div className="w-full">
             <div
                 className={`flex bg-white w-full flex-shrink-0 items-center justify-center px-4 py-2 text-sm rounded-full border focus:outline-none cursor-pointer select-none
-          ${
-                    filterCount
+          ${filterCount
                         ? "border border-primary-500 bg-primary-50 text-primary-900 focus:outline-none cursor-pointer select-none"
                         : "border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
-                }`}
+                    }`}
             >
                 <svg
                     className="w-4 h-4"
@@ -260,10 +259,10 @@ const MobileFilterSheet = ({
                 </svg>
 
                 <span className="ml-2" onClick={openModalMoreFilter}>
-            {filterCount > 0
-                ? `Products filters (${filterCount})`
-                : "Products filters"}
-          </span>
+                    {filterCount > 0
+                        ? `Products filters (${filterCount})`
+                        : "Products filters"}
+                </span>
                 {filterCount > 0 && renderXClear()}
             </div>
 
@@ -283,7 +282,7 @@ const MobileFilterSheet = ({
                             leaveFrom="opacity-100"
                             leaveTo="opacity-0"
                         >
-                            <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-40 dark:bg-opacity-60"/>
+                            <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-40 dark:bg-opacity-60" />
                         </Transition.Child>
 
                         {/* This element is to trick the browser into centering the modal contents. */}
@@ -291,8 +290,8 @@ const MobileFilterSheet = ({
                             className="inline-block h-screen align-middle"
                             aria-hidden="true"
                         >
-                &#8203;
-              </span>
+                            &#8203;
+                        </span>
                         <Transition.Child
                             className="fixed inset-0 h-screen w-full max-w-4xl"
                             enter="ease-out duration-300"
@@ -313,8 +312,8 @@ const MobileFilterSheet = ({
                                         Products filters
                                     </Dialog.Title>
                                     <span className="absolute left-3 top-3">
-                      <ButtonClose onClick={closeModalMoreFilter}/>
-                    </span>
+                                        <ButtonClose onClick={closeModalMoreFilter} />
+                                    </span>
                                 </div>
 
                                 <div className="overflow-y-auto h-[calc(100vh-70px)] pt-12">
@@ -336,10 +335,10 @@ const MobileFilterSheet = ({
                                                             }
                                                         />
                                                         <div
-                                                            className="w-full border-b  border-neutral-200 dark:border-neutral-700"/>
+                                                            className="w-full border-b  border-neutral-200 dark:border-neutral-700" />
                                                         <div className={twMerge(
                                                             "grid grid-cols-1 gap-2",
-                                                            facetedCategories.length > 4 && 'grid-cols-2'
+                                                            facetedCategories.length > 4 && 'grid-cols-1'
                                                         )}>
                                                             {facetedCategories.length > 0 ?
                                                                 <>
@@ -385,7 +384,7 @@ const MobileFilterSheet = ({
                                                         />
 
                                                         <div
-                                                            className="w-full border-b  border-neutral-200 dark:border-neutral-700"/>
+                                                            className="w-full border-b  border-neutral-200 dark:border-neutral-700" />
                                                         <div className={twMerge(
                                                             "grid grid-cols-1 gap-2",
                                                             facetedBrands.length > 4 && 'grid-cols-2'
@@ -423,14 +422,14 @@ const MobileFilterSheet = ({
                                         {/* --------- */}
                                         {/* ---- */}
                                         <div className="py-7">
-                                            <div className="relative flex flex-col px-5  space-y-8">
+                                            <div className="relative flex flex-col space-y-8">
                                                 <div className="space-y-5">
                                                     <span className="text-md font-medium">Price range</span>
-                                                    <br/>
+                                                    <br />
                                                     <span className="pt-1">
-                              LKR {rangePrices[0].toLocaleString()} - LKR{" "}
+                                                        LKR {rangePrices[0].toLocaleString()} - LKR{" "}
                                                         {rangePrices[1].toLocaleString()}
-                            </span>
+                                                    </span>
                                                     <Slider
                                                         range
                                                         min={PRICE_RANGE[0]}
@@ -449,19 +448,19 @@ const MobileFilterSheet = ({
                                                     />
                                                 </div>
 
-                                                <div className="flex justify-between space-x-5">
-                                                    <div>
+                                                <div className="flex flex-col gap-4">
+                                                    <div >
                                                         <label
                                                             htmlFor="minPrice"
                                                             className="block text-sm font-medium text-neutral-700 dark:text-neutral-300"
                                                         >
                                                             Min price
                                                         </label>
-                                                        <div className="mt-1 relative rounded-md">
-                                <span
-                                    className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-neutral-500 sm:text-sm">
-                                  LKR
-                                </span>
+                                                        <div className="flex flex-row gap-2 mt-1 rounded-md">
+                                                            <span
+                                                                className="flex items-center pointer-events-none text-neutral-500 sm:text-sm">
+                                                                LKR
+                                                            </span>
                                                             <input
                                                                 type="number"
                                                                 max={PRICE_RANGE[1]}
@@ -486,11 +485,10 @@ const MobileFilterSheet = ({
                                                         >
                                                             Max price
                                                         </label>
-                                                        <div className="mt-1 relative rounded-md">
-                                <span
-                                    className="absolute inset-y-0 right-4 flex items-center pointer-events-none text-neutral-500 sm:text-sm">
-                                  LKR
-                                </span>
+                                                        <div className="flex flex-row gap-2 mt-1 rounded-md">
+                                                            <span                                                                className=" flex items-center pointer-events-none text-neutral-500 sm:text-sm">
+                                                                LKR
+                                                            </span>
                                                             <input
                                                                 type="number"
                                                                 max={PRICE_RANGE[1]}
@@ -536,15 +534,14 @@ const MobileFilterSheet = ({
 
 
                                         <div className='flex gap-4 pb-24 w-full justify-between'>
-                                            <div className="py-7 w-1/2">
+                                            <div className="py-7 w-full">
                                                 <h3 className="text-md font-medium">On sale!</h3>
                                                 <div className="mt-3 relative ">
                                                     <div
-                                                        className={`flex h-[42px] items-center justify-center px-4 py-2 text-sm rounded-full border focus:outline-none cursor-pointer select-none ${
-                                                            isOnSale
+                                                        className={`flex w-2/3 h-[42px] items-center justify-center px-4 py-2 text-sm rounded-full border focus:outline-none cursor-pointer select-none ${isOnSale
                                                                 ? "border-primary-500 bg-primary-50 text-primary-900"
                                                                 : "border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
-                                                        }`}
+                                                            }`}
                                                         onClick={() => setIsIsOnSale(!isOnSale)}
                                                     >
                                                         <svg
@@ -587,7 +584,7 @@ const MobileFilterSheet = ({
                                                         {isOnSale && (
                                                             <div
                                                                 className="flex-shrink-0 w-4 h-4 rounded-full bg-primary-500 text-white flex items-center justify-center ml-3 cursor-pointer">
-                                                                <XIcon className="p-0.5"/>
+                                                                <XIcon className="p-0.5" />
                                                             </div>
                                                         )}
                                                     </div>

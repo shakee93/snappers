@@ -63,7 +63,7 @@ const BrandFilter = ({ }: BrandFilterProps) => {
                     <span className="font-medium">Price range</span>
                     <br />
                     <span className='pt-1'>LKR {rangePrices[0].toLocaleString()} - LKR {rangePrices[1].toLocaleString()}</span>
-                    <div className="w-48">
+                    <div className="w-full">
                         <Slider
                             range
                             min={PRICE_RANGE[0]}
