@@ -28,6 +28,16 @@ const Paginationx: FC<PaginationProps> = ({ className = "", onPageChange }) => {
   const nextPageIndex = currentRefinement + 1;
   const lastPageIndex = nbPages - 1;
 
+  const getVisiblePages = () => {
+    if (typeof window !== 'undefined' && window.innerWidth < 768) {
+      console.log(currentRefinement)
+      const start = Math.max(0, currentRefinement - 1);
+      const end = Math.min(nbPages - 1, currentRefinement + 1);
+      return pages.slice(start, end + 1);
+    }
+    return pages;
+  };
+
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -83,22 +93,41 @@ const Paginationx: FC<PaginationProps> = ({ className = "", onPageChange }) => {
               </button>
             )}
 
-            {pages.map((page) => (
-              <button
-                key={page}
-                onClick={(event) => {
-                  event.preventDefault();
-                  refine(page);
-                }}
-                className={twMerge(
-                  currentRefinement === page
-                    ? `inline-flex w-11 h-11 items-center justify-center rounded-full bg-primaryColor text-white ${twFocusClass()}`
-                    : `inline-flex w-11 h-11 items-center justify-center rounded-full bg-white hover:bg-neutral-100 border border-neutral-200 text-neutral-6000 dark:text-neutral-400 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:border-neutral-700 ${twFocusClass()}`
-                )}
-              >
-                {page + 1}
-              </button>
-            ))}
+            {typeof window !== 'undefined' && window.innerWidth < 768 ? (
+              getVisiblePages().map((page) => (
+                <button
+                  key={page}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    refine(page);
+                  }}
+                  className={twMerge(
+                    currentRefinement === page
+                      ? `inline-flex w-11 h-11 items-center justify-center rounded-full bg-primaryColor text-white ${twFocusClass()}`
+                      : `inline-flex w-11 h-11 items-center justify-center rounded-full bg-white hover:bg-neutral-100 border border-neutral-200 text-neutral-6000 dark:text-neutral-400 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:border-neutral-700 ${twFocusClass()}`
+                  )}
+                >
+                  {page + 1}
+                </button>
+              ))
+            ) : (
+              pages.map((page) => (
+                <button
+                  key={page}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    refine(page);
+                  }}
+                  className={twMerge(
+                    currentRefinement === page
+                      ? `inline-flex w-11 h-11 items-center justify-center rounded-full bg-primaryColor text-white ${twFocusClass()}`
+                      : `inline-flex w-11 h-11 items-center justify-center rounded-full bg-white hover:bg-neutral-100 border border-neutral-200 text-neutral-6000 dark:text-neutral-400 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:border-neutral-700 ${twFocusClass()}`
+                  )}
+                >
+                  {page + 1}
+                </button>
+              ))
+            )}
 
             <button
               disabled={isLastPage}
