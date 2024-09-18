@@ -25,13 +25,14 @@ module.exports = {
     container: {
       center: true,
       padding: {
-        DEFAULT: "1rem",
+        // DEFAULT: "1rem",
+        DEFAULT: "50px",
         xl: "48px",
         "2xl": "128px",
       },
       screens: {
         // md: '745px',
-        lg: '1220px',
+        // lg: '1220px',
         // xl: "1220px",
       }
     },
