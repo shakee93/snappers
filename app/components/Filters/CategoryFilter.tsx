@@ -8,7 +8,7 @@ import {ProductCategory} from "@/graphql/types/graphql";
 import {useStore} from "@/store/store";
 import FilterPopover from "@/app/components/Filters/FilterPopover";
 import {useHits, useRefinementList} from "react-instantsearch";
-import {RefinementListItem} from "instantsearch.js/es/connectors/refinement-list/connectRefinementList";
+// import {RefinementListItem} from "instantsearch.js/es/connectors/refinement-list/connectRefinementList";
 import {useParams} from "next/navigation";
 
 interface CategoryFilterProps {
@@ -17,7 +17,7 @@ interface CategoryFilterProps {
 
 const CategoryFilter = ({categories}: CategoryFilterProps) => {
     const { syncCategories, search, sidebar: {categories : catState } } = useStore()
-    const [firstCategoryFacets, setFirstCategoryFacets] = useState<RefinementListItem[]>([]);
+    const [firstCategoryFacets, setFirstCategoryFacets] = useState<any[]>([]);
     const { brand } = useParams()
     const { hits, results } = useHits();
 

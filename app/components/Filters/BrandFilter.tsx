@@ -6,7 +6,8 @@ import { Brand, ProductCategory } from "@/graphql/types/graphql";
 import { useStore } from "@/store/store";
 import FilterPopover from "@/app/components/Filters/FilterPopover";
 import {useRefinementList} from "react-instantsearch";
-import {RefinementListItem} from "instantsearch.js/es/connectors/refinement-list/connectRefinementList";
+// import {RefinementListItem} from "instantsearch.js/es/connectors/refinement-list/connectRefinementList";
+// import type { RefinementListItem } from 'instantsearch.js/es/connectors/refinement-list/connectRefinementList';
 import {useParams} from "next/navigation";
 
 interface BrandFilterProps {
@@ -19,7 +20,7 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
       search,
     sidebar: { brands: brandsState },
   } = useStore();
-  const [firstFacets, setFirstFacets] = useState<RefinementListItem[]>([]);
+  const [firstFacets, setFirstFacets] = useState<any[]>([]);
   const { category } = useParams()
 
   const {items: brandsFacet, refine} = useRefinementList({
