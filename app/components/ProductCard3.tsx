@@ -305,7 +305,7 @@ const ProductCard: FC<ProductCardProps> = ({
           <Prices
             price={lowestPrice}
             salePrice={lowestSalePrice}
-            className="lg:flex-row"
+            className="lg:flex-col-reverse"
           />
 
           {(salePrice === price || !salePrice) && !!reviewCount && (
