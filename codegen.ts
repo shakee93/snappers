@@ -1,7 +1,8 @@
-
 import type { CodegenConfig } from '@graphql-codegen/cli';
 import * as dotenv from 'dotenv';
-dotenv.config();
+import path from 'path';
+
+dotenv.config({ path: path.resolve(process.cwd(), '.env.local') });
 
 const config: CodegenConfig = {
   overwrite: true,

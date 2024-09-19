@@ -221,7 +221,7 @@ export const GET_PRODUCTS_NODES = gql`
 
 
 export const GET_PRODUCTS_NODES_HOMEPAGE = gql`
-  query getProductsNode($first: Int = 10, $tagId: Int!) {
+  query getProductsNodeHomePage($first: Int = 10, $tagId: Int!) {
     products(
       first: $first
       where: {

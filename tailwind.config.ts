@@ -25,7 +25,7 @@ const config: Config = {
 	darkMode: ["class", "class"],
 	theme: {
 		container: {
-			center: 'true',
+			center: true,
 			padding: {
 				DEFAULT: '1rem',
 				xl: '10px',
