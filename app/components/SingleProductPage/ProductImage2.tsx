@@ -34,9 +34,14 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   const { variationId, activeVariation } = useImage();
   const [variationImageEnabled, setVariationImageEnabled] = useState(false);
 
-  const [galleryImages, setGalleryImages]  = useState(product.galleryImages?.nodes.length !== 0
-      ? product.galleryImages?.nodes
-      : [] || [])
+  // const [galleryImages, setGalleryImages]  = useState(product.galleryImages?.nodes.length !== 0
+  //     ? product.galleryImages?.nodes
+  //     : [] || [])
+
+  const [galleryImages, setGalleryImages] = useState(
+    product?.galleryImages?.nodes?.length ? product.galleryImages.nodes : []
+  );
+  
 
   const variationImages = product.variations?.nodes?.map(
     (variation: any) => variation.image

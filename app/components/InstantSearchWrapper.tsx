@@ -11,6 +11,7 @@ import { useStore } from "@/store/store";
 import { PRICE_RANGE } from "@/app/components/Filters/PriceFilter";
 import SortInput from "@/app/components/SortInput";
 import { useDebounce } from "use-debounce";
+import MobileFilterSheet from "@/app/components/MobileFilterSheet";
 
 interface InstantSearchWrapperProps {
   search?: boolean;
@@ -111,6 +112,14 @@ const InstantSearchWrapper = ({
   }, [differedSidebar]);
 
   useEffect(() => {
+
+    if (!search) {
+      setFilterQuery(getFilterQuery);
+    }
+    // setSortQuery(differedSidebar.sort);
+  }, [search]);
+
+  useEffect(() => {
     // console.log(filterQuery);
   }, [filterQuery]);
 
@@ -144,20 +153,35 @@ const InstantSearchWrapper = ({
         searchClient={searchClient}
         indexName="product"
       >
-        <div className="flex gap-6 flex-col">
+        <div className="flex lg:gap-6 flex-col">
           <SearchInput bindToStore={bindToStore} show={search} />
-          <SortInput />
-          {filters && (
-            <TabFilters
-              category={category}
-              brand={brand}
-              categories={categories}
-              brands={brands}
-              sort={sort}
-            />
-          )}
-          <Configure filters={filterQuery} hitsPerPage={12} />
-          <ProductGridInstant />
+
+          <div className='flex overflow-x-auto lg:hidden w-full'>
+            <MobileFilterSheet category={category}
+                               brand={brand}
+                               categories={categories}
+                               brands={brands}
+                               sort={sort}/>
+          </div>
+          <div className='grid grid-cols-12 gap-4'>
+
+            <div className='col-span-0 lg:col-span-3'>
+              <SortInput />
+              {filters && (
+                  <TabFilters
+                      category={category}
+                      brand={brand}
+                      categories={categories}
+                      brands={brands}
+                      sort={sort}
+                  />
+              )}
+              <Configure filters={filterQuery} hitsPerPage={12} />
+            </div>
+            <div className='col-span-12 lg:col-span-9'>
+              <ProductGridInstant />
+            </div>
+          </div>
         </div>
       </InstantSearchComponent>
     </div>

@@ -1,6 +1,4 @@
-import { Popover, Transition } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import React, {Fragment, useMemo, useState} from "react";
+import React, {Fragment, useCallback, useEffect, useMemo, useState} from "react";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonThird from "@/shared/Button/ButtonThird";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
@@ -8,6 +6,9 @@ import { Brand, ProductCategory } from "@/graphql/types/graphql";
 import { useStore } from "@/store/store";
 import FilterPopover from "@/app/components/Filters/FilterPopover";
 import {useRefinementList} from "react-instantsearch";
+// import {RefinementListItem} from "instantsearch.js/es/connectors/refinement-list/connectRefinementList";
+// import type { RefinementListItem } from 'instantsearch.js/es/connectors/refinement-list/connectRefinementList';
+import {useParams} from "next/navigation";
 
 interface BrandFilterProps {
   brands: Brand[];
@@ -16,28 +17,56 @@ interface BrandFilterProps {
 const BrandFilter = ({ brands }: BrandFilterProps) => {
   const {
     syncBrands,
-    sidebar: { brands: brandStore },
+      search,
+    sidebar: { brands: brandsState },
   } = useStore();
-  const [brandsState, setBrandsState] = useState<number[]>([]);
-  const {items: brandsFacet} = useRefinementList({
+  const [firstFacets, setFirstFacets] = useState<any[]>([]);
+  const { category } = useParams()
+
+  const {items: brandsFacet, refine} = useRefinementList({
     attribute: 'brands_facet',
   });
 
-  const handleChange = (checked: boolean, name: number) => {
+  useEffect(() => {
+    setFirstFacets([])
+  }, [])
+
+  useEffect(() => {
+
+    if (firstFacets.length === 0) {
+      setFirstFacets(brandsFacet)
+    }
+
+  }, [brandsFacet, category])
+
+
+  //TODO: bug - when a category is selected it will show up in search as well
+  useEffect(() => {
+
+    if (search.length === 0) {
+    } else {
+      setFirstFacets(brandsFacet);
+    }
+
+
+  }, [brandsFacet, search])
+
+
+  const handleChange = useCallback((checked: boolean, name: number) => {
     if (name === 0 && checked) {
-      setBrandsState([]);
       syncBrands([]);
       return;
     }
 
     checked
-      ? setBrandsState([...brandsState, name])
-      : setBrandsState(brandsState.filter((i) => i !== name));
-  };
+        ? syncBrands([...brandsState, name])
+        : syncBrands(brandsState.filter((i: any) => i !== name));
+
+  }, [brandsState])
 
   const facetedBrands = useMemo(() => {
     return brands.filter(b =>
-        brandsFacet.map(f =>  Number(f.value)).includes(b.databaseId)
+        firstFacets.map(f =>  Number(f.value)).includes(b.databaseId)
     )
   }, [brands, brandsFacet])
 
@@ -91,23 +120,21 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
     </svg>
   );
 
+  const totalCount = useMemo(() => {
+    return firstFacets.reduce((acc, f) => {
+      const count = f.count || 0;
+      return acc + count;
+    }, 0)
+  }, [firstFacets]);
+
   return (
-    <FilterPopover
-      title="Brands"
-      icon={icon}
-      active={!!brandStore.length}
-      onClear={() => {
-        setBrandsState([]);
-        syncBrands([]);
-      }}
-    >
-      {({ open, close }) => (
-        <>
-          <div className="overflow-hidden rounded-2xl shadow-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
-            <div className="relative flex flex-col px-5 py-6 space-y-5">
+     <div className="overflow-hidden rounded-2xl w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
+            <div className="relative flex flex-col w-full px-5 py-4 pb-5 space-y-5">
+
+              <span className='font-medium'>Brands</span>
               <Checkbox
                 name="All Brands"
-                label="All Brands"
+                label={`All Brands (${totalCount})`}
                 defaultChecked={brandsState.length === 0}
                 onChange={(checked) => handleChange(checked, 0)}
               />
@@ -115,13 +142,13 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
               <div className="w-full border-b  border-neutral-200 dark:border-neutral-700" />
 
               {facetedBrands.length > 0 ?
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+                  <div className="grid grid-cols-1 md:grid-cols-1 gap-2">
                     {facetedBrands.map((item) => (
                         <div key={item.databaseId} className="">
                           <Checkbox
                               name={item.slug || ""}
                               //label={`${item.name} (${item.count})`}
-                              label={`${item.name} (${brandsFacet.find(f => item.databaseId === Number(f.value))?.count})`}
+                              label={`${item.name} (${firstFacets.find(f => item.databaseId === Number(f.value))?.count || 0})`}
                               defaultChecked={brandsState.includes(item.databaseId)}
                               onChange={(checked) =>
                                   handleChange(checked, item.databaseId)
@@ -134,31 +161,8 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
               }
 
             </div>
-            <div className="p-5 bg-neutral-50 dark:bg-neutral-900 dark:border-t dark:border-neutral-800 flex items-center justify-between">
-              <ButtonThird
-                onClick={() => {
-                  close();
-                  setBrandsState([]);
-                  syncBrands([]);
-                }}
-                sizeClass="px-4 py-2 sm:px-5"
-              >
-                Clear
-              </ButtonThird>
-              <ButtonPrimary
-                onClick={() => {
-                  syncBrands(brandsState);
-                  close();
-                }}
-                sizeClass="px-4 py-2 sm:px-5"
-              >
-                Apply
-              </ButtonPrimary>
-            </div>
           </div>
-        </>
-      )}
-    </FilterPopover>
+
   );
 };
 

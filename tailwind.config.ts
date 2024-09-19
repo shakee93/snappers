@@ -1,4 +1,4 @@
-import {nextui} from "@nextui-org/react";
+import { nextui } from "@nextui-org/react";
 const defaultTheme = require("tailwindcss/defaultTheme");
 
 interface CustomColorsParams {
@@ -19,15 +19,30 @@ function customColors(cssVar: string) {
 }
 
 module.exports = {
-  content: ["./app/**/*.{js,jsx,ts,tsx}", "./public/index.html" , "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}"],
+  content: ["./app/**/*.{js,jsx,ts,tsx}", "./public/index.html", "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}"],
   darkMode: "class", // or 'media' or 'class',
   theme: {
     container: {
       center: true,
       padding: {
-        DEFAULT: "1rem",
-        xl: "10px",
+        "sm": '0.5rem',
+        "md": '1rem',  
+        DEFAULT: "2rem",
+        // DEFAULT: "50px",
+        xl: "48px",
         "2xl": "128px",
+      },
+      // "max-width": {
+      //   lg: '1220px',
+      //   xl: '1280px',
+      //   '2xl': '1536px',
+      // },
+      screens: {
+        sm: '100%',
+        md: '100%',
+        lg: '100%',
+        xl: '1536px',
+        '2xl': '1800px',
       },
     },
     fontFamily: {
@@ -41,7 +56,7 @@ module.exports = {
         primaryColor: '#1b40af',
 
         primary: {
-        
+
           50: customColors("--c-primary-50"),
           100: customColors("--c-primary-100"),
           200: customColors("--c-primary-200"),

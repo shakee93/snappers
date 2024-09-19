@@ -89,14 +89,7 @@ const TabFilters = ({
     }, [categoriesFacet, categories])
 
     const {
-        sidebar,
-        syncCategories,
-        syncBrands,
         setMounted,
-        synPriceRange,
-        syncOnSale,
-        setInStock,
-        setSort,
     } = useStore();
 
 

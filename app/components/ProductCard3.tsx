@@ -237,7 +237,7 @@ const ProductCard: FC<ProductCardProps> = ({
                     className="w-full flex-shrink-0 bg-[#fefefe]"
                   >
                     <Image
-                      src={variation?.node?.image?.sourceUrl || ""}
+                      src={variation?.node?.image?.sourceUrl?.replace('http://', 'https://') || ""}
                       width={300}
                       height={300}
                       alt={name || ""}
@@ -283,7 +283,7 @@ const ProductCard: FC<ProductCardProps> = ({
         </div>
       </div>
 
-      <div className="space-y-2 flex flex-col space-between  h-[100px] px-2.5 justify-between  lg:pt-2 lg:pb-2.5 relative">
+      <div className="space-y-2 flex flex-col space-between min-h-[100px] px-2.5 justify-between  lg:pt-2 lg:pb-2.5 relative">
         <div>{renderGroupButtons()}</div>
 
         <Link className="block " href={link}>
