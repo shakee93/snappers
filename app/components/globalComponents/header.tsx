@@ -49,7 +49,7 @@ const Header = async () => {
               <Logo />
             </div>
 
-            <div className="flex items-center relative">
+            <div className="flex items-center relative px-4">
               <div className="hidden md:block">
                 <NavLinks />
               </div>

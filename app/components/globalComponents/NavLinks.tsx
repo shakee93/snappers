@@ -169,7 +169,7 @@ export default function NavigationMenuDemo() {
                 {item.component}
               </NavigationMenuContent>
             </> :
-              <Link href="/docs" legacyBehavior passHref>
+              <Link href={item.href} legacyBehavior passHref>
                 <NavigationMenuLink className={navigationMenuTriggerStyle()}>
                   {item.name}
                 </NavigationMenuLink>

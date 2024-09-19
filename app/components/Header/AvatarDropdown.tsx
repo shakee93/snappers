@@ -13,7 +13,7 @@ export default function AvatarDropdown() {
 
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  
+
   const { customer, fetchCustomer } = useSession();
 
   const fetchData = async () => {
@@ -27,7 +27,7 @@ export default function AvatarDropdown() {
   }, [customer]);
 
 
-  const handleClickOutside = (event : any) => {
+  const handleClickOutside = (event: any) => {
     if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
       setIsOpen(false);
     }
@@ -56,10 +56,10 @@ export default function AvatarDropdown() {
               }}
             >
               <div
-                className={`text-primaryColor w-10 h-10 sm:w-12 sm:h-12 rounded-full dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none flex items-center justify-center`}
+                className={`text-primaryColor w-10 h-10 sm:w-10 sm:h-10 rounded-full dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 focus:outline-none flex items-center justify-center`}
               >
                 {!customer || customer?.id === "guest" ? (
-                  <CircleUserRound />
+                  <User className="w-5" />
                 ) : (
                   <LoggedInAvatar name={customer?.displayName?.toString()} />
                 )}
