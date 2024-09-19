@@ -71,46 +71,27 @@ const CategoryFilter = ({ sorts }: { sorts: any }) => {
 
 
     return (
-        <FilterPopover
-            title= {sortOrderStates
-                ? DATA_sortOrderRadios.filter(
-                    (i) => i.id === sortOrderStates
-                )[0].name
-                : "Sort order"}
-            icon={icon}
-            active={!!sort}
-            onClear={() =>{
-                setSortOrderStates("")
-                setSort("")
-            }}
-            className={'lg:max-w-sm right-0'}
 
-        >
-            {({ open, close }) => (
-                <>
+        <div className="overflow-hidden rounded-2xl w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
+            <div className="relative flex flex-col px-4 py-4 w-full space-y-3">
+                <span className="font-medium">Sort By</span>
+                {DATA_sortOrderRadios.map((item) => (
+                    <Radio
+                        id={item.id}
+                        key={item.id}
+                        name="radioNameSort"
+                        label={item.name}
+                        defaultChecked={sortOrderStates === item.id}
+                        onChange={v => {
+                            console.log({v});
+                            setSortOrderStates(v)
+                            close()
+                        }}
+                    />
+                ))}
+            </div>
+        </div>
 
-                    <div className="overflow-hidden rounded-2xl shadow-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
-                        <div className="relative flex flex-col px-5 py-6 space-y-5">
-                            {DATA_sortOrderRadios.map((item) => (
-                                <Radio
-                                    id={item.id}
-                                    key={item.id}
-                                    name="radioNameSort"
-                                    label={item.name}
-                                    defaultChecked={sortOrderStates === item.id}
-                                    onChange={v => {
-                                        console.log({v});
-                                        setSortOrderStates(v)
-                                        close()
-                                    }}
-                                />
-                            ))}
-                        </div>
-                    </div>
-
-                </>
-            )}
-        </FilterPopover>
     );
 }
 

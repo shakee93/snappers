@@ -11,6 +11,7 @@ import { useStore } from "@/store/store";
 import { PRICE_RANGE } from "@/app/components/Filters/PriceFilter";
 import SortInput from "@/app/components/SortInput";
 import { useDebounce } from "use-debounce";
+import MobileFilterSheet from "@/app/components/MobileFilterSheet";
 
 interface InstantSearchWrapperProps {
   search?: boolean;
@@ -83,11 +84,15 @@ const InstantSearchWrapper = ({
   const [filterQuery, setFilterQuery] = useState<string>(getFilterQuery);
 
   const searchClient = useMemo(() => {
+    console.log('Creating Typesense client with config:', typesenseConfig);
     const typesenseInstantSearchAdapter = new TypesenseInstantSearchAdapter({
       server: {
         apiKey: "xyz", // Be sure to use an API key that only allows search operations
         nodes: [typesenseConfig],
         cacheSearchResultsForSeconds: 2 * 60, // Cache search results from server. Defaults to 2 minutes. Set to 0 to disable caching.
+        retryIntervalSeconds: 500, // Set to 0 to disable retries
+        numRetries: 100,
+        connectionTimeoutSeconds: 10,
       },
       additionalSearchParameters: {
         query_by: "name, description",
@@ -97,6 +102,7 @@ const InstantSearchWrapper = ({
       },
     });
 
+    console.log('Typesense client created successfully');
     return typesenseInstantSearchAdapter.searchClient;
   }, []);
 
@@ -104,6 +110,14 @@ const InstantSearchWrapper = ({
     setFilterQuery(getFilterQuery);
     // setSortQuery(differedSidebar.sort);
   }, [differedSidebar]);
+
+  useEffect(() => {
+
+    if (!search) {
+      setFilterQuery(getFilterQuery);
+    }
+    // setSortQuery(differedSidebar.sort);
+  }, [search]);
 
   useEffect(() => {
     // console.log(filterQuery);
@@ -139,20 +153,35 @@ const InstantSearchWrapper = ({
         searchClient={searchClient}
         indexName="product"
       >
-        <div className="flex gap-6 flex-col">
+        <div className="flex lg:gap-6 flex-col">
           <SearchInput bindToStore={bindToStore} show={search} />
-          <SortInput />
-          {filters && (
-            <TabFilters
-              category={category}
-              brand={brand}
-              categories={categories}
-              brands={brands}
-              sort={sort}
-            />
-          )}
-          <Configure filters={filterQuery} hitsPerPage={12} />
-          <ProductGridInstant />
+
+          <div className='flex overflow-x-auto lg:hidden w-full'>
+            <MobileFilterSheet category={category}
+                               brand={brand}
+                               categories={categories}
+                               brands={brands}
+                               sort={sort}/>
+          </div>
+          <div className='grid grid-cols-12 gap-4'>
+
+            <div className='col-span-0 lg:col-span-3'>
+              <SortInput />
+              {filters && (
+                  <TabFilters
+                      category={category}
+                      brand={brand}
+                      categories={categories}
+                      brands={brands}
+                      sort={sort}
+                  />
+              )}
+              <Configure filters={filterQuery} hitsPerPage={12} />
+            </div>
+            <div className='col-span-12 lg:col-span-9'>
+              <ProductGridInstant />
+            </div>
+          </div>
         </div>
       </InstantSearchComponent>
     </div>

@@ -66,6 +66,9 @@ const Header = async () => {
         </div>
       </header>
       <MobileNavLinks />
+
+
+
       <HeaderSearchResults
         productCategories={productCategories}
         brands={brands}

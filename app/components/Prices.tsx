@@ -37,7 +37,7 @@ const Prices: FC<PricesProps> = ({
             }
 
             {(salePrice && salePrice !== price) ? (
-                <div className={`flex ${contentClass}`}>
+                <div className={`flex w-full ${contentClass}`}>
                     <span className="text-red-400 font-bold line-through text-xs lg:text-sm" dangerouslySetInnerHTML={{ __html: salePrice || '' }} />
                 </div>
             ): <></>}

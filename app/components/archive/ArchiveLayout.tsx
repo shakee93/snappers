@@ -39,7 +39,7 @@ const ArchiveLayout = async ({
   // console.log('category', category);
   return (
     <div className="container py-8 lg:py-12 space-y-16 sm:space-y-20 lg:space-y-28">
-      <div className="space-y-4 lg:space-y-14">
+      <div className="space-y-4 lg:space-y-6">
         <div className="max-w-screen-sm">
           <h2 className="block text-2xl sm:text-3xl lg:text-4xl font-semibold">
             {title}
@@ -54,6 +54,7 @@ const ArchiveLayout = async ({
         <main>
           <div className="flex flex-col lg:flex-row">
             <div className="flex-1 ">
+
               {/* {JSON.stringify(search, null, 2)}
               {JSON.stringify(productCategories, null, 2)}
               {JSON.stringify(brand, null, 2)} */}

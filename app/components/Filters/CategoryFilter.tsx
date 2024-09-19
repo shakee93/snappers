@@ -1,167 +1,119 @@
 import {Popover, Transition} from "@headlessui/react";
 import {ChevronDownIcon} from "@heroicons/react/24/outline";
-import React, {Fragment, useMemo, useState} from "react";
+import React, {Fragment, useCallback, useEffect, useMemo, useRef, useState} from "react";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonThird from "@/shared/Button/ButtonThird";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import {ProductCategory} from "@/graphql/types/graphql";
 import {useStore} from "@/store/store";
 import FilterPopover from "@/app/components/Filters/FilterPopover";
-import {useRefinementList} from "react-instantsearch";
+import {useHits, useRefinementList} from "react-instantsearch";
+// import {RefinementListItem} from "instantsearch.js/es/connectors/refinement-list/connectRefinementList";
+import {useParams} from "next/navigation";
 
 interface CategoryFilterProps {
     categories: ProductCategory[]
 }
 
 const CategoryFilter = ({categories}: CategoryFilterProps) => {
-    const { syncCategories, sidebar: {categories : catState } } = useStore()
-    const [categoriesState, setCategoriesState] = useState<number[]>([]);
+    const { syncCategories, search, sidebar: {categories : catState } } = useStore()
+    const [firstCategoryFacets, setFirstCategoryFacets] = useState<any[]>([]);
+    const { brand } = useParams()
+    const { hits, results } = useHits();
+
+
     const {items: categoriesFacet} = useRefinementList({
         attribute: 'categories_facet',
     });
 
-    const handleChangeCategories = (checked: boolean, name: number) => {
+    useEffect(() => {
 
-        if (name === 0 && checked) {
-            setCategoriesState([])
-            syncCategories([])
-            return
+        if (firstCategoryFacets.length === 0) {
+            setFirstCategoryFacets(categoriesFacet)
         }
 
-        checked
-            ? setCategoriesState([...categoriesState, name])
-            : setCategoriesState(categoriesState.filter((i) => i !== name));
+    }, [categoriesFacet, brand])
 
 
-        // syncCategories(categoriesState);
-    };
+    //TODO: bug - when a category is selected it will show up in search as well
+    useEffect(() => {
+
+        if (search.length === 0) {
+
+        } else {
+            setFirstCategoryFacets(categoriesFacet);
+        }
+
+
+    }, [categoriesFacet, search])
+
+
+    const handleChangeCategories = useCallback(
+        (checked: boolean, name: number) => {
+
+            if (name === 0 && checked) {
+                syncCategories([])
+                return
+            }
+
+            checked
+                ? syncCategories([...catState, name])
+                : syncCategories(catState.filter((i) => i !== name));
+
+        }, [catState])
 
     const facetedCategories = useMemo(() => {
-        return categories.filter(b =>
-            categoriesFacet.map(f =>  Number(f.value)).includes(b.databaseId)
-        )
-    }, [categoriesFacet, categories])
 
-    const icon =  <svg
-        className="w-4 h-4"
-        viewBox="0 0 24 24"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-    >
-        <path
-            d="M8 2V5"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeMiterlimit="10"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        />
-        <path
-            d="M16 2V5"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeMiterlimit="10"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        />
-        <path
-            d="M7 13H15"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeMiterlimit="10"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        />
-        <path
-            d="M7 17H12"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeMiterlimit="10"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        />
-        <path
-            d="M16 3.5C19.33 3.68 21 4.95 21 9.65V15.83C21 19.95 20 22.01 15 22.01H9C4 22.01 3 19.95 3 15.83V9.65C3 4.95 4.67 3.69 8 3.5H16Z"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeMiterlimit="10"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-        />
-    </svg>
+        return categories.filter(b =>
+            firstCategoryFacets.map(f =>  Number(f.value)).includes(b.databaseId)
+        )
+    }, [firstCategoryFacets, categories])
+
+    const totalCount = useMemo(() => {
+        return firstCategoryFacets.reduce((acc, f) => {
+            const count = f.count || 0;
+            return acc + count;
+        }, 0)
+    }, [firstCategoryFacets]);
+
 
     return (
-        <FilterPopover
-            title='Categories'
-            icon={icon}
-            active={!!catState.length}
-            onClear={() =>{
-                setCategoriesState([])
-                syncCategories([])
-            }}
+        <div className="overflow-hidden relative w-full z-10 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
 
-        >
-            {({ open, close }) => (
-                <>
 
-                    <div className="overflow-hidden relative  z-10 rounded-2xl shadow-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
+            <div className="relative flex flex-col px-4 py-4 w-full space-y-5">
+                <span className='font-medium flex gap-2 items-center'>Categories</span>
+                <Checkbox
+                    name="All Categories"
+                    label={`All Categories (${totalCount})`}
+                    defaultChecked={catState.length === 0}
+                    onChange={(checked) =>
+                        handleChangeCategories(checked, 0)
+                    }
+                />
 
-                        <div className="relative flex flex-col px-5 py-6 space-y-5">
-                            <Checkbox
-                                name="All Categories"
-                                label="All Categories"
-                                defaultChecked={categoriesState.length === 0}
-                                onChange={(checked) =>
-                                    handleChangeCategories(checked, 0)
-                                }
-                            />
+                <div className="w-full border-b  border-neutral-200 dark:border-neutral-700" />
 
-                            <div className="w-full border-b  border-neutral-200 dark:border-neutral-700" />
-
-                            {facetedCategories.length > 0 ?
-                            <div className='grid grid-cols-2 gap-2'>
-                                {facetedCategories.map((item) => (
-                                    <div key={item.databaseId} className="">
-                                        <Checkbox
-                                            name={item.slug || ''}
-                                            // label={`${item.name} (${item.count})`}
-                                            label={`${item.name} (${categoriesFacet.find(f => item.databaseId === Number(f.value))?.count})`}
-                                            defaultChecked={categoriesState.includes(item.databaseId)}
-                                            onChange={(checked) =>
-                                                handleChangeCategories(checked, item.databaseId)
-                                            }
-                                        />
-                                    </div>
-                                ))}
-                            </div> :
-                                <div className='text-sm'>No Categories found for this search.</div>
-                            }
-                        </div>
-                        <div className="p-5 bg-neutral-50 dark:bg-neutral-900 dark:border-t dark:border-neutral-800 flex items-center justify-between">
-                            <ButtonThird
-                                onClick={() => {
-                                    close();
-                                    setCategoriesState([]);
-                                    syncCategories([])
-                                }}
-                                sizeClass="px-4 py-2 sm:px-5"
-                            >
-                                Clear
-                            </ButtonThird>
-                            <ButtonPrimary
-                                onClick={() => {
-                                    syncCategories(categoriesState)
-                                    close()
-                                }}
-                                sizeClass="px-4 py-2 sm:px-5"
-                            >
-                                Apply
-                            </ButtonPrimary>
-                        </div>
-                    </div>
-                </>
-            )}
-        </FilterPopover>
+                {facetedCategories.length > 0 ?
+                    <div className='grid grid-cols-1 gap-2'>
+                        {facetedCategories.map((item) => (
+                            <div key={item.databaseId} className="">
+                                <Checkbox
+                                    name={item.slug || ''}
+                                    // label={`${item.name} (${item.count})`}
+                                    label={`${item.name} (${firstCategoryFacets.find(f => item.databaseId === Number(f.value))?.count || 0})`}
+                                    defaultChecked={catState.includes(item.databaseId)}
+                                    onChange={(checked) =>
+                                        handleChangeCategories(checked, item.databaseId)
+                                    }
+                                />
+                            </div>
+                        ))}
+                    </div> :
+                    <div className='text-sm'>No Categories found for this search.</div>
+                }
+            </div>
+        </div>
     );
 }
 

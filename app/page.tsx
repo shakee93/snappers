@@ -26,6 +26,7 @@ import Standard from "@/public/images/bank logos/standard-chartered-2021-logo-fr
 import SectionHero2 from "./components/HomePage/SectionHero2";
 import CategoryWithSubcategories from "./components/globalComponents/CategoryWithSubcategories";
 import bgSlide2 from '@/public/homepage/slider/Layer_2.png';
+import kokoBg from '@/public/homepage/slider/koko.png';
 import bgSlide3 from '@/public/homepage/slider/Layer_3.png';
 import bgSlide4 from '@/public/homepage/slider/Layer_4.png';
 import bgSlide5 from '@/public/homepage/slider/Layer_5.png';
@@ -36,9 +37,26 @@ import bgSlide9 from '@/public/homepage/slider/Layer_9.png';
 import bgSlide10 from '@/public/homepage/slider/Layer_10.png';
 import bgSlide11 from '@/public/homepage/slider/Layer_11.png';
 
+
 const slidesData = [
   {
     id: "1",
+    slideFields: {
+      mainHeading: "Shop now, pay later with Koko.",
+      subHeading: "No interest, No card block",
+      buttonText: "Contact",
+      buttonLink: "/contact",
+      backgroundColor: "#CCE0EF",
+      backgroundImage:kokoBg.src,
+      featureImage: {
+        id: "2",
+        sourceUrl:
+          "http://api.gqmobiles.lk/wp-content/uploads/2024/09/Group-1.png",
+      },
+    },
+  },
+  {
+    id: "2",
     slideFields: {
       mainHeading: "Pioneering Excellence",
       subHeading: "Samsung Galaxy Watch 7: Smart, Stylish, Superior",
@@ -54,7 +72,7 @@ const slidesData = [
     },
   },
   {
-    id: "2",
+    id: "3",
     slideFields: {
       mainHeading: "Ultimate Precision",
       subHeading: "Samsung Galaxy Watch Ultra: Style Meets Performance",
@@ -71,7 +89,7 @@ const slidesData = [
   },
 
   {
-    id: "3",
+    id: "4",
     slideFields: {
       mainHeading: "Innovation Redefined",
       subHeading: "CMF Phone 1: Simple, Elegant, Powerful",
@@ -88,7 +106,7 @@ const slidesData = [
   },
 
   {
-    id: "4",
+    id: "5",
     slideFields: {
       mainHeading: "Flip Your World",
       subHeading: "Samsung Galaxy Z Flip 6: Elegance Redefined in Every Flip",
@@ -106,7 +124,7 @@ const slidesData = [
   },
 
   {
-    id: "5",
+    id: "6",
     slideFields: {
       mainHeading: "Unfold Excellence",
       subHeading: "Z Fold 6 : Cutting-Edge Innovation, Unmatched Sophistication",
@@ -124,7 +142,7 @@ const slidesData = [
   },
 
   {
-    id: "6",
+    id: "7",
     slideFields: {
       mainHeading: "Power Up Swiftly",
       subHeading: "Apple 20W USB-C Power Adapter",
@@ -156,47 +174,63 @@ const Banks = [
 ];
 
 const getData = async () => {
-  const [newArrivals, mobiles, speakers, watches, backInStock] =
-    await Promise.all([
-      //Slides
-      // getClient().query({ query: GET_SLIDES }),
-      //New Arrivals
-      getClient().query({ query: GET_PRODUCTS_NODES }),
-      //Mobiles
-      getClient().query({
-        query: GET_PRODUCTS_NODES,
-        variables: { first: 10, categoryIdIn: [165] },
-      }),
-      //Speakers
-      getClient().query({
-        query: GET_PRODUCTS_NODES_HOMEPAGE,
-        variables: { first: 10, tagId: 538 },
-      }),
-      //Watches
-      getClient().query({
-        query: GET_PRODUCTS_NODES,
-        variables: { first: 10, categoryIdIn: [302] },
-      }),
+  const queries = [
+    getClient().query({ query: GET_PRODUCTS_NODES }).then(res => {
+      return res.data?.products?.nodes || [];
+    }).catch(() => {
+      console.error('Error fetching new arrivals');
+      return [];
+    }),
 
-      //Back In Stock
-      getClient().query({
-        query: GET_PRODUCTS_NODES_HOMEPAGE,
-        variables: { first: 10, tagId: 536 },
-      }),
-    ]);
+    getClient().query({
+      query: GET_PRODUCTS_NODES,
+      variables: { first: 10, categoryIdIn: [165] },
+    }).then(res => {
+      return res.data?.products?.nodes || [];
+    }).catch(() => {
+      console.error('Error fetching mobiles');
+      return [];
+    }),
+
+    getClient().query({
+      query: GET_PRODUCTS_NODES_HOMEPAGE,
+      variables: { first: 10, tagId: 538 },
+    }).then(res => {
+      return res.data?.products?.nodes || [];
+    }).catch(() => {
+      console.error('Error fetching speakers');
+      return [];
+    }),
+
+    getClient().query({
+      query: GET_PRODUCTS_NODES,
+      variables: { first: 10, categoryIdIn: [302] },
+    }).then(res => {
+      return res.data?.products?.nodes || [];
+    }).catch(() => {
+      console.error('Error fetching watches');
+      return [];
+    }),
+
+    getClient().query({
+      query: GET_PRODUCTS_NODES_HOMEPAGE,
+      variables: { first: 10, tagId: 536 },
+    }).then(res => {
+      return res.data?.products?.nodes || [];
+    }).catch(() => {
+      console.error('Error fetching back in stock');
+      return [];
+    }),
+  ];
+
+  const [newArrivals, mobiles, speakers, watches, backInStock] = await Promise.all(queries);
 
   return {
-    // slides: slides.data?.slides?.nodes,
-    newArrivals: newArrivals.data?.products?.nodes as (SimpleProduct &
-      VariableProduct)[],
-    mobiles: mobiles.data?.products?.nodes as (SimpleProduct &
-      VariableProduct)[],
-    speakers: speakers.data?.products?.nodes as (SimpleProduct &
-      VariableProduct)[],
-    watches: watches.data?.products?.nodes as (SimpleProduct &
-      VariableProduct)[],
-    backInStock: backInStock?.data?.products?.nodes as (SimpleProduct &
-      VariableProduct)[],
+    newArrivals: newArrivals as (SimpleProduct & VariableProduct)[],
+    mobiles: mobiles as (SimpleProduct & VariableProduct)[],
+    speakers: speakers as (SimpleProduct & VariableProduct)[],
+    watches: watches as (SimpleProduct & VariableProduct)[],
+    backInStock: backInStock as (SimpleProduct & VariableProduct)[],
   };
 };
 
