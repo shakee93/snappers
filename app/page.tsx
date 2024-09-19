@@ -174,47 +174,63 @@ const Banks = [
 ];
 
 const getData = async () => {
-  const [newArrivals, mobiles, speakers, watches, backInStock] =
-    await Promise.all([
-      //Slides
-      // getClient().query({ query: GET_SLIDES }),
-      //New Arrivals
-      getClient().query({ query: GET_PRODUCTS_NODES }),
-      //Mobiles
-      getClient().query({
-        query: GET_PRODUCTS_NODES,
-        variables: { first: 10, categoryIdIn: [165] },
-      }),
-      //Speakers
-      getClient().query({
-        query: GET_PRODUCTS_NODES_HOMEPAGE,
-        variables: { first: 10, tagId: 538 },
-      }),
-      //Watches
-      getClient().query({
-        query: GET_PRODUCTS_NODES,
-        variables: { first: 10, categoryIdIn: [302] },
-      }),
+  const queries = [
+    getClient().query({ query: GET_PRODUCTS_NODES }).then(res => {
+      return res.data?.products?.nodes || [];
+    }).catch(() => {
+      console.error('Error fetching new arrivals');
+      return [];
+    }),
 
-      //Back In Stock
-      getClient().query({
-        query: GET_PRODUCTS_NODES_HOMEPAGE,
-        variables: { first: 10, tagId: 536 },
-      }),
-    ]);
+    getClient().query({
+      query: GET_PRODUCTS_NODES,
+      variables: { first: 10, categoryIdIn: [165] },
+    }).then(res => {
+      return res.data?.products?.nodes || [];
+    }).catch(() => {
+      console.error('Error fetching mobiles');
+      return [];
+    }),
+
+    getClient().query({
+      query: GET_PRODUCTS_NODES_HOMEPAGE,
+      variables: { first: 10, tagId: 538 },
+    }).then(res => {
+      return res.data?.products?.nodes || [];
+    }).catch(() => {
+      console.error('Error fetching speakers');
+      return [];
+    }),
+
+    getClient().query({
+      query: GET_PRODUCTS_NODES,
+      variables: { first: 10, categoryIdIn: [302] },
+    }).then(res => {
+      return res.data?.products?.nodes || [];
+    }).catch(() => {
+      console.error('Error fetching watches');
+      return [];
+    }),
+
+    getClient().query({
+      query: GET_PRODUCTS_NODES_HOMEPAGE,
+      variables: { first: 10, tagId: 536 },
+    }).then(res => {
+      return res.data?.products?.nodes || [];
+    }).catch(() => {
+      console.error('Error fetching back in stock');
+      return [];
+    }),
+  ];
+
+  const [newArrivals, mobiles, speakers, watches, backInStock] = await Promise.all(queries);
 
   return {
-    // slides: slides.data?.slides?.nodes,
-    newArrivals: newArrivals.data?.products?.nodes as (SimpleProduct &
-      VariableProduct)[],
-    mobiles: mobiles.data?.products?.nodes as (SimpleProduct &
-      VariableProduct)[],
-    speakers: speakers.data?.products?.nodes as (SimpleProduct &
-      VariableProduct)[],
-    watches: watches.data?.products?.nodes as (SimpleProduct &
-      VariableProduct)[],
-    backInStock: backInStock?.data?.products?.nodes as (SimpleProduct &
-      VariableProduct)[],
+    newArrivals: newArrivals as (SimpleProduct & VariableProduct)[],
+    mobiles: mobiles as (SimpleProduct & VariableProduct)[],
+    speakers: speakers as (SimpleProduct & VariableProduct)[],
+    watches: watches as (SimpleProduct & VariableProduct)[],
+    backInStock: backInStock as (SimpleProduct & VariableProduct)[],
   };
 };
 
