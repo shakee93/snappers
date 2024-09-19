@@ -41,8 +41,8 @@ module.exports = {
         sm: '100%',
         md: '100%',
         lg: '100%',
-        xl: '1280px',
-        '2xl': '1536px',
+        xl: '1536px',
+        '2xl': '1800px',
       },
     },
     fontFamily: {
