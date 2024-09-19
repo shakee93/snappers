@@ -40,9 +40,9 @@ export default function NavCategories() {
                     </div>
                 ) : (
                     splitIntoColumns(categories, columnCount).map((column, colIndex) => (
-                        <div key={colIndex} className="flex-1">
+                        <div key={`column-${colIndex}`} className="flex-1">
                             {column.map((category) => (
-                                <div key={category.id} className="category-group mb-2 p-2 hover:bg-zinc-100 rounded-md">
+                                <div key={`category-${category.slug}`} className="category-group mb-2 p-2 hover:bg-zinc-100 rounded-md">
                                     <h3 className={`text-sm font-semibold ${category.children?.nodes && category.children.nodes.length > 0 ? 'mb-2' : ''}`}>
                                         <Link href={`/collections/${category.slug}`} className="text-blue-950 hover:underline flex items-center">
                                             <span className="inline-block bg-zinc-200 rounded-full w-6 h-6 mr-1.5"></span>
@@ -52,7 +52,7 @@ export default function NavCategories() {
                                     {category?.children?.nodes && category.children.nodes.length > 0 && (
                                         <ul className="space-y-1">
                                             {category?.children?.nodes.map((child: ProductCategory) => (
-                                                <li key={child.id} className='ml-2.5'>
+                                                <li key={`child-${child.slug}`} className='ml-2.5'>
                                                     <Link href={`/collections/${child.slug}`} className="text-sm text-muted-foreground hover:text-primary">
                                                         {child.name}
                                                     </Link>

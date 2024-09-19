@@ -4,7 +4,7 @@ import * as React from "react"
 import Link from "next/link"
 import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu"
 import NavCategories from "./mega-menu/categories"
-import BrandsMenu from "./mega-menu/BrandsMenu"
+import BrandsMenu from "./mega-menu/brands"
 
 type NavLinkItem = {
   href: string;

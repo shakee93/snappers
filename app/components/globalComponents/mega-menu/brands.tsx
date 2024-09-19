@@ -1,34 +1,58 @@
+'use client'
+import { useQuery } from '@apollo/client';
+import { GET_NAV_BRANDS } from '@/graphql/defs/nav';
+import Link from 'next/link';
+import { Brand } from '@/graphql/types/graphql';
+import { ArrowRight } from 'lucide-react';
 
-import { NavigationMenuLink } from "@/components/ui/navigation-menu"
-import { ListItem } from "../ListItem"
+export default function BrandsMenu() {
+    const { data, loading, error } = useQuery(GET_NAV_BRANDS);
 
-export function BrandsMenu() {
-  return (
-    <ul className="grid bg-white gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
-      <li className="row-span-3">
-        <NavigationMenuLink asChild>
-          <a
-            className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-            href="/"
-          >
-            <div className="mb-2 mt-4 text-lg font-medium">
-              shadcn/ui
+    const brands: Brand[] = data?.brands?.nodes || [];
+
+    // Function to split brands into columns
+    const splitIntoColumns = (items: Brand[], columnCount: number): Brand[][] => {
+        const columns: Brand[][] = Array.from({ length: columnCount }, () => []);
+        items.forEach((item, index) => {
+            columns[index % columnCount].push(item);
+        });
+        return columns;
+    };
+
+    const columnCount = 4;
+
+    return (
+        <div className="w-full bg-white md:w-[800px] lg:w-[800px] xl:w-[1200px]">
+            <div className="text-sm p-3 text-muted-foreground mb-2 w-full border-b pb-2">
+                <Link href="/brands" className="flex items-center hover:underline hover:text-blue-800 transition-colors duration-200">
+                    <span>Browse all brands</span>
+                    <ArrowRight className="ml-1 h-4 w-4 group-hover:text-blue-500" />
+                </Link>
             </div>
-            <p className="text-sm leading-tight text-muted-foreground">
-              adasdas
-            </p>
-          </a>
-        </NavigationMenuLink>
-      </li>
-      <ListItem href="/docs" title="Introduction">
-        Re-usable components built using Radix UI and Tailwind CSS.
-      </ListItem>
-      <ListItem href="/docs/installation" title="Installation">
-        How to install dependencies and structure your app.
-      </ListItem>
-      <ListItem href="/docs/primitives/typography" title="Typography">
-        Styles for headings, paragraphs, lists...etc
-      </ListItem>
-    </ul>
-  )
+            <div className="flex space-x-6 p-3 pt-1">
+                {loading ? (
+                    <div className="flex-1">
+                        <p>Loading brands...</p>
+                    </div>
+                ) : error ? (
+                    <div className="flex-1">
+                        <p>Error loading brands</p>
+                    </div>
+                ) : (
+                    splitIntoColumns(brands, columnCount).map((column, colIndex) => (
+                        <div key={colIndex} className="flex-1">
+                            {column.map((brand) => (
+                                <div key={`brand-${brand.slug}`} className="brand-item mb-2 p-2 hover:bg-zinc-100 rounded-md">
+                                    <Link href={`/${brand.slug}`} className="text-blue-950 hover:underline flex items-center">
+                                        <span className="inline-block bg-zinc-200 rounded-full w-6 h-6 mr-1.5"></span>
+                                        <span className="truncate max-w-[200px] text-sm font-semibold">{brand.name}</span>
+                                    </Link>
+                                </div>
+                            ))}
+                        </div>
+                    ))
+                )}
+            </div>
+        </div>
+    )
 }
