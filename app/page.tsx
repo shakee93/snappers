@@ -216,6 +216,7 @@ const getData = async () => {
       query: GET_PRODUCTS_NODES_HOMEPAGE,
       variables: { first: 10, tagId: 536 },
     }).then(res => {
+      console.debug('Back In Stock Response:', res);
       return res.data?.products?.nodes || [];
     }).catch(() => {
       console.error('Error fetching back in stock');
@@ -247,14 +248,9 @@ export default async function Home() {
   return (
     <main>
       <div className="nc-PageHome relative flex flex-col overflow-hidden">
-        <div className="bg-[#285f38] px-2 py-4 md:p-3">
+        {/* <div className="bg-[#285f38] px-2 py-4 md:p-3">
           <div className="items-between flex flex-col gap-4 md:flex-row md:items-center md:gap-3">
             <div className="flex w-full flex-col items-center justify-center gap-2 md:flex-row">
-              {/* <div>
-                <p className="text-3xl md:text-xl lg:text-3xl xl:text-5xl -skew-x-[20deg] font-bold bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent bg-clip-text">
-                  0% Installment
-                </p>
-              </div> */}
               <div className="flex shrink-0 flex-col gap-0">
                 <p className="items-center justify-center text-center text-lg font-semibold text-white md:text-lg lg:text-2xl">
                   Up to 24 Month Bank Installment Plans
@@ -265,22 +261,9 @@ export default async function Home() {
                 <p className="flex w-full items-baseline justify-end gap-2 md:gap-1"></p>
               </div>
 
-              {/* <div className="flex py-2 mx-4 md:mx-0 px-2 md:px-4  shrink  gap-2 xl:gap-5 bg-white rounded-xl">
-                <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 md:gap-x-7 md:gap-y-2 xl:gap-4">
-                  {Banks.map((bank, index) => (
-                    <div key={index} className="">
-                      <Image
-                        src={bank}
-                        alt={`Bank Logo ${index}`}
-                        className="w-auto h-5 md:h-6 lg:h-7"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div> */}
             </div>
           </div>
-        </div>
+        </div> */}
         {/* hero section */}
         <div className="z-0">
           {/* <SectionHero3 /> */}
