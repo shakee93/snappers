@@ -17,6 +17,7 @@ interface TabFilterProps {
 }
 
 
+
 const TabFilters = ({
     categories = [],
     brands = [],
