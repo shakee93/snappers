@@ -11,7 +11,6 @@ import HeaderSearchResults from "@/app/components/globalComponents/HeaderSearchR
 import { Brand } from "@/graphql/types/graphql";
 import MobileBottomNav from "@/app/components/globalComponents/MobileBottomNav";
 import { isPaymentPage } from "./paymentPageCheckUtils";
-import LeftNavLinks from "./LeftNavLinks";
 
 async function getData(categories: number[] | null = null) {
   const { data, error } = await getClient().query({
