@@ -2,9 +2,11 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu"
+import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger, navigationMenuTriggerStyle, NavigationMenuViewport } from "@/components/ui/navigation-menu"
 import NavCategories from "./mega-menu/categories"
 import BrandsMenu from "./mega-menu/brands"
+// import * as NavigationMenu from '@radix-ui/react-navigation-menu';
+import { CaretDownIcon } from '@radix-ui/react-icons';
 
 type NavLinkItem = {
   href: string;
@@ -37,34 +39,69 @@ const navLinks: NavLinkItem[] = [
   },
 ];
 
+
 export default function NavLinks() {
 
   return (
-    <NavigationMenu>
-      <NavigationMenuList>
+    <NavigationMenu className="NavigationMenuRoot">
+      <NavigationMenuList className="NavigationMenuList">
         {navLinks.map(item => (
           <NavigationMenuItem key={item.href}>
             {item.component ? (
               <>
-                <NavigationMenuTrigger>
-                  {item.name}
+                <NavigationMenuTrigger className="NavigationMenuTrigger">
+                  {item.name} 
                 </NavigationMenuTrigger>
-
-                <NavigationMenuContent className="animate-in">
+                <NavigationMenuContent className="NavigationMenuContent">
                   {React.createElement(item.component)}
                 </NavigationMenuContent>
               </>
             ) : (
-              <Link href={item.href} legacyBehavior passHref>
-                <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+              <NavigationMenuLink asChild>
+                <Link href={item.href} className="NavigationMenuLink">
                   {item.name}
-                </NavigationMenuLink>
-              </Link>
+                </Link>
+              </NavigationMenuLink>
             )}
           </NavigationMenuItem>
         ))}
+
       </NavigationMenuList>
+
+      <div className="ViewportPosition">
+        <NavigationMenuViewport className="NavigationMenuViewport" />
+      </div>
+
     </NavigationMenu>
+
+    // <NavigationMenu>
+    //   <NavigationMenuList>
+    //     {navLinks.map(item => (
+    //       <NavigationMenuItem key={item.href}>
+    //         {item.component ? (
+    //           <>
+    //             <NavigationMenuTrigger>
+    //               {item.name}
+    //             </NavigationMenuTrigger>
+
+    //             <NavigationMenuContent className="animate-in fade-in">
+    //               {React.createElement(item.component)}
+    //             </NavigationMenuContent>
+    //           </>
+    //         ) : (
+    //           <Link href={item.href} legacyBehavior passHref>
+    //             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+    //               {item.name}
+    //             </NavigationMenuLink>
+    //           </Link>
+    //         )}
+    //       </NavigationMenuItem>
+    //     ))}
+    //   </NavigationMenuList>
+    // </NavigationMenu>
+
   )
+
+
 }
 

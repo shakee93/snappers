@@ -37,19 +37,20 @@ const Header = async () => {
           "sticky top-0 py-1 flex flex-col justify-between bg-white z-30 transition-all duration-1300 md:border-b"
         }
       >
-        <div className="container flex justify-between items-center md:items-stretch">
-          <div className="flex md:hidden px-2 gap-2 bg-gradient-to-br from-sky-500 to-primaryColor py-2 flex-1 justify-center items-center">
+        <div className="md:container flex justify-between items-center md:items-stretch px-0">
+
+          <div className="hidden md:hidden px-2 gap-2 bg-gradient-to-br from-sky-500 to-primaryColor py-2 flex-1 justify-center items-center">
             <SearchBar />
           </div>
 
           <div className="relative flex items-center justify-between w-full pr-3">
 
-            <div className="  -left-12 hidden md:flex items-center mr-4">
+            <div className="-left-12 hidden md:flex items-center mr-4">
               <Logo />
             </div>
 
-            <div className="flex items-center relative px-4">
-              <div className="hidden md:block">
+            <div className="hidden md:flex items-center relative px-4">
+              <div className="md:block">
                 <NavLinks />
               </div>
             </div>
@@ -57,21 +58,26 @@ const Header = async () => {
             <div className="flex-1">
               <SearchBar />
             </div>
+
             <div className="hidden md:flex">
               <AvatarDropdown />
               <CartDropdown />
             </div>
+
           </div>
         </div>
       </header>
+
       <MobileNavLinks />
       <HeaderSearchResults
         productCategories={productCategories}
         brands={brands}
       />
+
       <div className="md:hidden">
         <MobileBottomNav categories={productCategories} />
       </div>
+
     </>
   );
 };
