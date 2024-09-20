@@ -70,6 +70,8 @@ mark.ais-Highlight-highlighted {
   width: 100%;
   animation-duration: 250ms;
   animation-timing-function: ease;
+  z-index: 1000; /* Add this line */
+  pointer-events: auto;
 }
 .NavigationMenuContent[data-motion='from-start'] {
   animation-name: enterFromLeft;

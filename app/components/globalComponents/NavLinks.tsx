@@ -50,18 +50,18 @@ export default function NavLinks() {
             {item.component ? (
               <>
                 <NavigationMenuTrigger className="NavigationMenuTrigger">
-                  {item.name} 
+                  {item.name}
                 </NavigationMenuTrigger>
-                <NavigationMenuContent className="NavigationMenuContent">
-                  {React.createElement(item.component)}
+                <NavigationMenuContent className="NavigationMenuContent test">
+                  {React.createElement(item.component, { onClose: () => { } })}
                 </NavigationMenuContent>
               </>
             ) : (
-              <NavigationMenuLink asChild>
-                <Link href={item.href} className="NavigationMenuLink">
+              <Link href={item.href} legacyBehavior passHref>
+                <NavigationMenuLink className="NavigationMenuLink">
                   {item.name}
-                </Link>
-              </NavigationMenuLink>
+                </NavigationMenuLink>
+              </Link>
             )}
           </NavigationMenuItem>
         ))}
