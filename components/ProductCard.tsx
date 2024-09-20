@@ -42,15 +42,15 @@ const ProductCard: FC<ProductCardProps> = ({
 
   const notifyAddTocart = ({ size }: { size?: string }) => {
     toast(
-        <div
-          className="p-4 max-w-md w-full bg-white dark:bg-slate-800 shadow-lg rounded-2xl pointer-events-auto ring-1 ring-black/5 dark:ring-white/10 text-slate-900 dark:text-slate-200"
-        >
-          <p className="block text-base font-semibold leading-none">
-            Added to cart!
-          </p>
-          <div className="border-t border-slate-200 dark:border-slate-700 my-4" />
-          {renderProductCartOnNotify({ size })}
-        </div>
+      <div
+        className="p-4 max-w-md w-full bg-white dark:bg-slate-800 shadow-lg rounded-2xl pointer-events-auto ring-1 ring-black/5 dark:ring-white/10 text-slate-900 dark:text-slate-200"
+      >
+        <p className="block text-base font-semibold leading-none">
+          Added to cart!
+        </p>
+        <div className="border-t border-slate-200 dark:border-slate-700 my-4" />
+        {renderProductCartOnNotify({ size })}
+      </div>
     );
   };
 
@@ -135,11 +135,10 @@ const ProductCard: FC<ProductCardProps> = ({
             <div
               key={index}
               onClick={() => setVariantActive(index)}
-              className={`relative w-6 h-6 rounded-full overflow-hidden z-10 border cursor-pointer ${
-                variantActive === index
+              className={`relative w-6 h-6 rounded-full overflow-hidden z-10 border cursor-pointer ${variantActive === index
                   ? getBorderClass(variant.color)
                   : "border-transparent"
-              }`}
+                }`}
               title={variant.name}
             >
               <div
@@ -157,11 +156,10 @@ const ProductCard: FC<ProductCardProps> = ({
           <div
             key={index}
             onClick={() => setVariantActive(index)}
-            className={`relative w-11 h-6 rounded-full overflow-hidden z-10 border cursor-pointer ${
-              variantActive === index
+            className={`relative w-11 h-6 rounded-full overflow-hidden z-10 border cursor-pointer ${variantActive === index
                 ? "border-black dark:border-slate-300"
                 : "border-transparent"
-            }`}
+              }`}
             title={variant.name}
           >
             <div className="absolute inset-0.5 rounded-full overflow-hidden z-0">

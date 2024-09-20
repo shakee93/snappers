@@ -23,7 +23,6 @@ const Prices: FC<PricesProps> = ({
             `flex flex-col lg:gap-3 gap-1 items-center justify-start`,
             className
         )}>
-            {/*{JSON.stringify(price)}*/}
             {price ?
                 <div
                     className={`flex items-center border-2 border-gray-300 rounded-lg p-2 ${contentClass}`}

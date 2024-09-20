@@ -3,12 +3,12 @@
 import Link from "next/link";
 import Image from "next/image";
 import SiteLogo from "@/public/global/logo.webp";
-import {twMerge} from "tailwind-merge";
+import { twMerge } from "tailwind-merge";
 
 
 export default async function Home() {
 
-    const Logo = ({className = '', imageClass = ''}: { className?: string, imageClass?: string }) => {
+    const Logo = ({ className = '', imageClass = '' }: { className?: string, imageClass?: string }) => {
         return (
             <Link href={"/"} className={className}>
                 <Image
@@ -30,7 +30,7 @@ export default async function Home() {
         <section key="1" className="w-full h-screen flex items-center justify-center bg-mobile-pattern">
             <div className="container px-4 md:px-6">
                 <div className="flex flex-col items-center space-y-4 text-center">
-                    <Logo/>
+                    <Logo />
                     <div className="space-y-2">
                         <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl py-8 text-primaryColor">Coming
                             Soon</h1>

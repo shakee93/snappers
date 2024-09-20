@@ -8,7 +8,7 @@ import SectionSliderProductCard from "components/SectionSliderProductCard";
 import DiscoverMoreSlider from "components/DiscoverMoreSlider";
 import SectionGridMoreExplore from "components/SectionGridMoreExplore/SectionGridMoreExplore";
 import SectionPromo2 from "components/SectionPromo2";
-import SectionSliderCategories from "components/SectionSliderCategories/SectionSliderCategories";
+// import SectionSliderCategories from "components/SectionSliderCategories/SectionSliderCategories";
 import SectionGridFeatureItems from "./SectionGridFeatureItems";
 import SectionPromo3 from "components/SectionPromo3";
 import SectionClientSay from "components/SectionClientSay/SectionClientSay";
@@ -62,7 +62,7 @@ function PageHome() {
         <SectionSliderLargeProduct cardStyle="style2" />
 
         {/*  */}
-        <SectionSliderCategories />
+        {/* <SectionSliderCategories /> */}
 
         {/* SECTION */}
         <SectionPromo3 />

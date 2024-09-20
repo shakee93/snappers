@@ -1,12 +1,12 @@
 import { Dialog, Transition } from "@headlessui/react";
-import React, {FC, Fragment, useEffect, useState} from "react";
+import React, { FC, Fragment, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ButtonClose from "@/shared/ButtonClose/ButtonClose";
 import ProductQuickView from "./ProductQuickView3";
 import ProductQuickView2 from "@/components/ProductQuickView";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
-import {useLazyQuery, useQuery} from "@apollo/client";
-import {GET_QUICK_VIEW_PRODUCT} from "@/graphql/defs/products";
+import { useLazyQuery, useQuery } from "@apollo/client";
+import { GET_QUICK_VIEW_PRODUCT } from "@/graphql/defs/products";
 
 export interface ModalQuickViewProps {
   show: boolean;
@@ -82,9 +82,9 @@ const ModalQuickView: FC<ModalQuickViewProps> = ({
                 </span>
 
                 {show &&
-                    <div className="flex-1 overflow-y-auto rounded-xl hiddenScrollbar">
-                      <ProductQuickView product={data?.product} brands={brands}/>
-                    </div>
+                  <div className="flex-1 overflow-y-auto rounded-xl hiddenScrollbar">
+                    <ProductQuickView product={data?.product} brands={brands} />
+                  </div>
                 }
               </div>
             </div>
