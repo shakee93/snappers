@@ -22,7 +22,7 @@ const SearchBar = () => {
 
     return <div className='flex-1 flex items-center gap-1'>
         {path !== '/' &&
-            <button onClick={e => router.back()} className='md:hidden w-10 h-10 flex items-center justify-center'>
+            <button onClick={e => router.back()} className='hidden md:hidden w-10 h-10 flex items-center justify-center'>
                 <ChevronLeft className='text-white w-8' />
             </button>
         }
