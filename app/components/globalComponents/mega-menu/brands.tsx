@@ -8,6 +8,8 @@ import { ArrowRight } from 'lucide-react';
 export default function BrandsMenu() {
     const { data, loading, error } = useQuery(GET_NAV_BRANDS);
 
+    console.log('data', data);
+
     const brands: Brand[] = data?.brands?.nodes || [];
 
     // Function to split brands into columns
@@ -44,7 +46,13 @@ export default function BrandsMenu() {
                             {column.map((brand) => (
                                 <div key={`brand-${brand.slug}`} className="brand-item mb-2 p-2 hover:bg-zinc-100 rounded-md">
                                     <Link href={`/${brand.slug}`} className="text-blue-950 hover:underline flex items-center">
-                                        <span className="inline-block bg-zinc-200 rounded-full w-6 h-6 mr-1.5"></span>
+                                        {brand.brandImage ? (
+                                            <img src={brand.brandImage}
+                                                alt={brand.name ?? ''}
+                                                className="inline-block rounded-full w-6 h-6 mr-1.5" />
+                                        ) : (
+                                            <span className="inline-block bg-zinc-200 rounded-full w-6 h-6 mr-1.5"></span>
+                                        )}
                                         <span className="truncate max-w-[200px] text-sm font-semibold">{brand.name}</span>
                                     </Link>
                                 </div>
