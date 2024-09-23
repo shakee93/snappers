@@ -4,11 +4,14 @@ import { GET_NAV_CATEGORIES } from '@/graphql/defs/nav';
 import Link from 'next/link';
 import { ProductCategory } from '@/graphql/types/graphql';
 import { ArrowRight } from 'lucide-react';
+import Image from 'next/image';
 
 export default function NavCategories() {
     const { data, loading, error } = useQuery(GET_NAV_CATEGORIES);
 
     const categories: ProductCategory[] = data?.productCategories?.nodes || [];
+
+    // console.log('categories', data?.productCategories?.nodes);
 
     // Function to split categories into columns
     const splitIntoColumns = (items: ProductCategory[], columnCount: number): ProductCategory[][] => {
@@ -45,7 +48,17 @@ export default function NavCategories() {
                                 <div key={`category-${category.slug}`} className="category-group mb-2 p-2 hover:bg-zinc-100 rounded-md">
                                     <h3 className={`text-sm font-semibold ${category.children?.nodes && category.children.nodes.length > 0 ? 'mb-2' : ''}`}>
                                         <Link href={`/collections/${category.slug}`} className="text-blue-950 hover:underline flex items-center">
-                                            <span className="inline-block bg-zinc-200 rounded-full w-6 h-6 mr-1.5"></span>
+                                            {category.image?.sourceUrl ? (
+                                                <Image
+                                                    src={category.image.sourceUrl}
+                                                    alt={category.name ?? ''}
+                                                    width={24}
+                                                    height={24}
+                                                    className="rounded-full w-6 h-6 mr-1.5 object-cover"
+                                                />
+                                            ) : (
+                                                <span className="inline-block bg-zinc-200 rounded-full w-6 h-6 mr-1.5"></span>
+                                            )}
                                             <span className="truncate max-w-[200px]">{category.name}</span>
                                         </Link>
                                     </h3>
