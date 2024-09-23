@@ -54,7 +54,7 @@ export default function NavCategories() {
                                                     alt={category.name ?? ''}
                                                     width={24}
                                                     height={24}
-                                                    className="rounded-full w-6 h-6 mr-1.5 object-cover"
+                                                    className="rounded-full w-6 h-6 mr-1.5 object-contain"
                                                 />
                                             ) : (
                                                 <span className="inline-block bg-zinc-200 rounded-full w-6 h-6 mr-1.5"></span>

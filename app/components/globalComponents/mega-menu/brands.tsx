@@ -8,7 +8,7 @@ import { ArrowRight } from 'lucide-react';
 export default function BrandsMenu() {
     const { data, loading, error } = useQuery(GET_NAV_BRANDS);
 
-    console.log('data', data);
+    // console.log('data', data);
 
     const brands: Brand[] = data?.brands?.nodes || [];
 
@@ -49,7 +49,7 @@ export default function BrandsMenu() {
                                         {brand.brandImage ? (
                                             <img src={brand.brandImage}
                                                 alt={brand.name ?? ''}
-                                                className="inline-block rounded-full w-6 h-6 mr-1.5" />
+                                                className="inline-block rounded-full w-6 h-6 mr-1.5 object-contain" />
                                         ) : (
                                             <span className="inline-block bg-zinc-200 rounded-full w-6 h-6 mr-1.5"></span>
                                         )}
