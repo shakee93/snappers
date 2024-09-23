@@ -154,6 +154,10 @@ const CheckoutPage = () => {
   }, [cart]);
 
   const updateFormData = (section: string, data: any) => {
+    console.log("data", JSON.stringify(data, null, 2));
+    console.log("section", JSON.stringify(section, null, 2));
+    // Form data changing here!.
+
     setFormData((prevData) => {
       let updatedSection;
 
@@ -463,7 +467,7 @@ const CheckoutPage = () => {
         return;
       }
 
-      toast.info("You'll be on the thank you page in just a moment.")
+      toast.info("You'll be on the thank you page in just a moment.");
 
       let redirectUrl = `checkout/${checkoutDetails.order_id}`;
 
@@ -472,13 +476,21 @@ const CheckoutPage = () => {
   }, [paymentData]);
 
   const handleCheckoutProcess = async () => {
+    console.log("order: ", formData);
+
     const isBankTransfer =
       formData?.paymentMethod?.selectedGateway?.id == "bacs";
-    if (wantToSHowBankTransfer) {
-      ImplementBankTransfer();
-      return;
-    }
+    const isPayhere = formData?.paymentMethod?.selectedGateway?.id == "payhere";
+    const isCashOnDelivery =
+      formData?.paymentMethod?.selectedGateway?.id == "cod";
+
+   
+
     if (isBankTransfer) {
+      if (wantToSHowBankTransfer) {
+        ImplementBankTransfer();
+        return;
+      }
       try {
         ImplementBankTransfer();
       } catch (e) {
@@ -486,7 +498,13 @@ const CheckoutPage = () => {
           "Sorry to hear that you are facing an issue with Bank Transfer. Please try again later."
         );
       }
-    } else {
+    }
+    if (isPayhere) {
+      await handleCheckout();
+      return;
+    }
+
+    if (isCashOnDelivery) {
       await handleCheckout();
     }
   };
