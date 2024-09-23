@@ -437,6 +437,11 @@ const CheckoutPage = () => {
 
     let checkoutDetails = paymentDetails;
 
+    // localStorage.setItem(
+    //   "checkoutDetails",
+    //   JSON.stringify(checkoutDetails)
+    // )
+
     // if (isPayhere) {
     //   try {
     //     ImplementPayhere(checkoutDetails);
