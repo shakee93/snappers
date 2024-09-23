@@ -72,7 +72,7 @@ const PaymentModal = ({
               dark:bg-neutral-900 dark:border dark:border-slate-700 dark:text-slate-100 shadow-xl"
               >
                 <span className="absolute right-3 top-3 z-50">
-                  <ButtonClose onClick={onCloseModalQuickView} />
+                  {/* <ButtonClose onClick={onCloseModalQuickView} /> */}
                 </span>
                 <div className="flex-1 overflow-y-auto rounded-xl hiddenScrollbar">
                   <BankTransfer handleCheckout={handleCheckout} paymentDetails={paymentDetails} />
