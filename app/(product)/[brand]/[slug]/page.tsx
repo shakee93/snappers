@@ -59,6 +59,8 @@ async function getData(slug: string, brand: string) {
   }
 }
 
+console.log("testing")
+
 export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
