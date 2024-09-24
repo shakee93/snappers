@@ -19,7 +19,7 @@ type Props = {
     brand: string;
   };
 };
-console.log("working")
+console.log("shadeer push ")
 
 export async function generateStaticParams() {
   const {
