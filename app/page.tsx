@@ -108,17 +108,17 @@ const slidesData = [
   {
     id: "5",
     slideFields: {
-      mainHeading: "Flip Your World",
-      subHeading: "Samsung Galaxy Z Flip 6: Elegance Redefined in Every Flip",
+      mainHeading: "Apple Watch Series 10",
+      subHeading: "The Future on Your Wrist",
       buttonText: "Buy Now",
-      buttonLink: "/samsung/samsung-galaxy-z-flip6-5g",
+      buttonLink: "https://gqmobiles.lk/apple/apple-watch-series-10",
       backgroundColor: "#CCE0EF",
       backgroundImage:bgSlide9.src,
 
       featureImage: {
         id: "2",
         sourceUrl:
-          "http://api.gqmobiles.lk/wp-content/uploads/2024/07/Galaxy-Z-Flip-6-4-removebg-preview.png",
+          "https://api.gqmobiles.lk/wp-content/uploads/2024/09/safety__eg2903fny6gm_large-removebg-preview.png",
       },
     },
   },
@@ -126,17 +126,17 @@ const slidesData = [
   {
     id: "6",
     slideFields: {
-      mainHeading: "Unfold Excellence",
-      subHeading: "Z Fold 6 : Cutting-Edge Innovation, Unmatched Sophistication",
+      mainHeading: "Apple AirPods Max (USB-C) — 2024",
+      subHeading: "The Perfect Harmony of Sound and Tech",
       buttonText: "Buy Now",
-      buttonLink: "/samsung/samsung-galaxy-z-fold6-5g",
+      buttonLink: "https://gqmobiles.lk/apple/apple-watch-series-10",
       backgroundColor: "#CCE0EF",
       backgroundImage:bgSlide6.src,
 
       featureImage: {
         id: "2",
         sourceUrl:
-          "http://api.gqmobiles.lk/wp-content/uploads/2024/07/uk-galaxy-z-fold6-f956-sm-f956bzsneub-542454423.avif",
+          "https://api.gqmobiles.lk/wp-content/uploads/2024/09/gq-mobiles-apple-airpods-max-usb-type-c-2024-orange-2-removebg-preview.png",
       },
     },
   },
