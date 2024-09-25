@@ -40,7 +40,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
 
   useEffect(() => {
     if (!sliderRef.current) {
-      console.error('Slider reference is not assigned properly.');
+      console.log('Slider reference is not assigned properly.');
       return;
     }
 

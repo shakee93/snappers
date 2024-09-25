@@ -13,6 +13,21 @@ import SortInput from "@/app/components/SortInput";
 import { useDebounce } from "use-debounce";
 import MobileFilterSheet from "@/app/components/MobileFilterSheet";
 
+const DelayedRender: React.FC<{ delay: number; children: React.ReactNode }> = ({ delay, children }) => {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+      const timer = setTimeout(() => {
+          setIsVisible(true);
+          // console.log('DelayedRender');
+      }, delay);
+
+      return () => clearTimeout(timer);
+  }, [delay]);
+
+  return isVisible ? <>{children}</> : null;
+};
+
 interface InstantSearchWrapperProps {
   search?: boolean;
   filters?: boolean;
@@ -127,6 +142,10 @@ const InstantSearchWrapper = ({
     setSearchMounted();
   }, []);
 
+//   const InstantSearchComponent = useMemo(() => {
+//     return server ? InstantSearchNext : InstantSearch;
+// }, [server]); // Add dependencies if necessary
+
   const InstantSearchComponent = useMemo(() => {
     // TODO: Search on client size freezes when using useInstantSearch hook so switching between normal and next.
     // when this gets fixed update the package
@@ -166,7 +185,11 @@ const InstantSearchWrapper = ({
           <div className='grid grid-cols-12 gap-4'>
 
             <div className='col-span-0 lg:col-span-3'>
-              <SortInput />
+              {typeof window !== 'undefined' && (
+                <DelayedRender delay={5000}>
+                  <SortInput />
+                </DelayedRender>
+              )}
               {filters && (
                   <TabFilters
                       category={category}
@@ -176,7 +199,7 @@ const InstantSearchWrapper = ({
                       sort={sort}
                   />
               )}
-              <Configure filters={filterQuery} hitsPerPage={12} />
+              <Configure filters={filterQuery} hitsPerPage={10} />
             </div>
             <div className='col-span-12 lg:col-span-9'>
               <ProductGridInstant />
