@@ -50,7 +50,7 @@ export default function NavLinks() {
   const [openMenu, setOpenMenu] = React.useState<string>("");
 
   const closeMenu = () => {
-    setOpenMenu(""); // Close the menu
+    setOpenMenu("");
   };
 
   return (
