@@ -11,8 +11,6 @@ export default function NavCategories() {
 
     const categories: ProductCategory[] = data?.productCategories?.nodes || [];
 
-    // console.log('categories', data?.productCategories?.nodes);
-
     // Function to split categories into columns
     const splitIntoColumns = (items: ProductCategory[], columnCount: number): ProductCategory[][] => {
         const columns: ProductCategory[][] = Array.from({ length: columnCount }, () => []);
@@ -32,6 +30,7 @@ export default function NavCategories() {
                     <ArrowRight className="ml-1 h-4 w-4 group-hover:text-blue-500" />
                 </Link>
             </div>
+            
             <div className="flex space-x-6 p-3 pt-1">
                 {loading ? (
                     <div className="flex-1">

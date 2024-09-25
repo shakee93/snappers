@@ -23,11 +23,8 @@ export default function BrandsMenu({ onClose }: { onClose: () => void }) {
 
     const handleLinkClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
         console.log(`Link clicked: ${e.currentTarget.href}`);
-        onClose(); // Close the navigation menu when a brand is clicked
+        onClose();
     }, [onClose]);
-
-    if (loading) return <div className="flex-1"><p>Loading brands...</p></div>;
-    if (error) return <div className="flex-1"><p>Error loading brands: {error.message}</p></div>;
 
     return (
         <div className="w-full bg-white md:w-[800px] lg:w-[800px] xl:w-[1200px]">
@@ -37,31 +34,42 @@ export default function BrandsMenu({ onClose }: { onClose: () => void }) {
                     <ArrowRight className="ml-1 h-4 w-4 group-hover:text-blue-500" />
                 </Link>
             </div>
+
             <div className="flex space-x-6 p-3 pt-1">
-                {splitIntoColumns(brands, columnCount).map((column, colIndex) => (
-                    <div key={colIndex} className="flex-1">
-                        {column.map((brand) => (
-                            <div key={`brand-${brand.slug}`} className="brand-item mb-2 p-2 hover:bg-zinc-100 rounded-md">
-                                <Link 
-                                    href={`/${brand.slug}`} 
-                                    className="text-blue-950 hover:underline flex items-center relative z-10 cursor-pointer"
-                                    onClick={handleLinkClick} // Call handleLinkClick to close the menu
-                                    // onMouseEnter={() => console.log(`Hovering over: ${brand.name}`)}
-                                    passHref={true}
-                                >
-                                    {brand.brandImage ? (
-                                        <img src={brand.brandImage}
-                                            alt={brand.name ?? ''}
-                                            className="inline-block rounded-full w-6 h-6 mr-1.5 object-contain" />
-                                    ) : (
-                                        <span className="inline-block bg-zinc-200 rounded-full w-6 h-6 mr-1.5"></span>
-                                    )}
-                                    <span className="truncate max-w-[200px] text-sm font-semibold">{brand.name}</span>
-                                </Link>
-                            </div>
-                        ))}
+                {loading ? (
+                    <div className="flex-1">
+                        <p>Loading categories...</p>
                     </div>
-                ))}
+                ) : error ? (
+                    <div className="flex-1">
+                        <p>Error loading categories</p>
+                    </div>
+                ) : (
+                    splitIntoColumns(brands, columnCount).map((column, colIndex) => (
+                        <div key={colIndex} className="flex-1">
+                            {column.map((brand) => (
+                                <div key={`brand-${brand.slug}`} className="brand-item mb-2 p-2 hover:bg-zinc-100 rounded-md">
+                                    <Link
+                                        href={`/${brand.slug}`}
+                                        className="text-blue-950 hover:underline flex items-center relative z-10 cursor-pointer"
+                                        onClick={handleLinkClick} // Call handleLinkClick to close the menu
+                                        // onMouseEnter={() => console.log(`Hovering over: ${brand.name}`)}
+                                        passHref={true}
+                                    >
+                                        {brand.brandImage ? (
+                                            <img src={brand.brandImage}
+                                                alt={brand.name ?? ''}
+                                                className="inline-block rounded-full w-6 h-6 mr-1.5 object-contain" />
+                                        ) : (
+                                            <span className="inline-block bg-zinc-200 rounded-full w-6 h-6 mr-1.5"></span>
+                                        )}
+                                        <span className="truncate max-w-[200px] text-sm font-semibold">{brand.name}</span>
+                                    </Link>
+                                </div>
+                            ))}
+                        </div>
+                    ))
+                )}
             </div>
         </div>
     );
