@@ -144,17 +144,17 @@ const slidesData = [
   {
     id: "7",
     slideFields: {
-      mainHeading: "Power Up Swiftly",
-      subHeading: "Apple 20W USB-C Power Adapter",
+      mainHeading:'iPad Air 11" &  13"',
+      subHeading:  "Where Performance Meets Portability",
       buttonText: "Buy Now",
-      buttonLink: "/apple/apple-20w-usb-c-power-adapter",
+      buttonLink: "https://gqmobiles.lk/apple/apple-ipad-air-6th-generation-wi-fi-13-inch-m2-chip",
       backgroundColor: "#CCE0EF",
       backgroundImage:bgSlide2.src,
 
       featureImage: {
         id: "2",
         sourceUrl:
-          "http://api.gqmobiles.lk/wp-content/uploads/2024/08/apple-1607949659-removebg-preview.png",
+          "https://api.gqmobiles.lk/wp-content/uploads/2024/09/ccddacd68dff4ee0927266e4f98d06c8-removebg-preview.png",
       },
     },
   },

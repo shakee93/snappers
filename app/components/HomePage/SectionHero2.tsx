@@ -163,7 +163,7 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
             <span className="nc-SectionHero2Item__subheading block text-base md:text-xl font-medium">
               {item.slideFields.subHeading}
             </span>
-            <h2 className="nc-SectionHero2Item__heading font-semibold text-3xl sm:text-4xl md:text-4xl xl:text-5xl 2xl:text-5xl uppercase !leading-[114%]">
+            <h2 className="nc-SectionHero2Item__heading font-semibold text-3xl sm:text-4xl md:text-4xl xl:text-5xl 2xl:text-5xl  !leading-[114%]">
               {item.slideFields.mainHeading}
             </h2>
             <ButtonPrimary
