@@ -58,32 +58,32 @@ const slidesData = [
   {
     id: "2",
     slideFields: {
-      mainHeading: "Pioneering Excellence",
-      subHeading: "Samsung Galaxy Watch 7: Smart, Stylish, Superior",
+      mainHeading: "SAMSUNG Galaxy Watch FE",
+      subHeading: "Precision in Every Movement",
       buttonText: "Buy Now",
-      buttonLink: "/samsung/samsung-galaxy-watch7",
+      buttonLink: "https://gqmobiles.lk/samsung/samsung-galaxy-watch-fe",
       backgroundColor: "#CCE0EF",
       backgroundImage:bgSlide10.src,
       featureImage: {
         id: "2",
         sourceUrl:
-          "http://api.gqmobiles.lk/wp-content/uploads/2024/07/ph-galaxy-watch7-l310-sm-l310nzgaasa-542245338.avif",
+          "https://api.gqmobiles.lk/wp-content/uploads/2024/09/WatchFE_FT02_Customize_PC.png",
       },
     },
   },
   {
     id: "3",
     slideFields: {
-      mainHeading: "Ultimate Precision",
-      subHeading: "Samsung Galaxy Watch Ultra: Style Meets Performance",
+      mainHeading: "Silence the World, Hear the Detail",
+      subHeading: "Apple AirPods 4 with Active Noise Cancellation (ANC) — 2024",
       buttonText: "Buy Now",
-      buttonLink: "/samsung/samsung-galaxy-watch-ultra",
+      buttonLink: "https://gqmobiles.lk/apple/apple-airpods-4-with-active-noise-cancellation-anc-2024",
       backgroundColor: "#CCE0EF",
-      backgroundImage:bgSlide8.src,
+      backgroundImage:bgSlide4.src,
       featureImage: {
         id: "2",
         sourceUrl:
-          "http://api.gqmobiles.lk/wp-content/uploads/2024/07/Samsung-Galaxy-Watch-Ultra-47mm-Titanium-Grey-C-small-removebg-preview.png",
+          "https://api.gqmobiles.lk/wp-content/uploads/2024/09/Apple-AirPods-Hearing-Aid-240909_inline.jpg.large-removebg-preview.png",
       },
     },
   },
@@ -91,16 +91,16 @@ const slidesData = [
   {
     id: "4",
     slideFields: {
-      mainHeading: "Innovation Redefined",
-      subHeading: "CMF Phone 1: Simple, Elegant, Powerful",
+      mainHeading: "AirPods Pro (2nd generation) with MagSafe Charging Case (USB‑C) — 2024",
+      subHeading: "USB-C Power, Pro-Level Performance",
       buttonText: "Buy Now",
-      buttonLink: "/cmf/cmf-phone-1",
+      buttonLink: "https://gqmobiles.lk/apple/airpods-pro-2nd-generation-with-magsafe-charging-case-usb%E2%80%91c-2024",
       backgroundColor: "#CCE0EF",
-      backgroundImage:bgSlide4.src,
+      backgroundImage:bgSlide8.src,
       featureImage: {
         id: "2",
         sourceUrl:
-          "http://api.gqmobiles.lk/wp-content/uploads/2024/07/CMF-Phone-1-orange-removebg-preview.png",
+          "https://api.gqmobiles.lk/wp-content/uploads/2024/09/file_2.png",
       },
     },
   },
