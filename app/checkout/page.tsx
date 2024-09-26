@@ -65,51 +65,51 @@ const CheckoutPage = () => {
     | "order-cart"
   >("ContactInfo");
 
-  const FORMDATA_DUMMY_OBJECT = {
-    contactInfo: {
-      phone: "0750278330",
-      email: "shadeersadikeen@gmail.com",
-    },
-    deliveryAddress: {
-      firstName: "shadeer",
-      lastName: "sadikeen",
-      address: "123",
-      apartment: "araliya uyana, megoda kolonnawa",
-      city: "welllampitiya , colombo",
-      state: "",
-      postal: "",
-      country: "LK",
-      addressType: "home",
-    },
-    billingAddress: {
-      firstName: "shadeer",
-      lastName: "sadikeen",
-      address: "123",
-      apartment: "araliya uyana, megoda kolonnawa",
-      city: "welllampitiya , colombo",
-      state: "",
-      postal: "",
-      country: "LK",
-      addressType: "home",
-    },
-    paymentMethod: {
-      selectedGateway: {
-        id: "bacs",
-        title: "Direct bank transfer",
-      },
-    },
-  };
-
-  const [formData, setFormData] = useState(FORMDATA_DUMMY_OBJECT);
-
-  // const [formData, setFormData] = useState<FormData>({
-  //   contactInfo: {},
-  //   deliveryAddress: {},
-  //   billingAddress: {},
-  //   paymentMethod: {
-  //     selectedGateway: {},
+  // const FORMDATA_DUMMY_OBJECT = {
+  //   contactInfo: {
+  //     phone: "0750278330",
+  //     email: "shadeersadikeen@gmail.com",
   //   },
-  // });
+  //   deliveryAddress: {
+  //     firstName: "shadeer",
+  //     lastName: "sadikeen",
+  //     address: "123",
+  //     apartment: "araliya uyana, megoda kolonnawa",
+  //     city: "welllampitiya , colombo",
+  //     state: "",
+  //     postal: "",
+  //     country: "LK",
+  //     addressType: "home",
+  //   },
+  //   billingAddress: {
+  //     firstName: "shadeer",
+  //     lastName: "sadikeen",
+  //     address: "123",
+  //     apartment: "araliya uyana, megoda kolonnawa",
+  //     city: "welllampitiya , colombo",
+  //     state: "",
+  //     postal: "",
+  //     country: "LK",
+  //     addressType: "home",
+  //   },
+  //   paymentMethod: {
+  //     selectedGateway: {
+  //       id: "bacs",
+  //       title: "Direct bank transfer",
+  //     },
+  //   },
+  // };
+
+  // const [formData, setFormData] = useState(FORMDATA_DUMMY_OBJECT);
+
+  const [formData, setFormData] = useState<FormData>({
+    contactInfo: {},
+    deliveryAddress: {},
+    billingAddress: {},
+    paymentMethod: {
+      selectedGateway: {},
+    },
+  });
   // create state for the payhere random id
   const [payherPaymentID, setPayherPaymentID] = useState<string | null>(null);
 
