@@ -64,14 +64,52 @@ const CheckoutPage = () => {
     | "PaymentMethod"
     | "order-cart"
   >("ContactInfo");
-  const [formData, setFormData] = useState<FormData>({
-    contactInfo: {},
-    deliveryAddress: {},
-    billingAddress: {},
-    paymentMethod: {
-      selectedGateway: {},
+
+  const FORMDATA_DUMMY_OBJECT = {
+    contactInfo: {
+      phone: "0750278330",
+      email: "shadeersadikeen@gmail.com",
     },
-  });
+    deliveryAddress: {
+      firstName: "shadeer",
+      lastName: "sadikeen",
+      address: "123",
+      apartment: "araliya uyana, megoda kolonnawa",
+      city: "welllampitiya , colombo",
+      state: "",
+      postal: "",
+      country: "LK",
+      addressType: "home",
+    },
+    billingAddress: {
+      firstName: "shadeer",
+      lastName: "sadikeen",
+      address: "123",
+      apartment: "araliya uyana, megoda kolonnawa",
+      city: "welllampitiya , colombo",
+      state: "",
+      postal: "",
+      country: "LK",
+      addressType: "home",
+    },
+    paymentMethod: {
+      selectedGateway: {
+        id: "bacs",
+        title: "Direct bank transfer",
+      },
+    },
+  };
+
+  const [formData, setFormData] = useState(FORMDATA_DUMMY_OBJECT);
+
+  // const [formData, setFormData] = useState<FormData>({
+  //   contactInfo: {},
+  //   deliveryAddress: {},
+  //   billingAddress: {},
+  //   paymentMethod: {
+  //     selectedGateway: {},
+  //   },
+  // });
   // create state for the payhere random id
   const [payherPaymentID, setPayherPaymentID] = useState<string | null>(null);
 
@@ -231,6 +269,7 @@ const CheckoutPage = () => {
         ? await guestCheckout({ variables })
         : await checkoutMutation({ variables });
 
+    console.log("data from checkout: ", data);
     if (data) {
       const checkoutDetails = savePaymentDetails(data);
       setPaymentData(checkoutDetails);
@@ -244,7 +283,6 @@ const CheckoutPage = () => {
 
   useEffect(() => {
     // let redirectUrl = `checkout/${checkoutDetails.order_id}`;
-
     // router.push(redirectUrl);
     switch (payhereHandleStatus) {
       case "finished":
@@ -463,11 +501,11 @@ const CheckoutPage = () => {
     if (isCashOnDelivery) {
       if (
         customer?.id === "guest" ||
-        checkoutDetails.order_id == "no_order_id_found"
+        checkoutDetails.order_id == "guest_checkout"
       ) {
         let email = formData?.contactInfo?.email;
         // let redirectUrl = `/checkout/${checkoutDetails.order_id}?email=${email}`;
-        let redirectUrl = `/checkout/no_order_id_found?email=${email}`;
+        let redirectUrl = `/checkout/guest_checkout?email=${email}`;
         router.push(redirectUrl);
         return;
       }
@@ -481,15 +519,13 @@ const CheckoutPage = () => {
   }, [paymentData]);
 
   const handleCheckoutProcess = async () => {
-    console.log("order: ", formData);
-
     const isBankTransfer =
       formData?.paymentMethod?.selectedGateway?.id == "bacs";
     const isPayhere = formData?.paymentMethod?.selectedGateway?.id == "payhere";
     const isCashOnDelivery =
       formData?.paymentMethod?.selectedGateway?.id == "cod";
 
-   
+    console.log("formData: ", formData);
 
     if (isBankTransfer) {
       if (wantToSHowBankTransfer) {
@@ -575,6 +611,8 @@ const CheckoutPage = () => {
       const isBankTransfer =
         formData?.paymentMethod?.selectedGateway?.id == "bacs";
 
+      console.log("data: ", data);
+      console.log("formdata on banktranser: ",formData);
       if (data) {
         const checkoutDetails = savePaymentDetails(data);
         setPaymentData(checkoutDetails);
