@@ -99,17 +99,20 @@ const savePaymentDetails = (
 ): PaymentDetailsWithoutUrls => {
   let orderDetails: CheckoutPayload = checkoutDetails?.checkout;
   let { order, customer } = orderDetails;
-
+  
+  
   let saved_data = {
     amount: order?.total ?? "no_amount",
     items: "Mobile Items",
-    order_id: order?.databaseId?.toString() ?? "no_order_id_found",
+    order_id: order?.databaseId?.toString() ?? "guest_checkout",
     first_name: customer?.billing?.firstName || "no_lastname",
     last_name: customer?.billing?.lastName || "no firstname",
-    email: customer?.email || "no_email",
+    email: customer?.billing?.email || customer?.shipping?.email || "no_email", 
     address: customer?.billing?.address1 || "no_address",
   };
 
+
+  console.log("saved_data: for payment", saved_data);
   return saved_data;
 };
 

@@ -18,6 +18,7 @@ const PaymentModal = ({
 
   const [isOpen, setIsOpen] = React.useState(false);
   useEffect(() => {
+
     setIsOpen(show);
   },[show])
 
@@ -32,7 +33,6 @@ const PaymentModal = ({
   // if (updatedPaymentDetails) {
   //   updatedPaymentDetails.email = customerEmail;
   // }
-  console.log("jisdfas")
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
