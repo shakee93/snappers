@@ -18,7 +18,7 @@ const BankTransfer: React.FC<BankTransferProps> = ({
   handleCheckout,
 }) => {
   const [file, setFile] = useState<File | null>(null);
-  // const [orderId, setOrderId] = useState<string>("");
+  const [orderId, setOrderId] = useState<string>("");
   // const [email, setEmail] = useState<string>("");
   const [uploadStatus, setUploadStatus] = useState<string>("");
   const [loading, setLoading] = useState(false);
@@ -55,11 +55,13 @@ const BankTransfer: React.FC<BankTransferProps> = ({
     }
 
     let paymentDetails: PaymentDetailsWithoutUrls = await handleCheckout();
+    console.log("paymentDetails: ", paymentDetails);
     if (paymentDetails === null) {
-      throw new Error("No payment details found");
+      alert('No payment Details provided for the bank transfer');
+      return;
     }
     let order_id = paymentDetails.order_id;
-    let email = paymentDetails.order_id;
+    let email = paymentDetails.email;
     if (paymentDetails.email === undefined) {
       throw new Error("No email found");
     }
@@ -109,10 +111,11 @@ const BankTransfer: React.FC<BankTransferProps> = ({
         }
 
         const orderConfirmationdata = await confirmationResponse.json();
+
         console.log("orderConfirmation", orderConfirmationdata);
 
         if (customer?.id === "guest") {
-          let redirectUrl = `/checkout/no_order_id_found?email=${email}`;
+          let redirectUrl = `/checkout/guest_checkout?email=${email}`;
           router.push(redirectUrl);
           return;
         } else {

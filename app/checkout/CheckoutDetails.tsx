@@ -120,6 +120,7 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
           updateFormData={(section, data) => {
             updateFormData(section, data);
           }}
+          formData={formData}
           initialData={initContactInformation!}
           handleConfirmationChange={(value: any) =>
             handleConfirmationChange("contactInfo", value)

@@ -14,6 +14,15 @@ export async function GET(request: NextRequest) {
             return Response.json({ revalidated: 'all', now: Date.now() })
         }
 
+        if (path === 'homepage') {
+            revalidatePath('/', 'page');
+            revalidatePath('/new-arrivals');
+            revalidatePath('/back-in-stock');
+            revalidatePath('/smartwatches');
+            revalidatePath('/explore-speakers');
+            return Response.json({ revalidated: 'homepage', now: Date.now() })
+        }
+
         revalidatePath(path);
         return Response.json({ revalidated: true, now: Date.now() })
     }
