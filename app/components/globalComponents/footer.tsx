@@ -169,6 +169,9 @@ const Footer = async () => {
                 <li className="hover:text-primaryColor">
                   <Link href={"/terms-and-conditions"}>Terms & Conditions</Link>
                 </li>
+                <li className="hover:text-primaryColor">
+                  <Link href={"/warrenty-terms"}>Warranty Terms</Link>
+                </li>
               </ul>
             </div>
           </div>
