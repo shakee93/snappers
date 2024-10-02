@@ -11,7 +11,6 @@ import {
 } from "@/graphql/defs/products";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 
-
 import Image from "next/image";
 import Scam from "@/public/homepage/scam.webp";
 import Sampath from "@/public/images/bank logos/sampath.png";
@@ -25,18 +24,17 @@ import Seylan from "@/public/images/bank logos/Seylan_Bank_logo.png";
 import Standard from "@/public/images/bank logos/standard-chartered-2021-logo-freelogovectors.net_.png";
 import SectionHero2 from "./components/HomePage/SectionHero2";
 import CategoryWithSubcategories from "./components/globalComponents/CategoryWithSubcategories";
-import bgSlide2 from '@/public/homepage/slider/Layer_2.png';
-import kokoBg from '@/public/homepage/slider/koko.png';
-import bgSlide3 from '@/public/homepage/slider/Layer_3.png';
-import bgSlide4 from '@/public/homepage/slider/Layer_4.png';
-import bgSlide5 from '@/public/homepage/slider/Layer_5.png';
-import bgSlide6 from '@/public/homepage/slider/Layer_6.png';
-import bgSlide7 from '@/public/homepage/slider/Layer_7.png';
-import bgSlide8 from '@/public/homepage/slider/Layer_8.png';
-import bgSlide9 from '@/public/homepage/slider/Layer_9.png';
-import bgSlide10 from '@/public/homepage/slider/Layer_10.png';
-import bgSlide11 from '@/public/homepage/slider/Layer_11.png';
-
+import bgSlide2 from "@/public/homepage/slider/Layer_2.png";
+import kokoBg from "@/public/homepage/slider/koko.png";
+import bgSlide3 from "@/public/homepage/slider/Layer_3.png";
+import bgSlide4 from "@/public/homepage/slider/Layer_4.png";
+import bgSlide5 from "@/public/homepage/slider/Layer_5.png";
+import bgSlide6 from "@/public/homepage/slider/Layer_6.png";
+import bgSlide7 from "@/public/homepage/slider/Layer_7.png";
+import bgSlide8 from "@/public/homepage/slider/Layer_8.png";
+import bgSlide9 from "@/public/homepage/slider/Layer_9.png";
+import bgSlide10 from "@/public/homepage/slider/Layer_10.png";
+import bgSlide11 from "@/public/homepage/slider/Layer_11.png";
 
 const slidesData = [
   {
@@ -47,7 +45,7 @@ const slidesData = [
       buttonText: "Contact",
       buttonLink: "/contact",
       backgroundColor: "#CCE0EF",
-      backgroundImage:kokoBg.src,
+      backgroundImage: kokoBg.src,
       featureImage: {
         id: "2",
         sourceUrl:
@@ -63,7 +61,7 @@ const slidesData = [
       buttonText: "Buy Now",
       buttonLink: "https://gqmobiles.lk/samsung/samsung-galaxy-watch-fe",
       backgroundColor: "#CCE0EF",
-      backgroundImage:bgSlide10.src,
+      backgroundImage: bgSlide10.src,
       featureImage: {
         id: "2",
         sourceUrl:
@@ -77,9 +75,10 @@ const slidesData = [
       mainHeading: "Silence the World, Hear the Detail",
       subHeading: "Apple AirPods 4 with Active Noise Cancellation (ANC) — 2024",
       buttonText: "Buy Now",
-      buttonLink: "https://gqmobiles.lk/apple/apple-airpods-4-with-active-noise-cancellation-anc-2024",
+      buttonLink:
+        "https://gqmobiles.lk/apple/apple-airpods-4-with-active-noise-cancellation-anc-2024",
       backgroundColor: "#CCE0EF",
-      backgroundImage:bgSlide4.src,
+      backgroundImage: bgSlide4.src,
       featureImage: {
         id: "2",
         sourceUrl:
@@ -91,12 +90,14 @@ const slidesData = [
   {
     id: "4",
     slideFields: {
-      mainHeading: "AirPods Pro (2nd generation) with MagSafe Charging Case (USB‑C) — 2024",
+      mainHeading:
+        "AirPods Pro (2nd generation) with MagSafe Charging Case (USB‑C) — 2024",
       subHeading: "USB-C Power, Pro-Level Performance",
       buttonText: "Buy Now",
-      buttonLink: "https://gqmobiles.lk/apple/airpods-pro-2nd-generation-with-magsafe-charging-case-usb%E2%80%91c-2024",
+      buttonLink:
+        "https://gqmobiles.lk/apple/airpods-pro-2nd-generation-with-magsafe-charging-case-usb%E2%80%91c-2024",
       backgroundColor: "#CCE0EF",
-      backgroundImage:bgSlide8.src,
+      backgroundImage: bgSlide8.src,
       featureImage: {
         id: "2",
         sourceUrl:
@@ -113,7 +114,7 @@ const slidesData = [
       buttonText: "Buy Now",
       buttonLink: "https://gqmobiles.lk/apple/apple-watch-series-10",
       backgroundColor: "#CCE0EF",
-      backgroundImage:bgSlide9.src,
+      backgroundImage: bgSlide9.src,
 
       featureImage: {
         id: "2",
@@ -131,7 +132,7 @@ const slidesData = [
       buttonText: "Buy Now",
       buttonLink: "https://gqmobiles.lk/apple/apple-watch-series-10",
       backgroundColor: "#CCE0EF",
-      backgroundImage:bgSlide6.src,
+      backgroundImage: bgSlide6.src,
 
       featureImage: {
         id: "2",
@@ -144,12 +145,13 @@ const slidesData = [
   {
     id: "7",
     slideFields: {
-      mainHeading:'iPad Air 11" &  13"',
-      subHeading:  "Where Performance Meets Portability",
+      mainHeading: 'iPad Air 11" &  13"',
+      subHeading: "Where Performance Meets Portability",
       buttonText: "Buy Now",
-      buttonLink: "https://gqmobiles.lk/apple/apple-ipad-air-6th-generation-wi-fi-13-inch-m2-chip",
+      buttonLink:
+        "https://gqmobiles.lk/apple/apple-ipad-air-6th-generation-wi-fi-13-inch-m2-chip",
       backgroundColor: "#CCE0EF",
-      backgroundImage:bgSlide2.src,
+      backgroundImage: bgSlide2.src,
 
       featureImage: {
         id: "2",
@@ -158,7 +160,6 @@ const slidesData = [
       },
     },
   },
-  
 ];
 
 const Banks = [
@@ -175,55 +176,71 @@ const Banks = [
 
 const getData = async () => {
   const queries = [
-    getClient().query({ query: GET_PRODUCTS_NODES }).then(res => {
-      return res.data?.products?.nodes || [];
-    }).catch(() => {
-      console.error('Error fetching new arrivals');
-      return [];
-    }),
+    getClient()
+      .query({ query: GET_PRODUCTS_NODES })
+      .then((res) => {
+        return res.data?.products?.nodes || [];
+      })
+      .catch(() => {
+        console.error("Error fetching new arrivals");
+        return [];
+      }),
 
-    getClient().query({
-      query: GET_PRODUCTS_NODES,
-      variables: { first: 10, categoryIdIn: [165] },
-    }).then(res => {
-      return res.data?.products?.nodes || [];
-    }).catch(() => {
-      console.error('Error fetching mobiles');
-      return [];
-    }),
+    getClient()
+      .query({
+        query: GET_PRODUCTS_NODES,
+        variables: { first: 10, categoryIdIn: [165] },
+      })
+      .then((res) => {
+        return res.data?.products?.nodes || [];
+      })
+      .catch(() => {
+        console.error("Error fetching mobiles");
+        return [];
+      }),
 
-    getClient().query({
-      query: GET_PRODUCTS_NODES_HOMEPAGE,
-      variables: { first: 10, tagId: 538 },
-    }).then(res => {
-      return res.data?.products?.nodes || [];
-    }).catch(() => {
-      console.error('Error fetching speakers');
-      return [];
-    }),
+    getClient()
+      .query({
+        query: GET_PRODUCTS_NODES_HOMEPAGE,
+        variables: { first: 10, tagId: 538 },
+      })
+      .then((res) => {
+        return res.data?.products?.nodes || [];
+      })
+      .catch(() => {
+        console.error("Error fetching speakers");
+        return [];
+      }),
 
-    getClient().query({
-      query: GET_PRODUCTS_NODES,
-      variables: { first: 10, categoryIdIn: [302] },
-    }).then(res => {
-      return res.data?.products?.nodes || [];
-    }).catch(() => {
-      console.error('Error fetching watches');
-      return [];
-    }),
+    getClient()
+      .query({
+        query: GET_PRODUCTS_NODES,
+        variables: { first: 10, categoryIdIn: [302] },
+      })
+      .then((res) => {
+        return res.data?.products?.nodes || [];
+      })
+      .catch(() => {
+        console.error("Error fetching watches");
+        return [];
+      }),
 
-    getClient().query({
-      query: GET_PRODUCTS_NODES_HOMEPAGE,
-      variables: { first: 10, tagId: 536 },
-    }).then(res => {
-      return res.data?.products?.nodes || [];
-    }).catch(() => {
-      console.error('Error fetching back in stock');
-      return [];
-    }),
+    getClient()
+      .query({
+        query: GET_PRODUCTS_NODES_HOMEPAGE,
+        variables: { first: 10, tagId: 536 },
+      })
+      .then((res) => {
+        return res.data?.products?.nodes || [];
+      })
+      .catch(() => {
+        console.error("Error fetching back in stock");
+        return [];
+      }),
   ];
 
-  const [newArrivals, mobiles, speakers, watches, backInStock] = await Promise.all(queries);
+  const [newArrivals, mobiles, speakers, watches, backInStock] =
+    await Promise.all(queries);
 
   return {
     newArrivals: newArrivals as (SimpleProduct & VariableProduct)[],
@@ -255,14 +272,31 @@ export default async function Home() {
                   0% Installment
                 </p>
               </div> */}
-              <div className="flex shrink-0 flex-col gap-0">
-                <p className="items-center justify-center text-center text-lg font-semibold text-white md:text-lg lg:text-2xl">
-                  Up to 24 Month Bank Installment Plans
-                  <span className="mt-2 flex shrink-0 justify-center text-[10px] font-semibold leading-none text-gray-400 md:mt-0 md:justify-center xl:text-xs">
-                    (T & C Apply)
-                  </span>
+              {/* <div className="flex shrink-0 flex-row gap-0">
+                <p className="flex items-center justify-center text-center text-lg font-semibold text-white md:text-lg lg:text-2xl">
+                  iPhone 16 Available
                 </p>
-                <p className="flex w-full items-baseline justify-end gap-2 md:gap-1"></p>
+                <p className="flex w-full items-baseline justify-center">
+                  <a
+                    href="/iphone-16-product-link"
+                    className="bg-blue-500 text-white font-semibold py-2 px-4 rounded"
+                  >
+                    Shop Now
+                  </a>
+                </p>
+              </div> */}
+              <div className="flex gap-5 justify-center items-center">
+                <div className="text-lg font-semibold text-white md:text-lg lg:text-2xl">
+                  iPhone 16 Available
+                </div>
+                <div>
+                  <a
+                    href="https://gqmobiles.lk/apple/apple-iphone-16-pro"
+                    className="bg-[#1b40af] text-white font-semibold py-2 px-4 rounded"
+                  >
+                    Shop Now
+                  </a>
+                </div>
               </div>
 
               {/* <div className="flex py-2 mx-4 md:mx-0 px-2 md:px-4  shrink  gap-2 xl:gap-5 bg-white rounded-xl">
@@ -369,7 +403,7 @@ export default async function Home() {
               products={watches}
               heading="Smart Watches"
               link="smartwatches"
-            // subHeading="Best selling of the month"
+              // subHeading="Best selling of the month"
             />
           </div>
         </div>
