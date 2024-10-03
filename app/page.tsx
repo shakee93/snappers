@@ -285,11 +285,11 @@ export default async function Home() {
                   </a>
                 </p>
               </div> */}
-              <div className="flex gap-5 justify-center items-center">
-                <div className="text-lg font-semibold text-white md:text-lg lg:text-2xl">
+              <div className="flex-col md:flex-row flex gap-5 justify-center text-center items-center">
+                <div className="text-sm font-semibold text-white md:text-lg lg:text-2xl">
                   The ALL NEW Exclusive iPhone 16 Series Available
                 </div>
-                <div>
+                <div className="text-sm">
                   <a
                     href="https://gqmobiles.lk/apple/apple-iphone-16-pro"
                     className="bg-[#1b40af] text-white font-semibold py-2 px-4 rounded"
