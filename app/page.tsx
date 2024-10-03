@@ -287,7 +287,7 @@ export default async function Home() {
               </div> */}
               <div className="flex gap-5 justify-center items-center">
                 <div className="text-lg font-semibold text-white md:text-lg lg:text-2xl">
-                  The ALL NEW Exclusive iPhone 16 Available
+                  The ALL NEW Exclusive iPhone 16 Series Available
                 </div>
                 <div>
                   <a
