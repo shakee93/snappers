@@ -216,7 +216,7 @@ const ProductCard: FC<ProductCardProps> = ({
 
   return (
     <div
-      className={`min-h-[270px] md:min-h-[365px] nc-ProductCard relative flex flex-col bg-white rounded-2xl p-1 group ${className}`}
+      className={`min-h-[270px] md:min-h-[365px] nc-ProductCard relative flex flex-col bg-white rounded-2xl p-1 group ${className} transition-transform duration-300 ease-in-out hover:-translate-y-1`}
       data-nc-id="ProductCard"
     >
       <div className="relative flex-shrink-0 bg-white rounded-2xl overflow-hidden ">

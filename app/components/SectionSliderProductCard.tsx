@@ -101,9 +101,9 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
           </Heading>
 
           <div className="glide__track" data-glide-el="track">
-            <ul className="glide__slides">
+            <ul className="glide__slides py-4">
               {_products.filter(p => p.price).map((item, index) => (
-                <li key={index} className={`w-[300px] ${itemClassName}`}>
+                <li key={index} className={`w-[300px] pt-2 ${itemClassName}`}>
                   <ProductCard className={!mounted ? 'opacity-0' : ''} key={item.slug} data={item} />
                 </li>
               ))}
