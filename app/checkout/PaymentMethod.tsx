@@ -63,10 +63,10 @@ const PaymentMethod: FC<Props> = ({
         )
         .filter(Boolean); // Filter out undefined values
 
-      // console.log("categoryNames: ", categoryNames);
+      console.log("categoryNames: ", categoryNames);
 
       const containsMobileOrTablet = categoryNames.some(
-        (name: string) => name === "Smartphones" || name === "Tablets"
+        (name: string) => name === "Smartphones" || name === "Tablets" || name === "1. Mobiles & Tablets"
       );
 
       return containsMobileOrTablet;
@@ -78,15 +78,14 @@ const PaymentMethod: FC<Props> = ({
 
   let hidePayhere = removePayhereOnMobileAndTab();
   const [isConfirmed, setIsConfirmed] = useState(false);
+  let hidePayhereForMobileAndTablets = false;
 
   const PaymentMethods: FC<{ gateway: PaymentGateway }> = ({ gateway }) => {
     const active = methodActive === gateway.id;
 
     // console.log("activeMethod: ", gateway.id);
 
-    let is_tab_or_mobile = gateway.id == "payhere" && hidePayhere;
-    // let is_tab_or_mobile = hidePayhere;
-
+    let is_tab_or_mobile = hidePayhereForMobileAndTablets ?  gateway.id == "payhere" && hidePayhere : false;
     return (
       <div
         className={` items-start cursor-pointer space-x-4 sm:space-x-6 ${

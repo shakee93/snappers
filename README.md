@@ -30,6 +30,21 @@ unter an "OPTION" on the [slug] page, your task is to add the correct attribute 
 
 Note: Ensure you use the correct attribute name as found in the GraphQL IDE.
 
+# Removing PayHere from Payment Method for Mobile and Tablets
+
+To disable PayHere as a payment method specifically for mobile devices and tablets, you can follow these steps:
+
+## Step 1: Configure the `hidePayhereForMobileAndTablets` Variable
+
+Define a boolean variable called `hidePayhereForMobileAndTablets`. Setting this value to `true` will hide the PayHere payment method on mobile devices and tablets. If the value is set to `false`, PayHere will remain visible across all device types.
+
+```javascript
+let hidePayhereForMobileAndTablets = true; // true means PayHere will be hidden for mobile and tablets
+```
+
+Explanation:
+* **true**: Hides PayHere payment option on mobile devices and tablets.
+* **false**: Keeps PayHere payment option visible on all device types, including mobile and tablets.
 
 
 ## Getting Started
