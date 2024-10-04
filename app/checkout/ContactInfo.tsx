@@ -11,6 +11,7 @@ interface Props {
   onOpenActive: () => void;
   onCloseActive: () => void;
   updateFormData: (section: string, data: any) => void;
+  formData: FormData;
   initialData: contactInformation;
   handleConfirmationChange: any;
 }
@@ -20,6 +21,7 @@ const ContactInfo: FC<Props> = ({
   onCloseActive,
   onOpenActive,
   updateFormData,
+  formData,
   initialData,
   handleConfirmationChange,
 }) => {

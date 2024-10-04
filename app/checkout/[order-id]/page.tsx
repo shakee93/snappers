@@ -21,7 +21,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   // console.log({orderId});
   // console.log({searchParams});
 
-  if (orderId === "no_order_id_found" && searchParams == null) {
+  if (orderId === "guest_checkout" && searchParams == null) {
     return (
       <h1 className="py-20 text-center text-2xl font-bold">
         📝 The page is unable to load
@@ -100,7 +100,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     [orderData, customerData],
   );
 
-  if (orderId === "no_order_id_found" && searchParams) {
+  if (orderId === "guest_checkout" && searchParams) {
     return (
       <div className="container mx-auto grid items-center justify-center">
         <h1 className="pt-20 text-center text-2xl font-bold">
