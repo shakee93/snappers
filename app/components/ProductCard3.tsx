@@ -219,83 +219,84 @@ const ProductCard: FC<ProductCardProps> = ({
       className={`min-h-[270px] md:min-h-[365px] nc-ProductCard relative flex flex-col bg-white rounded-2xl p-1 group ${className}`}
       data-nc-id="ProductCard"
     >
-    <div className="relative flex-shrink-0 bg-white rounded-2xl overflow-hidden ">
-  <Link href={link}>
-    <div className="flex items-center justify-center h-[250px] sm:h-[250px] relative">
-      {variations?.edges &&
-      variations.edges.some(
-        (variation: { node: ProductVariation }) =>
-          variation.node?.image?.sourceUrl
-      ) ? (
-        variations.edges.map(
-          (
-            variation: {
-              node: ProductVariation;
-            },
-            index: number
-          ) => (
-            <div
-              key={index}
-              className="w-full flex-shrink-0 bg-[#fefefe] relative"
-            >
-              <Image
-                src={
-                  variation?.node?.image?.sourceUrl?.replace(
-                    "http://",
-                    "https://"
-                  ) || ""
-                }
-                width={300}
-                height={300}
-                alt={name || ""}
-                placeholder="blur"
-                className="object-contain w-auto h-full mx-auto my-auto"
-              />
-              <div className="h-full relative ">
-                <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-white via-transparent to-transparent"></div> {/* Overlay from bottom */}
+      <div className="relative flex-shrink-0 bg-white rounded-2xl overflow-hidden ">
+        <Link href={link}>
+          <div className="flex items-center justify-center aspect-square relative">
+            {variations?.edges &&
+            variations.edges.some(
+              (variation: { node: ProductVariation }) =>
+                variation.node?.image?.sourceUrl
+            ) ? (
+              variations.edges.map(
+                (
+                  variation: {
+                    node: ProductVariation;
+                  },
+                  index: number
+                ) => (
+                  <div
+                    key={index}
+                    className="w-full flex-shrink-0 bg-[#fefefe] relative"
+                  >
+                    <Image
+                      src={
+                        variation?.node?.image?.sourceUrl?.replace(
+                          "http://",
+                          "https://"
+                        ) || ""
+                      }
+                      width={300}
+                      height={300}
+                      alt={name || ""}
+                      placeholder="blur"
+                      className="object-contain w-auto h-full mx-auto my-auto"
+                    />
+                    <div className="h-full relative ">
+                      <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-white via-transparent to-transparent"></div>{" "}
+                      {/* Overlay from bottom */}
+                    </div>
+                  </div>
+                )
+              )
+            ) : (
+              <div className="relative w-full aspect-square">
+                <Image
+                  width={250}
+                  height={250}
+                  src={image?.sourceUrl || ""}
+                  alt={name || ""}
+                  className={twMerge(
+                    `object-cover object-center w-full h-full rounded-2xl`
+                  )}
+                />
+                <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-white/90 via-white/30 to-transparent"></div>{" "}
+                {/* Overlay from bottom */}
               </div>
-            </div>
-          )
-        )
-      ) : (
-        <div className="relative w-full h-full">
-          <Image
-            width={250}
-            height={250}
-            src={image?.sourceUrl || ""}
-            alt={name || ""}
-            className={twMerge(
-              `object-cover object-center mx-auto my-auto rounded-2xl`
             )}
-          />
-          <div className="absolute inset-x-0 bottom-0  h-28 bg-gradient-to-t from-white/70 via-white/30 to-transparent"></div> {/* Overlay from bottom */}
+          </div>
+        </Link>
+
+        {/* Arrow Icon */}
+        <div
+          className={"absolute hidden md:block top-3 cursor-pointer right-3"}
+          onClick={() => handleCloseModalQuickView()}
+        >
+          <ArrowsPointingOutIcon className="w-5" />
         </div>
-      )}
-    </div>
-  </Link>
 
-  {/* Arrow Icon */}
-  <div
-    className={"absolute hidden md:block top-3 cursor-pointer right-3"}
-    onClick={() => handleCloseModalQuickView()}
-  >
-    <ArrowsPointingOutIcon className="w-5" />
-  </div>
-
-  {/* Brand */}
-  <div
-    className={`absolute left-1.5 top-2 bg-zinc-100/80 text-center text-xs lg:text-sm line-clamp-2 rounded-full text-slate-800`}
-  >
-    {brands?.nodes?.map((brand: Brand, index: number) => (
-      <Link href={`/${brand?.slug}`} key={index}>
-        <div className="bg-gradient-to-b w-fit from-blue-500/30 font-semibold to-blue-400/5 text-xs text-blue-900 px-4 py-2 rounded-full">
-          {brand?.name}
+        {/* Brand */}
+        <div
+          className={`absolute left-1.5 top-2 bg-zinc-100/80 text-center text-xs lg:text-sm line-clamp-2 rounded-full text-slate-800`}
+        >
+          {brands?.nodes?.map((brand: Brand, index: number) => (
+            <Link href={`/${brand?.slug}`} key={index}>
+              <div className="bg-gradient-to-b w-fit from-blue-500/30 font-semibold to-blue-400/5 text-xs text-blue-900 px-4 py-2 rounded-full">
+                {brand?.name}
+              </div>
+            </Link>
+          ))}
         </div>
-      </Link>
-    ))}
-  </div>
-</div>
-
+      </div>
 
       <div className="space-y-2 flex flex-col space-between min-h-[100px] px-2.5 justify-between  lg:pt-2 lg:pb-2.5 relative">
         <div>{renderGroupButtons()}</div>

@@ -342,7 +342,7 @@ export default async function Home() {
           </div>
         </div> */}
 
-        <div className="container flex flex-col gap-10 lg:gap-16">
+        <div className="flex flex-col px-3  gap-10 lg:gap-16 sm:container">
           {/* new arrivals section */}
           <div className="mt-5 md:mt-10">
             <SectionSliderProductCard
