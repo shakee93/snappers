@@ -216,7 +216,7 @@ const ProductCard: FC<ProductCardProps> = ({
 
   return (
     <div
-      className={`min-h-[270px] md:min-h-[365px] nc-ProductCard relative flex flex-col bg-white rounded-2xl p-1 group ${className} transition-transform duration-300 ease-in-out hover:-translate-y-1`}
+      className={`min-h-[270px] md:min-h-[365px] nc-ProductCard relative flex flex-col bg-white rounded-2xl p-1 group ${className} `}
       data-nc-id="ProductCard"
     >
       <div className="relative flex-shrink-0 bg-white rounded-2xl overflow-hidden ">
@@ -236,7 +236,7 @@ const ProductCard: FC<ProductCardProps> = ({
                 ) => (
                   <div
                     key={index}
-                    className="w-full flex-shrink-0 bg-[#fefefe] relative"
+                    className="w-full flex-shrink-0 bg-[#fefefe] relative overflow-hidden"
                   >
                     <Image
                       src={
@@ -249,7 +249,7 @@ const ProductCard: FC<ProductCardProps> = ({
                       height={300}
                       alt={name || ""}
                       placeholder="blur"
-                      className="object-contain w-auto h-full mx-auto my-auto"
+                      className="object-contain w-auto h-full mx-auto my-auto transition-transform duration-800 ease-in-out group-hover:scale-110" // <-- Add hover scale effect
                     />
                     <div className="h-full relative ">
                       <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-white via-transparent to-transparent"></div>{" "}
@@ -259,14 +259,14 @@ const ProductCard: FC<ProductCardProps> = ({
                 )
               )
             ) : (
-              <div className="relative w-full aspect-square">
+              <div className="relative w-full aspect-square overflow-hidden">
                 <Image
                   width={250}
                   height={250}
                   src={image?.sourceUrl || ""}
                   alt={name || ""}
                   className={twMerge(
-                    `object-cover object-center w-full h-full rounded-2xl`
+                    `object-cover object-center w-full h-full rounded-2xl transition-transform duration-800 ease-in-out group-hover:scale-105` // <-- Add hover scale effect
                   )}
                 />
                 <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-white/90 via-white/30 to-transparent"></div>{" "}
@@ -278,6 +278,8 @@ const ProductCard: FC<ProductCardProps> = ({
 
         {/* Arrow Icon */}
         <div
+
+
           className={"absolute hidden md:block top-3 cursor-pointer right-3"}
           onClick={() => handleCloseModalQuickView()}
         >

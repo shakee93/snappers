@@ -140,7 +140,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
 
   return (
     <div className="embla" id='product-image'>
-      <div className="embla__viewport border rounded-2xl" ref={emblaMainRef}>
+      <div className="embla__viewport  rounded-2xl" ref={emblaMainRef}>
         <div className="embla__container ">
           {galleryImages?.map((variation: any, index: number) => (
             <div className="embla__slide" key={index}>

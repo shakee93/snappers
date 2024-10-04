@@ -10,6 +10,7 @@ import ProductImage from "@/app/components/SingleProductPage/ProductImage2";
 import { Suspense } from "react";
 import { Metadata, ResolvingMetadata } from "next";
 import { ImageProvider } from "@/context/ImageChangeGrabber";
+import React from "react";
 
 export const dynamic = 'force-dynamic'
 
@@ -102,7 +103,7 @@ const Page = async ({ params }: Props) => {
 
   return (
     <div className="mt-5 md:mt-10">
-      <main className="container m-auto">
+        <main className="flex flex-col px-3   sm:container sm:max-w-screen-2xl">
         <div className="md:mt-0 text-sm md:px-5 md:text-[0.95rem] md:ml-4">
           <Link href="/">Home</Link> &gt;{" "}
           <Link href={`/${brand.slug}`}>{brand.name}</Link> &gt;{" "}
