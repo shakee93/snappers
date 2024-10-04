@@ -324,7 +324,6 @@ const ProductCard: FC<ProductCardProps> = ({
             salePrice={lowestSalePrice}
             className=""
           />
-          
           {(salePrice === price || !salePrice) && !!reviewCount && (
             <div className="flex items-center mb-0.5">
               <StarIcon className="w-4 h-4 pb-[1px] text-amber-400" />
