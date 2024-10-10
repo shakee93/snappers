@@ -203,7 +203,7 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
             <NcImage
               priority={true}
               src={item.slideFields.featureImage.sourceUrl}
-              className="max-h-[300px] md:max-h-[500px] w-auto py-6 px-4"
+              className="max-h-[250px] md:max-h-[300px] xl:max-h-[500px] w-auto py-6 px-4"
             />
           </motion.div>
         </div>
