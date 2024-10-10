@@ -6,10 +6,11 @@ import SectionPromo1 from "@/app/components/HomePage/SectionPromo1";
 import Heading from "@/app/components/Heading/Heading";
 import { getClient } from "@/graphql/apollo-ssr";
 import {
+  GET_BRANDS,
   GET_PRODUCTS_NODES,
   GET_PRODUCTS_NODES_HOMEPAGE,
 } from "@/graphql/defs/products";
-import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
+import { Brand, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 
 import Image from "next/image";
 import Scam from "@/public/homepage/scam.webp";
@@ -35,6 +36,7 @@ import bgSlide8 from "@/public/homepage/slider/Layer_8.png";
 import bgSlide9 from "@/public/homepage/slider/Layer_9.png";
 import bgSlide10 from "@/public/homepage/slider/Layer_10.png";
 import bgSlide11 from "@/public/homepage/slider/Layer_11.png";
+import SectionSliderBrandCard from "./components/SectionSliderBrandCard";
 
 const slidesData = [
   {
@@ -254,9 +256,22 @@ const getData = async () => {
         console.error("Error fetching back in stock");
         return [];
       }),
+
+      
+      getClient()
+      .query({
+        query: GET_BRANDS, }) .then((res) => {
+        return res.data?.brands?.nodes || [];
+      })
+      .catch(() => {
+        console.error("Error fetching brands");
+        return [];
+      }),
+
   ];
 
-  const [newArrivals, mobiles, speakers, watches, backInStock] =
+
+  const [newArrivals, mobiles, speakers, watches, backInStock, brands] =
     await Promise.all(queries);
 
   return {
@@ -265,13 +280,14 @@ const getData = async () => {
     speakers: speakers as (SimpleProduct & VariableProduct)[],
     watches: watches as (SimpleProduct & VariableProduct)[],
     backInStock: backInStock as (SimpleProduct & VariableProduct)[],
+    brands: brands as Brand[],
   };
 };
 
 export default async function Home() {
   // const startTime = performance.now(); // Log the start time
 
-  const { newArrivals, mobiles, speakers, watches, backInStock } =
+  const { newArrivals, mobiles, speakers, watches, backInStock, brands } =
     await getData();
   // const endTime = performance.now(); // Log the end time
   // console.log(
@@ -365,6 +381,15 @@ export default async function Home() {
               products={newArrivals}
               heading="New Arrivals"
               link="new-arrivals"
+            />
+          </div>
+
+            {/* Brand Logo section */}
+            <div className="mt-5 md:mt-10">
+            <SectionSliderBrandCard
+              heading="Our Brands"
+              link="brands"
+              brands={brands}
             />
           </div>
 
