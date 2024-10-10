@@ -56,42 +56,59 @@ const slidesData = [
   {
     id: "2",
     slideFields: {
-      mainHeading: "SAMSUNG Galaxy Watch FE",
+      mainHeading: "iPhone 15 pro max",
       subHeading: "Precision in Every Movement",
       buttonText: "Buy Now",
-      buttonLink: "https://gqmobiles.lk/samsung/samsung-galaxy-watch-fe",
+      buttonLink: "https://gqmobiles.lk/apple/apple-iphone-15-pro-max",
       backgroundColor: "#CCE0EF",
       backgroundImage: bgSlide10.src,
       featureImage: {
         id: "2",
         sourceUrl:
-          "https://api.gqmobiles.lk/wp-content/uploads/2024/09/WatchFE_FT02_Customize_PC.png",
+          "https://api.gqmobiles.lk/wp-content/uploads/2024/10/Apple-iPhone-15-Pro-Max-1TB-removebg-preview.png",
       },
     },
   },
+  // {
+  //   id: "3",
+  //   slideFields: {
+  //     mainHeading: "PS5 Slim Digital Edition",
+  //     subHeading: "Performance Packed, Space Saved",
+  //     buttonText: "Buy Now",
+  //     buttonLink:
+  //       "https://gqmobiles.lk/apple/apple-airpods-4-with-active-noise-cancellation-anc-2024",
+  //     backgroundColor: "#CCE0EF",
+  //     backgroundImage: bgSlide4.src,
+  //     featureImage: {
+  //       id: "2",
+  //       sourceUrl:
+  //         "https://api.gqmobiles.lk/wp-content/uploads/2024/09/Apple-AirPods-Hearing-Aid-240909_inline.jpg.large-removebg-preview.png",
+  //     },
+  //   },
+  // },
   {
-    id: "3",
+    id: "4",
     slideFields: {
-      mainHeading: "Silence the World, Hear the Detail",
-      subHeading: "Apple AirPods 4 with Active Noise Cancellation (ANC) — 2024",
+      mainHeading: "Sony PlayStation 5 Slim",
+      subHeading: "Performance Packed, Space Saved",
       buttonText: "Buy Now",
       buttonLink:
-        "https://gqmobiles.lk/apple/apple-airpods-4-with-active-noise-cancellation-anc-2024",
+        "https://gqmobiles.lk/sony/sony-playstation-5-slim-ps5-eur-disc-edition",
       backgroundColor: "#CCE0EF",
       backgroundImage: bgSlide4.src,
       featureImage: {
         id: "2",
         sourceUrl:
-          "https://api.gqmobiles.lk/wp-content/uploads/2024/09/Apple-AirPods-Hearing-Aid-240909_inline.jpg.large-removebg-preview.png",
+          "https://api.gqmobiles.lk/wp-content/uploads/2024/10/PS5-slim-digital-edition-new-pn-550x550h.png",
       },
     },
   },
 
   {
-    id: "4",
+    id: "5",
     slideFields: {
       mainHeading:
-        "AirPods Pro (2nd generation) with MagSafe Charging Case (USB‑C) — 2024",
+        "AirPods Pro (2nd Gen) with USB-C — 2024",
       subHeading: "USB-C Power, Pro-Level Performance",
       buttonText: "Buy Now",
       buttonLink:
@@ -107,7 +124,7 @@ const slidesData = [
   },
 
   {
-    id: "5",
+    id: "6",
     slideFields: {
       mainHeading: "Apple Watch Series 10",
       subHeading: "The Future on Your Wrist",
@@ -125,25 +142,25 @@ const slidesData = [
   },
 
   {
-    id: "6",
+    id: "7",
     slideFields: {
-      mainHeading: "Apple AirPods Max (USB-C) — 2024",
-      subHeading: "The Perfect Harmony of Sound and Tech",
+      mainHeading: "Samsung Galaxy Tab S9 FE",
+      subHeading: "Smart, Sleek, and Ready for More",
       buttonText: "Buy Now",
-      buttonLink: "https://gqmobiles.lk/apple/apple-watch-series-10",
+      buttonLink: "https://gqmobiles.lk/samsung/samsung-tab-s9-fe-5g-6gb-128gb-lavender-sm-x516b",
       backgroundColor: "#CCE0EF",
       backgroundImage: bgSlide6.src,
 
       featureImage: {
         id: "2",
         sourceUrl:
-          "https://api.gqmobiles.lk/wp-content/uploads/2024/09/gq-mobiles-apple-airpods-max-usb-type-c-2024-orange-2-removebg-preview.png",
+          "https://api.gqmobiles.lk/wp-content/uploads/2024/10/Samsung-Galaxy-Tab-S9-FE-6GB-RAM-128GB-Graphite-removebg-preview.png",
       },
     },
   },
 
   {
-    id: "7",
+    id: "8",
     slideFields: {
       mainHeading: 'iPad Air 11" &  13"',
       subHeading: "Where Performance Meets Portability",
