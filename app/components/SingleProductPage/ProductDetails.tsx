@@ -38,6 +38,7 @@ const ProductDetails = ({
   );
 
   const manualMeta = product?.metaData;
+
   const warrantyType = manualMeta?.find(
     (item) => item?.key === "warranty_type"
   )?.value;
@@ -161,7 +162,7 @@ const ProductDetails = ({
     }
   }, [attribute, product]);
 
-  useEffect(() => {}, [attribute]);
+  useEffect(() => { }, [attribute]);
 
 
   return (
@@ -277,24 +278,26 @@ const ProductDetails = ({
                 Low Stock
               </div>
             )}
-
-          {warrantyType && warrantyPeriod && (
-            <div className="items-left flex w-full flex-col flex-wrap gap-2 py-2 text-xs text-gray-500 md:text-sm">
-              <div className="">
-                <span className="font-medium">Warranty Type :</span>{" "}
-                {warrantyType}
-              </div>
-              <div className="">
-                <span className="font-medium">Warranty period :</span>{" "}
-                {warrantyPeriod} Months
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
-      {product.shortDescription && <ProductDescription product={product} />}
+      {/* <div className="">
+        {warrantyType && warrantyPeriod && (
+          <div className="items-left flex w-full flex-col flex-wrap gap-2 py-2 text-xs text-gray-500 md:text-sm">
+            <div className="">
+              <span className="font-medium">Warranty Type :</span>{" "}
+              {warrantyType}
+            </div>
+            <div className="">
+              <span className="font-medium">Warranty period :</span>{" "}
+              {warrantyPeriod} Months
+            </div>
+          </div>
+        )}
+      </div> */}
 
+      {/* {product.shortDescription && <ProductDescription product={product} />} */}
+      <ProductDescription product={product} />
       {product.type === "VARIABLE" && (
         <>
           {product.attributes?.nodes.map(
@@ -351,7 +354,7 @@ const ProductDetails = ({
                         className={twMerge(
                           "relative inline-block cursor-pointer rounded border bg-gray-200/80 px-3.5 py-2 text-xs text-black md:text-sm",
                           activeAttr(attr)?.val === option &&
-                            "border-primaryColor text-primaryColor bg-white shadow-md",
+                          "border-primaryColor text-primaryColor bg-white shadow-md",
                           allOutOfStock && "diag-line bg-gray-100 text-gray-500"
                         )}
                         style={{ opacity: allOutOfStock ? 0.9 : 1 }}
@@ -363,9 +366,9 @@ const ProductDetails = ({
                             .join("")}`
                         ]?.nodes.find((node: PaCapacity) => {
                           return node.slug === option;
-                        })?.name || "OPTION" }
+                        })?.name || "OPTION"}
 
-                      
+
                         {/* {allOutOfStock && (
                           <span
                             className="absolute inset-0 flex items-center justify-center"
