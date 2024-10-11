@@ -58,7 +58,7 @@ const ProductDescription: React.FC<ProductDescriptionProps> = ({ product }) => {
 
       {warrantyType && warrantyPeriod && (
         <div>
-          <hr className="mt-2 border-gray-300" />
+          {!product.shortDescription && <hr className="mt-2 border-gray-300" />}
           <Accordion>
             <AccordionItem key="1" aria-label="Warranty" title="Warranty">
               <div className="pb-1">
