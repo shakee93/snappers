@@ -444,7 +444,8 @@ const CheckoutPage = () => {
       );
 
       if (!confirmationResponse.ok) {
-        throw new Error("Failed to confirm order status");
+        const errorResponse = await confirmationResponse.json();
+        console.error("Error confirming order status:", errorResponse);
       }
 
       const orderConfirmationdata = await confirmationResponse.json();
