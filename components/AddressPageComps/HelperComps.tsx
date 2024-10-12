@@ -217,8 +217,6 @@ const getPaymentHash = async (dynamicData: any) => {
     }
 
     const data = await response.json();
-    console.log('Hash is ', JSON.stringify(data, null, 2));
-
 
     return data.hash;
   } catch (error) {
