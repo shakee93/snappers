@@ -23,7 +23,7 @@ const ProductAddToCart = ({
 }) => {
   const [quantity, setQuantity] = useState(1);
   const [loading, setLoading] = useState(false);
-  const { addToCart } = useCart();
+  const { addToCart, cart } = useCart();
   const ROUTER = useRouter();
 
   // useEffect(() => {
@@ -48,8 +48,6 @@ const ProductAddToCart = ({
       }
     );
   };
-
-  // console.log("variation", variation, "type:", typeof variation?.rawPrice, "old value:", variation?.rawPrice);
   // console.log("product", product, "type:", typeof product);
   //     (t: any) => (
   //       <Transition
@@ -87,34 +85,100 @@ const ProductAddToCart = ({
   };
 
   const addItemToCart = async () => {
+    if (!isProductInStock()) return;
+
+    setLoading(true);
+    const variationId = getVariationId();
+
+    try {
+      const { data, error } = await addToCart(
+        product?.databaseId,
+        quantity,
+        variationId
+      );
+      handleAddToCartResponse(data, error);
+    } catch (error: any) {
+      handleAddToCartError(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const isProductInStock = () => {
     if (
       (product?.type === "VARIABLE" && variation?.stockStatus !== "IN_STOCK") ||
       (product?.type === "SIMPLE" && product?.stockStatus !== "IN_STOCK")
     ) {
-      return;
+      return false;
     }
 
-    setLoading(true);
-    let variationId =
-      product.type == "SIMPLE" ? undefined : variation.databaseId;
+    let find = cart?.contents?.nodes;
+    let findProduct = find?.find(
+      (item: any) => item.product.node.name === product.name
+    );
+    let cartQuantity = findProduct?.quantity as number;
+    let maxVariationQuantity = (variation?.stockQuantity ?? 0) >= cartQuantity; // Use optional chaining and fallback to 0
+    let maxProductQuantity = (variation?.stockQuantity ?? 0) >= cartQuantity; // Use optional chaining and fallback to 0
 
-    try {
-      await addToCart(product?.databaseId, quantity, variationId);
-      cartCompleted();
-    } catch (error: any) {
-      console.log("Error:", error);
+    if (
+      product?.type === "VARIABLE" &&
+      maxVariationQuantity
+    ) {
+      toast.error(
+        "Added the maximum stock quantity to cart. Stock levels are low."
+      );
+      return false;
+    }
 
-      let isTokenExpired =
-        error.graphQLErrors[0]?.debugMessage ===
-        "invalid-secret-key | Expired token";
-      if (isTokenExpired) {
-        toast.error("You've been logged out. Please sign in again.");
-        ROUTER.push("/login");
-      } else {
-        toast.error("Unable to add to cart");
-      }
-    } finally {
-      setLoading(false);
+    if (
+      product?.type === "SIMPLE" &&
+      maxProductQuantity
+    ) {
+      toast.error("stock quantity maximum added");
+      return false;
+    }
+
+    return true;
+  };
+
+  const getVariationId = () => {
+    return product.type == "SIMPLE" ? undefined : variation.databaseId;
+  };
+
+  const handleAddToCartResponse = (data: any, error: any) => {
+    console.log("response", data);
+    console.log("error", error);
+    if (!error) cartCompleted();
+  };
+
+  const handleAddToCartError = (error: any) => {
+    let isTokenExpired =
+      error.graphQLErrors[0]?.debugMessage ===
+      "invalid-secret-key | Expired token";
+
+    error.graphQLErrors.forEach((err: any, index: number) => {
+      console.log(`Error ${index + 1}:`, err.debugMessage);
+    });
+
+    if (isTokenExpired) {
+      handleTokenExpiredError();
+    } else {
+      handleGenericError(error);
+    }
+  };
+
+  const handleTokenExpiredError = () => {
+    toast.error("You've been logged out. Please sign in again.");
+    ROUTER.push("/login");
+  };
+
+  const handleGenericError = (error: any) => {
+    const apiErrorMessage = error.graphQLErrors[0]?.message;
+
+    if (apiErrorMessage) {
+      toast.error(apiErrorMessage);
+    } else {
+      toast.error("Unable to add to cart");
     }
   };
 
@@ -152,7 +216,11 @@ const ProductAddToCart = ({
         </div>
 
         <button
-          disabled={loading || variation?.rawPrice === "0.00" || variation?.rawPrice == null}
+          disabled={
+            loading ||
+            variation?.rawPrice === "0.00" ||
+            variation?.rawPrice == null
+          }
           onClick={(e) => addItemToCart()}
           className={twMerge(
             "relative w-auto grow md:flex-none  h-auto inline-flex\

@@ -64,7 +64,7 @@ export function CartProvider({ children }: {
 
     const [_addToCart] = useMutation(ADD_TO_CART, {
         fetchPolicy: 'no-cache',
-        onCompleted: refreshData
+        onCompleted: refreshData,
     });
 
     const [_updateCart] = useMutation(UPDATE_CART_ITEM_QUANTITY, {
