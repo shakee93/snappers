@@ -135,6 +135,7 @@ const CheckoutPage = () => {
   const [totalWithTax, setTotalWithTax] = useState<string | null>();
   const [isTOC, setTOC] = useState<boolean>(false);
   const [freeShipping, setFreeShipping] = useState<boolean>(false);
+  const [confirmOrderErrors, setConfirmOrderErrors] = useState<string[]>([]);
 
   const handleTOC = () => {
     // Toggle the state and get the updated value
@@ -519,13 +520,35 @@ const CheckoutPage = () => {
   }, [paymentData]);
 
   const handleCheckoutProcess = async () => {
+    console.log("isConfirmed", isConfirmed);
+    let errors = [];
+    if (!isConfirmed.contactInfo) {
+      errors.push("Contact info is missing.");
+    }
+    if (!isConfirmed.deliveryAddress) {
+      errors.push("Delivery address is missing.");
+    }
+    if (!isConfirmed.billingAddress) {
+      errors.push("Billing address is missing.");
+    }
+    if (!isConfirmed.paymentMethod) {
+      errors.push("Payment method is missing.");
+    }
+    if (!isTOC) {
+      errors.push("Terms and conditions are not accepted.");
+    }
+    if (errors.length > 0) {
+      setConfirmOrderErrors(errors);
+      return;
+    }
+
     const isBankTransfer =
       formData?.paymentMethod?.selectedGateway?.id == "bacs";
     const isPayhere = formData?.paymentMethod?.selectedGateway?.id == "payhere";
     const isCashOnDelivery =
       formData?.paymentMethod?.selectedGateway?.id == "cod";
 
-    console.log("formData: ", formData);
+    // console.log("formData: ", formData);
 
     if (isBankTransfer) {
       if (wantToSHowBankTransfer) {
@@ -612,7 +635,7 @@ const CheckoutPage = () => {
         formData?.paymentMethod?.selectedGateway?.id == "bacs";
 
       console.log("data: ", data);
-      console.log("formdata on banktranser: ",formData);
+      console.log("formdata on banktranser: ", formData);
       if (data) {
         const checkoutDetails = savePaymentDetails(data);
         setPaymentData(checkoutDetails);
@@ -880,26 +903,16 @@ const CheckoutPage = () => {
             </div>
             <ButtonPrimary
               onClick={handleCheckoutProcess}
-              disabled={
-                !(
-                  isConfirmed.contactInfo &&
-                  isConfirmed.deliveryAddress &&
-                  isConfirmed.billingAddress &&
-                  isConfirmed.paymentMethod &&
-                  isTOC
-                )
-              }
-              className={`mt-8 w-full ${
-                !(
-                  isConfirmed.contactInfo &&
-                  isConfirmed.deliveryAddress &&
-                  isConfirmed.billingAddress &&
-                  isConfirmed.paymentMethod &&
-                  isTOC
-                )
-                  ? "cursor-not-allowed bg-slate-500"
-                  : "bg-primary hover:bg-primary-dark"
-              }`}
+              // disabled={
+              //   !(
+              //     isConfirmed.contactInfo &&
+              //     isConfirmed.deliveryAddress &&
+              //     isConfirmed.billingAddress &&
+              //     isConfirmed.paymentMethod &&
+              //     isTOC
+              //   )
+              // }
+              className={`mt-8 w-full bg-primary hover:bg-primary-dark`}
             >
               {loading ? (
                 <Loader className="animate-spin text-gray-100 " />
@@ -907,6 +920,14 @@ const CheckoutPage = () => {
                 "Confirm Order"
               )}
             </ButtonPrimary>
+
+            <div className="text-xs space-y-1.5 mt-4 pl-5">
+              {confirmOrderErrors.map((error, index) => (
+                <div key={index} className="text-red-500">
+                  *{error}
+                </div>
+              ))}
+            </div>
 
             {/*<ButtonPrimary onClick={CreateOrderGuest}>*/}
             {/*    GUEST CHECKOUT*/}

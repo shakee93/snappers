@@ -63,7 +63,6 @@ const PaymentMethod: FC<Props> = ({
         )
         .filter(Boolean); // Filter out undefined values
 
-      console.log("categoryNames: ", categoryNames);
 
       const containsMobileOrTablet = categoryNames.some(
         (name: string) => name === "Smartphones" || name === "Tablets" || name === "1. Mobiles & Tablets"
@@ -107,7 +106,7 @@ const PaymentMethod: FC<Props> = ({
 
             if (gateway.id === "payhere") {
               setIsCardPayment(true);
-              console.log("cardpayment", isCardPayment);
+              // console.log("cardpayment", isCardPayment);
             } else {
               setIsCardPayment(false);
             }
