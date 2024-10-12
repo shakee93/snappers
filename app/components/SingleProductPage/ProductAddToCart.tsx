@@ -61,13 +61,22 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
       (item: any) => item.product.node.databaseId === product.databaseId
     );
 
+    console.log("product", product);
     const existingCartQuantity = existingCartItem?.quantity ?? 0;
     const desiredQuantity = existingCartQuantity + quantity;
 
+   
     const availableStock =
       product.type === "VARIABLE"
-        ? variation?.stockQuantity ?? 0
-        : product?.stockQuantity ?? 0;
+        ? variation?.stockQuantity 
+        : product?.stockQuantity ;
+
+    
+    console.log("availableStock", availableStock);
+    if(availableStock === null || availableStock === undefined) {
+      return true
+    }
+    
 
     if (availableStock < desiredQuantity) {
       const message =
