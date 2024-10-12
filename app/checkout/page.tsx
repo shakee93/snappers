@@ -394,18 +394,18 @@ const CheckoutPage = () => {
     const productList = products?.map((product: any) => {
       const productName = product.product.node.name;
       const varProduct = product.product.node.type;
-      const color =
-        varProduct === "VARIABLE"
-          ? product.product.node.allPaColor.nodes[0].name
-          : "";
-      const capacity =
-        varProduct === "VARIABLE"
-          ? product.product.node.allPaCapacity.nodes[0].name
-          : "";
-      const productString =
-        varProduct === "VARIABLE"
-          ? `${productName} ${color} | ${capacity}`
-          : productName;
+
+
+      const attributes = Object.keys(product.product.node).filter(key => key.startsWith('allPa'));
+      const attributeValues = attributes.map(attr => {
+        const nodes = product.product.node[attr]?.nodes;
+        return nodes && nodes.length > 0 ? nodes[0].name : '';
+      }).filter(Boolean);
+
+      const productString = varProduct === "VARIABLE"
+        ? `${productName} | ${attributeValues.join(' | ')}`
+        : productName;
+
       return productString;
     });
 
@@ -424,6 +424,9 @@ const CheckoutPage = () => {
 
     if (initiatePayment !== null) {
       setPayhereHandleStatus("loading");
+
+      // console.log("checkoutDetails", checkoutDetails);
+
       initiatePayment(checkoutDetails, setPayhereHandleStatus).then((r) => r);
 
       const confirmationResponse = await fetch(
@@ -520,7 +523,7 @@ const CheckoutPage = () => {
   }, [paymentData]);
 
   const handleCheckoutProcess = async () => {
-    console.log("isConfirmed", isConfirmed);
+    // console.log("isConfirmed", isConfirmed);
     let errors = [];
     if (!isConfirmed.contactInfo) {
       errors.push("Contact info is missing.");
@@ -703,12 +706,10 @@ const CheckoutPage = () => {
   // console.log("numericOrderTotal: ", numericOrderTotal);
   const threePercentFromTotal = numericOrderTotal * 0.03;
 
-  // const taxWithTotal = (numericOrderTotal + threePercentFromTotal).toFixed(2);
-  const taxWithTotal = numericOrderTotal;
-  // console.log("taxWithTotal: ", taxWithTotal);
+  const taxWithTotal = (numericOrderTotal + threePercentFromTotal).toFixed(2);
 
   useEffect(() => {
-    // setTotalWithTax(taxWithTotal);
+    setTotalWithTax(taxWithTotal);
   }, [taxWithTotal]);
 
   return (

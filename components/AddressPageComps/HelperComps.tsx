@@ -99,18 +99,16 @@ const savePaymentDetails = (
 ): PaymentDetailsWithoutUrls => {
   let orderDetails: CheckoutPayload = checkoutDetails?.checkout;
   let { order, customer } = orderDetails;
-  
-  
+
   let saved_data = {
     amount: order?.total ?? "no_amount",
     items: "Mobile Items",
     order_id: order?.databaseId?.toString() ?? "guest_checkout",
     first_name: customer?.billing?.firstName || "no_lastname",
     last_name: customer?.billing?.lastName || "no firstname",
-    email: customer?.billing?.email || customer?.shipping?.email || "no_email", 
+    email: customer?.billing?.email || customer?.shipping?.email || "no_email",
     address: customer?.billing?.address1 || "no_address",
   };
-
 
   console.log("saved_data: for payment", saved_data);
   return saved_data;
@@ -138,7 +136,7 @@ const getRandomWelcomeMessage = () => {
 const domain = process.env.NEXT_PUBLIC_DOMAIN;
 const MERCHANT_ID = process.env.NEXT_PUBLIC_MERCHANT_ID;
 const TEST: boolean = false;
-const SANDBOX: boolean = false
+const SANDBOX: boolean = false;
 
 const STATIC_DATA = {
   sandbox: SANDBOX,
@@ -181,25 +179,22 @@ const TEST_STATIC_DATA = {
   address: "welllampitiya , colombodasf",
   city: "Colombo",
   country: "Sri Lanka",
-  iframe: true
+  iframe: true,
 };
 
-
-
 const getPaymentHash = async (dynamicData: any) => {
-
   try {
-    const amount = TEST ? "100.00" : numberFormat(extractRawAmount(dynamicData?.amount), 2, ".", "");
-    const order_id = TEST ? "ItemNo12345" : dynamicData?.order_id
-    
-    
+    const amount = TEST
+      ? "100.00"
+      : numberFormat(extractRawAmount(dynamicData?.amount), 2, ".", "");
+    const order_id = TEST ? "ItemNo12345" : dynamicData?.order_id;
+
     const requestData = {
       merchant_id: MERCHANT_ID,
-      order_id:  order_id,
+      order_id: order_id,
       amount: amount,
       currency: "LKR",
     };
-
 
     // console.log("data sent to the payhere hash: ", requestData);
     // console.log("requestData: ", requestData);
@@ -214,7 +209,7 @@ const getPaymentHash = async (dynamicData: any) => {
       body: JSON.stringify(requestData),
     });
 
-    // console.log("Response from the payment route: ",await response.json());
+    console.log("Response from the payment route: ", await response.json());
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -227,17 +222,20 @@ const getPaymentHash = async (dynamicData: any) => {
   }
 };
 
-function numberFormat(amount: any, decimals: any, decimalPoint: any, thousandsSeparator: any) {
+function numberFormat(
+  amount: any,
+  decimals: any,
+  decimalPoint: any,
+  thousandsSeparator: any
+) {
   // Format the number with the specified number of decimals
   let number = parseFloat(amount).toFixed(decimals);
-
   // Split the number into integer and decimal parts
-  let parts = number.split('.');
+  let parts = number.split(".");
 
   // Replace the thousands separator
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousandsSeparator);
 
-  // Reassemble the number and return it
   return parts.join(decimalPoint);
 }
 
@@ -253,6 +251,5 @@ export {
   STATIC_DATA,
   TEST_STATIC_DATA,
   getPaymentHash,
-numberFormat
+  numberFormat,
 };
-

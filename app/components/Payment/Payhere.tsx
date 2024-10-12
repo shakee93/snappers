@@ -20,15 +20,24 @@ const TEST: boolean = false;
 const tranformDataForPayhere = async (
   paymentDetails_: PaymentDetailsWithoutUrls
 ): Promise<PayhereTransactionData | null> => {
+
+  // console.log("paymentDetails_: ", paymentDetails_);
   let hash: string | null = await getPaymentHash(paymentDetails_);
+  // console.log("hash: ", hash);
+
+
   if (!hash) {
     alert("hash Can not be generated");
     return null;
   }
 
+
   let order_id: string | undefined = TEST
     ? "ItemNo12345"
     : paymentDetails_?.order_id;
+
+
+    // console.log("amount String: ", paymentDetails_?.amount);
   let amount: string | undefined = TEST
     ? "100.00"
     : numberFormat(extractRawAmount(paymentDetails_?.amount), 2, ".", ""); 
@@ -80,12 +89,14 @@ export const usePayhere = () => {
         alert("No payment details provided");
         return null;
       }
-
+      
+      console.log("in initiatePayment: ", paymentDetails);
+      // TODO Passing data from here
       // this for real data
       let dynamicData = await tranformDataForPayhere(paymentDetails);
       // let dynamicData = await tranformDataForPayhere(TEST_STATIC_DATA);
       // console.log("finalData which goes to the payhere: ", dynamicData);
-
+      // return;
       setPayhereHandleStatus("loading");
       window?.payhere.startPayment(dynamicData);
 
