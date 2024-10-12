@@ -15,7 +15,6 @@ const revalidationToast = (message: string, type: 'success' | 'error') => {
     });
 };
 
-
 export function NavigationEvents() {
     const pathname = usePathname()
     const searchParams = useSearchParams()
