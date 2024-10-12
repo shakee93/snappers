@@ -156,10 +156,6 @@ const ProductAddToCart = ({
       error.graphQLErrors[0]?.debugMessage ===
       "invalid-secret-key | Expired token";
 
-    error.graphQLErrors.forEach((err: any, index: number) => {
-      console.log(`Error ${index + 1}:`, err.debugMessage);
-    });
-
     if (isTokenExpired) {
       handleTokenExpiredError();
     } else {
@@ -176,7 +172,7 @@ const ProductAddToCart = ({
     const apiErrorMessage = error.graphQLErrors[0]?.message;
 
     if (apiErrorMessage) {
-      toast.error(apiErrorMessage);
+      toast.error(apiErrorMessage.replace(/&quot;/g, '"'));
     } else {
       toast.error("Unable to add to cart");
     }
