@@ -94,6 +94,9 @@ const cartItems: React.FC<CartItemsProps> = ({
                                 className="w-4"
                               />{" "}
                               <span key={attr?.value}>
+
+                                {/* {attr?.label}: */}
+                                {attr?.value}
                                 {" "}
                                 {
                                   (product.node as unknown as VariableProduct)[

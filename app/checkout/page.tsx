@@ -193,8 +193,8 @@ const CheckoutPage = () => {
   }, [cart]);
 
   const updateFormData = (section: string, data: any) => {
-    console.log("data", JSON.stringify(data, null, 2));
-    console.log("section", JSON.stringify(section, null, 2));
+    // console.log("data", JSON.stringify(data, null, 2));
+    // console.log("section", JSON.stringify(section, null, 2));
     // Form data changing here!.
 
     setFormData((prevData) => {
@@ -270,7 +270,7 @@ const CheckoutPage = () => {
         ? await guestCheckout({ variables })
         : await checkoutMutation({ variables });
 
-    console.log("data from checkout: ", data);
+    // console.log("data from checkout: ", data);
     if (data) {
       const checkoutDetails = savePaymentDetails(data);
       setPaymentData(checkoutDetails);
@@ -456,11 +456,11 @@ const CheckoutPage = () => {
     setShowBankTransfer(true);
   }
 
-  useEffect(() => {
-    if (orderTotal) {
-      // console.log("Order Total: ", orderTotal)
-    }
-  }, [formData]);
+  // useEffect(() => {
+  //   if (orderTotal) {
+  //     // console.log("Order Total: ", orderTotal)
+  //   }
+  // }, [formData]);
 
   useEffect(() => {
     if (!paymentDetails) {
@@ -634,8 +634,8 @@ const CheckoutPage = () => {
       const isBankTransfer =
         formData?.paymentMethod?.selectedGateway?.id == "bacs";
 
-      console.log("data: ", data);
-      console.log("formdata on banktranser: ", formData);
+      // console.log("data: ", data);
+      // console.log("formdata on banktranser: ", formData);
       if (data) {
         const checkoutDetails = savePaymentDetails(data);
         setPaymentData(checkoutDetails);
@@ -700,12 +700,15 @@ const CheckoutPage = () => {
 
   const numericOrderTotal = replaceStringinInt(orderTotal);
 
+  // console.log("numericOrderTotal: ", numericOrderTotal);
   const threePercentFromTotal = numericOrderTotal * 0.03;
 
-  const taxWithTotal = (numericOrderTotal + threePercentFromTotal).toFixed(2);
+  // const taxWithTotal = (numericOrderTotal + threePercentFromTotal).toFixed(2);
+  const taxWithTotal = numericOrderTotal;
+  // console.log("taxWithTotal: ", taxWithTotal);
 
   useEffect(() => {
-    setTotalWithTax(taxWithTotal);
+    // setTotalWithTax(taxWithTotal);
   }, [taxWithTotal]);
 
   return (
@@ -843,7 +846,7 @@ const CheckoutPage = () => {
                   <span
                     dangerouslySetInnerHTML={{
                       __html:
-                        `Rs ${new Intl.NumberFormat("en-IN", {
+                        `Rs ${new Intl.NumberFormat("en-US", {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         }).format(
