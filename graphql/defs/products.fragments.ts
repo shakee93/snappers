@@ -1,4 +1,4 @@
-import {gql} from "@apollo/client";
+import { gql } from "@apollo/client";
 
 export const ProductSpecs = gql`
   fragment ProductSpecs on Product {
@@ -164,6 +164,11 @@ export const ProductContentFull = gql`
         slug
         count
       }
+    }
+      metaData {
+      key
+      value
+      id
     }
     galleryImages {
       nodes {
