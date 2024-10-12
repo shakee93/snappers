@@ -270,11 +270,34 @@ const CheckoutPage = () => {
         ? await guestCheckout({ variables })
         : await checkoutMutation({ variables });
 
-    // console.log("data from checkout: ", data);
+    const sentConfirmation = async () => {
+      const confirmationResponse = await fetch(
+        "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/order-confirmation",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            order_id: data.order_id,
+            order_status: "completed",
+          }),
+        }
+      );
+
+      if (confirmationResponse.ok) {
+        return true;
+      }
+      return false;
+    };
+
+    await sentConfirmation();
+
     if (data) {
       const checkoutDetails = savePaymentDetails(data);
       setPaymentData(checkoutDetails);
       let orderid = data?.checkout.order.databaseId;
+
       toast.success("🌟 Order Placed Successfully! 🚀");
       router.push(`/checkout/${orderid}`);
     } else {
@@ -395,16 +418,20 @@ const CheckoutPage = () => {
       const productName = product.product.node.name;
       const varProduct = product.product.node.type;
 
+      const attributes = Object.keys(product.product.node).filter((key) =>
+        key.startsWith("allPa")
+      );
+      const attributeValues = attributes
+        .map((attr) => {
+          const nodes = product.product.node[attr]?.nodes;
+          return nodes && nodes.length > 0 ? nodes[0].name : "";
+        })
+        .filter(Boolean);
 
-      const attributes = Object.keys(product.product.node).filter(key => key.startsWith('allPa'));
-      const attributeValues = attributes.map(attr => {
-        const nodes = product.product.node[attr]?.nodes;
-        return nodes && nodes.length > 0 ? nodes[0].name : '';
-      }).filter(Boolean);
-
-      const productString = varProduct === "VARIABLE"
-        ? `${productName} | ${attributeValues.join(' | ')}`
-        : productName;
+      const productString =
+        varProduct === "VARIABLE"
+          ? `${productName} | ${attributeValues.join(" | ")}`
+          : productName;
 
       return productString;
     });
@@ -429,26 +456,26 @@ const CheckoutPage = () => {
 
       initiatePayment(checkoutDetails, setPayhereHandleStatus).then((r) => r);
 
-      const confirmationResponse = await fetch(
-        "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/order-confirmation",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            order_id: checkoutDetails.order_id,
-            order_status: "completed",
-          }),
-        }
-      );
+      // const confirmationResponse = await fetch(
+      //   "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/order-confirmation",
+      //   {
+      //     method: "POST",
+      //     headers: {
+      //       "Content-Type": "application/json",
+      //     },
+      //     body: JSON.stringify({
+      //       order_id: checkoutDetails.order_id,
+      //       order_status: "completed",
+      //     }),
+      //   }
+      // );
 
-      if (!confirmationResponse.ok) {
-        const errorResponse = await confirmationResponse.json();
-        console.error("Error confirming order status:", errorResponse);
-      }
+      // if (!confirmationResponse.ok) {
+      //   const errorResponse = await confirmationResponse.json();
+      //   console.error("Error confirming order status:", errorResponse);
+      // }
 
-      const orderConfirmationdata = await confirmationResponse.json();
+      // const orderConfirmationdata = await confirmationResponse.json();
       // console.log("orderConfirmation", orderConfirmationdata);
     } else {
       console.log("initiate payment become null");
