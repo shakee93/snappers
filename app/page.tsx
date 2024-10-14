@@ -37,6 +37,8 @@ import bgSlide9 from "@/public/homepage/slider/Layer_9.png";
 import bgSlide10 from "@/public/homepage/slider/Layer_10.png";
 import bgSlide11 from "@/public/homepage/slider/Layer_11.png";
 import SectionSliderBrandCard from "./components/SectionSliderBrandCard";
+import { Card } from "@nextui-org/react";
+import CardSkeleton from "./components/Skeletons/CardSkeleton";
 
 const slidesData = [
   {
@@ -55,7 +57,7 @@ const slidesData = [
       },
     },
   },
-  
+
   {
     id: "2",
     slideFields: {
@@ -110,8 +112,7 @@ const slidesData = [
   {
     id: "5",
     slideFields: {
-      mainHeading:
-        "AirPods Pro (2nd Gen) with USB-C — 2024",
+      mainHeading: "AirPods Pro (2nd Gen) with USB-C — 2024",
       subHeading: "USB-C Power, Pro-Level Performance",
       buttonText: "Buy Now",
       buttonLink:
@@ -150,7 +151,8 @@ const slidesData = [
       mainHeading: "Samsung Galaxy Tab S9 FE",
       subHeading: "Smart, Sleek, and Ready for More",
       buttonText: "Buy Now",
-      buttonLink: "https://gqmobiles.lk/samsung/samsung-tab-s9-fe-5g-6gb-128gb-lavender-sm-x516b",
+      buttonLink:
+        "https://gqmobiles.lk/samsung/samsung-tab-s9-fe-5g-6gb-128gb-lavender-sm-x516b",
       backgroundColor: "#CCE0EF",
       backgroundImage: bgSlide6.src,
 
@@ -258,19 +260,18 @@ const getData = async () => {
         return [];
       }),
 
-      
-      getClient()
+    getClient()
       .query({
-        query: GET_BRANDS, }) .then((res) => {
+        query: GET_BRANDS,
+      })
+      .then((res) => {
         return res.data?.brands?.nodes || [];
       })
       .catch(() => {
         console.error("Error fetching brands");
         return [];
       }),
-
   ];
-
 
   const [newArrivals, mobiles, speakers, watches, backInStock, brands] =
     await Promise.all(queries);
@@ -298,7 +299,7 @@ export default async function Home() {
   return (
     <main>
       <div className="nc-PageHome relative flex flex-col overflow-hidden">
-        <div className="bg-[#285f38] px-2 py-4 md:p-3">
+        <div className="bg-black px-2 py-4 md:p-3">
           <div className="items-between flex flex-col gap-4 md:flex-row md:items-center md:gap-3">
             <div className="flex w-full flex-col items-center justify-center gap-2 md:flex-row">
               {/* <div>
@@ -321,12 +322,15 @@ export default async function Home() {
               </div> */}
               <div className="flex-col md:flex-row flex gap-5 justify-center text-center items-center">
                 <div className="text-sm font-semibold text-white md:text-lg lg:text-2xl">
-                  The ALL NEW Exclusive iPhone 16 Series Available
+                  <span className="font-bold">The ALL NEW</span>{" "}
+                  <span> Exclusive</span>
+                  <span className="text-orange-400"> iPhone 16 Series</span> {" "}
+                  <span>Available!</span> {" "}
                 </div>
                 <div className="text-sm">
                   <a
                     href="https://gqmobiles.lk/apple/apple-iphone-16-pro"
-                    className="bg-[#1b40af] text-white font-semibold py-2 px-4 rounded"
+                    className="bg-blue-700 text-white font-semibold py-2 px-4 rounded transition duration-300 ease-in-out hover:bg-blue-800"
                   >
                     Shop Now
                   </a>
@@ -384,15 +388,15 @@ export default async function Home() {
               link="new-arrivals"
             />
           </div>
-
-            {/* Brand Logo section */}
-            <div className="mt-5 md:mt-10">
+          {brands ? (
             <SectionSliderBrandCard
               heading="Our Brands"
               link="brands"
               brands={brands}
             />
-          </div>
+          ) : (
+            <CardSkeleton />
+          )}
 
           {/* Back In Stock category */}
           <div>

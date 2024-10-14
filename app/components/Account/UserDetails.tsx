@@ -1,19 +1,25 @@
 "use client";
-import {useSession} from "@/context/SessionProvider";
-import {useRouter} from "next/navigation";
-import React, {useEffect, useState} from "react";
+import { useSession } from "@/context/SessionProvider";
+import { useRouter } from "next/navigation";
+import React, { useEffect, useState } from "react";
+import AvatarSkeleton from "../Skeletons/AvatarSkeleton";
 
 const UserDetails = () => {
-  const { customer, fetchCustomer, updateCustomer } = useSession();
+  const { customer, fetchCustomer } = useSession();
   const router = useRouter();
 
-  // Define state variables for displayName, email, and address
+  // Define state variables for displayName, email, and loading state
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
+  const [isLoading, setIsLoading] = useState(true); // Add loading state
 
   useEffect(() => {
     // Fetch customer data
-    fetchCustomer();
+    const fetchData = async () => {
+      await fetchCustomer();
+      setIsLoading(false); // Set loading to false after fetching
+    };
+    fetchData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -23,16 +29,19 @@ const UserDetails = () => {
     setEmail(customer?.email || "");
   }, [customer]);
 
-  // console.log("address", customer);
   return (
     <div className="max-w-2xl">
       <h2 className="text-3xl xl:text-4xl font-semibold">Account</h2>
-      <span className="block mt-4 text-neutral-500 dark:text-neutral-400 text-base sm:text-lg">
-        <span className="text-slate-900 dark:text-slate-200 font-semibold">
-          {displayName} ·
-        </span>{" "}
-        {email}  
-      </span>
+      {isLoading ? ( // Show skeleton while loading
+        <AvatarSkeleton />
+      ) : (
+        <span className="block mt-4 text-neutral-500 dark:text-neutral-400 text-base sm:text-lg">
+          <span className="text-slate-900 dark:text-slate-200 font-semibold">
+            {displayName} ·
+          </span>{" "}
+          {email}  
+        </span>
+      )}
     </div>
   );
 };

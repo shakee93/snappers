@@ -4,6 +4,7 @@ import Heading from "@/app/components/Heading/Heading";
 import Glide from "@glidejs/glide";
 import { Brand } from "@/graphql/types/graphql";
 import BrandCard from "@/components/BrandCard";
+import CardSkeleton from "./Skeletons/CardSkeleton";
 
 export interface SectionSliderBrandCardProps {
   className?: string;
@@ -27,7 +28,7 @@ const SectionSliderBrandCard: FC<SectionSliderBrandCardProps> = ({
   link,
 }) => {
   const [mounted, setMounted] = useState(false);
-
+  const [showSkeleton, setShowSkeleton] = useState(true)
   const sliderRef = useRef(null);
   const id = useId();
   const UNIQUE_CLASS = "glidejs" + id.replace(/:/g, "_");
@@ -71,6 +72,7 @@ const SectionSliderBrandCard: FC<SectionSliderBrandCardProps> = ({
     let slider = new Glide(`.${UNIQUE_CLASS}`, OPTIONS);
     slider.mount();
 
+    setShowSkeleton(false);
     setMounted(true);
 
     return () => {
@@ -80,6 +82,7 @@ const SectionSliderBrandCard: FC<SectionSliderBrandCardProps> = ({
   }, []);
 
   const limitedBrands = brands.slice(0, 18);
+
   return (
     <div className={`nc-SectionSliderBrandCard ${className}`}>
       {limitedBrands.length > 0 && (
@@ -93,6 +96,8 @@ const SectionSliderBrandCard: FC<SectionSliderBrandCardProps> = ({
           >
             {heading}
           </Heading>
+
+          {showSkeleton && <CardSkeleton className="w-1/3" />}
 
           <div className="glide__track" data-glide-el="track">
             <ul className="glide__slides py-4">

@@ -1,13 +1,11 @@
-'use client'
+"use client";
 import React, { FC, useEffect, useId, useRef, useState } from "react";
 import { useQuery } from "@apollo/client";
 import Heading from "@/app/components/Heading/Heading";
 import Glide from "@glidejs/glide";
 import ProductCard from "@/app/components/ProductCard3";
-import { Product, PRODUCTS } from "@/data/data";
-
-import { GET_PRODUCTS, GET_CATEGORY } from "@/graphql/defs/products";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
+import CardSkeleton from "./Skeletons/CardSkeleton"; // Import skeleton
 
 export interface SectionSliderProductCardProps {
   className?: string;
@@ -28,11 +26,11 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
   heading,
   subHeading = " ",
   products = [],
-  link
+  link,
 }) => {
 
-  const [_products, setProducts] = useState<(SimpleProduct & VariableProduct)[]>(products);
-  const [mounted, setMounted] = useState(false)
+  const [mounted, setMounted] = useState(false);
+  const [showSkeleton, setShowSkeleton] = useState(true); // Add loading state
 
   const sliderRef = useRef(null);
   const id = useId();
@@ -40,7 +38,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
 
   useEffect(() => {
     if (!sliderRef.current) {
-      console.log('Slider reference is not assigned properly.');
+      console.log("Slider reference is not assigned properly.");
       return;
     }
 
@@ -49,8 +47,6 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
       perView: 4,
       gap: 20,
       bound: true,
-      // autoplay: 5000,
-      // hoverpause: false,
       breakpoints: {
         1280: {
           perView: 4,
@@ -77,18 +73,20 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
     let slider = new Glide(`.${UNIQUE_CLASS}`, OPTIONS);
     slider.mount();
 
-    setMounted(true)
+    setShowSkeleton(false); // Once mounted, hide the skeleton
+    setMounted(true);
 
     return () => {
       slider.destroy();
-      setMounted(false)
+      setMounted(false);
     };
   }, []);
 
 
+
   return (
     <div className={`nc-SectionSliderProductCard ${className}`}>
-      {_products.some(p => p.price) && ( // Checking if at least one product has a price
+      {products.some((p) => p.price) && (
         <div className={`glide ${UNIQUE_CLASS} flow-root`} ref={sliderRef}>
           <Heading
             className={headingClassName}
@@ -100,13 +98,22 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
             {heading}
           </Heading>
 
+          {/* Show Skeleton while loading */}
+          {showSkeleton && <CardSkeleton className="w-1/3" />}
+
           <div className="glide__track" data-glide-el="track">
             <ul className="glide__slides py-4">
-              {_products.filter(p => p.price).map((item, index) => (
-                <li key={index} className={`w-[300px] pt-2 ${itemClassName}`}>
-                  <ProductCard className={!mounted ? 'opacity-0' : ''} key={item.slug} data={item} />
-                </li>
-              ))}
+              {products
+                .filter((p) => p.price)
+                .map((item, index) => (
+                  <li key={index} className={`w-[300px] pt-2 ${itemClassName}`}>
+                    <ProductCard
+                      className={!mounted ? "opacity-0" : ""}
+                      key={item.slug}
+                      data={item}
+                    />
+                  </li>
+                ))}
             </ul>
           </div>
         </div>
