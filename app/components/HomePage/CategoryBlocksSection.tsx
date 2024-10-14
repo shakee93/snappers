@@ -44,7 +44,7 @@ export default function CategoryBlockSection() {
               </p>
             </div>
           </div>
-          <Link href={"/collections/smartphones"}>
+          <Link href={"/collections/smart-phones"}>
             <Button
               className="bg-primaryColor text-sm text-white"
               radius="full"
@@ -266,7 +266,7 @@ export default function CategoryBlockSection() {
               </p>
             </div>
           </div>
-          <Link href={"/collections/tablets"}>
+          <Link href={"/collections/tablets-mobiles-and-tablets-2"}>
             <Button
               className="bg-primaryColor text-sm text-white"
               radius="full"

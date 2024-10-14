@@ -84,17 +84,17 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
           "Wrong number of segments",
         ];
 
+        let isTargetError = graphQLErrors && graphQLErrors.some((err: any) => {
+          const errorMessage = err?.debugMessage || err?.message ;
+          return targetErrors.includes(errorMessage) || errorMessage.includes("invalid-secret-key");
+        });
+
         if (
-          graphQLErrors &&
-          graphQLErrors.some((err: any) =>
-            targetErrors.includes(err?.message || err?.debugMessage)
-          )
+          isTargetError
         ) {
           return new Observable((observer) => {
             fetchAuthToken()
               .then((newToken) => {
-                // console.log('newToken', newToken);
-                // Update the context with the new token
                 operation.setContext(({ headers = {} }) => ({
                   headers: {
                     ...headers,
@@ -122,8 +122,6 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
               });
           });
         }
-
-        // console.log(graphQLErrors);
 
         if (networkError) console.log(`[Network error]: ${networkError}`);
       }

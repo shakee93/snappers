@@ -19,7 +19,11 @@ const AccountOrder = () => {
     if (loading) return <LoadingSkeleton/>;
 
     const hasOrders = data?.customer?.orders?.nodes?.length > 0;
-    let a = data;
+    if (customer?.id === "guest") {
+        window.location.href = "/";
+    }
+
+
     return (
         <div className="space-y-10 sm:space-y-12">
             <h2 className="text-2xl sm:text-3xl font-semibold">Order History</h2>

@@ -238,8 +238,9 @@ const ProductDetails = ({
             )}
 
           {/* In Stock Badge */}
+                     {/* Removed low stock and INSTOCK badge October 14 */}
 
-          {product.type === "VARIABLE" &&
+          {/* {product.type === "VARIABLE" &&
             activeVariation?.stockStatus == "IN_STOCK" &&
             ((activeVariation?.stockQuantity &&
               activeVariation?.stockQuantity >= 3) ||
@@ -258,10 +259,11 @@ const ProductDetails = ({
               <div className="w-max rounded-full bg-green-200 px-4 py-1.5 text-center text-xs font-medium text-gray-800">
                 In Stock
               </div>
-            )}
+            )} */}
 
+           {/* Removed low stock and INSTOCK badge October 14 */}
           {/* Low Stock Badge */}
-          {product.type === "VARIABLE" &&
+          {/* {product.type === "VARIABLE" &&
             activeVariation?.stockStatus == "IN_STOCK" &&
             activeVariation?.stockQuantity &&
             activeVariation?.stockQuantity <= 2 && (
@@ -277,7 +279,7 @@ const ProductDetails = ({
               <div className="mb-1 w-max rounded-full bg-yellow-200 px-4 py-1 text-center text-xs text-gray-800 md:text-sm">
                 Low Stock
               </div>
-            )}
+            )} */}
         </div>
       </div>
 
