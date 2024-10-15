@@ -4,6 +4,7 @@ import ProductAddToCart from "./ProductAddToCart";
 import {
   Brand,
   PaCapacity,
+  Attribute,
   ProductAttribute,
   ProductVariation,
   SimpleProduct,
@@ -28,6 +29,8 @@ const ProductDetails = ({
     product: { attribute },
     setAttribute,
   } = useStore();
+
+  const { setVariationId } = useImage();
 
   const [activeVariation, setActiveVariation] = useState<any>(
     product?.variations?.nodes[0]
@@ -105,6 +108,45 @@ const ProductDetails = ({
       //   }
     }
   }, [attribute]);
+
+  useEffect(() => {
+    const lowestPriceInStockVariation: any | undefined =
+      product.variations?.nodes
+        .filter((v: ProductVariation) => v.stockStatus === "IN_STOCK")
+        .reduce((lowest: any, v: any | undefined) => {
+          const currentPrice = parseFloat(v?.rawPrice || "0");
+          const lowestPrice = parseFloat(lowest?.rawPrice || "Infinity");
+          return currentPrice < lowestPrice ? v : lowest;
+        }, undefined as ProductVariation | undefined);
+    // if (lowestPriceInStockVariation) {
+    //   console.log(
+    //     `Lowest price in-stock variation: ${lowestPriceInStockVariation.name} at ${lowestPriceInStockVariation.rawPrice}`,
+    //   );
+    // } else {
+    //   console.log("No in-stock variations available.");
+    // }
+
+    if (lowestPriceInStockVariation) {
+      lowestPriceInStockVariation.attributes?.nodes.forEach(
+        (attr: Attribute) => {
+          const option = attr.value;
+          setAttribute(attr, option || "");
+        }
+      );
+      if (lowestPriceInStockVariation?.image) {
+        setActiveVariation(lowestPriceInStockVariation);
+        setVariationId(
+          lowestPriceInStockVariation?.image.databaseId.toString()
+        );
+      } else {
+        const firstVariation = product?.variations?.nodes[0];
+        if (firstVariation) {
+          setActiveVariation(firstVariation); // Fallback to the first variation if none are in stock
+          setVariationId(firstVariation?.image?.databaseId.toString());
+        }
+      }
+    }
+  }, []);
 
   return (
     <div className="space-y-0">
@@ -244,18 +286,18 @@ const ProductDetails = ({
         </div>
       )}
 
-      {/* {product?.type === "SIMPLE" && product?.stockStatus !== "IN_STOCK" && (
+      {product?.type === "SIMPLE" && product?.stockStatus !== "IN_STOCK" && (
         <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1">
           Sold Out
         </div>
-      )} */}
-      {/* 
+      )}
+
       {product?.type === "VARIABLE" &&
         activeVariation?.stockStatus !== "IN_STOCK" && (
           <div className="w-max px-4 bg-red-200  text-center rounded-full  text-gray-800 text-xs md:text-sm py-1">
             Sold Out
           </div>
-        )} */}
+        )}
 
       <ProductAddToCart product={product} variation={activeVariation} />
       <div className="flex gap-1 items-center text-sm md:text-base text-gray-500">
