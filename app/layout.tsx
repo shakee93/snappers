@@ -13,6 +13,7 @@ import { Metadata } from "next";
 import WhatsappLogoComponent from "@/app/components/WhatsAppLogo";
 import Script from "next/script";
 
+
 export const metadata: Metadata = {
   title: {
     template: "%s - GQ Mobiles",
