@@ -4,6 +4,7 @@ import ProductAddToCart from "./ProductAddToCart";
 import {
   Brand,
   PaCapacity,
+  Attribute,
   ProductAttribute,
   ProductVariation,
   SimpleProduct,
@@ -15,6 +16,7 @@ import { useStore } from "@/store/store";
 import { twMerge } from "tailwind-merge";
 import parseHtml from "html-react-parser";
 import { useImage } from "@/context/ImageChangeGrabber";
+import AttributeIcon from "@/app/components/AttributeIcon";
 
 const ProductDetails = ({
   product,
@@ -27,6 +29,8 @@ const ProductDetails = ({
     product: { attribute },
     setAttribute,
   } = useStore();
+
+  const { setVariationId } = useImage();
 
   const [activeVariation, setActiveVariation] = useState<any>(
     product?.variations?.nodes[0]
@@ -105,6 +109,45 @@ const ProductDetails = ({
     }
   }, [attribute]);
 
+  useEffect(() => {
+    const lowestPriceInStockVariation: any | undefined =
+      product.variations?.nodes
+        .filter((v: ProductVariation) => v.stockStatus === "IN_STOCK")
+        .reduce((lowest: any, v: any | undefined) => {
+          const currentPrice = parseFloat(v?.rawPrice || "0");
+          const lowestPrice = parseFloat(lowest?.rawPrice || "Infinity");
+          return currentPrice < lowestPrice ? v : lowest;
+        }, undefined as ProductVariation | undefined);
+    // if (lowestPriceInStockVariation) {
+    //   console.log(
+    //     `Lowest price in-stock variation: ${lowestPriceInStockVariation.name} at ${lowestPriceInStockVariation.rawPrice}`,
+    //   );
+    // } else {
+    //   console.log("No in-stock variations available.");
+    // }
+
+    if (lowestPriceInStockVariation) {
+      lowestPriceInStockVariation.attributes?.nodes.forEach(
+        (attr: Attribute) => {
+          const option = attr.value;
+          setAttribute(attr, option || "");
+        }
+      );
+      if (lowestPriceInStockVariation?.image) {
+        setActiveVariation(lowestPriceInStockVariation);
+        setVariationId(
+          lowestPriceInStockVariation?.image.databaseId.toString()
+        );
+      } else {
+        const firstVariation = product?.variations?.nodes[0];
+        if (firstVariation) {
+          setActiveVariation(firstVariation); // Fallback to the first variation if none are in stock
+          setVariationId(firstVariation?.image?.databaseId.toString());
+        }
+      }
+    }
+  }, []);
+
   return (
     <div className="space-y-0">
       <div className="flex gap-1  text-sm text-gray-500">
@@ -123,14 +166,19 @@ const ProductDetails = ({
 
       {product?.type === "VARIABLE" && (
         <>
-          {product?.attributes?.nodes.map(
+
+
+          {product.attributes?.nodes.map(
             (attr: ProductAttribute, index: number) => (
               <div key={index} className="py-2 text-gray-500">
-                <div className="text-sm py-2">
-                  {attr.label}:{" "}
+                <div className="flex items-center gap-1 py-2 text-sm">
+                  <span className="text-primaryColor flex items-center gap-1">
+                    <AttributeIcon name={attr?.name || ""} className="w-4" />
+                    {attr.label}:
+                  </span>
                   <span className="font-medium text-gray-700">
                     {
-                      (product as unknown as VariableProduct)[
+                      (product as unknown as Record<string, any>)[
                         `allPa${attr?.label as unknown as "Capacity"}`
                       ]?.nodes.find(
                         (node: PaCapacity) =>
@@ -140,33 +188,63 @@ const ProductDetails = ({
                   </span>{" "}
                 </div>
 
-                <ul className="flex gap-2 flex-wrap text-sm items-center">
-                  {attr.options?.map((option, index) => {
+                <ul className="flex flex-wrap items-center gap-2 text-sm">
+                  {attr.options?.map((option, optionIndex) => {
+                    // Find the variations that match the current attribute option
+                    const matchingVariations = (
+                      product as VariableProduct
+                    ).variations?.nodes.filter((v: ProductVariation) => {
+                      return v.attributes?.nodes.some(
+                        (node: any) =>
+                          node.name === attr.name && node.value === option
+                      );
+                    });
+
+                    const allOutOfStock = matchingVariations?.every(
+                      (v) => v.stockStatus !== "IN_STOCK"
+                    );
+
                     return (
                       <li
-                        key={index}
-                        onClick={(e) => setAttribute(attr, option || "")}
-                        className={twMerge(
-                          "border bg-gray-200/80 cursor-pointer text-black inline-block py-2 px-3.5  text-xs md:text-sm rounded",
-                          activeAttr(attr)?.val === option &&
-                          " border-blue-700 bg-white"
-                        )}
-                      >
-                        {/* {
-                                                    (product as unknown as VariableProduct)
-                                                    [
-                                                        `allPa${attr?.label as unknown as "Capacity"}`
-                                                    ]?.nodes.find((node: PaCapacity) => {
-                                                        return node.slug === option;
-                                                    })?.name || option
-                                                } */}
+                        key={optionIndex}
+                        onClick={() => {
+                          // Set the first in-stock variation as the active variation
 
-                        {(product as any)
-                        [
-                          `allPa${(attr?.label as unknown as "Capacity")?.split(" ").join("")}`
+                          //   "attirbute is clicked",
+                          //   firstInStockVariation?.attributes,
+                          //   firstInStockVariation?.attributes?.nodes[0].name
+                          // );
+
+                          // option = firstInStockVariation?.attributes?.nodes[1].value || ""
+
+                          setAttribute(attr, option || "");
+                        }}
+                        className={twMerge(
+                          "relative inline-block cursor-pointer rounded border bg-gray-200/80 px-3.5 py-2 text-xs text-black md:text-sm",
+                          activeAttr(attr)?.val === option &&
+                          "border-primaryColor text-primaryColor bg-white shadow-md",
+                          allOutOfStock && "diag-line bg-gray-100 text-gray-500"
+                        )}
+                        style={{ opacity: allOutOfStock ? 0.9 : 1 }}
+                        title={allOutOfStock ? "Out of stock" : ""}
+                      >
+                        {(product as any)[
+                          `allPa${(attr?.label as unknown as "Capacity")
+                            ?.split(" ")
+                            .join("")}`
                         ]?.nodes.find((node: PaCapacity) => {
                           return node.slug === option;
                         })?.name || "OPTION"}
+
+
+                        {/* {allOutOfStock && (
+                          <span
+                            className="absolute inset-0 flex items-center justify-center"
+                            aria-hidden="true"
+                          >
+                            <span className="w-full h-0.5 bg-gray-400 transform rotate-45"></span>
+                          </span>
+                        )} */}
                       </li>
                     );
                   })}
@@ -174,6 +252,7 @@ const ProductDetails = ({
               </div>
             )
           )}
+
         </>
       )}
 

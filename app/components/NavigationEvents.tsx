@@ -7,7 +7,7 @@ import { Next13ProgressBar } from "next13-progressbar";
 import { PRICE_RANGE } from "@/app/components/Filters/PriceFilter";
 import { toast } from 'sonner';
 
-// Custom toast function for revalidation messages
+// Custom toast function for revalidation messages 
 const revalidationToast = (message: string, type: 'success' | 'error') => {
     toast[type](message, {
         position: 'top-center',

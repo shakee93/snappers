@@ -137,6 +137,8 @@ const CheckoutPage = () => {
   const [freeShipping, setFreeShipping] = useState<boolean>(false);
   const [confirmOrderErrors, setConfirmOrderErrors] = useState<string[]>([]);
 
+  
+
   const handleTOC = () => {
     // Toggle the state and get the updated value
     const updatedTOC = !isTOC;

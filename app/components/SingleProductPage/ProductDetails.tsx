@@ -39,13 +39,6 @@ const ProductDetails = ({
 
   const manualMeta = product?.metaData;
 
-  const warrantyType = manualMeta?.find(
-    (item) => item?.key === "warranty_type"
-  )?.value;
-  const warrantyPeriod = manualMeta?.find(
-    (item) => item?.key === "warranty_period"
-  )?.value;
-
   const { setVariationId } = useImage();
 
   // console.log("ProductDetails", product);
