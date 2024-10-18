@@ -205,7 +205,9 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
         </div>
       </div>
 
-      {(product.type === "SIMPLE" || product.type === "VARIABLE") && product.stockStatus === "IN_STOCK" ? (
+
+      {(product.type === "SIMPLE" && product.stockStatus === "IN_STOCK") ||
+        (product.type === "VARIABLE" && !isProductOutOfStock()) ? (
         <button
           disabled={isAddToCartDisabled}
           onClick={addItemToCart}
@@ -215,7 +217,9 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
           )}
         >
           {loading ? <Loader className="animate-spin" /> : <ShoppingCart />}
-          <span className="md:ml-3 cursor-pointer">Add to cart</span>
+          <span className="md:ml-3 cursor-pointer">
+            Add to cart
+          </span>
         </button>
       ) : (
         <button
@@ -229,6 +233,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
           Notify Me When Available
         </button>
       )}
+
 
       {/* Modal Implementation */}
       <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
