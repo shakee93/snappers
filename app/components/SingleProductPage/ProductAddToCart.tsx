@@ -12,6 +12,8 @@ import { toast } from "sonner";
 import AddedToCart from "@/app/components/Notifications/added-to-cart";
 import { twMerge } from "tailwind-merge";
 import { useRouter } from "next/navigation";
+import { useSession } from "@/context/SessionProvider";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, useDisclosure } from "@nextui-org/react";
 
 interface ProductAddToCartProps {
   product: SimpleProduct & VariableProduct;
@@ -23,6 +25,32 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   const [loading, setLoading] = useState<boolean>(false);
   const { addToCart, cart } = useCart();
   const router = useRouter();
+  const { customer, fetchCustomer } = useSession();
+  const [isNotifyClicked, setIsNotifyClicked] = useState(false);
+  const [userEmail, setUserEmail] = useState(customer?.email || ""); // Track user's email
+  const [isThankYouModal, setIsThankYouModal] = useState(false); // Track thank you modal visibility
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+  console.log('cusotmer', customer);
+
+  const handleNotifyClick = () => {
+    if (customer?.email) {
+      setIsThankYouModal(true);
+      onOpen();
+    } else {
+      onOpen();
+    }
+    setIsNotifyClicked(true);
+  };
+
+  const handleSubmitEmail = () => {
+    if (userEmail) {
+      console.log("Email submitted:", userEmail);
+      setIsThankYouModal(true);
+      onOpenChange();
+      setTimeout(onOpen, 500);
+    }
+  };
 
   const notifyAddToCart = (quantity: number) => {
     toast(
@@ -64,18 +92,18 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
     const existingCartQuantity = existingCartItem?.quantity ?? 0;
     const desiredQuantity = existingCartQuantity + quantity;
 
-   
+
     const availableStock =
       product.type === "VARIABLE"
-        ? variation?.stockQuantity 
-        : product?.stockQuantity ;
+        ? variation?.stockQuantity
+        : product?.stockQuantity;
 
-    
+
     console.log("availableStock", availableStock);
-    if(availableStock === null || availableStock === undefined) {
+    if (availableStock === null || availableStock === undefined) {
       return true
     }
-    
+
 
     if (availableStock < desiredQuantity) {
       const message =
@@ -177,17 +205,88 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
         </div>
       </div>
 
-      <button
-        disabled={isAddToCartDisabled}
-        onClick={addItemToCart}
-        className={twMerge(
-          "relative w-auto grow md:flex-none h-auto inline-flex cursor-pointer items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-primaryColor dark:bg-slate-100 text-slate-50 dark:text-slate-800 shadow-xl flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0",
-          isAddToCartDisabled && "opacity-50 disabled:cursor-not-allowed"
-        )}
-      >
-        {loading ? <Loader className="animate-spin" /> : <ShoppingCart />}
-        <span className="md:ml-3 cursor-pointer">Add to cart</span>
-      </button>
+      {(product.type === "SIMPLE" || product.type === "VARIABLE") && product.stockStatus === "IN_STOCK" ? (
+        <button
+          disabled={isAddToCartDisabled}
+          onClick={addItemToCart}
+          className={twMerge(
+            "relative w-auto grow md:flex-none h-auto inline-flex cursor-pointer items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-primaryColor dark:bg-slate-100 text-slate-50 dark:text-slate-800 shadow-xl flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0",
+            isAddToCartDisabled && "opacity-50 disabled:cursor-not-allowed"
+          )}
+        >
+          {loading ? <Loader className="animate-spin" /> : <ShoppingCart />}
+          <span className="md:ml-3 cursor-pointer">Add to cart</span>
+        </button>
+      ) : (
+        <button
+          disabled={isNotifyClicked}
+          onClick={handleNotifyClick}
+          className={twMerge(
+            "relative w-auto grow md:flex-none h-auto inline-flex cursor-pointer items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-primaryColor dark:bg-slate-100 text-slate-50 dark:text-slate-800 shadow-xl flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0",
+            isNotifyClicked && "opacity-50 disabled:cursor-not-allowed"
+          )}
+        >
+          Notify Me When Available
+        </button>
+      )}
+
+      {/* Modal Implementation */}
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              {!isThankYouModal ? (
+                <>
+                  <ModalHeader className="flex flex-col gap-1 px-6 py-4">Notify Me</ModalHeader>
+                  <ModalBody className="py-0">
+                    {customer?.email ? (
+                      <p>Thank you! You will be notified when the product is back in stock.</p>
+                    ) : (
+                      <>
+                        <p>Please enter your email to be notified when the product is back in stock.</p>
+                        <input
+                          className="p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600 dark:border-neutral-600 dark:bg-neutral-800 
+                          dark:text-white transition duration-200 ease-in-out"
+                          type="email"
+                          value={userEmail}
+                          onChange={(e) => setUserEmail(e.target.value)}
+                          required
+                        />
+                      </>
+                    )}
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button className="bg-transparent text-red-500 hover:bg-red-600 hover:text-white transition-colors duration-200 ease-in-out"
+                      onPress={onClose}>
+                      Close
+                    </Button>
+                    {!customer?.email && (
+                      <Button className="bg-transparent text-primaryColor hover:bg-blue-500 hover:text-white transition-colors duration-200 ease-in-out"
+                        onPress={handleSubmitEmail}>
+                        Submit
+                      </Button>
+                    )}
+                  </ModalFooter>
+                </>
+              ) : (
+                <>
+                  <ModalHeader className="flex flex-col gap-1">Thank You</ModalHeader>
+                  <ModalBody>
+                    <p>You will be notified when the product is back in stock!</p>
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button className="bg-transparent text-red-500 hover:bg-red-600 hover:text-white transition-colors duration-200 ease-in-out"
+                      onPress={onClose}>
+                      Close
+                    </Button>
+                  </ModalFooter>
+                </>
+              )}
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
     </div>
   );
 };
