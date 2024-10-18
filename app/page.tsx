@@ -329,7 +329,7 @@ export default async function Home() {
                 </div>
                 <div className="text-sm">
                   <a
-                    href="https://gqmobiles.lk/apple/apple-iphone-16-pro"
+                    href="https://gqmobiles.lk//apple/apple-iphone-16"
                     className="bg-blue-700 text-white font-semibold py-2 px-4 rounded transition duration-300 ease-in-out hover:bg-blue-800"
                   >
                     Shop Now
