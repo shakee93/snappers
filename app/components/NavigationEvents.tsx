@@ -13,6 +13,7 @@ const revalidationToast = (message: string, type: 'success' | 'error') => {
         position: 'top-center',
         className: '',
     });
+    
 };
 
 export function NavigationEvents() {
