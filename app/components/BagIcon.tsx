@@ -4,6 +4,8 @@ interface BagIconProps {
   className?: string;
 }
 
+
+
 const BagIcon: FC<BagIconProps> = ({ className = "w-5 h-5" }) => {
   return (
     <svg className={className} viewBox="0 0 9 9" fill="none">
