@@ -116,7 +116,7 @@ const slidesData = [
       subHeading: "Unleash creativity with the powerful M3 MacBook!",
       buttonText: "Order Today",
       buttonLink:
-        "https://api.gqmobiles.lk/apple/apple-macbook-air-m3-chip-15-inch-2024",
+        "https://gqmobiles.lk/apple/apple-macbook-air-m3-chip-15-inch-2024",
       backgroundColor: "#CCE0EF",
       backgroundImage: bgSlide8.src,
       featureImage: {
