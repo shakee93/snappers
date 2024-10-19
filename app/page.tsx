@@ -32,7 +32,7 @@ import bgSlide4 from "@/public/homepage/slider/Layer_4.png";
 import bgSlide5 from "@/public/homepage/slider/Layer_5.png";
 import bgSlide6 from "@/public/homepage/slider/Layer_6.png";
 import bgSlide7 from "@/public/homepage/slider/Layer_7.png";
-import bgSlide8 from "@/public/homepage/slider/Layer_8.png";
+import bgSlide8 from "@/public/homepage/slider/Layer_8_1.png";
 import bgSlide9 from "@/public/homepage/slider/Layer_9.png";
 import bgSlide10 from "@/public/homepage/slider/Layer_10.png";
 import bgSlide11 from "@/public/homepage/slider/Layer_11.png";
@@ -112,17 +112,17 @@ const slidesData = [
   {
     id: "5",
     slideFields: {
-      mainHeading: "AirPods Pro (2nd Gen) with USB-C — 2024",
-      subHeading: "USB-C Power, Pro-Level Performance",
-      buttonText: "Buy Now",
+      mainHeading: "Apple MacBook Air M3 Chip 15-inch (2024)",
+      subHeading: "Unleash creativity with the powerful M3 MacBook!",
+      buttonText: "Order Today",
       buttonLink:
-        "https://gqmobiles.lk/apple/airpods-pro-2nd-generation-with-magsafe-charging-case-usb%E2%80%91c-2024",
+        "http://localhost:3000/apple/apple-macbook-air-m3-chip-15-inch-2024",
       backgroundColor: "#CCE0EF",
       backgroundImage: bgSlide8.src,
       featureImage: {
         id: "2",
         sourceUrl:
-          "https://api.gqmobiles.lk/wp-content/uploads/2024/09/file_2.png",
+          "https://api.gqmobiles.lk/wp-content/uploads/2024/10/GQ-MOBILES-LAPTOP-NETBOOK-MACBOOK-AIR-M3-15-INCH-2024-MIDNIGHT-removebg.png",
       },
     },
   },
