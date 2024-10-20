@@ -1,29 +1,29 @@
 import React, { FC } from "react";
-import facebookSvg from "@/public/images/Facebook.svg";
-import twitterSvg from "@/public/images/Twitter.svg";
-import googleSvg from "@/public/images/Google.svg";
+// import facebookSvg from "@/public/imahges/Facebook.svg";
+// import twitterSvg from "@/public/images/Twitter.svg";
+// import googleSvg from "@/public/images/Google.svg";
 import Image from "next/image";
 import Link from "next/link";
 import LoginForm from "@/app/components/LoginSignupPage/LoginForm";
 
 
-const loginSocials = [
-    {
-        name: "Continue with Facebook",
-        href: "#",
-        icon: facebookSvg,
-    },
-    {
-        name: "Continue with Twitter",
-        href: "#",
-        icon: twitterSvg,
-    },
-    {
-        name: "Continue with Google",
-        href: "#",
-        icon: googleSvg,
-    },
-];
+// const loginSocials = [
+//     {
+//         name: "Continue with Facebook",
+//         href: "#",
+//         icon: facebookSvg,
+//     },
+//     {
+//         name: "Continue with Twitter",
+//         href: "#",
+//         icon: twitterSvg,
+//     },
+//     {
+//         name: "Continue with Google",
+//         href: "#",
+//         icon: googleSvg,
+//     },
+// ];
 
 const PageLogin = () => {
 

@@ -100,7 +100,7 @@ const slidesData = [
       buttonLink:
         "https://gqmobiles.lk/sony/sony-playstation-5-slim-ps5-eur-disc-edition",
       backgroundColor: "#CCE0EF",
-      backgroundImage: bgSlide4.src,
+    backgroundImage: bgSlide4.src,
       featureImage: {
         id: "2",
         sourceUrl:
