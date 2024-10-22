@@ -7,7 +7,7 @@ import {
   VariableProduct,
 } from "@/graphql/types/graphql";
 import NcInputNumber from "@/components/NcInputNumber";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import AddedToCart from "@/app/components/Notifications/added-to-cart";
 import { twMerge } from "tailwind-merge";
@@ -64,18 +64,18 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
     const existingCartQuantity = existingCartItem?.quantity ?? 0;
     const desiredQuantity = existingCartQuantity + quantity;
 
-   
+
     const availableStock =
       product.type === "VARIABLE"
-        ? variation?.stockQuantity 
-        : product?.stockQuantity ;
+        ? variation?.stockQuantity
+        : product?.stockQuantity;
 
-    
+
     console.log("availableStock", availableStock);
-    if(availableStock === null || availableStock === undefined) {
+    if (availableStock === null || availableStock === undefined) {
       return true
     }
-    
+
 
     if (availableStock < desiredQuantity) {
       const message =
@@ -148,7 +148,19 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
     }
   };
 
-  if (product?.type === "VARIABLE" && !variation) {
+
+  const isAddToCartDisabled =
+    loading ||
+    variation?.rawPrice === "0.00" ||
+    variation?.rawPrice == null ||
+    isProductOutOfStock();
+
+  console.log('isAddToCartDisabled', isAddToCartDisabled);
+  // console.log('product', product);
+  // console.log('variation', variation);
+
+
+  if (product.type === "VARIABLE" && !variation) {
     return (
       <button
         className={twMerge(
@@ -158,14 +170,8 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
       >
         <span className="md:ml-3 cursor-pointer">Not Available</span>
       </button>
-    );
+    )
   }
-
-  const isAddToCartDisabled =
-    loading ||
-    variation?.rawPrice === "0.00" ||
-    variation?.rawPrice == null ||
-    isProductOutOfStock();
 
   return (
     <div
@@ -188,6 +194,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
         {loading ? <Loader className="animate-spin" /> : <ShoppingCart />}
         <span className="md:ml-3 cursor-pointer">Add to cart</span>
       </button>
+      
     </div>
   );
 };

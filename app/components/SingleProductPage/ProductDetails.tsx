@@ -128,11 +128,10 @@ const ProductDetails = ({
   }, []);
 
   useEffect(() => {
-    // This function determines which is the variation for selected attributes
     if (product.type === "VARIABLE") {
       let variation = (product as VariableProduct).variations
         ?.nodes as unknown as ProductVariation[];
-
+  
       let vProduct = variation.find((v) => {
         let nodes = v.attributes?.nodes as unknown as VariationAttribute[];
         let attrKey = attribute
@@ -143,20 +142,28 @@ const ProductDetails = ({
           .sort((a, b) => a?.name?.localeCompare(b?.name || "") || 0)
           ?.map((a) => `${a.name}:${a.value}`)
           .join("+");
-
+  
         return attrKey === variationKey;
       });
-
+  
+      // Debounce update of activeVariation
+      let timeoutId: NodeJS.Timeout;
       if (vProduct) {
         setActiveVariation(vProduct);
       } else {
-        setActiveVariation(null);
+        // Debounce setting activeVariation to null to prevent flickering
+        timeoutId = setTimeout(() => {
+          setActiveVariation(null);
+        }, 150); // Small delay before setting to null
       }
+  
+      // Clean up timeout on unmount or re-render
+      return () => clearTimeout(timeoutId);
     }
   }, [attribute, product]);
+  
 
   useEffect(() => { }, [attribute]);
-
 
   return (
     <>
@@ -231,7 +238,7 @@ const ProductDetails = ({
             )}
 
           {/* In Stock Badge */}
-                     {/* Removed low stock and INSTOCK badge October 14 */}
+          {/* Removed low stock and INSTOCK badge October 14 */}
 
           {/* {product.type === "VARIABLE" &&
             activeVariation?.stockStatus == "IN_STOCK" &&
@@ -254,7 +261,7 @@ const ProductDetails = ({
               </div>
             )} */}
 
-           {/* Removed low stock and INSTOCK badge October 14 */}
+          {/* Removed low stock and INSTOCK badge October 14 */}
           {/* Low Stock Badge */}
           {/* {product.type === "VARIABLE" &&
             activeVariation?.stockStatus == "IN_STOCK" &&
