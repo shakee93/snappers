@@ -155,7 +155,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
     variation?.rawPrice == null ||
     isProductOutOfStock();
 
-  console.log('isAddToCartDisabled', isAddToCartDisabled);
+  // console.log('isAddToCartDisabled', isAddToCartDisabled);
   // console.log('product', product);
   // console.log('variation', variation);
 
@@ -194,7 +194,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
         {loading ? <Loader className="animate-spin" /> : <ShoppingCart />}
         <span className="md:ml-3 cursor-pointer">Add to cart</span>
       </button>
-      
+
     </div>
   );
 };
