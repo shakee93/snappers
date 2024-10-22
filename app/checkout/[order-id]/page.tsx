@@ -18,8 +18,139 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   const orderId = params["order-id"];
   const searchParams = useSearchParams().get("email");
 
-  // console.log({orderId});
-  // console.log({searchParams});
+
+  const [getUserData, { data: customerData }] = useLazyQuery(
+    GET_CHECKOUT_USER_DETAILS,
+    { fetchPolicy: "no-cache" },
+  );
+
+  console.log('customerData', customerData);
+
+  // console.log({ orderId });
+  // console.log({ searchParams });
+
+  const order_id = useSearchParams().get('order_id');
+  const first_name = useSearchParams().get('first_name');
+  const last_name = useSearchParams().get('last_name');
+  const email = useSearchParams().get('email');
+  const address = useSearchParams().get('address');
+  const amount = useSearchParams().get('amount');
+  const items = useSearchParams().get('items');
+  const ordermethod = useSearchParams().get('ordermethod');
+
+  // Now you have the data from the URL and can use it on the page
+  console.log({ order_id, first_name, last_name, email, address, amount, items });
+
+  if (ordermethod === "guest") {
+
+    const orderData = {
+      order: {
+        orderNumber: order_id,
+        // total: amount,
+        total: "₨ 580.00",    // formatted as a string with currency symbol
+        subtotal: "₨ 450.00", // formatted as a string with currency symbol
+        shippingTotal: "₨ 50.00",
+        lineItems: {
+          nodes: [
+            {
+              id: "item_1",
+              product: {
+                node: {
+                  name: "Product 1",
+                },
+              },
+              quantity: 2,
+              subtotal: 3000,
+            },
+            {
+              id: "item_2",
+              product: {
+                node: {
+                  name: "Product 2",
+                },
+              },
+              quantity: 1,
+              subtotal: 2000,
+            },
+            {
+              id: "item_3",
+              product: {
+                node: {
+                  name: "Product 3",
+                },
+              },
+              quantity: 3,
+              subtotal: 3000,
+            },
+          ],
+        },
+      },
+      date: "2024-10-22",
+    };
+
+    const temporaryPaymentDetails: PaymentDetailsWithoutUrls = useMemo(
+      () => ({
+        order_id: orderData?.order?.orderNumber ?? "",
+        // items: orderData?.order?.lineItems?.nodes ?? [],
+        subtotal: orderData?.order?.subtotal,
+        amount: orderData?.order?.total ?? "",
+        currency: "LKR",
+        first_name:
+          customerData?.customer?.shipping?.firstName ?? "no_first_name",
+        last_name: customerData?.customer?.shipping?.lastName ?? "no_last_name",
+        email: customerData?.customer?.email ?? "no_email",
+        phone: customerData?.customer?.shipping?.phone ?? "no_phone",
+        shippingAddress1:
+          customerData?.customer?.shipping?.address1 ?? "no_shipping_address1",
+        shippingAddress2:
+          customerData?.customer?.shipping?.address2 ?? "no_shipping_address2",
+        billingAddress1:
+          customerData?.customer?.billing?.address1 ?? "no_billing_address1",
+        billingAddress2:
+          customerData?.customer?.billing?.address2 ?? "no_billing_address2",
+        city: customerData?.customer?.shipping?.city ?? "no_city",
+        country: "Sri Lanka",
+      }),
+      [orderData, customerData],
+    );
+
+    return (
+      <>
+        <div className="container mx-auto rounded-3xl text-center lg:p-20">
+          <div className="my-4">
+            <OrderDetails orderData={orderData} />
+            <div className="">
+              <div className="">
+                <ProductTable
+                  lineItems={orderData?.order?.lineItems?.nodes}
+                  orderData={orderData}
+                  paymentDetails={temporaryPaymentDetails}
+                />
+              </div>
+            </div>
+          </div>
+          <h1 className="pb-4 pt-20 text-center text-2xl font-bold">
+            To Explore Our Product Range Further!
+          </h1>
+          <Link href={`/`} passHref>
+            <ButtonPrimary>Shop More</ButtonPrimary>
+          </Link>
+        </div>
+
+        {/* <h1 className="py-20 text-center text-2xl font-bold">
+          <OrderDetails orderData={orderData} />
+          <h1>Checkout</h1>
+          <p>Order ID: {order_id}</p>
+          <p>Name: {first_name} {last_name}</p>
+          <p>Email: {email}</p>
+          <p>Address: {address}</p>
+          <p>Amount: {amount}</p>
+          <p>Items: {items}</p>
+        </h1> */}
+      </>
+    );
+
+  }
 
   if (orderId === "guest_checkout" && searchParams == null) {
     return (
@@ -28,17 +159,6 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
       </h1>
     );
   }
-
-  const { getCart } = useCart();
-
-  const refreshCart = async () => {
-    try {
-      await getCart();
-    } catch (error: any) {
-      console.error("Error refreshing the cart:", error);
-      throw error;
-    }
-  };
 
   if (orderId == "ItemNo12345") {
     return (
@@ -56,22 +176,64 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     );
   }
 
-  const [getUserData, { data: customerData }] = useLazyQuery(
-    GET_CHECKOUT_USER_DETAILS,
-    { fetchPolicy: "no-cache" },
-  );
+  if (!orderId || orderId == "12345") {
+    toast.error(`Order not found: ${orderId}`);
+  }
+
+  if (orderId === "guest_checkout" && searchParams) {
+    return (
+      <div className="container mx-auto grid items-center justify-center">
+        <h1 className="pt-20 text-center text-2xl font-bold">
+          Thank you! Your order has been successfully placed📦
+        </h1>
+        <p className="py-4 text-center">
+          Please check your email({searchParams}) for further details.
+        </p>
+        <Link href={`/`} passHref>
+          <p className="self-center text-center font-bold text-blue-500 underline hover:cursor-pointer hover:text-blue-800">
+            Back to Home
+          </p>
+        </Link>
+      </div>
+    );
+  }
+
+  const { getCart } = useCart();
+
+  const refreshCart = async () => {
+    try {
+      await getCart();
+    } catch (error: any) {
+      console.error("Error refreshing the cart:", error);
+      throw error;
+    }
+  };
+
 
   const { data: orderData, error: orderError } = useQuery(GET_SINGLE_ORDER, {
     variables: { orderID: orderId },
   });
+
+  console.log('order data', orderData);
 
   useEffect(() => {
     getUserData();
     refreshCart();
   }, [getUserData]);
 
-  if (!orderId || orderId == "12345") {
-    toast.error(`Order not found: ${orderId}`);
+  if (orderError) {
+    return (
+      <div className="container mx-auto grid items-center justify-center">
+        <h1 className="py-20 text-center text-2xl font-bold">
+          Not authorized to view this order
+        </h1>
+        <Link href={`/`} passHref>
+          <div className="self-center text-center font-bold text-blue-500 underline hover:cursor-pointer hover:text-blue-800">
+            Back to Home
+          </div>
+        </Link>
+      </div>
+    );
   }
 
   const temporaryPaymentDetails: PaymentDetailsWithoutUrls = useMemo(
@@ -100,39 +262,6 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     [orderData, customerData],
   );
 
-  if (orderId === "guest_checkout" && searchParams) {
-    return (
-      <div className="container mx-auto grid items-center justify-center">
-        <h1 className="pt-20 text-center text-2xl font-bold">
-          Thank you! Your order has been successfully placed📦
-        </h1>
-        <p className="py-4 text-center">
-          Please check your email({searchParams}) for further details.
-        </p>
-        <Link href={`/`} passHref>
-          <p className="self-center text-center font-bold text-blue-500 underline hover:cursor-pointer hover:text-blue-800">
-            Back to Home
-          </p>
-        </Link>
-      </div>
-    );
-  }
-
-  if (orderError) {
-    return (
-      <div className="container mx-auto grid items-center justify-center">
-        <h1 className="py-20 text-center text-2xl font-bold">
-          Not authorized to view this order
-        </h1>
-        <Link href={`/`} passHref>
-          <div className="self-center text-center font-bold text-blue-500 underline hover:cursor-pointer hover:text-blue-800">
-            Back to Home
-          </div>
-        </Link>
-      </div>
-    );
-  }
-
   useEffect(() => {
     // window.location.reload()
   }, []);
@@ -141,7 +270,6 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     <div className="container mx-auto rounded-3xl text-center lg:p-20">
       <div className="my-4">
         <OrderDetails orderData={orderData} />
-
         <div className="">
           <div className="">
             <ProductTable
@@ -152,7 +280,6 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
           </div>
         </div>
       </div>
-
       <h1 className="pb-4 pt-20 text-center text-2xl font-bold">
         To Explore Our Product Range Further!
       </h1>

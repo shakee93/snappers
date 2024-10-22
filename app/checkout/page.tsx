@@ -137,7 +137,7 @@ const CheckoutPage = () => {
   const [freeShipping, setFreeShipping] = useState<boolean>(false);
   const [confirmOrderErrors, setConfirmOrderErrors] = useState<string[]>([]);
 
-  
+
 
   const handleTOC = () => {
     // Toggle the state and get the updated value
@@ -272,6 +272,8 @@ const CheckoutPage = () => {
         ? await guestCheckout({ variables })
         : await checkoutMutation({ variables });
 
+    console.log('gueist data', data);
+
     const sentConfirmation = async () => {
       const confirmationResponse = await fetch(
         "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/order-confirmation",
@@ -296,6 +298,7 @@ const CheckoutPage = () => {
     await sentConfirmation();
 
     if (data) {
+
       const checkoutDetails = savePaymentDetails(data);
       setPaymentData(checkoutDetails);
       let orderid = data?.checkout.order.databaseId;
@@ -339,8 +342,8 @@ const CheckoutPage = () => {
       const shippingMethods = isStorePickup
         ? "pickup_location:0"
         : freeShipping
-        ? "wbs:5c9bd062_free_shipping"
-        : "wbs:0dd3bc79_weight_based_shipping";
+          ? "wbs:5c9bd062_free_shipping"
+          : "wbs:0dd3bc79_weight_based_shipping";
 
       const total: any = cart?.total;
       setOrderTotal(freeShipping ? cart?.subtotal : total);
@@ -388,6 +391,7 @@ const CheckoutPage = () => {
   const paymentDetails = useMemo(() => {
     return paymentData;
   }, [paymentData]);
+
   const ImplementPayhere = async () => {
     let generatedOrderId = crypto.randomUUID();
     setPayherPaymentID(generatedOrderId);
@@ -414,6 +418,7 @@ const CheckoutPage = () => {
     }
 
     const products = cart?.contents?.nodes;
+    console.log('products', products);
 
     // Generate the list of products as strings
     const productList = products?.map((product: any) => {
@@ -533,13 +538,18 @@ const CheckoutPage = () => {
     // }
 
     if (isCashOnDelivery) {
+      console.log('checkoutDetails', checkoutDetails);
       if (
         customer?.id === "guest" ||
         checkoutDetails.order_id == "guest_checkout"
       ) {
+        
+        const queryParams = new URLSearchParams(checkoutDetails).toString();
         let email = formData?.contactInfo?.email;
-        // let redirectUrl = `/checkout/${checkoutDetails.order_id}?email=${email}`;
-        let redirectUrl = `/checkout/guest_checkout?email=${email}`;
+        // let redirectUrl = `/checkout/${checkoutDetails.order_id}`;
+        // let redirectUrl = `/checkout/guest_checkout?email=${email}`;
+        // router.push(redirectUrl);
+        const redirectUrl = `/checkout/guest_checkout?${queryParams}&ordermethod=guest`;
         router.push(redirectUrl);
         return;
       }
@@ -693,14 +703,14 @@ const CheckoutPage = () => {
     const methodId = isStorePickup
       ? "pickup_location:0"
       : freeShipping
-      ? "wbs:5c9bd062_free_shipping"
-      : "wbs:0dd3bc79_weight_based_shipping";
+        ? "wbs:5c9bd062_free_shipping"
+        : "wbs:0dd3bc79_weight_based_shipping";
 
     const methodTitle = isStorePickup
       ? "pickup_location:0"
       : freeShipping
-      ? "wbs:5c9bd062_free_shipping"
-      : "wbs:0dd3bc79_weight_based_shipping";
+        ? "wbs:5c9bd062_free_shipping"
+        : "wbs:0dd3bc79_weight_based_shipping";
 
     const total = shippingTotal;
 

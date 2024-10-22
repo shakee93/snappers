@@ -31,16 +31,41 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   const [isThankYouModal, setIsThankYouModal] = useState(false); // Track thank you modal visibility
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-  console.log('cusotmer', customer);
+  // console.log('cusotmer', customer);
 
-  const handleNotifyClick = () => {
-    if (customer?.email) {
-      setIsThankYouModal(true);
-      onOpen();
-    } else {
-      onOpen();
+  const handleNotifyClick = async () => {
+
+    const body = new URLSearchParams({
+      "xoo_wl_user_email": customer?.email || "",
+      "_xoo_wl_product_id": "12",
+      "xoo_wl_required_qty": "1",
+    }).toString();
+
+    try {
+      const response = await fetch("/api/emailnotify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Accept": "application/json"
+        },
+        body: body,
+        credentials: "include"
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Response Data:", data);
+        setIsThankYouModal(true);
+      } else {
+        const errordata = await response.json();
+        console.error("error data", errordata)
+      }
+    } catch (error) {
+      console.error("Fetch error:", error);
+    } finally {
+      onOpen(); // Open modal regardless of success or failure
+      setIsNotifyClicked(true);
     }
-    setIsNotifyClicked(true);
   };
 
   const handleSubmitEmail = () => {
