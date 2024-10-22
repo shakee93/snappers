@@ -131,7 +131,7 @@ const ProductDetails = ({
     if (product.type === "VARIABLE") {
       let variation = (product as VariableProduct).variations
         ?.nodes as unknown as ProductVariation[];
-  
+
       let vProduct = variation.find((v) => {
         let nodes = v.attributes?.nodes as unknown as VariationAttribute[];
         let attrKey = attribute
@@ -142,10 +142,10 @@ const ProductDetails = ({
           .sort((a, b) => a?.name?.localeCompare(b?.name || "") || 0)
           ?.map((a) => `${a.name}:${a.value}`)
           .join("+");
-  
+
         return attrKey === variationKey;
       });
-  
+
       // Debounce update of activeVariation
       let timeoutId: NodeJS.Timeout;
       if (vProduct) {
@@ -156,12 +156,12 @@ const ProductDetails = ({
           setActiveVariation(null);
         }, 150); // Small delay before setting to null
       }
-  
+
       // Clean up timeout on unmount or re-render
       return () => clearTimeout(timeoutId);
     }
   }, [attribute, product]);
-  
+
 
   useEffect(() => { }, [attribute]);
 
@@ -230,12 +230,18 @@ const ProductDetails = ({
             </div>
           )}
 
-          {product.type === "VARIABLE" &&
+          {product.type === "VARIABLE" && activeVariation &&
             activeVariation?.stockStatus !== "IN_STOCK" && (
               <div className="mb-1 w-max rounded-full bg-red-200 px-4 py-1.5 text-center text-xs font-medium text-gray-800">
                 Sold Out
               </div>
             )}
+
+          {product.type === "VARIABLE" && !activeVariation && (
+            <div className="mb-1 w-max rounded-full bg-gray-600 px-4 py-1.5 text-center text-xs font-medium text-white">
+              Not Available
+            </div>
+          )}
 
           {/* In Stock Badge */}
           {/* Removed low stock and INSTOCK badge October 14 */}
