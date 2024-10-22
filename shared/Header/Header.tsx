@@ -1,7 +1,7 @@
 import React, { FC } from "react";
 import MainNav1 from "./MainNav1";
 
-export interface HeaderProps {}
+export interface HeaderProps { }
 
 const Header: FC<HeaderProps> = () => {
   return (

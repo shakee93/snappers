@@ -337,22 +337,9 @@ export default async function Home() {
                 </div>
               </div>
 
-              {/* <div className="flex py-2 mx-4 md:mx-0 px-2 md:px-4  shrink  gap-2 xl:gap-5 bg-white rounded-xl">
-                <div className="flex flex-wrap justify-center gap-x-4 gap-y-2 md:gap-x-7 md:gap-y-2 xl:gap-4">
-                  {Banks.map((bank, index) => (
-                    <div key={index} className="">
-                      <Image
-                        src={bank}
-                        alt={`Bank Logo ${index}`}
-                        className="w-auto h-5 md:h-6 lg:h-7"
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div> */}
             </div>
           </div>
-        </div>
+        </div> */}
         {/* hero section */}
         <div className="z-0">
           {/* <SectionHero3 /> */}

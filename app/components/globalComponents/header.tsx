@@ -5,12 +5,12 @@ import NavLinks from "./NavLinks";
 import BrandBar from "./BrandBar";
 import SearchBar from "@/app/components/globalComponents/SearchBar";
 import MobileNavLinks from "./MobileNavLinks";
-import {getClient} from "@/graphql/apollo-ssr";
-import {GET_ALL_PRODUCTS} from "@/graphql/defs/products";
+import { getClient } from "@/graphql/apollo-ssr";
+import { GET_ALL_PRODUCTS } from "@/graphql/defs/products";
 import HeaderSearchResults from "@/app/components/globalComponents/HeaderSearchResults";
-import {Brand} from "@/graphql/types/graphql";
+import { Brand } from "@/graphql/types/graphql";
 import MobileBottomNav from "@/app/components/globalComponents/MobileBottomNav";
-import {isPaymentPage} from "./paymentPageCheckUtils";
+import { isPaymentPage } from "./paymentPageCheckUtils";
 
 async function getData(categories: number[] | null = null) {
   const { data, error } = await getClient().query({
@@ -34,37 +34,40 @@ const Header = async () => {
     <>
       <header
         className={
-          "backdrop-blur-md sticky top-0 flex flex-col justify-between bg-white/90 z-30 transition-all duration-1300 shadow-xl md:border-b"
+          "sticky top-0 py-1 flex flex-col justify-between bg-white z-30 transition-all duration-1300 md:border-b"
         }
       >
-        <div className="flex justify-between items-center md:items-stretch bg-white">
-          <div className="flex md:hidden px-2 gap-2 bg-gradient-to-br from-sky-500 to-primaryColor py-2 flex-1 justify-center items-center">
+        <div className="md:container flex justify-between items-center md:items-stretch px-0">
+
+          <div className="hidden md:hidden px-2 gap-2 bg-gradient-to-br from-sky-500 to-primaryColor py-2 flex-1 justify-center items-center">
             <SearchBar />
           </div>
 
-          <div className="hidden md:flex items-center relative">
-            <Logo />
-          </div>
+          <div className="relative flex items-center justify-between w-full pr-3">
 
-          <div className="hidden md:flex flex-1 flex-col justify-between">
-            <div className="w-full flex flex-1">
-              <div className="flex flex-1 justify-center items-center">
-                <SearchBar />
-              </div>
-              <div className="w-fit flex items-center justify-end pr-3">
-                <div className="hidden md:block">
-                  <NavLinks />
-                </div>
-                <div className="hidden md:flex">
-                  <AvatarDropdown />
-                  <CartDropdown />
-                </div>
+            <div className="-left-12 hidden md:flex items-center mr-4">
+              <Logo />
+            </div>
+
+            <div className="hidden md:flex items-center relative px-4">
+              <div className="md:block">
+                <NavLinks />
               </div>
             </div>
-            <BrandBar categories={productCategories} brands={brands} />
+
+            <div className="flex-1">
+              <SearchBar />
+            </div>
+
+            <div className="hidden md:flex">
+              <AvatarDropdown />
+              <CartDropdown />
+            </div>
+
           </div>
         </div>
       </header>
+
       <MobileNavLinks />
 
 
@@ -73,9 +76,11 @@ const Header = async () => {
         productCategories={productCategories}
         brands={brands}
       />
+
       <div className="md:hidden">
         <MobileBottomNav categories={productCategories} />
       </div>
+
     </>
   );
 };

@@ -1,40 +1,90 @@
+"use client";
+
+import * as React from "react";
 import Link from "next/link";
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  NavigationMenuViewport,
+} from "@radix-ui/react-navigation-menu";
+import { CaretDownIcon } from "@radix-ui/react-icons";
+import NavCategories from "./mega-menu/categories";
+import BrandsMenu from "./mega-menu/brands";
 
-
-
-const NavLinks = () => {
-  const iconSize = 18;
-
-  const navLinks = [
-    {
-      id: 2,
-      href: "/collections/all",
-      name: "Shop",
-    },
-    {
-      id: 3,
-      href: "/about",
-      name: "About Us",
-    },
-
-    {
-      id: 4,
-      href: "/contact",
-      name: "Contact Us",
-    },
-  ];
-
-  return (
-    <ul className="gap-1 text-sm  flex text-center items-center font-medium  text-black px-3 ">
-      {navLinks.map((item) => (
-        <Link href={item.href} key={item.id}>
-          <li className="hover:[#f1f5f9] rounded-3xl px-1 xl:px-3  py-1 whitespace-nowrap ">
-            {item.name}
-          </li>
-        </Link>
-      ))}
-    </ul>
-  );
+type NavLinkItem = {
+  href: string;
+  name: string;
+  component?: React.ComponentType<{ onClose: () => void }>;
 };
 
-export default NavLinks;
+const navLinks: NavLinkItem[] = [
+  {
+    href: "/",
+    name: "Home",
+  },
+  {
+    href: "/collections",
+    name: "Collections",
+    component: NavCategories,
+  },
+  {
+    href: "/brands",
+    name: "Brands",
+    component: BrandsMenu,
+  },
+  {
+    href: "/collections/all",
+    name: "Shop",
+  },
+  {
+    href: "/contact",
+    name: "Contact",
+  },
+];
+
+export default function NavLinks() {
+  const [openMenu, setOpenMenu] = React.useState<string>("");
+
+  const closeMenu = () => {
+    setOpenMenu("");
+  };
+
+  return (
+    <NavigationMenu
+      value={openMenu}
+      onValueChange={(e: string) => setOpenMenu(e)}
+      className="NavigationMenuRoot"
+    >
+      <NavigationMenuList className="NavigationMenuList">
+        {navLinks.map((item) => (
+          <NavigationMenuItem key={item.href}>
+            {item.component ? (
+              <>
+                <NavigationMenuTrigger className="NavigationMenuTrigger">
+                  {item.name} <CaretDownIcon className="CaretDown" aria-hidden />
+                </NavigationMenuTrigger>
+                <NavigationMenuContent className="NavigationMenuContent test">
+                  {React.createElement(item.component, { onClose: closeMenu })}
+                </NavigationMenuContent>
+              </>
+            ) : (
+              <Link href={item.href} legacyBehavior passHref>
+                <NavigationMenuLink className="NavigationMenuLink">
+                  {item.name}
+                </NavigationMenuLink>
+              </Link>
+            )}
+          </NavigationMenuItem>
+        ))}
+      </NavigationMenuList>
+
+      <div className="ViewportPosition">
+        <NavigationMenuViewport className="NavigationMenuViewport" />
+      </div>
+    </NavigationMenu>
+  );
+}

@@ -10,9 +10,10 @@ import ProductImage from "@/app/components/SingleProductPage/ProductImage2";
 import { Suspense } from "react";
 import { Metadata, ResolvingMetadata } from "next";
 import { ImageProvider } from "@/context/ImageChangeGrabber";
-import React from "react";
+import SectionSliderProductCard from "@/components/SectionSliderProductCard";
+import UpsellProducts from "@/app/components/globalComponents/UpsellProducts";
 
-export const dynamic = 'force-dynamic'
+export const dynamic = "force-dynamic";
 
 type Props = {
   params: {
@@ -67,7 +68,9 @@ export async function generateMetadata(
   // fetch data
   const { product, brand } = await getData(params.slug, params.brand);
   // const price = product.price || "the best price";
-  const price = product.price ? product.price.replace(/₨|&nbsp;/g, '') : "the best price";
+  const price = product.price
+    ? product.price.replace(/₨|&nbsp;/g, "")
+    : "the best price";
 
   return {
     title: product.name,
@@ -76,11 +79,13 @@ export async function generateMetadata(
 
     openGraph: {
       title: product.name,
-      description:  "Check out this product!",
+      description: "Check out this product!",
       url: `https://gqmobiles.lk/${params.brand}/${params.slug}`,
       images: [
         {
-          url: product.image?.sourceUrl || 'https://gqmobiles.lk/default-og-image.jpg',
+          url:
+            product.image?.sourceUrl ||
+            "https://gqmobiles.lk/default-og-image.jpg",
           width: 800,
           height: 600,
           alt: "GQ Mobiles",
@@ -99,6 +104,11 @@ const Page = async ({ params }: Props) => {
     product: SimpleProduct & VariableProduct;
     brand: Brand;
   } = await getData(params.slug, params.brand);
+
+  // console.log("product", product);
+
+
+
 
   return (
     <div className="mt-5 md:mt-10">
@@ -140,6 +150,11 @@ const Page = async ({ params }: Props) => {
           {/*    ]}*/}
           {/*    heading="Related Products"*/}
           {/*/>*/}
+        </div>
+
+
+        <div className="mt-5 md:mt-10">
+          <UpsellProducts newArrivals={product.upsell?.nodes} />
         </div>
       </main>
     </div>

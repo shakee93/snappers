@@ -1,21 +1,23 @@
-import { nextui } from "@nextui-org/react";
-const defaultTheme = require("tailwindcss/defaultTheme");
+import {  nextui  } from "@nextui-org/react";
+import type { Config } from 'tailwindcss';
+import defaultTheme from "tailwindcss/defaultTheme";
+import plugin from 'tailwindcss/plugin';
 
 interface CustomColorsParams {
-  opacityVariable?: string;
-  opacityValue?: number;
+	opacityVariable?: string;
+	opacityValue?: number;
 }
 
 function customColors(cssVar: string) {
-  return ({ opacityVariable, opacityValue }: CustomColorsParams) => {
-    if (opacityValue !== undefined) {
-      return `rgba(var(${cssVar}), ${opacityValue})`;
-    }
-    if (opacityVariable !== undefined) {
-      return `rgba(var(${cssVar}), var(${opacityVariable}, 1))`;
-    }
-    return `rgb(var(${cssVar}))`;
-  };
+	return ({ opacityVariable, opacityValue }: CustomColorsParams) => {
+		if (opacityValue !== undefined) {
+			return `rgba(var(${cssVar}), ${opacityValue})`;
+		}
+		if (opacityVariable !== undefined) {
+			return `rgba(var(${cssVar}), var(${opacityVariable}, 1))`;
+		}
+		return `rgb(var(${cssVar}))`;
+	};
 }
 
 module.exports = {
@@ -106,3 +108,5 @@ module.exports = {
     nextui()
   ],
 };
+
+export default config;

@@ -106,7 +106,7 @@ const InstantSearchWrapper = ({
         nodes: [typesenseConfig],
         cacheSearchResultsForSeconds: 2 * 60, // Cache search results from server. Defaults to 2 minutes. Set to 0 to disable caching.
         retryIntervalSeconds: 500, // Set to 0 to disable retries
-        numRetries: 100,
+        numRetries: 3000,
         connectionTimeoutSeconds: 10,
       },
       additionalSearchParameters: {

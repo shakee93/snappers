@@ -194,6 +194,206 @@ export const ProductContentFull = gql`
         options
       }
     }
+    upsell {
+      nodes {
+        id
+        name
+        databaseId
+        onSale
+        slug
+        image {
+          altText
+          link
+          sourceUrl
+        }
+
+        ... on SimpleProduct {
+          onSale
+          stockStatus
+          price
+          rawPrice: price(format: RAW)
+          regularPrice
+          salePrice
+          stockStatus
+          purchasable
+          stockQuantity
+          soldIndividually
+          productCategories {
+            edges {
+              node {
+                id
+                name
+                slug
+              }
+            }
+          }
+          galleryImages {
+            nodes {
+              id
+              sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
+              altText
+              databaseId
+            }
+          }
+        }
+          ... on VariableProduct {
+      allPaCapacity {
+        nodes {
+          name
+          slug
+        }
+      }
+      allPaColor {
+        nodes {
+          name
+          slug
+        }
+      }
+      allPaColour {
+        nodes {
+          name
+          slug
+        }
+      }
+      allPaSpecification {
+        nodes {
+          name
+          slug
+        }
+      }
+      allPaVariant {
+        nodes {
+          name
+          slug
+        }
+      }
+      allPaWarranty {
+        nodes {
+          name
+          slug
+        }
+      }
+      allPaWatchSize {
+        nodes {
+          name
+          slug
+        }
+      }
+      allPaConnectivity {
+        nodes {
+          name
+          slug
+        }
+      }
+     allPaPacks {
+        nodes {
+          name
+          slug
+        }
+      }  
+     allPaSize {
+        nodes {
+          name
+          slug
+        }
+      }  
+      allPaBandType {
+        nodes {
+          name
+          slug
+        }
+      }
+      allPaShape {
+        nodes {
+          name
+          slug
+        }
+      }
+      allPaCompatibility {
+        nodes {
+          name
+          slug
+        }
+      }
+      allPaNetwork {
+        nodes {
+          name
+          slug
+        }
+      }
+      onSale
+      price
+      rawPrice: price(format: RAW)
+      regularPrice
+      salePrice
+      stockStatus
+      purchasable
+      stockQuantity
+      soldIndividually
+      defaultAttributes {
+        nodes {
+          id
+          name
+          label
+          value
+        }
+      }
+      globalAttributes {
+        nodes {
+          id
+          slug
+          name
+          label
+        }
+      }
+      productCategories {
+        edges {
+          node {
+            id
+            databaseId
+            name
+            slug
+          }
+        }
+      }
+      galleryImages {
+        nodes {
+          id
+          sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
+          altText
+          databaseId
+        }
+      }
+      variations(first: 50) {
+        nodes {
+          id
+          databaseId
+          name
+          price
+          stockStatus
+          stockQuantity
+          rawPrice: price(format: RAW)
+          regularPrice
+          salePrice
+          onSale
+          image {
+              sourceUrl
+              id
+              databaseId
+          }
+          attributes {
+            nodes {
+              id
+              name
+              label
+              value
+            }
+          }
+        }
+      }
+    }
+      }
+    }
     ... on SimpleProduct {
       onSale
       stockStatus
