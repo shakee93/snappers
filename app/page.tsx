@@ -339,7 +339,7 @@ export default async function Home() {
 
             </div>
           </div>
-        </div> */}
+        </div>
         {/* hero section */}
         <div className="z-0">
           {/* <SectionHero3 /> */}
