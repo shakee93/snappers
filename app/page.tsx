@@ -24,21 +24,11 @@ import Peaple from "@/public/images/bank logos/Peoplesbanklk.png";
 import Seylan from "@/public/images/bank logos/Seylan_Bank_logo.png";
 import Standard from "@/public/images/bank logos/standard-chartered-2021-logo-freelogovectors.net_.png";
 import SectionHero2 from "./components/HomePage/SectionHero2";
-import CategoryWithSubcategories from "./components/globalComponents/CategoryWithSubcategories";
-import bgSlide2 from "@/public/homepage/slider/Layer_2.png";
-import kokoBg from "@/public/homepage/slider/koko.png";
-import bgSlide3 from "@/public/homepage/slider/Layer_3.png";
-import bgSlide4 from "@/public/homepage/slider/Layer_4.png";
-import bgSlide5 from "@/public/homepage/slider/Layer_5.png";
-import bgSlide6 from "@/public/homepage/slider/Layer_6.png";
-import bgSlide7 from "@/public/homepage/slider/Layer_7.png";
-import bgSlide8 from "@/public/homepage/slider/Layer_8_1.png";
-import bgSlide9 from "@/public/homepage/slider/Layer_9.png";
-import bgSlide10 from "@/public/homepage/slider/Layer_10.png";
-import bgSlide11 from "@/public/homepage/slider/Layer_11.png";
 import SectionSliderBrandCard from "./components/SectionSliderBrandCard";
 import { Card } from "@nextui-org/react";
 import CardSkeleton from "./components/Skeletons/CardSkeleton";
+import TopBarPromotion from "@/components/TopBarPromotion";
+import { GET_OPTIONS } from "@/graphql/defs/options";
 
 const Banks = [
   Sampath,
@@ -139,9 +129,18 @@ const getData = async () => {
         console.error("Error fetching slides");
         return [];
       }),
+      getClient()
+      .query({
+        query: GET_OPTIONS,
+      })
+      .then((res) => res.data || [])
+      .catch(() => {
+        console.error("Error fetching options");
+        return [];
+      }),
   ];
 
-  const [newArrivals, mobiles, speakers, watches, backInStock, brands, slides] = await Promise.all(queries);
+  const [newArrivals, mobiles, speakers, watches, backInStock, brands, slides , options] = await Promise.all(queries);
 
   return {
     newArrivals: newArrivals as (SimpleProduct & VariableProduct)[],
@@ -150,213 +149,26 @@ const getData = async () => {
     watches: watches as (SimpleProduct & VariableProduct)[],
     backInStock: backInStock as (SimpleProduct & VariableProduct)[],
     brands: brands as Brand[],
-    slides
+    slides,
+    options,
   };
 };
 
 export default async function Home() {
-  // const startTime = performance.now(); // Log the start time
 
-  const { newArrivals, mobiles, speakers, watches, backInStock, brands, slides } = await getData();
 
-  // const slidesData = [
-  //   {
-  //     id: "1",
-  //     slideFields: {
-  //       mainHeading: "Shop now, pay later with Koko.",
-  //       subHeading: "No interest, No card block",
-  //       buttonText: "Contact",
-  //       buttonLink: "/contact",
-  //       backgroundColor: "#CCE0EF",
-  //       backgroundImage: kokoBg.src,
-  //       featureImage: {
-  //         id: "2",
-  //         sourceUrl:
-  //           "http://api.gqmobiles.lk/wp-content/uploads/2024/09/Group-1.png",
-  //       },
-  //     },
-  //   },
-
-  //   {
-  //     id: "2",
-  //     slideFields: {
-  //       mainHeading: "iPhone 15 pro max",
-  //       subHeading: "Precision in Every Movement",
-  //       buttonText: "Buy Now",
-  //       buttonLink: "https://gqmobiles.lk/apple/apple-iphone-15-pro-max",
-  //       backgroundColor: "#CCE0EF",
-  //       backgroundImage: bgSlide10.src,
-  //       featureImage: {
-  //         id: "2",
-  //         sourceUrl:
-  //           "https://api.gqmobiles.lk/wp-content/uploads/2024/10/Apple-iPhone-15-Pro-Max-1TB-removebg-preview.png",
-  //       },
-  //     },
-  //   },
-   
-  //   {
-  //     id: "4",
-  //     slideFields: {
-  //       mainHeading: "Sony PlayStation 5 Slim",
-  //       subHeading: "Performance Packed, Space Saved",
-  //       buttonText: "Buy Now",
-  //       buttonLink:
-  //         "https://gqmobiles.lk/sony/sony-playstation-5-slim-ps5-eur-disc-edition",
-  //       backgroundColor: "#CCE0EF",
-  //       backgroundImage: bgSlide4.src,
-  //       featureImage: {
-  //         id: "2",
-  //         sourceUrl:
-  //           "https://api.gqmobiles.lk/wp-content/uploads/2024/10/PS5-slim-digital-edition-new-pn-550x550h.png",
-  //       },
-  //     },
-  //   },
-
-  //   {
-  //     id: "5",
-  //     slideFields: {
-  //       mainHeading: "Apple MacBook Air M3 Chip 15-inch (2024)",
-  //       subHeading: "Unleash creativity with the powerful M3 MacBook!",
-  //       buttonText: "Order Today",
-  //       buttonLink:
-  //         "https://gqmobiles.lk/apple/apple-macbook-air-m3-chip-15-inch-2024",
-  //       backgroundColor: "#CCE0EF",
-  //       backgroundImage: bgSlide8.src,
-  //       featureImage: {
-  //         id: "2",
-  //         sourceUrl:
-  //           "https://api.gqmobiles.lk/wp-content/uploads/2024/10/GQ-MOBILES-LAPTOP-NETBOOK-MACBOOK-AIR-M3-15-INCH-2024-MIDNIGHT-removebg.png",
-  //       },
-  //     },
-  //   },
-
-  //   {
-  //     id: "6",
-  //     slideFields: {
-  //       mainHeading: "Apple Watch Series 10",
-  //       subHeading: "The Future on Your Wrist",
-  //       buttonText: "Buy Now",
-  //       buttonLink: "https://gqmobiles.lk/apple/apple-watch-series-10",
-  //       backgroundColor: "#CCE0EF",
-  //       backgroundImage: bgSlide9.src,
-
-  //       featureImage: {
-  //         id: "2",
-  //         sourceUrl:
-  //           "https://api.gqmobiles.lk/wp-content/uploads/2024/09/safety__eg2903fny6gm_large-removebg-preview.png",
-  //       },
-  //     },
-  //   },
-
-  //   {
-  //     id: "7",
-  //     slideFields: {
-  //       mainHeading: "Samsung Galaxy Tab S9 FE",
-  //       subHeading: "Smart, Sleek, and Ready for More",
-  //       buttonText: "Buy Now",
-  //       buttonLink:
-  //         "https://gqmobiles.lk/samsung/samsung-tab-s9-fe-5g-6gb-128gb-lavender-sm-x516b",
-  //       backgroundColor: "#CCE0EF",
-  //       backgroundImage: bgSlide6.src,
-
-  //       featureImage: {
-  //         id: "2",
-  //         sourceUrl:
-  //           "https://api.gqmobiles.lk/wp-content/uploads/2024/10/Samsung-Galaxy-Tab-S9-FE-6GB-RAM-128GB-Graphite-removebg-preview.png",
-  //       },
-  //     },
-  //   },
-
-  //   {
-  //     id: "8",
-  //     slideFields: {
-  //       mainHeading: 'iPad Air 11" &  13"',
-  //       subHeading: "Where Performance Meets Portability",
-  //       buttonText: "Buy Now",
-  //       buttonLink:
-  //         "https://gqmobiles.lk/apple/apple-ipad-air-6th-generation-wi-fi-13-inch-m2-chip",
-  //       backgroundColor: "#CCE0EF",
-  //       backgroundImage: bgSlide2.src,
-
-  //       featureImage: {
-  //         id: "2",
-  //         sourceUrl:
-  //           "https://api.gqmobiles.lk/wp-content/uploads/2024/09/ccddacd68dff4ee0927266e4f98d06c8-removebg-preview.png",
-  //       },
-  //     },
-  //   },
-  // ];
+  const { newArrivals, mobiles, speakers, watches, backInStock, brands, slides, options } = await getData();
 
   return (
     <main>
       <div className="nc-PageHome relative flex flex-col overflow-hidden">
-        <div className="bg-black px-2 py-4 md:p-3">
-          <div className="items-between flex flex-col gap-4 md:flex-row md:items-center md:gap-3">
-            <div className="flex w-full flex-col items-center justify-center gap-2 md:flex-row">
-              {/* <div>
-                <p className="text-3xl md:text-xl lg:text-3xl xl:text-5xl -skew-x-[20deg] font-bold bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent bg-clip-text">
-                  0% Installment
-                </p>
-              </div> */}
-              {/* <div className="flex shrink-0 flex-row gap-0">
-                <p className="flex items-center justify-center text-center text-lg font-semibold text-white md:text-lg lg:text-2xl">
-                  iPhone 16 Available
-                </p>
-                <p className="flex w-full items-baseline justify-center">
-                  <a
-                    href="/iphone-16-product-link"
-                    className="bg-blue-500 text-white font-semibold py-2 px-4 rounded"
-                  >
-                    Shop Now
-                  </a>
-                </p>
-              </div> */}
-              <div className="flex-col md:flex-row flex gap-5 justify-center text-center items-center">
-                <div className="text-sm font-semibold text-white md:text-lg lg:text-2xl">
-                  <span className="font-bold">The ALL NEW</span>{" "}
-                  <span> Exclusive</span>
-                  <span className="text-orange-400"> iPhone 16 Series</span> {" "}
-                  <span>Available!</span> {" "}
-                </div>
-                <div className="text-sm">
-                  <a
-                    href="https://gqmobiles.lk//apple/apple-iphone-16"
-                    className="bg-blue-700 text-white font-semibold py-2 px-4 rounded transition duration-300 ease-in-out hover:bg-blue-800"
-                  >
-                    Shop Now
-                  </a>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div>
+      <TopBarPromotion options={options} />
         {/* hero section */}
         <div className="z-0">
           {/* <SectionHero3 /> */}
           <SectionHero2 slides={slides} />
           {/* <CategoryWithSubcategories/> */}
         </div>
-        {/* <div className="bg-[#e5e7eb] py-4 md:p-2">
-          <div className="container flex md:items-center gap-3 flex-col md:flex-row items-start ">
-            <Image
-              src={Scam}
-              alt=""
-              height={20}
-              className="w-56 md:w-40 h-auto"
-            />
-            <div>
-              <p className="text-base md:text-lg font-medium">
-                Fraud Alert : Rajagiriya & Kurunegala Scam Warning!
-              </p>
-              <p className="text-sm md:text-base">
-                We have no branches in Rajagiriya or Kurunegala. Beware of
-                scams. Your safety is our priority.
-              </p>
-            </div>
-          </div>
-        </div> */}
-
         <div className="flex flex-col px-3  gap-10 lg:gap-16 sm:container sm:max-w-screen-2xl">
           {/* new arrivals section */}
           <div className="mt-5 md:mt-10">
@@ -396,7 +208,6 @@ export default async function Home() {
           <div>
             <SectionSliderProductCard
               products={mobiles}
-              // subHeading="Explore the Latest in Smartphone Innovation"
               heading="Latest Smartphones"
             />
           </div>
@@ -428,7 +239,6 @@ export default async function Home() {
               products={watches}
               heading="Smart Watches"
               link="smartwatches"
-            // subHeading="Best selling of the month"
             />
           </div>
         </div>
