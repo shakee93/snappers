@@ -36,53 +36,22 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   const address = useSearchParams().get('address');
   const amount = useSearchParams().get('amount');
   const items = useSearchParams().get('items');
+  const lineItems = JSON.parse(useSearchParams().get('lineItems') || '[]');
   const ordermethod = useSearchParams().get('ordermethod');
 
   // Now you have the data from the URL and can use it on the page
-  console.log({ order_id, first_name, last_name, email, address, amount, items });
+  console.log({ order_id, first_name, last_name, email, address, amount, items, lineItems });
 
   if (ordermethod === "guest") {
 
     const orderData = {
       order: {
         orderNumber: order_id,
-        // total: amount,
-        total: "₨ 580.00",    // formatted as a string with currency symbol
-        subtotal: "₨ 450.00", // formatted as a string with currency symbol
+        total: amount,
+        subtotal: "₨ 450.00",
         shippingTotal: "₨ 50.00",
         lineItems: {
-          nodes: [
-            {
-              id: "item_1",
-              product: {
-                node: {
-                  name: "Product 1",
-                },
-              },
-              quantity: 2,
-              subtotal: 3000,
-            },
-            {
-              id: "item_2",
-              product: {
-                node: {
-                  name: "Product 2",
-                },
-              },
-              quantity: 1,
-              subtotal: 2000,
-            },
-            {
-              id: "item_3",
-              product: {
-                node: {
-                  name: "Product 3",
-                },
-              },
-              quantity: 3,
-              subtotal: 3000,
-            },
-          ],
+          nodes: lineItems.nodes,
         },
       },
       date: "2024-10-22",
