@@ -13,7 +13,7 @@ const Logo = ({ className = '', imageClass = '' }: { className?: string, imageCl
         src={SiteLogo}
         alt="logo"
         className={twMerge(
-          "h-32 md:h-20 hover:scale-110 transition-all max-w-[80px] md:max-w-[320px] w-auto relative rounded-b-2xl",
+          "h-28 md:h-16 hover:scale-110 transition-all max-w-[80px] md:max-w-[320px] w-auto relative rounded-b-2xl",
           imageClass
         )}
       ></Image>
