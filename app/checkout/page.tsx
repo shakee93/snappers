@@ -136,8 +136,9 @@ const CheckoutPage = () => {
   const [isTOC, setTOC] = useState<boolean>(false);
   const [freeShipping, setFreeShipping] = useState<boolean>(false);
   const [confirmOrderErrors, setConfirmOrderErrors] = useState<string[]>([]);
+  const [guestCheckoutData, setGuestCheckoutData] = useState<any>();
 
-  
+
 
   const handleTOC = () => {
     // Toggle the state and get the updated value
@@ -228,6 +229,9 @@ const CheckoutPage = () => {
   };
 
   const implementCheckoutAfterPayhere = async () => {
+
+    console.log('implementCheckoutAfterPayhere function running');
+
     const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
     if (paymentMethodId === undefined) {
       console.error("Payment method ID is undefined");
@@ -272,6 +276,8 @@ const CheckoutPage = () => {
         ? await guestCheckout({ variables })
         : await checkoutMutation({ variables });
 
+    console.log('guest data', data);
+
     const sentConfirmation = async () => {
       const confirmationResponse = await fetch(
         "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/order-confirmation",
@@ -295,7 +301,12 @@ const CheckoutPage = () => {
 
     await sentConfirmation();
 
+    console.log('sent confirmaton', sentConfirmation);
+
     if (data) {
+
+      console.log('data right after confirmation', data);
+
       const checkoutDetails = savePaymentDetails(data);
       setPaymentData(checkoutDetails);
       let orderid = data?.checkout.order.databaseId;
@@ -339,8 +350,8 @@ const CheckoutPage = () => {
       const shippingMethods = isStorePickup
         ? "pickup_location:0"
         : freeShipping
-        ? "wbs:5c9bd062_free_shipping"
-        : "wbs:0dd3bc79_weight_based_shipping";
+          ? "wbs:5c9bd062_free_shipping"
+          : "wbs:0dd3bc79_weight_based_shipping";
 
       const total: any = cart?.total;
       setOrderTotal(freeShipping ? cart?.subtotal : total);
@@ -388,6 +399,7 @@ const CheckoutPage = () => {
   const paymentDetails = useMemo(() => {
     return paymentData;
   }, [paymentData]);
+
   const ImplementPayhere = async () => {
     let generatedOrderId = crypto.randomUUID();
     setPayherPaymentID(generatedOrderId);
@@ -414,6 +426,7 @@ const CheckoutPage = () => {
     }
 
     const products = cart?.contents?.nodes;
+    console.log('products', products);
 
     // Generate the list of products as strings
     const productList = products?.map((product: any) => {
@@ -501,45 +514,40 @@ const CheckoutPage = () => {
       return;
     }
 
-    // const isBankTransfer =
-    //   formData?.paymentMethod?.selectedGateway?.id == "bacs";
-    // const isPayhere = formData?.paymentMethod?.selectedGateway?.id == "payhere";
     const isCashOnDelivery =
       formData?.paymentMethod?.selectedGateway?.id == "cod";
 
     let checkoutDetails = paymentDetails;
 
-    // localStorage.setItem(
-    //   "checkoutDetails",
-    //   JSON.stringify(checkoutDetails)
-    // )
+    console.log('paymentDetails', paymentDetails);
+    console.log('checkoutDetails', checkoutDetails);
+    console.log('guestCheckoutData', guestCheckoutData);
 
-    // if (isPayhere) {
-    //   try {
-    //     ImplementPayhere(checkoutDetails);
-    //     return;
-    //   } catch (e) {
-    //     console.log("Error while creating Payhere:", e);
-    //   }
-    // }
+    const { lineItems } = guestCheckoutData.checkout.order;
 
-    // if (isBankTransfer) {
-    //   try {
-    //     ImplementBankTransfer();
-    //   } catch (e) {
-    //     // console.log("Error while creating BankTransfer:", e);
-    //     toast.error("Error on BankTransfer");
-    //   }
-    // }
+    console.log('lineItems', lineItems);
+
+    const updatedCheckoutDetails = {
+      ...checkoutDetails,
+      lineItems: lineItems
+    };
+
+    console.log('updatedCheckoutDetails', updatedCheckoutDetails);
 
     if (isCashOnDelivery) {
       if (
         customer?.id === "guest" ||
         checkoutDetails.order_id == "guest_checkout"
       ) {
+        const queryParams = new URLSearchParams({
+          ...updatedCheckoutDetails,
+          lineItems: JSON.stringify(updatedCheckoutDetails.lineItems),
+        }).toString();
         let email = formData?.contactInfo?.email;
-        // let redirectUrl = `/checkout/${checkoutDetails.order_id}?email=${email}`;
-        let redirectUrl = `/checkout/guest_checkout?email=${email}`;
+        // let redirectUrl = `/checkout/${checkoutDetails.order_id}`;
+        // let redirectUrl = `/checkout/guest_checkout?email=${email}`;
+        // router.push(redirectUrl);
+        const redirectUrl = `/checkout/guest_checkout?${queryParams}&ordermethod=guest`;
         router.push(redirectUrl);
         return;
       }
@@ -550,7 +558,37 @@ const CheckoutPage = () => {
 
       router.push(redirectUrl);
     }
+
+    // const isBankTransfer =
+    //   formData?.paymentMethod?.selectedGateway?.id == "bacs";
+    // const isPayhere = formData?.paymentMethod?.selectedGateway?.id == "payhere";
+
   }, [paymentData]);
+
+  // localStorage.setItem(
+  //   "checkoutDetails",
+  //   JSON.stringify(checkoutDetails)
+  // )
+
+  // if (isPayhere) {
+  //   try {
+  //     ImplementPayhere(checkoutDetails);
+  //     return;
+  //   } catch (e) {
+  //     console.log("Error while creating Payhere:", e);
+  //   }
+  // }
+
+  // if (isBankTransfer) {
+  //   try {
+  //     ImplementBankTransfer();
+  //   } catch (e) {
+  //     // console.log("Error while creating BankTransfer:", e);
+  //     toast.error("Error on BankTransfer");
+  //   }
+  // }
+
+
 
   const handleCheckoutProcess = async () => {
     // console.log("isConfirmed", isConfirmed);
@@ -625,6 +663,8 @@ const CheckoutPage = () => {
 
       const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
 
+      console.log('paymentMethodID', paymentMethodId);
+
       if (paymentMethodId === undefined) {
         console.error("Payment method ID is undefined");
         toast.error("Payment Method was not chosen.");
@@ -667,7 +707,8 @@ const CheckoutPage = () => {
       const isBankTransfer =
         formData?.paymentMethod?.selectedGateway?.id == "bacs";
 
-      // console.log("data: ", data);
+      // console.log("data: guest checkout ", data);
+      setGuestCheckoutData(data);
       // console.log("formdata on banktranser: ", formData);
       if (data) {
         const checkoutDetails = savePaymentDetails(data);
@@ -693,14 +734,14 @@ const CheckoutPage = () => {
     const methodId = isStorePickup
       ? "pickup_location:0"
       : freeShipping
-      ? "wbs:5c9bd062_free_shipping"
-      : "wbs:0dd3bc79_weight_based_shipping";
+        ? "wbs:5c9bd062_free_shipping"
+        : "wbs:0dd3bc79_weight_based_shipping";
 
     const methodTitle = isStorePickup
       ? "pickup_location:0"
       : freeShipping
-      ? "wbs:5c9bd062_free_shipping"
-      : "wbs:0dd3bc79_weight_based_shipping";
+        ? "wbs:5c9bd062_free_shipping"
+        : "wbs:0dd3bc79_weight_based_shipping";
 
     const total = shippingTotal;
 

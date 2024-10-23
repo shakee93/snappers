@@ -11,6 +11,14 @@ export default function NavCategories() {
 
     const categories: ProductCategory[] = data?.productCategories?.nodes || [];
 
+    const prioritizeCategory = (items: ProductCategory[], slugToPrioritize: string): ProductCategory[] => {
+        const prioritizedCategory = items.find(item => item.slug === slugToPrioritize);
+        const otherCategories = items.filter(item => item.slug !== slugToPrioritize);
+        return prioritizedCategory ? [prioritizedCategory, ...otherCategories] : items;
+    };
+
+    const prioritizedCategories = prioritizeCategory(categories, 'mobiles-and-tablets');
+
     // Function to split categories into columns
     const splitIntoColumns = (items: ProductCategory[], columnCount: number): ProductCategory[][] => {
         const columns: ProductCategory[][] = Array.from({ length: columnCount }, () => []);
@@ -41,7 +49,7 @@ export default function NavCategories() {
                         <p>Error loading categories</p>
                     </div>
                 ) : (
-                    splitIntoColumns(categories, columnCount).map((column, colIndex) => (
+                    splitIntoColumns(prioritizedCategories, columnCount).map((column, colIndex) => (
                         <div key={`column-${colIndex}`} className="flex-1">
                             {column.map((category) => (
                                 <div key={`category-${category.slug}`} className="category-group mb-2 p-2 hover:bg-zinc-100 rounded-md">
