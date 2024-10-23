@@ -18,17 +18,16 @@ interface Hero2DataType {
 
 interface SlideType {
   id: string;
-  slideFields: {
-    mainHeading: string;
-    subHeading: string;
-    buttonText: string;
-    buttonLink: string;
-    backgroundColor: string;
-    backgroundImage: string; // URL of the background image
-    featureImage: {
-      id: string;
-      sourceUrl: string;
-    };
+
+  mainHeading: string;
+  subHeading: string;
+  buttonText: string;
+  buttonLink: string;
+  backgroundColor: string;
+  backgroundImage: string;
+  featureImage: {
+    id: string;
+    sourceUrl: string;
   };
 }
 
@@ -108,14 +107,13 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
     return (
       <div
         key={index}
-        className={`relative w-full h-[550px] md:h-[400px] xl:h-[600px] justify-center nc-SectionHero2Item--animation flex items-center transition-transform ease-in-out transform ${
-          isActive ? 'translate-y-0' : 'translate-y-10'
-        }`}
-        style={{ 
+        className={`relative w-full h-[550px] md:h-[400px] xl:h-[600px] justify-center nc-SectionHero2Item--animation flex items-center transition-transform ease-in-out transform ${isActive ? 'translate-y-0' : 'translate-y-10'
+          }`}
+        style={{
           // backgroundColor: item.slideFields.backgroundColor, 
-          backgroundImage: `url(${item.slideFields.backgroundImage})`, // Use the background image
-          backgroundSize: 'cover', 
-          backgroundPosition: 'center' 
+          backgroundImage: `url(${item.backgroundImage})`, // Use the background image
+          backgroundSize: 'cover',
+          backgroundPosition: 'center'
         }}
       >
         {/* Dots Navigation */}
@@ -131,9 +129,8 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
             >
               <div className={`relative w-5 md:w-20 h-1 shadow-sm rounded-md bg-white`}>
                 <div
-                  className={`absolute inset-0 bg-gray-700 rounded-md ${
-                    dotIndex === indexActive ? 'opacity-100 nc-SectionHero2Item__dot rounded-md' : 'opacity-0'
-                  }`}
+                  className={`absolute inset-0 bg-gray-700 rounded-md ${dotIndex === indexActive ? 'opacity-100 nc-SectionHero2Item__dot rounded-md' : 'opacity-0'
+                    }`}
                 ></div>
               </div>
             </div>
@@ -161,17 +158,17 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
         <div className="flex-col md:flex-row container flex justify-between items-center z-[1] w-full">
           <div className="relative z-10 space-y-3 sm:space-y-4 text-white px-6">
             <span className="nc-SectionHero2Item__subheading block text-base md:text-xl font-medium">
-              {item.slideFields.subHeading}
+              {item?.subHeading}
             </span>
             <h2 className="nc-SectionHero2Item__heading font-semibold text-3xl sm:text-4xl md:text-4xl xl:text-5xl 2xl:text-5xl  !leading-[114%]">
-              {item.slideFields.mainHeading}
+              {item?.mainHeading}
             </h2>
             <ButtonPrimary
               className="nc-SectionHero2Item__button dark:bg-slate-900"
               sizeClass="py-3 px-6 sm:py-5 sm:px-9"
-              href={item.slideFields.buttonLink as any}
+              href={item.buttonLink as any}
             >
-              <span>{item.slideFields.buttonText}</span>
+              <span>{item.buttonText}</span>
               <span>
                 <svg className="w-5 h-5 ml-2.5" viewBox="0 0 24 24" fill="none">
                   <path
@@ -202,7 +199,7 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
           >
             <NcImage
               priority={true}
-              src={item.slideFields.featureImage.sourceUrl}
+              src={item.featureImage}
               className="max-h-[250px] md:max-h-[300px] xl:max-h-[500px] w-auto py-6 px-4"
             />
           </motion.div>

@@ -10,8 +10,8 @@ import {
   GET_PRODUCTS_NODES,
   GET_PRODUCTS_NODES_HOMEPAGE,
 } from "@/graphql/defs/products";
+import { GET_SLIDES } from "@/graphql/defs/slides";
 import { Brand, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
-
 import Image from "next/image";
 import Scam from "@/public/homepage/scam.webp";
 import Sampath from "@/public/images/bank logos/sampath.png";
@@ -40,149 +40,7 @@ import SectionSliderBrandCard from "./components/SectionSliderBrandCard";
 import { Card } from "@nextui-org/react";
 import CardSkeleton from "./components/Skeletons/CardSkeleton";
 
-const slidesData = [
-  {
-    id: "1",
-    slideFields: {
-      mainHeading: "Shop now, pay later with Koko.",
-      subHeading: "No interest, No card block",
-      buttonText: "Contact",
-      buttonLink: "/contact",
-      backgroundColor: "#CCE0EF",
-      backgroundImage: kokoBg.src,
-      featureImage: {
-        id: "2",
-        sourceUrl:
-          "http://api.gqmobiles.lk/wp-content/uploads/2024/09/Group-1.png",
-      },
-    },
-  },
 
-  {
-    id: "2",
-    slideFields: {
-      mainHeading: "iPhone 15 pro max",
-      subHeading: "Precision in Every Movement",
-      buttonText: "Buy Now",
-      buttonLink: "https://gqmobiles.lk/apple/apple-iphone-15-pro-max",
-      backgroundColor: "#CCE0EF",
-      backgroundImage: bgSlide10.src,
-      featureImage: {
-        id: "2",
-        sourceUrl:
-          "https://api.gqmobiles.lk/wp-content/uploads/2024/10/Apple-iPhone-15-Pro-Max-1TB-removebg-preview.png",
-      },
-    },
-  },
-  // {
-  //   id: "3",
-  //   slideFields: {
-  //     mainHeading: "PS5 Slim Digital Edition",
-  //     subHeading: "Performance Packed, Space Saved",
-  //     buttonText: "Buy Now",
-  //     buttonLink:
-  //       "https://gqmobiles.lk/apple/apple-airpods-4-with-active-noise-cancellation-anc-2024",
-  //     backgroundColor: "#CCE0EF",
-  //     backgroundImage: bgSlide4.src,
-  //     featureImage: {
-  //       id: "2",
-  //       sourceUrl:
-  //         "https://api.gqmobiles.lk/wp-content/uploads/2024/09/Apple-AirPods-Hearing-Aid-240909_inline.jpg.large-removebg-preview.png",
-  //     },
-  //   },
-  // },
-  {
-    id: "4",
-    slideFields: {
-      mainHeading: "Sony PlayStation 5 Slim",
-      subHeading: "Performance Packed, Space Saved",
-      buttonText: "Buy Now",
-      buttonLink:
-        "https://gqmobiles.lk/sony/sony-playstation-5-slim-ps5-eur-disc-edition",
-      backgroundColor: "#CCE0EF",
-    backgroundImage: bgSlide4.src,
-      featureImage: {
-        id: "2",
-        sourceUrl:
-          "https://api.gqmobiles.lk/wp-content/uploads/2024/10/PS5-slim-digital-edition-new-pn-550x550h.png",
-      },
-    },
-  },
-
-  {
-    id: "5",
-    slideFields: {
-      mainHeading: "Apple MacBook Air M3 Chip 15-inch (2024)",
-      subHeading: "Unleash creativity with the powerful M3 MacBook!",
-      buttonText: "Order Today",
-      buttonLink:
-        "https://gqmobiles.lk/apple/apple-macbook-air-m3-chip-15-inch-2024",
-      backgroundColor: "#CCE0EF",
-      backgroundImage: bgSlide8.src,
-      featureImage: {
-        id: "2",
-        sourceUrl:
-          "https://api.gqmobiles.lk/wp-content/uploads/2024/10/GQ-MOBILES-LAPTOP-NETBOOK-MACBOOK-AIR-M3-15-INCH-2024-MIDNIGHT-removebg.png",
-      },
-    },
-  },
-
-  {
-    id: "6",
-    slideFields: {
-      mainHeading: "Apple Watch Series 10",
-      subHeading: "The Future on Your Wrist",
-      buttonText: "Buy Now",
-      buttonLink: "https://gqmobiles.lk/apple/apple-watch-series-10",
-      backgroundColor: "#CCE0EF",
-      backgroundImage: bgSlide9.src,
-
-      featureImage: {
-        id: "2",
-        sourceUrl:
-          "https://api.gqmobiles.lk/wp-content/uploads/2024/09/safety__eg2903fny6gm_large-removebg-preview.png",
-      },
-    },
-  },
-
-  {
-    id: "7",
-    slideFields: {
-      mainHeading: "Samsung Galaxy Tab S9 FE",
-      subHeading: "Smart, Sleek, and Ready for More",
-      buttonText: "Buy Now",
-      buttonLink:
-        "https://gqmobiles.lk/samsung/samsung-tab-s9-fe-5g-6gb-128gb-lavender-sm-x516b",
-      backgroundColor: "#CCE0EF",
-      backgroundImage: bgSlide6.src,
-
-      featureImage: {
-        id: "2",
-        sourceUrl:
-          "https://api.gqmobiles.lk/wp-content/uploads/2024/10/Samsung-Galaxy-Tab-S9-FE-6GB-RAM-128GB-Graphite-removebg-preview.png",
-      },
-    },
-  },
-
-  {
-    id: "8",
-    slideFields: {
-      mainHeading: 'iPad Air 11" &  13"',
-      subHeading: "Where Performance Meets Portability",
-      buttonText: "Buy Now",
-      buttonLink:
-        "https://gqmobiles.lk/apple/apple-ipad-air-6th-generation-wi-fi-13-inch-m2-chip",
-      backgroundColor: "#CCE0EF",
-      backgroundImage: bgSlide2.src,
-
-      featureImage: {
-        id: "2",
-        sourceUrl:
-          "https://api.gqmobiles.lk/wp-content/uploads/2024/09/ccddacd68dff4ee0927266e4f98d06c8-removebg-preview.png",
-      },
-    },
-  },
-];
 
 const Banks = [
   Sampath,
@@ -271,10 +129,21 @@ const getData = async () => {
         console.error("Error fetching brands");
         return [];
       }),
+
+    getClient()
+      .query({
+        query: GET_SLIDES,
+      })
+      .then((res) => {
+        return res.data?.slides?.nodes || [];
+      })
+      .catch(() => {
+        console.error("Error fetching slides");
+        return [];
+      }),
   ];
 
-  const [newArrivals, mobiles, speakers, watches, backInStock, brands] =
-    await Promise.all(queries);
+  const [newArrivals, mobiles, speakers, watches, backInStock, brands, slides] = await Promise.all(queries);
 
   return {
     newArrivals: newArrivals as (SimpleProduct & VariableProduct)[],
@@ -283,18 +152,163 @@ const getData = async () => {
     watches: watches as (SimpleProduct & VariableProduct)[],
     backInStock: backInStock as (SimpleProduct & VariableProduct)[],
     brands: brands as Brand[],
+    slides
   };
 };
 
 export default async function Home() {
   // const startTime = performance.now(); // Log the start time
 
-  const { newArrivals, mobiles, speakers, watches, backInStock, brands } =
-    await getData();
+  const { newArrivals, mobiles, speakers, watches, backInStock, brands, slides } = await getData();
+  console.log('slides', slides);
   // const endTime = performance.now(); // Log the end time
   // console.log(
   //   `getData function took ${endTime - startTime} milliseconds to execute.`
   // );
+
+  const slidesData = [
+    {
+      id: "1",
+      slideFields: {
+        mainHeading: "Shop now, pay later with Koko.",
+        subHeading: "No interest, No card block",
+        buttonText: "Contact",
+        buttonLink: "/contact",
+        backgroundColor: "#CCE0EF",
+        backgroundImage: kokoBg.src,
+        featureImage: {
+          id: "2",
+          sourceUrl:
+            "http://api.gqmobiles.lk/wp-content/uploads/2024/09/Group-1.png",
+        },
+      },
+    },
+
+    {
+      id: "2",
+      slideFields: {
+        mainHeading: "iPhone 15 pro max",
+        subHeading: "Precision in Every Movement",
+        buttonText: "Buy Now",
+        buttonLink: "https://gqmobiles.lk/apple/apple-iphone-15-pro-max",
+        backgroundColor: "#CCE0EF",
+        backgroundImage: bgSlide10.src,
+        featureImage: {
+          id: "2",
+          sourceUrl:
+            "https://api.gqmobiles.lk/wp-content/uploads/2024/10/Apple-iPhone-15-Pro-Max-1TB-removebg-preview.png",
+        },
+      },
+    },
+    // {
+    //   id: "3",
+    //   slideFields: {
+    //     mainHeading: "PS5 Slim Digital Edition",
+    //     subHeading: "Performance Packed, Space Saved",
+    //     buttonText: "Buy Now",
+    //     buttonLink:
+    //       "https://gqmobiles.lk/apple/apple-airpods-4-with-active-noise-cancellation-anc-2024",
+    //     backgroundColor: "#CCE0EF",
+    //     backgroundImage: bgSlide4.src,
+    //     featureImage: {
+    //       id: "2",
+    //       sourceUrl:
+    //         "https://api.gqmobiles.lk/wp-content/uploads/2024/09/Apple-AirPods-Hearing-Aid-240909_inline.jpg.large-removebg-preview.png",
+    //     },
+    //   },
+    // },
+    {
+      id: "4",
+      slideFields: {
+        mainHeading: "Sony PlayStation 5 Slim",
+        subHeading: "Performance Packed, Space Saved",
+        buttonText: "Buy Now",
+        buttonLink:
+          "https://gqmobiles.lk/sony/sony-playstation-5-slim-ps5-eur-disc-edition",
+        backgroundColor: "#CCE0EF",
+        backgroundImage: bgSlide4.src,
+        featureImage: {
+          id: "2",
+          sourceUrl:
+            "https://api.gqmobiles.lk/wp-content/uploads/2024/10/PS5-slim-digital-edition-new-pn-550x550h.png",
+        },
+      },
+    },
+
+    {
+      id: "5",
+      slideFields: {
+        mainHeading: "Apple MacBook Air M3 Chip 15-inch (2024)",
+        subHeading: "Unleash creativity with the powerful M3 MacBook!",
+        buttonText: "Order Today",
+        buttonLink:
+          "https://gqmobiles.lk/apple/apple-macbook-air-m3-chip-15-inch-2024",
+        backgroundColor: "#CCE0EF",
+        backgroundImage: bgSlide8.src,
+        featureImage: {
+          id: "2",
+          sourceUrl:
+            "https://api.gqmobiles.lk/wp-content/uploads/2024/10/GQ-MOBILES-LAPTOP-NETBOOK-MACBOOK-AIR-M3-15-INCH-2024-MIDNIGHT-removebg.png",
+        },
+      },
+    },
+
+    {
+      id: "6",
+      slideFields: {
+        mainHeading: "Apple Watch Series 10",
+        subHeading: "The Future on Your Wrist",
+        buttonText: "Buy Now",
+        buttonLink: "https://gqmobiles.lk/apple/apple-watch-series-10",
+        backgroundColor: "#CCE0EF",
+        backgroundImage: bgSlide9.src,
+
+        featureImage: {
+          id: "2",
+          sourceUrl:
+            "https://api.gqmobiles.lk/wp-content/uploads/2024/09/safety__eg2903fny6gm_large-removebg-preview.png",
+        },
+      },
+    },
+
+    {
+      id: "7",
+      slideFields: {
+        mainHeading: "Samsung Galaxy Tab S9 FE",
+        subHeading: "Smart, Sleek, and Ready for More",
+        buttonText: "Buy Now",
+        buttonLink:
+          "https://gqmobiles.lk/samsung/samsung-tab-s9-fe-5g-6gb-128gb-lavender-sm-x516b",
+        backgroundColor: "#CCE0EF",
+        backgroundImage: bgSlide6.src,
+
+        featureImage: {
+          id: "2",
+          sourceUrl:
+            "https://api.gqmobiles.lk/wp-content/uploads/2024/10/Samsung-Galaxy-Tab-S9-FE-6GB-RAM-128GB-Graphite-removebg-preview.png",
+        },
+      },
+    },
+
+    {
+      id: "8",
+      slideFields: {
+        mainHeading: 'iPad Air 11" &  13"',
+        subHeading: "Where Performance Meets Portability",
+        buttonText: "Buy Now",
+        buttonLink:
+          "https://gqmobiles.lk/apple/apple-ipad-air-6th-generation-wi-fi-13-inch-m2-chip",
+        backgroundColor: "#CCE0EF",
+        backgroundImage: bgSlide2.src,
+
+        featureImage: {
+          id: "2",
+          sourceUrl:
+            "https://api.gqmobiles.lk/wp-content/uploads/2024/09/ccddacd68dff4ee0927266e4f98d06c8-removebg-preview.png",
+        },
+      },
+    },
+  ];
 
   return (
     <main>
@@ -343,7 +357,7 @@ export default async function Home() {
         {/* hero section */}
         <div className="z-0">
           {/* <SectionHero3 /> */}
-          <SectionHero2 slides={slidesData} />
+          <SectionHero2 slides={slides} />
           {/* <CategoryWithSubcategories/> */}
         </div>
         {/* <div className="bg-[#e5e7eb] py-4 md:p-2">
@@ -437,7 +451,7 @@ export default async function Home() {
               products={watches}
               heading="Smart Watches"
               link="smartwatches"
-              // subHeading="Best selling of the month"
+            // subHeading="Best selling of the month"
             />
           </div>
         </div>
