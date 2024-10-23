@@ -312,7 +312,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
                     <p>You will be notified when the product is back in stock!</p>
                   </ModalBody>
                   <ModalFooter>
-                    <Button className="bg-transparent text-red-500 hover:bg-red-600 hover:text-white transition-colors duration-200 ease-in-out"
+                    <Button className="bg-transparent text-blue-500 hover:bg-blue-600 hover:text-white transition-colors duration-200 ease-in-out"
                       onPress={onClose}>
                       Close
                     </Button>
