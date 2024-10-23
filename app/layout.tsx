@@ -98,7 +98,7 @@ export default async function RootLayout({
               <WhatsappLogoComponent />
               <Toaster />
               <Footer />
-              <ScreenSizeIndicator />
+              {/* <ScreenSizeIndicator /> */}
             </SessionProvider>
           </CartProvider>
         </ApolloWrapper>
