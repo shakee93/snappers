@@ -12,6 +12,8 @@ import { toast } from "sonner";
 import AddedToCart from "@/app/components/Notifications/added-to-cart";
 import { twMerge } from "tailwind-merge";
 import { useRouter } from "next/navigation";
+import { useSession } from "@/context/SessionProvider";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, useDisclosure } from "@nextui-org/react";
 
 interface ProductAddToCartProps {
   product: SimpleProduct & VariableProduct;
@@ -23,6 +25,58 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   const [loading, setLoading] = useState<boolean>(false);
   const { addToCart, cart } = useCart();
   const router = useRouter();
+  const { customer, fetchCustomer } = useSession();
+  const [isNotifyClicked, setIsNotifyClicked] = useState(false);
+  const [userEmail, setUserEmail] = useState(customer?.email || ""); // Track user's email
+  const [isThankYouModal, setIsThankYouModal] = useState(false); // Track thank you modal visibility
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+  const handleNotifyClick = async () => {
+    console.log("Notify button clicked", userEmail);
+    onOpen();
+  };
+
+  const handleSubmitEmail = async () => {
+
+    if (userEmail) {
+
+      console.log("Email submitted:", userEmail);
+
+      try {
+        const response = await fetch("/api/emailnotify", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+          },
+          body: JSON.stringify({
+            xoo_wl_user_email: userEmail || "",
+            _xoo_wl_product_id: variation.databaseId,
+            xoo_wl_required_qty: "1",
+          }),
+        });
+
+        if (response.ok) {
+
+          const data = await response.json();
+          // console.log("Response Data:", data);
+          setIsThankYouModal(true);
+
+        } else {
+          const errordata = await response.json();
+          console.error("error data", errordata)
+        }
+      } catch (error) {
+        console.error("Fetch error:", error);
+      } finally {
+        onOpen();
+        setIsNotifyClicked(true);
+      }
+      setIsThankYouModal(true);
+      onOpenChange();
+      setTimeout(onOpen, 500);
+    }
+  };
 
   const notifyAddToCart = (quantity: number) => {
     toast(
@@ -183,17 +237,99 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
         </div>
       </div>
 
-      <button
-        disabled={isAddToCartDisabled}
-        onClick={addItemToCart}
-        className={twMerge(
-          "relative w-auto grow md:flex-none h-auto inline-flex cursor-pointer items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-primaryColor dark:bg-slate-100 text-slate-50 dark:text-slate-800 shadow-xl flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0",
-          isAddToCartDisabled && "opacity-50 disabled:cursor-not-allowed"
-        )}
-      >
-        {loading ? <Loader className="animate-spin" /> : <ShoppingCart />}
-        <span className="md:ml-3 cursor-pointer">Add to cart</span>
-      </button>
+
+      {(product.type === "SIMPLE" && product.stockStatus === "IN_STOCK") ||
+        (product.type === "VARIABLE" && !isProductOutOfStock()) ? (
+        <button
+          disabled={isAddToCartDisabled}
+          onClick={addItemToCart}
+          className={twMerge(
+            "relative w-auto grow md:flex-none h-auto inline-flex cursor-pointer items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-primaryColor dark:bg-slate-100 text-slate-50 dark:text-slate-800 shadow-xl flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0",
+            isAddToCartDisabled && "opacity-50 disabled:cursor-not-allowed"
+          )}
+        >
+          {loading ? <Loader className="animate-spin" /> : <ShoppingCart />}
+          <span className="md:ml-3 cursor-pointer">
+            Add to cart
+          </span>
+        </button>
+      ) : (
+        <button
+          disabled={isNotifyClicked}
+          onClick={handleNotifyClick}
+          className={twMerge(
+            "relative w-auto grow md:flex-none h-auto inline-flex cursor-pointer items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-primaryColor dark:bg-slate-100 text-slate-50 dark:text-slate-800 shadow-xl flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0",
+            isNotifyClicked && "opacity-50 disabled:cursor-not-allowed"
+          )}
+        >
+          Notify Me When Available
+        </button>
+      )}
+
+
+      {/* Modal Implementation */}
+      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+        <ModalContent>
+          {(onClose) => (
+            <>
+              {!isThankYouModal ? (
+                <>
+                  <ModalHeader className="flex flex-row gap-2 px-6 py-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 9v.906a2.25 2.25 0 0 1-1.183 1.981l-6.478 3.488M2.25 9v.906a2.25 2.25 0 0 0 1.183 1.981l6.478 3.488m8.839 2.51-4.66-2.51m0 0-1.023-.55a2.25 2.25 0 0 0-2.134 0l-1.022.55m0 0-4.661 2.51m16.5 1.615a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V8.844a2.25 2.25 0 0 1 1.183-1.981l7.5-4.039a2.25 2.25 0 0 1 2.134 0l7.5 4.039a2.25 2.25 0 0 1 1.183 1.98V19.5Z" />
+                    </svg>
+                    Notify Me
+                  </ModalHeader>
+                  <ModalBody className="py-0">
+                    {customer?.email ? (
+                      <p>Thank you! You will be notified when the product is back in stock.</p>
+                    ) : (
+                      <>
+                        <p>Please enter your email to be notified when the product is back in stock.</p>
+                        <input
+                          className="p-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-600 dark:border-neutral-600 dark:bg-neutral-800 
+                          dark:text-white transition duration-200 ease-in-out"
+                          type="email"
+                          value={userEmail}
+                          placeholder="Enter Email"
+                          onChange={(e) => setUserEmail(e.target.value)}
+                          required
+                        />
+                      </>
+                    )}
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button className="bg-transparent text-red-500 hover:bg-black hover:text-white transition-colors duration-200 ease-in-out"
+                      onPress={onClose}>
+                      Close
+                    </Button>
+                    {!customer?.email && (
+                      <Button className="bg-transparent text-primaryColor hover:bg-blue-500 hover:text-white transition-colors duration-200 ease-in-out"
+                        onPress={handleSubmitEmail}>
+                        Submit
+                      </Button>
+                    )}
+                  </ModalFooter>
+                </>
+              ) : (
+                <>
+                  <ModalHeader className="flex flex-col gap-1">Thank You</ModalHeader>
+                  <ModalBody>
+                    <p>You will be notified when the product is back in stock!</p>
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button className="bg-transparent text-blue-500 hover:bg-black hover:text-white transition-colors duration-200 ease-in-out"
+                      onPress={onClose}>
+                      Close
+                    </Button>
+                  </ModalFooter>
+                </>
+              )}
+            </>
+          )}
+        </ModalContent>
+      </Modal>
+
 
     </div>
   );
