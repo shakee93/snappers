@@ -31,46 +31,48 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   const [isThankYouModal, setIsThankYouModal] = useState(false); // Track thank you modal visibility
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-  // console.log('cusotmer', customer);
-
   const handleNotifyClick = async () => {
-
-    const body = new URLSearchParams({
-      "xoo_wl_user_email": customer?.email || "",
-      "_xoo_wl_product_id": "12",
-      "xoo_wl_required_qty": "1",
-    }).toString();
-
-    try {
-      const response = await fetch("/api/emailnotify", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-          "Accept": "application/json"
-        },
-        body: body,
-        credentials: "include"
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        console.log("Response Data:", data);
-        setIsThankYouModal(true);
-      } else {
-        const errordata = await response.json();
-        console.error("error data", errordata)
-      }
-    } catch (error) {
-      console.error("Fetch error:", error);
-    } finally {
-      onOpen(); // Open modal regardless of success or failure
-      setIsNotifyClicked(true);
-    }
+    console.log("Notify button clicked", userEmail);
+    onOpen();
   };
 
-  const handleSubmitEmail = () => {
+  const handleSubmitEmail = async () => {
+
     if (userEmail) {
+
       console.log("Email submitted:", userEmail);
+
+      try {
+        const response = await fetch("/api/emailnotify", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json",
+          },
+          body: JSON.stringify({
+            xoo_wl_user_email: userEmail || "",
+            _xoo_wl_product_id: "12",
+            xoo_wl_required_qty: "1",
+          }),
+        });
+
+        if (response.ok) {
+
+          const data = await response.json();
+          console.log("Response Data:", data);
+          setIsThankYouModal(true);
+
+        } else {
+          const errordata = await response.json();
+          console.error("error data", errordata)
+        }
+      } catch (error) {
+        console.error("Fetch error:", error);
+      } finally {
+        onOpen();
+        setIsNotifyClicked(true);
+      }
+
       setIsThankYouModal(true);
       onOpenChange();
       setTimeout(onOpen, 500);
@@ -267,7 +269,12 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
             <>
               {!isThankYouModal ? (
                 <>
-                  <ModalHeader className="flex flex-col gap-1 px-6 py-4">Notify Me</ModalHeader>
+                  <ModalHeader className="flex flex-row gap-2 px-6 py-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M21.75 9v.906a2.25 2.25 0 0 1-1.183 1.981l-6.478 3.488M2.25 9v.906a2.25 2.25 0 0 0 1.183 1.981l6.478 3.488m8.839 2.51-4.66-2.51m0 0-1.023-.55a2.25 2.25 0 0 0-2.134 0l-1.022.55m0 0-4.661 2.51m16.5 1.615a2.25 2.25 0 0 1-2.25 2.25h-15a2.25 2.25 0 0 1-2.25-2.25V8.844a2.25 2.25 0 0 1 1.183-1.981l7.5-4.039a2.25 2.25 0 0 1 2.134 0l7.5 4.039a2.25 2.25 0 0 1 1.183 1.98V19.5Z" />
+                    </svg>
+                    Notify Me
+                  </ModalHeader>
                   <ModalBody className="py-0">
                     {customer?.email ? (
                       <p>Thank you! You will be notified when the product is back in stock.</p>
@@ -279,6 +286,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
                           dark:text-white transition duration-200 ease-in-out"
                           type="email"
                           value={userEmail}
+                          placeholder="Enter Email"
                           onChange={(e) => setUserEmail(e.target.value)}
                           required
                         />

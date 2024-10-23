@@ -1,19 +1,25 @@
-// api/emailNotify.js
-export default async function handler(req: any, res: any) {
-    console.log('Received request:', req.body);
+import { NextApiRequest, NextApiResponse } from 'next';
+import { NextResponse } from "next/server";
+
+export async function POST(req: Request) {
 
     if (req.method === 'POST') {
-        const { xoo_wl_user_email, _xoo_wl_product_id, xoo_wl_required_qty } = req.body;
 
-        // Prepare the request body for the external API
-        const body = new URLSearchParams({
-            "xoo_wl_user_email": xoo_wl_user_email,
-            "_xoo_wl_product_id": _xoo_wl_product_id,
-            "xoo_wl_required_qty": xoo_wl_required_qty,
-        }).toString();
+        console.log('inside');
 
         try {
-            // Sending the request to the external API
+
+            const reqBody = await req.json();
+            console.log('Inside API', reqBody);
+
+            const body = new URLSearchParams({
+                "xoo_wl_user_email": reqBody.xoo_wl_user_email || "",
+                "_xoo_wl_product_id": reqBody._xoo_wl_product_id || "",
+                "xoo_wl_required_qty": reqBody.xoo_wl_required_qty || "",
+            }).toString();
+
+            console.log('body', body);
+
             const response = await fetch("http://newtitan.local/wp-json/api/gq_mobile/v1/handle_waitlist_form_submit", {
                 method: "POST",
                 headers: {
@@ -21,31 +27,43 @@ export default async function handler(req: any, res: any) {
                     "Accept": "application/json",
                 },
                 body: body,
-                credentials: "include", // Include credentials if needed
+                credentials: "include",
             });
 
-            // Check if the response is OK (status in the range 200-299)
-            if (response.ok) {
-                const data = await response.json(); // Parse the JSON response
-                console.log("Response from external API:", data);
+            console.log('response', response);
 
-                // Return success response to the client
-                return res.status(200).json({ success: true, data });
-            } else {
-                const errorData = await response.json(); // Get error details
-                console.error("Error from external API:", errorData);
-
-                // Return error response to the client
-                return res.status(response.status).json({ success: false, error: errorData });
+            // Check if the response is okay
+            // Check if the response is okay
+            if (!response.ok) {
+                const errorMessage = await response.text(); // Get the error message
+                console.error('Error from external API:', errorMessage);
+                return NextResponse.json(
+                    { message: 'Error from external API', details: errorMessage },
+                    { status: Number(response.status) }
+                );
             }
-        } catch (error) {
-            console.error("Fetch error:", error);
 
-            // Return error response to the client
-            return res.status(500).json({ success: false, error: "Internal server error" });
+            // Get the response data from the external API
+            const responseData = await response.json();
+            console.log('Response from external API:', responseData);
+
+            // Send the response back to the client
+            return NextResponse.json(
+                { message: 'Fetch Success', details: responseData },
+                { status: 200 }
+            )
+        } catch (error) {
+            console.error('Error processing request:', error);
+            return NextResponse.json(
+                { error: 'Internal Server Error', details: (error as any)?.message },
+                { status: 500 }
+            );
         }
     } else {
-        // Handle other request methods
-        return res.status(405).json({ error: "Method not allowed" });
+        // Handle non-POST requests
+        return NextResponse.json(
+            { error: 'Method Not Allowed' },
+            { status: 405 }
+        );
     }
 }
