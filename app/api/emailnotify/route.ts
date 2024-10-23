@@ -20,7 +20,7 @@ export async function POST(req: Request) {
 
             console.log('body', body);
 
-            const response = await fetch("http://newtitan.local/wp-json/api/gq_mobile/v1/handle_waitlist_form_submit", {
+            const response = await fetch("https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/handle_waitlist_form_submit", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded",
@@ -30,9 +30,8 @@ export async function POST(req: Request) {
                 credentials: "include",
             });
 
-            console.log('response', response);
+            // console.log('response', response);
 
-            // Check if the response is okay
             // Check if the response is okay
             if (!response.ok) {
                 const errorMessage = await response.text(); // Get the error message

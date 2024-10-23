@@ -51,7 +51,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
           },
           body: JSON.stringify({
             xoo_wl_user_email: userEmail || "",
-            _xoo_wl_product_id: "12",
+            _xoo_wl_product_id: variation.databaseId,
             xoo_wl_required_qty: "1",
           }),
         });
@@ -59,7 +59,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
         if (response.ok) {
 
           const data = await response.json();
-          console.log("Response Data:", data);
+          // console.log("Response Data:", data);
           setIsThankYouModal(true);
 
         } else {
@@ -72,7 +72,6 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
         onOpen();
         setIsNotifyClicked(true);
       }
-
       setIsThankYouModal(true);
       onOpenChange();
       setTimeout(onOpen, 500);
