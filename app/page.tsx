@@ -200,7 +200,7 @@ export default async function Home() {
 
           {/*featured categoties */}
           <div>
-            <Heading>Featured Categories.</Heading>
+            <Heading>Featured Categories</Heading>
             <CategoryBlockSection />
           </div>
 

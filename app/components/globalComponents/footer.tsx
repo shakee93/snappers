@@ -194,8 +194,9 @@ const Footer = async () => {
                   <div>
                     No. 250 | 53 - 54 Ground Floor, Liberty Plaza, Colombo 03.
                   </div>
-                  <div className="flex flex-row gap-2 mt-2">
-                    <Link href={"tel:0777555665"}>0777 555 665</Link> / <Link href={"tel:0112372665"}>0112 372 665</Link>
+                  <div className="flex flex-col mt-2">
+                    <Link href={"tel:0777555665"}>0777 555 665</Link>
+                    <Link href={"tel:0112372665"}>0112 372 665</Link>
                   </div>
                 </div>
               </li>
@@ -208,11 +209,11 @@ const Footer = async () => {
                   <div>
                     No. 250 | 1 | 161 First Floor, Liberty Plaza, Colombo 03.
                   </div>
-                  <div className="flex flex-row gap-2 mt-2">
-                    <Link href={"tel:0777988665"}>0777 988 665</Link> /
+                  <div className="flex flex-col mt-2">
+                    <Link href={"tel:0777988665"}>0777 988 665</Link>
                     <Link href={"tel:0754555665"}>0754 555 665</Link>
+                    <Link href={"tel:0112447489"}>0112 447 489</Link>
                   </div>
-                  <Link href={"tel:0112447489"}>0112 447 489</Link>
                 </div>
               </li>
               {/* <li className="lg:text-sm text-gray-500 flex gap-3">
