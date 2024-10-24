@@ -30,8 +30,8 @@ const SearchBar = () => {
         <div
             className="text-primary-700 flex-1"
         >
-            <div className="bg-white border-none lg:border border-primaryColor/20 py-0 md:py-2 flex
-            items-center space-x-0 lg:space-x-1.5 px-3 md:px-5 rounded-md md:rounded-lg h-full ">
+            <div className="bg-white border-2 lg:border border-primaryColor/20 py-0 md:py-1 flex
+            items-center space-x-0 lg:space-x-1.5 px-3 md:px-5 rounded-md md:rounded-[25px] h-full ">
                 {
                     (search_status === 'stalled' || search_status === 'loading') ? <Loader className='text-primaryColor animate-spin' /> : search.length > 0 ?
                         <button onClick={e => setSearch("")}>
