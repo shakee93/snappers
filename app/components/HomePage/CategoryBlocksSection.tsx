@@ -19,7 +19,7 @@ import Link from "next/link";
 
 export default function CategoryBlockSection() {
   return (
-    <div className=" grid grid-cols-12 grid-rows-2 gap-5 py-5">
+    <div className=" grid grid-cols-12 grid-rows-2 gap-5 py-2">
 
       <Card className="col-span-12 h-[200px] sm:col-span-4 md:h-[300px]">
         <CardHeader className="absolute top-1 z-10 flex-col !items-start">

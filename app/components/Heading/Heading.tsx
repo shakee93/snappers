@@ -30,10 +30,10 @@ const solutions = [
 const Heading: React.FC<HeadingProps> = ({
   children,
   desc = "",
-  className = "mb-5 flex md:mb-10 text-neutral-900 dark:text-neutral-50",
+  className = "mb-5 flex md:mb-6 text-neutral-900 dark:text-neutral-50",
   isCenter = false,
   hasNextPrev = false,
-  fontClass = "text-2xl md:text-4xl font-semibold flex items-center justify-center",
+  fontClass = "text-2xl md:text-3xl font-semibold flex items-center justify-center",
   rightDescText,
   rightPopoverOptions = solutions,
   link,
@@ -104,7 +104,7 @@ const Heading: React.FC<HeadingProps> = ({
           </div>
           {link ? (
             <Link href={link} target="_blank" rel="noopener noreferrer"
-              className="text-xs md:text-sm md:mt-4 md:ml-4 flex p-2 justify-end sm:ml-2 sm:mt-0 flex-shrink-0 border border-slate-200 rounded-lg">
+              className="text-xs md:text-base md:mt-4 md:ml-4 flex p-2 justify-end sm:ml-2 sm:mt-0 flex-shrink-0 border border-slate-200 rounded-lg">
               See More
             </Link>
           ) : <>

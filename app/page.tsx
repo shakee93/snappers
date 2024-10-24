@@ -162,15 +162,20 @@ export default async function Home() {
   return (
     <main>
       <div className="nc-PageHome relative flex flex-col overflow-hidden">
+      
       <TopBarPromotion options={options} />
+        
         {/* hero section */}
         <div className="z-0">
           {/* <SectionHero3 /> */}
           <SectionHero2 slides={slides} />
           {/* <CategoryWithSubcategories/> */}
         </div>
-        <div className="flex flex-col px-3  gap-10 lg:gap-16 sm:container sm:max-w-screen-2xl">
+        
+        <div className="flex flex-col px-3 gap-10 lg:gap-12 sm:container sm:max-w-screen-2xl">
+          
           {/* new arrivals section */}
+          
           <div className="mt-5 md:mt-10">
             <SectionSliderProductCard
               products={newArrivals}
@@ -178,6 +183,7 @@ export default async function Home() {
               link="new-arrivals"
             />
           </div>
+          
           {brands ? (
             <SectionSliderBrandCard
               heading="Our Brands"
@@ -204,20 +210,20 @@ export default async function Home() {
             <CategoryBlockSection />
           </div>
 
-          {/*mobile categoty */}
-          <div>
+          {/*Mobile Category */}
+          <div className="block md:hidden">
             <SectionSliderProductCard
               products={mobiles}
               heading="Latest Smartphones"
             />
           </div>
 
-          {/* about section */}
-          <div>
+          {/* About section */}
+          <div className="">
             <SectionPromo1 />
           </div>
 
-          {/* speakers category */}
+          {/* Speakers Category */}
           <div>
             <SectionSliderProductCard
               products={speakers}
@@ -228,12 +234,12 @@ export default async function Home() {
           </div>
 
           {/* brand section */}
-          <div className="relative">
+          {/* <div className="relative md:hidden"> */}
             {/* <BackgroundSection /> */}
             {/* <SectionGridMoreExplore /> */}
-          </div>
+          {/* </div> */}
 
-          {/* smart watches section */}
+          {/* Smart Watches Section */}
           <div>
             <SectionSliderProductCard
               products={watches}

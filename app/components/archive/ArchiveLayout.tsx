@@ -14,7 +14,7 @@ async function getData(parentId: number | null = null) {
   let nestedCategories = [];
 
   if (parentId) {
-    console.log('parentId', parentId);
+    // console.log('parentId', parentId);
 
     const { data: categoryData, error: categoryError } = await getClient().query({
       query: GET_NESTED_CATEGORIES,
@@ -79,12 +79,12 @@ const ArchiveLayout = async ({
           </span>
         </div>
 
-        <div className="flex flex-row gap-2 overflow-x-auto text-sm">
+        <div className="flex flex-wrap gap-2 text-sm">
           {nestedCategories.map((item: any, index: number) => (
             <Link
               href={item.slug}
               key={index}
-              className="flex-shrink-0 rounded-md p-4 bg-white border border-primaryColor"
+              className="flex-shrink-0 rounded-md py-2 px-4 bg-white border border-primaryColor"
             >
               {item.name}
             </Link>
