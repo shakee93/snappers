@@ -32,15 +32,15 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
   const handleNotifyClick = async () => {
-    console.log("Notify button clicked", userEmail);
+    console.log("Notify button clicked", customer?.email);
     onOpen();
   };
 
   const handleSubmitEmail = async () => {
 
-    if (userEmail) {
+    if (customer?.email) {
 
-      console.log("Email submitted:", userEmail);
+      console.log("Email submitted:", customer?.email);
 
       try {
         const response = await fetch("/api/emailnotify", {
