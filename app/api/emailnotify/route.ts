@@ -10,7 +10,7 @@ export async function POST(req: Request) {
         try {
 
             const reqBody = await req.json();
-            console.log('Inside API', reqBody);
+            // console.log('Inside API', reqBody);
 
             const body = new URLSearchParams({
                 "xoo_wl_user_email": reqBody.xoo_wl_user_email || "",
@@ -18,7 +18,7 @@ export async function POST(req: Request) {
                 "xoo_wl_required_qty": reqBody.xoo_wl_required_qty || "",
             }).toString();
 
-            console.log('body', body);
+            // console.log('body', body);
 
             const response = await fetch("https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/handle_waitlist_form_submit", {
                 method: "POST",
