@@ -13,6 +13,7 @@ query SlidePostType {
       buttonText
       subHeading
       mainHeading
+      contentPosition
     }
   }
 }

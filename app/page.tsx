@@ -334,7 +334,8 @@ export default async function Home() {
         {/* hero section */}
         <div className="z-0">
           {/* <SectionHero3 /> */}
-          <SectionHero2 slides={slides} />
+          {/* <SectionHero2 slides={slides} /> */}
+          <SectionHero3 slides={slides} />
           {/* <CategoryWithSubcategories/> */}
         </div>
         {/* <div className="bg-[#e5e7eb] py-4 md:p-2">
