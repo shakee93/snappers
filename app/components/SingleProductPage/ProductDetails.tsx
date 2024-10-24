@@ -167,7 +167,7 @@ const ProductDetails = ({
 
   return (
     <>
-      <div className="flex gap-1 text-sm text-gray-500">
+      {/* <div className="flex gap-1 text-sm text-gray-500">
         <Link
           href={`/${brand?.slug}`}
           target="_blank"
@@ -175,12 +175,111 @@ const ProductDetails = ({
         >
           {brand?.name}
         </Link>
+      </div> */}
+
+      {/* <div className="text-2xl font-medium md:text-3xl">{product.name}</div> */}
+
+      {/* Commented */}
+      {product.type === "VARIABLE" && activeVariation ? (
+        <div>
+          <div className="flex flex-wrap items-center gap-4 text-base font-bold text-black-600 md:text-2xl">
+
+            <span
+              dangerouslySetInnerHTML={{ __html: activeVariation.price }}
+            />
+
+            {!!activeVariation.salePrice &&
+              activeVariation.salePrice !== activeVariation.regularPrice && (
+                <span className="text-red-400 line-through md:text-xl">
+                  <span
+                    dangerouslySetInnerHTML={{
+                      __html: activeVariation.regularPrice,
+                    }}
+                  />
+                </span>
+              )}
+
+            {activeVariation?.stockStatus == "IN_STOCK" && activeVariation?.stockQuantity &&
+              activeVariation?.stockQuantity <= 2 && (
+                <div className="mb-1 w-max rounded-full bg-yellow-200 px-3 py-1.5 text-center text-xs font-medium text-gray-800">
+                  Low Stock
+                </div>
+              )}
+
+            {product.type === "VARIABLE" && activeVariation &&
+              activeVariation?.stockStatus !== "IN_STOCK" && (
+                <div className="mb-1 w-max rounded-full bg-red-200 px-4 py-1.5 text-center text-xs font-medium text-gray-800">
+                  Sold Out
+                </div>
+              )}
+
+            {product.type === "VARIABLE" && !activeVariation && (
+              <div className="mb-1 w-max rounded-full bg-gray-600 px-4 py-1.5 text-center text-xs font-medium text-white">
+                Not Available
+              </div>
+            )}
+
+          </div>
+        </div>
+      ) : (
+        <div className="flex flex-wrap items-center gap-2 text-base font-bold text-gray-600 md:text-2xl">
+
+          {/* {JSON.stringify(product.price)}
+          {JSON.stringify(product.salePrice)}
+          {JSON.stringify(product.regularPrice)} */}
+
+          {!!product.price ? (
+            <span dangerouslySetInnerHTML={{ __html: product.price || "" }} />
+          ) : (
+            <span>Can not be purchased now</span>
+          )}
+
+          {product.salePrice &&
+            product.salePrice !== product.regularPrice && (
+              <span className="text-red-400 line-through md:text-xl">
+                <span
+                  dangerouslySetInnerHTML={{
+                    __html: product.regularPrice || "",
+                  }}
+                />
+              </span>
+            )}
+
+          {product.stockStatus == "IN_STOCK" &&
+            product?.stockQuantity &&
+            product?.stockQuantity <= 2 && (
+              <div className="mb-1 w-max rounded-full bg-yellow-200 px-4 py-1 text-center text-xs text-gray-800 md:text-sm">
+                Low Stock
+              </div>
+            )}
+
+          {product.type === "SIMPLE" && product.stockStatus !== "IN_STOCK" && (
+            <div className="w-max rounded-full bg-red-200 px-4 py-1.5 text-center text-xs font-medium text-gray-800">
+              Sold Out
+            </div>
+          )}
+
+        </div>
+      )}
+
+      {/* Commented */}
+
+      <div className="text-2xl text-primaryColor font-bold md:text-3xl">{product.name}</div>
+      <div className="flex items-center gap-1 text-sm font-medium text-gray-500">
+        <Link
+          href={`/${brand?.slug}`}
+          target="_blank"
+          className="text-gray"
+        >
+          {brand?.name}
+        </Link>
+
+
       </div>
 
-      <div className="text-2xl font-medium md:text-3xl">{product.name}</div>
-
       <div className="flex items-center gap-2">
-        {product.type === "VARIABLE" && activeVariation ? (
+        {/* Commented */}
+        {/* {product.type === "VARIABLE" && activeVariation ? (
           <div>
             <div className="flex flex-wrap items-center gap-4 py-2 text-base font-medium text-gray-600 md:text-xl">
               <span
@@ -201,7 +300,6 @@ const ProductDetails = ({
           </div>
         ) : (
           <div className="flex flex-wrap items-center gap-2 py-2 text-base font-medium text-gray-600 md:text-xl">
-            {/* <span dangerouslySetInnerHTML={{ __html: product.price || "nothing to show" }} /> */}
             {!!product.price ? (
               <span dangerouslySetInnerHTML={{ __html: product.price || "" }} />
             ) : (
@@ -219,12 +317,16 @@ const ProductDetails = ({
                 </span>
               )}
           </div>
-        )}
+        )} */}
+
+        {/* Commented */}
 
         {/* Sold Out Badge */}
 
         <div>
-          {product.type === "SIMPLE" && product.stockStatus !== "IN_STOCK" && (
+
+          {/* Commented */}
+          {/* {product.type === "SIMPLE" && product.stockStatus !== "IN_STOCK" && (
             <div className="w-max rounded-full bg-red-200 px-4 py-1.5 text-center text-xs font-medium text-gray-800">
               Sold Out
             </div>
@@ -241,7 +343,8 @@ const ProductDetails = ({
             <div className="mb-1 w-max rounded-full bg-gray-600 px-4 py-1.5 text-center text-xs font-medium text-white">
               Not Available
             </div>
-          )}
+          )} */}
+          {/* Commented */}
 
           {/* In Stock Badge */}
           {/* Removed low stock and INSTOCK badge October 14 */}
