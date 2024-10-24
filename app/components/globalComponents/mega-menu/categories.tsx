@@ -7,7 +7,11 @@ import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import CategoriesMenuSkeleton from "../../Skeletons/CategorySkeleton";
 
-export default function NavCategories() {
+type NavCategoriesProps = {
+  onClose: () => void;
+};
+
+export default function NavCategories({ onClose }: NavCategoriesProps) {
   const { data, loading, error } = useQuery(GET_NAV_CATEGORIES);
 
   const categories: ProductCategory[] = data?.productCategories?.nodes || [];
@@ -94,6 +98,7 @@ export default function NavCategories() {
                       <Link
                         href={`/collections/${category.slug}`}
                         className="text-blue-950 hover:underline flex items-center"
+                        onClick={onClose}
                       >
                         {category.image?.sourceUrl ? (
                           <Image
@@ -123,6 +128,7 @@ export default function NavCategories() {
                                 <Link
                                   href={`/collections/${child.slug}`}
                                   className="text-sm text-muted-foreground hover:text-primary"
+                                  onClick={onClose}
                                 >
                                   {child.name}
                                 </Link>

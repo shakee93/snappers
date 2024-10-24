@@ -5,7 +5,7 @@ import InstantSearchWrapper from "@/app/components/InstantSearchWrapper";
 import { Brand, ProductCategory } from "@/graphql/types/graphql";
 import Link from "next/link";
 
-async function getData(parentId: number | null = null) {
+async function getData(parentId?: number) {
 
   const { data, error } = await getClient().query({
     query: GET_ALL_PRODUCTS,
@@ -14,15 +14,11 @@ async function getData(parentId: number | null = null) {
   let nestedCategories = [];
 
   if (parentId) {
-    // console.log('parentId', parentId);
 
     const { data: categoryData, error: categoryError } = await getClient().query({
       query: GET_NESTED_CATEGORIES,
       variables: { parent: parentId },
     });
-
-    // console.log('data in category', categoryData);
-    // console.log('categoryError', categoryError);
 
     if (!categoryError) {
       nestedCategories = categoryData.productCategories.nodes;
@@ -60,7 +56,7 @@ const ArchiveLayout = async ({
   tag
 }: ArchiveLayoutProps) => {
 
-  const { productCategories, brands, nestedCategories } = await getData(category.databaseId);;
+  const { productCategories, brands, nestedCategories } = await getData(category?.databaseId ?? '');
 
   // console.log('categoryName', category.databaseId);
   // console.log('nestedCategories', nestedCategories);
