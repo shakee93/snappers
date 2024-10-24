@@ -55,11 +55,14 @@ const BankTransfer: React.FC<BankTransferProps> = ({
     }
 
     let paymentDetails: PaymentDetailsWithoutUrls = await handleCheckout();
-    console.log("paymentDetails: ", paymentDetails);
+
+    // console.log("paymentDetails: ", paymentDetails);
+
     if (paymentDetails === null) {
       alert('No payment Details provided for the bank transfer');
       return;
     }
+
     let order_id = paymentDetails.order_id;
     let email = paymentDetails.email;
     if (paymentDetails.email === undefined) {
@@ -112,10 +115,16 @@ const BankTransfer: React.FC<BankTransferProps> = ({
 
         const orderConfirmationdata = await confirmationResponse.json();
 
-        console.log("orderConfirmation", orderConfirmationdata);
+        // console.log("orderConfirmation", orderConfirmationdata);
 
         if (customer?.id === "guest") {
-          let redirectUrl = `/checkout/guest_checkout?email=${email}`;
+
+          const queryParams = new URLSearchParams({
+            ...paymentDetails,
+            lineItems: JSON.stringify(paymentDetails.lineItems),
+          }).toString();
+
+          const redirectUrl = `/checkout/guest_checkout?${queryParams}&ordermethod=guest`;
           router.push(redirectUrl);
           return;
         } else {

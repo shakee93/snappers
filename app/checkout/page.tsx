@@ -230,7 +230,6 @@ const CheckoutPage = () => {
 
   const implementCheckoutAfterPayhere = async () => {
 
-    console.log('implementCheckoutAfterPayhere function running');
 
     const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
     if (paymentMethodId === undefined) {
@@ -276,9 +275,7 @@ const CheckoutPage = () => {
         ? await guestCheckout({ variables })
         : await checkoutMutation({ variables });
 
-    console.log('guest data', data);
-
-    const sentConfirmation = async () => {
+    const sentConfirmation = async (): Promise<any> => {
       const confirmationResponse = await fetch(
         "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/order-confirmation",
         {
@@ -301,12 +298,7 @@ const CheckoutPage = () => {
 
     await sentConfirmation();
 
-    console.log('sent confirmaton', sentConfirmation);
-
     if (data) {
-
-      console.log('data right after confirmation', data);
-
       const checkoutDetails = savePaymentDetails(data);
       setPaymentData(checkoutDetails);
       let orderid = data?.checkout.order.databaseId;
@@ -409,9 +401,6 @@ const CheckoutPage = () => {
 
     let { email, phone } = formData.contactInfo;
 
-    // console.log('console.log', orderTotal);2
-    // console.log('totalwd', totalWithTax);
-
     if (
       !orderTotal ||
       !firstName ||
@@ -426,7 +415,6 @@ const CheckoutPage = () => {
     }
 
     const products = cart?.contents?.nodes;
-    console.log('products', products);
 
     // Generate the list of products as strings
     const productList = products?.map((product: any) => {
@@ -510,7 +498,6 @@ const CheckoutPage = () => {
 
   useEffect(() => {
     if (!paymentDetails) {
-      // console.log("payment data not initiated yet!");
       return;
     }
 
@@ -519,17 +506,23 @@ const CheckoutPage = () => {
 
     let checkoutDetails = paymentDetails;
 
-    console.log('paymentDetails', paymentDetails);
-    console.log('checkoutDetails', checkoutDetails);
-    console.log('guestCheckoutData', guestCheckoutData);
+    const { address1: shippingaddress1, address2: shippingaddress2, city } = guestCheckoutData.checkout.customer.shipping
+    const { address1: billingaddress1, address2: billingaddress2 } = guestCheckoutData.checkout.customer.billing
 
-    const { lineItems } = guestCheckoutData.checkout.order;
+    const { lineItems, shippingTotal, subtotal, date } = guestCheckoutData.checkout.order;
 
-    console.log('lineItems', lineItems);
 
     const updatedCheckoutDetails = {
       ...checkoutDetails,
-      lineItems: lineItems
+      lineItems: lineItems,
+      subtotal: subtotal,
+      shippingTotal: shippingTotal,
+      date: date,
+      billingaddress1: billingaddress1,
+      billingaddress2: billingaddress2,
+      shippingaddress1: shippingaddress1,
+      shippingaddress2: shippingaddress2,
+      city: city
     };
 
     console.log('updatedCheckoutDetails', updatedCheckoutDetails);
@@ -543,25 +536,14 @@ const CheckoutPage = () => {
           ...updatedCheckoutDetails,
           lineItems: JSON.stringify(updatedCheckoutDetails.lineItems),
         }).toString();
-        let email = formData?.contactInfo?.email;
-        // let redirectUrl = `/checkout/${checkoutDetails.order_id}`;
-        // let redirectUrl = `/checkout/guest_checkout?email=${email}`;
-        // router.push(redirectUrl);
         const redirectUrl = `/checkout/guest_checkout?${queryParams}&ordermethod=guest`;
         router.push(redirectUrl);
         return;
       }
-
       toast.info("You'll be on the thank you page in just a moment.");
-
       let redirectUrl = `checkout/${checkoutDetails.order_id}`;
-
       router.push(redirectUrl);
     }
-
-    // const isBankTransfer =
-    //   formData?.paymentMethod?.selectedGateway?.id == "bacs";
-    // const isPayhere = formData?.paymentMethod?.selectedGateway?.id == "payhere";
 
   }, [paymentData]);
 
@@ -634,6 +616,7 @@ const CheckoutPage = () => {
         );
       }
     }
+
     if (isPayhere) {
       await handleCheckout();
       return;
@@ -663,7 +646,7 @@ const CheckoutPage = () => {
 
       const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
 
-      console.log('paymentMethodID', paymentMethodId);
+      // console.log('paymentMethodID', paymentMethodId);
 
       if (paymentMethodId === undefined) {
         console.error("Payment method ID is undefined");
@@ -707,12 +690,12 @@ const CheckoutPage = () => {
       const isBankTransfer =
         formData?.paymentMethod?.selectedGateway?.id == "bacs";
 
-      // console.log("data: guest checkout ", data);
       setGuestCheckoutData(data);
-      // console.log("formdata on banktranser: ", formData);
+
       if (data) {
         const checkoutDetails = savePaymentDetails(data);
         setPaymentData(checkoutDetails);
+        
         if (isBankTransfer) {
           return checkoutDetails;
         } else {
@@ -771,12 +754,8 @@ const CheckoutPage = () => {
     const orderTotalNumber = parseFloat(numericString);
     return orderTotalNumber;
   };
-
   const numericOrderTotal = replaceStringinInt(orderTotal);
-
-  // console.log("numericOrderTotal: ", numericOrderTotal);
   const threePercentFromTotal = numericOrderTotal * 0.03;
-
   const taxWithTotal = (numericOrderTotal + threePercentFromTotal).toFixed(2);
 
   useEffect(() => {

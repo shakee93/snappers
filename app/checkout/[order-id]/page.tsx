@@ -36,11 +36,19 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   const address = useSearchParams().get('address');
   const amount = useSearchParams().get('amount');
   const items = useSearchParams().get('items');
+  const shippingTotal = useSearchParams().get('shippingTotal');
+  const subtotal = useSearchParams().get('subtotal');
+  const date = useSearchParams().get('date');
+  const shippingaddress1 = useSearchParams().get('shippingaddress1');
+  const shippingaddress2 = useSearchParams().get('shippingaddress2');
+  const billingaddress1 = useSearchParams().get('billingaddress1');
+  const billingaddress2 = useSearchParams().get('billingaddress2');
+  const city = useSearchParams().get('city');
   const lineItems = JSON.parse(useSearchParams().get('lineItems') || '[]');
   const ordermethod = useSearchParams().get('ordermethod');
 
   // Now you have the data from the URL and can use it on the page
-  console.log({ order_id, first_name, last_name, email, address, amount, items, lineItems });
+  // console.log({ order_id, first_name, last_name, email, address, amount, items, lineItems, shippingTotal, subtotal, date, city, shippingaddress1, shippingaddress2, billingaddress1, billingaddress2 });
 
   if (ordermethod === "guest") {
 
@@ -48,13 +56,13 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
       order: {
         orderNumber: order_id,
         total: amount,
-        subtotal: "₨ 450.00",
-        shippingTotal: "₨ 50.00",
+        subtotal: subtotal,
+        shippingTotal: shippingTotal,
         lineItems: {
           nodes: lineItems.nodes,
         },
       },
-      date: "2024-10-22",
+      date: date,
     };
 
     const temporaryPaymentDetails: PaymentDetailsWithoutUrls = useMemo(
@@ -70,14 +78,14 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
         email: customerData?.customer?.email ?? "no_email",
         phone: customerData?.customer?.shipping?.phone ?? "no_phone",
         shippingAddress1:
-          customerData?.customer?.shipping?.address1 ?? "no_shipping_address1",
+          shippingaddress1 ?? "no_shipping_address1",
         shippingAddress2:
-          customerData?.customer?.shipping?.address2 ?? "no_shipping_address2",
+          shippingaddress2 ?? "no_shipping_address2",
         billingAddress1:
-          customerData?.customer?.billing?.address1 ?? "no_billing_address1",
+          billingaddress1 ?? "no_billing_address1",
         billingAddress2:
-          customerData?.customer?.billing?.address2 ?? "no_billing_address2",
-        city: customerData?.customer?.shipping?.city ?? "no_city",
+          billingaddress2 ?? "no_billing_address2",
+        city: city ?? "no_city",
         country: "Sri Lanka",
       }),
       [orderData, customerData],
