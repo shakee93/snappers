@@ -31,41 +31,65 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   const [isThankYouModal, setIsThankYouModal] = useState(false); // Track thank you modal visibility
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
+  const sendNotificationRequest = async () => {
+    try {
+      const response = await fetch("/api/emailnotify", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json",
+        },
+        body: JSON.stringify({
+          xoo_wl_user_email: userEmail || "",
+          _xoo_wl_product_id: variation.databaseId,
+          xoo_wl_required_qty: "1",
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setIsThankYouModal(true);
+      } else {
+        const errorData = await response.json();
+        console.error("Error data:", errorData);
+      }
+    } catch (error) {
+      console.error("Fetch error:", error);
+    }
+  };
+
   const handleNotifyClick = async () => {
-    console.log("Notify button clicked", customer?.email);
+    // console.log("Notify button clicked", customer?.email);
+
+    if (userEmail) {
+
+      // console.log("Email submitted:", userEmail);
+
+      try {
+        sendNotificationRequest();
+      }
+      catch (error) {
+        console.error("Fetch error:", error);
+      } finally {
+        onOpen();
+        setIsNotifyClicked(true);
+      }
+      setIsThankYouModal(true);
+      onOpenChange();
+      setTimeout(onOpen, 500);
+    }
+
     onOpen();
   };
 
   const handleSubmitEmail = async () => {
 
-    if (customer?.email) {
+    if (userEmail) {
 
-      console.log("Email submitted:", customer?.email);
+      // console.log("Email submitted:", userEmail);
 
       try {
-        const response = await fetch("/api/emailnotify", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-          },
-          body: JSON.stringify({
-            xoo_wl_user_email: userEmail || "",
-            _xoo_wl_product_id: variation.databaseId,
-            xoo_wl_required_qty: "1",
-          }),
-        });
-
-        if (response.ok) {
-
-          const data = await response.json();
-          // console.log("Response Data:", data);
-          setIsThankYouModal(true);
-
-        } else {
-          const errordata = await response.json();
-          console.error("error data", errordata)
-        }
+        sendNotificationRequest();
       } catch (error) {
         console.error("Fetch error:", error);
       } finally {
@@ -75,6 +99,8 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
       setIsThankYouModal(true);
       onOpenChange();
       setTimeout(onOpen, 500);
+    } else {
+      console.log('no customer email');
     }
   };
 
