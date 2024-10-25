@@ -3,7 +3,6 @@ import SectionHero3 from "@/app/components/HomePage/SectionHero3";
 import SectionSliderProductCard from "@/app/components/SectionSliderProductCard";
 import SectionGridMoreExplore from "@/app/components/HomePage/SectionGridMoreExplore";
 import SectionPromo1 from "@/app/components/HomePage/SectionPromo1";
-import TopBarPromotion from "@/components/TopBarPromotion";
 import Heading from "@/app/components/Heading/Heading";
 import { getClient } from "@/graphql/apollo-ssr";
 import {
@@ -24,9 +23,12 @@ import Hsbc from "@/public/images/bank logos/2560px-HSBC_logo_(2018).svg.png";
 import Peaple from "@/public/images/bank logos/Peoplesbanklk.png";
 import Seylan from "@/public/images/bank logos/Seylan_Bank_logo.png";
 import Standard from "@/public/images/bank logos/standard-chartered-2021-logo-freelogovectors.net_.png";
+import SectionHero2 from "./components/HomePage/SectionHero2";
 import SectionSliderBrandCard from "./components/SectionSliderBrandCard";
 import { Card } from "@nextui-org/react";
 import CardSkeleton from "./components/Skeletons/CardSkeleton";
+import TopBarPromotion from "@/components/TopBarPromotion";
+import { GET_OPTIONS } from "@/graphql/defs/options";
 
 const Banks = [
   Sampath,
@@ -127,9 +129,18 @@ const getData = async () => {
         console.error("Error fetching slides");
         return [];
       }),
+      getClient()
+      .query({
+        query: GET_OPTIONS,
+      })
+      .then((res) => res.data || [])
+      .catch(() => {
+        console.error("Error fetching options");
+        return [];
+      }),
   ];
 
-  const [newArrivals, mobiles, speakers, watches, backInStock, brands, slides] = await Promise.all(queries);
+  const [newArrivals, mobiles, speakers, watches, backInStock, brands, slides , options] = await Promise.all(queries);
 
   return {
     newArrivals: newArrivals as (SimpleProduct & VariableProduct)[],
@@ -138,19 +149,20 @@ const getData = async () => {
     watches: watches as (SimpleProduct & VariableProduct)[],
     backInStock: backInStock as (SimpleProduct & VariableProduct)[],
     brands: brands as Brand[],
-    slides
+    slides,
+    options,
   };
 };
 
 export default async function Home() {
   // const startTime = performance.now(); // Log the start time
 
-  const { newArrivals, mobiles, speakers, watches, backInStock, brands, slides } = await getData();
+  const { newArrivals, mobiles, speakers, watches, backInStock, brands, slides, options } = await getData();
 
   return (
     <main>
       <div className="nc-PageHome relative flex flex-col overflow-hidden">
-      <TopBarPromotion options={options} />
+      {/* <TopBarPromotion options={options} /> */}
         {/* hero section */}
         <div className="z-0">
           {/* <SectionHero3 /> */}
