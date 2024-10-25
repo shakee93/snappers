@@ -19,6 +19,10 @@ import { useImage } from "@/context/ImageChangeGrabber";
 import brandColors from "@/data/brandColors";
 import AttributeIcon from "@/app/components/AttributeIcon";
 import ProductDescription from "./ProductDescription";
+import {
+  GET_PRICE_FLUCTUATION_NOTICE,
+} from "@/graphql/defs/options";
+import { useQuery } from '@apollo/client';
 
 const ProductDetails = ({
   product,
@@ -165,8 +169,18 @@ const ProductDetails = ({
 
   useEffect(() => { }, [attribute]);
 
+  const { data, loading, error } = useQuery(GET_PRICE_FLUCTUATION_NOTICE);
+  console.log('data', data);
+  const isPriceFluctuation = data?.topBarPriceFluctuationNotice || false;
+
+
   return (
     <>
+      {isPriceFluctuation && (
+        <div className="p-4 mb-2 bg-red-400 text-white text-base rounded-md">
+          Prices are being updated. For current pricing, please contact us on WhatsApp. Updated prices will be on the site soon!
+        </div>
+      )}
       {/* <div className="flex gap-1 text-sm text-gray-500">
         <Link
           href={`/${brand?.slug}`}
