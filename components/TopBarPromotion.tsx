@@ -27,8 +27,7 @@ const TopBarPromotion: React.FC<{ options?: Options }> = ({ options }) => {
         <div className="flex w-full flex-col items-center justify-center gap-2 md:flex-row">
           <div className="flex-col md:flex-row flex gap-5 justify-center text-center items-center">
             <div className="text-sm font-semibold text-white md:text-xs lg:text-sm">
-              <span className="font-bold">{topBarBeforeText}</span>{" "}
-              <span>Exclusive</span>
+              <span className="font-bold">{topBarBeforeText}</span>
               <span style={{ color: topBarHighlightedColor }}> {topBarHighlightedText}</span>{" "}
               <span>{topBarAfterText}</span>{" "}
             </div>
