@@ -23,6 +23,7 @@ import Hsbc from "@/public/images/bank logos/2560px-HSBC_logo_(2018).svg.png";
 import Peaple from "@/public/images/bank logos/Peoplesbanklk.png";
 import Seylan from "@/public/images/bank logos/Seylan_Bank_logo.png";
 import Standard from "@/public/images/bank logos/standard-chartered-2021-logo-freelogovectors.net_.png";
+import SectionHero2 from "./components/HomePage/SectionHero2";
 import SectionSliderBrandCard from "./components/SectionSliderBrandCard";
 import { Card } from "@nextui-org/react";
 import CardSkeleton from "./components/Skeletons/CardSkeleton";
@@ -156,34 +157,12 @@ const getData = async () => {
 export default async function Home() {
 
 
-  const { newArrivals, mobiles, speakers, watches, backInStock, brands, slides } = await getData();
+  const { newArrivals, mobiles, speakers, watches, backInStock, brands, slides, options } = await getData();
 
   return (
     <main>
       <div className="nc-PageHome relative flex flex-col overflow-hidden">
-        {/* <div className="bg-black px-2 py-4 md:p-3">
-          <div className="items-between flex flex-col gap-4 md:flex-row md:items-center md:gap-3">
-            <div className="flex w-full flex-col items-center justify-center gap-2 md:flex-row">
-              <div className="flex-col md:flex-row flex gap-5 justify-center text-center items-center">
-                <div className="text-sm font-semibold text-white md:text-lg lg:text-2xl">
-                  <span className="font-bold">The ALL NEW</span>{" "}
-                  <span> Exclusive</span>
-                  <span className="text-orange-400"> iPhone 16 Series</span> {" "}
-                  <span>Available!</span> {" "}
-                </div>
-                <div className="text-sm">
-                  <a
-                    href="https://gqmobiles.lk//apple/apple-iphone-16"
-                    className="bg-blue-700 text-white font-semibold py-2 px-4 rounded transition duration-300 ease-in-out hover:bg-blue-800"
-                  >
-                    Shop Now
-                  </a>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div> */}
+      {/* <TopBarPromotion options={options} /> */}
         {/* hero section */}
         <div className="z-0">
           {/* <SectionHero3 /> */}
