@@ -79,6 +79,7 @@ const getData = async () => {
         console.error("Error fetching speakers");
         return [];
       }),
+      
 
     getClient()
       .query({
