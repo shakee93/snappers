@@ -230,8 +230,8 @@ const CheckoutPage = () => {
 
   const implementCheckoutAfterPayhere = async () => {
 
-
     const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
+    const isPayhere = formData?.paymentMethod?.selectedGateway?.id == "payhere";
     if (paymentMethodId === undefined) {
       console.error("Payment method ID is undefined");
       toast.error("Payment Method was not chosen.");
@@ -301,8 +301,45 @@ const CheckoutPage = () => {
     if (data) {
       const checkoutDetails = savePaymentDetails(data);
       setPaymentData(checkoutDetails);
-      let orderid = data?.checkout.order.databaseId;
 
+      const { address1: shippingaddress1, address2: shippingaddress2, city } = guestCheckoutData.checkout.customer.shipping
+      const { address1: billingaddress1, address2: billingaddress2 } = guestCheckoutData.checkout.customer.billing
+      const { lineItems, shippingTotal, subtotal, date } = guestCheckoutData.checkout.order;
+
+      const updatedCheckoutDetails = {
+        ...checkoutDetails,
+        lineItems: lineItems,
+        subtotal: subtotal,
+        shippingTotal: shippingTotal,
+        date: date,
+        billingaddress1: billingaddress1,
+        billingaddress2: billingaddress2,
+        shippingaddress1: shippingaddress1,
+        shippingaddress2: shippingaddress2,
+        city: city
+      };
+
+      console.log('updatedCheckoutDetails', updatedCheckoutDetails);
+      
+      if (isPayhere) {
+        if (
+          customer?.id === "guest" ||
+          checkoutDetails.order_id == "guest_checkout"
+        ) {
+          const queryParams = new URLSearchParams({
+            ...updatedCheckoutDetails,
+            lineItems: JSON.stringify(updatedCheckoutDetails.lineItems),
+          }).toString();
+          const redirectUrl = `/checkout/guest_checkout?${queryParams}&ordermethod=guest`;
+          router.push(redirectUrl);
+          return;
+        }
+        toast.info("You'll be on the thank you page in just a moment.");
+        let redirectUrl = `checkout/${checkoutDetails.order_id}`;
+        router.push(redirectUrl);
+      }
+
+      let orderid = data?.checkout.order.databaseId;
       toast.success("🌟 Order Placed Successfully! 🚀");
       router.push(`/checkout/${orderid}`);
     } else {
@@ -393,6 +430,7 @@ const CheckoutPage = () => {
   }, [paymentData]);
 
   const ImplementPayhere = async () => {
+
     let generatedOrderId = crypto.randomUUID();
     setPayherPaymentID(generatedOrderId);
 
@@ -695,7 +733,7 @@ const CheckoutPage = () => {
       if (data) {
         const checkoutDetails = savePaymentDetails(data);
         setPaymentData(checkoutDetails);
-        
+
         if (isBankTransfer) {
           return checkoutDetails;
         } else {
