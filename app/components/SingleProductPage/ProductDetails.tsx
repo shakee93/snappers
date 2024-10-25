@@ -41,11 +41,8 @@ const ProductDetails = ({
     product?.variations?.nodes[0]
   );
 
-  const manualMeta = product?.metaData;
-
   const { setVariationId } = useImage();
 
-  // console.log("ProductDetails", product);
   useEffect(() => {
     clearAttributes();
 
@@ -170,9 +167,7 @@ const ProductDetails = ({
   useEffect(() => { }, [attribute]);
 
   const { data, loading, error } = useQuery(GET_PRICE_FLUCTUATION_NOTICE);
-  console.log('data', data);
   const isPriceFluctuation = data?.topBarPriceFluctuationNotice || false;
-
 
   return (
     <>
