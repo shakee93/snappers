@@ -3,6 +3,7 @@ import SectionHero3 from "@/app/components/HomePage/SectionHero3";
 import SectionSliderProductCard from "@/app/components/SectionSliderProductCard";
 import SectionGridMoreExplore from "@/app/components/HomePage/SectionGridMoreExplore";
 import SectionPromo1 from "@/app/components/HomePage/SectionPromo1";
+import TopBarPromotion from "@/components/TopBarPromotion";
 import Heading from "@/app/components/Heading/Heading";
 import { getClient } from "@/graphql/apollo-ssr";
 import {
@@ -149,29 +150,7 @@ export default async function Home() {
   return (
     <main>
       <div className="nc-PageHome relative flex flex-col overflow-hidden">
-        {/* <div className="bg-black px-2 py-4 md:p-3">
-          <div className="items-between flex flex-col gap-4 md:flex-row md:items-center md:gap-3">
-            <div className="flex w-full flex-col items-center justify-center gap-2 md:flex-row">
-              <div className="flex-col md:flex-row flex gap-5 justify-center text-center items-center">
-                <div className="text-sm font-semibold text-white md:text-lg lg:text-2xl">
-                  <span className="font-bold">The ALL NEW</span>{" "}
-                  <span> Exclusive</span>
-                  <span className="text-orange-400"> iPhone 16 Series</span> {" "}
-                  <span>Available!</span> {" "}
-                </div>
-                <div className="text-sm">
-                  <a
-                    href="https://gqmobiles.lk//apple/apple-iphone-16"
-                    className="bg-blue-700 text-white font-semibold py-2 px-4 rounded transition duration-300 ease-in-out hover:bg-blue-800"
-                  >
-                    Shop Now
-                  </a>
-                </div>
-              </div>
-
-            </div>
-          </div>
-        </div> */}
+      <TopBarPromotion options={options} />
         {/* hero section */}
         <div className="z-0">
           {/* <SectionHero3 /> */}
