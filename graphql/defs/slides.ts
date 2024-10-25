@@ -9,6 +9,8 @@ query SlidePostType {
       uri
       featureImage
       backgroundImage
+      mobileBackgroundImage
+      tabletBackgroundImage
       buttonLink
       buttonText
       subHeading
