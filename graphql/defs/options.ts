@@ -11,3 +11,9 @@ query OptionsTopBar {
   topBarButtonText
 }
 `
+
+export const GET_PRICE_FLUCTUATION_NOTICE = gql`
+query OptionsTopBar {
+  topBarPriceFluctuationNotice
+}
+`

@@ -51,11 +51,11 @@ const AddedToCart = ({
           <div className="grid justify-start ">
             <div className=" min-w-0">
               <h3 className="text-base font-medium ">{product.name}</h3>
-              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+              <div className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                 {/* Check if product.productCategories exists */}
 
                 {product.type === "VARIABLE" && (
-                  <p className="my-1 text-sm text-slate-500 dark:text-slate-400">
+                  <div className="my-1 text-sm text-slate-500 dark:text-slate-400">
                     {variation?.attributes?.nodes.map(
                       (attr: VariationAttribute, index) => (
                         <Fragment key={index}>
@@ -79,7 +79,7 @@ const AddedToCart = ({
                         </Fragment>
                       )
                     )}
-                  </p>
+                  </div>
                 )}
 
                 {/* {product.productCategories && (
@@ -106,7 +106,7 @@ const AddedToCart = ({
                                     ))
                                 )
                             )} */}
-              </p>
+              </div>
             </div>
             <div className="flex mt-2">
               <Prices

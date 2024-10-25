@@ -35,3 +35,24 @@ export const GET_NAV_BRANDS = gql`
     }
   }
 `;
+
+export const GET_NESTED_CATEGORIES = gql`
+query GetNestedProductCategoriesForArchive($parent: Int) {
+  productCategories(first: 100, where: {parent: $parent}) {
+    nodes {
+      ...CategoryFields
+      children {
+        nodes {
+          ...CategoryFields
+          children {
+            nodes {
+              ...CategoryFields
+            }
+          }
+        }
+      }
+    }
+  }
+}
+${CategoryFragment}
+`;

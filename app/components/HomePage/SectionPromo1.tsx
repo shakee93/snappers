@@ -18,7 +18,7 @@ const SLIDES = Array.from(Array(SLIDE_COUNT).keys())
 const SectionPromo1: FC<SectionPromo1Props> = ({ className = "" }) => {
 
   return (
-    <div className="  bg-blue-100 flex flex-col justify-between p-5 md:p-12 lg:flex-row gap-5 lg:gap-3 rounded-3xl">
+    <div className="bg-blue-100 flex flex-col justify-between p-5 md:p-12 lg:flex-row gap-5 lg:gap-3 rounded-3xl">
       <div className="lg:w-1/2 w-full gap-4 justify-center flex flex-col">
         <div>
           <Image

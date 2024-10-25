@@ -108,6 +108,15 @@ const savePaymentDetails = (
     last_name: customer?.billing?.lastName || "no firstname",
     email: customer?.billing?.email || customer?.shipping?.email || "no_email",
     address: customer?.billing?.address1 || "no_address",
+    lineItems: order?.lineItems || "no_items",
+    subtotal: order?.subtotal || "no_subtotal",
+    shippingTotal: order?.shippingTotal || "no_shippingTotal",
+    date: order?.date || "no_date",
+    billingaddress1: customer?.billing?.address1 || "no_address",
+    billingaddress2: customer?.billing?.address2 || "no_address",
+    shippingaddress1: customer?.shipping?.address1 || "no_address",
+    shippingaddress2: customer?.shipping?.address2 || "no_address",
+    city: customer?.billing?.city || "no_city"
   };
 
   console.log("saved_data: for payment", saved_data);

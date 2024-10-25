@@ -49,6 +49,14 @@ export type PaymentDetailsType = {
   address?: string;
   city?: string;
   country?: string;
+  lineItems?: any;
+  subtotal?: any;
+  shippingTotal?: any;
+  date?: any;
+  billingaddress1?: any;
+  billingaddress2?: any;
+  shippingaddress1?: any;
+  shippingaddress2?: any;
 };
 declare global {
   interface Window {

@@ -155,7 +155,7 @@ const getData = async () => {
 };
 
 export default async function Home() {
-  // const startTime = performance.now(); // Log the start time
+
 
   const { newArrivals, mobiles, speakers, watches, backInStock, brands, slides, options } = await getData();
 
@@ -170,28 +170,11 @@ export default async function Home() {
           <SectionHero3 slides={slides} />
           {/* <CategoryWithSubcategories/> */}
         </div>
-        {/* <div className="bg-[#e5e7eb] py-4 md:p-2">
-          <div className="container flex md:items-center gap-3 flex-col md:flex-row items-start ">
-            <Image
-              src={Scam}
-              alt=""
-              height={20}
-              className="w-56 md:w-40 h-auto"
-            />
-            <div>
-              <p className="text-base md:text-lg font-medium">
-                Fraud Alert : Rajagiriya & Kurunegala Scam Warning!
-              </p>
-              <p className="text-sm md:text-base">
-                We have no branches in Rajagiriya or Kurunegala. Beware of
-                scams. Your safety is our priority.
-              </p>
-            </div>
-          </div>
-        </div> */}
-
-        <div className="flex flex-col px-3  gap-10 lg:gap-16 sm:container sm:max-w-screen-2xl">
+        
+        <div className="flex flex-col px-3 gap-10 lg:gap-12 sm:container sm:max-w-screen-2xl">
+          
           {/* new arrivals section */}
+          
           <div className="mt-5 md:mt-10">
             <SectionSliderProductCard
               products={newArrivals}
@@ -199,6 +182,7 @@ export default async function Home() {
               link="new-arrivals"
             />
           </div>
+          
           {brands ? (
             <SectionSliderBrandCard
               heading="Our Brands"
@@ -221,25 +205,24 @@ export default async function Home() {
 
           {/*featured categoties */}
           <div>
-            <Heading>Featured Categories.</Heading>
+            <Heading>Featured Categories</Heading>
             <CategoryBlockSection />
           </div>
 
-          {/*mobile categoty */}
-          <div>
+          {/*Mobile Category */}
+          <div className="block md:hidden">
             <SectionSliderProductCard
               products={mobiles}
-              // subHeading="Explore the Latest in Smartphone Innovation"
               heading="Latest Smartphones"
             />
           </div>
 
-          {/* about section */}
-          <div>
+          {/* About section */}
+          <div className="">
             <SectionPromo1 />
           </div>
 
-          {/* speakers category */}
+          {/* Speakers Category */}
           <div>
             <SectionSliderProductCard
               products={speakers}
@@ -250,18 +233,17 @@ export default async function Home() {
           </div>
 
           {/* brand section */}
-          <div className="relative">
+          {/* <div className="relative md:hidden"> */}
             {/* <BackgroundSection /> */}
             {/* <SectionGridMoreExplore /> */}
-          </div>
+          {/* </div> */}
 
-          {/* smart watches section */}
+          {/* Smart Watches Section */}
           <div>
             <SectionSliderProductCard
               products={watches}
               heading="Smart Watches"
               link="smartwatches"
-            // subHeading="Best selling of the month"
             />
           </div>
         </div>
