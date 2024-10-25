@@ -103,6 +103,7 @@ export const usePayhere = () => {
         setPayhereHandleStatus("error");
         alert("Error Happened while Payhere:" + error);
       };
+      
       window.payhere.onError = function onError(error: any) {
         setPayhereHandleStatus("error");
         alert("Error Happened while Payhere:" + error);
