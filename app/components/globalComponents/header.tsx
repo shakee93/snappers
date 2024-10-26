@@ -46,7 +46,7 @@ const Header = async () => {
     <>
       <header
         className={
-          "sticky top-0  mt-[-10px] flex flex-col justify-between bg-white z-30 transition-all duration-1300 md:border-b"
+          "sticky top-0  mt-[-9px] flex flex-col justify-between bg-white z-30 transition-all duration-1300 md:border-b"
         }
       >
         <TopBarPromotion options={options} />
