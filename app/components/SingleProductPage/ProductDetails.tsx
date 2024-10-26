@@ -173,7 +173,8 @@ const ProductDetails = ({
     <>
       {isPriceFluctuation && (
         <div className="p-4 mb-2 bg-red-400 text-white text-base rounded-md">
-          Prices are being updated. For current pricing, please contact us on WhatsApp. Updated prices will be on the site soon!
+          Prices are being updated. For current pricing, please contact us on WhatsApp 0777555665 / 0777988665.
+          Updated prices will be on the site soon!
         </div>
       )}
       {/* <div className="flex gap-1 text-sm text-gray-500">
