@@ -19,6 +19,8 @@ interface Props {
   isBillingAddressEnabled: any;
   isCardPayment: any;
   setIsCardPayment: any;
+  isPriceFluctuation: any;
+  totalPayment: number;
 }
 
 const PaymentMethod: FC<Props> = ({
@@ -31,12 +33,14 @@ const PaymentMethod: FC<Props> = ({
   isBillingAddressEnabled,
   isCardPayment,
   setIsCardPayment,
+  isPriceFluctuation,
+  totalPayment
 }) => {
   const [methodActive, setMethodActive] = useState<
     "Credit-Card" | "Internet-banking" | "Wallet"
   >("Credit-Card");
 
-  useEffect(() => {}, [paymentGateways]);
+  useEffect(() => { }, [paymentGateways]);
 
   const [selectedGateway, setSelectedGateway] = useState<PaymentGateway>({
     id: "",
@@ -84,76 +88,78 @@ const PaymentMethod: FC<Props> = ({
 
     // console.log("activeMethod: ", gateway.id);
 
-    let is_tab_or_mobile = hidePayhereForMobileAndTablets ?  gateway.id == "payhere" && hidePayhere : false;
+    let is_tab_or_mobile = hidePayhereForMobileAndTablets ? gateway.id == "payhere" && hidePayhere : false;
+    const shouldHidePayhere = gateway.id === 'payhere' && isPriceFluctuation?.topBarPriceFluctuationNotice && totalPayment >= 100000;
     return (
-      <div
-        className={` items-start cursor-pointer space-x-4 sm:space-x-6 ${
-          is_tab_or_mobile ? "hidden  " : "flex"
-        }`}
-      >
-        {/* <div className={`flex items-start cursor-pointer space-x-4 sm:space-x-6 `}> */}
-        <Radio
-          className="cursor-pointer"
-          name="payment-method"
-          id={gateway.id}
-          defaultChecked={active}
-          onChange={(e) => {
-            setMethodActive(e as any);
-            setSelectedGateway({
-              id: gateway.id,
-              title: gateway.title,
-            });
+      !shouldHidePayhere && (
+        <div
+          className={` items-start cursor-pointer space-x-4 sm:space-x-6 ${is_tab_or_mobile ? "hidden  " : "flex"
+            }`}
+        >
+          {/* <div className={`flex items-start cursor-pointer space-x-4 sm:space-x-6 `}> */}
+          <Radio
+            className="cursor-pointer"
+            name="payment-method"
+            id={gateway.id}
+            defaultChecked={active}
+            onChange={(e) => {
+              setMethodActive(e as any);
+              setSelectedGateway({
+                id: gateway.id,
+                title: gateway.title,
+              });
 
-            if (gateway.id === "payhere") {
-              setIsCardPayment(true);
-              // console.log("cardpayment", isCardPayment);
-            } else {
-              setIsCardPayment(false);
-            }
-          }}
-        />
-        <div className="flex-1">
-          <label
-            htmlFor={gateway.id}
-            className="flex items-center space-x-4 sm:space-x-6"
-          >
-            <p className="font-medium">{gateway.title}</p>
-          </label>
-          <div className={`mt-6 mb-4 ${active ? "block" : "hidden"}`}>
-            {gateway.icon ? (
-              <Image
-                src={gateway?.icon}
-                alt="payment gateway"
-                width={1000}
-                height={1000}
-                className="pb-2"
-              />
-            ) : (
-              <></>
-            )}
-            <p className="text-sm dark:text-slate-300">
-              Your order will be delivered to you after you{" "}
-              {gateway.title || "transfer funds"} to:
-            </p>
-            <ul className="mt-3.5 text-sm text-slate-500 dark:text-slate-400 space-y-2">
-              <li>
-                {/* <h3 className="text-base text-slate-800 dark:text-slate-200 font-semibold mb-1">
+              if (gateway.id === "payhere") {
+                setIsCardPayment(true);
+                // console.log("cardpayment", isCardPayment);
+              } else {
+                setIsCardPayment(false);
+              }
+            }}
+          />
+          <div className="flex-1">
+            <label
+              htmlFor={gateway.id}
+              className="flex items-center space-x-4 sm:space-x-6"
+            >
+              <p className="font-medium">{gateway.title}</p>
+            </label>
+            <div className={`mt-6 mb-4 ${active ? "block" : "hidden"}`}>
+              {gateway.icon ? (
+                <Image
+                  src={gateway?.icon}
+                  alt="payment gateway"
+                  width={1000}
+                  height={1000}
+                  className="pb-2"
+                />
+              ) : (
+                <></>
+              )}
+              <p className="text-sm dark:text-slate-300">
+                Your order will be delivered to you after you{" "}
+                {gateway.title || "transfer funds"} to:
+              </p>
+              <ul className="mt-3.5 text-sm text-slate-500 dark:text-slate-400 space-y-2">
+                <li>
+                  {/* <h3 className="text-base text-slate-800 dark:text-slate-200 font-semibold mb-1">
                   {gateway.title}
                 </h3> */}
-              </li>
-              <li>
-                {gateway.description && (
-                  <span className="text-slate-900 dark:text-slate-200 font-medium">
-                    <span
-                      dangerouslySetInnerHTML={{ __html: gateway.description }}
-                    />
-                  </span>
-                )}
-              </li>
-            </ul>
+                </li>
+                <li>
+                  {gateway.description && (
+                    <span className="text-slate-900 dark:text-slate-200 font-medium">
+                      <span
+                        dangerouslySetInnerHTML={{ __html: gateway.description }}
+                      />
+                    </span>
+                  )}
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
-      </div>
+      )
     );
   };
 
@@ -188,9 +194,8 @@ const PaymentMethod: FC<Props> = ({
         </div>
 
         <div
-          className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-6 ${
-            isActive ? "block" : "hidden"
-          }`}
+          className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-6 ${isActive ? "block" : "hidden"
+            }`}
         >
           {/* ==================== */}
           {/* <div>{renderDebitCredit()}</div> */}

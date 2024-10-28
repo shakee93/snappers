@@ -6,6 +6,7 @@ import DeliveryAddress from "./DeliveryAddress";
 import PaymentMethod from "./PaymentMethod";
 import { QueryResult, useQuery } from "@apollo/client";
 import { GET_CHECKOUT_USER_DETAILS } from "@/graphql/defs/order";
+import { GET_PRICE_FLUCTUATION_NOTICE } from "@/graphql/defs/options";
 import { Customer, CustomerAddress } from "@/graphql/types/graphql";
 import { contactInformation } from "@/data/types";
 import BillingAddress from "./BillingAddress";
@@ -35,6 +36,7 @@ interface CheckoutLeftProps {
   isStorePickup: boolean;
   isCardPayment: boolean;
   setIsCardPayment: any;
+  totalPayment: any;
 }
 
 const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
@@ -48,10 +50,12 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
   handleConfirmationChange,
   isStorePickup,
   isCardPayment,
-  setIsCardPayment
+  setIsCardPayment,
+  totalPayment
 }) => {
 
   const { data, loading: dataLoading }: QueryResult = useQuery(GET_CHECKOUT_USER_DETAILS);
+  const { data: isPriceFluctuation, loading, error } = useQuery(GET_PRICE_FLUCTUATION_NOTICE);
   const [shippingDetails, setShippingDetails] =
     useState<CustomerAddress | null>(null);
   const [billingDetails, setBillingDetails] = useState<CustomerAddress | null>(
@@ -187,26 +191,28 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
         </div>
       )} */}
 
-      <div id="PaymentMethod" className="scroll-mt-24">
-        <PaymentMethod
-          isActive={tabActive === "PaymentMethod"}
-          onOpenActive={() => {
-            setTabActive("PaymentMethod");
-            handleScrollToEl("PaymentMethod");
-          }}
-          onCloseActive={() => setTabActive("order-cart")}
-          paymentGateways={paymentGateways}
-          updateFormData={(section, data) => {
-            updateFormData(section, data);
-          }}
-          isBillingAddressEnabled={isBillingAddressHidden}
-          handleConfirmationChange={(value: any) =>
-            handleConfirmationChange("paymentMethod", value)
-          }
-          isCardPayment={isCardPayment}
-          setIsCardPayment={setIsCardPayment}
-        />
-      </div>
+        <div id="PaymentMethod" className="scroll-mt-24">
+          <PaymentMethod
+            isActive={tabActive === "PaymentMethod"}
+            onOpenActive={() => {
+              setTabActive("PaymentMethod");
+              handleScrollToEl("PaymentMethod");
+            }}
+            onCloseActive={() => setTabActive("order-cart")}
+            paymentGateways={paymentGateways}
+            updateFormData={(section, data) => {
+              updateFormData(section, data);
+            }}
+            isBillingAddressEnabled={isBillingAddressHidden}
+            handleConfirmationChange={(value: any) =>
+              handleConfirmationChange("paymentMethod", value)
+            }
+            isCardPayment={isCardPayment}
+            setIsCardPayment={setIsCardPayment}
+            isPriceFluctuation={isPriceFluctuation}
+            totalPayment={totalPayment}
+          />
+        </div>
     </div>
   );
 };

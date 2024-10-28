@@ -855,6 +855,7 @@ const CheckoutPage = () => {
               isStorePickup={isStorePickup}
               setIsCardPayment={setIsCardPayment}
               isCardPayment={isCardPayment}
+              totalPayment={numericOrderTotal}
             />
           </div>
 
