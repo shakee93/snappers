@@ -266,7 +266,7 @@ export default function CategoryBlockSection() {
               </p>
             </div>
           </div>
-          <Link href={"/collections/tablets-mobiles-and-tablets-2"}>
+          <Link href={"/collections/tablet-accessories"}>
             <Button
               className="bg-primaryColor text-sm text-white"
               radius="full"
