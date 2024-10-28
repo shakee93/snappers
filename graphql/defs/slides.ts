@@ -7,6 +7,7 @@ query SlidePostType {
       databaseId
       title
       uri
+      slidePriority
       featureImage
       backgroundImage
       mobileBackgroundImage
