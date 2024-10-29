@@ -100,7 +100,7 @@ const SectionSliderBrandCard: FC<SectionSliderBrandCardProps> = ({
           {showSkeleton && <CardSkeleton className="w-1/3" />}
 
           <div className="glide__track" data-glide-el="track">
-            <ul className="glide__slides py-4 gap-12">
+            <ul className="glide__slides py-4 gap-6">
               {limitedBrands.map((brand, index) => (
                 <li key={index} className={`w-[300px] pt-2 ${itemClassName}`}>
                   <BrandCard
