@@ -114,6 +114,7 @@ const InstantSearchWrapper = ({
         exclude_fields:
           "description, productTags, shortDescription, galleryImages, attributes",
         use_cache: false,
+        
       },
     });
 
@@ -151,6 +152,8 @@ const InstantSearchWrapper = ({
     // when this gets fixed update the package
     return server ? InstantSearchNext : InstantSearch;
   }, []);
+
+  // console.log('sort in instant search wrapper', sort);
 
   return (
     <div>

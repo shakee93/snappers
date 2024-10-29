@@ -132,7 +132,7 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
   }, [firstFacets]);
 
   useEffect(() => {
-    console.log("Faceted brands updated:", facetedBrands);
+    // console.log("Faceted brands updated:", facetedBrands);
   }, [facetedBrands]);
 
   return (
