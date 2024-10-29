@@ -39,12 +39,6 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
   }, [brandsFacet, category]);
 
   useEffect(() => {
-    console.log("Category changed:", category);
-    console.log("Brands facet loaded:", brandsFacet);
-    console.log("First facets updated:", firstFacets);
-  }, [category, brandsFacet, firstFacets]);
-
-  useEffect(() => {
 
     if (firstFacets.length === 0) {
       setFirstFacets(brandsFacet)
