@@ -209,12 +209,12 @@ const ProductDetails = ({
                 </span>
               )}
 
-            {activeVariation?.stockStatus == "IN_STOCK" && activeVariation?.stockQuantity &&
+            {/* {activeVariation?.stockStatus == "IN_STOCK" && activeVariation?.stockQuantity &&
               activeVariation?.stockQuantity <= 2 && (
                 <div className="mb-1 w-max rounded-full bg-yellow-200 px-3 py-1.5 text-center text-xs font-medium text-gray-800">
                   Low Stock
                 </div>
-              )}
+              )} */}
 
             {product.type === "VARIABLE" && activeVariation &&
               activeVariation?.stockStatus !== "IN_STOCK" && (
@@ -255,13 +255,13 @@ const ProductDetails = ({
               </span>
             )}
 
-          {product.stockStatus == "IN_STOCK" &&
+          {/* {product.stockStatus == "IN_STOCK" &&
             product?.stockQuantity &&
             product?.stockQuantity <= 2 && (
               <div className="mb-1 w-max rounded-full bg-yellow-200 px-4 py-1 text-center text-xs text-gray-800 md:text-sm">
                 Low Stock
               </div>
-            )}
+            )} */}
 
           {product.type === "SIMPLE" && product.stockStatus !== "IN_STOCK" && (
             <div className="w-max rounded-full bg-red-200 px-4 py-1.5 text-center text-xs font-medium text-gray-800">
