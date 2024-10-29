@@ -59,11 +59,11 @@ const SectionHero3 = ({ className = "", slides }: SectionHero3Props) => {
       return aPriority - bPriority;
     });
 
-    console.log('Sorted slides:', sorted.map(slide => ({
-      id: slide.id,
-      priority: slide.slidePriority,
-      heading: slide.mainHeading
-    })));
+    // console.log('Sorted slides:', sorted.map(slide => ({
+    //   id: slide.id,
+    //   priority: slide.slidePriority,
+    //   heading: slide.mainHeading
+    // })));
 
     return sorted;
   }, [slides]);
