@@ -38,7 +38,7 @@ export default function BrandsMenu({ onClose }: { onClose: () => void }) {
     // <div className="w-full bg-white md:w-[800px] lg:w-[800px] xl:w-[1200px]">
     <div
       className="w-full bg-white md:w-[800px] lg:w-[800px] xl:w-[1200px] overflow-y-auto"
-      style={{ maxHeight: "calc(100vh - 100px)" }}
+      style={{ maxHeight: "calc(100vh - 200px)" }}
     >
       <div className="text-sm p-3 text-muted-foreground mb-2 w-full border-b pb-2">
         <Link
