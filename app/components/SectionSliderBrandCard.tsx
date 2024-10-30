@@ -48,7 +48,7 @@ const SectionSliderBrandCard: FC<SectionSliderBrandCardProps> = ({
       // hoverpause: false,
       breakpoints: {
         1280: {
-          perView: 6,
+          perView: 5,
         },
         1024: {
           gap: 10,
@@ -81,7 +81,7 @@ const SectionSliderBrandCard: FC<SectionSliderBrandCardProps> = ({
     };
   }, []);
 
-  const limitedBrands = brands.slice(0, 18);
+  const limitedBrands = brands.slice(0, 15);
 
   return (
     <div className={`nc-SectionSliderBrandCard ${className}`}>
@@ -100,7 +100,7 @@ const SectionSliderBrandCard: FC<SectionSliderBrandCardProps> = ({
           {showSkeleton && <CardSkeleton className="w-1/3" />}
 
           <div className="glide__track" data-glide-el="track">
-            <ul className="glide__slides py-4 gap-8">
+            <ul className="glide__slides py-4 gap-6">
               {limitedBrands.map((brand, index) => (
                 <li key={index} className={`w-[300px] pt-2 ${itemClassName}`}>
                   <BrandCard

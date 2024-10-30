@@ -80,7 +80,7 @@ const ArchiveLayout = async ({
             <Link
               href={item.slug}
               key={index}
-              className="flex-shrink-0 rounded-md py-2 px-4 bg-white border border-primaryColor"
+              className="flex-shrink-0 rounded-md py-2 px-4 bg-white border border-primaryColor "
             >
               {item.name}
             </Link>

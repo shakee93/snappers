@@ -17,7 +17,6 @@ interface TabFilterProps {
 }
 
 
-
 const TabFilters = ({
     categories = [],
     brands = [],
@@ -34,6 +33,8 @@ const TabFilters = ({
     useEffect(() => {
         setMounted();
     }, []);
+
+    // console.log('sortsss', sort);
 
     return (
         <div className="flex flex-col gap-0 lg:gap-3 lg:space-x-4">

@@ -216,7 +216,7 @@ const ProductCard: FC<ProductCardProps> = ({
 
   return (
     <div
-      className={`min-h-[270px] md:min-h-[365px] nc-ProductCard relative flex flex-col bg-white rounded-2xl p-1 group ${className} `}
+      className={`min-h-[270px] md:min-h-[350px] nc-ProductCard relative flex flex-col bg-white rounded-2xl p-1 group ${className} `}
       data-nc-id="ProductCard"
     >
       <div className="relative flex-shrink-0 bg-white rounded-2xl overflow-hidden ">
@@ -303,9 +303,9 @@ const ProductCard: FC<ProductCardProps> = ({
       <div className="space-y-2 flex flex-col space-between min-h-[100px] px-2.5 justify-between  lg:pt-2 lg:pb-2.5 relative">
         <div>{renderGroupButtons()}</div>
 
-        <Link className="block " href={link}>
+        <Link className="block" href={link}>
           <h2
-            className={`nc-ProductCard__title  text-xs lg:text-sm text-black line-clamp-2 font-semibold transition-colors whitespace-normal`}
+            className={` text-xs lg:text-sm text-black font-semibold transition-colors whitespace-normal min-h-[2.5rem] min-lg:h-[3rem]  line-clamp-2 overflow-hidden `}
           >
             {fromSearch ? (
               <Highlight attribute="name" hit={data as any} />

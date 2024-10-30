@@ -1,14 +1,14 @@
-import React, {Fragment, useCallback, useEffect, useMemo, useState} from "react";
+import React, { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonThird from "@/shared/Button/ButtonThird";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import { Brand, ProductCategory } from "@/graphql/types/graphql";
 import { useStore } from "@/store/store";
 import FilterPopover from "@/app/components/Filters/FilterPopover";
-import {useRefinementList} from "react-instantsearch";
+import { useRefinementList } from "react-instantsearch";
 // import {RefinementListItem} from "instantsearch.js/es/connectors/refinement-list/connectRefinementList";
 // import type { RefinementListItem } from 'instantsearch.js/es/connectors/refinement-list/connectRefinementList';
-import {useParams} from "next/navigation";
+import { useParams } from "next/navigation";
 
 interface BrandFilterProps {
   brands: Brand[];
@@ -17,19 +17,26 @@ interface BrandFilterProps {
 const BrandFilter = ({ brands }: BrandFilterProps) => {
   const {
     syncBrands,
-      search,
+    search,
     sidebar: { brands: brandsState },
   } = useStore();
   const [firstFacets, setFirstFacets] = useState<any[]>([]);
   const { category } = useParams()
 
-  const {items: brandsFacet, refine} = useRefinementList({
+  const { items: brandsFacet, refine } = useRefinementList({
     attribute: 'brands_facet',
   });
 
+
   useEffect(() => {
-    setFirstFacets([])
-  }, [])
+    // Reset firstFacets on category change to avoid stale data
+    if (brandsFacet.length > 0) {
+      setFirstFacets([]); // Clear `firstFacets` momentarily
+      setTimeout(() => {
+        setFirstFacets(brandsFacet); // Set `firstFacets` with new `brandsFacet` after a short delay
+      }, 0); // Adjust delay if necessary for smoother updates
+    }
+  }, [brandsFacet, category]);
 
   useEffect(() => {
 
@@ -42,13 +49,10 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
 
   //TODO: bug - when a category is selected it will show up in search as well
   useEffect(() => {
-
     if (search.length === 0) {
     } else {
       setFirstFacets(brandsFacet);
     }
-
-
   }, [brandsFacet, search])
 
 
@@ -59,16 +63,16 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
     }
 
     checked
-        ? syncBrands([...brandsState, name])
-        : syncBrands(brandsState.filter((i: any) => i !== name));
+      ? syncBrands([...brandsState, name])
+      : syncBrands(brandsState.filter((i: any) => i !== name));
 
   }, [brandsState])
 
   const facetedBrands = useMemo(() => {
     return brands.filter(b =>
-        firstFacets.map(f =>  Number(f.value)).includes(b.databaseId)
-    )
-  }, [brands, brandsFacet])
+      firstFacets.map(f => Number(f.value)).includes(b.databaseId)
+    );
+  }, [brands, firstFacets]);
 
   const icon = (
     <svg
@@ -127,41 +131,45 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
     }, 0)
   }, [firstFacets]);
 
+  useEffect(() => {
+    // console.log("Faceted brands updated:", facetedBrands);
+  }, [facetedBrands]);
+
   return (
-     <div className="overflow-hidden rounded-2xl w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
-            <div className="relative flex flex-col w-full px-5 py-4 pb-5 space-y-5">
+    <div className="overflow-hidden rounded-2xl w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
+      <div className="relative flex flex-col w-full px-5 py-4 pb-5 space-y-5">
 
-              <span className='font-medium'>Brands</span>
-              <Checkbox
-                name="All Brands"
-                label={`All Brands (${totalCount})`}
-                defaultChecked={brandsState.length === 0}
-                onChange={(checked) => handleChange(checked, 0)}
-              />
+        <span className='font-medium'>Brands</span>
+        <Checkbox
+          name="All Brands"
+          label={`All Brands (${totalCount})`}
+          defaultChecked={brandsState.length === 0}
+          onChange={(checked) => handleChange(checked, 0)}
+        />
 
-              <div className="w-full border-b  border-neutral-200 dark:border-neutral-700" />
+        <div className="w-full border-b  border-neutral-200 dark:border-neutral-700" />
 
-              {facetedBrands.length > 0 ?
-                  <div className="grid grid-cols-1 md:grid-cols-1 gap-2">
-                    {facetedBrands.map((item) => (
-                        <div key={item.databaseId} className="">
-                          <Checkbox
-                              name={item.slug || ""}
-                              //label={`${item.name} (${item.count})`}
-                              label={`${item.name} (${firstFacets.find(f => item.databaseId === Number(f.value))?.count || 0})`}
-                              defaultChecked={brandsState.includes(item.databaseId)}
-                              onChange={(checked) =>
-                                  handleChange(checked, item.databaseId)
-                              }
-                          />
-                        </div>
-                    ))}
-                  </div> :
-                  <div className='text-sm'>No Brands found for this search.</div>
-              }
+        {facetedBrands.length > 0 ?
+          <div className="grid grid-cols-1 md:grid-cols-1 gap-2">
+            {facetedBrands.map((item) => (
+              <div key={item.databaseId} className="">
+                <Checkbox
+                  name={item.slug || ""}
+                  //label={`${item.name} (${item.count})`}
+                  label={`${item.name} (${firstFacets.find(f => item.databaseId === Number(f.value))?.count || 0})`}
+                  defaultChecked={brandsState.includes(item.databaseId)}
+                  onChange={(checked) =>
+                    handleChange(checked, item.databaseId)
+                  }
+                />
+              </div>
+            ))}
+          </div> :
+          <div className='text-sm'>No Brands found for this search.</div>
+        }
 
-            </div>
-          </div>
+      </div>
+    </div>
 
   );
 };

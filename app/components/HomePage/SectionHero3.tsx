@@ -32,13 +32,13 @@ let TIME_OUT: NodeJS.Timeout | null = null;
 
 const SectionHero3 = ({ className = "", slides }: SectionHero3Props) => {
   // Log original slides once
-  useEffect(() => {
-    console.log('Original slides:', slides.map(slide => ({
-      id: slide.id,
-      priority: slide.slidePriority,
-      heading: slide.mainHeading
-    })));
-  }, []);
+  // useEffect(() => {
+  //   console.log('Original slides:', slides.map(slide => ({
+  //     id: slide.id,
+  //     priority: slide.slidePriority,
+  //     heading: slide.mainHeading
+  //   })));
+  // }, []);
 
   // Cache sorted slides
   const sortedSlides = useMemo(() => {
@@ -59,11 +59,11 @@ const SectionHero3 = ({ className = "", slides }: SectionHero3Props) => {
       return aPriority - bPriority;
     });
 
-    console.log('Sorted slides:', sorted.map(slide => ({
-      id: slide.id,
-      priority: slide.slidePriority,
-      heading: slide.mainHeading
-    })));
+    // console.log('Sorted slides:', sorted.map(slide => ({
+    //   id: slide.id,
+    //   priority: slide.slidePriority,
+    //   heading: slide.mainHeading
+    // })));
 
     return sorted;
   }, [slides]);

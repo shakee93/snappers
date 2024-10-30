@@ -1,11 +1,11 @@
-import {Popover, Transition} from "@headlessui/react";
-import {ChevronDownIcon} from "@heroicons/react/24/outline";
-import React, {Fragment, useEffect, useState} from "react";
+import { Popover, Transition } from "@headlessui/react";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import React, { Fragment, useEffect, useState } from "react";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonThird from "@/shared/Button/ButtonThird";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
-import {ProductCategory} from "@/graphql/types/graphql";
-import {useStore} from "@/store/store";
+import { ProductCategory } from "@/graphql/types/graphql";
+import { useStore } from "@/store/store";
 import FilterPopover from "@/app/components/Filters/FilterPopover";
 import Radio from "@/shared/Radio/Radio";
 
@@ -19,7 +19,8 @@ const DATA_sortOrderRadios = [
 ];
 
 const CategoryFilter = ({ sorts }: { sorts: any }) => {
-    const { setSort, sidebar: {sort } } = useStore()
+
+    const { setSort, sidebar: { sort } } = useStore()
     const [sortOrderStates, setSortOrderStates] = useState<string>(sorts ? "databaseId:desc" : "");
 
 
@@ -27,7 +28,7 @@ const CategoryFilter = ({ sorts }: { sorts: any }) => {
         setSort(sortOrderStates)
     }, [sortOrderStates])
 
-    const icon =  <svg className="w-4 h-4" viewBox="0 0 20 20" fill="none">
+    const icon = <svg className="w-4 h-4" viewBox="0 0 20 20" fill="none">
         <path
             d="M11.5166 5.70834L14.0499 8.24168"
             stroke="currentColor"
@@ -69,7 +70,6 @@ const CategoryFilter = ({ sorts }: { sorts: any }) => {
         />
     </svg>
 
-
     return (
 
         <div className="overflow-hidden rounded-2xl w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
@@ -83,7 +83,7 @@ const CategoryFilter = ({ sorts }: { sorts: any }) => {
                         label={item.name}
                         defaultChecked={sortOrderStates === item.id}
                         onChange={v => {
-                            console.log({v});
+                            console.log({ v });
                             setSortOrderStates(v)
                             close()
                         }}
