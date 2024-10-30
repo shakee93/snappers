@@ -93,12 +93,12 @@ export const ProductContentSlice = gql`
           slug
         }
       }
-     allPaPacks {
+      allPaPacks {
         nodes {
           name
           slug
         }
-      } 
+      }
       allPaWatchSize {
         nodes {
           name
@@ -110,7 +110,7 @@ export const ProductContentSlice = gql`
           name
           slug
         }
-      } 
+      }
       price
       regularPrice
       soldIndividually
@@ -165,7 +165,7 @@ export const ProductContentFull = gql`
         count
       }
     }
-      metaData {
+    metaData {
       key
       value
       id
@@ -235,153 +235,110 @@ export const ProductContentFull = gql`
               databaseId
             }
           }
-        }
-          ... on VariableProduct {
-      allPaCapacity {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaColor {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaColour {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaSpecification {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaVariant {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaWarranty {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaWatchSize {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaConnectivity {
-        nodes {
-          name
-          slug
-        }
-      }
-     allPaPacks {
-        nodes {
-          name
-          slug
-        }
-      }  
-     allPaSize {
-        nodes {
-          name
-          slug
-        }
-      }  
-      allPaBandType {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaShape {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaCompatibility {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaNetwork {
-        nodes {
-          name
-          slug
-        }
-      }
-      onSale
-      price
-      rawPrice: price(format: RAW)
-      regularPrice
-      salePrice
-      stockStatus
-      purchasable
-      stockQuantity
-      soldIndividually
-      defaultAttributes {
-        nodes {
-          id
-          name
-          label
-          value
-        }
-      }
-      globalAttributes {
-        nodes {
-          id
-          slug
-          name
-          label
-        }
-      }
-      productCategories {
-        edges {
-          node {
-            id
-            databaseId
-            name
-            slug
+          brands {
+            nodes {
+              databaseId
+              name
+              slug
+              count
+            }
           }
         }
-      }
-      galleryImages {
-        nodes {
-          id
-          sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
-          altText
-          databaseId
-        }
-      }
-      variations(first: 50) {
-        nodes {
-          id
-          databaseId
-          name
+        ... on VariableProduct {
+          allPaCapacity {
+            nodes {
+              name
+              slug
+            }
+          }
+          allPaColor {
+            nodes {
+              name
+              slug
+            }
+          }
+          allPaColour {
+            nodes {
+              name
+              slug
+            }
+          }
+          allPaSpecification {
+            nodes {
+              name
+              slug
+            }
+          }
+          allPaVariant {
+            nodes {
+              name
+              slug
+            }
+          }
+          allPaWarranty {
+            nodes {
+              name
+              slug
+            }
+          }
+          allPaWatchSize {
+            nodes {
+              name
+              slug
+            }
+          }
+          allPaConnectivity {
+            nodes {
+              name
+              slug
+            }
+          }
+          allPaPacks {
+            nodes {
+              name
+              slug
+            }
+          }
+          allPaSize {
+            nodes {
+              name
+              slug
+            }
+          }
+          allPaBandType {
+            nodes {
+              name
+              slug
+            }
+          }
+          allPaShape {
+            nodes {
+              name
+              slug
+            }
+          }
+          allPaCompatibility {
+            nodes {
+              name
+              slug
+            }
+          }
+          allPaNetwork {
+            nodes {
+              name
+              slug
+            }
+          }
+          onSale
           price
-          stockStatus
-          stockQuantity
           rawPrice: price(format: RAW)
           regularPrice
           salePrice
-          onSale
-          image {
-              sourceUrl
-              id
-              databaseId
-          }
-          attributes {
+          stockStatus
+          purchasable
+          stockQuantity
+          soldIndividually
+          defaultAttributes {
             nodes {
               id
               name
@@ -389,9 +346,69 @@ export const ProductContentFull = gql`
               value
             }
           }
+          globalAttributes {
+            nodes {
+              id
+              slug
+              name
+              label
+            }
+          }
+          productCategories {
+            edges {
+              node {
+                id
+                databaseId
+                name
+                slug
+              }
+            }
+          }
+          galleryImages {
+            nodes {
+              id
+              sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
+              altText
+              databaseId
+            }
+          }
+          brands {
+            nodes {
+              databaseId
+              name
+              slug
+              count
+            }
+          }
+          variations(first: 50) {
+            nodes {
+              id
+              databaseId
+              name
+              price
+              stockStatus
+              stockQuantity
+              rawPrice: price(format: RAW)
+              regularPrice
+              salePrice
+              onSale
+              image {
+                sourceUrl
+                id
+                databaseId
+              }
+              
+              attributes {
+                nodes {
+                  id
+                  name
+                  label
+                  value
+                }
+              }
+            }
+          }
         }
-      }
-    }
       }
     }
     ... on SimpleProduct {
@@ -472,18 +489,18 @@ export const ProductContentFull = gql`
           slug
         }
       }
-     allPaPacks {
+      allPaPacks {
         nodes {
           name
           slug
         }
-      }  
-     allPaSize {
+      }
+      allPaSize {
         nodes {
           name
           slug
         }
-      }  
+      }
       allPaBandType {
         nodes {
           name
@@ -564,9 +581,9 @@ export const ProductContentFull = gql`
           salePrice
           onSale
           image {
-              sourceUrl
-              id
-              databaseId
+            sourceUrl
+            id
+            databaseId
           }
           attributes {
             nodes {
