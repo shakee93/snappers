@@ -23,7 +23,6 @@ const CategoryFilter = ({ sorts }: { sorts: any }) => {
     const { setSort, sidebar: { sort } } = useStore()
     const [sortOrderStates, setSortOrderStates] = useState<string>(sorts ? "databaseId:desc" : "");
 
-
     useEffect(() => {
         setSort(sortOrderStates)
     }, [sortOrderStates])

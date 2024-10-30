@@ -55,7 +55,7 @@ const Header = async () => {
             <SearchBar />
           </div>
 
-          <div className="relative flex items-center justify-between w-full pr-3">
+          <div className="relative flex items-center justify-between w-full px-3">
             <div className="-left-12 hidden md:flex items-center mr-4">
               <Logo />
             </div>

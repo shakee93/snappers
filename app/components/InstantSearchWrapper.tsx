@@ -17,12 +17,12 @@ const DelayedRender: React.FC<{ delay: number; children: React.ReactNode }> = ({
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-      const timer = setTimeout(() => {
-          setIsVisible(true);
-          // console.log('DelayedRender');
-      }, delay);
+    const timer = setTimeout(() => {
+      setIsVisible(true);
+      // console.log('DelayedRender');
+    }, delay);
 
-      return () => clearTimeout(timer);
+    return () => clearTimeout(timer);
   }, [delay]);
 
   return isVisible ? <>{children}</> : null;
@@ -114,7 +114,7 @@ const InstantSearchWrapper = ({
         exclude_fields:
           "description, productTags, shortDescription, galleryImages, attributes",
         use_cache: false,
-        
+
       },
     });
 
@@ -143,9 +143,9 @@ const InstantSearchWrapper = ({
     setSearchMounted();
   }, []);
 
-//   const InstantSearchComponent = useMemo(() => {
-//     return server ? InstantSearchNext : InstantSearch;
-// }, [server]); // Add dependencies if necessary
+  //   const InstantSearchComponent = useMemo(() => {
+  //     return server ? InstantSearchNext : InstantSearch;
+  // }, [server]); // Add dependencies if necessary
 
   const InstantSearchComponent = useMemo(() => {
     // TODO: Search on client size freezes when using useInstantSearch hook so switching between normal and next.
@@ -180,10 +180,10 @@ const InstantSearchWrapper = ({
 
           <div className='flex overflow-x-auto lg:hidden w-full'>
             <MobileFilterSheet category={category}
-                               brand={brand}
-                               categories={categories}
-                               brands={brands}
-                               sort={sort}/>
+              brand={brand}
+              categories={categories}
+              brands={brands}
+              sort={sort} />
           </div>
           <div className='grid grid-cols-12 gap-4'>
 
@@ -194,13 +194,13 @@ const InstantSearchWrapper = ({
                 </DelayedRender>
               )}
               {filters && (
-                  <TabFilters
-                      category={category}
-                      brand={brand}
-                      categories={categories}
-                      brands={brands}
-                      sort={sort}
-                  />
+                <TabFilters
+                  category={category}
+                  brand={brand}
+                  categories={categories}
+                  brands={brands}
+                  sort={sort}
+                />
               )}
               <Configure filters={filterQuery} hitsPerPage={10} />
             </div>
