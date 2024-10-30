@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useBoolean } from "react-use";
 import useInterval from "react-use/lib/useInterval";
@@ -9,7 +9,7 @@ import Prev from "shared/NextPrev/Prev";
 
 interface SlideType {
   id: string;
-  slidePriority: number;  // From GraphQL
+  slidePriority: number; // From GraphQL
   mainHeading?: string;
   subHeading?: string;
   buttonText?: string;
@@ -31,49 +31,23 @@ const SLIDE_DURATION = 5500; // Slider duration in milliseconds
 let TIME_OUT: NodeJS.Timeout | null = null;
 
 const SectionHero3 = ({ className = "", slides }: SectionHero3Props) => {
-  // Log original slides once
-  // useEffect(() => {
-  //   console.log('Original slides:', slides.map(slide => ({
-  //     id: slide.id,
-  //     priority: slide.slidePriority,
-  //     heading: slide.mainHeading
-  //   })));
-  // }, []);
+  const sortedSlides = [...slides].sort((a, b) => {
+    const aPriority = Number(a.slidePriority);
+    const bPriority = Number(b.slidePriority);
 
-  // Cache sorted slides
-  const sortedSlides = useMemo(() => {
-    const sorted = [...slides].sort((a, b) => {
-      // Convert string priorities to numbers
-      const aPriority = Number(a.slidePriority);
-      const bPriority = Number(b.slidePriority);
+    if (aPriority === 1) return -1;
+    if (bPriority === 1) return 1;
+    if (aPriority === 0 && bPriority !== 0) return 1;
+    if (bPriority === 0 && aPriority !== 0) return -1;
 
-      // Handle priority 1 first
-      if (aPriority === 1) return -1;
-      if (bPriority === 1) return 1;
-
-      // Handle priority 0 last
-      if (aPriority === 0 && bPriority !== 0) return 1;
-      if (bPriority === 0 && aPriority !== 0) return -1;
-
-      // For remaining priorities (>1), sort in ascending order
-      return aPriority - bPriority;
-    });
-
-    // console.log('Sorted slides:', sorted.map(slide => ({
-    //   id: slide.id,
-    //   priority: slide.slidePriority,
-    //   heading: slide.mainHeading
-    // })));
-
-    return sorted;
-  }, [slides]);
+    return aPriority - bPriority;
+  });
 
   const [indexActive, setIndexActive] = useState(0);
   const [isRunning, toggleIsRunning] = useBoolean(true);
   const [progress, setProgress] = useState(0);
   const [backgroundImage, setBackgroundImage] = useState(sortedSlides[0].backgroundImage);
 
-  // Update background image based on screen width
   useEffect(() => {
     const updateBackgroundImage = () => {
       const slide = sortedSlides[indexActive];
@@ -157,48 +131,50 @@ const SectionHero3 = ({ className = "", slides }: SectionHero3Props) => {
     );
   };
 
+  const currentSlide = sortedSlides[indexActive];
+  const showOverlay = currentSlide?.mainHeading || currentSlide?.subHeading;
+
   return (
-    <div className="relative w-full h-[550px] md:h-[400px] xl:h-[600px]">
-      {/* Backgrounds with fade-out/fade-in effect */}
+    <div 
+      className="relative w-full h-[550px] md:h-[400px] xl:h-[600px]"
+      onMouseEnter={() => toggleIsRunning(false)}
+      onMouseLeave={() => toggleIsRunning(true)}
+    >
       <AnimatePresence>
         {sortedSlides.map((_, index) => index === indexActive && renderItem(index))}
       </AnimatePresence>
 
-      {/* Conditionally render text content and overlay only if there is content to display */}
-      {(sortedSlides[indexActive]?.mainHeading || 
-        sortedSlides[indexActive]?.subHeading || 
-        sortedSlides[indexActive]?.buttonText) && (
+      {(currentSlide?.mainHeading || currentSlide?.subHeading || currentSlide?.buttonText) && (
         <>
-          {/* Dark overlay behind text */}
-          <div className="absolute inset-0 bg-black/40 z-[1]" />
-          
+          {showOverlay && <div className="absolute inset-0 bg-black/40 z-[1]" />}
+
           <div className={`absolute container inset-0 flex ${
-            sortedSlides[indexActive]?.contentPosition === "right" 
+            currentSlide?.contentPosition === "right" 
               ? "justify-end" 
-              : sortedSlides[indexActive]?.contentPosition === "left" 
+              : currentSlide?.contentPosition === "left" 
               ? "justify-start" 
               : "justify-center"
           } items-center z-[2]`}>
             <motion.div
-              className={`relative space-y-3 text-${sortedSlides[indexActive]?.contentPosition || 'center'} sm:space-y-4 text-white px-6`}
+              className={`relative space-y-3 text-${currentSlide?.contentPosition || 'center'} sm:space-y-4 text-white px-6`}
               initial={{ opacity: 0, y: -50 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: "easeInOut" }}
-              key={sortedSlides[indexActive].id}
+              key={currentSlide.id}
             >
-              {sortedSlides[indexActive]?.subHeading && (
-                <span className={`nc-SectionHero2Item__subheading text-${sortedSlides[indexActive]?.contentPosition || 'center'} block text-base md:text-xl font-medium`}>
-                  {sortedSlides[indexActive]?.subHeading}
+              {currentSlide?.subHeading && (
+                <span className={`nc-SectionHero2Item__subheading text-${currentSlide?.contentPosition || 'center'} block text-base md:text-xl font-medium`}>
+                  {currentSlide.subHeading}
                 </span>
               )}
 
-              {sortedSlides[indexActive]?.mainHeading && (
-                <h2 className={`nc-SectionHero2Item__heading font-semibold text-${sortedSlides[indexActive]?.contentPosition || 'center'} text-3xl sm:text-4xl md:text-4xl xl:text-5xl 2xl:text-5xl !leading-[114%]`}>
-                  {sortedSlides[indexActive]?.mainHeading}
+              {currentSlide?.mainHeading && (
+                <h2 className={`nc-SectionHero2Item__heading font-semibold text-${currentSlide?.contentPosition || 'center'} text-3xl sm:text-4xl md:text-4xl xl:text-5xl 2xl:text-5xl !leading-[114%]`}>
+                  {currentSlide.mainHeading}
                 </h2>
               )}
 
-              {sortedSlides[indexActive]?.buttonText && (
+              {currentSlide?.buttonText && (
                 <motion.div
                   initial={{ opacity: 0, y: 50 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -207,9 +183,9 @@ const SectionHero3 = ({ className = "", slides }: SectionHero3Props) => {
                   <ButtonPrimary
                     className="nc-SectionHero2Item__button items-center dark:bg-slate-900"
                     sizeClass="py-3 px-6 sm:py-5 sm:px-9"
-                    href={sortedSlides[indexActive]?.buttonLink as any}
+                    href={currentSlide.buttonLink as any}
                   >
-                    <span>{sortedSlides[indexActive]?.buttonText}</span>
+                    <span>{currentSlide.buttonText}</span>
                   </ButtonPrimary>
                 </motion.div>
               )}
@@ -218,7 +194,6 @@ const SectionHero3 = ({ className = "", slides }: SectionHero3Props) => {
         </>
       )}
 
-      {/* Previous & Next Buttons with animated background progress */}
       <div
         className="absolute shadow-2xl bottom-10 select-none right-5 z-50 rounded-[48px] w-[125px] flex bg-white items-center space-x-4"
         style={{
