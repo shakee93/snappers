@@ -50,9 +50,9 @@ const SectionHero3 = ({ className = "", slides }: SectionHero3Props) => {
   const [backgroundImage, setBackgroundImage] = useState(sortedSlides[0].backgroundImage);
 
   // Log the sorted slides data
-  useEffect(() => {
-    console.log("Sorted Slides Data:", sortedSlides);
-  }, [sortedSlides]);
+  // useEffect(() => {
+  //   console.log("Sorted Slides Data:", sortedSlides);
+  // }, [sortedSlides]);
 
   useEffect(() => {
     const updateBackgroundImage = () => {

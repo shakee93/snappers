@@ -5,7 +5,6 @@ import {useEffect, useState} from "react";
 const useProductLink = (product?: Product | null) => {
 
     const [link, setLink] = useState('')
-    console.log("prooductis", product)
 
     useEffect(() => {
 
@@ -20,7 +19,6 @@ const useProductLink = (product?: Product | null) => {
 
         setLink(`/${productBrand.slug}/${product.slug}`)
     }, [product])
-    console.log('inside link',link)   
     return link
 }
 
