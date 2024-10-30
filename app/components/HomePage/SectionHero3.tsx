@@ -164,45 +164,58 @@ const SectionHero3 = ({ className = "", slides }: SectionHero3Props) => {
         {sortedSlides.map((_, index) => index === indexActive && renderItem(index))}
       </AnimatePresence>
 
-      {/* Conditionally render text content only if there is content to display */}
-      {(sortedSlides[indexActive]?.mainHeading || sortedSlides[indexActive]?.subHeading || sortedSlides[indexActive]?.buttonText) && (
-        <div className={`absolute container inset-0 flex ${sortedSlides[indexActive]?.contentPosition === "right" ? "justify-end" : sortedSlides[indexActive]?.contentPosition === "left" ? "justify-start" : "justify-center"} items-center z-[1]`}>
-          <motion.div
-            className={`relative z-10 space-y-3 text-${sortedSlides[indexActive]?.contentPosition || 'center'} sm:space-y-4 text-white px-6`}
-            initial={{ opacity: 0, y: -50 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: "easeInOut" }}
-            key={sortedSlides[indexActive].id}
-          >
-            {sortedSlides[indexActive]?.subHeading && (
-              <span className={`nc-SectionHero2Item__subheading text-${sortedSlides[indexActive]?.contentPosition || 'center'} block text-base md:text-xl font-medium`}>
-                {sortedSlides[indexActive]?.subHeading}
-              </span>
-            )}
+      {/* Conditionally render text content and overlay only if there is content to display */}
+      {(sortedSlides[indexActive]?.mainHeading || 
+        sortedSlides[indexActive]?.subHeading || 
+        sortedSlides[indexActive]?.buttonText) && (
+        <>
+          {/* Dark overlay behind text */}
+          <div className="absolute inset-0 bg-black/40 z-[1]" />
+          
+          <div className={`absolute container inset-0 flex ${
+            sortedSlides[indexActive]?.contentPosition === "right" 
+              ? "justify-end" 
+              : sortedSlides[indexActive]?.contentPosition === "left" 
+              ? "justify-start" 
+              : "justify-center"
+          } items-center z-[2]`}>
+            <motion.div
+              className={`relative space-y-3 text-${sortedSlides[indexActive]?.contentPosition || 'center'} sm:space-y-4 text-white px-6`}
+              initial={{ opacity: 0, y: -50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: "easeInOut" }}
+              key={sortedSlides[indexActive].id}
+            >
+              {sortedSlides[indexActive]?.subHeading && (
+                <span className={`nc-SectionHero2Item__subheading text-${sortedSlides[indexActive]?.contentPosition || 'center'} block text-base md:text-xl font-medium`}>
+                  {sortedSlides[indexActive]?.subHeading}
+                </span>
+              )}
 
-            {sortedSlides[indexActive]?.mainHeading && (
-              <h2 className={`nc-SectionHero2Item__heading font-semibold text-${sortedSlides[indexActive]?.contentPosition || 'center'} text-3xl sm:text-4xl md:text-4xl xl:text-5xl 2xl:text-5xl !leading-[114%]`}>
-                {sortedSlides[indexActive]?.mainHeading}
-              </h2>
-            )}
+              {sortedSlides[indexActive]?.mainHeading && (
+                <h2 className={`nc-SectionHero2Item__heading font-semibold text-${sortedSlides[indexActive]?.contentPosition || 'center'} text-3xl sm:text-4xl md:text-4xl xl:text-5xl 2xl:text-5xl !leading-[114%]`}>
+                  {sortedSlides[indexActive]?.mainHeading}
+                </h2>
+              )}
 
-            {sortedSlides[indexActive]?.buttonText && (
-              <motion.div
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, ease: "easeInOut", delay: 0.6 }}
-              >
-                <ButtonPrimary
-                  className="nc-SectionHero2Item__button items-center dark:bg-slate-900"
-                  sizeClass="py-3 px-6 sm:py-5 sm:px-9"
-                  href={sortedSlides[indexActive]?.buttonLink as any}
+              {sortedSlides[indexActive]?.buttonText && (
+                <motion.div
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, ease: "easeInOut", delay: 0.6 }}
                 >
-                  <span>{sortedSlides[indexActive]?.buttonText}</span>
-                </ButtonPrimary>
-              </motion.div>
-            )}
-          </motion.div>
-        </div>
+                  <ButtonPrimary
+                    className="nc-SectionHero2Item__button items-center dark:bg-slate-900"
+                    sizeClass="py-3 px-6 sm:py-5 sm:px-9"
+                    href={sortedSlides[indexActive]?.buttonLink as any}
+                  >
+                    <span>{sortedSlides[indexActive]?.buttonText}</span>
+                  </ButtonPrimary>
+                </motion.div>
+              )}
+            </motion.div>
+          </div>
+        </>
       )}
 
       {/* Previous & Next Buttons with animated background progress */}
