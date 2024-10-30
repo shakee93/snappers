@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useBoolean } from "react-use";
 import useInterval from "react-use/lib/useInterval";
@@ -31,48 +31,62 @@ const SLIDE_DURATION = 5500;
 let TIME_OUT: NodeJS.Timeout | null = null;
 
 const SectionHero3 = ({ className = "", slides }: SectionHero3Props) => {
-  const cacheRef = useRef<SlideType[]>([]); // Cache to store the last slides
-  const sortedSlides = useRef<SlideType[]>([]); // Cache for sorted slides
   const [indexActive, setIndexActive] = useState(0);
   const [isRunning, toggleIsRunning] = useBoolean(true);
   const [progress, setProgress] = useState(0);
   const [backgroundImage, setBackgroundImage] = useState("");
 
-  // Load the first slide immediately
+  // Log slides data whenever it changes
   useEffect(() => {
-    if (slides.length > 0) {
-      // Set background image to the first slide immediately
-      setBackgroundImage(slides[0].backgroundImage);
-      cacheRef.current = slides;
-      sortedSlides.current = [...slides].sort((a, b) => {
-        const aPriority = Number(a.slidePriority);
-        const bPriority = Number(b.slidePriority);
-        if (aPriority === 1) return -1;
-        if (bPriority === 1) return 1;
-        if (aPriority === 0 && bPriority !== 0) return 1;
-        if (bPriority === 0 && aPriority !== 0) return -1;
-        return aPriority - bPriority;
-      });
-    }
+    console.log('Slides Data:', slides);
   }, [slides]);
 
+  // Preload the background images and sort slides by priority
+  const sortedSlides = slides.sort((a, b) => {
+    const aPriority = Number(a.slidePriority);
+    const bPriority = Number(b.slidePriority);
+
+    // Treat priority 0 as the last priority
+    if (aPriority === 0) return 1;
+    if (bPriority === 0) return -1;
+
+    return aPriority - bPriority; // Sort in ascending order
+  });
+
+  useEffect(() => {
+    if (sortedSlides.length > 0) {
+      sortedSlides.forEach(slide => {
+        const img = new Image();
+        img.src = slide.backgroundImage;
+        img.src = slide.tabletBackgroundImage || slide.backgroundImage;
+        img.src = slide.mobileBackgroundImage || slide.backgroundImage;
+      });
+
+      // Set the background image for the initial slide
+      setBackgroundImage(sortedSlides[0].backgroundImage);
+    }
+  }, [sortedSlides]);
+
+  // Update the background image based on screen width
   useEffect(() => {
     const updateBackgroundImage = () => {
-      const slide = sortedSlides.current[indexActive];
-      const screenWidth = window.innerWidth;
-      if (screenWidth <= 768) {
-        setBackgroundImage(slide.mobileBackgroundImage || slide.backgroundImage);
-      } else if (screenWidth <= 1024) {
-        setBackgroundImage(slide.tabletBackgroundImage || slide.backgroundImage);
-      } else {
-        setBackgroundImage(slide.backgroundImage);
+      if (sortedSlides.length > 0) {
+        const slide = sortedSlides[indexActive];
+        const screenWidth = window.innerWidth;
+        if (screenWidth <= 768) {
+          setBackgroundImage(slide.mobileBackgroundImage || slide.backgroundImage);
+        } else if (screenWidth <= 1024) {
+          setBackgroundImage(slide.tabletBackgroundImage || slide.backgroundImage);
+        } else {
+          setBackgroundImage(slide.backgroundImage);
+        }
       }
     };
 
     updateBackgroundImage();
     window.addEventListener("resize", updateBackgroundImage);
     return () => window.removeEventListener("resize", updateBackgroundImage);
-  }, [indexActive]);
+  }, [indexActive, sortedSlides]);
 
   useInterval(
     () => {
@@ -93,19 +107,19 @@ const SectionHero3 = ({ className = "", slides }: SectionHero3Props) => {
 
   const handleAutoNext = () => {
     setIndexActive((state) => {
-      if (state >= sortedSlides.current.length - 1) return 0;
+      if (state >= sortedSlides.length - 1) return 0;
       return state + 1;
     });
     resetProgress();
   };
 
   const handleClickNext = () => {
-    setIndexActive((state) => (state >= sortedSlides.current.length - 1 ? 0 : state + 1));
+    setIndexActive((state) => (state >= sortedSlides.length - 1 ? 0 : state + 1));
     handleAfterClick();
   };
 
   const handleClickPrev = () => {
-    setIndexActive((state) => (state === 0 ? sortedSlides.current.length - 1 : state - 1));
+    setIndexActive((state) => (state === 0 ? sortedSlides.length - 1 : state - 1));
     handleAfterClick();
   };
 
@@ -139,7 +153,7 @@ const SectionHero3 = ({ className = "", slides }: SectionHero3Props) => {
     );
   };
 
-  const currentSlide = sortedSlides.current[indexActive];
+  const currentSlide = sortedSlides[indexActive];
   const showOverlay = currentSlide?.mainHeading || currentSlide?.subHeading;
 
   return (
@@ -149,7 +163,7 @@ const SectionHero3 = ({ className = "", slides }: SectionHero3Props) => {
       onMouseLeave={() => toggleIsRunning(true)}
     >
       <AnimatePresence>
-        {sortedSlides.current.map((_, index) => index === indexActive && renderItem(index))}
+        {sortedSlides.map((_, index) => index === indexActive && renderItem(index))}
       </AnimatePresence>
 
       {(currentSlide?.mainHeading || currentSlide?.subHeading || currentSlide?.buttonText) && (
@@ -216,7 +230,7 @@ const SectionHero3 = ({ className = "", slides }: SectionHero3Props) => {
           onClickPrev={handleClickPrev}
         />
         <div className="mx-4 text-black text-xs font-medium">
-          {indexActive + 1} / {sortedSlides.current.length}
+          {indexActive + 1} / {sortedSlides.length}
         </div>
         <Next
           className="z-10 !text-black"
