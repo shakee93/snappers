@@ -4,11 +4,8 @@ export const GET_SLIDES = gql`
 query SlidePostType {
     slides {
     nodes {
-      databaseId
-      title
       uri
       slidePriority
-      featureImage
       backgroundImage
       mobileBackgroundImage
       tabletBackgroundImage

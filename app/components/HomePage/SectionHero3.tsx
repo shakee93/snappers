@@ -9,7 +9,7 @@ import Prev from "shared/NextPrev/Prev";
 
 interface SlideType {
   id: string;
-  slidePriority: number;
+  slidePriority: number; // From GraphQL
   mainHeading?: string;
   subHeading?: string;
   buttonText?: string;
@@ -26,60 +26,44 @@ export interface SectionHero3Props {
   slides: SlideType[];
 }
 
-const SLIDE_DURATION = 5500;
+const SLIDE_DURATION = 5500; // Slider duration in milliseconds
 
 let TIME_OUT: NodeJS.Timeout | null = null;
 
 const SectionHero3 = ({ className = "", slides }: SectionHero3Props) => {
-  const [indexActive, setIndexActive] = useState(0);
-  const [isRunning, toggleIsRunning] = useBoolean(true);
-  const [progress, setProgress] = useState(0);
-  const [backgroundImage, setBackgroundImage] = useState("");
-
-  // Log slides data whenever it changes
-  useEffect(() => {
-    console.log('Slides Data:', slides);
-  }, [slides]);
-
-  // Preload the background images and sort slides by priority
-  const sortedSlides = slides.sort((a, b) => {
+  // Sort slides according to priority
+  const sortedSlides = [...slides].sort((a, b) => {
     const aPriority = Number(a.slidePriority);
     const bPriority = Number(b.slidePriority);
 
-    // Treat priority 0 as the last priority
-    if (aPriority === 0) return 1;
-    if (bPriority === 0) return -1;
+    if (aPriority === 1) return -1;
+    if (bPriority === 1) return 1;
+    if (aPriority === 0 && bPriority !== 0) return 1;
+    if (bPriority === 0 && aPriority !== 0) return -1;
 
-    return aPriority - bPriority; // Sort in ascending order
+    return aPriority - bPriority;
   });
 
-  useEffect(() => {
-    if (sortedSlides.length > 0) {
-      sortedSlides.forEach(slide => {
-        const img = new Image();
-        img.src = slide.backgroundImage;
-        img.src = slide.tabletBackgroundImage || slide.backgroundImage;
-        img.src = slide.mobileBackgroundImage || slide.backgroundImage;
-      });
+  const [indexActive, setIndexActive] = useState(0);
+  const [isRunning, toggleIsRunning] = useBoolean(true);
+  const [progress, setProgress] = useState(0);
+  const [backgroundImage, setBackgroundImage] = useState(sortedSlides[0].backgroundImage);
 
-      // Set the background image for the initial slide
-      setBackgroundImage(sortedSlides[0].backgroundImage);
-    }
+  // Log the sorted slides data
+  useEffect(() => {
+    console.log("Sorted Slides Data:", sortedSlides);
   }, [sortedSlides]);
 
-  // Update the background image based on screen width
   useEffect(() => {
     const updateBackgroundImage = () => {
-      if (sortedSlides.length > 0) {
-        const slide = sortedSlides[indexActive];
-        const screenWidth = window.innerWidth;
-        if (screenWidth <= 768) {
-          setBackgroundImage(slide.mobileBackgroundImage || slide.backgroundImage);
-        } else if (screenWidth <= 1024) {
-          setBackgroundImage(slide.tabletBackgroundImage || slide.backgroundImage);
-        } else {
-          setBackgroundImage(slide.backgroundImage);
-        }
+      const slide = sortedSlides[indexActive];
+      const screenWidth = window.innerWidth;
+      if (screenWidth <= 768) {
+        setBackgroundImage(slide.mobileBackgroundImage || slide.backgroundImage);
+      } else if (screenWidth <= 1024) {
+        setBackgroundImage(slide.tabletBackgroundImage || slide.backgroundImage);
+      } else {
+        setBackgroundImage(slide.backgroundImage);
       }
     };
 
