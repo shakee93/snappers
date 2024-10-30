@@ -206,6 +206,7 @@ export const ProductContentFull = gql`
           link
           sourceUrl
         }
+        type
         
         ... on SimpleProduct {
           onSale
