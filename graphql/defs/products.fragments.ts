@@ -206,7 +206,7 @@ export const ProductContentFull = gql`
           link
           sourceUrl
         }
-
+        
         ... on SimpleProduct {
           onSale
           stockStatus
