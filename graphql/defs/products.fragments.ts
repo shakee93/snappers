@@ -201,6 +201,7 @@ export const ProductContentFull = gql`
         databaseId
         onSale
         slug
+        type
         image {
           altText
           link

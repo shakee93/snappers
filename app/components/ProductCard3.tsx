@@ -169,7 +169,6 @@ const ProductCard: FC<ProductCardProps> = ({
     return (
 
       <div className="absolute -top-12 right-1 flex justify-center opacity-100 visible transition-all">
-        Stock status: {stockStatus}
         {stockStatus === "IN_STOCK" ? (
           <>
             {type === "SIMPLE" && price && price?.length > 0 && (
