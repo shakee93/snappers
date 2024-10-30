@@ -1,5 +1,5 @@
 "use client";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useBoolean } from "react-use";
 import useInterval from "react-use/lib/useInterval";
@@ -9,7 +9,7 @@ import Prev from "shared/NextPrev/Prev";
 
 interface SlideType {
   id: string;
-  slidePriority: number; // From GraphQL
+  slidePriority: number;
   mainHeading?: string;
   subHeading?: string;
   buttonText?: string;
@@ -26,31 +26,39 @@ export interface SectionHero3Props {
   slides: SlideType[];
 }
 
-const SLIDE_DURATION = 5500; // Slider duration in milliseconds
+const SLIDE_DURATION = 5500;
 
 let TIME_OUT: NodeJS.Timeout | null = null;
 
 const SectionHero3 = ({ className = "", slides }: SectionHero3Props) => {
-  const sortedSlides = [...slides].sort((a, b) => {
-    const aPriority = Number(a.slidePriority);
-    const bPriority = Number(b.slidePriority);
-
-    if (aPriority === 1) return -1;
-    if (bPriority === 1) return 1;
-    if (aPriority === 0 && bPriority !== 0) return 1;
-    if (bPriority === 0 && aPriority !== 0) return -1;
-
-    return aPriority - bPriority;
-  });
-
+  const cacheRef = useRef<SlideType[]>([]); // Cache to store the last slides
+  const sortedSlides = useRef<SlideType[]>([]); // Cache for sorted slides
   const [indexActive, setIndexActive] = useState(0);
   const [isRunning, toggleIsRunning] = useBoolean(true);
   const [progress, setProgress] = useState(0);
-  const [backgroundImage, setBackgroundImage] = useState(sortedSlides[0].backgroundImage);
+  const [backgroundImage, setBackgroundImage] = useState("");
+
+  // Load the first slide immediately
+  useEffect(() => {
+    if (slides.length > 0) {
+      // Set background image to the first slide immediately
+      setBackgroundImage(slides[0].backgroundImage);
+      cacheRef.current = slides;
+      sortedSlides.current = [...slides].sort((a, b) => {
+        const aPriority = Number(a.slidePriority);
+        const bPriority = Number(b.slidePriority);
+        if (aPriority === 1) return -1;
+        if (bPriority === 1) return 1;
+        if (aPriority === 0 && bPriority !== 0) return 1;
+        if (bPriority === 0 && aPriority !== 0) return -1;
+        return aPriority - bPriority;
+      });
+    }
+  }, [slides]);
 
   useEffect(() => {
     const updateBackgroundImage = () => {
-      const slide = sortedSlides[indexActive];
+      const slide = sortedSlides.current[indexActive];
       const screenWidth = window.innerWidth;
       if (screenWidth <= 768) {
         setBackgroundImage(slide.mobileBackgroundImage || slide.backgroundImage);
@@ -64,7 +72,7 @@ const SectionHero3 = ({ className = "", slides }: SectionHero3Props) => {
     updateBackgroundImage();
     window.addEventListener("resize", updateBackgroundImage);
     return () => window.removeEventListener("resize", updateBackgroundImage);
-  }, [indexActive, sortedSlides]);
+  }, [indexActive]);
 
   useInterval(
     () => {
@@ -85,19 +93,19 @@ const SectionHero3 = ({ className = "", slides }: SectionHero3Props) => {
 
   const handleAutoNext = () => {
     setIndexActive((state) => {
-      if (state >= sortedSlides.length - 1) return 0;
+      if (state >= sortedSlides.current.length - 1) return 0;
       return state + 1;
     });
     resetProgress();
   };
 
   const handleClickNext = () => {
-    setIndexActive((state) => (state >= sortedSlides.length - 1 ? 0 : state + 1));
+    setIndexActive((state) => (state >= sortedSlides.current.length - 1 ? 0 : state + 1));
     handleAfterClick();
   };
 
   const handleClickPrev = () => {
-    setIndexActive((state) => (state === 0 ? sortedSlides.length - 1 : state - 1));
+    setIndexActive((state) => (state === 0 ? sortedSlides.current.length - 1 : state - 1));
     handleAfterClick();
   };
 
@@ -131,7 +139,7 @@ const SectionHero3 = ({ className = "", slides }: SectionHero3Props) => {
     );
   };
 
-  const currentSlide = sortedSlides[indexActive];
+  const currentSlide = sortedSlides.current[indexActive];
   const showOverlay = currentSlide?.mainHeading || currentSlide?.subHeading;
 
   return (
@@ -141,7 +149,7 @@ const SectionHero3 = ({ className = "", slides }: SectionHero3Props) => {
       onMouseLeave={() => toggleIsRunning(true)}
     >
       <AnimatePresence>
-        {sortedSlides.map((_, index) => index === indexActive && renderItem(index))}
+        {sortedSlides.current.map((_, index) => index === indexActive && renderItem(index))}
       </AnimatePresence>
 
       {(currentSlide?.mainHeading || currentSlide?.subHeading || currentSlide?.buttonText) && (
@@ -208,7 +216,7 @@ const SectionHero3 = ({ className = "", slides }: SectionHero3Props) => {
           onClickPrev={handleClickPrev}
         />
         <div className="mx-4 text-black text-xs font-medium">
-          {indexActive + 1} / {sortedSlides.length}
+          {indexActive + 1} / {sortedSlides.current.length}
         </div>
         <Next
           className="z-10 !text-black"
