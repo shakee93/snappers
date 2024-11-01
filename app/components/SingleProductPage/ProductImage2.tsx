@@ -156,7 +156,6 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
       <div className="embla-thumbs">
         <div className="embla-thumbs__viewport " ref={emblaThumbsRef}>
           <div className="embla-thumbs__container" >
-
             {/* Gallery Image */}
             {galleryImages?.map((variation: any, index: number) => (
               <Thumb
