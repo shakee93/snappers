@@ -50,12 +50,13 @@ const Header = async () => {
         }
       >
         <TopBarPromotion options={options} />
-        <div className="md:container flex justify-between items-center md:items-stretch py-2 px-0">
-          <div className="hidden md:hidden px-2 gap-2 bg-gradient-to-br from-sky-500 to-primaryColor py-2 flex-1 justify-center items-center">
+        <div className="py-0 md:container flex justify-between items-center md:items-stretch md:py-2 px-0">
+          
+          <div className="md:hidden px-2 gap-2 bg-gradient-to-br from-sky-500 to-primaryColor py-2 flex-1 justify-center items-center">
             <SearchBar />
           </div>
 
-          <div className="relative flex items-center justify-between w-full px-3">
+          <div className="hidden md:flex relative items-center justify-between w-full px-3">
             <div className="-left-12 hidden md:flex items-center mr-4">
               <Logo />
             </div>
@@ -66,7 +67,7 @@ const Header = async () => {
               </div>
             </div>
 
-            <div className="flex-1">
+            <div className="hidden md:block flex-1">
               <SearchBar />
             </div>
 
