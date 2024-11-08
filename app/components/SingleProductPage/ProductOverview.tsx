@@ -43,7 +43,7 @@ const ProductOverview = ({
 
   const increaseH1Font = (htmlContent: any) => {
     if (typeof htmlContent !== 'undefined') {
-      return htmlContent.replace(/<h1>/g, '<h1 class="text-lg py-2">');
+      return htmlContent.replace(/<h1>/g, '<h1 class="text-2xl py-2">');
     } else {
       return '';
     }
