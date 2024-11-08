@@ -44,7 +44,6 @@ const HeaderSearchResults = ({ brands, productCategories}: SearchBarProps) => {
                 <h2 className="mb-8 ml-6 block text-sm md:text-lg font-semibold mt-14">
                     Search Results for <span className='text-primaryColor'>{search}</span>
                 </h2>
-
                 <InstantSearchWrapper
                     filters
                     categories={productCategories}
