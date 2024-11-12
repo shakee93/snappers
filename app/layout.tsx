@@ -33,6 +33,10 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <head>
+        <meta
+          name="google-site-verification"
+          content="1jxvcjKwBJHZpD2gN7mtEpCc1WQfzu7Wfp0RlyA0zA4"
+        />
         {!isLocalhost && (
           <>
             <Script
