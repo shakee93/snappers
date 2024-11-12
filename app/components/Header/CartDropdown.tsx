@@ -1,6 +1,6 @@
 "use client";
 import { Popover, Transition } from "@headlessui/react";
-import { ShoppingBag } from "lucide-react";
+import { ShoppingBag, ShoppingCart } from "lucide-react";
 import { Fragment, useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
@@ -37,16 +37,16 @@ export default function CartDropdown() {
             onClick={() => setIsOpen(!isOpen)}
             className={`
                 ${open ? "" : "text-opacity-90"}
-                 group w-10 h-10 sm:w-12 sm:h-12 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full inline-flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 relative`}
+                 group w-10 h-10 sm:w-10 sm:h-10 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full inline-flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 relative`}
           >
             {!!cart?.contents?.itemCount && (
-              <div className="w-3.5 h-3.5 flex items-center justify-center bg-primary-500 absolute top-1.5 right-1.5 rounded-full text-[10px] leading-none text-white font-medium">
-                <span className="mt-[1px]">{cart?.contents?.itemCount}</span>
+              <div className="w-5 bg-primaryColor h-5 flex items-center justify-center bg-primary-500 absolute top-0 right-0 rounded-full text-[11px] leading-none text-white font-medium">
+                <span className="mt-[1px] font-bold">{cart?.contents?.itemCount}</span>
               </div>
             )}
 
-            <div className="text-primaryColor">
-              <ShoppingBag />
+            <div className="text-primaryColor flex items-center justify-center w-10 sm:h-10">
+              <ShoppingCart className="w-5" />
             </div>
 
             <Link className="block md:hidden absolute inset-0" href={"/cart"} />

@@ -139,7 +139,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   }, [emblaMainApi, onSelect]);
 
   return (
-    <div className="embla" id='product-image'>
+    <div className="embla min-h-[272px] md:min-h-[576px]" id='product-image'>
       <div className="embla__viewport  rounded-2xl" ref={emblaMainRef}>
         <div className="embla__container ">
           {galleryImages?.map((variation: any, index: number) => (
@@ -156,7 +156,6 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
       <div className="embla-thumbs">
         <div className="embla-thumbs__viewport " ref={emblaThumbsRef}>
           <div className="embla-thumbs__container" >
-
             {/* Gallery Image */}
             {galleryImages?.map((variation: any, index: number) => (
               <Thumb

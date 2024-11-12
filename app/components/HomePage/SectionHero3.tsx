@@ -1,140 +1,227 @@
 "use client";
-import { useState, useEffect } from "react";
-import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { useBoolean } from "react-use";
+import useInterval from "react-use/lib/useInterval";
+import ButtonPrimary from "shared/Button/ButtonPrimary";
+import Next from "shared/NextPrev/Next";
+import Prev from "shared/NextPrev/Prev";
 
-const desktopSlidesData = [
-  {
-    id: "1",
-    backgroundColor: "#ffffff",
-    featureImage:
-      "http://api.gqmobiles.lk/wp-content/uploads/2024/03/Desktop.jpg",
-  },
-];
+interface SlideType {
+  id: string;
+  slidePriority: number; // From GraphQL
+  mainHeading?: string;
+  subHeading?: string;
+  buttonText?: string;
+  buttonLink?: string;
+  backgroundColor: string;
+  backgroundImage: string;
+  tabletBackgroundImage?: string;
+  mobileBackgroundImage?: string;
+  contentPosition: string;
+}
 
-const tabletSlidesData = [
-  {
-    id: "1",
-    backgroundColor: "#ffffff",
-    featureImage:
-      "http://api.gqmobiles.lk/wp-content/uploads/2024/03/Tab.jpg",
-  },
-];
+export interface SectionHero3Props {
+  className?: string;
+  slides: SlideType[];
+}
 
-const mobileSlidesData = [
-  {
-    id: "1",
-    backgroundColor: "#ffffff",
-    featureImage:
-      "http://api.gqmobiles.lk/wp-content/uploads/2024/03/Moble.jpg",
-  },
- 
-];
+const SLIDE_DURATION = 5500; // Slider duration in milliseconds
 
-const SectionHero3 = () => {
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const [isHovering, setIsHovering] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
-  const [isTablet, setIsTablet] = useState(false);
+let TIME_OUT: NodeJS.Timeout | null = null;
+
+const SectionHero3 = ({ className = "", slides }: SectionHero3Props) => {
+  // Sort slides according to priority
+  const sortedSlides = [...slides].sort((a, b) => {
+    const aPriority = Number(a.slidePriority);
+    const bPriority = Number(b.slidePriority);
+
+    if (aPriority === 1) return -1;
+    if (bPriority === 1) return 1;
+    if (aPriority === 0 && bPriority !== 0) return 1;
+    if (bPriority === 0 && aPriority !== 0) return -1;
+
+    return aPriority - bPriority;
+  });
+
+  const [indexActive, setIndexActive] = useState(0);
+  const [isRunning, toggleIsRunning] = useBoolean(true);
+  const [progress, setProgress] = useState(0);
+  const [backgroundImage, setBackgroundImage] = useState(sortedSlides[0].backgroundImage);
+
+  // Log the sorted slides data
+  // useEffect(() => {
+  //   console.log("Sorted Slides Data:", sortedSlides);
+  // }, [sortedSlides]);
 
   useEffect(() => {
-    const handleResize = () => {
-      const width = window.innerWidth;
-      setIsMobile(width <= 600);
-      setIsTablet(width >= 601 && width <= 768); // Assuming tablet width range
+    const updateBackgroundImage = () => {
+      const slide = sortedSlides[indexActive];
+      const screenWidth = window.innerWidth;
+      if (screenWidth <= 768) {
+        setBackgroundImage(slide.mobileBackgroundImage || slide.backgroundImage);
+      } else if (screenWidth <= 1024) {
+        setBackgroundImage(slide.tabletBackgroundImage || slide.backgroundImage);
+      } else {
+        setBackgroundImage(slide.backgroundImage);
+      }
     };
 
-    handleResize(); // Initialize isMobile and isTablet on mount
+    updateBackgroundImage();
+    window.addEventListener("resize", updateBackgroundImage);
+    return () => window.removeEventListener("resize", updateBackgroundImage);
+  }, [indexActive, sortedSlides]);
 
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      window.removeEventListener("resize", handleResize);
-    };
-  }, []);
-
-  const slidesData = isMobile
-    ? mobileSlidesData
-    : isTablet
-    ? tabletSlidesData
-    : desktopSlidesData;
+  useInterval(
+    () => {
+      handleAutoNext();
+    },
+    isRunning ? SLIDE_DURATION : null
+  );
 
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (!isHovering) {
+    if (isRunning) {
       interval = setInterval(() => {
-        setCurrentSlide((prevSlide) => (prevSlide + 1) % slidesData.length);
-      }, 3000);
+        setProgress((prev) => (prev < 100 ? prev + 1 : 100));
+      }, SLIDE_DURATION / 100);
     }
-
     return () => clearInterval(interval);
-  }, [currentSlide, isHovering, slidesData]);
+  }, [isRunning]);
 
-  const handleMouseEnter = () => {
-    setIsHovering(true);
+  const handleAutoNext = () => {
+    setIndexActive((state) => {
+      if (state >= sortedSlides.length - 1) return 0;
+      return state + 1;
+    });
+    resetProgress();
   };
 
-  const handleMouseLeave = () => {
-    setIsHovering(false);
+  const handleClickNext = () => {
+    setIndexActive((state) => (state >= sortedSlides.length - 1 ? 0 : state + 1));
+    handleAfterClick();
   };
 
-  const nextSlide = () => {
-    setCurrentSlide((prevSlide) => (prevSlide + 1) % slidesData.length);
+  const handleClickPrev = () => {
+    setIndexActive((state) => (state === 0 ? sortedSlides.length - 1 : state - 1));
+    handleAfterClick();
   };
 
-  const prevSlide = () => {
-    setCurrentSlide((prevSlide) =>
-      prevSlide === 0 ? slidesData.length - 1 : prevSlide - 1
+  const handleAfterClick = () => {
+    toggleIsRunning(false);
+    resetProgress();
+    if (TIME_OUT) clearTimeout(TIME_OUT);
+    TIME_OUT = setTimeout(() => toggleIsRunning(true), 1000);
+  };
+
+  const resetProgress = () => {
+    setProgress(0);
+  };
+
+  const renderItem = (index: number) => {
+    const isActive = indexActive === index;
+    return (
+      <motion.div
+        key={index}
+        className="absolute inset-0 w-full h-full"
+        style={{
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: isActive ? 1 : 0 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.8, ease: "easeInOut" }}
+      />
     );
   };
 
+  const currentSlide = sortedSlides[indexActive];
+  const showOverlay = currentSlide?.mainHeading || currentSlide?.subHeading;
+
   return (
-    <div
-      className="relative max-h-[550px] min-h-[450px] md:min-h-[500px] lg:min-h-[550px]  overflow-hidden"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
+    <div 
+      className="relative w-full h-[550px] md:h-[400px] xl:h-[600px]"
+      onMouseEnter={() => toggleIsRunning(false)}
+      onMouseLeave={() => toggleIsRunning(true)}
     >
-      {slidesData.map((slide, index) => (
-        <div
-          key={slide.id}
-          className={`absolute top-0 left-0 w-full h-full transition-opacity duration-1000 ${
-            index === currentSlide
-              ? "opacity-100"
-              : "opacity-0 pointer-events-none"
-          }`}
-          style={{ backgroundColor: slide.backgroundColor }}
-        >
-          <Image
-            src={slide.featureImage}
-            alt={`Slide ${index + 1}`}
-            className="mx-auto"
-            layout="fill"
-            objectFit="contain"
-          />
+      <AnimatePresence>
+        {sortedSlides.map((_, index) => index === indexActive && renderItem(index))}
+      </AnimatePresence>
+
+      {(currentSlide?.mainHeading || currentSlide?.subHeading || currentSlide?.buttonText) && (
+        <>
+          {showOverlay && <div className="absolute inset-0 bg-black/40 z-[1]" />}
+
+          <div className={`absolute container inset-0 flex ${
+            currentSlide?.contentPosition === "right" 
+              ? "justify-end" 
+              : currentSlide?.contentPosition === "left" 
+              ? "justify-start" 
+              : "justify-center"
+          } items-center z-[2]`}>
+            <motion.div
+              className={`relative space-y-3 text-${currentSlide?.contentPosition || 'center'} sm:space-y-4 text-white px-6`}
+              initial={{ opacity: 0, y: -50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: "easeInOut" }}
+              key={currentSlide.id}
+            >
+              {currentSlide?.subHeading && (
+                <span className={`nc-SectionHero2Item__subheading text-${currentSlide?.contentPosition || 'center'} block text-base md:text-xl font-medium`}>
+                  {currentSlide.subHeading}
+                </span>
+              )}
+
+              {currentSlide?.mainHeading && (
+                <h2 className={`nc-SectionHero2Item__heading font-semibold text-${currentSlide?.contentPosition || 'center'} text-3xl sm:text-4xl md:text-4xl xl:text-5xl 2xl:text-5xl !leading-[114%]`}>
+                  {currentSlide.mainHeading}
+                </h2>
+              )}
+
+              {currentSlide?.buttonText && (
+                <motion.div
+                  initial={{ opacity: 0, y: 50 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, ease: "easeInOut", delay: 0.6 }}
+                >
+                  <ButtonPrimary
+                    className="nc-SectionHero2Item__button items-center dark:bg-slate-900"
+                    sizeClass="py-3 px-6 sm:py-5 sm:px-9"
+                    href={currentSlide.buttonLink as any}
+                  >
+                    <span>{currentSlide.buttonText}</span>
+                  </ButtonPrimary>
+                </motion.div>
+              )}
+            </motion.div>
+          </div>
+        </>
+      )}
+
+      <div
+        className="absolute shadow-2xl bottom-10 select-none right-5 z-50 rounded-[48px] w-[125px] flex bg-white items-center space-x-4"
+        style={{
+          background: `linear-gradient(to right, #00bfff ${progress}%, #fff 0%)`,
+          transition: "background 0.8s ease",
+        }}
+      >
+        <Prev
+          className="z-10 !text-black"
+          btnClassName="w-8 h-8 hover:shadow-xl dark:hover:border-gray-400"
+          svgSize="w-4 h-4"
+          onClickPrev={handleClickPrev}
+        />
+        <div className="mx-4 text-black text-xs font-medium">
+          {indexActive + 1} / {sortedSlides.length}
         </div>
-      ))}
-      <button
-        className="absolute top-1/2 left-4 transform -translate-y-1/2 bg-[#1d4ed8] text-white px-1 py-1 rounded-full focus:outline-none z-10"
-        onClick={prevSlide}
-      >
-        <ChevronLeft className="h-10 w-auto " />
-      </button>
-      <button
-        className="absolute top-1/2 right-4 transform -translate-y-1/2 bg-[#1d4ed8] text-white px-1 py-1 rounded-full focus:outline-none z-10"
-        onClick={nextSlide}
-      >
-        <ChevronRight className="h-10 w-auto " />
-      </button>
-      <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2 z-10">
-        {slidesData.map((_, index) => (
-          <button
-            key={index}
-            className={`w-4 h-4 rounded-full ${
-              index === currentSlide ? "bg-gray-800" : "bg-gray-400"
-            }`}
-            onClick={() => setCurrentSlide(index)}
-          />
-        ))}
+        <Next
+          className="z-10 !text-black"
+          btnClassName="w-8 h-8 hover:shadow-xl dark:hover:border-gray-400"
+          svgSize="w-4 h-4"
+          onClickNext={handleClickNext}
+        />
       </div>
     </div>
   );

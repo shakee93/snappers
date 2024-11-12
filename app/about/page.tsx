@@ -7,6 +7,7 @@ import Img1 from "public/aboutpage/about-img-1-1.jpg";
 import Img2 from "public/aboutpage/about-img-2-1.jpg";
 import Img3 from "public/aboutpage/about-img-3-1.jpg";
 
+
 const AccountPage = () => {
   const about = [
     {

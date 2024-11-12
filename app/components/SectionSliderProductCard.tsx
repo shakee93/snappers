@@ -83,7 +83,6 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
   }, []);
 
 
-
   return (
     <div className={`nc-SectionSliderProductCard ${className}`}>
       {products.some((p) => p.price) && (

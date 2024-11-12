@@ -13,6 +13,7 @@ import { Metadata } from "next";
 import WhatsappLogoComponent from "@/app/components/WhatsAppLogo";
 import Script from "next/script";
 
+import ScreenSizeIndicator from "@/app/components/ScreenSizeIndicator";
 
 export const metadata: Metadata = {
   title: {
@@ -101,6 +102,7 @@ export default async function RootLayout({
               <WhatsappLogoComponent />
               <Toaster />
               <Footer />
+              {/* <ScreenSizeIndicator /> */}
             </SessionProvider>
           </CartProvider>
         </ApolloWrapper>

@@ -6,7 +6,7 @@ import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import { LoginResponse } from "@/utils/type";
 import { useSession } from "@/context/SessionProvider";
 import { useRouter } from "next/navigation";
-import {toast} from "sonner";
+import { toast } from "sonner";
 import { Loader } from "lucide-react";
 import { getRandomWelcomeMessage } from "@/components/AddressPageComps/HelperComps";
 
@@ -20,28 +20,35 @@ const LoginForm = () => {
 
   const handleFormSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-
+  
     try {
       setIsLoading(true);
       let response: LoginResponse = await login(email, password);
+  
       if (response.error) {
-        let errorMessage = `${response.error}`;
-        toast.error(errorMessage);
+        // If there's an error (e.g., incorrect credentials), show the error message and stop further execution
+        toast.error(response.error);
         setIsLoading(false);
         return;
       }
+  
+      // If login is successful, display a welcome message
       const randomMessage = getRandomWelcomeMessage();
       toast(randomMessage);
-    } catch (error) {
-      console.error("Error:", error);
-    } finally {
+  
+      // Fetch customer data and redirect only on successful login
       await fetchCustomer();
-        router.push("/");
-      setIsLoading(false);
-   
+      router.push("/");
+  
+    } catch (error) {
+      // Catch any other unexpected errors
+      console.error("Error:", error);
+      toast.error("Something went wrong, please try again.");
+    } finally {
+      setIsLoading(false); // Always stop the loading spinner at the end
     }
   };
-
+  
 
   return (
     <form className="grid grid-cols-1 gap-6" onSubmit={handleFormSubmit}>

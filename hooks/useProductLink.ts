@@ -19,7 +19,6 @@ const useProductLink = (product?: Product | null) => {
 
         setLink(`/${productBrand.slug}/${product.slug}`)
     }, [product])
-
     return link
 }
 

@@ -19,7 +19,7 @@ const BrandCard: FC<BrandCardProps> = ({
       className="block h-full group " // Add group class for hover targeting
     >
       <div
-        className={`nc-BrandCard bg-white flex h-full px-8 items-center justify-center overflow-hidden relative w-[125px] rounded-2xl ${className}`}
+        className={`nc-BrandCard bg-white flex h-full px-8 items-center justify-center overflow-hidden relative w-full rounded-2xl ${className}`}
       >
         {/* Wrapping the Image in a div to ensure hover applies correctly */}
         <div className="transition-transform duration-300 ease-in-out transform hover:scale-140">

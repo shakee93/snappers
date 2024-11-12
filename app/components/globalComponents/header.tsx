@@ -5,13 +5,16 @@ import NavLinks from "./NavLinks";
 import BrandBar from "./BrandBar";
 import SearchBar from "@/app/components/globalComponents/SearchBar";
 import MobileNavLinks from "./MobileNavLinks";
-import {getClient} from "@/graphql/apollo-ssr";
-import {GET_ALL_PRODUCTS} from "@/graphql/defs/products";
+import { getClient } from "@/graphql/apollo-ssr";
+import { GET_ALL_PRODUCTS } from "@/graphql/defs/products";
+import { GET_OPTIONS } from "@/graphql/defs/options";
 import HeaderSearchResults from "@/app/components/globalComponents/HeaderSearchResults";
-import {Brand} from "@/graphql/types/graphql";
+import { Brand } from "@/graphql/types/graphql";
 import MobileBottomNav from "@/app/components/globalComponents/MobileBottomNav";
-import {isPaymentPage} from "./paymentPageCheckUtils";
+import { isPaymentPage } from "./paymentPageCheckUtils";
+import TopBarPromotion from "@/components/TopBarPromotion";
 
+// Fetch all products and categories
 async function getData(categories: number[] | null = null) {
   const { data, error } = await getClient().query({
     query: GET_ALL_PRODUCTS,
@@ -23,8 +26,17 @@ async function getData(categories: number[] | null = null) {
   };
 }
 
+// Fetch options data for TopBarPromotion
+async function getOptionsData() {
+  const { data } = await getClient().query({
+    query: GET_OPTIONS,
+  });
+  return data;
+}
+
 const Header = async () => {
   const { productCategories, brands } = await getData();
+  const options = await getOptionsData();
 
   if (isPaymentPage()) {
     return <></>;
@@ -34,45 +46,43 @@ const Header = async () => {
     <>
       <header
         className={
-          "backdrop-blur-md sticky top-0 flex flex-col justify-between bg-white/90 z-30 transition-all duration-1300 shadow-xl md:border-b"
+          "sticky top-0  mt-[-9px] flex flex-col justify-between bg-white z-30 transition-all duration-1300 md:border-b"
         }
       >
-        <div className="flex justify-between items-center md:items-stretch bg-white">
-          <div className="flex md:hidden px-2 gap-2 bg-gradient-to-br from-sky-500 to-primaryColor py-2 flex-1 justify-center items-center">
+        <TopBarPromotion options={options} />
+        <div className="py-0 md:container flex justify-between items-center md:items-stretch md:py-2 px-0">
+          
+          <div className="md:hidden px-2 gap-2 bg-gradient-to-br from-sky-500 to-primaryColor py-2 flex-1 justify-center items-center">
             <SearchBar />
           </div>
 
-          <div className="hidden md:flex items-center relative">
-            <Logo />
-          </div>
+          <div className="hidden md:flex relative items-center justify-between w-full px-3">
+            <div className="-left-12 hidden md:flex items-center mr-4">
+              <Logo />
+            </div>
 
-          <div className="hidden md:flex flex-1 flex-col justify-between">
-            <div className="w-full flex flex-1">
-              <div className="flex flex-1 justify-center items-center">
-                <SearchBar />
-              </div>
-              <div className="w-fit flex items-center justify-end pr-3">
-                <div className="hidden md:block">
-                  <NavLinks />
-                </div>
-                <div className="hidden md:flex">
-                  <AvatarDropdown />
-                  <CartDropdown />
-                </div>
+            <div className="hidden md:flex items-center relative px-4">
+              <div className="md:block">
+                <NavLinks />
               </div>
             </div>
-            <BrandBar categories={productCategories} brands={brands} />
+
+            <div className="hidden md:block flex-1">
+              <SearchBar />
+            </div>
+
+            <div className="hidden ml-5 md:flex">
+              <AvatarDropdown />
+              <CartDropdown />
+            </div>
           </div>
         </div>
       </header>
+
       <MobileNavLinks />
 
+      <HeaderSearchResults productCategories={productCategories} brands={brands} />
 
-
-      <HeaderSearchResults
-        productCategories={productCategories}
-        brands={brands}
-      />
       <div className="md:hidden">
         <MobileBottomNav categories={productCategories} />
       </div>

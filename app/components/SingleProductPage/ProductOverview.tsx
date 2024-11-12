@@ -39,11 +39,15 @@ const ProductOverview = ({
     return htmlContent?.replace(/<img/g, '<img style="display:block; margin:auto;"');
   };
 
+  const styleListItems = (htmlContent: string) => {
+    return htmlContent?.replace(/<ul/g, '<ul style="list-style: disc; margin-top:5px; margin-left:25px"');
+  };
+
   const formattedDescription = centerImages(addParagraphSpacing(product.description));
 
   const increaseH1Font = (htmlContent: any) => {
     if (typeof htmlContent !== 'undefined') {
-      return htmlContent.replace(/<h1>/g, '<h1 class="text-lg py-2">');
+      return htmlContent.replace(/<h1>/g, '<h1 class="text-2xl py-2">');
     } else {
       return '';
     }
@@ -59,7 +63,7 @@ const ProductOverview = ({
         <div className="flex flex-col md:flex-row py-2 md:py-5">
           <div className={`${techSpecs && techSpecs.items ? "md:w-3/5" : "md:w-full"} p-2 md:p-4`}>
             <div className="text-xs md:text-sm text-gray-600">
-              {parseHtml(increaseH1Font(formattedDescription) || '')}
+              {parseHtml(styleListItems(increaseH1Font(formattedDescription)) || '')}
             </div>
           </div>
           {(techSpecs && techSpecs.items || manualTechSpecs && manualTechSpecs.length > 0) && (
