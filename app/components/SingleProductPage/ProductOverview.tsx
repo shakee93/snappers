@@ -38,6 +38,7 @@ const ProductOverview = ({
   const centerImages = (htmlContent: string) => {
     return htmlContent?.replace(/<img/g, '<img style="display:block; margin:auto;"');
   };
+  
 
   const styleListItems = (htmlContent: string) => {
     return htmlContent?.replace(/<ul/g, '<ul style="list-style: disc; margin-top:5px; margin-left:25px"');
