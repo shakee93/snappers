@@ -28,6 +28,7 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
+
   const isLocalhost =
     typeof window !== "undefined" && window.location.hostname === "localhost";
 
