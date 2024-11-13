@@ -8,8 +8,7 @@
     "start": "next start",
     "lint": "next lint",
     "codegen": "graphql-codegen --config codegen.ts",
-    "find-unused-exports": "find-unused-exports",
-    "postbuild": "next-sitemap"
+    "find-unused-exports": "find-unused-exports"
   },
   "dependencies": {
     "@apollo/client": "^3.11.0",
