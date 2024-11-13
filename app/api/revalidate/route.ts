@@ -1,7 +1,6 @@
 import { revalidatePath } from 'next/cache'
 import { NextRequest } from 'next/server'
 
-
 // NOTE: IF you want to revalidate all routes, use `/api/revalidate?path=all`;
 // just use `/api/revalidate`.
 export async function GET(request: NextRequest) {
