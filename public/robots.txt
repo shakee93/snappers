@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://gqmobiles.lk/
+
+# Sitemaps
+Sitemap: https://gqmobiles.lk/sitemap.xml
