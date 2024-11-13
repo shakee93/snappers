@@ -42,7 +42,6 @@ const ProductOverview = ({
   const styleListItems = (htmlContent: string) => {
     return htmlContent?.replace(/<ul/g, '<ul style="list-style: disc; margin-top:5px; margin-left:25px"');
   };
-  
 
   const formattedDescription = centerImages(addParagraphSpacing(product.description));
 
