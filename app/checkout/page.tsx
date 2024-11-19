@@ -38,6 +38,7 @@ import {
   transformAddress,
 } from "@/components/AddressPageComps/HelperComps";
 import { useStats } from "react-instantsearch";
+import { Metadata } from "next/types";
 
 interface FormData {
   contactInfo: Record<string, any>;
@@ -49,6 +50,8 @@ interface FormData {
     };
   };
 }
+
+
 
 const CheckoutPage = () => {
   const { cart, removeFromCart, updateCart } = useCart();
@@ -808,7 +811,6 @@ const CheckoutPage = () => {
         onLoad={() => console.log("PayHere script loaded")}
         onError={() => console.error("Error loading PayHere script")}
       />
-      <title>Checkout</title>
 
       <main className="container py-8 md:py-16 lg:pb-28 lg:pt-20 ">
         <PaymentModal

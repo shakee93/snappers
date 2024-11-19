@@ -4,6 +4,7 @@ import { GET_NESTED_CATEGORIES } from "@/graphql/defs/nav";
 import InstantSearchWrapper from "@/app/components/InstantSearchWrapper";
 import { Brand, ProductCategory } from "@/graphql/types/graphql";
 import Link from "next/link";
+import { Metadata } from "next";
 
 async function getData(parentId?: number) {
 
@@ -34,6 +35,42 @@ async function getData(parentId?: number) {
   };
 }
 
+export async function generateMetadata({
+  title,
+  description,
+  category,
+  brand,
+}: ArchiveLayoutProps): Promise<Metadata> {
+  const pageTitle = title || "Explore Our Collections";
+  const pageDescription =
+    description ||
+    "Discover a wide range of products and brands. Elevate your style with GQ Mobiles.";
+  const imageUrl = "https://gqmobiles.lk/default-og-image.jpg";
+
+  return {
+    title: "ddead man walking",
+    description: pageDescription,
+    openGraph: {
+      title: pageTitle,
+      description: pageDescription,
+      url: `https://gqmobiles.lk/${brand?.slug ?? "brands"}/${
+        category?.slug ?? "categories"
+      }`,
+      images: [
+        {
+          url: imageUrl,
+          width: 800,
+          height: 600,
+          alt: "GQ Mobiles Collections",
+        },
+      ],
+    },
+  };
+}
+
+
+
+
 interface ArchiveLayoutProps {
   title: string;
   description?: string;
@@ -60,15 +97,15 @@ const ArchiveLayout = async ({
 
   // console.log('categoryName', category.databaseId);
   // console.log('nestedCategories', nestedCategories);
-  console.log('descriptoin', description);
+  // console.log('descriptoin', description);
   return (
 
     <div className="container py-8 lg:py-12 space-y-16 sm:space-y-20 lg:space-y-28">
       <div className="space-y-4 lg:space-y-6">
         <div className="max-w-screen-sm">
-          <h2 className="block text-2xl sm:text-3xl lg:text-4xl font-semibold">
-            {title}
-          </h2>
+          <h1 className="block text-2xl sm:text-3xl lg:text-4xl font-semibold">
+            {title} 
+          </h1>
           <span className="block mt-2 lg:mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
             {description ||
               "Explore GQ Mobiles Collections – where style meets functionality. Elevate your experience with quality and diverse options. Shop now for a seamless blend of style and substance!"}
@@ -82,7 +119,7 @@ const ArchiveLayout = async ({
               key={index}
               className="flex-shrink-0 rounded-md py-2 px-4 bg-white border border-primaryColor "
             >
-              {item.name}
+              {item.name}  
             </Link>
           ))}
         </div>

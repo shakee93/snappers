@@ -274,7 +274,7 @@ const ProductDetails = ({
 
       {/* Commented */}
 
-      <div className="text-2xl text-primaryColor font-bold md:text-3xl">{product.name}</div>
+      <h1 className="text-2xl text-primaryColor font-bold md:text-3xl">{product.name}</h1>
       <div className="flex items-center gap-1 text-sm font-medium text-gray-500">
         <Link
           href={`/${brand?.slug}`}

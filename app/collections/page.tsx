@@ -1,9 +1,9 @@
+import { Metadata, ResolvingMetadata } from "next";
 import { getClient } from "@/graphql/apollo-ssr";
 import { GET_ALL_PRODUCTS } from "@/graphql/defs/products";
 import InstantSearchWrapper from "@/app/components/InstantSearchWrapper";
 import { Category } from "@/graphql/types/graphql";
 import Link from "next/link";
-import Loading from "./loading";
 
 async function getData(categories: number[] | null = null) {
   const { data, error } = await getClient().query({
@@ -16,26 +16,31 @@ async function getData(categories: number[] | null = null) {
   };
 }
 
+type Props = {
+  params: {
+    slug: string;
+    brand: string;
+  };
+};
+
+
+
 const Page = async () => {
   const { productCategories } = await getData();
-
-  // console.log("productCategory", productCategories);
-
-  // return <Loading/>;
 
   return (
     <div>
       <div className="container py-8 lg:py-12 space-y-16 sm:space-y-20 lg:space-y-28">
-        <div className="space-y-4  lg:space-y-14">
+        <div className="space-y-4 lg:space-y-14">
           <div className="max-w-screen-sm">
             <h2 className="block text-2xl sm:text-3xl lg:text-4xl font-semibold">
               Browse Collections
             </h2>
-            
+
             <span className="block mt-2 lg:mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
-              {
-                "Explore GQ Mobiles Collections asdfasfd – where style meets functionality. Elevate your experience with quality and diverse options. Shop now for a seamless blend of style and substance!"
-              }
+              Explore GQ Mobiles Collections – where style meets functionality.
+              Elevate your experience with quality and diverse options. Shop
+              now for a seamless blend of style and substance!
             </span>
             <div className="block mt-3 sm:mt-5 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-400">
               <Link href={"/#"} className="">

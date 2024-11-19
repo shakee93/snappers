@@ -1,5 +1,11 @@
 import React, { FC } from "react";
 import Link from "next/link";
+import { Metadata } from "next/types";
+
+
+export const metadata: Metadata = {
+  title: "terms and conditions",
+};
 
 const PageTerm = () => {
   return (
@@ -7,7 +13,6 @@ const PageTerm = () => {
       className={` overflow-hidden relative`}
       data-nc-id="Pageterms"
     >
-      <title>Terms and Conditions</title>
 
       <div className="container py-10 lg:py-10 space-y-16 lg:space-y-28">
         <div className="py-8">

@@ -99,7 +99,7 @@ const InstantSearchWrapper = ({
   const [filterQuery, setFilterQuery] = useState<string>(getFilterQuery);
 
   const searchClient = useMemo(() => {
-    console.log('Creating Typesense client with config:', typesenseConfig);
+    // console.log('Creating Typesense client with config:', typesenseConfig);
     const typesenseInstantSearchAdapter = new TypesenseInstantSearchAdapter({
       server: {
         apiKey: "xyz", // Be sure to use an API key that only allows search operations
@@ -118,7 +118,7 @@ const InstantSearchWrapper = ({
       },
     });
 
-    console.log('Typesense client created successfully');
+    // console.log('Typesense client created successfully');
     return typesenseInstantSearchAdapter.searchClient;
   }, []);
 

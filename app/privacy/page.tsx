@@ -1,7 +1,10 @@
 import React, { FC } from "react";
 import Link from "next/link";
+import { Metadata } from "next";
 
-
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+};
 async function measureRequestDuration() {
   try {
     const start = performance.now(); // Start timing
@@ -36,8 +39,6 @@ export default async function PagePrivacy() {
       data-nc-id="PageAbout"
     >
 
-      {/* {JSON.stringify(data)} */}
-      <title>Privacy Policy </title>
 
       <div className="container py-10 lg:py-10 space-y-16 lg:space-y-28">
         <div className="py-8">
