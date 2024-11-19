@@ -5,7 +5,6 @@ export async function POST(req: Request) {
 
     if (req.method === 'POST') {
 
-        console.log('inside');
 
         try {
 

@@ -30,7 +30,7 @@ const Paginationx: FC<PaginationProps> = ({ className = "", onPageChange }) => {
 
   const getVisiblePages = () => {
     if (typeof window !== 'undefined' && window.innerWidth < 768) {
-      console.log(currentRefinement)
+      // console.log(currentRefinement)
       const start = Math.max(0, currentRefinement - 1);
       const end = Math.min(nbPages - 1, currentRefinement + 1);
       return pages.slice(start, end + 1);

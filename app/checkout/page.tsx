@@ -519,7 +519,7 @@ const CheckoutPage = () => {
       // const orderConfirmationdata = await confirmationResponse.json();
       // console.log("orderConfirmation", orderConfirmationdata);
     } else {
-      console.log("initiate payment become null");
+      console.error("initiate payment become null");
     }
   };
 
@@ -563,7 +563,7 @@ const CheckoutPage = () => {
       city: city
     };
 
-    console.log('updatedCheckoutDetails', updatedCheckoutDetails);
+    // console.log('updatedCheckoutDetails', updatedCheckoutDetails);
 
     if (isCashOnDelivery) {
       if (

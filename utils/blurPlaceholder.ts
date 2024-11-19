@@ -7,7 +7,7 @@ async function getBlurData(src: string) {
 
         let jsonData = await data.json()
 
-        console.log(jsonData.data);
+        // console.log(jsonData.data);
 
         return  jsonData.data
     } catch (e ) {

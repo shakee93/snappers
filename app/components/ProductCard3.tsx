@@ -116,7 +116,7 @@ const ProductCard: FC<ProductCardProps> = ({
         notifyAddTocart(1);
       }
     } catch (error: any) {
-      console.log("error", error);
+      // console.log("error", error);
       let isTokenExpired =
         error.graphQLErrors[0]?.debugMessage ===
         "invalid-secret-key | Expired token";

@@ -100,7 +100,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
       onOpenChange();
       setTimeout(onOpen, 500);
     } else {
-      console.log('no customer email');
+      // console.log('no customer email');
     }
   };
 
@@ -151,7 +151,6 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
         : product?.stockQuantity;
 
 
-    console.log("availableStock", availableStock);
     if (availableStock === null || availableStock === undefined) {
       return true
     }

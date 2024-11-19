@@ -191,7 +191,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     variables: { orderID: orderId },
   });
 
-  console.log('order data', orderData);
+  // console.log('order data', orderData);
 
   useEffect(() => {
     getUserData();
