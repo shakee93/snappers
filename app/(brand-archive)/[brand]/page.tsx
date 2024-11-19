@@ -66,9 +66,9 @@ const Page = async ({ params } : {
     }
 }) => {
     const { brand } = await getData(params.brand)
-
+    console.log("Brand description: ", brand)
     return (
-        <ArchiveLayout title={brand.name} brand={brand} filters />
+        <ArchiveLayout title={brand.name} description={brand.description} brand={brand} filters />
     );
 }
 

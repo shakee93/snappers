@@ -49,8 +49,9 @@ export async function generateMetadata(
 const Page = async ({ params }: Props) => {
     const {  productCategory } = await getData(params.collection);
 
+
     return (
-        <ArchiveLayout title={productCategory.name} category={productCategory} filters />
+        <ArchiveLayout title={productCategory.name} description={productCategory.description}   category={productCategory} filters />
     );
 };
 

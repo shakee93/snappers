@@ -60,7 +60,7 @@ const ArchiveLayout = async ({
 
   // console.log('categoryName', category.databaseId);
   // console.log('nestedCategories', nestedCategories);
-
+  console.log('descriptoin', description);
   return (
 
     <div className="container py-8 lg:py-12 space-y-16 sm:space-y-20 lg:space-y-28">

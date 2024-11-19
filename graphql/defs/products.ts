@@ -129,6 +129,7 @@ export const GET_VARIATIONS_PRODUCT = gql`
 export const GET_BRAND = gql`
   query GetBrand($brandId: ID!) {
     brand(id: $brandId, idType: SLUG) {
+      description
       databaseId
       name
       slug

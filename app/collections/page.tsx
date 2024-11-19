@@ -19,6 +19,8 @@ async function getData(categories: number[] | null = null) {
 const Page = async () => {
   const { productCategories } = await getData();
 
+  // console.log("productCategory", productCategories);
+
   // return <Loading/>;
 
   return (
@@ -32,7 +34,7 @@ const Page = async () => {
             
             <span className="block mt-2 lg:mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
               {
-                "Explore GQ Mobiles Collections – where style meets functionality. Elevate your experience with quality and diverse options. Shop now for a seamless blend of style and substance!"
+                "Explore GQ Mobiles Collections asdfasfd – where style meets functionality. Elevate your experience with quality and diverse options. Shop now for a seamless blend of style and substance!"
               }
             </span>
             <div className="block mt-3 sm:mt-5 text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-400">
