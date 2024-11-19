@@ -1,16 +1,23 @@
 import type { MetadataRoute } from 'next'
+import { parseStringPromise } from 'xml2js';
 
 const site = "https://api.gqmobiles.lk/"; 
-const YOAST_API_ENDPOINT = `${site}wp-json/yoast/v1/sitemap_index`;  
+// const YOAST_API_ENDPOINT = `${site}wp-json/yoast/v1/sitemap_index`;  
+const YOAST_API_ENDPOINT = `${site}sitemap_index.xml`;
+
 
 
 async function fetchSitemapData() {
-  // Fetch the Yoast sitemap data from the WordPress site
-  const response = await fetch(YOAST_API_ENDPOINT);
+  const response = await fetch('https://api.gqmobiles.lk/sitemap_index.xml');
   if (!response.ok) {
-    throw new Error('Failed to fetch sitemap data from Yoast API');
+    throw new Error('Failed to fetch sitemap data');
   }
-  return response.json();
+
+  const xmlText = await response.text(); // Get XML as text
+  const jsonData = await parseStringPromise(xmlText); // Convert XML to JSON
+
+  // Adjust the following line to match the structure of your parsed JSON data
+  return jsonData.sitemapindex.sitemap; // Assuming Yoast XML structure
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
