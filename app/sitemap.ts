@@ -80,7 +80,7 @@ export default async function sitemap() {
   const pwbBrandData = await fetchPwbBrandSitemap();
   console.log(`Generated ${pwbBrandData.length} sitemap entries for brands`);
 
-  const productCatData = await fetchProductCatSitemap();
+  const productCatData: any = await fetchProductCatSitemap();
   console.log(
     `Generated ${productCatData.length} sitemap entries for product categories`
   );
