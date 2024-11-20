@@ -38,6 +38,7 @@ const ProductDescription: React.FC<ProductDescriptionProps> = ({ product }) => {
   };
 
   return (
+
     <>
       {product.shortDescription && (
         <div>
@@ -52,27 +53,30 @@ const ProductDescription: React.FC<ProductDescriptionProps> = ({ product }) => {
               />
             </AccordionItem>
           </Accordion>
-          <hr className="border-gray-300" />
+          {!warrantyType && <hr className="mt-2 border-gray-300" />}
         </div>
-      )} 
+      )}
 
-      {warrantyType && warrantyPeriod && (
+      {(warrantyType || warrantyPeriod) && (
         <div>
-          {!product.shortDescription && <hr className="mt-2 border-gray-300" />}
+          {product.shortDescription && <hr className="mt-2 border-gray-300" />}
           <Accordion>
             <AccordionItem key="1" aria-label="Warranty" title="Warranty">
               <div className="pb-1 text-sm">
                 <span className="">Warranty Type :</span>{" "}
                 {warrantyType}
               </div>
-              <div className="text-sm">
-                <span className="">Warranty period :</span>{" "}
-                {warrantyPeriod} Months
-              </div>
+              {warrantyPeriod && (
+                <div className="text-sm">
+                  <span>Warranty period :</span>{" "}
+                  {warrantyPeriod === null || "Not Applicable" ? warrantyPeriod : `${warrantyPeriod} Months`}
+                </div>
+              )}
             </AccordionItem>
           </Accordion>
         </div>
       )}
+
 
       {insideTheBoxValue && (
         <div>
