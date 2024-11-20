@@ -1,44 +1,108 @@
-import type { MetadataRoute } from 'next'
-import { parseStringPromise } from 'xml2js';
+import {
+  fetchPageSitemap,
+  fetchPwbBrandSitemap,
+  fetchProductCatSitemap,
+} from "@/data/sitemap-helpers";
+import { getClient } from "@/graphql/apollo-ssr";
+import { ProductURLData } from "@/graphql/defs/sitemap-queries";
+import { gql } from "@apollo/client";
 
-const site = "https://api.gqmobiles.lk/"; 
-// const YOAST_API_ENDPOINT = `${site}wp-json/yoast/v1/sitemap_index`;  
-const YOAST_API_ENDPOINT = `${site}sitemap_index.xml`;
+const FRONT_APP_URL = "https://gqmobiles.lk";
 
+// Function to fetch all products via GraphQL
+const getAllProducts = async () => {
+  let allProducts: any[] = [];
+  let hasNextPage = true;
+  let afterCursor = null;
 
+  try {
+    while (hasNextPage) {
+      const { data }: any = await getClient().query({
+        query: gql`
+          query GetProducts($first: Int!, $after: String) {
+            products(first: $first, after: $after) {
+              nodes {
+                ...ProductURLData
+              }
+              pageInfo {
+                hasNextPage
+                endCursor
+              }
+            }
+          }
+          ${ProductURLData}
+        `,
+        variables: {
+          first: 100, // Adjust batch size based on API limit
+          after: afterCursor,
+        },
+      });
 
-async function fetchSitemapData() {
-  const response = await fetch('https://api.gqmobiles.lk/sitemap_index.xml');
-  if (!response.ok) {
-    throw new Error('Failed to fetch sitemap data');
+      const { nodes, pageInfo } = data.products;
+      allProducts = [...allProducts, ...nodes];
+      hasNextPage = pageInfo.hasNextPage;
+      afterCursor = pageInfo.endCursor;
+    }
+
+    return { products: allProducts };
+  } catch (error) {
+    console.error("Error fetching all sitemap products", error);
+    return { products: [] };
   }
+};
 
-  const xmlText = await response.text(); // Get XML as text
-  const jsonData = await parseStringPromise(xmlText); // Convert XML to JSON
+// Transform products into sitemap entries
+const fetchProductSitemapWithGraphql = (products: any[]) => {
+  return products.map((product: any) => {
+    const lastModified = product.date ? new Date(product.date) : new Date();
+    const brand = product.brands?.nodes?.[0]?.name.toLowerCase() || "";
+    const slug = product.slug || "";
+    const url = `${FRONT_APP_URL}/${brand}/${slug}`;
 
-  // Adjust the following line to match the structure of your parsed JSON data
-  return jsonData.sitemapindex.sitemap; // Assuming Yoast XML structure
-}
+    return {
+      url,
+      lastModified,
+      changeFrequency: "monthly",
+      priority: 0.5,
+    };
+  });
+};
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  // Fetch Yoast data
-  const yoastData = await fetchSitemapData();
-  
-  // Construct URLs for the sitemap based on Yoast response
-  // This depends on the structure of the response from Yoast API.
-  const sitemapEntries = yoastData.map((item: any) => ({
-    url: item.loc, // Adjust this property based on the Yoast API response structure
-    lastModified: new Date(item.lastmod), // Ensure this field exists or replace with Date()
-    changeFrequency: item.changefreq || 'monthly',
-    priority: item.priority || 0.5,
-  }));
+export default async function sitemap() {
+  // Fetch data
+  const listAllProducts = await getAllProducts();
+  const productData = fetchProductSitemapWithGraphql(listAllProducts.products);
+  console.log(`Generated ${productData.length} sitemap entries for products`);
 
-  // Return the generated sitemap array
+  const pageData = await fetchPageSitemap();
+  console.log(`Generated ${pageData.length} sitemap entries for pages`);
+
+  const pwbBrandData = await fetchPwbBrandSitemap();
+  console.log(`Generated ${pwbBrandData.length} sitemap entries for brands`);
+
+  const productCatData = await fetchProductCatSitemap();
+  console.log(
+    `Generated ${productCatData.length} sitemap entries for product categories`
+  );
+
+  // Combine all results into a single array
+  const sitemapEntries = [
+    ...pageData,
+    ...productData,
+    ...pwbBrandData,
+    ...productCatData,
+  ];
+
+  // Add main site entry and return sitemap
+  console.log(
+    `Total sitemap entries generated: ${sitemapEntries.length + 1}` // +1 for the main site entry
+  );
+
   return [
     {
-      url: 'https://gqmobiles.lk',
+      url: FRONT_APP_URL,
       lastModified: new Date(),
-      changeFrequency: 'yearly',
+      changeFrequency: "yearly",
       priority: 1,
     },
     ...sitemapEntries,

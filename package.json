@@ -79,6 +79,7 @@
     "use-next-blurhash": "^1.0.5",
     "web-vitals": "^3.5.2",
     "xml2js": "^0.6.2",
+    "xmldom": "^0.6.0",
     "zustand": "^4.5.4"
   },
   "devDependencies": {
@@ -92,6 +93,7 @@
     "@types/react-image-gallery": "^1.2.4",
     "@types/react-inner-image-zoom": "^3.0.3",
     "@types/react-slick": "^0.23.13",
+    "@types/xml2js": "^0.4.14",
     "autoprefixer": "^10.4.19",
     "eslint": "^8.57.0",
     "eslint-config-next": "14.0.3",
