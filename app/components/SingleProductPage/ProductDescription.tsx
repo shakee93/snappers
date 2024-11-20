@@ -38,7 +38,6 @@ const ProductDescription: React.FC<ProductDescriptionProps> = ({ product }) => {
   };
 
   return (
-
     <>
       {product.shortDescription && (
         <div>
