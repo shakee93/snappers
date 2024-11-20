@@ -36,7 +36,6 @@ const ProductDescription: React.FC<ProductDescriptionProps> = ({ product }) => {
       .map(item => `<li class="mb-1 capitalize">${item}</li>`)
       .join('')}</ul>`;
   };
-
   return (
     <>
       {product.shortDescription && (
