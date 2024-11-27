@@ -1,4 +1,5 @@
 import React from "react";
+import Link from "next/link";
 
 interface Options {
   topBarBgColor?: string;
@@ -12,12 +13,12 @@ interface Options {
 
 const TopBarPromotion: React.FC<{ options?: Options }> = ({ options }) => {
   const {
-    topBarBgColor = "rgba(0, 0, 0, 0.8)", // Default value in rgba format for opacity
+    topBarBgColor = "rgba(0, 0, 0, 0.8)",
     topBarBeforeText = "The ALL NEW",
     topBarHighlightedText = "iPhone 16 Series",
     topBarAfterText = "Available!",
-    topBarHighlightedColor = "#fb923c", // Example hex color
-    topBarButtonLink = "https://gqmobiles.lk/iphone-16",
+    topBarHighlightedColor = "#fb923c",
+    topBarButtonLink = "/iphone-16",
     topBarButtonText = "Shop Now",
   } = options || {};
 
@@ -32,12 +33,12 @@ const TopBarPromotion: React.FC<{ options?: Options }> = ({ options }) => {
               <span>{topBarAfterText}</span>{" "}
             </div>
             <div className="text-xs">
-              <a
-                href={topBarButtonLink}
+              <Link
+                href="/iphone-16"
                 className="bg-blue-700 text-white font-semibold py-1 px-4 rounded transition duration-300 ease-in-out hover:bg-blue-800"
               >
                  {topBarButtonText}
-              </a>
+              </Link>
             </div>
           </div>
         </div>
