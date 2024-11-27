@@ -17,7 +17,7 @@ const TopBarPromotion: React.FC<{ options?: Options }> = ({ options }) => {
     topBarHighlightedText = "iPhone 16 Series",
     topBarAfterText = "Available!",
     topBarHighlightedColor = "#fb923c", // Example hex color
-    topBarButtonLink = "https://gqmobiles.lk//apple/apple-iphone-16",
+    topBarButtonLink = "https://gqmobiles.lk/iphone-16",
     topBarButtonText = "Shop Now",
   } = options || {};
 
