@@ -55,15 +55,15 @@ const getAllProducts = async () => {
 const fetchProductSitemapWithGraphql = (products: any[]) => {
   return products.map((product: any) => {
     const lastModified = product.date ? new Date(product.date) : new Date();
-    const brand = product.brands?.nodes?.[0]?.name.toLowerCase() || "";
+    const brand = product.brands?.nodes?.[0]?.name.toLowerCase().replace(" ", "-") || "";
     const slug = product.slug || "";
     const url = `${FRONT_APP_URL}/${brand}/${slug}`;
 
     return {
       url,
       lastModified,
-      changeFrequency: "monthly",
-      priority: 0.5,
+      changeFrequency: "weekly",
+      priority: 0.9, 
     };
   });
 };
@@ -99,12 +99,12 @@ export default async function sitemap() {
   );
 
   return [
-    {
-      url: FRONT_APP_URL,
-      lastModified: new Date(),
-      changeFrequency: "yearly",
-      priority: 1,
-    },
+    // {
+    //   url: FRONT_APP_URL,
+    //   lastModified: new Date(),
+    //   changeFrequency: "yearly",
+    //   priority: 1,
+    // },
     ...sitemapEntries,
   ];
 }

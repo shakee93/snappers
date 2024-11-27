@@ -51,7 +51,12 @@ async function fetchAndParseSitemap(
 
 // Fetchers for individual XML sitemaps
 const fetchPageSitemap = () =>
-  fetchAndParseSitemap(`${API_SITE_URL}/page-sitemap.xml`);
+  fetchAndParseSitemap(`${API_SITE_URL}/page-sitemap.xml`, (urlEntry) => ({
+    url: urlEntry.loc[0].replace(API_SITE_URL, FRONT_APP_URL),
+    lastModified: urlEntry.lastmod ? new Date(urlEntry.lastmod[0]) : new Date(),
+    changeFrequency: "monthly",
+    priority: urlEntry.priority ? parseFloat(urlEntry.priority[0]) : 0.5,
+  }));
 
 const fetchPwbBrandSitemap = () =>
   fetchAndParseSitemap(
@@ -63,6 +68,7 @@ const fetchPwbBrandSitemap = () =>
       const brandMatch = originalLoc.match(/\/brand\/([^/]+)/);
       if (brandMatch) {
         const brandName = brandMatch[1];
+        console.log("brandName", brandName);
         transformedUrl = `${FRONT_APP_URL}/${brandName}`;
       } else {
         transformedUrl = originalLoc.replace(API_SITE_URL, FRONT_APP_URL);
@@ -98,12 +104,10 @@ const fetchProductCatSitemap = () =>
         lastModified: urlEntry.lastmod
           ? new Date(urlEntry.lastmod[0])
           : new Date(),
-        changeFrequency: urlEntry.changefreq
-          ? urlEntry.changefreq[0]
-          : "monthly",
+        changeFrequency: "daily",
         priority: urlEntry.priority
           ? parseFloat(urlEntry.priority[0])
-          : 0.5,
+          : 0.8,
       };
     }
   );
