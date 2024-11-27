@@ -86,8 +86,6 @@ const PaymentMethod: FC<Props> = ({
   const PaymentMethods: FC<{ gateway: PaymentGateway }> = ({ gateway }) => {
     const active = methodActive === gateway.id;
 
-    // console.log("activeMethod: ", gateway.id);
-
     let is_tab_or_mobile = hidePayhereForMobileAndTablets ? gateway.id == "payhere" && hidePayhere : false;
     const shouldHidePayhere = gateway.id === 'payhere' && isPriceFluctuation?.topBarPriceFluctuationNotice && totalPayment >= 100000;
     return (
@@ -122,7 +120,7 @@ const PaymentMethod: FC<Props> = ({
               htmlFor={gateway.id}
               className="flex items-center space-x-4 sm:space-x-6"
             >
-              <p className="font-medium">{gateway.title}</p>
+              <p className="font-medium">{gateway.id === "payhere" ? "Pay Online" : gateway.title}</p>
             </label>
             <div className={`mt-6 mb-4 ${active ? "block" : "hidden"}`}>
               {gateway.icon ? (
@@ -202,9 +200,7 @@ const PaymentMethod: FC<Props> = ({
 
           {/* ==================== */}
           <div className="flex flex-col gap-6">
-            {/* {paymentGateways?.map((gateway) => (
-              <p key={gateway.id}>{ JSON.stringify(gateway) }</p>
-            ))} */}
+           
             {paymentGateways?.map((gateway) => (
               <PaymentMethods key={gateway.id} gateway={gateway} />
             ))}
