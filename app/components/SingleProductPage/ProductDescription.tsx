@@ -85,7 +85,6 @@ const ProductDescription: React.FC<ProductDescriptionProps> = ({ product }) => {
         </div>
       )}
 
-
       {insideTheBoxValue && (
         <div>
           <hr className="border-gray-300" />
