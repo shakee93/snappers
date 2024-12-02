@@ -97,7 +97,8 @@ export const ProductContentSlice = gql`
         nodes {
           name
           slug
-        }
+       
+          }
       }
       allPaWatchSize {
         nodes {
@@ -111,6 +112,13 @@ export const ProductContentSlice = gql`
           slug
         }
       }
+      allPaConnectorType {
+        nodes {
+          name
+          slug
+        }
+      } 
+      
       price
       regularPrice
       soldIndividually
@@ -307,6 +315,12 @@ export const ProductContentFull = gql`
               slug
             }
           }
+          allPaConnectorType {
+            nodes {
+              name
+              slug
+            }
+          }
           allPaBandType {
             nodes {
               name
@@ -498,6 +512,12 @@ export const ProductContentFull = gql`
         }
       }
       allPaSize {
+        nodes {
+          name
+          slug
+        }
+      }
+      allPaConnectorType {
         nodes {
           name
           slug
