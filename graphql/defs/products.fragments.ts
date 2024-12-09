@@ -350,6 +350,12 @@ export const ProductContentFull = gql`
               slug
             }
           }
+          allPaAmount {
+            nodes {
+              name
+              slug
+            }
+          }
          
           onSale
           price
@@ -548,6 +554,12 @@ export const ProductContentFull = gql`
         }
       }
       allPaNetwork {
+        nodes {
+          name
+          slug
+        }
+      }
+      allPaAmount {
         nodes {
           name
           slug
