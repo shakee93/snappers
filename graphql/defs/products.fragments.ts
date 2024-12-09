@@ -118,7 +118,12 @@ export const ProductContentSlice = gql`
           slug
         }
       } 
-      
+      allPaAmount {
+        nodes {
+          name
+          slug
+        }
+      }
       price
       regularPrice
       soldIndividually
@@ -345,12 +350,7 @@ export const ProductContentFull = gql`
               slug
             }
           }
-          allPaAmount {
-            nodes {
-              name
-              slug
-            }
-          }
+         
           onSale
           price
           rawPrice: price(format: RAW)
@@ -548,12 +548,6 @@ export const ProductContentFull = gql`
         }
       }
       allPaNetwork {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaAmount {
         nodes {
           name
           slug
