@@ -167,8 +167,7 @@ const CheckoutPage = () => {
 
   // MUTATIONS
   const [updateCartShippingTotalMutation] = useMutation(UPDATE_SHIPPING_TOTAL);
-  const [
-    checkoutMutation,
+  const [checkoutMutation,
     {
       // data: realCheckoutData,
     },
@@ -236,6 +235,7 @@ const CheckoutPage = () => {
     const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
     const isPayhere = formData?.paymentMethod?.selectedGateway?.id == "payhere";
     if (paymentMethodId === undefined) {
+      console.log('transaction message failed');
       console.error("Payment method ID is undefined");
       toast.error("Payment Method was not chosen.");
       return;
@@ -243,8 +243,6 @@ const CheckoutPage = () => {
 
     const shippingMethod = getShippingMethod(shippingTotal);
     const shippingDetails = transformAddress(formData.deliveryAddress);
-    // const billingDetails = transformAddress(formData.billingAddress);
-
     const email = formData?.contactInfo?.email;
 
     const billingDetails = {
@@ -277,6 +275,8 @@ const CheckoutPage = () => {
       customer?.id === "guest"
         ? await guestCheckout({ variables })
         : await checkoutMutation({ variables });
+
+    console.log('data in checkout page', data);
 
     const sentConfirmation = async (): Promise<any> => {
       const confirmationResponse = await fetch(
@@ -323,8 +323,10 @@ const CheckoutPage = () => {
       };
 
       console.log('updatedCheckoutDetails', updatedCheckoutDetails);
-      
+
+
       if (isPayhere) {
+        console.log('inside the checkout page is payhere', checkoutDetails);
         if (
           customer?.id === "guest" ||
           checkoutDetails.order_id == "guest_checkout"
@@ -340,9 +342,17 @@ const CheckoutPage = () => {
         toast.info("You'll be on the thank you page in just a moment.");
         let redirectUrl = `checkout/${checkoutDetails.order_id}`;
         router.push(redirectUrl);
+        const data = {
+          ...checkoutDetails,
+          order_id: checkoutDetails.order_id
+          // order_id: 16382
+        }
+        console.log('data', data);
       }
 
       let orderid = data?.checkout.order.databaseId;
+      console.log('orderid', orderid);
+
       toast.success("🌟 Order Placed Successfully! 🚀");
       router.push(`/checkout/${orderid}`);
     } else {
@@ -351,8 +361,7 @@ const CheckoutPage = () => {
   };
 
   useEffect(() => {
-    // let redirectUrl = `checkout/${checkoutDetails.order_id}`;
-    // router.push(redirectUrl);
+
     switch (payhereHandleStatus) {
       case "finished":
         implementCheckoutAfterPayhere();
@@ -378,6 +387,7 @@ const CheckoutPage = () => {
     if (hasFreeShipping) {
       setFreeShipping(true);
     }
+    // console.log('isStorePickup', isStorePickup);
     try {
       const shippingMethods = isStorePickup
         ? "pickup_location:0"
@@ -434,12 +444,12 @@ const CheckoutPage = () => {
 
   const ImplementPayhere = async () => {
 
+    console.log('ImplementPayhere', paymentData);
+
     let generatedOrderId = crypto.randomUUID();
     setPayherPaymentID(generatedOrderId);
 
-    let { firstName, lastName, city, apartment } =
-      formData.billingAddress as any;
-
+    let { firstName, lastName, city, apartment } = formData.billingAddress as any;
     let { email, phone } = formData.contactInfo;
 
     if (
@@ -484,6 +494,7 @@ const CheckoutPage = () => {
       // amount: orderTotal,
       amount: isCardPayment ? totalWithTax : orderTotal,
       order_id: generatedOrderId,
+      // order_id: "16382",
       first_name: firstName,
       last_name: lastName,
       email: email,
@@ -496,31 +507,36 @@ const CheckoutPage = () => {
     if (initiatePayment !== null) {
       setPayhereHandleStatus("loading");
 
-      // console.log("checkoutDetails", checkoutDetails);
+      console.log("checkoutDetails in checkout page", checkoutDetails);
 
       initiatePayment(checkoutDetails, setPayhereHandleStatus).then((r) => r);
 
-      // const confirmationResponse = await fetch(
-      //   "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/order-confirmation",
-      //   {
-      //     method: "POST",
-      //     headers: {
-      //       "Content-Type": "application/json",
-      //     },
-      //     body: JSON.stringify({
-      //       order_id: checkoutDetails.order_id,
-      //       order_status: "completed",
-      //     }),
-      //   }
-      // );
+      const confirmationResponse = await fetch(
+        "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/order-confirmation",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            order_id: checkoutDetails.order_id,
+            order_status: "completed",
+          }),
+        }
+      );
 
-      // if (!confirmationResponse.ok) {
-      //   const errorResponse = await confirmationResponse.json();
-      //   console.error("Error confirming order status:", errorResponse);
-      // }
+      console.log('confirmationResponse', confirmationResponse);
 
-      // const orderConfirmationdata = await confirmationResponse.json();
-      // console.log("orderConfirmation", orderConfirmationdata);
+      if (!confirmationResponse.ok) {
+        const errorResponse = await confirmationResponse.json();
+        console.error("Error confirming order status:", errorResponse);
+      }
+
+      const orderConfirmationdata = await confirmationResponse.json();
+      console.log("orderConfirmation", orderConfirmationdata);
+      toast.info("You'll be on the thank you page in just a moment.");
+      let redirectUrl = `checkout/${checkoutDetails.order_id}`;
+      router.push(redirectUrl);
     } else {
       console.error("initiate payment become null");
     }
@@ -542,8 +558,7 @@ const CheckoutPage = () => {
       return;
     }
 
-    const isCashOnDelivery =
-      formData?.paymentMethod?.selectedGateway?.id == "cod";
+    const isCashOnDelivery = formData?.paymentMethod?.selectedGateway?.id == "cod";
 
     let checkoutDetails = paymentDetails;
 
@@ -636,11 +651,9 @@ const CheckoutPage = () => {
       return;
     }
 
-    const isBankTransfer =
-      formData?.paymentMethod?.selectedGateway?.id == "bacs";
+    const isBankTransfer = formData?.paymentMethod?.selectedGateway?.id == "bacs";
     const isPayhere = formData?.paymentMethod?.selectedGateway?.id == "payhere";
-    const isCashOnDelivery =
-      formData?.paymentMethod?.selectedGateway?.id == "cod";
+    const isCashOnDelivery = formData?.paymentMethod?.selectedGateway?.id == "cod";
 
     // console.log("formData: ", formData);
 
@@ -672,8 +685,7 @@ const CheckoutPage = () => {
     setLoading(true);
 
     try {
-      const isPayhere =
-        formData?.paymentMethod?.selectedGateway?.id == "payhere";
+      const isPayhere = formData?.paymentMethod?.selectedGateway?.id == "payhere";
 
       if (isPayhere) {
         try {
@@ -686,8 +698,7 @@ const CheckoutPage = () => {
       }
 
       const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
-
-      // console.log('paymentMethodID', paymentMethodId);
+      console.log('paymentMethodID', paymentMethodId);
 
       if (paymentMethodId === undefined) {
         console.error("Payment method ID is undefined");
@@ -713,6 +724,8 @@ const CheckoutPage = () => {
             <p><strong>Phone Number:</strong> ${formData?.contactInfo?.phone}</p>
         `;
 
+      console.log('paymentMethodId', paymentMethodId);
+
       const variables = {
         input: {
           paymentMethod: paymentMethodId,
@@ -723,15 +736,13 @@ const CheckoutPage = () => {
         },
       };
 
-      const { data } =
-        customer?.id === "guest"
-          ? await guestCheckout({ variables })
-          : await checkoutMutation({ variables });
 
-      const isBankTransfer =
-        formData?.paymentMethod?.selectedGateway?.id == "bacs";
+      const { data } = customer?.id === "guest" ? await guestCheckout({ variables }) : await checkoutMutation({ variables });
+
+      const isBankTransfer = formData?.paymentMethod?.selectedGateway?.id == "bacs";
 
       setGuestCheckoutData(data);
+      console.log('data just below guest checkout', data);
 
       if (data) {
         const checkoutDetails = savePaymentDetails(data);
@@ -768,8 +779,6 @@ const CheckoutPage = () => {
         : "wbs:0dd3bc79_weight_based_shipping";
 
     const total = shippingTotal;
-
-    // console.log("Shipping Method: ", { methodId, methodTitle, total });
 
     return { methodId, methodTitle, total };
   };

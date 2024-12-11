@@ -51,7 +51,7 @@ const DeliveryAddress: FC<Props> = ({
 
   const [isBillingSameAsShipping, setIsBillingSameAsShipping] = useState(true);
 
-  useEffect(() => {}, []);
+  useEffect(() => { }, []);
   const handleDeliverySame = () => {
     setIsBillingSameAsShipping((prevValue) => {
       const newValue = !prevValue;
@@ -69,10 +69,10 @@ const DeliveryAddress: FC<Props> = ({
   };
 
   const handleStorePickupChange = () => {
-    // console.log("inital value: ", isStorePickup);
+    console.log("inital value: ", isStorePickup);
     if (!isStorePickup) {
       setStorePickup(true);
-      // console.log("store pickup Value: ", isStorePickup);
+      console.log("store pickup Value: ", isStorePickup);
       updateFormData("billingAddress", formData.BillingAddress);
       updateFormData("shippingDetails", {
         databaseId: "local_pickup",
@@ -87,7 +87,7 @@ const DeliveryAddress: FC<Props> = ({
         title: null,
       });
     }
-    // console.log("final value: ", isStorePickup);
+    console.log("final value: ", isStorePickup);
   };
 
   useEffect(() => {
@@ -186,11 +186,10 @@ const DeliveryAddress: FC<Props> = ({
         </div>
         <form onSubmit={handleSubmit}>
           <div
-            className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-2 sm:space-y-2 ${
-              isActive ? "block" : "hidden"
-            }`}
+            className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-2 sm:space-y-2 ${isActive ? "block" : "hidden"
+              }`}
           >
-            {/* <div className="w-fit border border-slate-200 dark:border-slate-700 rounded-xl p-4">
+            <div className="w-fit border border-slate-200 dark:border-slate-700 rounded-xl p-4">
               <Checkbox
                 key={1}
                 label="Store Pickup"
@@ -198,7 +197,7 @@ const DeliveryAddress: FC<Props> = ({
                 defaultChecked={isStorePickup}
                 onChange={handleStorePickupChange}
               />
-            </div> */}
+            </div>
             {/* ============ */}
             <div className="grid grid-cols-1 sm:grid-cols-2  sm:gap-3">
               <div>
