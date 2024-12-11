@@ -84,7 +84,7 @@ const CategoryFilter = ({ sorts }: { sorts: any }) => {
                         onChange={v => {
                             console.log({ v });
                             setSortOrderStates(v)
-                            close()
+                            // close()
                         }}
                     />
                 ))}
