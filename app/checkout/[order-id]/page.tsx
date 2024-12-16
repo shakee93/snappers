@@ -24,7 +24,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     { fetchPolicy: "no-cache" },
   );
 
-  console.log('customerData', customerData);
+  // console.log('customerData', customerData);
 
   // console.log({ orderId });
   // console.log({ searchParams });

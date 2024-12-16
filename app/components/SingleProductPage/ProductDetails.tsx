@@ -169,6 +169,7 @@ const ProductDetails = ({
   const { data, loading, error } = useQuery(GET_PRICE_FLUCTUATION_NOTICE);
   const isPriceFluctuation = data?.topBarPriceFluctuationNotice || false;
 
+
   return (
     <>
       {isPriceFluctuation && (
@@ -441,56 +442,63 @@ const ProductDetails = ({
                   </span>{" "}
                 </div>
 
+
                 <ul className="flex flex-wrap items-center gap-2 text-sm">
-                  {attr.options?.map((option, optionIndex) => {
-                    // Find the variations that match the current attribute option
-                    const matchingVariations = (
-                      product as VariableProduct
-                    ).variations?.nodes.filter((v: ProductVariation) => {
-                      return v.attributes?.nodes.some(
-                        (node: any) =>
-                          node.name === attr.name && node.value === option
+                  {attr.options
+                    ?.slice()
+                    .sort((a, b) => {
+                      const numA = a ? parseInt(a.replace(/[^0-9]/g, ""), 10) : 0; // Default to 0 if a is null
+                      const numB = b ? parseInt(b.replace(/[^0-9]/g, ""), 10) : 0; // Default to 0 if b is null
+                      return numA - numB;
+                    })
+                    .map((option, optionIndex) => {
+                      const matchingVariations = (
+                        product as VariableProduct
+                      ).variations?.nodes.filter((v: ProductVariation) => {
+                        return v.attributes?.nodes.some(
+                          (node: any) =>
+                            node.name === attr.name && node.value === option
+                        );
+                      });
+
+                      const allOutOfStock = matchingVariations?.every(
+                        (v) => v.stockStatus !== "IN_STOCK"
                       );
-                    });
 
-                    const allOutOfStock = matchingVariations?.every(
-                      (v) => v.stockStatus !== "IN_STOCK"
-                    );
+                      return (
+                        <li
+                          key={optionIndex}
+                          onClick={() => {
+                            // Set the first in-stock variation as the active variation
 
-                    return (
-                      <li
-                        key={optionIndex}
-                        onClick={() => {
-                          // Set the first in-stock variation as the active variation
+                            //   "attirbute is clicked",
+                            //   firstInStockVariation?.attributes,
+                            //   firstInStockVariation?.attributes?.nodes[0].name
+                            // );
 
-                          //   "attirbute is clicked",
-                          //   firstInStockVariation?.attributes,
-                          //   firstInStockVariation?.attributes?.nodes[0].name
-                          // );
+                            // option = firstInStockVariation?.attributes?.nodes[1].value || ""
 
-                          // option = firstInStockVariation?.attributes?.nodes[1].value || ""
-
-                          setAttribute(attr, option || "");
-                        }}
-                        className={twMerge(
-                          "relative inline-block cursor-pointer rounded border bg-gray-200/80 px-3.5 py-2 text-xs text-black md:text-sm",
-                          activeAttr(attr)?.val === option &&
-                          "border-primaryColor text-primaryColor bg-white shadow-md",
-                          allOutOfStock && "diag-line bg-gray-100 text-gray-500"
-                        )}
-                        style={{ opacity: allOutOfStock ? 0.9 : 1 }}
-                        title={allOutOfStock ? "Out of stock" : ""}
-                      >
-                        {(product as any)[
-                          `allPa${(attr?.label as unknown as "Capacity")
-                            ?.split(" ")
-                            .join("")}`
-                        ]?.nodes.find((node: PaCapacity) => {
-                          return node.slug === option;
-                        })?.name || "OPTION"}
+                            setAttribute(attr, option || "");
+                          }}
+                          className={twMerge(
+                            "relative inline-block cursor-pointer rounded border bg-gray-200/80 px-3.5 py-2 text-xs text-black md:text-sm",
+                            activeAttr(attr)?.val === option &&
+                            "border-primaryColor text-primaryColor bg-white shadow-md",
+                            allOutOfStock && "diag-line bg-gray-100 text-gray-500"
+                          )}
+                          style={{ opacity: allOutOfStock ? 0.9 : 1 }}
+                          title={allOutOfStock ? "Out of stock" : ""}
+                        >
+                          {(product as any)[
+                            `allPa${(attr?.label as unknown as "Capacity")
+                              ?.split(" ")
+                              .join("")}`
+                          ]?.nodes.find((node: PaCapacity) => {
+                            return node.slug === option;
+                          })?.name || "OPTION"}
 
 
-                        {/* {allOutOfStock && (
+                          {/* {allOutOfStock && (
                           <span
                             className="absolute inset-0 flex items-center justify-center"
                             aria-hidden="true"
@@ -498,9 +506,9 @@ const ProductDetails = ({
                             <span className="w-full h-0.5 bg-gray-400 transform rotate-45"></span>
                           </span>
                         )} */}
-                      </li>
-                    );
-                  })}
+                        </li>
+                      );
+                    })}
                 </ul>
               </div>
             )
