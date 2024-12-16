@@ -18,7 +18,7 @@ const TopBarPromotion: React.FC<{ options?: Options }> = ({ options }) => {
     topBarHighlightedText = "iPhone 16 Series",
     topBarAfterText = "Available!",
     topBarHighlightedColor = "#fb923c",
-    topBarButtonLink = "/iphone-16",
+    topBarButtonLink = "/series/iphone-16",
     topBarButtonText = "Shop Now",
   } = options || {};
 
@@ -34,10 +34,10 @@ const TopBarPromotion: React.FC<{ options?: Options }> = ({ options }) => {
             </div>
             <div className="text-xs">
               <Link
-                href="/iphone-16"
+                href={{ pathname: '/tag/iphone-16', query: { title: 'Iphone 16' } }}
                 className="bg-blue-700 text-white font-semibold py-1 px-4 rounded transition duration-300 ease-in-out hover:bg-blue-800"
               >
-                 {topBarButtonText}
+                {topBarButtonText}
               </Link>
             </div>
           </div>

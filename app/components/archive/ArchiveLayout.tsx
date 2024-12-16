@@ -48,7 +48,7 @@ export async function generateMetadata({
   const imageUrl = "https://gqmobiles.lk/default-og-image.jpg";
 
   return {
-    title: "ddead man walking",
+    title: "dead man walking",
     description: pageDescription,
     openGraph: {
       title: pageTitle,
