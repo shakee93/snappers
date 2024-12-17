@@ -34,6 +34,18 @@ export const GET_PRODUCT = gql`
   }
 `;
 
+
+export const GET_TAG_DETAILS_BY_SLUG = gql`
+  query GetTagDetailsBySlug($slug: [String]!) {
+    productTags(where: {slug: $slug }) {
+      nodes {
+        id
+        name
+      }
+  }
+}
+`;
+
 export const GET_ALL_PRODUCTS = gql`
   query GetAllProducts {
     productCategories(first: 100, where: { orderby: COUNT }) {
@@ -101,6 +113,7 @@ export const GET_VARIATIONS_PRODUCT = gql`
             productTags {
               nodes {
                 name
+                slug
               }
             }
             id

@@ -24,7 +24,10 @@ const ProductGridInstant = ({
   brand,
   category,
 }: ProductGridProps) => {
+
   const { hits, results } = useHits();
+
+  // console.log('hits', hits);
 
   const { status: statusState } = useInstantSearch();
   const { setSearchStatus, search, search_status, navigation } = useStore();

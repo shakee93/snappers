@@ -114,7 +114,6 @@ const InstantSearchWrapper = ({
         exclude_fields:
           "description, productTags, shortDescription, galleryImages, attributes",
         use_cache: false,
-
       },
     });
 

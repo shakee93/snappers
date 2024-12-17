@@ -34,7 +34,7 @@ const TopBarPromotion: React.FC<{ options?: Options }> = ({ options }) => {
             </div>
             <div className="text-xs">
               <Link
-                href={{ pathname: '/tag/iphone-16', query: { title: 'Iphone 16' } }}
+                href='/tag/iphone-16'
                 className="bg-blue-700 text-white font-semibold py-1 px-4 rounded transition duration-300 ease-in-out hover:bg-blue-800"
               >
                 {topBarButtonText}

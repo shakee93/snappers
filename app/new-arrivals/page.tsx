@@ -9,7 +9,10 @@ export const metadata: Metadata = {
 const Page = () => {
   return (
     <Suspense>
-      <ArchiveLayout title="New Arrivals" filters sort={true} />
+      <ArchiveLayout
+        title="New Arrivals"
+        filters
+        sort={true} />
     </Suspense>
   );
 };

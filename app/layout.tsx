@@ -12,7 +12,6 @@ import { NavigationEvents } from "@/app/components/NavigationEvents";
 import { Metadata } from "next";
 import WhatsappLogoComponent from "@/app/components/WhatsAppLogo";
 import Script from "next/script";
-
 import ScreenSizeIndicator from "@/app/components/ScreenSizeIndicator";
 
 export const metadata: Metadata = {
@@ -93,19 +92,19 @@ export default async function RootLayout({
       </head>
       <body className="bg-gray-100 text-base dark:bg-slate-900 text-slate-900 dark:text-slate-200">
         <ApolloWrapper>
-          <CartProvider>
-            <SessionProvider>
-              <Suspense fallback={null}>
-                <NavigationEvents />
-              </Suspense>
-              <Header />
-              <div className="pb-8 md:pb-24">{children}</div>
-              <WhatsappLogoComponent />
-              <Toaster />
-              <Footer />
-              {/* <ScreenSizeIndicator /> */}
-            </SessionProvider>
-          </CartProvider>
+            <CartProvider>
+              <SessionProvider>
+                <Suspense fallback={null}>
+                  <NavigationEvents />
+                </Suspense>
+                <Header />
+                <div className="pb-8 md:pb-24">{children}</div>
+                <WhatsappLogoComponent />
+                <Toaster />
+                <Footer />
+                {/* <ScreenSizeIndicator /> */}
+              </SessionProvider>
+            </CartProvider>
         </ApolloWrapper>
       </body>
     </html>
