@@ -41,8 +41,6 @@ async function getData(parentId?: number, tagSlug?: string) {
     }
   }
 
-  // console.log("Tag Details:", tagDetails);
-
   return {
     productCategories: data.productCategories.nodes,
     brands: data.brands.nodes,
