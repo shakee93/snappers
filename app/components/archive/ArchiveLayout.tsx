@@ -106,7 +106,7 @@ const ArchiveLayout = async ({
 
   const { productCategories, brands, nestedCategories, tagDetails } = await getData(category?.databaseId ?? '', tag);
 
-  console.log('tagDetails', tagDetails);
+  // console.log('tagDetails', tagDetails);
   // console.log('categoryName', category.databaseId);
   // console.log('nestedCategories', nestedCategories);
   // console.log('descriptoin', description);
