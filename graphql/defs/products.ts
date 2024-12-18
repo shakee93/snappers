@@ -41,6 +41,7 @@ export const GET_TAG_DETAILS_BY_SLUG = gql`
       nodes {
         id
         name
+        description
       }
   }
 }

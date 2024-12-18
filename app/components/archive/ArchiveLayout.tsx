@@ -106,10 +106,11 @@ const ArchiveLayout = async ({
 
   const { productCategories, brands, nestedCategories, tagDetails } = await getData(category?.databaseId ?? '', tag);
 
-  // console.log('tagDetails', tagDetails);
+  console.log('tagDetails', tagDetails);
   // console.log('categoryName', category.databaseId);
   // console.log('nestedCategories', nestedCategories);
   // console.log('descriptoin', description);
+
   return (
     <div className="container py-8 lg:py-12 space-y-16 sm:space-y-20 lg:space-y-28">
       <div className="space-y-4 lg:space-y-6">
@@ -118,8 +119,9 @@ const ArchiveLayout = async ({
             {tagDetails.length > 0 ? tagDetails[0].name : title}
           </h1>
           <span className="block mt-2 lg:mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
-            {description ||
-              "Explore GQ Mobiles Collections – where style meets functionality. Elevate your experience with quality and diverse options. Shop now for a seamless blend of style and substance!"}
+            {tagDetails.length > 0 && tagDetails[0].description
+              ? tagDetails[0].description
+              : description || "Explore GQ Mobiles Collections – where style meets functionality. Elevate your experience with quality and diverse options. Shop now for a seamless blend of style and substance!"}
           </span>
         </div>
 
