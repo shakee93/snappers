@@ -9,7 +9,7 @@ import { extractRawAmount, getPaymentHash, numberFormat, TEST_STATIC_DATA } from
 // const MERCHANT_ID = "1225436";
 const MERCHANT_ID = process.env.NEXT_PUBLIC_MERCHANT_ID;
 // const TEST: boolean = process.env.NEXT_PUBLIC_PAYHERE_IS_LIVE === "true" ? true : false;
-const TEST: boolean = true;
+const TEST: boolean = false;
 
 // DOCS:
 // https://support.payhere.lk/api-&-mobile-sdk/javascript-sdk
@@ -90,24 +90,24 @@ export const usePayhere = () => {
         return null;
       }
       
-      console.log("paymentDetails: ", paymentDetails);
+      // console.log("paymentDetails: ", paymentDetails);
       // this for real data
       let dynamicData = await tranformDataForPayhere(paymentDetails);
-      let dynamicDataTest = await tranformDataForPayhere(TEST_STATIC_DATA);
+      // let dynamicDataTest = await tranformDataForPayhere(TEST_STATIC_DATA);
       // console.log("finalData which goes to the payhere: ", dynamicData);
 
 
       // this for dummy data
       // let dynamicData = await tranformDataForPayhere(TEST_STATIC_DATA);
 
-      console.log("finalData which goes to the payhere: ", dynamicData);
-      console.log("finalData TEST which goes to the payhere: ", dynamicDataTest);
+      // console.log("finalData which goes to the payhere: ", dynamicData);
+      // console.log("finalData TEST which goes to the payhere: ", dynamicDataTest);
 
       // return;
 
 
       setPayhereHandleStatus("loading");
-      window?.payhere.startPayment(dynamicDataTest);
+      window?.payhere.startPayment(dynamicData);
 
       window.onerror = function onError(error: any) {
         // setPayhereHandleStatus("error");
