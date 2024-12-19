@@ -13,6 +13,8 @@ export async function GET(request: NextRequest) {
             return Response.json({ revalidated: 'all', now: Date.now() })
         }
 
+        
+
         if (path === 'homepage') {
             revalidatePath('/', 'page');
             revalidatePath('/new-arrivals');
