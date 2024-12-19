@@ -1,11 +1,17 @@
+"use client"
 import Link from "next/link";
 import Image from "next/image";
 import SiteLogo from "@/public/global/logo_cropped.webp";
 import { twMerge } from "tailwind-merge";
+import { useStore } from "@/store/store";
 
 const Logo = ({ className = '', imageClass = '' }: { className?: string, imageClass?: string }) => {
+  const { search, setSearch, search_status } = useStore()
   return (
-    <Link href={"/"} className={className}>
+    <Link href={"/"} className={className}
+      onClick={() => {
+        setSearch('')
+      }}>
       <Image
         width={320}
         height={266}
