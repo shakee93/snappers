@@ -76,8 +76,8 @@ const ProductCard: FC<ProductCardProps> = ({
   const productName = segments[segments.length - 1];
   const LinkSegments = link.split('/');
   const productLink = LinkSegments[LinkSegments.length - 1];
-  console.log("Product link:", productLink);
-  console.log("Product Name:", productName);
+  // console.log("Product link:", productLink);
+  // console.log("Product Name:", productName);
 
   const { search, setSearch, search_status } = useStore();
 
