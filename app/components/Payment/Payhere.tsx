@@ -10,7 +10,8 @@ import { extractRawAmount, getPaymentHash, numberFormat, TEST_STATIC_DATA } from
 const MERCHANT_ID = process.env.NEXT_PUBLIC_MERCHANT_ID;
 // const TEST: boolean = process.env.NEXT_PUBLIC_PAYHERE_IS_LIVE === "true" ? true : false;
 
-const TEST: boolean = false;
+let host = window.location.host 
+const TEST: boolean = host === "localhost:3000" ? true : false
 // Like same in the Helpoer comps change the TEST to true or false
 
 // DOCS:
@@ -95,17 +96,11 @@ export const usePayhere = () => {
       // console.log("paymentDetails: ", paymentDetails);a
       // this for real data
       let dynamicData = await tranformDataForPayhere(paymentDetails);
-      console.log("dynamicData: ", dynamicData);
       let dynamicDataTest = await tranformDataForPayhere(TEST_STATIC_DATA);
+      console.log("dynamicData: ", dynamicData);
       console.log("dynamicDataTest: ", dynamicDataTest);
-      // console.log("finalData which goes to the payhere: ", dynamicData);
 
 
-      // this for dummy data
-      // let dynamicData = await tranformDataForPayhere(TEST_STATIC_DATA);
-
-      // console.log("finalData which goes to the payhere: ", dynamicData);
-      // console.log("finalData TEST which goes to the payhere: ", dynamicDataTest);
 
 
 

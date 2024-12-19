@@ -143,15 +143,15 @@ const getRandomWelcomeMessage = () => {
 //PAYMENT FUNCTIONS
 
 const MERCHANT_ID = process.env.NEXT_PUBLIC_MERCHANT_ID;
-const TEST: boolean = false;
-const domain = TEST ? "http://localhost:3000/" : process.env.NEXT_PUBLIC_DOMAIN;
+let host = window.location.host 
+const TEST: boolean = host === "localhost:3000" ? true : false
 
 const STATIC_DATA = {
-  sandbox: TEST,
-  merchant_id: TEST ? "1225436" : MERCHANT_ID,
-  return_url: `${domain}/success`,
-  cancel_url: `${domain}/cancel`,
-  notify_url: `${domain}/notify`,
+  sandbox: true,
+  merchant_id: "1225436",
+  return_url: `http://${host}/success`,
+  cancel_url: `http://${host}/cancel`,
+  notify_url: `http://${host}/notify`,
   order_id: "ItemNo12345",
   items: "gq mobiles",
   hash: null,
@@ -170,11 +170,11 @@ const STATIC_DATA = {
 };
 
 const TEST_STATIC_DATA = {
-  sandbox: TEST,
-  merchant_id: TEST ? "1225436" : MERCHANT_ID,
-  return_url: `${domain}/success`,
-  cancel_url: `${domain}/cancel`,
-  notify_url: `${domain}/notify`,
+  sandbox: true,
+  merchant_id: "1225436",
+  return_url: `http://${host}/success`,
+  cancel_url: `http://${host}/cancel`,
+  notify_url: `http://${host}/notify`,
   order_id: "ItemNo12345",
   items: "gq mobiles",
   hash: null,
