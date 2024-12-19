@@ -95,13 +95,8 @@ export const usePayhere = () => {
       // this for real data
       let dynamicData = await tranformDataForPayhere(paymentDetails);
       let dynamicDataTest = await tranformDataForPayhere(TEST_STATIC_DATA);
-      console.log("dynamicData: ", dynamicData);
-      console.log("dynamicDataTest: ", dynamicDataTest);
-
-
-
-
-
+      // console.log("dynamicData: ", dynamicData);
+      // console.log("dynamicDataTest: ", dynamicDataTest);
 
       if(!window?.payhere) {
         alert("Payhere is not initialized");
