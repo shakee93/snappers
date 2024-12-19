@@ -143,7 +143,7 @@ const getRandomWelcomeMessage = () => {
 //PAYMENT FUNCTIONS
 
 const MERCHANT_ID = process.env.NEXT_PUBLIC_MERCHANT_ID;
-const TEST: boolean = true;
+const TEST: boolean = false;
 const domain = TEST ? "http://localhost:3000/" : process.env.NEXT_PUBLIC_DOMAIN;
 
 const STATIC_DATA = {
