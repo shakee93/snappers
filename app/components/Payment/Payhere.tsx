@@ -8,10 +8,8 @@ import { extractRawAmount, getPaymentHash, numberFormat, TEST_STATIC_DATA } from
 
 // const MERCHANT_ID = "1225436";
 const MERCHANT_ID = process.env.NEXT_PUBLIC_MERCHANT_ID;
-// const TEST: boolean = process.env.NEXT_PUBLIC_PAYHERE_IS_LIVE === "true" ? true : false;
+const TEST: boolean = process.env.NEXT_PUBLIC_PAYHERE_IS_LIVE === "true" ? true : false;
 
-let host = window.location.host 
-const TEST: boolean = host === "localhost:3000" ? true : false
 // Like same in the Helpoer comps change the TEST to true or false
 
 // DOCS:
@@ -105,6 +103,10 @@ export const usePayhere = () => {
 
 
 
+      if(!window?.payhere) {
+        alert("Payhere is not initialized");
+        return;
+      }
       setPayhereHandleStatus("loading");
       window?.payhere.startPayment(dynamicData);
       

@@ -143,8 +143,8 @@ const getRandomWelcomeMessage = () => {
 //PAYMENT FUNCTIONS
 
 const MERCHANT_ID = process.env.NEXT_PUBLIC_MERCHANT_ID;
-let host = window.location.host 
-const TEST: boolean = host === "localhost:3000" ? true : false
+const TEST: boolean = process.env.NEXT_PUBLIC_PAYHERE_IS_LIVE === "true" ? true : false;
+const host = TEST ? "localhost:3000" : "gqmobiles.lk";
 
 const STATIC_DATA = {
   sandbox: true,
