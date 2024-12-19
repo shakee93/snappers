@@ -28,7 +28,8 @@ import { twMerge } from "tailwind-merge";
 import { GET_QUICK_VIEW_PRODUCT } from "@/graphql/defs/products";
 import { useQuery } from "@apollo/client";
 import { Highlight } from "react-instantsearch";
-import { redirect, useRouter } from "next/navigation";
+import { redirect, useRouter, usePathname } from "next/navigation";
+import { useStore } from "@/store/store";
 
 export interface ProductCardProps {
   className?: string;
@@ -68,6 +69,17 @@ const ProductCard: FC<ProductCardProps> = ({
   const { addToCart } = useCart();
   const link = useProductLink(data);
   const ROUTER = useRouter();
+  const pathname = usePathname();
+
+  // Extract the last segment of the pathname
+  const segments = pathname.split('/');
+  const productName = segments[segments.length - 1];
+  const LinkSegments = link.split('/');
+  const productLink = LinkSegments[LinkSegments.length - 1];
+  console.log("Product link:", productLink);
+  console.log("Product Name:", productName);
+
+  const { search, setSearch, search_status } = useStore();
 
   const handleHoverOut = () => {
     setIsHovered(false);
@@ -165,7 +177,7 @@ const ProductCard: FC<ProductCardProps> = ({
   }
 
   const renderGroupButtons = () => {
-    
+
     return (
 
       <div className="absolute -top-12 right-1 flex justify-center opacity-100 visible transition-all">
@@ -173,9 +185,8 @@ const ProductCard: FC<ProductCardProps> = ({
           <>
             {type === "SIMPLE" && price && price?.length > 0 && (
               <ButtonPrimary
-                className={`shadow-md ${
-                  rawPrice === "0.00" ? "opacity-60 cursor-not-allowed" : ""
-                }`}
+                className={`shadow-md ${rawPrice === "0.00" ? "opacity-60 cursor-not-allowed" : ""
+                  }`}
                 fontSize="text-xs"
                 sizeClass="py-2.5 px-3.5"
                 onClick={handleAddToCart}
@@ -191,7 +202,11 @@ const ProductCard: FC<ProductCardProps> = ({
             )}
 
             {type === "VARIABLE" && (
-              <Link href={link}>
+              <Link href={link} onClick={() => {
+                if (productLink == productName) {
+                  setSearch("");
+                }
+              }}>
                 <ButtonPrimary
                   className="shadow-md"
                   fontSize="text-xs"
@@ -223,13 +238,18 @@ const ProductCard: FC<ProductCardProps> = ({
       data-nc-id="ProductCard"
     >
       <div className="relative flex-shrink-0 bg-white rounded-2xl overflow-hidden ">
-        <Link href={link}>
+        <Link href={link}
+          onClick={() => {
+            if (productLink == productName) {
+              setSearch("");
+            }
+          }}>
           <div className="flex items-center justify-center aspect-square relative">
             {variations?.edges &&
-            variations.edges.some(
-              (variation: { node: ProductVariation }) =>
-                variation.node?.image?.sourceUrl
-            ) ? (
+              variations.edges.some(
+                (variation: { node: ProductVariation }) =>
+                  variation.node?.image?.sourceUrl
+              ) ? (
               variations.edges.map(
                 (
                   variation: {
@@ -294,7 +314,11 @@ const ProductCard: FC<ProductCardProps> = ({
           className={`absolute left-1.5 top-2 bg-zinc-100/80 text-center text-xs lg:text-sm line-clamp-2 rounded-full text-slate-800`}
         >
           {brands?.nodes?.map((brand: Brand, index: number) => (
-            <Link href={`/${brand?.slug}`} key={index}>
+            <Link onClick={() => {
+              if (productLink == productName) {
+                setSearch("");
+              }
+            }} href={`/${brand?.slug}`} key={index}>
               <div className="bg-gradient-to-b w-fit from-blue-500/30 font-semibold to-blue-400/5 text-xs text-blue-900 px-4 py-2 rounded-full">
                 {brand?.name}
               </div>
@@ -306,7 +330,12 @@ const ProductCard: FC<ProductCardProps> = ({
       <div className="space-y-2 flex flex-col space-between min-h-[100px] px-2.5 justify-between  lg:pt-2 lg:pb-2.5 relative">
         <div>{renderGroupButtons()}</div>
 
-        <Link className="block" href={link}>
+        <Link className="block" href={link}
+          onClick={() => {
+            if (productLink == productName) {
+              setSearch("");
+            }
+          }}>
           <h2
             className={` text-xs lg:text-sm text-black font-semibold transition-colors whitespace-normal min-h-[2.5rem] min-lg:h-[3rem]  line-clamp-2 overflow-hidden `}
           >
@@ -321,6 +350,11 @@ const ProductCard: FC<ProductCardProps> = ({
         <Link
           href={link}
           className="flex m-0 mb-2 justify-between  items-center"
+          onClick={() => {
+            if (productLink == productName) {
+              setSearch("");
+            }
+          }}
         >
           <Prices
             price={lowestPrice}
