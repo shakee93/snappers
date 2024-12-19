@@ -4,12 +4,12 @@ import {
   PayhereTransactionData,
   PaymentDetailsWithoutUrls,
 } from "@/data/types";
-import { extractRawAmount, getPaymentHash, numberFormat } from "@/components/AddressPageComps/HelperComps";
+import { extractRawAmount, getPaymentHash, numberFormat, TEST_STATIC_DATA } from "@/components/AddressPageComps/HelperComps";
 
 // const MERCHANT_ID = "1225436";
 const MERCHANT_ID = process.env.NEXT_PUBLIC_MERCHANT_ID;
 // const TEST: boolean = process.env.NEXT_PUBLIC_PAYHERE_IS_LIVE === "true" ? true : false;
-const TEST: boolean = false;
+const TEST: boolean = true;
 
 // DOCS:
 // https://support.payhere.lk/api-&-mobile-sdk/javascript-sdk
@@ -45,8 +45,8 @@ const tranformDataForPayhere = async (
   let host = window.location.host 
 
   return {
-    sandbox: false,
-    merchant_id: MERCHANT_ID ?? "1225436",
+    sandbox: TEST ? true : false,
+    merchant_id: TEST ? "1225436" : MERCHANT_ID ?? "1225436",
     return_url: `http://${host}/checkout`,
     cancel_url: `http://${host}/cancel`,
     notify_url: `http://${host}/notify`,
@@ -90,28 +90,40 @@ export const usePayhere = () => {
         return null;
       }
       
-
+      console.log("paymentDetails: ", paymentDetails);
       // this for real data
       let dynamicData = await tranformDataForPayhere(paymentDetails);
-      // let dynamicData = await tranformDataForPayhere(TEST_STATIC_DATA);
+      let dynamicDataTest = await tranformDataForPayhere(TEST_STATIC_DATA);
       // console.log("finalData which goes to the payhere: ", dynamicData);
+
+
+      // this for dummy data
+      // let dynamicData = await tranformDataForPayhere(TEST_STATIC_DATA);
+
+      console.log("finalData which goes to the payhere: ", dynamicData);
+      console.log("finalData TEST which goes to the payhere: ", dynamicDataTest);
+
       // return;
+
+
       setPayhereHandleStatus("loading");
-      window?.payhere.startPayment(dynamicData);
+      window?.payhere.startPayment(dynamicDataTest);
 
       window.onerror = function onError(error: any) {
-        setPayhereHandleStatus("error");
-        alert("Error Happened while Payhere:" + error);
+        // setPayhereHandleStatus("error");
+        // alert("Error Happened while Payhere:" + error);
+        console.log("Error Happened while Payhere:", error);
       };
       
       window.payhere.onError = function onError(error: any) {
-        setPayhereHandleStatus("error");
-        alert("Error Happened while Payhere:" + error);
+        // setPayhereHandleStatus("error");
+        // alert("Error Happened while Payhere:" + error);
+        console.log("Error Happened while Payhere:", error);
       };
 
       window.payhere.onDismissed = function onDismissed() {
-        setPayhereHandleStatus("dismissed");
-        // console.log("Dismissed");
+        // setPayhereHandleStatus("dismissed");
+        console.log("Dismissed");
       }
 
       // Payment completed. It can be a successful failure.

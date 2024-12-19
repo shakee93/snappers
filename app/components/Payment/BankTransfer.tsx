@@ -7,6 +7,7 @@ import { PaymentDetailsWithoutUrls } from "@/data/types";
 import { Loader } from "lucide-react";
 import { useSession } from "@/context/SessionProvider";
 import Image from "next/image";
+import { sentConfirmation } from "@/components/AddressPageComps/HelperComps";
 
 type BankTransferProps = {
   paymentDetails: PaymentDetailsWithoutUrls;
@@ -94,28 +95,13 @@ const BankTransfer: React.FC<BankTransferProps> = ({
         toast.success(
           "Upload successful! We'll redirect you to our thank you page. Thank you!"
         );
-
-        const confirmationResponse = await fetch(
-          "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/order-confirmation",
-          {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              order_id: order_id,
-              order_status: "completed",
-            }),
-          }
-        );
-
-        if (!confirmationResponse.ok) {
-          throw new Error("Failed to confirm order status");
+        console.log("order_id", order_id);
+        console.log("typeof order_id", typeof order_id);
+        if (typeof order_id !== "string") {
+          const confirmation = await sentConfirmation(order_id as number);
+          console.log("confirmation", confirmation);
         }
 
-        const orderConfirmationdata = await confirmationResponse.json();
-
-        // console.log("orderConfirmation", orderConfirmationdata);
 
         if (customer?.id === "guest") {
 

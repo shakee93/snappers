@@ -116,7 +116,7 @@ const savePaymentDetails = (
     billingaddress2: customer?.billing?.address2 || "no_address",
     shippingaddress1: customer?.shipping?.address1 || "no_address",
     shippingaddress2: customer?.shipping?.address2 || "no_address",
-    city: customer?.billing?.city || "no_city"
+    city: customer?.billing?.city || "no_city",
   };
 
   console.log("saved_data: for payment", saved_data);
@@ -142,14 +142,13 @@ const getRandomWelcomeMessage = () => {
 
 //PAYMENT FUNCTIONS
 
-const domain = process.env.NEXT_PUBLIC_DOMAIN;
 const MERCHANT_ID = process.env.NEXT_PUBLIC_MERCHANT_ID;
-const TEST: boolean = false;
-const SANDBOX: boolean = false;
+const TEST: boolean = true;
+const domain = TEST ? "http://localhost:3000/" : process.env.NEXT_PUBLIC_DOMAIN;
 
 const STATIC_DATA = {
-  sandbox: SANDBOX,
-  merchant_id: MERCHANT_ID,
+  sandbox: TEST,
+  merchant_id: TEST ? "1225436" : MERCHANT_ID,
   return_url: `${domain}/success`,
   cancel_url: `${domain}/cancel`,
   notify_url: `${domain}/notify`,
@@ -170,11 +169,9 @@ const STATIC_DATA = {
   delivery_country: "Sri Lanka",
 };
 
-
-
 const TEST_STATIC_DATA = {
-  sandbox: SANDBOX,
-  merchant_id: MERCHANT_ID,
+  sandbox: TEST,
+  merchant_id: TEST ? "1225436" : MERCHANT_ID,
   return_url: `${domain}/success`,
   cancel_url: `${domain}/cancel`,
   notify_url: `${domain}/notify`,
@@ -201,7 +198,7 @@ const getPaymentHash = async (dynamicData: any) => {
     const order_id = TEST ? "ItemNo12345" : dynamicData?.order_id;
 
     const requestData = {
-      merchant_id: MERCHANT_ID,
+      merchant_id: TEST ? "1225436" : MERCHANT_ID,
       order_id: order_id,
       amount: amount,
       currency: "LKR",
@@ -219,7 +216,6 @@ const getPaymentHash = async (dynamicData: any) => {
       },
       body: JSON.stringify(requestData),
     });
-
 
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
@@ -250,6 +246,27 @@ function numberFormat(
   return parts.join(decimalPoint);
 }
 
+const sentConfirmation = async (orderId: number | string): Promise<any> => {
+  const confirmationResponse = await fetch(
+    "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/order-confirmation",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        order_id: orderId,
+        order_status: "completed",
+      }),
+    }
+  );
+
+  if (confirmationResponse.ok) {
+    return true;
+  }
+  return false;
+};
+
 export {
   InputField,
   SelectField,
@@ -263,4 +280,5 @@ export {
   TEST_STATIC_DATA,
   getPaymentHash,
   numberFormat,
+  sentConfirmation,
 };
