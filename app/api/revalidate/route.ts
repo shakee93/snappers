@@ -12,7 +12,6 @@ export async function GET(request: NextRequest) {
             revalidatePath('/', 'layout');
             return Response.json({ revalidated: 'all', now: Date.now() })
         }
-
         
 
         if (path === 'homepage') {
