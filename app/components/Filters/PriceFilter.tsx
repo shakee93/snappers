@@ -1,3 +1,4 @@
+"use client"
 import { Popover, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import React, { Fragment, useEffect, useState } from "react";
