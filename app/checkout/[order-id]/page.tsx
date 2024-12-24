@@ -44,7 +44,10 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   const billingaddress1 = useSearchParams().get('billingaddress1');
   const billingaddress2 = useSearchParams().get('billingaddress2');
   const city = useSearchParams().get('city');
-  const lineItems = JSON.parse(useSearchParams().get('lineItems') || '[]');
+  const lineItemsParam = useSearchParams().get('lineItems');
+  const lineItems = lineItemsParam && lineItemsParam !== "undefined"
+    ? JSON.parse(lineItemsParam)
+    : { nodes: [] };
   const ordermethod = useSearchParams().get('ordermethod');
 
   // Now you have the data from the URL and can use it on the page
