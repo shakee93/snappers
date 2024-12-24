@@ -25,7 +25,6 @@ const tranformDataForPayhere = async (
   // console.log("paymentDetails_: ", paymentDetails_);
   let hash: string | null = await getPaymentHash(paymentDetails_);
 
-
   if (!hash) {
     alert("hash Can not be generated");
     return null;
@@ -95,8 +94,8 @@ export const usePayhere = () => {
       // this for real data
       let dynamicData = await tranformDataForPayhere(paymentDetails);
       let dynamicDataTest = await tranformDataForPayhere(TEST_STATIC_DATA);
-      // console.log("dynamicData: ", dynamicData);
-      // console.log("dynamicDataTest: ", dynamicDataTest);
+      console.log("dynamicData: ", dynamicData);
+      console.log("dynamicDataTest: ", dynamicDataTest);
 
       if(!window?.payhere) {
         alert("Payhere is not initialized");
