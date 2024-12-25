@@ -307,6 +307,16 @@ const CheckoutPage = () => {
           const queryParams = new URLSearchParams({
             ...updatedCheckoutDetails,
             lineItems: JSON.stringify(updatedCheckoutDetails.lineItems),
+            subtotal: String(updatedCheckoutDetails.subtotal),
+            shippingTotal: String(updatedCheckoutDetails.shippingTotal),
+            date: String(updatedCheckoutDetails.date),
+            billingaddress1: String(updatedCheckoutDetails.billingaddress1),
+            billingaddress2: String(updatedCheckoutDetails.billingaddress2),
+            shippingaddress1: String(updatedCheckoutDetails.shippingaddress1),
+            shippingaddress2: String(updatedCheckoutDetails.shippingaddress2),
+            city: updatedCheckoutDetails.city || "",
+            order_id: updatedCheckoutDetails.order_id,
+            // Add other fields as necessary, ensuring they are strings
           }).toString();
           const redirectUrl = `/checkout/guest_checkout?${queryParams}&ordermethod=guest`;
           router.push(redirectUrl);
@@ -488,15 +498,11 @@ const CheckoutPage = () => {
       return;
     }
 
-    const isCashOnDelivery =
-      formData?.paymentMethod?.selectedGateway?.id == "cod";
+    const isCashOnDelivery = formData?.paymentMethod?.selectedGateway?.id == "cod";
 
     let checkoutDetails = paymentDetails;
 
-    const { shippingaddress1, shippingaddress2, city } = data;
-    const { billingaddress1, billingaddress2 } = data;
-
-    const { lineItems, shippingTotal, subtotal, date } = data;
+    const { shippingaddress1, shippingaddress2, city, billingaddress1, billingaddress2, lineItems, shippingTotal, subtotal, date  } = checkoutDetails;
 
     const updatedCheckoutDetails = {
       ...checkoutDetails,
@@ -512,6 +518,7 @@ const CheckoutPage = () => {
     };
 
     if (isCashOnDelivery) {
+      console.log('isCashOnDelivery', updatedCheckoutDetails);
       if (
         customer?.id === "guest" ||
         checkoutDetails.order_id == "guest_checkout"
@@ -519,6 +526,15 @@ const CheckoutPage = () => {
         const queryParams = new URLSearchParams({
           ...updatedCheckoutDetails,
           lineItems: JSON.stringify(updatedCheckoutDetails.lineItems),
+          subtotal: String(updatedCheckoutDetails.subtotal),
+          shippingTotal: String(updatedCheckoutDetails.shippingTotal),
+          date: String(updatedCheckoutDetails.date),
+          billingaddress1: String(updatedCheckoutDetails.billingaddress1),
+          billingaddress2: String(updatedCheckoutDetails.billingaddress2),
+          shippingaddress1: String(updatedCheckoutDetails.shippingaddress1),
+          shippingaddress2: String(updatedCheckoutDetails.shippingaddress2),
+          city: updatedCheckoutDetails.city || "",
+          order_id: updatedCheckoutDetails.order_id,
         }).toString();
         const redirectUrl = `/checkout/guest_checkout?${queryParams}&ordermethod=guest`;
         router.push(redirectUrl);
