@@ -244,8 +244,8 @@ const CheckoutPage = () => {
     }
 
     const shippingMethod = getShippingMethod(shippingTotal);
-    const shippingDetails = isStorePickup 
-      ? { 
+    const shippingDetails = isStorePickup
+      ? {
           ...transformAddress(formData.deliveryAddress),
           address1: "Store Pickup",
           address2: "",
@@ -266,7 +266,7 @@ const CheckoutPage = () => {
         <p><strong>Customer Email:</strong> ${email}</p>
         <p><strong>Phone Number:</strong> ${formData?.contactInfo?.phone}</p>
         <p><strong>Payhere Payment ID:</strong> ${payherPaymentID}</p>
-        ${isStorePickup ? '<p><strong>Pickup Location:</strong> Store</p>' : ''}
+        ${isStorePickup ? "<p><strong>Pickup Location:</strong> Store</p>" : ""}
     `;
 
     try {
@@ -280,6 +280,7 @@ const CheckoutPage = () => {
         },
       };
 
+
       const { data } =
         customer?.id === "guest"
           ? await guestCheckout({ variables })
@@ -290,13 +291,33 @@ const CheckoutPage = () => {
         return;
       }
 
+      toast.loading("Please wait, we are confirming your order...");
+
       let confirmation = await sentConfirmation(data.checkout.order.databaseId);
-      console.log("confirmation", confirmation);
+      if (confirmation) {
+        toast.dismiss();
+        toast.success(
+          "Congratulations! Your order has been successfully confirmed."
+        );
+      } else {
+        toast.error("Failed to confirm the order after payment");
+        toast.dismiss();
+      }
 
       const checkoutDetails = savePaymentDetails(data);
       setPaymentData(checkoutDetails);
 
-      const { shippingaddress1, shippingaddress2, city, billingaddress1, billingaddress2, lineItems, shippingTotal, subtotal, date } = checkoutDetails;
+      const {
+        shippingaddress1,
+        shippingaddress2,
+        city,
+        billingaddress1,
+        billingaddress2,
+        lineItems,
+        shippingTotal,
+        subtotal,
+        date,
+      } = checkoutDetails;
 
       const updatedCheckoutDetails = {
         ...checkoutDetails,
@@ -311,7 +332,10 @@ const CheckoutPage = () => {
         city: city,
       };
 
-      if (customer?.id === "guest" || checkoutDetails.order_id == "guest_checkout") {
+      if (
+        customer?.id === "guest" ||
+        checkoutDetails.order_id == "guest_checkout"
+      ) {
         const queryParams = new URLSearchParams({
           ...updatedCheckoutDetails,
           lineItems: JSON.stringify(updatedCheckoutDetails.lineItems),
@@ -495,11 +519,22 @@ const CheckoutPage = () => {
       return;
     }
 
-    const isCashOnDelivery = formData?.paymentMethod?.selectedGateway?.id == "cod";
+    const isCashOnDelivery =
+      formData?.paymentMethod?.selectedGateway?.id == "cod";
 
     let checkoutDetails = paymentDetails;
 
-    const { shippingaddress1, shippingaddress2, city, billingaddress1, billingaddress2, lineItems, shippingTotal, subtotal, date  } = checkoutDetails;
+    const {
+      shippingaddress1,
+      shippingaddress2,
+      city,
+      billingaddress1,
+      billingaddress2,
+      lineItems,
+      shippingTotal,
+      subtotal,
+      date,
+    } = checkoutDetails;
 
     const updatedCheckoutDetails = {
       ...checkoutDetails,
@@ -515,7 +550,7 @@ const CheckoutPage = () => {
     };
 
     if (isCashOnDelivery) {
-      console.log('isCashOnDelivery', updatedCheckoutDetails);
+      console.log("isCashOnDelivery", updatedCheckoutDetails);
       if (
         customer?.id === "guest" ||
         checkoutDetails.order_id == "guest_checkout"
@@ -650,8 +685,8 @@ const CheckoutPage = () => {
       formData.deliveryAddress.country = "LK";
 
       const shippingMethod = getShippingMethod(shippingTotal);
-      const shippingDetails = isStorePickup 
-        ? { 
+      const shippingDetails = isStorePickup
+        ? {
             ...transformAddress(formData.deliveryAddress),
             address1: "Store Pickup",
             address2: "",
@@ -670,8 +705,14 @@ const CheckoutPage = () => {
 
       const customerNoteHTML = `
             <p><strong>Customer Email:</strong> ${email}</p>
-            <p><strong>Phone Number:</strong> ${formData?.contactInfo?.phone}</p>
-            ${isStorePickup ? '<p><strong>Pickup Location:</strong> Store</p>' : ''}
+            <p><strong>Phone Number:</strong> ${
+              formData?.contactInfo?.phone
+            }</p>
+            ${
+              isStorePickup
+                ? "<p><strong>Pickup Location:</strong> Store</p>"
+                : ""
+            }
         `;
 
       const variables = {
@@ -870,7 +911,6 @@ const CheckoutPage = () => {
                         }}
                       />
                     ) : (
-                      
                       <span
                         dangerouslySetInnerHTML={{
                           __html: cart?.shippingTotal || "0.00",
