@@ -5,6 +5,7 @@ import SiteLogo from "@/public/global/logo_cropped.webp";
 import { twMerge } from "tailwind-merge";
 import { useStore } from "@/store/store";
 
+
 const Logo = ({ className = '', imageClass = '' }: { className?: string, imageClass?: string }) => {
   const { search, setSearch, search_status } = useStore()
   return (
