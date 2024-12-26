@@ -238,8 +238,23 @@ const CheckoutPage = () => {
       return;
     }
 
+    if (payherPaymentID == null) {
+      toast("payhere payment not initiated");
+      return;
+    }
+
     const shippingMethod = getShippingMethod(shippingTotal);
-    const shippingDetails = transformAddress(formData.deliveryAddress);
+    const shippingDetails = isStorePickup 
+      ? { 
+          ...transformAddress(formData.deliveryAddress),
+          address1: "Store Pickup",
+          address2: "",
+          city: "Store Pickup",
+          state: "",
+          postcode: "",
+        }
+      : transformAddress(formData.deliveryAddress);
+
     const email = formData?.contactInfo?.email;
 
     const billingDetails = {
@@ -247,42 +262,41 @@ const CheckoutPage = () => {
       email: formData?.contactInfo?.email,
     };
 
-    if (payherPaymentID == null) {
-      toast("payhere payment not initiated");
-      return;
-    }
-
     const customerNoteHTML = `
-            <p><strong>Customer Email:</strong> ${email}</p>
-            <p><strong>Phone Number:</strong> ${formData?.contactInfo?.phone}</p>
-            <p><strong>Payhere Payment ID:</strong> ${payherPaymentID}</p>
-        `;
+        <p><strong>Customer Email:</strong> ${email}</p>
+        <p><strong>Phone Number:</strong> ${formData?.contactInfo?.phone}</p>
+        <p><strong>Payhere Payment ID:</strong> ${payherPaymentID}</p>
+        ${isStorePickup ? '<p><strong>Pickup Location:</strong> Store</p>' : ''}
+    `;
 
-    const variables = {
-      input: {
-        paymentMethod: paymentMethodId,
-        shippingMethod,
-        shipping: shippingDetails,
-        billing: billingDetails,
-        customerNote: customerNoteHTML,
-      },
-    };
+    try {
+      const variables = {
+        input: {
+          paymentMethod: paymentMethodId,
+          shippingMethod,
+          shipping: shippingDetails,
+          billing: billingDetails,
+          customerNote: customerNoteHTML,
+        },
+      };
 
-    const { data } =
-      customer?.id === "guest"
-        ? await guestCheckout({ variables })
-        : await checkoutMutation({ variables });
+      const { data } =
+        customer?.id === "guest"
+          ? await guestCheckout({ variables })
+          : await checkoutMutation({ variables });
 
-    console.log("data in checkout page", data);
+      if (!data || !data.checkout) {
+        toast.error("Failed to process the order after payment");
+        return;
+      }
 
-    let confirmation = await sentConfirmation(data.checkout.order.databaseId);
-    console.log("confirmation", confirmation);
+      let confirmation = await sentConfirmation(data.checkout.order.databaseId);
+      console.log("confirmation", confirmation);
 
-    if (data) {
       const checkoutDetails = savePaymentDetails(data);
       setPaymentData(checkoutDetails);
 
-      const { shippingaddress1, shippingaddress2, city , billingaddress1, billingaddress2, lineItems, shippingTotal, subtotal, date } = checkoutDetails;
+      const { shippingaddress1, shippingaddress2, city, billingaddress1, billingaddress2, lineItems, shippingTotal, subtotal, date } = checkoutDetails;
 
       const updatedCheckoutDetails = {
         ...checkoutDetails,
@@ -297,45 +311,31 @@ const CheckoutPage = () => {
         city: city,
       };
 
-      if (isPayhere) {
-        if (
-          customer?.id === "guest" ||
-          checkoutDetails.order_id == "guest_checkout"
-        ) {
-          const queryParams = new URLSearchParams({
-            ...updatedCheckoutDetails,
-            lineItems: JSON.stringify(updatedCheckoutDetails.lineItems),
-            subtotal: String(updatedCheckoutDetails.subtotal),
-            shippingTotal: String(updatedCheckoutDetails.shippingTotal),
-            date: String(updatedCheckoutDetails.date),
-            billingaddress1: String(updatedCheckoutDetails.billingaddress1),
-            billingaddress2: String(updatedCheckoutDetails.billingaddress2),
-            shippingaddress1: String(updatedCheckoutDetails.shippingaddress1),
-            shippingaddress2: String(updatedCheckoutDetails.shippingaddress2),
-            city: updatedCheckoutDetails.city || "",
-            order_id: updatedCheckoutDetails.order_id,
-          }).toString();
-          const redirectUrl = `/checkout/guest_checkout?${queryParams}&ordermethod=guest`;
-          router.push(redirectUrl);
-          return;
-        }
-        // toast.info("You'll be on the thank you page in just a moment.");
-        let redirectUrl = `checkout/${checkoutDetails.order_id}`;
+      if (customer?.id === "guest" || checkoutDetails.order_id == "guest_checkout") {
+        const queryParams = new URLSearchParams({
+          ...updatedCheckoutDetails,
+          lineItems: JSON.stringify(updatedCheckoutDetails.lineItems),
+          subtotal: String(updatedCheckoutDetails.subtotal),
+          shippingTotal: String(updatedCheckoutDetails.shippingTotal),
+          date: String(updatedCheckoutDetails.date),
+          billingaddress1: String(updatedCheckoutDetails.billingaddress1),
+          billingaddress2: String(updatedCheckoutDetails.billingaddress2),
+          shippingaddress1: String(updatedCheckoutDetails.shippingaddress1),
+          shippingaddress2: String(updatedCheckoutDetails.shippingaddress2),
+          city: updatedCheckoutDetails.city || "",
+          order_id: updatedCheckoutDetails.order_id,
+        }).toString();
+        const redirectUrl = `/checkout/guest_checkout?${queryParams}&ordermethod=guest`;
         router.push(redirectUrl);
-        const data = {
-          ...checkoutDetails,
-          order_id: checkoutDetails.order_id,
-        };
         return;
       }
 
-      let orderid = data?.checkout.order.databaseId;
-      console.log("orderid", orderid);
-
-      toast.success("🌟 Order Placed Successfully! 🚀");
-      router.push(`/checkout/${orderid}`);
-    } else {
-      toast.error("Something Went Wrong While Checkout");
+      let redirectUrl = `checkout/${checkoutDetails.order_id}`;
+      router.push(redirectUrl);
+    } catch (error) {
+      console.error("Error in implementCheckoutAfterPayhere:", error);
+      toast.error("Failed to complete the order after payment");
+      setLoading(false);
     }
   };
 
@@ -650,7 +650,16 @@ const CheckoutPage = () => {
       formData.deliveryAddress.country = "LK";
 
       const shippingMethod = getShippingMethod(shippingTotal);
-      const shippingDetails = transformAddress(formData.deliveryAddress);
+      const shippingDetails = isStorePickup 
+        ? { 
+            ...transformAddress(formData.deliveryAddress),
+            address1: "Store Pickup",
+            address2: "",
+            city: "Store Pickup",
+            state: "",
+            postcode: "",
+          }
+        : transformAddress(formData.deliveryAddress);
 
       const email = formData?.contactInfo?.email;
 
@@ -662,9 +671,8 @@ const CheckoutPage = () => {
       const customerNoteHTML = `
             <p><strong>Customer Email:</strong> ${email}</p>
             <p><strong>Phone Number:</strong> ${formData?.contactInfo?.phone}</p>
+            ${isStorePickup ? '<p><strong>Pickup Location:</strong> Store</p>' : ''}
         `;
-
-      console.log("paymentMethodId", paymentMethodId);
 
       const variables = {
         input: {
@@ -716,12 +724,12 @@ const CheckoutPage = () => {
       : "wbs:0dd3bc79_weight_based_shipping";
 
     const methodTitle = isStorePickup
-      ? "pickup_location:0"
+      ? "Store Pickup"
       : freeShipping
-      ? "wbs:5c9bd062_free_shipping"
-      : "wbs:0dd3bc79_weight_based_shipping";
+      ? "Free Shipping"
+      : "Weight Based Shipping";
 
-    const total = shippingTotal;
+    const total = isStorePickup ? "0" : shippingTotal;
 
     return { methodId, methodTitle, total };
   };
