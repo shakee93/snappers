@@ -300,7 +300,7 @@ const CheckoutPage = () => {
           "Congratulations! Your order has been successfully confirmed."
         );
       } else {
-        toast.error("Failed to confirm the order after payment");
+        toast.error("We got your order. but something went wrong our team will contact you soon.");
         toast.dismiss();
       }
 
