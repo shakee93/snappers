@@ -364,6 +364,7 @@ const CheckoutPage = () => {
   };
 
   useEffect(() => {
+    console.log("payhereHandleStatus Status Changing", payhereHandleStatus);
     switch (payhereHandleStatus) {
       case "finished":
         implementCheckoutAfterPayhere();
@@ -371,6 +372,7 @@ const CheckoutPage = () => {
         break;
       case "dismissed":
         setLoading(false);
+        toast.error("Payment was dismissed");
         break;
       case "error":
         toast.error("error while initiate payment");
@@ -506,7 +508,9 @@ const CheckoutPage = () => {
     }
 
     setPayhereHandleStatus("loading");
-    initiatePayment(checkoutDetails, setPayhereHandleStatus).then((r) => r);
+    initiatePayment(checkoutDetails, setPayhereHandleStatus).then((r) => {
+      console.log("r", r);
+    });
   };
 
   function ImplementBankTransfer() {

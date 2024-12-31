@@ -112,20 +112,22 @@ export const usePayhere = () => {
       };
       
       window.payhere.onError = function onError(error: any) {
-        // setPayhereHandleStatus("error");
+        setPayhereHandleStatus("error");
         // alert("Error Happened while Payhere:" + error);
         console.log("Error Happened while Payhere:", error);
+        alert("Error Happened while Payhere:" + error);
       };
 
       window.payhere.onDismissed = function onDismissed() {
-        // setPayhereHandleStatus("dismissed");
+        setPayhereHandleStatus("dismissed");
         console.log("Dismissed");
+        alert("Dismissed");
       }
 
       // Payment completed. It can be a successful failure.
       window.payhere.onCompleted = function onCompleted(orderId: any) {
-        // console.log("completed succesffully`", orderId);
-        // alert("succussfull")
+        console.log("completed succesffully`", orderId);
+        alert("succussfull")
         setPayhereHandleStatus("finished");
         
         // onPaymentCompleted(paymentDetails, orderId);
