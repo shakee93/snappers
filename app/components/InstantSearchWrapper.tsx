@@ -1,7 +1,7 @@
 "use client";
 import { Configure, InstantSearch, RefinementList } from "react-instantsearch";
 import { InstantSearchNext } from "react-instantsearch-nextjs";
-import TypesenseInstantSearchAdapter from "typesense-instantsearch-adapter";
+import TypesenseInstantSearchAdapter, { BaseSearchParameters } from "typesense-instantsearch-adapter";
 import ProductGridInstant from "@/app/components/ProductGridInstant";
 import SearchInput from "@/app/components/SearchInput";
 import TabFilters from "@/app/components/TabFilters";
@@ -41,6 +41,10 @@ interface InstantSearchWrapperProps {
   sort?: boolean;
   tag?: string;
 }
+
+type CustomSearchParameters = Omit<BaseSearchParameters, "filter_by"> & {
+  filter_by?: string;
+};
 
 const typesenseConfig = {
   host: process.env.NEXT_PUBLIC_TYPESENSE_HOST || "api.gqmobiles.lk",
@@ -117,22 +121,22 @@ const InstantSearchWrapper = ({
       },
     });
 
-    // console.log('Typesense client created successfully');
-    return typesenseInstantSearchAdapter.searchClient;
-  }, []);
+  // console.log('Typesense client created successfully');
+  return typesenseInstantSearchAdapter.searchClient;
+}, []);
 
-  useEffect(() => {
+useEffect(() => {
+  setFilterQuery(getFilterQuery);
+  // setSortQuery(differedSidebar.sort);
+}, [differedSidebar]);
+
+useEffect(() => {
+
+  if (!search) {
     setFilterQuery(getFilterQuery);
-    // setSortQuery(differedSidebar.sort);
-  }, [differedSidebar]);
-
-  useEffect(() => {
-
-    if (!search) {
-      setFilterQuery(getFilterQuery);
-    }
-    // setSortQuery(differedSidebar.sort);
-  }, [search]);
+  }
+  // setSortQuery(differedSidebar.sort);
+}, [search]);
 
   useEffect(() => {
     // console.log(filterQuery);

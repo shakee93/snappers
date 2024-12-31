@@ -337,12 +337,17 @@ const ProductCard: FC<ProductCardProps> = ({
             }
           }}>
           <h2
-            className={` text-xs lg:text-sm text-black font-semibold transition-colors whitespace-normal min-h-[2.5rem] min-lg:h-[3rem]  line-clamp-2 overflow-hidden `}
+            className={`flex flex-col md:flex-row gap-2 justify-between md:gap-0 text-xs lg:text-sm text-black font-semibold transition-colors whitespace-normal min-h-[2.5rem] min-lg:h-[3rem] line-clamp-2 overflow-hidden`}
           >
             {fromSearch ? (
               <Highlight attribute="name" hit={data as any} />
             ) : (
               <>{name}</>
+            )}
+            {stockStatus !== "IN_STOCK" && (
+              <span className="ml-0 mb-1 md-ml-2 inline-block bg-gray-500 text-white text-xs font-semibold px-2 py-1 rounded-full self-start">
+                Sold Out
+              </span>
             )}
           </h2>
         </Link>

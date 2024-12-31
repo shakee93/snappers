@@ -222,7 +222,6 @@ export const GET_PRODUCTS_NODES = gql`
       first: $first
       where: {
         categoryIdIn: $categoryIdIn
-        stockStatus: IN_STOCK
         orderby: { field: DATE, order: DESC }
       }
     ) {
@@ -240,7 +239,6 @@ export const GET_PRODUCTS_NODES_HOMEPAGE = gql`
     products(
       first: $first
       where: {
-      stockStatus: IN_STOCK, 
       tagId: $tagId
     }
     ) {
