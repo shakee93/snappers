@@ -5,7 +5,7 @@ import Checkbox from "@/shared/Checkbox/Checkbox";
 import { twMerge } from "tailwind-merge";
 import Slider from "rc-slider";
 import Radio from "@/shared/Radio/Radio";
-import { XIcon } from "lucide-react";
+import { Package, XIcon } from "lucide-react";
 import ButtonThird from "@/shared/Button/ButtonThird";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import { useStore } from "@/store/store";
@@ -486,7 +486,7 @@ const MobileFilterSheet = ({
                                                             Max price
                                                         </label>
                                                         <div className="flex flex-row gap-2 mt-1 rounded-md">
-                                                            <span                                                                className=" flex items-center pointer-events-none text-neutral-500 sm:text-sm">
+                                                            <span className=" flex items-center pointer-events-none text-neutral-500 sm:text-sm">
                                                                 LKR
                                                             </span>
                                                             <input
@@ -531,7 +531,27 @@ const MobileFilterSheet = ({
                                                 </div>
                                             </div>
                                         </div>
-
+                                        <div className="py-7 w-1/2">
+                                            <h3 className="text-md font-medium">In Stock!</h3>
+                                            <div className="mt-3 relative ">
+                                                <div
+                                                    className={`flex items-center justify-center px-4 py-2 text-sm rounded-full border focus:outline-none cursor-pointer select-none ${inStock
+                                                        ? "border border-2 border-[#2563eb] bg-primary-50 text-primary-900"
+                                                        : "border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
+                                                        }`}
+                                                    onClick={() => setInStockState(!inStock)}
+                                                >
+                                                    <Package className="stroke-1 w-4" />
+                                                    <span className="line-clamp-1 ml-2">In Stock</span>
+                                                    {inStock && (
+                                                        <div
+                                                            className="flex-shrink-0 w-4 h-4 rounded-full bg-primary-500 text-white flex items-center justify-center ml-3 cursor-pointer">
+                                                            <XIcon className="p-0.5 p-0.5 w-4 h-4 text-black" />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
 
                                         <div className='flex gap-4 pb-24 w-full justify-between'>
                                             <div className="py-7 w-full">
@@ -539,8 +559,8 @@ const MobileFilterSheet = ({
                                                 <div className="mt-3 relative ">
                                                     <div
                                                         className={`flex w-2/3 h-[42px] items-center justify-center px-4 py-2 text-sm rounded-full border focus:outline-none cursor-pointer select-none ${isOnSale
-                                                                ? "border-primary-500 bg-primary-50 text-primary-900"
-                                                                : "border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
+                                                            ? "border-primary-500 bg-primary-50 text-primary-900"
+                                                            : "border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
                                                             }`}
                                                         onClick={() => setIsIsOnSale(!isOnSale)}
                                                     >
@@ -591,28 +611,7 @@ const MobileFilterSheet = ({
                                                 </div>
                                             </div>
 
-                                            {/*<div className="py-7 w-1/2">*/}
-                                            {/*    <h3 className="text-md font-medium">In Stock!</h3>*/}
-                                            {/*    <div className="mt-3 relative ">*/}
-                                            {/*        <div*/}
-                                            {/*            className={`flex items-center justify-center px-4 py-2 text-sm rounded-full border focus:outline-none cursor-pointer select-none ${*/}
-                                            {/*                inStock*/}
-                                            {/*                    ? "border-primary-500 bg-primary-50 text-primary-900"*/}
-                                            {/*                    : "border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"*/}
-                                            {/*            }`}*/}
-                                            {/*            onClick={() => setInStockState(!inStock)}*/}
-                                            {/*        >*/}
-                                            {/*            <Package className="stroke-1 w-4"/>*/}
-                                            {/*            <span className="line-clamp-1 ml-2">In Stock</span>*/}
-                                            {/*            {inStock && (*/}
-                                            {/*                <div*/}
-                                            {/*                    className="flex-shrink-0 w-4 h-4 rounded-full bg-primary-500 text-white flex items-center justify-center ml-3 cursor-pointer">*/}
-                                            {/*                    <XIcon className="p-0.5"/>*/}
-                                            {/*                </div>*/}
-                                            {/*            )}*/}
-                                            {/*        </div>*/}
-                                            {/*    </div>*/}
-                                            {/*</div>*/}
+
                                         </div>
                                     </div>
                                 </div>

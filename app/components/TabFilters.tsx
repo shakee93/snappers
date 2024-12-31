@@ -7,6 +7,7 @@ import BrandFilter from "@/app/components/Filters/BrandFilter";
 import PriceFilter from "@/app/components/Filters/PriceFilter";
 import OnSaleFilter from "@/app/components/Filters/OnSaleFilter";
 import SortOrderFilter from "@/app/components/Filters/SortOrderFilter";
+import InStockFilter from "./Filters/InStockFilter";
 
 interface TabFilterProps {
     categories?: ProductCategory[];
@@ -40,10 +41,10 @@ const TabFilters = ({
         <div className="flex flex-col gap-0 lg:gap-3 lg:space-x-4">
             <div className="hidden lg:flex flex-col justify-start items-start flex-1 space-y-3">
                 {!category && <CategoryFilter categories={categories} />}
+                <InStockFilter/>
                 {!brand && <BrandFilter brands={brands} />}
                 <PriceFilter />
                 <OnSaleFilter />
-                {/*<InStockFilter/>*/}
                 <SortOrderFilter sorts={sort} />
             </div>
         </div>
