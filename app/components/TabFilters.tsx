@@ -35,7 +35,6 @@ const TabFilters = ({
         setMounted();
     }, []);
 
-    // console.log('sortsss', sort);
 
     return (
         <div className="flex flex-col gap-0 lg:gap-3 lg:space-x-4">
