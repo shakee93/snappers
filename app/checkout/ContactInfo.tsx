@@ -106,10 +106,12 @@ const ContactInfo: FC<Props> = ({
             <div className="max-w-lg">
               {/* <Label className="text-sm">Your phone number</Label> */}
               <Input
-                className="mt-1.5  "
-                placeholder="Phone*"
+                className="mt-1.5"
+                placeholder="Phone* (Sri Lankan mobile starting with 07)"
                 value={phone}
                 type="tel"
+                pattern="^[0]{1}[7]{1}[01245678]{1}[0-9]{7}$"
+                title="Please enter a valid Sri Lankan mobile number starting with 07"
                 onChange={(e) => setPhone(e.target.value)}
                 required={true}
               />

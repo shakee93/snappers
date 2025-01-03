@@ -37,7 +37,7 @@ const Footer = async () => {
           </Link>
           <Link
             className="flex gap-2"
-            href={"https://www.instagram.com/gqthemobilestoreunlimited"}
+            href={"https://www.instagram.com/gqthemobilestore/"}
           >
             <Instagram size={32} strokeWidth={1.25} className="text-primaryColor" />
           </Link>
