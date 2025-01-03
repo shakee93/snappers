@@ -46,9 +46,9 @@ const tranformDataForPayhere = async (
   return {
     sandbox: TEST ? true : false,
     merchant_id: TEST ? "1225436" : MERCHANT_ID ?? "1225436",
-    return_url: `http://${host}/checkout`,
+    return_url: `http://${host}/return`,
     cancel_url: `http://${host}/cancel`,
-    notify_url: `http://${host}/notify`,
+    notify_url: `http://${host}/api/payhere/notify`,
     order_id: order_id,
     items: JSON.stringify(paymentDetails_?.items) ?? "gq mobiles",
     hash: hash,
@@ -126,8 +126,7 @@ export const usePayhere = () => {
 
       // Payment completed. It can be a successful failure.
       window.payhere.onCompleted = function onCompleted(orderId: any) {
-        console.log("completed succesffully`", orderId);
-        alert("succussfull")
+        console.log("Payment completed successfully", orderId);
         setPayhereHandleStatus("finished");
         
         // onPaymentCompleted(paymentDetails, orderId);
