@@ -119,7 +119,7 @@ const savePaymentDetails = (
     city: customer?.billing?.city || "no_city",
   };
 
-  console.log("saved_data: for payment", saved_data);
+  // console.log("saved_data: for payment", saved_data);
   return saved_data;
 };
 
