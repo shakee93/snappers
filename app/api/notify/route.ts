@@ -27,8 +27,19 @@ function validateRequiredFields(data: any) {
 export async function POST(req: Request) {
   try {
     console.log("Payhere Notification Endpoint is running");
-    const data = await req.json();
-    console.log("data: ", data);
+    
+    let data;
+    const contentType = req.headers.get('content-type');
+    
+    if (contentType?.includes('application/json')) {
+      data = await req.json();
+    } else {
+      // Handle form data
+      const formData = await req.formData();
+      data = Object.fromEntries(formData);
+    }
+    
+    console.log("Parsed data: ", data);
     const { isValid, missingFields } = validateRequiredFields(data);
     if (!isValid) {
       return NextResponse.json(
