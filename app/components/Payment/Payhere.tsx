@@ -47,8 +47,8 @@ const tranformDataForPayhere = async (
   return {
     sandbox: TEST ? true : false,
     merchant_id: TEST ? "1225436" : MERCHANT_ID ?? "1225436",
-    return_url: `https://${host}/return`,
-    cancel_url: `https://${host}/cancel`,
+    return_url: `http://${host}/return`,
+    cancel_url: `http://${host}/cancel`,
     notify_url: `https://${host}/api/notify`,
     order_id: order_id,
     items: JSON.stringify(paymentDetails_?.items) ?? "gq mobiles",
