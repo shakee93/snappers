@@ -50,6 +50,8 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
+    let parsed_data = JSON.parse(data);
+    console.log("parsed_data: ", parsed_data);
 
     // Get merchant secret from environment variables
     const merchant_secret = process.env.GQ_PAYHERE_MERCHANT_SECRET_KEY;

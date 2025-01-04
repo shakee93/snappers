@@ -42,6 +42,7 @@ const tranformDataForPayhere = async (
     : numberFormat(extractRawAmount(paymentDetails_?.amount), 2, ".", ""); 
 
   let host = window.location.host 
+  
 
   return {
     sandbox: TEST ? true : false,
@@ -93,7 +94,7 @@ export const usePayhere = () => {
       // console.log("paymentDetails: ", paymentDetails);a
       // this for real data
       let dynamicData = await tranformDataForPayhere(paymentDetails);
-      let dynamicDataTest = await tranformDataForPayhere(TEST_STATIC_DATA);
+      // let dynamicDataTest = await tranformDataForPayhere(TEST_STATIC_DATA);
       console.log("dynamicData: ", dynamicData);
       // console.log("dynamicDataTest: ", dynamicDataTest);
 
