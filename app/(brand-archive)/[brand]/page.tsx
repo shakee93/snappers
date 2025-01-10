@@ -37,7 +37,7 @@ export async function generateMetadata(
   const { brand } = await getData(id);
 
   // Dynamic Metadata
-  const pageTitle = `${brand.name} - Top Products  | GQ Mobiles`;
+  const pageTitle = `${brand.name}  | GQ Mobiles`;
   const pageDescription =
     brand.description ||
     `Discover premium products from ${brand.name}. Explore exclusive collections at unbeatable prices. Shop with GQ Mobiles for quality and style.`;
