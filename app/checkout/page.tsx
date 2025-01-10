@@ -277,12 +277,12 @@ const CheckoutPage = () => {
           shipping: shippingDetails,
           billing: billingDetails,
           customerNote: customerNoteHTML,
-          // metaData: [
-          //   {
-          //     key: "payhere_order_id",
-          //     value: payherPaymentID
-          //   }
-          // ]
+          metaData: [
+            {
+              key: "payhere_order_id",
+              value: payherPaymentID
+            }
+          ]
         },
       };
 
@@ -732,12 +732,12 @@ const CheckoutPage = () => {
           shipping: shippingDetails,
           billing: billingDetails,
           customerNote: customerNoteHTML,
-          // metaData: [
-          //   {
-          //     key: "order_id",
-          //     value: payherPaymentID
-          //   }
-          // ]
+          metaData: [
+            {
+              key: "payhere_order_id",
+              value: payherPaymentID ?? ""
+            }
+          ]
         },
       };
 
