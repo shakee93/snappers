@@ -93,7 +93,9 @@ export async function POST(req: Request) {
       );
     }
 
-    const merchant_secret = process.env.GQ_PAYHERE_MERCHANT_SECRET_KEY;
+    // const merchant_secret = process.env.GQ_PAYHERE_MERCHANT_SECRET_KEY;
+    // Sandbox
+    const merchant_secret = "MTc2MTg0ODIyMTMwNTM4NTM0MDgzODI2MTg1MDQ2NDE5MjA1MTI0MA==";
     console.log("Merchant secret configured:", !!merchant_secret);
 
     if (!merchant_secret) {

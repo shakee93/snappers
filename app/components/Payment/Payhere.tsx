@@ -8,7 +8,7 @@ import { extractRawAmount, getPaymentHash, numberFormat, TEST_STATIC_DATA } from
 
 // const MERCHANT_ID = "1225436";
 const MERCHANT_ID = process.env.NEXT_PUBLIC_MERCHANT_ID;
-const TEST: boolean = process.env.NEXT_PUBLIC_PAYHERE_IS_LIVE === "true" ? true : false;
+const TEST: boolean = true;
 
 // Like same in the Helpoer comps change the TEST to true or false
 
@@ -43,11 +43,10 @@ const tranformDataForPayhere = async (
 
   let host = window.location.host 
   let notify_url = `https://gqmobiles.lk/api/notify`
-  
 
   return {
     sandbox: TEST ? true : false,
-    merchant_id: TEST ? "1225436" : MERCHANT_ID ?? "1225436",
+    merchant_id: TEST ? "1225436" : MERCHANT_ID ?? "",
     return_url: `http://${host}/return`,
     cancel_url: `http://${host}/cancel`,
     notify_url: notify_url,
