@@ -32,6 +32,10 @@ function validateRequiredFields(data: any) {
   const sentPayhereConfirmation = async (orderId: number | string, status: string): Promise<any> => {
     console.log("Starting sentPayhereConfirmation with:", { orderId, status });
     
+    // Wait for 10 seconds
+    console.log("Waiting 10 seconds before sending confirmation...");
+    await new Promise(resolve => setTimeout(resolve, 10000));
+    
     console.log("Making request to WordPress API...");
     const confirmationResponse = await fetch(
       "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/payhere-order-confirmation",
