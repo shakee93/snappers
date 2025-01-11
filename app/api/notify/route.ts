@@ -32,10 +32,6 @@ function validateRequiredFields(data: any) {
   const sentPayhereConfirmation = async (orderId: number | string, status: string): Promise<any> => {
     console.log("Starting sentPayhereConfirmation with:", { orderId, status });
     
-    // Wait for 30 seconds
-    console.log("Waiting 30 seconds before sending confirmation...");
-    await new Promise(resolve => setTimeout(resolve, 30000));
-    
     console.log("Making request to WordPress API...");
     const confirmationResponse = await fetch(
       "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/payhere-order-confirmation",
@@ -51,11 +47,7 @@ function validateRequiredFields(data: any) {
       }
     );
 
-    console.log("WordPress API response:", confirmationResponse);
     const body = await confirmationResponse.text();
-    console.log("WordPress API response body:", body);
-    console.log("WordPress API response status:", confirmationResponse.status);
-    console.log("WordPress API response ok:", confirmationResponse.ok);
   
     if (confirmationResponse.ok) {
       console.log("Confirmation sent successfully");
@@ -70,9 +62,6 @@ export async function POST(req: Request) {
   console.log("POST request received at /api/notify");
   try {
     console.log("Processing Payhere notification...");
-    // Wait for 40 seconds before processing
-    console.log("Waiting 40 seconds before processing notification...");
-    await new Promise(resolve => setTimeout(resolve, 40000)); // 40000ms = 40 seconds
     let data;
     const contentType = req.headers.get('content-type');
     console.log("Content-Type:", contentType);
