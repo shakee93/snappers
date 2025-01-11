@@ -8,7 +8,7 @@ import { extractRawAmount, getPaymentHash, numberFormat, TEST_STATIC_DATA } from
 
 // const MERCHANT_ID = "1225436";
 const MERCHANT_ID = process.env.NEXT_PUBLIC_MERCHANT_ID;
-const TEST: boolean = true;
+const TEST: boolean = process.env.NEXT_PUBLIC_PAYHERE_IS_LIVE === "true" ? true : false;
 
 // Like same in the Helpoer comps change the TEST to true or false
 
@@ -32,7 +32,7 @@ const tranformDataForPayhere = async (
 
 
   let order_id: string | undefined = TEST
-    ? paymentDetails_?.order_id
+    ? "ItemNo12345"
     : paymentDetails_?.order_id;
 
 
