@@ -122,7 +122,7 @@ export const usePayhere = () => {
       window.payhere.onDismissed = function onDismissed() {
         setPayhereHandleStatus("dismissed");
         console.log("Dismissed");
-        alert("Dismissed");
+        // alert("Dismissed");
       }
 
       // Payment completed. It can be a successful failure.

@@ -46,7 +46,7 @@ function validateRequiredFields(data: any) {
         }),
       }
     );
-
+    console.log("WordPress API response:", confirmationResponse);
     console.log("WordPress API response status:", confirmationResponse.status);
     console.log("WordPress API response ok:", confirmationResponse.ok);
   
