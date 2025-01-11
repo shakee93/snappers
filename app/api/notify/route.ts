@@ -32,31 +32,56 @@ function validateRequiredFields(data: any) {
   const sentPayhereConfirmation = async (orderId: number | string, status: string): Promise<any> => {
     console.log("Starting sentPayhereConfirmation with:", { orderId, status });
     
-    console.log("Making request to WordPress API...");
-    const confirmationResponse = await fetch(
-      "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/payhere-order-confirmation",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          order_id: orderId,
-          order_status: status,
-        }),
-      }
-    );
-    console.log("WordPress API response:", confirmationResponse);
-    console.log("WordPress API response status:", confirmationResponse.status);
-    console.log("WordPress API response ok:", confirmationResponse.ok);
-  
-    if (confirmationResponse.ok) {
-      console.log("Confirmation sent successfully");
-      return true;
+    try {
+        console.log("Making request to WordPress API...");
+        const confirmationResponse = await fetch(
+            "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/payhere-order-confirmation",
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    order_id: orderId,
+                    order_status: status,
+                }),
+            }
+        );
+
+        // Log the actual response body
+        const responseBody = await confirmationResponse.text();
+        console.log("WordPress API response body:", responseBody);
+
+        if (!confirmationResponse.ok) {
+            console.error("WordPress API error:", {
+                status: confirmationResponse.status,
+                statusText: confirmationResponse.statusText,
+                body: responseBody
+            });
+            return false;
+        }
+
+        try {
+            const jsonResponse = JSON.parse(responseBody);
+            console.log("Parsed WordPress API response:", jsonResponse);
+            
+            // Check if the response indicates success
+            if (jsonResponse.success === true || jsonResponse.status === 'success') {
+                console.log("Confirmation sent and processed successfully");
+                return true;
+            } else {
+                console.error("WordPress API returned success:false:", jsonResponse);
+                return false;
+            }
+        } catch (parseError) {
+            console.error("Failed to parse WordPress API response:", parseError);
+            return false;
+        }
+    } catch (error) {
+        console.error("Error sending confirmation to WordPress:", error);
+        return false;
     }
-    console.log("Confirmation failed");
-    return false;
-  };
+};
   
 
 export async function POST(req: Request) {
