@@ -32,7 +32,7 @@ const tranformDataForPayhere = async (
 
 
   let order_id: string | undefined = TEST
-    ? "ItemNo12345"
+    ? paymentDetails_?.order_id
     : paymentDetails_?.order_id;
 
 
