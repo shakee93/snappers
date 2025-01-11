@@ -42,6 +42,7 @@ const tranformDataForPayhere = async (
     : numberFormat(extractRawAmount(paymentDetails_?.amount), 2, ".", ""); 
 
   let host = window.location.host 
+  let notify_url = `https://gqmobiles.lk/api/notify`
   
 
   return {
@@ -49,7 +50,7 @@ const tranformDataForPayhere = async (
     merchant_id: TEST ? "1225436" : MERCHANT_ID ?? "1225436",
     return_url: `http://${host}/return`,
     cancel_url: `http://${host}/cancel`,
-    notify_url: `https://${host}/api/notify`,
+    notify_url: notify_url,
     order_id: order_id,
     items: JSON.stringify(paymentDetails_?.items) ?? "gq mobiles",
     hash: hash,
