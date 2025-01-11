@@ -50,7 +50,10 @@ function validateRequiredFields(data: any) {
         }),
       }
     );
+
     console.log("WordPress API response:", confirmationResponse);
+    const body = await confirmationResponse.text();
+    console.log("WordPress API response body:", body);
     console.log("WordPress API response status:", confirmationResponse.status);
     console.log("WordPress API response ok:", confirmationResponse.ok);
   
@@ -82,6 +85,25 @@ export async function POST(req: Request) {
     }
     
     console.log("Parsed request data:", data);
+
+    // let data = {
+    //   merchant_id: '215650',
+    //   order_id: 'bd098dc1-edfe-4f41-926e-acb63426d22c',
+    //   payment_id: '320043795686',
+    //   captured_amount: '21.22',
+    //   payhere_amount: '21.22',
+    //   payhere_currency: 'LKR',
+    //   status_code: '2',
+    //   md5sig: 'FA1A26166FF8FB36472D104DEA7D1D99',
+    //   custom_1: '',
+    //   custom_2: '',
+    //   status_message: 'Successfully received the VISA payment',
+    //   method: 'VISA',
+    //   card_holder_name: 'Mohammed Sadikin Mohammed Shadir',
+    //   card_no: '************6268',
+    //   card_expiry: '0826',
+    //   recurring: '0'
+    // }
     
     const { isValid, missingFields } = validateRequiredFields(data);
     console.log("Validation results:", { isValid, missingFields });
