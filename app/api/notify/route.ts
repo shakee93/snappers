@@ -70,9 +70,9 @@ export async function POST(req: Request) {
   console.log("POST request received at /api/notify");
   try {
     console.log("Processing Payhere notification...");
-    // Wait for 2 minutes before processing
-    console.log("Waiting 2 minutes before processing notification...");
-    await new Promise(resolve => setTimeout(resolve, 120000)); // 120000ms = 2 minutes
+    // Wait for 40 seconds before processing
+    console.log("Waiting 40 seconds before processing notification...");
+    await new Promise(resolve => setTimeout(resolve, 40000)); // 40000ms = 40 seconds
     let data;
     const contentType = req.headers.get('content-type');
     console.log("Content-Type:", contentType);
