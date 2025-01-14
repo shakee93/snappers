@@ -143,7 +143,7 @@ const getRandomWelcomeMessage = () => {
 //PAYMENT FUNCTIONS
 
 const MERCHANT_ID = process.env.NEXT_PUBLIC_MERCHANT_ID;
-const TEST: boolean = process.env.NEXT_PUBLIC_PAYHERE_IS_TESTING === "true" ? true : false;
+const TEST: boolean = process.env.NEXT_PUBLIC_PAYHERE_IS_TESTING === "true" ? false : true;
 const host = TEST ? "localhost:3000" : "gqmobiles.lk";
 
 const STATIC_DATA = {
@@ -151,7 +151,7 @@ const STATIC_DATA = {
   merchant_id: "1225436",
   return_url: `http://${host}/success`,
   cancel_url: `http://${host}/cancel`,
-  notify_url: `http://${host}/api/notify`,
+  notify_url: `https://gqmobiles.lk/api/notify`,
   order_id: "ItemNo12345",
   items: "gq mobiles",
   hash: null,
@@ -174,7 +174,7 @@ const TEST_STATIC_DATA = {
   merchant_id: "1225436",
   return_url: `http://${host}/success`,
   cancel_url: `http://${host}/cancel`,
-  notify_url: `http://${host}/api/notify`,
+  notify_url: `https://gqmobiles.lk/api/notify`,
   order_id: "ItemNo12345",
   items: "gq mobiles",
   hash: null,
