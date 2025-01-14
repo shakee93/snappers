@@ -44,7 +44,7 @@ const SearchBar = () => {
                     onChange={e => setSearch(e.target.value)}
                     type="text"
                     placeholder="Type to Quick Search"
-                    className="border-none focus:border-none focus:outline-none focus:ring-0 bg-transparent w-full text-sm"
+                    className="border-none focus:border-none focus:outline-none focus:ring-0 bg-transparent w-full text-base"
                 />
             </div>
         </div>
