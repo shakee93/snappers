@@ -16,6 +16,7 @@ type CartSession = {
     getCart: () => void
     addToCart: (id : number, quantity?: number, variation?: number) => void | Promise<any>
     setCustomer: React.Dispatch<React.SetStateAction<Customer | null>>
+    clearCart: () => void
 }
 
 
@@ -27,7 +28,8 @@ const CartContext = createContext<CartSession>({
     addToCart : (id) => {},
     updateCart : (key, q) => {},
     getCart : () => {},
-    setCustomer: () => {}
+    setCustomer: () => {},
+    clearCart: () => {}
 });
 
 export function useCart() {
@@ -71,15 +73,19 @@ export function CartProvider({ children }: {
         onCompleted: refreshData
     });
 
-    const removeFromCart = async (keys: string[] = []) => {
+    const removeFromCart = async (keys: string[] = [], all: boolean = false) => {
         setLoading(true)
 
         return await _removeFromCart({
             variables: {
-                keys: keys
+                keys: keys,
+                all: all
             }
         }).finally(() => setLoading(false))
+    }
 
+    const clearCart = async () => {
+        return await removeFromCart([], true);
     }
 
     const addToCart = async (id: number, quantity?: number, variation?: number) => {
@@ -121,7 +127,8 @@ export function CartProvider({ children }: {
             removeFromCart,
             addToCart,
             getCart,
-            setCustomer
+            setCustomer,
+            clearCart
         }}>
             {children}
         </CartContext.Provider>

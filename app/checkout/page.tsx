@@ -417,9 +417,14 @@ const CheckoutPage = () => {
         }
       }
 
-      const { data } = await updateCartShippingTotalMutation({
+      const { data, errors } = await updateCartShippingTotalMutation({
         variables: { input: { shippingMethods } },
       });
+
+      if (errors) {
+        console.error("Error updating cart shipping total:", errors);
+        return;
+      }
 
       // console.log("data in shippng", data);
 
