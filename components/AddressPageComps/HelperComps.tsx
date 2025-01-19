@@ -143,7 +143,7 @@ const getRandomWelcomeMessage = () => {
 //PAYMENT FUNCTIONS
 
 const MERCHANT_ID = process.env.NEXT_PUBLIC_MERCHANT_ID;
-const TEST: boolean = process.env.NEXT_PUBLIC_PAYHERE_IS_TESTING === "true" ? false : true;
+const TEST: boolean = process.env.NEXT_PUBLIC_PAYHERE_IS_TESTING === "true" ? true : false;
 const host = TEST ? "localhost:3000" : "gqmobiles.lk";
 
 const STATIC_DATA = {
