@@ -93,6 +93,7 @@ export const usePayhere = () => {
       
       // console.log("paymentDetails: ", paymentDetails);a
       // this for real data
+      console.log("TEST: ", TEST)
       let dynamicData = await tranformDataForPayhere(paymentDetails);
       // let dynamicDataTest = await tranformDataForPayhere(TEST_STATIC_DATA);
       console.log("dynamicData: ", dynamicData);
