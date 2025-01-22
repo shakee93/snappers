@@ -157,7 +157,6 @@ const InstantSearchWrapper = ({
     return server ? InstantSearchNext : InstantSearch;
   }, []);
 
-  // console.log('sort in instant search wrapper', sort);
 
   return (
     <div>
@@ -181,8 +180,6 @@ const InstantSearchWrapper = ({
       >
         <div className="flex lg:gap-6 flex-col">
           <SearchInput bindToStore={bindToStore} show={search} />
-
-
 
           <div className='flex overflow-x-auto lg:hidden w-full'>
             <MobileFilterSheet category={category}

@@ -18,6 +18,7 @@ export interface PaginationProps {
 }
 
 const Paginationx: FC<PaginationProps> = ({ className = "", onPageChange }) => {
+
   const { pages, refine, currentRefinement, isFirstPage, isLastPage, nbPages } =
     usePagination({
       padding: 2
@@ -41,6 +42,10 @@ const Paginationx: FC<PaginationProps> = ({ className = "", onPageChange }) => {
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
+    const overlay = document.querySelector('.overlay-class');
+    if (overlay) {
+      overlay.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   }, [currentRefinement])
 
 
