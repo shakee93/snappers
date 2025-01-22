@@ -68,6 +68,7 @@ const InstantSearchWrapper = ({
 }: InstantSearchWrapperProps) => {
   const { sidebar, setSearchMounted } = useStore();
   const [differedSidebar] = useDebounce(sidebar, 800);
+  const [hitsPerPage, setHitsPerPage] = useState<number>(10);
 
   const getFilterQuery: () => string = () => {
     const f = [
@@ -121,22 +122,22 @@ const InstantSearchWrapper = ({
       },
     });
 
-  // console.log('Typesense client created successfully');
-  return typesenseInstantSearchAdapter.searchClient;
-}, []);
+    // console.log('Typesense client created successfully');
+    return typesenseInstantSearchAdapter.searchClient;
+  }, []);
 
-useEffect(() => {
-  setFilterQuery(getFilterQuery);
-  // setSortQuery(differedSidebar.sort);
-}, [differedSidebar]);
-
-useEffect(() => {
-
-  if (!search) {
+  useEffect(() => {
     setFilterQuery(getFilterQuery);
-  }
-  // setSortQuery(differedSidebar.sort);
-}, [search]);
+    // setSortQuery(differedSidebar.sort);
+  }, [differedSidebar]);
+
+  useEffect(() => {
+
+    if (!search) {
+      setFilterQuery(getFilterQuery);
+    }
+    // setSortQuery(differedSidebar.sort);
+  }, [search]);
 
   useEffect(() => {
     // console.log(filterQuery);
@@ -181,6 +182,8 @@ useEffect(() => {
         <div className="flex lg:gap-6 flex-col">
           <SearchInput bindToStore={bindToStore} show={search} />
 
+
+
           <div className='flex overflow-x-auto lg:hidden w-full'>
             <MobileFilterSheet category={category}
               brand={brand}
@@ -205,9 +208,23 @@ useEffect(() => {
                   sort={sort}
                 />
               )}
-              <Configure filters={filterQuery} hitsPerPage={10} />
+              <Configure filters={filterQuery} hitsPerPage={hitsPerPage} />
             </div>
             <div className='col-span-12 lg:col-span-9'>
+              <div className="mb-4">
+                <label htmlFor="hitsPerPage" className="mr-2">Results per page:</label>
+                <select
+                  id="hitsPerPage"
+                  value={hitsPerPage}
+                  onChange={(e) => setHitsPerPage(Number(e.target.value))}
+                  className="border rounded p-1 w-16"
+                >
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={50}>50</option>
+                  <option value={100}>100</option>
+                </select>
+              </div>
               <ProductGridInstant />
             </div>
           </div>
