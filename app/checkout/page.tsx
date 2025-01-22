@@ -139,6 +139,7 @@ const CheckoutPage = () => {
   const [freeShipping, setFreeShipping] = useState<boolean>(false);
   const [confirmOrderErrors, setConfirmOrderErrors] = useState<string[]>([]);
   const [guestCheckoutData, setGuestCheckoutData] = useState<any>();
+  const [isConfirmingOrder, setIsConfirmingOrder] = useState(false);
 
   const handleTOC = () => {
     // Toggle the state and get the updated value
@@ -270,6 +271,7 @@ const CheckoutPage = () => {
     `;
 
     try {
+      setIsConfirmingOrder(true);
       const variables = {
         input: {
           paymentMethod: paymentMethodId,
@@ -299,15 +301,15 @@ const CheckoutPage = () => {
 
       toast.loading("Please wait, we are confirming your order...");
 
-      let confirmation = await sentConfirmation(data.checkout.order.databaseId);
-      if (confirmation) {
-        toast.dismiss();
-        toast.success(
-          "Congratulations! Your order has been successfully confirmed."
-        );
-      } else {
-        toast.error("We got your order. but something went wrong our team will contact you soon.");
-        toast.dismiss();
+      try {
+        let confirmation = await sentConfirmation(data.checkout.order.databaseId);
+        if (confirmation) {
+          toast.success("Congratulations! Your order has been successfully confirmed.");
+        } else {
+          toast.error("We got your order, but something went wrong. Our team will contact you soon.");
+        }
+      } finally {
+        setIsConfirmingOrder(false);
       }
 
       const checkoutDetails = savePaymentDetails(data);
@@ -1059,6 +1061,20 @@ const CheckoutPage = () => {
           </div>
         </div>
       </main>
+
+      {isConfirmingOrder && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center">
+          <div className="bg-white dark:bg-slate-800 p-8 rounded-lg shadow-xl text-center max-w-md mx-4">
+            <div className="flex flex-col items-center gap-4">
+              <Loader className="w-12 h-12 animate-spin text-primary" />
+              <h2 className="text-xl font-semibold">Confirming Your Order</h2>
+              <p className="text-slate-600 dark:text-slate-300">
+                Please don't close this window while we confirm your order...
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
