@@ -34,6 +34,7 @@ const HeaderSearchResults = ({ brands, productCategories }: SearchBarProps) => {
     if (!mounted) {
         return <></>
     }
+    
 
 
     return search.length > 0 ? <div className={twMerge(
