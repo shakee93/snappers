@@ -217,12 +217,13 @@ const InstantSearchWrapper = ({
                   id="hitsPerPage"
                   value={hitsPerPage}
                   onChange={(e) => setHitsPerPage(Number(e.target.value))}
-                  className="border rounded p-1 w-16"
+                  className="border rounded p-2 w-20 text-sm rounded-md border 
+                  cursor-pointer border border-2"
                 >
-                  <option value={10}>10</option>
-                  <option value={20}>20</option>
-                  <option value={50}>50</option>
-                  <option value={100}>100</option>
+                  <option className="text-sm p-2" value={10}>10</option>
+                  <option className="text-sm p-2" value={20}>20</option>
+                  <option className="text-sm p-2" value={50}>50</option>
+                  <option className="text-sm p-2" value={100}>100</option>
                 </select>
               </div>
               <ProductGridInstant />
