@@ -1069,7 +1069,7 @@ const CheckoutPage = () => {
               <Loader className="w-12 h-12 animate-spin text-primary" />
               <h2 className="text-xl font-semibold">Confirming Your Order</h2>
               <p className="text-slate-600 dark:text-slate-300">
-                Please don't close this window while we confirm your order...
+                Please don&apos;t close this window while we confirm your order...
               </p>
             </div>
           </div>
