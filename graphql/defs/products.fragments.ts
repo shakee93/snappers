@@ -93,12 +93,17 @@ export const ProductContentSlice = gql`
           slug
         }
       }
+      allPaModel {
+        nodes {
+          name
+          slug
+        }
+      }
       allPaPacks {
         nodes {
           name
           slug
-       
-          }
+        }
       }
       allPaWatchSize {
         nodes {
@@ -117,7 +122,7 @@ export const ProductContentSlice = gql`
           name
           slug
         }
-      } 
+      }
       allPaAmount {
         nodes {
           name
@@ -221,7 +226,7 @@ export const ProductContentFull = gql`
           sourceUrl
         }
         type
-        
+
         ... on SimpleProduct {
           onSale
           stockStatus
@@ -296,6 +301,12 @@ export const ProductContentFull = gql`
               slug
             }
           }
+          allPaModel {
+            nodes {
+              name
+              slug
+            }
+          }
           allPaWatchSize {
             nodes {
               name
@@ -356,7 +367,7 @@ export const ProductContentFull = gql`
               slug
             }
           }
-         
+
           onSale
           price
           rawPrice: price(format: RAW)
@@ -425,7 +436,7 @@ export const ProductContentFull = gql`
                 id
                 databaseId
               }
-              
+
               attributes {
                 nodes {
                   id
@@ -500,6 +511,12 @@ export const ProductContentFull = gql`
         }
       }
       allPaWarranty {
+        nodes {
+          name
+          slug
+        }
+      }
+      allPaModel {
         nodes {
           name
           slug
