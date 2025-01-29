@@ -151,30 +151,39 @@ const CheckoutPage = () => {
     // console.log({ updatedTOC });
   };
   // TODO: Uncomment this for the redirect on cart free
-  // useEffect(() => {
-  //   if (cart && cart?.contents?.nodes?.length === 0) {
-  //     router.push("/");
-  //   }
-  //   if (cart?.total !== null && cart?.total !== undefined) {
-  //     setOrderTotal(cart?.total);
-  //   }
-  // }, [cart]);
+  useEffect(() => {
+    if (cart && cart?.contents?.nodes?.length === 0) {
+      router.push("/");
+    }
+    if (cart?.total !== null && cart?.total !== undefined) {
+      setOrderTotal(cart?.total);
+    }
+  }, [cart]);
 
-  // useEffect(() => {
-  //   fetchCustomer();
-  // }, []);
+  useEffect(() => {
+    fetchCustomer();
+  }, []);
 
   // MUTATIONS
   const [updateCartShippingTotalMutation] = useMutation(UPDATE_SHIPPING_TOTAL);
   const [
     checkoutMutation,
     {
-      // data: realCheckoutData,
+      data: realCheckoutData,
+      loading: realCheckoutLoading,
+      error: realCheckoutError,
     },
   ] = useMutation(CHECKOUT);
+
+  // console.log("realCheckoutData", realCheckoutData);
+  // console.log("realCheckoutLoading", realCheckoutLoading);
+  // console.log("realCheckoutError", realCheckoutError);
   const [completeOrderPayment] = useMutation(COMPLETE_ORDER_PAYMENT);
   // const  [createOrderGuest] = useMutation(GUEST_CHECKOUT_MUTATION)
-  const [guestCheckout] = useMutation(GUEST_CHECKOUT);
+  const [guestCheckout, { loading: guestCheckoutLoading, error: guestCheckoutError }] = useMutation(GUEST_CHECKOUT);
+  
+  // console.log("guestCheckoutLoading", guestCheckoutLoading);
+  // console.log("guestCheckoutError", guestCheckoutError);
 
   // Creating a Order using For Guest. Instead of using direct checkout mutation.
   const [
@@ -230,167 +239,167 @@ const CheckoutPage = () => {
     });
   };
 
-  const implementCheckoutAfterPayhere = async () => {
-    const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
-    const isPayhere = formData?.paymentMethod?.selectedGateway?.id == "payhere";
-    if (paymentMethodId === undefined) {
-      console.log("transaction message failed");
-      console.error("Payment method ID is undefined");
-      toast.error("Payment Method was not chosen.");
-      return;
-    }
+  // const implementCheckoutAfterPayhere = async () => {
+  //   const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
+  //   const isPayhere = formData?.paymentMethod?.selectedGateway?.id == "payhere";
+  //   if (paymentMethodId === undefined) {
+  //     console.log("transaction message failed");
+  //     console.error("Payment method ID is undefined");
+  //     toast.error("Payment Method was not chosen.");
+  //     return;
+  //   }
 
-    if (payherPaymentID == null) {
-      toast("payhere payment not initiated");
-      return;
-    }
+  //   if (payherPaymentID == null) {
+  //     toast("payhere payment not initiated");
+  //     return;
+  //   }
 
-    const shippingMethod = getShippingMethod(shippingTotal);
-    const shippingDetails = isStorePickup
-      ? {
-          ...transformAddress(formData.deliveryAddress),
-          address1: "Store Pickup",
-          address2: "",
-          city: "Store Pickup",
-          state: "",
-          postcode: "",
-        }
-      : transformAddress(formData.deliveryAddress);
+  //   const shippingMethod = getShippingMethod(shippingTotal);
+  //   const shippingDetails = isStorePickup
+  //     ? {
+  //         ...transformAddress(formData.deliveryAddress),
+  //         address1: "Store Pickup",
+  //         address2: "",
+  //         city: "Store Pickup",
+  //         state: "",
+  //         postcode: "",
+  //       }
+  //     : transformAddress(formData.deliveryAddress);
 
-    const email = formData?.contactInfo?.email;
+  //   const email = formData?.contactInfo?.email;
 
-    const billingDetails = {
-      ...transformAddress(formData.billingAddress),
-      email: formData?.contactInfo?.email,
-    };
+  //   const billingDetails = {
+  //     ...transformAddress(formData.billingAddress),
+  //     email: formData?.contactInfo?.email,
+  //   };
 
-    const customerNoteHTML = `
-        <p><strong>Customer Email:</strong> ${email}</p>
-        <p><strong>Phone Number:</strong> ${formData?.contactInfo?.phone}</p>
-        <p><strong>Payhere Payment ID:</strong> ${payherPaymentID}</p>
-        ${isStorePickup ? "<p><strong>Pickup Location:</strong> Store</p>" : ""}
-    `;
+  //   const customerNoteHTML = `
+  //       <p><strong>Customer Email:</strong> ${email}</p>
+  //       <p><strong>Phone Number:</strong> ${formData?.contactInfo?.phone}</p>
+  //       <p><strong>Payhere Payment ID:</strong> ${payherPaymentID}</p>
+  //       ${isStorePickup ? "<p><strong>Pickup Location:</strong> Store</p>" : ""}
+  //   `;
 
-    try {
-      setIsConfirmingOrder(true);
-      const variables = {
-        input: {
-          paymentMethod: paymentMethodId,
-          shippingMethod,
-          shipping: shippingDetails,
-          billing: billingDetails,
-          customerNote: customerNoteHTML,
-          metaData: [
-            {
-              key: "payhere_order_id",
-              value: payherPaymentID
-            }
-          ]
-        },
-      };
+  //   try {
+  //     setIsConfirmingOrder(true);
+  //     const variables = {
+  //       input: {
+  //         paymentMethod: paymentMethodId,
+  //         shippingMethod,
+  //         shipping: shippingDetails,
+  //         billing: billingDetails,
+  //         customerNote: customerNoteHTML,
+  //         metaData: [
+  //           {
+  //             key: "payhere_order_id",
+  //             value: payherPaymentID
+  //           }
+  //         ]
+  //       },
+  //     };
 
 
-      const { data } =
-        customer?.id === "guest"
-          ? await guestCheckout({ variables })
-          : await checkoutMutation({ variables });
+  //     const { data } =
+  //       customer?.id === "guest"
+  //         ? await guestCheckout({ variables })
+  //         : await checkoutMutation({ variables });
 
-      if (!data || !data.checkout) {
-        toast.error("Failed to process the order after payment");
-        return;
-      }
+  //     if (!data || !data.checkout) {
+  //       toast.error("Failed to process the order after payment");
+  //       return;
+  //     }
 
-      toast.loading("Please wait, we are confirming your order...");
+  //     toast.loading("Please wait, we are confirming your order...");
 
-      try {
-        let confirmation = await sentConfirmation(data.checkout.order.databaseId);
-        if (confirmation) {
-          toast.success("Congratulations! Your order has been successfully confirmed.");
-        } else {
-          toast.error("We got your order, but something went wrong. Our team will contact you soon.");
-        }
-      } finally {
-        setIsConfirmingOrder(false);
-      }
+  //     try {
+  //       let confirmation = await sentConfirmation(data.checkout.order.databaseId);
+  //       if (confirmation) {
+  //         toast.success("Congratulations! Your order has been successfully confirmed.");
+  //       } else {
+  //         toast.error("We got your order, but something went wrong. Our team will contact you soon.");
+  //       }
+  //     } finally {
+  //       setIsConfirmingOrder(false);
+  //     }
 
-      const checkoutDetails = savePaymentDetails(data);
-      setPaymentData(checkoutDetails);
+  //     const checkoutDetails = savePaymentDetails(data);
+  //     setPaymentData(checkoutDetails);
 
-      const {
-        shippingaddress1,
-        shippingaddress2,
-        city,
-        billingaddress1,
-        billingaddress2,
-        lineItems,
-        shippingTotal,
-        subtotal,
-        date,
-      } = checkoutDetails;
+  //     const {
+  //       shippingaddress1,
+  //       shippingaddress2,
+  //       city,
+  //       billingaddress1,
+  //       billingaddress2,
+  //       lineItems,
+  //       shippingTotal,
+  //       subtotal,
+  //       date,
+  //     } = checkoutDetails;
 
-      const updatedCheckoutDetails = {
-        ...checkoutDetails,
-        lineItems: lineItems,
-        subtotal: subtotal,
-        shippingTotal: shippingTotal,
-        date: date,
-        billingaddress1: billingaddress1,
-        billingaddress2: billingaddress2,
-        shippingaddress1: shippingaddress1,
-        shippingaddress2: shippingaddress2,
-        city: city,
-      };
+  //     const updatedCheckoutDetails = {
+  //       ...checkoutDetails,
+  //       lineItems: lineItems,
+  //       subtotal: subtotal,
+  //       shippingTotal: shippingTotal,
+  //       date: date,
+  //       billingaddress1: billingaddress1,
+  //       billingaddress2: billingaddress2,
+  //       shippingaddress1: shippingaddress1,
+  //       shippingaddress2: shippingaddress2,
+  //       city: city,
+  //     };
 
-      if (
-        customer?.id === "guest" ||
-        checkoutDetails.order_id == "guest_checkout"
-      ) {
-        const queryParams = new URLSearchParams({
-          ...updatedCheckoutDetails,
-          lineItems: JSON.stringify(updatedCheckoutDetails.lineItems),
-          subtotal: String(updatedCheckoutDetails.subtotal),
-          shippingTotal: String(updatedCheckoutDetails.shippingTotal),
-          date: String(updatedCheckoutDetails.date),
-          billingaddress1: String(updatedCheckoutDetails.billingaddress1),
-          billingaddress2: String(updatedCheckoutDetails.billingaddress2),
-          shippingaddress1: String(updatedCheckoutDetails.shippingaddress1),
-          shippingaddress2: String(updatedCheckoutDetails.shippingaddress2),
-          city: updatedCheckoutDetails.city || "",
-          order_id: updatedCheckoutDetails.order_id,
-        }).toString();
-        const redirectUrl = `/checkout/guest_checkout?${queryParams}&ordermethod=guest`;
-        router.push(redirectUrl);
-        return;
-      }
+  //     if (
+  //       customer?.id === "guest" ||
+  //       checkoutDetails.order_id == "guest_checkout"
+  //     ) {
+  //       const queryParams = new URLSearchParams({
+  //         ...updatedCheckoutDetails,
+  //         lineItems: JSON.stringify(updatedCheckoutDetails.lineItems),
+  //         subtotal: String(updatedCheckoutDetails.subtotal),
+  //         shippingTotal: String(updatedCheckoutDetails.shippingTotal),
+  //         date: String(updatedCheckoutDetails.date),
+  //         billingaddress1: String(updatedCheckoutDetails.billingaddress1),
+  //         billingaddress2: String(updatedCheckoutDetails.billingaddress2),
+  //         shippingaddress1: String(updatedCheckoutDetails.shippingaddress1),
+  //         shippingaddress2: String(updatedCheckoutDetails.shippingaddress2),
+  //         city: updatedCheckoutDetails.city || "",
+  //         order_id: updatedCheckoutDetails.order_id,
+  //       }).toString();
+  //       const redirectUrl = `/checkout/guest_checkout?${queryParams}&ordermethod=guest`;
+  //       router.push(redirectUrl);
+  //       return;
+  //     }
 
-      let redirectUrl = `checkout/${checkoutDetails.order_id}`;
-      router.push(redirectUrl);
-    } catch (error) {
-      console.error("Error in implementCheckoutAfterPayhere:", error);
-      toast.error("Failed to complete the order after payment");
-      setLoading(false);
-    }
-  };
+  //     let redirectUrl = `checkout/${checkoutDetails.order_id}`;
+  //     router.push(redirectUrl);
+  //   } catch (error) {
+  //     console.error("Error in implementCheckoutAfterPayhere:", error);
+  //     toast.error("Failed to complete the order after payment");
+  //     setLoading(false);
+  //   }
+  // };
 
-  useEffect(() => {
-    console.log("payhereHandleStatus Status Changing", payhereHandleStatus);
-    switch (payhereHandleStatus) {
-      case "finished":
-        implementCheckoutAfterPayhere();
-        setLoading(false);
-        break;
-      case "dismissed":
-        setLoading(false);
-        toast.error("Payment was dismissed");
-        break;
-      case "error":
-        toast.error("error while initiate payment");
-        break;
+  // useEffect(() => {
+  //   console.log("payhereHandleStatus Status Changing", payhereHandleStatus);
+  //   switch (payhereHandleStatus) {
+  //     case "finished":
+  //       // implementCheckoutAfterPayhere();
+  //       setLoading(false);
+  //       break;
+  //     case "dismissed":
+  //       setLoading(false);
+  //       toast.error("Payment was dismissed");
+  //       break;
+  //     case "error":
+  //       toast.error("error while initiate payment");
+  //       break;
 
-      default:
-        break;
-    }
-  }, [payhereHandleStatus]);
+  //     default:
+  //       break;
+  //   }
+  // }, [payhereHandleStatus]);
 
   const updateShippingTotal = async () => {
     const hasFreeShipping: any = cart?.appliedCoupons?.some(
@@ -419,6 +428,8 @@ const CheckoutPage = () => {
           setOrderTotal(total);
         }
       }
+
+      
 
       const { data, errors } = await updateCartShippingTotalMutation({
         variables: { input: { shippingMethods } },
@@ -691,90 +702,91 @@ const CheckoutPage = () => {
       //   }
       // }
 
-      // const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
+      const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
 
-      // if (paymentMethodId === undefined) {
-      //   console.error("Payment method ID is undefined");
-      //   toast.error("Payment Method was not chosen.");
-      //   return;
-      // }
+      if (paymentMethodId === undefined) {
+        console.error("Payment method ID is undefined");
+        toast.error("Payment Method was not chosen.");
+        return;
+      }
 
-      // formData.billingAddress.country = "LK";
-      // formData.deliveryAddress.country = "LK";
+      formData.billingAddress.country = "LK";
+      formData.deliveryAddress.country = "LK";
 
-      // const shippingMethod = getShippingMethod(shippingTotal);
-      // const shippingDetails = isStorePickup
-      //   ? {
-      //       ...transformAddress(formData.deliveryAddress),
-      //       address1: "Store Pickup",
-      //       address2: "",
-      //       city: "Store Pickup",
-      //       state: "",
-      //       postcode: "",
-      //     }
-      //   : transformAddress(formData.deliveryAddress);
+      const shippingMethod = getShippingMethod(shippingTotal);
+      const shippingDetails = isStorePickup
+        ? {
+            ...transformAddress(formData.deliveryAddress),
+            address1: "Store Pickup",
+            address2: "",
+            city: "Store Pickup",
+            state: "",
+            postcode: "",
+          }
+        : transformAddress(formData.deliveryAddress);
 
-      // const email = formData?.contactInfo?.email;
+      const email = formData?.contactInfo?.email;
 
-      // const billingDetails = {
-      //   ...transformAddress(formData.billingAddress),
-      //   email: formData?.contactInfo?.email,
-      // };
+      const billingDetails = {
+        ...transformAddress(formData.billingAddress),
+        email: formData?.contactInfo?.email,
+      };
 
-      // const customerNoteHTML = `
-      //       <p><strong>Customer Email:</strong> ${email}</p>
-      //       <p><strong>Phone Number:</strong> ${
-      //         formData?.contactInfo?.phone
-      //       }</p>
-      //       ${
-      //         isStorePickup
-      //           ? "<p><strong>Pickup Location:</strong> Store</p>"
-      //           : ""
-      //       }
-      //   `;
+      const customerNoteHTML = `
+            <p><strong>Customer Email:</strong> ${email}</p>
+            <p><strong>Phone Number:</strong> ${
+              formData?.contactInfo?.phone
+            }</p>
+            ${
+              isStorePickup
+                ? "<p><strong>Pickup Location:</strong> Store</p>"
+                : ""
+            }
+        `;
 
-      // const variables = {
-      //   input: {
-      //     paymentMethod: paymentMethodId,
-      //     shippingMethod,
-      //     shipping: shippingDetails,
-      //     billing: billingDetails,
-      //     customerNote: customerNoteHTML,
-      //     metaData: [
-      //       {
-      //         key: "payhere_order_id",
-      //         value: payherPaymentID ?? ""
-      //       }
-      //     ]
-      //   },
-      // };
+      const variables = {
+        input: {
+          paymentMethod: paymentMethodId,
+          shippingMethod,
+          shipping: shippingDetails,
+          billing: billingDetails,
+          customerNote: customerNoteHTML,
+          metaData: [
+            {
+              key: "payhere_order_id",
+              value: payherPaymentID ?? ""
+            }
+          ]
+        },
+      };
 
-      // const { data } =
-      //   customer?.id === "guest"
-      //     ? await guestCheckout({ variables })
-      //     : await checkoutMutation({ variables });
+      const { data } =
+        customer?.id === "guest"
+          ? await guestCheckout({ variables })
+          : await checkoutMutation({ variables });
 
-      // console.log("data just below guest checkout", data);
 
       // FOR GUEST CHECKOUT
-      let testPaymentData = dummyPaymentData;
+      let testPaymentData = data;
 
       const isBankTransfer =
         formData?.paymentMethod?.selectedGateway?.id == "bacs";
 
-      // setGuestCheckoutData(data);
       console.log("data just below guest checkout", data);
       const isGuest = customer?.id === "guest";
-      console.log("isGuest", isGuest);
       if(isPayhere && isGuest){
-        const orderId = testPaymentData?.checkout?.order?.databaseId;
         console.log("Payhere order", testPaymentData);
         localStorage.setItem('payhere_last_order', JSON.stringify(testPaymentData));
-        router.push(`/checkout/payhere/${orderId}`);
-
+        router.push(`/checkout/payhere/guest_order`);
         return;
       }
-      return;
+
+      if(isPayhere && !isGuest){
+        const orderId = data?.checkout?.order?.databaseId;
+        router.push(`/checkout/payhere/${orderId}`);
+        return;
+      }
+
 
       if (data) {
         const checkoutDetails = savePaymentDetails(data);
@@ -817,6 +829,7 @@ const CheckoutPage = () => {
 
   const handleCheckoutError = (error: any) => {
     setLoading(false);
+    console.log("error: ", error)
     if (error.message === "Sorry, no session found.") {
       toast.error("No Items to checkout");
     } else {

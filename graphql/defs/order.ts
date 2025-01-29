@@ -143,8 +143,8 @@ export const GET_ALL_ORDER_DETAILS = gql`
   ${ProductContentSlice}
 `;
 
-export const GET_GUEST_ORDER = gql`
-  query getguestorder {
+export const GET_MY_ORDERS = gql`
+  query getMyOrders {
     customer {
       id
       databaseId
@@ -156,6 +156,7 @@ export const GET_GUEST_ORDER = gql`
           orderNumber
           total
           status
+          paymentMethod
           lineItems {
             nodes {
               databaseId

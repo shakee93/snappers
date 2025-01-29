@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import ProductTable, { OrderDetails, PaymentSection } from "./Comps";
 import { toast } from "sonner";
@@ -5,6 +6,8 @@ import Link from "next/link";
 import Script from "next/script";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import { useSearchParams } from "next/navigation";
+import { useCart } from "@/context/CartProvider";
+import { useEffect } from "react";
 
 
 
@@ -21,61 +24,74 @@ const OrderStatusMessage = ({ status }: { status: string }) => {
   return null;
 };
 
+// No Order Message Component
+const NoOrderMessage = () => {
+  return (
+    <div className="container mx-auto py-20 px-4">
+      <div className="max-w-2xl mx-auto text-center">
+        <h2 className="text-2xl font-bold text-red-600 mb-4">
+          Order Not Available
+        </h2>
+        <p className="text-gray-600 mb-6">
+          We couldn{"'"}t find your order information. If you believe this is our mistake, please contact us:
+        </p>
+        <div className="space-y-2 text-lg">
+          <p>
+            <span className="font-semibold">Phone:</span>{" "}
+            <a href="tel:0777555665" className="text-blue-600 hover:underline">077 755 5665</a>
+            {" / "}
+            <a href="tel:0777988665" className="text-blue-600 hover:underline">077 798 8665</a>
+          </p>
+          <p>
+            <span className="font-semibold">Email:</span>{" "}
+            <a href="mailto:inquiries@gqmobiles.lk" className="text-blue-600 hover:underline">
+              inquiries@gqmobiles.lk
+            </a>
+          </p>
+        </div>
+        <div className="mt-8">
+          <Link href="/" passHref>
+            <ButtonPrimary>Return to Home</ButtonPrimary>
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Main Payment Page Component
 export default function PayherePaymentPage() {
-  const searchParams = useSearchParams();
+  const { clearCart, refreshCart } = useCart();
 
   let orderData = localStorage.getItem('payhere_last_order');
-  const parsedOrderData = orderData ? JSON.parse(orderData) : {};
+  
+  useEffect(() => {
+    const clearCartSafely = async () => {
+      try {
+        await clearCart();
+        await refreshCart();
+      } catch (error: unknown) {
+        // Ignore "No items in cart to remove" error as it's expected
+        if (
+          error instanceof Error &&
+          !error.message.includes("No items in cart to remove")
+        ) {
+          console.error("Error clearing cart:", error);
+        }
+      }
+    };
+    void clearCartSafely();
+  }, []);
+
+  // Return early if no order data
+  if (!orderData) {
+    return <NoOrderMessage />;
+  }
+
+  const parsedOrderData = JSON.parse(orderData);
   const orderStatus = (parsedOrderData?.order as any)?.status || "pending";
 
-  const orderId = parsedOrderData?.checkout?.order?.databaseId;
-
-  if (orderId === "guest_checkout") {
-    return (
-      <h1 className="py-20 text-center text-2xl font-bold">
-        📝 The page is unable to load
-      </h1>
-    );
-  }
-
-  if (orderId === "ItemNo12345") {
-    return (
-      <div className="container mx-auto grid items-center justify-center">
-        <h1 className="py-20 text-center text-2xl font-bold">
-          📝 The page is unable to load the order ID since it{"'"}s a Payhere
-          testing ID.
-        </h1>
-        <Link href="/" passHref>
-          <div className="self-center text-center font-bold text-blue-500 underline hover:cursor-pointer hover:text-blue-800">
-            Back to Home
-          </div>
-        </Link>
-      </div>
-    );
-  }
-
-  if (!orderId || orderId === "12345") {
-    toast.error(`Order not found: ${orderId}`);
-  }
-
-  if (orderId === "guest_checkout" && searchParams) {
-    return (
-      <div className="container mx-auto grid items-center justify-center">
-        <h1 className="pt-20 text-center text-2xl font-bold">
-          Thank you! Your order has been successfully placed📦
-        </h1>
-        <p className="py-4 text-center">
-          Please check your email({searchParams}) for further details.
-        </p>
-        <Link href="/" passHref>
-          <p className="self-center text-center font-bold text-blue-500 underline hover:cursor-pointer hover:text-blue-800">
-            Back to Home
-          </p>
-        </Link>
-      </div>
-    );
-  }
+  // const orderId = parsedOrderData?.checkout?.order?.databaseId;
 
   return (
     <>

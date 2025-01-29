@@ -1,6 +1,6 @@
 "use client";
 import { useQuery } from "@apollo/client";
-import { GET_GUEST_ORDER } from "@/graphql/defs/order";
+import { GET_MY_ORDERS } from "@/graphql/defs/order";
 import OrderItemProduct from "@/app/containers/ProductDetailPage/OrderItem";
 import LoadingSkeleton from "@/components/OrderPageSkeleton";
 import { useSession } from "@/context/SessionProvider";
@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useEffect } from "react";
 
 const AccountOrder = () => {
-  const { loading, error, data } = useQuery(GET_GUEST_ORDER);
+  const { loading, error, data } = useQuery(GET_MY_ORDERS);
   const { customer } = useSession();
 
   useEffect(() => {
@@ -75,7 +75,12 @@ const formatDate = (date: any) => {
 const OrderHeader = ({ order }: any) => (
   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 sm:p-8 bg-slate-50 dark:bg-slate-500/5">
     <div>
-      <p className="text-lg font-semibold">#{order?.orderNumber}</p>
+      <Link 
+        href={`/checkout/payhere/${order?.orderNumber}`}
+        className="text-lg font-semibold hover:text-primary-600 hover:underline"
+      >
+        #{order?.orderNumber}
+      </Link>
       <p className="text-slate-500 dark:text-slate-400 text-sm mt-1.5 sm:mt-2">
         <span>{formatDate(order?.date)}</span>
         <span className="mx-2">·</span>
@@ -88,9 +93,23 @@ const OrderHeader = ({ order }: any) => (
         </span>
       </p>
       <p className="text-sm mt-1.5 sm:mt-2">
-        <strong>Total:</strong> {order?.total}
+        <strong>Total:</strong>{" "}
+        <span
+          dangerouslySetInnerHTML={{
+            __html: `${order?.total}`,
+          }}
+        />
+      </p>
+      <p className="text-sm mt-1.5 sm:mt-2">
+        <strong>Payment Method:</strong> {order?.paymentMethod}
       </p>
     </div>
+    <Link 
+      href={`/checkout/payhere/${order?.orderNumber}`}
+      className="mt-3 sm:mt-0 text-primary-600 hover:text-primary-700 text-sm font-medium hover:underline"
+    >
+      View Order Details →
+    </Link>
   </div>
 );
 

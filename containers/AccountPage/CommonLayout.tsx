@@ -34,7 +34,7 @@ const CommonLayout: FC<CommonLayoutProps> = ({ children }) => {
               },
               {
                 name: " My order",
-                link: "/account/my-order",
+                link: "/account/my-orders",
               },
               {
                 name: "Change password",

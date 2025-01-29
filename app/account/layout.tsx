@@ -1,3 +1,4 @@
+
 import React, { FC } from "react";
 import Link from "next/link";
 import UserDetails from "@/app/components/Account/UserDetails";
@@ -8,7 +9,7 @@ export interface CommonLayoutProps {
 
 const menuItems = [
   { name: "Account info", link: "/account" },
-  { name: "My order", link: "/account/my-order" },
+  { name: "My orders", link: "/account/my-orders" },
   { name: "Address", link: "/account/address" },
   // { name: "Change password", link: "/account/change-password" },
 ];
