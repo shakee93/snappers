@@ -267,6 +267,83 @@ const sentConfirmation = async (orderId: number | string): Promise<any> => {
   return false;
 };
 
+
+const dummyPaymentData = {
+  "checkout": {
+      "clientMutationId": null,
+      "redirect": "https://api.gqmobiles.lk/checkout/order-pay/18038/?key=wc_order_mH2xaPihZnpnw",
+      "result": "success",
+      "customer": {
+          "displayName": null,
+          "shipping": {
+              "firstName": "shadeer",
+              "lastName": "sadikeen",
+              "address1": "120/21/5b",
+              "address2": "araliya uyana, megoda kolonnawa",
+              "city": "wellampitiya , colombo",
+              "country": "LK",
+              "state": null,
+              "postcode": null,
+              "phone": null,
+              "email": null,
+              "__typename": "CustomerAddress"
+          },
+          "billing": {
+              "firstName": "shadeer",
+              "lastName": "sadikeen",
+              "address1": "120/21/5b",
+              "address2": "araliya uyana, megoda kolonnawa",
+              "city": "wellampitiya , colombo",
+              "country": "LK",
+              "state": null,
+              "postcode": null,
+              "phone": null,
+              "email": "test@gmail.com",
+              "__typename": "CustomerAddress"
+          },
+          "email": null,
+          "__typename": "Customer"
+      },
+      "order": {
+          "total": "₨&nbsp;520.60",
+          "subtotal": "₨&nbsp;20.00",
+          "shippingTotal": "₨&nbsp;500.00",
+          "date": "2025-01-29T08:17:15+00:00",
+          "id": "b3JkZXI6MTgwMzg=",
+          "databaseId": 18038,
+          "lineItems": {
+              "nodes": [
+                  {
+                      "databaseId": 3108,
+                      "subtotal": "20",
+                      "quantity": 1,
+                      "product": {
+                          "node": {
+                              "name": "testing product 2",
+                              "databaseId": 14158,
+                              "featuredImage": {
+                                  "node": {
+                                      "sourceUrl": "https://api.gqmobiles.lk/wp-content/uploads/2024/01/gq-mobiles-netbooks-apple-macbook-air-m1-chip-13_-13-inch-2020-gold-2.png",
+                                      "__typename": "MediaItem"
+                                  },
+                                  "__typename": "NodeWithFeaturedImageToMediaItemConnectionEdge"
+                              },
+                              "__typename": "VariableProduct"
+                          },
+                          "__typename": "LineItemToProductConnectionEdge"
+                      },
+                      "__typename": "LineItem"
+                  }
+              ],
+              "__typename": "OrderToLineItemConnection"
+          },
+          "__typename": "Order"
+      },
+      "__typename": "CheckoutPayload"
+  }
+}
+
+
 export {
   InputField,
   SelectField,
@@ -281,4 +358,5 @@ export {
   getPaymentHash,
   numberFormat,
   sentConfirmation,
+  dummyPaymentData
 };

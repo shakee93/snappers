@@ -82,7 +82,7 @@ export const usePayhere = () => {
     paymentDetails: PaymentDetailsWithoutUrls | null,
     setPayhereHandleStatus: (status: PayhereStatus) => void
   ) => {
-    // console.log("paymentDetails in initatePayment: ", paymentDetails);
+    console.log("paymentDetails in initatePayment: ", paymentDetails);
     
 
     if (window?.payhere ) {
@@ -142,6 +142,10 @@ export const usePayhere = () => {
         // });
         // window.location.href = `/checkout/${orderId}`;
       };
+    }
+    else {
+      alert("Payhere is not initialized");
+      return;
     }
   };
   return initiatePayment;

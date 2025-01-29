@@ -29,11 +29,12 @@ import { toast } from "sonner";
 import { PayhereStatus, PaymentDetailsWithoutUrls } from "@/data/types";
 import Script from "next/script";
 import { usePayhere } from "../components/Payment/Payhere";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import PaymentModal from "@/app/components/Payment/PaymentModal";
 import { useSession } from "@/context/SessionProvider";
 import { Info, Loader } from "lucide-react";
 import {
+  dummyPaymentData,
   savePaymentDetails,
   sentConfirmation,
   transformAddress,
@@ -150,18 +151,18 @@ const CheckoutPage = () => {
     // console.log({ updatedTOC });
   };
   // TODO: Uncomment this for the redirect on cart free
-  useEffect(() => {
-    if (cart && cart?.contents?.nodes?.length === 0) {
-      router.push("/");
-    }
-    if (cart?.total !== null && cart?.total !== undefined) {
-      setOrderTotal(cart?.total);
-    }
-  }, [cart]);
+  // useEffect(() => {
+  //   if (cart && cart?.contents?.nodes?.length === 0) {
+  //     router.push("/");
+  //   }
+  //   if (cart?.total !== null && cart?.total !== undefined) {
+  //     setOrderTotal(cart?.total);
+  //   }
+  // }, [cart]);
 
-  useEffect(() => {
-    fetchCustomer();
-  }, []);
+  // useEffect(() => {
+  //   fetchCustomer();
+  // }, []);
 
   // MUTATIONS
   const [updateCartShippingTotalMutation] = useMutation(UPDATE_SHIPPING_TOTAL);
@@ -680,84 +681,100 @@ const CheckoutPage = () => {
       const isPayhere =
         formData?.paymentMethod?.selectedGateway?.id == "payhere";
 
-      if (isPayhere) {
-        try {
-          ImplementPayhere();
-          setLoading(true);
-          return;
-        } catch (e) {
-          console.log("Error while creating Payhere:", e);
-        }
-      }
+      // if (isPayhere) {
+      //   try {
+      //     ImplementPayhere();
+      //     setLoading(true);
+      //     return;
+      //   } catch (e) {
+      //     console.log("Error while creating Payhere:", e);
+      //   }
+      // }
 
-      const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
+      // const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
 
-      if (paymentMethodId === undefined) {
-        console.error("Payment method ID is undefined");
-        toast.error("Payment Method was not chosen.");
-        return;
-      }
+      // if (paymentMethodId === undefined) {
+      //   console.error("Payment method ID is undefined");
+      //   toast.error("Payment Method was not chosen.");
+      //   return;
+      // }
 
-      formData.billingAddress.country = "LK";
-      formData.deliveryAddress.country = "LK";
+      // formData.billingAddress.country = "LK";
+      // formData.deliveryAddress.country = "LK";
 
-      const shippingMethod = getShippingMethod(shippingTotal);
-      const shippingDetails = isStorePickup
-        ? {
-            ...transformAddress(formData.deliveryAddress),
-            address1: "Store Pickup",
-            address2: "",
-            city: "Store Pickup",
-            state: "",
-            postcode: "",
-          }
-        : transformAddress(formData.deliveryAddress);
+      // const shippingMethod = getShippingMethod(shippingTotal);
+      // const shippingDetails = isStorePickup
+      //   ? {
+      //       ...transformAddress(formData.deliveryAddress),
+      //       address1: "Store Pickup",
+      //       address2: "",
+      //       city: "Store Pickup",
+      //       state: "",
+      //       postcode: "",
+      //     }
+      //   : transformAddress(formData.deliveryAddress);
 
-      const email = formData?.contactInfo?.email;
+      // const email = formData?.contactInfo?.email;
 
-      const billingDetails = {
-        ...transformAddress(formData.billingAddress),
-        email: formData?.contactInfo?.email,
-      };
+      // const billingDetails = {
+      //   ...transformAddress(formData.billingAddress),
+      //   email: formData?.contactInfo?.email,
+      // };
 
-      const customerNoteHTML = `
-            <p><strong>Customer Email:</strong> ${email}</p>
-            <p><strong>Phone Number:</strong> ${
-              formData?.contactInfo?.phone
-            }</p>
-            ${
-              isStorePickup
-                ? "<p><strong>Pickup Location:</strong> Store</p>"
-                : ""
-            }
-        `;
+      // const customerNoteHTML = `
+      //       <p><strong>Customer Email:</strong> ${email}</p>
+      //       <p><strong>Phone Number:</strong> ${
+      //         formData?.contactInfo?.phone
+      //       }</p>
+      //       ${
+      //         isStorePickup
+      //           ? "<p><strong>Pickup Location:</strong> Store</p>"
+      //           : ""
+      //       }
+      //   `;
 
-      const variables = {
-        input: {
-          paymentMethod: paymentMethodId,
-          shippingMethod,
-          shipping: shippingDetails,
-          billing: billingDetails,
-          customerNote: customerNoteHTML,
-          metaData: [
-            {
-              key: "payhere_order_id",
-              value: payherPaymentID ?? ""
-            }
-          ]
-        },
-      };
+      // const variables = {
+      //   input: {
+      //     paymentMethod: paymentMethodId,
+      //     shippingMethod,
+      //     shipping: shippingDetails,
+      //     billing: billingDetails,
+      //     customerNote: customerNoteHTML,
+      //     metaData: [
+      //       {
+      //         key: "payhere_order_id",
+      //         value: payherPaymentID ?? ""
+      //       }
+      //     ]
+      //   },
+      // };
 
-      const { data } =
-        customer?.id === "guest"
-          ? await guestCheckout({ variables })
-          : await checkoutMutation({ variables });
+      // const { data } =
+      //   customer?.id === "guest"
+      //     ? await guestCheckout({ variables })
+      //     : await checkoutMutation({ variables });
+
+      // console.log("data just below guest checkout", data);
+
+      // FOR GUEST CHECKOUT
+      let testPaymentData = dummyPaymentData;
 
       const isBankTransfer =
         formData?.paymentMethod?.selectedGateway?.id == "bacs";
 
-      setGuestCheckoutData(data);
+      // setGuestCheckoutData(data);
       console.log("data just below guest checkout", data);
+      const isGuest = customer?.id === "guest";
+      console.log("isGuest", isGuest);
+      if(isPayhere && isGuest){
+        const orderId = testPaymentData?.checkout?.order?.databaseId;
+        console.log("Payhere order", testPaymentData);
+        localStorage.setItem('payhere_last_order', JSON.stringify(testPaymentData));
+        router.push(`/checkout/payhere/${orderId}`);
+
+        return;
+      }
+      return;
 
       if (data) {
         const checkoutDetails = savePaymentDetails(data);

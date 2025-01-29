@@ -217,6 +217,12 @@ export const GET_CHECKOUT_USER_DETAILS = gql`
       billing {
         ...CustomerAddressFragment
       }
+      orders {
+        nodes {
+          id
+          databaseId
+        }
+      }
       email
     }
   }
