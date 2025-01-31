@@ -1,72 +1,75 @@
-import { NextResponse } from 'next/server';
-import { md5 } from 'js-md5';
+import { NextResponse } from "next/server";
+import { md5 } from "js-md5";
 
 function validateRequiredFields(data: any) {
-    console.log("Starting validateRequiredFields with data:", data);
-    const requiredFields = {
-      merchant_id: data.merchant_id,
-      order_id: data.order_id,
-      payhere_amount: data.payhere_amount,
-      payhere_currency: data.payhere_currency,
-      status_code: data.status_code,
-      md5sig: data.md5sig
-    };
-
-    console.log("Required fields extracted:", requiredFields);
-  
-    const missingFields = Object.entries(requiredFields)
-      .filter(([_, value]) => !value)
-      .map(([field]) => field);
-  
-    console.log("Missing fields:", missingFields);
-    
-    const result = {
-      isValid: missingFields.length === 0,
-      missingFields
-    };
-    console.log("Validation result:", result);
-    return result;
-  }
-
-
-  const sentPayhereConfirmation = async (orderId: number | string, status: string): Promise<any> => {
-    console.log("Starting sentPayhereConfirmation with:", { orderId, status });
-    
-    console.log("Making request to WordPress API...");
-    const confirmationResponse = await fetch(
-      "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/payhere-order-confirmation",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          order_id: orderId,
-          order_status: status,
-        }),
-      }
-    );
-
-    const body = await confirmationResponse.text();
-  
-    if (confirmationResponse.ok) {
-      console.log("Confirmation sent successfully");
-      return true;
-    }
-    console.log("Confirmation failed");
-    return false;
+  console.log("Starting validateRequiredFields with data:", data);
+  const requiredFields = {
+    merchant_id: data.merchant_id,
+    order_id: data.order_id,
+    payhere_amount: data.payhere_amount,
+    payhere_currency: data.payhere_currency,
+    status_code: data.status_code,
+    md5sig: data.md5sig,
   };
-  
+
+  console.log("Required fields extracted:", requiredFields);
+
+  const missingFields = Object.entries(requiredFields)
+    .filter(([_, value]) => !value)
+    .map(([field]) => field);
+
+  console.log("Missing fields:", missingFields);
+
+  const result = {
+    isValid: missingFields.length === 0,
+    missingFields,
+  };
+  console.log("Validation result:", result);
+  return result;
+}
+
+const sentPayhereConfirmation = async (
+  orderId: number | string,
+  status: string
+): Promise<any> => {
+  console.log("Starting sentPayhereConfirmation with:", { orderId, status });
+
+  console.log("Making request to WordPress API...");
+  const confirmationResponse = await fetch(
+    "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/order-confirmation",
+    // "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/payhere-order-confirmation",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        order_id: orderId,
+        order_status: status,
+      }),
+    }
+  );
+
+  const body = await confirmationResponse.text();
+  console.log("Confirmation response body:", body);
+
+  if (confirmationResponse.ok) {
+    console.log("Confirmation sent successfully");
+    return true;
+  }
+  console.log("Confirmation failed");
+  return false;
+};
 
 export async function POST(req: Request) {
   console.log("POST request received at /api/notify");
   try {
     console.log("Processing Payhere notification...");
     let data;
-    const contentType = req.headers.get('content-type');
+    const contentType = req.headers.get("content-type");
     console.log("Content-Type:", contentType);
-    
-    if (contentType?.includes('application/json')) {
+
+    if (contentType?.includes("application/json")) {
       console.log("Processing JSON data");
       data = await req.json();
     } else {
@@ -74,7 +77,7 @@ export async function POST(req: Request) {
       const formData = await req.formData();
       data = Object.fromEntries(formData);
     }
-    
+
     console.log("Parsed request data:", data);
 
     // let data = {
@@ -95,16 +98,16 @@ export async function POST(req: Request) {
     //   card_expiry: '0826',
     //   recurring: '0'
     // }
-    
+
     const { isValid, missingFields } = validateRequiredFields(data);
     console.log("Validation results:", { isValid, missingFields });
-    
+
     if (!isValid) {
       console.log("Validation failed - missing required fields");
       return NextResponse.json(
-        { 
-          error: 'Missing required fields',
-          missingFields 
+        {
+          error: "Missing required fields",
+          missingFields,
         },
         { status: 400 }
       );
@@ -116,9 +119,9 @@ export async function POST(req: Request) {
     console.log("Merchant secret configured:", !!merchant_secret);
 
     if (!merchant_secret) {
-      console.error('Merchant secret missing in environment variables');
+      console.error("Merchant secret missing in environment variables");
       return NextResponse.json(
-        { error: 'Internal server error' },
+        { error: "Internal server error" },
         { status: 500 }
       );
     }
@@ -150,15 +153,14 @@ export async function POST(req: Request) {
     // //   recurring: '0'
     // // }
 
-
     console.log("Calculating MD5 signature...");
     const local_md5sig = md5(
       data.merchant_id +
-      data.order_id +
-      data.payhere_amount +
-      data.payhere_currency +
-      data.status_code +
-      md5(merchant_secret).toUpperCase()
+        data.order_id +
+        data.payhere_amount +
+        data.payhere_currency +
+        data.status_code +
+        md5(merchant_secret).toUpperCase()
     ).toUpperCase();
     console.log("Local MD5:", local_md5sig);
     console.log("Received MD5:", data.md5sig);
@@ -167,33 +169,33 @@ export async function POST(req: Request) {
       console.log("MD5 signature verified successfully");
       let orderStatus = "pending";
       console.log("Processing status code:", data.status_code);
-      
-      switch(data.status_code) {
-        case '2':
-          orderStatus = "completed";
-          console.log("Payment successful");
+
+      switch (data.status_code) {
+        case "2":
+          orderStatus = "pauthorized";
+          console.log("Payment Payhere successful");
           break;
-        case '3':
+        case "3":
           orderStatus = "pauthorized";
           console.log("Payment authorized");
           break;
-        case '1':
+        case "1":
           orderStatus = "processing";
           console.log("Payment processing");
           break;
-        case '0':
+        case "0":
           orderStatus = "on-hold";
           console.log("Payment pending");
           break;
-        case '-1':
+        case "-1":
           orderStatus = "cancelled";
           console.log("Payment cancelled");
           break;
-        case '-2':
+        case "-2":
           orderStatus = "failed";
           console.log("Payment failed");
           break;
-        case '-3':
+        case "-3":
           orderStatus = "refunded";
           console.log("Payment refunded");
           break;
@@ -203,51 +205,53 @@ export async function POST(req: Request) {
       }
 
       console.log("Sending confirmation to WordPress...");
-      const confirmResult = await sentPayhereConfirmation(data.order_id, orderStatus);
+      const confirmResult = await sentPayhereConfirmation(
+        data.order_id,
+        orderStatus
+      );
       console.log("WordPress confirmation result:", confirmResult);
-      
+
       if (!confirmResult) {
-        console.error('WordPress confirmation failed');
+        console.error("WordPress confirmation failed");
         return NextResponse.json(
-          { error: 'Failed to update order status' },
+          { error: "Failed to update order status" },
           { status: 500 }
         );
       }
-      
+
       console.log("Payment process completed successfully");
       return NextResponse.json(
-        { message: 'Payment verification successful' },
+        { message: "Payment verification successful" },
         { status: 200 }
       );
     } else {
-      console.error('Payment verification failed - signature mismatch');
-      console.error('Verification details:', {
+      console.error("Payment verification failed - signature mismatch");
+      console.error("Verification details:", {
         status_code: data.status_code,
         signature_match: local_md5sig === data.md5sig,
         received_sig: data.md5sig,
-        calculated_sig: local_md5sig
+        calculated_sig: local_md5sig,
       });
-      
+
       return NextResponse.json(
-        { error: 'Payment verification failed' },
+        { error: "Payment verification failed" },
         { status: 400 }
       );
     }
   } catch (error) {
-    console.error('Error processing payment notification:', error);
+    console.error("Error processing payment notification:", error);
     if (error instanceof Error) {
-      console.error('Error details:', {
+      console.error("Error details:", {
         message: error.message,
-        stack: error.stack
+        stack: error.stack,
       });
     }
     return NextResponse.json(
-      { error: 'Internal server error' },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }
-} 
-
+}
 
 export async function GET() {
   console.log("GET request received at /api/notify");
