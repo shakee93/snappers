@@ -2,7 +2,6 @@ import { PayhereStatus, PaymentDetailsWithoutUrls } from "@/data/types";
 import { usePayhere } from "@/app/components/Payment/Payhere";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import React, { useState } from "react";
-
 import { toast } from "sonner";
 import Link from "next/link";
 
@@ -169,26 +168,19 @@ const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData }) => 
 
 
 
-export const PaymentSection = ({ orderData }: any) => {
+export const PaymentSection = ({ orderData, email }: any) => {
   const [payhereStatus, setPayhereStatus] = useState<PayhereStatus>("idle");
   const initiatePayment = usePayhere();
 
+  console.log("orderData", orderData);
+  
   const handlePayherePayment = async () => {
     try {
       const rawAmount = orderData.order.total.replace(/[^0-9.]/g, '');
       
       const paymentDetails: PaymentDetailsWithoutUrls = {
         order_id: orderData.order.databaseId.toString(),
-          items: orderData.order.lineItems.nodes.map((item: any) => ({
-          product: {
-            node: {
-              name: item.product.node.name,
-              databaseId: item.product.node.databaseId
-            }
-          },
-          quantity: item.quantity,
-          subtotal: item.subtotal
-        })),
+        items: createProductList(orderData),
         amount: rawAmount,
         first_name: orderData.customer.billing.firstName || orderData.customer.shipping.firstName,
         last_name: orderData.customer.billing.lastName || orderData.customer.shipping.lastName,
@@ -228,7 +220,7 @@ export const PaymentSection = ({ orderData }: any) => {
   if (payhereStatus === "finished") {
     return (
       <div className="rounded-lg bg-green-50 p-4 text-center">
-        <p className="text-lg font-medium text-green-800">Payment successful!</p>
+        <p className="text-lg font-medium text-green-800">Payment successful!. Our team will Review this and proceed order</p>
         <Link href="/" passHref>
           <ButtonPrimary className="mt-4">Return to Home</ButtonPrimary>
         </Link>
@@ -238,7 +230,24 @@ export const PaymentSection = ({ orderData }: any) => {
 
   return (
     <div className="mb-8">
-      <div className="flex justify-center">
+       <div className="rounded-lg bg-white p-6 shadow-sm">
+          
+         <h3 className="mb-4 text-lg font-semibold text-gray-800">Secure Payment Powered By</h3>
+         <p className="text-sm my-2 text-gray-600 text-center">
+           Your order details have been sent to your email address: {email}
+         </p>
+         <div className="flex justify-center">
+             <img 
+               src="https://www.payhere.lk/downloads/images/payhere_square_banner_dark.png" 
+               alt="PayHere" 
+               className="h-auto w-[200px]"
+             />
+         </div>
+         <p className="mt-4 text-sm text-gray-600 text-center">
+           We accept Visa, Mastercard, and local payment methods through PayHere
+         </p>
+       </div>
+      <div className="flex justify-center mt-4">
         <ButtonPrimary
           onClick={handlePayherePayment}
           className="bg-blue-600 hover:bg-blue-700"
@@ -251,4 +260,46 @@ export const PaymentSection = ({ orderData }: any) => {
 };
 
 
+
+
 export default ProductTable;
+
+
+
+
+
+
+
+
+
+export const createProductList = (orderData: any): string => {
+  if(!orderData) return "";
+  const productArray = orderData?.order?.lineItems?.nodes?.map((item: any) => {
+      const productNode = item.product.node;
+      const productName = productNode.name;
+      
+      // Get all keys that start with "allPa"
+      const attributes = Object.keys(productNode)
+          .filter(key => key.startsWith('allPa'));
+      
+      // Get the first value from each attribute's nodes array if it exists
+      const attributeValues = attributes
+          .map(attr => {
+              const nodes = productNode[attr]?.nodes;
+              return nodes && nodes.length > 0 ? nodes[0].name : '';
+          })
+          .filter(Boolean);  // Remove empty values
+      
+      // Combine product name with attributes
+      return attributeValues.length > 0
+          ? `${productName} | ${attributeValues.join(" | ")}`
+          : productName;
+  });
+
+  // Convert array into a comma-separated string
+  return productArray.join(", ");
+};
+
+
+
+

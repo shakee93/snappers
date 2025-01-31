@@ -318,9 +318,130 @@ export const GET_SINGLE_ORDER = gql`
             node {
               name
               databaseId
+              brands {
+                nodes {
+                  databaseId
+                  name
+                  slug
+                  count
+                }
+              }
               featuredImage {
                 node {
                   sourceUrl
+                }
+              }
+              image {
+                id
+                sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
+                altText
+              }
+              ... on SimpleProduct {
+                price
+                regularPrice
+                soldIndividually
+                brands {
+                  nodes {
+                    id
+                    name
+                    slug
+                  }
+                }
+              }
+              productCategories {
+                nodes {
+                  id
+                  name
+                }
+              }
+              ... on VariableProduct {
+                allPaCapacity {
+                  nodes {
+                    name
+                    slug
+                  }
+                }
+                allPaConnectivity {
+                  nodes {
+                    name
+                    slug
+                  }
+                }
+                allPaColor {
+                  nodes {
+                    name
+                    slug
+                  }
+                }
+                allPaColour {
+                  nodes {
+                    name
+                    slug
+                  }
+                }
+                allPaSpecification {
+                  nodes {
+                    name
+                    slug
+                  }
+                }
+                allPaVariant {
+                  nodes {
+                    name
+                    slug
+                  }
+                }
+                allPaWarranty {
+                  nodes {
+                    name
+                    slug
+                  }
+                }
+                allPaModel {
+                  nodes {
+                    name
+                    slug
+                  }
+                }
+                allPaPacks {
+                  nodes {
+                    name
+                    slug
+                  }
+                }
+                allPaWatchSize {
+                  nodes {
+                    name
+                    slug
+                  }
+                }
+                allPaSize {
+                  nodes {
+                    name
+                    slug
+                  }
+                }
+                allPaConnectorType {
+                  nodes {
+                    name
+                    slug
+                  }
+                }
+                allPaAmount {
+                  nodes {
+                    name
+                    slug
+                  }
+                }
+                price
+                regularPrice
+                soldIndividually
+                brands {
+                  nodes {
+                    id
+                    name
+                    slug
+                  }
                 }
               }
             }

@@ -13,6 +13,7 @@ import {
 } from "@/graphql/defs/order";
 import { useLazyQuery, useQuery } from "@apollo/client";
 import { useEffect, useMemo } from "react";
+import OrderPaymentPageSkeleton from "./Skeleton";
 
 // Order Status Message Component
 const OrderStatusMessage = ({ status }: { status: string }) => {
@@ -41,6 +42,14 @@ const OrderStatusMessage = ({ status }: { status: string }) => {
         </p>
       </div>
     );
+  }
+
+  if( status == "phauthorized"){
+    return (
+      <div className="mb-8 rounded-lg bg-blue-50 p-6 text-center">
+        <p className="text-blue-600">Your order has been Paid and Authorized. Our team will review this and proceed order</p>
+      </div>
+    )
   }
 
   return null;
@@ -122,7 +131,7 @@ export default function PayherePaymentPage({ params }: any) {
   );
 
   if (!orderData) {
-    return <div>Loading...</div>;
+    return <OrderPaymentPageSkeleton />;
   }
 
   if (orderError) {
@@ -131,6 +140,7 @@ export default function PayherePaymentPage({ params }: any) {
   const orderStatus = orderData?.order?.status?.toLowerCase() ?? "pending";
 
   let parsedOrderData = orderData?.order;
+  let email = customerData?.customer?.email;
   // console.log("parsedOrderData", parsedOrderData);
   // console.log("orderStatus", orderStatus);
   // console.log("temporaryPaymentDetails", temporaryPaymentDetails);
@@ -153,12 +163,19 @@ export default function PayherePaymentPage({ params }: any) {
         <div className="my-4">
           {/* Order Status Message */}
           <OrderStatusMessage status={orderStatus} />
+          
+          {/* Email Notification */}
+          <div className="mb-6 text-gray-600">
+            Order details have been sent to your email: <span className="font-medium">{email}</span>
+          </div>
 
-          {/* Payment Section - Moved to top */}
-          <PaymentSection orderData={temporaryPaymentDetails} />
+          {/* Payment Section - Only show for pending/processing orders */}
+          {(orderStatus === 'pending' || orderStatus === 'processing') && (
+            <PaymentSection orderData={temporaryPaymentDetails} />
+          )}
 
           {/* Order Details */}
-          <OrderDetails orderData={temporaryPaymentDetails} />
+          <OrderDetails orderData={temporaryPaymentDetails} orderStatus={orderStatus} />
 
           {/* Product Table */}
           <div className="">
