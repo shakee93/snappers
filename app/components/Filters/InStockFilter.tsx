@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState} from "react";
 import {useStore} from "@/store/store";
 import {Package, XIcon} from "lucide-react";
@@ -22,11 +21,16 @@ const InStockFilter = () => {
             }`}
             onClick={() => setInStockState(!inStock)}
         >
-            <Package className='stroke-1 w-4'/>
-             <span className="line-clamp-1 ml-2">In Stock</span>
-            {inStock && <div className="flex-shrink-0 w-4 h-4 rounded-full bg-primary-500 text-white flex items-center justify-center ml-3 cursor-pointer">
+            <input
+                type="checkbox"
+                checked={inStock}
+                onChange={() => setInStockState(!inStock)}
+                className="w-6 h-6 mr-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-sm bg-transparent"
+            />
+            <span className="line-clamp-1">In Stock</span>
+            {/* {inStock && <div className="flex-shrink-0 w-4 h-4 rounded-full bg-primary-500 text-white flex items-center justify-center ml-3 cursor-pointer">
                 <XIcon className='p-0.5 w-4 h-4 text-black'/>
-            </div>}
+            </div>} */}
         </div>
     );
 }
