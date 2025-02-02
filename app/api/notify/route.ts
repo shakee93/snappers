@@ -36,8 +36,8 @@ const sentPayhereConfirmation = async (
 
   console.log("Making request to WordPress API...");
   const confirmationResponse = await fetch(
-    "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/order-confirmation",
-    // "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/payhere-order-confirmation",
+    // "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/order-confirmation",
+    "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/payhere-order-confirmation",
     {
       method: "POST",
       headers: {
@@ -171,33 +171,36 @@ export async function POST(req: Request) {
       console.log("Processing status code:", data.status_code);
 
       switch (data.status_code) {
+        case "3":
+          orderStatus = "phauthorized";
+          console.log("Payment Payhere successful. status code: ", data.status_code);
         case "2":
-          orderStatus = "pauthorized";
-          console.log("Payment Payhere successful");
+          orderStatus = "phauthorized";
+          console.log("Payment Payhere successful. status code: ", data.status_code);
           break;
         case "3":
-          orderStatus = "pauthorized";
-          console.log("Payment authorized");
+          orderStatus = "phauthorized";
+          console.log("Payment authorized. status code: ", data.status_code);
           break;
         case "1":
           orderStatus = "processing";
-          console.log("Payment processing");
+          console.log("Payment processing. status code: ", data.status_code);
           break;
         case "0":
           orderStatus = "on-hold";
-          console.log("Payment pending");
+          console.log("Payment pending. status code: ", data.status_code  );
           break;
         case "-1":
           orderStatus = "cancelled";
-          console.log("Payment cancelled");
+          console.log("Payment cancelled. status code: ", data.status_code    );
           break;
         case "-2":
           orderStatus = "failed";
-          console.log("Payment failed");
+          console.log("Payment failed. status code: ", data.status_code    );
           break;
         case "-3":
           orderStatus = "refunded";
-          console.log("Payment refunded");
+          console.log("Payment refunded. status code: ", data.status_code    );
           break;
         default:
           orderStatus = "pending";
