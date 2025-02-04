@@ -43,6 +43,8 @@ async function Page() {
             filters
             categories={productCategories}
             brands={brands}
+            // server={true}
+            routing={true}
         >
         </InstantSearchWrapper>
 

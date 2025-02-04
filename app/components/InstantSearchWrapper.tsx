@@ -69,6 +69,13 @@ const InstantSearchWrapper = ({
   const { sidebar, setSearchMounted } = useStore();
   const [differedSidebar] = useDebounce(sidebar, 800);
   const [hitsPerPage, setHitsPerPage] = useState<number>(10);
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 300); // Debounce the search query
+
+  console.log('server', server);
+  console.log('routing', routing);
+
+  // console.log('sidebar instock', sidebar?.in_stock);
 
   const getFilterQuery: () => string = () => {
     const f = [
@@ -89,6 +96,7 @@ const InstantSearchWrapper = ({
           : null,
       sidebar.on_sale ? "onSale:true" : null,
       sidebar.in_stock ? "stockStatus:IN_STOCK" : null,
+      sidebar.out_of_stock ? "stockStatus:OUT_OF_STOCK" : null,
       tag
         ? `productTags.nodes.slug:${tag}`
         : null,
@@ -98,8 +106,6 @@ const InstantSearchWrapper = ({
 
     return f.filter((n) => n).join(" && ");
   };
-
-  // console.log({ category });
 
   const [filterQuery, setFilterQuery] = useState<string>(getFilterQuery);
 
@@ -127,12 +133,13 @@ const InstantSearchWrapper = ({
   }, []);
 
   useEffect(() => {
+    console.log('InstantSearchWrapper mounted or updated');
     setFilterQuery(getFilterQuery);
     // setSortQuery(differedSidebar.sort);
   }, [differedSidebar]);
 
   useEffect(() => {
-
+    console.log('Search state changed:', search);
     if (!search) {
       setFilterQuery(getFilterQuery);
     }
@@ -140,11 +147,17 @@ const InstantSearchWrapper = ({
   }, [search]);
 
   useEffect(() => {
-    // console.log(filterQuery);
+    console.log('Debounced search query changed:', debouncedSearchQuery);
+    setFilterQuery(getFilterQuery);
+  }, [debouncedSearchQuery]);
+
+  useEffect(() => {
+    console.log(filterQuery);
   }, [filterQuery]);
 
   useEffect(() => {
     setSearchMounted();
+    console.log('Search mounted function called');
   }, []);
 
   //   const InstantSearchComponent = useMemo(() => {
@@ -156,7 +169,6 @@ const InstantSearchWrapper = ({
     // when this gets fixed update the package
     return server ? InstantSearchNext : InstantSearch;
   }, []);
-
 
   return (
     <div>
@@ -178,8 +190,21 @@ const InstantSearchWrapper = ({
         searchClient={searchClient}
         indexName="product"
       >
+
+      {/* <InstantSearchComponent
+        searchClient={searchClient}
+        indexName="product"
+        future={{ preserveSharedStateOnUnmount: false }}
+        // @ts-ignore
+        routing={{
+          router: {
+            cleanUrlOnDispose: true,
+          },
+        }}
+      > */}
+        
         <div className="flex lg:gap-6 flex-col">
-          <SearchInput bindToStore={bindToStore} show={search} />
+          <SearchInput bindToStore={bindToStore} show={search} onSearchChange={(value) => setSearchQuery(value)} />
 
           <div className='flex overflow-x-auto lg:hidden w-full'>
             <MobileFilterSheet category={category}
@@ -207,24 +232,11 @@ const InstantSearchWrapper = ({
               )}
               <Configure filters={filterQuery} hitsPerPage={hitsPerPage} />
             </div>
+            
             <div className='col-span-12 lg:col-span-9'>
-              <div className="mb-4">
-                <label htmlFor="hitsPerPage" className="mr-2">Results per page:</label>
-                <select
-                  id="hitsPerPage"
-                  value={hitsPerPage}
-                  onChange={(e) => setHitsPerPage(Number(e.target.value))}
-                  className="border rounded p-2 w-20 text-sm rounded-md border 
-                  cursor-pointer border border-2"
-                >
-                  <option className="text-sm p-2" value={10}>10</option>
-                  <option className="text-sm p-2" value={20}>20</option>
-                  <option className="text-sm p-2" value={50}>50</option>
-                  <option className="text-sm p-2" value={100}>100</option>
-                </select>
-              </div>
-              <ProductGridInstant />
+              <ProductGridInstant hitsPerPage={hitsPerPage} setHitsPerPage={setHitsPerPage} />
             </div>
+
           </div>
         </div>
       </InstantSearchComponent>

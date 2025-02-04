@@ -3,9 +3,15 @@ import {Search} from "lucide-react";
 import {useStore} from "@/store/store";
 import {useDeferredValue, useEffect} from "react";
 import { useDebounce } from 'use-debounce';
+import React from 'react';
 
+interface SearchInputProps {
+    bindToStore?: boolean;
+    show?: boolean;
+    onSearchChange?: (value: any) => void;
+}
 
-const SearchInput = ({ show = true, bindToStore = false } : { show?: boolean, bindToStore?: boolean}) => {
+const SearchInput: React.FC<SearchInputProps> = ({ show = true, bindToStore = false, onSearchChange }) => {
     const {
         query,
         refine,
@@ -24,6 +30,12 @@ const SearchInput = ({ show = true, bindToStore = false } : { show?: boolean, bi
         refine(value);
     }, [value])
 
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        if (onSearchChange) {
+            onSearchChange(event.target.value);
+        }
+    };
+
     if (!show) {
         return <></>
     }
@@ -38,7 +50,7 @@ const SearchInput = ({ show = true, bindToStore = false } : { show?: boolean, bi
                 type="text"
                 placeholder="Type to Quick Search"
                 defaultValue={query}
-                onChange={e => refine(e.target.value)}
+                onChange={handleChange}
                 className="border-none bg-transparent focus:outline-none focus:ring-0 w-full text-sm"
                 autoFocus
             />

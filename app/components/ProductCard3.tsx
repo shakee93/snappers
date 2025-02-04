@@ -30,7 +30,7 @@ import { useQuery } from "@apollo/client";
 import { Highlight } from "react-instantsearch";
 import { redirect, useRouter, usePathname } from "next/navigation";
 import { useStore } from "@/store/store";
-
+import koko from "@/public/koko.png";
 export interface ProductCardProps {
   className?: string;
   data: (SimpleProduct & VariableProduct) | any;
@@ -319,9 +319,16 @@ const ProductCard: FC<ProductCardProps> = ({
                 setSearch("");
               }
             }} href={`/${brand?.slug}`} key={index}>
-              <div className="bg-gradient-to-b w-fit from-blue-500/30 font-semibold to-blue-400/5 text-xs text-blue-900 px-4 py-2 rounded-full">
-                {brand?.name}
-              </div>
+
+              {stockStatus !== "IN_STOCK" ? (
+                <span className="ml-2 inline-block bg-gray-500 text-white text-xs font-semibold px-2 py-1 rounded-full self-start w-24 text-center">
+                  Sold Out
+                </span>
+              ) : (
+                <div className="bg-gradient-to-b w-fit from-blue-500/30 font-semibold to-blue-400/5 text-xs text-blue-900 px-4 py-2 rounded-full">
+                  {brand?.name}
+                </div>
+              )}
             </Link>
           ))}
         </div>
@@ -344,17 +351,17 @@ const ProductCard: FC<ProductCardProps> = ({
             ) : (
               <>{name}</>
             )}
-            {stockStatus !== "IN_STOCK" && (
-              <span className="ml-0 mb-1 md-ml-2 inline-block bg-gray-500 text-white text-xs font-semibold px-2 py-1 rounded-full self-start">
+            {/* {stockStatus !== "IN_STOCK" && (
+              <span className="ml-2 inline-block bg-gray-500 text-white text-xs font-semibold px-2 py-1 rounded-full self-start w-24 text-center">
                 Sold Out
               </span>
-            )}
+            )} */}
           </h2>
         </Link>
 
         <Link
           href={link}
-          className="flex m-0 mb-2 justify-between  items-center"
+          className="flex m-0 mb-2 justify-between items-center"
           onClick={() => {
             if (productLink == productName) {
               setSearch("");
@@ -388,6 +395,20 @@ const ProductCard: FC<ProductCardProps> = ({
             </div>
           )}
         </Link>
+        {/* <div className="flex flex-wrap items-center text-xs text-gray-500 mt-1">
+          <span>or pay in 3 x Rs</span>
+          <span className="font-semibold mx-1">
+            {(
+              parseFloat(
+                ((lowestPrice || lowestSalePrice || "0").toString()).replace(/[^\d.]/g, "")
+              ) / 3
+            ).toFixed(2)}
+          </span>
+          <span>with</span>
+          <span className="ml-1 inline-block">
+            <Image src={koko} alt="KOKO" className="inline-block w-12 h-auto" />
+          </span>
+        </div> */}
       </div>
       <ModalQuickView
         show={showModalQuickView}

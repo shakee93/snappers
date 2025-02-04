@@ -11,6 +11,7 @@ import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import { useStore } from "@/store/store";
 import { Brand, ProductCategory } from "@/graphql/types/graphql";
 import { useRefinementList } from "react-instantsearch";
+import InStockFilter from "./Filters/InStockFilter";
 
 interface TabFilterProps {
     categories?: ProductCategory[];
@@ -56,7 +57,8 @@ const MobileFilterSheet = ({
     );
     const [brandsState, setBrandsState] = useState<number[]>([]);
     const [categoriesState, setCategoriesState] = useState<number[]>([]);
-    const [inStock, setInStockState] = useState(true);
+    const [inStock, setInStockState] = useState(false);
+    const [outOfStock, setOutOfStockState] = useState(false);
 
     const {
         sidebar,
@@ -66,6 +68,7 @@ const MobileFilterSheet = ({
         synPriceRange,
         syncOnSale,
         setInStock,
+        setOutOfStock,
         setSort,
     } = useStore();
 
@@ -87,6 +90,7 @@ const MobileFilterSheet = ({
         sizesState,
         isOnSale,
         inStock,
+        outOfStock,
         sortOrderStates,
         rangePrices,
     ])
@@ -129,6 +133,10 @@ const MobileFilterSheet = ({
     }, [inStock]);
 
     useEffect(() => {
+        setOutOfStock(outOfStock);
+    }, [outOfStock]);
+
+    useEffect(() => {
         setSort(sortOrderStates);
     }, [sortOrderStates]);
 
@@ -147,6 +155,7 @@ const MobileFilterSheet = ({
         syncCategories([]);
         setIsIsOnSale(false);
         setInStockState(false);
+        setOutOfStockState(false);
         setSortOrderStates("");
         setSort("");
         closeModalMoreFilter();
@@ -422,25 +431,57 @@ const MobileFilterSheet = ({
                                         {/* --------- */}
 
                                         <div className="py-7 w-1/2">
-                                            <h3 className="text-md font-medium">In Stock!</h3>
-                                            <div className="mt-3 relative ">
+                                            <h3 className="text-md font-medium">Stock Status</h3>
+                                            <div className="mt-3 flex flex-col gap-2">
                                                 <div
-                                                    className={`flex items-center justify-center px-4 py-2 text-sm rounded-full border focus:outline-none cursor-pointer select-none ${inStock
-                                                        ? "border border-2 border-[#2563eb] bg-primary-50 text-primary-900"
-                                                        : "border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
+                                                    className={`flex items-center justify-start py-2 text-sm border focus:outline-none cursor-pointer border-none select-none 
+                                                        ${inStock
+                                                        ? "bg-primary-50 text-primary-900"
+                                                        : "dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
                                                         }`}
-                                                    onClick={() => setInStockState(!inStock)}
+                                                    onClick={() => {
+                                                        setInStockState(!inStock);
+                                                        // setOutOfStockState(false);
+                                                    }}
                                                 >
                                                     <input
                                                         type="checkbox"
                                                         checked={inStock}
-                                                        onChange={() => setInStockState(!inStock)}
-                                                        className="w-6 h-6 mr-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-sm bg-transparent"
+                                                        onChange={() => {
+                                                            setInStockState(!inStock);
+                                                            // setOutOfStockState(false);
+                                                        }}
+                                                        className="w-6 h-6 mr-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-sm bg-transparent
+                                                        focus:ring-primary-500 focus:ring-action-primary"
                                                     />
-                                                    <span className="line-clamp-1">In Stock</span>
+                                                    <span className="line-clamp-1 text-slate-900 dark:text-slate-100">In Stock</span>
                                                 </div>
+                                                {/* <div
+                                                    className={`flex items-center justify-start py-2 text-sm border focus:outline-none cursor-pointer border-none select-none 
+                                                        ${outOfStock
+                                                        ? "bg-primary-50 text-primary-900"
+                                                        : "border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
+                                                        }`}
+                                                    onClick={() => {
+                                                        setOutOfStockState(!outOfStock);
+                                                        setInStockState(false);
+                                                    }}
+                                                >
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={outOfStock}
+                                                        onChange={() => {
+                                                            setOutOfStockState(!outOfStock);
+                                                            setInStockState(false);
+                                                        }}
+                                                        className="w-6 h-6 mr-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-sm bg-transparent
+                                                        focus:ring-primary-500 focus:ring-action-primary"
+                                                    />
+                                                    <span className="line-clamp-1 text-slate-900 dark:text-slate-100">Out of Stock</span>
+                                                </div> */}
                                             </div>
                                         </div>
+
                                         {/* ---- */}
                                         <div className="py-7">
                                             <div className="relative flex flex-col space-y-8">

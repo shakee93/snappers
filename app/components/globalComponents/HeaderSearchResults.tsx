@@ -52,6 +52,7 @@ const HeaderSearchResults = ({ brands, productCategories }: SearchBarProps) => {
                     brands={brands}
                     bindToStore={true}
                     server={false}
+                    routing={true}
                 >
                 </InstantSearchWrapper>
             </Suspense>

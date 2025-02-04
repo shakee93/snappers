@@ -1,14 +1,13 @@
 "use client";
 import { Brand, Category, Product } from "@/graphql/types/graphql";
 import { useStore } from "@/store/store";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { GET_BRAND_ARCHIVE } from "@/graphql/defs/products";
 import { useLazyQuery } from "@apollo/client";
 import ProductCard from "./ProductCard3";
 import { useHits, useInstantSearch } from "react-instantsearch";
 import Pagination from "@/shared/Pagination/Pagination";
 import Image from "next/image";
-
 import NotFound from "@/public/not_found.svg";
 import { usePathname } from "next/navigation";
 import ProductCardLoading from "@/components/Loading/ProductCardLoading";
@@ -17,18 +16,21 @@ interface ProductGridProps {
   products?: { node: Product }[];
   brand?: Brand;
   category?: Category;
+  pages?: number;
+  hitsPerPage?: number;
+  setHitsPerPage?: (hitsPerPage: number) => void;
 }
 
 const ProductGridInstant = ({
   products,
   brand,
   category,
+  pages,
+  hitsPerPage,
+  setHitsPerPage,
 }: ProductGridProps) => {
 
   const { hits, results } = useHits();
-
-  // console.log('hits', hits);
-
   const { status: statusState } = useInstantSearch();
   const { setSearchStatus, search, search_status, navigation } = useStore();
 
@@ -56,8 +58,30 @@ const ProductGridInstant = ({
     // console.log(statusState);
   }, [statusState])
 
+
   return (
     <>
+
+      <div className='col-span-12 lg:col-span-9'>
+
+        {results?.nbPages && results?.nbPages > 1 && <div className="mb-4
+               text-right px-4 py-4 text-sm rounded-xl border-none focus:outline-none select-none">
+          <label htmlFor="hitsPerPage" className="mr-2 text-slate-900 dark:text-slate-100">Results per page:</label>
+          <select
+            id="hitsPerPage"
+            value={hitsPerPage}
+            onChange={(e) => setHitsPerPage ? setHitsPerPage(Number(e.target.value)) : null}
+            className="border rounded p-2 w-20 text-sm rounded-md border-neutral-300 dark:border-neutral-700
+                  cursor-pointer bg-transparent"
+          >
+            <option className="text-sm p-2" value={10}>10</option>
+            <option className="text-sm p-2" value={20}>20</option>
+            <option className="text-sm p-2" value={50}>50</option>
+            <option className="text-sm p-2" value={100}>100</option>
+          </select>
+        </div>}
+      </div>
+
       <div className='h-[185px] md:h-60 bottom-3 right-3 hidden'></div>
       {statusState === 'idle' &&
         <div className="flex-1 grid  grid-cols-2 lg:grid-cols-4 md:grid-cols-4 gap-x-2 gap-y-2 lg:gap-x-3 lg:gap-y-4">

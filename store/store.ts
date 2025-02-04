@@ -15,6 +15,7 @@ type State = {
         on_sale: boolean,
         sort: string
         in_stock: boolean
+        out_of_stock: boolean
     }
     product: {
         attribute: any[]
@@ -26,6 +27,7 @@ type Actions = {
     syncCategories: (categories: number[]) => void
     syncOnSale: (onSale:boolean) => void
     setInStock: (onSale:boolean) => void
+    setOutOfStock: (outOfStock:boolean) => void
     toggleMobileMenu: (onSale?:boolean) => void
     setSort: (sort:string) => void
     setSearch: (search:string) => void
@@ -51,7 +53,8 @@ export const useStore = create<State & Actions>((set) => ({
         priceRange: PRICE_RANGE,
         on_sale: false,
         sort: "",
-        in_stock: true
+        in_stock: true,
+        out_of_stock: false
     },
     searchMounted: false,
     product: {
@@ -99,6 +102,13 @@ export const useStore = create<State & Actions>((set) => ({
         sidebar: {
             ...state.sidebar,
             in_stock
+        },
+    })),
+    setOutOfStock: (out_of_stock: boolean) => set((state) => ({
+        ...state,
+        sidebar: {
+            ...state.sidebar,
+            out_of_stock
         },
     })),
     syncOnSale: (on_sale: boolean) => set((state) => ({

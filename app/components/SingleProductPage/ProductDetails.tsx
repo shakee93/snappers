@@ -489,6 +489,7 @@ const ProductDetails = ({
                           style={{ opacity: allOutOfStock ? 0.9 : 1 }}
                           title={allOutOfStock ? "Out of stock" : ""}
                         >
+                          {/* {JSON.stringify(allOutOfStock)} */}
                           {(product as any)[
                             `allPa${(attr?.label as unknown as "Capacity")
                               ?.split(" ")
