@@ -210,6 +210,7 @@ const MobileFilterSheet = ({
                         ? "border border-primary-500 bg-primary-50 text-primary-900 focus:outline-none cursor-pointer select-none"
                         : "border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
                     }`}
+                onClick={openModalMoreFilter}
             >
                 <svg
                     className="w-4 h-4"
@@ -267,7 +268,7 @@ const MobileFilterSheet = ({
                     />
                 </svg>
 
-                <span className="ml-2" onClick={openModalMoreFilter}>
+                <span className="ml-2">
                     {filterCount > 0
                         ? `Products filters (${filterCount})`
                         : "Products filters"}

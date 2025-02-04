@@ -321,9 +321,9 @@ const ProductCard: FC<ProductCardProps> = ({
             }} href={`/${brand?.slug}`} key={index}>
 
               {stockStatus !== "IN_STOCK" ? (
-                <span className="ml-2 inline-block bg-gray-500 text-white text-xs font-semibold px-2 py-1 rounded-full self-start w-24 text-center">
+                <div className="bg-gradient-to-b w-fit from-gray-500/30 font-semibold to-gray-400/5 text-xs text-gray-900 px-4 py-2 rounded-full">
                   Sold Out
-                </span>
+                </div>
               ) : (
                 <div className="bg-gradient-to-b w-fit from-blue-500/30 font-semibold to-blue-400/5 text-xs text-blue-900 px-4 py-2 rounded-full">
                   {brand?.name}
