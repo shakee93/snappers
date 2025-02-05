@@ -15,10 +15,10 @@ const TopBarPromotion: React.FC<{ options?: Options }> = ({ options }) => {
   const {
     topBarBgColor = "rgba(0, 0, 0, 0.8)",
     topBarBeforeText = "The ALL NEW",
-    topBarHighlightedText = "iPhone 16 Series",
+    topBarHighlightedText = "Samsung Galaxy S25 Series",
     topBarAfterText = "Available!",
     topBarHighlightedColor = "#fb923c",
-    topBarButtonLink = "/series/iphone-16",
+    topBarButtonLink = "/series/samsung-s25",
     topBarButtonText = "Shop Now",
   } = options || {};
 
@@ -29,12 +29,12 @@ const TopBarPromotion: React.FC<{ options?: Options }> = ({ options }) => {
           <div className="flex-col md:flex-row flex gap-5 justify-center text-center items-center">
             <div className="text-sm font-semibold text-white md:text-xs lg:text-sm">
               <span className="font-bold">{topBarBeforeText}</span>
-              <span style={{ color: topBarHighlightedColor }}> {topBarHighlightedText}</span>{" "}
+              <span style={{ color: topBarHighlightedColor }}> Samsung Galaxy S25 Series </span>{" "}
               <span>{topBarAfterText}</span>{" "}
             </div>
             <div className="text-xs">
               <Link
-                href='/tag/iphone-16'
+                href='/tag/samsung-s25'
                 className="bg-blue-700 text-white font-semibold py-1 px-4 rounded transition duration-300 ease-in-out hover:bg-blue-800"
               >
                 {topBarButtonText}
