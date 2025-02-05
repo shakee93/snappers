@@ -4,6 +4,7 @@ import { Brand, ProductCategory } from "@/graphql/types/graphql";
 import { useStore } from "@/store/store";
 import { Suspense, useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
+import { useSearchParams, useRouter } from 'next/navigation';
 
 interface SearchBarProps {
     productCategories: ProductCategory[]
@@ -13,7 +14,8 @@ interface SearchBarProps {
 
 const HeaderSearchResults = ({ brands, productCategories }: SearchBarProps) => {
 
-    const { search, syncBrands, syncCategories } = useStore()
+    const { search, setSearch, syncBrands, syncCategories } = useStore()
+    const searchParams = useSearchParams()
     const [mounted, setMounted] = useState(false)
 
     useEffect(() => {
@@ -31,11 +33,17 @@ const HeaderSearchResults = ({ brands, productCategories }: SearchBarProps) => {
         setMounted(true)
     }, [])
 
+    useEffect(() => {
+        const query = searchParams.get('q')
+        if (query) {
+            setSearch(query)
+        }
+    }, [searchParams])
+
     if (!mounted) {
         return <></>
     }
     
-
 
     return search.length > 0 ? <div className={twMerge(
         `inset-0 py-4 px-0 md:pt-0 pb-[100px] md:p-10 mt-[60px] lg:mt-[70px] bg-zinc-100 z-[15] overflow-y-scroll overlay-class`,
@@ -53,6 +61,7 @@ const HeaderSearchResults = ({ brands, productCategories }: SearchBarProps) => {
                     bindToStore={true}
                     server={false}
                     routing={true}
+                    searchQueryValue={search}
                 >
                 </InstantSearchWrapper>
             </Suspense>

@@ -40,6 +40,7 @@ interface InstantSearchWrapperProps {
   server?: boolean;
   sort?: boolean;
   tag?: string;
+  searchQueryValue?: string;
 }
 
 type CustomSearchParameters = Omit<BaseSearchParameters, "filter_by"> & {
@@ -64,7 +65,8 @@ const InstantSearchWrapper = ({
   brand,
   category,
   sort,
-  tag
+  tag,
+  searchQueryValue
 }: InstantSearchWrapperProps) => {
   const { sidebar, setSearchMounted } = useStore();
   const [differedSidebar] = useDebounce(sidebar, 800);
@@ -72,8 +74,9 @@ const InstantSearchWrapper = ({
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [debouncedSearchQuery] = useDebounce(searchQuery, 300); // Debounce the search query
 
-  console.log('server', server);
-  console.log('routing', routing);
+  // console.log('server', server);
+  // console.log('routing', routing);
+  console.log('searchQueryValue', searchQueryValue);
 
   // console.log('sidebar instock', sidebar?.in_stock);
 
@@ -133,13 +136,11 @@ const InstantSearchWrapper = ({
   }, []);
 
   useEffect(() => {
-    console.log('InstantSearchWrapper mounted or updated');
     setFilterQuery(getFilterQuery);
     // setSortQuery(differedSidebar.sort);
   }, [differedSidebar]);
 
   useEffect(() => {
-    console.log('Search state changed:', search);
     if (!search) {
       setFilterQuery(getFilterQuery);
     }
@@ -147,7 +148,6 @@ const InstantSearchWrapper = ({
   }, [search]);
 
   useEffect(() => {
-    console.log('Debounced search query changed:', debouncedSearchQuery);
     setFilterQuery(getFilterQuery);
   }, [debouncedSearchQuery]);
 
@@ -157,8 +157,15 @@ const InstantSearchWrapper = ({
 
   useEffect(() => {
     setSearchMounted();
-    console.log('Search mounted function called');
   }, []);
+
+  useEffect(() => {
+    if (searchQueryValue) {
+      const url = new URL(window.location.href);
+      url.searchParams.set('q', searchQueryValue);
+      window.history.replaceState({}, '', url);
+    }
+  }, [searchQueryValue]);
 
   //   const InstantSearchComponent = useMemo(() => {
   //     return server ? InstantSearchNext : InstantSearch;

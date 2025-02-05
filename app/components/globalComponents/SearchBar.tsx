@@ -34,7 +34,14 @@ const SearchBar = () => {
             items-center space-x-0 lg:space-x-1.5 px-3 md:px-5 rounded-md md:rounded-[25px] h-full ">
                 {
                     (search_status === 'stalled' || search_status === 'loading') ? <Loader className='text-primaryColor animate-spin' /> : search.length > 0 ?
-                        <button onClick={e => setSearch("")}>
+                        <button onClick={e => {
+                            setSearch("");
+                            const url = new URL(window.location.href);
+                            if (url.searchParams.has('q')) {
+                                url.searchParams.delete('q');
+                                router.push(url.toString());
+                            }
+                        }}>
                             <XIcon className='text-primaryColor' />
                         </button>
                         : <Search className='text-primaryColor' />
