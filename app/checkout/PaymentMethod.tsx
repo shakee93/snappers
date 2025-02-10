@@ -21,6 +21,8 @@ interface Props {
   setIsCardPayment: any;
   isPriceFluctuation: any;
   totalPayment: number;
+  setIsKokoPayment: any;
+  isKokoPayment: boolean;
 }
 
 const PaymentMethod: FC<Props> = ({
@@ -34,7 +36,9 @@ const PaymentMethod: FC<Props> = ({
   isCardPayment,
   setIsCardPayment,
   isPriceFluctuation,
-  totalPayment
+  totalPayment,
+  setIsKokoPayment,
+  isKokoPayment
 }) => {
   const [methodActive, setMethodActive] = useState<
     "Credit-Card" | "Internet-banking" | "Wallet"
@@ -107,6 +111,12 @@ const PaymentMethod: FC<Props> = ({
                 title: gateway.title,
               });
 
+              if (gateway.id === "darazbnpl") {
+                setIsKokoPayment(true);
+              } else {
+                setIsKokoPayment(false);
+              }
+
               if (gateway.id === "payhere") {
                 setIsCardPayment(true);
                 // console.log("cardpayment", isCardPayment);
@@ -123,7 +133,7 @@ const PaymentMethod: FC<Props> = ({
               <p className="font-medium">{gateway.id === "payhere" ? "Pay Online" : gateway.title}</p>
             </label>
             <div className={`mt-6 mb-4 ${active ? "block" : "hidden"}`}>
-              {gateway.icon ? (
+              {/* {gateway.icon ? (
                 <Image
                   src={gateway?.icon}
                   alt="payment gateway"
@@ -133,7 +143,7 @@ const PaymentMethod: FC<Props> = ({
                 />
               ) : (
                 <></>
-              )}
+              )} */}
               <p className="text-sm dark:text-slate-300">
                 Your order will be delivered to you after you{" "}
                 {gateway.title || "transfer funds"} to:

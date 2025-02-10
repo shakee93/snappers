@@ -13,8 +13,10 @@ import Link from "next/link";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCart } from "@/context/CartProvider";
+import { sentConfirmation } from "@/components/AddressPageComps/HelperComps";
 
 export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
+  const router = useRouter();
   const orderId = params["order-id"];
   const searchParams = useSearchParams().get("email");
 
@@ -28,6 +30,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
 
   // console.log({ orderId });
   // console.log({ searchParams });
+
 
   const order_id = useSearchParams().get('order_id');
   const first_name = useSearchParams().get('first_name');
@@ -50,8 +53,48 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     : { nodes: [] };
   const ordermethod = useSearchParams().get('ordermethod');
 
-  // Now you have the data from the URL and can use it on the page
-  // console.log({ order_id, first_name, last_name, email, address, amount, items, lineItems, shippingTotal, subtotal, date, city, shippingaddress1, shippingaddress2, billingaddress1, billingaddress2 });
+  //Koko Payment
+  const trnId = useSearchParams().get('trnId');
+  const orderIdParam = useSearchParams().get('orderId') || (window.location.pathname.split('/')[2] || '');
+  const orderIdUrl = window.location.pathname.split('/')[2]
+  const status = useSearchParams().get('status');
+  const desc = useSearchParams().get('desc');
+  const key = useSearchParams().get('key');
+  const wcApi = useSearchParams().get('wc-api');
+
+  console.log('orderIdParam', orderIdUrl);
+  console.log('status', status);
+  
+  const lastOrder = localStorage.getItem('last_order');
+  if (lastOrder && trnId && status !== "FAILURE") {
+    router.push(`/checkout/koko/guest_order?orderId=${orderIdUrl}&status=${status}`);
+  }
+
+  useEffect(() => {
+    const sendKokoVerification = async () => {
+      if (orderIdUrl && status) {
+        try {
+          const response = await fetch('/api/koko-verify', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              orderId: orderIdUrl,
+              status: status,
+            }),
+          });
+
+          const data = await response.json();
+          console.log('Koko verification response:', data);
+        } catch (error) {
+          console.error('Error sending Koko verification:', error);
+        }
+      }
+    };
+
+    sendKokoVerification();
+  }, [orderId, status]); // Dependencies to trigger the effect
 
   if (ordermethod === "guest") {
 
@@ -132,6 +175,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
 
   }
 
+
   if (orderId === "guest_checkout" && searchParams == null) {
     return (
       <h1 className="py-20 text-center text-2xl font-bold">
@@ -194,12 +238,23 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     variables: { orderID: orderId },
   });
 
-  // console.log('order data', orderData);
+  console.log('order data', orderData);
 
   useEffect(() => {
     getUserData();
     refreshCart();
   }, [getUserData]);
+
+  if (status === "FAILURE") {
+    return (
+      <div className="container mx-auto grid items-center justify-center">
+        <h1 className="py-20 text-center text-2xl font-bold">
+          Your order has been failed to be placed📦<br />
+          Koko Payment Error
+        </h1>
+      </div>
+    );
+  }
 
   if (orderError) {
     return (
@@ -215,6 +270,8 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
       </div>
     );
   }
+
+
 
   const temporaryPaymentDetails: PaymentDetailsWithoutUrls = useMemo(
     () => ({

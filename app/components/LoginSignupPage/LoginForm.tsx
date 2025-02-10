@@ -39,7 +39,7 @@ const LoginForm = () => {
       // Fetch customer data and redirect only on successful login
       await fetchCustomer();
       router.push("/");
-  
+      localStorage.removeItem('last_order');
     } catch (error) {
       // Catch any other unexpected errors
       console.error("Error:", error);

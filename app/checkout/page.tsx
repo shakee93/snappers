@@ -121,6 +121,7 @@ const CheckoutPage = () => {
 
   const [isStorePickup, setIsStorePickup] = useState(false);
   const [isCardPayment, setIsCardPayment] = useState(false);
+  const [isKokoPayment, setIsKokoPayment] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState({
     contactInfo: false,
     deliveryAddress: false,
@@ -141,6 +142,7 @@ const CheckoutPage = () => {
   const [confirmOrderErrors, setConfirmOrderErrors] = useState<string[]>([]);
   const [guestCheckoutData, setGuestCheckoutData] = useState<any>();
   const [isConfirmingOrder, setIsConfirmingOrder] = useState(false);
+  const [htmlFormResponse, setHtmlFormResponse] = useState<string | null>(null);
 
   const handleTOC = () => {
     // Toggle the state and get the updated value
@@ -181,7 +183,7 @@ const CheckoutPage = () => {
   const [completeOrderPayment] = useMutation(COMPLETE_ORDER_PAYMENT);
   // const  [createOrderGuest] = useMutation(GUEST_CHECKOUT_MUTATION)
   const [guestCheckout, { loading: guestCheckoutLoading, error: guestCheckoutError }] = useMutation(GUEST_CHECKOUT);
-  
+
   // console.log("guestCheckoutLoading", guestCheckoutLoading);
   // console.log("guestCheckoutError", guestCheckoutError);
 
@@ -413,8 +415,8 @@ const CheckoutPage = () => {
       const shippingMethods = isStorePickup
         ? "pickup_location:0"
         : freeShipping
-        ? "wbs:5c9bd062_free_shipping"
-        : "wbs:0dd3bc79_weight_based_shipping";
+          ? "wbs:5c9bd062_free_shipping"
+          : "wbs:0dd3bc79_weight_based_shipping";
 
       const total: any = cart?.total;
       setOrderTotal(freeShipping ? cart?.subtotal : total);
@@ -429,7 +431,7 @@ const CheckoutPage = () => {
         }
       }
 
-      
+
 
       const { data, errors } = await updateCartShippingTotalMutation({
         variables: { input: { shippingMethods } },
@@ -474,8 +476,7 @@ const CheckoutPage = () => {
     let generatedOrderId = crypto.randomUUID();
     setPayherPaymentID(generatedOrderId);
 
-    let { firstName, lastName, city, apartment } =
-      formData.billingAddress as any;
+    let { firstName, lastName, city, apartment } = formData.billingAddress as any;
     let { email, phone } = formData.contactInfo;
 
     if (
@@ -548,8 +549,8 @@ const CheckoutPage = () => {
       return;
     }
 
-    const isCashOnDelivery =
-      formData?.paymentMethod?.selectedGateway?.id == "cod";
+    const isCashOnDelivery = formData?.paymentMethod?.selectedGateway?.id == "cod";
+    const isKokoPayment = formData?.paymentMethod?.selectedGateway?.id == "darazbnpl";
 
     let checkoutDetails = paymentDetails;
 
@@ -653,11 +654,10 @@ const CheckoutPage = () => {
       return;
     }
 
-    const isBankTransfer =
-      formData?.paymentMethod?.selectedGateway?.id == "bacs";
+    const isBankTransfer = formData?.paymentMethod?.selectedGateway?.id == "bacs";
     const isPayhere = formData?.paymentMethod?.selectedGateway?.id == "payhere";
-    const isCashOnDelivery =
-      formData?.paymentMethod?.selectedGateway?.id == "cod";
+    const isCashOnDelivery = formData?.paymentMethod?.selectedGateway?.id == "cod";
+    const isKokoPayment = formData?.paymentMethod?.selectedGateway?.id == "darazbnpl";
 
     // console.log("formData: ", formData);
 
@@ -680,12 +680,13 @@ const CheckoutPage = () => {
       return;
     }
 
-    if (isCashOnDelivery) {
+    if (isCashOnDelivery || isKokoPayment) {
       await handleCheckout();
     }
   };
 
   const handleCheckout = async () => {
+    console.log('handleCheckout');
     setLoading(true);
 
     try {
@@ -716,13 +717,13 @@ const CheckoutPage = () => {
       const shippingMethod = getShippingMethod(shippingTotal);
       const shippingDetails = isStorePickup
         ? {
-            ...transformAddress(formData.deliveryAddress),
-            address1: "Store Pickup",
-            address2: "",
-            city: "Store Pickup",
-            state: "",
-            postcode: "",
-          }
+          ...transformAddress(formData.deliveryAddress),
+          address1: "Store Pickup",
+          address2: "",
+          city: "Store Pickup",
+          state: "",
+          postcode: "",
+        }
         : transformAddress(formData.deliveryAddress);
 
       const email = formData?.contactInfo?.email;
@@ -730,18 +731,14 @@ const CheckoutPage = () => {
       const billingDetails = {
         ...transformAddress(formData.billingAddress),
         email: formData?.contactInfo?.email,
+        phone: formData?.contactInfo?.phone,
       };
 
       const customerNoteHTML = `
             <p><strong>Customer Email:</strong> ${email}</p>
-            <p><strong>Phone Number:</strong> ${
-              formData?.contactInfo?.phone
-            }</p>
-            ${
-              isStorePickup
-                ? "<p><strong>Pickup Location:</strong> Store</p>"
-                : ""
-            }
+            <p><strong>Phone Number:</strong> ${formData?.contactInfo?.phone}</p>
+            ${isStorePickup ? "<p><strong>Pickup Location:</strong> Store</p>" : ""}
+            ${isKokoPayment ? "<p><strong>Payment Method:</strong> Koko Pay</p>" : ""}
         `;
 
       const variables = {
@@ -760,28 +757,40 @@ const CheckoutPage = () => {
         },
       };
 
+      console.log('variables', variables);
+
       const { data } =
         customer?.id === "guest"
           ? await guestCheckout({ variables })
           : await checkoutMutation({ variables });
 
+      //Koko Payment
+      if (isKokoPayment) {
+        const orderData = {
+          order_id: data?.checkout?.order?.databaseId,
+        };
+        localStorage.setItem('last_order', JSON.stringify(data));
+        handleKoko(orderData);
+        console.log('isKokoPayment', isKokoPayment);
+      }
+
 
       // FOR GUEST CHECKOUT
       let testPaymentData = data;
 
-      const isBankTransfer =
-        formData?.paymentMethod?.selectedGateway?.id == "bacs";
+      const isBankTransfer = formData?.paymentMethod?.selectedGateway?.id == "bacs";
 
       console.log("data just below guest checkout", data);
       const isGuest = customer?.id === "guest";
-      if(isPayhere && isGuest){
+      
+      if (isPayhere && isGuest) {
         console.log("Payhere order", testPaymentData);
         localStorage.setItem('payhere_last_order', JSON.stringify(testPaymentData));
         router.push(`/checkout/payhere/guest_order`);
         return;
       }
 
-      if(isPayhere && !isGuest){
+      if (isPayhere && !isGuest) {
         const orderId = data?.checkout?.order?.databaseId;
         router.push(`/checkout/payhere/${orderId}`);
         return;
@@ -813,14 +822,14 @@ const CheckoutPage = () => {
     const methodId = isStorePickup
       ? "pickup_location:0"
       : freeShipping
-      ? "wbs:5c9bd062_free_shipping"
-      : "wbs:0dd3bc79_weight_based_shipping";
+        ? "wbs:5c9bd062_free_shipping"
+        : "wbs:0dd3bc79_weight_based_shipping";
 
     const methodTitle = isStorePickup
       ? "Store Pickup"
       : freeShipping
-      ? "Free Shipping"
-      : "Weight Based Shipping";
+        ? "Free Shipping"
+        : "Weight Based Shipping";
 
     const total = isStorePickup ? "0" : shippingTotal;
 
@@ -856,6 +865,45 @@ const CheckoutPage = () => {
   useEffect(() => {
     setTotalWithTax(taxWithTotal);
   }, [taxWithTotal]);
+
+  const handleKoko = async (orderData: any) => {
+    console.log('orderData', orderData);
+    toast.info("Redirecting to Koko payment portal...", {
+      duration: 10000
+    });
+    try {
+      const response = await fetch('/api/koko', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData),
+      });
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+
+      const result = await response.json();
+      console.log('result', result);
+
+      const kokoResponseData = JSON.parse(result.kokoResponse).data;
+      setHtmlFormResponse(kokoResponseData);
+
+      const formContainer = document.createElement('div');
+      formContainer.innerHTML = kokoResponseData;
+      document.body.appendChild(formContainer);
+
+      const form = formContainer.querySelector('form');
+      if (form) {
+        form.submit();
+      }
+
+      console.log('Success:', result.kokoResponse);
+    } catch (error) {
+      console.error('Error:', error);
+    }
+  };
 
   return (
     <div className="nc-CheckoutPage">
@@ -912,6 +960,8 @@ const CheckoutPage = () => {
               setIsCardPayment={setIsCardPayment}
               isCardPayment={isCardPayment}
               totalPayment={numericOrderTotal}
+              setIsKokoPayment={setIsKokoPayment}
+              isKokoPayment={isKokoPayment}
             />
           </div>
 
@@ -1069,6 +1119,13 @@ const CheckoutPage = () => {
               )}
             </ButtonPrimary>
 
+            {/* <ButtonPrimary
+              onClick={handleKoko}
+              className={`mt-8 w-full bg-primary hover:bg-primary-dark`}
+            >
+              Confirm Koko
+            </ButtonPrimary> */}
+
             <div className="text-xs space-y-1.5 mt-4 pl-5">
               {confirmOrderErrors.map((error, index) => (
                 <div key={index} className="text-red-500">
@@ -1105,6 +1162,10 @@ const CheckoutPage = () => {
           </div>
         </div>
       )}
+
+      {/* {htmlFormResponse && (
+        <div className="html-form-response" dangerouslySetInnerHTML={{ __html: htmlFormResponse }} />
+      )} */}
     </div>
   );
 };

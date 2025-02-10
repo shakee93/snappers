@@ -37,6 +37,8 @@ interface CheckoutLeftProps {
   isCardPayment: boolean;
   setIsCardPayment: any;
   totalPayment: any;
+  setIsKokoPayment: any;
+  isKokoPayment: boolean;
 }
 
 const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
@@ -51,16 +53,15 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
   isStorePickup,
   isCardPayment,
   setIsCardPayment,
-  totalPayment
+  totalPayment,
+  setIsKokoPayment,
+  isKokoPayment
 }) => {
 
   const { data, loading: dataLoading }: QueryResult = useQuery(GET_CHECKOUT_USER_DETAILS);
   const { data: isPriceFluctuation, loading, error } = useQuery(GET_PRICE_FLUCTUATION_NOTICE);
-  const [shippingDetails, setShippingDetails] =
-    useState<CustomerAddress | null>(null);
-  const [billingDetails, setBillingDetails] = useState<CustomerAddress | null>(
-    null
-  );
+  const [shippingDetails, setShippingDetails] = useState<CustomerAddress | null>(null);
+  const [billingDetails, setBillingDetails] = useState<CustomerAddress | null>(null);
 
   const [initContactInformation, setInitContactInformation] =
     useState<contactInformation | null>(null);
@@ -70,8 +71,6 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
   const [isBillingAddressHidden, setIsBillingAddressHidden] = useState(false);
 
   useEffect(() => {
-    // console.log("isStorePickup", isStorePickup);
-    // console.log("isBillingSameAsShipping", isBillingSameAsShipping);
     if (isStorePickup == true) {
       setIsStorePickup(true);
       handleConfirmationChange("billingAddress", true);
@@ -86,8 +85,7 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
 
   useEffect(() => {
     if (data) {
-      const { displayName, email, shipping, billing } =
-        data.customer as Customer;
+      const { displayName, email, shipping, billing } = data.customer as Customer;
       setInitContactInformation({
         phone: shipping?.phone || "",
         email: email || "",
@@ -191,28 +189,30 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
         </div>
       )} */}
 
-        <div id="PaymentMethod" className="scroll-mt-24">
-          <PaymentMethod
-            isActive={tabActive === "PaymentMethod"}
-            onOpenActive={() => {
-              setTabActive("PaymentMethod");
-              handleScrollToEl("PaymentMethod");
-            }}
-            onCloseActive={() => setTabActive("order-cart")}
-            paymentGateways={paymentGateways}
-            updateFormData={(section, data) => {
-              updateFormData(section, data);
-            }}
-            isBillingAddressEnabled={isBillingAddressHidden}
-            handleConfirmationChange={(value: any) =>
-              handleConfirmationChange("paymentMethod", value)
-            }
-            isCardPayment={isCardPayment}
-            setIsCardPayment={setIsCardPayment}
-            isPriceFluctuation={isPriceFluctuation}
-            totalPayment={totalPayment}
-          />
-        </div>
+      <div id="PaymentMethod" className="scroll-mt-24">
+        <PaymentMethod
+          isActive={tabActive === "PaymentMethod"}
+          onOpenActive={() => {
+            setTabActive("PaymentMethod");
+            handleScrollToEl("PaymentMethod");
+          }}
+          onCloseActive={() => setTabActive("order-cart")}
+          paymentGateways={paymentGateways}
+          updateFormData={(section, data) => {
+            updateFormData(section, data);
+          }}
+          isBillingAddressEnabled={isBillingAddressHidden}
+          handleConfirmationChange={(value: any) =>
+            handleConfirmationChange("paymentMethod", value)
+          }
+          isCardPayment={isCardPayment}
+          setIsCardPayment={setIsCardPayment}
+          isPriceFluctuation={isPriceFluctuation}
+          totalPayment={totalPayment}
+          setIsKokoPayment={setIsKokoPayment}
+          isKokoPayment={isKokoPayment}
+        />
+      </div>
     </div>
   );
 };

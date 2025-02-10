@@ -36,7 +36,6 @@ const sentPayhereConfirmation = async (
 
   console.log("Making request to WordPress API...");
   const confirmationResponse = await fetch(
-    // "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/order-confirmation",
     "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/payhere-order-confirmation",
     {
       method: "POST",

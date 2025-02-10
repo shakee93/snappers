@@ -106,6 +106,7 @@ const savePaymentDetails = (
     order_id: order?.databaseId?.toString() ?? "guest_checkout",
     first_name: customer?.billing?.firstName || "no_lastname",
     last_name: customer?.billing?.lastName || "no firstname",
+    phone: customer?.billing?.phone || "no_phone",
     email: customer?.billing?.email || customer?.shipping?.email || "no_email",
     address: customer?.billing?.address1 || "no_address",
     lineItems: order?.lineItems || "no_items",

@@ -459,6 +459,12 @@ export const GET_SINGLE_ORDER = gql`
           address2
           phone
         }
+        billing {
+          city
+          address1
+          address2
+          phone
+        }
       }
       orderKey
       paymentMethodTitle

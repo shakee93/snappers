@@ -9,65 +9,6 @@ import { useSearchParams } from "next/navigation";
 import { useCart } from "@/context/CartProvider";
 import { useEffect, useState } from "react";
 
-
-
-// Order Status Message Component
-// const OrderStatusMessage = ({ status, email }: { status: string, email: string }) => {
-//   if (status === "pending") {
-//     return (
-//       <div className="mb-8 space-y-6">
-   
-        
-//         {/* Payment pending warning */}
-//         <div className="rounded-lg border-l-4 border-yellow-400 bg-yellow-50 p-6">
-//           <div className="flex items-center">
-//             <div className="flex-shrink-0">
-//               <svg className="h-6 w-6 text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-//                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-//               </svg>
-//             </div>
-//             <div className="ml-1">
-//               <h3 className="text-lg text-left font-medium text-yellow-800">Payment Required</h3>
-//               <p className="mt-1 ml-1 text-left text-yellow-700">
-//                 Please complete your payment to process and confirm your order.
-//               </p>
-//               <p className="mt-1 ml-1 text-left text-yellow-700">
-//                 Your order details have been sent to your email address: {email}
-//               </p>
-//             </div>
-//           </div>
-//         </div>
-
-//         {/* PayHere Payment Banner */}
-//         <div className="rounded-lg bg-white p-6 shadow-sm">
-//           <h3 className="mb-4 text-lg font-semibold text-gray-800">Secure Payment Powered By</h3>
-//           <div className="flex justify-center">
-//               <img 
-//                 src="https://www.payhere.lk/downloads/images/payhere_square_banner_dark.png" 
-//                 alt="PayHere" 
-//                 className="h-auto w-[200px]"
-//               />
-//           </div>
-//           <p className="mt-4 text-sm text-gray-600 text-center">
-//             We accept Visa, Mastercard, and local payment methods through PayHere
-//           </p>
-//         </div>
-//       </div>
-//     );
-//   }
-
-//   if (status === "completed") {
-//     return (
-//       <div className="mb-8 space-y-6">
-//         <h2 className="mb-2 text-2xl font-bold text-blue-800">Thank You for Your Order!</h2>
-//         <p className="text-blue-700">Your order has been successfully received.</p>
-//         <p className="text-blue-700">Your order details have been sent to your email address: {email}</p>
-//       </div>
-//     );
-//   }
-//   return null;
-// };
-
 // No Order Message Component
 const NoOrderMessage = () => {
   return (
@@ -110,7 +51,7 @@ export default function PayherePaymentPage() {
 
   useEffect(() => {
     // Access localStorage only on client side
-    const storedOrderData = localStorage.getItem('payhere_last_order');
+    const storedOrderData = localStorage.getItem('last_order');
     setOrderData(storedOrderData);
   }, []);
 
