@@ -92,6 +92,7 @@ const PaymentMethod: FC<Props> = ({
 
     let is_tab_or_mobile = hidePayhereForMobileAndTablets ? gateway.id == "payhere" && hidePayhere : false;
     const shouldHidePayhere = gateway.id === 'payhere' && isPriceFluctuation?.topBarPriceFluctuationNotice && totalPayment >= 100000;
+    
     return (
       !shouldHidePayhere && (
         <div
@@ -119,7 +120,6 @@ const PaymentMethod: FC<Props> = ({
 
               if (gateway.id === "payhere") {
                 setIsCardPayment(true);
-                // console.log("cardpayment", isCardPayment);
               } else {
                 setIsCardPayment(false);
               }

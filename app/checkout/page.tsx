@@ -22,7 +22,7 @@ import {
   CustomerAddressInput,
   PaymentGateway,
 } from "@/graphql/types/graphql";
-
+import koko from "@/public/koko.png";
 import CheckoutDetails from "./CheckoutDetails";
 import CartItems from "./CartItems";
 import { toast } from "sonner";
@@ -41,7 +41,7 @@ import {
 } from "@/components/AddressPageComps/HelperComps";
 import { useStats } from "react-instantsearch";
 import { Metadata } from "next/types";
-
+import Image from "next/image";
 interface FormData {
   contactInfo: Record<string, any>;
   deliveryAddress: any;
@@ -197,7 +197,7 @@ const CheckoutPage = () => {
   const router = useRouter();
   const initiatePayment = usePayhere();
 
-  // console.log('cart', cart);
+  console.log('cart', cart);
 
   useEffect(() => {
     const hasFreeShipping: any = cart?.appliedCoupons?.some(
@@ -410,7 +410,7 @@ const CheckoutPage = () => {
     if (hasFreeShipping) {
       setFreeShipping(true);
     }
-    // console.log('isStorePickup', isStorePickup);
+
     try {
       const shippingMethods = isStorePickup
         ? "pickup_location:0"
@@ -431,8 +431,6 @@ const CheckoutPage = () => {
         }
       }
 
-
-
       const { data, errors } = await updateCartShippingTotalMutation({
         variables: { input: { shippingMethods } },
       });
@@ -442,11 +440,8 @@ const CheckoutPage = () => {
         return;
       }
 
-      // console.log("data in shippng", data);
-
       if (data?.updateShippingMethod?.cart) {
-        const { total, shippingTotal, subtotal } =
-          data.updateShippingMethod.cart;
+        const { total, shippingTotal, subtotal } = data.updateShippingMethod.cart;
         if (freeShipping) {
           setOrderTotal(subtotal);
           setShippingTotal(shippingTotal);
@@ -565,6 +560,8 @@ const CheckoutPage = () => {
       subtotal,
       date,
     } = checkoutDetails;
+
+    console.log('subtotal', subtotal);
 
     const updatedCheckoutDetails = {
       ...checkoutDetails,
@@ -690,8 +687,7 @@ const CheckoutPage = () => {
     setLoading(true);
 
     try {
-      const isPayhere =
-        formData?.paymentMethod?.selectedGateway?.id == "payhere";
+      const isPayhere = formData?.paymentMethod?.selectedGateway?.id == "payhere";
 
       // if (isPayhere) {
       //   try {
@@ -782,7 +778,7 @@ const CheckoutPage = () => {
 
       console.log("data just below guest checkout", data);
       const isGuest = customer?.id === "guest";
-      
+
       if (isPayhere && isGuest) {
         console.log("Payhere order", testPaymentData);
         localStorage.setItem('payhere_last_order', JSON.stringify(testPaymentData));
@@ -858,9 +854,13 @@ const CheckoutPage = () => {
     const orderTotalNumber = parseFloat(numericString);
     return orderTotalNumber;
   };
+
   const numericOrderTotal = replaceStringinInt(orderTotal);
   const threePercentFromTotal = numericOrderTotal * 0.03;
+  const kokoTenPercentFromTotal = numericOrderTotal * 0.10;
+  const TotalWithKoko = (numericOrderTotal / 88) * 100;
   const taxWithTotal = (numericOrderTotal + threePercentFromTotal).toFixed(2);
+
 
   useEffect(() => {
     setTotalWithTax(taxWithTotal);
@@ -1001,6 +1001,7 @@ const CheckoutPage = () => {
                   />
                 </span>
               </div>
+              {/* {JSON.stringify(cart?.shippingTotal)} */}
               {!isStorePickup && (
                 <div className="flex justify-between py-2.5">
                   <span>
@@ -1035,6 +1036,34 @@ const CheckoutPage = () => {
                 </div>
               )}
 
+              {isKokoPayment && (
+                <div className="flex justify-between py-2.5">
+                  <span>Koko Charge</span>
+                  <span className="font-semibold text-slate-900 dark:text-slate-200">
+                    {/* {JSON.stringify(orderTotal)} */}
+                    {/* <span dangerouslySetInnerHTML={{ __html: `₨&nbsp;threePercentFromTotal` || "0.00" }} /> */}
+                    <span>Rs {(TotalWithKoko - numericOrderTotal).toFixed(2) || "0.00"}</span>
+                  </span>
+                </div>
+
+              )}
+
+              {isKokoPayment && (<div className="flex flex-wrap items-center text-xs text-gray-500 mt-1">
+                <span>pay in 3 x Rs</span>
+                <span className="font-semibold mx-1">
+                  {(
+
+                    parseFloat(
+                      ((TotalWithKoko || "0").toString()).replace(/[^\d.]/g, "")
+                    ) / 3
+                  ).toFixed(2)}
+                </span>                  
+                <span>with</span>
+                <span className="ml-1 inline-block">
+                  <Image src={koko} alt="KOKO" className="inline-block w-12 h-auto" />
+                </span>
+              </div>)}
+
               {isCardPayment && (
                 <div className="flex justify-between pt-4 text-base font-semibold text-slate-900 dark:text-slate-200">
                   <span>Order total</span>
@@ -1052,9 +1081,27 @@ const CheckoutPage = () => {
                 </div>
               )}
 
-              {!isCardPayment && (
+              {isKokoPayment && (
                 <div className="flex justify-between pt-4 text-base font-semibold text-slate-900 dark:text-slate-200">
                   <span>Order total</span>
+                  <span
+                    dangerouslySetInnerHTML={{
+                      __html:
+                        `Rs ${new Intl.NumberFormat("en-US", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        }).format(
+                          TotalWithKoko
+                        )}` || "0.00",
+                    }}
+                  />
+                </div>
+              )}
+
+              {!isCardPayment && !isKokoPayment && (
+                <div className="flex justify-between pt-4 text-base font-semibold text-slate-900 dark:text-slate-200">
+                  <span>Order total</span>
+                  {/* {JSON.stringify(orderTotal)} */}
                   <span
                     dangerouslySetInnerHTML={{ __html: orderTotal || "0.00" }}
                   />
