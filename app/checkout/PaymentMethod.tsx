@@ -212,7 +212,9 @@ const PaymentMethod: FC<Props> = ({
           <div className="flex flex-col gap-6">
            
             {paymentGateways?.map((gateway) => (
-              <PaymentMethods key={gateway.id} gateway={gateway} />
+              gateway.id !== "darazbnpl" && (
+                <PaymentMethods key={gateway.id} gateway={gateway} />
+              )
             ))}
           </div>
 
