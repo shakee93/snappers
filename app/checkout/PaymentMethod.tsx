@@ -92,7 +92,7 @@ const PaymentMethod: FC<Props> = ({
 
     let is_tab_or_mobile = hidePayhereForMobileAndTablets ? gateway.id == "payhere" && hidePayhere : false;
     const shouldHidePayhere = gateway.id === 'payhere' && isPriceFluctuation?.topBarPriceFluctuationNotice && totalPayment >= 100000;
-    
+
     return (
       !shouldHidePayhere && (
         <div
@@ -210,11 +210,15 @@ const PaymentMethod: FC<Props> = ({
 
           {/* ==================== */}
           <div className="flex flex-col gap-6">
-           
-            {paymentGateways?.map((gateway) => (
+
+            {/* {paymentGateways?.map((gateway) => (
               gateway.id !== "darazbnpl" && (
                 <PaymentMethods key={gateway.id} gateway={gateway} />
               )
+            ))} */}
+
+            {paymentGateways?.map((gateway) => (
+              <PaymentMethods key={gateway.id} gateway={gateway} />
             ))}
           </div>
 
