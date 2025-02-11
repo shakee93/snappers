@@ -395,7 +395,7 @@ const ProductCard: FC<ProductCardProps> = ({
             </div>
           )}
         </Link>
-        {/* <div className="flex flex-wrap items-center text-xs text-gray-500 mt-1">
+        <div className="flex flex-wrap items-center text-xs text-gray-500 mt-1">
           <span>or pay in 3 x Rs</span>
           <span className="font-semibold mx-1">
             {(
@@ -410,7 +410,7 @@ const ProductCard: FC<ProductCardProps> = ({
           <span className="ml-1 inline-block">
             <Image src={koko} alt="KOKO" className="inline-block w-12 h-auto" />
           </span>
-        </div> */}
+        </div>
       </div>
       <ModalQuickView
         show={showModalQuickView}

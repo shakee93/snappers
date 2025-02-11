@@ -68,6 +68,8 @@ const CheckoutPage = () => {
     | "order-cart"
   >("ContactInfo");
 
+  console.log('paymentGateways', paymentGateways);
+
   // const FORMDATA_DUMMY_OBJECT = {
   //   contactInfo: {
   //     phone: "0750278330",
@@ -197,7 +199,9 @@ const CheckoutPage = () => {
   const router = useRouter();
   const initiatePayment = usePayhere();
 
-  console.log('cart', cart);
+  // console.log('cart', cart);
+  // console.log('paymentGateways', paymentGateways);
+  // console.log('formData', formData);
 
   useEffect(() => {
     const hasFreeShipping: any = cart?.appliedCoupons?.some(
@@ -561,7 +565,7 @@ const CheckoutPage = () => {
       date,
     } = checkoutDetails;
 
-    console.log('subtotal', subtotal);
+    // console.log('subtotal', subtotal);
 
     const updatedCheckoutDetails = {
       ...checkoutDetails,
@@ -753,7 +757,7 @@ const CheckoutPage = () => {
         },
       };
 
-      console.log('variables', variables);
+      // console.log('variables', variables);
 
       const { data } =
         customer?.id === "guest"
@@ -767,7 +771,7 @@ const CheckoutPage = () => {
         };
         localStorage.setItem('last_order', JSON.stringify(data));
         handleKoko(orderData);
-        console.log('isKokoPayment', isKokoPayment);
+        // console.log('isKokoPayment', isKokoPayment);
       }
 
 
@@ -776,7 +780,7 @@ const CheckoutPage = () => {
 
       const isBankTransfer = formData?.paymentMethod?.selectedGateway?.id == "bacs";
 
-      console.log("data just below guest checkout", data);
+      // console.log("data just below guest checkout", data);
       const isGuest = customer?.id === "guest";
 
       if (isPayhere && isGuest) {
@@ -856,9 +860,10 @@ const CheckoutPage = () => {
   };
 
   const numericOrderTotal = replaceStringinInt(orderTotal);
+  const cartSubtotal = replaceStringinInt(cart?.subtotal);
+  // console.log('numericOrderTotal', numericOrderTotal);
   const threePercentFromTotal = numericOrderTotal * 0.03;
-  const kokoTenPercentFromTotal = numericOrderTotal * 0.10;
-  const TotalWithKoko = (numericOrderTotal / 88) * 100;
+  const TotalWithKoko = (cartSubtotal / 88) * 100;
   const taxWithTotal = (numericOrderTotal + threePercentFromTotal).toFixed(2);
 
 
@@ -1001,7 +1006,7 @@ const CheckoutPage = () => {
                   />
                 </span>
               </div>
-              {/* {JSON.stringify(cart?.shippingTotal)} */}
+
               {!isStorePickup && (
                 <div className="flex justify-between py-2.5">
                   <span>
@@ -1040,9 +1045,9 @@ const CheckoutPage = () => {
                 <div className="flex justify-between py-2.5">
                   <span>Koko Charge</span>
                   <span className="font-semibold text-slate-900 dark:text-slate-200">
-                    {/* {JSON.stringify(orderTotal)} */}
-                    {/* <span dangerouslySetInnerHTML={{ __html: `₨&nbsp;threePercentFromTotal` || "0.00" }} /> */}
-                    <span>Rs {(TotalWithKoko - numericOrderTotal).toFixed(2) || "0.00"}</span>
+                    {/* {JSON.stringify(TotalWithKoko)} */}
+                    <span>Rs {(TotalWithKoko - cartSubtotal).toFixed(2) || "0.00"}</span>
+                    {/* {JSON.stringify(cartSubtotal)} */}
                   </span>
                 </div>
 
@@ -1052,12 +1057,13 @@ const CheckoutPage = () => {
                 <span>pay in 3 x Rs</span>
                 <span className="font-semibold mx-1">
                   {(
-
                     parseFloat(
-                      ((TotalWithKoko || "0").toString()).replace(/[^\d.]/g, "")
+                      (TotalWithKoko + (isStorePickup ? 0 : 500) || "0")
+                        .toString()
+                        .replace(/[^\d.]/g, "")
                     ) / 3
                   ).toFixed(2)}
-                </span>                  
+                </span>
                 <span>with</span>
                 <span className="ml-1 inline-block">
                   <Image src={koko} alt="KOKO" className="inline-block w-12 h-auto" />
@@ -1091,7 +1097,7 @@ const CheckoutPage = () => {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         }).format(
-                          TotalWithKoko
+                          TotalWithKoko + (isStorePickup ? 0 : 500)
                         )}` || "0.00",
                     }}
                   />
@@ -1101,7 +1107,7 @@ const CheckoutPage = () => {
               {!isCardPayment && !isKokoPayment && (
                 <div className="flex justify-between pt-4 text-base font-semibold text-slate-900 dark:text-slate-200">
                   <span>Order total</span>
-                  {/* {JSON.stringify(orderTotal)} */}
+
                   <span
                     dangerouslySetInnerHTML={{ __html: orderTotal || "0.00" }}
                   />
