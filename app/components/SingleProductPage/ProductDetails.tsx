@@ -23,7 +23,8 @@ import {
   GET_PRICE_FLUCTUATION_NOTICE,
 } from "@/graphql/defs/options";
 import { useQuery } from '@apollo/client';
-
+import koko from "@/public/koko.png";
+import Image from "next/image";
 const ProductDetails = ({
   product,
   brand,
@@ -194,11 +195,9 @@ const ProductDetails = ({
       {product.type === "VARIABLE" && activeVariation ? (
         <div>
           <div className="flex flex-wrap items-center gap-4 text-base font-bold text-black-600 md:text-2xl">
-
             <span
               dangerouslySetInnerHTML={{ __html: activeVariation.price }}
             />
-
             {!!activeVariation.salePrice &&
               activeVariation.salePrice !== activeVariation.regularPrice && (
                 <span className="text-red-400 line-through md:text-xl">
@@ -230,14 +229,27 @@ const ProductDetails = ({
               </div>
             )}
 
+            <div className="flex flex-wrap items-center text-xs text-gray-400">
+              <span>or pay in 3 x Rs</span>
+              <span className="font-semibold mx-1">
+                {(
+                  parseFloat(
+                    (activeVariation.salePrice ? activeVariation.salePrice : activeVariation.regularPrice || "0")
+                      .toString()
+                      .replace(/[^\d.]/g, "")
+                  ) / 88 * 100 / 3
+                ).toFixed(2)}
+              </span>
+              <span>with</span>
+              <span className="ml-1 inline-block">
+                <Image src={koko} alt="KOKO" className="inline-block w-12 h-auto" />
+              </span>
+            </div>
+
           </div>
         </div>
       ) : (
         <div className="flex flex-wrap items-center gap-2 text-base font-bold text-gray-600 md:text-2xl">
-
-          {/* {JSON.stringify(product.price)}
-          {JSON.stringify(product.salePrice)}
-          {JSON.stringify(product.regularPrice)} */}
 
           {!!product.price ? (
             <span dangerouslySetInnerHTML={{ __html: product.price || "" }} />
@@ -247,14 +259,18 @@ const ProductDetails = ({
 
           {product.salePrice &&
             product.salePrice !== product.regularPrice && (
-              <span className="text-red-400 line-through md:text-xl">
-                <span
-                  dangerouslySetInnerHTML={{
-                    __html: product.regularPrice || "",
-                  }}
-                />
-              </span>
+              <div>
+                <span className="text-red-400 line-through md:text-xl">
+                  <span
+                    dangerouslySetInnerHTML={{
+                      __html: product.regularPrice || "",
+                    }}
+                  />
+                </span>
+
+              </div>
             )}
+
 
           {/* {product.stockStatus == "IN_STOCK" &&
             product?.stockQuantity &&
