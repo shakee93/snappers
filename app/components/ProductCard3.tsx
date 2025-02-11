@@ -395,20 +395,22 @@ const ProductCard: FC<ProductCardProps> = ({
             </div>
           )}
         </Link>
-        <div className="flex flex-wrap items-center text-xs text-gray-500 mt-1">
+        {/* <div className="flex flex-wrap items-center text-xs text-gray-500 mt-1">
           <span>or pay in 3 x Rs</span>
           <span className="font-semibold mx-1">
             {(
               parseFloat(
-                ((lowestPrice || lowestSalePrice || "0").toString()).replace(/[^\d.]/g, "")
-              ) / 3
+                (lowestPrice || lowestSalePrice || "0")
+                  .toString()
+                  .replace(/[^\d.]/g, "")
+              ) / 88 * 100 / 3
             ).toFixed(2)}
           </span>
           <span>with</span>
           <span className="ml-1 inline-block">
             <Image src={koko} alt="KOKO" className="inline-block w-12 h-auto" />
           </span>
-        </div>
+        </div> */}
       </div>
       <ModalQuickView
         show={showModalQuickView}
