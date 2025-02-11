@@ -211,15 +211,15 @@ const PaymentMethod: FC<Props> = ({
           {/* ==================== */}
           <div className="flex flex-col gap-6">
 
-            {/* {paymentGateways?.map((gateway) => (
+            {paymentGateways?.map((gateway) => (
               gateway.id !== "darazbnpl" && (
                 <PaymentMethods key={gateway.id} gateway={gateway} />
               )
-            ))} */}
-
-            {paymentGateways?.map((gateway) => (
-              <PaymentMethods key={gateway.id} gateway={gateway} />
             ))}
+
+            {/* {paymentGateways?.map((gateway) => (
+              <PaymentMethods key={gateway.id} gateway={gateway} />
+            ))} */}
           </div>
 
           <div className="flex pt-6">
