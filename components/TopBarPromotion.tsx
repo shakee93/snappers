@@ -38,7 +38,7 @@ console.log('TopBarPromotion', topBarButtonLink, topBarBgColor, topBarBeforeText
             </div>
             <div className="text-xs">
               <Link
-                href='/tag/samsung-s25'
+                href={topBarButtonLink}
                 className="bg-blue-700 text-white font-semibold py-1 px-4 rounded transition duration-300 ease-in-out hover:bg-blue-800"
               >
                 {topBarButtonText}
