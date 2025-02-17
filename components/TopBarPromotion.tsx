@@ -11,9 +11,11 @@ interface Options {
   topBarButtonText?: string;
 }
 
+
+
 const TopBarPromotion: React.FC<{ options?: Options }> = ({ options }) => {
   const {
-    topBarBgColor = "rgba(0, 0, 0, 0.8)",
+    topBarBgColor = "hsla(0, 0.00%, 0.00%, 0.80)",
     topBarBeforeText = "The ALL NEW",
     topBarHighlightedText = "Samsung Galaxy S25 Series",
     topBarAfterText = "Available!",
@@ -22,6 +24,8 @@ const TopBarPromotion: React.FC<{ options?: Options }> = ({ options }) => {
     topBarButtonText = "Shop Now",
   } = options || {};
 
+console.log('TopBarPromotion', topBarButtonLink, topBarBgColor, topBarBeforeText);
+
   return (
     <div style={{ backgroundColor: topBarBgColor }} className="px-2 py-5 md:p-3">
       <div className="items-between flex flex-col gap-4 md:flex-row md:items-center md:gap-3">
@@ -29,7 +33,7 @@ const TopBarPromotion: React.FC<{ options?: Options }> = ({ options }) => {
           <div className="flex-col md:flex-row flex gap-5 justify-center text-center items-center">
             <div className="text-sm font-semibold text-white md:text-xs lg:text-sm">
               <span className="font-bold">{topBarBeforeText}</span>
-              <span style={{ color: topBarHighlightedColor }}> Samsung Galaxy S25 Series </span>{" "}
+              <span style={{ color: topBarHighlightedColor }}> {topBarHighlightedText} </span>{" "}
               <span>{topBarAfterText}</span>{" "}
             </div>
             <div className="text-xs">
