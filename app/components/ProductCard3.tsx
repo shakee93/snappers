@@ -56,6 +56,7 @@ const ProductCard: FC<ProductCardProps> = ({
     salePrice,
     rawPrice,
     databaseId,
+    nodes
   } = data;
 
   const [showModalQuickView, setShowModalQuickView] = useState(false);
@@ -147,9 +148,21 @@ const ProductCard: FC<ProductCardProps> = ({
     return parseFloat(priceString?.replace(/[^\d.]/g, ""));
   };
 
-  // Calculate the lowest price and sale price among in-stock variations
+  // Calculate the lowest and highest prices among in-stock variations
   let lowestPrice = price;
   let lowestSalePrice = regularPrice;
+  // console.log('lowestPrice', name, lowestPrice);
+  // console.log('lowestSalePrice', name, lowestSalePrice);
+
+  let highestPrice = price;
+  if (variations?.nodes) {
+    const prices = variations.nodes.map((variation: ProductVariation) => 
+      parseFloat(variation.price?.replace(/[^0-9.]/g, '') || "0")
+    );
+    highestPrice = Math.max(...prices).toString();
+  }
+
+  // console.log('highestPrice', name, highestPrice);
 
   if (type === "VARIABLE" && variations?.nodes) {
     const inStockVariations = variations.nodes.filter(
@@ -395,22 +408,28 @@ const ProductCard: FC<ProductCardProps> = ({
             </div>
           )}
         </Link>
-        <div className="flex flex-wrap items-center text-xs text-gray-500 mt-1">
-          <span>or pay in 3 x Rs</span>
-          <span className="font-semibold mx-1">
-            {(
-              parseFloat(
-                (lowestPrice || lowestSalePrice || "0")
-                  .toString()
-                  .replace(/[^\d.]/g, "")
-              ) / 88 * 100 / 3
-            ).toFixed(2)}
-          </span>
-          <span>with</span>
-          <span className="ml-1 inline-block">
-            <Image src={koko} alt="KOKO" className="inline-block w-12 h-auto" />
-          </span>
-        </div>
+        
+        {lowestPrice && lowestSalePrice && (
+          <div className="flex flex-wrap items-center text-xs text-gray-500 mt-1">
+            <span>or pay in 3 x Rs</span>
+            <span className="font-semibold mx-1">
+              {(
+                parseFloat(
+                  ((lowestPrice?.includes("₨&nbsp;0.00") || lowestSalePrice?.includes("₨&nbsp;0.00")) 
+                    ? highestPrice 
+                    : (lowestPrice || lowestSalePrice || "0"))
+                    .toString()
+                    .replace(/[^\d.]/g, "")
+                ) / 88 * 100 / 3
+              ).toFixed(2)}
+            </span>
+            <span>with</span>
+            <span className="ml-1 inline-block">
+              <Image src={koko} alt="KOKO" className="inline-block w-12 h-auto" />
+            </span>
+          </div>
+        )}
+        
       </div>
       <ModalQuickView
         show={showModalQuickView}

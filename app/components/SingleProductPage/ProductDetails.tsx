@@ -170,6 +170,30 @@ const ProductDetails = ({
   const { data, loading, error } = useQuery(GET_PRICE_FLUCTUATION_NOTICE);
   const isPriceFluctuation = data?.topBarPriceFluctuationNotice || false;
 
+  const [highestPrice, setHighestPrice] = useState<string>('');
+
+  useEffect(() => {
+    if (product.type === "VARIABLE") {
+      const variations = (product as VariableProduct).variations?.nodes as unknown as ProductVariation[];
+      
+      if (variations && variations.length > 0) {
+        // Convert price strings to numbers by removing currency symbol and parsing
+        const prices = variations.map(v => 
+          parseFloat(v.price?.replace(/[^0-9.]/g, '') || "0")
+        );
+        
+        const maxPrice = Math.max(...prices);
+        const variationWithMaxPrice = variations.find(v => 
+          v.price && parseFloat(v.price.replace(/[^0-9.]/g, '')) === maxPrice
+        );
+
+        if (variationWithMaxPrice) {
+          setHighestPrice(variationWithMaxPrice.price || "");
+        }
+      }
+    }
+  }, [product]);
+
 
   return (
     <>
@@ -228,13 +252,15 @@ const ProductDetails = ({
                 Not Available
               </div>
             )}
-
+            
             <div className="flex flex-wrap items-center text-xs text-gray-400">
               <span>or pay in 3 x Rs</span>
               <span className="font-semibold mx-1">
                 {(
                   parseFloat(
-                    (activeVariation.salePrice ? activeVariation.salePrice : activeVariation.regularPrice || "0")
+                    ((activeVariation.salePrice === "₨&nbsp;0.00" || activeVariation.salePrice === null) && (activeVariation.regularPrice === "₨&nbsp;0.00" || activeVariation.regularPrice === null)
+                      ? highestPrice 
+                      : (activeVariation.salePrice || activeVariation.regularPrice) || "0")
                       .toString()
                       .replace(/[^\d.]/g, "")
                   ) / 88 * 100 / 3
