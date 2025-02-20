@@ -3,59 +3,95 @@ import { ChevronLeft, Loader, Search, XIcon } from "lucide-react";
 import HeaderSearchResults from "@/app/components/globalComponents/HeaderSearchResults";
 import { Brand, ProductCategory } from "@/graphql/types/graphql";
 import { useStore } from "@/store/store";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { usePathname } from "next/navigation";
-
+import { useEffect, useState } from "react";
 
 const SearchBar = () => {
+    const { search, setSearch, search_status } = useStore();
+    const router = useRouter();
+    const path = usePathname();
+    const searchParams = useSearchParams();
+    
+    const [mounted, setMounted] = useState(false);
+    const [isInitialized, setIsInitialized] = useState(false);
 
-    const { search, setSearch, search_status } = useStore()
-
-    const router = useRouter()
-    const path = usePathname()
-
-
+    // Handle hydration
     useEffect(() => {
-        setSearch('');
-    }, [path])
+        setMounted(true);
+    }, []);
 
-    return <div className='flex-1 flex items-center gap-1'>
-        {path !== '/' &&
-            <button onClick={e => router.back()} className='hidden md:hidden w-10 h-10 flex items-center justify-center'>
-                <ChevronLeft className='text-white w-8' />
-            </button>
+    // Handle initial load and subsequent URL changes
+    useEffect(() => {
+        if (!mounted) return; // Don't run until component is mounted
+
+        const query = searchParams.get('q');
+        
+        if ((query && !isInitialized) || isInitialized) {
+            console.log('Setting search to:', query);
+            setSearch(query ? decodeURIComponent(query) : '');
         }
+        
+        if (!isInitialized) {
+            setIsInitialized(true);
+        }
+    }, [searchParams, setSearch, isInitialized, mounted]);
 
-        <div
-            className="text-primary-700 flex-1"
-        >
-            <div className="bg-white border-2 lg:border border-primaryColor/20 py-0 md:py-1 flex
-            items-center space-x-0 lg:space-x-1.5 px-3 md:px-5 rounded-md md:rounded-[25px] h-full ">
-                {
-                    (search_status === 'stalled' || search_status === 'loading') ? <Loader className='text-primaryColor animate-spin' /> : search.length > 0 ?
-                        <button onClick={e => {
-                            setSearch("");
-                            const url = new URL(window.location.href);
-                            if (url.searchParams.has('q')) {
-                                url.searchParams.delete('q');
-                                router.push(url.toString());
-                            }
-                        }}>
-                            <XIcon className='text-primaryColor' />
+    const handleSearchClear = () => {
+        setSearch("");
+        const url = new URL(window.location.href);
+        url.searchParams.delete('q');
+        router.push(url.pathname + url.search);
+    };
+
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const value = e.target.value;
+        setSearch(value);
+        
+        const url = new URL(window.location.href);
+        if (value) {
+            url.searchParams.set('q', value);
+        } else {
+            url.searchParams.delete('q');
+        }
+        router.push(url.pathname + url.search);
+    };
+
+    return (
+        <div className="flex-1 flex items-center gap-1">
+            {path !== '/' && (
+                <button 
+                    onClick={() => router.back()} 
+                    className="hidden md:hidden w-10 h-10 flex items-center justify-center"
+                >
+                    <ChevronLeft className="text-white w-8" />
+                </button>
+            )}
+
+            <div className="text-primary-700 flex-1">
+                <div className="bg-white border-2 lg:border border-primaryColor/20 py-0 md:py-1 flex
+                items-center space-x-0 lg:space-x-1.5 px-3 md:px-5 rounded-md md:rounded-[25px] h-full">
+                    {(search_status === 'stalled' || search_status === 'loading') ? (
+                        <Loader className="text-primaryColor animate-spin" />
+                    ) : search.length > 0 ? (
+                        <button onClick={handleSearchClear} className={mounted ? '' : 'opacity-0'}>
+                            <XIcon className="text-primaryColor" />
                         </button>
-                        : <Search className='text-primaryColor' />
-                }
-                <input
-                    value={search}
-                    onChange={e => setSearch(e.target.value)}
-                    type="text"
-                    placeholder="Type to Quick Search"
-                    className="border-none focus:border-none focus:outline-none focus:ring-0 bg-transparent w-full text-base"
-                />
+                    ) : (
+                        <Search className="text-primaryColor" />
+                    )}
+                    <input
+                        value={mounted ? search : ''}
+                        onChange={handleSearchChange}
+                        type="text"
+                        placeholder="Type to Quick Search"
+                        className="border-none focus:border-none focus:outline-none focus:ring-0 bg-transparent w-full text-base"
+                        suppressHydrationWarning
+                    />
+                </div>
             </div>
         </div>
-    </div>
-}
+    );
+};
 
-export default SearchBar
+export default SearchBar;
