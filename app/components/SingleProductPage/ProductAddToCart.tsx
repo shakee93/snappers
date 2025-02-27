@@ -244,7 +244,6 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   // console.log('product', product);
   // console.log('variation', variation);
 
-
   if (product.type === "VARIABLE" && !variation) {
     return (
       <button

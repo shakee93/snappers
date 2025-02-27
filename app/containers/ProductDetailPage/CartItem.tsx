@@ -42,6 +42,7 @@ const CartItemProduct = ({
     regularPrice,
   }: SimpleProduct & VariableProduct = product.node;
 
+
   return (
     <div className="relative flex py-8 first:pt-0 last:pb-0 sm:py-10 xl:py-12">
       <div className="relative h-36 w-24 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100 sm:w-32">
@@ -49,7 +50,9 @@ const CartItemProduct = ({
           width={100}
           height={100}
           style={{ objectFit: "contain" }}
-          src={image?.sourceUrl || ""}
+          src={product.node.type === "VARIABLE"
+            ? variation?.node.image?.sourceUrl || ""
+            : product.node.image?.sourceUrl || product.node.image?.mediaItemUrl || ""}
           alt={name || ""}
           className="h-full w-full object-contain object-center"
         />
@@ -83,7 +86,8 @@ const CartItemProduct = ({
                                 ]?.nodes.find(
                                   (node: PaCapacity) =>
                                     node.slug === attr?.value,
-                                )?.name
+                                )?.name || 
+                                type === "VARIABLE" && variation ? attr?.value : ""
                               }
                             </span>
                           </div>

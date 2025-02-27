@@ -58,7 +58,9 @@ const CartDropdownItem = ({ item, close }: CartDropdownItemProps) => {
           fill
           style={{ objectFit: "cover" }}
           layout="fill"
-          src={image?.sourceUrl || ""}
+          src={product.node.type === "VARIABLE"
+            ? variation?.node.image?.sourceUrl || ""
+            : product.node.image?.sourceUrl || product.node.image?.mediaItemUrl || ""}
           alt={name || ""}
           className="h-full w-full object-contain object-center"
         />

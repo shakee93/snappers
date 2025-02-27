@@ -62,7 +62,9 @@ const cartItems: React.FC<CartItemsProps> = ({
         <Image
           fill
           style={{ objectFit: "cover" }}
-          src={image?.sourceUrl}
+          src={product.node.type === "VARIABLE"
+            ? variation?.node.image?.sourceUrl || ""
+            : product.node.image?.sourceUrl || image?.sourceUrl || ""}
           alt={name}
           className="h-full w-full object-contain object-center"
         />

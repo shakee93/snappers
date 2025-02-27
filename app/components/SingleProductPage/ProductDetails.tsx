@@ -461,7 +461,7 @@ const ProductDetails = ({
       </div> */}
 
       {/* {product.shortDescription && <ProductDescription product={product} />} */}
-      <ProductDescription product={product} />
+     
       {product.type === "VARIABLE" && (
         <>
           {product.attributes?.nodes.map(
@@ -560,7 +560,10 @@ const ProductDetails = ({
       )}
 
       <ProductAddToCart product={product} variation={activeVariation} />
-      <div className="flex w-full flex-wrap items-center gap-1 text-sm text-gray-500 md:text-base">
+
+      <ProductDescription product={product} />
+
+      <div className="flex w-full flex-wrap items-center gap-1 pt-2 text-sm text-gray-500 md:text-base">
         <div className="py-2 text-sm">Category :</div>
         {product.productCategories?.edges.map(
           (category: any, index: number) => (
