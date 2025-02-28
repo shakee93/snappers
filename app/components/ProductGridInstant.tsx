@@ -63,23 +63,23 @@ const ProductGridInstant = ({
     <>
 
       <div className='col-span-12 lg:col-span-9'>
-
-        {results?.nbPages && results?.nbPages > 1 && <div className="mb-4
-               text-right px-4 py-4 text-sm rounded-xl border-none focus:outline-none select-none">
-          <label htmlFor="hitsPerPage" className="mr-2 text-slate-900 dark:text-slate-100">Results per page:</label>
-          <select
-            id="hitsPerPage"
-            value={hitsPerPage}
-            onChange={(e) => setHitsPerPage ? setHitsPerPage(Number(e.target.value)) : null}
-            className="border rounded p-2 w-20 text-sm rounded-md border-neutral-300 dark:border-neutral-700
-                  cursor-pointer bg-transparent"
-          >
-            <option className="text-sm p-2" value={10}>10</option>
-            <option className="text-sm p-2" value={20}>20</option>
-            <option className="text-sm p-2" value={50}>50</option>
-            <option className="text-sm p-2" value={100}>100</option>
-          </select>
-        </div>}
+        {results && results.nbPages > 1 && results.nbHits > 0 && (
+          <div className="mb-4 text-right px-4 py-4 text-sm rounded-xl border-none focus:outline-none select-none">
+            <label htmlFor="hitsPerPage" className="mr-2 text-slate-900 dark:text-slate-100">Results per page:</label>
+            <select 
+              id="hitsPerPage"
+              value={hitsPerPage}
+              onChange={(e) => setHitsPerPage ? setHitsPerPage(Number(e.target.value)) : null}
+              className="border rounded p-2 w-20 text-sm rounded-md border-neutral-300 dark:border-neutral-700
+                    cursor-pointer bg-transparent"
+            >
+              <option className="text-sm p-2" value={10}>10</option>
+              <option className="text-sm p-2" value={20}>20</option>
+              <option className="text-sm p-2" value={50}>50</option>
+              <option className="text-sm p-2" value={100}>100</option>
+            </select>
+          </div>
+        )}
       </div>
 
       <div className='h-[185px] md:h-60 bottom-3 right-3 hidden'></div>
