@@ -192,8 +192,7 @@ const ProductDetails = ({
         }
       }
     }
-  }, [product]);
-
+  }, [product]); // Log the variations to inspect their structure
 
   return (
     <>
@@ -511,15 +510,6 @@ const ProductDetails = ({
                         <li
                           key={optionIndex}
                           onClick={() => {
-                            // Set the first in-stock variation as the active variation
-
-                            //   "attirbute is clicked",
-                            //   firstInStockVariation?.attributes,
-                            //   firstInStockVariation?.attributes?.nodes[0].name
-                            // );
-
-                            // option = firstInStockVariation?.attributes?.nodes[1].value || ""
-
                             setAttribute(attr, option || "");
                           }}
                           className={twMerge(
@@ -531,24 +521,13 @@ const ProductDetails = ({
                           style={{ opacity: allOutOfStock ? 0.9 : 1 }}
                           title={allOutOfStock ? "Out of stock" : ""}
                         >
-                          {/* {JSON.stringify(allOutOfStock)} */}
                           {(product as any)[
                             `allPa${(attr?.label as unknown as "Capacity")
                               ?.split(" ")
                               .join("")}`
-                          ]?.nodes.find((node: PaCapacity) => {
-                            return node.slug === option;
-                          })?.name || "OPTION"}
-
-
-                          {/* {allOutOfStock && (
-                          <span
-                            className="absolute inset-0 flex items-center justify-center"
-                            aria-hidden="true"
-                          >
-                            <span className="w-full h-0.5 bg-gray-400 transform rotate-45"></span>
-                          </span>
-                        )} */}
+                          ]?.nodes.find(
+                            (node: PaCapacity) => node.slug === option
+                          )?.name || "OPTION"}
                         </li>
                       );
                     })}

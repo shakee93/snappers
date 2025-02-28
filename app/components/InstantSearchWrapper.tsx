@@ -124,9 +124,9 @@ const InstantSearchWrapper = ({
         connectionTimeoutSeconds: 10,
       },
       additionalSearchParameters: {
-        query_by: "name, description",
+        query_by: "name, description, productTags",
         exclude_fields:
-          "description, productTags, shortDescription, galleryImages, attributes",
+          "description, shortDescription, galleryImages, attributes",
         use_cache: false,
       },
     });
