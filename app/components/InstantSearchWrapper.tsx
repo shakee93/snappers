@@ -70,15 +70,9 @@ const InstantSearchWrapper = ({
 }: InstantSearchWrapperProps) => {
   const { sidebar, setSearchMounted } = useStore();
   const [differedSidebar] = useDebounce(sidebar, 800);
-  const [hitsPerPage, setHitsPerPage] = useState<number>(10);
+  const [hitsPerPage, setHitsPerPage] = useState<number>(12);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [debouncedSearchQuery] = useDebounce(searchQuery, 300); // Debounce the search query
-
-  // console.log('server', server);
-  // console.log('routing', routing);
-  console.log('searchQueryValue', searchQueryValue);
-
-  // console.log('sidebar instock', sidebar?.in_stock);
 
   const getFilterQuery: () => string = () => {
     const f = [

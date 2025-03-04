@@ -20,7 +20,7 @@ type Props = {
     slug: string;
     brand: string;
   };
-};
+}
 
 export async function generateStaticParams() {
   const {
@@ -32,7 +32,9 @@ export async function generateStaticParams() {
 }
 
 async function getData(slug: string, brand: string) {
+  console.log('Fetching data for:', { slug, brand });
   try {
+    // const { data } = await getClient().query({
     const { data } = await getClient().query({
       query: GET_PRODUCT,
       variables: {
@@ -41,7 +43,10 @@ async function getData(slug: string, brand: string) {
       fetchPolicy: "no-cache",
     });
 
+    // console.log('data', data);
+
     if (!data.product) {
+      console.log('Product not found');
       return notFound();
     }
     const productBrand = data.product.brands?.nodes[0] || {
@@ -49,6 +54,7 @@ async function getData(slug: string, brand: string) {
       slug: "product",
     };
     if (productBrand.slug !== brand) {
+      console.log('Brand mismatch:', { productBrand, brand });
       return notFound();
     }
     return {
@@ -56,7 +62,7 @@ async function getData(slug: string, brand: string) {
       brand: productBrand,
     };
   } catch (e) {
-    // console.log(e);
+    console.error('Error fetching product data:', e);
     return notFound();
   }
 }
@@ -104,6 +110,9 @@ const Page = async ({ params }: Props) => {
     product: SimpleProduct & VariableProduct;
     brand: Brand;
   } = await getData(params.slug, params.brand);
+
+  console.log('product', product);
+  console.log('brand', brand);
 
 
   return (

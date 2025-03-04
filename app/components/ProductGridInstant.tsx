@@ -73,10 +73,10 @@ const ProductGridInstant = ({
               className="border rounded p-2 w-20 text-sm rounded-md border-neutral-300 dark:border-neutral-700
                     cursor-pointer bg-transparent"
             >
-              <option className="text-sm p-2" value={10}>10</option>
-              <option className="text-sm p-2" value={20}>20</option>
-              <option className="text-sm p-2" value={50}>50</option>
-              <option className="text-sm p-2" value={100}>100</option>
+              <option className="text-sm p-2" value={12}>12</option>
+              <option className="text-sm p-2" value={24}>24</option>
+              <option className="text-sm p-2" value={48}>48</option>
+              <option className="text-sm p-2" value={96}>96</option>
             </select>
           </div>
         )}
