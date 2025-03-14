@@ -1,28 +1,27 @@
-import {Popover, Transition} from "@headlessui/react";
-import {ChevronDownIcon} from "@heroicons/react/24/outline";
-import React, {Fragment, useCallback, useEffect, useMemo, useRef, useState} from "react";
+import { Popover, Transition } from "@headlessui/react";
+import { ChevronDownIcon } from "@heroicons/react/24/outline";
+import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonThird from "@/shared/Button/ButtonThird";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
-import {ProductCategory} from "@/graphql/types/graphql";
-import {useStore} from "@/store/store";
+import { ProductCategory } from "@/graphql/types/graphql";
+import { useStore } from "@/store/store";
 import FilterPopover from "@/app/components/Filters/FilterPopover";
-import {useHits, useRefinementList} from "react-instantsearch";
+import { useHits, useRefinementList } from "react-instantsearch";
 // import {RefinementListItem} from "instantsearch.js/es/connectors/refinement-list/connectRefinementList";
-import {useParams} from "next/navigation";
+import { useParams } from "next/navigation";
 
 interface CategoryFilterProps {
     categories: ProductCategory[]
 }
 
-const CategoryFilter = ({categories}: CategoryFilterProps) => {
-    const { syncCategories, search, sidebar: {categories : catState } } = useStore()
+const CategoryFilter = ({ categories }: CategoryFilterProps) => {
+    const { syncCategories, search, sidebar: { categories: catState } } = useStore()
     const [firstCategoryFacets, setFirstCategoryFacets] = useState<any[]>([]);
     const { brand } = useParams()
     const { hits, results } = useHits();
 
-
-    const {items: categoriesFacet} = useRefinementList({
+    const { items: categoriesFacet } = useRefinementList({
         attribute: 'categories_facet',
     });
 
@@ -63,11 +62,24 @@ const CategoryFilter = ({categories}: CategoryFilterProps) => {
         }, [catState])
 
     const facetedCategories = useMemo(() => {
+        const sortedCategories = categories.filter(b =>
+            firstCategoryFacets.map(f => Number(f.value)).includes(b.databaseId)
+        );
 
-        return categories.filter(b =>
-            firstCategoryFacets.map(f =>  Number(f.value)).includes(b.databaseId)
-        )
-    }, [firstCategoryFacets, categories])
+        // console.log(sortedCategories)
+
+        sortedCategories.sort((a, b) => {
+            if (a.databaseId === 1484) return -1;
+            if (b.databaseId === 1484) return 1;
+            if (a.databaseId === 1483) return -1;
+            if (b.databaseId === 1483) return 1;
+            if (a.databaseId === 1485) return -1;
+            if (b.databaseId === 1485) return 1;
+            return 0;
+        });
+
+        return sortedCategories;
+    }, [firstCategoryFacets, categories]);
 
     const totalCount = useMemo(() => {
         return firstCategoryFacets.reduce((acc, f) => {

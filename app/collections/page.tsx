@@ -27,6 +27,16 @@ type Props = {
 
 const Page = async () => {
   const { productCategories } = await getData();
+  
+  productCategories.sort((a: Category, b: Category) => {
+      if (a.databaseId === 1484) return -1;
+      if (b.databaseId === 1484) return 1;
+      if (a.databaseId === 1483) return -1;
+      if (b.databaseId === 1483) return 1;
+      if (a.databaseId === 1485) return -1;
+      if (b.databaseId === 1485) return 1;
+      return 0;
+  });
 
   return (
     <div>

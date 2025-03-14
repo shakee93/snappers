@@ -110,9 +110,22 @@ const MobileFilterSheet = ({
     }, [brands, brandsFacet])
 
     const facetedCategories = useMemo(() => {
-        return categories.filter(b =>
+        const sortedCategories = categories.filter(b =>
             categoriesFacet.map(f => Number(f.value)).includes(b.databaseId)
-        )
+        );
+
+        // Sort categories to have 1484 first and 1483 second
+        sortedCategories.sort((a, b) => {
+            if (a.databaseId === 1484) return -1;
+            if (b.databaseId === 1484) return 1;
+            if (a.databaseId === 1483) return -1;
+            if (b.databaseId === 1483) return 1;
+            if (a.databaseId === 1485) return -1;
+            if (b.databaseId === 1485) return 1;
+            return 0;
+        });
+
+        return sortedCategories;
     }, [categoriesFacet, categories])
 
     useEffect(() => {
