@@ -549,7 +549,8 @@ const ProductDetails = ({
             <Link
               href={`/collections/${category.node.slug}`}
               key={index}
-              className="bg-primary-100 inline-block min-w-max rounded-3xl px-3 py-1 text-xs md:text-sm"
+              className="border border-primaryColor inline-block min-w-max 
+              rounded-md text-black px-3 py-1 text-xs md:text-sm bg-white"
             >
               {category.node.name}
             </Link>
