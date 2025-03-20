@@ -101,6 +101,7 @@ const MobileFilterSheet = ({
 
     const { items: brandsFacet } = useRefinementList({
         attribute: 'brands_facet',
+        limit: 20,
     });
 
     const facetedBrands = useMemo(() => {

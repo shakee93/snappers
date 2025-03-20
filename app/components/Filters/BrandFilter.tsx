@@ -25,7 +25,7 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
 
   const { items: brandsFacet, refine } = useRefinementList({
     attribute: 'brands_facet',
-    limit: 13,
+    limit: 17,
   });
 
 
