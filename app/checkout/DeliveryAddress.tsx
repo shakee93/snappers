@@ -226,7 +226,7 @@ const DeliveryAddress: FC<Props> = ({
                 {/* <Label className="text-sm">Address</Label> */}
                 <Input
                   className="mt-1.5 capitalize"
-                  placeholder="Address*"
+                  placeholder="Address Line 1*"
                   name="address1"
                   value={address}
                   type={"text"}
@@ -238,7 +238,7 @@ const DeliveryAddress: FC<Props> = ({
                 {/* <Label className="text-sm ">Apt, Suite *</Label> */}
                 <Input
                   className="mt-1.5 capitalize"
-                  placeholder="Apt, Suite **"
+                  placeholder="Address Line 2*"
                   name="address2"
                   value={apartment}
                   onChange={(e) => setApartment(e.target.value)}
@@ -253,10 +253,10 @@ const DeliveryAddress: FC<Props> = ({
                 {/* <Label className="text-sm   ">City</Label> */}
                 <Input
                   className=" sm:mt-1.5 mt-0 normal-case  "
-                  placeholder="City*"
+                  placeholder="Address Line 3*"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  required={true}
+                  // required={true}
                 />
               </div>
               <div>
