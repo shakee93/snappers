@@ -27,11 +27,11 @@ const TopBarPromotion: React.FC<{ options?: Options }> = ({ options }) => {
 console.log('TopBarPromotion', topBarButtonLink, topBarBgColor, topBarBeforeText);
 
   return (
-    <div style={{ backgroundColor: topBarBgColor }} className="px-2 py-5 md:p-3">
+    <div style={{ backgroundColor: topBarBgColor }} className="px-2 py-4 md:p-3">
       <div className="items-between flex flex-col gap-4 md:flex-row md:items-center md:gap-3">
         <div className="flex w-full flex-col items-center justify-center gap-2 md:flex-row">
-          <div className="flex-col md:flex-row flex gap-5 justify-center text-center items-center">
-            <div className="text-sm font-semibold text-white md:text-xs lg:text-sm">
+          <div className="flex-row md:flex-row flex gap-2 md:gap-5 justify-center text-center items-center">
+            <div className="text-xs font-semibold text-white md:text-sm lg:text-md">
               <span className="font-bold">{topBarBeforeText}</span>
               <span style={{ color: topBarHighlightedColor }}> {topBarHighlightedText} </span>{" "}
               <span>{topBarAfterText}</span>{" "}
@@ -39,7 +39,7 @@ console.log('TopBarPromotion', topBarButtonLink, topBarBgColor, topBarBeforeText
             <div className="text-xs">
               <Link
                 href={topBarButtonLink}
-                className="bg-blue-700 text-white font-semibold py-1 px-4 rounded transition duration-300 ease-in-out hover:bg-blue-800"
+                className="bg-blue-700 text-white font-semibold py-1 px-2 md:py-1 md:px-4 rounded transition duration-300 ease-in-out hover:bg-blue-800"
               >
                 {topBarButtonText}
               </Link>

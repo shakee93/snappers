@@ -197,27 +197,25 @@ const DeliveryAddress: FC<Props> = ({
               />
             </div>
             {/* ============ */}
-            <div className="grid grid-cols-1 sm:grid-cols-2  sm:gap-3">
-              <div>
-                {/* <Label className="text-sm capitalize ">first name</Label> */}
+            <div className="grid md:grid-cols-1 sm:grid-cols-2 sm:gap-3">
+              <div className="w-full">
                 <Input
                   className="mt-1.5 capitalize"
                   value={firstName}
-                  placeholder="First name*"
+                  placeholder="Name*"
                   onChange={(e) => setFirstName(e.target.value)}
                   required={true}
                 />
               </div>
-              <div>
-                {/* <Label className="text-sm">Last name</Label> */}
+              {/* <div>
                 <Input
                   className="mt-1.5 capitalize"
                   value={lastName}
                   placeholder="Last name*"
                   onChange={(e) => setLastName(e.target.value)}
-                  required={true}
+                  required={false}
                 />
-              </div>
+              </div> */}
             </div>
 
             {/* ============ */}
@@ -249,8 +247,7 @@ const DeliveryAddress: FC<Props> = ({
 
             {/* ============ */}
             <div className="grid grid-cols-1 mt-0 sm:grid-cols-2 gap-0  sm:gap-3">
-              <div>
-                {/* <Label className="text-sm   ">City</Label> */}
+              {/* <div>
                 <Input
                   className=" sm:mt-1.5 mt-0 normal-case  "
                   placeholder="Address Line 3*"
@@ -258,7 +255,7 @@ const DeliveryAddress: FC<Props> = ({
                   onChange={(e) => setCity(e.target.value)}
                   // required={true}
                 />
-              </div>
+              </div> */}
               <div>
                 {/* <Label className="text-sm">Country</Label> */}
                 <Select
@@ -271,22 +268,25 @@ const DeliveryAddress: FC<Props> = ({
                   <option value="Sri Lanka">Sri Lanka</option>
                 </Select>
               </div>
+              <div>
+                <SelectField
+                  // label="State"
+                  sizeClass="mt-0 sm:mt-1.5"
+                  className="mt-0 sm:mt-1.5"
+                  name="state"
+                  value={state}
+                  options={SRI_LANKAN_STATES.map((state) => ({
+                    value: state,
+                    label: state,
+                  }))}
+                  onChange={(e: any) => setState(e.target.value)}
+                />
+              </div>
             </div>
 
             {/* ============ */}
             <div className="grid grid-cols-1 mt-0 sm:grid-cols-2  sm:gap-3">
-              <SelectField
-                // label="State"
-                sizeClass="mt-0 sm:mt-1.5"
-                className="mt-0 sm:mt-1.5"
-                name="state"
-                value={state}
-                options={SRI_LANKAN_STATES.map((state) => ({
-                  value: state,
-                  label: state,
-                }))}
-                onChange={(e: any) => setState(e.target.value)}
-              />
+
               <div>
                 {/* <Label className="text-sm">Postal code</Label> */}
                 {/* <Input
