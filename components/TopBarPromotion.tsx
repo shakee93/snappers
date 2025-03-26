@@ -27,7 +27,7 @@ const TopBarPromotion: React.FC<{ options?: Options }> = ({ options }) => {
 console.log('TopBarPromotion', topBarButtonLink, topBarBgColor, topBarBeforeText);
 
   return (
-    <div style={{ backgroundColor: topBarBgColor }} className="px-2 py-4 md:p-3">
+    <div style={{ backgroundColor: topBarBgColor }} className="px-1 py-3 md:p-3">
       <div className="items-between flex flex-col gap-4 md:flex-row md:items-center md:gap-3">
         <div className="flex w-full flex-col items-center justify-center gap-2 md:flex-row">
           <div className="flex-row md:flex-row flex gap-2 md:gap-5 justify-center text-center items-center">

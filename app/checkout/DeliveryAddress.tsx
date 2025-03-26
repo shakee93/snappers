@@ -247,15 +247,15 @@ const DeliveryAddress: FC<Props> = ({
 
             {/* ============ */}
             <div className="grid grid-cols-1 mt-0 sm:grid-cols-2 gap-0  sm:gap-3">
-              {/* <div>
+              <div>
                 <Input
                   className=" sm:mt-1.5 mt-0 normal-case  "
-                  placeholder="Address Line 3*"
+                  placeholder="Address Line 3"
                   value={city}
                   onChange={(e) => setCity(e.target.value)}
-                  // required={true}
+                  required={false}
                 />
-              </div> */}
+              </div>
               <div>
                 {/* <Label className="text-sm">Country</Label> */}
                 <Select
