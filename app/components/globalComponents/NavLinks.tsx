@@ -41,8 +41,12 @@ const navLinks: NavLinkItem[] = [
     name: "Shop",
   },
   {
+    href: "/tag/clearance",
+    name: "Clearance",
+  },
+  {
     href: "/contact",
-    name: "Contact",
+    name: "Location",
   },
 ];
 

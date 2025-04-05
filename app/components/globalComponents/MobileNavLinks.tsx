@@ -24,12 +24,17 @@ const MobileNavLinks = () => {
     },
     {
       id: 3,
+      href: "/tag/clearance",
+      name: "Clearance",
+    },
+    {
+      id: 4,
       href: "/about",
       name: "About Us",
     },
 
     {
-      id: 4,
+      id: 5,
       href: "/contact",
       name: "Contact Us",
     },
