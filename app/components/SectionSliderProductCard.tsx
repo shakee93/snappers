@@ -82,6 +82,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
     };
   }, []);
 
+  // console.log('products', products);
 
   return (
     <div className={`nc-SectionSliderProductCard ${className}`}>
