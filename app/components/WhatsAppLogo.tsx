@@ -44,7 +44,7 @@ const WhatsappLogoComponent = () => {
       "transition-transform fixed z-[1000] md:bottom-12 md:right-10 bottom-[120px] right-7 h-8 w-12 md:mb-5",
       isProduct && 'bottom-44'
     )}>
-      <Link href={"https://wa.me/94777555665"} target="_blank">
+      <Link href={"https://wa.me/94722299944"} target="_blank">
         <div className="relative flex flex-col items-center">
           <Image
             src={whatsappLogo}
