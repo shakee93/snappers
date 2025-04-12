@@ -114,7 +114,10 @@ const Contact = () => {
                       Our Locations
                     </h4>
                     <p className=" flex justify-center items-center text-base text-body-color dark:text-dark-6">
-                      <PinIcon className="mr-3 h-4" /> 250/54, Ground Floor, Liberty Plaza, Colombo 03.
+                      <PinIcon className="mr-3 h-4" /> No. 250 | 53 - 54 Ground Floor, Liberty Plaza, Colombo 03.
+                    </p>
+                    <p className="flex justify-center items-center pt-4 text-base text-body-color dark:text-dark-6">
+                      <PinIcon className="mr-3 h-4" /> No. 250 | 1 | 161 First Floor, Liberty Plaza, Colombo 03.
                     </p>
                     {/*<br />  */}
                     {/*<p className="flex justify-center items-center text-base text-body-color dark:text-dark-6">*/}
