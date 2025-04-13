@@ -29,7 +29,10 @@ import { Card } from "@nextui-org/react";
 import CardSkeleton from "./components/Skeletons/CardSkeleton";
 import TopBarPromotion from "@/components/TopBarPromotion";
 import { GET_OPTIONS } from "@/graphql/defs/options";
-
+import TestimonialImg01 from "@/public/images/testimonials/clientSay1.png";
+import TestimonialImg02 from "@/public/images/testimonials/clientSay2.png";
+import TestimonialImg03 from "@/public/images/testimonials/clientSay3.png";
+import FancyTestimonialsSlider from "@/app/components/TestimonialsSlider";
 const Banks = [
   Sampath,
   Dfcc,
@@ -79,7 +82,7 @@ const getData = async () => {
         console.error("Error fetching speakers");
         return [];
       }),
-      
+
 
     getClient()
       .query({
@@ -130,7 +133,7 @@ const getData = async () => {
         console.error("Error fetching slides");
         return [];
       }),
-      getClient()
+    getClient()
       .query({
         query: GET_OPTIONS,
       })
@@ -141,7 +144,7 @@ const getData = async () => {
       }),
   ];
 
-  const [newArrivals, mobiles, speakers, watches, backInStock, brands, slides , options] = await Promise.all(queries);
+  const [newArrivals, mobiles, speakers, watches, backInStock, brands, slides, options] = await Promise.all(queries);
 
   return {
     newArrivals: newArrivals as (SimpleProduct & VariableProduct)[],
@@ -155,15 +158,38 @@ const getData = async () => {
   };
 };
 
+const testimonials = [
+  {
+    img: TestimonialImg01,
+    quote: "I had an absolutely wonderful experience at GQ - The Mobile Store! The staff was incredibly helpful and went above and beyond to ensure I found the perfect product. They were friendly, approachable, and made the entire process smooth and stress-free.",
+    name: 'Thilina M. Senadheera',
+    role: ''
+  },
+  {
+    img: TestimonialImg02,
+    quote: "Fourth time buying a phone from GQ. Always selling original products. No complaints whatsoever. Friendly customer service. A best place to buy electronic items",
+    name: 'Angelo Yohan Diaz',
+    role: ''
+  },
+  {
+    img: TestimonialImg03,
+    quote: "Great experience at this shop! The staff was very helpful, and the prices were reasonable. The best part was their excellent service—when I needed to withdraw money from the ATM, they sent a staff member with me to make the process smooth and secure. Highly recommended!",
+    name: 'Rashmika Wellappili',
+    role: ''
+  }
+]
+
 export default async function Home() {
 
 
   const { newArrivals, mobiles, speakers, watches, backInStock, brands, slides, options } = await getData();
 
+  // console.log('newArrivals', newArrivals);s
+
   return (
     <main>
       <div className="nc-PageHome relative flex flex-col overflow-hidden">
-      {/* <TopBarPromotion options={options} /> */}
+        {/* <TopBarPromotion options={options} /> */}
         {/* hero section */}
         <div className="z-0">
           {/* <SectionHero3 /> */}
@@ -171,11 +197,11 @@ export default async function Home() {
           <SectionHero3 slides={slides} />
           {/* <CategoryWithSubcategories/> */}
         </div>
-        
+
         <div className="flex flex-col px-3 gap-10 lg:gap-12 sm:container sm:max-w-screen-2xl">
-          
+
           {/* new arrivals section */}
-          
+
           <div className="mt-5 md:mt-10">
             <SectionSliderProductCard
               products={newArrivals}
@@ -183,7 +209,7 @@ export default async function Home() {
               link="new-arrivals"
             />
           </div>
-          
+
           {brands ? (
             <SectionSliderBrandCard
               heading="Our Brands"
@@ -210,6 +236,12 @@ export default async function Home() {
             <CategoryBlockSection />
           </div>
 
+          {/* Testimonials section */}
+          <div className="">
+            <Heading>What Our Customers Say</Heading>
+            <FancyTestimonialsSlider testimonials={testimonials} />
+          </div>
+
           {/*Mobile Category */}
           <div className="block md:hidden">
             <SectionSliderProductCard
@@ -223,6 +255,8 @@ export default async function Home() {
             <SectionPromo1 />
           </div>
 
+          
+
           {/* Speakers Category */}
           <div>
             <SectionSliderProductCard
@@ -235,8 +269,8 @@ export default async function Home() {
 
           {/* brand section */}
           {/* <div className="relative md:hidden"> */}
-            {/* <BackgroundSection /> */}
-            {/* <SectionGridMoreExplore /> */}
+          {/* <BackgroundSection /> */}
+          {/* <SectionGridMoreExplore /> */}
           {/* </div> */}
 
           {/* Smart Watches Section */}
