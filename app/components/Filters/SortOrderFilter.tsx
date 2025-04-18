@@ -8,6 +8,7 @@ import { ProductCategory } from "@/graphql/types/graphql";
 import { useStore } from "@/store/store";
 import FilterPopover from "@/app/components/Filters/FilterPopover";
 import Radio from "@/shared/Radio/Radio";
+import { useSearchParams } from "next/navigation";
 
 const DATA_sortOrderRadios = [
     { name: "Name", id: "name:asc" },
@@ -18,14 +19,33 @@ const DATA_sortOrderRadios = [
     { name: "Price High - Low", id: "rawPriceNumber(missing_values: last):desc" },
 ];
 
-const CategoryFilter = ({ sorts }: { sorts: any }) => {
-
+const SortOrderFilter = ({ sorts }: { sorts: any }) => {
     const { setSort, sidebar: { sort } } = useStore()
     const [sortOrderStates, setSortOrderStates] = useState<string>(sorts ? "databaseId:desc" : "");
+    const searchParams = useSearchParams();
 
     useEffect(() => {
-        setSort(sortOrderStates)
-    }, [sortOrderStates])
+        // Read from URL on mount
+        const sortParam = searchParams.get('sort');
+        if (sortParam) {
+            setSortOrderStates(sortParam);
+            setSort(sortParam);
+        }
+    }, []);
+
+    useEffect(() => {
+        // Update URL when sort order changes
+        const url = new URL(window.location.href);
+        if (sortOrderStates) {
+            url.searchParams.set('sort', sortOrderStates);
+        } else {
+            url.searchParams.delete('sort');
+        }
+        window.history.replaceState({}, '', url.toString());
+
+        // Update store
+        setSort(sortOrderStates);
+    }, [sortOrderStates]);
 
     const icon = <svg className="w-4 h-4" viewBox="0 0 20 20" fill="none">
         <path
@@ -70,7 +90,6 @@ const CategoryFilter = ({ sorts }: { sorts: any }) => {
     </svg>
 
     return (
-
         <div className="overflow-hidden rounded-2xl w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
             <div className="relative flex flex-col px-4 py-4 w-full space-y-3">
                 <span className="font-medium">Sort By</span>
@@ -81,17 +100,12 @@ const CategoryFilter = ({ sorts }: { sorts: any }) => {
                         name="radioNameSort"
                         label={item.name}
                         defaultChecked={sortOrderStates === item.id}
-                        onChange={v => {
-                            console.log({ v });
-                            setSortOrderStates(v)
-                            // close()
-                        }}
+                        onChange={v => setSortOrderStates(v)}
                     />
                 ))}
             </div>
         </div>
-
     );
 }
 
-export default CategoryFilter
+export default SortOrderFilter;
