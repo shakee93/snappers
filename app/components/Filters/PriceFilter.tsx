@@ -9,22 +9,56 @@ import { Brand, ProductCategory } from "@/graphql/types/graphql";
 import { useStore } from "@/store/store";
 import FilterPopover from "@/app/components/Filters/FilterPopover";
 import Slider from "rc-slider";
+import { useSearchParams } from "next/navigation";
 
 interface BrandFilterProps {
 }
 
 export const PRICE_RANGE = [500, 500000];
 
-
-const BrandFilter = ({ }: BrandFilterProps) => {
-
+const PriceFilter = ({ }: BrandFilterProps) => {
     const { synPriceRange, sidebar: { priceRange } } = useStore()
     const [rangePrices, setRangePrices] = useState(priceRange || PRICE_RANGE);
-
+    const searchParams = useSearchParams();
 
     useEffect(() => {
-        synPriceRange(rangePrices)
-    }, [rangePrices])
+        // Read from URL on mount
+        const priceMin = searchParams.get('priceMin');
+        const priceMax = searchParams.get('priceMax');
+        
+        if (priceMin && priceMax) {
+            const min = parseInt(priceMin);
+            const max = parseInt(priceMax);
+            
+            // Validate the values to ensure they're within the allowable range and are valid numbers
+            if (!isNaN(min) && !isNaN(max) && 
+                min >= PRICE_RANGE[0] && max <= PRICE_RANGE[1] && 
+                min <= max) {
+                setRangePrices([min, max]);
+                synPriceRange([min, max]);
+            }
+        }
+    }, []);
+
+    useEffect(() => {
+        // Update URL when price range changes
+        // Only update if the range is different from the default
+        if (rangePrices[0] !== PRICE_RANGE[0] || rangePrices[1] !== PRICE_RANGE[1]) {
+            const url = new URL(window.location.href);
+            url.searchParams.set('priceMin', rangePrices[0].toString());
+            url.searchParams.set('priceMax', rangePrices[1].toString());
+            window.history.replaceState({}, '', url.toString());
+        } else {
+            // If default range, remove the parameters
+            const url = new URL(window.location.href);
+            url.searchParams.delete('priceMin');
+            url.searchParams.delete('priceMax');
+            window.history.replaceState({}, '', url.toString());
+        }
+
+        // Update store
+        synPriceRange(rangePrices);
+    }, [rangePrices]);
 
     const icon = <svg
         className="w-4 h-4"
@@ -56,8 +90,6 @@ const BrandFilter = ({ }: BrandFilterProps) => {
     </svg>
 
     return (
-
-
         <div className="overflow-hidden w-full rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
             <div className="relative flex flex-col px-4 py-4 w-full space-y-4">
                 <div className="space-y-5">
@@ -99,7 +131,7 @@ const BrandFilter = ({ }: BrandFilterProps) => {
                                 id="minPrice"
                                 className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
                                 value={rangePrices[0]}
-                                onChange={e => setRangePrices([e.target.value as unknown as number, rangePrices[1]])}
+                                onChange={e => setRangePrices([parseInt(e.target.value) || PRICE_RANGE[0], rangePrices[1]])}
                             />
                         </div>
                     </div>
@@ -122,7 +154,7 @@ const BrandFilter = ({ }: BrandFilterProps) => {
                                 id="maxPrice"
                                 className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
                                 value={rangePrices[1]}
-                                onChange={e => setRangePrices([rangePrices[0], e.target.value as unknown as number])}
+                                onChange={e => setRangePrices([rangePrices[0], parseInt(e.target.value) || PRICE_RANGE[1]])}
                             />
                         </div>
                     </div>
@@ -132,4 +164,4 @@ const BrandFilter = ({ }: BrandFilterProps) => {
     );
 }
 
-export default BrandFilter
+export default PriceFilter
