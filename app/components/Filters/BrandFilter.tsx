@@ -8,7 +8,7 @@ import FilterPopover from "@/app/components/Filters/FilterPopover";
 import { useRefinementList } from "react-instantsearch";
 // import {RefinementListItem} from "instantsearch.js/es/connectors/refinement-list/connectRefinementList";
 // import type { RefinementListItem } from 'instantsearch.js/es/connectors/refinement-list/connectRefinementList';
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 
 interface BrandFilterProps {
   brands: Brand[];
@@ -22,40 +22,55 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
   } = useStore();
   const [firstFacets, setFirstFacets] = useState<any[]>([]);
   const { category } = useParams()
+  const searchParams = useSearchParams();
 
   const { items: brandsFacet, refine } = useRefinementList({
     attribute: 'brands_facet',
     limit: 17,
   });
 
+  useEffect(() => {
+    // Read from URL on mount
+    const brandIds = searchParams.get('brands');
+    if (brandIds) {
+      const ids = brandIds.split(',').map(id => parseInt(id));
+      syncBrands(ids);
+    }
+  }, []);
+
+  useEffect(() => {
+    // Update URL when brands change
+    const url = new URL(window.location.href);
+    if (brandsState.length > 0) {
+      url.searchParams.set('brands', brandsState.join(','));
+    } else {
+      url.searchParams.delete('brands');
+    }
+    window.history.replaceState({}, '', url.toString());
+  }, [brandsState]);
 
   useEffect(() => {
     // Reset firstFacets on category change to avoid stale data
     if (brandsFacet.length > 0) {
-      setFirstFacets([]); // Clear `firstFacets` momentarily
+      setFirstFacets([]);
       setTimeout(() => {
-        setFirstFacets(brandsFacet); // Set `firstFacets` with new `brandsFacet` after a short delay
-      }, 0); // Adjust delay if necessary for smoother updates
+        setFirstFacets(brandsFacet);
+      }, 0);
     }
   }, [brandsFacet, category]);
 
   useEffect(() => {
-
     if (firstFacets.length === 0) {
       setFirstFacets(brandsFacet)
     }
-
   }, [brandsFacet, category])
 
-
-  //TODO: bug - when a category is selected it will show up in search as well
   useEffect(() => {
     if (search.length === 0) {
     } else {
       setFirstFacets(brandsFacet);
     }
   }, [brandsFacet, search])
-
 
   const handleChange = useCallback((checked: boolean, name: number) => {
     if (name === 0 && checked) {
@@ -66,7 +81,6 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
     checked
       ? syncBrands([...brandsState, name])
       : syncBrands(brandsState.filter((i: any) => i !== name));
-
   }, [brandsState])
 
   const facetedBrands = useMemo(() => {
