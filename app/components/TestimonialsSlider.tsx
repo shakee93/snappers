@@ -4,16 +4,50 @@ import { useState, useRef, useEffect } from 'react'
 import Image, { StaticImageData } from 'next/image'
 import { Transition } from '@headlessui/react'
 import { CircleUser } from 'lucide-react'
-import userprofile from '@/public/images/userprofile.jpg'
+import googleLogo from '@/public/images/testimonials/icons8-google.svg'
 
 interface Testimonial {
-    img: StaticImageData
     quote: string
     name: string
     role: string
 }
 
-export default function FancyTestimonialsSlider({ testimonials }: { testimonials: Testimonial[] }) {
+
+const testimonials: Testimonial[] = [
+    {
+      quote: "I had an absolutely wonderful experience at GQ - The Mobile Store! The staff was incredibly helpful and went above and beyond to ensure I found the perfect product. They were friendly, approachable, and made the entire process smooth and stress-free.",
+      name: 'Thilina M. Senadheera',
+      role: ''
+    },
+    {
+      quote: "Fourth time buying a phone from GQ. Always selling original products. No complaints whatsoever. Friendly customer service. A best place to buy electronic items",
+      name: 'Angelo Yohan Diaz',
+      role: ''
+    },
+    {
+      quote: "Great experience at this shop! The staff was very helpful, and the prices were reasonable. The best part was their excellent service—when I needed to withdraw money from the ATM, they sent a staff member with me to make the process smooth and secure. Highly recommended!",
+      name: 'Rashmika Wellappili',
+      role: ''
+    },
+    {
+      quote: "I recently purchase Bose QC ultra headphones from GQ mobile and I am so much satisfied with their service. Highly recommended place. Great service by ASIF who is very friendly.",
+      name: 'Prasanna Fonseka',
+      role: ''
+    },
+    {
+      quote: "The best place to purchase genuine, reliable & quality products. The staff is very attentive and friendly. Quick and efficient delivery service. Order from Daraz. Good packing and no physical damage. Satisfied with the order. Package as same as expected and highly recommended to anyone. Thank you GQ team!",
+      name: 'Missaka Sithara',
+      role: ''
+    },
+    {
+      quote: "Went to GQ Mobile looking for a mobile phone for a friend. Though we didn't end up buying the item, Aasif sat down with us and explained all the things to look for and the regions info and warranty processes. Thanks Aasif for providing such a great customer experience!",
+      name: 'Kasun Eranda',
+      role: ''
+    }
+  ]
+
+
+export default function FancyTestimonialsSlider() {
     const testimonialsRef = useRef<HTMLDivElement>(null)
     const [active, setActive] = useState<number>(0)
     const [autorotate, setAutorotate] = useState<boolean>(true)
@@ -58,7 +92,7 @@ export default function FancyTestimonialsSlider({ testimonials }: { testimonials
                                 beforeEnter={() => heightFix()}
                             >
                                 <Image className="relative top-11 left-1/2 -translate-x-1/2 rounded-full"
-                                    src={userprofile} width={56} height={56} alt={testimonial.name}
+                                    src={googleLogo} width={56} height={56} alt={testimonial.name}
                                 />
                                 
                             </Transition>
@@ -91,23 +125,33 @@ export default function FancyTestimonialsSlider({ testimonials }: { testimonials
                 </div>
             </div>
             {/* Buttons */}
-            <div className="flex flex-wrap justify-center -m-1.5">
-
-                {testimonials.map((testimonial: any, index: any) => (
+            <div className="grid grid-cols-4 gap-4 max-w-4xl mx-auto mb-4">
+                {testimonials.slice(0, 4).map((testimonial: any, index: any) => (
                     <button
                         key={index}
-                        className={`inline-flex justify-center whitespace-nowrap rounded-full px-3 py-1.5 m-1.5 
+                        className={`inline-flex justify-center whitespace-nowrap rounded-full px-3 py-1.5 
                 text-xs shadow-sm focus-visible:outline-none focus-visible:ring focus-visible:ring-indigo-300 
                 dark:focus-visible:ring-slate-600 transition-colors duration-150 
                 ${active === index ? 'bg-primaryColor text-white shadow-indigo-950/10' : 'bg-white hover:bg-indigo-100 text-slate-900'}`}
                         onClick={() => { setActive(index); setAutorotate(false); }}
                     >
                         <span>{testimonial.name}</span>
-                        <span className={`${active === index ? 'text-indigo-200' : 'text-slate-300'}`}></span>
-                        {/* <span>{testimonial.role}</span> */}
                     </button>
                 ))}
-
+            </div>
+            <div className="flex justify-center gap-4">
+                {testimonials.slice(4).map((testimonial: any, index: any) => (
+                    <button
+                        key={index + 4}
+                        className={`inline-flex justify-center whitespace-nowrap rounded-full px-3 py-1.5 
+                text-xs shadow-sm focus-visible:outline-none focus-visible:ring focus-visible:ring-indigo-300 
+                dark:focus-visible:ring-slate-600 transition-colors duration-150 w-fit
+                ${active === index + 4 ? 'bg-primaryColor text-white shadow-indigo-950/10' : 'bg-white hover:bg-indigo-100 text-slate-900'}`}
+                        onClick={() => { setActive(index + 4); setAutorotate(false); }}
+                    >
+                        <span>{testimonial.name}</span>
+                    </button>
+                ))}
             </div>
         </div>
     )

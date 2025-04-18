@@ -158,26 +158,6 @@ const getData = async () => {
   };
 };
 
-const testimonials = [
-  {
-    img: TestimonialImg01,
-    quote: "I had an absolutely wonderful experience at GQ - The Mobile Store! The staff was incredibly helpful and went above and beyond to ensure I found the perfect product. They were friendly, approachable, and made the entire process smooth and stress-free.",
-    name: 'Thilina M. Senadheera',
-    role: ''
-  },
-  {
-    img: TestimonialImg02,
-    quote: "Fourth time buying a phone from GQ. Always selling original products. No complaints whatsoever. Friendly customer service. A best place to buy electronic items",
-    name: 'Angelo Yohan Diaz',
-    role: ''
-  },
-  {
-    img: TestimonialImg03,
-    quote: "Great experience at this shop! The staff was very helpful, and the prices were reasonable. The best part was their excellent service—when I needed to withdraw money from the ATM, they sent a staff member with me to make the process smooth and secure. Highly recommended!",
-    name: 'Rashmika Wellappili',
-    role: ''
-  }
-]
 
 export default async function Home() {
 
@@ -239,7 +219,7 @@ export default async function Home() {
           {/* Testimonials section */}
           <div className="">
             <Heading>What Our Customers Say</Heading>
-            <FancyTestimonialsSlider testimonials={testimonials} />
+            <FancyTestimonialsSlider />
           </div>
 
           {/*Mobile Category */}
