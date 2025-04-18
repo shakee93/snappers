@@ -9,27 +9,44 @@ import { useStore } from "@/store/store";
 import FilterPopover from "@/app/components/Filters/FilterPopover";
 import Slider from "rc-slider";
 import { XIcon } from "lucide-react";
+import { useSearchParams } from 'next/navigation';
 
 interface BrandFilterProps {
 }
 
-
-
 const OnSaleFilter = ({ }: BrandFilterProps) => {
-
-    const { syncOnSale, sidebar: { on_sale } } = useStore()
-    const [isOnSale, setIsIsOnSale] = useState(false);
-
+    const { syncOnSale } = useStore();
+    const [isOnSale, setIsOnSale] = useState(false);
+    const searchParams = useSearchParams();
 
     useEffect(() => {
-        syncOnSale(isOnSale)
-    }, [isOnSale])
+        // Read from URL on mount
+        const saleStatus = searchParams.get('sale');
+        if (saleStatus === 'true') {
+            setIsOnSale(true);
+            syncOnSale(true);
+        }
+    }, []);
+
+    useEffect(() => {
+        // Update URL when sale status changes
+        const url = new URL(window.location.href);
+        if (isOnSale) {
+            url.searchParams.set('sale', 'true');
+        } else {
+            url.searchParams.delete('sale');
+        }
+        window.history.replaceState({}, '', url.toString());
+
+        // Update store
+        syncOnSale(isOnSale);
+    }, [isOnSale]);
 
     return (
         <div
             className={`flex flex-col items-start justify-start px-4 py-4 text-sm rounded-xl w-full border focus:outline-none cursor-pointer select-none bg-white ${"border-neutral-200 gap-4 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
                 }`}
-            onClick={() => setIsIsOnSale(!isOnSale)}
+            onClick={() => setIsOnSale(!isOnSale)}
         >
             <div className='flex hidden items-center'>
                 <svg
@@ -75,9 +92,7 @@ const OnSaleFilter = ({ }: BrandFilterProps) => {
                     name='On Sale'
                     label='On Sale'
                     defaultChecked={isOnSale}
-                    onChange={(checked) =>
-                        setIsIsOnSale(checked)
-                    }
+                    onChange={(checked) => setIsOnSale(checked)}
                 />
             </div>
         </div>

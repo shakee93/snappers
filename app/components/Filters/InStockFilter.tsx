@@ -1,25 +1,39 @@
 import React, { useEffect, useState } from "react";
 import { useStore } from "@/store/store";
-import { Package, XIcon } from "lucide-react";
+import { useSearchParams, useRouter } from 'next/navigation';
 
 const InStockFilter = () => {
-    const { setInStock, setOutOfStock, sidebar: { on_sale } } = useStore();
+    const { setInStock, setOutOfStock } = useStore();
     const [inStock, setInStockState] = useState(false);
-    const [outOfStock, setOutOfStockState] = useState(false);
+    const router = useRouter();
+    const searchParams = useSearchParams();
 
     useEffect(() => {
+        // Read from URL on mount
+        const stockStatus = searchParams.get('stock');
+        if (stockStatus === 'in') {
+            setInStockState(true);
+            setInStock(true);
+        }
+    }, []);
+
+    useEffect(() => {
+        // Update URL when stock status changes
+        const url = new URL(window.location.href);
+        if (inStock) {
+            url.searchParams.set('stock', 'in');
+        } else {
+            url.searchParams.delete('stock');
+        }
+        window.history.replaceState({}, '', url.toString());
+
+        // Update store
         setInStock(inStock);
-        setOutOfStock(outOfStock);
-    }, [inStock, outOfStock]);
+        setOutOfStock(false);
+    }, [inStock]);
 
     const handleInStockChange = () => {
         setInStockState(!inStock);
-        // setOutOfStockState(false);
-    };
-
-    const handleOutOfStockChange = () => {
-        setInStockState(false);
-        setOutOfStockState(true);
     };
 
     return (
@@ -42,20 +56,6 @@ const InStockFilter = () => {
                 />
                 <span className="line-clamp-1 text-slate-900 dark:text-slate-100">In Stock</span>
             </div>
-            {/* <div
-                className={`flex items-center justify-start text-sm cursor-pointer select-none ${
-                    outOfStock ? "text-primary-900" : "text-neutral-700 dark:text-neutral-300"
-                }`}
-                onClick={handleOutOfStockChange}
-            >
-                <input
-                    type="checkbox"
-                    checked={outOfStock}
-                    onChange={handleOutOfStockChange}
-                    className="w-6 h-6 mr-2 border-neutral-200 dark:border-neutral-700 rounded-sm bg-transparent focus:ring-primary-500 focus:ring-action-primary"
-                />
-                <span className="line-clamp-1 text-slate-900 dark:text-slate-100 ">Out of Stock</span>
-            </div> */}
         </div>
     );
 }
