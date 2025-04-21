@@ -12,6 +12,7 @@ import { useStore } from "@/store/store";
 import { Brand, ProductCategory } from "@/graphql/types/graphql";
 import { useRefinementList } from "react-instantsearch";
 import InStockFilter from "./Filters/InStockFilter";
+import { useSearchParams, useRouter } from 'next/navigation';
 
 interface TabFilterProps {
     categories?: ProductCategory[];
@@ -45,7 +46,8 @@ const MobileFilterSheet = ({
     category,
     sort,
 }: TabFilterProps) => {
-
+    const router = useRouter();
+    const searchParams = useSearchParams();
 
     const [isOpenMoreFilter, setisOpenMoreFilter] = useState(false);
     const [isOnSale, setIsIsOnSale] = useState(false);
@@ -72,9 +74,7 @@ const MobileFilterSheet = ({
         setSort,
     } = useStore();
 
-
     const filterCount = useMemo(() => {
-
         return categoriesState.length +
             brandsState.length +
             colorsState.length +
@@ -82,7 +82,6 @@ const MobileFilterSheet = ({
             (isOnSale ? 1 : 0) +
             (sortOrderStates ? 1 : 0) +
             (rangePrices.join('') !== PRICE_RANGE.join('') ? 1 : 0);
-
     }, [
         categoriesState,
         brandsState,
@@ -130,36 +129,179 @@ const MobileFilterSheet = ({
     }, [categoriesFacet, categories])
 
     useEffect(() => {
-
-        if (rangePrices.join('') === PRICE_RANGE.join('')) {
-            return;
+        // Read price range from URL on mount
+        const minPrice = searchParams.get('minPrice');
+        const maxPrice = searchParams.get('maxPrice');
+        
+        if (minPrice && maxPrice) {
+            const newRange = [Number(minPrice), Number(maxPrice)];
+            setRangePrices(newRange);
+            synPriceRange(newRange);
         }
+    }, []);
 
-        synPriceRange(rangePrices);
+    useEffect(() => {
+        // Update URL when price range changes
+        const url = new URL(window.location.href);
+        
+        if (rangePrices[0] !== PRICE_RANGE[0] || rangePrices[1] !== PRICE_RANGE[1]) {
+            url.searchParams.set('minPrice', rangePrices[0].toString());
+            url.searchParams.set('maxPrice', rangePrices[1].toString());
+        } else {
+            url.searchParams.delete('minPrice');
+            url.searchParams.delete('maxPrice');
+        }
+        
+        window.history.replaceState({}, '', url.toString());
+        
+        // Update store
+        if (rangePrices.join('') !== PRICE_RANGE.join('')) {
+            synPriceRange(rangePrices);
+        }
     }, [rangePrices]);
 
     useEffect(() => {
+        // Read sale status from URL on mount
+        const saleStatus = searchParams.get('sale');
+        if (saleStatus === 'true') {
+            setIsIsOnSale(true);
+            syncOnSale(true);
+        }
+    }, []);
+
+    useEffect(() => {
+        // Update URL when sale status changes
+        const url = new URL(window.location.href);
+        
+        if (isOnSale) {
+            url.searchParams.set('sale', 'true');
+        } else {
+            url.searchParams.delete('sale');
+        }
+        
+        window.history.replaceState({}, '', url.toString());
+        
+        // Update store
         syncOnSale(isOnSale);
     }, [isOnSale]);
 
     useEffect(() => {
+        // Read stock status from URL on mount
+        const stockStatus = searchParams.get('stock');
+        if (stockStatus === 'in') {
+            setInStockState(true);
+            setInStock(true);
+        }
+    }, []);
+
+    useEffect(() => {
+        // Update URL when stock status changes
+        const url = new URL(window.location.href);
+        if (inStock) {
+            url.searchParams.set('stock', 'in');
+        } else {
+            url.searchParams.delete('stock');
+        }
+        window.history.replaceState({}, '', url.toString());
+
+        // Update store
         setInStock(inStock);
+        setOutOfStock(false);
     }, [inStock]);
 
     useEffect(() => {
-        setOutOfStock(outOfStock);
-    }, [outOfStock]);
+        // Read sort order from URL on mount
+        const sortParam = searchParams.get('sort');
+        if (sortParam) {
+            setSortOrderStates(sortParam);
+            setSort(sortParam);
+        }
+    }, []);
 
     useEffect(() => {
+        // Update URL when sort order changes
+        const url = new URL(window.location.href);
+        
+        if (sortOrderStates) {
+            url.searchParams.set('sort', sortOrderStates);
+        } else {
+            url.searchParams.delete('sort');
+        }
+        
+        window.history.replaceState({}, '', url.toString());
+        
+        // Update store
         setSort(sortOrderStates);
     }, [sortOrderStates]);
+
+    useEffect(() => {
+        // Read categories from URL on mount
+        const categoriesParam = searchParams.get('categories');
+        if (categoriesParam) {
+            const categoryIds = categoriesParam.split(',').map(id => Number(id));
+            setCategoriesState(categoryIds);
+            syncCategories(categoryIds);
+        }
+    }, []);
+
+    useEffect(() => {
+        // Update URL when categories change
+        const url = new URL(window.location.href);
+        
+        if (categoriesState.length > 0) {
+            url.searchParams.set('categories', categoriesState.join(','));
+        } else {
+            url.searchParams.delete('categories');
+        }
+        
+        window.history.replaceState({}, '', url.toString());
+        
+        // Update store
+        syncCategories(categoriesState);
+    }, [categoriesState]);
+
+    useEffect(() => {
+        // Read brands from URL on mount
+        const brandsParam = searchParams.get('brands');
+        if (brandsParam) {
+            const brandIds = brandsParam.split(',').map(id => Number(id));
+            setBrandsState(brandIds);
+            syncBrands(brandIds);
+        }
+    }, []);
+
+    useEffect(() => {
+        // Update URL when brands change
+        const url = new URL(window.location.href);
+        
+        if (brandsState.length > 0) {
+            url.searchParams.set('brands', brandsState.join(','));
+        } else {
+            url.searchParams.delete('brands');
+        }
+        
+        window.history.replaceState({}, '', url.toString());
+        
+        // Update store
+        syncBrands(brandsState);
+    }, [brandsState]);
 
     const closeModalMoreFilter = () => setisOpenMoreFilter(false);
     const openModalMoreFilter = () => setisOpenMoreFilter(true);
 
-    //Handling Clear Filters
-
     const handleClearFilters = () => {
+        // Clear URL parameters
+        const url = new URL(window.location.href);
+        url.searchParams.delete('stock');
+        url.searchParams.delete('minPrice');
+        url.searchParams.delete('maxPrice');
+        url.searchParams.delete('categories');
+        url.searchParams.delete('brands');
+        url.searchParams.delete('sort');
+        url.searchParams.delete('sale');
+        window.history.replaceState({}, '', url.toString());
+
+        // Clear local state
         setRangePrices(PRICE_RANGE);
         setColorsState([]);
         setSortOrderStates("");
@@ -182,10 +324,12 @@ const MobileFilterSheet = ({
             return;
         }
 
-        checked
-            ? setCategoriesState([...categoriesState, name])
-            : setCategoriesState(categoriesState.filter((i) => i !== name));
+        const newCategories = checked
+            ? [...categoriesState, name]
+            : categoriesState.filter((i) => i !== name);
 
+        setCategoriesState(newCategories);
+        syncCategories(newCategories);
     };
 
     const handleChangeBrands = (checked: boolean, name: number) => {
@@ -195,13 +339,14 @@ const MobileFilterSheet = ({
             return;
         }
 
-        checked
-            ? setBrandsState([...brandsState, name])
-            : setBrandsState(brandsState.filter((i) => i !== name));
+        const newBrands = checked
+            ? [...brandsState, name]
+            : brandsState.filter((i) => i !== name);
+
+        setBrandsState(newBrands);
+        syncBrands(newBrands);
     };
 
-
-    // OK
     const renderXClear = () => {
         const handleXClearClick = () => {
             handleClearFilters();
@@ -213,8 +358,6 @@ const MobileFilterSheet = ({
             </span>
         );
     };
-
-
 
     return (
         <div className="w-full">
@@ -309,7 +452,6 @@ const MobileFilterSheet = ({
                             <Dialog.Overlay className="fixed inset-0 bg-black bg-opacity-40 dark:bg-opacity-60" />
                         </Transition.Child>
 
-                        {/* This element is to trick the browser into centering the modal contents. */}
                         <span
                             className="inline-block h-screen align-middle"
                             aria-hidden="true"
@@ -343,8 +485,6 @@ const MobileFilterSheet = ({
                                 <div className="overflow-y-auto h-[calc(100vh-70px)] pt-12">
                                     <div
                                         className="px-6 sm:px-8 md:px-10 divide-y divide-neutral-200 dark:divide-neutral-800">
-                                        {/* --------- */}
-                                        {/* ---- */}
                                         {!category && (
                                             <div className="py-7">
                                                 <h3 className="text-md font-medium">Categories</h3>
@@ -396,7 +536,6 @@ const MobileFilterSheet = ({
                                             <div className="py-7">
                                                 <h3 className="text-md font-medium">Brands</h3>
                                                 <div className="mt-1 relative ">
-                                                    {/*{renderMoreFilterItem(categories)}*/}
                                                     <div className="relative flex flex-col  py-6 space-y-5">
                                                         <Checkbox
                                                             name="All Brands"
@@ -420,7 +559,6 @@ const MobileFilterSheet = ({
                                                                         <div key={item.databaseId} className="">
                                                                             <Checkbox
                                                                                 name={item.slug || ""}
-                                                                                // label={`${item.name} (${item.count})`}
                                                                                 label={`${item.name} (${brandsFacet.find(f => item.databaseId === Number(f.value))?.count})`}
                                                                                 defaultChecked={brandsState.includes(
                                                                                     item.databaseId
@@ -443,7 +581,6 @@ const MobileFilterSheet = ({
                                                 </div>
                                             </div>
                                         )}
-                                        {/* --------- */}
 
                                         <div className="py-7 w-1/2">
                                             <h3 className="text-md font-medium">Stock Status</h3>
@@ -456,7 +593,6 @@ const MobileFilterSheet = ({
                                                         }`}
                                                     onClick={() => {
                                                         setInStockState(!inStock);
-                                                        // setOutOfStockState(false);
                                                     }}
                                                 >
                                                     <input
@@ -464,40 +600,15 @@ const MobileFilterSheet = ({
                                                         checked={inStock}
                                                         onChange={() => {
                                                             setInStockState(!inStock);
-                                                            // setOutOfStockState(false);
                                                         }}
                                                         className="w-6 h-6 mr-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-sm bg-transparent
                                                         focus:ring-primary-500 focus:ring-action-primary"
                                                     />
                                                     <span className="line-clamp-1 text-slate-900 dark:text-slate-100">In Stock</span>
                                                 </div>
-                                                {/* <div
-                                                    className={`flex items-center justify-start py-2 text-sm border focus:outline-none cursor-pointer border-none select-none 
-                                                        ${outOfStock
-                                                        ? "bg-primary-50 text-primary-900"
-                                                        : "border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
-                                                        }`}
-                                                    onClick={() => {
-                                                        setOutOfStockState(!outOfStock);
-                                                        setInStockState(false);
-                                                    }}
-                                                >
-                                                    <input
-                                                        type="checkbox"
-                                                        checked={outOfStock}
-                                                        onChange={() => {
-                                                            setOutOfStockState(!outOfStock);
-                                                            setInStockState(false);
-                                                        }}
-                                                        className="w-6 h-6 mr-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-sm bg-transparent
-                                                        focus:ring-primary-500 focus:ring-action-primary"
-                                                    />
-                                                    <span className="line-clamp-1 text-slate-900 dark:text-slate-100">Out of Stock</span>
-                                                </div> */}
                                             </div>
                                         </div>
 
-                                        {/* ---- */}
                                         <div className="py-7">
                                             <div className="relative flex flex-col space-y-8">
                                                 <div className="space-y-5">
@@ -587,8 +698,6 @@ const MobileFilterSheet = ({
                                             </div>
                                         </div>
 
-                                        {/* --------- */}
-                                        {/* ---- */}
                                         <div className="py-7">
                                             <h3 className="text-md font-medium">Sort Order</h3>
                                             <div className="mt-6 relative ">
@@ -608,7 +717,6 @@ const MobileFilterSheet = ({
                                                 </div>
                                             </div>
                                         </div>
-
 
                                         <div className='flex gap-4 pb-24 w-full justify-between'>
                                             <div className="py-7 w-full">
