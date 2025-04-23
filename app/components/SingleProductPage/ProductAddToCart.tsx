@@ -5,6 +5,7 @@ import {
   ProductVariation,
   SimpleProduct,
   VariableProduct,
+  ProductTag,
 } from "@/graphql/types/graphql";
 import NcInputNumber from "@/components/NcInputNumber";
 import React, { useState, useEffect } from "react";
@@ -30,6 +31,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   const [userEmail, setUserEmail] = useState(customer?.email || ""); // Track user's email
   const [isThankYouModal, setIsThankYouModal] = useState(false); // Track thank you modal visibility
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  console.log('product', product);
 
   const sendNotificationRequest = async () => {
     try {
@@ -233,6 +235,16 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
     }
   };
 
+  const isPreOrderProduct = () => {
+    return product.productTags?.nodes?.some(
+      (tag: ProductTag) => tag.slug === 'pre-order'
+    ) || false;
+  };
+
+  const handlePreOrder = async () => {
+    console.log('Pre-order clicked for product:', product.databaseId);
+    toast.success('Pre order feature will be available soon!');
+  };
 
   const isAddToCartDisabled =
     loading ||
@@ -252,7 +264,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
           "opacity-50 disabled:cursor-not-allowed"
         )}
       >
-        <span className="md:ml-3 cursor-pointer">Not Available</span>
+        <span className=" cursor-pointer">Not Available</span>
       </button>
     )
   }
@@ -270,19 +282,30 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
 
       {(product.type === "SIMPLE" && product.stockStatus === "IN_STOCK") ||
         (product.type === "VARIABLE" && !isProductOutOfStock()) ? (
-        <button
-          disabled={isAddToCartDisabled}
-          onClick={addItemToCart}
-          className={twMerge(
-            "relative w-auto grow md:flex-none h-auto inline-flex cursor-pointer items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-primaryColor dark:bg-slate-100 text-slate-50 dark:text-slate-800 shadow-xl flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0",
-            isAddToCartDisabled && "opacity-50 disabled:cursor-not-allowed"
-          )}
-        >
-          {loading ? <Loader className="animate-spin" /> : <ShoppingCart />}
-          <span className="md:ml-3 cursor-pointer">
-            Add to cart
-          </span>
-        </button>
+        isPreOrderProduct() ? (
+          <button
+            onClick={handlePreOrder}
+            className="relative w-auto grow md:flex-none h-auto inline-flex cursor-pointer items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-blue-800 dark:bg-slate-100 text-slate-50 dark:text-slate-800 shadow-xl flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0"
+          >
+            <span className=" cursor-pointer">
+              Pre-order Now
+            </span>
+          </button>
+        ) : (
+          <button
+            disabled={isAddToCartDisabled}
+            onClick={addItemToCart}
+            className={twMerge(
+              "relative w-auto grow md:flex-none h-auto inline-flex cursor-pointer items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-primaryColor dark:bg-slate-100 text-slate-50 dark:text-slate-800 shadow-xl flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0",
+              isAddToCartDisabled && "opacity-50 disabled:cursor-not-allowed"
+            )}
+          >
+            {loading ? <Loader className="animate-spin" /> : <ShoppingCart />}
+            <span className="md:ml-3 cursor-pointer">
+              Add to cart
+            </span>
+          </button>
+        )
       ) : (
         <button
           disabled={isNotifyClicked}
