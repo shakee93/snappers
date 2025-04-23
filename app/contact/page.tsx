@@ -111,7 +111,7 @@ const Contact = () => {
                   </div>
                   <div className="w-full">
                     <h4 className="mb-4 text-xl font-bold text-primaryColor">
-                      Our Locations
+                      Our Locations & contact
                     </h4>
                     <div className="space-y-6">
                       {/* Ground Floor Branch */}
