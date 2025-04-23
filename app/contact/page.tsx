@@ -94,7 +94,7 @@ const Contact = () => {
                   GET IN TOUCH WITH US
                 </h2>
 
-                <div className="mb-8 flex w-full max-w-[370px]">
+                <div className="mb-8 flex w-full max-w-[570px]">
                   <div className="mr-6 flex h-[60px] w-full max-w-[60px] items-center justify-center overflow-hidden rounded bg-primary/5 text-primary sm:h-[70px] sm:max-w-[70px]">
                     <svg
                       width="32"
@@ -110,23 +110,72 @@ const Contact = () => {
                     </svg>
                   </div>
                   <div className="w-full">
-                    <h4 className="mb-1 text-xl font-bold text-primaryColor">
+                    <h4 className="mb-4 text-xl font-bold text-primaryColor">
                       Our Locations
                     </h4>
-                    <p className=" flex justify-center items-center text-base text-body-color dark:text-dark-6">
-                      <PinIcon className="mr-3 h-4" /> No. 250 | 53 - 54 Ground Floor, Liberty Plaza, Colombo 03.
-                    </p>
-                    <p className="flex justify-center items-center pt-4 text-base text-body-color dark:text-dark-6">
-                      <PinIcon className="mr-3 h-4" /> No. 250 | 1 | 161 First Floor, Liberty Plaza, Colombo 03.
-                    </p>
-                    {/*<br />  */}
-                    {/*<p className="flex justify-center items-center text-base text-body-color dark:text-dark-6">*/}
-                    {/*<PinIcon className="mr-3 h-4"/>  157, 2nd Cross Street, Colombo 11.*/}
-                    {/*</p>*/}
+                    <div className="space-y-6">
+                      {/* Ground Floor Branch */}
+                      <div className="group relative overflow-hidden rounded-xl border border-neutral-200 bg-white p-6 transition-all duration-300 hover:border-primaryColor hover:shadow-lg dark:border-neutral-700 dark:bg-neutral-900">
+                        <div className="absolute -right-2 -top-2 h-20 w-20 rotate-12 transform bg-primaryColor/10 transition-transform group-hover:scale-150" />
+                        <p className="relative mb-3 flex items-center text-base font-medium text-neutral-900 dark:text-neutral-100">
+                          <PinIcon className="mr-3 h-5 w-5 text-primaryColor" /> 
+                          Ground Floor - Liberty Plaza
+                        </p>
+                        <div className="relative ml-8 space-y-2">
+                          <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                            No. 250 | 53 - 54 Ground Floor,<br />
+                            Liberty Plaza, Colombo 03.
+                          </p>
+                          <div className="flex flex-col space-y-1">
+                            <Link 
+                              href="tel:0777555665"
+                              className="inline-flex items-center text-base text-primaryColor transition-colors hover:text-primary-700"
+                            >
+                              077 755 5665
+                            </Link>
+                            <Link 
+                              href="tel:0727988665"
+                              className="inline-flex items-center text-base text-primaryColor transition-colors hover:text-primary-700"
+                            >
+                              072 798 8665
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* First Floor Branch */}
+                      <div className="group relative overflow-hidden rounded-xl border border-neutral-200 bg-white p-6 transition-all duration-300 hover:border-primaryColor hover:shadow-lg dark:border-neutral-700 dark:bg-neutral-900">
+                        <div className="absolute -right-2 -top-2 h-20 w-20 rotate-12 transform bg-primaryColor/10 transition-transform group-hover:scale-150" />
+                        <p className="relative mb-3 flex items-center text-base font-medium text-neutral-900 dark:text-neutral-100">
+                          <PinIcon className="mr-3 h-5 w-5 text-primaryColor" /> 
+                          First Floor - Liberty Plaza
+                        </p>
+                        <div className="relative ml-8 space-y-2">
+                          <p className="text-sm text-neutral-500 dark:text-neutral-400">
+                            No. 250 | 1 | 161 First Floor,<br />
+                            Liberty Plaza, Colombo 03.
+                          </p>
+                          <div className="flex flex-col space-y-1">
+                            <Link 
+                              href="tel:0777988665"
+                              className="inline-flex items-center text-base text-primaryColor transition-colors hover:text-primary-700"
+                            >
+                              077 798 8665
+                            </Link>
+                            <Link 
+                              href="tel:0754555665"
+                              className="inline-flex items-center text-base text-primaryColor transition-colors hover:text-primary-700"
+                            >
+                              075 455 5665
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                <div className="mb-8 flex w-full max-w-[370px]">
+                {/* <div className="mb-8 flex w-full max-w-[570px]">
                   <div className="mr-6 flex h-[60px] w-full max-w-[60px] items-center justify-center overflow-hidden rounded bg-primary/5 text-primary sm:h-[70px] sm:max-w-[70px]">
                     <svg
                       width="32"
@@ -157,16 +206,28 @@ const Contact = () => {
                     </svg>
                   </div>
                   <div className="w-full">
-                    <h4 className="mb-1 text-xl font-bold text-primaryColor">
-                      Phone Number
+                    <h4 className="mb-4 text-xl font-bold text-primaryColor">
+                      Phone Numbers
                     </h4>
-                    <p className="text-base text-body-color dark:text-dark-6">
-                      <Link href={"tel:0777555665"}> 077 755 5665</Link>
-                      <br />
-                      <Link href={"tel:0777988665"}> 077 798 8665</Link>
-                    </p>
+                    <div className="group relative overflow-hidden rounded-xl border border-neutral-200 bg-white p-6 transition-all duration-300 hover:border-primaryColor hover:shadow-lg dark:border-neutral-700 dark:bg-neutral-900">
+                      <div className="absolute -right-2 -top-2 h-20 w-20 rotate-12 transform bg-primaryColor/10 transition-transform group-hover:scale-150" />
+                      <div className="relative grid grid-cols-1 gap-3 sm:grid-cols-2">
+                        <Link 
+                          href="tel:0777555665"
+                          className="inline-flex items-center text-base text-primaryColor transition-colors hover:text-primary-700"
+                        >
+                          077 755 5665
+                        </Link>
+                        <Link 
+                          href="tel:0777988665"
+                          className="inline-flex items-center text-base text-primaryColor transition-colors hover:text-primary-700"
+                        >
+                          077 798 8665
+                        </Link>
+                      </div>
+                    </div>
                   </div>
-                </div>
+                </div> */}
 
                 <div className="mb-8 flex w-full max-w-[370px]">
                   <div className="mr-6 flex h-[60px] w-full max-w-[60px] items-center justify-center overflow-hidden rounded bg-primary/5 text-primary sm:h-[70px] sm:max-w-[70px]">
