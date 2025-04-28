@@ -55,27 +55,31 @@ const BankTransfer: React.FC<BankTransferProps> = ({
       return;
     }
 
-    let paymentDetails: PaymentDetailsWithoutUrls = await handleCheckout();
-
-    // console.log("paymentDetails: ", paymentDetails);
-
-    if (paymentDetails === null) {
-      alert('No payment Details provided for the bank transfer');
-      return;
-    }
-
-    let order_id = paymentDetails.order_id;
-    let email = paymentDetails.email;
-    if (paymentDetails.email === undefined) {
-      throw new Error("No email found");
-    }
-
-    if (!order_id) {
-      console.log("Order ID not found");
-      setLoading(false);
-      return toast.error("Order not created");
-    }
     try {
+      let paymentDetails: PaymentDetailsWithoutUrls = await handleCheckout();
+
+      // Check if paymentDetails is null or undefined
+      if (!paymentDetails) {
+        toast.error('No payment details provided for the bank transfer');
+        setLoading(false);
+        return;
+      }
+
+      // Check if order_id exists
+      if (!paymentDetails.order_id) {
+        console.log("Order ID not found");
+        setLoading(false);
+        toast.error("Order not created");
+        return;
+      }
+
+      let order_id = paymentDetails.order_id;
+      let email = paymentDetails.email;
+      
+      if (paymentDetails.email === undefined) {
+        throw new Error("No email found");
+      }
+
       const formData = new FormData();
       formData.append("file", file);
       formData.append("order_id", order_id);
