@@ -885,6 +885,8 @@ const CheckoutPage = () => {
         body: JSON.stringify(orderData),
       });
 
+      console.log('response', response);
+
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
@@ -893,16 +895,19 @@ const CheckoutPage = () => {
       console.log('result', result);
 
       const kokoResponseData = JSON.parse(result.kokoResponse).data;
+      console.log('kokoResponseData', kokoResponseData);
       setHtmlFormResponse(kokoResponseData);
 
       const formContainer = document.createElement('div');
       formContainer.innerHTML = kokoResponseData;
       document.body.appendChild(formContainer);
 
+
       const form = formContainer.querySelector('form');
       if (form) {
         form.submit();
       }
+      console.log('form', form);
 
       console.log('Success:', result.kokoResponse);
     } catch (error) {

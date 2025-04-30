@@ -7,12 +7,8 @@ export async function POST(request: Request) {
     const { orderId, status } = await request.json();
       // console.log("orderId", orderId);
       // console.log("status", status);
-
-    if(status === "SUCCESS"){
-        orderStatus = "processing";
-    } else if (status === "FAILURE") {
-        orderStatus = "cancelled";
-    }
+    
+    orderStatus = status === "SUCCESS" ? "processing" : status === "FAILURE" ? "cancelled" : "";
 
     const confirmationResponse = await fetch(
       "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/payhere-order-confirmation",
@@ -27,6 +23,8 @@ export async function POST(request: Request) {
         }),
       }
     );
+    
+    console.log("confirmationResponse", confirmationResponse);
 
     const data = await confirmationResponse.json(); // Parse the response data
     return NextResponse.json(data); // Return the response data as JSON

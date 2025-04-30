@@ -222,7 +222,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   const handleGenericError = (error: any) => {
     const apiErrorMessage = error.graphQLErrors?.[0]?.message;
 
-    if (apiErrorMessage?.includes("Expired token")) {
+  if (apiErrorMessage?.includes("Expired token")) {
       toast.error("You've been logged out. Please sign in again.");
       router.push("/login");
       return;
