@@ -591,7 +591,7 @@ const CheckoutPage = () => {
           lineItems: JSON.stringify(updatedCheckoutDetails.lineItems),
           subtotal: String(updatedCheckoutDetails.subtotal),
           shippingTotal: String(updatedCheckoutDetails.shippingTotal),
-          date: String(updatedCheckoutDetails.date),
+          date: String(updatedCheckoutDetails.date ?? ""),
           billingaddress1: String(updatedCheckoutDetails.billingaddress1),
           billingaddress2: String(updatedCheckoutDetails.billingaddress2),
           shippingaddress1: String(updatedCheckoutDetails.shippingaddress1),
