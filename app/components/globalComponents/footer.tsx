@@ -312,7 +312,7 @@ const Footer = async () => {
 
       <div className="text-center text-xs text-white py-2 bg-primaryColor">
         <div className="container flex gap-4 justify-center flex-wrap">
-          <div>Copyright ©️ 2024 GQ Mobiles (Pvt) Ltd.</div>
+          <div>Copyright ©️ {new Date().getFullYear()} GQ Mobiles (Pvt) Ltd.</div>
           <div>{" | "} </div>
           <div>
             Designed by{" "}

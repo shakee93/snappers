@@ -24,7 +24,7 @@ const TopBarPromotion: React.FC<{ options?: Options }> = ({ options }) => {
     topBarButtonText = "Shop Now",
   } = options || {};
 
-console.log('TopBarPromotion', topBarButtonLink, topBarBgColor, topBarBeforeText);
+// console.log('TopBarPromotion', topBarButtonLink, topBarBgColor, topBarBeforeText);
 
   return (
     <div style={{ backgroundColor: topBarBgColor }} className="px-1 py-3 md:p-3">

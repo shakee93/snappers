@@ -7,7 +7,8 @@ interface OrderDetailsProps {
 export const OrderDetails: React.FC<OrderDetailsProps> = ({ orderData }) => {
   if (!orderData) return null;
   
-  const date = orderData.date ? orderData.date.substring(0, 10) : "2024/01/01";
+  const date = orderData.date ? orderData.date.substring(0, 10) : "-";
+  
 
   const rows = [
     { label: "Order Id", value: orderData.order.orderNumber ?? "Not found" },

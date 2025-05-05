@@ -812,6 +812,7 @@ const CheckoutPage = () => {
         return null;
       }
     } catch (error) {
+      
       handleCheckoutError(error);
     } finally {
       setLoading(false);
