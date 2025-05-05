@@ -96,6 +96,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     sendKokoVerification();
   }, [orderId, status]); // Dependencies to trigger the effect
 
+
   if (ordermethod === "guest") {
 
     const orderData = {

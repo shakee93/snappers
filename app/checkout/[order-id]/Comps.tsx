@@ -6,8 +6,15 @@ interface OrderDetailsProps {
 
 export const OrderDetails: React.FC<OrderDetailsProps> = ({ orderData }) => {
   if (!orderData) return null;
+  console.log('orderData', orderData.order);
   
-  const date = orderData.date ? orderData.date.substring(0, 10) : "-";
+  const date = orderData.order.date ? new Date(orderData.order.date).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  }) : "-";
+
+  console.log('date', date);
   
 
   const rows = [
