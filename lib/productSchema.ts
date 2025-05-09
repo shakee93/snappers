@@ -7,7 +7,6 @@ export function getProductSchema(product: any, brand: any) {
     "@type": "Product",
     name: product.name,
     description: stripHtml(product.description ?? ""),
-    sku: product.slug,
     brand: { "@type": "Brand", name: brand.name },
     image: [
       product.image?.sourceUrl,
