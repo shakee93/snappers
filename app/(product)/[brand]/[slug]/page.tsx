@@ -12,6 +12,8 @@ import { Metadata, ResolvingMetadata } from "next";
 import { ImageProvider } from "@/context/ImageChangeGrabber";
 import SectionSliderProductCard from "@/components/SectionSliderProductCard";
 import UpsellProducts from "@/app/components/globalComponents/UpsellProducts";
+import { stripHtml } from "@/components/AddressPageComps/HelperComps";
+import { getProductSchema } from "@/lib/jsonld/productSchema";
 
 export const dynamic = "force-dynamic";
 
@@ -20,7 +22,7 @@ type Props = {
     slug: string;
     brand: string;
   };
-}
+};
 
 export async function generateStaticParams() {
   const {
@@ -32,7 +34,7 @@ export async function generateStaticParams() {
 }
 
 async function getData(slug: string, brand: string) {
-  console.log('Fetching data for:', { slug, brand });
+  console.log("Fetching data for:", { slug, brand });
   try {
     // const { data } = await getClient().query({
     const { data } = await getClient().query({
@@ -46,7 +48,7 @@ async function getData(slug: string, brand: string) {
     // console.log('data', data);
 
     if (!data.product) {
-      console.log('Product not found');
+      console.log("Product not found");
       return notFound();
     }
     const productBrand = data.product.brands?.nodes[0] || {
@@ -54,7 +56,7 @@ async function getData(slug: string, brand: string) {
       slug: "product",
     };
     if (productBrand.slug !== brand) {
-      console.log('Brand mismatch:', { productBrand, brand });
+      console.log("Brand mismatch:", { productBrand, brand });
       return notFound();
     }
     return {
@@ -62,9 +64,17 @@ async function getData(slug: string, brand: string) {
       brand: productBrand,
     };
   } catch (e) {
-    console.error('Error fetching product data:', e);
+    console.error("Error fetching product data:", e);
     return notFound();
   }
+}
+
+// Utility to strip HTML tags and make description single line
+function stripHtmlTags(html: string): string {
+  if (!html) return "";
+  let text = html.replace(/<[^>]*>/g, " ");
+  text = text.replace(/\s+/g, " ").trim();
+  return text;
 }
 
 export async function generateMetadata(
@@ -111,13 +121,20 @@ const Page = async ({ params }: Props) => {
     brand: Brand;
   } = await getData(params.slug, params.brand);
 
-  console.log('product', product);
-  console.log('brand', brand);
+  console.log("product", product);
 
+  /** Schema: Product JSON-LD */
+  const productSchema = getProductSchema(product, brand);
+
+  console.log("productSchema", productSchema);
 
   return (
     <div className="mt-5 md:mt-10">
-        <main className="flex flex-col px-3   sm:container sm:max-w-screen-2xl">
+      <main className="flex flex-col px-3   sm:container sm:max-w-screen-2xl">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+        />
         <div className="md:mt-0 text-sm md:px-5 md:text-[0.95rem] md:ml-4">
           <Link href="/">Home</Link> &gt;{" "}
           <Link href={`/${brand.slug}`}>{brand.name}</Link> &gt;{" "}
@@ -156,7 +173,6 @@ const Page = async ({ params }: Props) => {
           {/*    heading="Related Products"*/}
           {/*/>*/}
         </div>
-
 
         <div className="mt-5 md:mt-10">
           <UpsellProducts newArrivals={product.upsell?.nodes} />

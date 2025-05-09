@@ -345,6 +345,17 @@ const dummyPaymentData = {
   }
 }
 
+/** Utility -------------------------------------------------------------- */
+const stripHtml = (html: string = '') =>
+  html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+
+// Utility to strip HTML tags and make description single line
+function stripHtmlTags(html: string): string {
+  if (!html) return "";
+  let text = html.replace(/<[^>]*>/g, " ");
+  text = text.replace(/\s+/g, " ").trim();
+  return text;
+}
 
 export {
   InputField,
@@ -360,5 +371,7 @@ export {
   getPaymentHash,
   numberFormat,
   sentConfirmation,
-  dummyPaymentData
+  dummyPaymentData,
+  stripHtml,
+  stripHtmlTags
 };
