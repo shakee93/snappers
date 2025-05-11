@@ -9,6 +9,15 @@ import { gql } from "@apollo/client";
 
 const FRONT_APP_URL = "https://gqmobiles.lk";
 
+// Define interfaces for sitemap entries
+interface SitemapEntry {
+  url: string;
+  lastModified: Date;
+  changeFrequency: string;
+  priority: number;
+  source?: string;
+}
+
 // Function to fetch all products via GraphQL
 const getAllProducts = async () => {
   let allProducts: any[] = [];
@@ -52,10 +61,10 @@ const getAllProducts = async () => {
 };
 
 // Transform products into sitemap entries
-const fetchProductSitemapWithGraphql = (products: any[]) => {
+const fetchProductSitemapWithGraphql = (products: any[]): SitemapEntry[] => {
   return products.map((product: any) => {
     const lastModified = product.date ? new Date(product.date) : new Date();
-    const brand = product.brands?.nodes?.[0]?.name.toLowerCase().replace(" ", "-") || "";
+    const brand = product.brands?.nodes?.[0]?.name.toLowerCase().replace(/\s+/g, "-") || "";
     const slug = product.slug || "";
     const url = `${FRONT_APP_URL}/${brand}/${slug}`;
 
@@ -63,9 +72,59 @@ const fetchProductSitemapWithGraphql = (products: any[]) => {
       url,
       lastModified,
       changeFrequency: "weekly",
-      priority: 0.9, 
+      priority: 0.9,
+      source: "products",
     };
   });
+};
+
+// Function to deduplicate sitemap entries with enhanced debugging
+const dedupeSitemapEntries = (entries: SitemapEntry[]): SitemapEntry[] => {
+  const urlMap = new Map<string, SitemapEntry>();
+  const duplicatesLog: Record<string, string[]> = {};
+  
+  // Track sources for each entry to identify where duplicates are coming from
+  entries.forEach(entry => {
+    if (!urlMap.has(entry.url)) {
+      urlMap.set(entry.url, {...entry});
+    } else {
+      // Record duplicate information for debugging
+      if (!duplicatesLog[entry.url]) {
+        duplicatesLog[entry.url] = [urlMap.get(entry.url)?.source || "unknown"];
+      }
+      duplicatesLog[entry.url].push(entry.source || "unknown");
+      
+      // Keep the entry with the highest priority
+      if (entry.priority > (urlMap.get(entry.url)?.priority || 0)) {
+        urlMap.set(entry.url, {...entry});
+      }
+    }
+  });
+  
+  // Log details about duplicates
+  const duplicateUrls = Object.keys(duplicatesLog);
+  if (duplicateUrls.length > 0) {
+    console.log(`\n----- Duplicate URL Details -----`);
+    console.log(`Found ${duplicateUrls.length} duplicate URLs:`);
+    
+    // Log some examples of duplicates and their sources
+    const samplesToShow = Math.min(5, duplicateUrls.length);
+    for (let i = 0; i < samplesToShow; i++) {
+      const url = duplicateUrls[i];
+      console.log(`- ${url} appears in: ${duplicatesLog[url].join(', ')}`);
+    }
+    
+    // Log details about URLs appearing 3 or more times
+    const triplicates = duplicateUrls.filter(url => duplicatesLog[url].length >= 2);
+    if (triplicates.length > 0) {
+      console.log(`\n${triplicates.length} URLs appear 3 or more times:`);
+      triplicates.forEach(url => {
+        console.log(`- ${url} (${duplicatesLog[url].length + 1} occurrences)`);
+      });
+    }
+  }
+  
+  return Array.from(urlMap.values());
 };
 
 export default async function sitemap() {
@@ -74,37 +133,45 @@ export default async function sitemap() {
   const productData = fetchProductSitemapWithGraphql(listAllProducts.products);
   console.log(`Generated ${productData.length} sitemap entries for products`);
 
-  const pageData = await fetchPageSitemap();
+  const pageData = await fetchPageSitemap() as SitemapEntry[];
+  pageData.forEach(entry => entry.source = "pages");
   console.log(`Generated ${pageData.length} sitemap entries for pages`);
 
-  const pwbBrandData = await fetchPwbBrandSitemap();
+  const pwbBrandData = await fetchPwbBrandSitemap() as SitemapEntry[];
+  pwbBrandData.forEach(entry => entry.source = "brands");
   console.log(`Generated ${pwbBrandData.length} sitemap entries for brands`);
 
-  const productCatData: any = await fetchProductCatSitemap();
+  const productCatData = await fetchProductCatSitemap() as SitemapEntry[];
+  productCatData.forEach(entry => entry.source = "categories");
   console.log(
     `Generated ${productCatData.length} sitemap entries for product categories`
   );
 
   // Combine all results into a single array
-  const sitemapEntries = [
+  const combinedEntries = [
     ...pageData,
     ...productData,
     ...pwbBrandData,
     ...productCatData,
   ];
+  
+  // Deduplicate entries
+  const sitemapEntries = dedupeSitemapEntries(combinedEntries);
 
   // Add main site entry and return sitemap
   console.log(
-    `Total sitemap entries generated: ${sitemapEntries.length + 1}` // +1 for the main site entry
+    `\n----- Sitemap Summary -----`
+  );
+  console.log(
+    `Total entries before deduplication: ${combinedEntries.length}`
+  );
+  console.log(
+    `Total entries after deduplication: ${sitemapEntries.length}`
+  );
+  console.log(
+    `Removed ${combinedEntries.length - sitemapEntries.length} duplicate entries`
   );
 
-  return [
-    // {
-    //   url: FRONT_APP_URL,
-    //   lastModified: new Date(),
-    //   changeFrequency: "yearly",
-    //   priority: 1,
-    // },
-    ...sitemapEntries,
-  ];
+  // Remove source property before returning (not part of sitemap spec)
+  return sitemapEntries.map(({ source, ...entry }) => entry);
 }
