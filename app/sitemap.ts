@@ -127,6 +127,22 @@ const dedupeSitemapEntries = (entries: SitemapEntry[]): SitemapEntry[] => {
   return Array.from(urlMap.values());
 };
 
+// Function to filter out testing URLs
+const filterTestingUrls = (entries: SitemapEntry[]): SitemapEntry[] => {
+  const filteredEntries = entries.filter(entry => {
+    const lowerUrl = entry.url.toLowerCase();
+    return !lowerUrl.includes('test') && !lowerUrl.includes('testing');
+  });
+  
+  const removedCount = entries.length - filteredEntries.length;
+  if (removedCount > 0) {
+    console.log(`\n----- Test URL Filtering -----`);
+    console.log(`Removed ${removedCount} URLs containing "test" or "testing"`);
+  }
+  
+  return filteredEntries;
+};
+
 export default async function sitemap() {
   // Fetch data
   const listAllProducts = await getAllProducts();
@@ -157,6 +173,9 @@ export default async function sitemap() {
   
   // Deduplicate entries
   const sitemapEntries = dedupeSitemapEntries(combinedEntries);
+  
+  // Filter out test/testing URLs
+  const filteredEntries = filterTestingUrls(sitemapEntries);
 
   // Add main site entry and return sitemap
   console.log(
@@ -171,7 +190,10 @@ export default async function sitemap() {
   console.log(
     `Removed ${combinedEntries.length - sitemapEntries.length} duplicate entries`
   );
+  console.log(
+    `Final sitemap entries: ${filteredEntries.length}`
+  );
 
   // Remove source property before returning (not part of sitemap spec)
-  return sitemapEntries.map(({ source, ...entry }) => entry);
+  return filteredEntries.map(({ source, ...entry }) => entry);
 }
