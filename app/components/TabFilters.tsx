@@ -36,6 +36,8 @@ const TabFilters = ({
     }, []);
 
 
+    console.log('categories', categories)
+
     return (
         <div className="flex flex-col gap-0 lg:gap-3 lg:space-x-4">
             <div className="hidden lg:flex flex-col justify-start items-start flex-1 space-y-3">

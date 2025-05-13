@@ -102,7 +102,7 @@ export default function FancyTestimonialsSlider() {
                 </div>
             </div>
             {/* Text */}
-            <div className="mb-9 transition-all duration-150 delay-300 ease-in-out">
+            <div className="mb-9 transition-all duration-150 delay-300 ease-in-out min-h-[96px]">
                 <div className="relative flex flex-col" ref={testimonialsRef}>
 
                     {testimonials.map((testimonial, index) => (
@@ -118,7 +118,7 @@ export default function FancyTestimonialsSlider() {
                             leaveTo="opacity-0 translate-x-4"
                             beforeEnter={() => heightFix()}
                         >
-                            <div className="text-2xl font-bold text-slate-900 before:content-['\\201C'] after:content-['\\201D'] min-h-[96px] overflow-hidden text-ellipsis line-clamp-4">
+                            <div className="text-2xl font-bold text-slate-900  min-h-[96px] overflow-hidden text-ellipsis line-clamp-4">
                                 {testimonial.quote}
                             </div>
                         </Transition>

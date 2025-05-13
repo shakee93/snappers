@@ -63,7 +63,7 @@ export default function NavCategories({ onClose }: NavCategoriesProps) {
           href="/collections"
           className="flex items-center hover:underline hover:text-blue-800 transition-colors duration-200"
         >
-          <span>Browse all categories</span>
+          <span>Browse all collections</span>
           <ArrowRight className="ml-1 h-4 w-4 group-hover:text-blue-500" />
         </Link>
       </div>
