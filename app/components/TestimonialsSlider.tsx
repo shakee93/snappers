@@ -137,7 +137,7 @@ export default function FancyTestimonialsSlider() {
                 ${active === index ? 'bg-primaryColor text-white shadow-indigo-950/10' : 'bg-white hover:bg-indigo-100 text-slate-900'}`}
                         onClick={() => { setActive(index); setAutorotate(false); }}
                     >
-                        <span>{testimonial.name}</span>
+                        <span className="truncate max-w-[120px] text-ellipsis">{testimonial.name}</span>
                     </button>
                 ))}
             </div>
@@ -151,7 +151,7 @@ export default function FancyTestimonialsSlider() {
                 ${active === index + 4 ? 'bg-primaryColor text-white shadow-indigo-950/10' : 'bg-white hover:bg-indigo-100 text-slate-900'}`}
                         onClick={() => { setActive(index + 4); setAutorotate(false); }}
                     >
-                        <span>{testimonial.name}</span>
+                        <span className="truncate max-w-[120px] text-ellipsis">{testimonial.name}</span>
                     </button>
                 ))}
             </div>
