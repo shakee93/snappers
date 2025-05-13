@@ -118,7 +118,9 @@ export default function FancyTestimonialsSlider() {
                             leaveTo="opacity-0 translate-x-4"
                             beforeEnter={() => heightFix()}
                         >
-                            <div className="text-2xl font-bold text-slate-900 before:content-['\201C'] after:content-['\201D']">{testimonial.quote}</div>
+                            <div className="text-2xl font-bold text-slate-900 before:content-['\\201C'] after:content-['\\201D'] min-h-[96px] overflow-hidden text-ellipsis line-clamp-4">
+                                {testimonial.quote}
+                            </div>
                         </Transition>
                     ))}
 

@@ -2,7 +2,7 @@ import { Button } from "@nextui-org/react";
 import Heading from "../Heading/Heading";
 
 const GoogleReviewsSection = () => {
-  const googleReviewUrl = "https://www.google.com/search?hl=en-LK&gl=lk&q=ground+floor,+GQ+-The+Mobile+Store,+2[…]ludocid=1458190955880003094&lsig=AB86z5VvNAV33q2slj2rSzJqGGyh";
+  const googleReviewUrl = "https://www.google.com/search?hl=en-LK&gl=lk&q=ground+floor,+GQ+-The+Mobile+Store,+250,+54+R.+A.+De+Mel+Mawatha,+Colombo+00300&ludocid=1458190955880003094&lsig=AB86z5VvNAV33q2slj2rSzJqGGyh#lrd=0x3ae25975d215fa97:0x143c88f2d3ea3616,3";
 
   return (
     <div className="w-full py-8 flex justify-center items-center bg-transparent">
@@ -11,7 +11,7 @@ const GoogleReviewsSection = () => {
         <Button
           as="a"
           href={googleReviewUrl}
-          target="_blank"
+          target=""
           rel="noopener noreferrer"
           className="bg-blue-800 hover:bg-blue-800 text-white text-base  px-8 py-2 rounded-full shadow-md transition-all duration-200  font-medium"
         >
