@@ -71,6 +71,14 @@ const SearchBar = () => {
             <div className="text-primary-700 flex-1">
                 <div className="bg-white border-2 lg:border border-primaryColor/20 py-0 md:py-1 flex
                 items-center space-x-0 lg:space-x-1.5 px-3 md:px-5 rounded-md md:rounded-[25px] h-full">
+                    <input
+                        value={mounted ? search : ''}
+                        onChange={handleSearchChange}
+                        type="text"
+                        placeholder="Type to Quick Search"
+                        className="border-none focus:border-none focus:outline-none focus:ring-0 bg-transparent w-full text-base"
+                        suppressHydrationWarning
+                    />
                     {(search_status === 'stalled' || search_status === 'loading') ? (
                         <Loader className="text-primaryColor animate-spin" />
                     ) : search.length > 0 ? (
@@ -80,14 +88,6 @@ const SearchBar = () => {
                     ) : (
                         <Search className="text-primaryColor" />
                     )}
-                    <input
-                        value={mounted ? search : ''}
-                        onChange={handleSearchChange}
-                        type="text"
-                        placeholder="Type to Quick Search"
-                        className="border-none focus:border-none focus:outline-none focus:ring-0 bg-transparent w-full text-base"
-                        suppressHydrationWarning
-                    />
                 </div>
             </div>
         </div>
