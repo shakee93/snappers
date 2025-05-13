@@ -33,6 +33,7 @@ import TestimonialImg01 from "@/public/images/testimonials/clientSay1.png";
 import TestimonialImg02 from "@/public/images/testimonials/clientSay2.png";
 import TestimonialImg03 from "@/public/images/testimonials/clientSay3.png";
 import FancyTestimonialsSlider from "@/app/components/TestimonialsSlider";
+import GoogleReviewsSection from "@/app/components/HomePage/GoogleReviewsSection";
 const Banks = [
   Sampath,
   Dfcc,
@@ -221,6 +222,9 @@ export default async function Home() {
             <Heading>What Our Customers Say</Heading>
             <FancyTestimonialsSlider />
           </div>
+
+          {/* Google Reviews Section */}
+          <GoogleReviewsSection />
 
           {/*Mobile Category */}
           <div className="block md:hidden">
