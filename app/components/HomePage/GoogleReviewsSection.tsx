@@ -13,7 +13,7 @@ const GoogleReviewsSection = () => {
           href={googleReviewUrl}
           target=""
           rel="noopener noreferrer"
-          className="bg-blue-800 hover:bg-blue-800 text-white text-base  px-8 py-2 rounded-full shadow-md transition-all duration-200  font-medium"
+          className="bg-blue-800  text-white text-base  px-8 py-2 rounded-full shadow-md transition-all duration-200  font-medium"
         >
           Write a Review on Google
         </Button>
