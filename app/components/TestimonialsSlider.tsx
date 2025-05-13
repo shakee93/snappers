@@ -4,7 +4,7 @@ import { useState, useRef, useEffect } from 'react'
 import Image, { StaticImageData } from 'next/image'
 import { Transition } from '@headlessui/react'
 import { CircleUser } from 'lucide-react'
-import googleLogo from '@/public/images/testimonials/icons8-google.svg'
+import googleLogo from '@/public/images/testimonials/icons8-google.webp'
 
 interface Testimonial {
     quote: string
