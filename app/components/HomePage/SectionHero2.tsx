@@ -111,7 +111,7 @@ const SectionHero2 = ({ className = '', slides }: SectionHero2Props) => {
           }`}
         style={{
           // backgroundColor: item.slideFields.backgroundColor, 
-          backgroundImage: `url(${item.backgroundImage})`, // Use the background image
+          backgroundImage: `url(${item?.backgroundImage})`, // Use the background image
           backgroundSize: 'cover',
           backgroundPosition: 'center'
         }}

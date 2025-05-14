@@ -47,7 +47,7 @@ const SectionHero3 = ({ className = "", slides }: SectionHero3Props) => {
   const [indexActive, setIndexActive] = useState(0);
   const [isRunning, toggleIsRunning] = useBoolean(true);
   const [progress, setProgress] = useState(0);
-  const [backgroundImage, setBackgroundImage] = useState(sortedSlides[0].backgroundImage);
+  const [backgroundImage, setBackgroundImage] = useState(sortedSlides[0]?.backgroundImage);
 
   // Log the sorted slides data
   // useEffect(() => {
@@ -59,11 +59,11 @@ const SectionHero3 = ({ className = "", slides }: SectionHero3Props) => {
       const slide = sortedSlides[indexActive];
       const screenWidth = window.innerWidth;
       if (screenWidth <= 768) {
-        setBackgroundImage(slide.mobileBackgroundImage || slide.backgroundImage);
+        setBackgroundImage(slide?.mobileBackgroundImage || slide?.backgroundImage);
       } else if (screenWidth <= 1024) {
-        setBackgroundImage(slide.tabletBackgroundImage || slide.backgroundImage);
+        setBackgroundImage(slide?.tabletBackgroundImage || slide?.backgroundImage);
       } else {
-        setBackgroundImage(slide.backgroundImage);
+        setBackgroundImage(slide?.backgroundImage);
       }
     };
 
