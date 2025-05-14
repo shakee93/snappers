@@ -14,7 +14,8 @@ import AddedToCart from "@/app/components/Notifications/added-to-cart";
 import { twMerge } from "tailwind-merge";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/context/SessionProvider";
-import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, Input, useDisclosure } from "@nextui-org/react";
+import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
+import Input from "shared/Input/Input";
 
 interface ProductAddToCartProps {
   product: SimpleProduct & VariableProduct;
@@ -31,6 +32,11 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   const [userEmail, setUserEmail] = useState(customer?.email || ""); // Track user's email
   const [isThankYouModal, setIsThankYouModal] = useState(false); // Track thank you modal visibility
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const [isPreOrderModalOpen, setIsPreOrderModalOpen] = useState(false);
+  const [preOrderEmail, setPreOrderEmail] = useState(customer?.email || "");
+  const [preOrderLoading, setPreOrderLoading] = useState(false);
+  const [preOrderUsername, setPreOrderUsername] = useState("");
+  const [preOrderPhone, setPreOrderPhone] = useState("");
   console.log('product', product);
 
   const sendNotificationRequest = async () => {
@@ -241,9 +247,35 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
     ) || false;
   };
 
-  const handlePreOrder = async () => {
-    console.log('Pre-order clicked for product:', product.databaseId);
-    toast.success('Pre order feature will be available soon!');
+  const handlePreOrder = () => {
+    setIsPreOrderModalOpen(true);
+  };
+
+  const handlePreOrderSubmit = async (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    setPreOrderLoading(true);
+    try {
+      const res = await fetch("https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/preorder", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: preOrderEmail,
+          username: preOrderUsername,
+          phone: preOrderPhone,
+          quantity,
+          product_id: product.databaseId,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to place pre-order");
+      toast.success("Pre-order placed successfully!");
+      console.log("Pre-order placed successfully!");
+      setIsPreOrderModalOpen(false);
+    } catch (err) {
+      console.log("Failed to place pre-order. Please try again.", err);
+      toast.error("Failed to place pre-order. Please try again.");
+    } finally {
+      setPreOrderLoading(false);
+    }
   };
 
   const isAddToCartDisabled =
@@ -283,14 +315,70 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
       {(product.type === "SIMPLE" && product.stockStatus === "IN_STOCK") ||
         (product.type === "VARIABLE" && !isProductOutOfStock()) ? (
         isPreOrderProduct() ? (
-          <button
-            onClick={handlePreOrder}
-            className="relative w-auto grow md:flex-none h-auto inline-flex cursor-pointer items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-blue-800 dark:bg-slate-100 text-slate-50 dark:text-slate-800 shadow-xl flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0"
-          >
-            <span className=" cursor-pointer">
-              Pre-order Now
-            </span>
-          </button>
+          <>
+            <button
+              onClick={handlePreOrder}
+              className="relative w-auto grow md:flex-none h-auto inline-flex cursor-pointer items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-blue-800 dark:bg-slate-100 text-slate-50 dark:text-slate-800 shadow-xl flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0"
+            >
+              <span className=" cursor-pointer">
+                Pre-order Now
+              </span>
+            </button>
+            <Modal isOpen={isPreOrderModalOpen} onOpenChange={setIsPreOrderModalOpen}>
+              <ModalContent>
+                <form onSubmit={handlePreOrderSubmit}>
+                  <ModalHeader className="flex flex-col gap-1">Pre-order Product</ModalHeader>
+                  <ModalBody>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">Email
+                      <Input
+                        type="email"
+                        placeholder="Enter your email"
+                        value={preOrderEmail}
+                        onChange={e => setPreOrderEmail(e.target.value)}
+                        required
+                      />
+                    </label>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">Username
+                      <Input
+                        type="text"
+                        placeholder="Enter your name"
+                        value={preOrderUsername}
+                        onChange={e => setPreOrderUsername(e.target.value)}
+                        required
+                      />
+                    </label>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">Phone
+                      <Input
+                        type="tel"
+                        placeholder="Enter your phone number"
+                        value={preOrderPhone}
+                        onChange={e => setPreOrderPhone(e.target.value)}
+                        required
+                      />
+                    </label>
+                    <label className="block mb-2 text-sm font-medium text-gray-700">Quantity
+                      <Input
+                        type="number"
+                        min={1}
+                        placeholder="Quantity"
+                        value={quantity.toString()}
+                        onChange={e => setQuantity(Number(e.target.value))}
+                        required
+                      />
+                    </label>
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button type="button" variant="light" onPress={() => setIsPreOrderModalOpen(false)}>
+                      Cancel
+                    </Button>
+                    <Button type="submit" color="primary" isLoading={preOrderLoading} disabled={preOrderLoading}>
+                      Place Pre-order
+                    </Button>
+                  </ModalFooter>
+                </form>
+              </ModalContent>
+            </Modal>
+          </>
         ) : (
           <button
             disabled={isAddToCartDisabled}

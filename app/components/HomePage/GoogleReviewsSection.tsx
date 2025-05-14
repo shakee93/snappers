@@ -6,14 +6,14 @@ const GoogleReviewsSection = () => {
 
   return (
     <div className="w-full py-8 flex justify-center items-center bg-transparent">
-      <div className="flex flex-col md:flex-row items-center justify-center gap-4 w-full max-w-2xl px-4">
-        <span className="font-bold text-xl md:text-2xl text-center mb-4 md:mb-0">Share Your Experience</span>
+      <div className="flex flex-row items-center justify-center gap-4 w-full max-w-2xl">
+        <span className="font-bold text-xl md:text-2xl text-center">Share Your Experience</span>
         <Button
           as="a"
           href={googleReviewUrl}
           target=""
           rel="noopener noreferrer"
-          className="bg-blue-800 text-white text-base px-8 py-2 rounded-full shadow-md transition-all duration-200 font-medium w-fit md:w-auto"
+          className="bg-blue-800  text-white text-base  px-8 py-2 rounded-full shadow-md transition-all duration-200  font-medium"
         >
           Write a Review on Google
         </Button>
@@ -22,4 +22,4 @@ const GoogleReviewsSection = () => {
   );
 };
 
-export default GoogleReviewsSection;
+export default GoogleReviewsSection; 
