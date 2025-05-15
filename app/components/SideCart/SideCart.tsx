@@ -47,14 +47,13 @@ export default function SideCart() {
                     sm:max-w-sm z-[1000] px-4"
             >
                 <SheetHeader className="space-y-4 pb-6">
-
                     <Link href={"/cart"} className="text-sm text-slate-500 dark:text-slate-400">
                         <SheetTitle className="text-xl font-semibold">Shopping Cart</SheetTitle>
                     </Link>
                 </SheetHeader>
 
-                <div className="flex flex-col justify-between h-[calc(100vh-6rem)]">
-                    <div className="flex-grow overflow-y-auto">
+                <div className="flex flex-col h-[calc(100%-3rem)]">
+                    <div className="flex-1 min-h-0 overflow-y-auto">
                         <div className="flex gap-2 flex-col">
                             {cart?.contents?.nodes?.map((item, index) => (
                                 <CartDropdownItem
