@@ -44,16 +44,16 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
 
     // @ts-ignore
     const OPTIONS: Glide.Options = {
-      perView: 4,
+      perView: 5,
       gap: 20,
       bound: true,
       breakpoints: {
         1280: {
-          perView: 4,
+          perView: 5,
         },
         1024: {
           gap: 20,
-          perView: 4,
+          perView: 5,
         },
         768: {
           gap: 20,

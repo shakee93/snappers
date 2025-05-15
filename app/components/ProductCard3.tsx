@@ -226,7 +226,7 @@ const ProductCard: FC<ProductCardProps> = ({
                   fontSize="text-xs"
                   sizeClass="py-1.5 px-3.5"
                 >
-                  <span className="flex items-center gap-2"><MousePointerClick className="w-3.5" />Select</span>
+                  <span className="flex items-center gap-2"><MousePointerClick className="w-3.5" />Choose</span>
                 </ButtonPrimary>
               </Link>
             )}
