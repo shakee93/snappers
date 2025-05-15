@@ -4,9 +4,11 @@ import SiteLogo from "@/public/global/logo.webp";
 import { getClient } from "@/graphql/apollo-ssr";
 import { GET_BRANDS } from "@/graphql/defs/products";
 import { Brand } from "@/graphql/types/graphql";
-import { Clock, Facebook, Instagram, Mail, MapPinned, PhoneCall, Twitter, Youtube } from "lucide-react";
+import { Clock, Copyright, Facebook, Heart, Instagram, Mail, MapPinned } from "lucide-react";
+import { PiFacebookLogoDuotone, PiInstagramLogoDuotone, PiTiktokLogo, PiTiktokLogoDuotone } from "react-icons/pi";
 import { isPaymentPage } from "./paymentPageCheckUtils";
 import { Divider } from "@nextui-org/react";
+import { HeartFilledIcon } from "@radix-ui/react-icons";
 
 const getData = async () => {
   const { data } = await getClient().query({
@@ -33,26 +35,21 @@ const Footer = async () => {
           <Link className="flex gap-2"
             href={"https://www.facebook.com/gqmobilestore"}
           >
-            <Facebook size={32} strokeWidth={1.25} className="text-primaryColor" />
+            <PiFacebookLogoDuotone size={32} strokeWidth={1.25} className="text-primaryColor" />
           </Link>
           <Link
             className="flex gap-2"
             href={"https://www.instagram.com/gqthemobilestore/"}
           >
-            <Instagram size={32} strokeWidth={1.25} className="text-primaryColor" />
+            <PiInstagramLogoDuotone size={32} strokeWidth={1.25} className="text-primaryColor" />
           </Link>
           <Link
             className="flex gap-2"
-            href="#"
+            href="https://www.tiktok.com/@gqmobiles"
           >
-            <Youtube size={32} strokeWidth={1.25} className="text-primaryColor" />
+            <PiTiktokLogoDuotone size={32} strokeWidth={1.25} className="text-primaryColor" />
           </Link>
-          <Link
-            className="flex gap-2"
-            href="#"
-          >
-            <Twitter size={32} strokeWidth={1.25} className="text-primaryColor" />
-          </Link>
+
         </div>
 
         <div className="pb-8 grid grid-cols-12 gap-x-1 gap-y-3 md:grid-cols-12 xl:grid-cols-12 justify-between">
@@ -106,7 +103,7 @@ const Footer = async () => {
                 <div className="flex flex-col">
                   <div>Business Hours:</div>
                   <div>Mon - Sat (10.00AM - 08.00PM)</div>
-                  <div>Sundays & Poya’s (10.00AM - 05.00PM)</div>
+                  <div>Sundays & Poya's (10.00AM - 05.00PM)</div>
                 </div>
               </li>
               <li className="lg:text-sm text-gray-500 flex gap-3">
@@ -223,7 +220,7 @@ const Footer = async () => {
                 <div className="flex flex-col">
                   <div>Business Hours:</div>
                   <div>Mon - Sat (10.00AM - 08.00PM)</div>
-                  <div>Sundays & Poya’s (10.00AM - 05.00PM)</div>
+                  <div>Sundays & Poya's (10.00AM - 05.00PM)</div>
                 </div>
               </li>
               <li className="lg:text-sm text-gray-500 flex gap-3">
@@ -253,7 +250,7 @@ const Footer = async () => {
                 <div className="flex flex-col">
                   {/* <div>Business Hours:</div> */}
                   <div>Mon - Sat (10.00AM - 08.00PM)</div>
-                  <div>Sundays & Poya’s (10.00AM - 05.00PM)</div>
+                  <div>Sundays & Poya's (10.00AM - 05.00PM)</div>
                 </div>
               </li>
               <li className="lg:text-sm text-gray-500 flex gap-3">
@@ -310,15 +307,15 @@ const Footer = async () => {
 
       </div>
 
-      <div className="text-center text-xs text-white py-2 bg-primaryColor">
+      <div className="text-center text-xs text-white py-4 bg-primaryColor">
         <div className="container flex gap-4 justify-center flex-wrap">
-          <div>Copyright ©️ {new Date().getFullYear()} GQ Mobiles (Pvt) Ltd.</div>
+          <div className="flex gap-2 items-center"><Copyright size={16} /> {new Date().getFullYear()} GQ Mobiles (Pvt) Ltd.</div>
           <div>{" | "} </div>
-          <div>
-            Designed by{" "}
+          <div className="flex gap-2 items-center">
+            Handcrafted with <HeartFilledIcon className="text-red-500" /> by {" "}
             <Link
               target="_blank"
-              className="font-semibold"
+              className="underline"
               href={`https://freshpixl.com/`}
             >
               Freshpixl Creative Agency
