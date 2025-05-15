@@ -1,9 +1,9 @@
 'use client';
 
-import React, {createContext, ReactNode, useContext, useEffect, useState} from 'react';
-import {ApolloError, useLazyQuery, useMutation} from '@apollo/client';
-import {ADD_TO_CART, GET_CART, REMOVE_ITEMS_FROM_CART, UPDATE_CART_ITEM_QUANTITY} from "@/graphql/defs/cart";
-import {Cart, Customer} from "@/graphql/types/graphql";
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { ApolloError, useLazyQuery, useMutation } from '@apollo/client';
+import { ADD_TO_CART, GET_CART, REMOVE_ITEMS_FROM_CART, UPDATE_CART_ITEM_QUANTITY } from "@/graphql/defs/cart";
+import { Cart, Customer } from "@/graphql/types/graphql";
 
 
 type CartSession = {
@@ -12,12 +12,14 @@ type CartSession = {
     loading: boolean | null
     error?: ApolloError
     updateCart: (key: string, quantity: number) => void
-    removeFromCart: (keys : string[]) => void
+    removeFromCart: (keys: string[]) => void
     getCart: () => void
-    addToCart: (id : number, quantity?: number, variation?: number) => void | Promise<any>
+    addToCart: (id: number, quantity?: number, variation?: number) => void | Promise<any>
     setCustomer: React.Dispatch<React.SetStateAction<Customer | null>>
     clearCart: () => void
     refreshCart: () => void
+    isCartOpen: boolean
+    setIsCartOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 
@@ -25,13 +27,15 @@ const CartContext = createContext<CartSession>({
     cart: null,
     customer: null,
     loading: null,
-    removeFromCart : (keys) => {},
-    addToCart : (id) => {},
-    updateCart : (key, q) => {},
-    getCart : () => {},
-    setCustomer: () => {},
-    clearCart: () => {},
-    refreshCart: () => {}
+    removeFromCart: (keys) => { },
+    addToCart: (id) => { },
+    updateCart: (key, q) => { },
+    getCart: () => { },
+    setCustomer: () => { },
+    clearCart: () => { },
+    refreshCart: () => { },
+    isCartOpen: false,
+    setIsCartOpen: () => { }
 });
 
 export function useCart() {
@@ -43,10 +47,11 @@ export function CartProvider({ children }: {
 }) {
     const [cart, setCart] = useState<Cart | null>(null)
     const [customer, setCustomer] = useState<Customer | null>(null)
+    const [isCartOpen, setIsCartOpen] = useState(false)
     const [loading, setLoading] = useState(false)
 
     const refreshData = (data: {
-        [key: string] : {
+        [key: string]: {
             cart: Cart,
             customer: Customer
         }
@@ -56,12 +61,12 @@ export function CartProvider({ children }: {
         setCustomer(data?.[key]?.customer || data.customer)
     }
 
-    const [getCart, {  error }] = useLazyQuery(GET_CART, {
+    const [getCart, { error }] = useLazyQuery(GET_CART, {
         fetchPolicy: 'no-cache',
         onCompleted: refreshData
     })
 
-    const [_removeFromCart, { data: cartData}] = useMutation(REMOVE_ITEMS_FROM_CART, {
+    const [_removeFromCart, { data: cartData }] = useMutation(REMOVE_ITEMS_FROM_CART, {
         fetchPolicy: 'no-cache',
         onCompleted: refreshData
     })
@@ -96,14 +101,20 @@ export function CartProvider({ children }: {
 
     const addToCart = async (id: number, quantity?: number, variation?: number) => {
 
-       return await _addToCart({
-           variables: {
-               productId: id,
-               quantity: quantity,
-               variationId: variation
-           },
-       })
+        const data = await _addToCart({
+            variables: {
+                productId: id,
+                quantity: quantity,
+                variationId: variation
+            },
+        })
 
+
+        if (data?.data?.addToCart?.cartItem) {
+            setIsCartOpen(true)
+        }
+
+        return data
     }
 
     const updateCart = async (key: string, quantity: number) => {
@@ -135,7 +146,9 @@ export function CartProvider({ children }: {
             getCart,
             setCustomer,
             clearCart,
-            refreshCart
+            refreshCart,
+            isCartOpen,
+            setIsCartOpen
         }}>
             {children}
         </CartContext.Provider>

@@ -10,17 +10,16 @@ import ButtonSecondary from "@/shared/Button/ButtonSecondary";
 import CartDropdownItem from "@/app/components/Header/CartDropdownItem";
 
 export default function SideCart() {
-    const { cart } = useCart();
+    const { cart, isCartOpen, setIsCartOpen } = useCart();
     let empty = cart?.contents?.itemCount == 0;
 
-    const [isOpen, setIsOpen] = useState(false);
 
     const subTotal = useMemo(() => {
         return cart?.subtotal;
     }, [cart]);
 
     return (
-        <Sheet open={isOpen} onOpenChange={setIsOpen}>
+        <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
             <SheetTrigger asChild>
                 <button
                     className="group w-10 h-10 sm:w-10 sm:h-10 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full inline-flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 relative"
@@ -41,11 +40,11 @@ export default function SideCart() {
 
             <SheetContent
                 side="right"
-                className="fixed inset-y-0 right-0 h-full w-3/4 border-l bg-background
+                className="fixed inset-y-0 right-0 h-full w-10/12 border-l bg-background
                     data-[state=closed]:duration-300 data-[state=open]:duration-200
                     data-[state=open]:animate-in data-[state=closed]:animate-out
                     data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right
-                    sm:max-w-sm z-[1000]"
+                    sm:max-w-sm z-[1000] px-4"
             >
                 <SheetHeader className="space-y-4 pb-6">
 
@@ -61,7 +60,7 @@ export default function SideCart() {
                                 <CartDropdownItem
                                     item={item}
                                     key={index}
-                                    close={() => setIsOpen(false)}
+                                    close={() => setIsCartOpen(false)}
                                 />
                             ))}
                         </div>
@@ -81,7 +80,7 @@ export default function SideCart() {
                             <Link className="flex-1" href={"/checkout"}>
                                 <button
                                     disabled={empty}
-                                    onClick={() => setIsOpen(false)}
+                                    onClick={() => setIsCartOpen(false)}
                                     className={
                                         "relative w-full h-auto flex-1 items-center justify-center rounded-full \
                                         transition-colors disabled:cursor-not-allowed text-sm sm:text-base font-medium py-3 px-4 sm:py-3 sm:px-6 \

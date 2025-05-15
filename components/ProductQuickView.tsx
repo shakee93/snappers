@@ -35,15 +35,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "" }) => {
   const [qualitySelected, setQualitySelected] = React.useState(1);
 
   const notifyAddTocart = () => {
-    toast(
-        <NotifyAddTocart
-          productImage={LIST_IMAGES_DEMO[0]}
-          qualitySelected={qualitySelected}
-          show={true}
-          sizeSelected={sizeSelected}
-          variantActive={variantActive}
-        />
-    );
+
   };
 
   const renderVariants = () => {
@@ -66,11 +58,10 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "" }) => {
             <div
               key={index}
               onClick={() => setVariantActive(index)}
-              className={`relative flex-1 max-w-[75px] h-10 rounded-full border-2 cursor-pointer ${
-                variantActive === index
+              className={`relative flex-1 max-w-[75px] h-10 rounded-full border-2 cursor-pointer ${variantActive === index
                   ? "border-primary-6000 dark:border-primary-500"
                   : "border-transparent"
-              }`}
+                }`}
             >
               <div className="absolute inset-0.5 rounded-full overflow-hidden z-0">
                 <Image fill style={{ objectFit: 'cover' }}
@@ -116,15 +107,13 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "" }) => {
               <div
                 key={index}
                 className={`relative h-10 sm:h-11 rounded-2xl border flex items-center justify-center 
-                text-sm sm:text-base uppercase font-semibold select-none overflow-hidden z-0 ${
-                  sizeOutStock
+                text-sm sm:text-base uppercase font-semibold select-none overflow-hidden z-0 ${sizeOutStock
                     ? "text-opacity-20 dark:text-opacity-20 cursor-not-allowed"
                     : "cursor-pointer"
-                } ${
-                  isActive
+                  } ${isActive
                     ? "bg-primary-6000 border-primary-6000 text-white hover:bg-primary-6000"
                     : "border-slate-300 dark:border-slate-600 text-slate-900 dark:text-slate-200 hover:bg-neutral-50 dark:hover:bg-neutral-700"
-                }`}
+                  }`}
                 onClick={() => {
                   if (sizeOutStock) {
                     return;
@@ -285,7 +274,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "" }) => {
           {/* HEADING */}
           <div className="relative">
             <div className="aspect-w-16 aspect-h-16">
-             <Image fill style={{ objectFit: 'cover' }}
+              <Image fill style={{ objectFit: 'cover' }}
                 src={LIST_IMAGES_DEMO[0]}
                 className="w-full rounded-xl object-cover"
                 alt="product detail 1"
@@ -301,7 +290,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "" }) => {
             {[LIST_IMAGES_DEMO[1], LIST_IMAGES_DEMO[2]].map((item, index) => {
               return (
                 <div key={index} className="aspect-w-3 aspect-h-4">
-                 <Image fill style={{ objectFit: 'cover' }}
+                  <Image fill style={{ objectFit: 'cover' }}
                     src={item}
                     className="w-full rounded-xl object-cover"
                     alt="product detail 1"

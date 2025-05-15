@@ -109,15 +109,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({
   );
 
   const notifyAddTocart = () => {
-    toast(
-        <NotifyAddTocart
-          productImage={product_images[0]}
-          qualitySelected={qualitySelected}
-          show={true}
-          sizeSelected={sizeSelected}
-          variantActive={variantActive}
-        />
-    );
+
   };
 
   const renderVariants = () => {

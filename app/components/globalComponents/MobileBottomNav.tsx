@@ -18,7 +18,7 @@ import { useSession } from "@/context/SessionProvider";
 
 const MobileBottomNav = ({ categories }: { categories: any }) => {
     const [openCat, setOpenCat] = useState(false);
-    const { cart } = useCart();
+    const { cart, isCartOpen, setIsCartOpen } = useCart();
     const { mobileMenu, toggleMobileMenu } = useStore()
     const { customer, fetchCustomer, updateCustomer } = useSession();
 
@@ -36,7 +36,7 @@ const MobileBottomNav = ({ categories }: { categories: any }) => {
         setOpenCat(!openCat);
     };
 
-    const router = useRouter();    
+    const router = useRouter();
 
     return (
         <div
@@ -58,21 +58,31 @@ const MobileBottomNav = ({ categories }: { categories: any }) => {
                 <Codesandbox />
                 <div className="text-[11px]">Brands</div>
             </Link>
-            <Link
-                href="/cart"
-                className="flex pt-2 flex-col justify-center items-center text-primaryColor gap-1"
+
+            <div
+                onClick={(e) => {
+                    e.preventDefault();
+                    setIsCartOpen(true)
+                }}
             >
-                <div className='relative'>
-                    {!!cart?.contents?.itemCount &&
-                        <div
-                            className="w-4 h-4 flex items-center justify-center bg-primary-500 absolute -top-1 -right-1.5 rounded-full text-[10px] leading-none text-white font-medium">
-                            <span className="mt-[1px]">{cart?.contents?.itemCount}</span>
-                        </div>
-                    }
-                    <ShoppingBag />
+
+                <div
+                    className="flex pt-2 flex-col justify-center items-center text-primaryColor gap-1"
+                >
+                    <div className='relative'>
+                        {!!cart?.contents?.itemCount &&
+                            <div
+                                className="w-4 h-4 flex items-center justify-center bg-primaryColor absolute -top-1 -right-1.5 rounded-full text-[10px] leading-none text-white font-medium">
+                                <span className="mt-[1px]">{cart?.contents?.itemCount}</span>
+                            </div>
+                        }
+                        <ShoppingBag />
+                    </div>
+                    <div className="text-[11px]">Cart</div>
                 </div>
-                <div className="text-[11px]">Cart</div>
-            </Link>
+
+            </div>
+
             <div
                 className="flex pt-2 flex-1 flex-col justify-center items-center text-primaryColor gap-1 cursor-pointer"
                 onClick={async () => {

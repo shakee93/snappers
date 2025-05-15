@@ -119,7 +119,7 @@ const CartDropdownItem = ({ item, close }: CartDropdownItemProps) => {
                                 className="w-4"
                               />{" "}
                               <span key={attr?.value}>
-                                {attr?.value}{" "} {console.log(attr)}
+                                {attr?.value}{" "}
                                 {
                                   (product.node as unknown as VariableProduct)[
                                     `allPa${attr?.label as unknown as "Capacity"}`
@@ -149,7 +149,7 @@ const CartDropdownItem = ({ item, close }: CartDropdownItemProps) => {
               />
             </div>
 
-            <div className="hidden flex-1 sm:flex justify-end items-end">
+            <div className="flex-1 sm:flex justify-end items-end">
               <div className="flex flex-row items-center justify-between w-full gap-4 mt-6">
                 <NcInputNumber
                   onChange={(q) => !isRemoving && !isUpdating && handleQuantityUpdate(q)}

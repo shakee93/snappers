@@ -37,7 +37,6 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   const [preOrderLoading, setPreOrderLoading] = useState(false);
   const [preOrderUsername, setPreOrderUsername] = useState("");
   const [preOrderPhone, setPreOrderPhone] = useState("");
-  console.log('product', product);
 
   const sendNotificationRequest = async () => {
     try {
@@ -128,7 +127,6 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   };
 
   const handleCartCompletion = () => {
-    notifyAddToCart(quantity);
     setQuantity(1);
   };
 
@@ -228,7 +226,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   const handleGenericError = (error: any) => {
     const apiErrorMessage = error.graphQLErrors?.[0]?.message;
 
-  if (apiErrorMessage?.includes("Expired token")) {
+    if (apiErrorMessage?.includes("Expired token")) {
       toast.error("You've been logged out. Please sign in again.");
       router.push("/login");
       return;

@@ -115,7 +115,7 @@ const ProductCard: FC<ProductCardProps> = ({
   };
 
   const cartCompleted = () => {
-    notifyAddTocart(quantity);
+    // notifyAddTocart(quantity);
     setQuantity(1);
   };
 
@@ -126,8 +126,8 @@ const ProductCard: FC<ProductCardProps> = ({
         await addToCart(data.databaseId, quantity);
         cartCompleted();
       } else {
-        toast("Wow so easy !");
-        notifyAddTocart(1);
+        // toast("Wow so easy !");
+        // notifyAddTocart(1);
       }
     } catch (error: any) {
       // console.log("error", error);
