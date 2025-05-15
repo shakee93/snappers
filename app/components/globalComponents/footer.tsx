@@ -250,7 +250,7 @@ const Footer = async () => {
                 <div className="flex flex-col">
                   {/* <div>Business Hours:</div> */}
                   <div>Mon - Sat (10.00AM - 08.00PM)</div>
-                  <div>Sundays & Poya's (10.00AM - 05.00PM)</div>
+                  <div>Sundays & Poya&apos;s (10.00AM - 05.00PM)</div>
                 </div>
               </li>
               <li className="lg:text-sm text-gray-500 flex gap-3">
