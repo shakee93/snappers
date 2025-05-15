@@ -71,7 +71,7 @@ const CartDropdownItem = ({ item, close }: CartDropdownItemProps) => {
   };
 
   return (
-    <div className={`flex px-3 py-4 border rounded-md relative ${(isRemoving || isUpdating) ? 'opacity-70' : ''}`}>
+    <div className={`flex px-3 py-4 border rounded-md relative bg-gradient-to-t from-gray-100/70 to-white ${(isRemoving || isUpdating) ? 'opacity-70' : ''}`}>
       {/* Loading overlay */}
       {(isRemoving || isUpdating) && (
         <div className="absolute inset-0 bg-white/80 dark:bg-slate-900/50 rounded-md flex items-center justify-center z-40">

@@ -100,7 +100,7 @@ const ProductGridInstant = ({
             <Pagination />
             <div className="flex items-center gap-2">
               {results && results.nbPages > 1 && results.nbHits > 0 && (
-                <div className="mb-4 text-right py-4 text-sm rounded-xl border-none focus:outline-none select-none">
+                <div className="text-right py-6 text-sm rounded-xl border-none focus:outline-none select-none">
                   <label htmlFor="hitsPerPage" className="mr-2 text-slate-900 dark:text-slate-100">Results per page:</label>
                   <select
                     id="hitsPerPage"
