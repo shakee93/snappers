@@ -74,8 +74,7 @@ const Header = async () => {
 
             <div className="hidden ml-5 md:flex">
               <AvatarDropdown />
-              <CartDropdown />
-              {/* <SideCart/> */}
+              <SideCart />
             </div>
           </div>
         </div>

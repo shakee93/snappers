@@ -2,7 +2,7 @@
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "components/ui/sheet";
 import { ShoppingCart } from "lucide-react";
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
@@ -14,20 +14,10 @@ export default function SideCart() {
     let empty = cart?.contents?.itemCount == 0;
 
     const [isOpen, setIsOpen] = useState(false);
-    const sheetRef = useRef<HTMLDivElement>(null);
 
-    const handleClickOutside = (event: any) => {
-        if (sheetRef.current && !sheetRef.current.contains(event.target)) {
-            setIsOpen(false);
-        }
-    };
-
-    useEffect(() => {
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => {
-            document.removeEventListener("mousedown", handleClickOutside);
-        };
-    }, []);
+    const subTotal = useMemo(() => {
+        return cart?.subtotal;
+    }, [cart]);
 
     return (
         <Sheet open={isOpen} onOpenChange={setIsOpen}>
@@ -49,14 +39,24 @@ export default function SideCart() {
                 </button>
             </SheetTrigger>
 
-            <SheetContent ref={sheetRef} className="w-full sm:max-w-lg">
-                <SheetHeader className="space-y-4 pb-4">
-                    <SheetTitle className="text-xl font-semibold">Shopping Cart</SheetTitle>
+            <SheetContent
+                side="right"
+                className="fixed inset-y-0 right-0 h-full w-3/4 border-l bg-background
+                    data-[state=closed]:duration-300 data-[state=open]:duration-200
+                    data-[state=open]:animate-in data-[state=closed]:animate-out
+                    data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right
+                    sm:max-w-sm z-[1000]"
+            >
+                <SheetHeader className="space-y-4 pb-6">
+
+                    <Link href={"/cart"} className="text-sm text-slate-500 dark:text-slate-400">
+                        <SheetTitle className="text-xl font-semibold">Shopping Cart</SheetTitle>
+                    </Link>
                 </SheetHeader>
 
-                <div className="flex flex-col h-[calc(100vh-8rem)]">
+                <div className="flex flex-col justify-between h-[calc(100vh-6rem)]">
                     <div className="flex-grow overflow-y-auto">
-                        <div className="divide-y divide-slate-100 dark:divide-slate-700">
+                        <div className="flex gap-2 flex-col">
                             {cart?.contents?.nodes?.map((item, index) => (
                                 <CartDropdownItem
                                     item={item}
@@ -67,7 +67,7 @@ export default function SideCart() {
                         </div>
                     </div>
 
-                    <div className="border-t border-slate-200 dark:border-slate-700 py-6 mt-auto">
+                    <div className="border-t border-slate-200 dark:border-slate-700 pt-6 mt-auto">
                         <div className="flex justify-between font-semibold text-slate-900 dark:text-slate-100">
                             <span>
                                 <span>Subtotal</span>
@@ -75,16 +75,9 @@ export default function SideCart() {
                                     Shipping and taxes calculated at checkout.
                                 </span>
                             </span>
-                            <span dangerouslySetInnerHTML={{ __html: cart?.subtotal || '' }} />
+                            <span dangerouslySetInnerHTML={{ __html: subTotal || '' }} />
                         </div>
                         <div className="flex space-x-2 mt-5">
-                            <ButtonSecondary
-                                href="/cart"
-                                className="flex-1 border border-slate-200 dark:border-slate-700"
-                                onClick={() => setIsOpen(false)}
-                            >
-                                View cart
-                            </ButtonSecondary>
                             <Link className="flex-1" href={"/checkout"}>
                                 <button
                                     disabled={empty}
