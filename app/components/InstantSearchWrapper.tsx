@@ -153,32 +153,33 @@ const InstantSearchWrapper = ({
     setSearchMounted();
   }, []);
 
-  useEffect(() => {
-    if (searchQueryValue) {
-      const url = new URL(window.location.href);
-      url.searchParams.set('q', searchQueryValue);
-      window.history.replaceState({}, '', url);
-    }
-  }, [searchQueryValue]);
+  // useEffect(() => {
+  //   if (searchQueryValue) {
+  //     const url = new URL(window.location.href);
+  //     url.searchParams.set('q', searchQueryValue);
+  //     window.history.replaceState({}, '', url);
+  //   }
+  // }, [searchQueryValue]);
 
   //   const InstantSearchComponent = useMemo(() => {
   //     return server ? InstantSearchNext : InstantSearch;
   // }, [server]); // Add dependencies if necessary
 
   const InstantSearchComponent = useMemo(() => {
-    // TODO: Search on client size freezes when using useInstantSearch hook so switching between normal and next.
+    // TODO: Search on client side freezes when using useInstantSearch hook so switching between normal and next.
+    // FIXED: I have updated the package to the latest version and it is working fine.
+    // KEPT the old code for reference.
     // when this gets fixed update the package
     return server ? InstantSearchNext : InstantSearch;
-  }, []);
+  }, [server]);
 
   return (
     <div>
-      <InstantSearchComponent
+      <InstantSearchNext
         stalledSearchDelay={200}
         future={{
           preserveSharedStateOnUnmount: true,
         }}
-        // @ts-ignore
         routing={
           routing && server
             ? {
@@ -192,7 +193,7 @@ const InstantSearchWrapper = ({
         indexName="product"
       >
 
-      {/* <InstantSearchComponent
+        {/* <InstantSearchComponent
         searchClient={searchClient}
         indexName="product"
         future={{ preserveSharedStateOnUnmount: false }}
@@ -203,7 +204,7 @@ const InstantSearchWrapper = ({
           },
         }}
       > */}
-        
+
         <div className="flex lg:gap-6 flex-col">
           <SearchInput bindToStore={bindToStore} show={search} onSearchChange={(value) => setSearchQuery(value)} />
 
@@ -233,14 +234,14 @@ const InstantSearchWrapper = ({
               )}
               <Configure filters={filterQuery} hitsPerPage={hitsPerPage} />
             </div>
-            
+
             <div className='col-span-12 lg:col-span-9'>
               <ProductGridInstant hitsPerPage={hitsPerPage} setHitsPerPage={setHitsPerPage} />
             </div>
 
           </div>
         </div>
-      </InstantSearchComponent>
+      </InstantSearchNext>
     </div>
   );
 };

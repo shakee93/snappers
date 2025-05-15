@@ -7,8 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "codegen": "graphql-codegen --config codegen.ts",
-    "find-unused-exports": "find-unused-exports"
+    "codegen": "graphql-codegen --config codegen.ts"
   },
   "dependencies": {
     "@apollo/client": "^3.11.0",
@@ -64,8 +63,8 @@
     "react-image-zoom": "^1.3.1",
     "react-img-zoom-gdn": "^0.1.7",
     "react-inner-image-zoom": "^3.0.2",
-    "react-instantsearch": "^7.13.1",
-    "react-instantsearch-nextjs": "^0.3.11",
+    "react-instantsearch": "^7.15.7",
+    "react-instantsearch-nextjs": "^0.4.8",
     "react-simple-image-slider": "^2.4.1",
     "react-use": "^17.5.1",
     "resend": "^3.5.0",
@@ -75,7 +74,7 @@
     "swiper": "^11.1.5",
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
-    "typesense-instantsearch-adapter": "^2.7.1",
+    "typesense-instantsearch-adapter": "^2.9.0",
     "use-debounce": "^10.0.1",
     "use-next-blurhash": "^1.0.5",
     "web-vitals": "^3.5.2",
