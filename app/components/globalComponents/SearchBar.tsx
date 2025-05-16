@@ -12,7 +12,7 @@ const SearchBar = () => {
     const router = useRouter();
     const path = usePathname();
     const searchParams = useSearchParams();
-    
+
     const [mounted, setMounted] = useState(false);
     const [isInitialized, setIsInitialized] = useState(false);
 
@@ -26,12 +26,11 @@ const SearchBar = () => {
         if (!mounted) return; // Don't run until component is mounted
 
         const query = searchParams.get('q');
-        
+
         if ((query && !isInitialized) || isInitialized) {
-            console.log('Setting search to:', query);
             setSearch(query ? decodeURIComponent(query) : '');
         }
-        
+
         if (!isInitialized) {
             setIsInitialized(true);
         }
@@ -47,7 +46,7 @@ const SearchBar = () => {
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setSearch(value);
-        
+
         const url = new URL(window.location.href);
         if (value) {
             url.searchParams.set('q', value);
@@ -60,8 +59,8 @@ const SearchBar = () => {
     return (
         <div className="flex-1 flex items-center gap-1">
             {path !== '/' && (
-                <button 
-                    onClick={() => router.back()} 
+                <button
+                    onClick={() => router.back()}
                     className="hidden md:hidden w-10 h-10 flex items-center justify-center"
                 >
                     <ChevronLeft className="text-white w-8" />

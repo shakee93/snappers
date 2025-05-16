@@ -1,15 +1,15 @@
 'use client';
 
-import React, {createContext, ReactNode, useContext, useEffect, useState} from 'react';
-import {ApolloError, FetchResult, useLazyQuery, useMutation, useQuery} from '@apollo/client';
-import {GET_CART} from "@/graphql/defs/cart";
+import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import { ApolloError, FetchResult, useLazyQuery, useMutation, useQuery } from '@apollo/client';
+import { GET_CART } from "@/graphql/defs/cart";
 import {
     GET_ACCOUNT_DETAILS,
     LOGIN_CUSTOMER_MUTATION,
     REGISTER_CUSTOMER_MUTATION,
     UPDATE_ACCOUNT_INFORMATION
 } from '@/graphql/defs/auth';
-import {LoginResponse, Session} from "@/utils/type";
+import { LoginResponse, Session } from "@/utils/type";
 import {
     Customer,
     LoginCustomerMutation,
@@ -17,7 +17,7 @@ import {
     RegisterCustomerMutation,
     RegisterCustomerPayload
 } from "@/graphql/types/graphql";
-import {useCart} from "@/context/CartProvider";
+import { useCart } from "@/context/CartProvider";
 
 const SessionContext = createContext<Session>({
     sessionToken: null,
@@ -78,7 +78,7 @@ export function SessionProvider({ children }: {
             localStorage.setItem(REFRESH_TOKEN_KEY, data?.refreshToken || '');
         }
 
-        if (type == "registerCustomer"){
+        if (type == "registerCustomer") {
             localStorage.setItem(USER_DATA_KEY, JSON.stringify(data?.customer));
             setCustomer(data?.customer as Customer)
 
@@ -178,9 +178,13 @@ export function SessionProvider({ children }: {
         }
 
         const { data } = await getUser();
-        setCustomer(data.customer as Customer)
-        // saveResponseToLocalStorage(data.customer, "login");
-        return data
+
+        if (data?.customer) {
+            setCustomer(data.customer as Customer)
+            // saveResponseToLocalStorage(data.customer, "login");
+            return data
+        }
+        return null
     }
 
     const [updateCustomerMutation] = useMutation(UPDATE_ACCOUNT_INFORMATION);
