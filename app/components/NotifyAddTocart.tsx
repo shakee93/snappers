@@ -27,7 +27,7 @@ const NotifyAddTocart: FC<Props> = ({
       <div className="flex ">
         <div className="h-24 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
           <Image fill style={{ objectFit: 'cover' }}
-          // width={300}
+            // width={300}
             // height={300}
             src={productImage}
             alt={name}
@@ -67,6 +67,8 @@ const NotifyAddTocart: FC<Props> = ({
       </div>
     );
   };
+
+  return null
 
   return (
     <Transition

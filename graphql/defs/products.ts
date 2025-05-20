@@ -40,7 +40,8 @@ export const GET_TAG_DETAILS_BY_SLUG = gql`
     productTags(where: {slug: $slug }) {
       nodes {
         id
-        name
+        name,
+        slug,
         description
       }
   }

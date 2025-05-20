@@ -41,7 +41,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   const [galleryImages, setGalleryImages] = useState(
     product?.galleryImages?.nodes?.length ? product.galleryImages.nodes : []
   );
-  
+
 
   const variationImages = product.variations?.nodes?.map(
     (variation: any) => variation.image
@@ -49,7 +49,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
 
   const combinedImages = [...variationImages, ...(galleryImages || [])];
   const [selectedVariation, setSelectedVariation] =
-  useState<selectedVariationType | null>(combinedImages[0]);
+    useState<selectedVariationType | null>(combinedImages[0]);
 
 
   // combinedImages.forEach((image) => {
@@ -64,7 +64,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
     }
   });
 
-  
+
   useEffect(() => {
 
     const activeVariationImage = variationImages.find(i => i.databaseId === variationId);
@@ -145,6 +145,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
           {galleryImages?.map((variation: any, index: number) => (
             <div className="embla__slide" key={index}>
               <ImageEffect
+                index={index}
                 src={variation?.sourceUrl || ""}
                 classNames="max-h-[330px] object-contain md:max-h-[410px] image transform transition-transform duration-300"
               />
@@ -161,7 +162,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
               <Thumb
                 onClick={() => onThumbClickCalculated(index)}
                 selected={
-                    index === selectedIndex
+                  index === selectedIndex
                 }
                 index={index}
                 imgSrc={variation?.sourceUrl || ""}

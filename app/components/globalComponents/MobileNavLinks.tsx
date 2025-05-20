@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import Logo from "./Logo";
 import { Menu, XIcon, Facebook, Instagram, PhoneCall } from "lucide-react";
+import { FaTiktok } from "react-icons/fa";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -57,7 +58,7 @@ const MobileNavLinks = () => {
           "bottom-[95px] translate-y-0 opacity-1 scale-100" :
           "translate-y-full opacity-0 bottom-0 scale-50"
           } fixed left-0  shadow-xl rounded-3xl left-1/2 -translate-x-1/2 w-11/12 border border-gray-30
-        0 h-fit pt-4 pb-8 bg-white ease-in-out duration-150 transform origin-center z-50`}
+        0 h-fit pt-4 pb-8 bg-white ease-in-out duration-150 transform origin-center z-[1001]`}
       >
         <div className="bg-gray-300 m-auto py-0.5 w-1/5 rounded-xl"></div>
 
@@ -110,6 +111,9 @@ const MobileNavLinks = () => {
             </Link>
             <Link href={"https://www.instagram.com/gqthemobilestoreunlimited"}>
               <Instagram size={24} />
+            </Link>
+            <Link href={"https://www.tiktok.com/@gqmobiles"}>
+              <FaTiktok size={24} />
             </Link>
           </div>
         </div>

@@ -11,6 +11,8 @@ import { Fragment, useState } from "react";
 import AttributeIcon from "@/app/components/AttributeIcon";
 import Prices from "@/app/components/Prices";
 import { useCart } from "@/context/CartProvider";
+import NcInputNumber from "@/components/NcInputNumber";
+import { Trash } from "lucide-react";
 
 interface CartDropdownItemProps {
   item: CartItem;
@@ -18,12 +20,13 @@ interface CartDropdownItemProps {
 }
 
 const CartDropdownItem = ({ item, close }: CartDropdownItemProps) => {
-  const { removeFromCart } = useCart();
+  const { removeFromCart, updateCart } = useCart();
 
   const { product, variation, quantity, key } = item;
 
-  // State to manage the loading indicator
-  const [isLoading, setIsLoading] = useState(false);
+  // States to manage loading indicators
+  const [isRemoving, setIsRemoving] = useState(false);
+  const [isUpdating, setIsUpdating] = useState(false);
 
   // @ts-ignore
   const {
@@ -46,13 +49,41 @@ const CartDropdownItem = ({ item, close }: CartDropdownItemProps) => {
   }
 
   const handleRemoveFromCart = async () => {
-    setIsLoading(true); // Start loading
-    await removeFromCart([key]);
-    setIsLoading(false); // End loading
+    if (isRemoving || isUpdating) return; // Prevent action if already in progress
+    setIsRemoving(true);
+    try {
+      await removeFromCart([key]);
+    } catch (error) {
+      console.error('Error removing item:', error);
+    }
+    setIsRemoving(false);
+  };
+
+  const handleQuantityUpdate = async (newQuantity: number) => {
+    if (isRemoving || isUpdating) return; // Prevent update if any operation is in progress
+    setIsUpdating(true);
+    try {
+      await updateCart(key, newQuantity);
+    } catch (error) {
+      console.error('Error updating quantity:', error);
+    }
+    setIsUpdating(false);
   };
 
   return (
-    <div className="flex py-5 last:pb-0">
+    <div className={`flex px-3 py-4 border rounded-md relative bg-gradient-to-t from-gray-100/70 to-white ${(isRemoving || isUpdating) ? 'opacity-70' : ''}`}>
+      {/* Loading overlay */}
+      {(isRemoving || isUpdating) && (
+        <div className="absolute inset-0 bg-white/80 dark:bg-slate-900/50 rounded-md flex items-center justify-center z-40">
+          <div className="flex items-center space-x-2">
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-500"></div>
+            <span className="text-sm font-medium text-slate-800 dark:text-slate-300">
+              {isRemoving ? 'Removing...' : 'Updating...'}
+            </span>
+          </div>
+        </div>
+      )}
+
       <div className="relative h-24 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
         <Image
           fill
@@ -69,14 +100,14 @@ const CartDropdownItem = ({ item, close }: CartDropdownItemProps) => {
 
       <div className="ml-3 sm:ml-6 flex flex-1 flex-col">
         <div>
-          <div className="flex justify-between">
-            <div className="flex-[1.5] ">
-              <h3 className="text-base font-semibold">
+          <div className="flex flex-col justify-between">
+            <div className="flex flex-col gap-1">
+              <h3 className="text-base font-semibold mt-3">
                 <Link href={link}>{name}</Link>
               </h3>
 
               {type === "VARIABLE" && (
-                <div className="mt-1.5 sm:mt-2.5 flex text-sm text-slate-600 dark:text-slate-300">
+                <div className="flex text-sm text-slate-600 dark:text-slate-300">
                   {type === "VARIABLE" && (
                     <div className="my-1 text-sm text-slate-500 dark:text-slate-400">
                       {variation?.attributes?.map(
@@ -91,9 +122,7 @@ const CartDropdownItem = ({ item, close }: CartDropdownItemProps) => {
                                 {attr?.value}{" "}
                                 {
                                   (product.node as unknown as VariableProduct)[
-                                    `allPa${
-                                      attr?.label as unknown as "Capacity"
-                                    }`
+                                    `allPa${attr?.label as unknown as "Capacity"}`
                                   ]?.nodes.find(
                                     (node: PaCapacity) =>
                                       node.slug === attr?.value
@@ -108,28 +137,37 @@ const CartDropdownItem = ({ item, close }: CartDropdownItemProps) => {
                   )}
                 </div>
               )}
+
+              <Prices
+                salePrice={
+                  type === "VARIABLE"
+                    ? variation?.node.regularPrice
+                    : regularPrice
+                }
+                price={type === "VARIABLE" ? variation?.node.price : price}
+                className="mt-0.5"
+              />
             </div>
 
-            <div className="hidden flex-1 sm:flex justify-end">
-              <div className="grid">
-                <Prices
-                  price={type === "VARIABLE" ? variation?.node.price : price}
-                  className="mt-0.5"
+            <div className="flex-1 sm:flex justify-end items-end">
+              <div className="flex flex-row items-center justify-between w-full gap-4 mt-6">
+                <NcInputNumber
+                  onChange={(q) => !isRemoving && !isUpdating && handleQuantityUpdate(q)}
+                  defaultValue={quantity || 1}
+                  className={`relative z-10 ${(isRemoving || isUpdating) ? 'opacity-50 pointer-events-none' : ''}`}
                 />
-                <div className="flex mt-auto pt-4 items-end justify-end text-sm">
-                  {isLoading ? (
-                    <span className="relative z-10 flex items-center mt-3 font-medium text-gray-500 text-sm">
-                      Removing...
-                    </span>
-                  ) : (
-                    <span
-                      className="cursor-pointer relative z-10 flex items-center mt-3 font-medium text-red-600 hover:text-text-800 text-sm"
-                      onClick={handleRemoveFromCart}
-                    >
-                      Remove
-                    </span>
-                  )}
-                </div>
+                <button
+                  className={`relative z-10 flex items-center justify-center font-medium text-red-600 hover:text-white text-base ml-2 transition-colors duration-150
+                    ${isRemoving || isUpdating
+                      ? 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                      : 'bg-red-50 hover:bg-red-600 cursor-pointer'
+                    } rounded-full w-8 h-8 shadow-sm border border-red-100`}
+                  onClick={handleRemoveFromCart}
+                  disabled={isRemoving || isUpdating}
+                  title="Remove"
+                >
+                  <Trash size={16} strokeWidth={2.2} />
+                </button>
               </div>
             </div>
           </div>

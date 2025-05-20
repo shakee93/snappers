@@ -2,6 +2,7 @@
 import {
   ExternalLink,
   Loader,
+  MousePointerClick,
   Settings2,
   ShoppingCart,
   XIcon,
@@ -114,7 +115,7 @@ const ProductCard: FC<ProductCardProps> = ({
   };
 
   const cartCompleted = () => {
-    notifyAddTocart(quantity);
+    // notifyAddTocart(quantity);
     setQuantity(1);
   };
 
@@ -125,8 +126,8 @@ const ProductCard: FC<ProductCardProps> = ({
         await addToCart(data.databaseId, quantity);
         cartCompleted();
       } else {
-        toast("Wow so easy !");
-        notifyAddTocart(1);
+        // toast("Wow so easy !");
+        // notifyAddTocart(1);
       }
     } catch (error: any) {
       // console.log("error", error);
@@ -156,7 +157,7 @@ const ProductCard: FC<ProductCardProps> = ({
 
   let highestPrice = price;
   if (variations?.nodes) {
-    const prices = variations.nodes.map((variation: ProductVariation) => 
+    const prices = variations.nodes.map((variation: ProductVariation) =>
       parseFloat(variation.price?.replace(/[^0-9.]/g, '') || "0")
     );
     highestPrice = Math.max(...prices).toString();
@@ -193,7 +194,7 @@ const ProductCard: FC<ProductCardProps> = ({
 
     return (
 
-      <div className="absolute -top-12 right-1 flex justify-center opacity-100 visible transition-all">
+      <div className="absolute -top-10 right-1 flex justify-center opacity-100 visible transition-all">
         {stockStatus === "IN_STOCK" ? (
           <>
             {type === "SIMPLE" && price && price?.length > 0 && (
@@ -201,16 +202,16 @@ const ProductCard: FC<ProductCardProps> = ({
                 className={`shadow-md ${rawPrice === "0.00" ? "opacity-60 cursor-not-allowed" : ""
                   }`}
                 fontSize="text-xs"
-                sizeClass="py-2.5 px-3.5"
+                sizeClass="py-1.5 px-3.5"
                 onClick={handleAddToCart}
                 disabled={loading || rawPrice === "0.00"}
               >
-                {loading ? (
+                <span className="flex items-center gap-2"> {loading ? (
                   <Loader className="animate-spin w-4" />
                 ) : (
-                  <ShoppingCart className="w-4" />
+                  <ShoppingCart className="w-3.5" />
+                )} Buy Now</span>
 
-                )}
               </ButtonPrimary>
             )}
 
@@ -223,9 +224,9 @@ const ProductCard: FC<ProductCardProps> = ({
                 <ButtonPrimary
                   className="shadow-md"
                   fontSize="text-xs"
-                  sizeClass="py-2.5 px-3.5"
+                  sizeClass="py-1.5 px-3.5"
                 >
-                  <Settings2 className="w-4" />
+                  <span className="flex items-center gap-2"><MousePointerClick className="w-3.5" />Customize</span>
                 </ButtonPrimary>
               </Link>
             )}
@@ -235,9 +236,9 @@ const ProductCard: FC<ProductCardProps> = ({
             <ButtonPrimary
               className="shadow-lg bg-zinc-500"
               fontSize="text-xs"
-              sizeClass="py-2.5 px-3.5"
+              sizeClass="py-1.5 px-3.5"
             >
-              <ExternalLink className="w-4" />
+              <span className="flex items-center gap-2"><ExternalLink className="w-3.5" />View</span>
             </ButtonPrimary>
           </Link>
         )}
@@ -322,29 +323,18 @@ const ProductCard: FC<ProductCardProps> = ({
           <ArrowsPointingOutIcon className="w-5" />
         </div>
 
-        {/* Brand */}
+        {/* Sold Out */}
         <div
-          className={`absolute left-1.5 top-2 bg-zinc-100/80 text-center text-xs lg:text-sm line-clamp-2 rounded-full text-slate-800`}
+          className={`absolute left-1 top-1.5 text-center text-xs lg:text-sm line-clamp-2 rounded-full text-slate-800`}
         >
-          {brands?.nodes?.map((brand: Brand, index: number) => (
-            <Link onClick={() => {
-              if (productLink == productName) {
-                setSearch("");
-              }
-            }} href={`/${brand?.slug}`} key={index}>
+          {stockStatus !== "IN_STOCK" && (
+            <div className="bg-gradient-to-b w-fit from-gray-500/30 font-semibold to-gray-400/5 text-xs text-gray-900 px-4 py-2 rounded-full">
+              Sold Out
+            </div>
+          )}
 
-              {stockStatus !== "IN_STOCK" ? (
-                <div className="bg-gradient-to-b w-fit from-gray-500/30 font-semibold to-gray-400/5 text-xs text-gray-900 px-4 py-2 rounded-full">
-                  Sold Out
-                </div>
-              ) : (
-                <div className="bg-gradient-to-b w-fit from-blue-500/30 font-semibold to-blue-400/5 text-xs text-blue-900 px-4 py-2 rounded-full">
-                  {brand?.name}
-                </div>
-              )}
-            </Link>
-          ))}
         </div>
+
       </div>
 
       <div className="space-y-2 flex flex-col space-between min-h-[100px] px-2.5 justify-between  lg:pt-2 lg:pb-2.5 relative">
@@ -371,6 +361,26 @@ const ProductCard: FC<ProductCardProps> = ({
             )} */}
           </h2>
         </Link>
+
+
+
+        {/* Brand */}
+        <div className="flex flex-wrap items-center gap-2 ">
+          {brands?.nodes?.map((brand: Brand, index: number) => (
+            <Link onClick={() => {
+              if (productLink == productName) {
+                setSearch("");
+              }
+            }} href={`/${brand?.slug}`} key={index}>
+
+              <div className="font-semibold text-xs text-blue-900 px-0 py-0 rounded-full ">
+                {brand?.name}
+              </div>
+            </Link>
+          ))}
+
+        </div>
+
 
         <Link
           href={link}
@@ -408,15 +418,17 @@ const ProductCard: FC<ProductCardProps> = ({
             </div>
           )}
         </Link>
-        
+
+
+
         {lowestPrice && lowestSalePrice && (
-          <div className="flex flex-wrap items-center text-xs text-gray-500 mt-1">
+          <div className="flex flex-wrap items-center text-xs text-gray-500 mt-1 mb-2">
             <span>or pay in 3 x Rs</span>
             <span className="font-semibold mx-1">
               {(
                 parseFloat(
-                  ((lowestPrice?.includes("₨&nbsp;0.00") || lowestSalePrice?.includes("₨&nbsp;0.00")) 
-                    ? highestPrice 
+                  ((lowestPrice?.includes("₨&nbsp;0.00") || lowestSalePrice?.includes("₨&nbsp;0.00"))
+                    ? highestPrice
                     : (lowestPrice || lowestSalePrice || "0"))
                     .toString()
                     .replace(/[^\d.]/g, "")
@@ -424,12 +436,14 @@ const ProductCard: FC<ProductCardProps> = ({
               ).toFixed(2)}
             </span>
             <span>with</span>
-            <span className="ml-1 inline-block">
+            <span className="ml-1 inline-block mb-2">
               <Image src={koko} alt="KOKO" className="inline-block w-12 h-auto" />
             </span>
           </div>
         )}
-        
+
+
+
       </div>
       <ModalQuickView
         show={showModalQuickView}

@@ -61,27 +61,6 @@ const ProductGridInstant = ({
 
   return (
     <>
-
-      <div className='col-span-12 lg:col-span-9'>
-        {results && results.nbPages > 1 && results.nbHits > 0 && (
-          <div className="mb-4 text-right px-4 py-4 text-sm rounded-xl border-none focus:outline-none select-none">
-            <label htmlFor="hitsPerPage" className="mr-2 text-slate-900 dark:text-slate-100">Results per page:</label>
-            <select 
-              id="hitsPerPage"
-              value={hitsPerPage}
-              onChange={(e) => setHitsPerPage ? setHitsPerPage(Number(e.target.value)) : null}
-              className="border rounded p-2 w-20 text-sm rounded-md border-neutral-300 dark:border-neutral-700
-                    cursor-pointer bg-transparent"
-            >
-              <option className="text-sm p-2" value={12}>12</option>
-              <option className="text-sm p-2" value={24}>24</option>
-              <option className="text-sm p-2" value={48}>48</option>
-              <option className="text-sm p-2" value={96}>96</option>
-            </select>
-          </div>
-        )}
-      </div>
-
       <div className='h-[185px] md:h-60 bottom-3 right-3 hidden'></div>
       {statusState === 'idle' &&
         <div className="flex-1 grid  grid-cols-2 lg:grid-cols-4 md:grid-cols-4 gap-x-2 gap-y-2 lg:gap-x-3 lg:gap-y-4">
@@ -115,8 +94,32 @@ const ProductGridInstant = ({
 
       {results && results?.nbHits > results?.hitsPerPage && (
         <>
-          <hr className="border-slate-200 mb-2 -mx-3 lg:my-6 dark:border-slate-700" />
-          <Pagination />
+          <hr className="border-slate-200 mb-2 lg:my-6 lg:mb-0 dark:border-slate-700" />
+
+          <div className="flex justify-between items-center gap-4">
+            <Pagination />
+            <div className="flex items-center gap-2">
+              {results && results.nbPages > 1 && results.nbHits > 0 && (
+                <div className="text-right py-6 text-sm rounded-xl border-none focus:outline-none select-none">
+                  <label htmlFor="hitsPerPage" className="mr-2 text-slate-900 dark:text-slate-100">Results per page:</label>
+                  <select
+                    id="hitsPerPage"
+                    value={hitsPerPage}
+                    onChange={(e) => setHitsPerPage ? setHitsPerPage(Number(e.target.value)) : null}
+                    className="border rounded p-2 w-20 text-sm rounded-md border-neutral-300 dark:border-neutral-700
+                    cursor-pointer bg-transparent"
+                  >
+                    <option className="text-sm p-2" value={12}>12</option>
+                    <option className="text-sm p-2" value={24}>24</option>
+                    <option className="text-sm p-2" value={48}>48</option>
+                    <option className="text-sm p-2" value={96}>96</option>
+                  </select>
+                </div>
+              )}
+            </div>
+          </div>
+
+
         </>
       )}
     </>

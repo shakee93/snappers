@@ -4,7 +4,7 @@ import { GET_NESTED_CATEGORIES } from "@/graphql/defs/nav";
 import InstantSearchWrapper from "@/app/components/InstantSearchWrapper";
 import { Brand, ProductCategory } from "@/graphql/types/graphql";
 import Link from "next/link";
-import { Metadata } from "next";
+import { Metadata, ResolvingMetadata } from "next";
 import { GET_TAG_DETAILS_BY_SLUG } from "@/graphql/defs/products";
 
 async function getData(parentId?: number, tagSlug?: string) {
@@ -46,38 +46,6 @@ async function getData(parentId?: number, tagSlug?: string) {
     brands: data.brands.nodes,
     nestedCategories,
     tagDetails,
-  };
-}
-
-export async function generateMetadata({
-  title,
-  description,
-  category,
-  brand,
-}: ArchiveLayoutProps): Promise<Metadata> {
-  const pageTitle = title || "Explore Our Collections";
-  const pageDescription =
-    description ||
-    "Discover a wide range of products and brands. Elevate your style with GQ Mobiles.";
-  const imageUrl = "https://gqmobiles.lk/default-og-image.jpg";
-
-  return {
-    title: "dead man walking",
-    description: pageDescription,
-    openGraph: {
-      title: pageTitle,
-      description: pageDescription,
-      url: `https://gqmobiles.lk/${brand?.slug ?? "brands"}/${category?.slug ?? "categories"
-        }`,
-      images: [
-        {
-          url: imageUrl,
-          width: 800,
-          height: 600,
-          alt: "GQ Mobiles Collections",
-        },
-      ],
-    },
   };
 }
 

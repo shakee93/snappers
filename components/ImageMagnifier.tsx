@@ -10,9 +10,10 @@ const ZOOM_LEVEL = 1.8;
 interface ImageEffectProps {
   src: string;
   classNames: string;
+  index: number | null;
 }
 // ImageEffect component
-const ImageEffect = ({ src, classNames }: ImageEffectProps) => {
+const ImageEffect = ({ src, classNames, index = null }: ImageEffectProps) => {
   // State variables
   const [zoomable, setZoomable] = useState(true);
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
@@ -64,6 +65,8 @@ const ImageEffect = ({ src, classNames }: ImageEffectProps) => {
       >
         <Image
           //   className="object-cover border z-10 h-full h-full"
+          fetchPriority={index === 0 ? "high" : undefined}
+          loading={index === 0 ? "eager" : "lazy"}
           className={classNames}
           alt=""
           width={1000}
@@ -74,9 +77,8 @@ const ImageEffect = ({ src, classNames }: ImageEffectProps) => {
           style={{
             backgroundPosition: `${position.x}px ${position.y}px`,
             backgroundImage: `url(${src})`,
-            backgroundSize: `${imageSize.width * ZOOM_LEVEL}px ${
-              imageSize.height * ZOOM_LEVEL
-            }px`,
+            backgroundSize: `${imageSize.width * ZOOM_LEVEL}px ${imageSize.height * ZOOM_LEVEL
+              }px`,
             backgroundRepeat: "no-repeat",
             display: zoomable ? "block" : "none",
             top: `${position.mouseY}px`,

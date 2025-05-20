@@ -34,15 +34,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({ className = "" }) => {
   const [qualitySelected, setQualitySelected] = React.useState(1);
 
   const notifyAddTocart = () => {
-    toast(
-        <NotifyAddTocart
-          productImage={LIST_IMAGES_DEMO[0]}
-          qualitySelected={qualitySelected}
-          show={true}
-          sizeSelected={sizeSelected}
-          variantActive={variantActive}
-        />
-    );
+
   };
 
   const renderVariants = () => {

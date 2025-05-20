@@ -18,13 +18,13 @@ const Prices: FC<PricesProps> = ({
   return (
     <div
       className={twMerge(
-        `flex flex-col lg:flex-row lg:gap-3 gap-1 items-start lg:items-center justify-start flex-wrap`,
+        `flex flex-col lg:flex-row lg:gap-2.5 gap-1 items-start lg:items-center justify-start flex-wrap`,
         className
       )}
     >
       {price ? (
         <div
-          className={`flex items-center border-2 border-gray-300 rounded-lg p-2 ${contentClass}`}
+          className={`flex items-center rounded-lg ${contentClass}`}
         >
           <span className="text-slate-950 text-sm font-bold !leading-none">
             <span dangerouslySetInnerHTML={{ __html: price || "" }} />
@@ -36,7 +36,7 @@ const Prices: FC<PricesProps> = ({
           className={`flex w-full ${contentClass} flex-wrap lg:flex-nowrap lg:w-auto`}
         >
           <span
-            className="text-red-400 font-bold line-through text-sm break-words lg:whitespace-nowrap max-w-full lg:max-w-none"
+            className="text-green-500 font-normal line-through text-sm break-words lg:whitespace-nowrap max-w-full lg:max-w-none"
             dangerouslySetInnerHTML={{ __html: salePrice || "" }}
           />
         </div>
