@@ -69,13 +69,7 @@ async function getData(slug: string, brand: string) {
   }
 }
 
-// Utility to strip HTML tags and make description single line
-function stripHtmlTags(html: string): string {
-  if (!html) return "";
-  let text = html.replace(/<[^>]*>/g, " ");
-  text = text.replace(/\s+/g, " ").trim();
-  return text;
-}
+
 
 export async function generateMetadata(
   { params }: Props,
@@ -122,7 +116,6 @@ const Page = async ({ params }: Props) => {
   } = await getData(params.slug, params.brand);
 
 
-  /** Schema: Product JSON-LD */
   const productSchema = getProductSchema(product, brand);
 
 
