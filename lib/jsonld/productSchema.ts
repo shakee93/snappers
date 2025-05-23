@@ -82,7 +82,7 @@ export function getProductSchema(product: any, brand: any) {
         "color": v.attributes.nodes.find((a: any) => a.name === "pa_color")?.value,
         "offers": {
           ...getBaseOfferSchema(product, brand),
-          "price": v.rawPrice
+          "price": Number((v.rawPrice ?? product.price ?? "0").toString().replace(/[^0-9.]/g, "") || "0")
         },
         "additionalProperty": getProductSpecs(v)
       })),
