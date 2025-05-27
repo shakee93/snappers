@@ -14,11 +14,12 @@ const NoOrderMessage = () => {
   return (
     <div className="container mx-auto py-20 px-4">
       <div className="max-w-2xl mx-auto text-center">
+
         <h2 className="text-2xl font-bold text-red-600 mb-4">
-          Order Not Available
+          Order Not Available 
         </h2>
         <p className="text-gray-600 mb-6">
-          We couldn{"'"}t find your order information. If you believe this is our mistake, please contact us:
+          We couldn{"'"}t find your payhere order information. If you believe this is our mistake, please contact us:
         </p>
         <div className="space-y-2 text-lg">
           <p>
@@ -51,7 +52,7 @@ export default function PayherePaymentPage() {
 
   useEffect(() => {
     // Access localStorage only on client side
-    const storedOrderData = localStorage.getItem('last_order');
+    const storedOrderData = localStorage.getItem('payhere_last_order');
     setOrderData(storedOrderData);
   }, []);
 

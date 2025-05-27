@@ -53,6 +53,7 @@ function PayherePaymentPage() {
   const { clearCart, refreshCart } = useCart();
   const [orderData, setOrderData] = useState<string | null>(null);
   const kokostatus = useSearchParams()?.get("status");
+  
 
   useEffect(() => {
     const storedOrderData = localStorage.getItem("last_order");
