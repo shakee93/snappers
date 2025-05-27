@@ -107,27 +107,26 @@ const InstantSearchWrapper = ({
   const [filterQuery, setFilterQuery] = useState<string>(getFilterQuery);
 
   const searchClient = useMemo(() => {
-    // console.log('Creating Typesense client with config:', typesenseConfig);
     const typesenseInstantSearchAdapter = new TypesenseInstantSearchAdapter({
       server: {
-        apiKey: "xyz", // Be sure to use an API key that only allows search operations
+        apiKey: "xyz",
         nodes: [typesenseConfig],
-        cacheSearchResultsForSeconds: 2 * 60, // Cache search results from server. Defaults to 2 minutes. Set to 0 to disable caching.
-        retryIntervalSeconds: 500, // Set to 0 to disable retries
+        cacheSearchResultsForSeconds: 2 * 60,
+        retryIntervalSeconds: 500,
         numRetries: 3000,
         connectionTimeoutSeconds: 10,
       },
       additionalSearchParameters: {
         query_by: "name, description, productTags",
-        exclude_fields:
-          "description, shortDescription, galleryImages, attributes",
+        exclude_fields: "description, shortDescription, galleryImages, attributes",
         use_cache: false,
+        filter_by: filterQuery,
+        per_page: hitsPerPage,
       },
     });
 
-    // console.log('Typesense client created successfully');
     return typesenseInstantSearchAdapter.searchClient;
-  }, []);
+  }, [filterQuery, hitsPerPage]);
 
   useEffect(() => {
     setFilterQuery(getFilterQuery);
@@ -232,7 +231,6 @@ const InstantSearchWrapper = ({
                   sort={sort}
                 />
               )}
-              <Configure filters={filterQuery} hitsPerPage={hitsPerPage} />
             </div>
 
             <div className='col-span-12 lg:col-span-9'>
