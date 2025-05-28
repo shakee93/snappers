@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-import SiteLogo from "@/public/global/logo.webp";
+import SiteLogo from "@/public/global/gq-logo.png";
 import { getClient } from "@/graphql/apollo-ssr";
 import { GET_BRANDS } from "@/graphql/defs/products";
 import { Brand } from "@/graphql/types/graphql";
@@ -266,7 +266,7 @@ const Footer = async () => {
                 </div>
               </li>
 
-              <Link href={"/"} className="flex justify-center pr-16">
+              <Link href={"/"} className="flex justify-center pr-16 mt-3">
                 <Image
                   width={100}
                   src={SiteLogo}

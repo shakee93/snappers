@@ -2,7 +2,7 @@
 // @ts-ignore
 import Link from "next/link";
 import Image from "next/image";
-import SiteLogo from "@/public/global/logo.webp";
+import SiteLogo from "@/public/global/gq-logo.png";
 import { twMerge } from "tailwind-merge";
 
 

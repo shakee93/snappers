@@ -1,7 +1,7 @@
 "use client"
 import Link from "next/link";
 import Image from "next/image";
-import SiteLogo from "@/public/global/logo_cropped.webp";
+import SiteLogo from "@/public/global/gq-logo.png";
 import { twMerge } from "tailwind-merge";
 import { useStore } from "@/store/store";
 

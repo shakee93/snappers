@@ -1,7 +1,7 @@
 import React, { FC } from "react"
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
-import SiteLogo from "@/public/global/logo.webp";
+import SiteLogo from "@/public/global/gq-logo.png";
 import Image from "next/image";
 import StoreImageSlider from "./StoreImageSlide"
 import { EmblaOptionsType } from "embla-carousel";

@@ -1,11 +1,10 @@
 import Link from "next/link";
 import Image from "next/image";
-import SiteLogo from "@/public/global/logo.webp";
 
 import { Brand } from "@/graphql/types/graphql";
 import { Menu, XIcon, Facebook, Instagram, PhoneCall } from "lucide-react";
-import {GET_BRANDS} from "@/graphql/defs/products";
-import {getClient} from "@/graphql/apollo-ssr";
+import { GET_BRANDS } from "@/graphql/defs/products";
+import { getClient } from "@/graphql/apollo-ssr";
 
 const getData = async () => {
   const { data } = await getClient().query({
