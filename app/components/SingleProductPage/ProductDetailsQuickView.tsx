@@ -265,8 +265,8 @@ const ProductDetails = ({
             {!!activeVariation.salePrice &&
               activeVariation.salePrice !== activeVariation.regularPrice && (
                 <span className="text-red-400">
-                  {/* <s>{activeVariation.regularPrice}</s> */}
-                  <s dangerouslySetInnerHTML={{ __html: activeVariation?.price }} />
+                  {/*  {activeVariation.regularPrice} */}
+                  <s dangerouslySetInnerHTML={{ __html: activeVariation?.regularPrice }} />
                 </span>
               )}
           </div>
@@ -279,7 +279,7 @@ const ProductDetails = ({
           {!!product?.salePrice &&
             product?.salePrice !== product?.regularPrice && (
               <span className="text-red-400">
-                {/* <s>{product?.regularPrice}</s> */}
+                {/*  {product?.regularPrice} */}
                 <s dangerouslySetInnerHTML={{ __html: product?.regularPrice || '' }} />
               </span>
             )}
