@@ -187,7 +187,7 @@ const Footer = async () => {
                   <MapPinned size={iconSize} className="text-primaryColor" />
                 </div>
                 <div className="flex flex-col">
-                  <div>GQ — The Mobile Store</div>
+                  <div>GQ Mobiles</div>
                   <div>
                     No. 250 | 53 - 54 Ground Floor, Liberty Plaza, Colombo 03.
                   </div>
@@ -202,7 +202,7 @@ const Footer = async () => {
                   <MapPinned size={iconSize} className="text-primaryColor" />
                 </div>
                 <div className="flex flex-col">
-                  <div>GQ — The Authentic Store</div>
+                  <div>GQ Authentic</div>
                   <div>
                     No. 250 | 1 | 161 First Floor, Liberty Plaza, Colombo 03.
                   </div>
@@ -250,7 +250,8 @@ const Footer = async () => {
                 <div className="flex flex-col">
                   {/* <div>Business Hours:</div> */}
                   <div>Mon - Sat (10.00AM - 08.00PM)</div>
-                  <div>Sundays & Poya&apos;s (10.00AM - 05.00PM)</div>
+                  <div>Poya Days: (10.00AM - 05.00PM)</div>
+                  <div>Sundays: Closed</div>
                 </div>
               </li>
               <li className="lg:text-sm text-gray-500 flex gap-3">
