@@ -233,7 +233,6 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
       return;
     }
 
-
     if (apiErrorMessage) {
       toast.error(apiErrorMessage.replace(/&quot;/g, '"'));
     } else {

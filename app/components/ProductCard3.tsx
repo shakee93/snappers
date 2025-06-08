@@ -131,6 +131,7 @@ const ProductCard: FC<ProductCardProps> = ({
       }
     } catch (error: any) {
       // console.log("error", error);
+      console.log('error on product update', error);
       let isTokenExpired =
         error.graphQLErrors[0]?.debugMessage ===
         "invalid-secret-key | Expired token";
@@ -141,7 +142,7 @@ const ProductCard: FC<ProductCardProps> = ({
         toast.error("You've been logged out. Please sign in again.");
         ROUTER.push("/login");
       } else {
-        toast.error("Something is went wrong");
+        toast.error("Something is went wrong!. try logout and login again");
       }
     } finally {
       setLoading(false);
