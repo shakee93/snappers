@@ -14,7 +14,6 @@ import {
 import { useCallback, useEffect, useState } from "react";
 import { useStore } from "@/store/store";
 import { twMerge } from "tailwind-merge";
-import parseHtml from "html-react-parser";
 import { useImage } from "@/context/ImageChangeGrabber";
 import AttributeIcon from "@/app/components/AttributeIcon";
 
