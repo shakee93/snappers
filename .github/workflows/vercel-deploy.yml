@@ -1,0 +1,33 @@
+name: Trigger Vercel Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  trigger-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Vercel Deploy
+        run: |
+          echo "🚀 Starting Vercel deployment trigger..."
+          echo "📝 Commit message: ${{ github.event.head_commit.message }}"
+          echo "👤 Committed by: ${{ github.event.head_commit.author.name }}"
+          
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X GET "https://api.vercel.com/v1/integrations/deploy/prj_FOQsQ9z4D5zkNybakSXxWmOjZfsd/GU0dOje7mE")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+          
+          echo "📡 Vercel API Response Code: $HTTP_CODE"
+          echo "📦 Response Body: $BODY"
+          
+          if [ "$HTTP_CODE" -eq 200 ]; then
+            echo "✅ Deployment trigger successful!"
+          else
+            echo "❌ Deployment trigger failed!"
+            exit 1
+          fi
+        env:
+          # You can add any environment variables here if needed
+          VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }} 
