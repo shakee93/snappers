@@ -237,7 +237,9 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
     }
 
     if (apiErrorMessage) {
-      toast.error(apiErrorMessage.replace(/&quot;/g, '"'));
+      // toast.error(apiErrorMessage.replace(/&quot;/g, '"'));
+      toast.error(JSON.stringify(apiErrorMessage));
+
       console.log('apiErrorMessage', apiErrorMessage);
     } else {
       toast.error("Unable to add to cart");
