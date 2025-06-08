@@ -193,8 +193,13 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
         quantity,
         variationId
       );
+      console.log('data', data);
+      toast.error("error is" + JSON.stringify(error));
+
+
       handleAddToCartResponse(data, error);
     } catch (error: any) {
+
       handleAddToCartError(error);
     } finally {
       setLoading(false);
@@ -205,6 +210,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
     if (!error) {
       handleCartCompletion();
     }
+  
   };
 
   const handleAddToCartError = (error: any) => {
