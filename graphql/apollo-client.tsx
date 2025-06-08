@@ -76,6 +76,7 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
 
     const errorLink = onError(
       ({ graphQLErrors, operation, forward, networkError }) => {
+
         const targetErrors = [
           "The iss do not match with this server",
           "invalid-secret-key | Expired token",
@@ -85,9 +86,10 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
         ];
 
         let isTargetError = graphQLErrors && graphQLErrors.some((err: any) => {
-          const errorMessage = err?.debugMessage || err?.message ;
+          const errorMessage = err?.extensions?.debugMessage || err?.message ;
           return targetErrors.includes(errorMessage) || errorMessage.includes("invalid-secret-key");
         });
+
 
         if (
           isTargetError

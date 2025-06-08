@@ -126,23 +126,13 @@ const ProductCard: FC<ProductCardProps> = ({
         await addToCart(data.databaseId, quantity);
         cartCompleted();
       } else {
-        // toast("Wow so easy !");
         // notifyAddTocart(1);
       }
     } catch (error: any) {
-      // console.log("error", error);
-      console.log("error on product update", error);
-
-      let isTokenExpired =
-        error.graphQLErrors[0]?.debugMessage ===
-        "invalid-secret-key | Expired token";
 
       let highQuantity = error.message.includes("You cannot add that amount");
 
-      if (isTokenExpired) {
-        toast.error("You've been logged out. Please sign in again.");
-        ROUTER.push("/login");
-      } else if (highQuantity) {
+      if (highQuantity) {
         toast.error("You've reached the maximum quantity allowed for this item.");
       } else {
         toast.error("Something is went wrong! please login again");

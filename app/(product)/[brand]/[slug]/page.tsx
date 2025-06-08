@@ -34,9 +34,7 @@ export async function generateStaticParams() {
 }
 
 async function getData(slug: string, brand: string) {
-  console.log("Fetching data for:", { slug, brand });
   try {
-    // const { data } = await getClient().query({
     const { data } = await getClient().query({
       query: GET_PRODUCT,
       variables: {
