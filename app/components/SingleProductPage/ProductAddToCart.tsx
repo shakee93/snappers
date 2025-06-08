@@ -260,6 +260,8 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
         extensions,
         timestamp: new Date().toISOString()
       });
+
+      toast.error(JSON.stringify(error));
       return;
     }
 
