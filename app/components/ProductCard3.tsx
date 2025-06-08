@@ -142,7 +142,7 @@ const ProductCard: FC<ProductCardProps> = ({
         toast.error("You've been logged out. Please sign in again.");
         ROUTER.push("/login");
       } else {
-        toast.error("Something is went wrong!. try logout and login again");
+        toast.error("Something is went wrong! please login again");
       }
     } finally {
       setLoading(false);
