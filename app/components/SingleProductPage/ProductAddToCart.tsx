@@ -213,33 +213,19 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   const handleAddToCartError = (error: any) => {
     console.log("add to cart error", error);
 
-    const isTokenExpired =
-      error.graphQLErrors?.[0]?.debugMessage === "invalid-secret-key | Expired token";
 
+    const isTokenExpired = 
+      error.graphQLErrors?.[0]?.debugMessage === "invalid-secret-key | Expired token" ||
+      error.graphQLErrors?.[0]?.message?.includes("Expired token");
 
     if (isTokenExpired) {
-      handleTokenExpiredError();
-    } else {
-      handleGenericError(error);
-    }
-  };
-
-  const handleTokenExpiredError = () => {
-    toast.error("You've been logged out. Please sign in again.");
-    router.push("/login");
-  };
-
-  const handleGenericError = (error: any) => {
-    const apiErrorMessage = error.graphQLErrors?.[0]?.message;
-
-    if (apiErrorMessage?.includes("Expired token")) {
       toast.error("You've been logged out. Please sign in again.");
       router.push("/login");
       return;
     }
 
-    toast.error("Something went wrong! Unable to add to cart");
-
+    toast.error("Something went wrong! Please login again.");
+    return
   };
 
   const isPreOrderProduct = () => {
