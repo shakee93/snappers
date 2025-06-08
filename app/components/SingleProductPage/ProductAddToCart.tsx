@@ -194,9 +194,6 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
         variationId
       );
 
-      console.log('data', data);
-      toast.error("error is" + JSON.stringify(error));
-
       handleAddToCartResponse(data, error);
     } catch (error: any) {
 
@@ -234,23 +231,15 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
 
   const handleGenericError = (error: any) => {
     const apiErrorMessage = error.graphQLErrors?.[0]?.message;
-    console.log('apiErrorMessage', apiErrorMessage);
 
     if (apiErrorMessage?.includes("Expired token")) {
       toast.error("You've been logged out. Please sign in again.");
       router.push("/login");
       return;
     }
-    
 
-    if (apiErrorMessage) {
-      // toast.error(apiErrorMessage.replace(/&quot;/g, '"'));
-      toast.error(JSON.stringify(apiErrorMessage));
+    toast.error("Something went wrong! Unable to add to cart");
 
-      console.log('apiErrorMessage', apiErrorMessage);
-    } else {
-      toast.error("Unable to add to cart");
-    }
   };
 
   const isPreOrderProduct = () => {
