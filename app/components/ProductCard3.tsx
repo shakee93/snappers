@@ -57,7 +57,7 @@ const ProductCard: FC<ProductCardProps> = ({
     salePrice,
     rawPrice,
     databaseId,
-    nodes
+    nodes,
   } = data;
 
   const [showModalQuickView, setShowModalQuickView] = useState(false);
@@ -74,9 +74,9 @@ const ProductCard: FC<ProductCardProps> = ({
   const pathname = usePathname();
 
   // Extract the last segment of the pathname
-  const segments = pathname.split('/');
+  const segments = pathname.split("/");
   const productName = segments[segments.length - 1];
-  const LinkSegments = link.split('/');
+  const LinkSegments = link.split("/");
   const productLink = LinkSegments[LinkSegments.length - 1];
   // console.log("Product link:", productLink);
   // console.log("Product Name:", productName);
@@ -131,16 +131,19 @@ const ProductCard: FC<ProductCardProps> = ({
       }
     } catch (error: any) {
       // console.log("error", error);
-      console.log('error on product update', error);
+      console.log("error on product update", error);
+
       let isTokenExpired =
         error.graphQLErrors[0]?.debugMessage ===
         "invalid-secret-key | Expired token";
-      
-      
-      
+
+      let highQuantity = error.message.includes("You cannot add that amount");
+
       if (isTokenExpired) {
         toast.error("You've been logged out. Please sign in again.");
         ROUTER.push("/login");
+      } else if (highQuantity) {
+        toast.error("You've reached the maximum quantity allowed for this item.");
       } else {
         toast.error("Something is went wrong! please login again");
       }
@@ -162,7 +165,7 @@ const ProductCard: FC<ProductCardProps> = ({
   let highestPrice = price;
   if (variations?.nodes) {
     const prices = variations.nodes.map((variation: ProductVariation) =>
-      parseFloat(variation.price?.replace(/[^0-9.]/g, '') || "0")
+      parseFloat(variation.price?.replace(/[^0-9.]/g, "") || "0")
     );
     highestPrice = Math.max(...prices).toString();
   }
@@ -195,42 +198,50 @@ const ProductCard: FC<ProductCardProps> = ({
   }
 
   const renderGroupButtons = () => {
-
     return (
-
       <div className="absolute -top-10 right-1 flex justify-center opacity-100 visible transition-all">
         {stockStatus === "IN_STOCK" ? (
           <>
             {type === "SIMPLE" && price && price?.length > 0 && (
               <ButtonPrimary
-                className={`shadow-md ${rawPrice === "0.00" ? "opacity-60 cursor-not-allowed" : ""
-                  }`}
+                className={`shadow-md ${
+                  rawPrice === "0.00" ? "opacity-60 cursor-not-allowed" : ""
+                }`}
                 fontSize="text-xs"
                 sizeClass="py-1.5 px-3.5"
                 onClick={handleAddToCart}
                 disabled={loading || rawPrice === "0.00"}
               >
-                <span className="flex items-center gap-2"> {loading ? (
-                  <Loader className="animate-spin w-4" />
-                ) : (
-                  <ShoppingCart className="w-3.5" />
-                )} Buy Now</span>
-
+                <span className="flex items-center gap-2">
+                  {" "}
+                  {loading ? (
+                    <Loader className="animate-spin w-4" />
+                  ) : (
+                    <ShoppingCart className="w-3.5" />
+                  )}{" "}
+                  Buy Now
+                </span>
               </ButtonPrimary>
             )}
 
             {type === "VARIABLE" && (
-              <Link href={link} onClick={() => {
-                if (productLink == productName) {
-                  setSearch("");
-                }
-              }}>
+              <Link
+                href={link}
+                onClick={() => {
+                  if (productLink == productName) {
+                    setSearch("");
+                  }
+                }}
+              >
                 <ButtonPrimary
                   className="shadow-md"
                   fontSize="text-xs"
                   sizeClass="py-1.5 px-3.5"
                 >
-                  <span className="flex items-center gap-2"><MousePointerClick className="w-3.5" />Customize</span>
+                  <span className="flex items-center gap-2">
+                    <MousePointerClick className="w-3.5" />
+                    Customize
+                  </span>
                 </ButtonPrimary>
               </Link>
             )}
@@ -242,7 +253,10 @@ const ProductCard: FC<ProductCardProps> = ({
               fontSize="text-xs"
               sizeClass="py-1.5 px-3.5"
             >
-              <span className="flex items-center gap-2"><ExternalLink className="w-3.5" />View</span>
+              <span className="flex items-center gap-2">
+                <ExternalLink className="w-3.5" />
+                View
+              </span>
             </ButtonPrimary>
           </Link>
         )}
@@ -256,18 +270,20 @@ const ProductCard: FC<ProductCardProps> = ({
       data-nc-id="ProductCard"
     >
       <div className="relative flex-shrink-0 bg-white rounded-2xl overflow-hidden ">
-        <Link href={link}
+        <Link
+          href={link}
           onClick={() => {
             if (productLink == productName) {
               setSearch("");
             }
-          }}>
+          }}
+        >
           <div className="flex items-center justify-center aspect-square relative">
             {variations?.edges &&
-              variations.edges.some(
-                (variation: { node: ProductVariation }) =>
-                  variation.node?.image?.sourceUrl
-              ) ? (
+            variations.edges.some(
+              (variation: { node: ProductVariation }) =>
+                variation.node?.image?.sourceUrl
+            ) ? (
               variations.edges.map(
                 (
                   variation: {
@@ -319,8 +335,6 @@ const ProductCard: FC<ProductCardProps> = ({
 
         {/* Arrow Icon */}
         <div
-
-
           className={"absolute hidden md:block top-3 cursor-pointer right-3"}
           onClick={() => handleCloseModalQuickView()}
         >
@@ -336,20 +350,21 @@ const ProductCard: FC<ProductCardProps> = ({
               Sold Out
             </div>
           )}
-
         </div>
-
       </div>
 
       <div className="space-y-2 flex flex-col space-between min-h-[100px] px-2.5 justify-between  lg:pt-2 lg:pb-2.5 relative">
         <div>{renderGroupButtons()}</div>
 
-        <Link className="block" href={link}
+        <Link
+          className="block"
+          href={link}
           onClick={() => {
             if (productLink == productName) {
               setSearch("");
             }
-          }}>
+          }}
+        >
           <h2
             className={`flex flex-col md:flex-row gap-2 justify-between md:gap-0 text-xs lg:text-sm text-black font-semibold transition-colors whitespace-normal min-h-[2.5rem] min-lg:h-[3rem] line-clamp-2 overflow-hidden`}
           >
@@ -366,25 +381,24 @@ const ProductCard: FC<ProductCardProps> = ({
           </h2>
         </Link>
 
-
-
         {/* Brand */}
         <div className="flex flex-wrap items-center gap-2 ">
           {brands?.nodes?.map((brand: Brand, index: number) => (
-            <Link onClick={() => {
-              if (productLink == productName) {
-                setSearch("");
-              }
-            }} href={`/${brand?.slug}`} key={index}>
-
+            <Link
+              onClick={() => {
+                if (productLink == productName) {
+                  setSearch("");
+                }
+              }}
+              href={`/${brand?.slug}`}
+              key={index}
+            >
               <div className="font-semibold text-xs text-blue-900 px-0 py-0 rounded-full ">
                 {brand?.name}
               </div>
             </Link>
           ))}
-
         </div>
-
 
         <Link
           href={link}
@@ -423,31 +437,35 @@ const ProductCard: FC<ProductCardProps> = ({
           )}
         </Link>
 
-
-
         {lowestPrice && lowestSalePrice && (
           <div className="flex flex-wrap items-center text-xs text-gray-500 mt-1 mb-2">
             <span>or pay in 3 x Rs</span>
             <span className="font-semibold mx-1">
               {(
-                parseFloat(
-                  ((lowestPrice?.includes("₨&nbsp;0.00") || lowestSalePrice?.includes("₨&nbsp;0.00"))
+                ((parseFloat(
+                  (lowestPrice?.includes("₨&nbsp;0.00") ||
+                  lowestSalePrice?.includes("₨&nbsp;0.00")
                     ? highestPrice
-                    : (lowestPrice || lowestSalePrice || "0"))
+                    : lowestPrice || lowestSalePrice || "0"
+                  )
                     .toString()
                     .replace(/[^\d.]/g, "")
-                ) / 88 * 100 / 3
+                ) /
+                  88) *
+                  100) /
+                3
               ).toFixed(2)}
             </span>
             <span>with</span>
             <span className="ml-1 inline-block mb-2">
-              <Image src={koko} alt="KOKO" className="inline-block w-12 h-auto" />
+              <Image
+                src={koko}
+                alt="KOKO"
+                className="inline-block w-12 h-auto"
+              />
             </span>
           </div>
         )}
-
-
-
       </div>
       <ModalQuickView
         show={showModalQuickView}

@@ -25,7 +25,7 @@ interface ProductAddToCartProps {
 const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation }) => {
   const [quantity, setQuantity] = useState<number>(1);
   const [loading, setLoading] = useState<boolean>(false);
-  const { addToCart, cart } = useCart();
+  const { addToCart, cart } = useCart();  
   const router = useRouter();
   const { customer, fetchCustomer } = useSession();
   const [isNotifyClicked, setIsNotifyClicked] = useState(false);
@@ -193,9 +193,9 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
         quantity,
         variationId
       );
+
       console.log('data', data);
       toast.error("error is" + JSON.stringify(error));
-
 
       handleAddToCartResponse(data, error);
     } catch (error: any) {
@@ -233,8 +233,16 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   };
 
   const handleGenericError = (error: any) => {
+    // Log the complete error object for debugging
+    console.error('Complete error object:', error);
+    
     const apiErrorMessage = error.graphQLErrors?.[0]?.message;
-    console.log('apiErrorMessage', apiErrorMessage);
+    const debugMessage = error.graphQLErrors?.[0]?.debugMessage;
+    const extensions = error.graphQLErrors?.[0]?.extensions;
+    
+    console.log('API Error Message:', apiErrorMessage);
+    console.log('Debug Message:', debugMessage);
+    console.log('Error Extensions:', extensions);
 
     if (apiErrorMessage?.includes("Expired token")) {
       toast.error("You've been logged out. Please sign in again.");
@@ -242,13 +250,30 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
       return;
     }
 
-    if (apiErrorMessage) {
-      // toast.error(apiErrorMessage.replace(/&quot;/g, '"'));
-      toast.error(JSON.stringify(apiErrorMessage));
+    // Handle specific error cases
+    if (apiErrorMessage?.includes("internal server error")) {
+      toast.error("Unable to add item to cart. Please try again later.");
+      // You might want to log this to your error tracking service
+      console.error('Internal server error details:', {
+        apiErrorMessage,
+        debugMessage,
+        extensions,
+        timestamp: new Date().toISOString()
+      });
+      return;
+    }
 
-      console.log('apiErrorMessage', apiErrorMessage);
+    if (apiErrorMessage) {
+      // Try to parse the error message if it's JSON
+      try {
+        const parsedError = JSON.parse(apiErrorMessage);
+        toast.error(parsedError.message || "Unable to add to cart");
+      } catch {
+        // If not JSON, display the raw message
+        toast.error(apiErrorMessage.replace(/&quot;/g, '"'));
+      }
     } else {
-      toast.error("Unable to add to cart");
+      toast.error("Unable to add to cart. Please try again.");
     }
   };
 
