@@ -108,8 +108,8 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
         lineItems: {
           nodes: lineItems.nodes,
         },
+        date: date,
       },
-      date: date,
     };
 
     const temporaryPaymentDetails: PaymentDetailsWithoutUrls = useMemo(

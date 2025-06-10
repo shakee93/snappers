@@ -68,7 +68,6 @@ const CheckoutPage = () => {
     | "order-cart"
   >("ContactInfo");
 
-  console.log('paymentGateways', paymentGateways);
 
   // const FORMDATA_DUMMY_OBJECT = {
   //   contactInfo: {
@@ -812,7 +811,7 @@ const CheckoutPage = () => {
         return null;
       }
     } catch (error) {
-      
+      console.log('error', error);
       handleCheckoutError(error);
     } finally {
       setLoading(false);
