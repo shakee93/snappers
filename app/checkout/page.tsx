@@ -841,7 +841,12 @@ const CheckoutPage = () => {
     setLoading(false);
     console.log("error: ", error)
     if (error.message === "Sorry, no session found.") {
-      toast.error("No Items to checkout");
+      if (customer?.id !== "guest") {
+        toast.error("please login or create an account to checkout");
+        router.push("/login");
+      } else {
+        toast.error("create an account to checkout");
+      }
     } else {
       toast.error("Failed to create the order: " + error.message);
     }
