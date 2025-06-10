@@ -1,7 +1,7 @@
 import { getClient } from "@/graphql/apollo-ssr";
 import { GET_BRANDS, GET_PRODUCT } from "@/graphql/defs/products";
 import { Brand, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import ProductDetails from "@/app/components/SingleProductPage/ProductDetails";
 import Features from "@/app/components/SingleProductPage/FeatureCard";
 import ProductOverview from "@/app/components/SingleProductPage/ProductOverview";
@@ -53,10 +53,7 @@ async function getData(slug: string, brand: string) {
       name: "Product",
       slug: "product",
     };
-    if (productBrand.slug !== brand) {
-      console.log("Brand mismatch:", { productBrand, brand });
-      return notFound();
-    }
+
     return {
       product: data.product,
       brand: productBrand,
@@ -76,6 +73,11 @@ export async function generateMetadata(
   // fetch data
   const { product, brand } = await getData(params.slug, params.brand);
   // const price = product.price || "the best price";
+
+  if (params.brand !== brand.slug) {
+    redirect(`/${brand.slug}/${product.slug}`)
+  }
+
   const price = product.price
     ? product.price.replace(/₨|&nbsp;/g, "")
     : "the best price";
