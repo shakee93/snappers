@@ -177,22 +177,22 @@ export default async function sitemap() {
   // Filter out test/testing URLs
   const filteredEntries = filterTestingUrls(sitemapEntries);
 
-  // Add main site entry and return sitemap
-  console.log(
-    `\n----- Sitemap Summary -----`
-  );
-  console.log(
-    `Total entries before deduplication: ${combinedEntries.length}`
-  );
-  console.log(
-    `Total entries after deduplication: ${sitemapEntries.length}`
-  );
-  console.log(
-    `Removed ${combinedEntries.length - sitemapEntries.length} duplicate entries`
-  );
-  console.log(
-    `Final sitemap entries: ${filteredEntries.length}`
-  );
+  // // Add main site entry and return sitemap
+  // console.log(
+  //   `\n----- Sitemap Summary -----`
+  // );
+  // console.log(
+  //   `Total entries before deduplication: ${combinedEntries.length}`
+  // );
+  // console.log(
+  //   `Total entries after deduplication: ${sitemapEntries.length}`
+  // );
+  // console.log(
+  //   `Removed ${combinedEntries.length - sitemapEntries.length} duplicate entries`
+  // );
+  // console.log(
+  //   `Final sitemap entries: ${filteredEntries.length}`
+  // );
 
   // Remove source property before returning (not part of sitemap spec)
   return filteredEntries.map(({ source, ...entry }) => entry);

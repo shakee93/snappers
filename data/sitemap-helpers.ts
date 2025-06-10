@@ -45,7 +45,7 @@ async function fetchAndParseSitemap(
     });
   } catch (error) {
     console.error("Error fetching or parsing sitemap:", error);
-    throw error;
+    return [];
   }
 }
 
