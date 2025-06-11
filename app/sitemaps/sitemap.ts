@@ -7,6 +7,7 @@ import { GET_BRAND_DETAILS } from '@/graphql/defs/products'
 import { BrandIdType } from '@/graphql/types/graphql'
 
 export const dynamic = 'force-dynamic'    // 👈 run on every request
+export const runtime = 'nodejs'         // if you call a DB/REST API
 
 
 
