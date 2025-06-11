@@ -10,106 +10,62 @@ export interface SitemapEntry {
   priority: number;
 }
 
-// Generic function to fetch and parse any XML sitemap with optional transformation
+const buildSitemapEntry = (
+  urlEntry: any,
+  url: string,
+  changeFrequency = "monthly",
+  priority = 0.5
+): SitemapEntry => ({
+  url,
+  lastModified: urlEntry.lastmod?.[0] ? new Date(urlEntry.lastmod[0]) : new Date(),
+  changeFrequency: urlEntry.changefreq?.[0] || changeFrequency,
+  priority: parseFloat(urlEntry.priority?.[0]) || priority,
+});
+
 async function fetchAndParseSitemap(
   url: string,
   transformFn?: (urlEntry: any) => SitemapEntry
 ): Promise<SitemapEntry[]> {
   try {
-    const response = await fetch(url);
+    const res = await fetch(url);
+    if (!res.ok) throw new Error(`Failed to fetch sitemap from ${url}`);
 
-    if (!response.ok) {
-      throw new Error(`Failed to fetch sitemap from ${url}`);
-    }
-
-    const xmlText = await response.text();
-    const jsonData = await parseStringPromise(xmlText);
-
-    return jsonData.urlset.url.map((urlEntry: any) => {
-      if (transformFn) {
-        return transformFn(urlEntry);
-      } else {
-        return {
-          url: urlEntry.loc[0].replace(API_SITE_URL, FRONT_APP_URL),
-          lastModified: urlEntry.lastmod
-            ? new Date(urlEntry.lastmod[0])
-            : new Date(),
-          changeFrequency: urlEntry.changefreq
-            ? urlEntry.changefreq[0]
-            : "monthly",
-          priority: urlEntry.priority
-            ? parseFloat(urlEntry.priority[0])
-            : 0.5,
-        };
-      }
-    });
-  } catch (error) {
-    console.error("Error fetching or parsing sitemap:", error);
+    const xml = await res.text();
+    const json = await parseStringPromise(xml);
+    return json.urlset.url.map((entry: any) => transformFn?.(entry) || buildSitemapEntry(
+      entry,
+      entry.loc[0].replace(API_SITE_URL, FRONT_APP_URL)
+    ));
+  } catch (err) {
+    console.error("Error fetching or parsing sitemap:", err);
     return [];
   }
 }
 
-// Fetchers for individual XML sitemaps
 const fetchPageSitemap = () =>
-  fetchAndParseSitemap(`${API_SITE_URL}/page-sitemap.xml`, (urlEntry) => ({
-    url: urlEntry.loc[0].replace(API_SITE_URL, FRONT_APP_URL),
-    lastModified: urlEntry.lastmod ? new Date(urlEntry.lastmod[0]) : new Date(),
-    changeFrequency: "monthly",
-    priority: urlEntry.priority ? parseFloat(urlEntry.priority[0]) : 0.5,
-  }));
+  fetchAndParseSitemap(`${API_SITE_URL}/page-sitemap.xml`, (entry) =>
+    buildSitemapEntry(entry, entry.loc[0].replace(API_SITE_URL, FRONT_APP_URL))
+  );
 
 const fetchPwbBrandSitemap = () =>
-  fetchAndParseSitemap(
-    `${API_SITE_URL}/pwb-brand-sitemap.xml`,
-    (urlEntry) => {
-      const originalLoc = urlEntry.loc[0];
-      let transformedUrl = originalLoc;
+  fetchAndParseSitemap(`${API_SITE_URL}/pwb-brand-sitemap.xml`, (entry) => {
+    const originalLoc = entry.loc[0];
+    const brandMatch = originalLoc.match(/\/brand\/([^/]+)/);
+    const transformedUrl = brandMatch
+      ? `${FRONT_APP_URL}/${brandMatch[1]}`
+      : originalLoc.replace(API_SITE_URL, FRONT_APP_URL);
 
-      const brandMatch = originalLoc.match(/\/brand\/([^/]+)/);
-      if (brandMatch) {
-        const brandName = brandMatch[1];
-        console.log("brandName", brandName);
-        transformedUrl = `${FRONT_APP_URL}/${brandName}`;
-      } else {
-        transformedUrl = originalLoc.replace(API_SITE_URL, FRONT_APP_URL);
-      }
-
-      return {
-        url: transformedUrl,
-        lastModified: urlEntry.lastmod
-          ? new Date(urlEntry.lastmod[0])
-          : new Date(),
-        changeFrequency: urlEntry.changefreq
-          ? urlEntry.changefreq[0]
-          : "monthly",
-        priority: urlEntry.priority
-          ? parseFloat(urlEntry.priority[0])
-          : 0.5,
-      };
-    }
-  );
+    return buildSitemapEntry(entry, transformedUrl);
+  });
 
 const fetchProductCatSitemap = () =>
-  fetchAndParseSitemap(
-    `${API_SITE_URL}/product_cat-sitemap.xml`,
-    (urlEntry) => {
-      const originalLoc = urlEntry.loc[0];
-      const lastCategory = originalLoc.split("/").filter(Boolean).pop();
-      const transformedUrl = lastCategory
-        ? `${FRONT_APP_URL}/collections/${lastCategory}`
-        : originalLoc;
+  fetchAndParseSitemap(`${API_SITE_URL}/product_cat-sitemap.xml`, (entry) => {
+    const lastCategory = entry.loc[0].split("/").filter(Boolean).pop();
+    const url = lastCategory
+      ? `${FRONT_APP_URL}/collections/${lastCategory}`
+      : entry.loc[0];
 
-      return {
-        url: transformedUrl,
-        lastModified: urlEntry.lastmod
-          ? new Date(urlEntry.lastmod[0])
-          : new Date(),
-        changeFrequency: "daily",
-        priority: urlEntry.priority
-          ? parseFloat(urlEntry.priority[0])
-          : 0.8,
-      };
-    }
-  );
+    return buildSitemapEntry(entry, url, "daily", 0.8);
+  });
 
 export { fetchPageSitemap, fetchPwbBrandSitemap, fetchProductCatSitemap };
