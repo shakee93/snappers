@@ -6,6 +6,9 @@ import { GET_BRAND_PRODUCTS } from '@/graphql/defs/sitemap-queries'
 import { GET_BRAND_DETAILS } from '@/graphql/defs/products'
 import { BrandIdType } from '@/graphql/types/graphql'
 
+export const dynamic = 'force-dynamic'    // 👈 run on every request
+
+
 
 async function getProducts(brandSlug: string): Promise<{ id: number; date: string; slug: string }[]> {
 
