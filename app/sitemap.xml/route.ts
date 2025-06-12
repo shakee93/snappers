@@ -1,16 +1,9 @@
 import { getClient } from '@/graphql/apollo-ssr'
 import { GET_SITEMAP_BRANDS } from '@/graphql/defs/sitemap-queries'
 import { Brand } from '@/graphql/types/graphql'
+import { BASE_URL, getBrands } from '../sitemap-helpers'
 
-export const BASE_URL = 'https://gqmobiles.lk'
 
-export const getBrands = async (): Promise<Brand[]> => {
-  const client = await getClient()
-  const { data } = await client.query({
-    query: GET_SITEMAP_BRANDS
-  })
-  return data.brands.nodes
-}
 
 export async function GET() {
   const brands = await getBrands()
