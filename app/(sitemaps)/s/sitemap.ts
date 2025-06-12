@@ -81,7 +81,6 @@ export default async function sitemap(id: { id: string }): Promise<MetadataRoute
   // slug example: apple, samsung, huawei, oppo
 
   const products = await getProducts(slug)
-  console.log("products", products);
 
   return products.map((product) => ({ 
     url: `${BASE_URL}/${slug}/${product.slug}`,
