@@ -1,4 +1,4 @@
-import { BASE_URL } from '@/app/sitemap'
+import { BASE_URL } from '@/app/sitemap-helpers'
 import type { MetadataRoute } from 'next'
 
 const PAGES = [

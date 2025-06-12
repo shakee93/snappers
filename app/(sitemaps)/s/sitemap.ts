@@ -1,4 +1,4 @@
-import { BASE_URL, getBrands } from '@/app/sitemap'
+import { BASE_URL, getBrands } from '@/app/sitemap-helpers'
 import { Brand } from '@/graphql/types/graphql';
 import type { MetadataRoute } from 'next'
 import { getClient } from '@/graphql/apollo-ssr'
