@@ -41,7 +41,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Add dynamic brand sitemaps
   brands.forEach(brand => {
     sitemapEntries.push({
-      url: `${BASE_URL}/${brand.slug}.xml`,
+      url: `${BASE_URL}/s/sitemap/${brand.slug}.xml`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.7,

@@ -68,10 +68,13 @@ async function getProducts(brandSlug: string): Promise<{ id: number; date: strin
 export async function generateSitemaps() {
   const brands = await getBrands()
   
-  return brands.map((brand: Brand) => ({
+  const list =brands.map((brand: Brand) => ({
     id: brand.slug,
   }))
+  console.log("list", list);
+  return list
 }
+
 
 export default async function sitemap(id: { id: string }): Promise<MetadataRoute.Sitemap> {
   const slug = id.id
@@ -81,7 +84,7 @@ export default async function sitemap(id: { id: string }): Promise<MetadataRoute
   console.log("products", products);
 
   return products.map((product) => ({ 
-    url: `${BASE_URL}/product/${product.slug}`,
+    url: `${BASE_URL}/${slug}/${product.slug}`,
     changeFrequency: 'weekly',
     priority: 0.7,
     lastModified: product.date,
