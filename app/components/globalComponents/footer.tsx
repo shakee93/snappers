@@ -202,7 +202,7 @@ const Footer = async () => {
                   <MapPinned size={iconSize} className="text-primaryColor" />
                 </div>
                 <div className="flex flex-col">
-                  <div>GQ Authentic</div>
+                  <div>GQ Authentics</div>
                   <div>
                     No. 250 | 1 | 161 First Floor, Liberty Plaza, Colombo 03.
                   </div>
