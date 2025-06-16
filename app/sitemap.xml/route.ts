@@ -11,19 +11,19 @@ export async function GET() {
   const sitemapEntries = [
     // Main sitemap index entries
     {
-      url: `${BASE_URL}/sitemaps/brands/sitemap.xml`,
+      url: `${BASE_URL}/s/brands/sitemap.xml`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.8,
     },
     {
-      url: `${BASE_URL}/sitemaps/collections/sitemap.xml`,
+      url: `${BASE_URL}/s/collections/sitemap.xml`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.8,
     },
     {
-      url: `${BASE_URL}/sitemaps/pages/sitemap.xml`,
+      url: `${BASE_URL}/s/pages/sitemap.xml`,
       lastModified: new Date(),
       changeFrequency: 'monthly',
       priority: 0.6,
