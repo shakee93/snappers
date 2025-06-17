@@ -129,11 +129,12 @@ const ProductCard: FC<ProductCardProps> = ({
         // notifyAddTocart(1);
       }
     } catch (error: any) {
-
       let highQuantity = error.message.includes("You cannot add that amount");
 
       if (highQuantity) {
-        toast.error("You've reached the maximum quantity allowed for this item.");
+        toast.error(
+          "You've reached the maximum quantity allowed for this item."
+        );
       } else {
         toast.error("Something is went wrong! please login again");
       }
@@ -372,22 +373,35 @@ const ProductCard: FC<ProductCardProps> = ({
         </Link>
 
         {/* Brand */}
-        <div className="flex flex-wrap items-center gap-2 ">
-          {brands?.nodes?.map((brand: Brand, index: number) => (
-            <Link
-              onClick={() => {
-                if (productLink == productName) {
-                  setSearch("");
-                }
-              }}
-              href={`/${brand?.slug}`}
-              key={index}
-            >
-              <div className="font-semibold text-xs text-blue-900 px-0 py-0 rounded-full ">
-                {brand?.name}
-              </div>
-            </Link>
-          ))}
+        <div className="flex  justify-between gap-2 ">
+          <div className="flex flex-wrap items-center gap-2 ">
+            {brands?.nodes?.map((brand: Brand, index: number) => (
+              <Link
+                onClick={() => {
+                  if (productLink == productName) {
+                    setSearch("");
+                  }
+                }}
+                href={`/${brand?.slug}`}
+                key={index}
+              >
+                <div className="font-semibold text-xs text-blue-900 px-0 py-0 rounded-full ">
+                  {brand?.name}
+                </div>
+              </Link>
+            ))}
+          </div>
+
+          {/* INstock badge in green */}
+          {stockStatus === "IN_STOCK" ? (
+            <div className="font-semibold text-xs text-green-500 px-0 py-0 rounded-full ">
+              In Stock
+            </div>
+          ) : (
+            <div className="font-semibold text-xs text-red-500 px-0 py-0 rounded-full ">
+              Out of Stock
+            </div>
+          )}
         </div>
 
         <Link
