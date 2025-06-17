@@ -193,8 +193,8 @@ const Footer = async () => {
                   </div>
                   <div className="flex flex-col mt-2 text-primaryColor">
                     <Link href={"tel:0777555665"}>0777 555 665</Link>
-                    <Link href={"tel:0112372665"}>0112 372 665</Link>
                     <Link href={"tel:0754555665"}>0754 555 665</Link>
+                    <Link href={"tel:0112372665"}>0112 372 665</Link>
                   </div>
                 </div>
               </li>
