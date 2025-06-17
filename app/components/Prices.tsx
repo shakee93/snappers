@@ -36,7 +36,7 @@ const Prices: FC<PricesProps> = ({
           className={`flex w-full ${contentClass} flex-wrap lg:flex-nowrap lg:w-auto`}
         >
           <span
-            className="text-green-500 font-normal line-through text-sm break-words lg:whitespace-nowrap max-w-full lg:max-w-none"
+            className="text-red-500 font-normal line-through text-sm break-words lg:whitespace-nowrap max-w-full lg:max-w-none"
             dangerouslySetInnerHTML={{ __html: salePrice || "" }}
           />
         </div>
