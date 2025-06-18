@@ -34,7 +34,7 @@ const navLinks: NavLinkItem[] = [
   {
     href: "/brands",
     name: "Brands",
-    component: BrandsMenu,
+    // component: BrandsMenu,
   },
   {
     href: "/collections/all",

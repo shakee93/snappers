@@ -25,6 +25,21 @@ export const GET_PRODUCT_SLUGS = gql`
   }
 `;
 
+export const GET_ALL_BRANDS = gql`
+  query getAllBrands {
+    brands(first: 100, where: { orderby: COUNT }) {
+      nodes {
+        name
+        slug
+        databaseId
+        count
+        brandImage
+      }
+    }
+  }
+`;
+
+
 export const GET_PRODUCT = gql`
   ${ProductContentFull}
   query GetProduct($productId: ID!) {
