@@ -19,6 +19,7 @@ type NavLinkItem = {
   href: string;
   name: string;
   component?: React.ComponentType<{ onClose: () => void }>;
+  special?: boolean;
 };
 
 const navLinks: NavLinkItem[] = [
@@ -43,6 +44,7 @@ const navLinks: NavLinkItem[] = [
   {
     href: "/tag/clearance",
     name: "Clearance",
+    special: true,
   },
   {
     href: "/contact",
@@ -77,7 +79,16 @@ export default function NavLinks() {
               </>
             ) : (
               <Link href={item.href} legacyBehavior passHref>
-                <NavigationMenuLink className="NavigationMenuLink">
+                <NavigationMenuLink
+                  className={`NavigationMenuLink ${
+                    item.special
+                      ? "relative px-3 animate-bounce flex items-center gap-1"
+                      : ""
+                  }`}
+                >
+                  {item.special && (
+                    <span className="mr-1">🔥</span>
+                  )}
                   {item.name}
                 </NavigationMenuLink>
               </Link>
