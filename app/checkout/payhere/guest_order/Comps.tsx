@@ -112,7 +112,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData }) => 
                 {lineItems.map((item: LineItem, index: number) => (
                   <tr key={index}>
                     <td className="px-6 text-left py-4 font-medium text-gray-800 dark:text-gray-200">
-                      {item.variation && item.variation.node?.name ? item.variation.node.name : "No product name found"}
+                      {item.variation ? item.variation.node?.name : item.product?.node?.name || "No product name found"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center text-gray-800 dark:text-gray-200">
                       {item?.quantity ?? 0}
