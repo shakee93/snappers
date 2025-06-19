@@ -4,6 +4,7 @@ import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import React, { useState } from "react";
 import { toast } from "sonner";
 import Link from "next/link";
+import { LineItem } from "@/graphql/types/graphql";
 
 
 interface OrderDetailsProps {
@@ -61,13 +62,13 @@ export const OrderDetails: React.FC<OrderDetailsProps> = ({ orderData }) => {
 };
 
 type ProductTableProps = {
-  lineItems?: any[];
+  lineItems?: LineItem[];
   orderData?: any;
   paymentDetails?: any;
 };
 
 const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData }) => {
-    if (!lineItems || !orderData) return null;
+    if (!lineItems || !orderData) return null;  
 
   const customer = orderData?.customer;
   const shippingAddress = customer?.shipping;
@@ -83,7 +84,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData }) => 
   };
 
 
-  console.log("lineItems in product table", lineItems);
+  console.log("lineItems in product table", lineItems );
 
   return (
     <>
@@ -108,7 +109,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData }) => 
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {lineItems.map((item, index) => (
+                {lineItems.map((item: LineItem, index: number) => (
                   <tr key={index}>
                     <td className="px-6 text-left py-4 font-medium text-gray-800 dark:text-gray-200">
                       {item.variation && item.variation.node?.name ? item.variation.node.name : "No product name found"}
