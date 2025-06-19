@@ -418,7 +418,6 @@ const CheckoutPage = () => {
     };
 
     if (isCashOnDelivery) {
-      console.log("isCashOnDelivery", updatedCheckoutDetails);
       if (
         customer?.id === "guest" ||
         checkoutDetails.order_id == "guest_checkout"
@@ -589,7 +588,6 @@ const CheckoutPage = () => {
 
       if (isPayhere && isGuest) {
         localStorage.setItem('payhere_last_order', JSON.stringify(guestCheckoutData));
-        console.log("guestCheckoutData in checkout page", guestCheckoutData);
         router.push(`/checkout/payhere/guest_order`);
         return;
       }
@@ -682,7 +680,6 @@ const CheckoutPage = () => {
   }, [taxWithTotal]);
 
   const handleKoko = async (orderData: any) => {
-    console.log('orderData', orderData);
     toast.info("Redirecting to Koko payment portal...", {
       duration: 10000
     });
@@ -695,17 +692,14 @@ const CheckoutPage = () => {
         body: JSON.stringify(orderData),
       });
 
-      console.log('response', response);
 
       if (!response.ok) {
         throw new Error('Network response was not ok');
       }
 
       const result = await response.json();
-      console.log('result', result);
 
       const kokoResponseData = JSON.parse(result.kokoResponse).data;
-      console.log('kokoResponseData', kokoResponseData);
       setHtmlFormResponse(kokoResponseData);
 
       const formContainer = document.createElement('div');
@@ -717,9 +711,7 @@ const CheckoutPage = () => {
       if (form) {
         form.submit();
       }
-      console.log('form', form);
 
-      console.log('Success:', result.kokoResponse);
     } catch (error) {
       console.error('Error:', error);
     }

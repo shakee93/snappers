@@ -8,6 +8,7 @@ import ButtonPrimary from "shared/Button/ButtonPrimary";
 import { useSearchParams } from "next/navigation";
 import { useCart } from "@/context/CartProvider";
 import { useEffect, useState } from "react";
+import OrderPaymentPageSkeleton from "./Skeleton";
 
 // No Order Message Component
 const NoOrderMessage = () => {
@@ -49,11 +50,13 @@ const NoOrderMessage = () => {
 export default function PayherePaymentPage() {
   const { clearCart, refreshCart } = useCart();
   const [orderData, setOrderData] = useState<string | null>(null);
+  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
     // Access localStorage only on client side
     const storedOrderData = localStorage.getItem('payhere_last_order');
     setOrderData(storedOrderData);
+    setIsChecking(false);
   }, []);
 
   useEffect(() => {
@@ -73,12 +76,15 @@ export default function PayherePaymentPage() {
     void clearCartSafely();
   }, []);
 
+  // Show skeleton while checking localStorage
+  if (isChecking) {
+    return <OrderPaymentPageSkeleton />;
+  }
+
   // Return early if no order data
   if (!orderData) {
     return <NoOrderMessage />;
   }
-
-  console.log("orderData in payhere page", orderData);
 
   const parsedOrderData = JSON.parse(orderData);
   let email = parsedOrderData?.checkout?.customer?.billing?.email || "";

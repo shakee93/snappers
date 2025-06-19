@@ -75,16 +75,12 @@ const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData }) => 
   const billingAddress = customer?.billing;
 
   const formatAddress = (address: any) => {
+
     if (!address) return "Address not available";
-    return `${address.firstName} ${address.lastName}
-            ${address.address1}
-            ${address.address2 ? address.address2 : ""}
-            ${address.city}
-            ${address.country}`.trim();
+    return `${address.address1 || ""} ${address.address2 || ""} ${address.city || ""} ${address.country || ""}`.trim();
   };
 
 
-  console.log("lineItems in product table", lineItems );
 
   return (
     <>
@@ -175,7 +171,6 @@ export const PaymentSection = ({ orderData, email }: any) => {
   const [payhereStatus, setPayhereStatus] = useState<PayhereStatus>("idle");
   const initiatePayment = usePayhere();
 
-  console.log("orderData", orderData);
   
   const handlePayherePayment = async () => {
     try {
@@ -277,26 +272,13 @@ export default ProductTable;
 
 export const createProductList = (orderData: any): string => {
   if(!orderData) return "";
+  console.log("orderData in createProductList", orderData);
   const productArray = orderData?.order?.lineItems?.nodes?.map((item: any) => {
-      const productNode = item.product.node;
+      const productNode = item.variation ? item.variation.node : item.product.node;
       const productName = productNode.name;
-      
-      // Get all keys that start with "allPa"
-      const attributes = Object.keys(productNode)
-          .filter(key => key.startsWith('allPa'));
-      
-      // Get the first value from each attribute's nodes array if it exists
-      const attributeValues = attributes
-          .map(attr => {
-              const nodes = productNode[attr]?.nodes;
-              return nodes && nodes.length > 0 ? nodes[0].name : '';
-          })
-          .filter(Boolean);  // Remove empty values
-      
-      // Combine product name with attributes
-      return attributeValues.length > 0
-          ? `${productName} | ${attributeValues.join(" | ")}`
-          : productName;
+
+
+      return productName;
   });
 
   // Convert array into a comma-separated string
