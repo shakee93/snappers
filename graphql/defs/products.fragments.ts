@@ -129,6 +129,7 @@ export const ProductContentSlice = gql`
           slug
         }
       }
+
       price
       regularPrice
       soldIndividually
@@ -142,6 +143,8 @@ export const ProductContentSlice = gql`
     }
   }
 `;
+
+
 
 export const ProductVariationContentSlice = gql`
   fragment ProductVariationContentSlice on ProductVariation {

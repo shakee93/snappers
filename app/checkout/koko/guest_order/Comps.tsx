@@ -192,6 +192,8 @@ export const PaymentSection = ({ orderData, email }: any) => {
         city: orderData.customer.billing.city,
       };
 
+      console.log("paymentDetails for payhere", paymentDetails);
+
       await initiatePayment(paymentDetails, setPayhereStatus);
     } catch (error) {
       console.error("Payment initiation error:", error);

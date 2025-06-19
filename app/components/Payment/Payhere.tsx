@@ -35,8 +35,6 @@ const tranformDataForPayhere = async (
     ? "ItemNo12345"
     : paymentDetails_?.order_id;
 
-
-    // console.log("amount String: ", paymentDetails_?.amount);
   let amount: string | undefined = TEST
     ? "100.00"
     : numberFormat(extractRawAmount(paymentDetails_?.amount), 2, ".", ""); 

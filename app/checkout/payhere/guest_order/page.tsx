@@ -53,6 +53,7 @@ export default function PayherePaymentPage() {
   useEffect(() => {
     // Access localStorage only on client side
     const storedOrderData = localStorage.getItem('payhere_last_order');
+    console.log("storedOrderData in payhere page", storedOrderData);
     setOrderData(storedOrderData);
   }, []);
 
@@ -77,6 +78,8 @@ export default function PayherePaymentPage() {
   if (!orderData) {
     return <NoOrderMessage />;
   }
+
+  console.log("orderData in payhere page", orderData);
 
   const parsedOrderData = JSON.parse(orderData);
   let email = parsedOrderData?.checkout?.customer?.billing?.email || "";

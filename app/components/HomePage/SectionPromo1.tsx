@@ -41,7 +41,7 @@ const SectionPromo1: FC<SectionPromo1Props> = ({ className = "" }) => {
         <div className="flex space-x-2 sm:space-x-5 ">
           <Link href="/collections/all">
             <ButtonPrimary className="">
-              Shop Now
+              Shop Now 
             </ButtonPrimary>
           </Link>
           <Link href="/collections/all">

@@ -71,7 +71,6 @@ export async function generateSitemaps() {
   const list =brands.map((brand: Brand) => ({
     id: brand.slug,
   }))
-  console.log("list", list);
   return list
 }
 

@@ -70,13 +70,16 @@ export const GUEST_CHECKOUT = gql`
             quantity
             product {
               node {
-                name
+                ...ProductContentSlice
+              }
+            }
+            variation {
+              node {
                 databaseId
-                featuredImage {
-                  node {
-                    sourceUrl
-                  }
-                }
+                name
+                price
+                regularPrice
+                soldIndividually
               }
             }
           }
@@ -85,6 +88,7 @@ export const GUEST_CHECKOUT = gql`
     }
   }
   ${CustomerAddressFragment}
+  ${ProductContentSlice}
 `;
 
 export const PAYMENT_DETAILS = gql`

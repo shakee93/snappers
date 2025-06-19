@@ -41,7 +41,7 @@ const TopBarPromotion: React.FC<{ options?: Options }> = ({ options }) => {
                 href={topBarButtonLink}
                 className="bg-blue-700 text-white font-semibold py-1 px-2 md:py-1 md:px-4 rounded transition duration-300 ease-in-out hover:bg-blue-800"
               >
-                {topBarButtonText}
+                {topBarButtonText} 
               </Link>
             </div>
           </div>
