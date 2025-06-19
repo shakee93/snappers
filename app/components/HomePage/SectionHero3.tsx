@@ -7,6 +7,9 @@ import ButtonPrimary from "shared/Button/ButtonPrimary";
 import Next from "shared/NextPrev/Next";
 import Prev from "shared/NextPrev/Prev";
 
+// REMOVE OVERLAY PROMPT
+// remove black overlay and add a shadow to text for heading andd subheading texts. 
+
 interface SlideType {
   id: string;
   slidePriority: number; // From GraphQL
@@ -140,6 +143,7 @@ const SectionHero3 = ({ className = "", slides }: SectionHero3Props) => {
   const currentSlide = sortedSlides[indexActive];
   const showOverlay = currentSlide?.mainHeading || currentSlide?.subHeading;
 
+
   return (
     <div 
       className="relative w-full h-[550px] md:h-[400px] xl:h-[600px]"
@@ -170,7 +174,7 @@ const SectionHero3 = ({ className = "", slides }: SectionHero3Props) => {
             >
               {currentSlide?.subHeading && (
                 <span className={`nc-SectionHero2Item__subheading text-${currentSlide?.contentPosition || 'center'} block text-base md:text-xl font-medium`}>
-                  {currentSlide.subHeading}
+                  {currentSlide.subHeading} 
                 </span>
               )}
 
