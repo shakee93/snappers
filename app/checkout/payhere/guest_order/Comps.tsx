@@ -62,7 +62,7 @@ export const OrderDetails: React.FC<OrderDetailsProps> = ({ orderData }) => {
 };
 
 type ProductTableProps = {
-  lineItems?: LineItem[];
+  lineItems?: LineItem[] | null;
   orderData?: any;
   paymentDetails?: any;
 };
