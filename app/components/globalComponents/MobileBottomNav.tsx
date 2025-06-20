@@ -4,7 +4,10 @@ import {
     Search,
     ShoppingBag,
     LayoutGrid,
-    UserCircle, Codesandbox, Menu, CircleUser,
+    UserCircle, Codesandbox, Menu, CircleUser, CircleEllipsis,
+    Tag,
+    Flame,
+
 } from "lucide-react";
 import Logo from "./Logo";
 import { XIcon } from "lucide-react";
@@ -82,8 +85,15 @@ const MobileBottomNav = ({ categories }: { categories: any }) => {
                 </div>
 
             </div>
+            <Link
+                href="/tag/clearance"
+                className="flex pt-2 flex-1 flex-col justify-center items-center text-primaryColor gap-1 cursor-pointer"
+            >
+                <Flame className="animate-bounce text-red-500" fill="orange"/>
+                <div className="text-[11px]">Clearance</div>
+            </Link>
 
-            <div
+            {/* <div
                 className="flex pt-2 flex-1 flex-col justify-center items-center text-primaryColor gap-1 cursor-pointer"
                 onClick={async () => {
                     const fetchedCustomer = await fetchCustomer();
@@ -97,12 +107,12 @@ const MobileBottomNav = ({ categories }: { categories: any }) => {
                 <CircleUser />
                 <div className="text-[11px]">{!customer || customer?.id === "guest" ? 'Login' : 'Account'}</div>
 
-            </div>
+            </div> */}
             <div
                 onClick={e => toggleMobileMenu()}
                 className="flex pt-2 flex-col justify-center items-center text-primaryColor gap-1"
             >
-                {mobileMenu ? <XIcon /> : <Menu />}
+                {mobileMenu ? <XIcon /> : (!customer || customer?.id === "guest" ? <Menu /> : <CircleEllipsis />)}
                 <div className="text-[11px]">Menu</div>
             </div>
 
