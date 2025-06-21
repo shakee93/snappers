@@ -19,6 +19,7 @@ const SortInput = () => {
 
 
     useEffect(() => {
+        console.log(sidebar.sort);
         refine(`product/sort/${sidebar.sort}`)
     }, [sidebar.sort])
 

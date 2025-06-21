@@ -118,10 +118,14 @@ const InstantSearchWrapper = ({
       },
       additionalSearchParameters: {
         query_by: "name, description, productTags",
+        query_by_weights: "3,1,1",
         exclude_fields: "description, shortDescription, galleryImages, attributes",
-        use_cache: false,
+        // use_cache: false,
         filter_by: filterQuery,
+        sort_by: "in_stock:desc",
         per_page: hitsPerPage,
+        prefix: true,
+        num_typos: 1,
       },
     });
 

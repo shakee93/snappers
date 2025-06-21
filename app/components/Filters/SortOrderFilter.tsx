@@ -16,7 +16,7 @@ const DATA_sortOrderRadios = [
     { name: "Best Rating", id: "reviewCount(missing_values: last):desc" },
     { name: "Newest", id: "databaseId:desc" },
     { name: "Price Low - High", id: "rawPriceNumber(missing_values: last):asc" },
-    { name: "Price High - Low", id: "rawPriceNumber(missing_values: last):desc" },
+    { name: "Price High - Low", id: "rawPriceNumber(missing_values: last):desc" },  
 ];
 
 const SortOrderFilter = ({ sorts }: { sorts: any }) => {
