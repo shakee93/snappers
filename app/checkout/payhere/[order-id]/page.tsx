@@ -174,7 +174,7 @@ export default function PayherePaymentPage({ params }: any) {
 
           {/* Payment Section - Only show for pending/processing orders */}
           {(orderStatus === 'pending' || orderStatus === 'processing') && (
-            <PaymentSection orderData={temporaryPaymentDetails} />
+            <PaymentSection orderData={temporaryPaymentDetails} CoreOrderData={orderData} />
           )}
 
           {/* Order Details */}

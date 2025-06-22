@@ -192,7 +192,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
   );
 };
 
-export const PaymentSection = ({ orderData }: any) => {
+export const PaymentSection = ({ orderData, CoreOrderData }: any) => {
   const [payhereStatus, setPayhereStatus] = useState<PayhereStatus>("idle");
   const initiatePayment = usePayhere();
 
@@ -202,7 +202,7 @@ export const PaymentSection = ({ orderData }: any) => {
       console.log("order data in payhere", orderData);
       const paymentDetails: PaymentDetailsWithoutUrls = {
         order_id: orderData.order_id,
-        items: createProductList(orderData) || [],
+        items: createProductList(CoreOrderData) || [],
         amount: rawAmount,
         first_name: orderData.first_name,
         last_name: orderData.last_name,
