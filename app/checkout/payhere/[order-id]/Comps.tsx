@@ -5,13 +5,18 @@ import React, { useState } from "react";
 
 import { toast } from "sonner";
 import Link from "next/link";
+import { LineItem } from "@/graphql/types/graphql";
+import { createProductList, ProductTableRows } from "../../CheckoutUtils";
 
 interface OrderDetailsProps {
   orderData: any;
   orderStatus: string;
 }
 
-export const OrderDetails: React.FC<OrderDetailsProps> = ({ orderData, orderStatus }) => {
+export const OrderDetails: React.FC<OrderDetailsProps> = ({
+  orderData,
+  orderStatus,
+}) => {
   if (!orderData) return null;
 
   const formatCurrency = (value: string) => {
@@ -33,27 +38,27 @@ export const OrderDetails: React.FC<OrderDetailsProps> = ({ orderData, orderStat
     <div className="my-4">
       <div className="grid grid-cols-1 lg:grid-cols-1 py-4">
         <div className="flex flex-col justify-center items-start">
-          {orderStatus === 'pending' && (
+          {orderStatus === "pending" && (
             <h1 className="text-3xl font-regural">
               We{"'"}ve got your order. Proceed with Payment.
             </h1>
           )}
-          {orderStatus === 'processing' && (
+          {orderStatus === "processing" && (
             <h1 className="text-3xl font-regural">
               Your payment is being processed. Please wait...
             </h1>
           )}
-          {orderStatus === 'completed' && (
+          {orderStatus === "completed" && (
             <h1 className="text-3xl font-regural text-green-600">
               Order Complete! Thank you for shopping with us.
             </h1>
           )}
-          {orderStatus === 'phauthorized' && (
+          {orderStatus === "phauthorized" && (
             <h1 className="text-3xl font-regural 0">
               Payment Authorized! Our team will review and process your order.
             </h1>
           )}
-          {orderStatus === 'failed' && (
+          {orderStatus === "failed" && (
             <h1 className="text-3xl font-regural text-red-600">
               Payment Failed. Please try again or contact support.
             </h1>
@@ -83,8 +88,10 @@ export const OrderDetails: React.FC<OrderDetailsProps> = ({ orderData, orderStat
   );
 };
 
+
+
 type ProductTableProps = {
-  lineItems?: any;
+  lineItems?: LineItem[];
   orderData?: any;
   paymentDetails?: any;
 };
@@ -110,6 +117,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
             ${orderData.city}
             ${orderData.country}`.trim();
   };
+  console.log("lineItems new section", lineItems);
 
   return (
     <>
@@ -134,21 +142,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {lineItems.map((item: any, index: any) => (
-                  <tr key={index}>
-                    <td className="px-6 text-left py-4 font-medium text-gray-800 dark:text-gray-200">
-                      {item?.product?.node?.name ??
-                        "Product name not available"}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center text-gray-800 dark:text-gray-200">
-                      {item?.quantity ?? 0}
-                    </td>
-                    <td className="px-6 py-4 text-right whitespace-nowrap text-gray-800 dark:text-gray-200">
-                      Rs. {item?.subtotal ?? 0}
-                    </td>
-                  </tr>
-                ))}
-
+                <ProductTableRows lineItems={lineItems} />
                 <tr>
                   <td className="px-6 text-left py-4 font-medium text-gray-800 dark:text-gray-200">
                     Shipping
@@ -201,15 +195,13 @@ export const PaymentSection = ({ orderData }: any) => {
   const [payhereStatus, setPayhereStatus] = useState<PayhereStatus>("idle");
   const initiatePayment = usePayhere();
 
-  console.log("orderData in logged in", orderData);
-
   const handlePayherePayment = async () => {
     try {
       const rawAmount = orderData.total.replace(/[^0-9.]/g, "");
       console.log("order data in payhere", orderData);
       const paymentDetails: PaymentDetailsWithoutUrls = {
         order_id: orderData.order_id,
-        items: createProductList(orderData),
+        items: createProductList(orderData) || [],
         amount: rawAmount,
         first_name: orderData.first_name,
         last_name: orderData.last_name,
@@ -282,34 +274,4 @@ export const PaymentSection = ({ orderData }: any) => {
 };
 
 export default ProductTable;
-
-
-const createProductList = (orderData: any): string => {
-  if(!orderData) return "";
-  
-  const productArray = orderData?.items?.map((item: any) => {
-      const productNode = item.product.node;
-      const productName = productNode.name;
-      
-      // Get all keys that start with "allPa"
-      const attributes = Object.keys(productNode)
-          .filter(key => key.startsWith('allPa'));
-      
-      // Get the first value from each attribute's nodes array if it exists
-      const attributeValues = attributes
-          .map(attr => {
-              const nodes = productNode[attr]?.nodes;
-              return nodes && nodes.length > 0 ? nodes[0].name : '';
-          })
-          .filter(Boolean);  // Remove empty values
-      
-      // Combine product name with attributes
-      return attributeValues.length > 0
-          ? `${productName} | ${attributeValues.join(" | ")}`
-          : productName;
-  });
-
-  // Convert array into a comma-separated string
-  return productArray.join(", ");
-};
 

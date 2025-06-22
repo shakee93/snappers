@@ -318,6 +318,13 @@ export const GET_SINGLE_ORDER = gql`
           databaseId
           subtotal
           quantity
+          variation {
+            node {
+              name
+              price
+              regularPrice
+            }
+          }
           product {
             node {
               name

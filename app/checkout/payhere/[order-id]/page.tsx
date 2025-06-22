@@ -129,6 +129,9 @@ export default function PayherePaymentPage({ params }: any) {
     }),
     [orderData, customerData]
   );
+  console.log("order data get data", orderData);
+  console.log("orderError", orderError);
+
 
   if (!orderData) {
     return <OrderPaymentPageSkeleton />;
@@ -166,7 +169,7 @@ export default function PayherePaymentPage({ params }: any) {
           
           {/* Email Notification */}
           <div className="mb-6 text-gray-600">
-            Order details have been sent to your email: <span className="font-medium">{email}</span>
+            Order details will be sent to your email: <span className="font-medium">{email}</span>
           </div>
 
           {/* Payment Section - Only show for pending/processing orders */}

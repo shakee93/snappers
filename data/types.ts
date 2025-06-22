@@ -1,3 +1,5 @@
+import { LineItem } from "@/graphql/types/graphql";
+
 //  ######  CustomLink  ######## //
 export interface CustomLink {
   label: string;
@@ -39,7 +41,7 @@ export type PaymentDetailsType = {
   notify_url?: string;
   hash?: string | null;
   order_id: string;
-  items?: string;
+  items?: LineItem[];
   amount: any;
   currency?: string;
   first_name?: string;
@@ -108,6 +110,8 @@ export interface PayhereTransactionData {
   city?: string;
   country: string;
 }
+
+
 
 export type PayhereStatus = "idle" | "loading" | "started" | "error" | "finished" | "dismissed";
 

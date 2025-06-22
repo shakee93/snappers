@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import { toast } from "sonner";
 import Link from "next/link";
 import { LineItem } from "@/graphql/types/graphql";
+import { createProductList, ProductTableRows } from "../../CheckoutUtils";
 
 
 interface OrderDetailsProps {
@@ -105,20 +106,7 @@ const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData }) => 
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-                {lineItems.map((item: LineItem, index: number) => (
-                  <tr key={index}>
-                    <td className="px-6 text-left py-4 font-medium text-gray-800 dark:text-gray-200">
-                      {item.variation ? item.variation.node?.name : item.product?.node?.name || "No product name found"}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-center text-gray-800 dark:text-gray-200">
-                      {item?.quantity ?? 0}
-                    </td>
-                    <td className="px-6 py-4 text-right whitespace-nowrap text-gray-800 dark:text-gray-200">
-                      Rs. {item?.subtotal ?? 0}
-                    </td>
-                  </tr>
-                ))}
-
+                <ProductTableRows lineItems={lineItems} />
                 <tr>
                   <td className="px-6 text-left py-4 font-medium text-gray-800 dark:text-gray-200">
                     Shipping
@@ -178,7 +166,7 @@ export const PaymentSection = ({ orderData, email }: any) => {
       
       const paymentDetails: PaymentDetailsWithoutUrls = {
         order_id: orderData.order.databaseId.toString(),
-        items: createProductList(orderData),
+        items: createProductList(orderData) || [],
         amount: rawAmount,
         first_name: orderData.customer.billing.firstName || orderData.customer.shipping.firstName,
         last_name: orderData.customer.billing.lastName || orderData.customer.shipping.lastName,
@@ -267,23 +255,6 @@ export default ProductTable;
 
 
 
-
-
-
-export const createProductList = (orderData: any): string => {
-  if(!orderData) return "";
-  console.log("orderData in createProductList", orderData);
-  const productArray = orderData?.order?.lineItems?.nodes?.map((item: any) => {
-      const productNode = item.variation ? item.variation.node : item.product.node;
-      const productName = productNode.name;
-
-
-      return productName;
-  });
-
-  // Convert array into a comma-separated string
-  return productArray.join(", ");
-};
 
 
 
