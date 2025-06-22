@@ -308,72 +308,74 @@ const CheckoutPage = () => {
     return paymentData;
   }, [paymentData]);
 
-  const ImplementPayhere = async () => {
-    let generatedOrderId = crypto.randomUUID();
-    setPayherPaymentID(generatedOrderId);
+  //   let generatedOrderId = crypto.randomUUID();
+  //   setPayherPaymentID(generatedOrderId);
 
-    let { firstName, lastName, city, apartment } = formData.billingAddress as any;
-    let { email, phone } = formData.contactInfo;
+  //   let { firstName, lastName, city, apartment } = formData.billingAddress as any;
+  //   let { email, phone } = formData.contactInfo;
 
-    if (
-      !orderTotal ||
-      !firstName ||
-      !lastName ||
-      !email ||
-      !phone ||
-      !apartment ||
-      !city
-    ) {
-      toast.error("No order found");
-      return;
-    }
+  //   if (
+  //     !orderTotal ||
+  //     !firstName ||
+  //     !lastName ||
+  //     !email ||
+  //     !phone ||
+  //     !apartment ||
+  //     !city
+  //   ) {
+  //     toast.error("No order found");
+  //     return;
+  //   }
 
-    const products = cart?.contents?.nodes;
+  //   const products = cart?.contents?.nodes;
+  //   console.log("CART PRODUCTS", cart);
 
-    const productList = products?.map((product: any) => {
-      const productName = product.product.node.name;
-      const varProduct = product.product.node.type;
+  //   const productList = products?.map((product: any) => {
+  //     const productName = product.product.node.name;
+  //     const varProduct = product.product.node.type;
 
-      const attributes = Object.keys(product.product.node).filter((key) =>
-        key.startsWith("allPa")
-      );
-      const attributeValues = attributes
-        .map((attr) => {
-          const nodes = product.product.node[attr]?.nodes;
-          return nodes && nodes.length > 0 ? nodes[0].name : "";
-        })
-        .filter(Boolean);
+  //     const attributes = Object.keys(product.product.node).filter((key) =>
+  //       key.startsWith("allPa")
+  //     );
+  //     const attributeValues = attributes
+  //       .map((attr) => {
+  //         const nodes = product.product.node[attr]?.nodes;
+  //         return nodes && nodes.length > 0 ? nodes[0].name : "";
+  //       })
+  //       .filter(Boolean);
 
-      const productString =
-        varProduct === "VARIABLE"
-          ? `${productName} | ${attributeValues.join(" | ")}`
-          : productName;
+  //     const productString =
+  //       varProduct === "VARIABLE"
+  //         ? `${productName} | ${attributeValues.join(" | ")}`
+  //         : productName;
 
-      return productString;
-    });
+  //     return productString;
+  //   });
+    
 
-    let checkoutDetails: PaymentDetailsWithoutUrls = {
-      amount: isCardPayment ? totalWithTax : orderTotal,
-      order_id: generatedOrderId,
-      first_name: firstName,
-      last_name: lastName,
-      email: email,
-      phone: phone,
-      items: productList?.join(" , "),
-      address: city + apartment,
-      city: city,
-    };
+  //   let checkoutDetails: PaymentDetailsWithoutUrls = {
+  //     amount: isCardPayment ? totalWithTax : orderTotal,
+  //     order_id: generatedOrderId,
+  //     first_name: firstName,
+  //     last_name: lastName,
+  //     email: email,
+  //     phone: phone,
+  //     items: productList?.join(" , "),
+  //     address: city + apartment,
+  //     city: city,
+  //   };
 
-    if (!initiatePayment) {
-      toast.error("Payhere not initiated");
-      return;
-    }
 
-    setPayhereHandleStatus("loading");
-    initiatePayment(checkoutDetails, setPayhereHandleStatus).then((r) => {
-      console.log("r", r);
-    });
-  };
+  //   if (!initiatePayment) {
+  //     toast.error("Payhere not initiated");
+  //     return;
+  //   }
+
+  //   setPayhereHandleStatus("loading");
+  //   initiatePayment(checkoutDetails, setPayhereHandleStatus).then((r) => {
+  //     console.log("r", r);
+  //   });
+  // };
 
   function ImplementBankTransfer() {
     setWantToSHowBankTransfer(false);
@@ -386,7 +388,7 @@ const CheckoutPage = () => {
     }
 
     const isCashOnDelivery = formData?.paymentMethod?.selectedGateway?.id == "cod";
-    const isKokoPayment = formData?.paymentMethod?.selectedGateway?.id == "darazbnpl";
+    // const isKokoPayment = formData?.paymentMethod?.selectedGateway?.id == "darazbnpl";
 
     let checkoutDetails = paymentDetails;
 
@@ -993,18 +995,6 @@ const CheckoutPage = () => {
                 </div>
               ))}
             </div>
-
-            {/*<ButtonPrimary onClick={CreateOrderGuest}>*/}
-            {/*    GUEST CHECKOUT*/}
-            {/*</ButtonPrimary>*/}
-
-            {/*<ButtonPrimary onClick={ImplementPayhere}>*/}
-            {/*    Confirm Order With Payhere*/}
-            {/*</ButtonPrimary>*/}
-
-            {/*<ButtonPrimary onClick={ImplementBankTransfer}>*/}
-            {/*    Do your Bank Transfer*/}
-            {/*</ButtonPrimary>*/}
           </div>
         </div>
       </main>

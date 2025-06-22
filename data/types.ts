@@ -41,7 +41,7 @@ export type PaymentDetailsType = {
   notify_url?: string;
   hash?: string | null;
   order_id: string;
-  items?: LineItem[];
+  items?: any;
   amount: any;
   currency?: string;
   first_name?: string;

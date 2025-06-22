@@ -4,6 +4,7 @@ import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import React, { useState } from "react";
 import { toast } from "sonner";
 import Link from "next/link";
+import { createProductList } from "../../CheckoutUtils";
 
 
 interface OrderDetailsProps {
@@ -171,10 +172,10 @@ const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData }) => 
 
 
 export const PaymentSection = ({ orderData, email }: any) => {
+
   const [payhereStatus, setPayhereStatus] = useState<PayhereStatus>("idle");
   const initiatePayment = usePayhere();
 
-  // console.log("orderData", orderData);
   
   const handlePayherePayment = async () => {
     try {
@@ -182,7 +183,7 @@ export const PaymentSection = ({ orderData, email }: any) => {
       
       const paymentDetails: PaymentDetailsWithoutUrls = {
         order_id: orderData.order.databaseId.toString(),
-        items: createProductList(orderData),
+        items: createProductList(orderData) || [],
         amount: rawAmount,
         first_name: orderData.customer.billing.firstName || orderData.customer.shipping.firstName,
         last_name: orderData.customer.billing.lastName || orderData.customer.shipping.lastName,
@@ -273,36 +274,6 @@ export default ProductTable;
 
 
 
-
-
-
-export const createProductList = (orderData: any): string => {
-  if(!orderData) return "";
-  const productArray = orderData?.order?.lineItems?.nodes?.map((item: any) => {
-      const productNode = item.product.node;
-      const productName = productNode.name;
-      
-      // Get all keys that start with "allPa"
-      const attributes = Object.keys(productNode)
-          .filter(key => key.startsWith('allPa'));
-      
-      // Get the first value from each attribute's nodes array if it exists
-      const attributeValues = attributes
-          .map(attr => {
-              const nodes = productNode[attr]?.nodes;
-              return nodes && nodes.length > 0 ? nodes[0].name : '';
-          })
-          .filter(Boolean);  // Remove empty values
-      
-      // Combine product name with attributes
-      return attributeValues.length > 0
-          ? `${productName} | ${attributeValues.join(" | ")}`
-          : productName;
-  });
-
-  // Convert array into a comma-separated string
-  return productArray.join(", ");
-};
 
 
 
