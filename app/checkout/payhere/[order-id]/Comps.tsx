@@ -17,6 +17,7 @@ export const OrderDetails: React.FC<OrderDetailsProps> = ({
   orderData,
   orderStatus,
 }) => {
+
   if (!orderData) return null;
 
   const formatCurrency = (value: string) => {
@@ -216,7 +217,6 @@ export const PaymentSection = ({ orderData }: any) => {
 
         city: orderData.city,
       };
-      console.log("paymentDetails", paymentDetails);
       // return;
 
       await initiatePayment(paymentDetails, setPayhereStatus);
