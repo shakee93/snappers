@@ -218,8 +218,6 @@ export const PaymentSection = ({ orderData, CoreOrderData }: any) => {
         city: orderData.city,
       };
 
-      console.log("PAYMENT DETAILS", paymentDetails);
-      // return;
 
       await initiatePayment(paymentDetails, setPayhereStatus);
     } catch (error) {

@@ -129,8 +129,7 @@ export default function PayherePaymentPage({ params }: any) {
     }),
     [orderData, customerData]
   );
-  console.log("order data get data", orderData);
-  console.log("orderError", orderError);
+
 
 
   if (!orderData) {
