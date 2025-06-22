@@ -217,6 +217,8 @@ export const PaymentSection = ({ orderData }: any) => {
 
         city: orderData.city,
       };
+
+      console.log("PAYMENT DETAILS", paymentDetails);
       // return;
 
       await initiatePayment(paymentDetails, setPayhereStatus);

@@ -11,8 +11,8 @@ export const createProductList = (orderData: any): LineItem[] | null => {
 
     return productName;
   });
+  console.log("PRODUCT ARRAY", productArray);
 
-  // Convert array into a comma-separated string
   return productArray.join(", ");
 };
 
