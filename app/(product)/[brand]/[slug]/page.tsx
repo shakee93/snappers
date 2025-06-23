@@ -1,6 +1,6 @@
 import { getClient } from "@/graphql/apollo-ssr";
-import { GET_BRANDS, GET_PRODUCT } from "@/graphql/defs/products";
-import { Brand, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
+import { GET_BRANDS, GET_CATEGORY_ARCHIVE, GET_PRODUCT, GET_PRODUCTS_NODES } from "@/graphql/defs/products";
+import { Brand, SimpleProduct, VariableProduct, Product as GQLProduct } from "@/graphql/types/graphql";
 import { notFound, redirect } from "next/navigation";
 import ProductDetails from "@/app/components/SingleProductPage/ProductDetails";
 import Features from "@/app/components/SingleProductPage/FeatureCard";
@@ -43,7 +43,15 @@ async function getData(slug: string, brand: string) {
       fetchPolicy: "no-cache",
     });
 
-    // console.log('data', data);
+    const { data: categoryData } = await getClient().query({
+      query: GET_CATEGORY_ARCHIVE,
+      variables: {
+        categoryIdIn: data.product.productCategories?.edges?.map((cat: any) => cat.node.databaseId) || [],
+        first: 10,
+      },
+    });
+
+    const upsellProducts = categoryData?.products?.edges.map((edge: any) => edge.node) || [];
 
     if (!data.product) {
       console.log("Product not found");
@@ -57,6 +65,7 @@ async function getData(slug: string, brand: string) {
     return {
       product: data.product,
       brand: productBrand,
+      upsellProducts: upsellProducts,
     };
   } catch (e) {
     console.error("Error fetching product data:", e);
@@ -65,14 +74,11 @@ async function getData(slug: string, brand: string) {
 }
 
 
-
 export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
 ): Promise<Metadata> {
-  // fetch data
   const { product, brand } = await getData(params.slug, params.brand);
-  // const price = product.price || "the best price";
 
   if (params.brand !== brand.slug) {
     redirect(`/${brand.slug}/${product.slug}`)
@@ -105,19 +111,19 @@ export async function generateMetadata(
   };
 }
 
+
 const Page = async ({ params }: Props) => {
-  // return <LoadingBrands/>
   const {
     product,
     brand,
+    upsellProducts: upsellProductsFromData,
   }: {
     product: SimpleProduct & VariableProduct;
     brand: Brand;
+    upsellProducts: any[];
   } = await getData(params.slug, params.brand);
 
-
   const productSchema = getProductSchema(product, brand);
-
 
   return (
     <div className="mt-5 md:mt-10">
@@ -152,21 +158,9 @@ const Page = async ({ params }: Props) => {
         <div className=" lg:hidden w-full lg:w-1/5 p-3 bg-white rounded-3xl my-5">
           <Features />
         </div>
-        <div className="hidden py-5 rounded-3xl my-5">
-          {/*<SectionSliderProductCard*/}
-          {/*    data={[*/}
-          {/*        PRODUCTS[4],*/}
-          {/*        SPORT_PRODUCTS[5],*/}
-          {/*        PRODUCTS[7],*/}
-          {/*        SPORT_PRODUCTS[1],*/}
-          {/*        PRODUCTS[6],*/}
-          {/*    ]}*/}
-          {/*    heading="Related Products"*/}
-          {/*/>*/}
-        </div>
 
         <div className="mt-5 md:mt-10">
-          <UpsellProducts newArrivals={product.upsell?.nodes} />
+          <UpsellProducts newArrivals={upsellProductsFromData} />
         </div>
       </main>
     </div>

@@ -77,6 +77,7 @@ export async function generateMetadata(
 
 const Page = async ({ params }: Props) => {
   const { productCategory } = await getData(params.collection);
+  console.log('PRODUCT CATEOGYRYYYYY', productCategory);
 
   return (
     <ArchiveLayout
