@@ -83,7 +83,7 @@ const faqs = [
 
 const FAQ = () => {
   return (
-    <div className="w-full max-w-6xl bg-gradient-to-br p-12 from-blue-500/40 via-blue-500/10 to-white rounded-3xl border flex flex-col md:flex-row overflow-hidden">
+    <div className="w-full  bg-gradient-to-br p-12 from-blue-500/40 via-blue-500/10 to-white rounded-3xl border flex flex-col md:flex-row overflow-hidden">
       {/* Left Column */}
       <div className="md:w-1/2 md:p-8 p-4 flex flex-col ">
         <span className="font-semibold text-sm mb-2">FAQ</span>
