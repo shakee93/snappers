@@ -649,7 +649,7 @@ const CheckoutPage = () => {
         toast.error("please login or create an account to checkout");
         router.push("/login");
       } else {
-        toast.error("create an account to checkout");
+        toast.error("Something went wrong. Please reload the page or log in again.");
       }
     } else {
       toast.error("Failed to create the order: " + error.message);

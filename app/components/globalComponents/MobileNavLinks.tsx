@@ -39,7 +39,9 @@ const MobileNavLinks = () => {
       href: "/contact",
       name: "Contact Us",
     },
+
   ];
+
 
   const { mobileMenu, toggleMobileMenu } = useStore()
   const { customer, fetchCustomer, updateCustomer } = useSession();
@@ -75,11 +77,19 @@ const MobileNavLinks = () => {
                 </Link>
               </li>
             ))}
+            <li className="rounded-3xl px-1 xl:px-3 py-1 ">
+              <Link
+                onClick={e => toggleMobileMenu()}
+                href={!customer || customer?.id === "guest" ? "/login" : "/account"}
+              >
+                {!customer || customer?.id === "guest" ? "Login" : "Account"}
+              </Link>
+            </li>
           </ul>
 
           {customer && customer?.id !== "guest" && (
             <div
-              className="gap-1 text-base text-center items-center font-medium  text-primaryColor "
+              className="gap-1 text-base cursor-pointer text-center items-center font-medium  text-primaryColor "
               onClick={handleLogout}
             >
               Log Out
