@@ -34,6 +34,7 @@ import TestimonialImg02 from "@/public/images/testimonials/clientSay2.png";
 import TestimonialImg03 from "@/public/images/testimonials/clientSay3.png";
 import FancyTestimonialsSlider from "@/app/components/TestimonialsSlider";
 import GoogleReviewsSection from "@/app/components/HomePage/GoogleReviewsSection";
+import FAQ from "./components/HomePage/FAQSection";
 const Banks = [
   Sampath,
   Dfcc,
@@ -264,6 +265,11 @@ export default async function Home() {
               heading="Smart Watches"
               link="smartwatches"
             />
+          </div>
+
+          <div>
+          <Heading>Frequently Asked Questions</Heading>
+            <FAQ />
           </div>
         </div>
       </div>
