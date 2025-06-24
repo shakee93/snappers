@@ -22,7 +22,7 @@ const faqs = [
     key: "3",
     title: "Warranty Claim Process?",
     content:
-      "Bring the device and invoice to our service center or reach out via WhatsApp—we’ll guide you through the process.",
+      "Bring the device and invoice to our service center or reach out via WhatsApp—we'll guide you through the process.",
   },
   {
     key: "4",
@@ -64,7 +64,7 @@ const faqs = [
     key: "10",
     title: "For more information? Call us",
     content:
-      "Message or call us via WhatsApp for quick responses. We’re happy to help!",
+      "Message or call us via WhatsApp for quick responses. We're happy to help!",
   },
   {
     key: "11",
@@ -80,36 +80,35 @@ const faqs = [
   },
 ];
 
-
 const FAQ = () => {
   return (
-    <div className="w-full  bg-gradient-to-br p-12 from-blue-500/40 via-blue-500/10 to-white rounded-3xl border flex flex-col md:flex-row overflow-hidden">
+    <div className="w-full bg-gradient-to-br p-4 sm:p-8 md:p-12 from-blue-500/40 via-blue-500/10 to-white rounded-2xl md:rounded-3xl border flex flex-col md:flex-row overflow-hidden">
       {/* Left Column */}
-      <div className="md:w-1/2 md:p-8 p-4 flex flex-col ">
-        <span className="font-semibold text-sm mb-2">FAQ</span>
-        <h1 className="text-3xl md:text-4xl font-bold mb-4">Customer Support Guide</h1>
-        <span className="text-sm font-medium mb-4">Frequently Asked Questions</span>
-        <div className="mb-4 hover:scale-120 transition-transform duration-200">
+      <div className="md:w-1/2 md:p-8 p-2 flex flex-col ">
+        <span className="font-semibold text-xs sm:text-sm mb-1 sm:mb-2">FAQ</span>
+        <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-2 sm:mb-4">Customer Support Guide</h1>
+        <span className="text-xs sm:text-sm font-medium mb-2 sm:mb-4">Frequently Asked Questions</span>
+        <div className="mb-2 sm:mb-4 hover:scale-105 transition-transform duration-200">
           {/* Brand logo placeholder */}
           <Image 
             src={SiteLogo} 
             alt="GQ Mobiles Logo" 
-            width={120} 
-            height={40} 
-            className="object-contain hover:scale-120 transition-transform duration-200" 
+            width={90} 
+            height={30} 
+            className="object-contain hover:scale-110 transition-transform duration-200" 
           />
         </div>
-        <div className="text-sm text-gray-700 mb-6">
+        <div className="text-xs sm:text-sm text-gray-700 mb-4 sm:mb-6">
           Our customer support is available Monday to Sunday: 8am–8:30pm.<br />
           Average answer time: Call for instant help
         </div>
       </div>
       {/* Right Column */}
-      <div className="md:w-1/2 py-8 px-8 bg-white/40  rounded-3xl">
+      <div className="md:w-1/2 py-4 px-2 sm:py-8 sm:px-8 bg-white/40 rounded-2xl md:rounded-3xl">
         <Accordion variant="splitted" className="w-full">
           {faqs.map((faq) => (
-            <AccordionItem className="shadow-none border" key={faq.key} aria-label={faq.title} title={faq.title}>
-              <div className=" text-gray-600  pb-4">{faq.content}</div>
+            <AccordionItem className="shadow-none border" key={faq.key} aria-label={faq.title} title={<span className="md:text-base text-xs">{faq.title}</span>}>
+              <div className="text-xs sm:text-sm text-gray-600 pb-2 sm:pb-4">{faq.content}</div>
             </AccordionItem>
           ))}
         </Accordion>
