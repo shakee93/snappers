@@ -1,7 +1,6 @@
 import CategoryBlockSection from "@/app/components/HomePage/CategoryBlocksSection";
 import SectionHero3 from "@/app/components/HomePage/SectionHero3";
 import SectionSliderProductCard from "@/app/components/SectionSliderProductCard";
-import SectionGridMoreExplore from "@/app/components/HomePage/SectionGridMoreExplore";
 import SectionPromo1 from "@/app/components/HomePage/SectionPromo1";
 import Heading from "@/app/components/Heading/Heading";
 import { getClient } from "@/graphql/apollo-ssr";
@@ -12,40 +11,13 @@ import {
 } from "@/graphql/defs/products";
 import { GET_SLIDES } from "@/graphql/defs/slides";
 import { Brand, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
-import Image from "next/image";
-import Scam from "@/public/homepage/scam.webp";
-import Sampath from "@/public/images/bank logos/sampath.png";
-import Commercial from "@/public/images/bank logos/commercial.png";
-import Hnb from "@/public/images/bank logos/hnb.png";
-import Dfcc from "@/public/images/bank logos/logo-dfccbank.png";
-import Ntb from "@/public/images/bank logos/Nations_Trust_Bank_logo.png";
-import Hsbc from "@/public/images/bank logos/2560px-HSBC_logo_(2018).svg.png";
-import Peaple from "@/public/images/bank logos/Peoplesbanklk.png";
-import Seylan from "@/public/images/bank logos/Seylan_Bank_logo.png";
-import Standard from "@/public/images/bank logos/standard-chartered-2021-logo-freelogovectors.net_.png";
-import SectionHero2 from "./components/HomePage/SectionHero2";
 import SectionSliderBrandCard from "./components/SectionSliderBrandCard";
-import { Card } from "@nextui-org/react";
 import CardSkeleton from "./components/Skeletons/CardSkeleton";
-import TopBarPromotion from "@/components/TopBarPromotion";
 import { GET_OPTIONS } from "@/graphql/defs/options";
-import TestimonialImg01 from "@/public/images/testimonials/clientSay1.png";
-import TestimonialImg02 from "@/public/images/testimonials/clientSay2.png";
-import TestimonialImg03 from "@/public/images/testimonials/clientSay3.png";
 import FancyTestimonialsSlider from "@/app/components/TestimonialsSlider";
 import GoogleReviewsSection from "@/app/components/HomePage/GoogleReviewsSection";
 import FAQ from "./components/HomePage/FAQSection";
-const Banks = [
-  Sampath,
-  Dfcc,
-  Ntb,
-  Peaple,
-  Hnb,
-  Commercial,
-  Standard,
-  Seylan,
-  Hsbc,
-];
+
 
 const getData = async () => {
   const queries = [
@@ -164,26 +136,16 @@ const getData = async () => {
 export default async function Home() {
 
 
-  const { newArrivals, mobiles, speakers, watches, backInStock, brands, slides, options } = await getData();
-
-  // console.log('newArrivals', newArrivals);s
+  const { newArrivals, mobiles, speakers, watches, backInStock, brands, slides } = await getData();
 
   return (
     <main>
       <div className="nc-PageHome relative flex flex-col overflow-hidden">
-        {/* <TopBarPromotion options={options} /> */}
-        {/* hero section */}
         <div className="z-0">
-          {/* <SectionHero3 /> */}
-          {/* <SectionHero2 slides={slides} /> */}
           <SectionHero3 slides={slides} />
-          {/* <CategoryWithSubcategories/> */}
         </div>
 
         <div className="flex flex-col px-3 gap-10 lg:gap-12 sm:container sm:max-w-screen-2xl">
-
-          {/* new arrivals section */}
-
           <div className="mt-5 md:mt-10">
             <SectionSliderProductCard
               products={newArrivals}
