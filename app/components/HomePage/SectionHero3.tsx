@@ -205,7 +205,7 @@ const SectionHero3 = ({ className = "", slides }: SectionHero3Props) => {
       )}
 
       <div
-        className="absolute shadow-2xl bottom-10 select-none right-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 z-50 rounded-[48px] w-[125px] flex bg-white items-center space-x-4"
+        className="absolute hidden md:hidden shadow-2xl bottom-10 select-none right-[50%] left-[50%] transform -translate-x-1/2 -translate-y-1/2 z-50 rounded-[48px] w-[125px] bg-white items-center space-x-4"
         style={{
           background: `linear-gradient(to right, #00bfff ${progress}%, #fff 0%)`,
           transition: "background 0.8s ease",
