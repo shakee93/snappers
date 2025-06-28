@@ -99,8 +99,10 @@ const FAQ = () => {
           />
         </div>
         <div className="text-xs sm:text-sm text-gray-700 mb-4 sm:mb-6">
-          Our customer support is available Monday to Sunday: 8am–8:30pm.<br />
-          Average answer time: Call for instant help
+          <div>Mon - Sat (10.00AM - 08.00PM)</div>
+          <div>Poya Days: (10.00AM - 05.00PM)</div>
+          <div>Sundays: Closed</div>
+          <div className="mt-2">Average answer time: Call for instant help</div>
         </div>
       </div>
       {/* Right Column */}
