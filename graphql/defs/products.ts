@@ -232,6 +232,19 @@ export const GET_CATEGORY_ARCHIVE = gql`
   ${ProductContentFull}
 `;
 
+export const GET_CATEGORY_ARCHIVE_IN_STOCK = gql`
+  query GetCategoryArchiveInStock($categoryIdIn: [Int] = null, $first: Int = 10) {
+    products(first: $first, where: { categoryIdIn: $categoryIdIn, stockStatus: IN_STOCK }) {
+      edges {
+        node {
+          ...ProductContentFull
+        }
+      }
+    }
+  }
+  ${ProductContentFull}
+`;
+
 export const GET_PRODUCTS_NODES = gql`
   query getProductsNode($categoryIdIn: [Int] = null, $first: Int = 10) {
     products(

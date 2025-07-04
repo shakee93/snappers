@@ -1,5 +1,5 @@
 import { getClient } from "@/graphql/apollo-ssr";
-import { GET_BRANDS, GET_CATEGORY_ARCHIVE, GET_PRODUCT, GET_PRODUCTS_NODES } from "@/graphql/defs/products";
+import { GET_BRANDS, GET_CATEGORY_ARCHIVE_IN_STOCK, GET_PRODUCT, GET_PRODUCTS_NODES } from "@/graphql/defs/products";
 import { Brand, SimpleProduct, VariableProduct, Product as GQLProduct } from "@/graphql/types/graphql";
 import { notFound, redirect } from "next/navigation";
 import ProductDetails from "@/app/components/SingleProductPage/ProductDetails";
@@ -44,7 +44,7 @@ async function getData(slug: string, brand: string) {
     });
 
     const { data: categoryData } = await getClient().query({
-      query: GET_CATEGORY_ARCHIVE,
+      query: GET_CATEGORY_ARCHIVE_IN_STOCK,
       variables: {
         categoryIdIn: data.product.productCategories?.edges?.map((cat: any) => cat.node.databaseId) || [],
         first: 10,
