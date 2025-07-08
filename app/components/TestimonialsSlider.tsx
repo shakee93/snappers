@@ -127,25 +127,14 @@ export default function FancyTestimonialsSlider() {
                 </div>
             </div>
             {/* Buttons */}
-            <div className="grid grid-cols-4 gap-4 max-w-4xl mx-auto mb-4">
-                {testimonials.slice(0, 4).map((testimonial: any, index: any) => (
+            <div className="flex flex-wrap justify-center gap-2 max-w-4xl mx-auto">
+                {testimonials.map((testimonial: any, index: any) => (
                     <button
                         key={index}
-                        className={`inline-flex justify-center items-center rounded-full px-3 py-1.5 w-[120px] overflow-hidden truncate text-xs shadow-sm focus-visible:outline-none focus-visible:ring focus-visible:ring-indigo-300 dark:focus-visible:ring-slate-600 transition-colors duration-150 text-center ${active === index ? 'bg-primaryColor text-white shadow-indigo-950/10' : 'bg-white hover:bg-indigo-100 text-slate-900'}`}
+                        className={`inline-flex justify-center items-center rounded-full px-3 py-1.5 min-w-0 max-w-[140px] sm:max-w-[180px] text-xs shadow-sm focus-visible:outline-none focus-visible:ring focus-visible:ring-indigo-300 dark:focus-visible:ring-slate-600 transition-colors duration-150 ${active === index ? 'bg-primaryColor text-white shadow-indigo-950/10' : 'bg-white hover:bg-indigo-100 text-slate-900'}`}
                         onClick={() => { setActive(index); setAutorotate(false); }}
                     >
-                        <span className="truncate w-full">{testimonial.name}</span>
-                    </button>
-                ))}
-            </div>
-            <div className="flex justify-center gap-4">
-                {testimonials.slice(4).map((testimonial: any, index: any) => (
-                    <button
-                        key={index + 4}
-                        className={`inline-flex justify-center items-center rounded-full px-3 py-1.5 w-[120px] overflow-hidden truncate text-xs shadow-sm focus-visible:outline-none focus-visible:ring focus-visible:ring-indigo-300 dark:focus-visible:ring-slate-600 transition-colors duration-150 text-center ${active === index + 4 ? 'bg-primaryColor text-white shadow-indigo-950/10' : 'bg-white hover:bg-indigo-100 text-slate-900'}`}
-                        onClick={() => { setActive(index + 4); setAutorotate(false); }}
-                    >
-                        <span className="truncate w-full">{testimonial.name}</span>
+                        <span className="truncate">{testimonial.name}</span>
                     </button>
                 ))}
             </div>
