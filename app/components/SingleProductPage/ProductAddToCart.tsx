@@ -224,7 +224,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
       return;
     }
 
-    toast.error("You have been logged out! Please login again.");
+    toast.error(error.message);
     return
   };
 
