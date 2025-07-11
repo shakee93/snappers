@@ -216,13 +216,15 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
       error.graphQLErrors?.[0]?.debugMessage === "invalid-secret-key | Expired token" ||
       error.graphQLErrors?.[0]?.message?.includes("Expired token");
 
+    console.log('error', error);
+
     if (isTokenExpired) {
       toast.error("You've been logged out. Please sign in again.");
       router.push("/login");
       return;
     }
 
-    toast.error("Something went wrong! Please login again.");
+    toast.error("You have been logged out! Please login again.");
     return
   };
 
