@@ -213,8 +213,8 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   const handleAddToCartError = (error: any) => {
 
     const isTokenExpired = 
-      error.graphQLErrors?.[0]?.debugMessage === "invalid-secret-key | Expired token" ||
-      error.graphQLErrors?.[0]?.message?.includes("Expired token");
+      error.graphQLErrors?.[0]?.extensions?.debugMessage === "invalid-secret-key | Expired token" ||
+      error.graphQLErrors?.[0]?.extensions?.message?.includes("Expired token");
 
     console.log('error', error);
 

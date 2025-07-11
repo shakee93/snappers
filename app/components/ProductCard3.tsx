@@ -136,7 +136,8 @@ const ProductCard: FC<ProductCardProps> = ({
           "You've reached the maximum quantity allowed for this item."
         );
       } else {
-        toast.error("Something is went wrong! please login again");
+        console.log('error', error);
+        toast.error(error.message);
       }
     } finally {
       setLoading(false);

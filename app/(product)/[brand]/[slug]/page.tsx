@@ -125,6 +125,8 @@ const Page = async ({ params }: Props) => {
 
   const productSchema = getProductSchema(product, brand);
 
+  console.log("product", product);
+
   return (
     <div className="mt-5 md:mt-10">
       <main className="flex flex-col px-3   sm:container sm:max-w-screen-2xl">
