@@ -68,7 +68,6 @@ const CheckoutPage = () => {
     | "order-cart"
   >("ContactInfo");
 
-
   // const FORMDATA_DUMMY_OBJECT = {
   //   contactInfo: {
   //     phone: "0750278330",
@@ -183,7 +182,10 @@ const CheckoutPage = () => {
   // console.log("realCheckoutError", realCheckoutError);
   const [completeOrderPayment] = useMutation(COMPLETE_ORDER_PAYMENT);
   // const  [createOrderGuest] = useMutation(GUEST_CHECKOUT_MUTATION)
-  const [guestCheckout, { loading: guestCheckoutLoading, error: guestCheckoutError }] = useMutation(GUEST_CHECKOUT);
+  const [
+    guestCheckout,
+    { loading: guestCheckoutLoading, error: guestCheckoutError },
+  ] = useMutation(GUEST_CHECKOUT);
 
   // console.log("guestCheckoutLoading", guestCheckoutLoading);
   // console.log("guestCheckoutError", guestCheckoutError);
@@ -256,8 +258,8 @@ const CheckoutPage = () => {
       const shippingMethods = isStorePickup
         ? "pickup_location:0"
         : freeShipping
-          ? "wbs:5c9bd062_free_shipping"
-          : "wbs:0dd3bc79_weight_based_shipping";
+        ? "wbs:5c9bd062_free_shipping"
+        : "wbs:0dd3bc79_weight_based_shipping";
 
       const total: any = cart?.total;
       setOrderTotal(freeShipping ? cart?.subtotal : total);
@@ -282,7 +284,8 @@ const CheckoutPage = () => {
       }
 
       if (data?.updateShippingMethod?.cart) {
-        const { total, shippingTotal, subtotal } = data.updateShippingMethod.cart;
+        const { total, shippingTotal, subtotal } =
+          data.updateShippingMethod.cart;
         if (freeShipping) {
           setOrderTotal(subtotal);
           setShippingTotal(shippingTotal);
@@ -308,75 +311,6 @@ const CheckoutPage = () => {
     return paymentData;
   }, [paymentData]);
 
-  //   let generatedOrderId = crypto.randomUUID();
-  //   setPayherPaymentID(generatedOrderId);
-
-  //   let { firstName, lastName, city, apartment } = formData.billingAddress as any;
-  //   let { email, phone } = formData.contactInfo;
-
-  //   if (
-  //     !orderTotal ||
-  //     !firstName ||
-  //     !lastName ||
-  //     !email ||
-  //     !phone ||
-  //     !apartment ||
-  //     !city
-  //   ) {
-  //     toast.error("No order found");
-  //     return;
-  //   }
-
-  //   const products = cart?.contents?.nodes;
-  //   console.log("CART PRODUCTS", cart);
-
-  //   const productList = products?.map((product: any) => {
-  //     const productName = product.product.node.name;
-  //     const varProduct = product.product.node.type;
-
-  //     const attributes = Object.keys(product.product.node).filter((key) =>
-  //       key.startsWith("allPa")
-  //     );
-  //     const attributeValues = attributes
-  //       .map((attr) => {
-  //         const nodes = product.product.node[attr]?.nodes;
-  //         return nodes && nodes.length > 0 ? nodes[0].name : "";
-  //       })
-  //       .filter(Boolean);
-
-  //     const productString =
-  //       varProduct === "VARIABLE"
-  //         ? `${productName} | ${attributeValues.join(" | ")}`
-  //         : productName;
-
-  //     return productString;
-  //   });
-    
-
-  //   let checkoutDetails: PaymentDetailsWithoutUrls = {
-  //     amount: isCardPayment ? totalWithTax : orderTotal,
-  //     order_id: generatedOrderId,
-  //     first_name: firstName,
-  //     last_name: lastName,
-  //     email: email,
-  //     phone: phone,
-  //     items: productList?.join(" , "),
-  //     address: city + apartment,
-  //     city: city,
-  //   };
-
-
-  //   if (!initiatePayment) {
-  //     toast.error("Payhere not initiated");
-  //     return;
-  //   }
-
-  //   setPayhereHandleStatus("loading");
-  //   initiatePayment(checkoutDetails, setPayhereHandleStatus).then((r) => {
-  //     console.log("r", r);
-  //   });
-  // };
-
   function ImplementBankTransfer() {
     setWantToSHowBankTransfer(false);
     setShowBankTransfer(true);
@@ -387,7 +321,8 @@ const CheckoutPage = () => {
       return;
     }
 
-    const isCashOnDelivery = formData?.paymentMethod?.selectedGateway?.id == "cod";
+    const isCashOnDelivery =
+      formData?.paymentMethod?.selectedGateway?.id == "cod";
     // const isKokoPayment = formData?.paymentMethod?.selectedGateway?.id == "darazbnpl";
 
     let checkoutDetails = paymentDetails;
@@ -447,7 +382,6 @@ const CheckoutPage = () => {
     }
   }, [paymentData]);
 
-
   const handleCheckoutProcess = async () => {
     // console.log("isConfirmed", isConfirmed);
     let errors = [];
@@ -471,10 +405,15 @@ const CheckoutPage = () => {
       return;
     }
 
-    const isBankTransfer = formData?.paymentMethod?.selectedGateway?.id == "bacs";
+    const isBankTransfer =
+      formData?.paymentMethod?.selectedGateway?.id == "bacs";
     const isPayhere = formData?.paymentMethod?.selectedGateway?.id == "payhere";
-    const isCashOnDelivery = formData?.paymentMethod?.selectedGateway?.id == "cod";
-    const isKokoPayment = formData?.paymentMethod?.selectedGateway?.id == "darazbnpl";
+    const isCashOnDelivery =
+      formData?.paymentMethod?.selectedGateway?.id == "cod";
+    const isKokoPayment =
+      formData?.paymentMethod?.selectedGateway?.id == "darazbnpl";
+    const isGeniePayment =
+      formData?.paymentMethod?.selectedGateway?.id == "geniebiz";
 
     if (isBankTransfer) {
       if (wantToSHowBankTransfer) {
@@ -488,6 +427,10 @@ const CheckoutPage = () => {
           "Sorry to hear that you are facing an issue with Bank Transfer. Please try again later."
         );
       }
+    }
+    if (isGeniePayment) {
+      await handleCheckout();
+      return;
     }
 
     if (isPayhere) {
@@ -504,7 +447,8 @@ const CheckoutPage = () => {
     setLoading(true);
 
     try {
-      const isPayhere = formData?.paymentMethod?.selectedGateway?.id == "payhere";
+      const isPayhere =
+        formData?.paymentMethod?.selectedGateway?.id == "payhere";
 
       const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
 
@@ -520,13 +464,13 @@ const CheckoutPage = () => {
       const shippingMethod = getShippingMethod(shippingTotal);
       const shippingDetails = isStorePickup
         ? {
-          ...transformAddress(formData.deliveryAddress),
-          address1: "Store Pickup",
-          address2: "",
-          city: "Store Pickup",
-          state: "",
-          postcode: "",
-        }
+            ...transformAddress(formData.deliveryAddress),
+            address1: "Store Pickup",
+            address2: "",
+            city: "Store Pickup",
+            state: "",
+            postcode: "",
+          }
         : transformAddress(formData.deliveryAddress);
 
       const email = formData?.contactInfo?.email;
@@ -539,9 +483,19 @@ const CheckoutPage = () => {
 
       const customerNoteHTML = `
             <p><strong>Customer Email:</strong> ${email}</p>
-            <p><strong>Phone Number:</strong> ${formData?.contactInfo?.phone}</p>
-            ${isStorePickup ? "<p><strong>Pickup Location:</strong> Store</p>" : ""}
-            ${isKokoPayment ? "<p><strong>Payment Method:</strong> Koko Pay</p>" : ""}
+            <p><strong>Phone Number:</strong> ${
+              formData?.contactInfo?.phone
+            }</p>
+            ${
+              isStorePickup
+                ? "<p><strong>Pickup Location:</strong> Store</p>"
+                : ""
+            }
+            ${
+              isKokoPayment
+                ? "<p><strong>Payment Method:</strong> Koko Pay</p>"
+                : ""
+            }
         `;
 
       const variables = {
@@ -554,9 +508,9 @@ const CheckoutPage = () => {
           metaData: [
             {
               key: "payhere_order_id",
-              value: payherPaymentID ?? ""
-            }
-          ]
+              value: payherPaymentID ?? "",
+            },
+          ],
         },
       };
 
@@ -564,10 +518,13 @@ const CheckoutPage = () => {
         customer?.id === "guest"
           ? await guestCheckout({ variables })
           : await checkoutMutation({ variables });
-        
+
+
+      console.log("data", data);
+
       // Store order data in localStorage for both guest and logged-in users
       if (data) {
-        localStorage.setItem('last_order', JSON.stringify(data));
+        localStorage.setItem("last_order", JSON.stringify(data));
       }
 
       //Koko Payment
@@ -575,7 +532,7 @@ const CheckoutPage = () => {
         const orderData = {
           order_id: data?.checkout?.order?.databaseId,
         };
-        localStorage.setItem('last_order', JSON.stringify(data));
+        localStorage.setItem("last_order", JSON.stringify(data));
         handleKoko(orderData);
         // console.log('isKokoPayment', isKokoPayment);
       }
@@ -583,13 +540,17 @@ const CheckoutPage = () => {
       // FOR GUEST CHECKOUT
       let guestCheckoutData = data;
 
-      const isBankTransfer = formData?.paymentMethod?.selectedGateway?.id == "bacs";
+      const isBankTransfer =
+        formData?.paymentMethod?.selectedGateway?.id == "bacs";
 
       // console.log("data just below guest checkout", data);
       const isGuest = customer?.id === "guest";
 
       if (isPayhere && isGuest) {
-        localStorage.setItem('payhere_last_order', JSON.stringify(guestCheckoutData));
+        localStorage.setItem(
+          "payhere_last_order",
+          JSON.stringify(guestCheckoutData)
+        );
         router.push(`/checkout/payhere/guest_order`);
         return;
       }
@@ -599,7 +560,6 @@ const CheckoutPage = () => {
         router.push(`/checkout/payhere/${orderId}`);
         return;
       }
-
 
       if (data) {
         const checkoutDetails = savePaymentDetails(data);
@@ -616,7 +576,7 @@ const CheckoutPage = () => {
         return null;
       }
     } catch (error) {
-      console.log('error', error);
+      console.log("error", error);
       handleCheckoutError(error);
     } finally {
       setLoading(false);
@@ -627,14 +587,14 @@ const CheckoutPage = () => {
     const methodId = isStorePickup
       ? "pickup_location:0"
       : freeShipping
-        ? "wbs:5c9bd062_free_shipping"
-        : "wbs:0dd3bc79_weight_based_shipping";
+      ? "wbs:5c9bd062_free_shipping"
+      : "wbs:0dd3bc79_weight_based_shipping";
 
     const methodTitle = isStorePickup
       ? "Store Pickup"
       : freeShipping
-        ? "Free Shipping"
-        : "Weight Based Shipping";
+      ? "Free Shipping"
+      : "Weight Based Shipping";
 
     const total = isStorePickup ? "0" : shippingTotal;
 
@@ -643,13 +603,15 @@ const CheckoutPage = () => {
 
   const handleCheckoutError = (error: any) => {
     setLoading(false);
-    console.log("error: ", error)
+    console.log("error: ", error);
     if (error.message === "Sorry, no session found.") {
       if (customer?.id !== "guest") {
         toast.error("please login or create an account to checkout");
         router.push("/login");
       } else {
-        toast.error("Something went wrong. Please reload the page or log in again.");
+        toast.error(
+          "Something went wrong. Please reload the page or log in again."
+        );
       }
     } else {
       toast.error("Failed to create the order: " + error.message);
@@ -676,27 +638,25 @@ const CheckoutPage = () => {
   const TotalWithKoko = (cartSubtotal / 88) * 100;
   const taxWithTotal = (numericOrderTotal + threePercentFromTotal).toFixed(2);
 
-
   useEffect(() => {
     setTotalWithTax(taxWithTotal);
   }, [taxWithTotal]);
 
   const handleKoko = async (orderData: any) => {
     toast.info("Redirecting to Koko payment portal...", {
-      duration: 10000
+      duration: 10000,
     });
     try {
-      const response = await fetch('/api/koko', {
-        method: 'POST',
+      const response = await fetch("/api/koko", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(orderData),
       });
 
-
       if (!response.ok) {
-        throw new Error('Network response was not ok');
+        throw new Error("Network response was not ok");
       }
 
       const result = await response.json();
@@ -704,18 +664,16 @@ const CheckoutPage = () => {
       const kokoResponseData = JSON.parse(result.kokoResponse).data;
       setHtmlFormResponse(kokoResponseData);
 
-      const formContainer = document.createElement('div');
+      const formContainer = document.createElement("div");
       formContainer.innerHTML = kokoResponseData;
       document.body.appendChild(formContainer);
 
-
-      const form = formContainer.querySelector('form');
+      const form = formContainer.querySelector("form");
       if (form) {
         form.submit();
       }
-
     } catch (error) {
-      console.error('Error:', error);
+      console.error("Error:", error);
     }
   };
 
@@ -855,29 +813,36 @@ const CheckoutPage = () => {
                   <span>Koko Charge</span>
                   <span className="font-semibold text-slate-900 dark:text-slate-200">
                     {/* {JSON.stringify(TotalWithKoko)} */}
-                    <span>Rs {(TotalWithKoko - cartSubtotal).toFixed(2) || "0.00"}</span>
+                    <span>
+                      Rs {(TotalWithKoko - cartSubtotal).toFixed(2) || "0.00"}
+                    </span>
                     {/* {JSON.stringify(cartSubtotal)} */}
                   </span>
                 </div>
-
               )}
 
-              {isKokoPayment && (<div className="flex flex-wrap items-center text-xs text-gray-500 mt-1">
-                <span>pay in 3 x Rs</span>
-                <span className="font-semibold mx-1">
-                  {(
-                    parseFloat(
-                      (TotalWithKoko + (isStorePickup ? 0 : 500) || "0")
-                        .toString()
-                        .replace(/[^\d.]/g, "")
-                    ) / 3
-                  ).toFixed(2)}
-                </span>
-                <span>with</span>
-                <span className="ml-1 inline-block">
-                  <Image src={koko} alt="KOKO" className="inline-block w-12 h-auto" />
-                </span>
-              </div>)}
+              {isKokoPayment && (
+                <div className="flex flex-wrap items-center text-xs text-gray-500 mt-1">
+                  <span>pay in 3 x Rs</span>
+                  <span className="font-semibold mx-1">
+                    {(
+                      parseFloat(
+                        (TotalWithKoko + (isStorePickup ? 0 : 500) || "0")
+                          .toString()
+                          .replace(/[^\d.]/g, "")
+                      ) / 3
+                    ).toFixed(2)}
+                  </span>
+                  <span>with</span>
+                  <span className="ml-1 inline-block">
+                    <Image
+                      src={koko}
+                      alt="KOKO"
+                      className="inline-block w-12 h-auto"
+                    />
+                  </span>
+                </div>
+              )}
 
               {isCardPayment && (
                 <div className="flex justify-between pt-4 text-base font-semibold text-slate-900 dark:text-slate-200">
@@ -1006,7 +971,8 @@ const CheckoutPage = () => {
               <Loader className="w-12 h-12 animate-spin text-primary" />
               <h2 className="text-xl font-semibold">Confirming Your Order</h2>
               <p className="text-slate-600 dark:text-slate-300">
-                Please don&apos;t close this window while we confirm your order...
+                Please don&apos;t close this window while we confirm your
+                order...
               </p>
             </div>
           </div>
