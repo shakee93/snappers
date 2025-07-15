@@ -514,14 +514,14 @@ const CheckoutPage = () => {
         },
       };
 
-      const { data } =
+      const { data, errors } =
         customer?.id === "guest"
           ? await guestCheckout({ variables })
           : await checkoutMutation({ variables });
 
+      console.log("data on handleCheckout() ", data);
 
-      console.log("data", data);
-
+      console.log("errors on handleCheckout() ", errors);
       // Store order data in localStorage for both guest and logged-in users
       if (data) {
         localStorage.setItem("last_order", JSON.stringify(data));
@@ -576,7 +576,7 @@ const CheckoutPage = () => {
         return null;
       }
     } catch (error) {
-      console.log("error", error);
+      console.log("error on handleCheckout() ", error);
       handleCheckoutError(error);
     } finally {
       setLoading(false);
@@ -604,6 +604,15 @@ const CheckoutPage = () => {
   const handleCheckoutError = (error: any) => {
     setLoading(false);
     console.log("error: ", error);
+    
+    // Check if it's a JSON parsing error indicating PHP output
+    if (error.message && error.message.includes("Unexpected token")) {
+      console.error("🚨 WordPress GraphQL Error - PHP output detected");
+      console.error("Raw error:", error);
+      toast.error("Server configuration error. Please contact support.");
+      return;
+    }
+    
     if (error.message === "Sorry, no session found.") {
       if (customer?.id !== "guest") {
         toast.error("please login or create an account to checkout");

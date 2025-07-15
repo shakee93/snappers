@@ -7,7 +7,10 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "codegen": "graphql-codegen --config codegen.ts"
+    "codegen": "graphql-codegen --config codegen.ts",
+    "debug-graphql": "node scripts/debug-graphql.js",
+    "debug-checkout": "node scripts/test-checkout-mutation.js",
+    "debug-real-checkout": "node scripts/test-real-checkout.js"
   },
   "dependencies": {
     "@apollo/client": "^3.11.0",

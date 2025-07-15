@@ -125,7 +125,16 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
           });
         }
 
-        if (networkError) console.log(`[Network error]: ${networkError}`);
+        if (networkError) {
+          console.log(`[Network error]: ${networkError}`);
+          
+          // Check if it's a JSON parsing error indicating PHP output
+          if (networkError.message && networkError.message.includes("Unexpected token")) {
+            console.error("🚨 WordPress is returning PHP output instead of JSON. Check your WordPress debug settings and plugins.");
+            console.error("This usually means PHP errors/warnings are being output before the GraphQL response.");
+            console.error("Check your wp-config.php file and ensure WP_DEBUG_DISPLAY is set to false.");
+          }
+        }
       }
     );
 
