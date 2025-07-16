@@ -125,7 +125,7 @@ const Page = async ({ params }: Props) => {
 
   const productSchema = getProductSchema(product, brand);
 
-  console.log("product", product);
+  // console.log("product", product);
 
   return (
     <div className="mt-5 md:mt-10">

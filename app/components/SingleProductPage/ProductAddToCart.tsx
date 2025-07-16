@@ -311,11 +311,17 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
                 Pre-order Now
               </span>
             </button>
-            <Modal isOpen={isPreOrderModalOpen} onOpenChange={setIsPreOrderModalOpen}>
+            <Modal 
+              isOpen={isPreOrderModalOpen} 
+              onOpenChange={setIsPreOrderModalOpen}
+              scrollBehavior="inside"
+              placement="center"
+              className="max-w-[90vw] w-full sm:max-w-lg mx-4"
+            >
               <ModalContent>
                 <form onSubmit={handlePreOrderSubmit}>
                   <ModalHeader className="flex flex-col gap-1">Pre-order Product</ModalHeader>
-                  <ModalBody>
+                  <ModalBody className="max-h-[60vh] overflow-y-auto">
                     <label className="block mb-2 text-sm font-medium text-gray-700">Email
                       <Input
                         type="email"
@@ -396,7 +402,13 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
 
 
       {/* Modal Implementation */}
-      <Modal isOpen={isOpen} onOpenChange={onOpenChange}>
+      <Modal 
+        isOpen={isOpen} 
+        onOpenChange={onOpenChange}
+        scrollBehavior="inside"
+        placement="center"
+        className="max-w-[90vw] w-full sm:max-w-lg mx-4"
+      >
         <ModalContent>
           {(onClose) => (
             <>
@@ -408,7 +420,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
                     </svg>
                     Notify Me
                   </ModalHeader>
-                  <ModalBody className="py-0">
+                  <ModalBody className="py-0 max-h-[60vh] overflow-y-auto">
                     {customer?.email ? (
                       <p>Thank you! You will be notified when the product is back in stock.</p>
                     ) : (
@@ -442,7 +454,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
               ) : (
                 <>
                   <ModalHeader className="flex flex-col gap-1">Thank You</ModalHeader>
-                  <ModalBody>
+                  <ModalBody className="max-h-[60vh] overflow-y-auto">
                     <p>You will be notified when the product is back in stock!</p>
                   </ModalBody>
                   <ModalFooter>

@@ -11,7 +11,7 @@ export const createProductList = (orderData: any): LineItem[] | null => {
 
     return productName;
   });
-  console.log("PRODUCT ARRAY", productArray);
+  // console.log("PRODUCT ARRAY", productArray);
 
   return productArray.join(", ");
 };
