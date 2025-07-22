@@ -4,6 +4,7 @@ import "rc-slider/assets/index.css";
 import ApolloWrapper from "@/graphql/apollo-client";
 import { SessionProvider } from "@/context/SessionProvider";
 import { CartProvider } from "@/context/CartProvider";
+import { PaymentProvider } from "@/context/PaymentProvider";
 import Header from "@/app/components/globalComponents/header";
 import { Toaster } from "sonner";
 import Footer from "@/app/components/globalComponents/footer";
@@ -92,8 +93,9 @@ export default async function RootLayout({
       </head>
       <body className="bg-gray-100 text-base dark:bg-slate-900 text-slate-900 dark:text-slate-200">
         <ApolloWrapper>
-            <CartProvider>
-              <SessionProvider>
+            <PaymentProvider>
+              <CartProvider>
+                <SessionProvider>
                 <Suspense fallback={null}>
                   <NavigationEvents />
                 </Suspense>
@@ -103,8 +105,9 @@ export default async function RootLayout({
                 <Toaster />
                 <Footer />
                 {/* <ScreenSizeIndicator /> */}
-              </SessionProvider>
-            </CartProvider>
+                </SessionProvider>
+              </CartProvider>
+            </PaymentProvider>
         </ApolloWrapper>
       </body>
     </html>

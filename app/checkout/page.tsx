@@ -8,7 +8,6 @@ import Checkbox from "@/shared/Checkbox/Checkbox";
 import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
 import {
-  GET_PAYMENT_GATEWAYS,
   UPDATE_SHIPPING_TOTAL,
 } from "@/graphql/defs/cart";
 import {
@@ -32,6 +31,7 @@ import { usePayhere } from "../components/Payment/Payhere";
 import { redirect, useRouter } from "next/navigation";
 import PaymentModal from "@/app/components/Payment/PaymentModal";
 import { useSession } from "@/context/SessionProvider";
+import { usePaymentGateways } from "@/context/PaymentProvider";
 import { Info, Loader } from "lucide-react";
 import {
   dummyPaymentData,
@@ -58,8 +58,7 @@ const CheckoutPage = () => {
   const [finalOrderTotal, setFinalOrderTotal] = useState(null);
   const { customer, fetchCustomer } = useSession();
 
-  const { data } = useQuery(GET_PAYMENT_GATEWAYS);
-  const paymentGateways: PaymentGateway[] = data?.paymentGateways?.nodes;
+  const { paymentGateways } = usePaymentGateways();
   const [tabActive, setTabActive] = useState<
     | "ContactInfo"
     | "DeliveryAddress"
@@ -734,7 +733,7 @@ const CheckoutPage = () => {
               handleScrollToEl={handleScrollToEl}
               updateFormData={updateFormData}
               formData={formData}
-              paymentGateways={paymentGateways}
+              paymentGateways={paymentGateways || []}
               handleConfirmationChange={handleConfirmationChange}
               setIsStorePickup={setIsStorePickup}
               isStorePickup={isStorePickup}

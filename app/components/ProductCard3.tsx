@@ -31,6 +31,7 @@ import { useQuery } from "@apollo/client";
 import { Highlight } from "react-instantsearch";
 import { redirect, useRouter, usePathname } from "next/navigation";
 import { useStore } from "@/store/store";
+import { usePaymentGateways } from "@/context/PaymentProvider";
 import koko from "@/public/koko.png";
 export interface ProductCardProps {
   className?: string;
@@ -82,6 +83,7 @@ const ProductCard: FC<ProductCardProps> = ({
   // console.log("Product Name:", productName);
 
   const { search, setSearch, search_status } = useStore();
+  const { isKokoEnabled } = usePaymentGateways();
 
   const handleHoverOut = () => {
     setIsHovered(false);
@@ -442,7 +444,7 @@ const ProductCard: FC<ProductCardProps> = ({
           )}
         </Link>
 
-        {lowestPrice && lowestSalePrice && (
+        {isKokoEnabled && lowestPrice && lowestSalePrice && (
           <div className="flex flex-wrap items-center text-xs text-gray-500 mt-1 mb-2">
             <span>or pay in 3 x Rs</span>
             <span className="font-semibold mx-1">
