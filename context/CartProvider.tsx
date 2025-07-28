@@ -4,6 +4,7 @@ import React, { createContext, ReactNode, useContext, useEffect, useState } from
 import { ApolloError, useLazyQuery, useMutation } from '@apollo/client';
 import { ADD_TO_CART, GET_CART, REMOVE_ITEMS_FROM_CART, UPDATE_CART_ITEM_QUANTITY } from "@/graphql/defs/cart";
 import { Cart, Customer } from "@/graphql/types/graphql";
+import { toast } from "sonner";
 
 
 type CartSession = {
@@ -14,7 +15,7 @@ type CartSession = {
     updateCart: (key: string, quantity: number) => void
     removeFromCart: (keys: string[]) => void
     getCart: () => void
-    addToCart: (id: number, quantity?: number, variation?: number) => void | Promise<any>
+    addToCart: (id: number, quantity?: number, variation?: number, productData?: any) => void | Promise<any>
     setCustomer: React.Dispatch<React.SetStateAction<Customer | null>>
     clearCart: () => void
     refreshCart: () => void
@@ -28,7 +29,7 @@ const CartContext = createContext<CartSession>({
     customer: null,
     loading: null,
     removeFromCart: (keys) => { },
-    addToCart: (id) => { },
+    addToCart: (id, quantity, variation, productData) => { },
     updateCart: (key, q) => { },
     getCart: () => { },
     setCustomer: () => { },
@@ -99,7 +100,44 @@ export function CartProvider({ children }: {
         return await getCart();
     }
 
-    const addToCart = async (id: number, quantity?: number, variation?: number) => {
+    // Helper function to check if a product is a pre-order product
+    const isPreOrderProduct = (product: any) => {
+        return product?.productTags?.nodes?.some(
+            (tag: any) => tag.slug === 'pre-order'
+        ) || false;
+    };
+
+    // Helper function to check if cart has pre-order products
+    const cartHasPreOrderProducts = () => {
+        if (!cart?.contents?.nodes) return false;
+        
+        return cart.contents.nodes.some((item: any) => 
+            isPreOrderProduct(item.product?.node)
+        );
+    };
+
+    // Helper function to check if cart has non-pre-order products
+    const cartHasNonPreOrderProducts = () => {
+        if (!cart?.contents?.nodes) return false;
+        
+        return cart.contents.nodes.some((item: any) => 
+            !isPreOrderProduct(item.product?.node)
+        );
+    };
+
+    const addToCart = async (id: number, quantity?: number, variation?: number, productData?: any) => {
+        // Check pre-order restrictions before adding to cart
+        const isProductPreOrder = productData ? isPreOrderProduct(productData) : false;
+        
+        if (isProductPreOrder && cartHasNonPreOrderProducts()) {
+            toast.error("You can't add pre-order products with regular products in your cart.");
+            return { error: "Pre-order restriction" };
+        }
+        
+        if (!isProductPreOrder && cartHasPreOrderProducts()) {
+            toast.error("You can't add regular products with pre-order products in your cart.");
+            return { error: "Pre-order restriction" };
+        }
 
         const data = await _addToCart({
             variables: {
@@ -108,7 +146,6 @@ export function CartProvider({ children }: {
                 variationId: variation
             },
         })
-
 
         if (data?.data?.addToCart?.cartItem) {
             setIsCartOpen(true)

@@ -32,6 +32,13 @@ export const ProductContentSlice = gql`
       sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
       altText
     }
+    productTags(first: 20) {
+      nodes {
+        id
+        slug
+        name
+      }
+    }
     ... on SimpleProduct {
       price
       regularPrice
