@@ -74,6 +74,13 @@ const ProductCard: FC<ProductCardProps> = ({
   const ROUTER = useRouter();
   const pathname = usePathname();
 
+  // Check if product is a pre-order product
+  const isPreOrderProduct = () => {
+    return data?.productTags?.nodes?.some(
+      (tag: any) => tag.slug === 'pre-order'
+    ) || false;
+  };
+
   // Extract the last segment of the pathname
   const segments = pathname.split("/");
   const productName = segments[segments.length - 1];
@@ -397,9 +404,19 @@ const ProductCard: FC<ProductCardProps> = ({
 
           {/* INstock badge in green */}
           {stockStatus === "IN_STOCK" ? (
-            <div className="font-semibold text-xs text-green-500 px-0 py-0 rounded-full ">
-              In Stock
-            </div>
+            isPreOrderProduct() ? (
+              <div className="font-semibold text-xs bg-blue-100 border border-blue-300 text-blue-700 px-3 py-1 rounded-full flex items-center gap-2">
+                <div className="relative flex size-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                </div>
+                Pre-order
+              </div>
+            ) : (
+              <div className="font-semibold text-xs text-green-500 px-0 py-0 rounded-full ">
+                In Stock
+              </div>
+            )
           ) : (
             <div className="font-semibold text-xs text-red-500 px-0 py-0 rounded-full ">
               Out of Stock
