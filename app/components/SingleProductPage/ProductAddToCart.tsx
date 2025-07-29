@@ -1,5 +1,5 @@
 "use client";
-import { Loader, ShoppingCart } from "lucide-react";
+import { Loader, ShoppingCart, Clock } from "lucide-react";
 import { useCart } from "@/context/CartProvider";
 import {
   ProductVariation,
@@ -280,7 +280,13 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
             isAddToCartDisabled && "opacity-50 disabled:cursor-not-allowed"
           )}
         >
-          {loading ? <Loader className="animate-spin" /> : <ShoppingCart />}
+          {loading ? <Loader className="animate-spin" /> : (
+            isPreOrderProduct() ? (
+              <Clock className="w-5 h-5" />
+            ) : (
+              <ShoppingCart />
+            )
+          )}
           <span className="md:ml-3 cursor-pointer">
             {isPreOrderProduct() ? "Pre-order Now" : "Add to cart"}
           </span>
