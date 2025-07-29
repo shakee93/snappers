@@ -207,7 +207,8 @@ const ProductCard: FC<ProductCardProps> = ({
               <ButtonPrimary
                 className={`shadow-md ${
                   rawPrice === "0.00" ? "opacity-60 cursor-not-allowed" : ""
-                }`}
+                }
+                `}
                 fontSize="text-xs"
                 sizeClass="py-1.5 px-3.5"
                 onClick={handleAddToCart}
@@ -220,7 +221,7 @@ const ProductCard: FC<ProductCardProps> = ({
                   ) : (
                     <ShoppingCart className="w-3.5" />
                   )}{" "}
-                  Buy Now
+                  {isPreOrderProduct() ? "Pre-order Now" : "Buy Now"}
                 </span>
               </ButtonPrimary>
             )}
