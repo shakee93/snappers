@@ -30,8 +30,6 @@ const getCollections = async (): Promise<ProductCategory[]> => {
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const collections = await getCollections()
 
-  console.log("collections", collections);
-
 
   const collectionEntries: MetadataRoute.Sitemap = [
     // Root collections page

@@ -518,6 +518,7 @@ const CheckoutPage = () => {
           ? await guestCheckout({ variables })
           : await checkoutMutation({ variables });
 
+
       console.log("data on handleCheckout() ", data);
 
       console.log("errors on handleCheckout() ", errors);
@@ -558,6 +559,19 @@ const CheckoutPage = () => {
         const orderId = data?.checkout?.order?.databaseId;
         router.push(`/checkout/payhere/${orderId}`);
         return;
+      }
+
+      // Genie Payment Redirect
+      const isGeniePayment = formData?.paymentMethod?.selectedGateway?.id == "geniebiz";
+      if (isGeniePayment && data?.checkout?.redirect) {
+        // Check if checkout was successful
+        if (data?.checkout?.result === "success") {
+          handleGeniePayment(data);
+          return;
+        } else {
+          toast.error("Checkout failed. Please try again.");
+          return;
+        }
       }
 
       if (data) {
@@ -651,9 +665,6 @@ const CheckoutPage = () => {
   }, [taxWithTotal]);
 
   const handleKoko = async (orderData: any) => {
-    toast.info("Redirecting to Koko payment portal...", {
-      duration: 10000,
-    });
     try {
       const response = await fetch("/api/koko", {
         method: "POST",
@@ -663,25 +674,46 @@ const CheckoutPage = () => {
         body: JSON.stringify(orderData),
       });
 
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-
-      const result = await response.json();
-
-      const kokoResponseData = JSON.parse(result.kokoResponse).data;
-      setHtmlFormResponse(kokoResponseData);
-
-      const formContainer = document.createElement("div");
-      formContainer.innerHTML = kokoResponseData;
-      document.body.appendChild(formContainer);
-
-      const form = formContainer.querySelector("form");
-      if (form) {
-        form.submit();
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          toast.success("Payment initiated successfully!");
+          router.push(data.redirect_url);
+        } else {
+          toast.error("Payment initiation failed. Please try again.");
+        }
+      } else {
+        toast.error("Payment initiation failed. Please try again.");
       }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Koko payment error:", error);
+      toast.error("Payment initiation failed. Please try again.");
+    }
+  };
+
+  const handleGeniePayment = (checkoutData: any) => {
+    try {
+      const redirectUrl = checkoutData?.checkout?.redirect;
+      
+      if (!redirectUrl) {
+        toast.error("Payment gateway URL not received. Please try again.");
+        return;
+      }
+
+      // Store order data for reference
+      localStorage.setItem("genie_last_order", JSON.stringify(checkoutData));
+      
+      // Show success message before redirect
+      toast.success("Redirecting to payment gateway...");
+      
+      // Small delay to ensure toast is shown
+      setTimeout(() => {
+        window.location.href = redirectUrl;
+      }, 1000);
+      
+    } catch (error) {
+      console.error("Genie payment redirect error:", error);
+      toast.error("Payment redirect failed. Please try again.");
     }
   };
 
