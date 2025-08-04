@@ -665,6 +665,9 @@ const CheckoutPage = () => {
   }, [taxWithTotal]);
 
   const handleKoko = async (orderData: any) => {
+    toast.info("Redirecting to Koko payment portal...", {
+      duration: 10000,
+    });
     try {
       const response = await fetch("/api/koko", {
         method: "POST",
@@ -674,16 +677,22 @@ const CheckoutPage = () => {
         body: JSON.stringify(orderData),
       });
 
-      if (response.ok) {
-        const data = await response.json();
-        if (data.success) {
-          toast.success("Payment initiated successfully!");
-          router.push(data.redirect_url);
-        } else {
-          toast.error("Payment initiation failed. Please try again.");
-        }
-      } else {
-        toast.error("Payment initiation failed. Please try again.");
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+
+      const result = await response.json();
+
+      const kokoResponseData = JSON.parse(result.kokoResponse).data;
+      setHtmlFormResponse(kokoResponseData);
+
+      const formContainer = document.createElement("div");
+      formContainer.innerHTML = kokoResponseData;
+      document.body.appendChild(formContainer);
+
+      const form = formContainer.querySelector("form");
+      if (form) {
+        form.submit();
       }
     } catch (error) {
       console.error("Koko payment error:", error);
