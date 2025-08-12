@@ -17,6 +17,7 @@ import { GET_OPTIONS } from "@/graphql/defs/options";
 import FancyTestimonialsSlider from "@/app/components/TestimonialsSlider";
 import GoogleReviewsSection from "@/app/components/HomePage/GoogleReviewsSection";
 import FAQ from "./components/HomePage/FAQSection";
+import TikTokSection from "@/components/TikTokSection";
 
 
 const getData = async () => {
@@ -178,6 +179,12 @@ export default async function Home() {
           <div>
             <Heading>Featured Categories</Heading>
             <CategoryBlockSection />
+          </div>
+
+          {/* TikTok Section */}
+          <div>
+            <Heading isCenter={true} >Take a look at our TikTok.</Heading>
+            <TikTokSection />
           </div>
 
           {/* Testimonials section */}
