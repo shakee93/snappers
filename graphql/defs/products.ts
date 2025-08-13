@@ -276,9 +276,21 @@ query HeroSection {
   }
   featuresSlide {
     name
+    slug
+    salePrice
+    regularPrice
+    price
+    imageUrl
+    currency
   }
   saleProduct {
     name
+    slug
+    currency
+    imageUrl
+    price
+    regularPrice
+    salePrice
   }
   tiktokVideo {
     tiktokLink

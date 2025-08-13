@@ -12,7 +12,7 @@ const TestPage = async () => {
     
       console.log("result", result);    
   return (
-    <div className="container mx-auto py-12">
+    <div className="">
       <h1 className="text-3xl font-bold mb-8">Test Page</h1>
       
      <SectionHero4 data={result.data} />
