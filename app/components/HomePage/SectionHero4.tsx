@@ -33,11 +33,11 @@ interface TiktokVideoType {
 interface BentoSliderData {
   mainSlidesMiddleRows: {
     slides: SlideType[];
-  };
+  }[];
   sideSlider: SideSliderType[];
   featuresSlide: FeaturesSlideType[];
   saleProduct: SaleProductType[];
-  tiktokVideo: TiktokVideoType[];
+  tiktokVideo: TiktokVideoType;
 }
 
 export interface SectionHero4Props {
@@ -48,6 +48,8 @@ export interface SectionHero4Props {
 const SectionHero4 =  ({ className = "", data }: SectionHero4Props) => {
 
   console.log("data", data);
+  console.log("mainSlidesMiddleRows", data?.mainSlidesMiddleRows);
+  console.log("slides", data?.mainSlidesMiddleRows?.slides);
   const [currentSlide, setCurrentSlide] = useState(0);
   const [currentLeftSlide, setCurrentLeftSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
@@ -57,38 +59,15 @@ const SectionHero4 =  ({ className = "", data }: SectionHero4Props) => {
   const [isLeftSliderHovered, setIsLeftSliderHovered] = useState(false);
 
   // Map GraphQL data to slider data
-  const sliderData = data?.mainSlidesMiddleRows?.slides?.map((slide, index) => ({
+  const sliderData = data?.mainSlidesMiddleRows?.[0]?.slides?.map((slide, index) => ({
     id: `slide-${index}`,
     image: slide.image,
     alt: `Hero Main ${index + 1}`,
     link: slide.url,
-  })) || [
-    // Fallback data when no GraphQL data is available
-    {
-      id: "fallback-1",
-      image: "/homepage/slider/Layer_2.png",
-      alt: "Hero Main 1",
-      link: "/products/samsung-s25-ultra",
-    },
-    {
-      id: "fallback-2", 
-      image: "/homepage/slider/Layer_5.png",
-      alt: "Hero Main 2",
-      link: "/products/samsung-galaxy-watch",
-    },
-    {
-      id: "fallback-3",
-      image: "/homepage/slider/Layer_3.png", 
-      alt: "Hero Main 3",
-      link: "/products/iphone-15-pro",
-    },
-    {
-      id: "fallback-4",
-      image: "/homepage/slider/Layer_4.png",
-      alt: "Hero Main 4",
-      link: "/products/google-pixel-8",
-    },
-  ];
+  })) || [];
+
+  console.log("sliderData", sliderData);
+  console.log("sliderData.length", sliderData.length);
 
   // Map GraphQL data to left slider data
   const leftSliderData = data?.sideSlider?.map((slide, index) => ({
@@ -96,40 +75,22 @@ const SectionHero4 =  ({ className = "", data }: SectionHero4Props) => {
     image: slide.image,
     alt: `Left Hero ${index + 1}`,
     link: slide.url,
-  })) || [
-    // Fallback data when no GraphQL data is available
-    {
-      id: "left-fallback-1",
-      image: "https://picsum.photos/1000/1000?random=10",
-      alt: "Left Hero 1",
-      link: "/products/accessories",
-    },
-    {
-      id: "left-fallback-2",
-      image: "https://picsum.photos/1000/1000?random=11",
-      alt: "Left Hero 2",
-      link: "/products/tablets",
-    },
-    {
-      id: "left-fallback-3",
-      image: "https://picsum.photos/1000/1000?random=12",
-      alt: "Left Hero 3",
-      link: "/products/laptops",
-    },
-  ];
+  })) || [];
 
   // Get feature slide name
-  const featureSlideName = data?.featuresSlide?.[0]?.name || "Feature Product";
+  const featureSlideName = data?.featuresSlide?.[0]?.name || "";
   
   // Get sale product name
-  const saleProductName = data?.saleProduct?.[0]?.name || "Sale Product";
+  const saleProductName = data?.saleProduct?.[0]?.name || "";
   
   // Get video URL
-  const videoUrl = data?.tiktokVideo?.[0]?.videoUrl || "/WhatsApp Video 2025-08-12 at 16.09.28_83ff54f6.mp4";
+  const videoUrl = data?.tiktokVideo?.videoUrl || "";
 
   // Ensure current indices are within bounds
-  const safeCurrentSlide = Math.min(currentSlide, Math.max(0, sliderData.length - 1));
-  const safeCurrentLeftSlide = Math.min(currentLeftSlide, Math.max(0, leftSliderData.length - 1));
+  const safeCurrentSlide = sliderData.length > 0 ? Math.min(currentSlide, Math.max(0, sliderData.length - 1)) : 0;
+  const safeCurrentLeftSlide = leftSliderData.length > 0 ? Math.min(currentLeftSlide, Math.max(0, leftSliderData.length - 1)) : 0;
+
+  console.log("safeCurrentSlide", safeCurrentSlide);
 
   // Auto-slide functionality for main slider
   useInterval(
@@ -207,11 +168,9 @@ const SectionHero4 =  ({ className = "", data }: SectionHero4Props) => {
   };
 
   const openVideoLink = () => {
-    const tiktokLink = data?.tiktokVideo?.[0]?.tiktokLink;
+    const tiktokLink = data?.tiktokVideo?.tiktokLink;
     if (tiktokLink) {
       window.open(tiktokLink, "_blank");
-    } else {
-      window.open(videoUrl, "_blank");
     }
   };
 
@@ -268,52 +227,58 @@ const SectionHero4 =  ({ className = "", data }: SectionHero4Props) => {
 
         {/* Center Column Slider */}
         <div className="w-3/5 h-full gap-6 flex flex-col">
-          {sliderData.length > 0 && (
-            <div 
-              className="w-full rounded-[18px] overflow-hidden relative min-h-[285px]"
-              onMouseEnter={() => setIsMainSliderHovered(true)}
-              onMouseLeave={() => setIsMainSliderHovered(false)}
-            >
-                          <AnimatePresence initial={false}>
-              <motion.div
-                key={safeCurrentSlide}
-                initial={{ x: "100%" }}
-                animate={{ x: 0 }}
-                exit={{ x: "-100%" }}
-                transition={{ 
-                  duration: 0.5,
-                  ease: [0.4, 0.0, 0.2, 1],
-                }}
-                className="w-full h-full absolute inset-0 cursor-pointer"
-                onClick={() => handleSlideClick(sliderData[safeCurrentSlide]?.link)}
-              >
-                <Image 
-                  src={sliderData[safeCurrentSlide]?.image || ""} 
-                  alt={sliderData[safeCurrentSlide]?.alt || ""} 
-                  width={1200} 
-                  height={900} 
-                  className="w-full h-full object-cover" 
-                />
-              </motion.div>
-            </AnimatePresence>
-            
-            {/* Center Dot Navigation */}
-            <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
-              {sliderData.map((_, index) => (
-                <button
-                  key={index}
-                  onClick={() => goToSlide(index)}
-                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                    index === safeCurrentSlide
-                      ? "bg-white scale-110"
-                      : "bg-white/50 hover:bg-white/75"
-                  }`}
-                  aria-label={`Go to slide ${index + 1}`}
-                />
-              ))}
-            </div>
+          <div 
+            className="w-full rounded-[18px] overflow-hidden relative min-h-[285px]"
+            onMouseEnter={() => setIsMainSliderHovered(true)}
+            onMouseLeave={() => setIsMainSliderHovered(false)}
+          >
+            {sliderData.length > 0 ? (
+              <>
+                <AnimatePresence initial={false}>
+                  <motion.div
+                    key={safeCurrentSlide}
+                    initial={{ x: "100%" }}
+                    animate={{ x: 0 }}
+                    exit={{ x: "-100%" }}
+                    transition={{ 
+                      duration: 0.5,
+                      ease: [0.4, 0.0, 0.2, 1],
+                    }}
+                    className="w-full h-full absolute inset-0 cursor-pointer"
+                    onClick={() => handleSlideClick(sliderData[safeCurrentSlide]?.link)}
+                  >
+                    <Image 
+                      src={sliderData[safeCurrentSlide]?.image || ""} 
+                      alt={sliderData[safeCurrentSlide]?.alt || ""} 
+                      width={1200} 
+                      height={900} 
+                      className="w-full h-full object-cover" 
+                    />
+                  </motion.div>
+                </AnimatePresence>
+                
+                {/* Center Dot Navigation */}
+                <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                  {sliderData.map((_, index) => (
+                    <button
+                      key={index}
+                      onClick={() => goToSlide(index)}
+                      className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                        index === safeCurrentSlide
+                          ? "bg-white scale-110"
+                          : "bg-white/50 hover:bg-white/75"
+                      }`}
+                      aria-label={`Go to slide ${index + 1}`}
+                    />
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+                <p className="text-gray-500">No slider data available</p>
+              </div>
+            )}
           </div>
-          )}
           <div className="w-full h-[130px] flex gap-6 rounded-[18px]">
             {/* Feature Product Card */}
             <Link
@@ -388,19 +353,20 @@ const SectionHero4 =  ({ className = "", data }: SectionHero4Props) => {
         </div>
 
         {/* Video Section */}
-        <div className="w-1/5 flex-shrink-0 h-full rounded-[18px] overflow-hidden relative bg-black">
-          <div className="w-full h-full relative">
-            <video
-              ref={videoRef}
-              src={videoUrl}
-              className="w-full h-full object-cover cursor-pointer"
-              onMouseEnter={handleVideoMouseEnter}
-              onMouseLeave={handleVideoMouseLeave}
-              muted
-              loop
-            >
-              Your browser does not support the video tag.
-            </video>
+        {videoUrl && (
+          <div className="w-1/5 flex-shrink-0 h-full rounded-[18px] overflow-hidden relative bg-black">
+            <div className="w-full h-full relative">
+              <video
+                ref={videoRef}
+                src={videoUrl}
+                className="w-full h-full object-cover cursor-pointer"
+                onMouseEnter={handleVideoMouseEnter}
+                onMouseLeave={handleVideoMouseLeave}
+                muted
+                loop
+              >
+                Your browser does not support the video tag.
+              </video>
             
             {/* Video Controls */}
             <div className="absolute bottom-3 left-3 flex space-x-2">
@@ -451,6 +417,7 @@ const SectionHero4 =  ({ className = "", data }: SectionHero4Props) => {
             </div>
           </div>
         </div>
+        )}
       </div>
     </div>
   );
