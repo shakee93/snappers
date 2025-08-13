@@ -262,6 +262,30 @@ export const GET_PRODUCTS_NODES = gql`
   ${ProductContentFull}
 `;
 
+export const GET_BENTO_SLIDER = gql`
+query HeroSection {
+  mainSlidesMiddleRows {
+    slides {
+      image
+      url
+    }
+  }
+  sideSlider {
+    image
+    url
+  }
+  featuresSlide {
+    name
+  }
+  saleProduct {
+    name
+  }
+  tiktokVideo {
+    tiktokLink
+    videoUrl
+  }
+}
+`
 
 export const GET_PRODUCTS_NODES_HOMEPAGE = gql`
   query getProductsNodeHomePage($first: Int = 10, $tagId: Int!) {
