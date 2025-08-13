@@ -110,33 +110,41 @@ const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData, payme
                   </td>
                   <td></td>
                   <td className="px-6 text-right py-4  font-medium text-gray-800 dark:text-gray-200">
-                    {`${paymentDetails.shippingAddress1}  ${paymentDetails.shippingAddress2}`}
+                    <span dangerouslySetInnerHTML={{ __html: orderData?.order?.shippingTotal || '₨ 0.00' }} />
                   </td>
                 </tr>
 
-                {orderData?.order?.customerNote !== null ? (
-                  <tr>
-                    <td className="px-6 text-left py-4 font-medium text-gray-800 dark:text-gray-200">
-                      {orderData?.order?.shippingTotal === "₨&nbsp;500.00" ? 'Delivery Fee' : '3% Bank Charge'}
-                    </td>
-                    <td></td>
-                    <td className="px-6 text-right py-4 font-medium text-gray-800 dark:text-gray-200">
-                      {(() => {
-                        const cleanString = (str: any) => str?.replace(/[^0-9.]+/g, "");
-
-                        const subtotal = orderData?.order?.subtotal
-                        const total = orderData?.order?.total
-
-                        const subtotalNumeric = parseFloat(cleanString(subtotal));
-                        const totalNumeric = parseFloat(cleanString(total));
-
-                        const difference = totalNumeric - subtotalNumeric;
-
-                        return `₨ ${difference.toFixed(2)}`;
-                      })()}
-                    </td>
-                  </tr>
-                ) : null}
+                {(() => {
+                  const cleanString = (str: any) => str?.replace(/[^0-9.]+/g, "");
+                  
+                  const subtotal = orderData?.order?.subtotal;
+                  const total = orderData?.order?.total;
+                  const shippingTotal = orderData?.order?.shippingTotal;
+                  
+                  const subtotalNumeric = parseFloat(cleanString(subtotal));
+                  const totalNumeric = parseFloat(cleanString(total));
+                  const shippingNumeric = parseFloat(cleanString(shippingTotal));
+                  
+                  // Calculate if there are additional charges beyond shipping (like bank charges)
+                  const expectedTotal = subtotalNumeric + shippingNumeric;
+                  const bankCharge = totalNumeric - expectedTotal;
+                  
+                  // Only show bank charge row if there's actually a charge beyond subtotal + shipping
+                  if (bankCharge > 0) {
+                    return (
+                      <tr>
+                        <td className="px-6 text-left py-4 font-medium text-gray-800 dark:text-gray-200">
+                          3% Bank Charge
+                        </td>
+                        <td></td>
+                        <td className="px-6 text-right py-4 font-medium text-gray-800 dark:text-gray-200">
+                          ₨ {bankCharge.toFixed(2)}
+                        </td>
+                      </tr>
+                    );
+                  }
+                  return null;
+                })()}
 
                 <tr>
                   <td className="px-6 text-left py-4  font-medium text-gray-800 dark:text-gray-200">
