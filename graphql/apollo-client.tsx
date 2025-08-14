@@ -8,6 +8,7 @@ import {
   SSRMultipartLink,
 } from "@apollo/experimental-nextjs-app-support/ssr";
 import { GraphQLClient } from "graphql-request";
+import { jwtDecode } from "jwt-decode";
 
 import { GET_AUTH_TOKEN } from "./defs/auth";
 import {
@@ -25,6 +26,36 @@ loadErrorMessages();
 
 export default function ApolloWrapper({ children }: React.PropsWithChildren) {
   function makeClient() {
+    // Global promise to prevent concurrent token refreshes
+    let refreshPromise: Promise<string> | null = null;
+
+    // Check if token is expired or will expire within 5 minutes
+    function isTokenExpiredOrExpiring(token: string): boolean {
+      try {
+        const decoded: any = jwtDecode(token);
+        const now = Date.now() / 1000;
+        const expirationTime = decoded.exp;
+        const bufferTime = 5 * 60; // 5 minutes buffer
+        
+        return !expirationTime || (expirationTime - bufferTime) <= now;
+      } catch (error) {
+        console.error('Error decoding token:', error);
+        return true; // Treat invalid tokens as expired
+      }
+    }
+
+    // Check if refresh token is expired
+    function isRefreshTokenExpired(refreshToken: string): boolean {
+      try {
+        const decoded: any = jwtDecode(refreshToken);
+        const now = Date.now() / 1000;
+        return !decoded.exp || decoded.exp <= now;
+      } catch (error) {
+        console.error('Error decoding refresh token:', error);
+        return true;
+      }
+    }
+
     async function refreshAuthToken(refreshToken?: string) {
       const graphQLClient = new GraphQLClient(
         process.env.NEXT_PUBLIC_WP_GRAPHQL || ""
@@ -44,22 +75,74 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
 
       return authToken;
     }
-    let tokenSetter: any;
 
     async function fetchAuthToken() {
+      // Prevent concurrent refresh attempts
+      if (refreshPromise) {
+        console.log('Token refresh already in progress, waiting...');
+        return refreshPromise;
+      }
+
       const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
 
       if (!refreshToken) {
-        new Error("refresh token missing");
+        throw new Error("refresh token missing");
       }
 
-      return await refreshAuthToken(refreshToken || undefined);
+      // Check if refresh token itself is expired
+      if (isRefreshTokenExpired(refreshToken)) {
+        localStorage.removeItem(AUTH_TOKEN_KEY);
+        localStorage.removeItem(REFRESH_TOKEN_KEY);
+        localStorage.removeItem(SESSION_TOKEN_KEY);
+        localStorage.removeItem(USER_DATA_KEY);
+        throw new Error("Refresh token expired, please login again");
+      }
+
+      // Create the refresh promise
+      refreshPromise = refreshAuthToken(refreshToken)
+        .finally(() => {
+          // Reset the promise after completion
+          refreshPromise = null;
+        });
+
+      return refreshPromise;
     }
 
     const authLink = new ApolloLink((operation, forward) => {
       const sessionToken = localStorage.getItem(SESSION_TOKEN_KEY);
       const authToken = localStorage.getItem(AUTH_TOKEN_KEY);
 
+      // Proactive token refresh if token is expiring soon
+      if (authToken && isTokenExpiredOrExpiring(authToken)) {
+        console.log('Token is expiring soon, refreshing proactively...');
+        return new Observable((observer) => {
+          fetchAuthToken()
+            .then((newToken) => {
+              operation.setContext({
+                headers: {
+                  ...(sessionToken && {
+                    "woocommerce-session": `Session ${sessionToken}`,
+                  }),
+                  Authorization: `Bearer ${newToken}`,
+                },
+              });
+              
+              // Forward the operation with the new token
+              const subscriber = {
+                next: observer.next.bind(observer),
+                error: observer.error.bind(observer),
+                complete: observer.complete.bind(observer),
+              };
+              forward(operation).subscribe(subscriber);
+            })
+            .catch((error) => {
+              console.error('Proactive token refresh failed:', error);
+              observer.error(error);
+            });
+        });
+      }
+
+      // Normal flow with current token
       operation.setContext({
         headers: {
           ...(sessionToken && {
@@ -100,7 +183,7 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
                 operation.setContext(({ headers = {} }) => ({
                   headers: {
                     ...headers,
-                    authorization: `Bearer ${newToken}`, // Update the authorization header
+                    Authorization: `Bearer ${newToken}`, // Update the authorization header
                   },
                 }));
               })
@@ -119,6 +202,11 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
                 localStorage.removeItem(REFRESH_TOKEN_KEY);
                 localStorage.removeItem(SESSION_TOKEN_KEY);
                 localStorage.removeItem(USER_DATA_KEY);
+                
+                // Redirect to login page or show appropriate error
+                if (typeof window !== 'undefined') {
+                  window.location.href = '/login';
+                }
 
                 observer.error(error);
               });
@@ -168,7 +256,7 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
         authLink,
         errorLink,
         httpLink,
-      ]),
+      ] as any),
       defaultOptions: {
         watchQuery: {
           // fetchPolicy: 'no-cache',
@@ -179,7 +267,6 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
       },
     });
   }
-
   return (
     <ApolloNextAppProvider makeClient={makeClient}>
       {children}
