@@ -32,7 +32,7 @@ import { redirect, useRouter } from "next/navigation";
 import PaymentModal from "@/app/components/Payment/PaymentModal";
 import { useSession } from "@/context/SessionProvider";
 import { usePaymentGateways } from "@/context/PaymentProvider";
-import { Info, Loader } from "lucide-react";
+import { Info, Loader, Clock } from "lucide-react";
 import {
   dummyPaymentData,
   savePaymentDetails,
@@ -42,6 +42,7 @@ import {
 import { useStats } from "react-instantsearch";
 import { Metadata } from "next/types";
 import Image from "next/image";
+import PreOrderNotice from "@/components/PreOrderNotice";
 interface FormData {
   contactInfo: Record<string, any>;
   deliveryAddress: any;
@@ -664,6 +665,30 @@ const CheckoutPage = () => {
     setTotalWithTax(taxWithTotal);
   }, [taxWithTotal]);
 
+  // Check if cart contains pre-order products
+  const hasPreOrderProducts = () => {
+    try {
+      const currentCart = cart;
+      if (
+        !currentCart ||
+        !currentCart.contents ||
+        !currentCart.contents.nodes
+      ) {
+        return false;
+      }
+
+      return currentCart.contents.nodes.some((node: any) => {
+        const productTags = node.product?.node?.productTags?.nodes || [];
+        return productTags.some((tag: any) => tag.slug === 'pre-order');
+      });
+    } catch (error) {
+      console.error("Error while checking for pre-order products:", error);
+      return false;
+    }
+  };
+
+  const isPreOrderCart = hasPreOrderProducts();
+
   const handleKoko = async (orderData: any) => {
     toast.info("Redirecting to Koko payment portal...", {
       duration: 10000,
@@ -975,6 +1000,12 @@ const CheckoutPage = () => {
                 </div>
               </div>
             </div>
+            
+            {/* Pre-order Notice */}
+            {isPreOrderCart && (
+              <PreOrderNotice className="mt-6" />
+            )}
+
             <ButtonPrimary
               onClick={handleCheckoutProcess}
               // disabled={

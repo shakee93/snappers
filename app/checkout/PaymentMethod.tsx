@@ -87,14 +87,41 @@ const PaymentMethod: FC<Props> = ({
   const [isConfirmed, setIsConfirmed] = useState(false);
   let hidePayhereForMobileAndTablets = false;
 
+  // Check if cart contains pre-order products
+  const hasPreOrderProducts = () => {
+    try {
+      const currentCart = cart;
+      if (
+        !currentCart ||
+        !currentCart.contents ||
+        !currentCart.contents.nodes
+      ) {
+        return false;
+      }
+
+      return currentCart.contents.nodes.some((node: any) => {
+        const productTags = node.product?.node?.productTags?.nodes || [];
+        return productTags.some((tag: any) => tag.slug === 'pre-order');
+      });
+    } catch (error) {
+      console.error("Error while checking for pre-order products:", error);
+      return false;
+    }
+  };
+
+  const isPreOrderCart = hasPreOrderProducts();
+
   const PaymentMethods: FC<{ gateway: PaymentGateway }> = ({ gateway }) => {
     const active = methodActive === gateway.id;
 
     let is_tab_or_mobile = hidePayhereForMobileAndTablets ? gateway.id == "payhere" && hidePayhere : false;
     const shouldHidePayhere = gateway.id === 'payhere' && isPriceFluctuation?.topBarPriceFluctuationNotice && totalPayment >= 100000;
+    
+    // Hide Koko and Pay Online for pre-order products
+    const shouldHideForPreOrder = isPreOrderCart && (gateway.id === 'darazbnpl' || gateway.id === 'payhere');
 
     return (
-      !shouldHidePayhere && (
+      !shouldHidePayhere && !shouldHideForPreOrder && (
         <div
           className={` items-start cursor-pointer space-x-4 sm:space-x-6 ${is_tab_or_mobile ? "hidden  " : "flex"
             }`}

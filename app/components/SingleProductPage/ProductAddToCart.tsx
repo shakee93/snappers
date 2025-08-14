@@ -16,6 +16,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "@/context/SessionProvider";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
 import Input from "shared/Input/Input";
+import PreOrderNotice from "@/components/PreOrderNotice";
 
 interface ProductAddToCartProps {
   product: SimpleProduct & VariableProduct;
@@ -256,9 +257,15 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   }
 
   return (
-    <div
-      className="flex items-center justify-center md:justify-start gap-4 md:gap-0 md:space-x-3.5 py-2 px-2 md:py-4 fixed bottom-[82px] left-0 z-10 md:z-10 bg-white md:bg-transparent w-full md:static"
-    >
+    <div className="w-full">
+      {/* Pre-order Notice */}
+      {isPreOrderProduct() && (
+        <PreOrderNotice className="mb-4" />
+      )}
+
+      <div
+        className="flex items-center justify-center md:justify-start gap-4 md:gap-0 md:space-x-3.5 py-2 px-2 md:py-4 fixed bottom-[82px] left-0 z-10 md:z-10 bg-white md:bg-transparent w-full md:static"
+      >
       <div className="flex border border-primaryColor/20 items-center justify-center dark:bg-slate-800/70 px-2 py-1 sm:p-2 rounded-full">
         <div className="flex items-center justify-between space-x-5 w-full">
           <NcInputNumber onChange={(v) => setQuantity(v)} defaultValue={quantity} />
@@ -374,7 +381,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
         </ModalContent>
       </Modal>
 
-
+      </div>
     </div>
   );
 };
