@@ -5,6 +5,7 @@ import React, { FC, useEffect, useState } from "react";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Input from "shared/Input/Input";
+import CountryPhoneInput, { countries } from "./components/CountryPhoneInput";
 
 interface Props {
   isActive: boolean;
@@ -28,13 +29,17 @@ const ContactInfo: FC<Props> = ({
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [displayName, setDisplayName] = useState("");
+  const [country, setCountry] = useState("LK");
   const [isConfirmed, setIsConfirmed] = useState(false);
+
+
 
   useEffect(() => {
     if (initialData) {
       setPhone(initialData?.phone);
       setEmail(initialData?.email);
       setDisplayName(initialData?.displayName);
+      setCountry(initialData?.country || "LK");
     }
   }, [initialData]);
 
@@ -44,6 +49,7 @@ const ContactInfo: FC<Props> = ({
       const contactInfo = {
         phone,
         email,
+        country,
       };
       updateFormData("contactInfo", contactInfo);
       setIsConfirmed(true);
@@ -58,11 +64,11 @@ const ContactInfo: FC<Props> = ({
     return (
       <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden z-0">
         <div className="flex flex-col sm:flex-row items-start p-6 ">
-          <div className="flex flex-row items-center gap-4 md:gap-0">
+          <div className="flex flex-row items-center gap-4 md:gap-0 flex-1">
             <h1 className="h-10 w-10 border-blue-700 text-blue-700 rounded-xl border-2 flex items-center justify-center text-xl font-bold">
               1
             </h1>
-            <div className="sm:ml-8">
+            <div className="sm:ml-8 flex-1">
               <div className=" text-slate-700 items-center dark:text-slate-300 flex ">
                 <h3 className="text-lg font-semibold">Contact infomation</h3>
               </div>
@@ -79,7 +85,7 @@ const ContactInfo: FC<Props> = ({
               <ButtonSecondary
                 sizeClass="py-2 px-4 sm:w-fit w-full"
                 fontSize="text-sm font-medium"
-                className="bg-slate-50 dark:bg-slate-800 mt-5 sm:mt-0 sm:ml-auto !rounded-lg"
+                className="bg-slate-50 dark:bg-slate-800 mt-5 sm:mt-0 sm:ml-4 !rounded-lg"
                 onClick={() => onOpenActive()}
               >
                 Change
@@ -104,16 +110,12 @@ const ContactInfo: FC<Props> = ({
               )}
             </div>
             <div className="max-w-lg">
-              {/* <Label className="text-sm">Your phone number</Label> */}
-              <Input
-                className="mt-1.5"
-                placeholder="Phone* (Sri Lankan mobile starting with 07)"
-                value={phone}
-                type="tel"
-                pattern="^[0]{1}[7]{1}[01245678]{1}[0-9]{7}$"
-                title="Please enter a valid Sri Lankan mobile number starting with 07"
-                onChange={(e) => setPhone(e.target.value)}
-                required={true}
+              {/* <Label className="text-sm">Country & Phone</Label> */}
+              <CountryPhoneInput
+                country={country}
+                phone={phone}
+                onCountryChange={setCountry}
+                onPhoneChange={setPhone}
               />
             </div>
             <div className="max-w-lg">

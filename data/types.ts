@@ -23,6 +23,7 @@ export type contactInformation = {
   phone: string;
   email: string;
   displayName: string;
+  country?: string;
 };
 
 export type Slug = {
