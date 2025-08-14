@@ -6,7 +6,7 @@ import {
   GET_CHECKOUT_USER_DETAILS,
   GET_SINGLE_ORDER,
 } from "@/graphql/defs/order";
-import { useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import ProductTable, { OrderDetails } from "./Comps";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -98,6 +98,25 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
 
 
   if (ordermethod === "guest") {
+    // Clear cart for guest checkout completion
+    const { clearCart: guestClearCart, refreshCart: guestRefreshCart } = useCart();
+    
+    useEffect(() => {
+      const clearCartSafely = async () => {
+        try {
+          await guestClearCart();
+          await guestRefreshCart();
+        } catch (error: unknown) {
+          if (
+            error instanceof Error &&
+            !error.message.includes("No items in cart to remove")
+          ) {
+            console.error("Error clearing cart:", error);
+          }
+        }
+      };
+      void clearCartSafely();
+    }, [guestClearCart, guestRefreshCart]);
 
     const orderData = {
       order: {
@@ -206,6 +225,26 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   }
 
   if (orderId === "guest_checkout" && searchParams) {
+    // Clear cart for simple guest checkout completion
+    const { clearCart: simpleClearCart, refreshCart: simpleRefreshCart } = useCart();
+    
+    useEffect(() => {
+      const clearCartSafely = async () => {
+        try {
+          await simpleClearCart();
+          await simpleRefreshCart();
+        } catch (error: unknown) {
+          if (
+            error instanceof Error &&
+            !error.message.includes("No items in cart to remove")
+          ) {
+            console.error("Error clearing cart:", error);
+          }
+        }
+      };
+      void clearCartSafely();
+    }, [simpleClearCart, simpleRefreshCart]);
+
     return (
       <div className="container mx-auto grid items-center justify-center">
         <h1 className="pt-20 text-center text-2xl font-bold">
@@ -223,16 +262,16 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     );
   }
 
-  const { getCart } = useCart();
+  const { getCart, clearCart } = useCart();
 
-  const refreshCart = async () => {
+  const refreshCart = useCallback(async () => {
     try {
       await getCart();
     } catch (error: any) {
       console.error("Error refreshing the cart:", error);
       throw error;
     }
-  };
+  }, [getCart]);
 
 
   const { data: orderData, error: orderError } = useQuery(GET_SINGLE_ORDER, {
@@ -242,9 +281,23 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   console.log('order data', orderData);
 
   useEffect(() => {
+    const clearCartSafely = async () => {
+      try {
+        await clearCart();
+        await refreshCart();
+      } catch (error: unknown) {
+        if (
+          error instanceof Error &&
+          !error.message.includes("No items in cart to remove")
+        ) {
+          console.error("Error clearing cart:", error);
+        }
+      }
+    };
+
     getUserData();
-    refreshCart();
-  }, [getUserData]);
+    void clearCartSafely();
+  }, [getUserData, clearCart, refreshCart]);
 
   if (status === "FAILURE") {
     return (

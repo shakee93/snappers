@@ -884,7 +884,7 @@ const CheckoutPage = () => {
 
               {isKokoPayment && (
                 <div className="flex justify-between py-2.5">
-                  <span>Koko Charge</span>
+                  <span>Handling Fee</span>
                   <span className="font-semibold text-slate-900 dark:text-slate-200">
                     {/* {JSON.stringify(TotalWithKoko)} */}
                     <span>
