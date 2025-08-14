@@ -30,12 +30,17 @@ const MobileNavLinks = () => {
     },
     {
       id: 4,
+      href: "/tag/pre-order",
+      name: "Pre Order",
+    },
+    {
+      id: 5,
       href: "/about",
       name: "About Us",
     },
 
     {
-      id: 5,
+      id: 6,
       href: "/contact",
       name: "Contact Us",
     },

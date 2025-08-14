@@ -50,6 +50,10 @@ const navLinks: NavLinkItem[] = [
     href: "/contact",
     name: "Location",
   },
+  {
+    href: "/tags/pre-order",
+    name: "Pre-Order",
+  },
 ];
 
 export default function NavLinks() {
