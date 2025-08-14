@@ -51,7 +51,7 @@ const navLinks: NavLinkItem[] = [
     name: "Location",
   },
   {
-    href: "/tags/pre-order",
+    href: "/tag/pre-order",
     name: "Pre-Order",
   },
 ];
