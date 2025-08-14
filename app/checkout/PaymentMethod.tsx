@@ -171,26 +171,31 @@ const PaymentMethod: FC<Props> = ({
               ) : (
                 <></>
               )} */}
-              <p className="text-sm dark:text-slate-300">
-                Your order will be delivered to you after you{" "}
-                {gateway.title || "transfer funds"} to:
-              </p>
-              <ul className="mt-3.5 text-sm text-slate-500 dark:text-slate-400 space-y-2">
-                <li>
-                  {/* <h3 className="text-base text-slate-800 dark:text-slate-200 font-semibold mb-1">
-                  {gateway.title}
-                </h3> */}
-                </li>
-                <li>
-                  {gateway.description && (
-                    <span className="text-slate-900 dark:text-slate-200 font-medium">
-                      <span
-                        dangerouslySetInnerHTML={{ __html: gateway.description }}
-                      />
-                    </span>
-                  )}
-                </li>
-              </ul>
+              {/* Only show description for non-Koko payment methods */}
+              {gateway.id !== "darazbnpl" && (
+                <>
+                  <p className="text-sm dark:text-slate-300">
+                    Your order will be delivered to you after you{" "}
+                    {gateway.title || "transfer funds"} to:
+                  </p>
+                  <ul className="mt-3.5 text-sm text-slate-500 dark:text-slate-400 space-y-2">
+                    <li>
+                      {/* <h3 className="text-base text-slate-800 dark:text-slate-200 font-semibold mb-1">
+                      {gateway.title}
+                    </h3> */}
+                    </li>
+                    <li>
+                      {gateway.description && (
+                        <span className="text-slate-900 dark:text-slate-200 font-medium">
+                          <span
+                            dangerouslySetInnerHTML={{ __html: gateway.description }}
+                          />
+                        </span>
+                      )}
+                    </li>
+                  </ul>
+                </>
+              )}
             </div>
           </div>
         </div>
