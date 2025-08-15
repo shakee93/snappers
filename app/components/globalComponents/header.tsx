@@ -14,6 +14,7 @@ import MobileBottomNav from "@/app/components/globalComponents/MobileBottomNav";
 import { isPaymentPage } from "./paymentPageCheckUtils";
 import TopBarPromotion from "@/components/TopBarPromotion";
 import SideCart from "../SideCart/SideCart";
+import HeaderContent from "./HeaderContent";
 
 // Fetch all products and categories
 async function getData(categories: number[] | null = null) {
@@ -51,40 +52,17 @@ const Header = async () => {
         }
       >
         <TopBarPromotion options={options} />
-        <div className="py-0 md:container flex justify-between items-center md:items-stretch md:py-2 px-0">
-
-          <div className="md:hidden px-2 gap-2 bg-gradient-to-br from-sky-500 to-primaryColor py-2 flex-1 justify-center items-center">
-            <SearchBar />
-          </div>
-
-          <div className="hidden md:flex relative items-center justify-between w-full px-3">
-            <div className="-left-12 hidden md:flex items-center mr-4">
-              <Logo />
-            </div>
-
-            <div className="hidden md:flex items-center relative px-4">
-              <div className="md:block">
-                <NavLinks />
-              </div>
-            </div>
-
-            <div className="hidden md:block flex-1">
-              <SearchBar />
-            </div>
-
-            <div className="hidden ml-5 md:flex">
-              <AvatarDropdown />
-              <SideCart />
-            </div>
-          </div>
-        </div>
+        <HeaderContent />
       </header>
 
       <MobileNavLinks />
 
-      <HeaderSearchResults productCategories={productCategories} brands={brands} />
+      <HeaderSearchResults
+        productCategories={productCategories}
+        brands={brands}
+      />
 
-      <div className="md:hidden">
+      <div className="lg:hidden">
         <MobileBottomNav categories={productCategories} />
       </div>
     </>
