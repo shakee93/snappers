@@ -98,7 +98,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
           </Heading>
 
           {/* Show Skeleton while loading */}
-          {showSkeleton && <CardSkeleton className="w-1/3" />}
+          {showSkeleton && <CardSkeleton className="w-1/5" />}
 
           <div className="glide__track" data-glide-el="track">
             <ul className="glide__slides py-4">
