@@ -308,7 +308,7 @@ const ProductCard: FC<ProductCardProps> = ({
                       height={300}
                       alt={name || ""}
                       placeholder="blur"
-                      className="object-contain w-auto h-full mx-auto my-auto transition-transform duration-800 ease-in-out group-hover:scale-110" // <-- Add hover scale effect
+                      className="object-contain w-full h-full aspect-square max-h-[225px] transition-transform duration-800 ease-in-out group-hover:scale-110" // <-- Add hover scale effect
                     />
                     <div className="h-full relative ">
                       <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-white via-transparent to-transparent"></div>{" "}
@@ -325,7 +325,7 @@ const ProductCard: FC<ProductCardProps> = ({
                   src={image?.sourceUrl || ""}
                   alt={name || ""}
                   className={twMerge(
-                    `object-cover object-center w-full h-full rounded-2xl transition-transform duration-800 ease-in-out group-hover:scale-105` // <-- Add hover scale effect
+                    `object-cover object-center w-full h-full rounded-2xl aspect-square max-h-[225px] transition-transform duration-800 ease-in-out group-hover:scale-105` // <-- Add hover scale effect
                   )}
                 />
                 <div className="absolute inset-x-0 bottom-0 h-1/4 bg-gradient-to-t from-white/90 via-white/30 to-transparent"></div>{" "}
