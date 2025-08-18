@@ -46,7 +46,7 @@ const LeftSlider = ({ slides }: LeftSliderProps) => {
 
   return (
     <div 
-      className="w-1/5 hidden lg:block flex-shrink-0 h-full rounded-[18px] overflow-hidden relative"
+      className="w-1/5 hidden lg:block flex-shrink-0 h-full rounded-[18px] overflow-hidden relative group"
       onMouseEnter={() => setIsLeftSliderHovered(true)}
       onMouseLeave={() => setIsLeftSliderHovered(false)}
     >
@@ -60,21 +60,25 @@ const LeftSlider = ({ slides }: LeftSliderProps) => {
             duration: 0.5,
             ease: [0.4, 0.0, 0.2, 1],
           }}
-          className="w-full h-full absolute inset-0 cursor-pointer"
+          className="w-full h-full absolute inset-0 cursor-pointer overflow-hidden"
           onClick={() => handleSlideClick(slides[safeCurrentSlide]?.link)}
         >
-          <Image
-            src={slides[safeCurrentSlide]?.image || ""}
-            alt={slides[safeCurrentSlide]?.alt || ""}
-            width={1000}
-            height={1000}
-            className="w-full h-full object-cover"
-          />
+          <div className="w-full h-full transition-transform duration-700 ease-out group-hover:scale-110">
+            <Image
+              src={slides[safeCurrentSlide]?.image || ""}
+              alt={slides[safeCurrentSlide]?.alt || ""}
+              width={1000}
+              height={1000}
+              className="w-full h-full object-cover transition-all duration-700 ease-out group-hover:brightness-110"
+            />
+          </div>
+          {/* Overlay effect on hover */}
+          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-all duration-700 ease-out"></div>
         </motion.div>
       </AnimatePresence>
       
       {/* Left Column Dot Navigation */}
-      <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1">
+      <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex space-x-1 z-10">
         {slides.map((_, index) => (
           <button
             key={index}
