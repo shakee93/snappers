@@ -368,7 +368,14 @@ const ProductCard: FC<ProductCardProps> = ({
           }}
         >
           <h2
-            className={`flex flex-col md:flex-row gap-2 justify-between md:gap-0 text-xs lg:text-sm text-black font-semibold transition-colors whitespace-normal min-h-[2.5rem] min-lg:h-[3rem] line-clamp-2 overflow-hidden`}
+            className={`text-xs lg:text-sm text-black font-semibold transition-colors whitespace-normal min-h-[2.5rem] min-lg:h-[3rem] overflow-hidden leading-tight`}
+            style={{
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              textOverflow: 'ellipsis'
+            }}
           >
             {fromSearch ? (
               <Highlight attribute="name" hit={data as any} />
