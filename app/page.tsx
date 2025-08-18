@@ -139,7 +139,7 @@ const getData = async () => {
 export default async function Home() {
   const result =  await getClient().query({ query: GET_BENTO_SLIDER });
     
-      console.log("result", result);  
+      // console.log("result", result);  
 
 
   const { newArrivals, mobiles, speakers, watches, backInStock, brands, slides } = await getData();

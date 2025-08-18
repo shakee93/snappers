@@ -27,7 +27,7 @@ const MainSlider = ({ slides }: MainSliderProps) => {
         setCurrentSlide((prev) => (prev + 1) % slides.length);
       }
     },
-    isAutoPlaying && !isMainSliderHovered && slides.length > 0 ? 5000 : null
+    isAutoPlaying && !isMainSliderHovered && slides.length > 0 ? 6000 : null
   );
 
   const goToSlide = (index: number) => {

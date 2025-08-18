@@ -58,9 +58,9 @@ export interface SectionHero4Props {
 }
 
 const SectionHero4 = ({ className = "", data }: SectionHero4Props) => {
-  console.log("data", data);
-  console.log("mainSlidesMiddleRows", data?.mainSlidesMiddleRows);
-  console.log("slides", data?.mainSlidesMiddleRows?.[0]?.slides);
+  // console.log("data", data);
+  // console.log("mainSlidesMiddleRows", data?.mainSlidesMiddleRows);
+  // console.log("slides", data?.mainSlidesMiddleRows?.[0]?.slides);
 
   // Map GraphQL data to slider data
   const sliderData =
