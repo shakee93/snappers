@@ -33,10 +33,10 @@ const Page = async () => {
               }
             </span>
           </div>
-          <hr className="border-slate-200 dark:border-slate-700 " />
-          <main>
+          <hr className="border-slate-200 dark:border-slate-700 !mt-4" />
+          <main className="!mt-4">
             <div className="w-full">
-              <ul className="py-2 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-8 md:gap-4 lg:gap-8 text-left text-sm text-gray-700 dark:text-gray-200">
+              <ul className="py-2 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-2  lg:gap-4 text-left text-sm text-gray-700 dark:text-gray-200">
                 {brands
                   ?.filter((brand: Brand) => brand.count && brand.count > 0)
                   .map((brand: Brand, index: number) => (
