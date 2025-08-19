@@ -1,10 +1,16 @@
 "use client";
-import React, { FC, useEffect, useId, useRef, useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import Heading from "@/app/components/Heading/Heading";
-import Glide from "@glidejs/glide";
 import { Brand } from "@/graphql/types/graphql";
 import BrandCard from "@/components/BrandCard";
-import CardSkeleton from "./Skeletons/CardSkeleton";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+  type CarouselApi,
+} from "@/components/ui/carousel";
 
 export interface SectionSliderBrandCardProps {
   className?: string;
@@ -28,96 +34,121 @@ const SectionSliderBrandCard: FC<SectionSliderBrandCardProps> = ({
   link,
 }) => {
   const [mounted, setMounted] = useState(false);
-  const [showSkeleton, setShowSkeleton] = useState(true)
-  const sliderRef = useRef(null);
-  const id = useId();
-  const UNIQUE_CLASS = "glidejs" + id.replace(/:/g, "_");
+  const [showSkeleton, setShowSkeleton] = useState(true);
+  const [api, setApi] = useState<CarouselApi>();
 
   useEffect(() => {
-    if (!sliderRef.current) {
-      console.log("Slider reference is not assigned properly.");
-      return;
-    }
+    // Simulate loading time and then show the carousel
+    const timer = setTimeout(() => {
+      setShowSkeleton(false);
+      setMounted(true);
+    }, 1000);
 
-    // @ts-ignore
-    const OPTIONS: Glide.Options = {
-      perView: 6,
-      gap: 10,
-      bound: true,
-      // autoplay: 5000,
-      // hoverpause: false,
-      breakpoints: {
-        1280: {
-          perView: 5,
-        },
-        1024: {
-          gap: 10,
-          perView: 4,
-        },
-        768: {
-          gap: 10,
-          perView: 3,
-        },
-        640: {
-          gap: 10,
-          perView: 2,
-        },
-        500: {
-          gap: 10,
-          perView: 2,
-        },
-      },
-    };
-
-    let slider = new Glide(`.${UNIQUE_CLASS}`, OPTIONS);
-    slider.mount();
-
-    setShowSkeleton(false);
-    setMounted(true);
-
-    return () => {
-      slider.destroy();
-      setMounted(false);
-    };
+    return () => clearTimeout(timer);
   }, []);
+
+  // Auto-slide functionality
+  useEffect(() => {
+    if (!api) return;
+
+    const interval = setInterval(() => {
+      api.scrollNext();
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [api]);
 
   const limitedBrands = brands.slice(0, 15);
 
+  if (!limitedBrands.length) {
+    return null;
+  }
+
   return (
     <div className={`nc-SectionSliderBrandCard ${className}`}>
-      {limitedBrands.length > 0 && (
-        <div className={`glide ${UNIQUE_CLASS} flow-root`} ref={sliderRef}>
-          <Heading
-            className={headingClassName}
-            fontClass={headingFontClassName}
-            rightDescText={subHeading}
-            hasNextPrev
-            link={link}
-          >
-            {heading}
-          </Heading>
+      <div className="flow-root">
+        <Heading
+          className={headingClassName}
+          fontClass={headingFontClassName}
+          rightDescText={subHeading}
+          hasNextPrev={false}
+          link={link}
+        >
+          {heading}
+        </Heading>
 
-          {showSkeleton && <CardSkeleton className="w-1/3" />}
-
-          <div className="glide__track" data-glide-el="track">
-            <ul className="glide__slides py-4 gap-6">
-              {limitedBrands.map((brand, index) => (
-                <li key={index} className={`w-[300px] pt-2 ${itemClassName}`}>
-                  <BrandCard
-                    imageUrl={
-                      brand.brandImage
-                        ? brand.brandImage
-                        : "https://via.placeholder.com/300"
-                    }
-                    brandLink={brand.slug || "#"}
-                    className={!mounted ? "opacity-0" : ""}
-                  />
-                </li>
+        {/* Show Skeleton while loading */}
+        {showSkeleton && (
+          <div className="py-4">
+            <div className="flex gap-4 overflow-hidden">
+              {Array.from({ length: Math.min(limitedBrands.length || 6, 6) }).map((_, index) => (
+                <div key={index} className="flex-shrink-0 basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/6">
+                  <div className="w-full h-32">
+                    <div className="animate-pulse bg-white rounded-2xl shadow-sm border border-gray-200 h-full px-8 flex items-center justify-center">
+                      {/* Brand Logo centered in the middle */}
+                      <div className="bg-gray-200 h-16 w-16 rounded-lg"></div>
+                    </div>
+                  </div>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Show Carousel when loaded */}
+        {!showSkeleton && mounted && (
+          <div className="py-4 relative">
+            <Carousel
+              opts={{
+                align: "start",
+                loop: true,
+                slidesToScroll: 1,
+              }}
+              setApi={setApi}
+              className="w-full"
+            >
+              <CarouselContent className="-ml-2 md:-ml-4">
+                {limitedBrands.map((brand, index) => (
+                  <CarouselItem 
+                    key={index} 
+                    className={`pl-2 md:pl-4 ${itemClassName} basis-1/2 sm:basis-1/3 md:basis-1/4 lg:basis-1/6`}
+                  >
+                    <div className="w-full h-32">
+                      <BrandCard
+                        imageUrl={
+                          brand.brandImage
+                            ? brand.brandImage
+                            : "https://via.placeholder.com/300"
+                        }
+                        brandLink={brand.slug || "#"}
+                        className="transition-opacity duration-300 h-full"
+                      />
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              
+              {/* Navigation arrows positioned in the middle */}
+              <CarouselPrevious className="absolute xl:-left-14 lg:-left-2 lg:right-auto right-10 lg:top-1/2 -top-14 -translate-y-1/2 z-10 border-0 bg-[#cecfd0] text-white hover:bg-[#9e9fa0] hover:text-white transition-colors duration-200 p-1 md:p-2 w-8 h-8 md:w-10 md:h-10 [&>svg]:w-4 [&>svg]:h-4 md:[&>svg]:w-6 md:[&>svg]:h-6" />
+              <CarouselNext className="absolute xl:-right-14 -right-2 lg:top-1/2 -top-14 -translate-y-1/2 z-10 border-0 bg-[#cecfd0] text-white hover:bg-[#9e9fa0] hover:text-white transition-colors duration-200 p-1 md:p-2 w-8 h-8 md:w-10 md:h-10 [&>svg]:w-4 [&>svg]:h-4 md:[&>svg]:w-6 md:[&>svg]:h-6" />
+            </Carousel>
+            
+            {/* See More button at the bottom */}
+            {link && (
+              <div className="flex justify-center mt-6">
+                <a
+                  href={link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-700 bg-white rounded-full shadow-lg hover:shadow-md transition-all duration-200"
+                >
+                  See More
+                </a>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
