@@ -1,11 +1,17 @@
 "use client";
-import React, { FC, useEffect, useId, useRef, useState } from "react";
-import { useQuery } from "@apollo/client";
+import React, { FC, useEffect, useState, useCallback } from "react";
 import Heading from "@/app/components/Heading/Heading";
-import Glide from "@glidejs/glide";
 import ProductCard from "@/app/components/ProductCard3";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
-import CardSkeleton from "./Skeletons/CardSkeleton"; // Import skeleton
+import CardSkeleton from "./Skeletons/CardSkeleton";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+  type CarouselApi,
+} from "@/components/ui/carousel";
 
 export interface SectionSliderProductCardProps {
   className?: string;
@@ -28,95 +34,113 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
   products = [],
   link,
 }) => {
-
   const [mounted, setMounted] = useState(false);
-  const [showSkeleton, setShowSkeleton] = useState(true); // Add loading state
-
-  const sliderRef = useRef(null);
-  const id = useId();
-  const UNIQUE_CLASS = "glidejs" + id.replace(/:/g, "_");
+  const [showSkeleton, setShowSkeleton] = useState(true);
+  const [api, setApi] = useState<CarouselApi>();
 
   useEffect(() => {
-    if (!sliderRef.current) {
-      // console.log("Slider reference is not assigned properly.");
-      return;
-    }
+    // Simulate loading time and then show the carousel
+    const timer = setTimeout(() => {
+      setShowSkeleton(false);
+      setMounted(true);
+    }, 1000);
 
-    // @ts-ignore
-    const OPTIONS: Glide.Options = {
-      perView: 5,
-      autoplay: 2000,
-      gap: 20,
-      bound: true,
-      breakpoints: {
-        1280: {
-          perView: 5,
-        },
-        1024: {
-          gap: 20,
-          perView: 5,
-        },
-        768: {
-          gap: 20,
-          perView: 3,
-        },
-        640: {
-          gap: 20,
-          perView: 2,
-        },
-        500: {
-          gap: 20,
-          perView: 2,
-        },
-      },
-    };
-
-    let slider = new Glide(`.${UNIQUE_CLASS}`, OPTIONS);
-    slider.mount();
-
-    setShowSkeleton(false); // Once mounted, hide the skeleton
-    setMounted(true);
-
-    return () => {
-      slider.destroy();
-      setMounted(false);
-    };
+    return () => clearTimeout(timer);
   }, []);
+
+  // Auto-slide functionality
+  useEffect(() => {
+    if (!api) return;
+
+    const interval = setInterval(() => {
+      api.scrollNext();
+    }, 3000);
+
+    return () => clearInterval(interval);
+  }, [api]);
+
+  const filteredProducts = products.filter((p) => p.price);
+
+  if (!filteredProducts.length) {
+    return null;
+  }
 
   return (
     <div className={`nc-SectionSliderProductCard ${className}`}>
-      {products.some((p) => p.price) && (
-        <div className={`glide ${UNIQUE_CLASS} flow-root`} ref={sliderRef}>
-          <Heading
-            className={headingClassName}
-            fontClass={headingFontClassName}
-            rightDescText={subHeading}
-            hasNextPrev
-            link={link}
-          >
-            {heading}
-          </Heading>
+      <div className="flow-root">
+        <Heading
+          className={headingClassName}
+          fontClass={headingFontClassName}
+          rightDescText={subHeading}
+          hasNextPrev={false}
+          link={link}
+        >
+          {heading}
+        </Heading>
 
-          {/* Show Skeleton while loading */}
-          {showSkeleton && <CardSkeleton className="w-1/5" />}
-
-          <div className="glide__track" data-glide-el="track">
-            <ul className="glide__slides py-4">
-              {products
-                .filter((p) => p.price)
-                .map((item, index) => (
-                  <li key={index} className={`w-[300px] pt-2 ${itemClassName}`}>
-                    <ProductCard
-                      className={!mounted ? "opacity-0" : ""}
-                      key={item.slug}
-                      data={item}
-                    />
-                  </li>
-                ))}
-            </ul>
+        {/* Show Skeleton while loading */}
+        {showSkeleton && (
+          <div className="py-4">
+            <div className="flex gap-4 overflow-hidden">
+              {Array.from({ length: Math.min(filteredProducts.length || 5, 5) }).map((_, index) => (
+                <div key={index} className="flex-shrink-0 basis-1/2 sm:basis-1/3 md:basis-1/3 lg:basis-1/5">
+                  <CardSkeleton cardCount={1} className="w-full" />
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        )}
+
+        {/* Show Carousel when loaded */}
+        {!showSkeleton && mounted && (
+          <div className="py-4 relative">
+            <Carousel
+              opts={{
+                align: "start",
+                loop: true,
+                slidesToScroll: 1,
+              }}
+              setApi={setApi}
+              className="w-full"
+            >
+              <CarouselContent className="-ml-2 md:-ml-4">
+                {filteredProducts.map((item, index) => (
+                  <CarouselItem 
+                    key={index} 
+                    className={`pl-2 md:pl-4 ${itemClassName} basis-1/2 sm:basis-1/3 lg:basis-1/5`}
+                  >
+                    <div className="w-full">
+                      <ProductCard
+                        className="transition-opacity duration-300"
+                        key={item.slug}
+                        data={item}
+                      />
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              
+              {/* Navigation arrows positioned in the middle */}
+              <CarouselPrevious className="absolute xl:-left-14 lg:-left-2 lg:right-auto right-10 lg:top-1/2 -top-14 -translate-y-1/2 z-10 border-0 bg-[#cecfd0] text-white hover:bg-[#9e9fa0] hover:text-white transition-colors duration-200 p-1 md:p-2 w-8 h-8 md:w-10 md:h-10 [&>svg]:w-4 [&>svg]:h-4 md:[&>svg]:w-6 md:[&>svg]:h-6" />
+              <CarouselNext className="absolute xl:-right-14 -right-2 lg:top-1/2 -top-14 -translate-y-1/2 z-10 border-0 bg-[#cecfd0] text-white hover:bg-[#9e9fa0] hover:text-white transition-colors duration-200 p-1 md:p-2 w-8 h-8 md:w-10 md:h-10 [&>svg]:w-4 [&>svg]:h-4 md:[&>svg]:w-6 md:[&>svg]:h-6" />
+            </Carousel>
+            
+            {/* See More button at the bottom */}
+            {link && (
+              <div className="flex justify-center mt-6">
+                <a
+                  href={link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-700 bg-white rounded-full shadow-lg hover:shadow-md transition-all duration-200"
+                >
+                  See More
+                </a>
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };
