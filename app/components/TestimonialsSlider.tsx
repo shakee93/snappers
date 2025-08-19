@@ -184,7 +184,7 @@ export default function TestimonialsSlider() {
     }, [api])
 
     return (
-        <div className="w-full mx-auto px-4 py-12">
+        <div className="w-full mx-auto px-4 py-8">
             {/* Section Title */}
             
 
