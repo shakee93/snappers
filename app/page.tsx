@@ -146,7 +146,7 @@ export default async function Home() {
           <SectionHero3 slides={slides} />
         </div>
 
-        <div className="flex flex-col px-3 gap-10 lg:gap-12 sm:container sm:max-w-screen-2xl">
+        <div className="flex flex-col px-3 gap-10 lg:gap-10 sm:container sm:max-w-screen-2xl">
           <div className="mt-5 md:mt-10">
             <SectionSliderProductCard
               products={newArrivals}
