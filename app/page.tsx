@@ -18,6 +18,8 @@ import FancyTestimonialsSlider from "@/app/components/TestimonialsSlider";
 import GoogleReviewsSection from "@/app/components/HomePage/GoogleReviewsSection";
 import FAQ from "./components/HomePage/FAQSection";
 import TikTokSection from "@/components/TikTokSection";
+import { GET_BENTO_SLIDER } from "@/graphql/defs/products";
+import SectionHero4 from "./components/HomePage/SectionHero4";
 
 
 const getData = async () => {
@@ -135,6 +137,9 @@ const getData = async () => {
 
 
 export default async function Home() {
+  const result =  await getClient().query({ query: GET_BENTO_SLIDER });
+    
+      // console.log("result", result);  
 
 
   const { newArrivals, mobiles, speakers, watches, backInStock, brands, slides } = await getData();
@@ -143,7 +148,7 @@ export default async function Home() {
     <main>
       <div className="nc-PageHome relative flex flex-col overflow-hidden">
         <div className="z-0">
-          <SectionHero3 slides={slides} />
+        <SectionHero4 data={result.data} />
         </div>
 
         <div className="flex flex-col px-3 gap-10 lg:gap-10 sm:container sm:max-w-screen-2xl">
