@@ -25,7 +25,7 @@ import SectionHero4 from "./components/HomePage/SectionHero4";
 const getData = async () => {
   const queries = [
     getClient()
-      .query({ query: GET_PRODUCTS_NODES })
+      .query({ query: GET_PRODUCTS_NODES, variables: { first: 25 } })
       .then((res) => {
         return res.data?.products?.nodes || [];
       })
