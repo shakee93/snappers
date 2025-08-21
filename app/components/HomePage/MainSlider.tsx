@@ -62,8 +62,10 @@ const MainSlider = ({ slides }: MainSliderProps) => {
                 duration: 0.5,
                 ease: [0.4, 0.0, 0.2, 1],
               }}
-              className="w-full h-full absolute inset-0 cursor-pointer overflow-hidden"
-              onClick={() => handleSlideClick(slides[safeCurrentSlide]?.link)}
+              className={`w-full h-full absolute inset-0 overflow-hidden ${
+                slides[safeCurrentSlide]?.link ? 'cursor-pointer' : 'cursor-default'
+              }`}
+              onClick={() => slides[safeCurrentSlide]?.link && handleSlideClick(slides[safeCurrentSlide].link)}
             >
               <div className="w-full h-full transition-transform duration-700 ease-out group-hover:scale-110">
                 <Image 
