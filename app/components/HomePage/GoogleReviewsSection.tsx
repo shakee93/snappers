@@ -5,8 +5,8 @@ const GoogleReviewsSection = () => {
   const googleReviewUrl = "https://www.google.com/search?hl=en-LK&gl=lk&q=ground+floor,+GQ+-The+Mobile+Store,+250,+54+R.+A.+De+Mel+Mawatha,+Colombo+00300&ludocid=1458190955880003094&lsig=AB86z5VvNAV33q2slj2rSzJqGGyh#lrd=0x3ae25975d215fa97:0x143c88f2d3ea3616,3";
 
   return (
-    <div className="w-full py-8 flex justify-center items-center bg-transparent">
-      <div className="flex flex-row items-center justify-center gap-4 w-full max-w-2xl">
+    <div className="w-full py-2 md:py-8 flex justify-center items-center bg-transparent">
+      <div className="flex flex-col md:flex-row items-center justify-center gap-4 w-full max-w-2xl">
         <span className="font-bold text-xl md:text-2xl text-center">Share Your Experience</span>
         <Button
           as="a"

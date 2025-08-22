@@ -6,6 +6,7 @@ import { useStore } from "@/store/store";
 import { useRouter, useSearchParams } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface SearchBarProps {
     onSearchExpand?: (expanded: boolean) => void;
@@ -20,6 +21,15 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
     const [mounted, setMounted] = useState(false);
     const [isInitialized, setIsInitialized] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
+    const [scrollHeight, setScrollHeight] = useState(0);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            setScrollHeight(window.scrollY);
+        };
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     // Handle hydration
     useEffect(() => {
@@ -72,41 +82,44 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
     };
 
     return (
-        <div className="flex-1 flex items-center gap-1">
-            {path !== '/' && (
-                <button
-                    onClick={() => router.back()}
-                    className="hidden md:hidden w-10 h-10 flex items-center justify-center"
-                >
-                    <ChevronLeft className="text-white w-8" />
-                </button>
-            )}
+        <div className="w-full pt-2 px-3">
+            <div className={cn("flex-1 transition-all duration-200 flex items-center gap-1 mx-auto", (isFocused || scrollHeight < 100) ? "w-full" : "w-1/2")}>
+                {path !== '/' && (
+                    <button
+                        onClick={() => router.back()}
+                        className="hidden md:hidden w-10 h-10 flex items-center justify-center"
+                    >
+                        <ChevronLeft className="text-white w-8" />
+                    </button>
+                )}
 
-            <div className="text-primary-700 flex-1 p-1 lg:p-0 bg-primaryColor lg:bg-transparent">
-                <div className="bg-white border-2 lg:border border-primaryColor/20 py-1 md:py-1 flex
-                items-center space-x-0 lg:space-x-1.5 px-2 xl:px-5 rounded-md lg:rounded-[25px] h-10 lg:h-full">
-                    <input
-                        value={mounted ? search : ''}
-                        onChange={handleSearchChange}
-                        onFocus={handleFocus}
-                        onBlur={handleBlur}
-                        type="text"
-                        placeholder="Type to Quick Search"
-                        className="border-none focus:border-none focus:outline-none focus:ring-0 bg-transparent w-full text-sm lg:text-base"
-                        suppressHydrationWarning
-                    />
-                    {(search_status === 'stalled' || search_status === 'loading') ? (
-                        <Loader className="text-primaryColor animate-spin w-5 h-5 lg:w-auto lg:h-auto" />
-                    ) : search.length > 0 ? (
-                        <button onClick={handleSearchClear} className={mounted ? '' : 'opacity-0'}>
-                            <XIcon className="text-primaryColor w-5 h-5 lg:w-auto lg:h-auto" />
-                        </button>
-                    ) : (
-                        <Search className="text-primaryColor w-5 h-5 lg:w-auto lg:h-auto" />
-                    )}
+                <div className="text-primary-700 flex-1 p-1 lg:p-0 bg-transparent w-1/2 lg:bg-transparent">
+                    <div className="bg-white border-2 lg:border border-primaryColor/20 py-1 md:py-1 flex
+                items-center space-x-0 lg:space-x-1.5 px-2 xl:px-5 rounded-full lg:rounded-[25px] h-10 lg:h-full">
+                        <input
+                            value={mounted ? search : ''}
+                            onChange={handleSearchChange}
+                            onFocus={handleFocus}
+                            onBlur={handleBlur}
+                            type="text"
+                            placeholder="Quick Search"
+                            className="border-none focus:border-none focus:outline-none focus:ring-0 bg-transparent w-full text-sm lg:text-base"
+                            suppressHydrationWarning
+                        />
+                        {(search_status === 'stalled' || search_status === 'loading') ? (
+                            <Loader className="text-primaryColor animate-spin w-5 h-5 lg:w-auto lg:h-auto" />
+                        ) : search.length > 0 ? (
+                            <button onClick={handleSearchClear} className={mounted ? '' : 'opacity-0'}>
+                                <XIcon className="text-primaryColor w-5 h-5 lg:w-auto lg:h-auto" />
+                            </button>
+                        ) : (
+                            <Search className="text-primaryColor w-5 h-5 lg:w-auto lg:h-auto" />
+                        )}
+                    </div>
                 </div>
             </div>
         </div>
+
     );
 };
 

@@ -32,7 +32,7 @@ const Header = () => {
   const productCategories = productsData?.productCategories?.nodes || [];
   const brands = productsData?.brands?.nodes || [];
   const options = optionsData || {};
-  
+
   // Extract background color from options
   const topBarBgColor = options?.topBarBgColor || 'white';
 
@@ -51,7 +51,7 @@ const Header = () => {
   useEffect(() => {
     const handleScroll = () => {
       if (!headerRef.current) return;
-      
+
       if (!stickyOffsetRef.current) {
         stickyOffsetRef.current = headerRef.current.offsetTop;
       }
@@ -97,16 +97,17 @@ const Header = () => {
     <>
       <header
         ref={headerRef}
-        style={{ 
-          backgroundColor: !isDesktop ? topBarBgColor : 'white' 
-        }}
+
         className={`
           ${isHeaderSticky ? 'fixed top-0 left-0 right-0' : 'relative'}
           flex flex-col justify-between bg-transparent z-30 transition-all duration-100 md:border-b
         `}
       >
         {/* TopBarPromotion - hides on scroll */}
-        <div 
+        <div
+          style={{
+            backgroundColor: !isDesktop ? topBarBgColor : 'white'
+          }}
           className={`
             transition-all duration-500 ease-out overflow-hidden
             ${isTopBarVisible ? 'max-h-32 opacity-100' : 'max-h-0 opacity-0'}

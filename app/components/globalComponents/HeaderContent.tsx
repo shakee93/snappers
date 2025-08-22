@@ -13,7 +13,7 @@ const HeaderContent = () => {
 
   const handleSearchExpand = (expanded: boolean) => {
     setIsSearchExpanded(expanded);
-    
+
     if (expanded) {
       // Hide nav links immediately when search expands
       setShowNavLinks(false);
