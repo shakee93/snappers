@@ -15,7 +15,8 @@ const PreOrderNotice: React.FC<PreOrderNoticeProps> = ({ className = "" }) => {
         <Clock className="w-4 h-4 text-yellow-600" />
         <span className="text-sm">Delivery in 7-10 business days</span>
       </div>
-      <p className="text-xs text-yellow-700 ml-6">First come, first served - reserve yours now!</p>
+      <p className="text-xs text-yellow-700 ml-6">Don&apos;t wait, your order is just a pre-click away!
+      </p>
     </div>
   );
 };

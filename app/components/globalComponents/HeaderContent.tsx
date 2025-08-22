@@ -26,7 +26,7 @@ const HeaderContent = () => {
   };
 
   return (
-    <div className="py-0 lg:container flex justify-between items-center lg:items-stretch lg:py-2 px-0">
+    <div className="py-0 xl:container flex justify-between items-center lg:items-stretch lg:py-2 px-0">
       <div className="lg:hidden lg:px-2 gap-2  lg:py-2 flex-1 justify-center items-center">
         <SearchBar onSearchExpand={handleSearchExpand} />
       </div>
