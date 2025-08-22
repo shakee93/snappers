@@ -82,9 +82,9 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
                 </button>
             )}
 
-            <div className="text-primary-700 flex-1 p-2 lg:p-0 bg-primaryColor lg:bg-transparent">
-                <div className="bg-white border-2 lg:border border-primaryColor/20 py-0 md:py-1 flex
-                items-center space-x-0 lg:space-x-1.5 px-3 xl:px-5 rounded-md md:rounded-[25px] h-full">
+            <div className="text-primary-700 flex-1 p-1 lg:p-0 bg-primaryColor lg:bg-transparent">
+                <div className="bg-white border-2 lg:border border-primaryColor/20 py-1 md:py-1 flex
+                items-center space-x-0 lg:space-x-1.5 px-2 xl:px-5 rounded-md lg:rounded-[25px] h-10 lg:h-full">
                     <input
                         value={mounted ? search : ''}
                         onChange={handleSearchChange}
@@ -92,17 +92,17 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
                         onBlur={handleBlur}
                         type="text"
                         placeholder="Type to Quick Search"
-                        className="border-none focus:border-none focus:outline-none focus:ring-0 bg-transparent w-full text-base"
+                        className="border-none focus:border-none focus:outline-none focus:ring-0 bg-transparent w-full text-sm lg:text-base"
                         suppressHydrationWarning
                     />
                     {(search_status === 'stalled' || search_status === 'loading') ? (
-                        <Loader className="text-primaryColor animate-spin" />
+                        <Loader className="text-primaryColor animate-spin w-5 h-5 lg:w-auto lg:h-auto" />
                     ) : search.length > 0 ? (
                         <button onClick={handleSearchClear} className={mounted ? '' : 'opacity-0'}>
-                            <XIcon className="text-primaryColor" />
+                            <XIcon className="text-primaryColor w-5 h-5 lg:w-auto lg:h-auto" />
                         </button>
                     ) : (
-                        <Search className="text-primaryColor w-8 h-8 lg:w-auto md:h-auto" />
+                        <Search className="text-primaryColor w-5 h-5 lg:w-auto lg:h-auto" />
                     )}
                 </div>
             </div>

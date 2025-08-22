@@ -1,10 +1,11 @@
+import { headers } from "next/headers";
+
 const EXAMPLE_ID = "b3JkZXI6NjQ0NQ==";
 
-// Client-side version for use in Client Components
-export function isPaymentPageClient(): boolean {
-  if (typeof window === 'undefined') return false;
-  
-  const fullUrl = window.location.href;
+export function isPaymentPage(): boolean {
+  const headersList = headers();
+  const fullUrl = headersList.get("referer") || "";
+
   const splits = fullUrl.split("/");
   const indexOfCheckout = splits.indexOf("checkout");
 
@@ -13,9 +14,11 @@ export function isPaymentPageClient(): boolean {
     const partAfterCheckout = splits[indexOfCheckout + 1];
     let paymentPage = partAfterCheckout.length == 16;
     return paymentPage;
+  } else {
+    // console.log("Pattern 'checkout/' not found in the URL.");
   }
 
   const searchString = /checkout\/id \w{16}/;
   const isMatch = searchString.test(fullUrl);
   return isMatch;
-}
+} 
