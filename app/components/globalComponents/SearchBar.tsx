@@ -82,8 +82,8 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
     };
 
     return (
-        <div className="w-full pt-2 px-3">
-            <div className={cn("flex-1 transition-all duration-200 flex items-center gap-1 mx-auto", (isFocused || scrollHeight < 100) ? "w-full" : "w-1/2")}>
+        <div className="w-full pt-2 px-3 md:p-0">
+            <div className={cn("flex-1 transition-all duration-200 flex items-center gap-1 mx-auto", (isFocused || scrollHeight < 100) ? "w-full" : "md:w-full w-1/2")}>
                 {path !== '/' && (
                     <button
                         onClick={() => router.back()}

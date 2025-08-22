@@ -97,7 +97,9 @@ const Header = () => {
     <>
       <header
         ref={headerRef}
-
+        style={{
+          backgroundColor: !isDesktop ? 'transparent' : 'white'
+        }}
         className={`
           ${isHeaderSticky ? 'fixed top-0 left-0 right-0' : 'relative'}
           flex flex-col justify-between bg-transparent z-30 transition-all duration-100 md:border-b
