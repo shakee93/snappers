@@ -94,8 +94,8 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
                 )}
 
                 <div className="text-primary-700 flex-1 p-1 lg:p-0 bg-transparent w-1/2 lg:bg-transparent">
-                    <div className="bg-white border-2 lg:border border-primaryColor/20 py-1 md:py-1 flex
-                items-center space-x-0 lg:space-x-1.5 px-2 xl:px-5 rounded-full lg:rounded-[25px] h-10 lg:h-full">
+                    <div className="bg-white/60 backdrop-blur-sm border lg:border border-primaryColor/20 py-1 md:py-1 flex
+                items-center space-x-0 lg:space-x-1.5 px-2 pr-3 xl:px-5 rounded-full lg:rounded-[25px] h-10 lg:h-full">
                         <input
                             value={mounted ? search : ''}
                             onChange={handleSearchChange}
@@ -103,7 +103,7 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
                             onBlur={handleBlur}
                             type="text"
                             placeholder="Quick Search"
-                            className="border-none focus:border-none focus:outline-none focus:ring-0 bg-transparent w-full text-sm lg:text-base"
+                            className="text-primaryColor/80 border-none focus:border-none focus:outline-none focus:ring-0 bg-transparent w-full text-sm lg:text-base"
                             suppressHydrationWarning
                         />
                         {(search_status === 'stalled' || search_status === 'loading') ? (
@@ -113,7 +113,7 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
                                 <XIcon className="text-primaryColor w-5 h-5 lg:w-auto lg:h-auto" />
                             </button>
                         ) : (
-                            <Search className="text-primaryColor w-5 h-5 lg:w-auto lg:h-auto" />
+                            <Search className="text-primaryColor/80 w-5 h-5 lg:w-auto lg:h-auto mr-4" />
                         )}
                     </div>
                 </div>
