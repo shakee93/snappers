@@ -173,10 +173,10 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
           {galleryImages?.map((variation: any, index: number) => (
             <div className="embla__slide" key={index}>
               {variation.isVideo ? (
-                <div className="relative max-h-[330px] md:max-h-[410px] w-full rounded-2xl overflow-hidden bg-black flex items-center justify-center">
+                <div className="relative max-h-[330px] md:max-h-[410px] w-full rounded-2xl overflow-hidden bg-black flex items-center justify-center min-h-[330px] md:min-h-[410px]">
                   <video 
                     ref={videoRef}
-                    className="w-full h-full object-contain rounded-[2rem]"
+                    className="max-w-full max-h-full object-contain rounded-xl"
                     controls={isVideoPlaying}
                     poster={originalGalleryImages?.[0]?.sourceUrl || product.image?.sourceUrl || undefined}
                     preload="metadata"
