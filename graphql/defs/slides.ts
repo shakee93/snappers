@@ -18,3 +18,13 @@ query SlidePostType {
   }
 }
 `
+
+export const GET_REVIEWS = gql`
+query getReviews {
+  customerReviewFields {
+    quote
+    review
+    reviewer_name
+  }
+}
+`

@@ -71,8 +71,6 @@ const SectionHero4 = ({ className = "", data }: SectionHero4Props) => {
       link: slide.url,
     })) || [];
 
-  console.log("sliderData", sliderData);
-  console.log("sliderData.length", sliderData.length);
 
   // Map GraphQL data to left slider data
   const leftSliderData =

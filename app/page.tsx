@@ -9,7 +9,7 @@ import {
   GET_PRODUCTS_NODES,
   GET_PRODUCTS_NODES_HOMEPAGE,
 } from "@/graphql/defs/products";
-import { GET_SLIDES } from "@/graphql/defs/slides";
+import { GET_SLIDES, GET_REVIEWS } from "@/graphql/defs/slides";
 import { Brand, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import SectionSliderBrandCard from "./components/SectionSliderBrandCard";
 import CardSkeleton from "./components/Skeletons/CardSkeleton";
@@ -50,7 +50,7 @@ const getData = async () => {
     getClient()
       .query({
         query: GET_PRODUCTS_NODES_HOMEPAGE,
-        variables: { first: 10, tagId: 538 },
+        variables: { first: 20, tagId: 538 },
       })
       .then((res) => {
         return res.data?.products?.nodes || [];
@@ -64,7 +64,7 @@ const getData = async () => {
     getClient()
       .query({
         query: GET_PRODUCTS_NODES,
-        variables: { first: 10, categoryIdIn: [302] },
+        variables: { first: 20, categoryIdIn: [302] },
       })
       .then((res) => {
         return res.data?.products?.nodes || [];
@@ -119,9 +119,20 @@ const getData = async () => {
         console.error("Error fetching options");
         return [];
       }),
+    getClient()
+      .query({
+        query: GET_REVIEWS,
+      })
+      .then((res) => {
+        return res.data?.customerReviewFields || [];
+      })
+      .catch(() => {
+        console.error("Error fetching reviews");
+        return [];
+      }),
   ];
 
-  const [newArrivals, mobiles, speakers, watches, backInStock, brands, slides, options] = await Promise.all(queries);
+  const [newArrivals, mobiles, speakers, watches, backInStock, brands, slides, options, reviews] = await Promise.all(queries);
 
   return {
     newArrivals: newArrivals as (SimpleProduct & VariableProduct)[],
@@ -132,6 +143,7 @@ const getData = async () => {
     brands: brands as Brand[],
     slides,
     options,
+    reviews,
   };
 };
 
@@ -142,7 +154,7 @@ export default async function Home() {
       // console.log("result", result);  
 
 
-  const { newArrivals, mobiles, speakers, watches, backInStock, brands, slides } = await getData();
+  const { newArrivals, mobiles, speakers, watches, backInStock, brands, slides, reviews } = await getData();
 
   return (
     <main>
@@ -195,7 +207,7 @@ export default async function Home() {
           {/* Testimonials section */}
           <div className="">
             <Heading>What Our Customers Say</Heading>
-            <FancyTestimonialsSlider />
+            <FancyTestimonialsSlider reviews={reviews} />
           </div>
 
           {/* Google Reviews Section */}
@@ -213,8 +225,6 @@ export default async function Home() {
           <div className="">
             <SectionPromo1 />
           </div>
-
-          
 
           {/* Speakers Category */}
           <div>

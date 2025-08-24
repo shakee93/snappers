@@ -306,6 +306,7 @@ export const GET_PRODUCTS_NODES_HOMEPAGE = gql`
       first: $first
       where: {
       tagId: $tagId
+    stockStatus: IN_STOCK
     }
     ) {
       nodes {
