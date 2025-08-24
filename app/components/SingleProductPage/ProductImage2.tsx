@@ -11,7 +11,7 @@ import { EmblaOptionsType } from "embla-carousel";
 import useEmblaCarousel from "embla-carousel-react";
 import { PlayIcon } from "lucide-react";
 import Image from "next/image";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState, useRef } from "react";
 // import "styles/embla.css";
 import "styles/product_embla.scss";
 
@@ -34,6 +34,8 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   });
   const { variationId, activeVariation } = useImage();
   const [variationImageEnabled, setVariationImageEnabled] = useState(false);
+  const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
 
   // const [galleryImages, setGalleryImages]  = useState(product.galleryImages?.nodes.length !== 0
   //     ? product.galleryImages?.nodes
@@ -171,15 +173,36 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
           {galleryImages?.map((variation: any, index: number) => (
             <div className="embla__slide" key={index}>
               {variation.isVideo ? (
-                <video 
-                  className="max-h-[330px] md:max-h-[410px] w-full object-contain rounded-lg"
-                  controls
-                  poster={originalGalleryImages?.[0]?.sourceUrl || product.image?.sourceUrl || undefined}
-                  preload="metadata"
-                >
-                  <source src={variation.sourceUrl} type="video/mp4" />
-                  <p>Your browser does not support the video tag.</p>
-                </video>
+                <div className="relative max-h-[330px] md:max-h-[410px] w-full rounded-2xl overflow-hidden bg-black flex items-center justify-center">
+                  <video 
+                    ref={videoRef}
+                    className="w-full h-full object-contain rounded-[2rem]"
+                    controls={isVideoPlaying}
+                    poster={originalGalleryImages?.[0]?.sourceUrl || product.image?.sourceUrl || undefined}
+                    preload="metadata"
+                    onPlay={() => setIsVideoPlaying(true)}
+                    onPause={() => setIsVideoPlaying(false)}
+                    onEnded={() => setIsVideoPlaying(false)}
+                  >
+                    <source src={variation.sourceUrl} type="video/mp4" />
+                    <p>Your browser does not support the video tag.</p>
+                  </video>
+                  {!isVideoPlaying && (
+                    <div 
+                      className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 cursor-pointer group hover:bg-opacity-40 transition-all duration-300"
+                      onClick={() => {
+                        if (videoRef.current) {
+                          videoRef.current.play();
+                          setIsVideoPlaying(true);
+                        }
+                      }}
+                    >
+                      <div className="bg-white bg-opacity-90 rounded-[2rem] p-4 md:p-6 shadow-2xl group-hover:bg-opacity-100 group-hover:scale-110 transition-all duration-300">
+                        <PlayIcon className="w-12 h-12 md:w-16 md:h-16 text-primaryColor ml-1" />
+                      </div>
+                    </div>
+                  )}
+                </div>
               ) : (
                 <ImageEffect
                   index={index}
@@ -216,8 +239,10 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
                       height={100}
                       alt="Video thumbnail"
                     />
-                    <div className="absolute inset-0 max-h-[75px] min-h-[75px] md:max-h-[100px] md:min-h-[100px] min-w-[75px] md:max-w-[100px] md:min-w-[100px] bg-black bg-opacity-20 flex items-center justify-center rounded-lg">
-                      <PlayIcon className="w-6 h-6 text-white" />
+                    <div className="absolute inset-0 max-h-[75px] min-h-[75px] md:max-h-[100px] md:min-h-[100px] min-w-[75px] md:max-w-[100px] md:min-w-[100px] bg-black bg-opacity-30 flex items-center justify-center rounded-lg">
+                      <div className="bg-white bg-opacity-90 rounded-full p-1.5">
+                        <PlayIcon className="w-4 h-4 text-black" />
+                      </div>
                     </div>
                   </button>
                 </div>
