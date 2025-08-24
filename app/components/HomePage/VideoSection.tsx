@@ -14,8 +14,23 @@ const VideoSection = ({ videoUrl, tiktokLink }: VideoSectionProps) => {
   // Video control handlers
   const handleVideoMouseEnter = (e: React.MouseEvent<HTMLVideoElement>) => {
     if (videoRef.current) {
-      videoRef.current.play();
-      setIsVideoPlaying(true);
+      // Ensure video is loaded and ready to play
+      if (videoRef.current.readyState >= 2) {
+        videoRef.current.play().then(() => {
+          setIsVideoPlaying(true);
+        }).catch((error) => {
+          console.log('Video play failed:', error);
+        });
+      } else {
+        // If video isn't ready, wait for it to load
+        videoRef.current.addEventListener('canplay', () => {
+          videoRef.current?.play().then(() => {
+            setIsVideoPlaying(true);
+          }).catch((error) => {
+            console.log('Video play failed:', error);
+          });
+        }, { once: true });
+      }
     }
   };
 
@@ -46,6 +61,12 @@ const VideoSection = ({ videoUrl, tiktokLink }: VideoSectionProps) => {
   };
 
   const openVideoLink = () => {
+    // Pause the video when opening the link
+    if (videoRef.current) {
+      videoRef.current.pause();
+      setIsVideoPlaying(false);
+    }
+    
     if (tiktokLink) {
       window.open(tiktokLink, "_blank");
     }
@@ -62,8 +83,11 @@ const VideoSection = ({ videoUrl, tiktokLink }: VideoSectionProps) => {
           className="w-full h-full object-cover cursor-pointer"
           onMouseEnter={handleVideoMouseEnter}
           onMouseLeave={handleVideoMouseLeave}
+          onClick={togglePlayPause}
+          onTouchEnd={togglePlayPause}
           muted
           loop
+          preload="metadata"
         >
           Your browser does not support the video tag.
         </video>

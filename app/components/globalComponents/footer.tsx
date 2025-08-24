@@ -6,7 +6,7 @@ import { GET_BRANDS } from "@/graphql/defs/products";
 import { Brand } from "@/graphql/types/graphql";
 import { Clock, Copyright, Facebook, Heart, Instagram, Mail, MapPinned } from "lucide-react";
 import { PiFacebookLogoDuotone, PiInstagramLogoDuotone, PiTiktokLogo, PiTiktokLogoDuotone } from "react-icons/pi";
-import { isPaymentPage } from "./paymentPageCheckUtils";
+import { isPaymentPage } from "./paymentPageCheckUtilsServer";
 import { Divider } from "@nextui-org/react";
 import { HeartFilledIcon } from "@radix-ui/react-icons";
 

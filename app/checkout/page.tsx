@@ -258,8 +258,8 @@ const CheckoutPage = () => {
       const shippingMethods = isStorePickup
         ? "pickup_location:0"
         : freeShipping
-        ? "wbs:5c9bd062_free_shipping"
-        : "wbs:0dd3bc79_weight_based_shipping";
+          ? "wbs:5c9bd062_free_shipping"
+          : "wbs:0dd3bc79_weight_based_shipping";
 
       const total: any = cart?.total;
       setOrderTotal(freeShipping ? cart?.subtotal : total);
@@ -464,13 +464,13 @@ const CheckoutPage = () => {
       const shippingMethod = getShippingMethod(shippingTotal);
       const shippingDetails = isStorePickup
         ? {
-            ...transformAddress(formData.deliveryAddress),
-            address1: "Store Pickup",
-            address2: "",
-            city: "Store Pickup",
-            state: "",
-            postcode: "",
-          }
+          ...transformAddress(formData.deliveryAddress),
+          address1: "Store Pickup",
+          address2: "",
+          city: "Store Pickup",
+          state: "",
+          postcode: "",
+        }
         : transformAddress(formData.deliveryAddress);
 
       const email = formData?.contactInfo?.email;
@@ -483,19 +483,16 @@ const CheckoutPage = () => {
 
       const customerNoteHTML = `
             <p><strong>Customer Email:</strong> ${email}</p>
-            <p><strong>Phone Number:</strong> ${
-              formData?.contactInfo?.phone
-            }</p>
-            ${
-              isStorePickup
-                ? "<p><strong>Pickup Location:</strong> Store</p>"
-                : ""
-            }
-            ${
-              isKokoPayment
-                ? "<p><strong>Payment Method:</strong> Koko Pay</p>"
-                : ""
-            }
+            <p><strong>Phone Number:</strong> ${formData?.contactInfo?.phone
+        }</p>
+            ${isStorePickup
+          ? "<p><strong>Pickup Location:</strong> Store</p>"
+          : ""
+        }
+            ${isKokoPayment
+          ? "<p><strong>Payment Method:</strong> Koko Pay</p>"
+          : ""
+        }
         `;
 
       const variables = {
@@ -601,14 +598,14 @@ const CheckoutPage = () => {
     const methodId = isStorePickup
       ? "pickup_location:0"
       : freeShipping
-      ? "wbs:5c9bd062_free_shipping"
-      : "wbs:0dd3bc79_weight_based_shipping";
+        ? "wbs:5c9bd062_free_shipping"
+        : "wbs:0dd3bc79_weight_based_shipping";
 
     const methodTitle = isStorePickup
       ? "Store Pickup"
       : freeShipping
-      ? "Free Shipping"
-      : "Weight Based Shipping";
+        ? "Free Shipping"
+        : "Weight Based Shipping";
 
     const total = isStorePickup ? "0" : shippingTotal;
 
@@ -618,7 +615,7 @@ const CheckoutPage = () => {
   const handleCheckoutError = (error: any) => {
     setLoading(false);
     console.log("error: ", error);
-    
+
     // Check if it's a JSON parsing error indicating PHP output
     if (error.message && error.message.includes("Unexpected token")) {
       console.error("🚨 WordPress GraphQL Error - PHP output detected");
@@ -626,7 +623,7 @@ const CheckoutPage = () => {
       toast.error("Server configuration error. Please contact support.");
       return;
     }
-    
+
     if (error.message === "Sorry, no session found.") {
       if (customer?.id !== "guest") {
         toast.error("please login or create an account to checkout");
@@ -728,7 +725,7 @@ const CheckoutPage = () => {
   const handleGeniePayment = (checkoutData: any) => {
     try {
       const redirectUrl = checkoutData?.checkout?.redirect;
-      
+
       if (!redirectUrl) {
         toast.error("Payment gateway URL not received. Please try again.");
         return;
@@ -736,15 +733,15 @@ const CheckoutPage = () => {
 
       // Store order data for reference
       localStorage.setItem("genie_last_order", JSON.stringify(checkoutData));
-      
+
       // Show success message before redirect
       toast.success("Redirecting to payment gateway...");
-      
+
       // Small delay to ensure toast is shown
       setTimeout(() => {
         window.location.href = redirectUrl;
       }, 1000);
-      
+
     } catch (error) {
       console.error("Genie payment redirect error:", error);
       toast.error("Payment redirect failed. Please try again.");
@@ -871,29 +868,35 @@ const CheckoutPage = () => {
                 </div>
               )}
 
-              {isCardPayment && (
+              {/* {isCardPayment && (
                 <div className="flex justify-between py-2.5">
                   <span>Bank Charge 3%</span>
                   <span className="font-semibold text-slate-900 dark:text-slate-200">
-                    {/* {JSON.stringify(orderTotal)} */}
-                    {/* <span dangerouslySetInnerHTML={{ __html: `₨&nbsp;threePercentFromTotal` || "0.00" }} /> */}
+                    {JSON.stringify(orderTotal)}
+                    <span dangerouslySetInnerHTML={{ __html: `₨&nbsp;threePercentFromTotal` || "0.00" }} />
                     <span>Rs {threePercentFromTotal.toFixed(2) || "0.00"}</span>
                   </span>
                 </div>
+              )} */}
+
+              {(isCardPayment || isKokoPayment) && (
+                <div className="flex justify-between py-2.5">
+                  <span className="text-red-500 font-medium">Sorry your missed the discount</span>
+                </div>
               )}
 
-              {isKokoPayment && (
+              {/* {isKokoPayment && (
                 <div className="flex justify-between py-2.5">
                   <span>Handling Fee</span>
                   <span className="font-semibold text-slate-900 dark:text-slate-200">
-                    {/* {JSON.stringify(TotalWithKoko)} */}
+                    {JSON.stringify(TotalWithKoko)}
                     <span>
                       Rs {(TotalWithKoko - cartSubtotal).toFixed(2) || "0.00"}
                     </span>
-                    {/* {JSON.stringify(cartSubtotal)} */}
+                    {JSON.stringify(cartSubtotal)}
                   </span>
                 </div>
-              )}
+              )} */}
 
               {isKokoPayment && (
                 <div className="flex flex-wrap items-center text-xs text-gray-500 mt-1">
@@ -1000,7 +1003,7 @@ const CheckoutPage = () => {
                 </div>
               </div>
             </div>
-            
+
             {/* Pre-order Notice */}
             {isPreOrderCart && (
               <PreOrderNotice className="mt-6" />

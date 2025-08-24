@@ -18,7 +18,8 @@ interface SaleProductCardProps {
   tiktokLink?: string;
 }
 
-const SaleProductCard = ({ product, tiktokLink }: SaleProductCardProps) => {
+const 
+SaleProductCard = ({ product, tiktokLink }: SaleProductCardProps) => {
   return (
     <div className="w-full md:w-2/3 lg:w-full xl:w-2/3 block h-full bg-white rounded-[18px] overflow-hidden relative border border-gray-200">
       <div className="w-full h-full flex items-center justify-between p-3">
@@ -59,16 +60,11 @@ const SaleProductCard = ({ product, tiktokLink }: SaleProductCardProps) => {
               </div>
             </div>
             <div className="flex flex-row gap-2">
-          <button 
-            onClick={() => {
-              if (tiktokLink) {
-                window.open(tiktokLink, "_blank");
-              }
-            }}
-            className="bg-white border border-[#1B40AF] text-[#1B40AF] text-xs px-4 py-1 rounded-full hover:bg-blue-50 transition-colors"
-          >
-            Explore Clearance
-          </button>
+          <Link href="/tag/clearance">
+            <button className="bg-white border border-[#1B40AF] text-[#1B40AF] text-xs px-4 py-1 rounded-full hover:bg-blue-50 transition-colors">
+              Explore Clearance
+            </button>
+          </Link>
           <Link href={`/products/${product.slug}`} target="_blank" rel="noopener noreferrer">
             <button className="bg-[#1B40AF] text-white text-xs px-4 py-1 rounded-full hover:bg-blue-600 transition-colors">
               Buy Now

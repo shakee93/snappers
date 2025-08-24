@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import useInterval from "react-use/lib/useInterval";
 import Image from "next/image";
@@ -19,6 +19,12 @@ const MainSlider = ({ slides }: MainSliderProps) => {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
   const [isMainSliderHovered, setIsMainSliderHovered] = useState(false);
+  const [touchStart, setTouchStart] = useState<number | null>(null);
+  const [touchEnd, setTouchEnd] = useState<number | null>(null);
+  const sliderRef = useRef<HTMLDivElement>(null);
+
+  // Minimum swipe distance (in px)
+  const minSwipeDistance = 50;
 
   // Auto-slide functionality for main slider
   useInterval(
@@ -36,9 +42,50 @@ const MainSlider = ({ slides }: MainSliderProps) => {
     setTimeout(() => setIsAutoPlaying(true), 1000);
   };
 
+  const goToNextSlide = useCallback(() => {
+    if (slides.length > 0) {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+      setIsAutoPlaying(false);
+      setTimeout(() => setIsAutoPlaying(true), 1000);
+    }
+  }, [slides.length]);
+
+  const goToPrevSlide = useCallback(() => {
+    if (slides.length > 0) {
+      setCurrentSlide((prev) => (prev - 1 + slides.length) % slides.length);
+      setIsAutoPlaying(false);
+      setTimeout(() => setIsAutoPlaying(true), 1000);
+    }
+  }, [slides.length]);
+
   const handleSlideClick = (link: string) => {
     if (link) {
       window.location.href = link;
+    }
+  };
+
+  // Touch handlers for swipe functionality
+  const onTouchStart = (e: React.TouchEvent) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e: React.TouchEvent) => {
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe) {
+      goToNextSlide();
+    }
+    if (isRightSwipe) {
+      goToPrevSlide();
     }
   };
 
@@ -46,9 +93,13 @@ const MainSlider = ({ slides }: MainSliderProps) => {
 
   return (
     <div 
+      ref={sliderRef}
       className="w-full rounded-[18px] overflow-hidden relative aspect-[16/9] min-h-[200px] group"
       onMouseEnter={() => setIsMainSliderHovered(true)}
       onMouseLeave={() => setIsMainSliderHovered(false)}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
     >
       {slides.length > 0 ? (
         <>
@@ -62,8 +113,10 @@ const MainSlider = ({ slides }: MainSliderProps) => {
                 duration: 0.5,
                 ease: [0.4, 0.0, 0.2, 1],
               }}
-              className="w-full h-full absolute inset-0 cursor-pointer overflow-hidden"
-              onClick={() => handleSlideClick(slides[safeCurrentSlide]?.link)}
+              className={`w-full h-full absolute inset-0 overflow-hidden ${
+                slides[safeCurrentSlide]?.link ? 'cursor-pointer' : 'cursor-default'
+              }`}
+              onClick={() => slides[safeCurrentSlide]?.link && handleSlideClick(slides[safeCurrentSlide].link)}
             >
               <div className="w-full h-full transition-transform duration-700 ease-out group-hover:scale-110">
                 <Image 

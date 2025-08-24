@@ -26,6 +26,7 @@ import { useQuery } from '@apollo/client';
 import { usePaymentGateways } from "@/context/PaymentProvider";
 import koko from "@/public/koko.png";
 import Image from "next/image";
+import { BanknotesIcon } from "@heroicons/react/24/outline";
 const ProductDetails = ({
   product,
   brand,
@@ -215,7 +216,12 @@ const ProductDetails = ({
       </div> */}
 
       {/* <div className="text-2xl font-medium md:text-3xl">{product.name}</div> */}
-
+      {product.price && (
+        <div className="text-sm text-primaryColor flex items-center gap-1 mt-2">
+          <BanknotesIcon className="w-4 h-4" />
+         <span className="text-gray-500 font-medium">Cash Price</span>
+        </div>
+      )}
       {/* Commented */}
       {product.type === "VARIABLE" && activeVariation ? (
         <div>
@@ -280,11 +286,13 @@ const ProductDetails = ({
       ) : (
         <div className="flex flex-wrap items-center gap-2 text-base font-bold text-gray-600 md:text-2xl">
 
+          <div className="flex flex-col gap-2">
           {!!product.price ? (
             <span dangerouslySetInnerHTML={{ __html: product.price || "" }} />
           ) : (
             <span>Can not be purchased now</span>
           )}
+          </div>
 
           {product.salePrice &&
             product.salePrice !== product.regularPrice && (

@@ -1,3 +1,4 @@
+
 import React from "react";
 import Link from "next/link";
 
@@ -29,8 +30,8 @@ const TopBarPromotion: React.FC<{ options?: Options }> = ({ options }) => {
   return (
     <div style={{ backgroundColor: topBarBgColor }} className="px-1 py-3 md:p-3">
       <div className="items-between flex flex-col gap-4 md:flex-row md:items-center md:gap-3">
-        <div className="flex w-full flex-col items-center justify-center gap-2 md:flex-row">
-          <div className="flex-row md:flex-row flex gap-2 md:gap-5 justify-center text-center items-center">
+        <div className="flex w-full flex-row items-center justify-center gap-2 md:flex-row">
+          <div className="flex-col md:flex-row flex gap-2 md:gap-5 justify-center text-center items-center">
             <div className="text-xs font-semibold text-white md:text-sm lg:text-md">
               <span className="font-bold">{topBarBeforeText}</span>
               <span style={{ color: topBarHighlightedColor }}> {topBarHighlightedText} </span>{" "}
