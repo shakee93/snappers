@@ -179,6 +179,7 @@ export const ProductContentFull = gql`
     description
     shortDescription(format: RAW)
     reviewCount
+    productVideoUrl
     image {
       id
       sourceUrl

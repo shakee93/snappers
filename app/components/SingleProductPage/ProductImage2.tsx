@@ -9,6 +9,7 @@ import {
 } from "app/components/SingleProductBlock/ProductCarouselThumb";
 import { EmblaOptionsType } from "embla-carousel";
 import useEmblaCarousel from "embla-carousel-react";
+import { PlayIcon } from "lucide-react";
 import Image from "next/image";
 import React, { useCallback, useEffect, useState } from "react";
 // import "styles/embla.css";
@@ -16,7 +17,7 @@ import "styles/product_embla.scss";
 
 type PropType = {
   options?: EmblaOptionsType;
-  product: SimpleProduct & VariableProduct;
+  product: SimpleProduct & VariableProduct & { productVideoUrl?: string };
 };
 type selectedVariationType = {
   sourceUrl: string;
@@ -38,9 +39,32 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   //     ? product.galleryImages?.nodes
   //     : [] || [])
 
-  const [galleryImages, setGalleryImages] = useState(
-    product?.galleryImages?.nodes?.length ? product.galleryImages.nodes : []
-  );
+  const isValidVideoUrl = (url?: string): boolean => {
+    if (!url) return false;
+    try {
+      const videoUrl = new URL(url);
+      const videoExtensions = ['.mp4', '.webm', '.ogg', '.avi', '.mov'];
+      return videoExtensions.some(ext => videoUrl.pathname.toLowerCase().endsWith(ext)) ||
+             videoUrl.hostname.includes('youtube.com') ||
+             videoUrl.hostname.includes('youtu.be') ||
+             videoUrl.hostname.includes('vimeo.com');
+    } catch {
+      return false;
+    }
+  };
+
+  const hasValidVideo = isValidVideoUrl(product.productVideoUrl);
+  const videoItem = hasValidVideo ? {
+    sourceUrl: product.productVideoUrl,
+    databaseId: 'video',
+    altText: 'Product Video',
+    isVideo: true
+  } : null;
+
+  const originalGalleryImages = product?.galleryImages?.nodes?.length ? product.galleryImages.nodes : [];
+  const initialGalleryImages = videoItem ? [videoItem, ...originalGalleryImages] : originalGalleryImages;
+  
+  const [galleryImages, setGalleryImages] = useState(initialGalleryImages);
 
 
   const variationImages = product.variations?.nodes?.map(
@@ -66,31 +90,33 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
 
 
   useEffect(() => {
-
     const activeVariationImage = variationImages.find(i => i.databaseId === variationId);
 
     setGalleryImages(previousImages => {
-
       if (!previousImages) {
-        return []
+        return initialGalleryImages
       }
 
       if (activeVariationImage) {
-        if (previousImages.length > 0 && previousImages[0].databaseId === activeVariationImage.databaseId) {
-          return previousImages;
+        const videoOffset = hasValidVideo ? 1 : 0;
+        const newFirstIndex = videoOffset;
+        
+        if (hasValidVideo) {
+          const newImages = [videoItem, activeVariationImage, ...originalGalleryImages.slice(1)];
+          emblaThumbsApi?.scrollTo(newFirstIndex);
+          setSelectedIndex(newFirstIndex);
+          emblaMainApi?.scrollTo(newFirstIndex);
+          return newImages;
         } else {
-
+          const newImages = [activeVariationImage, ...originalGalleryImages.slice(1)];
           emblaThumbsApi?.scrollTo(0);
           setSelectedIndex(0);
           emblaMainApi?.scrollTo(0);
-
-          return [activeVariationImage, ...previousImages.slice(1)];
+          return newImages;
         }
       }
       return previousImages;
     });
-
-
   }, [variationId]);
 
   const onThumbVariationClick = (variationId: string | null = null) => {
@@ -144,11 +170,23 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
         <div className="embla__container ">
           {galleryImages?.map((variation: any, index: number) => (
             <div className="embla__slide" key={index}>
-              <ImageEffect
-                index={index}
-                src={variation?.sourceUrl || ""}
-                classNames="max-h-[330px] object-contain md:max-h-[410px] image transform transition-transform duration-300"
-              />
+              {variation.isVideo ? (
+                <video 
+                  className="max-h-[330px] md:max-h-[410px] w-full object-contain rounded-lg"
+                  controls
+                  poster={originalGalleryImages?.[0]?.sourceUrl || product.image?.sourceUrl || undefined}
+                  preload="metadata"
+                >
+                  <source src={variation.sourceUrl} type="video/mp4" />
+                  <p>Your browser does not support the video tag.</p>
+                </video>
+              ) : (
+                <ImageEffect
+                  index={index}
+                  src={variation?.sourceUrl || ""}
+                  classNames="max-h-[330px] object-contain md:max-h-[410px] image transform transition-transform duration-300"
+                />
+              )}
             </div>
           ))}
         </div>
@@ -159,15 +197,39 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
           <div className="embla-thumbs__container" >
             {/* Gallery Image */}
             {galleryImages?.map((variation: any, index: number) => (
-              <Thumb
-                onClick={() => onThumbClickCalculated(index)}
-                selected={
-                  index === selectedIndex
-                }
-                index={index}
-                imgSrc={variation?.sourceUrl || ""}
-                key={index}
-              />
+              variation.isVideo ? (
+                <div
+                  key={index}
+                  className={'embla-thumbs__slide relative '.concat(
+                    index === selectedIndex ? ' embla-thumbs__slide--selected' : ''
+                  )}
+                >
+                  <button
+                    onClick={() => onThumbClickCalculated(index)}
+                    className="embla-thumbs__slide__button flex items-center relative w-full"
+                    type="button"
+                  >
+                    <Image
+                      className="embla-thumbs__slide__img object-contain max-h-[75px] min-h-[75px] md:max-h-[100px] md:min-h-[100px] min-w-[75px] md:max-w-[100px] md:min-w-[100px] rounded-lg"
+                      src={originalGalleryImages?.[0]?.sourceUrl || product.image?.sourceUrl || '/images/placeholder-small.png'}
+                      width={100}
+                      height={100}
+                      alt="Video thumbnail"
+                    />
+                    <div className="absolute inset-0 max-h-[75px] min-h-[75px] md:max-h-[100px] md:min-h-[100px] min-w-[75px] md:max-w-[100px] md:min-w-[100px] bg-black bg-opacity-20 flex items-center justify-center rounded-lg">
+                      <PlayIcon className="w-6 h-6 text-white" />
+                    </div>
+                  </button>
+                </div>
+              ) : (
+                <Thumb
+                  onClick={() => onThumbClickCalculated(index)}
+                  selected={index === selectedIndex}
+                  index={index}
+                  imgSrc={variation?.sourceUrl || ""}
+                  key={index}
+                />
+              )
             ))}
           </div>
         </div>

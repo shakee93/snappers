@@ -16,7 +16,7 @@
   .embla__slide {
     flex: 0 0 var(--slide-size);
     min-width: 0;
-    padding-left: var(--slide-spacing);
+    /* padding-left: var(--slide-spacing); */
     position: relative;
   }
   .embla__slide__img {
@@ -73,9 +73,9 @@
     /* margin-left: calc(var(--thumbs-slide-spacing) * -1); */
   }
   .embla-thumbs__slide {
-    flex: 0 0 28%;
+    flex: 0 0 ;
     min-width: 0;
-    padding-left: var(--thumbs-slide-spacing);
+    /* padding-left: var(--thumbs-slide-spacing); */
     position: relative;
     
   }

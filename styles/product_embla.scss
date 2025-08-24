@@ -49,12 +49,12 @@
   .embla-thumbs__slide {
     flex: 0 0 25%;
     min-width: 0;
-    padding-left: calc(var(--thumbs-slide-spacing) * 0.5);
+    // padding-left: calc(var(--thumbs-slide-spacing) * 0.5);
     position: relative;
 
-    &:first-child {
-      padding-left: 0.6;
-    }
+    // &:first-child {
+    //   padding-left: 0.6;
+    // }
 
   }
 
