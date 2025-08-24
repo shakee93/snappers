@@ -21,7 +21,6 @@ import TikTokSection from "@/components/TikTokSection";
 import { GET_BENTO_SLIDER } from "@/graphql/defs/products";
 import SectionHero4 from "./components/HomePage/SectionHero4";
 
-
 const getData = async () => {
   const queries = [
     getClient()
@@ -59,7 +58,6 @@ const getData = async () => {
         console.error("Error fetching speakers");
         return [];
       }),
-
 
     getClient()
       .query({
@@ -130,9 +128,32 @@ const getData = async () => {
         console.error("Error fetching reviews");
         return [];
       }),
+
+    getClient()
+      .query({
+        query: GET_BENTO_SLIDER,
+      })
+      .then((res) => {
+        return res.data || [];
+      })
+      .catch(() => {
+        console.error("Error fetching bento slider");
+        return [];
+      }),
   ];
 
-  const [newArrivals, mobiles, speakers, watches, backInStock, brands, slides, options, reviews] = await Promise.all(queries);
+  const [
+    newArrivals,
+    mobiles,
+    speakers,
+    watches,
+    backInStock,
+    brands,
+    slides,
+    options,
+    reviews,
+    bentoSlider,
+  ] = await Promise.all(queries);
 
   return {
     newArrivals: newArrivals as (SimpleProduct & VariableProduct)[],
@@ -144,23 +165,28 @@ const getData = async () => {
     slides,
     options,
     reviews,
+    bentoSlider,
   };
 };
 
-
 export default async function Home() {
-  const result =  await getClient().query({ query: GET_BENTO_SLIDER });
-    
-      // console.log("result", result);  
-
-
-  const { newArrivals, mobiles, speakers, watches, backInStock, brands, slides, reviews } = await getData();
+  const {
+    newArrivals,
+    mobiles,
+    speakers,
+    watches,
+    backInStock,
+    brands,
+    slides,
+    reviews,
+    bentoSlider,
+  } = await getData();
 
   return (
     <main>
       <div className="nc-PageHome relative flex flex-col overflow-hidden">
         <div className="z-0">
-        <SectionHero4 data={result.data} />
+          <SectionHero4 data={bentoSlider} />
         </div>
 
         <div className="flex flex-col px-3 gap-10 lg:gap-10 sm:container sm:max-w-screen-2xl">
@@ -200,7 +226,7 @@ export default async function Home() {
 
           {/* TikTok Section */}
           <div>
-            <Heading isCenter={true} >Take a look at our TikTok.</Heading>
+            <Heading isCenter={true}>Take a look at our TikTok.</Heading>
             <TikTokSection />
           </div>
 
@@ -252,7 +278,7 @@ export default async function Home() {
           </div>
 
           <div>
-          <Heading>Frequently Asked Questions</Heading>
+            <Heading>Frequently Asked Questions</Heading>
             <FAQ />
           </div>
         </div>
