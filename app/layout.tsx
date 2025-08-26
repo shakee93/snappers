@@ -14,6 +14,7 @@ import { Metadata } from "next";
 import WhatsappLogoComponent from "@/app/components/WhatsAppLogo";
 import Script from "next/script";
 import ScreenSizeIndicator from "@/app/components/ScreenSizeIndicator";
+import GoogleAnalytics from "@/app/components/GoogleAnalytics";
 
 export const metadata: Metadata = {
   title: {
@@ -29,8 +30,8 @@ export default async function RootLayout({
   children: React.ReactNode;
 }) {
 
-  const isLocalhost =
-    typeof window !== "undefined" && window.location.hostname === "localhost";
+  // Server-side localhost check
+  const isLocalhost = process.env.NODE_ENV === 'development';
 
   return (
     <html lang="en">
@@ -39,18 +40,23 @@ export default async function RootLayout({
           name="google-site-verification"
           content="1jxvcjKwBJHZpD2gN7mtEpCc1WQfzu7Wfp0RlyA0zA4"
         />
+        {/* Google Analytics - Only load in production */}
         {!isLocalhost && (
           <>
             <Script
               async
               src="https://www.googletagmanager.com/gtag/js?id=G-LS3EVR93ZH"
+              strategy="afterInteractive"
             />
-            <Script id="google-analytics">
+            <Script id="google-analytics" strategy="afterInteractive">
               {`
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
-                gtag('config', 'G-LS3EVR93ZH');
+                gtag('config', 'G-LS3EVR93ZH', {
+                  page_title: document.title,
+                  page_location: window.location.href,
+                });
               `}
             </Script>
           </>
@@ -99,6 +105,7 @@ export default async function RootLayout({
                 <Suspense fallback={null}>
                   <NavigationEvents />
                 </Suspense>
+                <GoogleAnalytics />
                 <Header />
                 <div className="pb-8 md:pb-24">{children}</div>
                 <WhatsappLogoComponent />
