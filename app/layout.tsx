@@ -105,7 +105,9 @@ export default async function RootLayout({
                 <Suspense fallback={null}>
                   <NavigationEvents />
                 </Suspense>
-                <GoogleAnalytics />
+                <Suspense fallback={null}>
+                  <GoogleAnalytics />
+                </Suspense>
                 <Header />
                 <div className="pb-8 md:pb-24">{children}</div>
                 <WhatsappLogoComponent />

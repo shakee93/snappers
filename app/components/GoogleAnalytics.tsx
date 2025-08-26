@@ -1,6 +1,6 @@
 "use client";
 
-import { usePathname, useSearchParams } from "next/navigation";
+import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 declare global {
@@ -38,13 +38,12 @@ export const event = ({ action, category, label, value }: {
 
 export default function GoogleAnalytics() {
   const pathname = usePathname();
-  const searchParams = useSearchParams();
 
   useEffect(() => {
     if (pathname) {
       pageview(pathname);
     }
-  }, [pathname, searchParams]);
+  }, [pathname]);
 
   return null;
 } 
