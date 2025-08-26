@@ -41,7 +41,7 @@ SaleProductCard = ({ product, tiktokLink }: SaleProductCardProps) => {
               <div className="flex gap-2 justify-center items-center font-semibold">
                 <span className="text-[33px] font-normal">at</span>
                 <Image
-                  src="https://cdn.gqmobiles.lk/wp-content/uploads/2024/10/gq-logo-remastered-e1729670923675.webp"
+                  src="https://cdn.gqmobiles.lk/wp-content/uploads/2025/08/gq-logo.9de22309.png"
                   alt="star"
                   width={30}
                   height={30}
