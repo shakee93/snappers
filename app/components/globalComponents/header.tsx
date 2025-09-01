@@ -35,10 +35,10 @@ const Header = async () => {
 
   return (
     <HeaderClientWrapper
-      productCategories={productCategories}
-      brands={brands}
+        productCategories={productCategories}
+        brands={brands}
       options={options}
-    />
+      />
   );
 };
 

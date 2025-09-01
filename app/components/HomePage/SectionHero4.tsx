@@ -40,6 +40,7 @@ interface SaleProductType {
 interface TiktokVideoType {
   tiktokLink: string;
   videoUrl: string;
+  productLink: string;
 }
 
 interface BentoSliderData {
@@ -58,7 +59,7 @@ export interface SectionHero4Props {
 }
 
 const SectionHero4 = ({ className = "", data }: SectionHero4Props) => {
-  // console.log("data", data);
+  console.log("data", data);
   // console.log("mainSlidesMiddleRows", data?.mainSlidesMiddleRows);
   // console.log("slides", data?.mainSlidesMiddleRows?.[0]?.slides);
 
@@ -108,6 +109,7 @@ const SectionHero4 = ({ className = "", data }: SectionHero4Props) => {
   // Get video URL
   const videoUrl = data?.tiktokVideo?.videoUrl || "";
   const tiktokLink = data?.tiktokVideo?.tiktokLink || "";
+  const productLink = data?.tiktokVideo?.productLink || "";
 
   console.log("safeCurrentSlide", 0);
 
@@ -131,7 +133,7 @@ const SectionHero4 = ({ className = "", data }: SectionHero4Props) => {
         </div>
 
         {/* Video Section */}
-        <VideoSection videoUrl={videoUrl} tiktokLink={tiktokLink} />
+        <VideoSection videoUrl={videoUrl} tiktokLink={tiktokLink} productLink={productLink} />
       </div>
     </div>
   );

@@ -296,6 +296,7 @@ query HeroSection {
   tiktokVideo {
     tiktokLink
     videoUrl
+    productLink
   }
 }
 `
