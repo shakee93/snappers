@@ -15,7 +15,7 @@ import UpsellProducts from "@/app/components/globalComponents/UpsellProducts";
 import { stripHtml } from "@/components/AddressPageComps/HelperComps";
 import { getProductSchema } from "@/lib/jsonld/productSchema";
 
-export const dynamic = "force-dynamic";
+// export const dynamic = "force-dynamic";
 
 type Props = {
   params: {
