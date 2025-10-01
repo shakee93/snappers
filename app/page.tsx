@@ -10,7 +10,7 @@ import {
   GET_PRODUCTS_NODES_HOMEPAGE,
 } from "@/graphql/defs/products";
 import { GET_SLIDES, GET_REVIEWS } from "@/graphql/defs/slides";
-import { Brand, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
+import { Brand, SimpleProduct, Slide, VariableProduct } from "@/graphql/types/graphql";
 import SectionSliderBrandCard from "./components/SectionSliderBrandCard";
 import CardSkeleton from "./components/Skeletons/CardSkeleton";
 import { GET_OPTIONS } from "@/graphql/defs/options";
@@ -21,6 +21,10 @@ import TikTokSection from "@/components/TikTokSection";
 import { GET_BENTO_SLIDER } from "@/graphql/defs/products";
 import SectionHero4 from "./components/HomePage/SectionHero4";
 
+/**
+ * Get the data for the home page
+  * @returns { Promise<{ newArrivals: (SimpleProduct & VariableProduct)[], mobiles: (SimpleProduct & VariableProduct)[], speakers: (SimpleProduct & VariableProduct)[], watches: (SimpleProduct & VariableProduct)[], backInStock: (SimpleProduct & VariableProduct)[], brands: Brand[], slides: Slide[], options: Option[], reviews: Review[], bentoSlider: BentoSlider[] }> }
+ */
 const getData = async () => {
   const queries = [
     getClient()
