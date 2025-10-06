@@ -271,7 +271,20 @@ const ProductCard: FC<ProductCardProps> = ({
       className={`min-h-[270px] md:min-h-[350px] nc-ProductCard relative flex flex-col bg-white rounded-2xl p-1 group ${className} `}
       data-nc-id="ProductCard"
     >
+      {/* Sale Badge - Outside image container */}
+      {stockStatus === "IN_STOCK" && salePrice && regularPrice && parsePrice(salePrice) < parsePrice(regularPrice) && (
+        <div className="absolute left-0 top-4 z-10 bg-green-600 w-fit font-normal text-xs text-white px-3 py-1.5 rounded-r-full shadow-md">
+          SALE!
+        </div>
+      )}
+      {stockStatus !== "IN_STOCK" && (
+        <div className="absolute left-2 top-2 z-10 bg-gradient-to-b w-fit from-gray-500/30 font-semibold to-gray-400/5 text-xs text-gray-900 px-4 py-2 rounded-full">
+          Sold Out
+        </div>
+      )}
+      
       <div className="relative flex-shrink-0 bg-white rounded-2xl overflow-hidden ">
+        
         <Link
           href={link}
           onClick={() => {
@@ -368,7 +381,7 @@ const ProductCard: FC<ProductCardProps> = ({
           }}
         >
           <h2
-            className={`text-xs lg:text-sm text-black font-semibold transition-colors whitespace-normal min-h-[2.5rem] min-lg:h-[3rem] overflow-hidden leading-tight`}
+            className={`text-xs hidden lg:text-sm text-black font-semibold transition-colors whitespace-normal min-h-[2.5rem] min-lg:h-[3rem] overflow-hidden leading-tight`}
             style={{
               display: '-webkit-box',
               WebkitLineClamp: 2,
@@ -411,7 +424,7 @@ const ProductCard: FC<ProductCardProps> = ({
           </div>
 
           {/* INstock badge in green */}
-          {stockStatus === "IN_STOCK" ? (
+          {/* {stockStatus === "IN_STOCK" ? (
             isPreOrderProduct() ? (
               <div className="font-semibold text-xs bg-blue-100 border border-blue-300 text-blue-700 px-3 py-1 rounded-full flex items-center gap-2">
                 <div className="relative flex size-2">
@@ -429,7 +442,7 @@ const ProductCard: FC<ProductCardProps> = ({
             <div className="font-semibold text-xs text-red-500 px-0 py-0 rounded-full ">
               Out of Stock
             </div>
-          )}
+          )} */}
         </div>
 
         <Link
