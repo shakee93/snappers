@@ -273,7 +273,7 @@ const ProductCard: FC<ProductCardProps> = ({
     >
       {/* Sale Badge - Outside image container */}
       {stockStatus === "IN_STOCK" && salePrice && regularPrice && parsePrice(salePrice) < parsePrice(regularPrice) && (
-        <div className="absolute left-0 top-4 z-10 bg-green-600 w-fit font-normal text-xs text-white px-3 py-1.5 rounded-r-full shadow-md">
+        <div className="absolute left-0 top-4 z-10 cursor-pointer bg-green-600 w-fit font-normal text-xs text-white px-3 py-1.5 rounded-r-full shadow-md">
           SALE!
         </div>
       )}
@@ -354,17 +354,6 @@ const ProductCard: FC<ProductCardProps> = ({
           onClick={() => handleCloseModalQuickView()}
         >
           <ArrowsPointingOutIcon className="w-5" />
-        </div>
-
-        {/* Sold Out */}
-        <div
-          className={`absolute left-1 top-1.5 text-center text-xs lg:text-sm line-clamp-2 rounded-full text-slate-800`}
-        >
-          {stockStatus !== "IN_STOCK" && (
-            <div className="bg-gradient-to-b w-fit from-gray-500/30 font-semibold to-gray-400/5 text-xs text-gray-900 px-4 py-2 rounded-full">
-              Sold Out
-            </div>
-          )}
         </div>
       </div>
 
