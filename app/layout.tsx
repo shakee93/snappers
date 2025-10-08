@@ -21,7 +21,29 @@ export const metadata: Metadata = {
     template: "%s - GQ Mobiles",
     default: "GQ Mobiles - Best mobile phones in the market",
   },
-  description: "",
+  description: "Shop the best mobile phones, smartwatches, and accessories at GQ Mobiles. Find the latest tech from top brands.",
+  openGraph: {
+    title: "GQ Mobiles - Best mobile phones in the market",
+    description: "Shop the best mobile phones, smartwatches, and accessories at GQ Mobiles. Find the latest tech from top brands.",
+    url: "https://gqmobiles.lk",
+    siteName: "GQ Mobiles",
+    images: [
+      {
+        url: "/global/gq-logo.png",
+        width: 1200,
+        height: 630,
+        alt: "GQ Mobiles Logo",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "GQ Mobiles - Best mobile phones in the market",
+    description: "Shop the best mobile phones, smartwatches, and accessories at GQ Mobiles. Find the latest tech from top brands.",
+    images: ["/global/gq-logo.png"],
+  },
 };
 
 export default async function RootLayout({
