@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     siteName: "GQ Mobiles",
     images: [
       {
-        url: "/global/gq-logo.png",
+        url: "https://cdn.gqmobiles.lk/wp-content/uploads/2025/10/gq.png",
         width: 1200,
         height: 630,
         alt: "GQ Mobiles Logo",
