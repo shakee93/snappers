@@ -616,6 +616,12 @@ const CheckoutPage = () => {
     setLoading(false);
     console.log("error: ", error);
 
+    // Handle network errors
+    if (error.networkError) {
+      toast.error("Unable to connect to the server. Please check your internet connection and try again.");
+      return;
+    }
+
     // Check if it's a JSON parsing error indicating PHP output
     if (error.message && error.message.includes("Unexpected token")) {
       console.error("🚨 WordPress GraphQL Error - PHP output detected");
@@ -624,18 +630,90 @@ const CheckoutPage = () => {
       return;
     }
 
+    // Handle session errors
     if (error.message === "Sorry, no session found.") {
       if (customer?.id !== "guest") {
-        toast.error("please login or create an account to checkout");
+        toast.error("Please login or create an account to checkout");
         router.push("/login");
       } else {
-        toast.error(
-          "Something went wrong. Please reload the page or log in again."
-        );
+        toast.error("Session expired. Please reload the page or login again.");
       }
-    } else {
-      toast.error("Failed to create the order: " + error.message);
+      return;
     }
+
+    // Handle GraphQL errors
+    if (error.graphQLErrors && error.graphQLErrors.length > 0) {
+      const graphQLError = error.graphQLErrors[0];
+      const errorMessage = graphQLError.message || graphQLError.extensions?.message;
+
+      if (errorMessage?.includes("out of stock") || errorMessage?.includes("stock")) {
+        toast.error("Some items in your cart are out of stock. Please update your cart and try again.");
+        return;
+      }
+
+      if (errorMessage?.includes("payment") || errorMessage?.includes("gateway")) {
+        toast.error("Payment processing error. Please try a different payment method.");
+        return;
+      }
+
+      if (errorMessage?.includes("shipping") || errorMessage?.includes("address")) {
+        toast.error("Shipping information error. Please check your address and try again.");
+        return;
+      }
+
+      if (errorMessage?.includes("cart") || errorMessage?.includes("empty")) {
+        toast.error("Your cart is empty. Please add items before checkout.");
+        return;
+      }
+
+      toast.error("Checkout failed due to a server error. Please try again.");
+      return;
+    }
+
+    // Handle HTTP status codes
+    if (error.message) {
+      if (error.message.includes("500") || error.message.includes("Internal Server Error")) {
+        toast.error("Server error occurred. Please try again in a few moments.");
+        return;
+      }
+
+      if (error.message.includes("400") || error.message.includes("Bad Request")) {
+        toast.error("Invalid request. Please check your information and try again.");
+        return;
+      }
+
+      if (error.message.includes("401") || error.message.includes("Unauthorized")) {
+        toast.error("Authentication required. Please login and try again.");
+        return;
+      }
+
+      if (error.message.includes("403") || error.message.includes("Forbidden")) {
+        toast.error("You don't have permission to perform this action. Please login and try again.");
+        return;
+      }
+
+      if (error.message.includes("404") || error.message.includes("Not Found")) {
+        toast.error("Service not available. Please try again later.");
+        return;
+      }
+
+      if (error.message.includes("timeout")) {
+        toast.error("Request timed out. Please try again.");
+        return;
+      }
+
+      if (error.message.includes("fetch") || error.message.includes("network")) {
+        toast.error("Unable to connect to the server. Please check your internet connection and try again.");
+        return;
+      }
+
+      // For other specific errors, show a more user-friendly message
+      toast.error(`Checkout failed: ${error.message}`);
+      return;
+    }
+
+    // Fallback for unknown errors
+    toast.error("An unexpected error occurred during checkout. Please try again or contact support if the problem persists.");
   };
 
   const handleScrollToEl = (id: string) => {

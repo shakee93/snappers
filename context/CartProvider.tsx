@@ -110,8 +110,8 @@ export function CartProvider({ children }: {
     // Helper function to check if cart has pre-order products
     const cartHasPreOrderProducts = () => {
         if (!cart?.contents?.nodes) return false;
-        
-        return cart.contents.nodes.some((item: any) => 
+
+        return cart.contents.nodes.some((item: any) =>
             isPreOrderProduct(item.product?.node)
         );
     };
@@ -119,39 +119,88 @@ export function CartProvider({ children }: {
     // Helper function to check if cart has non-pre-order products
     const cartHasNonPreOrderProducts = () => {
         if (!cart?.contents?.nodes) return false;
-        
-        return cart.contents.nodes.some((item: any) => 
+
+        return cart.contents.nodes.some((item: any) =>
             !isPreOrderProduct(item.product?.node)
         );
     };
 
     const addToCart = async (id: number, quantity?: number, variation?: number, productData?: any) => {
-        // Check pre-order restrictions before adding to cart
-        const isProductPreOrder = productData ? isPreOrderProduct(productData) : false;
-        
-        if (isProductPreOrder && cartHasNonPreOrderProducts()) {
-            toast.error("You can't add pre-order products with regular products in your cart.");
-            return { error: "Pre-order restriction" };
-        }
-        
-        if (!isProductPreOrder && cartHasPreOrderProducts()) {
-            toast.error("You can't add regular products with pre-order products in your cart.");
-            return { error: "Pre-order restriction" };
-        }
+        try {
+            // Check pre-order restrictions before adding to cart
+            const isProductPreOrder = productData ? isPreOrderProduct(productData) : false;
 
-        const data = await _addToCart({
-            variables: {
-                productId: id,
-                quantity: quantity,
-                variationId: variation
-            },
-        })
+            if (isProductPreOrder && cartHasNonPreOrderProducts()) {
+                toast.error("You can't add pre-order products with regular products in your cart.");
+                return { error: "Pre-order restriction" };
+            }
 
-        if (data?.data?.addToCart?.cartItem) {
-            setIsCartOpen(true)
+            if (!isProductPreOrder && cartHasPreOrderProducts()) {
+                toast.error("You can't add regular products with pre-order products in your cart.");
+                return { error: "Pre-order restriction" };
+            }
+
+            const data = await _addToCart({
+                variables: {
+                    productId: id,
+                    quantity: quantity,
+                    variationId: variation
+                },
+            })
+
+            if (data?.data?.addToCart?.cartItem) {
+                setIsCartOpen(true)
+            }
+
+            return data
+        } catch (error: any) {
+            console.error('Add to cart error:', error);
+
+            // Handle GraphQL errors
+            if (error.graphQLErrors && error.graphQLErrors.length > 0) {
+                const graphQLError = error.graphQLErrors[0];
+                const errorMessage = graphQLError.message || graphQLError.extensions?.message;
+
+                if (errorMessage?.includes("out of stock") || errorMessage?.includes("stock")) {
+                    toast.error("This product is currently out of stock.");
+                    return { error: "Out of stock" };
+                }
+
+                if (errorMessage?.includes("cart") || errorMessage?.includes("add")) {
+                    toast.error("Unable to add item to cart. Please login and try again.");
+                    return { error: "Add to cart failed" };
+                }
+
+                toast.error("Unable to add item to cart. Please login and try again.");
+                return { error: "Add to cart failed" };
+            }
+
+            // Handle network errors
+            if (error.networkError) {
+                toast.error("Unable to connect to the server. Please check your internet connection and try again.");
+                return { error: "Network error" };
+            }
+
+            // Handle generic errors
+            if (error.message?.includes("fetch") || error.message?.includes("network")) {
+                toast.error("Unable to connect to the server. Please check your internet connection and try again.");
+                return { error: "Network error" };
+            }
+
+            if (error.message?.includes("timeout")) {
+                toast.error("Request timed out. Please try again.");
+                return { error: "Timeout error" };
+            }
+
+            if (error.message?.includes("500") || error.message?.includes("Internal Server Error")) {
+                toast.error("Server error occurred. Please try again in a few moments.");
+                return { error: "Server error" };
+            }
+
+            // Fallback
+            toast.error("An unexpected error occurred. Please try again.");
+            return { error: "Unknown error" };
         }
-
-        return data
     }
 
     const updateCart = async (key: string, quantity: number) => {

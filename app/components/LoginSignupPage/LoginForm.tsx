@@ -20,35 +20,45 @@ const LoginForm = () => {
 
   const handleFormSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-  
+
     try {
       setIsLoading(true);
       let response: LoginResponse = await login(email, password);
-  
+
       if (response.error) {
         // If there's an error (e.g., incorrect credentials), show the error message and stop further execution
         toast.error(response.error);
         setIsLoading(false);
         return;
       }
-  
+
       // If login is successful, display a welcome message
       const randomMessage = getRandomWelcomeMessage();
       toast(randomMessage);
-  
+
       // Fetch customer data and redirect only on successful login
       await fetchCustomer();
       router.push("/");
       localStorage.removeItem('last_order');
-    } catch (error) {
+    } catch (error: any) {
       // Catch any other unexpected errors
       console.error("Error:", error);
-      toast.error("Something went wrong, please try again.");
+
+      // Handle specific error types
+      if (error.message?.includes("fetch") || error.message?.includes("network")) {
+        toast.error("Unable to connect to the server. Please check your internet connection and try again.");
+      } else if (error.message?.includes("timeout")) {
+        toast.error("Request timed out. Please try again.");
+      } else if (error.message?.includes("500") || error.message?.includes("Internal Server Error")) {
+        toast.error("Server error occurred. Please try again in a few moments.");
+      } else {
+        toast.error("Something went wrong, please try again.");
+      }
     } finally {
       setIsLoading(false); // Always stop the loading spinner at the end
     }
   };
-  
+
 
   return (
     <form className="grid grid-cols-1 gap-6" onSubmit={handleFormSubmit}>

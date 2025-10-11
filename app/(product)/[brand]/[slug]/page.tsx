@@ -35,7 +35,7 @@ export async function generateStaticParams() {
 
 async function getData(slug: string, brand: string) {
   try {
-    const { data } = await getClient().query({
+    const { data, error } = await getClient().query({
       query: GET_PRODUCT,
       variables: {
         productId: slug,
@@ -43,21 +43,27 @@ async function getData(slug: string, brand: string) {
       fetchPolicy: "no-cache",
     });
 
+    if (error) {
+      console.log("DATA ERROR: ", error)
+      notFound()
+    }
+
+    if (!data.product || data.product == null) {
+      console.log("data product not found", data)
+      notFound()
+    }
+
     const { data: categoryData } = await getClient().query({
       query: GET_CATEGORY_ARCHIVE_IN_STOCK,
       variables: {
-        categoryIdIn: data.product.productCategories?.edges?.map((cat: any) => cat.node.databaseId) || [],
+        categoryIdIn: data.product?.productCategories?.edges?.map((cat: any) => cat.node.databaseId) || [],
         first: 10,
       },
     });
 
     const upsellProducts = categoryData?.products?.edges.map((edge: any) => edge.node) || [];
 
-    if (!data.product) {
-      console.log("Product not found");
-      return notFound();
-    }
-    const productBrand = data.product.brands?.nodes[0] || {
+    const productBrand = data.product?.brands?.nodes?.[0] || {
       name: "Product",
       slug: "product",
     };
