@@ -40,6 +40,11 @@ const HeaderSearchResults = ({ brands, productCategories }: SearchBarProps) => {
         }
     }, [searchParams])
 
+    useEffect(() => {
+        console.log('search', search)
+    }, [search])
+
+
     if (!mounted) {
         return <></>
     }

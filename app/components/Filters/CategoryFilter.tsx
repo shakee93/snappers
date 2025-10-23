@@ -40,14 +40,16 @@ const CategoryFilter = ({ categories }: CategoryFilterProps) => {
 
     useEffect(() => {
         // Update URL when categories change
-        const url = new URL(window.location.href);
+        const currentParams = new URLSearchParams(searchParams.toString());
         if (catState.length > 0) {
-            url.searchParams.set('categories', catState.join(','));
+            currentParams.set('categories', catState.join(','));
         } else {
-            url.searchParams.delete('categories');
+            currentParams.delete('categories');
         }
-        window.history.replaceState({}, '', url.toString());
-    }, [catState]);
+        const newUrl = `${window.location.pathname}?${currentParams.toString()}`;
+        window.history.replaceState({}, '', newUrl);
+
+    }, [catState, searchParams]);
 
     useEffect(() => {
         if (firstCategoryFacets.length === 0) {

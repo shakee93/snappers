@@ -13,7 +13,7 @@ const revalidationToast = (message: string, type: 'success' | 'error') => {
         position: 'top-center',
         className: '',
     });
-    
+
 };
 
 export function NavigationEvents() {
@@ -27,7 +27,8 @@ export function NavigationEvents() {
         syncCategories([])
         syncBrands([])
         synPriceRange(PRICE_RANGE)
-    }, [pathname, pushNavigation, setSearch, syncCategories, syncBrands, synPriceRange])
+
+    }, [pathname])
 
     useEffect(() => {
         const revalidate = searchParams.has('revalidate')
