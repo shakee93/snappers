@@ -14,10 +14,10 @@ interface HeaderClientWrapperProps {
   options: any;
 }
 
-const HeaderClientWrapper = ({ 
-  productCategories, 
-  brands, 
-  options 
+const HeaderClientWrapper = ({
+  productCategories,
+  brands,
+  options
 }: HeaderClientWrapperProps) => {
   const [isDesktop, setIsDesktop] = useState(false);
   const [isTopBarVisible, setIsTopBarVisible] = useState(true);
@@ -79,7 +79,7 @@ const HeaderClientWrapper = ({
         }}
         className={`
           ${isHeaderSticky ? 'fixed top-0 left-0 right-0' : 'relative'}
-          flex flex-col justify-between bg-transparent z-30 transition-all duration-100 md:border-b
+          flex flex-col justify-between bg-transparent z-[100] transition-all duration-100 md:border-b
         `}
       >
         {/* TopBarPromotion - hides on scroll */}

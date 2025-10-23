@@ -158,10 +158,6 @@ const InstantSearchWrapper = ({
   }, [debouncedSearchQuery]);
 
   useEffect(() => {
-    console.log(filterQuery);
-  }, [filterQuery]);
-
-  useEffect(() => {
     setSearchMounted();
   }, []);
 

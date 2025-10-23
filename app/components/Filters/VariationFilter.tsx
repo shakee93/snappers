@@ -131,7 +131,7 @@ const VariationFilter = ({ attribute, label }: VariationFilterProps) => {
                                     <div className="absolute bottom-8 left-0 right-0 h-6 bg-gradient-to-t from-white dark:from-neutral-900 to-transparent pointer-events-none z-10" />
 
                                     {/* Show More button */}
-                                    <div className="mt-2 text-center relative z-20">
+                                    <div className="mt-2 text-center relative z-15">
                                         <button
                                             onClick={() => setShowAll(true)}
                                             className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
