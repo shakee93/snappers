@@ -1,6 +1,6 @@
-import {useSortBy} from "react-instantsearch";
-import {useStore} from "@/store/store";
-import {useEffect} from "react";
+import { useSortBy } from "react-instantsearch";
+import { useStore } from "@/store/store";
+import { useEffect } from "react";
 
 
 const SortInput = () => {
@@ -19,7 +19,6 @@ const SortInput = () => {
 
 
     useEffect(() => {
-        console.log(sidebar.sort);
         refine(`product/sort/${sidebar.sort}`)
     }, [sidebar.sort])
 
