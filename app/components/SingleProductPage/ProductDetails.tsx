@@ -260,26 +260,24 @@ const ProductDetails = ({
               </div>
             )}
             
-            {isKokoEnabled && (
-              <div className="flex flex-wrap items-center text-xs text-gray-400">
-                <span>or pay in 3 x Rs</span>
-                <span className="font-semibold mx-1">
-                  {(
-                    parseFloat(
-                      ((activeVariation.salePrice === "₨&nbsp;0.00" || activeVariation.salePrice === null) && (activeVariation.regularPrice === "₨&nbsp;0.00" || activeVariation.regularPrice === null)
-                        ? highestPrice 
-                        : (activeVariation.salePrice || activeVariation.regularPrice) || "0")
-                        .toString()
-                        .replace(/[^\d.]/g, "")
-                    ) / 88 * 100 / 3
-                  ).toFixed(2)}
-                </span>
-                <span>with</span>
-                <span className="ml-1 inline-block">
-                  <Image src={koko} alt="KOKO" className="inline-block w-12 h-auto" />
-                </span>
-              </div>
-            )}
+            <div className="flex flex-wrap items-center text-xs text-gray-400">
+              <span>or pay in 3 x Rs</span>
+              <span className="font-semibold mx-1">
+                {(
+                  parseFloat(
+                    ((activeVariation.salePrice === "₨&nbsp;0.00" || activeVariation.salePrice === null) && (activeVariation.regularPrice === "₨&nbsp;0.00" || activeVariation.regularPrice === null)
+                      ? highestPrice 
+                      : (activeVariation.salePrice || activeVariation.regularPrice) || "0")
+                      .toString()
+                      .replace(/[^\d.]/g, "")
+                  ) / 88 * 100 / 3
+                ).toFixed(2)}
+              </span>
+              <span>with</span>
+              <span className="ml-1 inline-block">
+                <Image src={koko} alt="KOKO" className="inline-block w-12 h-auto" />
+              </span>
+            </div>
 
           </div>
         </div>
@@ -322,6 +320,23 @@ const ProductDetails = ({
               Sold Out
             </div>
           )}
+
+          <div className="flex flex-wrap items-center text-xs text-gray-400">
+            <span>or pay in 3 x Rs</span>
+            <span className="font-semibold mx-1">
+              {(
+                parseFloat(
+                  (product.price || "0")
+                    .toString()
+                    .replace(/[^\d.]/g, "")
+                ) / 88 * 100 / 3
+              ).toFixed(2)}
+            </span>
+            <span>with</span>
+            <span className="ml-1 inline-block">
+              <Image src={koko} alt="KOKO" className="inline-block w-12 h-auto" />
+            </span>
+          </div>
 
         </div>
       )}
