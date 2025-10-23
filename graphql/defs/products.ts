@@ -749,3 +749,15 @@ export const GET_QUICK_VIEW_PRODUCT = gql`
 `;
 
 
+export const GET_ALL_PRODUCT_ATTRIBUTES = gql`
+  query getAllProductAttributes {
+    allProductAttributes {
+      slug
+      name
+      terms {
+        name
+        slug
+      }
+    }
+  }
+`;

@@ -99,6 +99,13 @@ const InstantSearchWrapper = ({
         : null,
     ];
 
+    // Add variation filters
+    Object.entries(sidebar.variations).forEach(([attribute, values]) => {
+      if (values.length > 0) {
+        f.push(`variation_facets.${attribute}:[${values.join(",")}]`);
+      }
+    });
+
     // console.log({ f });
 
     return f.filter((n) => n).join(" && ");
@@ -120,6 +127,8 @@ const InstantSearchWrapper = ({
         query_by: "name, description, productTags",
         query_by_weights: "3,1,1",
         exclude_fields: "description, shortDescription, galleryImages, attributes",
+        facet_by: "brands_facet, categories_facet, variation_facets.*",
+        max_facet_values: 20,
         // use_cache: false,
         filter_by: filterQuery,
         sort_by: "in_stock:desc",

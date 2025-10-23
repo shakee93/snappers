@@ -15,6 +15,7 @@ import WhatsappLogoComponent from "@/app/components/WhatsAppLogo";
 import Script from "next/script";
 import ScreenSizeIndicator from "@/app/components/ScreenSizeIndicator";
 import GoogleAnalytics from "@/app/components/GoogleAnalytics";
+import AttributeMappingsInitializer from "@/app/components/AttributeMappingsInitializer";
 
 export const metadata: Metadata = {
   title: {
@@ -121,14 +122,17 @@ export default async function RootLayout({
       </head>
       <body className="bg-gray-100 text-base dark:bg-slate-900 text-slate-900 dark:text-slate-200">
         <ApolloWrapper>
-            <PaymentProvider>
-              <CartProvider>
-                <SessionProvider>
+          <PaymentProvider>
+            <CartProvider>
+              <SessionProvider>
                 <Suspense fallback={null}>
                   <NavigationEvents />
                 </Suspense>
                 <Suspense fallback={null}>
                   <GoogleAnalytics />
+                </Suspense>
+                <Suspense fallback={null}>
+                  <AttributeMappingsInitializer />
                 </Suspense>
                 <Header />
                 <div className="pb-8 md:pb-24">{children}</div>
@@ -136,9 +140,9 @@ export default async function RootLayout({
                 <Toaster />
                 <Footer />
                 {/* <ScreenSizeIndicator /> */}
-                </SessionProvider>
-              </CartProvider>
-            </PaymentProvider>
+              </SessionProvider>
+            </CartProvider>
+          </PaymentProvider>
         </ApolloWrapper>
       </body>
     </html>

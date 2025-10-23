@@ -1,6 +1,7 @@
-import {create} from 'zustand'
-import {ProductAttribute, VariationAttribute} from "@/graphql/types/graphql";
-import {PRICE_RANGE} from "@/app/components/Filters/PriceFilter";
+import { create } from 'zustand'
+import { ProductAttribute, VariationAttribute } from "@/graphql/types/graphql";
+import { PRICE_RANGE } from "@/app/components/Filters/PriceFilter";
+import { AttributeMapping } from "@/utils/attributeMappingService";
 
 type State = {
     search: string,
@@ -16,32 +17,41 @@ type State = {
         sort: string
         in_stock: boolean
         out_of_stock: boolean
+        variations: Record<string, string[]>
     }
     product: {
         attribute: any[]
     }
     searchMounted: boolean
+    attributeMappings: Map<string, AttributeMapping>
+    attributeMappingsLoaded: boolean
 }
 
 type Actions = {
     syncCategories: (categories: number[]) => void
-    syncOnSale: (onSale:boolean) => void
-    setInStock: (onSale:boolean) => void
-    setOutOfStock: (outOfStock:boolean) => void
-    toggleMobileMenu: (onSale?:boolean) => void
-    setSort: (sort:string) => void
-    setSearch: (search:string) => void
-    pushNavigation: (event:string) => void
-    setSearchStatus: (status:string) => void
+    syncOnSale: (onSale: boolean) => void
+    setInStock: (onSale: boolean) => void
+    setOutOfStock: (outOfStock: boolean) => void
+    toggleMobileMenu: (onSale?: boolean) => void
+    setSort: (sort: string) => void
+    setSearch: (search: string) => void
+    pushNavigation: (event: string) => void
+    setSearchStatus: (status: string) => void
     syncBrands: (brands: number[]) => void
     synPriceRange: (brands: number[]) => void
+    syncVariations: (attribute: string, values: string[]) => void
+    clearVariations: () => void
     setMounted: () => void
     setSearchMounted: () => void
     clearAttributes: () => void
     setAttribute: (attr: ProductAttribute | VariationAttribute, option: string) => void
+    setAttributeMappings: (mappings: Map<string, AttributeMapping>) => void
+    setAttributeMappingsLoaded: (loaded: boolean) => void
+    getAttributeLabel: (slug: string) => string
+    getTermLabel: (attributeSlug: string, termSlug: string) => string
 }
 
-export const useStore = create<State & Actions>((set) => ({
+export const useStore = create<State & Actions>((set, get) => ({
     search: "",
     search_status: '',
     navigation: [],
@@ -54,12 +64,15 @@ export const useStore = create<State & Actions>((set) => ({
         on_sale: false,
         sort: "",
         in_stock: true,
-        out_of_stock: false
+        out_of_stock: false,
+        variations: {}
     },
     searchMounted: false,
     product: {
         attribute: []
     },
+    attributeMappings: new Map(),
+    attributeMappingsLoaded: false,
     setSearchMounted: () => set((state) => ({
         ...state,
         searchMounted: true
@@ -139,6 +152,23 @@ export const useStore = create<State & Actions>((set) => ({
             priceRange
         },
     })),
+    syncVariations: (attribute: string, values: string[]) => set((state) => ({
+        ...state,
+        sidebar: {
+            ...state.sidebar,
+            variations: {
+                ...state.sidebar.variations,
+                [attribute]: values
+            }
+        },
+    })),
+    clearVariations: () => set((state) => ({
+        ...state,
+        sidebar: {
+            ...state.sidebar,
+            variations: {}
+        },
+    })),
     setMounted: () => set((state) => ({
         ...state,
         sidebar: {
@@ -172,7 +202,7 @@ export const useStore = create<State & Actions>((set) => ({
 
         return {
             ...state,
-            product : product
+            product: product
         }
     }),
     clearAttributes: () => set((state) => ({
@@ -180,6 +210,44 @@ export const useStore = create<State & Actions>((set) => ({
         product: {
             attribute: []
         }
-    }))
+    })),
+    setAttributeMappings: (mappings: Map<string, AttributeMapping>) => set((state) => ({
+        ...state,
+        attributeMappings: mappings,
+        attributeMappingsLoaded: true
+    })),
+    setAttributeMappingsLoaded: (loaded: boolean) => set((state) => ({
+        ...state,
+        attributeMappingsLoaded: loaded
+    })),
+    getAttributeLabel: (slug: string) => {
+        const state = get();
+        const mapping = state.attributeMappings.get(slug);
+        if (mapping) {
+            return mapping.label;
+        }
+
+        // Fallback to formatted slug
+        return slug
+            .split('_')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+    },
+    getTermLabel: (attributeSlug: string, termSlug: string) => {
+        const state = get();
+        const mapping = state.attributeMappings.get(attributeSlug);
+        if (mapping && mapping.terms) {
+            const term = mapping.terms.find(t => t.slug === termSlug);
+            if (term) {
+                return term.name;
+            }
+        }
+
+        // Fallback to formatted term slug
+        return termSlug
+            .split('-')
+            .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+            .join(' ');
+    }
 
 }))

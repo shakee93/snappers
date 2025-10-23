@@ -8,6 +8,7 @@ import PriceFilter from "@/app/components/Filters/PriceFilter";
 import OnSaleFilter from "@/app/components/Filters/OnSaleFilter";
 import SortOrderFilter from "@/app/components/Filters/SortOrderFilter";
 import InStockFilter from "./Filters/InStockFilter";
+import DynamicVariationFilters from "@/app/components/Filters/DynamicVariationFilters";
 
 interface TabFilterProps {
     categories?: ProductCategory[];
@@ -42,6 +43,7 @@ const TabFilters = ({
                 <InStockFilter />
                 {!category && <CategoryFilter categories={categories} />}
                 {!brand && <BrandFilter brands={brands} />}
+                <DynamicVariationFilters />
                 <PriceFilter />
                 <OnSaleFilter />
                 <SortOrderFilter sorts={sort} />

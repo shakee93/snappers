@@ -10,6 +10,7 @@ import FilterPopover from "@/app/components/Filters/FilterPopover";
 import { useHits, useRefinementList } from "react-instantsearch";
 // import {RefinementListItem} from "instantsearch.js/es/connectors/refinement-list/connectRefinementList";
 import { useParams, useSearchParams } from "next/navigation";
+import { ChevronDown } from "lucide-react";
 
 interface CategoryFilterProps {
     categories: ProductCategory[]
@@ -19,6 +20,7 @@ const CategoryFilter = ({ categories }: CategoryFilterProps) => {
     const { syncCategories, search, sidebar: { categories: catState } } = useStore()
     const [firstCategoryFacets, setFirstCategoryFacets] = useState<any[]>([]);
     const [showAllCategories, setShowAllCategories] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(false);
     const { brand } = useParams()
     const { hits, results } = useHits();
     const searchParams = useSearchParams();
@@ -108,65 +110,86 @@ const CategoryFilter = ({ categories }: CategoryFilterProps) => {
     return (
         <div className="overflow-hidden relative w-full z-10 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
             <div className="relative flex flex-col px-4 py-4 w-full space-y-5">
-                <span className='font-medium flex gap-2 items-center'>Categories</span>
-                <Checkbox
-                    name="All Categories"
-                    label={`All Categories (${totalCount})`}
-                    defaultChecked={catState.length === 0}
-                    onChange={(checked) =>
-                        handleChangeCategories(checked, 0)
-                    }
-                />
+                <button
+                    onClick={() => setIsCollapsed(!isCollapsed)}
+                    className="font-medium flex gap-2 items-center justify-between w-full text-left hover:opacity-80 transition-opacity"
+                >
+                    <span>Categories</span>
+                    <ChevronDown
+                        className={`w-4 h-4 transition-transform duration-200 ${isCollapsed ? 'rotate-180' : ''}`}
+                    />
+                </button>
 
-                <div className="w-full border-b  border-neutral-200 dark:border-neutral-700" />
+                <Transition
+                    show={!isCollapsed}
+                    enter="transition-all duration-300 ease-out"
+                    enterFrom="opacity-0 max-h-0"
+                    enterTo="opacity-100 max-h-[1000px]"
+                    leave="transition-all duration-300 ease-in"
+                    leaveFrom="opacity-100 max-h-[1000px]"
+                    leaveTo="opacity-0 max-h-0"
+                >
+                    <div className="space-y-5">
+                        <Checkbox
+                            name="All Categories"
+                            label={`All Categories (${totalCount})`}
+                            defaultChecked={catState.length === 0}
+                            onChange={(checked) =>
+                                handleChangeCategories(checked, 0)
+                            }
+                        />
 
-                {facetedCategories.length > 0 ?
-                    <div className="relative">
-                        <div className='grid grid-cols-1 gap-2'>
-                            {(showAllCategories ? facetedCategories : facetedCategories.slice(0, 10)).map((item) => (
-                                <div key={item.databaseId} className="">
-                                    <Checkbox
-                                        name={item.slug || ''}
-                                        label={`${item.name} (${firstCategoryFacets.find(f => item.databaseId === Number(f.value))?.count || 0})`}
-                                        defaultChecked={catState.includes(item.databaseId)}
-                                        onChange={(checked) =>
-                                            handleChangeCategories(checked, item.databaseId)
-                                        }
-                                    />
+                        <div className="w-full border-b  border-neutral-200 dark:border-neutral-700" />
+
+                        {facetedCategories.length > 0 ?
+                            <div className="relative">
+                                <div className='grid grid-cols-1 gap-2'>
+                                    {(showAllCategories ? facetedCategories : facetedCategories.slice(0, 10)).map((item) => (
+                                        <div key={item.databaseId} className="">
+                                            <Checkbox
+                                                name={item.slug || ''}
+                                                label={`${item.name} (${firstCategoryFacets.find(f => item.databaseId === Number(f.value))?.count || 0})`}
+                                                defaultChecked={catState.includes(item.databaseId)}
+                                                onChange={(checked) =>
+                                                    handleChangeCategories(checked, item.databaseId)
+                                                }
+                                            />
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
-                        </div>
 
-                        {facetedCategories.length > 10 && !showAllCategories && (
-                            <>
-                                {/* Gradient overlay */}
-                                <div className="absolute bottom-8 left-0 right-0 h-6 bg-gradient-to-t from-white dark:from-neutral-900 to-transparent pointer-events-none z-10" />
+                                {facetedCategories.length > 10 && !showAllCategories && (
+                                    <>
+                                        {/* Gradient overlay */}
+                                        <div className="absolute bottom-8 left-0 right-0 h-6 bg-gradient-to-t from-white dark:from-neutral-900 to-transparent pointer-events-none z-10" />
 
-                                {/* Show More button */}
-                                <div className="mt-2 text-center relative z-20">
-                                    <button
-                                        onClick={() => setShowAllCategories(true)}
-                                        className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
-                                    >
-                                        Show More ({facetedCategories.length - 10} more)
-                                    </button>
-                                </div>
-                            </>
-                        )}
+                                        {/* Show More button */}
+                                        <div className="mt-2 text-center relative z-20">
+                                            <button
+                                                onClick={() => setShowAllCategories(true)}
+                                                className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+                                            >
+                                                Show More ({facetedCategories.length - 10} more)
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
 
-                        {facetedCategories.length > 10 && showAllCategories && (
-                            <div className="mt-2 text-center">
-                                <button
-                                    onClick={() => setShowAllCategories(false)}
-                                    className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
-                                >
-                                    Show Less
-                                </button>
-                            </div>
-                        )}
-                    </div> :
-                    <div className='text-sm'>No Categories found for this search.</div>
-                }
+                                {facetedCategories.length > 10 && showAllCategories && (
+                                    <div className="mt-2 text-center">
+                                        <button
+                                            onClick={() => setShowAllCategories(false)}
+                                            className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+                                        >
+                                            Show Less
+                                        </button>
+                                    </div>
+                                )}
+                            </div> :
+                            <div className='text-sm'>No Categories found for this search.</div>
+                        }
+                    </div>
+                </Transition>
             </div>
         </div>
     );

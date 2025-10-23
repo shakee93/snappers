@@ -9,6 +9,8 @@ import { useRefinementList } from "react-instantsearch";
 // import {RefinementListItem} from "instantsearch.js/es/connectors/refinement-list/connectRefinementList";
 // import type { RefinementListItem } from 'instantsearch.js/es/connectors/refinement-list/connectRefinementList';
 import { useParams, useSearchParams } from "next/navigation";
+import { ChevronDown } from "lucide-react";
+import { Transition } from "@headlessui/react";
 
 interface BrandFilterProps {
   brands: Brand[];
@@ -22,6 +24,7 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
   } = useStore();
   const [firstFacets, setFirstFacets] = useState<any[]>([]);
   const [showAllBrands, setShowAllBrands] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const { category } = useParams()
   const searchParams = useSearchParams();
 
@@ -162,64 +165,85 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
     <div className="overflow-hidden rounded-2xl w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
       <div className="relative flex flex-col w-full px-5 py-4 pb-5 space-y-5">
 
-        <span className='font-medium'>Brands</span>
-        <Checkbox
-          name="All Brands"
-          label={`All Brands (${totalCount})`}
-          defaultChecked={brandsState.length === 0}
-          onChange={(checked) => handleChange(checked, 0)}
-        />
+        <button
+          onClick={() => setIsCollapsed(!isCollapsed)}
+          className="font-medium flex gap-2 items-center justify-between w-full text-left hover:opacity-80 transition-opacity"
+        >
+          <span>Brands</span>
+          <ChevronDown
+            className={`w-4 h-4 transition-transform duration-200 ${isCollapsed ? 'rotate-180' : ''}`}
+          />
+        </button>
 
-        <div className="w-full border-b  border-neutral-200 dark:border-neutral-700" />
+        <Transition
+          show={!isCollapsed}
+          enter="transition-all duration-300 ease-out"
+          enterFrom="opacity-0 max-h-0"
+          enterTo="opacity-100 max-h-[1000px]"
+          leave="transition-all duration-300 ease-in"
+          leaveFrom="opacity-100 max-h-[1000px]"
+          leaveTo="opacity-0 max-h-0"
+        >
+          <div className="space-y-5">
+            <Checkbox
+              name="All Brands"
+              label={`All Brands (${totalCount})`}
+              defaultChecked={brandsState.length === 0}
+              onChange={(checked) => handleChange(checked, 0)}
+            />
 
-        {facetedBrands.length > 0 ?
-          <div className="relative">
-            <div className="grid grid-cols-1 md:grid-cols-1 gap-2">
-              {(showAllBrands ? facetedBrands : facetedBrands.slice(0, 10)).map((item) => (
-                <div key={item.databaseId} className="">
-                  <Checkbox
-                    name={item.slug || ""}
-                    //label={`${item.name} (${item.count})`}
-                    label={`${item.name} (${firstFacets.find(f => item.databaseId === Number(f.value))?.count || 0})`}
-                    defaultChecked={brandsState.includes(item.databaseId)}
-                    onChange={(checked) =>
-                      handleChange(checked, item.databaseId)
-                    }
-                  />
+            <div className="w-full border-b  border-neutral-200 dark:border-neutral-700" />
+
+            {facetedBrands.length > 0 ?
+              <div className="relative">
+                <div className="grid grid-cols-1 md:grid-cols-1 gap-2">
+                  {(showAllBrands ? facetedBrands : facetedBrands.slice(0, 10)).map((item) => (
+                    <div key={item.databaseId} className="">
+                      <Checkbox
+                        name={item.slug || ""}
+                        //label={`${item.name} (${item.count})`}
+                        label={`${item.name} (${firstFacets.find(f => item.databaseId === Number(f.value))?.count || 0})`}
+                        defaultChecked={brandsState.includes(item.databaseId)}
+                        onChange={(checked) =>
+                          handleChange(checked, item.databaseId)
+                        }
+                      />
+                    </div>
+                  ))}
                 </div>
-              ))}
-            </div>
 
-            {facetedBrands.length > 10 && !showAllBrands && (
-              <>
-                {/* Gradient overlay */}
-                <div className="absolute bottom-8 left-0 right-0 h-6 bg-gradient-to-t from-white dark:from-neutral-900 to-transparent pointer-events-none z-10" />
+                {facetedBrands.length > 10 && !showAllBrands && (
+                  <>
+                    {/* Gradient overlay */}
+                    <div className="absolute bottom-8 left-0 right-0 h-6 bg-gradient-to-t from-white dark:from-neutral-900 to-transparent pointer-events-none z-10" />
 
-                {/* Show More button */}
-                <div className="mt-2 text-center relative z-20">
-                  <button
-                    onClick={() => setShowAllBrands(true)}
-                    className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
-                  >
-                    Show More ({facetedBrands.length - 10} more)
-                  </button>
-                </div>
-              </>
-            )}
+                    {/* Show More button */}
+                    <div className="mt-2 text-center relative z-20">
+                      <button
+                        onClick={() => setShowAllBrands(true)}
+                        className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+                      >
+                        Show More ({facetedBrands.length - 10} more)
+                      </button>
+                    </div>
+                  </>
+                )}
 
-            {facetedBrands.length > 10 && showAllBrands && (
-              <div className="mt-2 text-center">
-                <button
-                  onClick={() => setShowAllBrands(false)}
-                  className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
-                >
-                  Show Less
-                </button>
-              </div>
-            )}
-          </div> :
-          <div className='text-sm'>No Brands found for this search.</div>
-        }
+                {facetedBrands.length > 10 && showAllBrands && (
+                  <div className="mt-2 text-center">
+                    <button
+                      onClick={() => setShowAllBrands(false)}
+                      className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+                    >
+                      Show Less
+                    </button>
+                  </div>
+                )}
+              </div> :
+              <div className='text-sm'>No Brands found for this search.</div>
+            }
+          </div>
+        </Transition>
 
       </div>
     </div>
