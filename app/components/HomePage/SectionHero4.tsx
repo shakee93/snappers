@@ -59,7 +59,6 @@ export interface SectionHero4Props {
 }
 
 const SectionHero4 = ({ className = "", data }: SectionHero4Props) => {
-  console.log("data", data);
   // console.log("mainSlidesMiddleRows", data?.mainSlidesMiddleRows);
   // console.log("slides", data?.mainSlidesMiddleRows?.[0]?.slides);
 
@@ -111,7 +110,6 @@ const SectionHero4 = ({ className = "", data }: SectionHero4Props) => {
   const tiktokLink = data?.tiktokVideo?.tiktokLink || "";
   const productLink = data?.tiktokVideo?.productLink || "";
 
-  console.log("safeCurrentSlide", 0);
 
   return (
     <div>
@@ -122,7 +120,7 @@ const SectionHero4 = ({ className = "", data }: SectionHero4Props) => {
         {/* Center Column Slider */}
         <div className="w-full lg:w-3/5 h-full gap-4 xl:gap-6 flex flex-col">
           <MainSlider slides={sliderData} />
-          
+
           <div className="flex w-full h-[150px] gap-4 md:gap-6 rounded-[18px]">
             {/* Feature Product Card */}
             <FeatureProductCard product={featureSlideData} />
