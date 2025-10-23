@@ -21,6 +21,7 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
     sidebar: { brands: brandsState },
   } = useStore();
   const [firstFacets, setFirstFacets] = useState<any[]>([]);
+  const [showAllBrands, setShowAllBrands] = useState(false);
   const { category } = useParams()
   const searchParams = useSearchParams();
 
@@ -84,9 +85,16 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
   }, [brandsState])
 
   const facetedBrands = useMemo(() => {
-    return brands.filter(b =>
-      firstFacets.map(f => Number(f.value)).includes(b.databaseId)
-    );
+    const filteredBrands = brands
+
+    // Sort by count from firstFacets (highest first)
+    filteredBrands.sort((a, b) => {
+      const countA = firstFacets.find(f => a.databaseId === Number(f.value))?.count || 0;
+      const countB = firstFacets.find(f => b.databaseId === Number(f.value))?.count || 0;
+      return countB - countA;
+    });
+
+    return filteredBrands;
   }, [brands, firstFacets]);
 
   const icon = (
@@ -165,20 +173,50 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
         <div className="w-full border-b  border-neutral-200 dark:border-neutral-700" />
 
         {facetedBrands.length > 0 ?
-          <div className="grid grid-cols-1 md:grid-cols-1 gap-2">
-            {facetedBrands.map((item) => (
-              <div key={item.databaseId} className="">
-                <Checkbox
-                  name={item.slug || ""}
-                  //label={`${item.name} (${item.count})`}
-                  label={`${item.name} (${firstFacets.find(f => item.databaseId === Number(f.value))?.count || 0})`}
-                  defaultChecked={brandsState.includes(item.databaseId)}
-                  onChange={(checked) =>
-                    handleChange(checked, item.databaseId)
-                  }
-                />
+          <div className="relative">
+            <div className="grid grid-cols-1 md:grid-cols-1 gap-2">
+              {(showAllBrands ? facetedBrands : facetedBrands.slice(0, 10)).map((item) => (
+                <div key={item.databaseId} className="">
+                  <Checkbox
+                    name={item.slug || ""}
+                    //label={`${item.name} (${item.count})`}
+                    label={`${item.name} (${firstFacets.find(f => item.databaseId === Number(f.value))?.count || 0})`}
+                    defaultChecked={brandsState.includes(item.databaseId)}
+                    onChange={(checked) =>
+                      handleChange(checked, item.databaseId)
+                    }
+                  />
+                </div>
+              ))}
+            </div>
+
+            {facetedBrands.length > 10 && !showAllBrands && (
+              <>
+                {/* Gradient overlay */}
+                <div className="absolute bottom-8 left-0 right-0 h-6 bg-gradient-to-t from-white dark:from-neutral-900 to-transparent pointer-events-none z-10" />
+
+                {/* Show More button */}
+                <div className="mt-2 text-center relative z-20">
+                  <button
+                    onClick={() => setShowAllBrands(true)}
+                    className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+                  >
+                    Show More ({facetedBrands.length - 10} more)
+                  </button>
+                </div>
+              </>
+            )}
+
+            {facetedBrands.length > 10 && showAllBrands && (
+              <div className="mt-2 text-center">
+                <button
+                  onClick={() => setShowAllBrands(false)}
+                  className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+                >
+                  Show Less
+                </button>
               </div>
-            ))}
+            )}
           </div> :
           <div className='text-sm'>No Brands found for this search.</div>
         }

@@ -1,11 +1,11 @@
 "use client"
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 
 import Checkbox from "@/app/components/globalComponents/Checkbox/Checkbox";
 import Slider from "rc-slider";
 import Radio from "shared/Radio/Radio";
 import MySwitch from "components/MySwitch";
-import {useStore} from "@/store/store";
+import { useStore } from "@/store/store";
 
 const DATA_colors = [
   { name: "White" },
@@ -37,9 +37,9 @@ const DATA_sortOrderRadios = [
 const PRICE_RANGE = [1, 500];
 //
 const SidebarFilters = ({
-    categories = [],
-    brands = []
-                        }: any) => {
+  categories = [],
+  brands = []
+}: any) => {
   //
   const [isOnSale, setIsIsOnSale] = useState(true);
   const [rangePrices, setRangePrices] = useState([100, 500]);
@@ -62,8 +62,8 @@ const SidebarFilters = ({
     // console.log(checked, name);
 
     checked
-        ? setBrandsState([...brandsState, name])
-        : setBrandsState(brandsState.filter((i) => i !== name));
+      ? setBrandsState([...brandsState, name])
+      : setBrandsState(brandsState.filter((i) => i !== name));
   };
 
   const handleChangeColors = (checked: boolean, name: string) => {
@@ -90,7 +90,7 @@ const SidebarFilters = ({
   useEffect(() => {
     setMounted()
   }, [])
-  
+
   const renderTabsPriceRage = () => {
     return (
       <div className="relative flex flex-col py-8 space-y-5 pr-3">
@@ -162,36 +162,36 @@ const SidebarFilters = ({
       <div className="relative flex flex-col pb-8 space-y-4">
         <h3 className="font-semibold mb-2.5">Collections</h3>
         {categories.filter((c: any) => c.count).map((item: any) => (
-            <div key={item.databaseId} className="">
-              <Checkbox
-                  name={item.databaseId}
-                  // label={`${item.name} (${item.count})`}
-                  label={`${item.name}`}
-                  defaultChecked={categoriesState.includes(item.databaseId)}
-                  sizeClassName="w-5 h-5"
-                  labelClassName="text-sm font-normal"
-                  onChange={(checked) => handleChangeCategories(checked, item.databaseId)}
-              />
-            </div>
+          <div key={item.databaseId} className="">
+            <Checkbox
+              name={item.databaseId}
+              // label={`${item.name} (${item.count})`}
+              label={`${item.name}`}
+              defaultChecked={categoriesState.includes(item.databaseId)}
+              sizeClassName="w-5 h-5"
+              labelClassName="text-sm font-normal"
+              onChange={(checked) => handleChangeCategories(checked, item.databaseId)}
+            />
+          </div>
         ))}
       </div>
       {brands.length > 0 &&
-          <div className="relative flex flex-col pb-8 space-y-4">
-            <h3 className="font-semibold mb-2.5">Brands</h3>
-            {brands.map((item: any) => (
-                <div key={item.databaseId} className="">
-                  <Checkbox
-                      name={item.databaseId}
-                      // label={`${item.name} (${item.count})`}
-                      label={`${item.name}`}
-                      defaultChecked={brandsState.includes(item.databaseId)}
-                      sizeClassName="w-5 h-5"
-                      labelClassName="text-sm font-normal"
-                      onChange={(checked) => handleChangeBrands(checked, item.databaseId)}
-                  />
-                </div>
-            ))}
-          </div>
+        <div className="relative flex flex-col pb-8 space-y-4">
+          <h3 className="font-semibold mb-2.5">Brands</h3>
+          {brands.map((item: any) => (
+            <div key={item.databaseId} className="">
+              <Checkbox
+                name={item.databaseId}
+                // label={`${item.name} (${item.count})`}
+                label={`${item.name}`}
+                defaultChecked={brandsState.includes(item.databaseId)}
+                sizeClassName="w-5 h-5"
+                labelClassName="text-sm font-normal"
+                onChange={(checked) => handleChangeBrands(checked, item.databaseId)}
+              />
+            </div>
+          ))}
+        </div>
       }
 
       {renderTabsPriceRage()}
@@ -206,16 +206,16 @@ const SidebarFilters = ({
       <div className="relative flex flex-col py-8 space-y-4">
         <h3 className="font-semibold mb-2.5">Sort order</h3>
         {DATA_sortOrderRadios.map((item) => (
-            <Radio
-                id={item.id}
-                key={item.id}
-                name="radioNameSort"
-                label={item.name}
-                defaultChecked={sortOrderStates === item.id}
-                sizeClassName="w-5 h-5"
-                onChange={setSortOrderStates}
-                className="!text-sm"
-            />
+          <Radio
+            id={item.id}
+            key={item.id}
+            name="radioNameSort"
+            label={item.name}
+            defaultChecked={sortOrderStates === item.id}
+            sizeClassName="w-5 h-5"
+            onChange={setSortOrderStates}
+            className="!text-sm"
+          />
         ))}
       </div>
     </div>

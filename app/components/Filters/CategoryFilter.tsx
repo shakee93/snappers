@@ -18,6 +18,7 @@ interface CategoryFilterProps {
 const CategoryFilter = ({ categories }: CategoryFilterProps) => {
     const { syncCategories, search, sidebar: { categories: catState } } = useStore()
     const [firstCategoryFacets, setFirstCategoryFacets] = useState<any[]>([]);
+    const [showAllCategories, setShowAllCategories] = useState(false);
     const { brand } = useParams()
     const { hits, results } = useHits();
     const searchParams = useSearchParams();
@@ -73,18 +74,25 @@ const CategoryFilter = ({ categories }: CategoryFilterProps) => {
         }, [catState])
 
     const facetedCategories = useMemo(() => {
-        const sortedCategories = categories.filter(b =>
-            firstCategoryFacets.map(f => Number(f.value)).includes(b.databaseId)
-        );
+        const sortedCategories = [...categories];
 
+        // Sort by count from firstCategoryFacets (highest first)
         sortedCategories.sort((a, b) => {
-            if (a.databaseId === 1484) return -1;
-            if (b.databaseId === 1484) return 1;
-            if (a.databaseId === 1483) return -1;
-            if (b.databaseId === 1483) return 1;
-            if (a.databaseId === 1485) return -1;
-            if (b.databaseId === 1485) return 1;
-            return 0;
+            const countA = firstCategoryFacets.find(f => a.databaseId === Number(f.value))?.count || 0;
+            const countB = firstCategoryFacets.find(f => b.databaseId === Number(f.value))?.count || 0;
+
+            // If counts are equal, maintain original order
+            if (countA === countB) {
+                if (a.databaseId === 1484) return -1;
+                if (b.databaseId === 1484) return 1;
+                if (a.databaseId === 1483) return -1;
+                if (b.databaseId === 1483) return 1;
+                if (a.databaseId === 1485) return -1;
+                if (b.databaseId === 1485) return 1;
+                return 0;
+            }
+
+            return countB - countA;
         });
 
         return sortedCategories;
@@ -113,19 +121,49 @@ const CategoryFilter = ({ categories }: CategoryFilterProps) => {
                 <div className="w-full border-b  border-neutral-200 dark:border-neutral-700" />
 
                 {facetedCategories.length > 0 ?
-                    <div className='grid grid-cols-1 gap-2'>
-                        {facetedCategories.map((item) => (
-                            <div key={item.databaseId} className="">
-                                <Checkbox
-                                    name={item.slug || ''}
-                                    label={`${item.name} (${firstCategoryFacets.find(f => item.databaseId === Number(f.value))?.count || 0})`}
-                                    defaultChecked={catState.includes(item.databaseId)}
-                                    onChange={(checked) =>
-                                        handleChangeCategories(checked, item.databaseId)
-                                    }
-                                />
+                    <div className="relative">
+                        <div className='grid grid-cols-1 gap-2'>
+                            {(showAllCategories ? facetedCategories : facetedCategories.slice(0, 10)).map((item) => (
+                                <div key={item.databaseId} className="">
+                                    <Checkbox
+                                        name={item.slug || ''}
+                                        label={`${item.name} (${firstCategoryFacets.find(f => item.databaseId === Number(f.value))?.count || 0})`}
+                                        defaultChecked={catState.includes(item.databaseId)}
+                                        onChange={(checked) =>
+                                            handleChangeCategories(checked, item.databaseId)
+                                        }
+                                    />
+                                </div>
+                            ))}
+                        </div>
+
+                        {facetedCategories.length > 10 && !showAllCategories && (
+                            <>
+                                {/* Gradient overlay */}
+                                <div className="absolute bottom-8 left-0 right-0 h-6 bg-gradient-to-t from-white dark:from-neutral-900 to-transparent pointer-events-none z-10" />
+
+                                {/* Show More button */}
+                                <div className="mt-2 text-center relative z-20">
+                                    <button
+                                        onClick={() => setShowAllCategories(true)}
+                                        className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+                                    >
+                                        Show More ({facetedCategories.length - 10} more)
+                                    </button>
+                                </div>
+                            </>
+                        )}
+
+                        {facetedCategories.length > 10 && showAllCategories && (
+                            <div className="mt-2 text-center">
+                                <button
+                                    onClick={() => setShowAllCategories(false)}
+                                    className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+                                >
+                                    Show Less
+                                </button>
                             </div>
-                        ))}
+                        )}
                     </div> :
                     <div className='text-sm'>No Categories found for this search.</div>
                 }
