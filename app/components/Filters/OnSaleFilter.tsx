@@ -49,11 +49,11 @@ const OnSaleFilter = ({ }: BrandFilterProps) => {
 
     return (
         <div
-            className={`flex flex-col items-start justify-start px-4 py-4 text-sm rounded-xl w-full border focus:outline-none cursor-pointer select-none bg-white ${"border-neutral-200 gap-4 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
+            className={`flex flex-col items-start justify-start px-3 py-3 text-xs rounded-xl w-full border focus:outline-none cursor-pointer select-none bg-white ${"border-neutral-200 gap-4 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
                 }`}
             onClick={() => setIsOnSale(!isOnSale)}
         >
-            <div className='flex hidden items-center'>
+            <div className='hidden items-center'>
                 <svg
                     className="w-4 h-4"
                     viewBox="0 0 24 24"
@@ -91,7 +91,7 @@ const OnSaleFilter = ({ }: BrandFilterProps) => {
                 </svg> <span className="line-clamp-1 ml-2 text-md">On sale</span>
             </div>
 
-            <span className='font-medium text-[16px] text-black'>On Sale </span>
+            <span className='font-medium text-sm text-black'>On Sale </span>
             <div className="">
                 <Checkbox
                     name='On Sale'

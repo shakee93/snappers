@@ -177,12 +177,12 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
   }, [facetedBrands]);
 
   return (
-    <div className="overflow-hidden rounded-2xl w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
-      <div className="relative flex flex-col w-full px-5 py-4 pb-5 space-y-5">
+    <div className="overflow-hidden rounded-xl w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
+      <div className="relative flex flex-col w-full px-4 py-3 space-y-3">
 
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="font-medium flex gap-2 items-center justify-between w-full text-left hover:opacity-80 transition-opacity"
+          className="font-medium flex gap-2 items-center justify-between w-full text-left hover:opacity-80 transition-opacity text-sm"
         >
           <span>Brands</span>
           <ChevronDown
@@ -199,7 +199,7 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
           leaveFrom="opacity-100 max-h-[1000px]"
           leaveTo="opacity-0 max-h-0"
         >
-          <div className="space-y-5">
+          <div className="space-y-3">
             <Checkbox
               name="All Brands"
               label={`All Brands (${totalCount})`}

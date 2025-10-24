@@ -123,11 +123,11 @@ const CategoryFilter = ({ categories }: CategoryFilterProps) => {
     }, [firstCategoryFacets]);
 
     return (
-        <div className="overflow-hidden relative w-full z-10 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
-            <div className="relative flex flex-col px-4 py-4 w-full space-y-5">
+        <div className="overflow-hidden relative w-full z-10 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
+            <div className="relative flex flex-col px-4 py-3 w-full space-y-3">
                 <button
                     onClick={() => setIsCollapsed(!isCollapsed)}
-                    className="font-medium flex gap-2 items-center justify-between w-full text-left hover:opacity-80 transition-opacity"
+                    className="font-medium flex gap-2 items-center justify-between w-full text-left hover:opacity-80 transition-opacity text-sm"
                 >
                     <span>Categories</span>
                     <ChevronDown
@@ -144,7 +144,7 @@ const CategoryFilter = ({ categories }: CategoryFilterProps) => {
                     leaveFrom="opacity-100 max-h-[1000px]"
                     leaveTo="opacity-0 max-h-0"
                 >
-                    <div className="space-y-5">
+                    <div className="space-y-3">
                         <Checkbox
                             name="All Categories"
                             label={`All Categories (${totalCount})`}

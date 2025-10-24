@@ -1,4 +1,4 @@
-import React, {FC, useEffect, useState} from "react";
+import React, { FC, useEffect, useState } from "react";
 
 export interface CheckboxProps {
   label?: string;
@@ -17,7 +17,7 @@ const Checkbox: FC<CheckboxProps> = ({
   label = "",
   name,
   className = "",
-  sizeClassName = "w-6 h-6",
+  sizeClassName = "w-5 h-5",
   labelClassName = "",
   defaultChecked,
   onChange,
@@ -41,12 +41,11 @@ const Checkbox: FC<CheckboxProps> = ({
       {label && (
         <label
           htmlFor={name}
-          className="pl-2.5 sm:pl-3.5 text-sm flex flex-col flex-1 justify-center select-none"
+          className="pl-2.5 sm:pl-2.5 text-xs flex flex-col flex-1 justify-center select-none"
         >
           <span
-            className={`text-slate-900 dark:text-slate-100 ${labelClassName} ${
-              !!subLabel ? "-mt-0.5" : ""
-            }`}
+            className={`text-slate-900 dark:text-slate-100 ${labelClassName} ${!!subLabel ? "-mt-0.5" : ""
+              }`}
           >
             {label}
           </span>

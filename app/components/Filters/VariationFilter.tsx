@@ -90,17 +90,27 @@ const VariationFilter = ({ attribute, label }: VariationFilterProps) => {
         return facets.reduce((acc, f) => acc + (f.count || 0), 0);
     }, [facets]);
 
-    // Don't render if no facets available
-    if (facets.length === 0) {
+    // Create a combined list of facets and selected values that aren't in facets
+    const displayItems = useMemo(() => {
+        const facetValues = new Set(facets.map(f => f.value));
+        const selectedNotInFacets = currentValues
+            .filter(v => !facetValues.has(v))
+            .map(value => ({ value, count: 0 }));
+
+        return [...sortedFacets, ...selectedNotInFacets];
+    }, [sortedFacets, currentValues]);
+
+    // Don't render if no facets available AND no selected values
+    if (facets.length === 0 && currentValues.length === 0) {
         return null;
     }
 
     return (
-        <div className="overflow-hidden relative w-full z-10 rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
-            <div className="relative flex flex-col px-4 py-4 w-full space-y-5">
+        <div className="overflow-hidden relative w-full z-10 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
+            <div className="relative flex flex-col px-4 py-3 w-full space-y-3">
                 <button
                     onClick={() => setIsCollapsed(!isCollapsed)}
-                    className="font-medium flex gap-2 items-center justify-between w-full text-left hover:opacity-80 transition-opacity"
+                    className="font-medium flex gap-2 items-center justify-between w-full text-left hover:opacity-80 transition-opacity text-sm"
                 >
                     <span>{label}</span>
                     <ChevronDown
@@ -117,7 +127,7 @@ const VariationFilter = ({ attribute, label }: VariationFilterProps) => {
                     leaveFrom="opacity-100 max-h-[1000px]"
                     leaveTo="opacity-0 max-h-0"
                 >
-                    <div className="space-y-5">
+                    <div className="space-y-3">
                         <Checkbox
                             name={`All ${label}`}
                             label={`All ${label} (${totalCount})`}
@@ -129,7 +139,7 @@ const VariationFilter = ({ attribute, label }: VariationFilterProps) => {
 
                         <div className="relative">
                             <div className='grid grid-cols-1 gap-2'>
-                                {(showAll ? sortedFacets : sortedFacets.slice(0, 10)).map((item) => {
+                                {(showAll ? displayItems : displayItems.slice(0, 10)).map((item) => {
                                     // Get the proper term label from the attribute mapping service
                                     const termLabel = getTermLabel(attribute, item.value);
                                     return (
@@ -145,7 +155,7 @@ const VariationFilter = ({ attribute, label }: VariationFilterProps) => {
                                 })}
                             </div>
 
-                            {sortedFacets.length > 10 && !showAll && (
+                            {displayItems.length > 10 && !showAll && (
                                 <>
                                     {/* Gradient overlay */}
                                     <div className="absolute bottom-8 left-0 right-0 h-6 bg-gradient-to-t from-white dark:from-neutral-900 to-transparent pointer-events-none z-10" />
@@ -156,13 +166,13 @@ const VariationFilter = ({ attribute, label }: VariationFilterProps) => {
                                             onClick={() => setShowAll(true)}
                                             className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
                                         >
-                                            Show More ({sortedFacets.length - 10} more)
+                                            Show More ({displayItems.length - 10} more)
                                         </button>
                                     </div>
                                 </>
                             )}
 
-                            {sortedFacets.length > 10 && showAll && (
+                            {displayItems.length > 10 && showAll && (
                                 <div className="mt-2 text-center">
                                     <button
                                         onClick={() => setShowAll(false)}

@@ -54,8 +54,7 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
     const handleSearchClear = () => {
         setSearch("");
         const url = new URL(window.location.href);
-        url.searchParams.delete('q');
-        // router.push(url.pathname + url.search);
+        url.searchParams.delete('query');
     };
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {

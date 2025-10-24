@@ -95,9 +95,9 @@ const SortOrderFilter = ({ sorts }: { sorts: any }) => {
     </svg>
 
     return (
-        <div className="overflow-hidden rounded-2xl w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
-            <div className="relative flex flex-col px-4 py-4 w-full space-y-3">
-                <span className="font-medium">Sort By</span>
+        <div className="overflow-hidden rounded-xl w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
+            <div className="relative flex flex-col px-4 py-4 w-full space-y-2">
+                <span className="font-medium text-sm">Sort By</span>
                 {DATA_sortOrderRadios.map((item) => (
                     <Radio
                         id={item.id}

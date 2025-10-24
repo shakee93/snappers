@@ -79,10 +79,10 @@ const PriceFilter = ({ }: BrandFilterProps) => {
     </svg>
 
     return (
-        <div className="overflow-hidden w-full rounded-2xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
-            <div className="relative flex flex-col px-4 py-4 w-full space-y-4">
-                <div className="space-y-5">
-                    <span className="font-medium">Price range</span>
+        <div className="overflow-hidden w-full rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
+            <div className="relative flex flex-col px-4 py-3 w-full space-y-3">
+                <div className="space-y-3">
+                    <span className="font-medium text-sm">Price range</span>
                     <br />
                     <span className='pt-1'>LKR {rangePrices[0].toLocaleString()} - LKR {rangePrices[1].toLocaleString()}</span>
                     <div className="w-full">

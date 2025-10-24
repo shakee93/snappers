@@ -12,6 +12,7 @@ import { useStore } from "@/store/store";
 import { Brand, ProductCategory } from "@/graphql/types/graphql";
 import { useRefinementList } from "react-instantsearch";
 import InStockFilter from "./Filters/InStockFilter";
+import DynamicVariationFilters from "./Filters/DynamicVariationFilters";
 
 interface TabFilterProps {
     categories?: ProductCategory[];
@@ -397,7 +398,7 @@ const MobileFilterSheet = ({
                                             </div>
                                         )}
                                         {!brand && (
-                                            <div className="py-7">
+                                            <div className="py-4">
                                                 <h3 className="text-md font-medium">Brands</h3>
                                                 <div className="mt-1 relative ">
                                                     <div className="relative flex flex-col  py-6 space-y-5">
@@ -446,7 +447,7 @@ const MobileFilterSheet = ({
                                             </div>
                                         )}
 
-                                        <div className="py-7 w-1/2">
+                                        <div className="py-4 w-full">
                                             <h3 className="text-md font-medium">Stock Status</h3>
                                             <div className="mt-3 flex flex-col gap-2">
                                                 <div
@@ -473,7 +474,7 @@ const MobileFilterSheet = ({
                                             </div>
                                         </div>
 
-                                        <div className="py-7">
+                                        <div className="py-4">
                                             <div className="relative flex flex-col space-y-8">
                                                 <div className="space-y-5">
                                                     <span className="text-md font-medium">Price range</span>
@@ -644,6 +645,8 @@ const MobileFilterSheet = ({
                                         </div>
                                     </div>
                                 </div>
+
+                                <DynamicVariationFilters />
 
                                 <div
                                     className="px-6 py-3 flex-shrink-0 bg-neutral-50
