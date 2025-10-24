@@ -1,7 +1,7 @@
 "use client"
 import { Popover, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState, useCallback } from "react";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonThird from "@/shared/Button/ButtonThird";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
@@ -9,56 +9,45 @@ import { Brand, ProductCategory } from "@/graphql/types/graphql";
 import { useStore } from "@/store/store";
 import FilterPopover from "@/app/components/Filters/FilterPopover";
 import Slider from "rc-slider";
-import { useSearchParams } from "next/navigation";
+import { useInstantSearch } from "react-instantsearch";
+import { UiState } from "instantsearch.js";
 
 interface BrandFilterProps {
 }
 
 export const PRICE_RANGE = [500, 500000];
 
+type MyUiState = UiState & {
+    product: {
+        priceRange: number[];
+        query?: string;
+    }
+}
+
 const PriceFilter = ({ }: BrandFilterProps) => {
     const { synPriceRange, sidebar: { priceRange } } = useStore()
     const [rangePrices, setRangePrices] = useState(priceRange || PRICE_RANGE);
-    const searchParams = useSearchParams();
+    const { setUiState } = useInstantSearch<MyUiState>();
+
+    // URL synchronization is now handled by InstantSearch routing
+    // No need for manual URL manipulation
 
     useEffect(() => {
-        // Read from URL on mount
-        const priceMin = searchParams.get('priceMin');
-        const priceMax = searchParams.get('priceMax');
-        
-        if (priceMin && priceMax) {
-            const min = parseInt(priceMin);
-            const max = parseInt(priceMax);
-            
-            // Validate the values to ensure they're within the allowable range and are valid numbers
-            if (!isNaN(min) && !isNaN(max) && 
-                min >= PRICE_RANGE[0] && max <= PRICE_RANGE[1] && 
-                min <= max) {
-                setRangePrices([min, max]);
-                synPriceRange([min, max]);
-            }
-        }
-    }, []);
-
-    useEffect(() => {
-        // Update URL when price range changes
-        // Only update if the range is different from the default
-        if (rangePrices[0] !== PRICE_RANGE[0] || rangePrices[1] !== PRICE_RANGE[1]) {
-            const url = new URL(window.location.href);
-            url.searchParams.set('priceMin', rangePrices[0].toString());
-            url.searchParams.set('priceMax', rangePrices[1].toString());
-            window.history.replaceState({}, '', url.toString());
-        } else {
-            // If default range, remove the parameters
-            const url = new URL(window.location.href);
-            url.searchParams.delete('priceMin');
-            url.searchParams.delete('priceMax');
-            window.history.replaceState({}, '', url.toString());
-        }
-
         // Update store
         synPriceRange(rangePrices);
-    }, [rangePrices]);
+
+        // Update UI state
+        setUiState(prev => {
+            return {
+                ...prev,
+                product: {
+                    ...(prev.product || {}),
+                    priceRange: rangePrices,
+                    query: prev.product?.query || '',
+                }
+            }
+        });
+    }, [rangePrices, setUiState, synPriceRange]);
 
     const icon = <svg
         className="w-4 h-4"

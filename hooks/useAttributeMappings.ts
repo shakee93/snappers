@@ -21,7 +21,6 @@ export const useAttributeMappings = () => {
             attributeMappingService.setAttributeMappings(data);
             const mappings = attributeMappingService.getAllMappings();
             setAttributeMappings(mappings);
-            console.log('Attribute mappings initialized in store');
         },
         onError: (error) => {
             console.error('Failed to initialize attribute mappings:', error);

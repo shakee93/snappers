@@ -5,15 +5,23 @@ import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import { Brand, ProductCategory } from "@/graphql/types/graphql";
 import { useStore } from "@/store/store";
 import FilterPopover from "@/app/components/Filters/FilterPopover";
-import { useRefinementList } from "react-instantsearch";
+import { useRefinementList, useInstantSearch } from "react-instantsearch";
 // import {RefinementListItem} from "instantsearch.js/es/connectors/refinement-list/connectRefinementList";
 // import type { RefinementListItem } from 'instantsearch.js/es/connectors/refinement-list/connectRefinementList';
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import { Transition } from "@headlessui/react";
+import { UiState } from "instantsearch.js";
 
 interface BrandFilterProps {
   brands: Brand[];
+}
+
+type MyUiState = UiState & {
+  product: {
+    brands: number[];
+    query?: string;
+  }
 }
 
 const BrandFilter = ({ brands }: BrandFilterProps) => {
@@ -26,32 +34,15 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
   const [showAllBrands, setShowAllBrands] = useState(false);
   const [isCollapsed, setIsCollapsed] = useState(false);
   const { category } = useParams()
-  const searchParams = useSearchParams();
+  const { uiState, setUiState } = useInstantSearch<MyUiState>();
 
   const { items: brandsFacet, refine } = useRefinementList({
     attribute: 'brands_facet',
     limit: 17,
   });
 
-  useEffect(() => {
-    // Read from URL on mount
-    const brandIds = searchParams.get('brands');
-    if (brandIds) {
-      const ids = brandIds.split(',').map(id => parseInt(id));
-      syncBrands(ids);
-    }
-  }, []);
-
-  useEffect(() => {
-    // Update URL when brands change
-    const url = new URL(window.location.href);
-    if (brandsState.length > 0) {
-      url.searchParams.set('brands', brandsState.join(','));
-    } else {
-      url.searchParams.delete('brands');
-    }
-    window.history.replaceState({}, '', url.toString());
-  }, [brandsState]);
+  // URL synchronization is now handled by InstantSearch routing
+  // No need for manual URL manipulation
 
   useEffect(() => {
     // Reset firstFacets on category change to avoid stale data
@@ -79,13 +70,37 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
   const handleChange = useCallback((checked: boolean, name: number) => {
     if (name === 0 && checked) {
       syncBrands([]);
+      setUiState(prev => {
+        return {
+          ...prev,
+          product: {
+            ...(prev.product || {}),
+            brands: [],
+            query: prev.product?.query || '',
+          }
+        }
+      });
       return;
     }
 
-    checked
-      ? syncBrands([...brandsState, name])
-      : syncBrands(brandsState.filter((i: any) => i !== name));
-  }, [brandsState])
+    const newBrands = checked
+      ? [...brandsState, name]
+      : brandsState.filter((i: any) => i !== name);
+
+    // Update UI state
+    setUiState(prev => {
+      return {
+        ...prev,
+        product: {
+          ...(prev.product || {}),
+          brands: newBrands,
+          query: prev.product?.query || '',
+        }
+      }
+    });
+
+    syncBrands(newBrands);
+  }, [brandsState, setUiState, syncBrands])
 
   const facetedBrands = useMemo(() => {
     const filteredBrands = brands

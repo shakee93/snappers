@@ -122,6 +122,7 @@ const ArchiveLayout = async ({
                 search={search}
                 sort={sort}
                 tag={tag}
+                routing={true}
               />
             </div>
           </div>

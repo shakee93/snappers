@@ -8,7 +8,8 @@ import { ProductCategory } from "@/graphql/types/graphql";
 import { useStore } from "@/store/store";
 import FilterPopover from "@/app/components/Filters/FilterPopover";
 import Radio from "@/shared/Radio/Radio";
-import { useSearchParams } from "next/navigation";
+import { useInstantSearch } from "react-instantsearch";
+import { UiState } from "instantsearch.js";
 
 const DATA_sortOrderRadios = [
     { name: "Name", id: "name:asc" },
@@ -16,36 +17,40 @@ const DATA_sortOrderRadios = [
     { name: "Best Rating", id: "reviewCount(missing_values: last):desc" },
     { name: "Newest", id: "databaseId:desc" },
     { name: "Price Low - High", id: "rawPriceNumber(missing_values: last):asc" },
-    { name: "Price High - Low", id: "rawPriceNumber(missing_values: last):desc" },  
+    { name: "Price High - Low", id: "rawPriceNumber(missing_values: last):desc" },
 ];
+
+type MyUiState = UiState & {
+    product: {
+        sort: string;
+        query?: string;
+    }
+}
 
 const SortOrderFilter = ({ sorts }: { sorts: any }) => {
     const { setSort, sidebar: { sort } } = useStore()
     const [sortOrderStates, setSortOrderStates] = useState<string>(sorts ? "databaseId:desc" : "");
-    const searchParams = useSearchParams();
+    const { setUiState } = useInstantSearch<MyUiState>();
+
+    // URL synchronization is now handled by InstantSearch routing
+    // No need for manual URL manipulation
 
     useEffect(() => {
-        // Read from URL on mount
-        const sortParam = searchParams.get('sort');
-        if (sortParam) {
-            setSortOrderStates(sortParam);
-            setSort(sortParam);
-        }
-    }, []);
-
-    useEffect(() => {
-        // Update URL when sort order changes
-        const url = new URL(window.location.href);
-        if (sortOrderStates) {
-            url.searchParams.set('sort', sortOrderStates);
-        } else {
-            url.searchParams.delete('sort');
-        }
-        window.history.replaceState({}, '', url.toString());
-
         // Update store
         setSort(sortOrderStates);
-    }, [sortOrderStates]);
+
+        // Update UI state
+        setUiState(prev => {
+            return {
+                ...prev,
+                product: {
+                    ...(prev.product || {}),
+                    sort: sortOrderStates,
+                    query: prev.product?.query || '',
+                }
+            }
+        });
+    }, [sortOrderStates, setSort, setUiState]);
 
     const icon = <svg className="w-4 h-4" viewBox="0 0 20 20" fill="none">
         <path

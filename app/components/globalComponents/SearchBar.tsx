@@ -43,7 +43,7 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
         const query = searchParams.get('q');
 
         if ((query && !isInitialized) || isInitialized) {
-            setSearch(query ? decodeURIComponent(query) : '');
+            // setSearch(query ? decodeURIComponent(query) : '');
         }
 
         if (!isInitialized) {
@@ -55,7 +55,7 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
         setSearch("");
         const url = new URL(window.location.href);
         url.searchParams.delete('q');
-        router.push(url.pathname + url.search);
+        // router.push(url.pathname + url.search);
     };
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -68,7 +68,7 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
         } else {
             url.searchParams.delete('q');
         }
-        router.push(url.pathname + url.search);
+        // router.push(url.pathname + url.search);
     };
 
     const handleFocus = () => {

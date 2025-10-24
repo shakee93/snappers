@@ -7,14 +7,25 @@ import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import { ProductCategory } from "@/graphql/types/graphql";
 import { useStore } from "@/store/store";
 import FilterPopover from "@/app/components/Filters/FilterPopover";
-import { useHits, useRefinementList } from "react-instantsearch";
+import { useHits, useInstantSearch, useRefinementList } from "react-instantsearch";
 // import {RefinementListItem} from "instantsearch.js/es/connectors/refinement-list/connectRefinementList";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import { ChevronDown } from "lucide-react";
+import { InstantSearchNextProps } from "react-instantsearch-nextjs";
+import { UiState } from "instantsearch.js";
 
 interface CategoryFilterProps {
     categories: ProductCategory[]
 }
+
+type MyUiState = UiState & {
+    product: {
+        categories: number[];
+        query?: string;
+        hello?: boolean;
+    }
+}
+    ;
 
 const CategoryFilter = ({ categories }: CategoryFilterProps) => {
     const { syncCategories, search, sidebar: { categories: catState } } = useStore()
@@ -23,33 +34,17 @@ const CategoryFilter = ({ categories }: CategoryFilterProps) => {
     const [isCollapsed, setIsCollapsed] = useState(false);
     const { brand } = useParams()
     const { hits, results } = useHits();
-    const searchParams = useSearchParams();
+    const { uiState, setUiState } = useInstantSearch<MyUiState>();
 
     const { items: categoriesFacet } = useRefinementList({
         attribute: 'categories_facet',
     });
 
-    useEffect(() => {
-        // Read from URL on mount
-        const categoryIds = searchParams.get('categories');
-        if (categoryIds) {
-            const ids = categoryIds.split(',').map(id => parseInt(id));
-            syncCategories(ids);
-        }
-    }, []);
+    // URL reading is now handled by InstantSearch routing
+    // No need for manual URL parameter reading
 
-    useEffect(() => {
-        // Update URL when categories change
-        const currentParams = new URLSearchParams(searchParams.toString());
-        if (catState.length > 0) {
-            currentParams.set('categories', catState.join(','));
-        } else {
-            currentParams.delete('categories');
-        }
-        const newUrl = `${window.location.pathname}?${currentParams.toString()}`;
-        window.history.replaceState({}, '', newUrl);
-
-    }, [catState, searchParams]);
+    // URL synchronization is now handled by InstantSearch routing
+    // No need for manual URL manipulation
 
     useEffect(() => {
         if (firstCategoryFacets.length === 0) {
@@ -72,10 +67,28 @@ const CategoryFilter = ({ categories }: CategoryFilterProps) => {
                 return
             }
 
-            checked
-                ? syncCategories([...catState, name])
-                : syncCategories(catState.filter((i) => i !== name));
-        }, [catState])
+            const newCategories = checked ? [...catState, name] : catState.filter((i) => i !== name);
+
+            // this is to trigger the ui state change
+            setUiState(prev => {
+                return {
+                    ...prev,
+                    product: {
+                        ...(prev.product || {}),
+                        categories: newCategories,
+                        query: prev.product?.query || '',
+                    }
+                }
+            });
+
+            syncCategories(newCategories);
+        }, [catState, setUiState, syncCategories])
+
+
+    useEffect(() => {
+        console.log('uiState', uiState);
+    }, [uiState])
+
 
     const facetedCategories = useMemo(() => {
         const sortedCategories = [...categories];

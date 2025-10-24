@@ -23,12 +23,27 @@ export function NavigationEvents() {
 
     useEffect(() => {
         pushNavigation(pathname);
-        setSearch('')
-        syncCategories([])
-        syncBrands([])
-        synPriceRange(PRICE_RANGE)
+        // Only reset filters when navigating to a completely different page, not when URL params change
+        // setSearch('')
+        // syncCategories([])
+        // syncBrands([])
+        // synPriceRange(PRICE_RANGE)
 
     }, [pathname])
+
+    useEffect(() => {
+        // If 'q' is present as a search param, update the URL to use 'query' instead.
+        if (searchParams.get('q') && !searchParams.get('query')) {
+            const url = new URL(window.location.href);
+            const qValue = searchParams.get('q');
+            url.searchParams.delete('q');
+            url.searchParams.set('query', qValue || '');
+            window.history.replaceState({}, '', url.toString());
+            setSearch(qValue || '');
+        } else if (searchParams.get('query')) {
+            setSearch(searchParams.get('query') || '');
+        }
+    }, [searchParams]);
 
     useEffect(() => {
         const revalidate = searchParams.has('revalidate')

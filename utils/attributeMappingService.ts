@@ -28,7 +28,6 @@ class AttributeMappingService {
                 });
             });
             this.isLoaded = true;
-            console.log('Attribute mappings loaded:', this.attributeMappings.size, 'attributes');
         }
     }
 

@@ -6,12 +6,29 @@ import ProductGridInstant from "@/app/components/ProductGridInstant";
 import SearchInput from "@/app/components/SearchInput";
 import TabFilters from "@/app/components/TabFilters";
 import { Brand, ProductCategory } from "@/graphql/types/graphql";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useStore } from "@/store/store";
 import { PRICE_RANGE } from "@/app/components/Filters/PriceFilter";
 import SortInput from "@/app/components/SortInput";
 import { useDebounce } from "use-debounce";
 import MobileFilterSheet from "@/app/components/MobileFilterSheet";
+import { history } from "instantsearch.js/es/lib/routers";
+import { UiState } from "instantsearch.js";
+import singletonRouter from 'next/router';
+import { useSearchParams } from "next/navigation";
+
+type CustomUiState = UiState & {
+  product: {
+    query: string;
+    categories: number[];
+    brands: number[];
+    priceRange: number[];
+    on_sale: boolean;
+    in_stock: boolean;
+    sort: string;
+    variations: Record<string, string[]>;
+  };
+};
 
 const DelayedRender: React.FC<{ delay: number; children: React.ReactNode }> = ({ delay, children }) => {
   const [isVisible, setIsVisible] = useState(false);
@@ -68,11 +85,18 @@ const InstantSearchWrapper = ({
   tag,
   searchQueryValue
 }: InstantSearchWrapperProps) => {
-  const { sidebar, setSearchMounted } = useStore();
+  const { sidebar, setSearchMounted, syncCategories, syncBrands, synPriceRange, setInStock, syncOnSale, setSort, syncVariations } = useStore();
   const [differedSidebar] = useDebounce(sidebar, 800);
   const [hitsPerPage, setHitsPerPage] = useState<number>(12);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [debouncedSearchQuery] = useDebounce(searchQuery, 300); // Debounce the search query
+  const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
+  const searchParams = useSearchParams();
+
+  useEffect(() => {
+    if (searchParams.get('q')) {
+      setSearchQuery(searchParams.get('q') || '');
+    }
+  }, [searchParams]);
 
   const getFilterQuery: () => string = () => {
     const f = [
@@ -157,30 +181,107 @@ const InstantSearchWrapper = ({
     setFilterQuery(getFilterQuery);
   }, [debouncedSearchQuery]);
 
-  useEffect(() => {
-    setSearchMounted();
-  }, []);
+  // this maps the ui state to the route state
+  const stateToRoute = useCallback((uiState: CustomUiState) => {
 
-  // useEffect(() => {
-  //   if (searchQueryValue) {
-  //     const url = new URL(window.location.href);
-  //     url.searchParams.set('q', searchQueryValue);
-  //     window.history.replaceState({}, '', url);
-  //   }
-  // }, [searchQueryValue]);
+    const _state = useStore.getState();
+    const _sidebar = _state.sidebar;
 
-  //   const InstantSearchComponent = useMemo(() => {
-  //     return server ? InstantSearchNext : InstantSearch;
-  // }, [server]); // Add dependencies if necessary
+    console.log('stateToRoute', _sidebar?.categories, uiState.product.categories);
 
-  const InstantSearchComponent = useMemo(() => {
-    // TODO: Search on client side freezes when using useInstantSearch hook so switching between normal and next.
-    // FIXED: I have updated the package to the latest version and it is working fine.
-    // KEPT the old code for reference.
-    // when this gets fixed update the package
-    return server ? InstantSearchNext : InstantSearch;
-  }, [server]);
+    // Build URL params object
+    const params: Record<string, string | undefined> = {
+      query: uiState.product.query,
+      categories: _sidebar?.categories?.join(',') || undefined,
+      brands: _sidebar?.brands?.join(',') || undefined,
+      priceRange: _sidebar?.priceRange?.join(',') || undefined,
+      on_sale: _sidebar?.on_sale ? 'true' : undefined,
+      in_stock: _sidebar?.in_stock ? 'true' : undefined,
+      sort: _sidebar?.sort || undefined,
+    };
 
+    // Handle variations object
+    const variationEntries = Object.entries(_sidebar?.variations || {});
+    if (variationEntries.length > 0) {
+      variationEntries.forEach(([attribute, values]) => {
+        if (values.length > 0) {
+          params[`variation_${attribute}`] = values.join(',');
+        }
+      });
+    }
+
+    // Remove undefined values
+    return Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== undefined));
+  }, [sidebar]);
+
+  // this maps the route state to the ui state
+  const routeToState = useCallback((routeState: any) => {
+    console.log('routeToState', routeState);
+
+    // Sync categories
+    if (routeState?.categories?.length > 0) {
+      syncCategories(routeState.categories.split(',').filter(Boolean).map(Number) || []);
+    }
+
+    // Sync brands
+    if (routeState?.brands?.length > 0) {
+      syncBrands(routeState.brands.split(',').filter(Boolean).map(Number) || []);
+    }
+
+    // Sync price range
+    if (routeState?.priceRange?.length > 0) {
+      const priceRange = routeState.priceRange.split(',').filter(Boolean).map(Number);
+      if (priceRange.length === 2) {
+        synPriceRange(priceRange);
+      }
+    }
+
+    // Sync on_sale
+    if (routeState?.on_sale === 'true') {
+      syncOnSale(true);
+    }
+
+    // Sync in_stock
+    if (routeState?.in_stock === 'true') {
+      setInStock(true);
+    }
+
+    // Sync sort
+    if (routeState?.sort) {
+      setSort(routeState.sort);
+    }
+
+    // Sync variations
+    const variations: Record<string, string[]> = {};
+    Object.keys(routeState || {}).forEach(key => {
+      if (key.startsWith('variation_')) {
+        const attribute = key.replace('variation_', '');
+        if (routeState[key]) {
+          variations[attribute] = routeState[key].split(',').filter(Boolean);
+        }
+      }
+    });
+
+    // Apply variations to store
+    Object.entries(variations).forEach(([attribute, values]) => {
+      syncVariations(attribute, values);
+    });
+
+    return {
+      product: {
+        query: routeState.query || '',
+        categories: sidebar.categories,
+        brands: sidebar.brands,
+        priceRange: sidebar.priceRange,
+        on_sale: sidebar.on_sale,
+        in_stock: sidebar.in_stock,
+        sort: sidebar.sort,
+        variations: sidebar.variations,
+      },
+    };
+  }, [syncCategories, syncBrands, synPriceRange, syncOnSale, setInStock, setSort, syncVariations]);
+
+  // Create reactive stateMapping that updates when sidebar changes
   return (
     <div>
       <InstantSearchNext
@@ -188,15 +289,15 @@ const InstantSearchWrapper = ({
         future={{
           preserveSharedStateOnUnmount: true,
         }}
-        routing={
-          routing && server
-            ? {
-              router: {
-                cleanUrlOnDispose: true,
-              },
-            }
-            : undefined
-        }
+        routing={{
+          router: {
+            cleanUrlOnDispose: true,
+          },
+          stateMapping: {
+            stateToRoute,
+            routeToState,
+          },
+        }}
         searchClient={searchClient}
         indexName="product"
       >

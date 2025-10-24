@@ -9,38 +9,43 @@ import { useStore } from "@/store/store";
 import FilterPopover from "@/app/components/Filters/FilterPopover";
 import Slider from "rc-slider";
 import { XIcon } from "lucide-react";
-import { useSearchParams } from 'next/navigation';
+import { useInstantSearch } from "react-instantsearch";
+import { UiState } from "instantsearch.js";
 
 interface BrandFilterProps {
+}
+
+type MyUiState = UiState & {
+    product: {
+        on_sale: boolean;
+        query?: string;
+    }
 }
 
 const OnSaleFilter = ({ }: BrandFilterProps) => {
     const { syncOnSale } = useStore();
     const [isOnSale, setIsOnSale] = useState(false);
-    const searchParams = useSearchParams();
+    const { setUiState } = useInstantSearch<MyUiState>();
+
+    // URL synchronization is now handled by InstantSearch routing
+    // No need for manual URL manipulation
 
     useEffect(() => {
-        // Read from URL on mount
-        const saleStatus = searchParams.get('sale');
-        if (saleStatus === 'true') {
-            setIsOnSale(true);
-            syncOnSale(true);
-        }
-    }, []);
-
-    useEffect(() => {
-        // Update URL when sale status changes
-        const url = new URL(window.location.href);
-        if (isOnSale) {
-            url.searchParams.set('sale', 'true');
-        } else {
-            url.searchParams.delete('sale');
-        }
-        window.history.replaceState({}, '', url.toString());
-
         // Update store
         syncOnSale(isOnSale);
-    }, [isOnSale]);
+
+        // Update UI state
+        setUiState(prev => {
+            return {
+                ...prev,
+                product: {
+                    ...(prev.product || {}),
+                    on_sale: isOnSale,
+                    query: prev.product?.query || '',
+                }
+            }
+        });
+    }, [isOnSale, setUiState, syncOnSale]);
 
     return (
         <div

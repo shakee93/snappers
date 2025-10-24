@@ -1,14 +1,21 @@
 import React, { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import { useStore } from "@/store/store";
-import { useRefinementList } from "react-instantsearch";
-import { useSearchParams } from "next/navigation";
+import { useRefinementList, useInstantSearch } from "react-instantsearch";
 import { ChevronDown } from "lucide-react";
 import { Transition } from "@headlessui/react";
+import { UiState } from "instantsearch.js";
 
 interface VariationFilterProps {
     attribute: string;
     label: string;
+}
+
+type MyUiState = UiState & {
+    product: {
+        variations: Record<string, string[]>;
+        query?: string;
+    }
 }
 
 const VariationFilter = ({ attribute, label }: VariationFilterProps) => {
@@ -16,7 +23,7 @@ const VariationFilter = ({ attribute, label }: VariationFilterProps) => {
     const [firstFacets, setFirstFacets] = useState<any[]>([]);
     const [showAll, setShowAll] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const searchParams = useSearchParams();
+    const { setUiState } = useInstantSearch<MyUiState>();
 
     const { items: facets } = useRefinementList({
         attribute: `variation_facets.${attribute}`,
@@ -25,25 +32,8 @@ const VariationFilter = ({ attribute, label }: VariationFilterProps) => {
 
     const currentValues = variations[attribute] || [];
 
-    useEffect(() => {
-        // Read from URL on mount
-        const urlValues = searchParams.get(`variation_${attribute}`);
-        if (urlValues) {
-            const values = urlValues.split(',');
-            syncVariations(attribute, values);
-        }
-    }, [attribute]);
-
-    useEffect(() => {
-        // Update URL when variations change
-        const url = new URL(window.location.href);
-        if (currentValues.length > 0) {
-            url.searchParams.set(`variation_${attribute}`, currentValues.join(','));
-        } else {
-            url.searchParams.delete(`variation_${attribute}`);
-        }
-        window.history.replaceState({}, '', url.toString());
-    }, [currentValues, attribute]);
+    // URL synchronization is now handled by InstantSearch routing
+    // No need for manual URL manipulation
 
     useEffect(() => {
         if (firstFacets.length === 0) {
@@ -54,13 +44,43 @@ const VariationFilter = ({ attribute, label }: VariationFilterProps) => {
     const handleChange = useCallback((checked: boolean, value: string) => {
         if (value === "all" && checked) {
             syncVariations(attribute, []);
+            setUiState(prev => {
+                return {
+                    ...prev,
+                    product: {
+                        ...(prev.product || {}),
+                        variations: {
+                            ...(prev.product?.variations || {}),
+                            [attribute]: []
+                        },
+                        query: prev.product?.query || '',
+                    }
+                }
+            });
             return;
         }
 
-        checked
-            ? syncVariations(attribute, [...currentValues, value])
-            : syncVariations(attribute, currentValues.filter((v) => v !== value));
-    }, [currentValues, attribute]);
+        const newValues = checked
+            ? [...currentValues, value]
+            : currentValues.filter((v) => v !== value);
+
+        // Update UI state
+        setUiState(prev => {
+            return {
+                ...prev,
+                product: {
+                    ...(prev.product || {}),
+                    variations: {
+                        ...(prev.product?.variations || {}),
+                        [attribute]: newValues
+                    },
+                    query: prev.product?.query || '',
+                }
+            }
+        });
+
+        syncVariations(attribute, newValues);
+    }, [currentValues, attribute, setUiState, syncVariations]);
 
     const sortedFacets = useMemo(() => {
         return [...facets].sort((a, b) => b.count - a.count);
