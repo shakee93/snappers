@@ -187,14 +187,12 @@ const InstantSearchWrapper = ({
     const _state = useStore.getState();
     const _sidebar = _state.sidebar;
 
-    console.log('stateToRoute', _sidebar?.categories, uiState.product.categories);
-
     // Build URL params object
     const params: Record<string, string | undefined> = {
       query: uiState.product.query,
       categories: _sidebar?.categories?.join(',') || undefined,
       brands: _sidebar?.brands?.join(',') || undefined,
-      priceRange: _sidebar?.priceRange?.join(',') || undefined,
+      priceRange: (_sidebar?.priceRange === PRICE_RANGE) ? undefined : _sidebar?.priceRange?.join(',') || undefined,
       on_sale: _sidebar?.on_sale ? 'true' : undefined,
       in_stock: _sidebar?.in_stock ? 'true' : undefined,
       sort: _sidebar?.sort || undefined,
@@ -216,7 +214,6 @@ const InstantSearchWrapper = ({
 
   // this maps the route state to the ui state
   const routeToState = useCallback((routeState: any) => {
-    console.log('routeToState', routeState);
 
     // Sync categories
     if (routeState?.categories?.length > 0) {

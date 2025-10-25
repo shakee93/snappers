@@ -85,11 +85,6 @@ const CategoryFilter = ({ categories }: CategoryFilterProps) => {
         }, [catState, setUiState, syncCategories])
 
 
-    useEffect(() => {
-        console.log('uiState', uiState);
-    }, [uiState])
-
-
     const facetedCategories = useMemo(() => {
         const sortedCategories = [...categories];
 
