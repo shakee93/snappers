@@ -88,7 +88,6 @@ const InstantSearchWrapper = ({
   const [differedSidebar] = useDebounce(sidebar, 800);
   const [hitsPerPage, setHitsPerPage] = useState<number>(12);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -175,10 +174,6 @@ const InstantSearchWrapper = ({
     // setSortQuery(differedSidebar.sort);
   }, [search]);
 
-  useEffect(() => {
-    setFilterQuery(getFilterQuery);
-  }, [debouncedSearchQuery]);
-
   // this maps the ui state to the route state
   const stateToRoute = useCallback((uiState: CustomUiState) => {
 
@@ -191,9 +186,9 @@ const InstantSearchWrapper = ({
       query: uiState.product.query,
       categories: _sidebar?.categories?.join(',') || undefined,
       brands: _sidebar?.brands?.join(',') || undefined,
-      priceRange: _sidebar?.priceRange?.join(',') || undefined,
+      priceRange: (_sidebar?.priceRange === PRICE_RANGE) ? undefined : _sidebar?.priceRange?.join(',') || undefined,
       on_sale: _sidebar?.on_sale ? 'true' : undefined,
-      in_stock: _sidebar?.in_stock ? 'true' : undefined,
+      in_stock: !_sidebar?.in_stock ? 'false' : undefined,
       sort: _sidebar?.sort || undefined,
     };
 
@@ -214,6 +209,7 @@ const InstantSearchWrapper = ({
   // this maps the route state to the ui state
   const routeToState = useCallback((routeState: any) => {
 
+    const state = useStore.getState();
     // Sync categories
     if (routeState?.categories?.length > 0) {
       syncCategories(routeState.categories.split(',').filter(Boolean).map(Number) || []);
@@ -238,8 +234,8 @@ const InstantSearchWrapper = ({
     }
 
     // Sync in_stock
-    if (routeState?.in_stock === 'true') {
-      setInStock(true);
+    if (routeState?.in_stock === 'false') {
+      setInStock(false);
     }
 
     // Sync sort
@@ -262,6 +258,9 @@ const InstantSearchWrapper = ({
     Object.entries(variations).forEach(([attribute, values]) => {
       syncVariations(attribute, values);
     });
+
+    console.log('routeState query', routeState?.query);
+    console.log('state query', state?.search);
 
     return {
       product: {

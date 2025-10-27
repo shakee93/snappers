@@ -43,7 +43,6 @@ const PriceFilter = ({ }: BrandFilterProps) => {
                 product: {
                     ...(prev.product || {}),
                     priceRange: rangePrices,
-                    query: prev.product?.query || '',
                 }
             }
         });

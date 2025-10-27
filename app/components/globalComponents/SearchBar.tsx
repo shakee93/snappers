@@ -7,13 +7,14 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { PRICE_RANGE } from "@/app/components/Filters/PriceFilter";
 
 interface SearchBarProps {
     onSearchExpand?: (expanded: boolean) => void;
 }
 
 const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
-    const { search, setSearch, search_status } = useStore();
+    const { search, setSearch, search_status, syncCategories, syncBrands, synPriceRange, syncOnSale, setInStock, setSort, clearVariations } = useStore();
     const router = useRouter();
     const path = usePathname();
     const searchParams = useSearchParams();
@@ -52,22 +53,44 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
     }, [searchParams, setSearch, isInitialized, mounted]);
 
     const handleSearchClear = () => {
+        // Clear search state
         setSearch("");
+
+        // Reset all filters in store
+        syncCategories([]);
+        syncBrands([]);
+        synPriceRange(PRICE_RANGE);
+        syncOnSale(false);
+        setInStock(true);
+        setSort("");
+        clearVariations();
+
+        // Clear all URL parameters
         const url = new URL(window.location.href);
+        url.searchParams.delete('q');
         url.searchParams.delete('query');
+        url.searchParams.delete('categories');
+        url.searchParams.delete('brands');
+        url.searchParams.delete('priceRange');
+        url.searchParams.delete('on_sale');
+        url.searchParams.delete('in_stock');
+        url.searchParams.delete('sort');
+
+        // Clear all variation parameters
+        const paramsToDelete: string[] = [];
+        url.searchParams.forEach((_, key) => {
+            if (key.startsWith('variation_')) {
+                paramsToDelete.push(key);
+            }
+        });
+        paramsToDelete.forEach(key => url.searchParams.delete(key));
+
+        router.push(url.pathname + url.search);
     };
 
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setSearch(value);
-
-        const url = new URL(window.location.href);
-        if (value) {
-            url.searchParams.set('q', value);
-        } else {
-            url.searchParams.delete('q');
-        }
-        // router.push(url.pathname + url.search);
     };
 
     const handleFocus = () => {
@@ -86,7 +109,7 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
                 {path !== '/' && (
                     <button
                         onClick={() => router.back()}
-                        className="hidden md:hidden w-10 h-10 flex items-center justify-center"
+                        className=" hidden w-10 h-10  items-center justify-center"
                     >
                         <ChevronLeft className="text-white w-8" />
                     </button>

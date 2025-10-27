@@ -33,17 +33,6 @@ const HeaderSearchResults = ({ brands, productCategories }: SearchBarProps) => {
         setMounted(true)
     }, [])
 
-    useEffect(() => {
-        const query = searchParams.get('q')
-        if (query) {
-            setSearch(query)
-        }
-    }, [searchParams])
-
-    useEffect(() => {
-        // console.log('search', search)
-    }, [search])
-
 
     if (!mounted) {
         return <></>

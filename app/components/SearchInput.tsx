@@ -1,9 +1,15 @@
 import { useInstantSearch, useSearchBox } from "react-instantsearch";
 import { Search } from "lucide-react";
 import { useStore } from "@/store/store";
-import { useDeferredValue, useEffect } from "react";
-import { useDebounce } from 'use-debounce';
+import { useEffect } from "react";
 import React from 'react';
+import { UiState } from "instantsearch.js";
+
+type MyUiState = UiState & {
+    product: {
+        query?: string;
+    }
+}
 
 interface SearchInputProps {
     bindToStore?: boolean;
@@ -11,24 +17,37 @@ interface SearchInputProps {
     onSearchChange?: (value: any) => void;
 }
 
+// Module-level timer for debouncing
+let timerId: NodeJS.Timeout | undefined;
+const timeout = 0; // 300ms delay
+
 const SearchInput: React.FC<SearchInputProps> = ({ show = true, bindToStore = false, onSearchChange }) => {
     const {
         query,
         refine,
         clear,
-    } = useSearchBox();
+    } = useSearchBox({
+        queryHook: queryHook
+    });
 
     const { search } = useStore()
-    const [value] = useDebounce(search, 300);
+    const { setUiState } = useInstantSearch<MyUiState>();
 
     useEffect(() => {
-
         if (!bindToStore) {
             return;
         }
 
-        refine(value);
-    }, [value])
+        refine(search);
+    }, [search])
+
+    useEffect(() => {
+
+        // this state update here to prevent race condition between the search input and the instantsearch search query. so on route change, the search query is not erased.
+        // setUiState(p => {
+        //     return p
+        // })
+    }, [search])
 
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         if (onSearchChange) {
@@ -58,6 +77,15 @@ const SearchInput: React.FC<SearchInputProps> = ({ show = true, bindToStore = fa
         </div>
         <input type="submit" hidden value="" />
     </form>;
+}
+
+
+const queryHook = (query: string, hook: (query: string) => void) => {
+    if (timerId) {
+        clearTimeout(timerId);
+    }
+
+    timerId = setTimeout(() => hook(query), timeout);
 }
 
 export default SearchInput
