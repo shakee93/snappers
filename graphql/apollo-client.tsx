@@ -89,7 +89,7 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
 
         let isTargetError = graphQLErrors && graphQLErrors.some((err: any) => {
           console.log("err on apollo client", err);
-          const errorMessage = err?.extensions?.debugMessage || err?.message ;
+          const errorMessage = err?.extensions?.debugMessage || err?.message;
           return targetErrors.includes(errorMessage) || errorMessage.includes("invalid-secret-key");
         });
 
@@ -134,7 +134,7 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
 
         if (networkError) {
           console.log(`[Network error]: ${networkError}`);
-          
+
           // Check if it's a JSON parsing error indicating PHP output
           if (networkError.message && networkError.message.includes("Unexpected token")) {
             console.error("🚨 WordPress is returning PHP output instead of JSON. Check your WordPress debug settings and plugins.");
@@ -162,15 +162,17 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
 
     return new NextSSRApolloClient({
       // Use the `NextSSRInMemoryCache`, not the normal `InMemoryCache`
-      connectToDevTools: true,
+      devtools: {
+        enabled: process.env.NODE_ENV !== 'production',
+      },
       cache: new NextSSRInMemoryCache(),
       link: from([
         ...(typeof window === "undefined"
           ? [
-              new SSRMultipartLink({
-                stripDefer: true,
-              }),
-            ]
+            new SSRMultipartLink({
+              stripDefer: true,
+            }),
+          ]
           : []),
         authLink,
         errorLink,

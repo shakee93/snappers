@@ -62,24 +62,47 @@ export function CartProvider({ children }: {
         setCustomer(data?.[key]?.customer || data.customer)
     }
 
-    const [getCart, { error }] = useLazyQuery(GET_CART, {
+    const [getCart, { error, data }] = useLazyQuery(GET_CART, {
         fetchPolicy: 'no-cache',
-        onCompleted: refreshData
     })
 
-    const [_removeFromCart, { data: cartData }] = useMutation(REMOVE_ITEMS_FROM_CART, {
+    const [_removeFromCart, { data: removeCartData }] = useMutation(REMOVE_ITEMS_FROM_CART, {
         fetchPolicy: 'no-cache',
-        onCompleted: refreshData
     })
 
-    const [_addToCart] = useMutation(ADD_TO_CART, {
+    const [_addToCart, { data: addToCartData }] = useMutation(ADD_TO_CART, {
         fetchPolicy: 'no-cache',
-        onCompleted: refreshData,
     });
 
-    const [_updateCart] = useMutation(UPDATE_CART_ITEM_QUANTITY, {
-        onCompleted: refreshData
-    });
+    const [_updateCart, { data: updateCartData }] = useMutation(UPDATE_CART_ITEM_QUANTITY);
+
+    // Handle data from getCart
+    useEffect(() => {
+        if (data) {
+            refreshData(data);
+        }
+    }, [data]);
+
+    // Handle data from removeFromCart mutation
+    useEffect(() => {
+        if (removeCartData) {
+            refreshData(removeCartData);
+        }
+    }, [removeCartData]);
+
+    // Handle data from addToCart mutation
+    useEffect(() => {
+        if (addToCartData) {
+            refreshData(addToCartData);
+        }
+    }, [addToCartData]);
+
+    // Handle data from updateCart mutation
+    useEffect(() => {
+        if (updateCartData) {
+            refreshData(updateCartData);
+        }
+    }, [updateCartData]);
 
     const removeFromCart = async (keys: string[] = [], all: boolean = false) => {
         setLoading(true)

@@ -17,15 +17,6 @@ export const useAttributeMappings = () => {
 
     const [loadAttributes, { data, loading, error }] = useLazyQuery(GET_ALL_PRODUCT_ATTRIBUTES, {
         fetchPolicy: 'cache-first',
-        onCompleted: (data) => {
-            attributeMappingService.setAttributeMappings(data);
-            const mappings = attributeMappingService.getAllMappings();
-            setAttributeMappings(mappings);
-        },
-        onError: (error) => {
-            console.error('Failed to initialize attribute mappings:', error);
-            setAttributeMappingsLoaded(false);
-        }
     });
 
     useEffect(() => {
@@ -34,6 +25,23 @@ export const useAttributeMappings = () => {
             loadAttributes();
         }
     }, [attributeMappingsLoaded, loading, loadAttributes]);
+
+    // Handle data from loadAttributes
+    useEffect(() => {
+        if (data) {
+            attributeMappingService.setAttributeMappings(data);
+            const mappings = attributeMappingService.getAllMappings();
+            setAttributeMappings(mappings);
+        }
+    }, [data]);
+
+    // Handle errors from loadAttributes
+    useEffect(() => {
+        if (error) {
+            console.error('Failed to initialize attribute mappings:', error);
+            setAttributeMappingsLoaded(false);
+        }
+    }, [error]);
 
     return {
         isLoaded: attributeMappingsLoaded,

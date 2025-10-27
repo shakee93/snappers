@@ -210,7 +210,6 @@ const InstantSearchWrapper = ({
   // this maps the route state to the ui state
   const routeToState = useCallback((routeState: any) => {
 
-    const state = useStore.getState();
     // Sync categories
     if (routeState?.categories?.length > 0) {
       syncCategories(routeState.categories.split(',').filter(Boolean).map(Number) || []);
@@ -259,9 +258,6 @@ const InstantSearchWrapper = ({
     Object.entries(variations).forEach(([attribute, values]) => {
       syncVariations(attribute, values);
     });
-
-    console.log('routeState query', routeState?.query);
-    console.log('state query', state?.search);
 
     return {
       product: {

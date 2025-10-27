@@ -65,11 +65,7 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({
 
   // console.log({ product });
 
-  const [getTechSpec, { loading, error, data }] = useLazyQuery(GET_TECH_SPEC, {
-    variables: {
-      productId: product?.databaseId,
-    },
-  });
+  const [getTechSpec, { loading, error, data }] = useLazyQuery(GET_TECH_SPEC);
 
 
 
@@ -78,7 +74,11 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({
     (async () => {
 
 
-      const { data: dataIn } = await getTechSpec()
+      const { data: dataIn } = await getTechSpec({
+        variables: {
+          productId: product?.databaseId,
+        },
+      })
 
       if (dataIn) {
         setTechSpecs(dataIn);

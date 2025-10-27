@@ -24,16 +24,16 @@ const ModalQuickView: FC<ModalQuickViewProps> = ({
 
   const [product, setProduct] = useState()
 
-  const [getProduct, { loading, error, data }] = useLazyQuery(GET_QUICK_VIEW_PRODUCT, {
-    variables: {
-      productId: productData,
-    },
-  });
+  const [getProduct, { loading, error, data }] = useLazyQuery(GET_QUICK_VIEW_PRODUCT);
 
 
   useEffect(() => {
     if (show) {
-      getProduct()
+      getProduct({
+        variables: {
+          productId: productData,
+        },
+      })
     }
 
   }, [show])
