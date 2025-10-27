@@ -91,14 +91,6 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
     const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
         setSearch(value);
-
-        const url = new URL(window.location.href);
-        if (value) {
-            url.searchParams.set('q', value);
-        } else {
-            url.searchParams.delete('q');
-        }
-        // router.push(url.pathname + url.search);
     };
 
     const handleFocus = () => {

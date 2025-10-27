@@ -205,9 +205,8 @@ const ProductCard: FC<ProductCardProps> = ({
           <>
             {type === "SIMPLE" && price && price?.length > 0 && (
               <ButtonPrimary
-                className={`shadow-md ${
-                  rawPrice === "0.00" ? "opacity-60 cursor-not-allowed" : ""
-                }
+                className={`shadow-md ${rawPrice === "0.00" ? "opacity-60 cursor-not-allowed" : ""
+                  }
                 `}
                 fontSize="text-xs"
                 sizeClass="py-1.5 px-3.5"
@@ -282,9 +281,9 @@ const ProductCard: FC<ProductCardProps> = ({
           Sold Out
         </div>
       )}
-      
+
       <div className="relative flex-shrink-0 bg-white rounded-2xl overflow-hidden ">
-        
+
         <Link
           href={link}
           onClick={() => {
@@ -295,10 +294,10 @@ const ProductCard: FC<ProductCardProps> = ({
         >
           <div className="flex items-center justify-center aspect-square relative">
             {variations?.edges &&
-            variations.edges.some(
-              (variation: { node: ProductVariation }) =>
-                variation.node?.image?.sourceUrl
-            ) ? (
+              variations.edges.some(
+                (variation: { node: ProductVariation }) =>
+                  variation.node?.image?.sourceUrl
+              ) ? (
               variations.edges.map(
                 (
                   variation: {
@@ -478,7 +477,7 @@ const ProductCard: FC<ProductCardProps> = ({
               {(
                 ((parseFloat(
                   (lowestPrice?.includes("₨&nbsp;0.00") ||
-                  lowestSalePrice?.includes("₨&nbsp;0.00")
+                    lowestSalePrice?.includes("₨&nbsp;0.00")
                     ? highestPrice
                     : lowestPrice || lowestSalePrice || "0"
                   )

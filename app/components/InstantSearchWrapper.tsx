@@ -89,7 +89,6 @@ const InstantSearchWrapper = ({
   const [differedSidebar] = useDebounce(sidebar, 800);
   const [hitsPerPage, setHitsPerPage] = useState<number>(12);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -177,10 +176,6 @@ const InstantSearchWrapper = ({
     // setSortQuery(differedSidebar.sort);
   }, [search]);
 
-  useEffect(() => {
-    setFilterQuery(getFilterQuery);
-  }, [debouncedSearchQuery]);
-
   // this maps the ui state to the route state
   const stateToRoute = useCallback((uiState: CustomUiState) => {
 
@@ -215,6 +210,7 @@ const InstantSearchWrapper = ({
   // this maps the route state to the ui state
   const routeToState = useCallback((routeState: any) => {
 
+    const state = useStore.getState();
     // Sync categories
     if (routeState?.categories?.length > 0) {
       syncCategories(routeState.categories.split(',').filter(Boolean).map(Number) || []);
@@ -263,6 +259,9 @@ const InstantSearchWrapper = ({
     Object.entries(variations).forEach(([attribute, values]) => {
       syncVariations(attribute, values);
     });
+
+    console.log('routeState query', routeState?.query);
+    console.log('state query', state?.search);
 
     return {
       product: {
