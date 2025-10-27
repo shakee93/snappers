@@ -118,7 +118,7 @@ export function SessionProvider({ children }: {
                     // console.log("An ApolloError occurred:", error);
                 }
             } else {
-                console.log("An error occurred:", error);
+                // console.log("An error occurred:", error);
             }
             return { data: null, error: errorMessage };
         }

@@ -85,10 +85,8 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
           "Wrong number of segments",
         ];
 
-        console.log("graphQLErrors", graphQLErrors);
 
         let isTargetError = graphQLErrors && graphQLErrors.some((err: any) => {
-          console.log("err on apollo client", err);
           const errorMessage = err?.extensions?.debugMessage || err?.message;
           return targetErrors.includes(errorMessage) || errorMessage.includes("invalid-secret-key");
         });
@@ -100,7 +98,6 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
           return new Observable((observer) => {
             fetchAuthToken()
               .then((newToken) => {
-                console.log("newToken on apollo client", newToken);
                 operation.setContext(({ headers = {} }) => ({
                   headers: {
                     ...headers,
@@ -109,7 +106,6 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
                 }));
               })
               .then(() => {
-                console.log("forward on apollo client");
                 const subscriber = {
                   next: observer.next.bind(observer),
                   error: observer.error.bind(observer),
@@ -117,11 +113,9 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
                 };
 
                 // Retry the request
-                console.log("subscriber on apollo client", subscriber);
                 forward(operation).subscribe(subscriber);
               })
               .catch((error) => {
-                console.log("error on apollo client", error);
                 localStorage.removeItem(AUTH_TOKEN_KEY);
                 localStorage.removeItem(REFRESH_TOKEN_KEY);
                 localStorage.removeItem(SESSION_TOKEN_KEY);
@@ -133,7 +127,6 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
         }
 
         if (networkError) {
-          console.log(`[Network error]: ${networkError}`);
 
           // Check if it's a JSON parsing error indicating PHP output
           if (networkError.message && networkError.message.includes("Unexpected token")) {

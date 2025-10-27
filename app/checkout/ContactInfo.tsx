@@ -1,7 +1,7 @@
 import { contactInformation } from "@/data/types";
 import Label from "components/Label/Label";
 import Link from "next/link";
-import React, { FC, useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Input from "shared/Input/Input";
@@ -17,7 +17,7 @@ interface Props {
   handleConfirmationChange: any;
 }
 
-const ContactInfo: FC<Props> = ({
+const ContactInfo = ({
   isActive,
   onCloseActive,
   onOpenActive,
@@ -25,7 +25,7 @@ const ContactInfo: FC<Props> = ({
   formData,
   initialData,
   handleConfirmationChange,
-}) => {
+}: Props) => {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [displayName, setDisplayName] = useState("");

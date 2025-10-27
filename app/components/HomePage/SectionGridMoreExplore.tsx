@@ -141,18 +141,18 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
         }
       }
 
-      console.log('all slugs', allSlugs);
+      // console.log('all slugs', allSlugs);
 
       const { data: fetchedData } = await refetch({
         slug: allSlugs,
       });
 
-      console.log('data', fetchedData);
+      // console.log('data', fetchedData);
 
       if (fetchedData?.brands) {
         setBrands(fetchedData.brands.nodes as Brand[]);
       } else {
-        console.log("No brands found for the given slug.");
+        // console.log("No brands found for the given slug.");
       }
     } catch (error) {
       console.error('cannot fetch data',error);

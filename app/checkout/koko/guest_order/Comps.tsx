@@ -1,22 +1,21 @@
 import { PayhereStatus, PaymentDetailsWithoutUrls } from "@/data/types";
 import { usePayhere } from "@/app/components/Payment/Payhere";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
-import React, { useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import Link from "next/link";
 import { createProductList } from "../../CheckoutUtils";
-
 
 interface OrderDetailsProps {
   orderData: any;
 }
 
-export const OrderDetails: React.FC<OrderDetailsProps> = ({ orderData }) => {
+export const OrderDetails = ({ orderData }: OrderDetailsProps) => {
   if (!orderData) return null;
 
-  // console.log('orderData', orderData);
-
-  const date = orderData?.order?.date ? new Date(orderData.order.date).toLocaleDateString() : "N/A";
+  const date = orderData?.order?.date
+    ? new Date(orderData.order.date).toLocaleDateString()
+    : "N/A";
 
   const rows = [
     { label: "Order Id", value: orderData?.order?.databaseId ?? "Not found" },
@@ -38,21 +37,26 @@ export const OrderDetails: React.FC<OrderDetailsProps> = ({ orderData }) => {
 
         <div className="flex flex-col items-center gap-3 text-center justify-between w-full py-8 md:flex-row">
           {rows.map((row, index) => (
-            <div key={index} className="flex flex-col items-center md:items-start">
+            <div
+              key={index}
+              className="flex flex-col items-center md:items-start"
+            >
               <p className="font-semibold">{row.label}</p>
               {row.label === "Order Id" ? (
                 <p className="text-4xl font-bold">
-                  {typeof row.value === 'string' ? 
-                    <span dangerouslySetInnerHTML={{ __html: row.value }} /> : 
+                  {typeof row.value === "string" ? (
+                    <span dangerouslySetInnerHTML={{ __html: row.value }} />
+                  ) : (
                     row.value
-                  }
+                  )}
                 </p>
               ) : (
                 <p className="mt-1">
-                  {typeof row.value === 'string' ? 
-                    <span dangerouslySetInnerHTML={{ __html: row.value }} /> : 
+                  {typeof row.value === "string" ? (
+                    <span dangerouslySetInnerHTML={{ __html: row.value }} />
+                  ) : (
                     row.value
-                  }
+                  )}
                 </p>
               )}
             </div>
@@ -69,8 +73,8 @@ type ProductTableProps = {
   paymentDetails?: any;
 };
 
-const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData }) => {
-    if (!lineItems || !orderData) return null;
+const ProductTable = ({ lineItems, orderData }: ProductTableProps) => {
+  if (!lineItems || !orderData) return null;
 
   const customer = orderData?.customer;
   const shippingAddress = customer?.shipping;
@@ -84,7 +88,6 @@ const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData }) => 
             ${address.city}
             ${address.country}`.trim();
   };
-
 
   return (
     <>
@@ -112,7 +115,8 @@ const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData }) => 
                 {lineItems.map((item, index) => (
                   <tr key={index}>
                     <td className="px-6 text-left py-4 font-medium text-gray-800 dark:text-gray-200">
-                      {item?.product?.node?.name ?? "Product name not available"}
+                      {item?.product?.node?.name ??
+                        "Product name not available"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-center text-gray-800 dark:text-gray-200">
                       {item?.quantity ?? 0}
@@ -129,7 +133,11 @@ const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData }) => 
                   </td>
                   <td></td>
                   <td className="px-6 text-right py-4 font-medium text-gray-800 dark:text-gray-200">
-                    <span dangerouslySetInnerHTML={{ __html: orderData.order?.shippingTotal || 'N/A' }} />
+                    <span
+                      dangerouslySetInnerHTML={{
+                        __html: orderData.order?.shippingTotal || "N/A",
+                      }}
+                    />
                   </td>
                 </tr>
 
@@ -139,7 +147,11 @@ const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData }) => 
                   </td>
                   <td></td>
                   <td className="px-6 text-right py-4 font-medium text-gray-800 dark:text-gray-200">
-                    <span dangerouslySetInnerHTML={{ __html: orderData.order?.total || 'N/A' }} />
+                    <span
+                      dangerouslySetInnerHTML={{
+                        __html: orderData.order?.total || "N/A",
+                      }}
+                    />
                   </td>
                 </tr>
               </tbody>
@@ -151,49 +163,45 @@ const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData }) => 
       <div className="pt-8">
         <p className="text-2xl text-left">Billing Address</p>
         <div className="mt-8 border rounded">
-          <div className="text-left p-4">
-            {formatAddress(billingAddress)}
-          </div>
+          <div className="text-left p-4">{formatAddress(billingAddress)}</div>
         </div>
       </div>
 
       <div className="pt-8">
         <p className="text-2xl text-left">Shipping Address</p>
         <div className="mt-8 border rounded">
-          <div className="text-left p-4">
-            {formatAddress(shippingAddress)}
-          </div>
+          <div className="text-left p-4">{formatAddress(shippingAddress)}</div>
         </div>
       </div>
     </>
   );
 };
 
-
-
 export const PaymentSection = ({ orderData, email }: any) => {
-
   const [payhereStatus, setPayhereStatus] = useState<PayhereStatus>("idle");
   const initiatePayment = usePayhere();
 
-  
   const handlePayherePayment = async () => {
     try {
-      const rawAmount = orderData.order.total.replace(/[^0-9.]/g, '');
-      
+      const rawAmount = orderData.order.total.replace(/[^0-9.]/g, "");
+
       const paymentDetails: PaymentDetailsWithoutUrls = {
         order_id: orderData.order.databaseId.toString(),
         items: createProductList(orderData) || [],
         amount: rawAmount,
-        first_name: orderData.customer.billing.firstName || orderData.customer.shipping.firstName,
-        last_name: orderData.customer.billing.lastName || orderData.customer.shipping.lastName,
+        first_name:
+          orderData.customer.billing.firstName ||
+          orderData.customer.shipping.firstName,
+        last_name:
+          orderData.customer.billing.lastName ||
+          orderData.customer.shipping.lastName,
         email: orderData.customer.billing.email,
         phone: orderData.customer.billing.phone || "0771234567",
-        address: `${orderData.customer.billing.address1} ${orderData.customer.billing.address2 || ''}`.trim(),
+        address: `${orderData.customer.billing.address1} ${
+          orderData.customer.billing.address2 || ""
+        }`.trim(),
         city: orderData.customer.billing.city,
       };
-
-      console.log("paymentDetails for payhere", paymentDetails);
 
       await initiatePayment(paymentDetails, setPayhereStatus);
     } catch (error) {
@@ -225,7 +233,9 @@ export const PaymentSection = ({ orderData, email }: any) => {
   if (payhereStatus === "finished") {
     return (
       <div className="rounded-lg bg-green-50 p-4 text-center">
-        <p className="text-lg font-medium text-green-800">Payment successful!. Our team will Review this and proceed order</p>
+        <p className="text-lg font-medium text-green-800">
+          Payment successful!. Our team will Review this and proceed order
+        </p>
         <Link href="/" passHref>
           <ButtonPrimary className="mt-4">Return to Home</ButtonPrimary>
         </Link>
@@ -235,23 +245,24 @@ export const PaymentSection = ({ orderData, email }: any) => {
 
   return (
     <div className="mb-8">
-       <div className="rounded-lg bg-white p-6 shadow-sm">
-          
-         <h3 className="mb-4 text-lg font-semibold text-gray-800">Secure Payment Powered By</h3>
-         <p className="text-sm my-2 text-gray-600 text-center">
-           Your order details have been sent to your email address: {email}
-         </p>
-         <div className="flex justify-center">
-             <img 
-               src="https://www.payhere.lk/downloads/images/payhere_square_banner_dark.png" 
-               alt="PayHere" 
-               className="h-auto w-[200px]"
-             />
-         </div>
-         <p className="mt-4 text-sm text-gray-600 text-center">
-           We accept Visa, Mastercard, and local payment methods through PayHere
-         </p>
-       </div>
+      <div className="rounded-lg bg-white p-6 shadow-sm">
+        <h3 className="mb-4 text-lg font-semibold text-gray-800">
+          Secure Payment Powered By
+        </h3>
+        <p className="text-sm my-2 text-gray-600 text-center">
+          Your order details have been sent to your email address: {email}
+        </p>
+        <div className="flex justify-center">
+          <img
+            src="https://www.payhere.lk/downloads/images/payhere_square_banner_dark.png"
+            alt="PayHere"
+            className="h-auto w-[200px]"
+          />
+        </div>
+        <p className="mt-4 text-sm text-gray-600 text-center">
+          We accept Visa, Mastercard, and local payment methods through PayHere
+        </p>
+      </div>
       <div className="flex justify-center mt-4">
         <ButtonPrimary
           onClick={handlePayherePayment}
@@ -264,17 +275,4 @@ export const PaymentSection = ({ orderData, email }: any) => {
   );
 };
 
-
-
-
 export default ProductTable;
-
-
-
-
-
-
-
-
-
-

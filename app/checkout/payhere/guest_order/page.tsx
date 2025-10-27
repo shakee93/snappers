@@ -100,7 +100,7 @@ export default function PayherePaymentPage() {
         src="https://www.payhere.lk/lib/payhere.js"
         strategy="afterInteractive"
         onLoad={() => {
-          console.log("PayHere script loaded");
+          // console.log("PayHere script loaded");
         }}
         onError={() => {
           console.error("Error loading PayHere script");

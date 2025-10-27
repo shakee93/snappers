@@ -3,7 +3,7 @@ import {
   SRI_LANKAN_STATES,
 } from "@/components/AddressPageComps/HelperComps";
 import { CustomerAddress } from "@/graphql/types/graphql";
-import React, { FC, useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Input from "shared/Input/Input";
@@ -71,7 +71,6 @@ const DeliveryAddress: FC<Props> = ({
   const handleStorePickupChange = () => {
     if (!isStorePickup) {
       setStorePickup(true);
-      // console.log("store pickup Value: ", isStorePickup);
       updateFormData("billingAddress", formData.BillingAddress);
       updateFormData("shippingDetails", {
         databaseId: "local_pickup",
@@ -90,7 +89,6 @@ const DeliveryAddress: FC<Props> = ({
 
   useEffect(() => {
     if (initialData) {
-      // console.log("initalData: ", initialData);
       setFirstName(initialData.firstName || "");
       setLastName(initialData.lastName || "");
       setAddress(initialData.address1 || "");

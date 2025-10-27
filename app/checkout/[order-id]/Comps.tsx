@@ -1,20 +1,15 @@
-import React from "react";
-
 interface OrderDetailsProps {
   orderData: any;
 }
 
-export const OrderDetails: React.FC<OrderDetailsProps> = ({ orderData }) => {
+export const OrderDetails = ({ orderData }: OrderDetailsProps) => {
   if (!orderData) return null;
-  console.log('orderData', orderData);
-  console.log('orderData.order.date', orderData.order.date);
   const date = orderData.order.date ? new Date(orderData.order.date).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   }) : "-";
 
-  console.log('date', date);
   
 
   const rows = [
@@ -62,10 +57,9 @@ type ProductTableProps = {
   paymentDetails?: any;
 };
 
-const ProductTable: React.FC<ProductTableProps> = ({ lineItems, orderData, paymentDetails }) => {
+const ProductTable = ({ lineItems, orderData, paymentDetails }: ProductTableProps) => {
   if (!lineItems) return null;
 
-  // console.log('orderData', orderData);
 
   return (
     <>

@@ -227,7 +227,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   };
 
   const handleAddToCartError = (error: any) => {
-    console.log('error', error);
+    // console.log('error', error);
 
     // Handle token expiration
     const isTokenExpired =

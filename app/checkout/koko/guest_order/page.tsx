@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-import ProductTable, { OrderDetails, PaymentSection } from "./Comps";
+import ProductTable, { OrderDetails } from "./Comps";
 import { toast } from "sonner";
 import Link from "next/link";
 import Script from "next/script";
@@ -17,18 +17,26 @@ const NoOrderMessage = () => (
         Order Not Available
       </h2>
       <p className="text-gray-600 mb-6">
-        We couldn{"'"}t find your order information. If you believe this is our mistake, please contact us:
+        We couldn{"'"}t find your order information. If you believe this is our
+        mistake, please contact us:
       </p>
       <div className="space-y-2 text-lg">
         <p>
           <span className="font-semibold">Phone:</span>{" "}
-          <a href="tel:0777555665" className="text-blue-600 hover:underline">077 755 5665</a>
+          <a href="tel:0777555665" className="text-blue-600 hover:underline">
+            077 755 5665
+          </a>
           {" / "}
-          <a href="tel:0777988665" className="text-blue-600 hover:underline">077 798 8665</a>
+          <a href="tel:0777988665" className="text-blue-600 hover:underline">
+            077 798 8665
+          </a>
         </p>
         <p>
           <span className="font-semibold">Email:</span>{" "}
-          <a href="mailto:inquiries@gqmobiles.lk" className="text-blue-600 hover:underline">
+          <a
+            href="mailto:inquiries@gqmobiles.lk"
+            className="text-blue-600 hover:underline"
+          >
             inquiries@gqmobiles.lk
           </a>
         </p>
@@ -53,7 +61,6 @@ function PayherePaymentPage() {
   const { clearCart, refreshCart } = useCart();
   const [orderData, setOrderData] = useState<string | null>(null);
   const kokostatus = useSearchParams()?.get("status");
-  
 
   useEffect(() => {
     const storedOrderData = localStorage.getItem("last_order");
@@ -96,7 +103,7 @@ function PayherePaymentPage() {
         src="https://www.payhere.lk/lib/payhere.js"
         strategy="afterInteractive"
         onLoad={() => {
-          console.log("PayHere script loaded");
+          // PayHere script loaded successfully
         }}
         onError={() => {
           console.error("Error loading PayHere script");

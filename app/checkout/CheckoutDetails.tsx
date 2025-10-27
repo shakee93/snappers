@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import ContactInfo from "./ContactInfo";
 import DeliveryAddress from "./DeliveryAddress";
 import PaymentMethod from "./PaymentMethod";
@@ -41,7 +41,7 @@ interface CheckoutLeftProps {
   isKokoPayment: boolean;
 }
 
-const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
+const CheckoutDetails = ({
   tabActive,
   setTabActive,
   handleScrollToEl,
@@ -56,7 +56,7 @@ const CheckoutDetails: React.FC<CheckoutLeftProps> = ({
   totalPayment,
   setIsKokoPayment,
   isKokoPayment
-}) => {
+}: CheckoutLeftProps) => {
 
   const { data, loading: dataLoading }: QueryResult = useQuery(GET_CHECKOUT_USER_DETAILS);
   const { data: isPriceFluctuation, loading, error } = useQuery(GET_PRICE_FLUCTUATION_NOTICE);

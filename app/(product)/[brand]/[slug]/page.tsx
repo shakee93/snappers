@@ -1,6 +1,10 @@
 import { getClient } from "@/graphql/apollo-ssr";
-import { GET_BRANDS, GET_CATEGORY_ARCHIVE_IN_STOCK, GET_PRODUCT, GET_PRODUCTS_NODES } from "@/graphql/defs/products";
-import { Brand, SimpleProduct, VariableProduct, Product as GQLProduct } from "@/graphql/types/graphql";
+import {
+  GET_BRANDS,
+  GET_CATEGORY_ARCHIVE_IN_STOCK,
+  GET_PRODUCT,
+} from "@/graphql/defs/products";
+import { Brand, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import { notFound, redirect } from "next/navigation";
 import ProductDetails from "@/app/components/SingleProductPage/ProductDetails";
 import Features from "@/app/components/SingleProductPage/FeatureCard";
@@ -10,9 +14,7 @@ import ProductImage from "@/app/components/SingleProductPage/ProductImage2";
 import { Suspense } from "react";
 import { Metadata, ResolvingMetadata } from "next";
 import { ImageProvider } from "@/context/ImageChangeGrabber";
-import SectionSliderProductCard from "@/components/SectionSliderProductCard";
 import UpsellProducts from "@/app/components/globalComponents/UpsellProducts";
-import { stripHtml } from "@/components/AddressPageComps/HelperComps";
 import { getProductSchema } from "@/lib/jsonld/productSchema";
 
 export const dynamic = "force-dynamic";
@@ -44,24 +46,26 @@ async function getData(slug: string, brand: string) {
     });
 
     if (error) {
-      console.log("DATA ERROR: ", error)
-      notFound()
+      notFound();
     }
 
     if (!data.product || data.product == null) {
-      console.log("data product not found", data)
-      notFound()
+      notFound();
     }
 
     const { data: categoryData } = await getClient().query({
       query: GET_CATEGORY_ARCHIVE_IN_STOCK,
       variables: {
-        categoryIdIn: data.product?.productCategories?.edges?.map((cat: any) => cat.node.databaseId) || [],
+        categoryIdIn:
+          data.product?.productCategories?.edges?.map(
+            (cat: any) => cat.node.databaseId
+          ) || [],
         first: 10,
       },
     });
 
-    const upsellProducts = categoryData?.products?.edges.map((edge: any) => edge.node) || [];
+    const upsellProducts =
+      categoryData?.products?.edges.map((edge: any) => edge.node) || [];
 
     const productBrand = data.product?.brands?.nodes?.[0] || {
       name: "Product",
@@ -79,7 +83,6 @@ async function getData(slug: string, brand: string) {
   }
 }
 
-
 export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
@@ -87,7 +90,7 @@ export async function generateMetadata(
   const { product, brand } = await getData(params.slug, params.brand);
 
   if (params.brand !== brand.slug) {
-    redirect(`/${brand.slug}/${product.slug}`)
+    redirect(`/${brand.slug}/${product.slug}`);
   }
 
   const price = product.price
@@ -96,7 +99,6 @@ export async function generateMetadata(
 
   return {
     title: product.name,
-    // description: `This ${product.name} is at GQMobile.lk. The best price in Sri Lanka for ${brand.name} priced at ${price}.`,
     description: `This ${product.name} is at GQMobile.lk. The best price in Sri Lanka for ${brand.name} priced at Rs.${price}.`,
 
     openGraph: {
@@ -117,7 +119,6 @@ export async function generateMetadata(
   };
 }
 
-
 const Page = async ({ params }: Props) => {
   const {
     product,
@@ -130,8 +131,6 @@ const Page = async ({ params }: Props) => {
   } = await getData(params.slug, params.brand);
 
   const productSchema = getProductSchema(product, brand);
-
-  // console.log("product", product);
 
   return (
     <div className="mt-5 md:mt-10">

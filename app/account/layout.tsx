@@ -1,5 +1,4 @@
-
-import React, { FC } from "react";
+import { FC } from "react";
 import Link from "next/link";
 import UserDetails from "@/app/components/Account/UserDetails";
 

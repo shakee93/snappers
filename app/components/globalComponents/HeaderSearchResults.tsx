@@ -34,8 +34,6 @@ const HeaderSearchResults = ({ brands, productCategories }: SearchBarProps) => {
     }, [])
 
 
-
-
     if (!mounted) {
         return <></>
     }

@@ -55,7 +55,6 @@ const ProductGridInstant = ({
 
 
   useEffect(() => {
-    // console.log(statusState);
   }, [statusState])
 
 

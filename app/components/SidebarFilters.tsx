@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 import Checkbox from "@/app/components/globalComponents/Checkbox/Checkbox";
 import Slider from "rc-slider";
@@ -59,8 +59,6 @@ const SidebarFilters = ({
   };
 
   const handleChangeBrands = (checked: boolean, name: number) => {
-    // console.log(checked, name);
-
     checked
       ? setBrandsState([...brandsState, name])
       : setBrandsState(brandsState.filter((i) => i !== name));

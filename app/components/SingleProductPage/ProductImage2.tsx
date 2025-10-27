@@ -143,8 +143,6 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   };
 
   const hasValidVideo = isValidVideoUrl(product.productVideoUrl);
-  // console.log('hasValidVideo', product);
-  console.log('product.productVideoUrl', product.productVideoUrl);
   const videoItem = hasValidVideo ? {
     sourceUrl: product.productVideoUrl,
     databaseId: 'video',
@@ -187,7 +185,6 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
         youtubePlayerRef.current = new (window as any).YT.Player('youtube-player-iframe', {
           events: {
             onReady: (event: any) => {
-              console.log('YouTube player ready');
             },
             onStateChange: (event: any) => {
               if (event.data === (window as any).YT.PlayerState.PLAYING) {
@@ -253,19 +250,15 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   }, []);
 
   const toggleYouTubePlayback = () => {
-    console.log('Toggle playback clicked, player ref:', youtubePlayerRef.current);
     if (!youtubePlayerRef.current || !youtubePlayerRef.current.playVideo) {
-      console.log('YouTube player not ready yet');
       return;
     }
     
     try {
       if (isVideoPlaying) {
         youtubePlayerRef.current.pauseVideo();
-        console.log('Pausing video');
       } else {
         youtubePlayerRef.current.playVideo();
-        console.log('Playing video');
       }
     } catch (error) {
       console.error('Error toggling playback:', error);
@@ -273,9 +266,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   };
 
   const toggleYouTubeMute = () => {
-    console.log('Toggle mute clicked, player ref:', youtubePlayerRef.current);
     if (!youtubePlayerRef.current || !youtubePlayerRef.current.mute) {
-      console.log('YouTube player not ready yet');
       return;
     }
     
@@ -283,11 +274,9 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
       if (isVideoMuted) {
         youtubePlayerRef.current.unMute();
         setIsVideoMuted(false);
-        console.log('Unmuting video');
       } else {
         youtubePlayerRef.current.mute();
         setIsVideoMuted(true);
-        console.log('Muting video');
       }
     } catch (error) {
       console.error('Error toggling mute:', error);
@@ -338,7 +327,6 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
       if (variationIndex !== -1) {
         emblaMainApi.scrollTo(variationIndex);
       } else {
-        // console.log("Image with Variation ID not found in gallery.");
       }
       return;
     }

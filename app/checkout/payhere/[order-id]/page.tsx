@@ -44,12 +44,15 @@ const OrderStatusMessage = ({ status }: { status: string }) => {
     );
   }
 
-  if( status == "phauthorized"){
+  if (status == "phauthorized") {
     return (
       <div className="mb-8 rounded-lg bg-blue-50 p-6 text-center">
-        <p className="text-blue-600">Your order has been Paid and Authorized. Our team will review this and proceed order</p>
+        <p className="text-blue-600">
+          Your order has been Paid and Authorized. Our team will review this and
+          proceed order
+        </p>
       </div>
-    )
+    );
   }
 
   return null;
@@ -130,22 +133,16 @@ export default function PayherePaymentPage({ params }: any) {
     [orderData, customerData]
   );
 
-
-
   if (!orderData) {
     return <OrderPaymentPageSkeleton />;
   }
 
   if (orderError) {
-    console.log("orderError", orderError);
   }
   const orderStatus = orderData?.order?.status?.toLowerCase() ?? "pending";
 
   let parsedOrderData = orderData?.order;
   let email = customerData?.customer?.email;
-  // console.log("parsedOrderData", parsedOrderData);
-  // console.log("orderStatus", orderStatus);
-  // console.log("temporaryPaymentDetails", temporaryPaymentDetails);
   return (
     <>
       <Script
@@ -153,7 +150,7 @@ export default function PayherePaymentPage({ params }: any) {
         src="https://www.payhere.lk/lib/payhere.js"
         strategy="afterInteractive"
         onLoad={() => {
-          console.log("PayHere script loaded");
+          // PayHere script loaded successfully
         }}
         onError={() => {
           console.error("Error loading PayHere script");
@@ -165,19 +162,26 @@ export default function PayherePaymentPage({ params }: any) {
         <div className="my-4">
           {/* Order Status Message */}
           <OrderStatusMessage status={orderStatus} />
-          
+
           {/* Email Notification */}
           <div className="mb-6 text-gray-600">
-            Order details will be sent to your email: <span className="font-medium">{email}</span>
+            Order details will be sent to your email:{" "}
+            <span className="font-medium">{email}</span>
           </div>
 
           {/* Payment Section - Only show for pending/processing orders */}
-          {(orderStatus === 'pending' || orderStatus === 'processing') && (
-            <PaymentSection orderData={temporaryPaymentDetails} CoreOrderData={orderData} />
+          {(orderStatus === "pending" || orderStatus === "processing") && (
+            <PaymentSection
+              orderData={temporaryPaymentDetails}
+              CoreOrderData={orderData}
+            />
           )}
 
           {/* Order Details */}
-          <OrderDetails orderData={temporaryPaymentDetails} orderStatus={orderStatus} />
+          <OrderDetails
+            orderData={temporaryPaymentDetails}
+            orderStatus={orderStatus}
+          />
 
           {/* Product Table */}
           <div className="">

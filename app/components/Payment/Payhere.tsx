@@ -22,7 +22,6 @@ const tranformDataForPayhere = async (
   paymentDetails_: PaymentDetailsWithoutUrls
 ): Promise<PayhereTransactionData | null> => {
 
-  // console.log("paymentDetails_: ", paymentDetails_);
   let hash: string | null = await getPaymentHash(paymentDetails_);
 
   if (!hash) {
@@ -72,7 +71,6 @@ export const usePayhere = () => {
   //       input: { orderId: TEST ? 1234 : orderId, status: "COMPLETED" }
   //     },
   //   });
-  //   console.log("data on the complete order Mutation: ", data);
   //   return data;
   // };
 
@@ -80,7 +78,6 @@ export const usePayhere = () => {
     paymentDetails: PaymentDetailsWithoutUrls | null,
     setPayhereHandleStatus: (status: PayhereStatus) => void
   ) => {
-    console.log("paymentDetails in initatePayment: ", paymentDetails);
     
 
     if (window?.payhere ) {
@@ -89,13 +86,9 @@ export const usePayhere = () => {
         return null;
       }
       
-      // console.log("paymentDetails: ", paymentDetails);a
       // this for real data
-      console.log("TEST: ", TEST)
       let dynamicData = await tranformDataForPayhere(paymentDetails);
       // let dynamicDataTest = await tranformDataForPayhere(TEST_STATIC_DATA);
-      console.log("dynamicData: ", dynamicData);
-      // console.log("dynamicDataTest: ", dynamicDataTest);
 
       if(!window?.payhere) {
         alert("Payhere is not initialized");
@@ -108,34 +101,28 @@ export const usePayhere = () => {
       window.onerror = function onError(error: any) {
         // setPayhereHandleStatus("error");
         // alert("Error Happened while Payhere:" + error);
-        console.log("Error Happened while Payhere:", error);
       };
       
       window.payhere.onError = function onError(error: any) {
         setPayhereHandleStatus("error");
         // alert("Error Happened while Payhere:" + error);
-        console.log("Error Happened while Payhere:", error);
         alert("Error Happened while Payhere:" + error);
       };
 
       window.payhere.onDismissed = function onDismissed() {
         setPayhereHandleStatus("dismissed");
-        console.log("Dismissed");
         // alert("Dismissed");
       }
 
       // Payment completed. It can be a successful failure.
       window.payhere.onCompleted = function onCompleted(orderId: any) {
-        console.log("Payment completed successfully", orderId);
         setPayhereHandleStatus("finished");
         
         // onPaymentCompleted(paymentDetails, orderId);
         // completePaymentWithOrder(orderId)
         // .then((data: any) => {
-        //   console.log("Payhere Completion data: ", data);
         // })
         // .catch((e: any) => {
-        //   console.log("Error on payhere Complete: ", e);
         //   alert("Something went wrong on the PAYHERE PAYMENT PROCESS");
         // });
         // window.location.href = `/checkout/${orderId}`;

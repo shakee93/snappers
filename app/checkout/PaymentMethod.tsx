@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Radio from "shared/Radio/Radio";
@@ -52,7 +52,6 @@ const PaymentMethod: FC<Props> = ({
   });
 
   const { cart, loading } = useCart();
-  // console.log("cart: ", cart);
 
   const removePayhereOnMobileAndTab = () => {
     try {
