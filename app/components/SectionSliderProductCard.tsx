@@ -48,16 +48,63 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
     return () => clearTimeout(timer);
   }, []);
 
-  // Auto-slide functionality
+  // Auto-slide functionality with pause on hover
   useEffect(() => {
-    if (!api) return;
+    if (!api || !mounted) return;
 
-    const interval = setInterval(() => {
-      api.scrollNext();
-    }, 3000);
+    let interval: NodeJS.Timeout;
 
-    return () => clearInterval(interval);
-  }, [api]);
+    const startAutoSlide = () => {
+      interval = setInterval(() => {
+        api.scrollNext();
+      }, 3000);
+    };
+
+    const stopAutoSlide = () => {
+      if (interval) {
+        clearInterval(interval);
+      }
+    };
+
+    // Start auto-slide initially
+    startAutoSlide();
+
+    // Add event listeners for pause on hover - wait for DOM to be ready
+    const addEventListeners = () => {
+      const carouselElement = document.querySelector('.nc-SectionSliderProductCard .py-4');
+      if (carouselElement) {
+        carouselElement.addEventListener('mouseenter', stopAutoSlide);
+        carouselElement.addEventListener('mouseleave', startAutoSlide);
+        return carouselElement;
+      }
+      return null;
+    };
+
+    // Try to add event listeners immediately, or retry after a short delay
+    let carouselElement = addEventListeners();
+    if (!carouselElement) {
+      const timeoutId = setTimeout(() => {
+        carouselElement = addEventListeners();
+      }, 100);
+      
+      return () => {
+        stopAutoSlide();
+        clearTimeout(timeoutId);
+        if (carouselElement) {
+          carouselElement.removeEventListener('mouseenter', stopAutoSlide);
+          carouselElement.removeEventListener('mouseleave', startAutoSlide);
+        }
+      };
+    }
+
+    return () => {
+      stopAutoSlide();
+      if (carouselElement) {
+        carouselElement.removeEventListener('mouseenter', stopAutoSlide);
+        carouselElement.removeEventListener('mouseleave', startAutoSlide);
+      }
+    };
+  }, [api, mounted]);
 
   const filteredProducts = products.filter((p) => p.price);
 
