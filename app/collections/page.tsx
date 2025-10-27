@@ -1,7 +1,5 @@
-import { Metadata, ResolvingMetadata } from "next";
 import { getClient } from "@/graphql/apollo-ssr";
 import { GET_ALL_PRODUCTS } from "@/graphql/defs/products";
-import InstantSearchWrapper from "@/app/components/InstantSearchWrapper";
 import { Category } from "@/graphql/types/graphql";
 import Link from "next/link";
 
@@ -15,15 +13,6 @@ async function getData(categories: number[] | null = null) {
     brands: data.brands.nodes,
   };
 }
-
-type Props = {
-  params: {
-    slug: string;
-    brand: string;
-  };
-};
-
-
 
 const Page = async () => {
   const { productCategories } = await getData();

@@ -28,7 +28,7 @@ export default function BrandsMenu({ onClose }: { onClose: () => void }) {
 
   const handleLinkClick = useCallback(
     (e: React.MouseEvent<HTMLAnchorElement>) => {
-      console.log(`Link clicked: ${e.currentTarget.href}`);
+      // console.log(`Link clicked: ${e.currentTarget.href}`);
       onClose();
     },
     [onClose]

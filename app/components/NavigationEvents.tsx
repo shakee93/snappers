@@ -48,12 +48,10 @@ export function NavigationEvents() {
     useEffect(() => {
         const revalidate = searchParams.has('revalidate')
         if (revalidate) {
-            // console.log('revalidate is true')
             const currentPath = pathname
             fetch(`/api/revalidate?path=${encodeURIComponent(currentPath)}`)
                 .then(response => response.json())
                 .then(data => {
-                    // console.log('Revalidation result:', data)
                     revalidationToast('Page cache revalidated successfully', 'success')
                 })
                 .catch(error => {

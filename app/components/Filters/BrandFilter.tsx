@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonThird from "@/shared/Button/ButtonThird";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
@@ -173,7 +173,6 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
   }, [firstFacets]);
 
   useEffect(() => {
-    // console.log("Faceted brands updated:", facetedBrands);
   }, [facetedBrands]);
 
   return (

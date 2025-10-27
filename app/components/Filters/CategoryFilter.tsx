@@ -1,6 +1,6 @@
 import { Popover, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import React, { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonThird from "@/shared/Button/ButtonThird";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
@@ -86,7 +86,7 @@ const CategoryFilter = ({ categories }: CategoryFilterProps) => {
 
 
     useEffect(() => {
-        console.log('uiState', uiState);
+        // console.log('uiState', uiState);
     }, [uiState])
 
 

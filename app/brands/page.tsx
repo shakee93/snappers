@@ -1,5 +1,5 @@
 import { getClient } from "@/graphql/apollo-ssr";
-import { GET_ALL_BRANDS, GET_ALL_PRODUCTS } from "@/graphql/defs/products";
+import { GET_ALL_BRANDS } from "@/graphql/defs/products";
 import { Brand } from "@/graphql/types/graphql";
 import Link from "next/link";
 import SiteLogo from "@/public/global/gq-logo.png";

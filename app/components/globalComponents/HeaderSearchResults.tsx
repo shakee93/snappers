@@ -41,7 +41,7 @@ const HeaderSearchResults = ({ brands, productCategories }: SearchBarProps) => {
     }, [searchParams])
 
     useEffect(() => {
-        console.log('search', search)
+        // console.log('search', search)
     }, [search])
 
 

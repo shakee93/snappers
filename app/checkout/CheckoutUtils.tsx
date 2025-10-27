@@ -2,7 +2,6 @@ import { LineItem } from "@/graphql/types/graphql";
 
 export const createProductList = (orderData: any): LineItem[] | null => {
   if (!orderData) return null;
-  console.log("orderData in createProductList", orderData);
   const productArray = orderData?.order?.lineItems?.nodes?.map((item: any) => {
     const productNode = item.variation
       ? item.variation.node
@@ -11,8 +10,6 @@ export const createProductList = (orderData: any): LineItem[] | null => {
 
     return productName;
   });
-  // console.log("PRODUCT ARRAY", productArray);
-
   return productArray.join(", ");
 };
 
@@ -20,9 +17,9 @@ interface ProductTableRowsProps {
   lineItems: LineItem[];
 }
 
-export const ProductTableRows: React.FC<ProductTableRowsProps> = ({
+export const ProductTableRows = ({
   lineItems,
-}) => (
+}: ProductTableRowsProps) => (
   <>
     {lineItems.map((item: LineItem, index: number) => (
       <tr key={index}>

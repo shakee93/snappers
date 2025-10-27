@@ -35,7 +35,6 @@ const BankTransfer: React.FC<BankTransferProps> = ({
   };
 
   // useEffect(() => {
-  //   console.log("Payment Details:", paymentDetails);
   //   if (paymentDetails) {
   //     setOrderId(paymentDetails.order_id);
   //   } else {
@@ -67,7 +66,6 @@ const BankTransfer: React.FC<BankTransferProps> = ({
 
       // Check if order_id exists
       if (!paymentDetails.order_id) {
-        console.log("Order ID not found");
         setLoading(false);
         toast.error("Order not created");
         return;
@@ -99,11 +97,8 @@ const BankTransfer: React.FC<BankTransferProps> = ({
         toast.success(
           "Upload successful! We'll redirect you to our thank you page. Thank you!"
         );
-        console.log("order_id", order_id);
-        console.log("typeof order_id", typeof order_id);
         if (typeof order_id !== "string") {
           const confirmation = await sentConfirmation(order_id as number);
-          console.log("confirmation", confirmation);
         }
 
 

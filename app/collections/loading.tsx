@@ -1,6 +1,3 @@
-import ArchiveLoading from "@/app/components/archive/ArchiveLoading";
-
-
 const LoadingBrands = () => {
 
     const list = 20;

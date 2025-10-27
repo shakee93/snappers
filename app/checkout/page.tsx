@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FetchResult, useMutation, useQuery } from "@apollo/client";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import Checkbox from "@/shared/Checkbox/Checkbox";
@@ -68,43 +68,6 @@ const CheckoutPage = () => {
     | "order-cart"
   >("ContactInfo");
 
-  // const FORMDATA_DUMMY_OBJECT = {
-  //   contactInfo: {
-  //     phone: "0750278330",
-  //     email: "shadeersadikeen@gmail.com",
-  //   },
-  //   deliveryAddress: {
-  //     firstName: "shadeer",
-  //     lastName: "sadikeen",
-  //     address: "123",
-  //     apartment: "araliya uyana, megoda kolonnawa",
-  //     city: "welllampitiya , colombo",
-  //     state: "",
-  //     postal: "",
-  //     country: "LK",
-  //     addressType: "home",
-  //   },
-  //   billingAddress: {
-  //     firstName: "shadeer",
-  //     lastName: "sadikeen",
-  //     address: "123",
-  //     apartment: "araliya uyana, megoda kolonnawa",
-  //     city: "welllampitiya , colombo",
-  //     state: "",
-  //     postal: "",
-  //     country: "LK",
-  //     addressType: "home",
-  //   },
-  //   paymentMethod: {
-  //     selectedGateway: {
-  //       id: "bacs",
-  //       title: "Direct bank transfer",
-  //     },
-  //   },
-  // };
-
-  // const [formData, setFormData] = useState(FORMDATA_DUMMY_OBJECT);
-
   const [formData, setFormData] = useState<FormData>({
     contactInfo: {},
     deliveryAddress: {},
@@ -150,7 +113,6 @@ const CheckoutPage = () => {
     setTOC(updatedTOC);
 
     // Log the updated value
-    // console.log({ updatedTOC });
   };
   // TODO: Uncomment this for the redirect on cart free
   useEffect(() => {
@@ -177,9 +139,6 @@ const CheckoutPage = () => {
     },
   ] = useMutation(CHECKOUT);
 
-  // console.log("realCheckoutData", realCheckoutData);
-  // console.log("realCheckoutLoading", realCheckoutLoading);
-  // console.log("realCheckoutError", realCheckoutError);
   const [completeOrderPayment] = useMutation(COMPLETE_ORDER_PAYMENT);
   // const  [createOrderGuest] = useMutation(GUEST_CHECKOUT_MUTATION)
   const [
@@ -187,8 +146,6 @@ const CheckoutPage = () => {
     { loading: guestCheckoutLoading, error: guestCheckoutError },
   ] = useMutation(GUEST_CHECKOUT);
 
-  // console.log("guestCheckoutLoading", guestCheckoutLoading);
-  // console.log("guestCheckoutError", guestCheckoutError);
 
   // Creating a Order using For Guest. Instead of using direct checkout mutation.
   const [
@@ -200,9 +157,6 @@ const CheckoutPage = () => {
   const router = useRouter();
   const initiatePayment = usePayhere();
 
-  // console.log('cart', cart);
-  // console.log('paymentGateways', paymentGateways);
-  // console.log('formData', formData);
 
   useEffect(() => {
     const hasFreeShipping: any = cart?.appliedCoupons?.some(
@@ -214,8 +168,6 @@ const CheckoutPage = () => {
   }, [cart]);
 
   const updateFormData = (section: string, data: any) => {
-    // console.log("data", JSON.stringify(data, null, 2));
-    // console.log("section", JSON.stringify(section, null, 2));
     // Form data changing here!.
 
     setFormData((prevData) => {
@@ -339,7 +291,6 @@ const CheckoutPage = () => {
       date,
     } = checkoutDetails;
 
-    // console.log('subtotal', subtotal);
 
     const updatedCheckoutDetails = {
       ...checkoutDetails,
@@ -383,7 +334,6 @@ const CheckoutPage = () => {
   }, [paymentData]);
 
   const handleCheckoutProcess = async () => {
-    // console.log("isConfirmed", isConfirmed);
     let errors = [];
     if (!isConfirmed.contactInfo) {
       errors.push("Contact info is missing.");
@@ -517,9 +467,6 @@ const CheckoutPage = () => {
           : await checkoutMutation({ variables });
 
 
-      console.log("data on handleCheckout() ", data);
-
-      console.log("errors on handleCheckout() ", errors);
       // Store order data in localStorage for both guest and logged-in users
       if (data) {
         localStorage.setItem("last_order", JSON.stringify(data));
@@ -532,7 +479,6 @@ const CheckoutPage = () => {
         };
         localStorage.setItem("last_order", JSON.stringify(data));
         handleKoko(orderData);
-        // console.log('isKokoPayment', isKokoPayment);
       }
 
       // FOR GUEST CHECKOUT
@@ -541,7 +487,6 @@ const CheckoutPage = () => {
       const isBankTransfer =
         formData?.paymentMethod?.selectedGateway?.id == "bacs";
 
-      // console.log("data just below guest checkout", data);
       const isGuest = customer?.id === "guest";
 
       if (isPayhere && isGuest) {
@@ -587,7 +532,6 @@ const CheckoutPage = () => {
         return null;
       }
     } catch (error) {
-      console.log("error on handleCheckout() ", error);
       handleCheckoutError(error);
     } finally {
       setLoading(false);
@@ -614,7 +558,6 @@ const CheckoutPage = () => {
 
   const handleCheckoutError = (error: any) => {
     setLoading(false);
-    console.log("error: ", error);
 
     // Handle network errors
     if (error.networkError) {
@@ -731,7 +674,6 @@ const CheckoutPage = () => {
 
   const numericOrderTotal = replaceStringinInt(orderTotal);
   const cartSubtotal = replaceStringinInt(cart?.subtotal);
-  // console.log('numericOrderTotal', numericOrderTotal);
   const threePercentFromTotal = numericOrderTotal * 0.03;
   const TotalWithKoko = (cartSubtotal / 88) * 100;
   const taxWithTotal = (numericOrderTotal + threePercentFromTotal).toFixed(2);
@@ -831,7 +773,9 @@ const CheckoutPage = () => {
       <Script
         type="text/javascript"
         src={"https://www.payhere.lk/lib/payhere.js"}
-        onLoad={() => console.log("PayHere script loaded")}
+        onLoad={() => {
+          // PayHere script loaded successfully
+        }}
         onError={() => console.error("Error loading PayHere script")}
       />
 

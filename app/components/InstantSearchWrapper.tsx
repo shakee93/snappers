@@ -36,7 +36,6 @@ const DelayedRender: React.FC<{ delay: number; children: React.ReactNode }> = ({
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsVisible(true);
-      // console.log('DelayedRender');
     }, delay);
 
     return () => clearTimeout(timer);
@@ -130,7 +129,6 @@ const InstantSearchWrapper = ({
       }
     });
 
-    // console.log({ f });
 
     return f.filter((n) => n).join(" && ");
   };
@@ -187,7 +185,6 @@ const InstantSearchWrapper = ({
     const _state = useStore.getState();
     const _sidebar = _state.sidebar;
 
-    console.log('stateToRoute', _sidebar?.categories, uiState.product.categories);
 
     // Build URL params object
     const params: Record<string, string | undefined> = {
@@ -216,7 +213,6 @@ const InstantSearchWrapper = ({
 
   // this maps the route state to the ui state
   const routeToState = useCallback((routeState: any) => {
-    console.log('routeToState', routeState);
 
     // Sync categories
     if (routeState?.categories?.length > 0) {

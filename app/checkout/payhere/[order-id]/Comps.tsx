@@ -1,7 +1,7 @@
 import { PayhereStatus, PaymentDetailsWithoutUrls } from "@/data/types";
 import { usePayhere } from "@/app/components/Payment/Payhere";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
-import React, { useState } from "react";
+import { useState } from "react";
 
 import { toast } from "sonner";
 import Link from "next/link";
@@ -17,7 +17,6 @@ export const OrderDetails: React.FC<OrderDetailsProps> = ({
   orderData,
   orderStatus,
 }) => {
-
   if (!orderData) return null;
 
   const formatCurrency = (value: string) => {
@@ -89,8 +88,6 @@ export const OrderDetails: React.FC<OrderDetailsProps> = ({
   );
 };
 
-
-
 type ProductTableProps = {
   lineItems?: LineItem[];
   orderData?: any;
@@ -118,7 +115,6 @@ const ProductTable: React.FC<ProductTableProps> = ({
             ${orderData.city}
             ${orderData.country}`.trim();
   };
-  console.log("lineItems new section", lineItems);
 
   return (
     <>
@@ -199,7 +195,6 @@ export const PaymentSection = ({ orderData, CoreOrderData }: any) => {
   const handlePayherePayment = async () => {
     try {
       const rawAmount = orderData.total.replace(/[^0-9.]/g, "");
-      console.log("order data in payhere", orderData);
       const paymentDetails: PaymentDetailsWithoutUrls = {
         order_id: orderData.order_id,
         items: createProductList(CoreOrderData) || [],
@@ -217,7 +212,6 @@ export const PaymentSection = ({ orderData, CoreOrderData }: any) => {
 
         city: orderData.city,
       };
-
 
       await initiatePayment(paymentDetails, setPayhereStatus);
     } catch (error) {
@@ -274,4 +268,3 @@ export const PaymentSection = ({ orderData, CoreOrderData }: any) => {
 };
 
 export default ProductTable;
-

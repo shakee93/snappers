@@ -27,7 +27,7 @@ const VideoSection = ({
             setIsVideoPlaying(true);
           })
           .catch((error) => {
-            console.log("Video play failed:", error);
+            // console.log("Video play failed:", error);
           });
       } else {
         // If video isn't ready, wait for it to load
@@ -40,7 +40,7 @@ const VideoSection = ({
                 setIsVideoPlaying(true);
               })
               .catch((error) => {
-                console.log("Video play failed:", error);
+                // console.log("Video play failed:", error);
               });
           },
           { once: true }

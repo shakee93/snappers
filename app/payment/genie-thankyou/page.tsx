@@ -27,7 +27,7 @@ const GenieThankYouContent = () => {
     const timestamp = new Date().toISOString();
     const logEntry = `[${timestamp}] ${message}`;
     setLogs(prev => [...prev, logEntry]);
-    console.log(logEntry);
+    // console.log(logEntry);
   };
 
   useEffect(() => {

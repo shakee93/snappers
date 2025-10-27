@@ -7,7 +7,7 @@ import {
   ShoppingCart,
   XIcon,
 } from "lucide-react";
-import React, { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
@@ -86,8 +86,6 @@ const ProductCard: FC<ProductCardProps> = ({
   const productName = segments[segments.length - 1];
   const LinkSegments = link.split("/");
   const productLink = LinkSegments[LinkSegments.length - 1];
-  // console.log("Product link:", productLink);
-  // console.log("Product Name:", productName);
 
   const { search, setSearch, search_status } = useStore();
   const { isKokoEnabled } = usePaymentGateways();
@@ -145,7 +143,6 @@ const ProductCard: FC<ProductCardProps> = ({
           "You've reached the maximum quantity allowed for this item."
         );
       } else {
-        console.log('error', error);
         toast.error(error.message);
       }
     } finally {
@@ -160,8 +157,6 @@ const ProductCard: FC<ProductCardProps> = ({
   // Calculate the lowest and highest prices among in-stock variations
   let lowestPrice = price;
   let lowestSalePrice = regularPrice;
-  // console.log('lowestPrice', name, lowestPrice);
-  // console.log('lowestSalePrice', name, lowestSalePrice);
 
   let highestPrice = price;
   if (variations?.nodes) {
@@ -171,7 +166,6 @@ const ProductCard: FC<ProductCardProps> = ({
     highestPrice = Math.max(...prices).toString();
   }
 
-  // console.log('highestPrice', name, highestPrice);
 
   if (type === "VARIABLE" && variations?.nodes) {
     const inStockVariations = variations.nodes.filter(

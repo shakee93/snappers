@@ -1,4 +1,4 @@
-import React, { FC, useState, useCallback, useEffect } from "react";
+import { FC, useState, useCallback, useEffect } from "react";
 import { useStore } from "@/store/store";
 import LikeButton from "@/app/components/LikeButton";
 import {
@@ -30,19 +30,19 @@ export interface ProductQuickViewProps {
   brands?: any;
 }
 
-const ProductQuickView: FC<ProductQuickViewProps> = ({
+const ProductQuickView = ({
   className = "",
   product,
   brands,
-}) => {
-  const [variantActive, setVariantActive] = React.useState(0);
-  const [sizeSelected, setSizeSelected] = React.useState("");
-  const [qualitySelected, setQualitySelected] = React.useState(1);
+}: ProductQuickViewProps) => {
+  const [variantActive, setVariantActive] = useState(0);
+  const [sizeSelected, setSizeSelected] = useState("");
+  const [qualitySelected, setQualitySelected] = useState(1);
   const {
     product: { attribute },
     setAttribute,
   } = useStore();
-  const [techspecs, setTechSpecs] = React.useState(null);
+  const [techspecs, setTechSpecs] = useState(null);
 
   const [manualTechSpecs, setManualTechSpecs] = useState<any>([]);
 
@@ -63,7 +63,6 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({
     product?.galleryImages?.nodes[1]?.sourceUrl ?? "",
   ];
 
-  // console.log({ product });
 
   const [getTechSpec, { loading, error, data }] = useLazyQuery(GET_TECH_SPEC, {
     variables: {
@@ -83,7 +82,6 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({
       if (dataIn) {
         setTechSpecs(dataIn);
 
-        // console.log(dataIn);
 
         const manualMeta = dataIn?.product?.metaData;
         const techSpecDataObject = manualMeta?.find(
@@ -196,7 +194,6 @@ const ProductQuickView: FC<ProductQuickViewProps> = ({
     return null;
   };
 
-  // console.log("product", product);
 
   const renderSectionContent = () => {
     return (

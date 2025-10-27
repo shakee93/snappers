@@ -5,7 +5,7 @@ import {
 import { CustomerAddress } from "@/graphql/types/graphql";
 import Label from "components/Label/Label";
 import { BadgeMinus, Check, Receipt } from "lucide-react";
-import React, { FC, useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Input from "shared/Input/Input";

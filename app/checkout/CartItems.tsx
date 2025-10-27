@@ -1,4 +1,3 @@
-import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import NcInputNumber from "components/NcInputNumber";
@@ -45,12 +44,12 @@ interface CartItemsProps {
   onRemove: (keys: string[]) => void;
 }
 
-const cartItems: React.FC<CartItemsProps> = ({
+const cartItems = ({
   item,
   index,
   onQuantityChange,
   onRemove,
-}) => {
+}: CartItemsProps) => {
   const { product, quantity, key, subtotal, total, variation } = item;
   const { node } = product || {};
   const { name, price, image, terms, brands, type } = node || {};

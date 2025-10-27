@@ -1,6 +1,6 @@
 import ButtonClose from "@/shared/ButtonClose/ButtonClose";
 import { Dialog, Transition } from "@headlessui/react";
-import React, { Fragment, useEffect } from "react";
+import { Fragment, useEffect, useState } from "react";
 import BankTransfer from "./BankTransfer";
 
 const PaymentModal = ({
@@ -16,19 +16,14 @@ const PaymentModal = ({
     setShowBankTransfer(false);
   };
 
-  const [isOpen, setIsOpen] = React.useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   useEffect(() => {
 
     setIsOpen(show);
   },[show])
 
-  // useEffect(() => {
-  //   // paymentDetails.email = customerEmail;
-  //   console.log("use Effect Payment Details:", paymentDetails);
-  // }, [paymentDetails]);
 
   // let updatedPaymentDetails = paymentDetails ? { ...paymentDetails } : null;
-  // console.log("updatedPaymentDetails: ", paymentDetails);
 
   // if (updatedPaymentDetails) {
   //   updatedPaymentDetails.email = customerEmail;

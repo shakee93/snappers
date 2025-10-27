@@ -13,7 +13,6 @@ import Link from "next/link";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCart } from "@/context/CartProvider";
-import { sentConfirmation } from "@/components/AddressPageComps/HelperComps";
 
 export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   const router = useRouter();
@@ -26,10 +25,6 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     { fetchPolicy: "no-cache" },
   );
 
-  // console.log('customerData', customerData);
-
-  // console.log({ orderId });
-  // console.log({ searchParams });
 
 
   const order_id = useSearchParams().get('order_id');
@@ -62,8 +57,6 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   const key = useSearchParams().get('key');
   const wcApi = useSearchParams().get('wc-api');
 
-  console.log('orderIdParam', orderIdUrl);
-  console.log('status', status);
   
   const lastOrder = localStorage.getItem('last_order');
   if (lastOrder && trnId && status !== "FAILURE") {
@@ -86,7 +79,6 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
           });
 
           const data = await response.json();
-          console.log('Koko verification response:', data);
         } catch (error) {
           console.error('Error sending Koko verification:', error);
         }
@@ -180,16 +172,6 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
           </Link>
         </div>
 
-        {/* <h1 className="py-20 text-center text-2xl font-bold">
-          <OrderDetails orderData={orderData} />
-          <h1>Checkout</h1>
-          <p>Order ID: {order_id}</p>
-          <p>Name: {first_name} {last_name}</p>
-          <p>Email: {email}</p>
-          <p>Address: {address}</p>
-          <p>Amount: {amount}</p>
-          <p>Items: {items}</p>
-        </h1> */}
       </>
     );
 
@@ -278,7 +260,6 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     variables: { orderID: orderId },
   });
 
-  console.log('order data', orderData);
 
   useEffect(() => {
     const clearCartSafely = async () => {
