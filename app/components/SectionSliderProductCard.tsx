@@ -1,5 +1,5 @@
 "use client";
-import React, { FC, useEffect, useState, useCallback } from "react";
+import React, { FC, useEffect, useState, useCallback, useRef } from "react";
 import Heading from "@/app/components/Heading/Heading";
 import ProductCard from "@/app/components/ProductCard3";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
@@ -37,6 +37,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
   const [mounted, setMounted] = useState(false);
   const [showSkeleton, setShowSkeleton] = useState(true);
   const [api, setApi] = useState<CarouselApi>();
+  const carouselRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     // Simulate loading time and then show the carousel
@@ -69,32 +70,11 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
     // Start auto-slide initially
     startAutoSlide();
 
-    // Add event listeners for pause on hover - wait for DOM to be ready
-    const addEventListeners = () => {
-      const carouselElement = document.querySelector('.nc-SectionSliderProductCard .py-4');
-      if (carouselElement) {
-        carouselElement.addEventListener('mouseenter', stopAutoSlide);
-        carouselElement.addEventListener('mouseleave', startAutoSlide);
-        return carouselElement;
-      }
-      return null;
-    };
-
-    // Try to add event listeners immediately, or retry after a short delay
-    let carouselElement = addEventListeners();
-    if (!carouselElement) {
-      const timeoutId = setTimeout(() => {
-        carouselElement = addEventListeners();
-      }, 100);
-      
-      return () => {
-        stopAutoSlide();
-        clearTimeout(timeoutId);
-        if (carouselElement) {
-          carouselElement.removeEventListener('mouseenter', stopAutoSlide);
-          carouselElement.removeEventListener('mouseleave', startAutoSlide);
-        }
-      };
+    // Add event listeners for pause on hover using ref
+    const carouselElement = carouselRef.current;
+    if (carouselElement) {
+      carouselElement.addEventListener('mouseenter', stopAutoSlide);
+      carouselElement.addEventListener('mouseleave', startAutoSlide);
     }
 
     return () => {
@@ -140,7 +120,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
 
         {/* Show Carousel when loaded */}
         {!showSkeleton && mounted && (
-          <div className="py-4 relative">
+          <div ref={carouselRef} className="py-4 relative">
             <Carousel
               opts={{
                 align: "start",

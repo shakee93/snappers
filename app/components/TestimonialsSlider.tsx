@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Star } from 'lucide-react'
 import {
   Carousel,
@@ -72,6 +72,7 @@ export default function TestimonialsSlider({ reviews }: TestimonialsSliderProps)
     const [api, setApi] = useState<CarouselApi>()
     const [current, setCurrent] = useState(0)
     const [count, setCount] = useState(0)
+    const carouselRef = useRef<HTMLDivElement>(null)
 
     // Transform GraphQL reviews to testimonials format, fallback to static data
     const testimonials: Testimonial[] = reviews && reviews.length > 0 
@@ -115,32 +116,11 @@ export default function TestimonialsSlider({ reviews }: TestimonialsSliderProps)
         // Start auto-slide initially
         startAutoSlide();
 
-        // Add event listeners for pause on hover - wait for DOM to be ready
-        const addEventListeners = () => {
-            const carouselElement = document.querySelector('.w-full.mx-auto.px-4.py-8 .relative');
-            if (carouselElement) {
-                carouselElement.addEventListener('mouseenter', stopAutoSlide);
-                carouselElement.addEventListener('mouseleave', startAutoSlide);
-                return carouselElement;
-            }
-            return null;
-        };
-
-        // Try to add event listeners immediately, or retry after a short delay
-        let carouselElement = addEventListeners();
-        if (!carouselElement) {
-            const timeoutId = setTimeout(() => {
-                carouselElement = addEventListeners();
-            }, 100);
-            
-            return () => {
-                stopAutoSlide();
-                clearTimeout(timeoutId);
-                if (carouselElement) {
-                    carouselElement.removeEventListener('mouseenter', stopAutoSlide);
-                    carouselElement.removeEventListener('mouseleave', startAutoSlide);
-                }
-            };
+        // Add event listeners for pause on hover using ref
+        const carouselElement = carouselRef.current;
+        if (carouselElement) {
+            carouselElement.addEventListener('mouseenter', stopAutoSlide);
+            carouselElement.addEventListener('mouseleave', startAutoSlide);
         }
 
         return () => {
@@ -157,7 +137,7 @@ export default function TestimonialsSlider({ reviews }: TestimonialsSliderProps)
             {/* Section Title */}
 
             {/* Testimonials Carousel */}
-            <div className="relative">
+            <div ref={carouselRef} className="relative">
                 <Carousel
                     opts={{
                         align: "start",
