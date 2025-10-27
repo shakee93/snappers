@@ -265,10 +265,22 @@ const ProductCard: FC<ProductCardProps> = ({
       data-nc-id="ProductCard"
     >
       {/* Sale Badge - Outside image container */}
-      {stockStatus === "IN_STOCK" && salePrice && regularPrice && parsePrice(salePrice) < parsePrice(regularPrice) && (
-        <div className="absolute left-0 top-4 z-10 cursor-pointer bg-green-600 w-fit font-normal text-xs text-white px-3 py-1.5 rounded-r-full shadow-md">
-          SALE!
-        </div>
+      {stockStatus === "IN_STOCK" && (
+        (() => {
+
+          if ((parsePrice(salePrice) > 0 && parsePrice(regularPrice) > 0) && parsePrice(salePrice) < parsePrice(regularPrice)) {
+            // Calculate discount in 5% increments
+            let rawDiscount =
+              ((parsePrice(regularPrice) - parsePrice(salePrice)) / parsePrice(regularPrice)) * 100;
+            let roundedDiscount = Math.round(rawDiscount / 5) * 5;
+            return (
+              <div className="absolute left-0 top-4 z-10 cursor-pointer bg-green-600 w-fit font-normal text-xs text-white px-3 py-1.5 rounded-r-full shadow-md">
+                {roundedDiscount}% OFF!
+              </div>
+            );
+          }
+          return null;
+        })()
       )}
       {stockStatus !== "IN_STOCK" && (
         <div className="absolute left-2 top-2 z-10 bg-gradient-to-b w-fit from-gray-500/30 font-semibold to-gray-400/5 text-xs text-gray-900 px-4 py-2 rounded-full">
