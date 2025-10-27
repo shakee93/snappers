@@ -99,7 +99,6 @@ export async function generateMetadata(
 
   return {
     title: product.name,
-    // description: `This ${product.name} is at GQMobile.lk. The best price in Sri Lanka for ${brand.name} priced at ${price}.`,
     description: `This ${product.name} is at GQMobile.lk. The best price in Sri Lanka for ${brand.name} priced at Rs.${price}.`,
 
     openGraph: {

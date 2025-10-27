@@ -76,16 +76,14 @@ const OrderHeader = ({ order }: any) => (
   <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center p-4 sm:p-8 bg-slate-50 dark:bg-slate-500/5">
     <div>
       {order?.paymentMethod === "payhere" ? (
-        <Link 
+        <Link
           href={`/checkout/payhere/${order?.orderNumber}`}
           className="text-lg font-semibold hover:text-primary-600 hover:underline"
         >
           #{order?.orderNumber}
         </Link>
       ) : (
-        <span className="text-lg font-semibold">
-          #{order?.orderNumber}
-        </span>
+        <span className="text-lg font-semibold">#{order?.orderNumber}</span>
       )}
       <p className="text-slate-500 dark:text-slate-400 text-sm mt-1.5 sm:mt-2">
         <span>{formatDate(order?.date)}</span>
@@ -111,7 +109,7 @@ const OrderHeader = ({ order }: any) => (
       </p>
     </div>
     {order?.paymentMethod === "payhere" && (
-      <Link 
+      <Link
         href={`/checkout/payhere/${order?.orderNumber}`}
         className="mt-3 sm:mt-0 text-primary-600 hover:text-primary-700 text-sm font-medium hover:underline"
       >

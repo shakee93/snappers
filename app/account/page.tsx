@@ -1,6 +1,6 @@
 "use client";
 
-import React, { FC, useEffect, useState } from "react";
+import { FC, useEffect, useState } from "react";
 import Input from "@/shared/Input/Input";
 import Label from "@/components/Label/Label";
 import Select from "@/shared/Select/Select";
@@ -33,7 +33,6 @@ const AccountPage: FC = () => {
       return () => clearTimeout(timeoutId);
     }
   }, [customer, router]);
-
 
   useEffect(() => {
     if (customer) {

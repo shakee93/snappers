@@ -1,6 +1,4 @@
 import BgGlassmorphism from "@/components/BgGlassmorphism/BgGlassmorphism";
-import AwesomeSlider from "react-awesome-slider";
-import "react-awesome-slider/dist/styles.css";
 import Image from "next/image";
 import StoreImg from "public/store/GqMobiles-Buy-geniune-branded-eletronics-from-GQMobiles-for-best-price-1-1.webp";
 import Img1 from "public/aboutpage/about-img-1-1.jpg";
@@ -31,7 +29,6 @@ const AccountPage = () => {
   ];
   const stats = [
     { id: 1, name: "Products", value: "500+" },
-    // { id: 2, name: "Customers", value: "2000+" },
     { id: 2, name: "Orders Completed", value: "1200+" },
   ];
 
@@ -58,13 +55,6 @@ const AccountPage = () => {
       ratings: 5,
     },
   ];
-  const settings = {
-    dots: true,
-    infinite: true,
-    speed: 500,
-    slidesToShow: 1,
-    slidesToScroll: 1,
-  };
 
   return (
     <div>
