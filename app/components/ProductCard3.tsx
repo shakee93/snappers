@@ -19,6 +19,7 @@ import Prices from "./Prices";
 import useProductLink from "@/hooks/useProductLink";
 import {
   Brand,
+  ProductAttribute,
   ProductVariation,
   SimpleProduct,
   VariableProduct,
@@ -33,11 +34,38 @@ import { redirect, useRouter, usePathname } from "next/navigation";
 import { useStore } from "@/store/store";
 import { usePaymentGateways } from "@/context/PaymentProvider";
 import koko from "@/public/koko.png";
+
 export interface ProductCardProps {
   className?: string;
   data: (SimpleProduct & VariableProduct) | any;
   fromSearch?: boolean;
 }
+
+// Color Preview Component
+interface ColorPreviewProps {
+  variations?: ProductVariation[];
+}
+
+const ColorPreview: FC<ColorPreviewProps> = ({ variations }) => {
+  // Extract unique color values from variations
+  const colors = variations
+    ?.map((variation: ProductVariation) => {
+      const colorAttr = variation.attributes?.nodes?.find(
+        (attribute: any) => attribute.name === 'pa_color'
+      ) as any;
+      return colorAttr?.value;
+    })
+    .filter((color): color is string => !!color && color !== undefined)
+    .filter((color, index, array) => array.indexOf(color) === index) || [];
+
+  if (!colors.length) return null;
+
+  return (
+    <div className="text-xs text-gray-600 font-medium">
+      • {colors.length} {colors.length === 1 ? 'color' : 'colors'}
+    </div>
+  );
+};
 
 const ProductCard: FC<ProductCardProps> = ({
   className = "",
@@ -399,7 +427,7 @@ const ProductCard: FC<ProductCardProps> = ({
 
         {/* Brand */}
         <div className="flex  justify-between gap-2 ">
-          <div className="flex flex-wrap items-center gap-2 ">
+          <div className="flex flex-wrap items-center gap-1 ">
             {brands?.nodes?.map((brand: Brand, index: number) => (
               <Link
                 onClick={() => {
@@ -410,11 +438,14 @@ const ProductCard: FC<ProductCardProps> = ({
                 href={`/${brand?.slug}`}
                 key={index}
               >
+
                 <div className="font-semibold text-xs text-blue-900 px-0 py-0 rounded-full ">
                   {brand?.name}
                 </div>
               </Link>
             ))}
+
+            <ColorPreview variations={variations?.nodes} />
           </div>
 
           {/* INstock badge in green */}
