@@ -16,9 +16,15 @@ const bankDetailsData: BankDetail[] = [
   },
   {
     bank: 'Commercial Bank',
-    accName: 'GQ Mobile Store',
-    accNo: '1720022600',
-    branch: 'Pettah Branch',
+    accName: 'GQ Mobiles Pvt Ltd',
+    accNo: '1000475584',
+    branch: 'Head office',
+  },
+  {
+    bank: 'People’s Bank',
+    accName: 'GQ MOBILES (PVT) LTD',
+    accNo: '309100120010779',
+    branch: 'Liberty Plaza',
   },
   {
     bank: 'HNB',
