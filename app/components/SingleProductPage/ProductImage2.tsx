@@ -184,23 +184,25 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   }, []);
 
   useEffect(() => {
-    // If variation changed from initial, mark as user interaction
-    if (variationId !== initialVariationId.current) {
-      hasUserInteracted.current = true;
+    // If video exists and user hasn't interacted yet, skip all updates
+    if (hasValidVideo && !hasUserInteracted.current) {
+      return;
     }
 
     const activeVariationImage = variationImages.find(i => i.databaseId === variationId);
+
+    // If this is not the initial variation, mark as user interaction
+    const isVariationChange = variationId !== initialVariationId.current;
+    if (isVariationChange) {
+      hasUserInteracted.current = true;
+    }
 
     setGalleryImages(previousImages => {
       if (!previousImages) {
         return initialGalleryImages
       }
 
-      // Only check for user interaction if there's a video
-      // Otherwise, allow normal variation scrolling
-      const shouldPreventScroll = hasValidVideo && !hasUserInteracted.current;
-
-      if (activeVariationImage && !shouldPreventScroll) {
+      if (activeVariationImage) {
         const videoOffset = hasValidVideo ? 1 : 0;
         const newFirstIndex = videoOffset;
         
@@ -260,11 +262,13 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
     [emblaMainApi, emblaThumbsApi, product, pauseAllVideos]
   );
 
-  const onSelect = useCallback(() => {
+  const onSelect = useCallback((isUserTriggered: boolean = false) => {
     if (!emblaMainApi || !emblaThumbsApi) return;
     const newIndex = emblaMainApi.selectedScrollSnap();
     if (newIndex !== selectedIndex) {
-      hasUserInteracted.current = true;
+      if (isUserTriggered) {
+        hasUserInteracted.current = true;
+      }
       pauseAllVideos();
       setSelectedIndex(newIndex);
     }
@@ -272,9 +276,17 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
 
   useEffect(() => {
     if (!emblaMainApi) return;
-    onSelect();
-    emblaMainApi.on("select", onSelect);
-    emblaMainApi.on("reInit", onSelect);
+    onSelect(false); // Initial call, not user triggered
+    
+    // These are user-triggered events
+    const handleUserSelect = () => onSelect(true);
+    emblaMainApi.on("select", handleUserSelect);
+    emblaMainApi.on("reInit", handleUserSelect);
+    
+    return () => {
+      emblaMainApi.off("select", handleUserSelect);
+      emblaMainApi.off("reInit", handleUserSelect);
+    };
   }, [emblaMainApi, onSelect]);
 
   return (
