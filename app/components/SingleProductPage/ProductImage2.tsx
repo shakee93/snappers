@@ -9,7 +9,7 @@ import {
 } from "app/components/SingleProductBlock/ProductCarouselThumb";
 import { EmblaOptionsType } from "embla-carousel";
 import useEmblaCarousel from "embla-carousel-react";
-import { PlayIcon, Volume2, VolumeX, Pause } from "lucide-react";
+import { PlayIcon } from "lucide-react";
 import Image from "next/image";
 import React, { useCallback, useEffect, useState, useRef } from "react";
 // import "styles/embla.css";
@@ -35,9 +35,9 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   const { variationId, activeVariation } = useImage();
   const [variationImageEnabled, setVariationImageEnabled] = useState(false);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
-  const [isVideoMuted, setIsVideoMuted] = useState(true);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const youtubePlayerRef = useRef<any>(null);
+  const hasUserInteracted = useRef(false);
+  const initialVariationId = useRef(variationId);
 
   // const [galleryImages, setGalleryImages]  = useState(product.galleryImages?.nodes.length !== 0
   //     ? product.galleryImages?.nodes
@@ -94,20 +94,17 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
       }
       
       if (videoId) {
-        // Add parameters to prevent carousel, suggestions, and related videos
+        // Add parameters for better experience
         const params = new URLSearchParams({
-          controls: '0',           // No player controls
+          controls: '1',          // Show native controls
           showinfo: '0',          // No title/uploader info
           rel: '0',               // No related videos at end
           modestbranding: '1',    // Minimal YouTube branding
           iv_load_policy: '3',    // No annotations
-          enablejsapi: '1',       // Enable JavaScript API
           mute: '1',              // Muted by default
           loop: '1',              // Loop video (prevents end screen)
           playlist: videoId,      // Required for loop to work
           playsinline: '1',       // Play inline on mobile
-          disablekb: '1',         // Disable keyboard controls
-          fs: '0',                // Disable fullscreen button
         });
         
         if (typeof window !== 'undefined') {
@@ -178,112 +175,20 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   });
 
 
-  const initializeYouTubePlayer = useCallback(() => {
-    const iframe = document.getElementById('youtube-player-iframe');
-    if (iframe && (window as any).YT && (window as any).YT.Player && !youtubePlayerRef.current) {
-      try {
-        youtubePlayerRef.current = new (window as any).YT.Player('youtube-player-iframe', {
-          events: {
-            onReady: (event: any) => {
-            },
-            onStateChange: (event: any) => {
-              if (event.data === (window as any).YT.PlayerState.PLAYING) {
-                setIsVideoPlaying(true);
-              } else if (event.data === (window as any).YT.PlayerState.PAUSED || event.data === (window as any).YT.PlayerState.ENDED) {
-                setIsVideoPlaying(false);
-              }
-            }
-          }
-        });
-      } catch (error) {
-        console.error('Error initializing YouTube player:', error);
-      }
-    }
-  }, []);
-
-  // Load YouTube IFrame API
-  useEffect(() => {
-    if (!isYouTubeUrl(product.productVideoUrl)) return;
-
-    // Check if API is already loaded
-    if ((window as any).YT && (window as any).YT.Player) {
-      // Small delay to ensure iframe is in DOM
-      setTimeout(() => initializeYouTubePlayer(), 100);
-      return;
-    }
-
-    // Check if script is already loading
-    if (document.querySelector('script[src="https://www.youtube.com/iframe_api"]')) {
-      // Script exists, just wait for it to load
-      const checkYT = setInterval(() => {
-        if ((window as any).YT && (window as any).YT.Player) {
-          clearInterval(checkYT);
-          setTimeout(() => initializeYouTubePlayer(), 100);
-        }
-      }, 100);
-      
-      return () => clearInterval(checkYT);
-    }
-
-    // Load the API script
-    const tag = document.createElement('script');
-    tag.src = 'https://www.youtube.com/iframe_api';
-    const firstScriptTag = document.getElementsByTagName('script')[0];
-    firstScriptTag?.parentNode?.insertBefore(tag, firstScriptTag);
-
-    (window as any).onYouTubeIframeAPIReady = () => {
-      setTimeout(() => initializeYouTubePlayer(), 100);
-    };
-  }, [product.productVideoUrl, initializeYouTubePlayer]);
-
   const pauseAllVideos = useCallback(() => {
     // Pause HTML5 video
     if (videoRef.current) {
       videoRef.current.pause();
       setIsVideoPlaying(false);
     }
-    // Pause YouTube video
-    if (youtubePlayerRef.current && youtubePlayerRef.current.pauseVideo) {
-      youtubePlayerRef.current.pauseVideo();
-      setIsVideoPlaying(false);
-    }
   }, []);
 
-  const toggleYouTubePlayback = () => {
-    if (!youtubePlayerRef.current || !youtubePlayerRef.current.playVideo) {
-      return;
-    }
-    
-    try {
-      if (isVideoPlaying) {
-        youtubePlayerRef.current.pauseVideo();
-      } else {
-        youtubePlayerRef.current.playVideo();
-      }
-    } catch (error) {
-      console.error('Error toggling playback:', error);
-    }
-  };
-
-  const toggleYouTubeMute = () => {
-    if (!youtubePlayerRef.current || !youtubePlayerRef.current.mute) {
-      return;
-    }
-    
-    try {
-      if (isVideoMuted) {
-        youtubePlayerRef.current.unMute();
-        setIsVideoMuted(false);
-      } else {
-        youtubePlayerRef.current.mute();
-        setIsVideoMuted(true);
-      }
-    } catch (error) {
-      console.error('Error toggling mute:', error);
-    }
-  };
-
   useEffect(() => {
+    // If variation changed from initial, mark as user interaction
+    if (variationId !== initialVariationId.current) {
+      hasUserInteracted.current = true;
+    }
+
     const activeVariationImage = variationImages.find(i => i.databaseId === variationId);
 
     setGalleryImages(previousImages => {
@@ -291,7 +196,11 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
         return initialGalleryImages
       }
 
-      if (activeVariationImage) {
+      // Only check for user interaction if there's a video
+      // Otherwise, allow normal variation scrolling
+      const shouldPreventScroll = hasValidVideo && !hasUserInteracted.current;
+
+      if (activeVariationImage && !shouldPreventScroll) {
         const videoOffset = hasValidVideo ? 1 : 0;
         const newFirstIndex = videoOffset;
         
@@ -316,6 +225,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   const onThumbVariationClick = (variationId: string | null = null) => {
     if (!emblaMainApi || !emblaThumbsApi) return;
 
+    hasUserInteracted.current = true;
     setVariationImageEnabled(false);
     if (variationId) {
       const variationIndex = combinedImages.findIndex(
@@ -336,6 +246,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   const onThumbClickCalculated = useCallback(
     (thumbIndex: number | null) => {
       if (!emblaMainApi || !emblaThumbsApi) return;
+      hasUserInteracted.current = true;
       setVariationImageEnabled(true);
       setSelectedIndex(thumbIndex as number)
       emblaThumbsApi.scrollTo(thumbIndex as number)
@@ -353,6 +264,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
     if (!emblaMainApi || !emblaThumbsApi) return;
     const newIndex = emblaMainApi.selectedScrollSnap();
     if (newIndex !== selectedIndex) {
+      hasUserInteracted.current = true;
       pauseAllVideos();
       setSelectedIndex(newIndex);
     }
@@ -383,44 +295,14 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
                     />
                   </div>
                 ) : isYouTubeUrl(variation.sourceUrl) ? (
-                  <div className="relative max-h-[330px] md:max-h-[410px] w-full rounded-2xl overflow-hidden bg-black flex items-center justify-center min-h-[330px] md:min-h-[410px] group">
+                  <div className="relative max-h-[330px] md:max-h-[410px] w-full rounded-2xl overflow-hidden bg-black flex items-center justify-center min-h-[330px] md:min-h-[410px]">
                     <iframe
-                      id="youtube-player-iframe"
                       src={getYouTubeEmbedUrl(variation.sourceUrl) || variation.sourceUrl}
                       className="w-full h-[330px] md:h-[410px] rounded-xl"
                       allowFullScreen
                       allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                       title="YouTube video player"
                     />
-                    {/* Custom Control Buttons - Centered and show on hover */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                      <div className="flex gap-3 md:gap-4 pointer-events-auto">
-                        <button
-                          onClick={toggleYouTubePlayback}
-                          className="bg-white bg-opacity-90 hover:bg-opacity-100 rounded-full p-3 md:p-4 shadow-2xl transition-all duration-200 hover:scale-110"
-                          type="button"
-                          aria-label={isVideoPlaying ? "Pause video" : "Play video"}
-                        >
-                          {isVideoPlaying ? (
-                            <Pause className="w-6 h-6 md:w-8 md:h-8 text-black" />
-                          ) : (
-                            <PlayIcon className="w-6 h-6 md:w-8 md:h-8 text-black" />
-                          )}
-                        </button>
-                        <button
-                          onClick={toggleYouTubeMute}
-                          className="bg-white bg-opacity-90 hover:bg-opacity-100 rounded-full p-3 md:p-4 shadow-2xl transition-all duration-200 hover:scale-110"
-                          type="button"
-                          aria-label={isVideoMuted ? "Unmute video" : "Mute video"}
-                        >
-                          {isVideoMuted ? (
-                            <VolumeX className="w-6 h-6 md:w-8 md:h-8 text-black" />
-                          ) : (
-                            <Volume2 className="w-6 h-6 md:w-8 md:h-8 text-black" />
-                          )}
-                        </button>
-                      </div>
-                    </div>
                   </div>
                 ) : (
                   <div className="relative max-h-[330px] md:max-h-[410px] w-full rounded-2xl overflow-hidden bg-black flex items-center justify-center min-h-[330px] md:min-h-[410px]">
