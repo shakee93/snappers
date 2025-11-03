@@ -241,11 +241,11 @@ const CountryPhoneInput: React.FC<CountryPhoneInputProps> = ({
         </select>
         <Input
           className="flex-1"
-          placeholder={`Phone* (${countries.find(c => c.code === country)?.name || "Select country"})`}
+          placeholder={"Phone* (9–12 digits)"}
           value={phone}
           type="tel"
-          pattern={country === "LK" ? "^[0]{1}[7]{1}[01245678]{1}[0-9]{7}$" : undefined}
-          title={country === "LK" ? "Please enter a valid Sri Lankan mobile number starting with 07" : "Please enter a valid phone number"}
+          pattern={"^[0-9]{9,12}$"}
+          title={"Please enter a phone number with 9 to 12 digits"}
           onChange={(e) => onPhoneChange(e.target.value)}
           required={true}
         />
