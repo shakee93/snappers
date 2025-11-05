@@ -14,7 +14,7 @@ interface SearchBarProps {
 
 const HeaderSearchResults = ({ brands, productCategories }: SearchBarProps) => {
 
-    const { search, setSearch, syncBrands, syncCategories } = useStore()
+    const { search, setSearch, syncBrands, syncCategories, isTyping } = useStore()
     const searchParams = useSearchParams()
     const [mounted, setMounted] = useState(false)
 
@@ -47,6 +47,7 @@ const HeaderSearchResults = ({ brands, productCategories }: SearchBarProps) => {
             <Suspense fallback={'loading...'}>
                 <h2 className="mb-8 ml-6 block text-sm md:text-lg font-semibold mt-14">
                     Search Results for <span className='text-primaryColor'>{search}</span>
+                    {isTyping && <span className='text-primaryColor'>Searching...</span>}
                 </h2>
                 <InstantSearchWrapper
                     filters

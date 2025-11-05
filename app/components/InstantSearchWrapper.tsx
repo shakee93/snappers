@@ -84,17 +84,22 @@ const InstantSearchWrapper = ({
   tag,
   searchQueryValue
 }: InstantSearchWrapperProps) => {
-  const { sidebar, setSearchMounted, syncCategories, syncBrands, synPriceRange, setInStock, syncOnSale, setSort, syncVariations } = useStore();
+  const { sidebar, setSearchMounted, syncCategories, syncBrands, synPriceRange, setInStock, syncOnSale, setSort, syncVariations, isTyping } = useStore();
   const [differedSidebar] = useDebounce(sidebar, 800);
   const [hitsPerPage, setHitsPerPage] = useState<number>(12);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const searchParams = useSearchParams();
+  const [debouncedIsTyping] = useDebounce(isTyping, 500);
 
   useEffect(() => {
     if (searchParams.get('q')) {
       setSearchQuery(searchParams.get('q') || '');
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    setSearchMounted();
+  }, []);
 
   const getFilterQuery: () => string = () => {
     const f = [
@@ -180,10 +185,9 @@ const InstantSearchWrapper = ({
     const _state = useStore.getState();
     const _sidebar = _state.sidebar;
 
-
     // Build URL params object
     const params: Record<string, string | undefined> = {
-      query: uiState.product.query,
+      query: uiState.product.query || '',
       categories: _sidebar?.categories?.join(',') || undefined,
       brands: _sidebar?.brands?.join(',') || undefined,
       priceRange: (_sidebar?.priceRange === PRICE_RANGE) ? undefined : _sidebar?.priceRange?.join(',') || undefined,
@@ -210,9 +214,7 @@ const InstantSearchWrapper = ({
   const routeToState = useCallback((routeState: any) => {
 
     // Sync categories
-    if (routeState?.categories?.length > 0) {
-      syncCategories(routeState.categories.split(',').filter(Boolean).map(Number) || []);
-    }
+
 
     // Sync brands
     if (routeState?.brands?.length > 0) {
@@ -257,6 +259,13 @@ const InstantSearchWrapper = ({
     Object.entries(variations).forEach(([attribute, values]) => {
       syncVariations(attribute, values);
     });
+
+    if (routeState?.categories?.length > 0) {
+      console.log('sync categories', routeState.categories.split(',').filter(Boolean).map(Number) || []);
+      syncCategories(routeState.categories.split(',').filter(Boolean).map(Number) || []);
+    }
+
+    console.log(sidebar.categories);
 
     return {
       product: {
