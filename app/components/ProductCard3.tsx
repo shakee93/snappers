@@ -449,14 +449,10 @@ const ProductCard: FC<ProductCardProps> = ({
           </div>
 
           {/* INstock badge in green */}
-          {/* {stockStatus === "IN_STOCK" ? (
+          {stockStatus === "IN_STOCK" ? (
             isPreOrderProduct() ? (
-              <div className="font-semibold text-xs bg-blue-100 border border-blue-300 text-blue-700 px-3 py-1 rounded-full flex items-center gap-2">
-                <div className="relative flex size-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
-                </div>
-                Pre-order
+              <div className="font-semibold text-xs text-blue-500 px-0 py-0 rounded-full ">
+                Pre Order
               </div>
             ) : (
               <div className="font-semibold text-xs text-green-500 px-0 py-0 rounded-full ">
@@ -464,10 +460,10 @@ const ProductCard: FC<ProductCardProps> = ({
               </div>
             )
           ) : (
-            <div className="font-semibold text-xs text-red-500 px-0 py-0 rounded-full ">
-              Out of Stock
+            <div className="hidden font-semibold text-xs text-red-500 px-0 py-0 rounded-full whitespace-nowrap">
+              Sold Out
             </div>
-          )} */}
+          )}
         </div>
 
         <Link

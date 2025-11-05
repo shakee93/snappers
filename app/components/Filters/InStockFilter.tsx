@@ -12,7 +12,7 @@ type MyUiState = UiState & {
 
 const InStockFilter = () => {
     const { setInStock, setOutOfStock } = useStore();
-    const [inStock, setInStockState] = useState(true);
+    const [inStock, setInStockState] = useState(false);
     const { setUiState } = useInstantSearch<MyUiState>();
 
     // URL synchronization is now handled by InstantSearch routing

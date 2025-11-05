@@ -188,7 +188,7 @@ const InstantSearchWrapper = ({
       brands: _sidebar?.brands?.join(',') || undefined,
       priceRange: (_sidebar?.priceRange === PRICE_RANGE) ? undefined : _sidebar?.priceRange?.join(',') || undefined,
       on_sale: _sidebar?.on_sale ? 'true' : undefined,
-      in_stock: !_sidebar?.in_stock ? 'false' : undefined,
+      in_stock: _sidebar?.in_stock ? 'true' : undefined,
       sort: _sidebar?.sort || undefined,
     };
 
@@ -233,8 +233,8 @@ const InstantSearchWrapper = ({
     }
 
     // Sync in_stock
-    if (routeState?.in_stock === 'false') {
-      setInStock(false);
+    if (routeState?.in_stock === 'true') {
+      setInStock(true);
     }
 
     // Sync sort
