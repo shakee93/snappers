@@ -32,7 +32,6 @@ import { useQuery } from "@apollo/client";
 import { Highlight } from "react-instantsearch";
 import { redirect, useRouter, usePathname } from "next/navigation";
 import { useStore } from "@/store/store";
-import { usePaymentGateways } from "@/context/PaymentProvider";
 import koko from "@/public/koko.png";
 
 export interface ProductCardProps {
@@ -116,7 +115,7 @@ const ProductCard: FC<ProductCardProps> = ({
   const productLink = LinkSegments[LinkSegments.length - 1];
 
   const { search, setSearch, search_status } = useStore();
-  const { isKokoEnabled } = usePaymentGateways();
+  const isKokoEnabled = true;
 
   const handleHoverOut = () => {
     setIsHovered(false);

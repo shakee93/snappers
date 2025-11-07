@@ -23,7 +23,6 @@ import {
   GET_PRICE_FLUCTUATION_NOTICE,
 } from "@/graphql/defs/options";
 import { useQuery } from '@apollo/client';
-import { usePaymentGateways } from "@/context/PaymentProvider";
 import koko from "@/public/koko.png";
 import Image from "next/image";
 import { BanknotesIcon } from "@heroicons/react/24/outline";
@@ -171,22 +170,21 @@ const ProductDetails = ({
 
   const { data, loading, error } = useQuery(GET_PRICE_FLUCTUATION_NOTICE);
   const isPriceFluctuation = data?.topBarPriceFluctuationNotice || false;
-  const { isKokoEnabled } = usePaymentGateways();
 
   const [highestPrice, setHighestPrice] = useState<string>('');
 
   useEffect(() => {
     if (product.type === "VARIABLE") {
       const variations = (product as VariableProduct).variations?.nodes as unknown as ProductVariation[];
-      
+
       if (variations && variations.length > 0) {
         // Convert price strings to numbers by removing currency symbol and parsing
-        const prices = variations.map(v => 
+        const prices = variations.map(v =>
           parseFloat(v.price?.replace(/[^0-9.]/g, '') || "0")
         );
-        
+
         const maxPrice = Math.max(...prices);
-        const variationWithMaxPrice = variations.find(v => 
+        const variationWithMaxPrice = variations.find(v =>
           v.price && parseFloat(v.price.replace(/[^0-9.]/g, '')) === maxPrice
         );
 
@@ -219,7 +217,7 @@ const ProductDetails = ({
       {product.price && (
         <div className="text-sm text-primaryColor flex items-center gap-1 mt-2">
           <BanknotesIcon className="w-4 h-4" />
-         <span className="text-gray-500 font-medium">Cash Price</span>
+          <span className="text-gray-500 font-medium">Cash Price</span>
         </div>
       )}
       {/* Commented */}
@@ -259,14 +257,14 @@ const ProductDetails = ({
                 Not Available
               </div>
             )}
-            
+
             <div className="flex flex-wrap items-center text-xs text-gray-400">
               <span>or pay in 3 x Rs</span>
               <span className="font-semibold mx-1">
                 {(
                   parseFloat(
                     ((activeVariation.salePrice === "₨&nbsp;0.00" || activeVariation.salePrice === null) && (activeVariation.regularPrice === "₨&nbsp;0.00" || activeVariation.regularPrice === null)
-                      ? highestPrice 
+                      ? highestPrice
                       : (activeVariation.salePrice || activeVariation.regularPrice) || "0")
                       .toString()
                       .replace(/[^\d.]/g, "")
@@ -285,11 +283,11 @@ const ProductDetails = ({
         <div className="flex flex-wrap items-center gap-2 text-base font-bold text-gray-600 md:text-2xl">
 
           <div className="flex flex-col gap-2">
-          {!!product.price ? (
-            <span dangerouslySetInnerHTML={{ __html: product.price || "" }} />
-          ) : (
-            <span>Can not be purchased now</span>
-          )}
+            {!!product.price ? (
+              <span dangerouslySetInnerHTML={{ __html: product.price || "" }} />
+            ) : (
+              <span>Can not be purchased now</span>
+            )}
           </div>
 
           {product.salePrice &&
@@ -487,7 +485,7 @@ const ProductDetails = ({
       </div> */}
 
       {/* {product.shortDescription && <ProductDescription product={product} />} */}
-     
+
       {product.type === "VARIABLE" && (
         <>
           {product.attributes?.nodes.map(

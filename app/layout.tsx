@@ -122,27 +122,23 @@ export default async function RootLayout({
       </head>
       <body className="bg-gray-100 text-base dark:bg-slate-900 text-slate-900 dark:text-slate-200">
         <ApolloWrapper>
-          <PaymentProvider>
-            <CartProvider>
-              <SessionProvider>
-                <Suspense fallback={null}>
-                  <NavigationEvents />
-                </Suspense>
-                <Suspense fallback={null}>
-                  <GoogleAnalytics />
-                </Suspense>
-                <Suspense fallback={null}>
-                  <AttributeMappingsInitializer />
-                </Suspense>
-                <Header />
-                <div className="pb-8 md:pb-24">{children}</div>
-                <WhatsappLogoComponent />
-                <Toaster />
-                <Footer />
-                {/* <ScreenSizeIndicator /> */}
-              </SessionProvider>
-            </CartProvider>
-          </PaymentProvider>
+          <CartProvider>
+            <SessionProvider>
+              <Suspense fallback={null}>
+                <NavigationEvents />
+              </Suspense>
+              <Suspense fallback={null}>
+                <GoogleAnalytics />
+              </Suspense>
+
+              <Header />
+              <div className="pb-8 md:pb-24">{children}</div>
+              <WhatsappLogoComponent />
+              <Toaster />
+              <Footer />
+              {/* <ScreenSizeIndicator /> */}
+            </SessionProvider>
+          </CartProvider>
         </ApolloWrapper>
       </body>
     </html>

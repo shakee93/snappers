@@ -5,6 +5,7 @@ import { useStore } from "@/store/store";
 import { Suspense, useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { useSearchParams, useRouter } from 'next/navigation';
+import AttributeMappingsInitializer from "../AttributeMappingsInitializer";
 
 interface SearchBarProps {
     productCategories: ProductCategory[]
@@ -45,6 +46,7 @@ const HeaderSearchResults = ({ brands, productCategories }: SearchBarProps) => {
     )}>
         <div className='container mx-auto'>
             <Suspense fallback={'loading...'}>
+                <AttributeMappingsInitializer />
                 <h2 className="mb-8 ml-6 block text-sm md:text-lg font-semibold mt-14">
                     Search Results for <span className='text-primaryColor'>{search}</span>
                     {isTyping && <span className='text-primaryColor'>Searching...</span>}
