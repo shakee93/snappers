@@ -81,7 +81,7 @@ const ProductGridInstant = ({
         </div>
       }
 
-      {(results?.nbHits === 0) && (
+      {(results?.nbHits === 0 && statusState === 'idle') && (
         <div className="text-center text-slate-500 flex flex-col items-center gap-20 py-12">
           <div>
             <Image className="w-64" src={NotFound} alt="No Search Results" />
@@ -105,7 +105,7 @@ const ProductGridInstant = ({
                     id="hitsPerPage"
                     value={hitsPerPage}
                     onChange={(e) => setHitsPerPage ? setHitsPerPage(Number(e.target.value)) : null}
-                    className="border rounded p-2 w-20 text-sm rounded-md border-neutral-300 dark:border-neutral-700
+                    className="border p-2 w-20 text-sm rounded-md border-neutral-300 dark:border-neutral-700
                     cursor-pointer bg-transparent"
                   >
                     <option className="text-sm p-2" value={12}>12</option>
