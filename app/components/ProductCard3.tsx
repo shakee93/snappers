@@ -57,11 +57,11 @@ const ColorPreview: FC<ColorPreviewProps> = ({ variations }) => {
     .filter((color): color is string => !!color && color !== undefined)
     .filter((color, index, array) => array.indexOf(color) === index) || [];
 
-  if (!colors.length) return null;
+  if (colors.length <= 1) return null;
 
   return (
-    <div className="text-xs text-gray-600 font-medium">
-      • {colors.length} {colors.length === 1 ? 'color' : 'colors'}
+    <div className="text-[12px] text-gray-600 font-medium">
+      {colors.length} {colors.length === 1 ? 'color' : 'colors'}
     </div>
   );
 };
@@ -221,7 +221,7 @@ const ProductCard: FC<ProductCardProps> = ({
 
   const renderGroupButtons = () => {
     return (
-      <div className="absolute -top-10 right-1 flex justify-center opacity-100 visible transition-all">
+      <div className="absolute -top-10 right-1 flex justify-center opacity-100 visible transition-all hover:scale-105 hover:shadow-md rounded-full">
         {stockStatus === "IN_STOCK" ? (
           <>
             {type === "SIMPLE" && price && price?.length > 0 && (
@@ -260,8 +260,8 @@ const ProductCard: FC<ProductCardProps> = ({
                   fontSize="text-xs"
                   sizeClass="py-1.5 px-3.5"
                 >
-                  <span className="flex items-center gap-2">
-                    <MousePointerClick className="w-3.5" />
+                  <span className="flex items-center gap-2  transition-all">
+                    <MousePointerClick className="w-3.5 group-hover:scale-125 transition-all" />
                     Customize
                   </span>
                 </ButtonPrimary>
@@ -270,16 +270,15 @@ const ProductCard: FC<ProductCardProps> = ({
           </>
         ) : (
           <Link href={link}>
-            <ButtonPrimary
+            {/* <ButtonPrimary
               className="shadow-lg bg-zinc-500"
               fontSize="text-xs"
               sizeClass="py-1.5 px-3.5"
             >
               <span className="flex items-center gap-2">
                 <ExternalLink className="w-3.5" />
-                View
               </span>
-            </ButtonPrimary>
+            </ButtonPrimary> */}
           </Link>
         )}
       </div>
@@ -310,7 +309,7 @@ const ProductCard: FC<ProductCardProps> = ({
         })()
       )}
       {stockStatus !== "IN_STOCK" && (
-        <div className="absolute left-2 top-2 z-10 bg-gradient-to-b w-fit from-gray-500/30 font-semibold to-gray-400/5 text-xs text-gray-900 px-4 py-2 rounded-full">
+        <div className="absolute left-0 top-4 z-10 cursor-pointer bg-red-600 w-fit font-normal text-xs text-white px-3 py-1.5 rounded-r-full shadow-md">
           Sold Out
         </div>
       )}
@@ -381,16 +380,21 @@ const ProductCard: FC<ProductCardProps> = ({
         </Link>
 
         {/* Arrow Icon */}
-        <div
+        {/* <div
           className={"absolute hidden md:block top-3 cursor-pointer right-3"}
           onClick={() => handleCloseModalQuickView()}
         >
           <ArrowsPointingOutIcon className="w-5" />
+        </div> */}
+        <div className="absolute top-1 right-2.5">
+          <ColorPreview variations={variations?.nodes} />
         </div>
       </div>
 
-      <div className="space-y-2 flex flex-col space-between min-h-[100px] px-2.5 justify-between  lg:pt-2 lg:pb-2.5 relative">
+      <div className="space-y-3 flex flex-col space-between min-h-[100px] px-2.5 justify-between  lg:pt-2 lg:pb-2.5 relative">
         <div>{renderGroupButtons()}</div>
+
+
 
         <Link
           className="block"
@@ -444,7 +448,7 @@ const ProductCard: FC<ProductCardProps> = ({
               </Link>
             ))}
 
-            <ColorPreview variations={variations?.nodes} />
+
           </div>
 
           {/* INstock badge in green */}
@@ -503,41 +507,43 @@ const ProductCard: FC<ProductCardProps> = ({
         </Link>
 
         {isKokoEnabled && lowestPrice && lowestSalePrice && (
-          <div className="flex flex-wrap items-center text-xs text-gray-500 mt-1 mb-2">
-            <span>or pay in 3 x Rs</span>
-            <span className="font-semibold mx-1">
-              {(
-                ((parseFloat(
-                  (lowestPrice?.includes("₨&nbsp;0.00") ||
-                    lowestSalePrice?.includes("₨&nbsp;0.00")
-                    ? highestPrice
-                    : lowestPrice || lowestSalePrice || "0"
-                  )
-                    .toString()
-                    .replace(/[^\d.]/g, "")
-                ) /
-                  88) *
-                  100) /
-                3
-              ).toFixed(2)}
-            </span>
-            <span>with</span>
-            <span className="ml-1 inline-block mb-2">
-              <Image
-                src={koko}
-                alt="KOKO"
-                className="inline-block w-12 h-auto"
-              />
-            </span>
+          <div className="flex flex-wrap items-center text-xs text-gray-500 gap-1 ">
+
+
+            <Image
+              src={koko}
+              alt="KOKO"
+              className="inline-block w-12 h-auto -mt-1"
+            />
+            <div className="flex flex-row items-center gap-1">
+              <span className="ml-1 flex items-center gap-1">3 x RS</span>
+              <span className="font-semibold ">
+                {(
+                  ((parseFloat(
+                    (lowestPrice?.includes("₨&nbsp;0.00") ||
+                      lowestSalePrice?.includes("₨&nbsp;0.00")
+                      ? highestPrice
+                      : lowestPrice || lowestSalePrice || "0"
+                    )
+                      .toString()
+                      .replace(/[^\d.]/g, "")
+                  ) /
+                    88) *
+                    100) /
+                  3
+                ).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </span>
+            </div>
+
           </div>
         )}
       </div>
-      <ModalQuickView
+      {/* <ModalQuickView
         show={showModalQuickView}
         onCloseModalQuickView={() => setShowModalQuickView(false)}
         productData={databaseId}
         brands={brands?.nodes[0]}
-      />
+      /> */}
     </div>
   );
 };
