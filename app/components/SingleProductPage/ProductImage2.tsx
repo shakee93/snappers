@@ -49,10 +49,10 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
       const videoUrl = new URL(url);
       const videoExtensions = ['.mp4', '.webm', '.ogg', '.avi', '.mov'];
       return videoExtensions.some(ext => videoUrl.pathname.toLowerCase().endsWith(ext)) ||
-             videoUrl.hostname.includes('youtube.com') ||
-             videoUrl.hostname.includes('youtu.be') ||
-             videoUrl.hostname.includes('vimeo.com') ||
-             videoUrl.hostname.includes('tiktok.com');
+        videoUrl.hostname.includes('youtube.com') ||
+        videoUrl.hostname.includes('youtu.be') ||
+        videoUrl.hostname.includes('vimeo.com') ||
+        videoUrl.hostname.includes('tiktok.com');
     } catch {
       return false;
     }
@@ -76,7 +76,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   const getYouTubeEmbedUrl = (url: string): string | null => {
     try {
       let videoId = null;
-      
+
       // Handle youtu.be format
       if (url.includes('youtu.be/')) {
         const match = url.match(/youtu\.be\/([^?&]+)/);
@@ -92,7 +92,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
         const match = url.match(/embed\/([^?&]+)/);
         videoId = match ? match[1] : null;
       }
-      
+
       if (videoId) {
         // Add parameters for better experience
         const params = new URLSearchParams({
@@ -106,11 +106,11 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
           playlist: videoId,      // Required for loop to work
           playsinline: '1',       // Play inline on mobile
         });
-        
+
         if (typeof window !== 'undefined') {
           params.append('origin', window.location.origin);
         }
-        
+
         return `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
       }
       return null;
@@ -149,7 +149,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
 
   const originalGalleryImages = product?.galleryImages?.nodes?.length ? product.galleryImages.nodes : [];
   const initialGalleryImages = videoItem ? [videoItem, ...originalGalleryImages] : originalGalleryImages;
-  
+
   const [galleryImages, setGalleryImages] = useState(initialGalleryImages);
 
 
@@ -184,18 +184,29 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   }, []);
 
   useEffect(() => {
+
+    console.log('variationId', variationId);
+
+    const lastInitialVariationId = initialVariationId.current;
+
+    if (initialVariationId.current === null) {
+      initialVariationId.current = variationId;
+    }
+
+    // If this is not the initial variation, mark as user interaction
+    const isVariationChange = variationId !== initialVariationId.current;
+
+    if (isVariationChange && lastInitialVariationId !== null) {
+      hasUserInteracted.current = true;
+    }
+
+
     // If video exists and user hasn't interacted yet, skip all updates
     if (hasValidVideo && !hasUserInteracted.current) {
       return;
     }
 
     const activeVariationImage = variationImages.find(i => i.databaseId === variationId);
-
-    // If this is not the initial variation, mark as user interaction
-    const isVariationChange = variationId !== initialVariationId.current;
-    if (isVariationChange) {
-      hasUserInteracted.current = true;
-    }
 
     setGalleryImages(previousImages => {
       if (!previousImages) {
@@ -205,7 +216,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
       if (activeVariationImage) {
         const videoOffset = hasValidVideo ? 1 : 0;
         const newFirstIndex = videoOffset;
-        
+
         if (hasValidVideo) {
           const newImages = [videoItem, activeVariationImage, ...originalGalleryImages.slice(1)];
           emblaThumbsApi?.scrollTo(newFirstIndex);
@@ -253,7 +264,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
       setSelectedIndex(thumbIndex as number)
       emblaThumbsApi.scrollTo(thumbIndex as number)
       emblaMainApi.scrollTo(thumbIndex as number);
-      
+
       // Pause videos when changing slides
       pauseAllVideos();
 
@@ -277,12 +288,12 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   useEffect(() => {
     if (!emblaMainApi) return;
     onSelect(false); // Initial call, not user triggered
-    
+
     // These are user-triggered events
     const handleUserSelect = () => onSelect(true);
     emblaMainApi.on("select", handleUserSelect);
     emblaMainApi.on("reInit", handleUserSelect);
-    
+
     return () => {
       emblaMainApi.off("select", handleUserSelect);
       emblaMainApi.off("reInit", handleUserSelect);
@@ -318,7 +329,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
                   </div>
                 ) : (
                   <div className="relative max-h-[330px] md:max-h-[410px] w-full rounded-2xl overflow-hidden bg-black flex items-center justify-center min-h-[330px] md:min-h-[410px]">
-                    <video 
+                    <video
                       ref={videoRef}
                       className="max-w-full max-h-full object-contain rounded-xl"
                       controls={isVideoPlaying}
@@ -332,7 +343,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
                       <p>Your browser does not support the video tag.</p>
                     </video>
                     {!isVideoPlaying && (
-                      <div 
+                      <div
                         className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 cursor-pointer group hover:bg-opacity-40 transition-all duration-300"
                         onClick={() => {
                           if (videoRef.current) {
