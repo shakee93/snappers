@@ -185,12 +185,6 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   useEffect(() => {
     const activeVariationImage = variationImages.find(i => i.databaseId === variationId);
 
-    // If this is not the initial variation, mark as user interaction
-    const isVariationChange = variationId !== initialVariationId.current;
-    if (isVariationChange) {
-      hasUserInteracted.current = true;
-    }
-
     setGalleryImages(previousImages => {
       if (!previousImages) {
         return initialGalleryImages
@@ -257,6 +251,11 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
     onSelect();
     emblaMainApi.on("select", onSelect);
     emblaMainApi.on("reInit", onSelect);
+    
+    return () => {
+      emblaMainApi.off("select", onSelect);
+      emblaMainApi.off("reInit", onSelect);
+    };
   }, [emblaMainApi, onSelect]);
 
   return (
