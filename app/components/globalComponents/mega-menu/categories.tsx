@@ -6,20 +6,72 @@ import { ProductCategory } from "@/graphql/types/graphql";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import CategoriesMenuSkeleton from "../../Skeletons/CategorySkeleton";
+import { useMemo } from "react";
 
 type NavCategoriesProps = {
   onClose: () => void;
 };
 
+type CategoryWithChildren = Omit<ProductCategory, 'children'> & {
+  children?: ProductCategory[];
+};
+
 export default function NavCategories({ onClose }: NavCategoriesProps) {
   const { data, loading, error } = useQuery(GET_NAV_CATEGORIES);
 
-  const categories: ProductCategory[] = data?.productCategories?.nodes || [];
+  const flatCategories: ProductCategory[] = data?.productCategories?.nodes || [];
+
+  // Build parent-child tree structure from flat categories
+  const buildCategoryTree = (
+    categories: ProductCategory[]
+  ): CategoryWithChildren[] => {
+    // Create a map for quick lookup
+    const categoryMap = new Map<number, CategoryWithChildren>();
+    const rootCategories: CategoryWithChildren[] = [];
+
+    // First pass: create all category objects
+    categories.forEach((category) => {
+      if (category.databaseId != null) {
+        categoryMap.set(category.databaseId, {
+          ...category,
+          children: [] as ProductCategory[],
+        });
+      }
+    });
+
+    // Second pass: build parent-child relationships
+    categories.forEach((category) => {
+      if (category.databaseId == null) return;
+
+      const categoryWithChildren = categoryMap.get(category.databaseId);
+      if (!categoryWithChildren) return;
+
+      // If category has a parent, add it to parent's children
+      if (category.parentDatabaseId != null) {
+        const parent = categoryMap.get(category.parentDatabaseId);
+        if (parent && parent.children) {
+          // Push the category without the children override to avoid type issues
+          const { children: _, ...categoryWithoutChildren } = categoryWithChildren;
+          parent.children.push(categoryWithoutChildren as ProductCategory);
+        }
+      } else {
+        // Root category (no parent)
+        rootCategories.push(categoryWithChildren);
+      }
+    });
+
+    return rootCategories;
+  };
+
+  const categoryTree = useMemo(
+    () => buildCategoryTree(flatCategories),
+    [flatCategories]
+  );
 
   const prioritizeCategory = (
-    items: ProductCategory[],
+    items: CategoryWithChildren[],
     slugToPrioritize: string
-  ): ProductCategory[] => {
+  ): CategoryWithChildren[] => {
     const prioritizedCategory = items.find(
       (item) => item.slug === slugToPrioritize
     );
@@ -32,16 +84,16 @@ export default function NavCategories({ onClose }: NavCategoriesProps) {
   };
 
   const prioritizedCategories = prioritizeCategory(
-    categories,
+    categoryTree,
     "mobiles-and-tablets"
   );
 
   // Function to split categories into columns
   const splitIntoColumns = (
-    items: ProductCategory[],
+    items: CategoryWithChildren[],
     columnCount: number
-  ): ProductCategory[][] => {
-    const columns: ProductCategory[][] = Array.from(
+  ): CategoryWithChildren[][] => {
+    const columns: CategoryWithChildren[][] = Array.from(
       { length: columnCount },
       () => []
     );
@@ -72,7 +124,7 @@ export default function NavCategories({ onClose }: NavCategoriesProps) {
         {loading ? (
           <div className="flex-1">
             {/* <p>Loading categories...</p> */}
-            <CategoriesMenuSkeleton/>
+            <CategoriesMenuSkeleton />
           </div>
         ) : error ? (
           <div className="flex-1">
@@ -88,12 +140,10 @@ export default function NavCategories({ onClose }: NavCategoriesProps) {
                     className="category-group mb-2 p-2 hover:bg-zinc-100 rounded-md"
                   >
                     <h3
-                      className={`text-sm font-semibold ${
-                        category.children?.nodes &&
-                        category.children.nodes.length > 0
-                          ? "mb-2"
-                          : ""
-                      }`}
+                      className={`text-sm font-semibold ${category.children && category.children.length > 0
+                        ? "mb-2"
+                        : ""
+                        }`}
                     >
                       <Link
                         href={`/collections/${category.slug}`}
@@ -116,27 +166,21 @@ export default function NavCategories({ onClose }: NavCategoriesProps) {
                         </span>
                       </Link>
                     </h3>
-                    {category?.children?.nodes &&
-                      category.children.nodes.length > 0 && (
-                        <ul className="space-y-1">
-                          {category?.children?.nodes.map(
-                            (child: ProductCategory) => (
-                              <li
-                                key={`child-${child.slug}`}
-                                className="ml-2.5"
-                              >
-                                <Link
-                                  href={`/collections/${child.slug}`}
-                                  className="text-sm text-muted-foreground hover:text-primary"
-                                  onClick={onClose}
-                                >
-                                  {child.name}
-                                </Link>
-                              </li>
-                            )
-                          )}
-                        </ul>
-                      )}
+                    {category.children && category.children.length > 0 && (
+                      <ul className="space-y-1">
+                        {category.children.map((child: ProductCategory) => (
+                          <li key={`child-${child.slug}`} className="ml-2.5">
+                            <Link
+                              href={`/collections/${child.slug}`}
+                              className="text-sm text-muted-foreground hover:text-primary"
+                              onClick={onClose}
+                            >
+                              {child.name}
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
                   </div>
                 ))}
               </div>
@@ -147,3 +191,4 @@ export default function NavCategories({ onClose }: NavCategoriesProps) {
     </div>
   );
 }
+// t

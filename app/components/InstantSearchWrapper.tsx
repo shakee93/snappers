@@ -70,6 +70,30 @@ const typesenseConfig = {
   protocol: process.env.NEXT_PUBLIC_TYPESENSE_PROTOCOL || "https",
 };
 
+
+const typesenseInstantSearchAdapter = new TypesenseInstantSearchAdapter({
+  server: {
+    apiKey: "xyz",
+    nodes: [typesenseConfig],
+    cacheSearchResultsForSeconds: 2 * 60,
+    retryIntervalSeconds: 500,
+    numRetries: 3000,
+    connectionTimeoutSeconds: 10,
+  },
+  additionalSearchParameters: {
+    query_by: "name, description, productTags",
+    query_by_weights: "3,1,1",
+    exclude_fields: "description, shortDescription, galleryImages, attributes",
+    facet_by: "brands_facet, categories_facet, variation_facets.*",
+    max_facet_values: 20,
+    // use_cache: false,
+    // filter_by: filterQuery,
+    sort_by: "in_stock:desc",
+    prefix: true,
+    num_typos: 1,
+  },
+});
+
 const InstantSearchWrapper = ({
   bindToStore = false,
   search = false,
@@ -84,17 +108,22 @@ const InstantSearchWrapper = ({
   tag,
   searchQueryValue
 }: InstantSearchWrapperProps) => {
-  const { sidebar, setSearchMounted, syncCategories, syncBrands, synPriceRange, setInStock, syncOnSale, setSort, syncVariations } = useStore();
+  const { sidebar, setSearchMounted, syncCategories, syncBrands, synPriceRange, setInStock, syncOnSale, setSort, syncVariations, isTyping } = useStore();
   const [differedSidebar] = useDebounce(sidebar, 800);
   const [hitsPerPage, setHitsPerPage] = useState<number>(12);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const searchParams = useSearchParams();
+  const [debouncedIsTyping] = useDebounce(isTyping, 500);
 
   useEffect(() => {
     if (searchParams.get('q')) {
       setSearchQuery(searchParams.get('q') || '');
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    setSearchMounted();
+  }, []);
 
   const getFilterQuery: () => string = () => {
     const f = [
@@ -134,34 +163,6 @@ const InstantSearchWrapper = ({
 
   const [filterQuery, setFilterQuery] = useState<string>(getFilterQuery);
 
-  const searchClient = useMemo(() => {
-    const typesenseInstantSearchAdapter = new TypesenseInstantSearchAdapter({
-      server: {
-        apiKey: "xyz",
-        nodes: [typesenseConfig],
-        cacheSearchResultsForSeconds: 2 * 60,
-        retryIntervalSeconds: 500,
-        numRetries: 3000,
-        connectionTimeoutSeconds: 10,
-      },
-      additionalSearchParameters: {
-        query_by: "name, description, productTags",
-        query_by_weights: "3,1,1",
-        exclude_fields: "description, shortDescription, galleryImages, attributes",
-        facet_by: "brands_facet, categories_facet, variation_facets.*",
-        max_facet_values: 20,
-        // use_cache: false,
-        filter_by: filterQuery,
-        sort_by: "in_stock:desc",
-        per_page: hitsPerPage,
-        prefix: true,
-        num_typos: 1,
-      },
-    });
-
-    return typesenseInstantSearchAdapter.searchClient;
-  }, [filterQuery, hitsPerPage]);
-
   useEffect(() => {
     setFilterQuery(getFilterQuery);
     // setSortQuery(differedSidebar.sort);
@@ -180,15 +181,14 @@ const InstantSearchWrapper = ({
     const _state = useStore.getState();
     const _sidebar = _state.sidebar;
 
-
     // Build URL params object
     const params: Record<string, string | undefined> = {
-      query: uiState.product.query,
+      query: uiState.product.query || undefined,
       categories: _sidebar?.categories?.join(',') || undefined,
       brands: _sidebar?.brands?.join(',') || undefined,
       priceRange: (_sidebar?.priceRange === PRICE_RANGE) ? undefined : _sidebar?.priceRange?.join(',') || undefined,
       on_sale: _sidebar?.on_sale ? 'true' : undefined,
-      in_stock: !_sidebar?.in_stock ? 'false' : undefined,
+      in_stock: _sidebar?.in_stock ? 'true' : undefined,
       sort: _sidebar?.sort || undefined,
     };
 
@@ -210,9 +210,7 @@ const InstantSearchWrapper = ({
   const routeToState = useCallback((routeState: any) => {
 
     // Sync categories
-    if (routeState?.categories?.length > 0) {
-      syncCategories(routeState.categories.split(',').filter(Boolean).map(Number) || []);
-    }
+
 
     // Sync brands
     if (routeState?.brands?.length > 0) {
@@ -233,8 +231,8 @@ const InstantSearchWrapper = ({
     }
 
     // Sync in_stock
-    if (routeState?.in_stock === 'false') {
-      setInStock(false);
+    if (routeState?.in_stock === 'true') {
+      setInStock(true);
     }
 
     // Sync sort
@@ -257,6 +255,11 @@ const InstantSearchWrapper = ({
     Object.entries(variations).forEach(([attribute, values]) => {
       syncVariations(attribute, values);
     });
+
+    if (routeState?.categories?.length > 0) {
+      console.log('sync categories', routeState.categories.split(',').filter(Boolean).map(Number) || []);
+      syncCategories(routeState.categories.split(',').filter(Boolean).map(Number) || []);
+    }
 
     return {
       product: {
@@ -289,10 +292,10 @@ const InstantSearchWrapper = ({
             routeToState,
           },
         }}
-        searchClient={searchClient}
+        searchClient={typesenseInstantSearchAdapter.searchClient}
         indexName="product"
       >
-
+        <Configure filters={filterQuery} hitsPerPage={hitsPerPage} />
         {/* <InstantSearchComponent
         searchClient={searchClient}
         indexName="product"

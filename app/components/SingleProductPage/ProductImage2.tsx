@@ -47,10 +47,10 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
       const videoUrl = new URL(url);
       const videoExtensions = ['.mp4', '.webm', '.ogg', '.avi', '.mov'];
       return videoExtensions.some(ext => videoUrl.pathname.toLowerCase().endsWith(ext)) ||
-             videoUrl.hostname.includes('youtube.com') ||
-             videoUrl.hostname.includes('youtu.be') ||
-             videoUrl.hostname.includes('vimeo.com') ||
-             videoUrl.hostname.includes('tiktok.com');
+        videoUrl.hostname.includes('youtube.com') ||
+        videoUrl.hostname.includes('youtu.be') ||
+        videoUrl.hostname.includes('vimeo.com') ||
+        videoUrl.hostname.includes('tiktok.com');
     } catch {
       return false;
     }
@@ -74,7 +74,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   const getYouTubeEmbedUrl = (url: string): string | null => {
     try {
       let videoId = null;
-      
+
       // Handle youtu.be format
       if (url.includes('youtu.be/')) {
         const match = url.match(/youtu\.be\/([^?&]+)/);
@@ -90,7 +90,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
         const match = url.match(/embed\/([^?&]+)/);
         videoId = match ? match[1] : null;
       }
-      
+
       if (videoId) {
         // Add parameters for better experience
         const params = new URLSearchParams({
@@ -104,11 +104,11 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
           playlist: videoId,      // Required for loop to work
           playsinline: '1',       // Play inline on mobile
         });
-        
+
         if (typeof window !== 'undefined') {
           params.append('origin', window.location.origin);
         }
-        
+
         return `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
       }
       return null;
@@ -185,6 +185,12 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   useEffect(() => {
     const activeVariationImage = variationImages.find(i => i.databaseId === variationId);
 
+    // If this is not the initial variation, mark as user interaction
+    const isVariationChange = variationId !== initialVariationId.current;
+    if (isVariationChange) {
+      hasUserInteracted.current = true;
+    }
+
     setGalleryImages(previousImages => {
       if (!previousImages) {
         return initialGalleryImages
@@ -228,7 +234,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
       setSelectedIndex(thumbIndex as number)
       emblaThumbsApi.scrollTo(thumbIndex as number)
       emblaMainApi.scrollTo(thumbIndex as number);
-      
+
       // Pause videos when changing slides
       pauseAllVideos();
 

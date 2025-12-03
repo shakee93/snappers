@@ -23,6 +23,7 @@ type State = {
         attribute: any[]
     }
     searchMounted: boolean
+    isTyping: boolean
     attributeMappings: Map<string, AttributeMapping>
     attributeMappingsLoaded: boolean
 }
@@ -43,6 +44,7 @@ type Actions = {
     clearVariations: () => void
     setMounted: () => void
     setSearchMounted: () => void
+    setIsTyping: (isTyping: boolean) => void
     clearAttributes: () => void
     setAttribute: (attr: ProductAttribute | VariationAttribute, option: string) => void
     setAttributeMappings: (mappings: Map<string, AttributeMapping>) => void
@@ -68,6 +70,7 @@ export const useStore = create<State & Actions>((set, get) => ({
         variations: {}
     },
     searchMounted: false,
+    isTyping: false,
     product: {
         attribute: []
     },
@@ -76,6 +79,10 @@ export const useStore = create<State & Actions>((set, get) => ({
     setSearchMounted: () => set((state) => ({
         ...state,
         searchMounted: true
+    })),
+    setIsTyping: (isTyping: boolean) => set((state) => ({
+        ...state,
+        isTyping
     })),
     setSort: (sort: string) => set((state) => ({
         ...state,

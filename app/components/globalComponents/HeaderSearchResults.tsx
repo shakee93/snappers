@@ -5,6 +5,7 @@ import { useStore } from "@/store/store";
 import { Suspense, useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
 import { useSearchParams, useRouter } from 'next/navigation';
+import AttributeMappingsInitializer from "../AttributeMappingsInitializer";
 
 interface SearchBarProps {
     productCategories: ProductCategory[]
@@ -14,7 +15,7 @@ interface SearchBarProps {
 
 const HeaderSearchResults = ({ brands, productCategories }: SearchBarProps) => {
 
-    const { search, setSearch, syncBrands, syncCategories } = useStore()
+    const { search, setSearch, syncBrands, syncCategories, isTyping } = useStore()
     const searchParams = useSearchParams()
     const [mounted, setMounted] = useState(false)
 
@@ -45,8 +46,10 @@ const HeaderSearchResults = ({ brands, productCategories }: SearchBarProps) => {
     )}>
         <div className='container mx-auto'>
             <Suspense fallback={'loading...'}>
+                <AttributeMappingsInitializer />
                 <h2 className="mb-8 ml-6 block text-sm md:text-lg font-semibold mt-14">
                     Search Results for <span className='text-primaryColor'>{search}</span>
+                    {isTyping && <span className='text-primaryColor'>Searching...</span>}
                 </h2>
                 <InstantSearchWrapper
                     filters

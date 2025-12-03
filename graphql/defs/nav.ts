@@ -2,21 +2,10 @@ import { gql } from '@apollo/client';
 import { CategoryFragment } from './nav.fragments';
 
 export const GET_NAV_CATEGORIES = gql`
-query GetNestedProductCategories {
-  productCategories(first: 100, where: { parent: null }) {
+query GetNavCategories {
+  productCategories(first: 1000) {
     nodes {
       ...CategoryFields
-      children {
-        nodes {
-          ...CategoryFields
-          children {
-            nodes {
-              ...CategoryFields
-              # You can add more levels if needed
-            }
-          }
-        }
-      }
     }
   }
 }
@@ -37,7 +26,7 @@ export const GET_NAV_BRANDS = gql`
 `;
 
 export const GET_NESTED_CATEGORIES = gql`
-query GetNestedProductCategoriesForArchive($parent: Int) {
+query GetNestedProductCategoriesForArchive($parent: Int = 0) {
   productCategories(first: 100, where: {parent: $parent}) {
     nodes {
       ...CategoryFields

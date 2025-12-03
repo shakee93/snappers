@@ -19,7 +19,7 @@ interface SearchInputProps {
 
 // Module-level timer for debouncing
 let timerId: NodeJS.Timeout | undefined;
-const timeout = 0; // 300ms delay
+const timeout = 300; // 300ms delay
 
 const SearchInput: React.FC<SearchInputProps> = ({ show = true, bindToStore = false, onSearchChange }) => {
     const {
@@ -68,7 +68,7 @@ const SearchInput: React.FC<SearchInputProps> = ({ show = true, bindToStore = fa
                 type="text"
                 placeholder="Type to Quick"
                 defaultValue={query}
-                onChange={handleChange}
+                onChange={(e) => refine(e.target.value)}
                 className="border-none bg-transparent focus:outline-none focus:ring-0 w-full text-sm"
                 autoFocus
             />
@@ -85,7 +85,9 @@ const queryHook = (query: string, hook: (query: string) => void) => {
         clearTimeout(timerId);
     }
 
-    timerId = setTimeout(() => hook(query), timeout);
+    timerId = setTimeout(() => {
+        hook(query);
+    }, timeout);
 }
 
 export default SearchInput

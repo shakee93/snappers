@@ -23,10 +23,10 @@ import {
   GET_PRICE_FLUCTUATION_NOTICE,
 } from "@/graphql/defs/options";
 import { useQuery } from '@apollo/client';
-import { usePaymentGateways } from "@/context/PaymentProvider";
 import koko from "@/public/koko.png";
 import Image from "next/image";
 import { BanknotesIcon } from "@heroicons/react/24/outline";
+import { AnimatePresence, motion } from "framer-motion";
 const ProductDetails = ({
   product,
   brand,
@@ -43,6 +43,8 @@ const ProductDetails = ({
   const [activeVariation, setActiveVariation] = useState<any>(
     product?.variations?.nodes[0]
   );
+
+  const [lastClickedAttribute, setLastClickedAttribute] = useState<string | null>(null);
 
   const { setVariationId } = useImage();
 
@@ -171,22 +173,21 @@ const ProductDetails = ({
 
   const { data, loading, error } = useQuery(GET_PRICE_FLUCTUATION_NOTICE);
   const isPriceFluctuation = data?.topBarPriceFluctuationNotice || false;
-  const { isKokoEnabled } = usePaymentGateways();
 
   const [highestPrice, setHighestPrice] = useState<string>('');
 
   useEffect(() => {
     if (product.type === "VARIABLE") {
       const variations = (product as VariableProduct).variations?.nodes as unknown as ProductVariation[];
-      
+
       if (variations && variations.length > 0) {
         // Convert price strings to numbers by removing currency symbol and parsing
-        const prices = variations.map(v => 
+        const prices = variations.map(v =>
           parseFloat(v.price?.replace(/[^0-9.]/g, '') || "0")
         );
-        
+
         const maxPrice = Math.max(...prices);
-        const variationWithMaxPrice = variations.find(v => 
+        const variationWithMaxPrice = variations.find(v =>
           v.price && parseFloat(v.price.replace(/[^0-9.]/g, '')) === maxPrice
         );
 
@@ -196,6 +197,70 @@ const ProductDetails = ({
       }
     }
   }, [product]); // Log the variations to inspect their structure
+
+  // Compute availability message for unavailable combinations
+  const availabilityMessage = useMemo(() => {
+    if (
+      product.type !== "VARIABLE" ||
+      (activeVariation && activeVariation?.stockStatus === "IN_STOCK") ||
+      !product.attributes?.nodes ||
+      product.attributes.nodes.length <= 1
+    ) {
+      return null;
+    }
+
+    // Find available alternatives for each attribute
+    const availabilityMessages: Array<{ attr: ProductAttribute; availableValues: string[] }> = [];
+
+    product.attributes.nodes.forEach((attr: ProductAttribute) => {
+      const selectedValue = activeAttr(attr)?.val;
+      if (!selectedValue) return;
+
+      // Get all variations that match the other attributes but have different values for this attribute
+      const otherAttributes = attribute.filter((a) => a.name !== attr.name);
+      const availableValues = new Set<string>();
+
+      (product as VariableProduct).variations?.nodes.forEach((v: ProductVariation) => {
+        // Check if this variation matches all other selected attributes
+        const matchesOtherAttributes = otherAttributes.every((selectedAttr) => {
+          return v.attributes?.nodes.some(
+            (node: any) => node.name === selectedAttr.name && node.value === selectedAttr.val
+          );
+        });
+
+        // If it matches other attributes and is in stock, get the value for this attribute
+        if (matchesOtherAttributes && v.stockStatus === "IN_STOCK") {
+          const attrValue = (v.attributes?.nodes as unknown as VariationAttribute[])?.find(
+            (node: VariationAttribute) => node.name === attr.name
+          )?.value;
+          if (attrValue && attrValue !== selectedValue) {
+            // Get the display name for this value
+            const displayName = (product as any)[
+              `allPa${attr?.label?.split(" ").join("")}`
+            ]?.nodes.find((node: PaCapacity) => node.slug === attrValue)?.name;
+            if (displayName) {
+              availableValues.add(displayName);
+            }
+          }
+        }
+      });
+
+      if (availableValues.size > 0) {
+        availabilityMessages.push({
+          attr,
+          availableValues: Array.from(availableValues),
+        });
+      }
+    });
+
+    // Return message for the first attribute with available alternatives
+    if (availabilityMessages.length > 0) {
+      const { attr, availableValues } = availabilityMessages[0];
+      return { attr, availableValues };
+    }
+
+    return null;
+  }, [product, activeVariation, attribute, activeAttr]);
 
   return (
     <>
@@ -219,7 +284,7 @@ const ProductDetails = ({
       {product.price && (
         <div className="text-sm text-primaryColor flex items-center gap-1 mt-2">
           <BanknotesIcon className="w-4 h-4" />
-         <span className="text-gray-500 font-medium">Cash Price</span>
+          <span className="text-gray-500 font-medium">Cash Price</span>
         </div>
       )}
       {/* Commented */}
@@ -259,14 +324,14 @@ const ProductDetails = ({
                 Not Available
               </div>
             )}
-            
+
             <div className="flex flex-wrap items-center text-xs text-gray-400">
               <span>or pay in 3 x Rs</span>
               <span className="font-semibold mx-1">
                 {(
                   parseFloat(
                     ((activeVariation.salePrice === "₨&nbsp;0.00" || activeVariation.salePrice === null) && (activeVariation.regularPrice === "₨&nbsp;0.00" || activeVariation.regularPrice === null)
-                      ? highestPrice 
+                      ? highestPrice
                       : (activeVariation.salePrice || activeVariation.regularPrice) || "0")
                       .toString()
                       .replace(/[^\d.]/g, "")
@@ -285,11 +350,11 @@ const ProductDetails = ({
         <div className="flex flex-wrap items-center gap-2 text-base font-bold text-gray-600 md:text-2xl">
 
           <div className="flex flex-col gap-2">
-          {!!product.price ? (
-            <span dangerouslySetInnerHTML={{ __html: product.price || "" }} />
-          ) : (
-            <span>Can not be purchased now</span>
-          )}
+            {!!product.price ? (
+              <span dangerouslySetInnerHTML={{ __html: product.price || "" }} />
+            ) : (
+              <span>Can not be purchased now</span>
+            )}
           </div>
 
           {product.salePrice &&
@@ -487,9 +552,9 @@ const ProductDetails = ({
       </div> */}
 
       {/* {product.shortDescription && <ProductDescription product={product} />} */}
-     
+
       {product.type === "VARIABLE" && (
-        <>
+        <div id="product-attributes">
           {product.attributes?.nodes.map(
             (attr: ProductAttribute, index: number) => (
               <div key={index} className="py-2 text-gray-500">
@@ -533,15 +598,48 @@ const ProductDetails = ({
                         (v) => v.stockStatus !== "IN_STOCK"
                       );
 
+                      const isSelected = activeAttr(attr)?.val === option;
+
+                      // Check if current combination is unavailable
+                      const currentCombinationUnavailable = !activeVariation || activeVariation.stockStatus !== "IN_STOCK";
+
+                      // Check if this option would be available when combined with other selected attributes
+                      // Don't show "available" on the last clicked attribute
+                      let isAvailable = false;
+                      if (currentCombinationUnavailable && !isSelected && lastClickedAttribute !== (attr.name || null)) {
+                        // Get all other selected attributes
+                        const otherAttributes = attribute.filter((a) => a.name !== attr.name);
+
+                        // Check if there's a variation that matches this option + other selected attributes and is in stock
+                        const availableVariation = (product as VariableProduct).variations?.nodes.find((v: ProductVariation) => {
+                          // Check if this variation has this option for current attribute
+                          const hasThisOption = v.attributes?.nodes.some(
+                            (node: any) => node.name === attr.name && node.value === option
+                          );
+
+                          // Check if this variation matches all other selected attributes
+                          const matchesOtherAttributes = otherAttributes.every((selectedAttr) => {
+                            return v.attributes?.nodes.some(
+                              (node: any) => node.name === selectedAttr.name && node.value === selectedAttr.val
+                            );
+                          });
+
+                          return hasThisOption && matchesOtherAttributes && v.stockStatus === "IN_STOCK";
+                        });
+
+                        isAvailable = !!availableVariation;
+                      }
+
                       return (
                         <li
                           key={optionIndex}
                           onClick={() => {
                             setAttribute(attr, option || "");
+                            setLastClickedAttribute(attr.name || null);
                           }}
                           className={twMerge(
                             "relative inline-block cursor-pointer rounded border bg-gray-200/80 px-3.5 py-2 text-xs text-black md:text-sm",
-                            activeAttr(attr)?.val === option &&
+                            isSelected &&
                             "border-primaryColor text-primaryColor bg-white shadow-md",
                             allOutOfStock && "diag-line bg-gray-100 text-gray-500"
                           )}
@@ -555,6 +653,9 @@ const ProductDetails = ({
                           ]?.nodes.find(
                             (node: PaCapacity) => node.slug === option
                           )?.name || "OPTION"}
+                          {isAvailable && (
+                            <span className="absolute -top-2 -right-1 text-[8px] font-medium text-white bg-green-600 rounded-full px-1.5 py-0.5 leading-tight">in-stock</span>
+                          )}
                         </li>
                       );
                     })}
@@ -562,8 +663,34 @@ const ProductDetails = ({
               </div>
             )
           )}
-        </>
+        </div>
       )}
+      <AnimatePresence>
+        {availabilityMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -10, height: 0, paddingTop: 0, paddingBottom: 0 }}
+            animate={{ opacity: 1, y: 0, height: '2rem', paddingTop: '.65rem', paddingBottom: '.65rem' }}
+            exit={{ opacity: 0, y: -10, height: 0, paddingTop: 0, paddingBottom: 0 }}
+            transition={{ duration: 0.3, ease: "easeOut" }}
+            style={{ overflow: 'hidden' }}
+            className="text-sm text-gray-600"
+          >
+            <span className="font-medium">
+              Unavailable.
+            </span>{" "}
+            <span className="">
+              In-stock
+              <span className="ml-1 font-medium">{availabilityMessage.attr.label?.toLowerCase()}:
+                <span className="ml-1 text-primaryColor font-medium">
+                  {availabilityMessage.availableValues.join(", ")}
+                </span>
+
+
+              </span>
+            </span>
+          </motion.div >
+        )}
+      </AnimatePresence >
 
       <ProductAddToCart product={product} variation={activeVariation} />
 

@@ -17,9 +17,9 @@ export const PaymentProvider: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   const { data, loading, error } = useQuery(GET_PAYMENT_GATEWAYS);
-  
+
   const paymentGateways: PaymentGateway[] = data?.paymentGateways?.nodes || [];
-  
+
   // Check if Koko payment (darazbnpl) is enabled
   const isKokoEnabled = paymentGateways.some(gateway => gateway.id === "darazbnpl");
 

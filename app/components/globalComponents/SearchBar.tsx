@@ -5,7 +5,7 @@ import { Brand, ProductCategory } from "@/graphql/types/graphql";
 import { useStore } from "@/store/store";
 import { useRouter, useSearchParams } from "next/navigation";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { cn } from "@/lib/utils";
 import { PRICE_RANGE } from "@/app/components/Filters/PriceFilter";
 
@@ -14,10 +14,11 @@ interface SearchBarProps {
 }
 
 const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
-    const { search, setSearch, search_status, syncCategories, syncBrands, synPriceRange, syncOnSale, setInStock, setSort, clearVariations } = useStore();
+    const { search, setSearch, search_status, syncCategories, syncBrands, synPriceRange, syncOnSale, setInStock, setSort, clearVariations, searchMounted } = useStore();
     const router = useRouter();
     const path = usePathname();
     const searchParams = useSearchParams();
+    const [searchValue, setSearchValue] = useState('');
 
     const [mounted, setMounted] = useState(false);
     const [isInitialized, setIsInitialized] = useState(false);
@@ -38,19 +39,19 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
     }, []);
 
     // Handle initial load and subsequent URL changes
-    useEffect(() => {
-        if (!mounted) return; // Don't run until component is mounted
+    // useEffect(() => {
+    //     if (!mounted) return; // Don't run until component is mounted
 
-        const query = searchParams.get('q');
+    //     const query = searchParams.get('q');
 
-        if ((query && !isInitialized) || isInitialized) {
-            // setSearch(query ? decodeURIComponent(query) : '');
-        }
+    //     if ((query && !isInitialized) || isInitialized) {
+    //         // setSearch(query ? decodeURIComponent(query) : '');
+    //     }
 
-        if (!isInitialized) {
-            setIsInitialized(true);
-        }
-    }, [searchParams, setSearch, isInitialized, mounted]);
+    //     if (!isInitialized) {
+    //         setIsInitialized(true);
+    //     }
+    // }, [searchParams, setSearch, isInitialized, mounted]);
 
     const handleSearchClear = () => {
         // Clear search state
@@ -64,6 +65,7 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
         setInStock(true);
         setSort("");
         clearVariations();
+        setSearchValue('');
 
         // Clear all URL parameters
         const url = new URL(window.location.href);
@@ -88,10 +90,26 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
         router.push(url.pathname + url.search);
     };
 
-    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
-        setSearch(value);
-    };
+
+        setSearchValue(value);
+
+        const timeoutId = setTimeout(() => {
+            setSearch(value);
+        }, 50);
+
+        return () => clearTimeout(timeoutId);
+    }, [setSearch]);
+
+    useEffect(() => {
+
+        if (search.length > 0) {
+            setSearchValue(search);
+        } else {
+            setSearchValue('');
+        }
+    }, [searchMounted]);
 
     const handleFocus = () => {
         setIsFocused(true);
@@ -119,7 +137,7 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
                     <div className="bg-white/60 backdrop-blur-sm border lg:border border-primaryColor/20 py-1 md:py-1 flex
                 items-center space-x-0 lg:space-x-1.5 px-2 pr-3 xl:px-5 rounded-full lg:rounded-[25px] h-10 lg:h-full">
                         <input
-                            value={mounted ? search : ''}
+                            value={mounted ? searchValue : ''}
                             onChange={handleSearchChange}
                             onFocus={handleFocus}
                             onBlur={handleBlur}

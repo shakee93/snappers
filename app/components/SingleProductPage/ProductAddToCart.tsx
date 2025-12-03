@@ -222,7 +222,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   const handleAddToCartResponse = (data: any, error: any) => {
     if (!error && !data?.error) {
       handleCartCompletion();
-      notifyAddToCart(quantity);
+      // notifyAddToCart(quantity);
     }
   };
 
