@@ -36,8 +36,6 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   const [variationImageEnabled, setVariationImageEnabled] = useState(false);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
-  const hasUserInteracted = useRef(false);
-  const initialVariationId = useRef(variationId);
 
   // const [galleryImages, setGalleryImages]  = useState(product.galleryImages?.nodes.length !== 0
   //     ? product.galleryImages?.nodes
@@ -148,7 +146,8 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   } : null;
 
   const originalGalleryImages = product?.galleryImages?.nodes?.length ? product.galleryImages.nodes : [];
-  const initialGalleryImages = videoItem ? [videoItem, ...originalGalleryImages] : originalGalleryImages;
+  // Don't include video in gallery images - it will be shown separately
+  const initialGalleryImages = originalGalleryImages;
   
   const [galleryImages, setGalleryImages] = useState(initialGalleryImages);
 
@@ -184,18 +183,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   }, []);
 
   useEffect(() => {
-    // If video exists and user hasn't interacted yet, skip all updates
-    if (hasValidVideo && !hasUserInteracted.current) {
-      return;
-    }
-
     const activeVariationImage = variationImages.find(i => i.databaseId === variationId);
-
-    // If this is not the initial variation, mark as user interaction
-    const isVariationChange = variationId !== initialVariationId.current;
-    if (isVariationChange) {
-      hasUserInteracted.current = true;
-    }
 
     setGalleryImages(previousImages => {
       if (!previousImages) {
@@ -203,22 +191,11 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
       }
 
       if (activeVariationImage) {
-        const videoOffset = hasValidVideo ? 1 : 0;
-        const newFirstIndex = videoOffset;
-        
-        if (hasValidVideo) {
-          const newImages = [videoItem, activeVariationImage, ...originalGalleryImages.slice(1)];
-          emblaThumbsApi?.scrollTo(newFirstIndex);
-          setSelectedIndex(newFirstIndex);
-          emblaMainApi?.scrollTo(newFirstIndex);
-          return newImages;
-        } else {
-          const newImages = [activeVariationImage, ...originalGalleryImages.slice(1)];
-          emblaThumbsApi?.scrollTo(0);
-          setSelectedIndex(0);
-          emblaMainApi?.scrollTo(0);
-          return newImages;
-        }
+        const newImages = [activeVariationImage, ...originalGalleryImages.slice(1)];
+        emblaThumbsApi?.scrollTo(0);
+        setSelectedIndex(0);
+        emblaMainApi?.scrollTo(0);
+        return newImages;
       }
       return previousImages;
     });
@@ -227,7 +204,6 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   const onThumbVariationClick = (variationId: string | null = null) => {
     if (!emblaMainApi || !emblaThumbsApi) return;
 
-    hasUserInteracted.current = true;
     setVariationImageEnabled(false);
     if (variationId) {
       const variationIndex = combinedImages.findIndex(
@@ -248,7 +224,6 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   const onThumbClickCalculated = useCallback(
     (thumbIndex: number | null) => {
       if (!emblaMainApi || !emblaThumbsApi) return;
-      hasUserInteracted.current = true;
       setVariationImageEnabled(true);
       setSelectedIndex(thumbIndex as number)
       emblaThumbsApi.scrollTo(thumbIndex as number)
@@ -262,13 +237,10 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
     [emblaMainApi, emblaThumbsApi, product, pauseAllVideos]
   );
 
-  const onSelect = useCallback((isUserTriggered: boolean = false) => {
+  const onSelect = useCallback(() => {
     if (!emblaMainApi || !emblaThumbsApi) return;
     const newIndex = emblaMainApi.selectedScrollSnap();
     if (newIndex !== selectedIndex) {
-      if (isUserTriggered) {
-        hasUserInteracted.current = true;
-      }
       pauseAllVideos();
       setSelectedIndex(newIndex);
     }
@@ -276,17 +248,9 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
 
   useEffect(() => {
     if (!emblaMainApi) return;
-    onSelect(false); // Initial call, not user triggered
-    
-    // These are user-triggered events
-    const handleUserSelect = () => onSelect(true);
-    emblaMainApi.on("select", handleUserSelect);
-    emblaMainApi.on("reInit", handleUserSelect);
-    
-    return () => {
-      emblaMainApi.off("select", handleUserSelect);
-      emblaMainApi.off("reInit", handleUserSelect);
-    };
+    onSelect();
+    emblaMainApi.on("select", onSelect);
+    emblaMainApi.on("reInit", onSelect);
   }, [emblaMainApi, onSelect]);
 
   return (
@@ -295,66 +259,11 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
         <div className="embla__container ">
           {galleryImages?.map((variation: any, index: number) => (
             <div className="embla__slide" key={index}>
-              {variation.isVideo ? (
-                isTikTokUrl(variation.sourceUrl) ? (
-                  <div className="relative max-h-[330px] md:max-h-[410px] w-full rounded-2xl overflow-hidden bg-black flex items-center justify-center min-h-[330px] md:min-h-[410px]">
-                    <iframe
-                      src={getTikTokEmbedUrl(variation.sourceUrl) || variation.sourceUrl}
-                      className="w-full h-[330px] md:h-[410px] rounded-xl"
-                      allowFullScreen
-                      scrolling="no"
-                      allow="encrypted-media;"
-                    />
-                  </div>
-                ) : isYouTubeUrl(variation.sourceUrl) ? (
-                  <div className="relative max-h-[330px] md:max-h-[410px] w-full rounded-2xl overflow-hidden bg-black flex items-center justify-center min-h-[330px] md:min-h-[410px]">
-                    <iframe
-                      src={getYouTubeEmbedUrl(variation.sourceUrl) || variation.sourceUrl}
-                      className="w-full h-[330px] md:h-[410px] rounded-xl"
-                      allowFullScreen
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      title="YouTube video player"
-                    />
-                  </div>
-                ) : (
-                  <div className="relative max-h-[330px] md:max-h-[410px] w-full rounded-2xl overflow-hidden bg-black flex items-center justify-center min-h-[330px] md:min-h-[410px]">
-                    <video 
-                      ref={videoRef}
-                      className="max-w-full max-h-full object-contain rounded-xl"
-                      controls={isVideoPlaying}
-                      poster={originalGalleryImages?.[0]?.sourceUrl || product.image?.sourceUrl || undefined}
-                      preload="metadata"
-                      onPlay={() => setIsVideoPlaying(true)}
-                      onPause={() => setIsVideoPlaying(false)}
-                      onEnded={() => setIsVideoPlaying(false)}
-                    >
-                      <source src={variation.sourceUrl} type="video/mp4" />
-                      <p>Your browser does not support the video tag.</p>
-                    </video>
-                    {!isVideoPlaying && (
-                      <div 
-                        className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 cursor-pointer group hover:bg-opacity-40 transition-all duration-300"
-                        onClick={() => {
-                          if (videoRef.current) {
-                            videoRef.current.play();
-                            setIsVideoPlaying(true);
-                          }
-                        }}
-                      >
-                        <div className="bg-white bg-opacity-90 rounded-[2rem] p-4 md:p-6 shadow-2xl group-hover:bg-opacity-100 group-hover:scale-110 transition-all duration-300">
-                          <PlayIcon className="w-12 h-12 md:w-16 md:h-16 text-primaryColor ml-1" />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )
-              ) : (
-                <ImageEffect
-                  index={index}
-                  src={variation?.sourceUrl || ""}
-                  classNames="max-h-[330px] object-contain md:max-h-[410px] image transform transition-transform duration-300"
-                />
-              )}
+              <ImageEffect
+                index={index}
+                src={variation?.sourceUrl || ""}
+                classNames="max-h-[330px] object-contain md:max-h-[410px] image transform transition-transform duration-300"
+              />
             </div>
           ))}
         </div>
@@ -363,47 +272,78 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
       <div className="embla-thumbs">
         <div className="embla-thumbs__viewport " ref={emblaThumbsRef}>
           <div className="embla-thumbs__container" >
-            {/* Gallery Image */}
+            {/* Gallery Image Thumbnails */}
             {galleryImages?.map((variation: any, index: number) => (
-              variation.isVideo ? (
-                <div
-                  key={index}
-                  className={'embla-thumbs__slide relative '.concat(
-                    index === selectedIndex ? ' embla-thumbs__slide--selected' : ''
-                  )}
-                >
-                  <button
-                    onClick={() => onThumbClickCalculated(index)}
-                    className="embla-thumbs__slide__button flex items-center relative w-full"
-                    type="button"
-                  >
-                    <Image
-                      className="embla-thumbs__slide__img object-contain max-h-[75px] min-h-[75px] md:max-h-[100px] md:min-h-[100px] min-w-[75px] md:max-w-[100px] md:min-w-[100px] rounded-lg"
-                      src={originalGalleryImages?.[0]?.sourceUrl || product.image?.sourceUrl || '/images/placeholder-small.png'}
-                      width={100}
-                      height={100}
-                      alt="Video thumbnail"
-                    />
-                    <div className="absolute inset-0 max-h-[75px] min-h-[75px] md:max-h-[100px] md:min-h-[100px] min-w-[75px] md:max-w-[100px] md:min-w-[100px] bg-black bg-opacity-30 flex items-center justify-center rounded-lg">
-                      <div className="bg-white bg-opacity-90 rounded-full p-1.5">
-                        <PlayIcon className="w-4 h-4 text-black" />
-                      </div>
-                    </div>
-                  </button>
-                </div>
-              ) : (
-                <Thumb
-                  onClick={() => onThumbClickCalculated(index)}
-                  selected={index === selectedIndex}
-                  index={index}
-                  imgSrc={variation?.sourceUrl || ""}
-                  key={index}
-                />
-              )
+              <Thumb
+                onClick={() => onThumbClickCalculated(index)}
+                selected={index === selectedIndex}
+                index={index}
+                imgSrc={variation?.sourceUrl || ""}
+                key={index}
+              />
             ))}
           </div>
         </div>
       </div>
+
+      {/* Product Video Section - Below Thumbnails */}
+      {hasValidVideo && product.productVideoUrl && (
+        <div className="mt-6 md:mt-8">
+          {isTikTokUrl(product.productVideoUrl) ? (
+            <div className="relative w-full rounded-2xl overflow-hidden bg-black flex items-center justify-center">
+              <iframe
+                src={getTikTokEmbedUrl(product.productVideoUrl) || product.productVideoUrl}
+                className="w-full h-[330px] md:h-[410px] rounded-xl"
+                allowFullScreen
+                scrolling="no"
+                allow="encrypted-media;"
+                title="TikTok video"
+              />
+            </div>
+          ) : isYouTubeUrl(product.productVideoUrl) ? (
+            <div className="relative w-full rounded-2xl overflow-hidden bg-black flex items-center justify-center">
+              <iframe
+                src={getYouTubeEmbedUrl(product.productVideoUrl)! || product.productVideoUrl}
+                className="w-full h-[330px] md:h-[410px] rounded-xl"
+                allowFullScreen
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                title="YouTube video player"
+              />
+            </div>
+          ) : (
+            <div className="relative w-full rounded-2xl overflow-hidden bg-black flex items-center justify-center">
+              <video 
+                ref={videoRef}
+                className="w-full max-h-[330px] md:max-h-[410px] object-contain rounded-xl"
+                controls={isVideoPlaying}
+                poster={originalGalleryImages?.[0]?.sourceUrl || product.image?.sourceUrl || undefined}
+                preload="metadata"
+                onPlay={() => setIsVideoPlaying(true)}
+                onPause={() => setIsVideoPlaying(false)}
+                onEnded={() => setIsVideoPlaying(false)}
+              >
+                <source src={product.productVideoUrl} type="video/mp4" />
+                <p>Your browser does not support the video tag.</p>
+              </video>
+              {!isVideoPlaying && (
+                <div 
+                  className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 cursor-pointer group hover:bg-opacity-40 transition-all duration-300"
+                  onClick={() => {
+                    if (videoRef.current) {
+                      videoRef.current.play();
+                      setIsVideoPlaying(true);
+                    }
+                  }}
+                >
+                  <div className="bg-white bg-opacity-90 rounded-[2rem] p-4 md:p-6 shadow-2xl group-hover:bg-opacity-100 group-hover:scale-110 transition-all duration-300">
+                    <PlayIcon className="w-12 h-12 md:w-16 md:h-16 text-primaryColor ml-1" />
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 };
