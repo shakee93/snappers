@@ -580,9 +580,10 @@ const ProductDetails = ({
                   {attr.options
                     ?.slice()
                     .sort((a, b) => {
-                      const numA = a ? parseInt(a.replace(/[^0-9]/g, ""), 10) : 0; // Default to 0 if a is null
-                      const numB = b ? parseInt(b.replace(/[^0-9]/g, ""), 10) : 0; // Default to 0 if b is null
-                      return numA - numB;
+                      // Extract first number from each option (e.g., "12gb-256gb" -> 12)
+                      const numA = a ? parseInt(a.match(/\d+/)?.[0] || "0", 10) : 0;
+                      const numB = b ? parseInt(b.match(/\d+/)?.[0] || "0", 10) : 0;
+                      return numA - numB; // Ascending order: 12, 16, 24
                     })
                     .map((option, optionIndex) => {
                       const matchingVariations = (
