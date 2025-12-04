@@ -293,7 +293,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
 
       {/* Product Video Section - Below Thumbnails */}
       {hasValidVideo && product.productVideoUrl && (
-        <div className="mt-6 md:mt-8">
+        <div className="hidden md:block mt-6 md:mt-8">
           {isTikTokUrl(product.productVideoUrl) ? (
             <div className="relative w-full rounded-2xl overflow-hidden bg-black flex items-center justify-center">
               <iframe
