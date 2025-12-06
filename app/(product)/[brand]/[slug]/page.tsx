@@ -16,6 +16,7 @@ import { Metadata, ResolvingMetadata } from "next";
 import { ImageProvider } from "@/context/ImageChangeGrabber";
 import UpsellProducts from "@/app/components/globalComponents/UpsellProducts";
 import { getProductSchema } from "@/lib/jsonld/productSchema";
+// import LoadingProduct from "./loading";
 
 export const dynamic = "force-dynamic";
 
