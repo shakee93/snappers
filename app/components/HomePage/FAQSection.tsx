@@ -4,6 +4,7 @@ import React from "react";
 import { Accordion, AccordionItem } from "@nextui-org/react";
 import SiteLogo from "@/public/global/gq-logo.png";
 import Image from "next/image";
+import { Clock } from "lucide-react";
 
 const faqs = [
   {
@@ -90,18 +91,28 @@ const FAQ = () => {
         <span className="text-xs sm:text-sm font-medium mb-2 sm:mb-4">Frequently Asked Questions</span>
         <div className="mb-2 sm:mb-4 hover:scale-105 transition-transform duration-200">
           {/* Brand logo placeholder */}
-          <Image 
-            src={SiteLogo} 
-            alt="GQ Mobiles Logo" 
-            width={90} 
-            height={30} 
-            className="object-contain hover:scale-110 transition-transform duration-200" 
+          <Image
+            src={SiteLogo}
+            alt="GQ Mobiles Logo"
+            width={90}
+            height={30}
+            className="object-contain hover:scale-110 transition-transform duration-200"
           />
         </div>
-        <div className="text-xs sm:text-sm text-gray-700 mb-4 sm:mb-6">
-          <div>Mon - Sat (10.00AM - 08.00PM)</div>
-          <div>Poya Days: (10.00AM - 05.00PM)</div>
-          <div>Sundays: Closed</div>
+        <div className="text-xs sm:text-sm text-gray-700 mb-4 sm:mb-6 flex flex-col gap-2">
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <Clock size={16} className="text-primaryColor" />
+            </div>
+            <div className="flex flex-col gap-1 md:gap-2 text-xs md:text-sm leading-tight md:leading-snug">
+              <div className="font-medium text-gray-800 ">Monday - Saturday&nbsp;
+                <span className="block font-normal text-gray-500">10.00AM&nbsp;-&nbsp;08.00PM</span>
+              </div>
+              <div className="font-medium text-gray-800 ">Sunday &amp; Poya's&nbsp;
+                <span className="block font-normal text-gray-500">10.00AM&nbsp;-&nbsp;05.00PM</span>
+              </div>
+            </div>
+          </div>
           <div className="mt-2">Average answer time: Call for instant help</div>
         </div>
       </div>

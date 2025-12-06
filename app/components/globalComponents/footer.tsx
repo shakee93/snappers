@@ -248,11 +248,13 @@ const Footer = async () => {
                 <div>
                   <Clock size={iconSize} className="text-primaryColor" />
                 </div>
-                <div className="flex flex-col">
-                  {/* <div>Business Hours:</div> */}
-                  <div>Mon - Sat (10.00AM - 08.00PM)</div>
-                  <div>Poya Days: (10.00AM - 05.00PM)</div>
-                  <div>Sundays: Closed</div>
+                <div className="flex flex-col gap-1 md:gap-2 text-xs md:text-sm leading-tight md:leading-snug">
+                  <div className="font-medium text-gray-800 ">Monday - Saturday&nbsp;
+                    <span className="block font-normal text-gray-500">10.00AM&nbsp;-&nbsp;08.00PM</span>
+                  </div>
+                  <div className="font-medium text-gray-800 ">Sunday &amp; Poya's&nbsp;
+                    <span className="block font-normal text-gray-500">10.00AM&nbsp;-&nbsp;05.00PM</span>
+                  </div>
                 </div>
               </li>
               <li className="lg:text-sm text-gray-500 flex gap-3">
