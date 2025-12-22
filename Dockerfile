@@ -56,9 +56,9 @@ COPY --from=builder --chown=nextjs:nodejs /app/public ./public
 USER nextjs
 
 # Expose port 3002
-EXPOSE 3002
+EXPOSE 3000
 
-ENV PORT=3002
+ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 
 # Set environment variables (placeholders - override at runtime)
