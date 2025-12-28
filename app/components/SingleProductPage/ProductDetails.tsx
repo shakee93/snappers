@@ -63,7 +63,7 @@ const ProductDetails = ({
   }, []);
 
   useEffect(() => {
-    setVariationId(activeVariation?.image.databaseId);
+    setVariationId(activeVariation?.image?.databaseId);
     setActiveVariation(activeVariation);
   }, [activeVariation]);
 
@@ -121,13 +121,13 @@ const ProductDetails = ({
       if (lowestPriceInStockVariation?.image) {
         setActiveVariation(lowestPriceInStockVariation);
         setVariationId(
-          lowestPriceInStockVariation?.image.databaseId.toString()
+          lowestPriceInStockVariation?.image?.databaseId.toString()
         );
       } else {
         const firstVariation = product?.variations?.nodes[0];
         if (firstVariation) {
           setActiveVariation(firstVariation); // Fallback to the first variation if none are in stock
-          setVariationId(firstVariation?.image?.databaseId.toString());
+          setVariationId(firstVariation?.image?.databaseId?.toString());
         }
       }
     }
