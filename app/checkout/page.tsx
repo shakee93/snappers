@@ -367,11 +367,19 @@ const CheckoutPage = () => {
 
     if (isBankTransfer) {
       if (wantToSHowBankTransfer) {
-        ImplementBankTransfer();
+        // First create the order and get payment details, then open modal
+        const checkoutResult = await handleCheckout();
+        if (checkoutResult) {
+          ImplementBankTransfer();
+        }
         return;
       }
       try {
-        ImplementBankTransfer();
+        // First create the order and get payment details, then open modal
+        const checkoutResult = await handleCheckout();
+        if (checkoutResult) {
+          ImplementBankTransfer();
+        }
       } catch (e) {
         toast.error(
           "Sorry to hear that you are facing an issue with Bank Transfer. Please try again later."
@@ -402,10 +410,13 @@ const CheckoutPage = () => {
 
       const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
 
+      console.log("paymentMethodId", paymentMethodId);
+      console.log("formData", formData);
+
       if (paymentMethodId === undefined) {
         console.error("Payment method ID is undefined");
         toast.error("Payment Method was not chosen.");
-        return;
+        return null;
       }
 
       formData.billingAddress.country = "LK";
@@ -522,6 +533,7 @@ const CheckoutPage = () => {
         setPaymentData(checkoutDetails);
 
         if (isBankTransfer) {
+          console.log("checkoutDetails", checkoutDetails);
           return checkoutDetails;
         } else {
           toast.success("🌟 Order Placed Successfully! 🚀");
@@ -533,6 +545,7 @@ const CheckoutPage = () => {
       }
     } catch (error) {
       handleCheckoutError(error);
+      return null; // Explicitly return null on error
     } finally {
       setLoading(false);
     }
