@@ -6,6 +6,7 @@ import BankDetails from "./BankDetails";
 import { PaymentDetailsWithoutUrls } from "@/data/types";
 import { Loader } from "lucide-react";
 import { useSession } from "@/context/SessionProvider";
+import { useCart } from "@/context/CartProvider";
 import Image from "next/image";
 import { sentConfirmation } from "@/components/AddressPageComps/HelperComps";
 
@@ -26,6 +27,7 @@ const BankTransfer: React.FC<BankTransferProps> = ({
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const { customer, fetchCustomer } = useSession();
+  const { clearCart, refreshCart } = useCart();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = event.target.files;
@@ -129,6 +131,18 @@ const BankTransfer: React.FC<BankTransferProps> = ({
           const confirmation = await sentConfirmation(order_id as number);
         }
 
+        // Clear cart after successful file upload (order is now complete)
+        try {
+          await clearCart();
+          await refreshCart();
+        } catch (error: unknown) {
+          if (
+            error instanceof Error &&
+            !error.message.includes("No items in cart to remove")
+          ) {
+            console.error("Error clearing cart:", error);
+          }
+        }
 
         if (customer?.id === "guest") {
 

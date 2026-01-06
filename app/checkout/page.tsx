@@ -55,7 +55,7 @@ interface FormData {
 }
 
 const CheckoutPage = () => {
-  const { cart, removeFromCart, updateCart } = useCart();
+  const { cart, removeFromCart, updateCart, clearCart, refreshCart } = useCart();
   const [finalOrderTotal, setFinalOrderTotal] = useState(null);
   const { customer, fetchCustomer } = useSession();
 
@@ -533,9 +533,22 @@ const CheckoutPage = () => {
         setPaymentData(checkoutDetails);
 
         if (isBankTransfer) {
+          // For bank transfer, don't clear cart yet - wait for file upload success
           console.log("checkoutDetails", checkoutDetails);
           return checkoutDetails;
         } else {
+          // For other payment methods, clear cart immediately after successful order creation
+          try {
+            await clearCart();
+            await refreshCart();
+          } catch (error: unknown) {
+            if (
+              error instanceof Error &&
+              !error.message.includes("No items in cart to remove")
+            ) {
+              console.error("Error clearing cart:", error);
+            }
+          }
           toast.success("🌟 Order Placed Successfully! 🚀");
           return null;
         }
