@@ -142,7 +142,8 @@ export async function POST(request: NextRequest) {
 
     // Redirect to checkout page with order ID on success
     if (isSuccess && referenceNumber) {
-      const redirectUrl = `http://localhost:3000/checkout/${referenceNumber}`;
+      const baseUrl = new URL(request.url);
+      const redirectUrl = `${baseUrl.origin}/checkout/${referenceNumber}`;
       
       // Return HTML that auto-redirects (for POST requests from CyberSource)
       const html = `
@@ -197,7 +198,7 @@ export async function POST(request: NextRequest) {
     // For review status or unknown status, redirect to checkout
     const baseUrl = new URL(request.url);
     const redirectUrl = referenceNumber 
-      ? `http://localhost:3000/checkout/${referenceNumber}`
+      ? `${baseUrl.origin}/checkout/${referenceNumber}`
       : `${baseUrl.origin}/checkout`;
     
     const html = `
@@ -237,11 +238,11 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const referenceNumber = searchParams.get('req_reference_number') || searchParams.get('order_id');
+  const baseUrl = new URL(request.url);
   
   if (referenceNumber) {
-    return NextResponse.redirect(`http://localhost:3000/checkout/${referenceNumber}`, 302);
+    return NextResponse.redirect(`${baseUrl.origin}/checkout/${referenceNumber}`, 302);
   }
   
-  const baseUrl = new URL(request.url);
   return NextResponse.redirect(`${baseUrl.origin}/checkout`, 302);
 }
