@@ -364,6 +364,8 @@ const CheckoutPage = () => {
       formData?.paymentMethod?.selectedGateway?.id == "darazbnpl";
     const isGeniePayment =
       formData?.paymentMethod?.selectedGateway?.id == "geniebiz";
+    const isNdbPay =
+      formData?.paymentMethod?.selectedGateway?.id == "ndb-pay";
 
     if (isBankTransfer) {
       if (wantToSHowBankTransfer) {
@@ -392,6 +394,11 @@ const CheckoutPage = () => {
     }
 
     if (isPayhere) {
+      await handleCheckout();
+      return;
+    }
+
+    if (isNdbPay) {
       await handleCheckout();
       return;
     }
@@ -490,6 +497,63 @@ const CheckoutPage = () => {
         };
         localStorage.setItem("last_order", JSON.stringify(data));
         handleKoko(orderData);
+        return; // Return early to prevent further processing
+      }
+
+      // NDB-Pay Payment - Order is already created above
+      const isNdbPay = formData?.paymentMethod?.selectedGateway?.id == "ndb-pay";
+      if (isNdbPay) {
+        // Order is already created at this point (line 475-478)
+        const orderTotalRaw = data?.checkout?.order?.total;
+        
+        // Extract raw numeric amount (remove HTML entities, currency symbols, etc.)
+        // Order total might be like "₨&nbsp;519.90" or "Rs 519.90"
+        const rawAmount = orderTotalRaw?.replace(/[^0-9.]/g, "") || "0.00";
+        const numericAmount = parseFloat(rawAmount).toFixed(2);
+        
+        console.log("=== NDB-PAY ORDER DATA DEBUG ===");
+        console.log("Order Total (raw HTML):", orderTotalRaw);
+        console.log("Order Total (extracted):", numericAmount);
+        console.log("Order Data:", data?.checkout?.order);
+        
+        // Prepare billing and shipping addresses for CyberSource
+        const billingAddress = transformAddress(formData.billingAddress);
+        const shippingAddress = isStorePickup 
+          ? { ...transformAddress(formData.deliveryAddress), address1: "Store Pickup", city: "Store Pickup" }
+          : transformAddress(formData.deliveryAddress);
+
+        const orderData = {
+          order_id: data?.checkout?.order?.databaseId, // Use the created order ID
+          amount: numericAmount, // Send clean numeric amount
+          currency: "LKR",
+          email: formData?.contactInfo?.email,
+          phone: formData?.contactInfo?.phone,
+          // Billing information for CyberSource
+          bill_to_forename: billingAddress.firstName || "",
+          bill_to_surname: billingAddress.lastName || "",
+          bill_to_address_line1: billingAddress.address1 || "",
+          bill_to_address_line2: billingAddress.address2 || "",
+          bill_to_address_city: billingAddress.city || "",
+          bill_to_address_state: billingAddress.state || "",
+          bill_to_address_postal_code: billingAddress.postcode || "",
+          bill_to_address_country: billingAddress.country || "LK",
+          bill_to_email: formData?.contactInfo?.email || "",
+          bill_to_phone: formData?.contactInfo?.phone || "",
+          // Shipping information for CyberSource
+          ship_to_forename: shippingAddress.firstName || "",
+          ship_to_surname: shippingAddress.lastName || "",
+          ship_to_address_line1: shippingAddress.address1 || "",
+          ship_to_address_line2: shippingAddress.address2 || "",
+          ship_to_address_city: shippingAddress.city || "",
+          ship_to_address_state: shippingAddress.state || "",
+          ship_to_address_postal_code: shippingAddress.postcode || "",
+          ship_to_address_country: shippingAddress.country || "LK",
+        };
+        
+        console.log("Sending to WordPress:", orderData);
+        localStorage.setItem("last_order", JSON.stringify(data));
+        handleNdbPay(orderData); // Fetch form and submit
+        return; // Return early to prevent cart clearing and other processing
       }
 
       // FOR GUEST CHECKOUT
@@ -765,6 +829,109 @@ const CheckoutPage = () => {
     } catch (error) {
       console.error("Koko payment error:", error);
       toast.error("Payment initiation failed. Please try again.");
+    }
+  };
+
+  const handleNdbPay = async (orderData: any) => {
+    toast.info("Redirecting to NDB-Pay payment portal...", {
+      duration: 10000,
+    });
+    try {
+      // Log the extracted amount being sent to backend
+      console.log("=== SENDING TO BACKEND ===");
+      console.log("Order Data (with extracted amount):", orderData);
+      console.log("Amount being sent:", orderData.amount);
+      
+      const response = await fetch("/api/ndb-pay", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(orderData),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("NDB-Pay API error response:", errorText);
+        throw new Error(`Network response was not ok: ${response.status} - ${errorText}`);
+      }
+
+      // WordPress returns only the HTML form (plain HTML, not JSON)
+      const formHtml = await response.text();
+
+      // Validate that we received HTML
+      if (!formHtml || formHtml.trim().length === 0) {
+        throw new Error("Empty response from server");
+      }
+
+      // Check if it's HTML (might be error JSON)
+      if (formHtml.trim().startsWith('{')) {
+        try {
+          const errorData = JSON.parse(formHtml);
+          throw new Error(errorData.error || errorData.message || "Unknown error from server");
+        } catch (e) {
+          // Not JSON, continue
+        }
+      }
+
+      console.log("NDB-Pay form HTML received:", formHtml.substring(0, 200) + "...");
+
+      setHtmlFormResponse(formHtml);
+
+      // Inject form HTML into DOM and display it on checkout page
+      const tempContainer = document.createElement("div");
+      tempContainer.innerHTML = formHtml;
+      const formWrapper = tempContainer.querySelector("#ndb-pay-form-container") as HTMLDivElement;
+      
+      if (!formWrapper) {
+        console.error("Form HTML received:", formHtml);
+        throw new Error("No form container found in response");
+      }
+
+      // Find the wrapper div on the checkout page
+      const checkoutFormWrapper = document.getElementById("ndb-pay-form-wrapper");
+      if (!checkoutFormWrapper) {
+        console.error("Checkout form wrapper not found");
+        throw new Error("Checkout form wrapper not found");
+      }
+
+      // Clear any existing form and append the new one
+      checkoutFormWrapper.innerHTML = "";
+      checkoutFormWrapper.appendChild(formWrapper);
+
+      // Get the form element from the wrapper
+      const form = formWrapper.querySelector("form") as HTMLFormElement;
+      if (!form) {
+        console.error("Form HTML received:", formHtml);
+        throw new Error("No form element found in response");
+      }
+
+      // Add submit button to form
+      const submitButton = document.createElement("button");
+      submitButton.textContent = "Pay Now";
+      submitButton.style.display = "none";
+      submitButton.type = "submit";
+      submitButton.className = "mt-4 px-6 py-2 bg-primary text-white rounded hover:bg-primary-dark";
+      
+      form.appendChild(submitButton);
+
+      // Form is now visible on the checkout page with all values
+      console.log("Form displayed on checkout page. Form action:", form.action);
+      
+      // Submit form by clicking the submit button
+      setTimeout(() => {
+        const submitBtn = document.querySelector("#ndb-pay-form-container button[type=submit]") as HTMLButtonElement;
+        if (submitBtn) {
+          submitBtn.click();
+        } else {
+          console.error("Submit button not found");
+        }
+      }, 100);
+
+    } catch (error) {
+      console.error("NDB-Pay payment error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+      toast.error(`Payment initiation failed: ${errorMessage}`);
     }
   };
 
@@ -1076,6 +1243,9 @@ const CheckoutPage = () => {
                 "Confirm Order"
               )}
             </ButtonPrimary>
+
+            {/* Dynamic NDB-Pay Form Container (populated when NDB-Pay is selected) */}
+            <div id="ndb-pay-form-wrapper" className="mt-6"></div>
 
             {/* <ButtonPrimary
               onClick={handleKoko}
