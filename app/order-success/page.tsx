@@ -4,15 +4,13 @@ import React, { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle, Info, Copy, Check, XCircle, AlertCircle, Clock } from "lucide-react";
-import { useRouter } from "next/navigation";
 
 interface RequestData {
   [key: string]: string | string[] | undefined;
 }
 
-const PaymentSuccessContent = () => {
+const OrderSuccessContent = () => {
   const searchParams = useSearchParams();
-  const router = useRouter();
   const [requestData, setRequestData] = useState<RequestData>({});
   const [copied, setCopied] = useState(false);
   const [paymentStatus, setPaymentStatus] = useState<{
@@ -125,8 +123,8 @@ const PaymentSuccessContent = () => {
     // Default
     return {
       icon: <Info className="w-16 h-16 text-blue-500" />,
-      title: "Payment Callback Received",
-      message: "Payment callback received. Processing...",
+      title: "Order Status",
+      message: "Processing your order...",
       bgColor: "bg-blue-50",
       borderColor: "border-blue-200",
       textColor: "text-blue-800",
@@ -180,6 +178,12 @@ const PaymentSuccessContent = () => {
                   <p className="text-gray-900">{requestData.reason_code}</p>
                 </div>
               )}
+              {requestData.decision && (
+                <div>
+                  <span className="font-medium text-gray-600">Decision:</span>
+                  <p className="text-gray-900 font-semibold">{requestData.decision}</p>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -189,7 +193,7 @@ const PaymentSuccessContent = () => {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-xl font-semibold flex items-center gap-2">
               <Info className="w-5 h-5" />
-              Request Body / Query Parameters
+              Payment Response Data
             </h2>
             {hasData && (
               <button
@@ -220,7 +224,7 @@ const PaymentSuccessContent = () => {
           ) : (
             <div className="bg-yellow-50 border border-yellow-200 rounded-md p-4">
               <p className="text-yellow-800">
-                No request data received. This page expects query parameters or a POST request body.
+                No payment data received. This page expects query parameters from the payment gateway.
               </p>
             </div>
           )}
@@ -288,10 +292,10 @@ const PaymentSuccessContent = () => {
             About This Page
           </h3>
           <ul className="text-sm text-blue-800 space-y-1">
-            <li>• This page handles CyberSource Secure Acceptance payment returns</li>
+            <li>• This page displays payment results from CyberSource Secure Acceptance</li>
             <li>• Payment status is determined by the <code className="bg-blue-100 px-1 rounded">decision</code> parameter</li>
-            <li>• All callback parameters are displayed below for debugging</li>
-            <li>• For POST requests, use the API route at <code className="bg-blue-100 px-1 rounded">/api/payment-success</code></li>
+            <li>• All callback parameters are displayed above for debugging</li>
+            <li>• POST requests are handled at <code className="bg-blue-100 px-1 rounded">/payment-success</code> and redirected here</li>
           </ul>
         </div>
       </div>
@@ -299,7 +303,7 @@ const PaymentSuccessContent = () => {
   );
 };
 
-const PaymentSuccessPage = () => {
+const OrderSuccessPage = () => {
   return (
     <Suspense fallback={
       <div className="min-h-screen bg-gray-50 py-12 flex items-center justify-center">
@@ -309,9 +313,9 @@ const PaymentSuccessPage = () => {
         </div>
       </div>
     }>
-      <PaymentSuccessContent />
+      <OrderSuccessContent />
     </Suspense>
   );
 };
 
-export default PaymentSuccessPage;
+export default OrderSuccessPage;

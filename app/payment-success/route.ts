@@ -3,7 +3,7 @@ import crypto from "crypto";
 
 /**
  * Handle POST requests from CyberSource at /payment-success
- * Since the return URL is fixed, we handle POST here and redirect with query params
+ * Redirects to /order-success with payment details as query parameters
  */
 
 // Get secret key from environment
@@ -83,30 +83,28 @@ export async function POST(request: NextRequest) {
     //   await updateOrderStatus(referenceNumber, 'completed', transactionId);
     // }
 
-    // Build query string from all parameters to redirect to the page
+    // Build query string from all parameters
     const queryString = new URLSearchParams(params).toString();
-    
-    // Redirect to the same path but with query parameters
-    // This allows the frontend page to read the data
     const baseUrl = new URL(request.url);
-    const redirectUrl = `${baseUrl.origin}${baseUrl.pathname}?${queryString}`;
+    const redirectUrl = `${baseUrl.origin}/order-success?${queryString}`;
     
+    // Redirect to order-success page with all payment parameters
     return NextResponse.redirect(redirectUrl, 302);
   } catch (error) {
     console.error('Payment success handler error:', error);
-    // On error, redirect to page with error parameter
+    // On error, redirect to order-success with error parameter
     const baseUrl = new URL(request.url);
     return NextResponse.redirect(
-      `${baseUrl.origin}${baseUrl.pathname}?error=processing`,
+      `${baseUrl.origin}/order-success?error=processing`,
       302
     );
   }
 }
 
 /**
- * Handle GET requests - just pass through to the page
+ * Handle GET requests - redirect to order-success (for testing)
  */
 export async function GET(request: NextRequest) {
-  // The page.tsx will handle GET requests and display query params
-  return NextResponse.next();
+  const baseUrl = new URL(request.url);
+  return NextResponse.redirect(`${baseUrl.origin}/order-success`, 302);
 }

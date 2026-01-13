@@ -107,7 +107,28 @@ export async function POST(request: NextRequest) {
     const baseUrl = new URL(request.url);
     const redirectUrl = `${baseUrl.origin}/payment-success?${queryString}`;
     
-    return NextResponse.redirect(redirectUrl, 302);
+    // Return HTML that auto-redirects (for POST requests from CyberSource)
+    // This works when CyberSource POSTs directly to /payment-success
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta http-equiv="refresh" content="0;url=${redirectUrl}">
+          <script>window.location.href = ${JSON.stringify(redirectUrl)};</script>
+        </head>
+        <body>
+          <p>Redirecting...</p>
+          <p>If you are not redirected, <a href="${redirectUrl}">click here</a>.</p>
+        </body>
+      </html>
+    `;
+    
+    return new NextResponse(html, {
+      status: 200,
+      headers: {
+        'Content-Type': 'text/html',
+      },
+    });
   } catch (error) {
     console.error('Payment success handler error:', error);
     // On error, redirect to page with error parameter
