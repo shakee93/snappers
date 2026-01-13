@@ -3,7 +3,8 @@
 import React, { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { CheckCircle, Info, Copy, Check } from "lucide-react";
+import { CheckCircle, Info, Copy, Check, XCircle, AlertCircle, Clock } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface RequestData {
   [key: string]: string | string[] | undefined;
@@ -11,8 +12,17 @@ interface RequestData {
 
 const PaymentSuccessContent = () => {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [requestData, setRequestData] = useState<RequestData>({});
   const [copied, setCopied] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState<{
+    decision?: string;
+    isSuccess?: boolean;
+    isDeclined?: boolean;
+    isReview?: boolean;
+    isError?: boolean;
+    isCancelled?: boolean;
+  }>({});
 
   useEffect(() => {
     // Extract all URL parameters
@@ -22,6 +32,19 @@ const PaymentSuccessContent = () => {
     });
 
     setRequestData(params);
+
+    // Determine payment status from CyberSource decision
+    const decision = params.decision as string;
+    if (decision) {
+      setPaymentStatus({
+        decision,
+        isSuccess: decision === 'ACCEPT',
+        isDeclined: decision === 'DECLINE',
+        isReview: decision === 'REVIEW',
+        isError: decision === 'ERROR',
+        isCancelled: decision === 'CANCEL',
+      });
+    }
   }, [searchParams]);
 
   const copyToClipboard = async () => {
@@ -35,6 +58,72 @@ const PaymentSuccessContent = () => {
   };
 
   const hasData = Object.keys(requestData).length > 0;
+  const decision = requestData.decision as string;
+
+  // Get status icon and colors
+  const getStatusDisplay = () => {
+    if (paymentStatus.isSuccess) {
+      return {
+        icon: <CheckCircle className="w-16 h-16 text-green-500" />,
+        title: "Payment Successful!",
+        message: "Your payment has been processed successfully.",
+        bgColor: "bg-green-50",
+        borderColor: "border-green-200",
+        textColor: "text-green-800",
+      };
+    }
+    if (paymentStatus.isDeclined) {
+      return {
+        icon: <XCircle className="w-16 h-16 text-red-500" />,
+        title: "Payment Declined",
+        message: "Your payment was declined. Please try again or use a different payment method.",
+        bgColor: "bg-red-50",
+        borderColor: "border-red-200",
+        textColor: "text-red-800",
+      };
+    }
+    if (paymentStatus.isReview) {
+      return {
+        icon: <Clock className="w-16 h-16 text-yellow-500" />,
+        title: "Payment Under Review",
+        message: "Your payment is being reviewed. We will notify you once it's processed.",
+        bgColor: "bg-yellow-50",
+        borderColor: "border-yellow-200",
+        textColor: "text-yellow-800",
+      };
+    }
+    if (paymentStatus.isCancelled) {
+      return {
+        icon: <AlertCircle className="w-16 h-16 text-orange-500" />,
+        title: "Payment Cancelled",
+        message: "Your payment was cancelled. You can try again when ready.",
+        bgColor: "bg-orange-50",
+        borderColor: "border-orange-200",
+        textColor: "text-orange-800",
+      };
+    }
+    if (paymentStatus.isError) {
+      return {
+        icon: <XCircle className="w-16 h-16 text-red-500" />,
+        title: "Payment Error",
+        message: "An error occurred during payment processing. Please contact support.",
+        bgColor: "bg-red-50",
+        borderColor: "border-red-200",
+        textColor: "text-red-800",
+      };
+    }
+    // Default
+    return {
+      icon: <Info className="w-16 h-16 text-blue-500" />,
+      title: "Payment Callback Received",
+      message: "Payment callback received. Processing...",
+      bgColor: "bg-blue-50",
+      borderColor: "border-blue-200",
+      textColor: "text-blue-800",
+    };
+  };
+
+  const statusDisplay = getStatusDisplay();
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -42,15 +131,48 @@ const PaymentSuccessContent = () => {
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <CheckCircle className="w-16 h-16 text-green-500" />
+            {statusDisplay.icon}
           </div>
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Payment Success
+            {statusDisplay.title}
           </h1>
           <p className="text-gray-600">
-            Payment callback received
+            {statusDisplay.message}
           </p>
         </div>
+
+        {/* Payment Details Card */}
+        {decision && (
+          <div className={`mb-6 ${statusDisplay.bgColor} ${statusDisplay.borderColor} border rounded-lg p-6`}>
+            <h2 className="text-lg font-semibold mb-4">Payment Details</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              {requestData.transaction_id && (
+                <div>
+                  <span className="font-medium text-gray-600">Transaction ID:</span>
+                  <p className="text-gray-900">{requestData.transaction_id}</p>
+                </div>
+              )}
+              {requestData.req_reference_number && (
+                <div>
+                  <span className="font-medium text-gray-600">Order Reference:</span>
+                  <p className="text-gray-900">{requestData.req_reference_number}</p>
+                </div>
+              )}
+              {requestData.auth_amount && (
+                <div>
+                  <span className="font-medium text-gray-600">Amount:</span>
+                  <p className="text-gray-900">{requestData.auth_amount} {requestData.currency || 'LKR'}</p>
+                </div>
+              )}
+              {requestData.reason_code && (
+                <div>
+                  <span className="font-medium text-gray-600">Reason Code:</span>
+                  <p className="text-gray-900">{requestData.reason_code}</p>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Main Content */}
         <div className="bg-white rounded-lg shadow-md p-6">
@@ -116,18 +238,37 @@ const PaymentSuccessContent = () => {
 
           {/* Action Buttons */}
           <div className="mt-8 space-y-3">
-            <Link
-              href="/"
-              className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 transition-colors block text-center font-medium"
-            >
-              Return to Home
-            </Link>
-            <Link
-              href="/shop"
-              className="w-full bg-gray-600 text-white py-3 px-4 rounded-md hover:bg-gray-700 transition-colors block text-center font-medium"
-            >
-              Continue Shopping
-            </Link>
+            {paymentStatus.isSuccess ? (
+              <>
+                <Link
+                  href="/"
+                  className="w-full bg-green-600 text-white py-3 px-4 rounded-md hover:bg-green-700 transition-colors block text-center font-medium"
+                >
+                  Return to Home
+                </Link>
+                <Link
+                  href="/shop"
+                  className="w-full bg-gray-600 text-white py-3 px-4 rounded-md hover:bg-gray-700 transition-colors block text-center font-medium"
+                >
+                  Continue Shopping
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/checkout"
+                  className="w-full bg-blue-600 text-white py-3 px-4 rounded-md hover:bg-blue-700 transition-colors block text-center font-medium"
+                >
+                  Try Again
+                </Link>
+                <Link
+                  href="/"
+                  className="w-full bg-gray-600 text-white py-3 px-4 rounded-md hover:bg-gray-700 transition-colors block text-center font-medium"
+                >
+                  Return to Home
+                </Link>
+              </>
+            )}
           </div>
         </div>
 
@@ -137,9 +278,9 @@ const PaymentSuccessContent = () => {
             About This Page
           </h3>
           <ul className="text-sm text-blue-800 space-y-1">
-            <li>• This page displays all query parameters from the payment gateway callback</li>
-            <li>• The request body is shown in JSON format for easy debugging</li>
-            <li>• You can copy the JSON data using the copy button</li>
+            <li>• This page handles CyberSource Secure Acceptance payment returns</li>
+            <li>• Payment status is determined by the <code className="bg-blue-100 px-1 rounded">decision</code> parameter</li>
+            <li>• All callback parameters are displayed below for debugging</li>
             <li>• For POST requests, use the API route at <code className="bg-blue-100 px-1 rounded">/api/payment-success</code></li>
           </ul>
         </div>
