@@ -37,62 +37,45 @@ function verifySignature(params: Record<string, string>, secretKey: string): boo
 }
 
 /**
- * Update order status to processing via GraphQL
+ * Update order status to processing via WordPress REST API
+ * Uses the same endpoint as PayHere order confirmation
  */
 async function updateOrderStatus(orderId: string, transactionId: string) {
   try {
-    const graphqlEndpoint = process.env.NEXT_PUBLIC_WP_GRAPHQL;
-    if (!graphqlEndpoint) {
-      console.error('GraphQL endpoint not configured');
-      return false;
-    }
-
-    const mutation = `
-      mutation updateOrderStatus($input: UpdateOrderInput!) {
-        updateOrder(input: $input) {
-          clientMutationId
-          order {
-            id
-            status
-            databaseId
-          }
-        }
-      }
-    `;
-
-    const variables = {
-      input: {
-        orderId: parseInt(orderId, 10),
-        status: 'PROCESSING',
-        transactionId: transactionId,
-      },
-    };
-
-    const response = await fetch(graphqlEndpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        query: mutation,
-        variables,
-      }),
-    });
-
-    if (!response.ok) {
-      console.error('GraphQL request failed:', response.statusText);
-      return false;
-    }
-
-    const result = await response.json();
+    console.log('Updating order status:', { orderId, transactionId });
     
-    if (result.errors) {
-      console.error('GraphQL errors:', result.errors);
+    const confirmationResponse = await fetch(
+      "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/payhere-order-confirmation",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          order_id: orderId,
+          order_status: "processing",
+          transaction_id: transactionId,
+        }),
+      }
+    );
+
+    const responseText = await confirmationResponse.text();
+    console.log('Order confirmation response status:', confirmationResponse.status);
+    console.log('Order confirmation response body:', responseText);
+
+    if (confirmationResponse.ok) {
+      let result;
+      try {
+        result = JSON.parse(responseText);
+      } catch {
+        result = responseText;
+      }
+      console.log('Order status updated successfully:', result);
+      return true;
+    } else {
+      console.error('Order confirmation failed:', confirmationResponse.status, responseText);
       return false;
     }
-
-    console.log('Order status updated successfully:', result.data);
-    return true;
   } catch (error) {
     console.error('Error updating order status:', error);
     return false;
