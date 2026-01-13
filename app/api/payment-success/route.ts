@@ -7,7 +7,7 @@ import crypto from "crypto";
  * CyberSource sends payment results via POST with form data containing:
  * - decision: ACCEPT, DECLINE, REVIEW, ERROR, CANCEL
  * - transaction_id: CyberSource transaction ID
- * - req_reference_number: Original order reference number
+ * - req_reference_number: Original order reference number (order ID)
  * - signature: Response signature for verification
  * - signed_field_names: Fields used in signature
  * - auth_amount: Authorized amount
@@ -45,6 +45,69 @@ function verifySignature(params: Record<string, string>, secretKey: string): boo
   }
 }
 
+/**
+ * Update order status to processing via GraphQL
+ */
+async function updateOrderStatus(orderId: string, transactionId: string) {
+  try {
+    const graphqlEndpoint = process.env.NEXT_PUBLIC_WP_GRAPHQL;
+    if (!graphqlEndpoint) {
+      console.error('GraphQL endpoint not configured');
+      return false;
+    }
+
+    const mutation = `
+      mutation updateOrderStatus($input: UpdateOrderInput!) {
+        updateOrder(input: $input) {
+          clientMutationId
+          order {
+            id
+            status
+            databaseId
+          }
+        }
+      }
+    `;
+
+    const variables = {
+      input: {
+        orderId: parseInt(orderId, 10),
+        status: 'PROCESSING',
+        transactionId: transactionId,
+      },
+    };
+
+    const response = await fetch(graphqlEndpoint, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        query: mutation,
+        variables,
+      }),
+    });
+
+    if (!response.ok) {
+      console.error('GraphQL request failed:', response.statusText);
+      return false;
+    }
+
+    const result = await response.json();
+    
+    if (result.errors) {
+      console.error('GraphQL errors:', result.errors);
+      return false;
+    }
+
+    console.log('Order status updated successfully:', result.data);
+    return true;
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    return false;
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     // CyberSource sends form data, not JSON
@@ -56,7 +119,7 @@ export async function POST(request: NextRequest) {
       params[key] = value.toString();
     });
 
-    console.log('=== CyberSource Payment Return ===');
+    console.log('=== NDB Payment Return (POST) ===');
     console.log('Received parameters:', params);
 
     // Extract key CyberSource parameters
@@ -80,7 +143,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Determine payment status
-    const isSuccess = decision === 'ACCEPT';
+    const isSuccess = decision === 'ACCEPT' && reasonCode === '100';
     const isDeclined = decision === 'DECLINE';
     const isReview = decision === 'REVIEW';
     const isError = decision === 'ERROR';
@@ -88,27 +151,82 @@ export async function POST(request: NextRequest) {
 
     // Log payment result
     console.log('Payment Decision:', decision);
+    console.log('Reason Code:', reasonCode);
     console.log('Transaction ID:', transactionId);
-    console.log('Reference Number:', referenceNumber);
+    console.log('Reference Number (Order ID):', referenceNumber);
     console.log('Amount:', authAmount, currency);
 
-    // TODO: Update order status in WordPress/WooCommerce
-    // You can call your WordPress API or GraphQL mutation here
-    // Example:
-    // if (isSuccess && referenceNumber) {
-    //   await updateOrderStatus(referenceNumber, 'completed', transactionId);
-    // }
+    // Update order status to processing if payment is successful
+    if (isSuccess && referenceNumber) {
+      console.log('Payment successful, updating order status to PROCESSING...');
+      const updateSuccess = await updateOrderStatus(referenceNumber, transactionId);
+      if (updateSuccess) {
+        console.log('Order status updated successfully');
+      } else {
+        console.error('Failed to update order status');
+      }
+    }
 
-    // Build query string from all parameters to redirect to the page
-    const queryString = new URLSearchParams(params).toString();
-    
-    // Redirect to the payment success page with all parameters as query string
-    // This allows the frontend page to read the data
+    // Redirect to checkout page with order ID
+    if (isSuccess && referenceNumber) {
+      const redirectUrl = `http://localhost:3000/checkout/${referenceNumber}`;
+      
+      // Return HTML that auto-redirects (for POST requests from CyberSource)
+      const html = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta http-equiv="refresh" content="0;url=${redirectUrl}">
+            <script>window.location.href = ${JSON.stringify(redirectUrl)};</script>
+          </head>
+          <body>
+            <p>Payment successful! Redirecting...</p>
+            <p>If you are not redirected, <a href="${redirectUrl}">click here</a>.</p>
+          </body>
+        </html>
+      `;
+      
+      return new NextResponse(html, {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/html',
+        },
+      });
+    }
+
+    // Handle failed/declined payments
+    if (isDeclined || isError || isCancelled) {
+      const baseUrl = new URL(request.url);
+      const redirectUrl = `${baseUrl.origin}/checkout?payment=failed`;
+      
+      const html = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta http-equiv="refresh" content="0;url=${redirectUrl}">
+            <script>window.location.href = ${JSON.stringify(redirectUrl)};</script>
+          </head>
+          <body>
+            <p>Payment failed. Redirecting...</p>
+            <p>If you are not redirected, <a href="${redirectUrl}">click here</a>.</p>
+          </body>
+        </html>
+      `;
+      
+      return new NextResponse(html, {
+        status: 200,
+        headers: {
+          'Content-Type': 'text/html',
+        },
+      });
+    }
+
+    // For review status or unknown status, redirect to checkout
     const baseUrl = new URL(request.url);
-    const redirectUrl = `${baseUrl.origin}/payment-success?${queryString}`;
+    const redirectUrl = referenceNumber 
+      ? `http://localhost:3000/checkout/${referenceNumber}`
+      : `${baseUrl.origin}/checkout`;
     
-    // Return HTML that auto-redirects (for POST requests from CyberSource)
-    // This works when CyberSource POSTs directly to /payment-success
     const html = `
       <!DOCTYPE html>
       <html>
@@ -117,7 +235,7 @@ export async function POST(request: NextRequest) {
           <script>window.location.href = ${JSON.stringify(redirectUrl)};</script>
         </head>
         <body>
-          <p>Redirecting...</p>
+          <p>Processing payment... Redirecting...</p>
           <p>If you are not redirected, <a href="${redirectUrl}">click here</a>.</p>
         </body>
       </html>
@@ -131,10 +249,10 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error('Payment success handler error:', error);
-    // On error, redirect to page with error parameter
+    // On error, redirect to checkout page
     const baseUrl = new URL(request.url);
     return NextResponse.redirect(
-      `${baseUrl.origin}/payment-success?error=processing`,
+      `${baseUrl.origin}/checkout?error=processing`,
       302
     );
   }
