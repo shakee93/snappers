@@ -31,6 +31,11 @@ const PaymentSuccessContent = () => {
       params[key] = value;
     });
 
+    // Also check for error parameter
+    if (searchParams.get('error')) {
+      params.error = searchParams.get('error') || '';
+    }
+
     setRequestData(params);
 
     // Determine payment status from CyberSource decision
@@ -43,6 +48,11 @@ const PaymentSuccessContent = () => {
         isReview: decision === 'REVIEW',
         isError: decision === 'ERROR',
         isCancelled: decision === 'CANCEL',
+      });
+    } else if (params.error) {
+      // Handle processing error
+      setPaymentStatus({
+        isError: true,
       });
     }
   }, [searchParams]);

@@ -2,20 +2,11 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 
 /**
- * CyberSource Secure Acceptance Return URL Handler
- * 
- * CyberSource sends payment results via POST with form data containing:
- * - decision: ACCEPT, DECLINE, REVIEW, ERROR, CANCEL
- * - transaction_id: CyberSource transaction ID
- * - req_reference_number: Original order reference number
- * - signature: Response signature for verification
- * - signed_field_names: Fields used in signature
- * - auth_amount: Authorized amount
- * - currency: Transaction currency
- * - reason_code: Numeric reason code
+ * Handle POST requests from CyberSource at /payment-success
+ * Since the return URL is fixed, we handle POST here and redirect with query params
  */
 
-// Get secret key from environment (should match the one used in form generation)
+// Get secret key from environment
 const getSecretKey = () => {
   return process.env.NDB_PAY_SECRET_KEY || '';
 };
@@ -56,7 +47,7 @@ export async function POST(request: NextRequest) {
       params[key] = value.toString();
     });
 
-    console.log('=== CyberSource Payment Return ===');
+    console.log('=== CyberSource Payment Return (POST) ===');
     console.log('Received parameters:', params);
 
     // Extract key CyberSource parameters
@@ -79,13 +70,6 @@ export async function POST(request: NextRequest) {
       console.log('Signature verification skipped (missing secret key or signature fields)');
     }
 
-    // Determine payment status
-    const isSuccess = decision === 'ACCEPT';
-    const isDeclined = decision === 'DECLINE';
-    const isReview = decision === 'REVIEW';
-    const isError = decision === 'ERROR';
-    const isCancelled = decision === 'CANCEL';
-
     // Log payment result
     console.log('Payment Decision:', decision);
     console.log('Transaction ID:', transactionId);
@@ -95,17 +79,17 @@ export async function POST(request: NextRequest) {
     // TODO: Update order status in WordPress/WooCommerce
     // You can call your WordPress API or GraphQL mutation here
     // Example:
-    // if (isSuccess && referenceNumber) {
+    // if (decision === 'ACCEPT' && referenceNumber) {
     //   await updateOrderStatus(referenceNumber, 'completed', transactionId);
     // }
 
     // Build query string from all parameters to redirect to the page
     const queryString = new URLSearchParams(params).toString();
     
-    // Redirect to the payment success page with all parameters as query string
+    // Redirect to the same path but with query parameters
     // This allows the frontend page to read the data
     const baseUrl = new URL(request.url);
-    const redirectUrl = `${baseUrl.origin}/payment-success?${queryString}`;
+    const redirectUrl = `${baseUrl.origin}${baseUrl.pathname}?${queryString}`;
     
     return NextResponse.redirect(redirectUrl, 302);
   } catch (error) {
@@ -113,59 +97,16 @@ export async function POST(request: NextRequest) {
     // On error, redirect to page with error parameter
     const baseUrl = new URL(request.url);
     return NextResponse.redirect(
-      `${baseUrl.origin}/payment-success?error=processing`,
+      `${baseUrl.origin}${baseUrl.pathname}?error=processing`,
       302
     );
   }
 }
 
+/**
+ * Handle GET requests - just pass through to the page
+ */
 export async function GET(request: NextRequest) {
-  // CyberSource can also redirect with query parameters
-  const { searchParams } = new URL(request.url);
-  const params: Record<string, string> = {};
-  
-  searchParams.forEach((value, key) => {
-    params[key] = value;
-  });
-
-  // Extract key CyberSource parameters
-  const decision = params.decision || '';
-  const transactionId = params.transaction_id || '';
-  const referenceNumber = params.req_reference_number || '';
-  const authAmount = params.auth_amount || '';
-  const currency = params.currency || '';
-  const reasonCode = params.reason_code || '';
-
-  // Determine payment status
-  const isSuccess = decision === 'ACCEPT';
-  const isDeclined = decision === 'DECLINE';
-  const isReview = decision === 'REVIEW';
-  const isError = decision === 'ERROR';
-  const isCancelled = decision === 'CANCEL';
-
-  // Prepare response data
-  const responseData = {
-    success: true,
-    method: 'GET',
-    timestamp: new Date().toISOString(),
-    cybersource: {
-      decision,
-      transaction_id: transactionId,
-      reference_number: referenceNumber,
-      auth_amount: authAmount,
-      currency,
-      reason_code: reasonCode,
-    },
-    payment_status: {
-      isSuccess,
-      isDeclined,
-      isReview,
-      isError,
-      isCancelled,
-    },
-    all_params: params,
-    url: request.url,
-  };
-
-  return NextResponse.json(responseData, { status: 200 });
+  // The page.tsx will handle GET requests and display query params
+  return NextResponse.next();
 }
