@@ -604,7 +604,8 @@ const CheckoutPage = () => {
           // For other payment methods, clear cart immediately after successful order creation
           try {
             await clearCart();
-            await refreshCart();
+            // Don't call refreshCart() here - the mutation already returns the updated cart
+            // Calling refreshCart() immediately can cause race conditions and infinite loops
           } catch (error: unknown) {
             if (
               error instanceof Error &&

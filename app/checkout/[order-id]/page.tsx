@@ -6,7 +6,7 @@ import {
   GET_CHECKOUT_USER_DETAILS,
   GET_SINGLE_ORDER,
 } from "@/graphql/defs/order";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import ProductTable, { OrderDetails } from "./Comps";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -92,23 +92,35 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   if (ordermethod === "guest") {
     // Clear cart for guest checkout completion
     const { clearCart: guestClearCart, refreshCart: guestRefreshCart } = useCart();
+    const hasClearedGuestRef = useRef(false);
     
     useEffect(() => {
+      // Only clear once on mount
+      if (hasClearedGuestRef.current) {
+        return;
+      }
+      
       const clearCartSafely = async () => {
+        hasClearedGuestRef.current = true;
         try {
           await guestClearCart();
+          // Don't call refreshCart if clearCart failed - it will also fail with 500
           await guestRefreshCart();
         } catch (error: unknown) {
+          // Silently handle errors - cart might already be cleared or session invalid
+          // The error handling in clearCart/refreshCart will prevent retries
           if (
             error instanceof Error &&
-            !error.message.includes("No items in cart to remove")
+            !error.message.includes("No items in cart to remove") &&
+            !error.message.includes("500")
           ) {
             console.error("Error clearing cart:", error);
           }
         }
       };
       void clearCartSafely();
-    }, [guestClearCart, guestRefreshCart]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Only run once on mount
 
     const orderData = {
       order: {
@@ -209,23 +221,35 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   if (orderId === "guest_checkout" && searchParams) {
     // Clear cart for simple guest checkout completion
     const { clearCart: simpleClearCart, refreshCart: simpleRefreshCart } = useCart();
+    const hasClearedRef = useRef(false);
     
     useEffect(() => {
+      // Only clear once on mount
+      if (hasClearedRef.current) {
+        return;
+      }
+      
       const clearCartSafely = async () => {
+        hasClearedRef.current = true;
         try {
           await simpleClearCart();
+          // Don't call refreshCart if clearCart failed - it will also fail with 500
           await simpleRefreshCart();
         } catch (error: unknown) {
+          // Silently handle errors - cart might already be cleared or session invalid
+          // The error handling in clearCart/refreshCart will prevent retries
           if (
             error instanceof Error &&
-            !error.message.includes("No items in cart to remove")
+            !error.message.includes("No items in cart to remove") &&
+            !error.message.includes("500")
           ) {
             console.error("Error clearing cart:", error);
           }
         }
       };
       void clearCartSafely();
-    }, [simpleClearCart, simpleRefreshCart]);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Only run once on mount
 
     return (
       <div className="container mx-auto grid items-center justify-center">
@@ -261,15 +285,28 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   });
 
 
+  const hasClearedOrderRef = useRef(false);
+  
   useEffect(() => {
+    // Only clear once on mount
+    if (hasClearedOrderRef.current) {
+      getUserData();
+      return;
+    }
+    
     const clearCartSafely = async () => {
+      hasClearedOrderRef.current = true;
       try {
         await clearCart();
+        // Don't call refreshCart if clearCart failed - it will also fail with 500
         await refreshCart();
       } catch (error: unknown) {
+        // Silently handle errors - cart might already be cleared or session invalid
+        // The error handling in clearCart/refreshCart will prevent retries
         if (
           error instanceof Error &&
-          !error.message.includes("No items in cart to remove")
+          !error.message.includes("No items in cart to remove") &&
+          !error.message.includes("500")
         ) {
           console.error("Error clearing cart:", error);
         }
@@ -278,7 +315,8 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
 
     getUserData();
     void clearCartSafely();
-  }, [getUserData, clearCart, refreshCart]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
 
   if (status === "FAILURE") {
     return (
