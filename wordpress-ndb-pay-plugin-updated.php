@@ -508,7 +508,7 @@ function generate_ndb_pay_form($request) {
             'signed_date_time' => $signed_date_time,
             'locale' => 'en',
             'transaction_type' => 'sale',
-            'reference_number' => $timestamp_ms,
+            'reference_number' => $order_id,
             'auth_trans_ref_no' => $timestamp_ms,
             'amount' => $amount,
             'currency' => $currency,
