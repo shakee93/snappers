@@ -19,13 +19,12 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   const orderId = params["order-id"];
   const searchParams = useSearchParams().get("email");
 
-
+  // All hooks must be called at the top level, before any conditional returns
+  const { getCart, clearCart, refreshCart } = useCart();
   const [getUserData, { data: customerData }] = useLazyQuery(
     GET_CHECKOUT_USER_DETAILS,
     { fetchPolicy: "no-cache" },
   );
-
-
 
   const order_id = useSearchParams().get('order_id');
   const first_name = useSearchParams().get('first_name');
@@ -50,18 +49,26 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
 
   //Koko Payment
   const trnId = useSearchParams().get('trnId');
-  const orderIdParam = useSearchParams().get('orderId') || (window.location.pathname.split('/')[2] || '');
-  const orderIdUrl = window.location.pathname.split('/')[2]
+  const orderIdParam = useSearchParams().get('orderId') || (typeof window !== 'undefined' ? window.location.pathname.split('/')[2] || '' : '');
+  const orderIdUrl = typeof window !== 'undefined' ? window.location.pathname.split('/')[2] : '';
   const status = useSearchParams().get('status');
   const desc = useSearchParams().get('desc');
   const key = useSearchParams().get('key');
   const wcApi = useSearchParams().get('wc-api');
 
   
-  const lastOrder = localStorage.getItem('last_order');
-  if (lastOrder && trnId && status !== "FAILURE") {
-    router.push(`/checkout/koko/guest_order?orderId=${orderIdUrl}&status=${status}`);
-  }
+  const hasClearedGuestRef = useRef(false);
+  const hasClearedSimpleRef = useRef(false);
+  const hasClearedOrderRef = useRef(false);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const lastOrder = localStorage.getItem('last_order');
+      if (lastOrder && trnId && status !== "FAILURE") {
+        router.push(`/checkout/koko/guest_order?orderId=${orderIdUrl}&status=${status}`);
+      }
+    }
+  }, [trnId, status, orderIdUrl, router]);
 
   useEffect(() => {
     const sendKokoVerification = async () => {
@@ -86,29 +93,24 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     };
 
     sendKokoVerification();
-  }, [orderId, status]); // Dependencies to trigger the effect
+  }, [orderId, status, orderIdUrl]); // Dependencies to trigger the effect
 
+  // Query for order data (will be skipped for guest checkouts)
+  const { data: orderData, error: orderError } = useQuery(GET_SINGLE_ORDER, {
+    variables: { orderID: orderId },
+    skip: !orderId || orderId === "guest_checkout" || orderId === "ItemNo12345" || orderId === "12345" || ordermethod === "guest",
+  });
 
-  if (ordermethod === "guest") {
-    // Clear cart for guest checkout completion
-    const { clearCart: guestClearCart, refreshCart: guestRefreshCart } = useCart();
-    const hasClearedGuestRef = useRef(false);
-    
-    useEffect(() => {
-      // Only clear once on mount
-      if (hasClearedGuestRef.current) {
-        return;
-      }
-      
+  // Clear cart for guest checkout with ordermethod=guest
+  useEffect(() => {
+    if (ordermethod === "guest" && !hasClearedGuestRef.current) {
+      hasClearedGuestRef.current = true;
       const clearCartSafely = async () => {
-        hasClearedGuestRef.current = true;
         try {
-          await guestClearCart();
-          // Don't call refreshCart if clearCart failed - it will also fail with 500
-          await guestRefreshCart();
+          await clearCart();
+          await refreshCart();
         } catch (error: unknown) {
           // Silently handle errors - cart might already be cleared or session invalid
-          // The error handling in clearCart/refreshCart will prevent retries
           if (
             error instanceof Error &&
             !error.message.includes("No items in cart to remove") &&
@@ -119,59 +121,143 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
         }
       };
       void clearCartSafely();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Only run once on mount
+    }
+  }, [ordermethod, clearCart, refreshCart]);
 
-    const orderData = {
-      order: {
-        orderNumber: order_id,
-        total: amount,
-        subtotal: subtotal,
-        shippingTotal: shippingTotal,
-        lineItems: {
-          nodes: lineItems.nodes,
-        },
-        date: date,
+  // Clear cart for simple guest checkout completion
+  useEffect(() => {
+    if (orderId === "guest_checkout" && searchParams && !hasClearedSimpleRef.current) {
+      hasClearedSimpleRef.current = true;
+      const clearCartSafely = async () => {
+        try {
+          await clearCart();
+          await refreshCart();
+        } catch (error: unknown) {
+          // Silently handle errors - cart might already be cleared or session invalid
+          if (
+            error instanceof Error &&
+            !error.message.includes("No items in cart to remove") &&
+            !error.message.includes("500")
+          ) {
+            console.error("Error clearing cart:", error);
+          }
+        }
+      };
+      void clearCartSafely();
+    }
+  }, [orderId, searchParams, clearCart, refreshCart]);
+
+  // Clear cart for regular order completion (non-guest)
+  useEffect(() => {
+    if (orderId && orderId !== "guest_checkout" && orderId !== "ItemNo12345" && orderId !== "12345" && ordermethod !== "guest" && !hasClearedOrderRef.current) {
+      hasClearedOrderRef.current = true;
+      const clearCartSafely = async () => {
+        try {
+          await clearCart();
+          await refreshCart();
+        } catch (error: unknown) {
+          // Silently handle errors - cart might already be cleared or session invalid
+          if (
+            error instanceof Error &&
+            !error.message.includes("No items in cart to remove") &&
+            !error.message.includes("500")
+          ) {
+            console.error("Error clearing cart:", error);
+          }
+        }
+      };
+      getUserData();
+      void clearCartSafely();
+    } else if (orderId && orderId !== "guest_checkout" && orderId !== "ItemNo12345" && orderId !== "12345" && ordermethod !== "guest") {
+      getUserData();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orderId, ordermethod]); // Only run when orderId or ordermethod changes
+
+  // Prepare guest order data
+  const guestOrderData = ordermethod === "guest" ? {
+    order: {
+      orderNumber: order_id,
+      total: amount,
+      subtotal: subtotal,
+      shippingTotal: shippingTotal,
+      lineItems: {
+        nodes: lineItems.nodes,
       },
-    };
+      date: date,
+    },
+  } : null;
 
-    const temporaryPaymentDetails: PaymentDetailsWithoutUrls = useMemo(
-      () => ({
-        order_id: orderData?.order?.orderNumber ?? "",
-        // items: orderData?.order?.lineItems?.nodes ?? [],
-        subtotal: orderData?.order?.subtotal,
-        amount: orderData?.order?.total ?? "",
-        currency: "LKR",
-        first_name:
-          customerData?.customer?.shipping?.firstName ?? "no_first_name",
-        last_name: customerData?.customer?.shipping?.lastName ?? "no_last_name",
-        email: customerData?.customer?.email ?? "no_email",
-        phone: customerData?.customer?.shipping?.phone ?? "no_phone",
-        shippingAddress1:
-          shippingaddress1 ?? "no_shipping_address1",
-        shippingAddress2:
-          shippingaddress2 ?? "no_shipping_address2",
-        billingAddress1:
-          billingaddress1 ?? "no_billing_address1",
-        billingAddress2:
-          billingaddress2 ?? "no_billing_address2",
-        city: city ?? "no_city",
-        country: "Sri Lanka",
-      }),
-      [orderData, customerData],
-    );
+  // Guest checkout payment details
+  const guestPaymentDetails: PaymentDetailsWithoutUrls = useMemo(
+    () => ({
+      order_id: guestOrderData?.order?.orderNumber ?? "",
+      subtotal: guestOrderData?.order?.subtotal,
+      amount: guestOrderData?.order?.total ?? "",
+      currency: "LKR",
+      first_name:
+        customerData?.customer?.shipping?.firstName ?? "no_first_name",
+      last_name: customerData?.customer?.shipping?.lastName ?? "no_last_name",
+      email: customerData?.customer?.email ?? "no_email",
+      phone: customerData?.customer?.shipping?.phone ?? "no_phone",
+      shippingAddress1:
+        shippingaddress1 ?? "no_shipping_address1",
+      shippingAddress2:
+        shippingaddress2 ?? "no_shipping_address2",
+      billingAddress1:
+        billingaddress1 ?? "no_billing_address1",
+      billingAddress2:
+        billingaddress2 ?? "no_billing_address2",
+      city: city ?? "no_city",
+      country: "Sri Lanka",
+    }),
+    [guestOrderData, customerData, shippingaddress1, shippingaddress2, billingaddress1, billingaddress2, city],
+  );
 
+  // Regular order payment details
+  const regularPaymentDetails: PaymentDetailsWithoutUrls = useMemo(
+    () => ({
+      order_id: orderData?.order?.orderNumber ?? "",
+      items: orderData?.order?.lineItems?.nodes ?? [],
+      subtotal: orderData?.order?.subtotal,
+      amount: orderData?.order?.total ?? "",
+      currency: "LKR",
+      first_name:
+        customerData?.customer?.shipping?.firstName ?? "no_first_name",
+      last_name: customerData?.customer?.shipping?.lastName ?? "no_last_name",
+      email: customerData?.customer?.email ?? "no_email",
+      phone: customerData?.customer?.shipping?.phone ?? "no_phone",
+      shippingAddress1:
+        customerData?.customer?.shipping?.address1 ?? "no_shipping_address1",
+      shippingAddress2:
+        customerData?.customer?.shipping?.address2 ?? "no_shipping_address2",
+      billingAddress1:
+        customerData?.customer?.billing?.address1 ?? "no_billing_address1",
+      billingAddress2:
+        customerData?.customer?.billing?.address2 ?? "no_billing_address2",
+      city: customerData?.customer?.shipping?.city ?? "no_city",
+      country: "Sri Lanka",
+    }),
+    [orderData, customerData],
+  );
+
+  // Empty effect for potential future use
+  useEffect(() => {
+    // window.location.reload()
+  }, []);
+
+  if (ordermethod === "guest") {
     return (
       <>
         <div className="container mx-auto rounded-3xl text-center lg:p-20">
           <div className="my-4">
-            <OrderDetails orderData={orderData} />
+            <OrderDetails orderData={guestOrderData} />
             <div className="">
               <div className="">
                 <ProductTable
-                  lineItems={orderData?.order?.lineItems?.nodes}
-                  orderData={orderData}
-                  paymentDetails={temporaryPaymentDetails}
+                  lineItems={guestOrderData?.order?.lineItems?.nodes}
+                  orderData={guestOrderData}
+                  paymentDetails={guestPaymentDetails}
                 />
               </div>
             </div>
@@ -183,10 +269,8 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
             <ButtonPrimary>Shop More</ButtonPrimary>
           </Link>
         </div>
-
       </>
     );
-
   }
 
 
@@ -219,38 +303,6 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   }
 
   if (orderId === "guest_checkout" && searchParams) {
-    // Clear cart for simple guest checkout completion
-    const { clearCart: simpleClearCart, refreshCart: simpleRefreshCart } = useCart();
-    const hasClearedRef = useRef(false);
-    
-    useEffect(() => {
-      // Only clear once on mount
-      if (hasClearedRef.current) {
-        return;
-      }
-      
-      const clearCartSafely = async () => {
-        hasClearedRef.current = true;
-        try {
-          await simpleClearCart();
-          // Don't call refreshCart if clearCart failed - it will also fail with 500
-          await simpleRefreshCart();
-        } catch (error: unknown) {
-          // Silently handle errors - cart might already be cleared or session invalid
-          // The error handling in clearCart/refreshCart will prevent retries
-          if (
-            error instanceof Error &&
-            !error.message.includes("No items in cart to remove") &&
-            !error.message.includes("500")
-          ) {
-            console.error("Error clearing cart:", error);
-          }
-        }
-      };
-      void clearCartSafely();
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Only run once on mount
-
     return (
       <div className="container mx-auto grid items-center justify-center">
         <h1 className="pt-20 text-center text-2xl font-bold">
@@ -267,56 +319,6 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
       </div>
     );
   }
-
-  const { getCart, clearCart } = useCart();
-
-  const refreshCart = useCallback(async () => {
-    try {
-      await getCart();
-    } catch (error: any) {
-      console.error("Error refreshing the cart:", error);
-      throw error;
-    }
-  }, [getCart]);
-
-
-  const { data: orderData, error: orderError } = useQuery(GET_SINGLE_ORDER, {
-    variables: { orderID: orderId },
-  });
-
-
-  const hasClearedOrderRef = useRef(false);
-  
-  useEffect(() => {
-    // Only clear once on mount
-    if (hasClearedOrderRef.current) {
-      getUserData();
-      return;
-    }
-    
-    const clearCartSafely = async () => {
-      hasClearedOrderRef.current = true;
-      try {
-        await clearCart();
-        // Don't call refreshCart if clearCart failed - it will also fail with 500
-        await refreshCart();
-      } catch (error: unknown) {
-        // Silently handle errors - cart might already be cleared or session invalid
-        // The error handling in clearCart/refreshCart will prevent retries
-        if (
-          error instanceof Error &&
-          !error.message.includes("No items in cart to remove") &&
-          !error.message.includes("500")
-        ) {
-          console.error("Error clearing cart:", error);
-        }
-      }
-    };
-
-    getUserData();
-    void clearCartSafely();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Only run once on mount
 
   if (status === "FAILURE") {
     return (
@@ -344,38 +346,6 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     );
   }
 
-
-
-  const temporaryPaymentDetails: PaymentDetailsWithoutUrls = useMemo(
-    () => ({
-      order_id: orderData?.order?.orderNumber ?? "",
-      items: orderData?.order?.lineItems?.nodes ?? [],
-      subtotal: orderData?.order?.subtotal,
-      amount: orderData?.order?.total ?? "",
-      currency: "LKR",
-      first_name:
-        customerData?.customer?.shipping?.firstName ?? "no_first_name",
-      last_name: customerData?.customer?.shipping?.lastName ?? "no_last_name",
-      email: customerData?.customer?.email ?? "no_email",
-      phone: customerData?.customer?.shipping?.phone ?? "no_phone",
-      shippingAddress1:
-        customerData?.customer?.shipping?.address1 ?? "no_shipping_address1",
-      shippingAddress2:
-        customerData?.customer?.shipping?.address2 ?? "no_shipping_address2",
-      billingAddress1:
-        customerData?.customer?.billing?.address1 ?? "no_billing_address1",
-      billingAddress2:
-        customerData?.customer?.billing?.address2 ?? "no_billing_address2",
-      city: customerData?.customer?.shipping?.city ?? "no_city",
-      country: "Sri Lanka",
-    }),
-    [orderData, customerData],
-  );
-
-  useEffect(() => {
-    // window.location.reload()
-  }, []);
-
   return (
     <div className="container mx-auto rounded-3xl text-center lg:p-20">
       <div className="my-4">
@@ -385,7 +355,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
             <ProductTable
               lineItems={orderData?.order?.lineItems?.nodes}
               orderData={orderData}
-              paymentDetails={temporaryPaymentDetails}
+              paymentDetails={regularPaymentDetails}
             />
           </div>
         </div>

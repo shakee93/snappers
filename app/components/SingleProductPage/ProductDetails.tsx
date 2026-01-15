@@ -89,7 +89,7 @@ const ProductDetails = ({
 
   useEffect(() => {
     if (product.type === "VARIABLE" && activeVariation) {
-      setVariationId(activeVariation?.image.databaseId);
+      setVariationId(activeVariation?.image?.databaseId);
       setActiveVariation(activeVariation);
     }
   }, [activeVariation]);
