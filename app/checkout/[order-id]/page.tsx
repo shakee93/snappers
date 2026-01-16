@@ -6,7 +6,7 @@ import {
   GET_CHECKOUT_USER_DETAILS,
   GET_SINGLE_ORDER,
 } from "@/graphql/defs/order";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import ProductTable, { OrderDetails } from "./Comps";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -17,7 +17,10 @@ import { useCart } from "@/context/CartProvider";
 export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   const router = useRouter();
   const orderId = params["order-id"];
-  const searchParams = useSearchParams().get("email");
+  
+  // Call useSearchParams once and reuse it
+  const searchParamsObj = useSearchParams();
+  const searchParams = searchParamsObj.get("email");
 
   // All hooks must be called at the top level, before any conditional returns
   const { getCart, clearCart, refreshCart } = useCart();
@@ -26,35 +29,35 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     { fetchPolicy: "no-cache" },
   );
 
-  const order_id = useSearchParams().get('order_id');
-  const first_name = useSearchParams().get('first_name');
-  const last_name = useSearchParams().get('last_name');
-  const email = useSearchParams().get('email');
-  const address = useSearchParams().get('address');
-  const amount = useSearchParams().get('amount');
-  const items = useSearchParams().get('items');
-  const shippingTotal = useSearchParams().get('shippingTotal');
-  const subtotal = useSearchParams().get('subtotal');
-  const date = useSearchParams().get('date');
-  const shippingaddress1 = useSearchParams().get('shippingaddress1');
-  const shippingaddress2 = useSearchParams().get('shippingaddress2');
-  const billingaddress1 = useSearchParams().get('billingaddress1');
-  const billingaddress2 = useSearchParams().get('billingaddress2');
-  const city = useSearchParams().get('city');
-  const lineItemsParam = useSearchParams().get('lineItems');
+  const order_id = searchParamsObj.get('order_id');
+  const first_name = searchParamsObj.get('first_name');
+  const last_name = searchParamsObj.get('last_name');
+  const email = searchParamsObj.get('email');
+  const address = searchParamsObj.get('address');
+  const amount = searchParamsObj.get('amount');
+  const items = searchParamsObj.get('items');
+  const shippingTotal = searchParamsObj.get('shippingTotal');
+  const subtotal = searchParamsObj.get('subtotal');
+  const date = searchParamsObj.get('date');
+  const shippingaddress1 = searchParamsObj.get('shippingaddress1');
+  const shippingaddress2 = searchParamsObj.get('shippingaddress2');
+  const billingaddress1 = searchParamsObj.get('billingaddress1');
+  const billingaddress2 = searchParamsObj.get('billingaddress2');
+  const city = searchParamsObj.get('city');
+  const lineItemsParam = searchParamsObj.get('lineItems');
   const lineItems = lineItemsParam && lineItemsParam !== "undefined"
     ? JSON.parse(lineItemsParam)
     : { nodes: [] };
-  const ordermethod = useSearchParams().get('ordermethod');
+  const ordermethod = searchParamsObj.get('ordermethod');
 
   //Koko Payment
-  const trnId = useSearchParams().get('trnId');
-  const orderIdParam = useSearchParams().get('orderId') || (typeof window !== 'undefined' ? window.location.pathname.split('/')[2] || '' : '');
+  const trnId = searchParamsObj.get('trnId');
+  const orderIdParam = searchParamsObj.get('orderId') || (typeof window !== 'undefined' ? window.location.pathname.split('/')[2] || '' : '');
   const orderIdUrl = typeof window !== 'undefined' ? window.location.pathname.split('/')[2] : '';
-  const status = useSearchParams().get('status');
-  const desc = useSearchParams().get('desc');
-  const key = useSearchParams().get('key');
-  const wcApi = useSearchParams().get('wc-api');
+  const status = searchParamsObj.get('status');
+  const desc = searchParamsObj.get('desc');
+  const key = searchParamsObj.get('key');
+  const wcApi = searchParamsObj.get('wc-api');
 
   
   const hasClearedGuestRef = useRef(false);
@@ -291,6 +294,33 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     [orderData, customerData],
   );
 
+  // If we have localStorage data, use it to create payment details
+  const localStoragePaymentDetails: PaymentDetailsWithoutUrls = useMemo(
+    () => {
+      if (!localStorageOrderData?.checkout) return regularPaymentDetails;
+      
+      const checkout = localStorageOrderData.checkout;
+      return {
+        order_id: checkout?.order?.orderNumber ?? checkout?.order?.databaseId?.toString() ?? "",
+        items: checkout?.order?.lineItems?.nodes ?? [],
+        subtotal: checkout?.order?.subtotal,
+        amount: checkout?.order?.total ?? "",
+        currency: "LKR",
+        first_name: checkout?.customer?.billing?.firstName ?? checkout?.customer?.shipping?.firstName ?? "no_first_name",
+        last_name: checkout?.customer?.billing?.lastName ?? checkout?.customer?.shipping?.lastName ?? "no_last_name",
+        email: checkout?.customer?.billing?.email ?? checkout?.customer?.email ?? "no_email",
+        phone: checkout?.customer?.billing?.phone ?? checkout?.customer?.shipping?.phone ?? "no_phone",
+        shippingAddress1: checkout?.customer?.shipping?.address1 ?? "no_shipping_address1",
+        shippingAddress2: checkout?.customer?.shipping?.address2 ?? "no_shipping_address2",
+        billingAddress1: checkout?.customer?.billing?.address1 ?? "no_billing_address1",
+        billingAddress2: checkout?.customer?.billing?.address2 ?? "no_billing_address2",
+        city: checkout?.customer?.shipping?.city ?? "no_city",
+        country: "Sri Lanka",
+      };
+    },
+    [localStorageOrderData, regularPaymentDetails],
+  );
+
   // Empty effect for potential future use
   useEffect(() => {
     // window.location.reload()
@@ -411,33 +441,6 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
       </div>
     );
   }
-
-  // If we have localStorage data, use it to create payment details
-  const localStoragePaymentDetails: PaymentDetailsWithoutUrls = useMemo(
-    () => {
-      if (!localStorageOrderData?.checkout) return regularPaymentDetails;
-      
-      const checkout = localStorageOrderData.checkout;
-      return {
-        order_id: checkout?.order?.orderNumber ?? checkout?.order?.databaseId?.toString() ?? "",
-        items: checkout?.order?.lineItems?.nodes ?? [],
-        subtotal: checkout?.order?.subtotal,
-        amount: checkout?.order?.total ?? "",
-        currency: "LKR",
-        first_name: checkout?.customer?.billing?.firstName ?? checkout?.customer?.shipping?.firstName ?? "no_first_name",
-        last_name: checkout?.customer?.billing?.lastName ?? checkout?.customer?.shipping?.lastName ?? "no_last_name",
-        email: checkout?.customer?.billing?.email ?? checkout?.customer?.email ?? "no_email",
-        phone: checkout?.customer?.billing?.phone ?? checkout?.customer?.shipping?.phone ?? "no_phone",
-        shippingAddress1: checkout?.customer?.shipping?.address1 ?? "no_shipping_address1",
-        shippingAddress2: checkout?.customer?.shipping?.address2 ?? "no_shipping_address2",
-        billingAddress1: checkout?.customer?.billing?.address1 ?? "no_billing_address1",
-        billingAddress2: checkout?.customer?.billing?.address2 ?? "no_billing_address2",
-        city: checkout?.customer?.shipping?.city ?? "no_city",
-        country: "Sri Lanka",
-      };
-    },
-    [localStorageOrderData, regularPaymentDetails],
-  );
 
   const displayOrderData = localStorageOrderData?.checkout || orderData;
   const displayPaymentDetails = localStorageOrderData ? localStoragePaymentDetails : regularPaymentDetails;
