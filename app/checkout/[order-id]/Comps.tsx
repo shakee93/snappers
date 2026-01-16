@@ -4,25 +4,31 @@ interface OrderDetailsProps {
 
 export const OrderDetails = ({ orderData }: OrderDetailsProps) => {
   if (!orderData) return null;
-  const date = orderData.order.date ? new Date(orderData.order.date).toLocaleDateString('en-US', {
+  
+  // Handle both orderData.order and orderData.checkout.order structures
+  const order = orderData.order || orderData.checkout?.order;
+  if (!order) return null;
+  
+  const date = order.date ? new Date(order.date).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   }) : "-";
 
-  
+  // Get order ID - try orderNumber first, then databaseId, then id
+  const orderId = order.orderNumber ?? order.databaseId ?? order.id ?? "Not found";
 
   const rows = [
-    { label: "Order Id", value: orderData.order.orderNumber ?? "Not found" },
+    { label: "Order Id", value: orderId },
     { label: "Date", value: date },
-    { label: "Order Total", value: orderData.order.total },
+    { label: "Order Total", value: order.total },
     {
       label: "Discount",
-      value: orderData.order.total - orderData.order.subtotal,
-      condition: orderData.order.total - orderData.order.subtotal > 0,
+      value: order.total - order.subtotal,
+      condition: order.total - order.subtotal > 0,
     },
-    { label: "Delivery Fee", value: orderData.order.shippingTotal },
-    { label: "Sub Total", value: orderData.order.subtotal },
+    { label: "Delivery Fee", value: order.shippingTotal },
+    { label: "Sub Total", value: order.subtotal },
   ];
 
   return (
@@ -60,6 +66,8 @@ type ProductTableProps = {
 const ProductTable = ({ lineItems, orderData, paymentDetails }: ProductTableProps) => {
   if (!lineItems) return null;
 
+  // Handle both orderData.order and orderData.checkout.order structures
+  const order = orderData?.order || orderData?.checkout?.order;
 
   return (
     <>
@@ -88,7 +96,7 @@ const ProductTable = ({ lineItems, orderData, paymentDetails }: ProductTableProp
                 {lineItems.map((item, index) => (
                   <tr key={index}>
                     <td className="px-6 text-left py-4 font-medium text-gray-800 dark:text-gray-200">
-                      {item?.product.node.name}
+                      {item?.product?.node?.name || item?.product?.name || 'Product'}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-gray-800 dark:text-gray-200">
                       {item?.quantity}
@@ -104,16 +112,16 @@ const ProductTable = ({ lineItems, orderData, paymentDetails }: ProductTableProp
                   </td>
                   <td></td>
                   <td className="px-6 text-right py-4  font-medium text-gray-800 dark:text-gray-200">
-                    <span dangerouslySetInnerHTML={{ __html: orderData?.order?.shippingTotal || '₨ 0.00' }} />
+                    <span dangerouslySetInnerHTML={{ __html: order?.shippingTotal || '₨ 0.00' }} />
                   </td>
                 </tr>
 
                 {(() => {
                   const cleanString = (str: any) => str?.replace(/[^0-9.]+/g, "");
                   
-                  const subtotal = orderData?.order?.subtotal;
-                  const total = orderData?.order?.total;
-                  const shippingTotal = orderData?.order?.shippingTotal;
+                  const subtotal = order?.subtotal;
+                  const total = order?.total;
+                  const shippingTotal = order?.shippingTotal;
                   
                   const subtotalNumeric = parseFloat(cleanString(subtotal));
                   const totalNumeric = parseFloat(cleanString(total));
@@ -146,7 +154,7 @@ const ProductTable = ({ lineItems, orderData, paymentDetails }: ProductTableProp
                   </td>
                   <td></td>
                   <td className="px-6 text-right py-4 font-medium text-gray-800 dark:text-gray-200">
-                    <span dangerouslySetInnerHTML={{ __html: orderData.order?.total || '' }} />
+                    <span dangerouslySetInnerHTML={{ __html: order?.total || '' }} />
                   </td>
                 </tr>
               </tbody>
