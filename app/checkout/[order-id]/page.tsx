@@ -6,7 +6,7 @@ import {
   GET_CHECKOUT_USER_DETAILS,
   GET_SINGLE_ORDER,
 } from "@/graphql/defs/order";
-import { useCallback, useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import ProductTable, { OrderDetails } from "./Comps";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -60,6 +60,33 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   const hasClearedGuestRef = useRef(false);
   const hasClearedSimpleRef = useRef(false);
   const hasClearedOrderRef = useRef(false);
+  
+  // State for localStorage order data (for guest NDB Pay orders)
+  const [localStorageOrderData, setLocalStorageOrderData] = useState<any>(null);
+  const [isCheckingLocalStorage, setIsCheckingLocalStorage] = useState(true);
+
+  // Check localStorage for guest order data (similar to PayHere guest orders)
+  useEffect(() => {
+    if (typeof window !== 'undefined' && orderId) {
+      try {
+        const lastOrder = localStorage.getItem('last_order');
+        if (lastOrder) {
+          const parsedOrder = JSON.parse(lastOrder);
+          // Check if the order ID matches and it's likely a guest order
+          const storedOrderId = parsedOrder?.checkout?.order?.databaseId?.toString();
+          if (storedOrderId === orderId) {
+            setLocalStorageOrderData(parsedOrder);
+          }
+        }
+      } catch (error) {
+        console.error('Error reading localStorage order data:', error);
+      } finally {
+        setIsCheckingLocalStorage(false);
+      }
+    } else {
+      setIsCheckingLocalStorage(false);
+    }
+  }, [orderId]);
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -95,10 +122,10 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     sendKokoVerification();
   }, [orderId, status, orderIdUrl]); // Dependencies to trigger the effect
 
-  // Query for order data (will be skipped for guest checkouts)
+  // Query for order data (will be skipped for guest checkouts or if we have localStorage data)
   const { data: orderData, error: orderError } = useQuery(GET_SINGLE_ORDER, {
     variables: { orderID: orderId },
-    skip: !orderId || orderId === "guest_checkout" || orderId === "ItemNo12345" || orderId === "12345" || ordermethod === "guest",
+    skip: !orderId || orderId === "guest_checkout" || orderId === "ItemNo12345" || orderId === "12345" || ordermethod === "guest" || !!localStorageOrderData,
   });
 
   // Clear cart for guest checkout with ordermethod=guest
@@ -147,8 +174,31 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     }
   }, [orderId, searchParams, clearCart, refreshCart]);
 
-  // Clear cart for regular order completion (non-guest)
+  // Clear cart for regular order completion (non-guest) or NDB Pay guest orders
   useEffect(() => {
+    // For NDB Pay guest orders (using localStorage data)
+    if (localStorageOrderData && !hasClearedOrderRef.current) {
+      hasClearedOrderRef.current = true;
+      const clearCartSafely = async () => {
+        try {
+          await clearCart();
+          await refreshCart();
+        } catch (error: unknown) {
+          // Silently handle errors - cart might already be cleared or session invalid
+          if (
+            error instanceof Error &&
+            !error.message.includes("No items in cart to remove") &&
+            !error.message.includes("500")
+          ) {
+            console.error("Error clearing cart:", error);
+          }
+        }
+      };
+      void clearCartSafely();
+      return;
+    }
+    
+    // For regular logged-in orders
     if (orderId && orderId !== "guest_checkout" && orderId !== "ItemNo12345" && orderId !== "12345" && ordermethod !== "guest" && !hasClearedOrderRef.current) {
       hasClearedOrderRef.current = true;
       const clearCartSafely = async () => {
@@ -172,7 +222,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
       getUserData();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orderId, ordermethod]); // Only run when orderId or ordermethod changes
+  }, [orderId, ordermethod, localStorageOrderData]); // Only run when orderId, ordermethod, or localStorageOrderData changes
 
   // Prepare guest order data
   const guestOrderData = ordermethod === "guest" ? {
@@ -331,7 +381,11 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     );
   }
 
-  if (orderError) {
+  // Use localStorage data if available (for guest NDB Pay orders)
+  const finalOrderData = localStorageOrderData?.checkout || orderData;
+  
+  // If query failed but we have localStorage data, use that instead
+  if (orderError && !localStorageOrderData && !isCheckingLocalStorage) {
     return (
       <div className="container mx-auto grid items-center justify-center">
         <h1 className="py-20 text-center text-2xl font-bold">
@@ -346,16 +400,73 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     );
   }
 
+  // Show loading while checking localStorage
+  if (isCheckingLocalStorage && !orderData && !localStorageOrderData) {
+    return (
+      <div className="container mx-auto grid items-center justify-center py-20">
+        <div className="text-center">
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
+          <p className="mt-4 text-lg">Loading order details...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // If we have localStorage data, use it to create payment details
+  const localStoragePaymentDetails: PaymentDetailsWithoutUrls = useMemo(
+    () => {
+      if (!localStorageOrderData?.checkout) return regularPaymentDetails;
+      
+      const checkout = localStorageOrderData.checkout;
+      return {
+        order_id: checkout?.order?.orderNumber ?? checkout?.order?.databaseId?.toString() ?? "",
+        items: checkout?.order?.lineItems?.nodes ?? [],
+        subtotal: checkout?.order?.subtotal,
+        amount: checkout?.order?.total ?? "",
+        currency: "LKR",
+        first_name: checkout?.customer?.billing?.firstName ?? checkout?.customer?.shipping?.firstName ?? "no_first_name",
+        last_name: checkout?.customer?.billing?.lastName ?? checkout?.customer?.shipping?.lastName ?? "no_last_name",
+        email: checkout?.customer?.billing?.email ?? checkout?.customer?.email ?? "no_email",
+        phone: checkout?.customer?.billing?.phone ?? checkout?.customer?.shipping?.phone ?? "no_phone",
+        shippingAddress1: checkout?.customer?.shipping?.address1 ?? "no_shipping_address1",
+        shippingAddress2: checkout?.customer?.shipping?.address2 ?? "no_shipping_address2",
+        billingAddress1: checkout?.customer?.billing?.address1 ?? "no_billing_address1",
+        billingAddress2: checkout?.customer?.billing?.address2 ?? "no_billing_address2",
+        city: checkout?.customer?.shipping?.city ?? "no_city",
+        country: "Sri Lanka",
+      };
+    },
+    [localStorageOrderData, regularPaymentDetails],
+  );
+
+  const displayOrderData = localStorageOrderData?.checkout || orderData;
+  const displayPaymentDetails = localStorageOrderData ? localStoragePaymentDetails : regularPaymentDetails;
+
+  if (!displayOrderData) {
+    return (
+      <div className="container mx-auto grid items-center justify-center">
+        <h1 className="py-20 text-center text-2xl font-bold">
+          Order not found
+        </h1>
+        <Link href={`/`} passHref>
+          <div className="self-center text-center font-bold text-blue-500 underline hover:cursor-pointer hover:text-blue-800">
+            Back to Home
+          </div>
+        </Link>
+      </div>
+    );
+  }
+
   return (
     <div className="container mx-auto rounded-3xl text-center lg:p-20">
       <div className="my-4">
-        <OrderDetails orderData={orderData} />
+        <OrderDetails orderData={displayOrderData} />
         <div className="">
           <div className="">
             <ProductTable
-              lineItems={orderData?.order?.lineItems?.nodes}
-              orderData={orderData}
-              paymentDetails={regularPaymentDetails}
+              lineItems={displayOrderData?.order?.lineItems?.nodes}
+              orderData={displayOrderData}
+              paymentDetails={displayPaymentDetails}
             />
           </div>
         </div>
