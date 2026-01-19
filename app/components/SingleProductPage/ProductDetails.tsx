@@ -556,14 +556,14 @@ const ProductDetails = ({
       {/* {product.shortDescription && <ProductDescription product={product} />} */}
 
       {product.type === "VARIABLE" && (
-        <div id="product-attributes" className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div id="product-attributes" className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
           {product.attributes?.nodes.map(
             (attr: ProductAttribute, index: number) => (
-              <div key={index} className="flex flex-col text-gray-500">
-                <div className="flex items-center gap-1 mb-2 text-sm min-h-[24px]">
+              <div key={index} className="flex flex-col w-full text-gray-500">
+                <div className="flex items-center gap-1 mb-2 text-sm h-6">
                   <span className="text-primaryColor flex items-center gap-1">
-                    <AttributeIcon name={attr?.name || ""} className="w-4 h-4" />
-                    {attr.label}:
+                    <AttributeIcon name={attr?.name || ""} className="w-4 h-4 flex-shrink-0" />
+                    <span className="whitespace-nowrap">{attr.label}:</span>
                   </span>
                 </div>
 
@@ -575,7 +575,7 @@ const ProductDetails = ({
                   }}
                 >
                   <div className="relative">
-                    <Listbox.Button className="relative w-full cursor-default rounded-2xl border border-gray-300 bg-white py-3 pl-4 pr-10 text-left text-sm focus:border-primaryColor focus:outline-none focus:ring-2 focus:ring-primaryColor focus:ring-opacity-50">
+                    <Listbox.Button className="relative w-full cursor-default rounded-2xl border border-gray-300 bg-white h-11 pl-4 pr-10 text-left text-sm focus:border-primaryColor focus:outline-none focus:ring-2 focus:ring-primaryColor focus:ring-opacity-50 flex items-center">
                       <span className="block truncate">
                         {(() => {
                           const selectedOption = activeAttr(attr)?.val;
