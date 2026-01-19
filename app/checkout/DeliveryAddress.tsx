@@ -23,6 +23,8 @@ interface Props {
   toggleConfirmationBillingAddress: any;
   setStorePickup: any;
   setDeliveryAddress: any;
+  pickupType: "store" | "uber" | "pickme" | null;
+  setPickupType: (type: "store" | "uber" | "pickme" | null) => void;
 }
 
 const DeliveryAddress: FC<Props> = ({
@@ -37,6 +39,8 @@ const DeliveryAddress: FC<Props> = ({
   isStorePickup,
   setStorePickup,
   setDeliveryAddress,
+  pickupType,
+  setPickupType,
 }) => {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -68,21 +72,29 @@ const DeliveryAddress: FC<Props> = ({
     });
   };
 
-  const handleStorePickupChange = () => {
-    if (!isStorePickup) {
-      setStorePickup(true);
-      updateFormData("billingAddress", formData.BillingAddress);
-      updateFormData("shippingDetails", {
-        databaseId: "local_pickup",
-        id: "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==",
-        title: "StorePickup",
-      });
-    } else {
+  const handlePickupTypeChange = (type: "store" | "uber" | "pickme" | null) => {
+    if (pickupType === type) {
+      // If clicking the same option, deselect it
+      setPickupType(null);
       setStorePickup(false);
       updateFormData("shippingDetails", {
         databaseId: null,
         id: null,
         title: null,
+      });
+    } else {
+      setPickupType(type);
+      setStorePickup(type !== null);
+      updateFormData("billingAddress", formData.BillingAddress);
+      const pickupTitles = {
+        store: "StorePickup",
+        uber: "Uber",
+        pickme: "PickMe",
+      };
+      updateFormData("shippingDetails", {
+        databaseId: "local_pickup",
+        id: "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==",
+        title: pickupTitles[type],
       });
     }
   };
@@ -125,7 +137,7 @@ const DeliveryAddress: FC<Props> = ({
       addressType,
     };
 
-    if (isStorePickup) {
+    if (pickupType) {
       updateFormData("deliveryAddress", shippingAddressData);
       updateFormData("billingAddress", shippingAddressData);
     } else {
@@ -138,11 +150,16 @@ const DeliveryAddress: FC<Props> = ({
       updateFormData("billingAddress", shippingAddressData);
       toggleConfirmationBillingAddress(true);
     }
-    if (isStorePickup) {
+    if (pickupType) {
+      const pickupTitles = {
+        store: "StorePickup",
+        uber: "Uber",
+        pickme: "PickMe",
+      };
       updateFormData("shippingDetails", {
         databaseId: "local_pickup",
         id: "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==",
-        title: "StorePickup",
+        title: pickupTitles[pickupType],
       });
     }
   };
@@ -185,14 +202,51 @@ const DeliveryAddress: FC<Props> = ({
             className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-2 sm:space-y-2 ${isActive ? "block" : "hidden"
               }`}
           >
-            <div className="w-fit border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-              <Checkbox
-                key={1}
-                label="Store Pickup"
-                name="store pickup"
-                defaultChecked={isStorePickup}
-                onChange={handleStorePickupChange}
-              />
+            <div className="w-full border border-slate-200 dark:border-slate-700 rounded-xl p-4">
+              <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
+                Pickup
+              </h4>
+              <div className="flex flex-wrap gap-4">
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="pickup"
+                    value="store"
+                    checked={pickupType === "store"}
+                    onChange={() => handlePickupTypeChange("store")}
+                    className="w-4 h-4 text-primaryColor border-gray-300 focus:ring-primaryColor focus:ring-2"
+                  />
+                  <span className="ml-2 text-sm text-slate-700 dark:text-slate-300">
+                    Store
+                  </span>
+                </label>
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="pickup"
+                    value="uber"
+                    checked={pickupType === "uber"}
+                    onChange={() => handlePickupTypeChange("uber")}
+                    className="w-4 h-4 text-primaryColor border-gray-300 focus:ring-primaryColor focus:ring-2"
+                  />
+                  <span className="ml-2 text-sm text-slate-700 dark:text-slate-300">
+                    Uber
+                  </span>
+                </label>
+                <label className="flex items-center cursor-pointer">
+                  <input
+                    type="radio"
+                    name="pickup"
+                    value="pickme"
+                    checked={pickupType === "pickme"}
+                    onChange={() => handlePickupTypeChange("pickme")}
+                    className="w-4 h-4 text-primaryColor border-gray-300 focus:ring-primaryColor focus:ring-2"
+                  />
+                  <span className="ml-2 text-sm text-slate-700 dark:text-slate-300">
+                    Pick Me
+                  </span>
+                </label>
+              </div>
             </div>
             {/* ============ */}
             <div className="grid md:grid-cols-1 sm:grid-cols-2 sm:gap-3">

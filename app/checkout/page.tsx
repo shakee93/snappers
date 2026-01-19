@@ -83,6 +83,7 @@ const CheckoutPage = () => {
     useState<PayhereStatus>("idle");
 
   const [isStorePickup, setIsStorePickup] = useState(false);
+  const [pickupType, setPickupType] = useState<"store" | "uber" | "pickme" | null>(null);
   const [isCardPayment, setIsCardPayment] = useState(false);
   const [isKokoPayment, setIsKokoPayment] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState({
@@ -127,6 +128,11 @@ const CheckoutPage = () => {
   useEffect(() => {
     fetchCustomer();
   }, []);
+
+  // Sync pickupType with isStorePickup for backward compatibility
+  useEffect(() => {
+    setIsStorePickup(!!pickupType);
+  }, [pickupType]);
 
   // MUTATIONS
   const [updateCartShippingTotalMutation] = useMutation(UPDATE_SHIPPING_TOTAL);
@@ -207,7 +213,7 @@ const CheckoutPage = () => {
     }
 
     try {
-      const shippingMethods = isStorePickup
+      const shippingMethods = pickupType
         ? "pickup_location:0"
         : freeShipping
           ? "wbs:5c9bd062_free_shipping"
@@ -219,7 +225,7 @@ const CheckoutPage = () => {
       if (customer?.id === "guest") {
         const subtotal: any = cart?.subtotal;
 
-        if (isStorePickup || freeShipping) {
+        if (pickupType || freeShipping) {
           setOrderTotal(subtotal);
         } else {
           setOrderTotal(total);
@@ -257,7 +263,7 @@ const CheckoutPage = () => {
 
   useEffect(() => {
     updateShippingTotal().then((r) => r);
-  }, [isStorePickup, updateCartShippingTotalMutation, freeShipping]);
+  }, [pickupType, updateCartShippingTotalMutation, freeShipping]);
 
   const paymentDetails = useMemo(() => {
     return paymentData;
@@ -430,12 +436,17 @@ const CheckoutPage = () => {
       formData.deliveryAddress.country = "LK";
 
       const shippingMethod = getShippingMethod(shippingTotal);
-      const shippingDetails = isStorePickup
+      const pickupLabels = {
+        store: "Store",
+        uber: "Uber",
+        pickme: "Pick Me",
+      };
+      const shippingDetails = pickupType
         ? {
           ...transformAddress(formData.deliveryAddress),
-          address1: "Store Pickup",
+          address1: pickupLabels[pickupType],
           address2: "",
-          city: "Store Pickup",
+          city: pickupLabels[pickupType],
           state: "",
           postcode: "",
         }
@@ -453,8 +464,8 @@ const CheckoutPage = () => {
             <p><strong>Customer Email:</strong> ${email}</p>
             <p><strong>Phone Number:</strong> ${formData?.contactInfo?.phone
         }</p>
-            ${isStorePickup
-          ? "<p><strong>Pickup Location:</strong> Store</p>"
+            ${pickupType
+          ? `<p><strong>Pickup Location:</strong> ${pickupLabels[pickupType]}</p>`
           : ""
         }
             ${isKokoPayment
@@ -518,8 +529,13 @@ const CheckoutPage = () => {
         
         // Prepare billing and shipping addresses for CyberSource
         const billingAddress = transformAddress(formData.billingAddress);
-        const shippingAddress = isStorePickup 
-          ? { ...transformAddress(formData.deliveryAddress), address1: "Store Pickup", city: "Store Pickup" }
+        const pickupLabels = {
+          store: "Store Pickup",
+          uber: "Uber",
+          pickme: "Pick Me",
+        };
+        const shippingAddress = pickupType 
+          ? { ...transformAddress(formData.deliveryAddress), address1: pickupLabels[pickupType], city: pickupLabels[pickupType] }
           : transformAddress(formData.deliveryAddress);
 
         const orderData = {
@@ -630,19 +646,24 @@ const CheckoutPage = () => {
   };
 
   const getShippingMethod = (shippingTotal: any) => {
-    const methodId = isStorePickup
+    const methodId = pickupType
       ? "pickup_location:0"
       : freeShipping
         ? "wbs:5c9bd062_free_shipping"
         : "wbs:0dd3bc79_weight_based_shipping";
 
-    const methodTitle = isStorePickup
-      ? "Store Pickup"
+    const pickupLabels = {
+      store: "Store",
+      uber: "Uber",
+      pickme: "Pick Me",
+    };
+    const methodTitle = pickupType
+      ? pickupLabels[pickupType]
       : freeShipping
         ? "Free Shipping"
         : "Weight Based Shipping";
 
-    const total = isStorePickup ? "0" : shippingTotal;
+    const total = pickupType ? "0" : shippingTotal;
 
     return { methodId, methodTitle, total };
   };
@@ -1016,6 +1037,8 @@ const CheckoutPage = () => {
               handleConfirmationChange={handleConfirmationChange}
               setIsStorePickup={setIsStorePickup}
               isStorePickup={isStorePickup}
+              pickupType={pickupType}
+              setPickupType={setPickupType}
               setIsCardPayment={setIsCardPayment}
               isCardPayment={isCardPayment}
               totalPayment={numericOrderTotal}
@@ -1061,7 +1084,7 @@ const CheckoutPage = () => {
                 </span>
               </div>
 
-              {!isStorePickup && (
+              {!pickupType && (
                 <div className="flex justify-between py-2.5">
                   <span>
                     {freeShipping ? `Free Shipping` : `Shipping estimate`}
@@ -1120,7 +1143,7 @@ const CheckoutPage = () => {
                   <span className="font-semibold mx-1">
                     {(
                       parseFloat(
-                        (TotalWithKoko + (isStorePickup ? 0 : 500) || "0")
+                        (TotalWithKoko + (pickupType ? 0 : 500) || "0")
                           .toString()
                           .replace(/[^\d.]/g, "")
                       ) / 3
@@ -1164,7 +1187,7 @@ const CheckoutPage = () => {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         }).format(
-                          TotalWithKoko + (isStorePickup ? 0 : 500)
+                          TotalWithKoko + (pickupType ? 0 : 500)
                         )}` || "0.00",
                     }}
                   />

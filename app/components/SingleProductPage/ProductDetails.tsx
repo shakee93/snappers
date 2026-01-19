@@ -679,12 +679,10 @@ const ProductDetails = ({
                               <Listbox.Option
                                 key={optionIndex}
                                 value={option || ""}
-                                disabled={allOutOfStock}
-                                className={({ active, disabled }) =>
+                                className={({ active }) =>
                                   twMerge(
-                                    "relative cursor-default select-none py-2 pl-10 pr-4",
-                                    active && !disabled && "bg-primaryColor/10 text-primaryColor",
-                                    disabled && "text-gray-400 cursor-not-allowed opacity-50",
+                                    "relative cursor-pointer select-none py-2 pl-10 pr-4",
+                                    active && "bg-primaryColor/10 text-primaryColor",
                                     isSelected && "font-medium"
                                   )
                                 }
