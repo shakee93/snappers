@@ -83,8 +83,11 @@ const DeliveryAddress: FC<Props> = ({
         title: null,
       });
     } else {
+      if (type === null) {
+        return; // Safety check - shouldn't happen but TypeScript needs it
+      }
       setPickupType(type);
-      setStorePickup(type !== null);
+      setStorePickup(true);
       updateFormData("billingAddress", formData.BillingAddress);
       const pickupTitles = {
         store: "StorePickup",
@@ -151,7 +154,7 @@ const DeliveryAddress: FC<Props> = ({
       toggleConfirmationBillingAddress(true);
     }
     if (pickupType) {
-      const pickupTitles = {
+      const pickupTitles: Record<"store" | "uber" | "pickme", string> = {
         store: "StorePickup",
         uber: "Uber",
         pickme: "PickMe",

@@ -436,7 +436,7 @@ const CheckoutPage = () => {
       formData.deliveryAddress.country = "LK";
 
       const shippingMethod = getShippingMethod(shippingTotal);
-      const pickupLabels = {
+      const pickupLabels: Record<"store" | "uber" | "pickme", string> = {
         store: "Store",
         uber: "Uber",
         pickme: "Pick Me",
@@ -465,7 +465,7 @@ const CheckoutPage = () => {
             <p><strong>Phone Number:</strong> ${formData?.contactInfo?.phone
         }</p>
             ${pickupType
-          ? `<p><strong>Pickup Location:</strong> ${pickupLabels[pickupType]}</p>`
+          ? `<p><strong>Pickup Location:</strong> ${pickupLabels[pickupType as "store" | "uber" | "pickme"]}</p>`
           : ""
         }
             ${isKokoPayment
@@ -529,8 +529,8 @@ const CheckoutPage = () => {
         
         // Prepare billing and shipping addresses for CyberSource
         const billingAddress = transformAddress(formData.billingAddress);
-        const pickupLabels = {
-          store: "Store Pickup",
+        const pickupLabels: Record<"store" | "uber" | "pickme", string> = {
+          store: "Store",
           uber: "Uber",
           pickme: "Pick Me",
         };
@@ -652,7 +652,7 @@ const CheckoutPage = () => {
         ? "wbs:5c9bd062_free_shipping"
         : "wbs:0dd3bc79_weight_based_shipping";
 
-    const pickupLabels = {
+    const pickupLabels: Record<"store" | "uber" | "pickme", string> = {
       store: "Store",
       uber: "Uber",
       pickme: "Pick Me",
