@@ -439,7 +439,7 @@ const CheckoutPage = () => {
       const pickupLabels: Record<"store" | "uber" | "pickme", string> = {
         store: "Store",
         uber: "Uber",
-        pickme: "Pick Me",
+        pickme: "PickMe",
       };
       const shippingDetails = pickupType
         ? {
@@ -532,7 +532,7 @@ const CheckoutPage = () => {
         const pickupLabels: Record<"store" | "uber" | "pickme", string> = {
           store: "Store",
           uber: "Uber",
-          pickme: "Pick Me",
+          pickme: "PickMe",
         };
         const shippingAddress = pickupType 
           ? { ...transformAddress(formData.deliveryAddress), address1: pickupLabels[pickupType], city: pickupLabels[pickupType] }
@@ -655,7 +655,7 @@ const CheckoutPage = () => {
     const pickupLabels: Record<"store" | "uber" | "pickme", string> = {
       store: "Store",
       uber: "Uber",
-      pickme: "Pick Me",
+      pickme: "PickMe",
     };
     const methodTitle = pickupType
       ? pickupLabels[pickupType]

@@ -246,7 +246,7 @@ const DeliveryAddress: FC<Props> = ({
                     className="w-4 h-4 text-primaryColor border-gray-300 focus:ring-primaryColor focus:ring-2"
                   />
                   <span className="ml-2 text-sm text-slate-700 dark:text-slate-300">
-                    Pick Me
+                    PickMe
                   </span>
                 </label>
               </div>

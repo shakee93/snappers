@@ -2,7 +2,7 @@
 /**
  * Pickup Type Handler for WooCommerce
  * 
- * This file handles pickup type (Store, Uber, Pick Me) functionality
+ * This file handles pickup type (Store, Uber, PickMe) functionality
  * Add this code to your theme's functions.php or create a custom plugin
  */
 
@@ -26,7 +26,7 @@ add_action('woocommerce_admin_order_data_after_shipping_address', function($orde
         $pickupLabels = [
             'store' => 'Store',
             'uber' => 'Uber',
-            'pickme' => 'Pick Me'
+            'pickme' => 'PickMe'
         ];
         
         $label = isset($pickupLabels[$pickupType]) ? $pickupLabels[$pickupType] : ucfirst($pickupType);
@@ -48,7 +48,7 @@ add_action('woocommerce_email_order_details', function($order, $sent_to_admin, $
         $pickupLabels = [
             'store' => 'Store',
             'uber' => 'Uber',
-            'pickme' => 'Pick Me'
+            'pickme' => 'PickMe'
         ];
         
         $label = isset($pickupLabels[$pickupType]) ? $pickupLabels[$pickupType] : ucfirst($pickupType);
@@ -195,7 +195,7 @@ add_action('woocommerce_admin_order_data_after_shipping_address', function($orde
     $pickupLabels = [
         'store' => 'Store',
         'uber' => 'Uber',
-        'pickme' => 'Pick Me'
+        'pickme' => 'PickMe'
     ];
     $label = '';
     
@@ -203,15 +203,15 @@ add_action('woocommerce_admin_order_data_after_shipping_address', function($orde
         $label = 'Store';
     } elseif (strpos($shippingMethod, 'Uber') !== false) {
         $label = 'Uber';
-    } elseif (strpos($shippingMethod, 'Pick Me') !== false) {
-        $label = 'Pick Me';
+    } elseif (strpos($shippingMethod, 'PickMe') !== false) {
+        $label = 'PickMe';
     }
     
     // If not found in shipping method, check address fields
     if (!$label) {
         $address1 = $order->get_shipping_address_1();
         $city = $order->get_shipping_city();
-        $pickupTypes = ['Store', 'Uber', 'Pick Me'];
+        $pickupTypes = ['Store', 'Uber', 'PickMe'];
         
         if (in_array($address1, $pickupTypes) && $address1 === $city) {
             $label = $address1;
@@ -245,7 +245,7 @@ add_action('manage_shop_order_posts_custom_column', function($column, $post_id) 
             $pickupLabels = [
                 'store' => 'Store',
                 'uber' => 'Uber',
-                'pickme' => 'Pick Me'
+                'pickme' => 'PickMe'
             ];
             
             $label = isset($pickupLabels[$pickupType]) ? $pickupLabels[$pickupType] : ucfirst($pickupType);
@@ -268,7 +268,7 @@ add_filter('woocommerce_rest_prepare_shop_order_object', function($response, $or
         $pickupLabels = [
             'store' => 'Store',
             'uber' => 'Uber',
-            'pickme' => 'Pick Me'
+            'pickme' => 'PickMe'
         ];
         
         $response->data['pickup_type'] = [
@@ -291,7 +291,7 @@ add_action('woocommerce_order_details_after_order_table', function($order) {
         $pickupLabels = [
             'store' => 'Store',
             'uber' => 'Uber',
-            'pickme' => 'Pick Me'
+            'pickme' => 'PickMe'
         ];
         
         $label = isset($pickupLabels[$pickupType]) ? $pickupLabels[$pickupType] : ucfirst($pickupType);
