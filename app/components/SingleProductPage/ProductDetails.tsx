@@ -12,7 +12,7 @@ import {
   VariableProduct,
   VariationAttribute,
 } from "@/graphql/types/graphql";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, { Fragment, useCallback, useEffect, useMemo, useState } from "react";
 import { useStore } from "@/store/store";
 import { twMerge } from "tailwind-merge";
 import { useImage } from "@/context/ImageChangeGrabber";
@@ -27,6 +27,8 @@ import koko from "@/public/koko.png";
 import Image from "next/image";
 import { BanknotesIcon } from "@heroicons/react/24/outline";
 import { AnimatePresence, motion } from "framer-motion";
+import { Listbox, Transition } from "@headlessui/react";
+import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 const ProductDetails = ({
   product,
   brand,
@@ -554,113 +556,164 @@ const ProductDetails = ({
       {/* {product.shortDescription && <ProductDescription product={product} />} */}
 
       {product.type === "VARIABLE" && (
-        <div id="product-attributes">
+        <div id="product-attributes" className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {product.attributes?.nodes.map(
             (attr: ProductAttribute, index: number) => (
-              <div key={index} className="py-2 text-gray-500">
-                <div className="flex items-center gap-1 py-2 text-sm">
+              <div key={index} className="flex flex-col text-gray-500">
+                <div className="flex items-center gap-1 mb-2 text-sm min-h-[24px]">
                   <span className="text-primaryColor flex items-center gap-1">
-                    <AttributeIcon name={attr?.name || ""} className="w-4" />
+                    <AttributeIcon name={attr?.name || ""} className="w-4 h-4" />
                     {attr.label}:
                   </span>
-                  <span className="font-medium text-gray-700">
-                    {
-                      (product as unknown as Record<string, any>)[
-                        `allPa${attr?.label as unknown as "Capacity"}`
-                      ]?.nodes.find(
-                        (node: PaCapacity) =>
-                          node.slug === activeAttr(attr)?.val
-                      )?.name
-                    }
-                  </span>{" "}
                 </div>
 
-
-                <ul className="flex flex-wrap items-center gap-2 text-sm">
-                  {attr.options
-                    ?.slice()
-                    .sort((a, b) => {
-                      // Extract first number from each option (e.g., "12gb-256gb" -> 12)
-                      const numA = a ? parseInt(a.match(/\d+/)?.[0] || "0", 10) : 0;
-                      const numB = b ? parseInt(b.match(/\d+/)?.[0] || "0", 10) : 0;
-                      return numA - numB; // Ascending order: 12, 16, 24
-                    })
-                    .map((option, optionIndex) => {
-                      const matchingVariations = (
-                        product as VariableProduct
-                      ).variations?.nodes.filter((v: ProductVariation) => {
-                        return v.attributes?.nodes.some(
-                          (node: any) =>
-                            node.name === attr.name && node.value === option
-                        );
-                      });
-
-                      const allOutOfStock = matchingVariations?.every(
-                        (v) => v.stockStatus !== "IN_STOCK"
-                      );
-
-                      const isSelected = activeAttr(attr)?.val === option;
-
-                      // Check if current combination is unavailable
-                      const currentCombinationUnavailable = !activeVariation || activeVariation.stockStatus !== "IN_STOCK";
-
-                      // Check if this option would be available when combined with other selected attributes
-                      // Don't show "available" on the last clicked attribute
-                      let isAvailable = false;
-                      if (currentCombinationUnavailable && !isSelected && lastClickedAttribute !== (attr.name || null)) {
-                        // Get all other selected attributes
-                        const otherAttributes = attribute.filter((a) => a.name !== attr.name);
-
-                        // Check if there's a variation that matches this option + other selected attributes and is in stock
-                        const availableVariation = (product as VariableProduct).variations?.nodes.find((v: ProductVariation) => {
-                          // Check if this variation has this option for current attribute
-                          const hasThisOption = v.attributes?.nodes.some(
-                            (node: any) => node.name === attr.name && node.value === option
-                          );
-
-                          // Check if this variation matches all other selected attributes
-                          const matchesOtherAttributes = otherAttributes.every((selectedAttr) => {
-                            return v.attributes?.nodes.some(
-                              (node: any) => node.name === selectedAttr.name && node.value === selectedAttr.val
-                            );
-                          });
-
-                          return hasThisOption && matchesOtherAttributes && v.stockStatus === "IN_STOCK";
-                        });
-
-                        isAvailable = !!availableVariation;
-                      }
-
-                      return (
-                        <li
-                          key={optionIndex}
-                          onClick={() => {
-                            setAttribute(attr, option || "");
-                            setLastClickedAttribute(attr.name || null);
-                          }}
-                          className={twMerge(
-                            "relative inline-block cursor-pointer rounded border bg-gray-200/80 px-3.5 py-2 text-xs text-black md:text-sm",
-                            isSelected &&
-                            "border-primaryColor text-primaryColor bg-white shadow-md",
-                            allOutOfStock && "diag-line bg-gray-100 text-gray-500"
-                          )}
-                          style={{ opacity: allOutOfStock ? 0.9 : 1 }}
-                          title={allOutOfStock ? "Out of stock" : ""}
-                        >
-                          {(product as any)[
+                <Listbox
+                  value={activeAttr(attr)?.val || ""}
+                  onChange={(value) => {
+                    setAttribute(attr, value || "");
+                    setLastClickedAttribute(attr.name || null);
+                  }}
+                >
+                  <div className="relative">
+                    <Listbox.Button className="relative w-full cursor-default rounded-2xl border border-gray-300 bg-white py-3 pl-4 pr-10 text-left text-sm focus:border-primaryColor focus:outline-none focus:ring-2 focus:ring-primaryColor focus:ring-opacity-50">
+                      <span className="block truncate">
+                        {(() => {
+                          const selectedOption = activeAttr(attr)?.val;
+                          if (!selectedOption) {
+                            return `Select ${attr.label}`;
+                          }
+                          const displayName = (product as any)[
                             `allPa${(attr?.label as unknown as "Capacity")
                               ?.split(" ")
                               .join("")}`
                           ]?.nodes.find(
-                            (node: PaCapacity) => node.slug === option
-                          )?.name || "OPTION"}
-                          {isAvailable && (
-                            <span className="absolute -top-2 -right-1 text-[8px] font-medium text-white bg-green-600 rounded-full px-1.5 py-0.5 leading-tight">in-stock</span>
-                          )}
-                        </li>
-                      );
-                    })}
-                </ul>
+                            (node: PaCapacity) => node.slug === selectedOption
+                          )?.name || "OPTION";
+                          return displayName;
+                        })()}
+                      </span>
+                      <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
+                        <ChevronDownIcon
+                          className="h-5 w-5 text-gray-400"
+                          aria-hidden="true"
+                        />
+                      </span>
+                    </Listbox.Button>
+                    <Transition
+                      as={Fragment}
+                      leave="transition ease-in duration-100"
+                      leaveFrom="opacity-100"
+                      leaveTo="opacity-0"
+                    >
+                      <Listbox.Options className="absolute z-20 mt-2 max-h-60 w-full overflow-auto rounded-2xl bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
+                        {attr.options
+                          ?.slice()
+                          .sort((a, b) => {
+                            // Extract first number from each option (e.g., "12gb-256gb" -> 12)
+                            const numA = a ? parseInt(a.match(/\d+/)?.[0] || "0", 10) : 0;
+                            const numB = b ? parseInt(b.match(/\d+/)?.[0] || "0", 10) : 0;
+                            return numA - numB; // Ascending order: 12, 16, 24
+                          })
+                          .map((option, optionIndex) => {
+                            const matchingVariations = (
+                              product as VariableProduct
+                            ).variations?.nodes.filter((v: ProductVariation) => {
+                              return v.attributes?.nodes.some(
+                                (node: any) =>
+                                  node.name === attr.name && node.value === option
+                              );
+                            });
+
+                            const allOutOfStock = matchingVariations?.every(
+                              (v) => v.stockStatus !== "IN_STOCK"
+                            );
+
+                            const isSelected = activeAttr(attr)?.val === option;
+
+                            // Check if current combination is unavailable
+                            const currentCombinationUnavailable = !activeVariation || activeVariation.stockStatus !== "IN_STOCK";
+
+                            // Check if this option would be available when combined with other selected attributes
+                            // Don't show "available" on the last clicked attribute
+                            let isAvailable = false;
+                            if (currentCombinationUnavailable && !isSelected && lastClickedAttribute !== (attr.name || null)) {
+                              // Get all other selected attributes
+                              const otherAttributes = attribute.filter((a) => a.name !== attr.name);
+
+                              // Check if there's a variation that matches this option + other selected attributes and is in stock
+                              const availableVariation = (product as VariableProduct).variations?.nodes.find((v: ProductVariation) => {
+                                // Check if this variation has this option for current attribute
+                                const hasThisOption = v.attributes?.nodes.some(
+                                  (node: any) => node.name === attr.name && node.value === option
+                                );
+
+                                // Check if this variation matches all other selected attributes
+                                const matchesOtherAttributes = otherAttributes.every((selectedAttr) => {
+                                  return v.attributes?.nodes.some(
+                                    (node: any) => node.name === selectedAttr.name && node.value === selectedAttr.val
+                                  );
+                                });
+
+                                return hasThisOption && matchesOtherAttributes && v.stockStatus === "IN_STOCK";
+                              });
+
+                              isAvailable = !!availableVariation;
+                            }
+
+                            const displayName = (product as any)[
+                              `allPa${(attr?.label as unknown as "Capacity")
+                                ?.split(" ")
+                                .join("")}`
+                            ]?.nodes.find(
+                              (node: PaCapacity) => node.slug === option
+                            )?.name || "OPTION";
+
+                            let optionText = displayName;
+                            if (allOutOfStock) {
+                              optionText += " (Out of Stock)";
+                            } else if (isAvailable) {
+                              optionText += " (In Stock)";
+                            }
+
+                            return (
+                              <Listbox.Option
+                                key={optionIndex}
+                                value={option || ""}
+                                disabled={allOutOfStock}
+                                className={({ active, disabled }) =>
+                                  twMerge(
+                                    "relative cursor-default select-none py-2 pl-10 pr-4",
+                                    active && !disabled && "bg-primaryColor/10 text-primaryColor",
+                                    disabled && "text-gray-400 cursor-not-allowed opacity-50",
+                                    isSelected && "font-medium"
+                                  )
+                                }
+                              >
+                                {({ selected, active }) => (
+                                  <>
+                                    <span
+                                      className={twMerge(
+                                        "block truncate",
+                                        selected ? "font-medium" : "font-normal",
+                                        allOutOfStock && "text-gray-400"
+                                      )}
+                                    >
+                                      {optionText}
+                                    </span>
+                                    {selected ? (
+                                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-primaryColor">
+                                        <CheckIcon className="h-5 w-5" aria-hidden="true" />
+                                      </span>
+                                    ) : null}
+                                  </>
+                                )}
+                              </Listbox.Option>
+                            );
+                          })}
+                      </Listbox.Options>
+                    </Transition>
+                  </div>
+                </Listbox>
               </div>
             )
           )}
