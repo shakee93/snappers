@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import SiteLogo from "@/public/global/gq-logo.png";
 import { Brand } from "@/graphql/types/graphql";
 
 interface BrandLogoProps {
@@ -13,9 +12,10 @@ const BrandLogo = ({ brand, className = "" }: BrandLogoProps) => {
     return null;
   }
 
-  const logoUrl = brand.brandImage && brand.brandImage.trim() !== "" 
-    ? brand.brandImage 
-    : SiteLogo;
+  // Only show logo if brandImage exists and is not empty
+  if (!brand.brandImage || brand.brandImage.trim() === "") {
+    return null;
+  }
 
   return (
     <Link
@@ -24,7 +24,7 @@ const BrandLogo = ({ brand, className = "" }: BrandLogoProps) => {
       className={`inline-block ${className}`}
     >
       <Image
-        src={logoUrl}
+        src={brand.brandImage}
         alt={brand.name || "Brand"}
         width={50}
         height={50}
