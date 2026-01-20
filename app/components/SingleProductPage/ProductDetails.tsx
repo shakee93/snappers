@@ -26,6 +26,7 @@ import { useQuery } from '@apollo/client';
 import koko from "@/public/koko.png";
 import Image from "next/image";
 import { BanknotesIcon } from "@heroicons/react/24/outline";
+import BrandLogo from "./BrandLogo";
 import { AnimatePresence, motion } from "framer-motion";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
@@ -411,16 +412,8 @@ const ProductDetails = ({
       {/* Commented */}
 
       <h1 className="text-2xl text-primaryColor font-bold md:text-3xl">{product.name}</h1>
-      <div className="flex items-center gap-1 text-sm font-medium text-gray-500">
-        <Link
-          href={`/${brand?.slug}`}
-          target="_blank"
-          className="text-gray"
-        >
-          {brand?.name}
-        </Link>
-
-
+      <div className="flex items-center gap-1 mt-2">
+        <BrandLogo brand={brand} />
       </div>
 
       <div className="flex items-center gap-2">
