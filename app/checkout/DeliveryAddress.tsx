@@ -210,40 +210,58 @@ const DeliveryAddress: FC<Props> = ({
                 Pickup
               </h4>
               <div className="flex flex-wrap gap-4">
-                <label className="flex items-center cursor-pointer">
+                <label 
+                  className="flex items-center cursor-pointer"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handlePickupTypeChange("store");
+                  }}
+                >
                   <input
                     type="radio"
                     name="pickup"
                     value="store"
                     checked={pickupType === "store"}
-                    onChange={() => handlePickupTypeChange("store")}
-                    className="w-4 h-4 text-primaryColor border-gray-300 focus:ring-primaryColor focus:ring-2"
+                    readOnly
+                    className="w-4 h-4 text-primaryColor border-gray-300 focus:ring-primaryColor focus:ring-2 pointer-events-none"
                   />
                   <span className="ml-2 text-sm text-slate-700 dark:text-slate-300">
                     Store
                   </span>
                 </label>
-                <label className="flex items-center cursor-pointer">
+                <label 
+                  className="flex items-center cursor-pointer"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handlePickupTypeChange("uber");
+                  }}
+                >
                   <input
                     type="radio"
                     name="pickup"
                     value="uber"
                     checked={pickupType === "uber"}
-                    onChange={() => handlePickupTypeChange("uber")}
-                    className="w-4 h-4 text-primaryColor border-gray-300 focus:ring-primaryColor focus:ring-2"
+                    readOnly
+                    className="w-4 h-4 text-primaryColor border-gray-300 focus:ring-primaryColor focus:ring-2 pointer-events-none"
                   />
                   <span className="ml-2 text-sm text-slate-700 dark:text-slate-300">
                     Uber
                   </span>
                 </label>
-                <label className="flex items-center cursor-pointer">
+                <label 
+                  className="flex items-center cursor-pointer"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    handlePickupTypeChange("pickme");
+                  }}
+                >
                   <input
                     type="radio"
                     name="pickup"
                     value="pickme"
                     checked={pickupType === "pickme"}
-                    onChange={() => handlePickupTypeChange("pickme")}
-                    className="w-4 h-4 text-primaryColor border-gray-300 focus:ring-primaryColor focus:ring-2"
+                    readOnly
+                    className="w-4 h-4 text-primaryColor border-gray-300 focus:ring-primaryColor focus:ring-2 pointer-events-none"
                   />
                   <span className="ml-2 text-sm text-slate-700 dark:text-slate-300">
                     PickMe
