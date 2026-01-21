@@ -264,9 +264,9 @@ const PageTerm = () => {
               <h2 className="text-3xl font-semibold mb-4">Your Privacy</h2>
               <p className="mb-4 leading-8">
                 Please read{" "}
-                <a href="link-to-privacy-policy" className="text-blue-500">
+                <Link href="/privacy" className="text-blue-500">
                   Privacy Policy
-                </a>
+                </Link>
                 .
               </p>
             </div>
@@ -313,6 +313,68 @@ const PageTerm = () => {
                 your card issuer’s policies. If you have any questions on how to
                 return your item to us, <Link href={"/contact"}> COntact</Link>.
               </p> */}
+            </div>
+
+            {/* Warranty & Return Policy section */}
+            <div className="mb-6">
+              <h2 className="text-3xl font-semibold mb-4">
+                Warranty & Return Policy
+              </h2>
+              
+              {/* Return Policy */}
+              <h3 className="text-xl font-semibold mb-2">Return & Exchange Policy</h3>
+              <p className="mb-4 leading-8">
+                Goods once sold cannot be returned or exchanged under any circumstances.
+              </p>
+
+              {/* Warranty Terms */}
+              <h3 className="text-xl font-semibold mb-2 mt-6">Warranty Terms</h3>
+              <ul className="list-disc pl-5 mb-4 leading-8">
+                <li>
+                  <span className="font-semibold">Repairs only</span> — No replacements will be provided.
+                </li>
+                <li>
+                  The product must be presented with the <span className="font-semibold">original box, cables, and all accessories</span> to claim warranty.
+                </li>
+                <li>
+                  AppleCare or manufacturer warranty claims may take a <span className="font-semibold">minimum of 45 days</span> to process.
+                </li>
+                <li>
+                  Warranty processing time depends on the <span className="font-semibold">availability of spare parts and shipping schedules</span>.
+                </li>
+              </ul>
+
+              {/* Warranty Exclusions */}
+              <h3 className="text-xl font-semibold mb-2 mt-6">Warranty Does Not Cover</h3>
+              <p className="mb-4 leading-8">
+                The following conditions and damages are <span className="font-semibold">not covered</span> under warranty:
+              </p>
+              <ul className="list-disc pl-5 mb-4 leading-8">
+                <li>Liquid or water damage</li>
+                <li>Display or display line issues</li>
+                <li>Touch panel faults</li>
+                <li>Charging port damage</li>
+                <li>Burn marks</li>
+                <li>Drops or physical damage</li>
+                <li>Power fluctuations</li>
+                <li>No-power issues</li>
+                <li>Improper usage or misuse</li>
+                <li>Products used outside normal domestic conditions</li>
+              </ul>
+
+              {/* Display Warranty Note */}
+              <h3 className="text-xl font-semibold mb-2 mt-6">Display Warranty</h3>
+              <p className="mb-4 leading-8">
+                Display warranty covers <span className="font-semibold">7 days</span> to check the device for any manufacturing defects.
+              </p>
+
+              <p className="mb-4 leading-8">
+                For complete warranty information, please visit our{" "}
+                <Link href="/warranty-terms" className="text-blue-500">
+                  Warranty Terms
+                </Link>{" "}
+                page.
+              </p>
             </div>
 
             {/* Copyright section */}
