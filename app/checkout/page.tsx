@@ -51,6 +51,7 @@ interface FormData {
     selectedGateway?: {
       id?: string;
     };
+    bankSlipFile?: File | null;
   };
 }
 
@@ -374,19 +375,20 @@ const CheckoutPage = () => {
       formData?.paymentMethod?.selectedGateway?.id == "ndb-pay";
 
     if (isBankTransfer) {
-      if (wantToSHowBankTransfer) {
-        // First create the order and get payment details, then open modal
-        const checkoutResult = await handleCheckout();
-        if (checkoutResult) {
-          ImplementBankTransfer();
-        }
+      // Check if bank slip file is uploaded
+      const bankSlipFile = formData?.paymentMethod?.bankSlipFile;
+      if (!bankSlipFile) {
+        toast.error("Please upload your bank slip before confirming the order.");
+        setConfirmOrderErrors(["Bank slip upload is required for Bank Transfer."]);
         return;
       }
+
       try {
-        // First create the order and get payment details, then open modal
+        // Create the order first
         const checkoutResult = await handleCheckout();
-        if (checkoutResult) {
-          ImplementBankTransfer();
+        if (checkoutResult && checkoutResult.order_id) {
+          // Upload the bank slip file immediately after order creation
+          await uploadBankSlip(bankSlipFile, checkoutResult);
         }
       } catch (e) {
         toast.error(
@@ -980,6 +982,87 @@ const CheckoutPage = () => {
     } catch (error) {
       console.error("Genie payment redirect error:", error);
       toast.error("Payment redirect failed. Please try again.");
+    }
+  };
+
+  const uploadBankSlip = async (file: File, checkoutDetails: PaymentDetailsWithoutUrls) => {
+    try {
+      toast.info("Uploading bank slip...");
+      
+      const orderId = checkoutDetails.order_id;
+      const email = checkoutDetails.email;
+      
+      if (!orderId) {
+        toast.error("Order ID not found. Please try again.");
+        return;
+      }
+
+      if (!email) {
+        toast.error("Email not found. Please try again.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("order_id", orderId);
+
+      const response = await fetch(
+        "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/upload",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.message === "File uploaded successfully") {
+        toast.success("Bank slip uploaded successfully!");
+        
+        // Clear cart after successful file upload
+        try {
+          await clearCart();
+        } catch (error: unknown) {
+          if (
+            error instanceof Error &&
+            !error.message.includes("No items in cart to remove")
+          ) {
+            console.error("Error clearing cart:", error);
+          }
+        }
+
+        // Send confirmation email if needed
+        if (typeof orderId !== "string") {
+          await sentConfirmation(orderId as number);
+        }
+
+        // Redirect based on user type
+        if (customer?.id === "guest" || checkoutDetails.order_id === "guest_checkout") {
+          // Pass all checkout details for guest checkout
+          const queryParams = new URLSearchParams({
+            ...checkoutDetails,
+            lineItems: JSON.stringify(checkoutDetails.lineItems),
+            subtotal: String(checkoutDetails.subtotal),
+            shippingTotal: String(checkoutDetails.shippingTotal),
+            date: String(checkoutDetails.date ?? ""),
+            billingaddress1: String(checkoutDetails.billingaddress1 || ""),
+            billingaddress2: String(checkoutDetails.billingaddress2 || ""),
+            shippingaddress1: String(checkoutDetails.shippingaddress1 || ""),
+            shippingaddress2: String(checkoutDetails.shippingaddress2 || ""),
+            city: checkoutDetails.city || "",
+            order_id: checkoutDetails.order_id,
+          }).toString();
+          const redirectUrl = `/checkout/guest_checkout?${queryParams}&ordermethod=guest`;
+          router.push(redirectUrl);
+        } else {
+          router.push(`/checkout/${orderId}`);
+        }
+      } else if (data.error) {
+        toast.error("An issue occurred during the bank slip upload process.");
+      }
+    } catch (error) {
+      console.error("Error uploading bank slip:", error);
+      toast.error("Failed to upload bank slip. Please try again.");
     }
   };
 
