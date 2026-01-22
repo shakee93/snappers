@@ -49,7 +49,7 @@ const ProductDescription: React.FC<ProductDescriptionProps> = ({ product }) => {
       "4 Years": "4 years",
       "5 Years": "5 years",
       "Life Time": "Life Time",
-      "12M Software Includes 06M hardware": "12 Months Software Includes 6 Months hardware",
+      "12M Software Includes 06M hardware": "12M Software Includes 6M hardware",
     };
 
     // Check if the period matches a key in our map (exact match)
