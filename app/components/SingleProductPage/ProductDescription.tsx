@@ -79,7 +79,7 @@ const ProductDescription: React.FC<ProductDescriptionProps> = ({ product }) => {
                   </svg>
                   <span>Warranty period :</span>{" "}
                   <span>
-                    {warrantyPeriod === null ? "Not Applicable" : warrantyPeriod.includes("Years") ? warrantyPeriod : warrantyPeriod === "Life Time" ? "Lifetime" : `${warrantyPeriod} Months`}
+                    {warrantyPeriod === null ? "Not Applicable" : warrantyPeriod.includes("Years") ? warrantyPeriod : warrantyPeriod === "Life Time" ? "Lifetime" : `${warrantyPeriod}`}
                   </span>
                 </div>
               )}
