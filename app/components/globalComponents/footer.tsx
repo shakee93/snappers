@@ -252,7 +252,10 @@ const Footer = async () => {
                   <div className="font-medium text-gray-800 ">Monday - Saturday&nbsp;
                     <span className="block font-normal text-gray-500">10.00AM&nbsp;-&nbsp;08.00PM</span>
                   </div>
-                  <div className="font-medium text-gray-800 ">Sunday &amp; Poya&apos;s&nbsp;
+                  <div className="font-medium text-gray-800 ">Sundays&nbsp;
+                    <span className="block font-normal text-gray-500">Closed</span>
+                  </div>
+                  <div className="font-medium text-gray-800 ">Poya Days&nbsp;
                     <span className="block font-normal text-gray-500">10.00AM&nbsp;-&nbsp;05.00PM</span>
                   </div>
                 </div>
