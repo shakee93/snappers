@@ -28,6 +28,65 @@ const ProductDescription: React.FC<ProductDescriptionProps> = ({ product }) => {
     (item) => item?.key === "warranty_period"
   )?.value;
 
+  // Format warranty period: map WordPress option keys to display names
+  const formatWarrantyPeriod = (period: string | null | undefined): string => {
+    if (!period || period === null || period === "null" || period.trim() === "") {
+      return "Not Applicable";
+    }
+
+    const periodTrimmed = period.trim();
+
+    // Mapping of WordPress option keys to display names
+    const warrantyPeriodMap: Record<string, string> = {
+      "0 Month": "N/A",
+      "1 Month": "1 month",
+      "3 Months": "3 months",
+      "6 Months": "6 months",
+      "12 Months": "12 months",
+      "18 Months": "18 months",
+      "24 Months": "24 months",
+      "3 Years": "3 years",
+      "4 Years": "4 years",
+      "5 Years": "5 years",
+      "Life Time": "Life Time",
+      "12M Software Includes 06M hardware": "12 Months Software Includes 6 Months hardware",
+    };
+
+    // Check if the period matches a key in our map (exact match)
+    if (warrantyPeriodMap[periodTrimmed]) {
+      return warrantyPeriodMap[periodTrimmed];
+    }
+
+    // Handle case-insensitive matching for "Life Time"
+    const periodLower = periodTrimmed.toLowerCase();
+    if (periodLower === "life time" || periodLower === "lifetime") {
+      return "Life Time";
+    }
+
+    // If already formatted correctly (contains "months" or "years" in lowercase), return as is
+    if (periodTrimmed.match(/\d+\s+(month|months|year|years)/i)) {
+      // Normalize to lowercase for consistency
+      return periodTrimmed.toLowerCase();
+    }
+
+    // Try to parse as number and format
+    const numericMatch = periodTrimmed.match(/^(\d+)$/);
+    if (numericMatch) {
+      const months = parseInt(numericMatch[1], 10);
+      if (months === 0) {
+        return "N/A";
+      }
+      if (months >= 12 && months % 12 === 0) {
+        const years = months / 12;
+        return `${years} ${years === 1 ? "year" : "years"}`;
+      }
+      return `${months} ${months === 1 ? "month" : "months"}`;
+    }
+
+    // Fallback: return as is (might already be formatted)
+    return periodTrimmed;
+  };
+
   // Step 2: Format the value as a list
   const formatInsideTheBox = (value: string): string => {
     if (!value) return '';
@@ -79,7 +138,7 @@ const ProductDescription: React.FC<ProductDescriptionProps> = ({ product }) => {
                   </svg>
                   <span>Warranty period :</span>{" "}
                   <span>
-                    {warrantyPeriod === null ? "Not Applicable" : warrantyPeriod.includes("Years") ? warrantyPeriod : warrantyPeriod === "Life Time" ? "Lifetime" : `${warrantyPeriod}`}
+                    {formatWarrantyPeriod(warrantyPeriod)}
                   </span>
                 </div>
               )}
