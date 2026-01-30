@@ -39,8 +39,8 @@ interface CheckoutLeftProps {
   totalPayment: any;
   setIsKokoPayment: any;
   isKokoPayment: boolean;
-  pickupType: "store" | "uber" | "pickme" | null;
-  setPickupType: (type: "store" | "uber" | "pickme" | null) => void;
+  pickupType: "store_uber_pickme" | "courier" | null;
+  setPickupType: (type: "store_uber_pickme" | "courier" | null) => void;
 }
 
 const CheckoutDetails = ({
@@ -75,11 +75,11 @@ const CheckoutDetails = ({
   const [isBillingAddressHidden, setIsBillingAddressHidden] = useState(false);
 
   useEffect(() => {
-    if (pickupType) {
+    if (pickupType === "store_uber_pickme") {
       setIsStorePickup(true);
       handleConfirmationChange("billingAddress", true);
     }
-    setIsBillingAddressHidden(isBillingSameAsShipping || !!pickupType);
+    setIsBillingAddressHidden(isBillingSameAsShipping || pickupType === "store_uber_pickme");
     if (!isBillingAddressHidden) {
       handleConfirmationChange("billingAddress", true);
     }

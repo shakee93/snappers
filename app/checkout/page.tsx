@@ -84,7 +84,7 @@ const CheckoutPage = () => {
     useState<PayhereStatus>("idle");
 
   const [isStorePickup, setIsStorePickup] = useState(false);
-  const [pickupType, setPickupType] = useState<"store" | "uber" | "pickme" | null>(null);
+  const [pickupType, setPickupType] = useState<"store_uber_pickme" | "courier" | null>(null);
   const [isCardPayment, setIsCardPayment] = useState(false);
   const [isKokoPayment, setIsKokoPayment] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState({
@@ -130,9 +130,9 @@ const CheckoutPage = () => {
     fetchCustomer();
   }, []);
 
-  // Sync pickupType with isStorePickup for backward compatibility
+  // Sync pickupType with isStorePickup: only "store_uber_pickme" is pickup
   useEffect(() => {
-    setIsStorePickup(!!pickupType);
+    setIsStorePickup(pickupType === "store_uber_pickme");
   }, [pickupType]);
 
   // MUTATIONS
@@ -214,7 +214,7 @@ const CheckoutPage = () => {
     }
 
     try {
-      const shippingMethods = pickupType
+      const shippingMethods = pickupType === "store_uber_pickme"
         ? "pickup_location:0"
         : freeShipping
           ? "wbs:5c9bd062_free_shipping"
@@ -226,7 +226,7 @@ const CheckoutPage = () => {
       if (customer?.id === "guest") {
         const subtotal: any = cart?.subtotal;
 
-        if (pickupType || freeShipping) {
+        if (pickupType === "store_uber_pickme" || freeShipping) {
           setOrderTotal(subtotal);
         } else {
           setOrderTotal(total);
@@ -438,17 +438,16 @@ const CheckoutPage = () => {
       formData.deliveryAddress.country = "LK";
 
       const shippingMethod = getShippingMethod(shippingTotal);
-      const pickupLabels: Record<"store" | "uber" | "pickme", string> = {
-        store: "Store",
-        uber: "Uber",
-        pickme: "PickMe",
+      const pickupLabels: Record<"store_uber_pickme" | "courier", string> = {
+        store_uber_pickme: "Store / Uber / PickMe",
+        courier: "Courier",
       };
-      const shippingDetails = pickupType
+      const shippingDetails = pickupType === "store_uber_pickme"
         ? {
           ...transformAddress(formData.deliveryAddress),
-          address1: pickupLabels[pickupType],
+          address1: pickupLabels.store_uber_pickme,
           address2: "",
-          city: pickupLabels[pickupType],
+          city: pickupLabels.store_uber_pickme,
           state: "",
           postcode: "",
         }
@@ -466,8 +465,10 @@ const CheckoutPage = () => {
             <p><strong>Customer Email:</strong> ${email}</p>
             <p><strong>Phone Number:</strong> ${formData?.contactInfo?.phone
         }</p>
-            ${pickupType
-          ? `<p><strong>Pickup Location:</strong> ${pickupLabels[pickupType as "store" | "uber" | "pickme"]}</p>`
+            ${pickupType === "store_uber_pickme"
+          ? `<p><strong>Pickup Location:</strong> ${pickupLabels.store_uber_pickme}</p>`
+          : pickupType === "courier"
+          ? `<p><strong>Delivery:</strong> Courier</p>`
           : ""
         }
             ${isKokoPayment
@@ -531,13 +532,12 @@ const CheckoutPage = () => {
         
         // Prepare billing and shipping addresses for CyberSource
         const billingAddress = transformAddress(formData.billingAddress);
-        const pickupLabels: Record<"store" | "uber" | "pickme", string> = {
-          store: "Store",
-          uber: "Uber",
-          pickme: "PickMe",
+        const pickupLabelsNdb: Record<"store_uber_pickme" | "courier", string> = {
+          store_uber_pickme: "Store / Uber / PickMe",
+          courier: "Courier",
         };
-        const shippingAddress = pickupType 
-          ? { ...transformAddress(formData.deliveryAddress), address1: pickupLabels[pickupType], city: pickupLabels[pickupType] }
+        const shippingAddress = pickupType === "store_uber_pickme"
+          ? { ...transformAddress(formData.deliveryAddress), address1: pickupLabelsNdb.store_uber_pickme, city: pickupLabelsNdb.store_uber_pickme }
           : transformAddress(formData.deliveryAddress);
 
         const orderData = {
@@ -648,24 +648,25 @@ const CheckoutPage = () => {
   };
 
   const getShippingMethod = (shippingTotal: any) => {
-    const methodId = pickupType
+    const methodId = pickupType === "store_uber_pickme"
       ? "pickup_location:0"
       : freeShipping
         ? "wbs:5c9bd062_free_shipping"
         : "wbs:0dd3bc79_weight_based_shipping";
 
-    const pickupLabels: Record<"store" | "uber" | "pickme", string> = {
-      store: "Store",
-      uber: "Uber",
-      pickme: "PickMe",
+    const pickupLabels: Record<"store_uber_pickme" | "courier", string> = {
+      store_uber_pickme: "Store / Uber / PickMe",
+      courier: "Courier",
     };
-    const methodTitle = pickupType
-      ? pickupLabels[pickupType]
-      : freeShipping
-        ? "Free Shipping"
-        : "Weight Based Shipping";
+    const methodTitle = pickupType === "store_uber_pickme"
+      ? pickupLabels.store_uber_pickme
+      : pickupType === "courier"
+        ? pickupLabels.courier
+        : freeShipping
+          ? "Free Shipping"
+          : "Weight Based Shipping";
 
-    const total = pickupType ? "0" : shippingTotal;
+    const total = pickupType === "store_uber_pickme" ? "0" : shippingTotal;
 
     return { methodId, methodTitle, total };
   };
@@ -1167,7 +1168,7 @@ const CheckoutPage = () => {
                 </span>
               </div>
 
-              {!pickupType && (
+              {pickupType !== "store_uber_pickme" && (
                 <div className="flex justify-between py-2.5">
                   <span>
                     {freeShipping ? `Free Shipping` : `Shipping estimate`}
@@ -1226,7 +1227,7 @@ const CheckoutPage = () => {
                   <span className="font-semibold mx-1">
                     {(
                       parseFloat(
-                        (TotalWithKoko + (pickupType ? 0 : 500) || "0")
+                        (TotalWithKoko + (pickupType === "store_uber_pickme" ? 0 : 500) || "0")
                           .toString()
                           .replace(/[^\d.]/g, "")
                       ) / 3
@@ -1270,7 +1271,7 @@ const CheckoutPage = () => {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         }).format(
-                          TotalWithKoko + (pickupType ? 0 : 500)
+                          TotalWithKoko + (pickupType === "store_uber_pickme" ? 0 : 500)
                         )}` || "0.00",
                     }}
                   />
