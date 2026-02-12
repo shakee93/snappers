@@ -26,7 +26,7 @@ const BrandLogo = ({ brand, className = "" }: BrandLogoProps) => {
       <Image
         src={brand.brandImage}
         alt={brand.name || "Brand"}
-        width={50}
+        width={100}
         height={50}
         className="object-contain"
       />
