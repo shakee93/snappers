@@ -84,6 +84,22 @@ async function getData(slug: string, brand: string) {
   }
 }
 
+const DEFAULT_OG_IMAGE = "https://cdn.gqmobiles.lk/wp-content/uploads/2025/10/gq.png";
+
+function getProductOgImage(product: SimpleProduct & VariableProduct): string {
+  // Main product image
+  const mainImage = product.image?.sourceUrl;
+
+  if (mainImage) return mainImage;
+
+  // Fallback: first variation image (for variable products without main image)
+  const firstVariationImage = (product as VariableProduct).variations?.nodes?.[0]
+    ?.image?.sourceUrl;
+  if (firstVariationImage) return firstVariationImage;
+
+  return DEFAULT_OG_IMAGE;
+}
+
 export async function generateMetadata(
   { params }: Props,
   parent: ResolvingMetadata
@@ -98,24 +114,33 @@ export async function generateMetadata(
     ? product.price.replace(/₨|&nbsp;/g, "")
     : "the best price";
 
+  const ogImageUrl = getProductOgImage(product);
+  const pageUrl = `https://gqmobiles.lk/${brand.slug}/${product.slug}`;
+  const description = `This ${product.name} is at GQMobiles.lk. The best price in Sri Lanka for ${brand.name} priced at Rs.${price}.`;
+
   return {
     title: product.name,
-    description: `This ${product.name} is at GQMobiles.lk. The best price in Sri Lanka for ${brand.name} priced at Rs.${price}.`,
+    description,
 
     openGraph: {
       title: product.name,
-      description: "Check out this product!",
-      url: `https://gqmobiles.lk/${params.brand}/${params.slug}`,
+      description,
+      url: pageUrl,
+      type: "website",
       images: [
         {
-          url:
-            product.image?.sourceUrl ||
-            "https://gqmobiles.lk/default-og-image.jpg",
-          width: 800,
-          height: 600,
-          alt: "GQ Mobiles",
+          url: ogImageUrl,
+          width: 1200,
+          height: 630,
+          alt: product.name || `${brand.name} - GQ Mobiles`,
         },
       ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: product.name,
+      description,
+      images: [ogImageUrl],
     },
   };
 }

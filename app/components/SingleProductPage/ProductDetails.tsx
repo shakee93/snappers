@@ -27,6 +27,7 @@ import koko from "@/public/koko.png";
 import Image from "next/image";
 import { BanknotesIcon } from "@heroicons/react/24/outline";
 import BrandLogo from "./BrandLogo";
+import ShareButtons from "./ShareButtons";
 import { AnimatePresence, motion } from "framer-motion";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
@@ -415,6 +416,12 @@ const ProductDetails = ({
       <div className="flex items-center gap-1 mt-2">
         <BrandLogo brand={brand} />
       </div>
+
+      <ShareButtons
+        url={`https://gqmobiles.lk/${brand.slug}/${product.slug}`}
+        title={product.name || "Product"}
+        className="mt-3"
+      />
 
       <div className="flex items-center gap-2">
         {/* Commented */}
