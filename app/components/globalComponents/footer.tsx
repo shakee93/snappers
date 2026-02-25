@@ -250,12 +250,12 @@ const Footer = async () => {
                 </div>
                 <div className="flex flex-col gap-1 md:gap-2 text-xs md:text-sm leading-tight md:leading-snug">
                   <div className="font-medium text-gray-800 ">Monday - Saturday&nbsp;
-                    <span className="block font-normal text-gray-500">10.00AM&nbsp;-&nbsp;08.00PM</span>
+                    <span className="block font-normal text-gray-500">10AM&nbsp;-&nbsp;6PM</span>
                   </div>
-                  <div className="font-medium text-gray-800 ">Poya Days&nbsp;
-                    <span className="block font-normal text-gray-500">10.00AM&nbsp;-&nbsp;05.00PM</span>
+                  <div className="font-medium text-gray-800 ">Poya & Mercantile Holidays&nbsp;
+                    <span className="block font-normal text-gray-500">10am&nbsp;-&nbsp;6pm</span>
                   </div>
-                  <div className="font-medium text-gray-800 ">Sundays&nbsp;
+                  <div className="font-medium text-gray-800 ">Sunday&nbsp;
                     <span className="block font-normal text-gray-500">Closed</span>
                   </div>
                 </div>
