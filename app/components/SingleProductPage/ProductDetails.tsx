@@ -26,6 +26,7 @@ import { useQuery } from '@apollo/client';
 import koko from "@/public/koko.png";
 import Image from "next/image";
 import { BanknotesIcon } from "@heroicons/react/24/outline";
+import { Flame } from "lucide-react";
 import BrandLogo from "./BrandLogo";
 import ShareButtons from "./ShareButtons";
 import { AnimatePresence, motion } from "framer-motion";
@@ -286,9 +287,19 @@ const ProductDetails = ({
 
       {/* <div className="text-2xl font-medium md:text-3xl">{product.name}</div> */}
       {product.price && (
-        <div className="text-sm text-primaryColor flex items-center gap-1 mt-2">
-          <BanknotesIcon className="w-4 h-4" />
-          <span className="text-gray-500 font-medium">Cash Price</span>
+        <div className="flex items-center gap-2 mt-2">
+          <div className="text-sm text-primaryColor flex items-center gap-1">
+            <BanknotesIcon className="w-4 h-4" />
+            <span className="text-gray-500 font-medium">Cash Price</span>
+          </div>
+          {product?.productTags?.nodes?.some(
+            (tag: any) => tag.slug === 'clearance'
+          ) && (
+            <span className="inline-flex items-center gap-1 bg-orange-500 text-white text-xs font-semibold px-2.5 py-0.5 rounded-full">
+              <Flame className="w-3 h-3" />
+              Clearance
+            </span>
+          )}
         </div>
       )}
       {/* Commented */}

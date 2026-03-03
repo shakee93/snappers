@@ -1,6 +1,7 @@
 "use client";
 import {
   ExternalLink,
+  Flame,
   Loader,
   MousePointerClick,
   Settings2,
@@ -105,6 +106,13 @@ const ProductCard: FC<ProductCardProps> = ({
   const isPreOrderProduct = () => {
     return data?.productTags?.nodes?.some(
       (tag: any) => tag.slug === 'pre-order'
+    ) || false;
+  };
+
+  // Check if product is a clearance product
+  const isClearanceProduct = () => {
+    return data?.productTags?.nodes?.some(
+      (tag: any) => tag.slug === 'clearance'
     ) || false;
   };
 
@@ -311,6 +319,16 @@ const ProductCard: FC<ProductCardProps> = ({
       {stockStatus !== "IN_STOCK" && (
         <div className="absolute left-0 top-4 z-10 cursor-pointer bg-red-600 w-fit font-normal text-xs text-white px-3 py-1.5 rounded-r-full shadow-md">
           Sold Out
+        </div>
+      )}
+
+      {/* Clearance fire tag - icon only by default, text reveals on card hover */}
+      {isClearanceProduct() && (
+        <div className="absolute left-0 top-12 z-10 flex items-center gap-1 bg-orange-500 w-fit font-normal text-xs text-white py-1.5 px-3 rounded-r-full shadow-md md:pl-2 md:pr-2 md:group-hover:pr-3 transition-all duration-200">
+          <Flame className="w-3.5 h-3.5 flex-shrink-0 hidden md:block" />
+          <span className="whitespace-nowrap md:max-w-0 md:overflow-hidden md:opacity-0 md:transition-all md:duration-200 md:group-hover:max-w-[100px] md:group-hover:opacity-100">
+            Clearance
+          </span>
         </div>
       )}
 
