@@ -258,6 +258,9 @@ export const CHECKOUT = gql`
       }
       order {
         total
+        subtotal
+        shippingTotal
+        date
         id
         databaseId
         lineItems {

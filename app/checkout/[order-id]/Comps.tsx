@@ -32,7 +32,7 @@ export const OrderDetails = ({ orderData }: OrderDetailsProps) => {
   ];
 
   return (
-    <div className="my-4">
+    <div className="my-4 max-w-5xl mx-auto">
       <div className="grid grid-cols-1 lg:grid-cols-1 py-4">
 
         <div className="flex flex-col justify-center items-start">
@@ -70,7 +70,7 @@ const ProductTable = ({ lineItems, orderData, paymentDetails }: ProductTableProp
   const order = orderData?.order || orderData?.checkout?.order;
 
   return (
-    <>
+    <div className="max-w-5xl mx-auto">
       <div>
         <p className="text-2xl text-left pb-4">Order Details</p>
       </div>
@@ -174,7 +174,7 @@ const ProductTable = ({ lineItems, orderData, paymentDetails }: ProductTableProp
       </div>
 
 
-    </>
+    </div>
   );
 };
 

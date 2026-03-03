@@ -125,10 +125,10 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     sendKokoVerification();
   }, [orderId, status, orderIdUrl]); // Dependencies to trigger the effect
 
-  // Query for order data (will be skipped for guest checkouts or if we have localStorage data)
+  // Query for order data (will be skipped for guest checkouts)
   const { data: orderData, error: orderError } = useQuery(GET_SINGLE_ORDER, {
     variables: { orderID: orderId },
-    skip: !orderId || orderId === "guest_checkout" || orderId === "ItemNo12345" || orderId === "12345" || ordermethod === "guest" || !!localStorageOrderData,
+    skip: !orderId || orderId === "guest_checkout" || orderId === "ItemNo12345" || orderId === "12345" || ordermethod === "guest",
   });
 
   // Clear cart for guest checkout with ordermethod=guest
@@ -411,10 +411,10 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     );
   }
 
-  // Use localStorage data if available (for guest NDB Pay orders)
-  const finalOrderData = localStorageOrderData?.checkout || orderData;
+  // Prefer query data (complete) over localStorage (may be incomplete); fall back to localStorage for guest orders
+  const finalOrderData = orderData || localStorageOrderData?.checkout;
   
-  // If query failed but we have localStorage data, use that instead
+  // If query failed and we have no localStorage data, show error
   if (orderError && !localStorageOrderData && !isCheckingLocalStorage) {
     return (
       <div className="container mx-auto grid items-center justify-center">
@@ -442,8 +442,8 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
     );
   }
 
-  const displayOrderData = localStorageOrderData?.checkout || orderData;
-  const displayPaymentDetails = localStorageOrderData ? localStoragePaymentDetails : regularPaymentDetails;
+  const displayOrderData = orderData || localStorageOrderData?.checkout;
+  const displayPaymentDetails = localStorageOrderData && !orderData ? localStoragePaymentDetails : regularPaymentDetails;
 
   if (!displayOrderData) {
     return (
