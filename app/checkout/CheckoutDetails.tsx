@@ -39,6 +39,8 @@ interface CheckoutLeftProps {
   totalPayment: any;
   setIsKokoPayment: any;
   isKokoPayment: boolean;
+  pickupType: "store_uber_pickme" | "courier" | null;
+  setPickupType: (type: "store_uber_pickme" | "courier" | null) => void;
 }
 
 const CheckoutDetails = ({
@@ -55,7 +57,9 @@ const CheckoutDetails = ({
   setIsCardPayment,
   totalPayment,
   setIsKokoPayment,
-  isKokoPayment
+  isKokoPayment,
+  pickupType,
+  setPickupType
 }: CheckoutLeftProps) => {
 
   const { data, loading: dataLoading }: QueryResult = useQuery(GET_CHECKOUT_USER_DETAILS);
@@ -71,16 +75,16 @@ const CheckoutDetails = ({
   const [isBillingAddressHidden, setIsBillingAddressHidden] = useState(false);
 
   useEffect(() => {
-    if (isStorePickup == true) {
+    if (pickupType === "store_uber_pickme") {
       setIsStorePickup(true);
       handleConfirmationChange("billingAddress", true);
     }
-    setIsBillingAddressHidden(isBillingSameAsShipping || isStorePickup);
+    setIsBillingAddressHidden(isBillingSameAsShipping || pickupType === "store_uber_pickme");
     if (!isBillingAddressHidden) {
       handleConfirmationChange("billingAddress", true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isStorePickup, isBillingSameAsShipping]);
+  }, [pickupType, isBillingSameAsShipping]);
 
 
   useEffect(() => {
@@ -163,6 +167,8 @@ const CheckoutDetails = ({
           isStorePickup={isStorePickup}
           setStorePickup={setIsStorePickup}
           setDeliveryAddress={setIsBillingSameAsShipping}
+          pickupType={pickupType}
+          setPickupType={setPickupType}
         />
       </div>
 

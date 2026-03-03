@@ -51,11 +51,12 @@ interface FormData {
     selectedGateway?: {
       id?: string;
     };
+    bankSlipFile?: File | null;
   };
 }
 
 const CheckoutPage = () => {
-  const { cart, removeFromCart, updateCart } = useCart();
+  const { cart, removeFromCart, updateCart, clearCart, refreshCart } = useCart();
   const [finalOrderTotal, setFinalOrderTotal] = useState(null);
   const { customer, fetchCustomer } = useSession();
 
@@ -83,6 +84,7 @@ const CheckoutPage = () => {
     useState<PayhereStatus>("idle");
 
   const [isStorePickup, setIsStorePickup] = useState(false);
+  const [pickupType, setPickupType] = useState<"store_uber_pickme" | "courier" | null>(null);
   const [isCardPayment, setIsCardPayment] = useState(false);
   const [isKokoPayment, setIsKokoPayment] = useState(false);
   const [isConfirmed, setIsConfirmed] = useState({
@@ -127,6 +129,11 @@ const CheckoutPage = () => {
   useEffect(() => {
     fetchCustomer();
   }, []);
+
+  // Sync pickupType with isStorePickup: only "store_uber_pickme" is pickup
+  useEffect(() => {
+    setIsStorePickup(pickupType === "store_uber_pickme");
+  }, [pickupType]);
 
   // MUTATIONS
   const [updateCartShippingTotalMutation] = useMutation(UPDATE_SHIPPING_TOTAL);
@@ -207,7 +214,7 @@ const CheckoutPage = () => {
     }
 
     try {
-      const shippingMethods = isStorePickup
+      const shippingMethods = pickupType === "store_uber_pickme"
         ? "pickup_location:0"
         : freeShipping
           ? "wbs:5c9bd062_free_shipping"
@@ -219,7 +226,7 @@ const CheckoutPage = () => {
       if (customer?.id === "guest") {
         const subtotal: any = cart?.subtotal;
 
-        if (isStorePickup || freeShipping) {
+        if (pickupType === "store_uber_pickme" || freeShipping) {
           setOrderTotal(subtotal);
         } else {
           setOrderTotal(total);
@@ -257,7 +264,7 @@ const CheckoutPage = () => {
 
   useEffect(() => {
     updateShippingTotal().then((r) => r);
-  }, [isStorePickup, updateCartShippingTotalMutation, freeShipping]);
+  }, [pickupType, updateCartShippingTotalMutation, freeShipping]);
 
   const paymentDetails = useMemo(() => {
     return paymentData;
@@ -364,14 +371,25 @@ const CheckoutPage = () => {
       formData?.paymentMethod?.selectedGateway?.id == "darazbnpl";
     const isGeniePayment =
       formData?.paymentMethod?.selectedGateway?.id == "geniebiz";
+    const isNdbPay =
+      formData?.paymentMethod?.selectedGateway?.id == "ndb-pay";
 
     if (isBankTransfer) {
-      if (wantToSHowBankTransfer) {
-        ImplementBankTransfer();
+      // Check if bank slip file is uploaded
+      const bankSlipFile = formData?.paymentMethod?.bankSlipFile;
+      if (!bankSlipFile) {
+        toast.error("Please upload your bank slip before confirming the order.");
+        setConfirmOrderErrors(["Bank slip upload is required for Bank Transfer."]);
         return;
       }
+
       try {
-        ImplementBankTransfer();
+        // Create the order first
+        const checkoutResult = await handleCheckout();
+        if (checkoutResult && checkoutResult.order_id) {
+          // Upload the bank slip file immediately after order creation
+          await uploadBankSlip(bankSlipFile, checkoutResult);
+        }
       } catch (e) {
         toast.error(
           "Sorry to hear that you are facing an issue with Bank Transfer. Please try again later."
@@ -384,6 +402,11 @@ const CheckoutPage = () => {
     }
 
     if (isPayhere) {
+      await handleCheckout();
+      return;
+    }
+
+    if (isNdbPay) {
       await handleCheckout();
       return;
     }
@@ -402,22 +425,29 @@ const CheckoutPage = () => {
 
       const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
 
+      console.log("paymentMethodId", paymentMethodId);
+      console.log("formData", formData);
+
       if (paymentMethodId === undefined) {
         console.error("Payment method ID is undefined");
         toast.error("Payment Method was not chosen.");
-        return;
+        return null;
       }
 
       formData.billingAddress.country = "LK";
       formData.deliveryAddress.country = "LK";
 
       const shippingMethod = getShippingMethod(shippingTotal);
-      const shippingDetails = isStorePickup
+      const pickupLabels: Record<"store_uber_pickme" | "courier", string> = {
+        store_uber_pickme: "Store / Uber / PickMe",
+        courier: "Courier",
+      };
+      const shippingDetails = pickupType === "store_uber_pickme"
         ? {
           ...transformAddress(formData.deliveryAddress),
-          address1: "Store Pickup",
+          address1: pickupLabels.store_uber_pickme,
           address2: "",
-          city: "Store Pickup",
+          city: pickupLabels.store_uber_pickme,
           state: "",
           postcode: "",
         }
@@ -435,8 +465,10 @@ const CheckoutPage = () => {
             <p><strong>Customer Email:</strong> ${email}</p>
             <p><strong>Phone Number:</strong> ${formData?.contactInfo?.phone
         }</p>
-            ${isStorePickup
-          ? "<p><strong>Pickup Location:</strong> Store</p>"
+            ${pickupType === "store_uber_pickme"
+          ? `<p><strong>Pickup Location:</strong> ${pickupLabels.store_uber_pickme}</p>`
+          : pickupType === "courier"
+          ? `<p><strong>Delivery:</strong> Courier</p>`
           : ""
         }
             ${isKokoPayment
@@ -479,6 +511,67 @@ const CheckoutPage = () => {
         };
         localStorage.setItem("last_order", JSON.stringify(data));
         handleKoko(orderData);
+        return; // Return early to prevent further processing
+      }
+
+      // NDB-Pay Payment - Order is already created above
+      const isNdbPay = formData?.paymentMethod?.selectedGateway?.id == "ndb-pay";
+      if (isNdbPay) {
+        // Order is already created at this point (line 475-478)
+        const orderTotalRaw = data?.checkout?.order?.total;
+        
+        // Extract raw numeric amount (remove HTML entities, currency symbols, etc.)
+        // Order total might be like "₨&nbsp;519.90" or "Rs 519.90"
+        const rawAmount = orderTotalRaw?.replace(/[^0-9.]/g, "") || "0.00";
+        const numericAmount = parseFloat(rawAmount).toFixed(2);
+        
+        console.log("=== NDB-PAY ORDER DATA DEBUG ===");
+        console.log("Order Total (raw HTML):", orderTotalRaw);
+        console.log("Order Total (extracted):", numericAmount);
+        console.log("Order Data:", data?.checkout?.order);
+        
+        // Prepare billing and shipping addresses for CyberSource
+        const billingAddress = transformAddress(formData.billingAddress);
+        const pickupLabelsNdb: Record<"store_uber_pickme" | "courier", string> = {
+          store_uber_pickme: "Store / Uber / PickMe",
+          courier: "Courier",
+        };
+        const shippingAddress = pickupType === "store_uber_pickme"
+          ? { ...transformAddress(formData.deliveryAddress), address1: pickupLabelsNdb.store_uber_pickme, city: pickupLabelsNdb.store_uber_pickme }
+          : transformAddress(formData.deliveryAddress);
+
+        const orderData = {
+          order_id: data?.checkout?.order?.databaseId, // Use the created order ID
+          amount: numericAmount, // Send clean numeric amount
+          currency: "LKR",
+          email: formData?.contactInfo?.email,
+          phone: formData?.contactInfo?.phone,
+          // Billing information for CyberSource
+          bill_to_forename: billingAddress.firstName || "",
+          bill_to_surname: billingAddress.lastName || "",
+          bill_to_address_line1: billingAddress.address1 || "",
+          bill_to_address_line2: billingAddress.address2 || "",
+          bill_to_address_city: billingAddress.city || "",
+          bill_to_address_state: billingAddress.state || "",
+          bill_to_address_postal_code: billingAddress.postcode || "",
+          bill_to_address_country: billingAddress.country || "LK",
+          bill_to_email: formData?.contactInfo?.email || "",
+          bill_to_phone: formData?.contactInfo?.phone || "",
+          // Shipping information for CyberSource
+          ship_to_forename: shippingAddress.firstName || "",
+          ship_to_surname: shippingAddress.lastName || "",
+          ship_to_address_line1: shippingAddress.address1 || "",
+          ship_to_address_line2: shippingAddress.address2 || "",
+          ship_to_address_city: shippingAddress.city || "",
+          ship_to_address_state: shippingAddress.state || "",
+          ship_to_address_postal_code: shippingAddress.postcode || "",
+          ship_to_address_country: shippingAddress.country || "LK",
+        };
+        
+        console.log("Sending to WordPress:", orderData);
+        localStorage.setItem("last_order", JSON.stringify(data));
+        handleNdbPay(orderData); // Fetch form and submit
+        return; // Return early to prevent cart clearing and other processing
       }
 
       // FOR GUEST CHECKOUT
@@ -522,8 +615,23 @@ const CheckoutPage = () => {
         setPaymentData(checkoutDetails);
 
         if (isBankTransfer) {
+          // For bank transfer, don't clear cart yet - wait for file upload success
+          console.log("checkoutDetails", checkoutDetails);
           return checkoutDetails;
         } else {
+          // For other payment methods, clear cart immediately after successful order creation
+          try {
+            await clearCart();
+            // Don't call refreshCart() here - the mutation already returns the updated cart
+            // Calling refreshCart() immediately can cause race conditions and infinite loops
+          } catch (error: unknown) {
+            if (
+              error instanceof Error &&
+              !error.message.includes("No items in cart to remove")
+            ) {
+              console.error("Error clearing cart:", error);
+            }
+          }
           toast.success("🌟 Order Placed Successfully! 🚀");
           return null;
         }
@@ -533,25 +641,32 @@ const CheckoutPage = () => {
       }
     } catch (error) {
       handleCheckoutError(error);
+      return null; // Explicitly return null on error
     } finally {
       setLoading(false);
     }
   };
 
   const getShippingMethod = (shippingTotal: any) => {
-    const methodId = isStorePickup
+    const methodId = pickupType === "store_uber_pickme"
       ? "pickup_location:0"
       : freeShipping
         ? "wbs:5c9bd062_free_shipping"
         : "wbs:0dd3bc79_weight_based_shipping";
 
-    const methodTitle = isStorePickup
-      ? "Store Pickup"
-      : freeShipping
-        ? "Free Shipping"
-        : "Weight Based Shipping";
+    const pickupLabels: Record<"store_uber_pickme" | "courier", string> = {
+      store_uber_pickme: "Store / Uber / PickMe",
+      courier: "Courier",
+    };
+    const methodTitle = pickupType === "store_uber_pickme"
+      ? pickupLabels.store_uber_pickme
+      : pickupType === "courier"
+        ? pickupLabels.courier
+        : freeShipping
+          ? "Free Shipping"
+          : "Weight Based Shipping";
 
-    const total = isStorePickup ? "0" : shippingTotal;
+    const total = pickupType === "store_uber_pickme" ? "0" : shippingTotal;
 
     return { methodId, methodTitle, total };
   };
@@ -742,6 +857,109 @@ const CheckoutPage = () => {
     }
   };
 
+  const handleNdbPay = async (orderData: any) => {
+    toast.info("Redirecting to NDB-Pay payment portal...", {
+      duration: 10000,
+    });
+    try {
+      // Log the extracted amount being sent to backend
+      console.log("=== SENDING TO BACKEND ===");
+      console.log("Order Data (with extracted amount):", orderData);
+      console.log("Amount being sent:", orderData.amount);
+      
+      const response = await fetch("/api/ndb-pay", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(orderData),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        console.error("NDB-Pay API error response:", errorText);
+        throw new Error(`Network response was not ok: ${response.status} - ${errorText}`);
+      }
+
+      // WordPress returns only the HTML form (plain HTML, not JSON)
+      const formHtml = await response.text();
+
+      // Validate that we received HTML
+      if (!formHtml || formHtml.trim().length === 0) {
+        throw new Error("Empty response from server");
+      }
+
+      // Check if it's HTML (might be error JSON)
+      if (formHtml.trim().startsWith('{')) {
+        try {
+          const errorData = JSON.parse(formHtml);
+          throw new Error(errorData.error || errorData.message || "Unknown error from server");
+        } catch (e) {
+          // Not JSON, continue
+        }
+      }
+
+      console.log("NDB-Pay form HTML received:", formHtml.substring(0, 200) + "...");
+
+      setHtmlFormResponse(formHtml);
+
+      // Inject form HTML into DOM and display it on checkout page
+      const tempContainer = document.createElement("div");
+      tempContainer.innerHTML = formHtml;
+      const formWrapper = tempContainer.querySelector("#ndb-pay-form-container") as HTMLDivElement;
+      
+      if (!formWrapper) {
+        console.error("Form HTML received:", formHtml);
+        throw new Error("No form container found in response");
+      }
+
+      // Find the wrapper div on the checkout page
+      const checkoutFormWrapper = document.getElementById("ndb-pay-form-wrapper");
+      if (!checkoutFormWrapper) {
+        console.error("Checkout form wrapper not found");
+        throw new Error("Checkout form wrapper not found");
+      }
+
+      // Clear any existing form and append the new one
+      checkoutFormWrapper.innerHTML = "";
+      checkoutFormWrapper.appendChild(formWrapper);
+
+      // Get the form element from the wrapper
+      const form = formWrapper.querySelector("form") as HTMLFormElement;
+      if (!form) {
+        console.error("Form HTML received:", formHtml);
+        throw new Error("No form element found in response");
+      }
+
+      // Add submit button to form
+      const submitButton = document.createElement("button");
+      submitButton.textContent = "Pay Now";
+      submitButton.style.display = "none";
+      submitButton.type = "submit";
+      submitButton.className = "mt-4 px-6 py-2 bg-primary text-white rounded hover:bg-primary-dark";
+      
+      form.appendChild(submitButton);
+
+      // Form is now visible on the checkout page with all values
+      console.log("Form displayed on checkout page. Form action:", form.action);
+      
+      // Submit form by clicking the submit button
+      setTimeout(() => {
+        const submitBtn = document.querySelector("#ndb-pay-form-container button[type=submit]") as HTMLButtonElement;
+        if (submitBtn) {
+          submitBtn.click();
+        } else {
+          console.error("Submit button not found");
+        }
+      }, 100);
+
+    } catch (error) {
+      console.error("NDB-Pay payment error:", error);
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+      toast.error(`Payment initiation failed: ${errorMessage}`);
+    }
+  };
+
   const handleGeniePayment = (checkoutData: any) => {
     try {
       const redirectUrl = checkoutData?.checkout?.redirect;
@@ -765,6 +983,87 @@ const CheckoutPage = () => {
     } catch (error) {
       console.error("Genie payment redirect error:", error);
       toast.error("Payment redirect failed. Please try again.");
+    }
+  };
+
+  const uploadBankSlip = async (file: File, checkoutDetails: PaymentDetailsWithoutUrls) => {
+    try {
+      toast.info("Uploading bank slip...");
+      
+      const orderId = checkoutDetails.order_id;
+      const email = checkoutDetails.email;
+      
+      if (!orderId) {
+        toast.error("Order ID not found. Please try again.");
+        return;
+      }
+
+      if (!email) {
+        toast.error("Email not found. Please try again.");
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append("file", file);
+      formData.append("order_id", orderId);
+
+      const response = await fetch(
+        "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/upload",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.message === "File uploaded successfully") {
+        toast.success("Bank slip uploaded successfully!");
+        
+        // Clear cart after successful file upload
+        try {
+          await clearCart();
+        } catch (error: unknown) {
+          if (
+            error instanceof Error &&
+            !error.message.includes("No items in cart to remove")
+          ) {
+            console.error("Error clearing cart:", error);
+          }
+        }
+
+        // Send confirmation email if needed
+        if (typeof orderId !== "string") {
+          await sentConfirmation(orderId as number);
+        }
+
+        // Redirect based on user type
+        if (customer?.id === "guest" || checkoutDetails.order_id === "guest_checkout") {
+          // Pass all checkout details for guest checkout
+          const queryParams = new URLSearchParams({
+            ...checkoutDetails,
+            lineItems: JSON.stringify(checkoutDetails.lineItems),
+            subtotal: String(checkoutDetails.subtotal),
+            shippingTotal: String(checkoutDetails.shippingTotal),
+            date: String(checkoutDetails.date ?? ""),
+            billingaddress1: String(checkoutDetails.billingaddress1 || ""),
+            billingaddress2: String(checkoutDetails.billingaddress2 || ""),
+            shippingaddress1: String(checkoutDetails.shippingaddress1 || ""),
+            shippingaddress2: String(checkoutDetails.shippingaddress2 || ""),
+            city: checkoutDetails.city || "",
+            order_id: checkoutDetails.order_id,
+          }).toString();
+          const redirectUrl = `/checkout/guest_checkout?${queryParams}&ordermethod=guest`;
+          router.push(redirectUrl);
+        } else {
+          router.push(`/checkout/${orderId}`);
+        }
+      } else if (data.error) {
+        toast.error("An issue occurred during the bank slip upload process.");
+      }
+    } catch (error) {
+      console.error("Error uploading bank slip:", error);
+      toast.error("Failed to upload bank slip. Please try again.");
     }
   };
 
@@ -822,6 +1121,8 @@ const CheckoutPage = () => {
               handleConfirmationChange={handleConfirmationChange}
               setIsStorePickup={setIsStorePickup}
               isStorePickup={isStorePickup}
+              pickupType={pickupType}
+              setPickupType={setPickupType}
               setIsCardPayment={setIsCardPayment}
               isCardPayment={isCardPayment}
               totalPayment={numericOrderTotal}
@@ -867,7 +1168,7 @@ const CheckoutPage = () => {
                 </span>
               </div>
 
-              {!isStorePickup && (
+              {pickupType !== "store_uber_pickme" && (
                 <div className="flex justify-between py-2.5">
                   <span>
                     {freeShipping ? `Free Shipping` : `Shipping estimate`}
@@ -926,7 +1227,7 @@ const CheckoutPage = () => {
                   <span className="font-semibold mx-1">
                     {(
                       parseFloat(
-                        (TotalWithKoko + (isStorePickup ? 0 : 500) || "0")
+                        (TotalWithKoko + (pickupType === "store_uber_pickme" ? 0 : 500) || "0")
                           .toString()
                           .replace(/[^\d.]/g, "")
                       ) / 3
@@ -970,7 +1271,7 @@ const CheckoutPage = () => {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
                         }).format(
-                          TotalWithKoko + (isStorePickup ? 0 : 500)
+                          TotalWithKoko + (pickupType === "store_uber_pickme" ? 0 : 500)
                         )}` || "0.00",
                     }}
                   />
@@ -1050,6 +1351,9 @@ const CheckoutPage = () => {
                 "Confirm Order"
               )}
             </ButtonPrimary>
+
+            {/* Dynamic NDB-Pay Form Container (populated when NDB-Pay is selected) */}
+            <div id="ndb-pay-form-wrapper" className="mt-6"></div>
 
             {/* <ButtonPrimary
               onClick={handleKoko}

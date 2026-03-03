@@ -25,6 +25,7 @@ export const ProductContentSlice = gql`
         name
         slug
         count
+        brandImage
       }
     }
     image {
@@ -192,6 +193,7 @@ export const ProductContentFull = gql`
         name
         slug
         count
+        brandImage
       }
     }
     metaData {

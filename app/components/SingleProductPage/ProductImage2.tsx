@@ -148,7 +148,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   const originalGalleryImages = product?.galleryImages?.nodes?.length ? product.galleryImages.nodes : [];
   // Don't include video in gallery images - it will be shown separately
   const initialGalleryImages = originalGalleryImages;
-  
+
   const [galleryImages, setGalleryImages] = useState(initialGalleryImages);
 
 
@@ -183,7 +183,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   }, []);
 
   useEffect(() => {
-    const activeVariationImage = variationImages.find(i => i.databaseId === variationId);
+    const activeVariationImage = variationImages.find(i => i?.databaseId === variationId);
 
     setGalleryImages(previousImages => {
       if (!previousImages) {
@@ -251,7 +251,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
     onSelect();
     emblaMainApi.on("select", onSelect);
     emblaMainApi.on("reInit", onSelect);
-    
+
     return () => {
       emblaMainApi.off("select", onSelect);
       emblaMainApi.off("reInit", onSelect);
@@ -317,7 +317,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
             </div>
           ) : (
             <div className="relative w-full rounded-2xl overflow-hidden bg-black flex items-center justify-center">
-              <video 
+              <video
                 ref={videoRef}
                 className="w-full max-h-[330px] md:max-h-[410px] object-contain rounded-xl"
                 controls={isVideoPlaying}
@@ -331,7 +331,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
                 <p>Your browser does not support the video tag.</p>
               </video>
               {!isVideoPlaying && (
-                <div 
+                <div
                   className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 cursor-pointer group hover:bg-opacity-40 transition-all duration-300"
                   onClick={() => {
                     if (videoRef.current) {

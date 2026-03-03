@@ -6,6 +6,7 @@ import BankDetails from "./BankDetails";
 import { PaymentDetailsWithoutUrls } from "@/data/types";
 import { Loader } from "lucide-react";
 import { useSession } from "@/context/SessionProvider";
+import { useCart } from "@/context/CartProvider";
 import Image from "next/image";
 import { sentConfirmation } from "@/components/AddressPageComps/HelperComps";
 
@@ -24,7 +25,9 @@ const BankTransfer: React.FC<BankTransferProps> = ({
   const [uploadStatus, setUploadStatus] = useState<string>("");
   const [loading, setLoading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [isCreatingOrder, setIsCreatingOrder] = useState(false);
   const { customer, fetchCustomer } = useSession();
+  const { clearCart, refreshCart } = useCart();
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = event.target.files;
@@ -48,6 +51,8 @@ const BankTransfer: React.FC<BankTransferProps> = ({
     setLoading(true);
     toast.info("Please wait while we process your checkout.");
     event.preventDefault();
+    console.log("file", file);
+    console.log("previewUrl", previewUrl);
     if (!file) {
       toast.error("Kindly choose a file for uploading.", { duration: 7000 });
       setLoading(false);
@@ -55,26 +60,49 @@ const BankTransfer: React.FC<BankTransferProps> = ({
     }
 
     try {
-      let paymentDetails: PaymentDetailsWithoutUrls = await handleCheckout();
+      // First, try to use the paymentDetails prop that was passed from parent
+      console.log("BankTransfer: paymentDetails prop received:", paymentDetails ? "available" : "null/undefined");
+      let currentPaymentDetails: PaymentDetailsWithoutUrls | null = paymentDetails || null;
+
+      // If paymentDetails prop is not available, try to get it from handleCheckout
+      if (!currentPaymentDetails) {
+        if (isCreatingOrder) {
+          toast.error("Order is already being created. Please wait...");
+          setLoading(false);
+          return;
+        }
+        console.log("Payment details not available from prop, calling handleCheckout...");
+        setIsCreatingOrder(true);
+        try {
+          currentPaymentDetails = await handleCheckout();
+          console.log("BankTransfer: handleCheckout() returned:", currentPaymentDetails ? "paymentDetails" : "null");
+        } finally {
+          setIsCreatingOrder(false);
+        }
+      } else {
+        console.log("BankTransfer: Using paymentDetails from prop");
+      }
+
+      console.log("paymentDetails", currentPaymentDetails);
 
       // Check if paymentDetails is null or undefined
-      if (!paymentDetails) {
-        toast.error('No payment details provided for the bank transfer');
+      if (!currentPaymentDetails) {
+        toast.error('No payment details provided for the bank transfer. Please try again.');
         setLoading(false);
         return;
       }
 
       // Check if order_id exists
-      if (!paymentDetails.order_id) {
+      if (!currentPaymentDetails.order_id) {
         setLoading(false);
         toast.error("Order not created");
         return;
       }
 
-      let order_id = paymentDetails.order_id;
-      let email = paymentDetails.email;
+      let order_id = currentPaymentDetails.order_id;
+      let email = currentPaymentDetails.email;
       
-      if (paymentDetails.email === undefined) {
+      if (currentPaymentDetails.email === undefined) {
         throw new Error("No email found");
       }
 
@@ -90,6 +118,8 @@ const BankTransfer: React.FC<BankTransferProps> = ({
         }
       );
 
+      console.log("response", response);
+
       const data = await response.json();
 
       if (data.message === "File uploaded successfully") {
@@ -101,12 +131,24 @@ const BankTransfer: React.FC<BankTransferProps> = ({
           const confirmation = await sentConfirmation(order_id as number);
         }
 
+        // Clear cart after successful file upload (order is now complete)
+        try {
+          await clearCart();
+          await refreshCart();
+        } catch (error: unknown) {
+          if (
+            error instanceof Error &&
+            !error.message.includes("No items in cart to remove")
+          ) {
+            console.error("Error clearing cart:", error);
+          }
+        }
 
         if (customer?.id === "guest") {
 
           const queryParams = new URLSearchParams({
-            ...paymentDetails,
-            lineItems: JSON.stringify(paymentDetails.lineItems),
+            ...currentPaymentDetails,
+            lineItems: JSON.stringify(currentPaymentDetails.lineItems),
           }).toString();
 
           const redirectUrl = `/checkout/guest_checkout?${queryParams}&ordermethod=guest`;

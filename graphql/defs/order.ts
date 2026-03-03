@@ -157,10 +157,16 @@ export const GET_MY_ORDERS = gql`
         nodes {
           date
           id
+          databaseId
           orderNumber
           total
           status
           paymentMethod
+          metaData {
+            id
+            key
+            value
+          }
           lineItems {
             nodes {
               databaseId

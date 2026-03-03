@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import React, { createContext, ReactNode, useContext, useEffect, useState, useRef, useCallback } from 'react';
 import { ApolloError, useLazyQuery, useMutation } from '@apollo/client';
 import { ADD_TO_CART, GET_CART, REMOVE_ITEMS_FROM_CART, UPDATE_CART_ITEM_QUANTITY } from "@/graphql/defs/cart";
 import { Cart, Customer } from "@/graphql/types/graphql";
@@ -50,16 +50,48 @@ export function CartProvider({ children }: {
     const [customer, setCustomer] = useState<Customer | null>(null)
     const [isCartOpen, setIsCartOpen] = useState(false)
     const [loading, setLoading] = useState(false)
+    const processedRemoveDataRef = useRef<string | null>(null)
+    const isClearingRef = useRef(false)
 
-    const refreshData = (data: {
-        [key: string]: {
-            cart: Cart,
-            customer: Customer
+    const refreshData = (data: any) => {
+        // Handle removeItemsFromCart mutation response
+        if (data?.removeItemsFromCart) {
+            setCart(data.removeItemsFromCart.cart || null)
+            // Don't update customer - this mutation doesn't return customer data
+            return
         }
-    }) => {
+        
+        // Handle addToCart mutation response
+        if (data?.addToCart) {
+            setCart(data.addToCart.cart || null)
+            // Don't update customer - this mutation doesn't return customer data
+            return
+        }
+        
+        // Handle updateItemQuantities mutation response
+        if (data?.updateItemQuantities) {
+            setCart(data.updateItemQuantities.cart || null)
+            // Don't update customer - this mutation doesn't return customer data
+            return
+        }
+        
+        // Handle updateShippingMethod mutation response
+        if (data?.updateShippingMethod) {
+            setCart(data.updateShippingMethod.cart || null)
+            // Don't update customer - this mutation doesn't return customer data
+            return
+        }
+        
+        // Handle GET_CART query response (has both cart and customer)
         const key = Object.keys(data)[0]
-        setCart(data?.[key]?.cart || data.cart)
-        setCustomer(data?.[key]?.customer || data.customer)
+        if (key && data[key]) {
+            setCart(data[key].cart || data.cart || null)
+            setCustomer(data[key].customer || data.customer || null)
+        } else {
+            // Fallback for direct cart/customer structure
+            setCart(data?.cart || null)
+            setCustomer(data?.customer || null)
+        }
     }
 
     const [getCart, { error, data }] = useLazyQuery(GET_CART, {
@@ -86,7 +118,21 @@ export function CartProvider({ children }: {
     // Handle data from removeFromCart mutation
     useEffect(() => {
         if (removeCartData) {
-            refreshData(removeCartData);
+            // Create a unique key to prevent processing the same response multiple times
+            const cartId = removeCartData?.removeItemsFromCart?.cart?.databaseId
+            const itemCount = removeCartData?.removeItemsFromCart?.cart?.contents?.nodes?.length || 0
+            const dataKey = `${cartId}-${itemCount}`
+            
+            // Skip if we've already processed this exact response
+            if (processedRemoveDataRef.current === dataKey) {
+                return
+            }
+            
+            processedRemoveDataRef.current = dataKey
+            refreshData(removeCartData)
+            
+            // Reset clearing flag after processing the response
+            isClearingRef.current = false
         }
     }, [removeCartData]);
 
@@ -104,7 +150,7 @@ export function CartProvider({ children }: {
         }
     }, [updateCartData]);
 
-    const removeFromCart = async (keys: string[] = [], all: boolean = false) => {
+    const removeFromCart = useCallback(async (keys: string[] = [], all: boolean = false) => {
         setLoading(true)
 
         return await _removeFromCart({
@@ -113,15 +159,63 @@ export function CartProvider({ children }: {
                 all: all
             }
         }).finally(() => setLoading(false))
-    }
+    }, [_removeFromCart])
 
-    const clearCart = async () => {
-        return await removeFromCart([], true);
-    }
+    const clearCart = useCallback(async () => {
+        // Prevent clearing if already in progress
+        if (isClearingRef.current) {
+            return Promise.resolve()
+        }
+        
+        // Prevent clearing if cart is already empty
+        if (!cart || !cart.contents?.nodes || cart.contents.nodes.length === 0) {
+            return Promise.resolve()
+        }
+        
+        isClearingRef.current = true
+        
+        try {
+            // Reset the processed data ref to allow processing the new response
+            processedRemoveDataRef.current = null
+            
+            const result = await removeFromCart([], true)
+            return result
+        } catch (error: any) {
+            // If we get a 500 error or server error, don't retry
+            // The cart might already be cleared or session invalid
+            if (error?.networkError?.statusCode === 500 || 
+                error?.message?.includes('500') ||
+                error?.graphQLErrors?.some((e: any) => e?.extensions?.code === 'INTERNAL_SERVER_ERROR')) {
+                console.warn('Cart clear failed with 500 error - likely already cleared or session invalid. Skipping retry.');
+                // Set cart to empty state to prevent further attempts
+                setCart(null)
+                return Promise.resolve()
+            }
+            // For other errors, re-throw
+            throw error
+        } finally {
+            // Reset the clearing flag after a short delay to allow mutation to complete
+            setTimeout(() => {
+                isClearingRef.current = false
+            }, 1000)
+        }
+    }, [cart, removeFromCart])
 
-    const refreshCart = async () => {
-        return await getCart();
-    }
+    const refreshCart = useCallback(async () => {
+        try {
+            return await getCart();
+        } catch (error: any) {
+            // If we get a 500 error, don't retry - session might be invalid
+            if (error?.networkError?.statusCode === 500 || 
+                error?.message?.includes('500') ||
+                error?.graphQLErrors?.some((e: any) => e?.extensions?.code === 'INTERNAL_SERVER_ERROR')) {
+                console.warn('Cart refresh failed with 500 error - session might be invalid. Skipping retry.');
+                return Promise.resolve()
+            }
+            // For other errors, re-throw
+            throw error
+        }
+    }, [getCart])
 
     // Helper function to check if a product is a pre-order product
     const isPreOrderProduct = (product: any) => {
