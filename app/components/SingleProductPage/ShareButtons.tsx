@@ -3,7 +3,7 @@
 import { useState, useCallback } from "react";
 import { FaFacebookF, FaWhatsapp } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
-import { Link2, Check } from "lucide-react";
+import { Share2, Check } from "lucide-react";
 
 const BASE_URL = "https://gqmobiles.lk";
 
@@ -92,7 +92,7 @@ export default function ShareButtons({
         {copied ? (
           <Check className="h-4 w-4 text-green-600" />
         ) : (
-          <Link2 className="h-4 w-4" />
+          <Share2 className="h-4 w-4" />
         )}
       </button>
     </div>
