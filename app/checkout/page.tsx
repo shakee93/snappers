@@ -807,24 +807,35 @@ const CheckoutPage = () => {
     setTotalWithTax(taxWithTotal);
   }, [taxWithTotal]);
 
-  // Check if cart contains pre-order products
+  const isPreOrderProduct = (product: any) => {
+    const tags = product?.productTags?.nodes || [];
+    const hasPreOrderTag = tags.some((tag: any) => {
+      const slug = String(tag.slug || "").toLowerCase();
+      const name = String(tag.name || "").toLowerCase();
+      return slug === "pre-order" || slug === "preorder" || slug.includes("pre-order") || name.includes("pre order");
+    });
+    if (hasPreOrderTag) return true;
+
+    const productName = String(product?.name || "").toLowerCase();
+    if (productName.includes("pre-order") || productName.includes("preorder") || productName.includes("pre order")) {
+      return true;
+    }
+
+    return false;
+  };
+
   const hasPreOrderProducts = () => {
     try {
       const currentCart = cart;
-      if (
-        !currentCart ||
-        !currentCart.contents ||
-        !currentCart.contents.nodes
-      ) {
-        return false;
-      }
+      if (!currentCart?.contents?.nodes) return false;
 
       return currentCart.contents.nodes.some((node: any) => {
-        const productTags = node.product?.node?.productTags?.nodes || [];
-        return productTags.some((tag: any) => tag.slug === 'pre-order');
+        const productNode = node.product?.node || node.product;
+        console.log("[PreOrder Debug] Cart item product:", productNode?.name, "tags:", productNode?.productTags?.nodes);
+        return isPreOrderProduct(productNode);
       });
     } catch (error) {
-      console.error("Error while checking for pre-order products:", error);
+      console.error("Error checking for pre-order products:", error);
       return false;
     }
   };
@@ -1127,7 +1138,10 @@ const CheckoutPage = () => {
               handleScrollToEl={handleScrollToEl}
               updateFormData={updateFormData}
               formData={formData}
-              paymentGateways={paymentGateways || []}
+              paymentGateways={isPreOrderCart
+                ? (paymentGateways || []).filter((g: any) => g.id === 'cod' || g.id === 'bacs')
+                : (paymentGateways || [])
+              }
               handleConfirmationChange={handleConfirmationChange}
               setIsStorePickup={setIsStorePickup}
               isStorePickup={isStorePickup}

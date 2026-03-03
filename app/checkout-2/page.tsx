@@ -5,10 +5,14 @@ import { useEffect, useMemo, useState } from "react";
 import { FetchResult, useMutation, useQuery } from "@apollo/client";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import Checkbox from "@/shared/Checkbox/Checkbox";
+import Input from "shared/Input/Input";
+import Label from "components/Label/Label";
 import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
 import {
   UPDATE_SHIPPING_TOTAL,
+  APPLY_COUPON,
+  REMOVE_COUPONS,
 } from "@/graphql/defs/cart";
 import {
   CHECKOUT,
@@ -55,7 +59,7 @@ interface FormData {
 }
 
 const CheckoutPage = () => {
-  const { cart, removeFromCart, updateCart } = useCart();
+  const { cart, removeFromCart, updateCart, clearCart, refreshCart } = useCart();
   const [finalOrderTotal, setFinalOrderTotal] = useState(null);
   const { customer, fetchCustomer } = useSession();
 
@@ -106,6 +110,12 @@ const CheckoutPage = () => {
   const [guestCheckoutData, setGuestCheckoutData] = useState<any>();
   const [isConfirmingOrder, setIsConfirmingOrder] = useState(false);
   const [htmlFormResponse, setHtmlFormResponse] = useState<string | null>(null);
+  const [couponCode, setCouponCode] = useState("");
+  const [couponStatus, setCouponStatus] = useState<"idle" | "success" | "error">("idle");
+  const [couponMessage, setCouponMessage] = useState<string | null>(null);
+
+  const [applyCouponMutation, { loading: applyingCoupon }] = useMutation(APPLY_COUPON);
+  const [removeCouponsMutation, { loading: removingCoupon }] = useMutation(REMOVE_COUPONS);
 
   const handleTOC = () => {
     // Toggle the state and get the updated value
@@ -524,6 +534,16 @@ const CheckoutPage = () => {
         if (isBankTransfer) {
           return checkoutDetails;
         } else {
+          try {
+            await clearCart();
+          } catch (error: unknown) {
+            if (
+              error instanceof Error &&
+              !error.message.includes("No items in cart to remove")
+            ) {
+              console.error("Error clearing cart:", error);
+            }
+          }
           toast.success("🌟 Order Placed Successfully! 🚀");
           return null;
         }
@@ -682,24 +702,35 @@ const CheckoutPage = () => {
     setTotalWithTax(taxWithTotal);
   }, [taxWithTotal]);
 
-  // Check if cart contains pre-order products
+  const isPreOrderProduct = (product: any) => {
+    const tags = product?.productTags?.nodes || [];
+    const hasPreOrderTag = tags.some((tag: any) => {
+      const slug = String(tag.slug || "").toLowerCase();
+      const name = String(tag.name || "").toLowerCase();
+      return slug === "pre-order" || slug === "preorder" || slug.includes("pre-order") || name.includes("pre order");
+    });
+    if (hasPreOrderTag) return true;
+
+    const productName = String(product?.name || "").toLowerCase();
+    if (productName.includes("pre-order") || productName.includes("preorder") || productName.includes("pre order")) {
+      return true;
+    }
+
+    return false;
+  };
+
   const hasPreOrderProducts = () => {
     try {
       const currentCart = cart;
-      if (
-        !currentCart ||
-        !currentCart.contents ||
-        !currentCart.contents.nodes
-      ) {
-        return false;
-      }
+      if (!currentCart?.contents?.nodes) return false;
 
       return currentCart.contents.nodes.some((node: any) => {
-        const productTags = node.product?.node?.productTags?.nodes || [];
-        return productTags.some((tag: any) => tag.slug === 'pre-order');
+        const productNode = node.product?.node || node.product;
+        console.log("[PreOrder Debug] Cart item product:", productNode?.name, "tags:", productNode?.productTags?.nodes);
+        return isPreOrderProduct(productNode);
       });
     } catch (error) {
-      console.error("Error while checking for pre-order products:", error);
+      console.error("Error checking for pre-order products:", error);
       return false;
     }
   };
@@ -794,7 +825,10 @@ const CheckoutPage = () => {
               handleScrollToEl={handleScrollToEl}
               updateFormData={updateFormData}
               formData={formData}
-              paymentGateways={paymentGateways || []}
+              paymentGateways={isPreOrderCart
+                ? (paymentGateways || []).filter((g: any) => g.id === 'cod' || g.id === 'bacs')
+                : (paymentGateways || [])
+              }
               handleConfirmationChange={handleConfirmationChange}
               setIsStorePickup={setIsStorePickup}
               isStorePickup={isStorePickup}
@@ -822,12 +856,174 @@ const CheckoutPage = () => {
             </div>
 
             <div className="mt-10 border-t border-slate-200/70 pt-6 text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400 ">
+              <div>
+                <Label className="text-sm">Discount code</Label>
+                <div className="mt-1.5 flex gap-2">
+                  <Input
+                    sizeClass="h-10 px-4 py-3 !rounded-full"
+                    className={`flex-1 ${
+                      couponStatus === "error"
+                        ? "border-red-500 focus:border-red-500 focus:ring-red-200"
+                        : couponStatus === "success"
+                        ? "border-emerald-500 focus:border-emerald-500 focus:ring-emerald-200"
+                        : ""
+                    }`}
+                    value={couponCode}
+                    onChange={(e) => {
+                      setCouponCode(e.target.value);
+                      if (couponStatus !== "idle") {
+                        setCouponStatus("idle");
+                        setCouponMessage(null);
+                      }
+                    }}
+                    placeholder="Enter coupon code"
+                  />
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      const code = couponCode.trim();
+                      if (!code) {
+                        toast.error("Please enter a coupon code.");
+                        setCouponStatus("error");
+                        setCouponMessage("Please enter a coupon code.");
+                        return;
+                      }
+                      try {
+                        setCouponStatus("idle");
+                        setCouponMessage(null);
+
+                        const { data } = await applyCouponMutation({
+                          variables: { code },
+                        });
+
+                        if (data?.applyCoupon?.applied?.code) {
+                          const successText = "Coupon applied successfully.";
+                          toast.success(successText);
+                          setCouponStatus("success");
+                          setCouponMessage(successText);
+                          await refreshCart();
+                        } else {
+                          const failText = "Coupon could not be applied.";
+                          toast.error(failText);
+                          setCouponStatus("error");
+                          setCouponMessage(failText);
+                        }
+                      } catch (error: any) {
+                        const rawMessage =
+                          error?.graphQLErrors?.[0]?.message ||
+                          error?.message ||
+                          "Failed to apply coupon.";
+                        const cleanedMessage = rawMessage.replace(/&quot;/g, '"');
+                        toast.error(cleanedMessage);
+                        setCouponStatus("error");
+                        setCouponMessage(cleanedMessage);
+                      }
+                    }}
+                    disabled={applyingCoupon}
+                    className="inline-flex items-center justify-center rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-60 disabled:cursor-not-allowed"
+                  >
+                    {applyingCoupon ? (
+                      <Loader className="w-4 h-4 animate-spin text-gray-100" />
+                    ) : (
+                      "Apply coupon"
+                    )}
+                  </button>
+                </div>
+
+                {couponMessage && (
+                  <div
+                    className={`mt-1 flex items-center text-xs ${
+                      couponStatus === "error"
+                        ? "text-red-600"
+                        : couponStatus === "success"
+                        ? "text-emerald-600"
+                        : "text-slate-500"
+                    }`}
+                  >
+                    <span className="mr-1 text-sm">
+                      {couponStatus === "error" ? "⚠" : "✓"}
+                    </span>
+                    <span>{couponMessage}</span>
+                  </div>
+                )}
+
+                {cart?.appliedCoupons && cart.appliedCoupons.length > 0 && (
+                  <div className="mt-3 space-y-1">
+                    <span className="text-xs font-medium text-emerald-600">
+                      Coupon{cart.appliedCoupons.length > 1 ? "s" : ""} applied:
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {cart.appliedCoupons.map((applied: any) => (
+                        <div
+                          key={applied.code}
+                          className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-100"
+                        >
+                          <span className="font-semibold uppercase">
+                            {applied.code}
+                          </span>
+                          {applied.discountAmount && (
+                            <span className="ml-2">
+                              (<span
+                                dangerouslySetInnerHTML={{
+                                  __html: applied.discountAmount,
+                                }}
+                              />{" "}
+                              off)
+                            </span>
+                          )}
+                          <button
+                            type="button"
+                            onClick={async () => {
+                              try {
+                                const { data } = await removeCouponsMutation({
+                                  variables: { codes: [applied.code] },
+                                });
+
+                                if (data?.removeCoupons?.cart) {
+                                  toast.success("Coupon removed.");
+                                  await refreshCart();
+                                } else {
+                                  toast.error("Coupon could not be removed.");
+                                }
+                              } catch (error: any) {
+                                const message =
+                                  error?.graphQLErrors?.[0]?.message ||
+                                  error?.message ||
+                                  "Failed to remove coupon.";
+                                toast.error(message);
+                              }
+                            }}
+                            disabled={removingCoupon}
+                            className="ml-2 text-[10px] font-semibold text-emerald-800 hover:text-emerald-950 dark:text-emerald-200 disabled:opacity-60"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
               <div className="mt-4 flex justify-between py-2.5">
                 <span>Subtotal</span>
                 <span className="font-semibold text-slate-900 dark:text-slate-200">
                   <span
                     dangerouslySetInnerHTML={{
                       __html: cart?.subtotal || "0.00",
+                    }}
+                  />
+                </span>
+              </div>
+
+              <div className="flex justify-between py-2.5">
+                <span>Discount</span>
+                <span className="font-semibold text-emerald-600">
+                  <span
+                    dangerouslySetInnerHTML={{
+                      __html: cart?.discountTotal
+                        ? `- ${cart.discountTotal}`
+                        : "0.00",
                     }}
                   />
                 </span>
