@@ -16,6 +16,7 @@ import Script from "next/script";
 import ScreenSizeIndicator from "@/app/components/ScreenSizeIndicator";
 import GoogleAnalytics from "@/app/components/GoogleAnalytics";
 import AttributeMappingsInitializer from "@/app/components/AttributeMappingsInitializer";
+import ContentWrapper from "@/app/components/ContentWrapper";
 
 export const metadata: Metadata = {
   title: {
@@ -132,7 +133,7 @@ export default async function RootLayout({
               </Suspense>
 
               <Header />
-              <div className="pb-8 md:pb-24">{children}</div>
+              <ContentWrapper>{children}</ContentWrapper>
               <WhatsappLogoComponent />
               <Toaster />
               <Footer />
