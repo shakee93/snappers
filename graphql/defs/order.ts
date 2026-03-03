@@ -310,6 +310,8 @@ export const GET_SINGLE_ORDER = gql`
       id
       subtotal
       total
+      discountTotal
+      discountTax
       shippingTax
       shippingTotal
       orderNumber
@@ -322,6 +324,13 @@ export const GET_SINGLE_ORDER = gql`
       needsShippingAddress
       status
       paymentMethod
+      couponLines {
+        nodes {
+          code
+          discount
+          discountTax
+        }
+      }
       lineItems {
         nodes {
           databaseId

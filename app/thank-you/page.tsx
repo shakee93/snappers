@@ -138,7 +138,7 @@ const ThankYouPage = ({ params }: OrderPaymentPageProps) => {
       <div>
         <p className="text-left text-2xl">Billing Address</p>
         <div className="mt-8 rounded border">
-          <div className="w-1/5 p-4 ">
+          <div className="w-full p-4 break-words whitespace-pre-wrap">
             sada asdas zxczxc asdasd zxczxc 10800
           </div>
         </div>

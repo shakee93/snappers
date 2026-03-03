@@ -89,4 +89,31 @@ mutation updateShippingMethod($input: UpdateShippingMethodInput!){
         }
         ${CartContent}`
 
+
+export const APPLY_COUPON = gql`
+mutation ApplyCoupon($code: String!) {
+  applyCoupon(input: { code: $code }) {
+    applied {
+      code
+      discountAmount
+      discountTax
+      description
+    }
+    cart {
+      ...CartContent
+    }
+  }
+}
+${CartContent}`
+
+export const REMOVE_COUPONS = gql`
+mutation RemoveCoupons($codes: [String]) {
+  removeCoupons(input: { codes: $codes }) {
+    cart {
+      ...CartContent
+    }
+  }
+}
+${CartContent}`
+
  

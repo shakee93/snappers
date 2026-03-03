@@ -8,6 +8,8 @@ export const OrderDetails = ({ orderData }: OrderDetailsProps) => {
   // Handle both orderData.order and orderData.checkout.order structures
   const order = orderData.order || orderData.checkout?.order;
   if (!order) return null;
+
+  const CURRENCY_SYMBOL = "₨";
   
   const date = order.date ? new Date(order.date).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -18,17 +20,52 @@ export const OrderDetails = ({ orderData }: OrderDetailsProps) => {
   // Get order ID - try orderNumber first, then databaseId, then id
   const orderId = order.orderNumber ?? order.databaseId ?? order.id ?? "Not found";
 
+  // Helper to normalize currency strings coming from backend (e.g. "Rs." → "₨")
+  const normalizeCurrencyHtml = (value: any) => {
+    if (typeof value !== "string") return value;
+    return value
+      .replace(/Rs\.?/gi, CURRENCY_SYMBOL)
+      .replace(/LKR/gi, CURRENCY_SYMBOL);
+  };
+
+  // Calculate numeric discount so that:
+  // Subtotal - Discount + Delivery Fee (+ Bank fee, tax, etc.) = Order Total
+  const cleanCurrency = (str: any) =>
+    typeof str === "string" ? str.replace(/[^0-9.]+/g, "") : "";
+
+  const subtotalNumeric = parseFloat(cleanCurrency(order.subtotal));
+  const totalNumeric = parseFloat(cleanCurrency(order.total));
+  const shippingNumeric = parseFloat(cleanCurrency(order.shippingTotal));
+  const discountNumericFromField = order.discountTotal
+    ? parseFloat(cleanCurrency(order.discountTotal))
+    : NaN;
+
+  // Prefer the backend discountTotal when available, fall back to derived value
+  let discountNumeric: number | null = null;
+  if (!isNaN(discountNumericFromField)) {
+    discountNumeric = discountNumericFromField;
+  } else if (!isNaN(subtotalNumeric) && !isNaN(totalNumeric)) {
+    discountNumeric = subtotalNumeric - (totalNumeric - (isNaN(shippingNumeric) ? 0 : shippingNumeric));
+  }
+
+  const formatCurrency = (amount: number | null) => {
+    if (amount === null || isNaN(amount)) return null;
+    return `${CURRENCY_SYMBOL} ${amount.toFixed(2)}`;
+  };
+
+  const formattedDiscount = formatCurrency(discountNumeric);
+
   const rows = [
     { label: "Order Id", value: orderId },
     { label: "Date", value: date },
-    { label: "Order Total", value: order.total },
+    { label: "Sub Total", value: normalizeCurrencyHtml(order.subtotal) },
     {
       label: "Discount",
-      value: order.total - order.subtotal,
-      condition: order.total - order.subtotal > 0,
+      value: formattedDiscount,
+      condition: !!formattedDiscount,
     },
-    { label: "Delivery Fee", value: order.shippingTotal },
-    { label: "Sub Total", value: order.subtotal },
+    { label: "Delivery Fee", value: normalizeCurrencyHtml(order.shippingTotal) },
+    { label: "Order Total", value: normalizeCurrencyHtml(order.total) },
   ];
 
   return (
@@ -45,12 +82,46 @@ export const OrderDetails = ({ orderData }: OrderDetailsProps) => {
             row.condition !== false ? (
               <div key={index} className="flex flex-col items-center md:items-start ">
                 <p className="font-semibold	">{row.label}</p>
-                {row.label == "Order Id" ? <p className="	text-4xl font-bold"><span dangerouslySetInnerHTML={{ __html: row.value || '' }} /></p> : <p className="mt-1"><span dangerouslySetInnerHTML={{ __html: row.value || '' }} /> </p>}
+                {row.label === "Order Id" ? (
+                  <p className="	text-4xl font-bold">
+                    <span dangerouslySetInnerHTML={{ __html: row.value || "" }} />
+                  </p>
+                ) : row.label === "Discount" ? (
+                  <p className="mt-1 text-emerald-600">
+                    -<span dangerouslySetInnerHTML={{ __html: row.value || "" }} />
+                  </p>
+                ) : (
+                  <p className="mt-1">
+                    <span dangerouslySetInnerHTML={{ __html: row.value || "" }} />{" "}
+                  </p>
+                )}
               </div>
             ) : null
           )}
 
         </div>
+
+        {order.couponLines?.nodes?.length > 0 && (
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-emerald-700">
+            <span className="font-semibold">Coupon applied:</span>
+            {order.couponLines.nodes.map((couponLine: any) => (
+              <span
+                key={couponLine.code}
+                className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium"
+              >
+                <span className="uppercase">{couponLine.code}</span>
+                {couponLine.discount && (
+                  <span className="ml-2">
+                    (<span
+                      dangerouslySetInnerHTML={{ __html: couponLine.discount }}
+                    />{" "}
+                    off)
+                  </span>
+                )}
+              </span>
+            ))}
+          </div>
+        )}
 
       </div>
     </div>
@@ -68,6 +139,7 @@ const ProductTable = ({ lineItems, orderData, paymentDetails }: ProductTableProp
 
   // Handle both orderData.order and orderData.checkout.order structures
   const order = orderData?.order || orderData?.checkout?.order;
+  const CURRENCY_SYMBOL = "₨";
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -102,39 +174,61 @@ const ProductTable = ({ lineItems, orderData, paymentDetails }: ProductTableProp
                       {item?.quantity}
                     </td>
                     <td className="px-6 py-4 text-right whitespace-nowrap text-gray-800 dark:text-gray-200">
-                      Rs. {item?.subtotal}
+                      {CURRENCY_SYMBOL} {item?.subtotal}
                     </td>
                   </tr>
                 ))}
-                <tr>
-                  <td className="px-6 text-left py-4  font-medium text-gray-800 dark:text-gray-200">
-                    Shipping
-                  </td>
-                  <td></td>
-                  <td className="px-6 text-right py-4  font-medium text-gray-800 dark:text-gray-200">
-                    <span dangerouslySetInnerHTML={{ __html: order?.shippingTotal || '₨ 0.00' }} />
-                  </td>
-                </tr>
-
                 {(() => {
                   const cleanString = (str: any) => str?.replace(/[^0-9.]+/g, "");
-                  
+
                   const subtotal = order?.subtotal;
                   const total = order?.total;
                   const shippingTotal = order?.shippingTotal;
-                  
+                  const discountTotal = order?.discountTotal;
+
                   const subtotalNumeric = parseFloat(cleanString(subtotal));
                   const totalNumeric = parseFloat(cleanString(total));
                   const shippingNumeric = parseFloat(cleanString(shippingTotal));
-                  
-                  // Calculate if there are additional charges beyond shipping (like bank charges)
-                  const expectedTotal = subtotalNumeric + shippingNumeric;
+                  const discountNumeric = discountTotal
+                    ? parseFloat(cleanString(discountTotal))
+                    : 0;
+
+                  const rows: any[] = [];
+
+                  // Discount row (from coupons)
+                  if (discountNumeric > 0) {
+                    rows.push(
+                      <tr key="discount">
+                        <td className="px-6 text-left py-4 font-medium text-gray-800 dark:text-gray-200">
+                          Discount
+                        </td>
+                        <td></td>
+                        <td className="px-6 text-right py-4 font-medium text-emerald-600 dark:text-emerald-300">
+                          -{CURRENCY_SYMBOL} {discountNumeric.toFixed(2)}
+                        </td>
+                      </tr>
+                    );
+                  }
+
+                  // Shipping row
+                  rows.push(
+                    <tr key="shipping">
+                      <td className="px-6 text-left py-4  font-medium text-gray-800 dark:text-gray-200">
+                        Shipping
+                      </td>
+                      <td></td>
+                      <td className="px-6 text-right py-4  font-medium text-gray-800 dark:text-gray-200">
+                        <span dangerouslySetInnerHTML={{ __html: order?.shippingTotal || '₨ 0.00' }} />
+                      </td>
+                    </tr>
+                  );
+
+                  // Bank charge row (e.g. card fee)
+                  const expectedTotal = subtotalNumeric - discountNumeric + shippingNumeric;
                   const bankCharge = totalNumeric - expectedTotal;
-                  
-                  // Only show bank charge row if there's actually a charge beyond subtotal + shipping
                   if (bankCharge > 0) {
-                    return (
-                      <tr>
+                    rows.push(
+                      <tr key="bankCharge">
                         <td className="px-6 text-left py-4 font-medium text-gray-800 dark:text-gray-200">
                           3% Bank Charge
                         </td>
@@ -145,7 +239,8 @@ const ProductTable = ({ lineItems, orderData, paymentDetails }: ProductTableProp
                       </tr>
                     );
                   }
-                  return null;
+
+                  return rows;
                 })()}
 
                 <tr>
@@ -166,8 +261,8 @@ const ProductTable = ({ lineItems, orderData, paymentDetails }: ProductTableProp
 
       <div className="pt-8">
         <p className="text-2xl text-left">Billing Address</p>
-        <div className="mt-8 border rounded" >
-          <div className="text-left p-4 ">
+        <div className="mt-8 border rounded">
+          <div className="text-left p-4 break-words whitespace-pre-wrap">
             {`${paymentDetails.billingAddress1}  ${paymentDetails.billingAddress2}`}
           </div>
         </div>
