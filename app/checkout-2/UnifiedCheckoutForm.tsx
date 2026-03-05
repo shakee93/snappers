@@ -75,6 +75,7 @@ const UnifiedCheckoutForm = ({
     });
 
     const [isBillingSameAsShipping, setIsBillingSameAsShipping] = useState(true);
+    const [pickupType, setPickupType] = useState<"store_uber_pickme" | "courier" | null>(null);
 
     const { cart } = useCart();
 
@@ -102,21 +103,35 @@ const UnifiedCheckoutForm = ({
         }
     }, [initialShippingData]);
 
-    const handleStorePickupChange = () => {
-        if (!isStorePickup) {
-            setIsStorePickup(true);
-            updateFormData("shippingDetails", {
-                databaseId: "local_pickup",
-                id: "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==",
-                title: "StorePickup",
-            });
-        } else {
+    const handlePickupTypeChange = (type: "store_uber_pickme" | "courier" | null) => {
+        if (pickupType === type) {
+            setPickupType(null);
             setIsStorePickup(false);
             updateFormData("shippingDetails", {
                 databaseId: null,
                 id: null,
                 title: null,
             });
+        } else {
+            if (type === null) {
+                return;
+            }
+            setPickupType(type);
+            const isPickup = type === "store_uber_pickme";
+            setIsStorePickup(isPickup);
+            if (isPickup) {
+                updateFormData("shippingDetails", {
+                    databaseId: "local_pickup",
+                    id: "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==",
+                    title: "Store / Uber / PickMe",
+                });
+            } else {
+                updateFormData("shippingDetails", {
+                    databaseId: null,
+                    id: null,
+                    title: "Courier",
+                });
+            }
         }
     };
 
@@ -360,13 +375,50 @@ const UnifiedCheckoutForm = ({
                     <h3 className="text-lg font-semibold mb-4">Shipping Address</h3>
 
                     <div className="space-y-4">
-                        <div className="w-fit border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-                            <Checkbox
-                                label="Store Pickup"
-                                name="store pickup"
-                                defaultChecked={isStorePickup}
-                                onChange={handleStorePickupChange}
-                            />
+                        <div className="w-full border border-slate-200 dark:border-slate-700 rounded-xl p-4">
+                            <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
+                                Pickup
+                            </h4>
+                            <div className="flex flex-wrap gap-4">
+                                <label
+                                    className="flex items-center cursor-pointer"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        handlePickupTypeChange("store_uber_pickme");
+                                    }}
+                                >
+                                    <input
+                                        type="radio"
+                                        name="pickup"
+                                        value="store_uber_pickme"
+                                        checked={pickupType === "store_uber_pickme"}
+                                        readOnly
+                                        className="w-4 h-4 text-primaryColor border-gray-300 focus:ring-primaryColor focus:ring-2 pointer-events-none"
+                                    />
+                                    <span className="ml-2 text-sm text-slate-700 dark:text-slate-300">
+                                        Store / Uber / PickMe
+                                    </span>
+                                </label>
+                                <label
+                                    className="flex items-center cursor-pointer"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        handlePickupTypeChange("courier");
+                                    }}
+                                >
+                                    <input
+                                        type="radio"
+                                        name="pickup"
+                                        value="courier"
+                                        checked={pickupType === "courier"}
+                                        readOnly
+                                        className="w-4 h-4 text-primaryColor border-gray-300 focus:ring-primaryColor focus:ring-2 pointer-events-none"
+                                    />
+                                    <span className="ml-2 text-sm text-slate-700 dark:text-slate-300">
+                                        Courier
+                                    </span>
+                                </label>
+                            </div>
                         </div>
 
                         <div className="grid md:grid-cols-1 sm:grid-cols-2 sm:gap-3">

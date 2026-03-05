@@ -841,9 +841,9 @@ const CheckoutPage = () => {
           </div>
         </div>
         <div className="lg:w-1/2 w-full border-l-1 border-gray-300">
-          <div className="lg:sticky lg:top-20 p-6 max-w-[625px] mr-auto">
+          <div className="lg:sticky lg:top-[125px] p-6 max-w-[625px] mr-auto">
           <div id="order-cart" className="w-full">
-            <div className="mt-8 divide-y divide-slate-200/70 dark:divide-slate-700 max-h-[400px] pr-5 overflow-y-auto">
+            <div className=" divide-y divide-slate-200/70 dark:divide-slate-700 pr-5">
               {cart?.contents?.nodes.map((item, index) => (
                 <CartItems
                   index={index}
