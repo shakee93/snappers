@@ -143,7 +143,7 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
                             onBlur={handleBlur}
                             type="text"
                             placeholder="Quick Search"
-                            className="text-primaryColor/80 border-none focus:border-none focus:outline-none focus:ring-0 bg-transparent w-full text-sm lg:text-base"
+                            className="text-primaryColor/80 border-none focus:border-none focus:outline-none focus:ring-0 bg-transparent w-full text-base"
                             suppressHydrationWarning
                         />
                         {(search_status === 'stalled' || search_status === 'loading') ? (

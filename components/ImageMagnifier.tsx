@@ -15,7 +15,7 @@ interface ImageEffectProps {
 // ImageEffect component
 const ImageEffect = ({ src, classNames, index = null }: ImageEffectProps) => {
   // State variables
-  const [zoomable, setZoomable] = useState(true);
+  const [zoomable, setZoomable] = useState(false);
   const [imageSize, setImageSize] = useState({ width: 0, height: 0 });
   const [position, setPosition] = useState({
     x: 100,
@@ -23,9 +23,24 @@ const ImageEffect = ({ src, classNames, index = null }: ImageEffectProps) => {
     mouseX: 0,
     mouseY: 0,
   });
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detect mobile/touch devices
+  useEffect(() => {
+    const checkMobile = () => {
+      const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+      const isSmallScreen = window.innerWidth < 768;
+      setIsMobile(isTouchDevice || isSmallScreen);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Event handlers
   const handleMouseEnter = (e: MouseEvent) => {
+    if (isMobile) return; // Disable zoom on mobile
     let element = e.currentTarget;
     let { width, height } = element.getBoundingClientRect();
     setImageSize({ width, height });
@@ -34,11 +49,13 @@ const ImageEffect = ({ src, classNames, index = null }: ImageEffectProps) => {
   };
 
   const handleMouseLeave = (e: MouseEvent) => {
+    if (isMobile) return; // Disable zoom on mobile
     setZoomable(false);
     updatePosition(e);
   };
 
   const handleMouseMove = (e: MouseEvent) => {
+    if (isMobile) return; // Disable zoom on mobile
     updatePosition(e);
   };
 
@@ -61,7 +78,8 @@ const ImageEffect = ({ src, classNames, index = null }: ImageEffectProps) => {
         onMouseLeave={handleMouseLeave}
         onMouseEnter={handleMouseEnter}
         onMouseMove={handleMouseMove}
-        className="w-full h-full relative overflow-hidden "
+        className="w-full h-full relative overflow-hidden"
+        style={{ touchAction: 'pan-y' }}
       >
         <Image
           //   className="object-cover border z-10 h-full h-full"
@@ -73,21 +91,23 @@ const ImageEffect = ({ src, classNames, index = null }: ImageEffectProps) => {
           height={1000}
           src={src}
         />
-        <div
-          style={{
-            backgroundPosition: `${position.x}px ${position.y}px`,
-            backgroundImage: `url(${src})`,
-            backgroundSize: `${imageSize.width * ZOOM_LEVEL}px ${imageSize.height * ZOOM_LEVEL
-              }px`,
-            backgroundRepeat: "no-repeat",
-            display: zoomable ? "block" : "none",
-            top: `${position.mouseY}px`,
-            left: `${position.mouseX}px`,
-            width: `${MAGNIFIER_SIZE}px`,
-            height: `${MAGNIFIER_SIZE}px`,
-          }}
-          className={`z-50  rounded-xl  pointer-events-none absolute `}
-        />
+        {!isMobile && (
+          <div
+            style={{
+              backgroundPosition: `${position.x}px ${position.y}px`,
+              backgroundImage: `url(${src})`,
+              backgroundSize: `${imageSize.width * ZOOM_LEVEL}px ${imageSize.height * ZOOM_LEVEL
+                }px`,
+              backgroundRepeat: "no-repeat",
+              display: zoomable ? "block" : "none",
+              top: `${position.mouseY}px`,
+              left: `${position.mouseX}px`,
+              width: `${MAGNIFIER_SIZE}px`,
+              height: `${MAGNIFIER_SIZE}px`,
+            }}
+            className="z-50 rounded-xl pointer-events-none absolute"
+          />
+        )}
       </div>
     </div>
   );

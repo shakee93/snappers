@@ -69,7 +69,7 @@ const SearchInput: React.FC<SearchInputProps> = ({ show = true, bindToStore = fa
                 placeholder="Type to Quick"
                 defaultValue={query}
                 onChange={(e) => refine(e.target.value)}
-                className="border-none bg-transparent focus:outline-none focus:ring-0 w-full text-sm"
+                className="border-none bg-transparent focus:outline-none focus:ring-0 w-full text-base"
                 autoFocus
             />
 
