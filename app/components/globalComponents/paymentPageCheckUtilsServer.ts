@@ -1,9 +1,9 @@
-import { headers, type UnsafeUnwrappedHeaders } from "next/headers";
+import { headers } from "next/headers";
 
 const EXAMPLE_ID = "b3JkZXI6NjQ0NQ==";
 
-export function isPaymentPage(): boolean {
-  const headersList = (headers() as unknown as UnsafeUnwrappedHeaders);
+export async function isPaymentPage(): Promise<boolean> {
+  const headersList = await headers();
   const fullUrl = headersList.get("referer") || "";
 
   const splits = fullUrl.split("/");
@@ -21,4 +21,4 @@ export function isPaymentPage(): boolean {
   const searchString = /checkout\/id \w{16}/;
   const isMatch = searchString.test(fullUrl);
   return isMatch;
-} 
+}
