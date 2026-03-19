@@ -7,6 +7,11 @@
 
   .embla__viewport {
     overflow: hidden;
+    cursor: grab;
+
+    &.is-dragging {
+      cursor: grabbing;
+    }
   }
   .embla__container {
     backface-visibility: hidden;
@@ -43,29 +48,19 @@
     flex-direction: row;
     justify-content: start;
     flex-wrap: nowrap;
-    gap: var(--thumbs-slide-spacing);
+    gap: 0.5rem;
   }
 
   .embla-thumbs__slide {
-    flex: 0 0 25%;
+    flex: 0 0 auto;
     min-width: 0;
-    // padding-left: calc(var(--thumbs-slide-spacing) * 0.5);
     position: relative;
-
-    // &:first-child {
-    //   padding-left: 0.6;
-    // }
-
   }
 
   @media (min-width: 576px) {
     .embla-thumbs {
-      --thumbs-slide-spacing: 1.2rem;
+      --thumbs-slide-spacing: 0.5rem;
       margin-top: 0.8rem;
-    }
-
-    .embla-thumbs__slide {
-      flex: 0 0 16.6%;
     }
   }
 

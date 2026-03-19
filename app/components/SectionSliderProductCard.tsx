@@ -93,7 +93,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
   }
 
   return (
-    <div className={`nc-SectionSliderProductCard ${className}`}>
+    <div className={`nc-SectionSliderProductCard overflow-hidden ${className}`}>
       <div className="flow-root">
         <Heading
           className={headingClassName}
@@ -132,8 +132,8 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
             >
               <CarouselContent className="-ml-2 md:-ml-4">
                 {filteredProducts.map((item, index) => (
-                  <CarouselItem 
-                    key={index} 
+                  <CarouselItem
+                    key={index}
                     className={`pl-2 md:pl-4 ${itemClassName} basis-1/2 sm:basis-1/3 lg:basis-1/5`}
                   >
                     <div className="w-full">
@@ -146,10 +146,10 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              
-              {/* Navigation arrows positioned in the middle */}
-              <CarouselPrevious className="absolute xl:-left-14 lg:-left-2 lg:right-auto right-10 lg:top-1/2 -top-14 -translate-y-1/2 z-10 border-0 bg-[#cecfd0] text-white hover:bg-[#9e9fa0] hover:text-white transition-colors duration-200 p-1 md:p-2 w-8 h-8 md:w-10 md:h-10 [&>svg]:w-4 [&>svg]:h-4 md:[&>svg]:w-6 md:[&>svg]:h-6" />
-              <CarouselNext className="absolute xl:-right-14 -right-2 lg:top-1/2 -top-14 -translate-y-1/2 z-10 border-0 bg-[#cecfd0] text-white hover:bg-[#9e9fa0] hover:text-white transition-colors duration-200 p-1 md:p-2 w-8 h-8 md:w-10 md:h-10 [&>svg]:w-4 [&>svg]:h-4 md:[&>svg]:w-6 md:[&>svg]:h-6" />
+
+              {/* Navigation arrows - hidden by default, visible on large screens */}
+              <CarouselPrevious className="hidden lg:flex absolute -left-14 top-1/2 -translate-y-1/2 z-10 border-0 bg-[#cecfd0] text-white hover:bg-[#9e9fa0] hover:text-white transition-colors duration-200 md:p-2 md:w-10 md:h-10 md:[&>svg]:w-6 md:[&>svg]:h-6" />
+              <CarouselNext className="hidden lg:flex absolute -right-14 top-1/2 -translate-y-1/2 z-10 border-0 bg-[#cecfd0] text-white hover:bg-[#9e9fa0] hover:text-white transition-colors duration-200 md:p-2 md:w-10 md:h-10 md:[&>svg]:w-6 md:[&>svg]:h-6" />
             </Carousel>
             
             {/* See More button at the bottom */}

@@ -1,6 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
-import ImageEffect from "@/components/ImageMagnifier";
 import { useImage } from "@/context/ImageChangeGrabber";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import {
@@ -9,9 +8,14 @@ import {
 } from "app/components/SingleProductBlock/ProductCarouselThumb";
 import { EmblaOptionsType } from "embla-carousel";
 import useEmblaCarousel from "embla-carousel-react";
-import { PlayIcon } from "lucide-react";
+import { ChevronLeft, ChevronRight, Expand, PlayIcon } from "lucide-react";
 import Image from "next/image";
 import React, { useCallback, useEffect, useState, useRef } from "react";
+import dynamic from "next/dynamic";
+
+const ProductLightbox = dynamic(() => import("./ProductLightbox"), {
+  ssr: false,
+});
 // import "styles/embla.css";
 import "styles/product_embla.scss";
 
@@ -35,6 +39,10 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   const { variationId, activeVariation } = useImage();
   const [variationImageEnabled, setVariationImageEnabled] = useState(false);
   const [isVideoPlaying, setIsVideoPlaying] = useState(false);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const [canScrollPrev, setCanScrollPrev] = useState(false);
+  const [canScrollNext, setCanScrollNext] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // const [galleryImages, setGalleryImages]  = useState(product.galleryImages?.nodes.length !== 0
@@ -240,6 +248,8 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   const onSelect = useCallback(() => {
     if (!emblaMainApi || !emblaThumbsApi) return;
     const newIndex = emblaMainApi.selectedScrollSnap();
+    setCanScrollPrev(emblaMainApi.canScrollPrev());
+    setCanScrollNext(emblaMainApi.canScrollNext());
     if (newIndex !== selectedIndex) {
       pauseAllVideos();
       setSelectedIndex(newIndex);
@@ -252,26 +262,77 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
     emblaMainApi.on("select", onSelect);
     emblaMainApi.on("reInit", onSelect);
 
+    const rootNode = emblaMainApi.rootNode();
+    const onPointerDown = () => rootNode.classList.add("is-dragging");
+    const onPointerUp = () => rootNode.classList.remove("is-dragging");
+    emblaMainApi.on("pointerDown", onPointerDown);
+    emblaMainApi.on("pointerUp", onPointerUp);
+
     return () => {
       emblaMainApi.off("select", onSelect);
       emblaMainApi.off("reInit", onSelect);
+      emblaMainApi.off("pointerDown", onPointerDown);
+      emblaMainApi.off("pointerUp", onPointerUp);
     };
   }, [emblaMainApi, onSelect]);
 
   return (
     <div className="embla min-h-[272px] md:min-h-[576px]" id='product-image'>
-      <div className="embla__viewport  rounded-2xl" ref={emblaMainRef}>
-        <div className="embla__container ">
-          {galleryImages?.map((variation: any, index: number) => (
-            <div className="embla__slide" key={index}>
-              <ImageEffect
-                index={index}
-                src={variation?.sourceUrl || ""}
-                classNames="max-h-[330px] object-contain md:max-h-[410px] image transform transition-transform duration-300"
-              />
-            </div>
-          ))}
+      <div className="relative">
+        <div className="embla__viewport  rounded-2xl" ref={emblaMainRef}>
+          <div className="embla__container ">
+            {galleryImages?.map((variation: any, index: number) => (
+              <div
+                className="embla__slide"
+                key={index}
+                onClick={() => {
+                  setLightboxIndex(index);
+                  setLightboxOpen(true);
+                }}
+              >
+                <div className="flex justify-center items-center p-2 py-4">
+                  <Image
+                    fetchPriority={index === 0 ? "high" : undefined}
+                    loading={index === 0 ? "eager" : "lazy"}
+                    className="max-h-[330px] object-contain md:max-h-[410px] image transform transition-transform duration-300"
+                    alt=""
+                    width={1000}
+                    height={1000}
+                    src={variation?.sourceUrl || ""}
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
+        <button
+          onClick={() => {
+            setLightboxIndex(selectedIndex);
+            setLightboxOpen(true);
+          }}
+          className="absolute top-3 right-3 z-10 bg-white/80 hover:bg-white rounded-lg p-2 shadow-md transition-colors"
+          aria-label="View fullscreen"
+        >
+          <Expand className="w-5 h-5 text-gray-700" />
+        </button>
+        {canScrollPrev && (
+          <button
+            onClick={() => emblaMainApi?.scrollPrev()}
+            className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white rounded-full p-2 shadow-md transition-colors"
+            aria-label="Previous image"
+          >
+            <ChevronLeft className="w-5 h-5 text-gray-700" />
+          </button>
+        )}
+        {canScrollNext && (
+          <button
+            onClick={() => emblaMainApi?.scrollNext()}
+            className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white rounded-full p-2 shadow-md transition-colors"
+            aria-label="Next image"
+          >
+            <ChevronRight className="w-5 h-5 text-gray-700" />
+          </button>
+        )}
       </div>
 
       <div className="embla-thumbs">
@@ -348,6 +409,14 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
             </div>
           )}
         </div>
+      )}
+
+      {lightboxOpen && galleryImages && (
+        <ProductLightbox
+          images={galleryImages}
+          initialIndex={lightboxIndex}
+          onClose={() => setLightboxOpen(false)}
+        />
       )}
     </div>
   );
