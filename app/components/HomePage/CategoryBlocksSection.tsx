@@ -29,7 +29,7 @@ const categories = [
   {
     title: "Mobile Accessories",
     subtitle: "Cases, Chargers & More",
-    href: "/collections/mobile-accessories",
+    href: "/collections/mobile-accessories-mobiles-and-tablets-2",
     icon: Bag,
     badge: null,
     pastelBg: "bg-slate-50",
@@ -79,7 +79,7 @@ const categories = [
   {
     title: "Gaming",
     subtitle: "Level Up Your Setup",
-    href: "/collections/gaming-accessories",
+    href: "/collections/console-gaming-and-accessories",
     icon: GameController,
     badge: null,
     pastelBg: "bg-red-50",
