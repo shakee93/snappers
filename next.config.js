@@ -1,15 +1,11 @@
-
-
 const path = require("path");
 
-module.exports = {
-  sassOptions: {
-    includePaths: [path.join(__dirname, "styles")],
-  },
-};
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'standalone',
+  sassOptions: {
+    includePaths: [path.join(__dirname, "styles")],
+  },
   logging: {
     fetches: {
       fullUrl: true
@@ -30,13 +26,6 @@ const nextConfig = {
         port: "",
         pathname: "/*/**",
       },
-
-      // {
-      //   protocol: "http",
-      //   hostname: "gq.freshpixl.com",
-      //   port: "",
-      //   pathname: "/*/**",
-      // },
       {
         protocol: "http",
         hostname: "localhost",
@@ -50,23 +39,11 @@ const nextConfig = {
         pathname: "/id/*/**",
       },
       {
-        protocol: "https", // Add this configuration for your domain
+        protocol: "https",
         hostname: "payherestorage.blob.core.windows.net",
         port: "",
         pathname: "/*/**",
       },
-      // {
-      //   protocol: "https",
-      //   hostname: "gq.freshpixl.com",
-      //   port: "",
-      //   pathname: "/*/**",
-      // },
-      // {
-      //   protocol: "https",
-      //   hostname: "api.gq.freshpixl.com",
-      //   port: "",
-      //   pathname: "/*/**",
-      // },
       {
         protocol: "https",
         hostname: "api.gqmobiles.lk",
