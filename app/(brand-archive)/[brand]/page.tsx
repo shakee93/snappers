@@ -6,7 +6,7 @@ import ArchiveLayout from "@/app/components/archive/ArchiveLayout";
 import { Metadata, ResolvingMetadata } from "next";
 
 type Props = {
-  params: { brand: string };
+  params: Promise<{ brand: string }>;
 };
 
 async function getData(slug: string | null = null) {
@@ -26,10 +26,8 @@ async function getData(slug: string | null = null) {
   };
 }
 
-export async function generateMetadata(
-  { params }: Props,
-  parent: ResolvingMetadata
-): Promise<Metadata> {
+export async function generateMetadata(props: Props, parent: ResolvingMetadata): Promise<Metadata> {
+  const params = await props.params;
   // Read route params
   const id = params.brand;
 
@@ -70,7 +68,8 @@ export async function generateMetadata(
   };
 }
 
-const Page = async ({ params }: { params: { brand: string } }) => {
+const Page = async (props: { params: Promise<{ brand: string }> }) => {
+  const params = await props.params;
   const { brand } = await getData(params.brand);
   return (
     <ArchiveLayout

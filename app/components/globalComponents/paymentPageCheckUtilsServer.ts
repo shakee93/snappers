@@ -1,9 +1,9 @@
-import { headers } from "next/headers";
+import { headers, type UnsafeUnwrappedHeaders } from "next/headers";
 
 const EXAMPLE_ID = "b3JkZXI6NjQ0NQ==";
 
 export function isPaymentPage(): boolean {
-  const headersList = headers();
+  const headersList = (headers() as unknown as UnsafeUnwrappedHeaders);
   const fullUrl = headersList.get("referer") || "";
 
   const splits = fullUrl.split("/");

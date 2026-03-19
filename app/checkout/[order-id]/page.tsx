@@ -6,7 +6,7 @@ import {
   GET_CHECKOUT_USER_DETAILS,
   GET_SINGLE_ORDER,
 } from "@/graphql/defs/order";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, use } from "react";
 import ProductTable, { OrderDetails } from "./Comps";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -14,10 +14,11 @@ import ButtonPrimary from "shared/Button/ButtonPrimary";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCart } from "@/context/CartProvider";
 
-export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
+export default function OrderPaymentPage(props: OrderPaymentPageProps) {
+  const params = use(props.params);
   const router = useRouter();
   const orderId = params["order-id"];
-  
+
   // Call useSearchParams once and reuse it
   const searchParamsObj = useSearchParams();
   const searchParams = searchParamsObj.get("email");
@@ -59,11 +60,11 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   const key = searchParamsObj.get('key');
   const wcApi = searchParamsObj.get('wc-api');
 
-  
+
   const hasClearedGuestRef = useRef(false);
   const hasClearedSimpleRef = useRef(false);
   const hasClearedOrderRef = useRef(false);
-  
+
   // State for localStorage order data (for guest NDB Pay orders)
   const [localStorageOrderData, setLocalStorageOrderData] = useState<any>(null);
   const [isCheckingLocalStorage, setIsCheckingLocalStorage] = useState(true);
@@ -345,7 +346,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
           <h1 className="pb-4 pt-20 text-center text-2xl font-bold">
             To Explore Our Product Range Further!
           </h1>
-          <Link href={`/`} passHref>
+          <Link href={`/`}>
             <ButtonPrimary>Shop More</ButtonPrimary>
           </Link>
         </div>
@@ -369,7 +370,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
           📝 The page is unable to load the order ID since it{"'"}s a Payhere
           testing ID.
         </h1>
-        <Link href={`/`} passHref>
+        <Link href={`/`}>
           <div className="self-center text-center font-bold text-blue-500 underline hover:cursor-pointer hover:text-blue-800">
             Back to Home
           </div>
@@ -391,7 +392,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
         <p className="py-4 text-center">
           Please check your email({searchParams}) for further details.
         </p>
-        <Link href={`/`} passHref>
+        <Link href={`/`}>
           <p className="self-center text-center font-bold text-blue-500 underline hover:cursor-pointer hover:text-blue-800">
             Back to Home
           </p>
@@ -413,7 +414,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
 
   // Prefer query data (complete) over localStorage (may be incomplete); fall back to localStorage for guest orders
   const finalOrderData = orderData || localStorageOrderData?.checkout;
-  
+
   // If query failed and we have no localStorage data, show error
   if (orderError && !localStorageOrderData && !isCheckingLocalStorage) {
     return (
@@ -421,7 +422,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
         <h1 className="py-20 text-center text-2xl font-bold">
           Not authorized to view this order
         </h1>
-        <Link href={`/`} passHref>
+        <Link href={`/`}>
           <div className="self-center text-center font-bold text-blue-500 underline hover:cursor-pointer hover:text-blue-800">
             Back to Home
           </div>
@@ -451,7 +452,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
         <h1 className="py-20 text-center text-2xl font-bold">
           Order not found
         </h1>
-        <Link href={`/`} passHref>
+        <Link href={`/`}>
           <div className="self-center text-center font-bold text-blue-500 underline hover:cursor-pointer hover:text-blue-800">
             Back to Home
           </div>
@@ -477,7 +478,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
       <h1 className="pb-4 pt-20 text-center text-2xl font-bold">
         To Explore Our Product Range Further!
       </h1>
-      <Link href={`/`} passHref>
+      <Link href={`/`}>
         <ButtonPrimary>Shop More</ButtonPrimary>
       </Link>
     </div>

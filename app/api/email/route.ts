@@ -10,7 +10,7 @@ const FAKEDATA = {
   itemsOrdered: ["Product 1", "Product 2", "Product 3"],
 };
 
-export async function POST(req: Request, res: Response) {
+export async function POST(req: Request) {
   try {
     const formData = await req.formData();
     const [email, name, orderId] = ["email", "name", "orderId"].map((field) =>
@@ -43,6 +43,6 @@ export async function POST(req: Request, res: Response) {
     return Response.json({ error });
   }
 }
-export async function GET(req: Request, res: Response) {
+export async function GET(req: Request) {
   return Response.json({ message: "hello" });
 }

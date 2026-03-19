@@ -3,7 +3,7 @@
 import { useEffect } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { useStore } from "@/store/store";
-import { Next13ProgressBar } from "next13-progressbar";
+import NextTopLoader from "nextjs-toploader";
 import { PRICE_RANGE } from "@/app/components/Filters/PriceFilter";
 import { toast } from 'sonner';
 
@@ -63,6 +63,6 @@ export function NavigationEvents() {
     }, [pathname, searchParams])
 
     return <div>
-        <Next13ProgressBar height="3px" color="#1b41b0" showOnShallow={true} options={{ showSpinner: false }} />
+        <NextTopLoader height={3} color="#1b41b0" showSpinner={false} />
     </div>
 }

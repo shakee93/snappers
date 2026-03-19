@@ -37,7 +37,7 @@ const NoOrderMessage = () => {
           </p>
         </div>
         <div className="mt-8">
-          <Link href="/" passHref>
+          <Link href="/">
             <ButtonPrimary>Return to Home</ButtonPrimary>
           </Link>
         </div>
@@ -136,7 +136,7 @@ export default function PayherePaymentPage() {
         <h1 className="pb-4 pt-20 text-center text-2xl font-bold">
           To Explore Our Product Range Further!
         </h1>
-        <Link href="/" passHref>
+        <Link href="/">
           <ButtonPrimary>Shop More</ButtonPrimary>
         </Link>
       </div>

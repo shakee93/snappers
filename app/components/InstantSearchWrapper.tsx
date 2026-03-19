@@ -14,7 +14,6 @@ import { useDebounce } from "use-debounce";
 import MobileFilterSheet from "@/app/components/MobileFilterSheet";
 import { history } from "instantsearch.js/es/lib/routers";
 import { UiState } from "instantsearch.js";
-import singletonRouter from 'next/router';
 import { useSearchParams } from "next/navigation";
 
 type CustomUiState = UiState & {
@@ -295,6 +294,7 @@ const InstantSearchWrapper = ({
         searchClient={typesenseInstantSearchAdapter.searchClient}
         indexName="product"
       >
+        {/* @ts-expect-error - filters prop is valid with Typesense adapter */}
         <Configure filters={filterQuery} hitsPerPage={hitsPerPage} />
         {/* <InstantSearchComponent
         searchClient={searchClient}

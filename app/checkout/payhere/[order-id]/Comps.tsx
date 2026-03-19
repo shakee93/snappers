@@ -246,7 +246,7 @@ export const PaymentSection = ({ orderData, CoreOrderData }: any) => {
         <p className="text-lg font-medium text-green-800">
           Payment successful!
         </p>
-        <Link href="/" passHref>
+        <Link href="/">
           <ButtonPrimary className="mt-4">Return to Home</ButtonPrimary>
         </Link>
       </div>
