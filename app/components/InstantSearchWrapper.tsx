@@ -1,7 +1,7 @@
 "use client";
 import { Configure, InstantSearch, RefinementList } from "react-instantsearch";
 import { InstantSearchNext } from "react-instantsearch-nextjs";
-import TypesenseInstantSearchAdapter, { BaseSearchParameters } from "typesense-instantsearch-adapter";
+import TypesenseInstantSearchAdapter from "typesense-instantsearch-adapter";
 import ProductGridInstant from "@/app/components/ProductGridInstant";
 import SearchInput from "@/app/components/SearchInput";
 import TabFilters from "@/app/components/TabFilters";
@@ -57,10 +57,6 @@ interface InstantSearchWrapperProps {
   tag?: string;
   searchQueryValue?: string;
 }
-
-type CustomSearchParameters = Omit<BaseSearchParameters, "filter_by"> & {
-  filter_by?: string;
-};
 
 const typesenseConfig = {
   host: process.env.NEXT_PUBLIC_TYPESENSE_HOST || "api.gqmobiles.lk",

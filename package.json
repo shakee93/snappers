@@ -79,7 +79,7 @@
     "swiper": "^11.1.5",
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
-    "typesense-instantsearch-adapter": "^2.9.0",
+    "typesense-instantsearch-adapter": "^3.0.2",
     "use-debounce": "^10.0.1",
     "use-next-blurhash": "^1.0.5",
     "vaul": "^1.1.2",
