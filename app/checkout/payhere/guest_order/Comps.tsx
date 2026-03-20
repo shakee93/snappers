@@ -207,7 +207,7 @@ export const PaymentSection = ({ orderData, email }: any) => {
     return (
       <div className="rounded-lg bg-green-50 p-4 text-center">
         <p className="text-lg font-medium text-green-800">Payment successful!. Our team will Review this and proceed order</p>
-        <Link href="/" passHref>
+        <Link href="/">
           <ButtonPrimary className="mt-4">Return to Home</ButtonPrimary>
         </Link>
       </div>

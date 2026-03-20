@@ -5,9 +5,8 @@ import { Metadata, ResolvingMetadata } from "next";
 import { Suspense } from "react";
 
 
-export async function generateMetadata(
-  { params }: any,
-  parent: ResolvingMetadata): Promise<Metadata> {
+export async function generateMetadata(props: { params: Promise<{ tag: string }> }, parent: ResolvingMetadata): Promise<Metadata> {
+  const params = await props.params;
 
   const { tag } = params;
 
@@ -22,13 +21,14 @@ export async function generateMetadata(
   };
 }
 
-export default async function Page({
-  params,
-  searchParams,
-}: {
-  params: { tag: string },
-  searchParams: { title?: string }
-}) {
+export default async function Page(
+  props: {
+    params: Promise<{ tag: string }>,
+    searchParams: Promise<{ title?: string }>
+  }
+) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const tag = params.tag;
   const title = searchParams.title || 'Default Title';
 

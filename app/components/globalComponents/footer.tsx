@@ -22,7 +22,7 @@ const Footer = async () => {
   const brands = await getData();
   const iconSize = 18;
 
-  if (isPaymentPage()) {
+  if (await isPaymentPage()) {
     return <></>;
   }
 

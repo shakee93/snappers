@@ -12,7 +12,7 @@ import {
   GET_SINGLE_ORDER,
 } from "@/graphql/defs/order";
 import { useLazyQuery, useQuery } from "@apollo/client";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, use } from "react";
 import OrderPaymentPageSkeleton from "./Skeleton";
 
 // Order Status Message Component
@@ -59,7 +59,8 @@ const OrderStatusMessage = ({ status }: { status: string }) => {
 };
 
 // Main Payment Page Component
-export default function PayherePaymentPage({ params }: any) {
+export default function PayherePaymentPage(props: { params: Promise<{ "order-id": string }> }) {
+  const params = use(props.params);
   const orderId = params["order-id"];
   if (!orderId) {
     toast.error(
@@ -197,7 +198,7 @@ export default function PayherePaymentPage({ params }: any) {
         <h1 className="pb-4 pt-20 text-center text-2xl font-bold">
           To Explore Our Product Range Further!
         </h1>
-        <Link href="/" passHref>
+        <Link href="/">
           <ButtonPrimary>Shop More</ButtonPrimary>
         </Link>
       </div>

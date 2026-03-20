@@ -82,8 +82,9 @@ export default function NavLinks() {
                 </NavigationMenuContent>
               </>
             ) : (
-              <Link href={item.href} legacyBehavior passHref>
-                <NavigationMenuLink
+              <NavigationMenuLink asChild>
+                <Link
+                  href={item.href}
                   className={`NavigationMenuLink ${
                     item.special
                       ? "relative px-3 animate-bounce flex items-center gap-1"
@@ -94,8 +95,8 @@ export default function NavLinks() {
                     <span className="mr-1">🔥</span>
                   )}
                   {item.name}
-                </NavigationMenuLink>
-              </Link>
+                </Link>
+              </NavigationMenuLink>
             )}
           </NavigationMenuItem>
         ))}

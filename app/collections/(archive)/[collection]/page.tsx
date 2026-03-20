@@ -11,7 +11,7 @@ import { notFound, redirect } from "next/navigation";
 import ArchiveLayout from "@/app/components/archive/ArchiveLayout";
 import { Metadata, ResolvingMetadata } from "next";
 
-type Props = { params: { collection: string } };
+type Props = { params: Promise<{ collection: string }> };
 
 async function getData(slug: string | null = null) {
   const { data } = await getClient().query({
@@ -30,10 +30,8 @@ async function getData(slug: string | null = null) {
   };
 }
 
-export async function generateMetadata(
-  { params }: Props,
-  parent: ResolvingMetadata
-): Promise<Metadata> {
+export async function generateMetadata(props: Props, parent: ResolvingMetadata): Promise<Metadata> {
+  const params = await props.params;
   // Read route params
   const id = params.collection;
 
@@ -75,7 +73,8 @@ export async function generateMetadata(
   };
 }
 
-const Page = async ({ params }: Props) => {
+const Page = async (props: Props) => {
+  const params = await props.params;
   const { productCategory } = await getData(params.collection);
 
   return (

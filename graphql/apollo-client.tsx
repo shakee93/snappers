@@ -2,11 +2,11 @@
 
 import { ApolloLink, from, HttpLink, Observable } from "@apollo/client";
 import {
+  ApolloClient,
   ApolloNextAppProvider,
-  NextSSRApolloClient,
-  NextSSRInMemoryCache,
+  InMemoryCache,
   SSRMultipartLink,
-} from "@apollo/experimental-nextjs-app-support/ssr";
+} from "@apollo/experimental-nextjs-app-support";
 import { GraphQLClient } from "graphql-request";
 
 import { GET_AUTH_TOKEN } from "./defs/auth";
@@ -153,12 +153,11 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
       // const { data } = useSuspenseQuery(MY_QUERY, { context: { fetchOptions: { cache: "force-cache" }}});
     });
 
-    return new NextSSRApolloClient({
-      // Use the `NextSSRInMemoryCache`, not the normal `InMemoryCache`
+    return new ApolloClient({
       devtools: {
         enabled: process.env.NODE_ENV !== 'production',
       },
-      cache: new NextSSRInMemoryCache(),
+      cache: new InMemoryCache(),
       link: from([
         ...(typeof window === "undefined"
           ? [

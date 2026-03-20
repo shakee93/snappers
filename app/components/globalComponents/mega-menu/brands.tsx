@@ -73,7 +73,7 @@ export default function BrandsMenu({ onClose }: { onClose: () => void }) {
                     href={`/${brand.slug}`}
                     className="text-blue-950 hover:underline flex items-center relative z-10 cursor-pointer"
                     onClick={handleLinkClick} // Call handleLinkClick to close the menu
-                    passHref={true}
+                   
                   >
                     {brand.brandImage ? (
                       <Image

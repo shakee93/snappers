@@ -1,7 +1,6 @@
-import { NextApiResponse } from "next";
 import { md5 } from "js-md5";
 
-export async function POST(req: Request, res: NextApiResponse) {
+export async function POST(req: Request) {
   const { merchant_id, order_id, amount, currency } = await req.json();
 
   const host = req.headers.get("host") as string;

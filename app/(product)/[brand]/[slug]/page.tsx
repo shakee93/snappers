@@ -21,19 +21,14 @@ import { getProductSchema } from "@/lib/jsonld/productSchema";
 export const dynamic = "force-dynamic";
 
 type Props = {
-  params: {
+  params: Promise<{
     slug: string;
     brand: string;
-  };
+  }>;
 };
 
 export async function generateStaticParams() {
-  const {
-    data: { brands },
-  } = await getClient().query({
-    query: GET_BRANDS,
-  });
-  return brands.nodes.map((p: Brand) => p.slug);
+  return [];
 }
 
 async function getData(slug: string, brand: string) {
@@ -100,10 +95,8 @@ function getProductOgImage(product: SimpleProduct & VariableProduct): string {
   return DEFAULT_OG_IMAGE;
 }
 
-export async function generateMetadata(
-  { params }: Props,
-  parent: ResolvingMetadata
-): Promise<Metadata> {
+export async function generateMetadata(props: Props, parent: ResolvingMetadata): Promise<Metadata> {
+  const params = await props.params;
   const { product, brand } = await getData(params.slug, params.brand);
 
   if (params.brand !== brand.slug) {
@@ -145,7 +138,8 @@ export async function generateMetadata(
   };
 }
 
-const Page = async ({ params }: Props) => {
+const Page = async (props: Props) => {
+  const params = await props.params;
   const {
     product,
     brand,

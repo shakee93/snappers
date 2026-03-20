@@ -1,283 +1,152 @@
 'use client'
+
 import React from "react";
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
-  Image,
-  Button,
-} from "@nextui-org/react";
-import img1 from "@/public/homepage/mobiles.png";
-import img2 from "@/public/homepage/buds.jpg";
-import img3 from "@/public/homepage/speaker.jpg";
-import img4 from "@/public/homepage/watch.jpg";
-import img5 from "@/public/homepage/laptop.webp";
-import tablet1 from "@/public/homepage/tablet1.jpg";
-import tablet2 from "@/public/homepage/tablet2.jpg";
 import Link from "next/link";
+import { motion } from "framer-motion";
+import {
+  DeviceMobile,
+  Headphones,
+  SpeakerHigh,
+  Watch,
+  DeviceTabletSpeaker,
+  GameController,
+  Bag,
+  Bluetooth,
+  ArrowRight,
+} from "@phosphor-icons/react";
+
+const categories = [
+  {
+    title: "Smart Phones",
+    subtitle: "Infinite Possibilities",
+    href: "/collections/smart-phones",
+    icon: DeviceMobile,
+    badge: "Trending",
+    pastelBg: "bg-blue-50",
+    pastelBgHover: "group-hover:bg-blue-100",
+    iconColor: "text-blue-600",
+  },
+  {
+    title: "Mobile Accessories",
+    subtitle: "Cases, Chargers & More",
+    href: "/collections/mobile-accessories-mobiles-and-tablets-2",
+    icon: Bag,
+    badge: null,
+    pastelBg: "bg-slate-50",
+    pastelBgHover: "group-hover:bg-slate-100",
+    iconColor: "text-slate-600",
+  },
+  {
+    title: "Headphones",
+    subtitle: "Immerse in Sound",
+    href: "/collections/headphones-and-headsets",
+    icon: Headphones,
+    badge: "Best Seller",
+    pastelBg: "bg-purple-50",
+    pastelBgHover: "group-hover:bg-purple-100",
+    iconColor: "text-purple-600",
+  },
+  {
+    title: "Wireless Earbuds",
+    subtitle: "True Wireless Freedom",
+    href: "/collections/wireless-earbuds",
+    icon: Bluetooth,
+    badge: null,
+    pastelBg: "bg-cyan-50",
+    pastelBgHover: "group-hover:bg-cyan-100",
+    iconColor: "text-cyan-600",
+  },
+  {
+    title: "Smartwatches",
+    subtitle: "Stay Connected",
+    href: "/collections/smartwatches",
+    icon: Watch,
+    badge: "New",
+    pastelBg: "bg-emerald-50",
+    pastelBgHover: "group-hover:bg-emerald-100",
+    iconColor: "text-emerald-600",
+  },
+  {
+    title: "Speakers",
+    subtitle: "Surround Yourself",
+    href: "/collections/smart-speakers",
+    icon: SpeakerHigh,
+    badge: null,
+    pastelBg: "bg-amber-50",
+    pastelBgHover: "group-hover:bg-amber-100",
+    iconColor: "text-amber-600",
+  },
+  {
+    title: "Gaming",
+    subtitle: "Level Up Your Setup",
+    href: "/collections/console-gaming-and-accessories",
+    icon: GameController,
+    badge: null,
+    pastelBg: "bg-red-50",
+    pastelBgHover: "group-hover:bg-red-100",
+    iconColor: "text-red-600",
+  },
+  {
+    title: "Tablets",
+    subtitle: "Elevate Productivity",
+    href: "/collections/tablet-accessories",
+    icon: DeviceTabletSpeaker,
+    badge: null,
+    pastelBg: "bg-rose-50",
+    pastelBgHover: "group-hover:bg-rose-100",
+    iconColor: "text-rose-600",
+  },
+];
 
 export default function CategoryBlockSection() {
   return (
-    <div className=" grid grid-cols-12 grid-rows-2 gap-5 py-2">
-
-      <Card className="col-span-12 h-[200px] sm:col-span-4 md:h-[300px]">
-        <CardHeader className="absolute top-1 z-10 flex-col !items-start">
-          <p className="text-base font-medium text-white/80">
-            Infinite Possibilities
-          </p>
-
-          <h4 className="text-3xl font-medium text-white">Innovative Smartphones</h4>
-        </CardHeader>
-        <Image
-          removeWrapper
-          alt="Card background"
-          className="z-0 h-full w-full object-cover"
-          src={img1.src}
-        />
-        <CardFooter className="border-default-600 dark:border-default-100 absolute bottom-0 z-10 bg-black/40">
-          <div className="flex flex-grow items-center gap-2">
-            <div className="flex flex-col">
-              <p className="hidden text-sm text-white/60 lg:block">
-                {/* Explore our collection of innovative smartphones that offer infinite possibilities. */}
-                Experience the Power of innovative smartphones
-              </p>
-            </div>
-          </div>
-          <Link href={"/collections/smart-phones"}>
-            <Button
-              className="bg-primaryColor text-sm text-white"
-              radius="full"
-              size="md"
+    <div className="grid grid-cols-2 gap-3 py-2 sm:gap-4 md:grid-cols-4">
+      {categories.map((cat) => {
+        const Icon = cat.icon;
+        return (
+          <Link key={cat.title} href={cat.href} className="group">
+            <motion.div
+              className="relative flex h-full min-h-[160px] flex-col justify-between rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-colors hover:border-gray-200"
+              whileHover={{ y: -4 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
+              style={{ willChange: "transform" }}
             >
-              Explore Mobiles
-            </Button>
+              <div>
+                <div className="flex items-start justify-between">
+                  <div
+                    className={`inline-flex rounded-xl p-2.5 ${cat.pastelBg} ${cat.pastelBgHover} transition-all duration-300`}
+                  >
+                    <Icon
+                      weight="duotone"
+                      className={`h-7 w-7 ${cat.iconColor} transition-transform duration-300 group-hover:scale-110`}
+                    />
+                  </div>
+                  {cat.badge && (
+                    <span className="rounded-full bg-primaryColor px-2.5 py-0.5 text-[11px] font-medium text-white">
+                      {cat.badge}
+                    </span>
+                  )}
+                </div>
+
+                <h3 className="mt-3 text-sm font-semibold text-gray-900 sm:text-base">
+                  {cat.title}
+                </h3>
+                <p className="mt-0.5 text-xs text-gray-500 sm:text-sm">
+                  {cat.subtitle}
+                </p>
+              </div>
+
+              <div className="mt-3 flex items-center gap-1 text-xs font-medium text-gray-500 group-hover:text-gray-900 sm:text-sm">
+                Explore
+                <ArrowRight
+                  weight="bold"
+                  className="h-3.5 w-3.5 transition-transform duration-300 group-hover:translate-x-1"
+                />
+              </div>
+            </motion.div>
           </Link>
-        </CardFooter>
-      </Card>
-
-      {/* <Card className="col-span-12 h-[200px] sm:col-span-4 md:h-[300px]">
-        <CardHeader className="absolute top-1 z-10 flex-col !items-start">
-          <p className="text-base font-medium text-white/80">
-            Elevate Your Productivity
-          </p>
-
-          <h4 className="text-3xl font-medium text-white">MacBooks</h4>
-        </CardHeader>
-        <Image
-          removeWrapper
-          alt="Card background"
-          className="z-0 h-full w-full object-cover"
-          src={img5.src}
-        />
-        <CardFooter className="border-default-600 dark:border-default-100 absolute bottom-0 z-10 bg-black/40">
-          <div className="flex flex-grow items-center gap-2">
-            <div className="flex flex-col">
-              <p className="hidden text-sm text-white/60 lg:block">
-                Experience the Power of MacBooks
-              </p>
-            </div>
-          </div>
-          <Link href={"/collections/macbooks"}>
-            <Button
-              className="bg-primaryColor text-sm text-white"
-              radius="full"
-              size="md"
-            >
-              Get a Mackbook
-            </Button>
-          </Link>
-        </CardFooter>
-      </Card>
-       */}
-      <Card className="col-span-12 h-[200px] sm:col-span-4 md:h-[300px]">
-        <CardHeader className="absolute top-1 z-10 flex-col !items-start">
-          <p className="text-base font-medium text-white/80">
-            Immerse Yourself in Sound
-          </p>
-
-          <h4 className="text-3xl font-medium text-white">
-            Audio Excellence Collection
-          </h4>
-        </CardHeader>
-        <Image
-          removeWrapper
-          alt="Card background"
-          className="z-0 h-full w-full object-cover"
-          src={img2.src}
-        />
-        <CardFooter className="border-default-600 dark:border-default-100 absolute bottom-0 z-10 bg-black/40">
-          <div className="flex flex-grow items-center gap-2">
-            <div className="flex flex-col">
-              <p className="hidden text-sm text-white/60 lg:block">
-                Surround Yourself with Sound
-              </p>
-            </div>
-          </div>
-          <Link href={"/collections/headphones-and-headsets"}>
-            <Button
-              className="bg-primaryColor text-sm text-white"
-              radius="full"
-              size="md"
-            >
-              All Headphones 
-            </Button>
-          </Link>
-        </CardFooter>
-      </Card>
-      <Card className="col-span-12 h-[200px] sm:col-span-4 md:h-[300px]">
-        <CardHeader className="absolute top-1 z-10 flex-col !items-start">
-          <p className="text-base font-medium text-white/80">
-            Surround Yourself with Sound
-          </p>
-
-          <h4 className="text-3xl font-medium text-white">
-            Immersive Speaker Collection
-          </h4>
-        </CardHeader>
-        <Image
-          removeWrapper
-          alt="Card background"
-          className="z-0 h-full w-full object-cover"
-          src={img3.src}
-        />
-        <CardFooter className="border-default-600 dark:border-default-100 absolute bottom-0 z-10 bg-black/40">
-          <div className="flex flex-grow items-center gap-2">
-            <div className="flex flex-col">
-              <p className="hidden text-sm text-white/60 lg:block">
-                Stay Connected, Stay Active
-              </p>
-            </div>
-          </div>
-          <Link href={"/collections/smart-speakers"}>
-            <Button
-              className="bg-primaryColor text-sm text-white"
-              radius="full"
-              size="md"
-            >
-              Browse Speakers
-            </Button>
-          </Link>
-        </CardFooter>
-      </Card>
-      <Card
-        isFooterBlurred
-        className="col-span-12 h-[200px] w-full sm:col-span-5 md:h-[300px]"
-      >
-        <CardHeader className="absolute top-1 z-10 flex-col items-start">
-          <p className="text-base font-medium text-white/80">
-            Stay Connected, Stay Active
-          </p>
-
-          <h4 className="text-3xl font-medium text-white">
-            Futuristic Smartwatches
-          </h4>
-        </CardHeader>
-        <Image
-          removeWrapper
-          alt="Card example background"
-          className="z-0 h-full w-full -translate-y-6 scale-125 object-cover"
-          src={img4.src}
-        />
-
-        <CardFooter className="border-default-600 dark:border-default-100 absolute bottom-0 z-10 bg-black/40">
-          <div className="flex flex-grow items-center gap-2">
-            <div className="flex flex-col">
-              <p className="hidden text-sm text-white/60 lg:block">
-                Elevate Your Productivity
-              </p>
-            </div>
-          </div>
-          <Link href={"/collections/smartwatches"}>
-            <Button
-              className="bg-primaryColor text-sm text-white"
-              radius="full"
-              size="md"
-            >
-              Explore Smart Watches
-            </Button>
-          </Link>
-        </CardFooter>
-      </Card>
-      {/* <Card
-        isFooterBlurred
-        className="col-span-12 h-[200px] w-full sm:col-span-7 md:h-[300px]"
-      >
-        <CardHeader className="absolute top-1 z-10 flex-col items-start p-4">
-          <p className="text-base font-medium text-white/80">
-            Infinite Possibilities
-          </p>
-
-          <h4 className="text-3xl font-medium text-white">
-            Innovative Smartphones
-          </h4>
-        </CardHeader>
-        <Image
-          removeWrapper
-          alt="Relaxing app background"
-          className="z-0 h-full w-full object-cover"
-          src={img1.src}
-        />
-        <CardFooter className="border-default-600 dark:border-default-100 absolute bottom-0 z-10 bg-black/40">
-          <div className="flex flex-grow items-center gap-2">
-            <div className="flex flex-col">
-              <p className="hidden text-sm text-white/60 lg:block">
-                Explore our collection of innovative smartphones that offer
-                infinite possibilities.
-              </p>
-            </div>
-          </div>
-          <Link href={"/collections/smart-phones"}>
-            <Button
-              className="bg-primaryColor text-sm text-white"
-              radius="full"
-              size="md"
-            >
-              Explore Mobiles
-            </Button>
-          </Link>
-        </CardFooter>
-      </Card> */}
-
-      <Card
-        isFooterBlurred
-        className="col-span-12 h-[200px] w-full sm:col-span-7 md:h-[300px]"
-      >
-        <CardHeader className="absolute top-1 z-10 flex-col items-start p-4">
-          <p className="text-base font-medium text-white/80">
-            Elevate Your Productivity
-          </p>
-
-          <h4 className="text-3xl font-medium text-white">
-            Tablets
-          </h4>
-        </CardHeader>
-        <Image
-          removeWrapper
-          alt="Relaxing app background"
-          className="z-0 h-full w-full object-cover"
-          src={tablet2.src}
-        />
-        <CardFooter className="border-default-600 dark:border-default-100 absolute bottom-0 z-10 bg-black/40">
-          <div className="flex flex-grow items-center gap-2">
-            <div className="flex flex-col">
-              <p className="hidden text-sm text-white/60 lg:block">
-                Explore our collection of Tablets that would boost your productivity.
-              </p>
-            </div>
-          </div>
-          <Link href={"/collections/tablet-accessories"}>
-            <Button
-              className="bg-primaryColor text-sm text-white"
-              radius="full"
-              size="md"
-            >
-              Get a Tablet
-            </Button>
-          </Link>
-        </CardFooter>
-      </Card>
-
+        );
+      })}
     </div>
   );
 }

@@ -1,5 +1,5 @@
 import {ApolloClient, FetchPolicy, from, HttpLink, InMemoryCache} from "@apollo/client";
-import {registerApolloClient} from "@apollo/experimental-nextjs-app-support/rsc";
+import {registerApolloClient} from "@apollo/experimental-nextjs-app-support";
 import {RetryLink} from "@apollo/client/link/retry";
 
 export const { getClient } = registerApolloClient(() => {
@@ -16,6 +16,9 @@ export const { getClient } = registerApolloClient(() => {
     let cacheType: FetchPolicy = 'no-cache'
 
     return new ApolloClient({
+        devtools: {
+            enabled: false,
+        },
         cache: new InMemoryCache(),
         link: from([
             retryLink,

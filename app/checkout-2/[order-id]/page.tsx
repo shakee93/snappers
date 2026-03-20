@@ -6,7 +6,7 @@ import {
   GET_CHECKOUT_USER_DETAILS,
   GET_SINGLE_ORDER,
 } from "@/graphql/defs/order";
-import { useCallback, useEffect, useMemo } from "react";
+import { useCallback, useEffect, useMemo, use } from "react";
 import ProductTable, { OrderDetails } from "./Comps";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -14,7 +14,8 @@ import ButtonPrimary from "shared/Button/ButtonPrimary";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCart } from "@/context/CartProvider";
 
-export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
+export default function OrderPaymentPage(props: OrderPaymentPageProps) {
+  const params = use(props.params);
   const router = useRouter();
   const orderId = params["order-id"];
   const searchParams = useSearchParams().get("email");
@@ -57,7 +58,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
   const key = useSearchParams().get('key');
   const wcApi = useSearchParams().get('wc-api');
 
-  
+
   const lastOrder = localStorage.getItem('last_order');
   if (lastOrder && trnId && status !== "FAILURE") {
     router.push(`/checkout/koko/guest_order?orderId=${orderIdUrl}&status=${status}`);
@@ -167,7 +168,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
           <h1 className="pb-4 pt-20 text-center text-2xl font-bold">
             To Explore Our Product Range Further!
           </h1>
-          <Link href={`/`} passHref>
+          <Link href={`/`}>
             <ButtonPrimary>Shop More</ButtonPrimary>
           </Link>
         </div>
@@ -193,7 +194,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
           📝 The page is unable to load the order ID since it{"'"}s a Payhere
           testing ID.
         </h1>
-        <Link href={`/`} passHref>
+        <Link href={`/`}>
           <div className="self-center text-center font-bold text-blue-500 underline hover:cursor-pointer hover:text-blue-800">
             Back to Home
           </div>
@@ -235,7 +236,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
         <p className="py-4 text-center">
           Please check your email({searchParams}) for further details.
         </p>
-        <Link href={`/`} passHref>
+        <Link href={`/`}>
           <p className="self-center text-center font-bold text-blue-500 underline hover:cursor-pointer hover:text-blue-800">
             Back to Home
           </p>
@@ -297,7 +298,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
         <h1 className="py-20 text-center text-2xl font-bold">
           Not authorized to view this order
         </h1>
-        <Link href={`/`} passHref>
+        <Link href={`/`}>
           <div className="self-center text-center font-bold text-blue-500 underline hover:cursor-pointer hover:text-blue-800">
             Back to Home
           </div>
@@ -355,7 +356,7 @@ export default function OrderPaymentPage({ params }: OrderPaymentPageProps) {
       <h1 className="pb-4 pt-20 text-center text-2xl font-bold">
         To Explore Our Product Range Further!
       </h1>
-      <Link href={`/`} passHref>
+      <Link href={`/`}>
         <ButtonPrimary>Shop More</ButtonPrimary>
       </Link>
     </div>

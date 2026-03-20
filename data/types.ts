@@ -31,7 +31,7 @@ export type Slug = {
 };
 
 export type OrderPaymentPageProps = {
-  params: Slug;
+  params: Promise<Slug>;
 };
 
 export type PaymentDetailsType = {

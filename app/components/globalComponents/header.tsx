@@ -27,7 +27,7 @@ const getData = async () => {
 };
 
 const Header = async () => {
-  if (isPaymentPage()) {
+  if (await isPaymentPage()) {
     return <></>;
   }
 
