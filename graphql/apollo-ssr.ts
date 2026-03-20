@@ -16,6 +16,9 @@ export const { getClient } = registerApolloClient(() => {
     let cacheType: FetchPolicy = 'no-cache'
 
     return new ApolloClient({
+        devtools: {
+            enabled: false,
+        },
         cache: new InMemoryCache(),
         link: from([
             retryLink,
