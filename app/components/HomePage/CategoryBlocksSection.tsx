@@ -21,7 +21,6 @@ const categories = [
     subtitle: "Infinite Possibilities",
     href: "/collections/smart-phones",
     icon: DeviceMobile,
-    badge: "Trending",
     pastelBg: "bg-blue-50",
     pastelBgHover: "group-hover:bg-blue-100",
     iconColor: "text-blue-600",
@@ -31,7 +30,6 @@ const categories = [
     subtitle: "Cases, Chargers & More",
     href: "/collections/mobile-accessories-mobiles-and-tablets-2",
     icon: Bag,
-    badge: null,
     pastelBg: "bg-slate-50",
     pastelBgHover: "group-hover:bg-slate-100",
     iconColor: "text-slate-600",
@@ -41,7 +39,6 @@ const categories = [
     subtitle: "Immerse in Sound",
     href: "/collections/headphones-and-headsets",
     icon: Headphones,
-    badge: "Best Seller",
     pastelBg: "bg-purple-50",
     pastelBgHover: "group-hover:bg-purple-100",
     iconColor: "text-purple-600",
@@ -51,7 +48,6 @@ const categories = [
     subtitle: "True Wireless Freedom",
     href: "/collections/wireless-earbuds",
     icon: Bluetooth,
-    badge: null,
     pastelBg: "bg-cyan-50",
     pastelBgHover: "group-hover:bg-cyan-100",
     iconColor: "text-cyan-600",
@@ -61,7 +57,6 @@ const categories = [
     subtitle: "Stay Connected",
     href: "/collections/smartwatches",
     icon: Watch,
-    badge: "New",
     pastelBg: "bg-emerald-50",
     pastelBgHover: "group-hover:bg-emerald-100",
     iconColor: "text-emerald-600",
@@ -71,7 +66,6 @@ const categories = [
     subtitle: "Surround Yourself",
     href: "/collections/smart-speakers",
     icon: SpeakerHigh,
-    badge: null,
     pastelBg: "bg-amber-50",
     pastelBgHover: "group-hover:bg-amber-100",
     iconColor: "text-amber-600",
@@ -81,7 +75,6 @@ const categories = [
     subtitle: "Level Up Your Setup",
     href: "/collections/console-gaming-and-accessories",
     icon: GameController,
-    badge: null,
     pastelBg: "bg-red-50",
     pastelBgHover: "group-hover:bg-red-100",
     iconColor: "text-red-600",
@@ -91,7 +84,6 @@ const categories = [
     subtitle: "Elevate Productivity",
     href: "/collections/tablet-accessories",
     icon: DeviceTabletSpeaker,
-    badge: null,
     pastelBg: "bg-rose-50",
     pastelBgHover: "group-hover:bg-rose-100",
     iconColor: "text-rose-600",
@@ -121,11 +113,6 @@ export default function CategoryBlockSection() {
                       className={`h-7 w-7 ${cat.iconColor} transition-transform duration-300 group-hover:scale-110`}
                     />
                   </div>
-                  {cat.badge && (
-                    <span className="rounded-full bg-primaryColor px-2.5 py-0.5 text-[11px] font-medium text-white">
-                      {cat.badge}
-                    </span>
-                  )}
                 </div>
 
                 <h3 className="mt-3 text-sm font-semibold text-gray-900 sm:text-base">
