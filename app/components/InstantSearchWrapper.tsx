@@ -138,7 +138,7 @@ const InstantSearchWrapper = ({
           ? `brands.nodes.databaseId:[${sidebar.brands.join(",")}]`
           : null,
       sidebar.on_sale ? "onSale:true" : null,
-      sidebar.in_stock ? "stockStatus:IN_STOCK" : null,
+      sidebar.in_stock ? "stockStatus:IN_STOCK && productTags.nodes.slug:!=pre-order" : null,
       sidebar.out_of_stock ? "stockStatus:OUT_OF_STOCK" : null,
       tag
         ? `productTags.nodes.slug:${tag}`
