@@ -103,7 +103,8 @@ const Footer = async () => {
                 <div className="flex flex-col">
                   <div>Business Hours:</div>
                   <div>Mon - Sat (10.00AM - 08.00PM)</div>
-                  <div>Sundays & Poya's (10.00AM - 05.00PM)</div>
+                  <div>Poya Day (10.00AM - 06.00PM)</div>
+                  <div>Sunday (Closed)</div>
                 </div>
               </li>
               <li className="lg:text-sm text-gray-500 flex gap-3">
@@ -221,7 +222,8 @@ const Footer = async () => {
                 <div className="flex flex-col">
                   <div>Business Hours:</div>
                   <div>Mon - Sat (10.00AM - 08.00PM)</div>
-                  <div>Sundays & Poya's (10.00AM - 05.00PM)</div>
+                  <div>Poya Day (10.00AM - 06.00PM)</div>
+                  <div>Sunday (Closed)</div>
                 </div>
               </li>
               <li className="lg:text-sm text-gray-500 flex gap-3">
@@ -250,10 +252,10 @@ const Footer = async () => {
                 </div>
                 <div className="flex flex-col gap-1 md:gap-2 text-xs md:text-sm leading-tight md:leading-snug">
                   <div className="font-medium text-gray-800 ">Monday - Saturday&nbsp;
-                    <span className="block font-normal text-gray-500">10AM&nbsp;-&nbsp;6PM</span>
+                    <span className="block font-normal text-gray-500">10AM&nbsp;-&nbsp;8PM</span>
                   </div>
-                  <div className="font-medium text-gray-800 ">Poya & Mercantile Holidays&nbsp;
-                    <span className="block font-normal text-gray-500">10am&nbsp;-&nbsp;6pm</span>
+                  <div className="font-medium text-gray-800 ">Poya Day&nbsp;
+                    <span className="block font-normal text-gray-500">10AM&nbsp;-&nbsp;6PM</span>
                   </div>
                   <div className="font-medium text-gray-800 ">Sunday&nbsp;
                     <span className="block font-normal text-gray-500">Closed</span>
