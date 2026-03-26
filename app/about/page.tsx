@@ -68,7 +68,7 @@ const AccountPage = () => {
             <div className="block text-base xl:text-base text-neutral-6000 dark:text-neutral-400 lg:text-justify">
               For more than 20 years,{" "}
               <span className="text-primaryColor">
-                GQ-The mobile Store Unlimited
+                GQ Mobiles
               </span>{" "}
               has demonstrated excellence in the retail industry by
               distinguishing itself with a commitment to delivering complete

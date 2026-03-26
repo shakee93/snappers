@@ -34,8 +34,8 @@ const SectionPromo1: FC<SectionPromo1Props> = ({ className = "" }) => {
           Together We Shine.
         </h2>
         <span className="block text-slate-500 dark:text-slate-400 ">
-          Located in the heart of Colombo, you can visit out GQ The Mobile Store
-          Unlimited stores and experience the greatest purchase experience in
+          Located in the heart of Colombo, you can visit our GQ Mobiles
+          stores and experience the greatest purchase experience in
           Sri Lanka for an affordable price
         </span>
         <div className="flex space-x-2 sm:space-x-5 ">
