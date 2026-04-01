@@ -2,18 +2,17 @@
 import React, { Fragment, useState } from "react";
 import { ChevronDown, XIcon } from "lucide-react";
 import Link from "next/link";
-import { Category } from "@/graphql/types/graphql";
+import { ProductCategory } from "@/graphql/types/graphql";
 import { Popover, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
 import { twMerge } from "tailwind-merge";
 import { usePathname } from "next/navigation";
+import { orderCollectionNavForDropdown } from "@/lib/collectionNavOrder";
 
-const DropdownButton = ({ categories }: { categories: any }) => {
+const DropdownButton = ({ categories }: { categories: ProductCategory[] }) => {
   const path = usePathname();
 
-  const sortedCategories = [...categories].sort((a, b) =>
-    a.name.localeCompare(b.name)
-  );
+  const sortedCategories = orderCollectionNavForDropdown(categories);
 
   return (
     <div className="relative text-center">
@@ -47,8 +46,7 @@ const DropdownButton = ({ categories }: { categories: any }) => {
                   className="py-4 px-4 text-left max-h-[350px] overflow-y-auto  grid-flow-row text-sm font-normal \
                  text-gray-700 grid grid-cols-1 dark:text-gray-200"
                 >
-                  {sortedCategories?.map(
-                    (category: Category, index: number) => (
+                  {sortedCategories?.map((category, index) => (
                       <li key={index} className="w-full">
                         <Link
                           onClick={(e) => close()}

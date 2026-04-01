@@ -7,6 +7,7 @@ import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import CategoriesMenuSkeleton from "../../Skeletons/CategorySkeleton";
 import { useMemo } from "react";
+import { orderCollectionNavRoots } from "@/lib/collectionNavOrder";
 
 type NavCategoriesProps = {
   onClose: () => void;
@@ -46,9 +47,12 @@ export default function NavCategories({ onClose }: NavCategoriesProps) {
       const categoryWithChildren = categoryMap.get(category.databaseId);
       if (!categoryWithChildren) return;
 
-      // If category has a parent, add it to parent's children
-      if (category.parentDatabaseId != null) {
-        const parent = categoryMap.get(category.parentDatabaseId);
+      const parentId = category.parentDatabaseId;
+      const isRoot = parentId == null || parentId === 0;
+
+      // If category has a parent (WP uses 0 for top-level; treat as root)
+      if (!isRoot) {
+        const parent = categoryMap.get(parentId);
         if (parent && parent.children) {
           // Push the category without the children override to avoid type issues
           const { children: _, ...categoryWithoutChildren } = categoryWithChildren;
@@ -68,42 +72,15 @@ export default function NavCategories({ onClose }: NavCategoriesProps) {
     [flatCategories]
   );
 
-  const prioritizeCategory = (
-    items: CategoryWithChildren[],
-    slugToPrioritize: string
-  ): CategoryWithChildren[] => {
-    const prioritizedCategory = items.find(
-      (item) => item.slug === slugToPrioritize
-    );
-    const otherCategories = items.filter(
-      (item) => item.slug !== slugToPrioritize
-    );
-    return prioritizedCategory
-      ? [prioritizedCategory, ...otherCategories]
-      : items;
-  };
-
-  const prioritizedCategories = prioritizeCategory(
-    categoryTree,
-    "mobiles-and-tablets"
-  );
-
-  // Function to split categories into columns
-  const splitIntoColumns = (
-    items: CategoryWithChildren[],
-    columnCount: number
-  ): CategoryWithChildren[][] => {
-    const columns: CategoryWithChildren[][] = Array.from(
-      { length: columnCount },
-      () => []
-    );
-    items.forEach((item, index) => {
-      columns[index % columnCount].push(item);
-    });
-    return columns;
-  };
-
-  const columnCount = 3;
+  /** Col1: items 1–3, Col2: 4–6, Col3: 7+ (e.g. 7–10) */
+  const categoryColumns = useMemo(() => {
+    const items = orderCollectionNavRoots(categoryTree);
+    return [
+      items.slice(0, 3),
+      items.slice(3, 6),
+      items.slice(6),
+    ] as const;
+  }, [categoryTree]);
 
   return (
     <div
@@ -120,72 +97,72 @@ export default function NavCategories({ onClose }: NavCategoriesProps) {
         </Link>
       </div>
 
-      <div className="flex space-x-6 p-3 pt-1">
+      <div className="flex flex-col md:flex-row gap-6 md:gap-8 p-3 pt-1 w-full">
         {loading ? (
-          <div className="flex-1">
-            {/* <p>Loading categories...</p> */}
+          <div className="flex-1 w-full">
             <CategoriesMenuSkeleton />
           </div>
         ) : error ? (
-          <div className="flex-1">
+          <div className="flex-1 w-full">
             <p>Error loading categories</p>
           </div>
         ) : (
-          splitIntoColumns(prioritizedCategories, columnCount).map(
-            (column, colIndex) => (
-              <div key={`column-${colIndex}`} className="flex-1">
-                {column.map((category) => (
-                  <div
-                    key={`category-${category.slug}`}
-                    className="category-group mb-2 p-2 hover:bg-zinc-100 rounded-md"
+          categoryColumns.map((columnItems, colIndex) => (
+            <div
+              key={`nav-col-${colIndex}`}
+              className="flex-1 flex flex-col gap-y-2 min-w-0"
+            >
+              {columnItems.map((category) => (
+                <div
+                  key={`category-${category.slug}`}
+                  className="category-group mb-2 p-2 hover:bg-zinc-100 rounded-md min-w-0"
+                >
+                  <h3
+                    className={`text-sm font-semibold ${category.children && category.children.length > 0
+                      ? "mb-2"
+                      : ""
+                      }`}
                   >
-                    <h3
-                      className={`text-sm font-semibold ${category.children && category.children.length > 0
-                        ? "mb-2"
-                        : ""
-                        }`}
+                    <Link
+                      href={`/collections/${category.slug}`}
+                      className="text-blue-950 hover:underline flex items-center"
+                      onClick={onClose}
                     >
-                      <Link
-                        href={`/collections/${category.slug}`}
-                        className="text-blue-950 hover:underline flex items-center"
-                        onClick={onClose}
-                      >
-                        {category.image?.sourceUrl ? (
-                          <Image
-                            src={category.image.sourceUrl}
-                            alt={category.name ?? ""}
-                            width={24}
-                            height={24}
-                            className="rounded-full w-6 h-6 mr-1.5 object-contain"
-                          />
-                        ) : (
-                          <span className="inline-block bg-zinc-200 rounded-full w-6 h-6 mr-1.5"></span>
-                        )}
-                        <span className="truncate max-w-[200px]">
-                          {category.name}
-                        </span>
-                      </Link>
-                    </h3>
-                    {category.children && category.children.length > 0 && (
-                      <ul className="space-y-1">
-                        {category.children.map((child: ProductCategory) => (
-                          <li key={`child-${child.slug}`} className="ml-2.5">
-                            <Link
-                              href={`/collections/${child.slug}`}
-                              className="text-sm text-muted-foreground hover:text-primary"
-                              onClick={onClose}
-                            >
-                              {child.name}
-                            </Link>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )
-          )
+                      {category.image?.sourceUrl ? (
+                        <Image
+                          src={category.image.sourceUrl}
+                          alt={category.name ?? ""}
+                          width={24}
+                          height={24}
+                          className="rounded-full w-6 h-6 mr-1.5 object-contain"
+                        />
+                      ) : (
+                        <span className="inline-block bg-zinc-200 rounded-full w-6 h-6 mr-1.5"></span>
+                      )}
+                      <span className="truncate max-w-[200px]">
+                        {category.name}
+                      </span>
+                    </Link>
+                  </h3>
+                  {category.children && category.children.length > 0 && (
+                    <ul className="space-y-1">
+                      {category.children.map((child: ProductCategory) => (
+                        <li key={`child-${child.slug}`} className="ml-2.5">
+                          <Link
+                            href={`/collections/${child.slug}`}
+                            className="text-sm text-muted-foreground hover:text-primary"
+                            onClick={onClose}
+                          >
+                            {child.name}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ))}
+            </div>
+          ))
         )}
       </div>
     </div>
