@@ -111,6 +111,7 @@ const CheckoutPage = () => {
   const [couponCode, setCouponCode] = useState("");
   const [couponStatus, setCouponStatus] = useState<"idle" | "success" | "error">("idle");
   const [couponMessage, setCouponMessage] = useState<string | null>(null);
+  const [hasSavedCheckoutForm, setHasSavedCheckoutForm] = useState(false);
 
   const [applyCouponMutation, { loading: applyingCoupon }] = useMutation(APPLY_COUPON);
   const [removeCouponsMutation, { loading: removingCoupon }] = useMutation(REMOVE_COUPONS);
@@ -412,10 +413,10 @@ const CheckoutPage = () => {
 
       const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
 
-      if (paymentMethodId === undefined) {
-        console.error("Payment method ID is undefined");
+      if (paymentMethodId === undefined || paymentMethodId === null || paymentMethodId === "") {
+        console.error("Payment method ID is missing");
         toast.error("Payment Method was not chosen.");
-        return;
+        return null;
       }
 
       formData.billingAddress.country = "LK";
@@ -449,7 +450,7 @@ const CheckoutPage = () => {
           ? "<p><strong>Pickup Location:</strong> Store</p>"
           : ""
         }
-            ${isKokoPayment
+            ${formData?.paymentMethod?.selectedGateway?.id === "darazbnpl"
           ? "<p><strong>Payment Method:</strong> Koko Pay</p>"
           : ""
         }
@@ -476,19 +477,31 @@ const CheckoutPage = () => {
           ? await guestCheckout({ variables })
           : await checkoutMutation({ variables });
 
-
-      // Store order data in localStorage for both guest and logged-in users
-      if (data) {
-        localStorage.setItem("last_order", JSON.stringify(data));
+      if (errors?.length) {
+        const msg =
+          errors.map((e: { message?: string }) => e.message).filter(Boolean).join(" ") ||
+          "Checkout failed.";
+        toast.error(msg);
+        return null;
       }
 
-      //Koko Payment
-      if (isKokoPayment) {
+      if (!data?.checkout) {
+        toast.error("Checkout failed. Please try again.");
+        return null;
+      }
+
+      // Store order data in localStorage for both guest and logged-in users
+      localStorage.setItem("last_order", JSON.stringify(data));
+
+      const isKokoGateway =
+        formData?.paymentMethod?.selectedGateway?.id === "darazbnpl";
+
+      if (isKokoGateway) {
         const orderData = {
           order_id: data?.checkout?.order?.databaseId,
         };
-        localStorage.setItem("last_order", JSON.stringify(data));
         handleKoko(orderData);
+        return null;
       }
 
       // FOR GUEST CHECKOUT
@@ -500,18 +513,27 @@ const CheckoutPage = () => {
       const isGuest = customer?.id === "guest";
 
       if (isPayhere && isGuest) {
+        const orderDbId = data?.checkout?.order?.databaseId;
+        if (!orderDbId) {
+          toast.error("Could not create order for payment.");
+          return null;
+        }
         localStorage.setItem(
           "payhere_last_order",
           JSON.stringify(guestCheckoutData)
         );
         router.push(`/checkout/payhere/guest_order`);
-        return;
+        return null;
       }
 
       if (isPayhere && !isGuest) {
         const orderId = data?.checkout?.order?.databaseId;
+        if (!orderId) {
+          toast.error("Could not create order for payment.");
+          return null;
+        }
         router.push(`/checkout/payhere/${orderId}`);
-        return;
+        return null;
       }
 
       // Genie Payment Redirect
@@ -907,6 +929,7 @@ const CheckoutPage = () => {
               totalPayment={numericOrderTotal}
               setIsKokoPayment={setIsKokoPayment}
               isKokoPayment={isKokoPayment}
+              onCheckoutFormSaved={() => setHasSavedCheckoutForm(true)}
             />
           </div>
         </div>
@@ -1238,8 +1261,10 @@ const CheckoutPage = () => {
             )}
 
             <ButtonPrimary
+              type="button"
               onClick={handleCheckoutProcess}
-              className={`mt-8 w-full bg-primary hover:bg-primary-dark`}
+              disabled={!hasSavedCheckoutForm || loading}
+              className={`mt-8 w-full bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:pointer-events-none`}
             >
               {loading ? (
                 <Loader className="animate-spin text-gray-100 " />

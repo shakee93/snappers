@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import Input from "shared/Input/Input";
@@ -17,6 +17,7 @@ import {
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import Radio from "shared/Radio/Radio";
 import { useCart } from "@/context/CartProvider";
+import { Check } from "lucide-react";
 
 interface Props {
     updateFormData: (section: string, data: any) => void;
@@ -70,7 +71,7 @@ const UnifiedCheckoutForm = ({
     const [addressType, setAddressType] = useState("home");
 
     // Payment Method State
-    const [methodActive, setMethodActive] = useState<string>("Credit-Card");
+    const [methodActive, setMethodActive] = useState<string>("");
     const [selectedGateway, setSelectedGateway] = useState<PaymentGateway>({
         id: "",
         title: null,
@@ -81,6 +82,8 @@ const UnifiedCheckoutForm = ({
 
     const [bankSlipFile, setBankSlipFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+    const [submitState, setSubmitState] = useState<"idle" | "loading" | "success">("idle");
 
     const { cart } = useCart();
 
@@ -214,11 +217,61 @@ const UnifiedCheckoutForm = ({
         }
     };
 
-    const hidePayhere = removePayhereOnMobileAndTab();
     const isPreOrderCart = hasPreOrderProducts();
 
-    const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const visiblePaymentGateways = useMemo(() => {
+        if (!paymentGateways?.length) return [];
+        const hidePayhereOnMobile = removePayhereOnMobileAndTab();
+        return paymentGateways.filter((gateway) => {
+            if (hidePayhereOnMobile && gateway.id === "payhere") {
+                return false;
+            }
+            if (isPreOrderCart && (gateway.id === "darazbnpl" || gateway.id === "payhere")) {
+                return false;
+            }
+            if (
+                gateway.id === "payhere" &&
+                isPriceFluctuation?.topBarPriceFluctuationNotice &&
+                totalPayment >= 100000
+            ) {
+                return false;
+            }
+            return true;
+        });
+    }, [paymentGateways, isPreOrderCart, isPriceFluctuation, totalPayment, cart]);
+
+    useEffect(() => {
+        if (!visiblePaymentGateways.length || selectedGateway.id) return;
+        const g = visiblePaymentGateways[0];
+        setMethodActive(g.id);
+        setSelectedGateway({ id: g.id, title: g.title });
+        if (g.id === "darazbnpl") {
+            setIsKokoPayment(true);
+        } else {
+            setIsKokoPayment(false);
+        }
+        if (g.id === "payhere") {
+            setIsCardPayment(true);
+        } else {
+            setIsCardPayment(false);
+        }
+    }, [visiblePaymentGateways, selectedGateway.id, setIsCardPayment, setIsKokoPayment]);
+
+    const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        if (!selectedGateway.id) {
+            toast.error("Please select a payment method.");
+            return;
+        }
+
+        if (selectedGateway.id === "bacs" && !bankSlipFile) {
+            toast.error("Please upload your bank slip before continuing.");
+            return;
+        }
+
+        setSubmitState("loading");
+        await new Promise<void>((r) => requestAnimationFrame(() => r()));
 
         // Update Contact Info
         const contactInfo = {
@@ -258,11 +311,6 @@ const UnifiedCheckoutForm = ({
             });
         }
 
-        if (selectedGateway.id === "bacs" && !bankSlipFile) {
-            toast.error("Please upload your bank slip before continuing.");
-            return;
-        }
-
         // Update Payment Method
         const paymethod = {
             selectedGateway,
@@ -271,22 +319,15 @@ const UnifiedCheckoutForm = ({
         updateFormData("paymentMethod", paymethod);
         handleConfirmationChange("paymentMethod", true);
 
-        // Call parent form submit handler
+        await new Promise<void>((r) => setTimeout(r, 400));
+
         onFormSubmit();
+        setSubmitState("success");
+        window.setTimeout(() => setSubmitState("idle"), 2500);
     };
 
     const PaymentMethods = ({ gateway }: { gateway: PaymentGateway }) => {
         const active = methodActive === gateway.id;
-        const shouldHidePayhere =
-            gateway.id === "payhere" &&
-            isPriceFluctuation?.topBarPriceFluctuationNotice &&
-            totalPayment >= 100000;
-        const shouldHideForPreOrder =
-            isPreOrderCart && (gateway.id === "darazbnpl" || gateway.id === "payhere");
-
-        if (shouldHidePayhere || shouldHideForPreOrder) {
-            return null;
-        }
 
         return (
             <div className="flex items-start cursor-pointer space-x-4 sm:space-x-6">
@@ -294,7 +335,7 @@ const UnifiedCheckoutForm = ({
                     className="cursor-pointer"
                     name="payment-method"
                     id={gateway.id}
-                    defaultChecked={active}
+                    checked={active}
                     onChange={(e) => {
                         setMethodActive(e as any);
                         setSelectedGateway({
@@ -597,22 +638,29 @@ const UnifiedCheckoutForm = ({
                     <h3 className="text-lg font-semibold mb-4">Payment Method</h3>
 
                     <div className="space-y-6">
-                        {paymentGateways
-                            ?.filter((gateway) => {
-                                if (isPreOrderCart && (gateway.id === 'darazbnpl' || gateway.id === 'payhere')) return false;
-                                return true;
-                            })
-                            .map((gateway) => (
-                                <PaymentMethods key={gateway.id} gateway={gateway} />
-                            ))}
+                        {visiblePaymentGateways.map((gateway) => (
+                            <PaymentMethods key={gateway.id} gateway={gateway} />
+                        ))}
                     </div>
                 </div>
             </div>
 
             {/* Submit Button */}
-            <div className="flex pt-6">
-                <ButtonPrimary type="submit" className="sm:!px-7 shadow-none">
-                    Continue to Review Order
+            <div className="flex flex-col gap-2 pt-6">
+                <ButtonPrimary
+                    type="submit"
+                    className="sm:!px-7 shadow-none min-w-[200px]"
+                    loading={submitState === "loading"}
+                    disabled={submitState === "success"}
+                >
+                    {submitState === "success" ? (
+                        <span className="inline-flex items-center justify-center gap-2">
+                            <Check className="w-5 h-5 shrink-0" strokeWidth={2.5} aria-hidden />
+                            Saved successfully
+                        </span>
+                    ) : (
+                        "Save and Continue"
+                    )}
                 </ButtonPrimary>
             </div>
         </form>

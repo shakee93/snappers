@@ -72,14 +72,18 @@ export default function NavCategories({ onClose }: NavCategoriesProps) {
     [flatCategories]
   );
 
-  /** Col1: items 1–3, Col2: 4–6, Col3: 7+ (e.g. 7–10) */
+  /** 3 columns, round-robin: 1→col1, 2→col2, 3→col3, 4→col1, … */
   const categoryColumns = useMemo(() => {
     const items = orderCollectionNavRoots(categoryTree);
-    return [
-      items.slice(0, 3),
-      items.slice(3, 6),
-      items.slice(6),
-    ] as const;
+    const columnCount = 3;
+    const columns: CategoryWithChildren[][] = Array.from(
+      { length: columnCount },
+      () => []
+    );
+    items.forEach((item, index) => {
+      columns[index % columnCount].push(item);
+    });
+    return columns;
   }, [categoryTree]);
 
   return (
