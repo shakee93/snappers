@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import Input from "shared/Input/Input";
 import CountryPhoneInput from "./components/CountryPhoneInput";
@@ -8,6 +9,7 @@ import Link from "next/link";
 import { CustomerAddress, PaymentGateway } from "@/graphql/types/graphql";
 import { contactInformation } from "@/data/types";
 import Select from "shared/Select/Select";
+import { toast } from "sonner";
 import {
     SelectField,
     SRI_LANKAN_STATES,
@@ -77,7 +79,20 @@ const UnifiedCheckoutForm = ({
     const [isBillingSameAsShipping, setIsBillingSameAsShipping] = useState(true);
     const [pickupType, setPickupType] = useState<"store_uber_pickme" | "courier" | null>(null);
 
+    const [bankSlipFile, setBankSlipFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
     const { cart } = useCart();
+
+    const handleBankSlipChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const fileList = event.target.files;
+        if (fileList?.[0]) {
+            const file = fileList[0];
+            setBankSlipFile(file);
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+            setPreviewUrl(URL.createObjectURL(file));
+        }
+    };
 
     // Initialize Contact Info
     useEffect(() => {
@@ -243,9 +258,15 @@ const UnifiedCheckoutForm = ({
             });
         }
 
+        if (selectedGateway.id === "bacs" && !bankSlipFile) {
+            toast.error("Please upload your bank slip before continuing.");
+            return;
+        }
+
         // Update Payment Method
         const paymethod = {
             selectedGateway,
+            bankSlipFile: selectedGateway.id === "bacs" ? bankSlipFile : null,
         };
         updateFormData("paymentMethod", paymethod);
         handleConfirmationChange("paymentMethod", true);
@@ -281,6 +302,14 @@ const UnifiedCheckoutForm = ({
                             title: gateway.title,
                         });
 
+                        if (gateway.id !== "bacs") {
+                            setBankSlipFile(null);
+                            if (previewUrl) {
+                                URL.revokeObjectURL(previewUrl);
+                                setPreviewUrl(null);
+                            }
+                        }
+
                         if (gateway.id === "darazbnpl") {
                             setIsKokoPayment(true);
                         } else {
@@ -306,21 +335,87 @@ const UnifiedCheckoutForm = ({
                     <div className={`mt-6 mb-4 ${active ? "block" : "hidden"}`}>
                         {gateway.id !== "darazbnpl" && (
                             <>
-                                <p className="text-sm dark:text-slate-300">
-                                    Your order will be delivered to you after you{" "}
-                                    {gateway.title || "transfer funds"} to:
-                                </p>
-                                <ul className="mt-3.5 text-sm text-slate-500 dark:text-slate-400 space-y-2">
-                                    <li>
+                                {gateway.id === "bacs" ? (
+                                    <div className="space-y-4">
+                                        <p className="text-sm dark:text-slate-300">
+                                            Your order will be delivered to you after you transfer the payment to our bank account.
+                                        </p>
+                                        <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-lg">
+                                            <p className="text-sm font-medium text-slate-900 dark:text-slate-200 mb-2">
+                                                Bank Details:
+                                            </p>
+                                            <p className="text-sm text-slate-700 dark:text-slate-300">
+                                                Bank Name: Commercial Bank
+                                                <br />
+                                                Account Name: GQ Mobiles Pvt Ltd
+                                                <br />
+                                                Account Number: 1000475584
+                                                <br />
+                                                Branch: Head office
+                                            </p>
+                                        </div>
+                                        <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+                                            <label className="block text-sm font-medium text-slate-900 dark:text-slate-200 mb-2">
+                                                Upload Bank Slip <span className="text-red-500">*</span>
+                                            </label>
+                                            <input
+                                                type="file"
+                                                id={`bank-slip-upload-${gateway.id}`}
+                                                accept="image/png, image/gif, image/jpeg, image/heic, image/heif, image/webp, image/bmp, image/tiff, application/pdf"
+                                                onChange={handleBankSlipChange}
+                                                className="block w-full text-sm text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primaryColor file:text-white hover:file:bg-slate-800 file:cursor-pointer cursor-pointer"
+                                            />
+                                            {previewUrl && bankSlipFile && (
+                                                <div className="mt-3">
+                                                    <p className="text-xs text-slate-600 dark:text-slate-400 mb-2">Preview:</p>
+                                                    {bankSlipFile.type.startsWith("image/") ? (
+                                                        <div className="relative w-full max-w-xs border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
+                                                            <Image
+                                                                src={previewUrl}
+                                                                alt="Bank slip preview"
+                                                                width={400}
+                                                                height={300}
+                                                                className="w-full h-auto object-contain"
+                                                            />
+                                                        </div>
+                                                    ) : (
+                                                        <p className="text-xs text-slate-600 dark:text-slate-400">{bankSlipFile.name}</p>
+                                                    )}
+                                                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{bankSlipFile.name}</p>
+                                                </div>
+                                            )}
+                                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                                                Please upload your bank transfer slip after completing the payment.
+                                            </p>
+                                        </div>
                                         {gateway.description && (
-                                            <span className="text-slate-900 dark:text-slate-200 font-medium">
-                                                <span
-                                                    dangerouslySetInnerHTML={{ __html: gateway.description }}
-                                                />
-                                            </span>
+                                            <div className="text-slate-900 dark:text-slate-200 font-medium text-sm">
+                                                <span dangerouslySetInnerHTML={{ __html: gateway.description }} />
+                                            </div>
                                         )}
-                                    </li>
-                                </ul>
+                                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                                            Make your payment directly into our bank account. Please attach your payment slip to this order. Your order will not be shipped until the funds have cleared in our account.
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <p className="text-sm dark:text-slate-300">
+                                            Your order will be delivered to you after you{" "}
+                                            {gateway.title || "transfer funds"} to:
+                                        </p>
+                                        <ul className="mt-3.5 text-sm text-slate-500 dark:text-slate-400 space-y-2">
+                                            <li>
+                                                {gateway.description && (
+                                                    <span className="text-slate-900 dark:text-slate-200 font-medium">
+                                                        <span
+                                                            dangerouslySetInnerHTML={{ __html: gateway.description }}
+                                                        />
+                                                    </span>
+                                                )}
+                                            </li>
+                                        </ul>
+                                    </>
+                                )}
                             </>
                         )}
                     </div>
