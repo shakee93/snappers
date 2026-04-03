@@ -9,10 +9,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { Fragment, useState } from "react";
 import AttributeIcon from "@/app/components/AttributeIcon";
-import Prices from "@/app/components/Prices";
+import LineOrCartPriceLabel from "@/app/components/LineOrCartPriceLabel";
 import { useCart } from "@/context/CartProvider";
 import NcInputNumber from "@/components/NcInputNumber";
 import { Trash } from "lucide-react";
+import { isLineItemFree } from "@/lib/cartLinePricing";
 
 interface CartDropdownItemProps {
   item: CartItem;
@@ -22,7 +23,8 @@ interface CartDropdownItemProps {
 const CartDropdownItem = ({ item, close }: CartDropdownItemProps) => {
   const { removeFromCart, updateCart } = useCart();
 
-  const { product, variation, quantity, key } = item;
+  const { product, variation, quantity, key, total, subtotal } = item;
+  const lineIsFree = isLineItemFree(total, subtotal);
 
   // States to manage loading indicators
   const [isRemoving, setIsRemoving] = useState(false);
@@ -138,13 +140,17 @@ const CartDropdownItem = ({ item, close }: CartDropdownItemProps) => {
                 </div>
               )}
 
-              <Prices
-                salePrice={
+              <LineOrCartPriceLabel
+                lineTotal={total}
+                lineSubtotal={subtotal}
+                catalogSalePrice={
                   type === "VARIABLE"
                     ? variation?.node.regularPrice
                     : regularPrice
                 }
-                price={type === "VARIABLE" ? variation?.node.price : price}
+                catalogPrice={
+                  type === "VARIABLE" ? variation?.node.price : price
+                }
                 className="mt-0.5"
               />
             </div>
@@ -155,6 +161,7 @@ const CartDropdownItem = ({ item, close }: CartDropdownItemProps) => {
                   onChange={(q) => !isRemoving && !isUpdating && handleQuantityUpdate(q)}
                   defaultValue={quantity || 1}
                   className={`relative z-10 ${(isRemoving || isUpdating) ? 'opacity-50 pointer-events-none' : ''}`}
+                  disabled={lineIsFree || isRemoving || isUpdating}
                 />
                 <button
                   className={`relative z-10 flex items-center justify-center font-medium text-red-600 hover:text-white text-base ml-2 transition-colors duration-150

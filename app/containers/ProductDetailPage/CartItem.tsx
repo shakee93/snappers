@@ -8,12 +8,13 @@ import {
 } from "@/graphql/types/graphql";
 import Image from "next/image";
 import Link from "next/link";
-import Prices from "@/app/components/Prices";
+import LineOrCartPriceLabel from "@/app/components/LineOrCartPriceLabel";
 import NcInputNumber from "@/components/NcInputNumber";
 import { useCart } from "@/context/CartProvider";
 import useProductLink from "@/hooks/useProductLink";
 import { Fragment } from "react";
 import AttributeIcon from "@/app/components/AttributeIcon";
+import { isLineItemFree } from "@/lib/cartLinePricing";
 
 const CartItemProduct = ({
   cartItem,
@@ -22,7 +23,8 @@ const CartItemProduct = ({
   cartItem: CartItem;
   index: number;
 }) => {
-  const { product, quantity, variation, key } = cartItem;
+  const { product, quantity, variation, key, total, subtotal } = cartItem;
+  const lineIsFree = isLineItemFree(total, subtotal);
 
   const { removeFromCart, updateCart } = useCart();
   const link = useProductLink(product?.node);
@@ -111,10 +113,18 @@ const CartItemProduct = ({
                   <option value="6">6</option>
                   <option value="7">7</option>
                 </select>
-                <Prices
+                <LineOrCartPriceLabel
+                  lineTotal={total}
+                  lineSubtotal={subtotal}
                   contentClass="py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium h-full"
-                  price={price}
-                  salePrice={salePrice}
+                  catalogPrice={
+                    type === "VARIABLE" ? variation?.node.price : price
+                  }
+                  catalogSalePrice={
+                    type === "VARIABLE"
+                      ? variation?.node.regularPrice
+                      : salePrice
+                  }
                 />
               </div>
             </div>
@@ -126,17 +136,22 @@ const CartItemProduct = ({
                 }}
                 defaultValue={quantity || 1}
                 className="relative z-10"
+                disabled={lineIsFree}
               />
             </div>
 
             <div className="hidden flex-1 justify-end sm:flex">
-              <Prices
-                salePrice={
+              <LineOrCartPriceLabel
+                lineTotal={total}
+                lineSubtotal={subtotal}
+                catalogPrice={
+                  type === "VARIABLE" ? variation?.node.price : price
+                }
+                catalogSalePrice={
                   type === "VARIABLE"
                     ? variation?.node.regularPrice
                     : regularPrice
                 }
-                price={type === "VARIABLE" ? variation?.node.price : price}
                 className="mt-0.5 lg:flex-col"
               />
             </div>

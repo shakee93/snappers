@@ -359,7 +359,7 @@ const ProductCard: FC<ProductCardProps> = ({
 
       {bogo.isBogoEnabled && (
         <div
-          className={`absolute left-0 z-10 w-fit cursor-default rounded-r-full bg-blue-600 text-xs font-normal text-white shadow-md ${
+          className={`absolute left-0 z-10 w-fit cursor-default rounded-r-full bg-green-600 text-xs font-normal text-white shadow-md ${
             isClearanceProduct() ? "top-20" : "top-12"
           }`}
         >

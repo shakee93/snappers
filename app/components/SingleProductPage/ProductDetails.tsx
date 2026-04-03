@@ -557,7 +557,7 @@ const ProductDetails = ({
       <h1 className="text-2xl text-primaryColor font-bold md:text-3xl">{product.name}</h1>
       {bogo.isBogoEnabled && (
         <div className="mt-2 flex flex-wrap items-center gap-2 text-xs md:text-sm">
-          <span className="inline-flex items-center rounded-full bg-blue-600 px-2.5 py-1 font-semibold text-white">
+          <span className="inline-flex items-center rounded-full bg-green-600 px-2.5 py-1 font-semibold text-white">
             {bogo.label}
           </span>
           <span className="text-gray-600">{freeGiftDetailLine}</span>

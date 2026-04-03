@@ -1,3 +1,5 @@
+import { isLineItemFree, stripHtmlMoney } from "@/lib/cartLinePricing";
+
 interface OrderDetailsProps {
   orderData: any;
 }
@@ -174,7 +176,16 @@ const ProductTable = ({ lineItems, orderData, paymentDetails }: ProductTableProp
                       {item?.quantity}
                     </td>
                     <td className="px-6 py-4 text-right whitespace-nowrap text-gray-800 dark:text-gray-200">
-                      {CURRENCY_SYMBOL} {item?.subtotal}
+                      {isLineItemFree(item?.total, item?.subtotal) ? (
+                        <span className="font-semibold text-green-600">
+                          Free
+                        </span>
+                      ) : (
+                        <>
+                          {CURRENCY_SYMBOL}{" "}
+                          {stripHtmlMoney(item?.total ?? item?.subtotal)}
+                        </>
+                      )}
                     </td>
                   </tr>
                 ))}
