@@ -34,11 +34,22 @@ import { Highlight } from "react-instantsearch";
 import { redirect, useRouter, usePathname } from "next/navigation";
 import { useStore } from "@/store/store";
 import koko from "@/public/koko.png";
+import {
+  getDatabaseIdFromProductLike,
+  mergeProductMetaForBogo,
+  normalizeBogoConfig,
+} from "@/lib/bogo";
 
 export interface ProductCardProps {
   className?: string;
   data: (SimpleProduct & VariableProduct) | any;
   fromSearch?: boolean;
+  /** From `ProductGridInstant`: BOGO meta keyed by Woo `databaseId` (Typesense hits have no meta). */
+  bogoPluginMetaByProductId?: Record<
+    number,
+    | Array<{ key: string; value?: string | null; id?: string | null } | null>
+    | null
+  >;
 }
 
 // Color Preview Component
@@ -71,6 +82,7 @@ const ProductCard: FC<ProductCardProps> = ({
   className = "",
   data,
   fromSearch = false,
+  bogoPluginMetaByProductId,
 }) => {
   const {
     name,
@@ -124,6 +136,19 @@ const ProductCard: FC<ProductCardProps> = ({
 
   const { search, setSearch, search_status } = useStore();
   const isKokoEnabled = true;
+  const productDbId = getDatabaseIdFromProductLike(data) ?? databaseId;
+  const batchBogoMeta =
+    productDbId != null && bogoPluginMetaByProductId
+      ? bogoPluginMetaByProductId[productDbId]
+      : undefined;
+  const bogo = normalizeBogoConfig(
+    mergeProductMetaForBogo(
+      batchBogoMeta !== undefined
+        ? { metaData: data?.metaData, bogoPluginMeta: batchBogoMeta }
+        : data
+    ),
+    productDbId ?? data?.databaseId
+  );
 
   const handleHoverOut = () => {
     setIsHovered(false);
@@ -164,8 +189,8 @@ const ProductCard: FC<ProductCardProps> = ({
   const handleAddToCart = async () => {
     setLoading(true);
     try {
-      if (data.databaseId) {
-        await addToCart(data.databaseId, quantity);
+      if (productDbId) {
+        await addToCart(productDbId, quantity);
         cartCompleted();
       } else {
         // notifyAddTocart(1);
@@ -329,6 +354,25 @@ const ProductCard: FC<ProductCardProps> = ({
           <span className="whitespace-nowrap md:max-w-0 md:overflow-hidden md:opacity-0 md:transition-all md:duration-200 md:group-hover:max-w-[100px] md:group-hover:opacity-100">
             Clearance
           </span>
+        </div>
+      )}
+
+      {bogo.isBogoEnabled && (
+        <div
+          className={`absolute left-0 z-10 w-fit cursor-default rounded-r-full bg-green-600 text-xs font-normal text-white shadow-md ${
+            isClearanceProduct() ? "top-20" : "top-12"
+          }`}
+        >
+          {/* Mobile / touch: full label. md+: only "Free"; on card hover swap to full BOGO text. */}
+          <span className="block whitespace-nowrap px-3 py-1.5 md:hidden">{bogo.label}</span>
+          <div className="hidden md:block">
+            <span className="block whitespace-nowrap px-3 py-1.5 font-semibold group-hover:hidden">
+              Free
+            </span>
+            <span className="hidden max-w-[min(16rem,calc(100vw-3rem))] whitespace-nowrap px-3 py-1.5 group-hover:block">
+              {bogo.label}
+            </span>
+          </div>
         </div>
       )}
 

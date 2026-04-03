@@ -67,6 +67,7 @@ export const GUEST_CHECKOUT = gql`
           nodes {
             databaseId
             subtotal
+            total
             quantity
             product {
               node {
@@ -267,6 +268,7 @@ export const CHECKOUT = gql`
           nodes {
             databaseId
             subtotal
+            total
             quantity
             product {
               node {
@@ -335,6 +337,7 @@ export const GET_SINGLE_ORDER = gql`
         nodes {
           databaseId
           subtotal
+          total
           quantity
           variation {
             node {

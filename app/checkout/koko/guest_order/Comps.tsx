@@ -5,6 +5,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import Link from "next/link";
 import { createProductList } from "../../CheckoutUtils";
+import { isLineItemFree, stripHtmlMoney } from "@/lib/cartLinePricing";
 
 interface OrderDetailsProps {
   orderData: any;
@@ -122,7 +123,13 @@ const ProductTable = ({ lineItems, orderData }: ProductTableProps) => {
                       {item?.quantity ?? 0}
                     </td>
                     <td className="px-6 py-4 text-right whitespace-nowrap text-gray-800 dark:text-gray-200">
-                      Rs. {item?.subtotal ?? 0}
+                      {isLineItemFree(item?.total, item?.subtotal) ? (
+                        <span className="font-semibold text-green-600">
+                          Free
+                        </span>
+                      ) : (
+                        <>Rs. {stripHtmlMoney(item?.total ?? item?.subtotal ?? 0)}</>
+                      )}
                     </td>
                   </tr>
                 ))}
