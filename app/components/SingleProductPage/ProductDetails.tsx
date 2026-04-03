@@ -23,6 +23,11 @@ import {
   GET_PRICE_FLUCTUATION_NOTICE,
 } from "@/graphql/defs/options";
 import { useQuery } from '@apollo/client';
+import {
+  GET_PRODUCT_BY_DATABASE_ID,
+  GET_PRODUCTS_BY_DATABASE_IDS,
+  GET_PRODUCT_VARIATION_BY_DATABASE_ID,
+} from "@/graphql/defs/products";
 import koko from "@/public/koko.png";
 import Image from "next/image";
 import { BanknotesIcon } from "@heroicons/react/24/outline";
@@ -32,6 +37,7 @@ import ShareButtons from "./ShareButtons";
 import { AnimatePresence, motion } from "framer-motion";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
+import { mergeProductMetaForBogo, normalizeBogoConfig } from "@/lib/bogo";
 const ProductDetails = ({
   product,
   brand,
@@ -178,6 +184,131 @@ const ProductDetails = ({
 
   const { data, loading, error } = useQuery(GET_PRICE_FLUCTUATION_NOTICE);
   const isPriceFluctuation = data?.topBarPriceFluctuationNotice || false;
+  const bogo = normalizeBogoConfig(
+    mergeProductMetaForBogo(product as Parameters<typeof mergeProductMetaForBogo>[0]),
+    product?.databaseId
+  );
+  const crossProductFreeIds = bogo.freeProductIds.filter(
+    (id) => id !== product?.databaseId
+  );
+  const { data: freeGiftData, loading: freeGiftLoading } = useQuery(
+    GET_PRODUCTS_BY_DATABASE_IDS,
+    {
+      variables: { ids: crossProductFreeIds },
+      skip: !bogo.isBogoEnabled || crossProductFreeIds.length === 0,
+      fetchPolicy: "network-only",
+    }
+  );
+  const freeGiftNodes =
+    freeGiftData?.products?.nodes?.filter(
+      (p: { name?: string | null } | null): p is NonNullable<typeof p> =>
+        !!p?.name
+    ) ?? [];
+  const resolvedProductIds = new Set(
+    freeGiftNodes
+      .map((p: { databaseId?: number }) => p?.databaseId)
+      .filter((id: number | undefined): id is number => Number.isFinite(id))
+  );
+  const unresolvedFreeIds = crossProductFreeIds.filter(
+    (id) => !resolvedProductIds.has(id)
+  );
+  const firstUnresolvedFreeId = unresolvedFreeIds[0];
+  const {
+    data: freeGiftSingleProductData,
+    loading: freeGiftSingleProductLoading,
+  } = useQuery(GET_PRODUCT_BY_DATABASE_ID, {
+    variables: { id: String(firstUnresolvedFreeId) },
+    skip: !bogo.isBogoEnabled || !firstUnresolvedFreeId,
+    fetchPolicy: "network-only",
+  });
+  const fallbackSingleProduct = freeGiftSingleProductData?.product;
+  const {
+    data: freeGiftVariationData,
+    loading: freeGiftVariationLoading,
+  } = useQuery(GET_PRODUCT_VARIATION_BY_DATABASE_ID, {
+    variables: { id: String(firstUnresolvedFreeId) },
+    skip:
+      !bogo.isBogoEnabled ||
+      !firstUnresolvedFreeId ||
+      freeGiftNodes.length === crossProductFreeIds.length,
+    fetchPolicy: "network-only",
+  });
+  const fallbackVariationParent = freeGiftVariationData?.productVariation?.parent?.node;
+  const freeGiftDetailLine =
+    crossProductFreeIds.length === 0 ? (
+      <>Free item applies to this product</>
+    ) : freeGiftLoading || freeGiftSingleProductLoading || freeGiftVariationLoading ? (
+      <>Loading free gift details…</>
+    ) : freeGiftNodes.length > 0 ? (
+      <>
+        Free gift included:{" "}
+        {freeGiftNodes.map(
+          (
+            p: {
+              databaseId?: number;
+              name?: string | null;
+              slug?: string | null;
+              brands?: { nodes?: { slug?: string | null }[] };
+            },
+            i: number
+          ) => {
+            const brandSlug = p.brands?.nodes?.[0]?.slug;
+            const href =
+              brandSlug && p.slug ? `/${brandSlug}/${p.slug}` : null;
+            return (
+              <span key={p.databaseId ?? i}>
+                {i > 0 ? ", " : null}
+                {href ? (
+                  <Link
+                    href={href}
+                    className="font-medium text-primaryColor underline"
+                  >
+                    {p.name}
+                  </Link>
+                ) : (
+                  <span className="font-medium">{p.name}</span>
+                )}
+              </span>
+            );
+          }
+        )}
+      </>
+    ) : fallbackSingleProduct?.name ? (
+      <>
+        Free gift included:{" "}
+        {fallbackSingleProduct?.brands?.nodes?.[0]?.slug && fallbackSingleProduct?.slug ? (
+          <Link
+            href={`/${fallbackSingleProduct.brands.nodes[0].slug}/${fallbackSingleProduct.slug}`}
+            className="font-medium text-primaryColor underline"
+          >
+            {fallbackSingleProduct.name}
+          </Link>
+        ) : (
+          <span className="font-medium">{fallbackSingleProduct.name}</span>
+        )}
+      </>
+    ) : fallbackVariationParent?.name ? (
+      <>
+        Free gift included:{" "}
+        {fallbackVariationParent?.brands?.nodes?.[0]?.slug && fallbackVariationParent?.slug ? (
+          <Link
+            href={`/${fallbackVariationParent.brands.nodes[0].slug}/${fallbackVariationParent.slug}`}
+            className="font-medium text-primaryColor underline"
+          >
+            {fallbackVariationParent.name}
+          </Link>
+        ) : (
+          <span className="font-medium">{fallbackVariationParent.name}</span>
+        )}
+      </>
+    ) : (
+      <>
+        Free gift product
+        {crossProductFreeIds.length === 1 ? "" : "s"} (ID
+        {crossProductFreeIds.length === 1 ? "" : "s"}: {crossProductFreeIds.join(", ")}
+        ) — could not load details from the catalog.
+      </>
+    );
 
   const [highestPrice, setHighestPrice] = useState<string>('');
 
@@ -424,6 +555,14 @@ const ProductDetails = ({
       {/* Commented */}
 
       <h1 className="text-2xl text-primaryColor font-bold md:text-3xl">{product.name}</h1>
+      {bogo.isBogoEnabled && (
+        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs md:text-sm">
+          <span className="inline-flex items-center rounded-full bg-blue-600 px-2.5 py-1 font-semibold text-white">
+            {bogo.label}
+          </span>
+          <span className="text-gray-600">{freeGiftDetailLine}</span>
+        </div>
+      )}
       <div className="flex items-center gap-1 mt-2">
         <BrandLogo brand={brand} />
       </div>

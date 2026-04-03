@@ -1,15 +1,15 @@
 "use client";
 import { Brand, Category, Product } from "@/graphql/types/graphql";
 import { useStore } from "@/store/store";
-import { useEffect, useState, useRef } from "react";
-import { GET_BRAND_ARCHIVE } from "@/graphql/defs/products";
-import { useLazyQuery } from "@apollo/client";
+import { useEffect, useMemo } from "react";
+import { GET_PRODUCTS_BOGO_PLUGIN_META } from "@/graphql/defs/products";
+import { useQuery } from "@apollo/client";
 import ProductCard from "./ProductCard3";
+import { getDatabaseIdFromProductLike } from "@/lib/bogo";
 import { useHits, useInstantSearch } from "react-instantsearch";
 import Pagination from "@/shared/Pagination/Pagination";
 import Image from "next/image";
 import NotFound from "@/public/not_found.svg";
-import { usePathname } from "next/navigation";
 import ProductCardLoading from "@/components/Loading/ProductCardLoading";
 
 interface ProductGridProps {
@@ -33,6 +33,35 @@ const ProductGridInstant = ({
   const { hits, results } = useHits();
   const { status: statusState } = useInstantSearch();
   const { setSearchStatus, search, search_status, navigation } = useStore();
+
+  const bogoDatabaseIds = useMemo(() => {
+    const s = new Set<number>();
+    for (const h of hits) {
+      const id = getDatabaseIdFromProductLike(h);
+      if (id) s.add(id);
+    }
+    return Array.from(s);
+  }, [hits]);
+
+  const { data: bogoBatchData } = useQuery(GET_PRODUCTS_BOGO_PLUGIN_META, {
+    variables: { ids: bogoDatabaseIds },
+    skip: bogoDatabaseIds.length === 0,
+    fetchPolicy: "cache-first",
+  });
+
+  const bogoPluginMetaByProductId = useMemo(() => {
+    const acc: Record<
+      number,
+      | Array<{ key: string; value?: string | null; id?: string | null } | null>
+      | null
+    > = {};
+    for (const n of bogoBatchData?.products?.nodes ?? []) {
+      if (n?.databaseId != null) {
+        acc[n.databaseId] = n.bogoPluginMeta ?? null;
+      }
+    }
+    return acc;
+  }, [bogoBatchData]);
 
   const grid = 8;
 
@@ -68,6 +97,7 @@ const ProductGridInstant = ({
               key={item?.slug as unknown as string}
               data={item as unknown as Product}
               fromSearch
+              bogoPluginMetaByProductId={bogoPluginMetaByProductId}
             />
           ))}
         </div>

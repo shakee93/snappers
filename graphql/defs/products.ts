@@ -49,6 +49,95 @@ export const GET_PRODUCT = gql`
   }
 `;
 
+export const GET_PRODUCTS_BY_DATABASE_IDS = gql`
+  query GetProductsByDatabaseIds($ids: [Int]) {
+    products(first: 25, where: { include: $ids }) {
+      nodes {
+        databaseId
+        name
+        slug
+        brands {
+          nodes {
+            slug
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_PRODUCT_BY_DATABASE_ID = gql`
+  query GetProductByDatabaseId($id: ID!) {
+    product(id: $id, idType: DATABASE_ID) {
+      databaseId
+      name
+      slug
+      ... on SimpleProduct {
+        brands {
+          nodes {
+            slug
+          }
+        }
+      }
+      ... on VariableProduct {
+        brands {
+          nodes {
+            slug
+          }
+        }
+      }
+    }
+  }
+`;
+
+/** Batch-fetch BOGO plugin meta for InstantSearch / Typesense hits (no Woo meta on the hit). */
+export const GET_PRODUCTS_BOGO_PLUGIN_META = gql`
+  query GetProductsBogoPluginMeta($ids: [Int]) {
+    products(first: 100, where: { include: $ids }) {
+      nodes {
+        databaseId
+        bogoPluginMeta: metaData(
+          keysIn: [
+            "_wc_bogo_enabled",
+            "_wc_bogo_buy_qty",
+            "_wc_bogo_get_qty",
+            "_wc_bogo_max_free_qty",
+            "_wc_bogo_free_product_ids",
+            "_wc_bogo_free_product_id"
+          ]
+        ) {
+          key
+          value
+          id
+        }
+      }
+    }
+  }
+`;
+
+export const GET_PRODUCT_VARIATION_BY_DATABASE_ID = gql`
+  query GetProductVariationByDatabaseId($id: ID!) {
+    productVariation(id: $id, idType: DATABASE_ID) {
+      databaseId
+      name
+      parent {
+        node {
+          databaseId
+          name
+          slug
+          ... on VariableProduct {
+            brands {
+              nodes {
+                slug
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 
 export const GET_TAG_DETAILS_BY_SLUG = gql`
   query GetTagDetailsBySlug($slug: [String]!) {
