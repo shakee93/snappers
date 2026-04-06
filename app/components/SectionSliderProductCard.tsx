@@ -86,7 +86,25 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
     };
   }, [api, mounted]);
 
-  const filteredProducts = products.filter((p) => p.price);
+  const filteredProducts = products.filter((product) => {
+    if (product?.price || product?.regularPrice || product?.salePrice) {
+      return true;
+    }
+
+    const variationNodes = (product?.variations as {
+      nodes?: Array<{
+        price?: string | null;
+        regularPrice?: string | null;
+        salePrice?: string | null;
+      }>;
+    } | null)?.nodes;
+
+    return (
+      variationNodes?.some(
+        (variation) => variation?.price || variation?.regularPrice || variation?.salePrice
+      ) ?? false
+    );
+  });
 
   if (!filteredProducts.length) {
     return null;

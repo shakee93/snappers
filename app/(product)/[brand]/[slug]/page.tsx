@@ -11,6 +11,7 @@ import Features from "@/app/components/SingleProductPage/FeatureCard";
 import ProductOverview from "@/app/components/SingleProductPage/ProductOverview";
 import Link from "next/link";
 import ProductImage from "@/app/components/SingleProductPage/ProductImage2";
+import FreeGiftPreview from "@/app/components/SingleProductPage/FreeGiftPreview";
 import { Suspense } from "react";
 import { Metadata, ResolvingMetadata } from "next";
 import { ImageProvider } from "@/context/ImageChangeGrabber";
@@ -171,6 +172,7 @@ const Page = async (props: Props) => {
               <Suspense fallback={<>loading...</>}>
                 <ProductImage product={product} />
               </Suspense>
+              <FreeGiftPreview product={product} />
               <div className="hidden lg:block w-full mt-6">
                 <Features />
               </div>

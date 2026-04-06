@@ -37,7 +37,6 @@ const getData = async () => {
         console.error("Error fetching new arrivals");
         return [];
       }),
-
     getClient()
       .query({
         query: GET_PRODUCTS_NODES,
