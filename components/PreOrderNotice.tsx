@@ -13,10 +13,9 @@ const PreOrderNotice: React.FC<PreOrderNoticeProps> = ({ className = "" }) => {
     >
       <div className="flex items-center gap-2 text-yellow-800 mb-1">
         <Clock className="w-4 h-4 text-yellow-600" />
-        <span className="text-sm">Delivery in 7-14 business days</span>
+        <span className="text-sm">Estimated delivery: 7–14 business days.</span>
       </div>
-      <p className="text-xs text-yellow-700 ml-6">Don&apos;t wait, your order is just a pre-click away!
-      </p>
+      <p className="text-xs text-yellow-700 ml-6">Orders are subject to stock availability and price changes. We will notify you promptly of any delays or cancellations.</p>
     </div>
   );
 };
