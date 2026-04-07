@@ -407,6 +407,21 @@ export const GET_PRODUCTS_NODES_HOMEPAGE = gql`
   ${ProductContentFull}
 `;
 
+/** Products tagged for BOGO / free offers (WP plugin syncs tag slug `bogo-offer`). */
+export const GET_PRODUCTS_BY_BOGO_TAG = gql`
+  query GetProductsByBogoTag($first: Int = 50, $tagIn: [String] = ["bogo-offer"]) {
+    products(
+      first: $first
+      where: { tagIn: $tagIn, orderby: { field: DATE, order: DESC } }
+    ) {
+      nodes {
+        ...ProductContentFull
+      }
+    }
+  }
+  ${ProductContentFull}
+`;
+
 export const GET_PRODUCTS = gql`
   query GetProducts($categoryIdIn: [Int]) {
     products(first: 10, where: { categoryIdIn: $categoryIdIn }) {
