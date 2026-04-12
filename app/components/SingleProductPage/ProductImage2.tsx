@@ -2,6 +2,7 @@
 "use client";
 import { useImage } from "@/context/ImageChangeGrabber";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
+import { getPreferredVariation } from "@/lib/getPreferredVariation";
 import {
   CoreVariationThumb,
   Thumb,
@@ -154,8 +155,14 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   } : null;
 
   const originalGalleryImages = product?.galleryImages?.nodes?.length ? product.galleryImages.nodes : [];
-  // Don't include video in gallery images - it will be shown separately
-  const initialGalleryImages = originalGalleryImages;
+
+  const preferredVariation = getPreferredVariation(product?.variations?.nodes);
+  const preferredImage = preferredVariation?.image;
+
+  // If there's a preferred in-stock variation with an image, place it first
+  const initialGalleryImages = preferredImage
+    ? [preferredImage, ...originalGalleryImages.slice(1)]
+    : originalGalleryImages;
 
   const [galleryImages, setGalleryImages] = useState(initialGalleryImages);
 
@@ -166,7 +173,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
 
   const combinedImages = [...variationImages, ...(galleryImages || [])];
   const [selectedVariation, setSelectedVariation] =
-    useState<selectedVariationType | null>(combinedImages[0]);
+    useState<selectedVariationType | null>(preferredImage || combinedImages[0]);
 
 
   // combinedImages.forEach((image) => {
@@ -191,6 +198,8 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   }, []);
 
   useEffect(() => {
+    if (variationId === null || variationId === undefined) return;
+
     const activeVariationImage = variationImages.find(i => i?.databaseId === variationId);
 
     setGalleryImages(previousImages => {
