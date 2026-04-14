@@ -111,7 +111,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
   }
 
   return (
-    <div className={`nc-SectionSliderProductCard overflow-hidden ${className}`}>
+    <div className={`nc-SectionSliderProductCard ${className}`}>
       <div className="flow-root">
         <Heading
           className={headingClassName}
@@ -165,9 +165,9 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
                 ))}
               </CarouselContent>
 
-              {/* Navigation arrows - hidden by default, visible on large screens */}
-              <CarouselPrevious className="hidden lg:flex absolute -left-14 top-1/2 -translate-y-1/2 z-10 border-0 bg-[#cecfd0] text-white hover:bg-[#9e9fa0] hover:text-white transition-colors duration-200 md:p-2 md:w-10 md:h-10 md:[&>svg]:w-6 md:[&>svg]:h-6" />
-              <CarouselNext className="hidden lg:flex absolute -right-14 top-1/2 -translate-y-1/2 z-10 border-0 bg-[#cecfd0] text-white hover:bg-[#9e9fa0] hover:text-white transition-colors duration-200 md:p-2 md:w-10 md:h-10 md:[&>svg]:w-6 md:[&>svg]:h-6" />
+              {/* Side navigation arrows for product rows */}
+              <CarouselPrevious className="hidden md:flex absolute xl:-left-14 -left-2 top-1/2 -translate-y-1/2 z-10 border-0 bg-[#cecfd0] text-white hover:bg-[#9e9fa0] hover:text-white transition-colors duration-200 p-1 md:p-2 w-8 h-8 md:w-10 md:h-10 [&>svg]:w-4 [&>svg]:h-4 md:[&>svg]:w-6 md:[&>svg]:h-6" />
+              <CarouselNext className="hidden md:flex absolute xl:-right-14 -right-2 top-1/2 -translate-y-1/2 z-10 border-0 bg-[#cecfd0] text-white hover:bg-[#9e9fa0] hover:text-white transition-colors duration-200 p-1 md:p-2 w-8 h-8 md:w-10 md:h-10 [&>svg]:w-4 [&>svg]:h-4 md:[&>svg]:w-6 md:[&>svg]:h-6" />
             </Carousel>
             
             {/* See More button at the bottom */}

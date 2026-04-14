@@ -28,7 +28,7 @@ const ForgotPasswordPage = () => {
       });
 
       setIsSubmitted(true);
-      toast.success("If an account exists for this email, a reset link has been sent.");
+      toast.success("Check your email for a password reset link if the account exists.");
     } catch (error) {
       console.error("Forgot password error:", error);
       toast.error("Unable to process your request right now. Please try again.");
