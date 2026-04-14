@@ -24,6 +24,7 @@ export interface LocationStates {
   "/login"?: {};
   "/signup"?: {};
   "/forgot-pass"?: {};
+  "/reset-password"?: {};
   "/page404"?: {};
   "/subscription"?: {};
 }
