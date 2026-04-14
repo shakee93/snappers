@@ -38,6 +38,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { mergeProductMetaForBogo, normalizeBogoConfig } from "@/lib/bogo";
+import { getPreferredVariation } from "@/lib/getPreferredVariation";
 const ProductDetails = ({
   product,
   brand,
@@ -51,8 +52,10 @@ const ProductDetails = ({
     clearAttributes,
   } = useStore();
 
+  const preferredVariation = getPreferredVariation(product?.variations?.nodes);
+
   const [activeVariation, setActiveVariation] = useState<any>(
-    product?.variations?.nodes[0]
+    preferredVariation
   );
 
   const [lastClickedAttribute, setLastClickedAttribute] = useState<string | null>(null);
@@ -70,6 +73,13 @@ const ProductDetails = ({
       defAttributes?.forEach((defAttr: VariationAttribute) => {
         setAttribute(defAttr, defAttr.value || "");
       });
+
+      // Apply preferred in-stock variation attributes so dropdowns match
+      if (preferredVariation?.attributes?.nodes) {
+        preferredVariation.attributes.nodes.forEach((attr: Attribute) => {
+          setAttribute(attr, attr.value || "");
+        });
+      }
     }
   }, []);
 
@@ -91,7 +101,7 @@ const ProductDetails = ({
       product?.variations?.nodes?.length !== undefined &&
       product.variations.nodes.length > 0
     ) {
-      setActiveVariation(product?.variations?.nodes[0]);
+      setActiveVariation(preferredVariation);
     } else if (product.type === "SIMPLE") {
       // Handle simple product case
       setActiveVariation(product);
@@ -106,40 +116,14 @@ const ProductDetails = ({
   }, [activeVariation]);
 
   useEffect(() => {
-    const lowestPriceInStockVariation: any | undefined =
-      product.variations?.nodes
-        .filter((v: ProductVariation) => v.stockStatus === "IN_STOCK")
-        .reduce((lowest: any, v: any | undefined) => {
-          const currentPrice = parseFloat(v?.rawPrice || "0");
-          const lowestPrice = parseFloat(lowest?.rawPrice || "Infinity");
-          return currentPrice < lowestPrice ? v : lowest;
-        }, undefined as ProductVariation | undefined);
-    // if (lowestPriceInStockVariation) {
-    //   console.log(
-    //     `Lowest price in-stock variation: ${lowestPriceInStockVariation.name} at ${lowestPriceInStockVariation.rawPrice}`,
-    //   );
-    // } else {
-    //   console.log("No in-stock variations available.");
-    // }
-
-    if (lowestPriceInStockVariation) {
-      lowestPriceInStockVariation.attributes?.nodes.forEach(
-        (attr: Attribute) => {
-          const option = attr.value;
-          setAttribute(attr, option || "");
-        }
-      );
-      if (lowestPriceInStockVariation?.image) {
-        setActiveVariation(lowestPriceInStockVariation);
-        setVariationId(
-          lowestPriceInStockVariation?.image?.databaseId.toString()
-        );
-      } else {
-        const firstVariation = product?.variations?.nodes[0];
-        if (firstVariation) {
-          setActiveVariation(firstVariation); // Fallback to the first variation if none are in stock
-          setVariationId(firstVariation?.image?.databaseId?.toString());
-        }
+    if (preferredVariation?.image) {
+      setActiveVariation(preferredVariation);
+      setVariationId(preferredVariation.image.databaseId.toString());
+    } else {
+      const firstVariation = product?.variations?.nodes[0];
+      if (firstVariation) {
+        setActiveVariation(firstVariation);
+        setVariationId(firstVariation?.image?.databaseId?.toString());
       }
     }
   }, []);

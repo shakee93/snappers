@@ -36,6 +36,7 @@ interface CheckoutLeftProps {
   totalPayment: any;
   setIsKokoPayment: any;
   isKokoPayment: boolean;
+  onCheckoutFormSaved?: () => void;
 }
 
 const CheckoutDetails = ({
@@ -52,7 +53,8 @@ const CheckoutDetails = ({
   setIsCardPayment,
   totalPayment,
   setIsKokoPayment,
-  isKokoPayment
+  isKokoPayment,
+  onCheckoutFormSaved,
 }: CheckoutLeftProps) => {
 
   const { data, loading: dataLoading }: QueryResult = useQuery(GET_CHECKOUT_USER_DETAILS);
@@ -121,6 +123,7 @@ const CheckoutDetails = ({
         onFormSubmit={() => {
           setTabActive("order-cart");
           handleScrollToEl("order-cart");
+          onCheckoutFormSaved?.();
         }}
       />
     </div>

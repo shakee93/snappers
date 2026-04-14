@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import Input from "shared/Input/Input";
 import CountryPhoneInput from "./components/CountryPhoneInput";
@@ -8,6 +9,7 @@ import Link from "next/link";
 import { CustomerAddress, PaymentGateway } from "@/graphql/types/graphql";
 import { contactInformation } from "@/data/types";
 import Select from "shared/Select/Select";
+import { toast } from "sonner";
 import {
     SelectField,
     SRI_LANKAN_STATES,
@@ -15,6 +17,7 @@ import {
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import Radio from "shared/Radio/Radio";
 import { useCart } from "@/context/CartProvider";
+import { Check } from "lucide-react";
 
 interface Props {
     updateFormData: (section: string, data: any) => void;
@@ -68,7 +71,7 @@ const UnifiedCheckoutForm = ({
     const [addressType, setAddressType] = useState("home");
 
     // Payment Method State
-    const [methodActive, setMethodActive] = useState<string>("Credit-Card");
+    const [methodActive, setMethodActive] = useState<string>("");
     const [selectedGateway, setSelectedGateway] = useState<PaymentGateway>({
         id: "",
         title: null,
@@ -77,7 +80,22 @@ const UnifiedCheckoutForm = ({
     const [isBillingSameAsShipping, setIsBillingSameAsShipping] = useState(true);
     const [pickupType, setPickupType] = useState<"store_uber_pickme" | "courier" | null>(null);
 
+    const [bankSlipFile, setBankSlipFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
+    const [submitState, setSubmitState] = useState<"idle" | "loading" | "success">("idle");
+
     const { cart } = useCart();
+
+    const handleBankSlipChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const fileList = event.target.files;
+        if (fileList?.[0]) {
+            const file = fileList[0];
+            setBankSlipFile(file);
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+            setPreviewUrl(URL.createObjectURL(file));
+        }
+    };
 
     // Initialize Contact Info
     useEffect(() => {
@@ -199,11 +217,61 @@ const UnifiedCheckoutForm = ({
         }
     };
 
-    const hidePayhere = removePayhereOnMobileAndTab();
     const isPreOrderCart = hasPreOrderProducts();
 
-    const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    const visiblePaymentGateways = useMemo(() => {
+        if (!paymentGateways?.length) return [];
+        const hidePayhereOnMobile = removePayhereOnMobileAndTab();
+        return paymentGateways.filter((gateway) => {
+            if (hidePayhereOnMobile && gateway.id === "payhere") {
+                return false;
+            }
+            if (isPreOrderCart && (gateway.id === "darazbnpl" || gateway.id === "payhere")) {
+                return false;
+            }
+            if (
+                gateway.id === "payhere" &&
+                isPriceFluctuation?.topBarPriceFluctuationNotice &&
+                totalPayment >= 100000
+            ) {
+                return false;
+            }
+            return true;
+        });
+    }, [paymentGateways, isPreOrderCart, isPriceFluctuation, totalPayment, cart]);
+
+    useEffect(() => {
+        if (!visiblePaymentGateways.length || selectedGateway.id) return;
+        const g = visiblePaymentGateways[0];
+        setMethodActive(g.id);
+        setSelectedGateway({ id: g.id, title: g.title });
+        if (g.id === "darazbnpl") {
+            setIsKokoPayment(true);
+        } else {
+            setIsKokoPayment(false);
+        }
+        if (g.id === "payhere") {
+            setIsCardPayment(true);
+        } else {
+            setIsCardPayment(false);
+        }
+    }, [visiblePaymentGateways, selectedGateway.id, setIsCardPayment, setIsKokoPayment]);
+
+    const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        if (!selectedGateway.id) {
+            toast.error("Please select a payment method.");
+            return;
+        }
+
+        if (selectedGateway.id === "bacs" && !bankSlipFile) {
+            toast.error("Please upload your bank slip before continuing.");
+            return;
+        }
+
+        setSubmitState("loading");
+        await new Promise<void>((r) => requestAnimationFrame(() => r()));
 
         // Update Contact Info
         const contactInfo = {
@@ -246,26 +314,20 @@ const UnifiedCheckoutForm = ({
         // Update Payment Method
         const paymethod = {
             selectedGateway,
+            bankSlipFile: selectedGateway.id === "bacs" ? bankSlipFile : null,
         };
         updateFormData("paymentMethod", paymethod);
         handleConfirmationChange("paymentMethod", true);
 
-        // Call parent form submit handler
+        await new Promise<void>((r) => setTimeout(r, 400));
+
         onFormSubmit();
+        setSubmitState("success");
+        window.setTimeout(() => setSubmitState("idle"), 2500);
     };
 
     const PaymentMethods = ({ gateway }: { gateway: PaymentGateway }) => {
         const active = methodActive === gateway.id;
-        const shouldHidePayhere =
-            gateway.id === "payhere" &&
-            isPriceFluctuation?.topBarPriceFluctuationNotice &&
-            totalPayment >= 100000;
-        const shouldHideForPreOrder =
-            isPreOrderCart && (gateway.id === "darazbnpl" || gateway.id === "payhere");
-
-        if (shouldHidePayhere || shouldHideForPreOrder) {
-            return null;
-        }
 
         return (
             <div className="flex items-start cursor-pointer space-x-4 sm:space-x-6">
@@ -273,13 +335,21 @@ const UnifiedCheckoutForm = ({
                     className="cursor-pointer"
                     name="payment-method"
                     id={gateway.id}
-                    defaultChecked={active}
+                    checked={active}
                     onChange={(e) => {
                         setMethodActive(e as any);
                         setSelectedGateway({
                             id: gateway.id,
                             title: gateway.title,
                         });
+
+                        if (gateway.id !== "bacs") {
+                            setBankSlipFile(null);
+                            if (previewUrl) {
+                                URL.revokeObjectURL(previewUrl);
+                                setPreviewUrl(null);
+                            }
+                        }
 
                         if (gateway.id === "darazbnpl") {
                             setIsKokoPayment(true);
@@ -306,21 +376,87 @@ const UnifiedCheckoutForm = ({
                     <div className={`mt-6 mb-4 ${active ? "block" : "hidden"}`}>
                         {gateway.id !== "darazbnpl" && (
                             <>
-                                <p className="text-sm dark:text-slate-300">
-                                    Your order will be delivered to you after you{" "}
-                                    {gateway.title || "transfer funds"} to:
-                                </p>
-                                <ul className="mt-3.5 text-sm text-slate-500 dark:text-slate-400 space-y-2">
-                                    <li>
+                                {gateway.id === "bacs" ? (
+                                    <div className="space-y-4">
+                                        <p className="text-sm dark:text-slate-300">
+                                            Your order will be delivered to you after you transfer the payment to our bank account.
+                                        </p>
+                                        <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-lg">
+                                            <p className="text-sm font-medium text-slate-900 dark:text-slate-200 mb-2">
+                                                Bank Details:
+                                            </p>
+                                            <p className="text-sm text-slate-700 dark:text-slate-300">
+                                                Bank Name: Commercial Bank
+                                                <br />
+                                                Account Name: GQ Mobiles Pvt Ltd
+                                                <br />
+                                                Account Number: 1000475584
+                                                <br />
+                                                Branch: Head office
+                                            </p>
+                                        </div>
+                                        <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
+                                            <label className="block text-sm font-medium text-slate-900 dark:text-slate-200 mb-2">
+                                                Upload Bank Slip <span className="text-red-500">*</span>
+                                            </label>
+                                            <input
+                                                type="file"
+                                                id={`bank-slip-upload-${gateway.id}`}
+                                                accept="image/png, image/gif, image/jpeg, image/heic, image/heif, image/webp, image/bmp, image/tiff, application/pdf"
+                                                onChange={handleBankSlipChange}
+                                                className="block w-full text-sm text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primaryColor file:text-white hover:file:bg-slate-800 file:cursor-pointer cursor-pointer"
+                                            />
+                                            {previewUrl && bankSlipFile && (
+                                                <div className="mt-3">
+                                                    <p className="text-xs text-slate-600 dark:text-slate-400 mb-2">Preview:</p>
+                                                    {bankSlipFile.type.startsWith("image/") ? (
+                                                        <div className="relative w-full max-w-xs border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
+                                                            <Image
+                                                                src={previewUrl}
+                                                                alt="Bank slip preview"
+                                                                width={400}
+                                                                height={300}
+                                                                className="w-full h-auto object-contain"
+                                                            />
+                                                        </div>
+                                                    ) : (
+                                                        <p className="text-xs text-slate-600 dark:text-slate-400">{bankSlipFile.name}</p>
+                                                    )}
+                                                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{bankSlipFile.name}</p>
+                                                </div>
+                                            )}
+                                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                                                Please upload your bank transfer slip after completing the payment.
+                                            </p>
+                                        </div>
                                         {gateway.description && (
-                                            <span className="text-slate-900 dark:text-slate-200 font-medium">
-                                                <span
-                                                    dangerouslySetInnerHTML={{ __html: gateway.description }}
-                                                />
-                                            </span>
+                                            <div className="text-slate-900 dark:text-slate-200 font-medium text-sm">
+                                                <span dangerouslySetInnerHTML={{ __html: gateway.description }} />
+                                            </div>
                                         )}
-                                    </li>
-                                </ul>
+                                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                                            Make your payment directly into our bank account. Please attach your payment slip to this order. Your order will not be shipped until the funds have cleared in our account.
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <>
+                                        <p className="text-sm dark:text-slate-300">
+                                            Your order will be delivered to you after you{" "}
+                                            {gateway.title || "transfer funds"} to:
+                                        </p>
+                                        <ul className="mt-3.5 text-sm text-slate-500 dark:text-slate-400 space-y-2">
+                                            <li>
+                                                {gateway.description && (
+                                                    <span className="text-slate-900 dark:text-slate-200 font-medium">
+                                                        <span
+                                                            dangerouslySetInnerHTML={{ __html: gateway.description }}
+                                                        />
+                                                    </span>
+                                                )}
+                                            </li>
+                                        </ul>
+                                    </>
+                                )}
                             </>
                         )}
                     </div>
@@ -502,22 +638,29 @@ const UnifiedCheckoutForm = ({
                     <h3 className="text-lg font-semibold mb-4">Payment Method</h3>
 
                     <div className="space-y-6">
-                        {paymentGateways
-                            ?.filter((gateway) => {
-                                if (isPreOrderCart && (gateway.id === 'darazbnpl' || gateway.id === 'payhere')) return false;
-                                return true;
-                            })
-                            .map((gateway) => (
-                                <PaymentMethods key={gateway.id} gateway={gateway} />
-                            ))}
+                        {visiblePaymentGateways.map((gateway) => (
+                            <PaymentMethods key={gateway.id} gateway={gateway} />
+                        ))}
                     </div>
                 </div>
             </div>
 
             {/* Submit Button */}
-            <div className="flex pt-6">
-                <ButtonPrimary type="submit" className="sm:!px-7 shadow-none">
-                    Continue to Review Order
+            <div className="flex flex-col gap-2 pt-6">
+                <ButtonPrimary
+                    type="submit"
+                    className="sm:!px-7 shadow-none min-w-[200px]"
+                    loading={submitState === "loading"}
+                    disabled={submitState === "success"}
+                >
+                    {submitState === "success" ? (
+                        <span className="inline-flex items-center justify-center gap-2">
+                            <Check className="w-5 h-5 shrink-0" strokeWidth={2.5} aria-hidden />
+                            Saved successfully
+                        </span>
+                    ) : (
+                        "Save and Continue"
+                    )}
                 </ButtonPrimary>
             </div>
         </form>

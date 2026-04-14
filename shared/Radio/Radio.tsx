@@ -5,6 +5,8 @@ export interface RadioProps {
   name: string;
   id: string;
   onChange?: (value: string) => void;
+  /** When set, the input is controlled (preferred for radio groups that sync with React state). */
+  checked?: boolean;
   defaultChecked?: boolean;
   sizeClassName?: string;
   label?: string;
@@ -17,8 +19,10 @@ const Radio: FC<RadioProps> = ({
   onChange,
   label,
   sizeClassName = "w-5 h-5",
+  checked,
   defaultChecked,
 }) => {
+  const controlled = checked !== undefined;
   return (
     <div className={`flex items-center text-xs sm:text-xs cursor-pointer ${className}`}>
       <input
@@ -27,7 +31,9 @@ const Radio: FC<RadioProps> = ({
         type="radio"
         className={`focus:ring-action-primary text-primary-500 rounded-full border-slate-400 hover:border-slate-700 bg-transparent dark:border-slate-700 dark:hover:border-slate-500 dark:checked:bg-primary-500 focus:ring-primary-500 text-sm ${sizeClassName}`}
         onChange={(e) => onChange && onChange(e.target.value)}
-        defaultChecked={defaultChecked}
+        {...(controlled
+          ? { checked }
+          : { defaultChecked })}
         value={id}
       />
       {label && (

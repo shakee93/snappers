@@ -33,7 +33,6 @@ import { PayhereStatus, PaymentDetailsWithoutUrls } from "@/data/types";
 import Script from "next/script";
 import { usePayhere } from "../components/Payment/Payhere";
 import { redirect, useRouter } from "next/navigation";
-import PaymentModal from "@/app/components/Payment/PaymentModal";
 import { useSession } from "@/context/SessionProvider";
 import { usePaymentGateways } from "@/context/PaymentProvider";
 import { Info, Loader, Clock } from "lucide-react";
@@ -55,6 +54,7 @@ interface FormData {
     selectedGateway?: {
       id?: string;
     };
+    bankSlipFile?: File | null;
   };
 }
 
@@ -100,8 +100,6 @@ const CheckoutPage = () => {
   const [orderTotal, setOrderTotal] = useState<string | null>(null);
   const [paymentData, setPaymentData] =
     useState<PaymentDetailsWithoutUrls | null>(null);
-  const [showBankTransfer, setShowBankTransfer] = useState<boolean>(false);
-  const [wantToSHowBankTransfer, setWantToSHowBankTransfer] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [totalWithTax, setTotalWithTax] = useState<string | null>();
   const [isTOC, setTOC] = useState<boolean>(false);
@@ -113,6 +111,7 @@ const CheckoutPage = () => {
   const [couponCode, setCouponCode] = useState("");
   const [couponStatus, setCouponStatus] = useState<"idle" | "success" | "error">("idle");
   const [couponMessage, setCouponMessage] = useState<string | null>(null);
+  const [hasSavedCheckoutForm, setHasSavedCheckoutForm] = useState(false);
 
   const [applyCouponMutation, { loading: applyingCoupon }] = useMutation(APPLY_COUPON);
   const [removeCouponsMutation, { loading: removingCoupon }] = useMutation(REMOVE_COUPONS);
@@ -273,11 +272,6 @@ const CheckoutPage = () => {
     return paymentData;
   }, [paymentData]);
 
-  function ImplementBankTransfer() {
-    setWantToSHowBankTransfer(false);
-    setShowBankTransfer(true);
-  }
-
   useEffect(() => {
     if (!paymentDetails) {
       return;
@@ -376,17 +370,24 @@ const CheckoutPage = () => {
       formData?.paymentMethod?.selectedGateway?.id == "geniebiz";
 
     if (isBankTransfer) {
-      if (wantToSHowBankTransfer) {
-        ImplementBankTransfer();
+      const bankSlipFile = formData?.paymentMethod?.bankSlipFile;
+      if (!bankSlipFile) {
+        toast.error("Please upload your bank slip before confirming the order.");
+        setConfirmOrderErrors(["Bank slip upload is required for Bank Transfer."]);
         return;
       }
+
       try {
-        ImplementBankTransfer();
+        const checkoutResult = await handleCheckout();
+        if (checkoutResult && checkoutResult.order_id) {
+          await uploadBankSlip(bankSlipFile, checkoutResult);
+        }
       } catch (e) {
         toast.error(
           "Sorry to hear that you are facing an issue with Bank Transfer. Please try again later."
         );
       }
+      return;
     }
     if (isGeniePayment) {
       await handleCheckout();
@@ -412,10 +413,10 @@ const CheckoutPage = () => {
 
       const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
 
-      if (paymentMethodId === undefined) {
-        console.error("Payment method ID is undefined");
+      if (paymentMethodId === undefined || paymentMethodId === null || paymentMethodId === "") {
+        console.error("Payment method ID is missing");
         toast.error("Payment Method was not chosen.");
-        return;
+        return null;
       }
 
       formData.billingAddress.country = "LK";
@@ -449,7 +450,7 @@ const CheckoutPage = () => {
           ? "<p><strong>Pickup Location:</strong> Store</p>"
           : ""
         }
-            ${isKokoPayment
+            ${formData?.paymentMethod?.selectedGateway?.id === "darazbnpl"
           ? "<p><strong>Payment Method:</strong> Koko Pay</p>"
           : ""
         }
@@ -476,19 +477,31 @@ const CheckoutPage = () => {
           ? await guestCheckout({ variables })
           : await checkoutMutation({ variables });
 
-
-      // Store order data in localStorage for both guest and logged-in users
-      if (data) {
-        localStorage.setItem("last_order", JSON.stringify(data));
+      if (errors?.length) {
+        const msg =
+          errors.map((e: { message?: string }) => e.message).filter(Boolean).join(" ") ||
+          "Checkout failed.";
+        toast.error(msg);
+        return null;
       }
 
-      //Koko Payment
-      if (isKokoPayment) {
+      if (!data?.checkout) {
+        toast.error("Checkout failed. Please try again.");
+        return null;
+      }
+
+      // Store order data in localStorage for both guest and logged-in users
+      localStorage.setItem("last_order", JSON.stringify(data));
+
+      const isKokoGateway =
+        formData?.paymentMethod?.selectedGateway?.id === "darazbnpl";
+
+      if (isKokoGateway) {
         const orderData = {
           order_id: data?.checkout?.order?.databaseId,
         };
-        localStorage.setItem("last_order", JSON.stringify(data));
         handleKoko(orderData);
+        return null;
       }
 
       // FOR GUEST CHECKOUT
@@ -500,18 +513,27 @@ const CheckoutPage = () => {
       const isGuest = customer?.id === "guest";
 
       if (isPayhere && isGuest) {
+        const orderDbId = data?.checkout?.order?.databaseId;
+        if (!orderDbId) {
+          toast.error("Could not create order for payment.");
+          return null;
+        }
         localStorage.setItem(
           "payhere_last_order",
           JSON.stringify(guestCheckoutData)
         );
         router.push(`/checkout/payhere/guest_order`);
-        return;
+        return null;
       }
 
       if (isPayhere && !isGuest) {
         const orderId = data?.checkout?.order?.databaseId;
+        if (!orderId) {
+          toast.error("Could not create order for payment.");
+          return null;
+        }
         router.push(`/checkout/payhere/${orderId}`);
-        return;
+        return null;
       }
 
       // Genie Payment Redirect
@@ -799,6 +821,76 @@ const CheckoutPage = () => {
     }
   };
 
+  const uploadBankSlip = async (file: File, checkoutDetails: PaymentDetailsWithoutUrls) => {
+    try {
+      toast.info("Uploading bank slip...");
+
+      const orderId = checkoutDetails.order_id;
+      if (!orderId) {
+        toast.error("Order ID not found. Please try again.");
+        return;
+      }
+
+      const formDataUpload = new FormData();
+      formDataUpload.append("file", file);
+      formDataUpload.append("order_id", String(orderId));
+
+      const response = await fetch(
+        "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/upload",
+        {
+          method: "POST",
+          body: formDataUpload,
+        }
+      );
+
+      const data = await response.json();
+
+      if (data.message === "File uploaded successfully") {
+        toast.success("Bank slip uploaded successfully!");
+
+        try {
+          await clearCart();
+        } catch (error: unknown) {
+          if (
+            error instanceof Error &&
+            !error.message.includes("No items in cart to remove")
+          ) {
+            console.error("Error clearing cart:", error);
+          }
+        }
+
+        if (typeof orderId !== "string") {
+          await sentConfirmation(orderId as number);
+        }
+
+        if (customer?.id === "guest" || checkoutDetails.order_id === "guest_checkout") {
+          const queryParams = new URLSearchParams({
+            ...checkoutDetails,
+            lineItems: JSON.stringify(checkoutDetails.lineItems),
+            subtotal: String(checkoutDetails.subtotal),
+            shippingTotal: String(checkoutDetails.shippingTotal),
+            date: String(checkoutDetails.date ?? ""),
+            billingaddress1: String(checkoutDetails.billingaddress1 || ""),
+            billingaddress2: String(checkoutDetails.billingaddress2 || ""),
+            shippingaddress1: String(checkoutDetails.shippingaddress1 || ""),
+            shippingaddress2: String(checkoutDetails.shippingaddress2 || ""),
+            city: checkoutDetails.city || "",
+            order_id: String(checkoutDetails.order_id),
+          }).toString();
+          const redirectUrl = `/checkout/guest_checkout?${queryParams}&ordermethod=guest`;
+          router.push(redirectUrl);
+        } else {
+          router.push(`/checkout/${orderId}`);
+        }
+      } else if (data.error) {
+        toast.error("An issue occurred during the bank slip upload process.");
+      }
+    } catch (error) {
+      console.error("Error uploading bank slip:", error);
+      toast.error("Failed to upload bank slip. Please try again.");
+    }
+  };
+
   return (
     <div className="nc-CheckoutPage">
       <Script
@@ -837,6 +929,7 @@ const CheckoutPage = () => {
               totalPayment={numericOrderTotal}
               setIsKokoPayment={setIsKokoPayment}
               isKokoPayment={isKokoPayment}
+              onCheckoutFormSaved={() => setHasSavedCheckoutForm(true)}
             />
           </div>
         </div>
@@ -1168,8 +1261,10 @@ const CheckoutPage = () => {
             )}
 
             <ButtonPrimary
+              type="button"
               onClick={handleCheckoutProcess}
-              className={`mt-8 w-full bg-primary hover:bg-primary-dark`}
+              disabled={!hasSavedCheckoutForm || loading}
+              className={`mt-8 w-full bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:pointer-events-none`}
             >
               {loading ? (
                 <Loader className="animate-spin text-gray-100 " />
