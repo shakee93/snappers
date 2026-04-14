@@ -9,6 +9,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader } from "lucide-react";
 import { getRandomWelcomeMessage } from "@/components/AddressPageComps/HelperComps";
+import Link from "next/link";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
@@ -78,6 +79,9 @@ const LoginForm = () => {
       <label className="block">
         <span className="flex justify-between items-center text-neutral-800 dark:text-neutral-200">
           Password
+          <Link href="/forgot-pass" className="text-sm text-green-600">
+            Forgot password?
+          </Link>
         </span>
         <Input
           type="password"
