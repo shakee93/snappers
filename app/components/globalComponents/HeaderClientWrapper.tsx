@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useRef } from "react";
 import { Brand, ProductCategory } from "@/graphql/types/graphql";
-import TopBarNotification from "@/components/TopBarNotification";
 import TopBarPromotion from "@/components/TopBarPromotion";
 import HeaderContent from "./HeaderContent";
 import HeaderSearchResults from "@/app/components/globalComponents/HeaderSearchResults";
@@ -83,16 +82,6 @@ const HeaderClientWrapper = ({
           flex flex-col justify-between bg-transparent z-[100] transition-all duration-100 md:border-b
         `}
       >
-        {/* TopBarNotification - hides on scroll */}
-        <div
-          className={`
-            transition-all duration-500 ease-out overflow-hidden
-            ${isTopBarVisible ? 'max-h-32 opacity-100' : 'max-h-0 opacity-0'}
-          `}
-        >
-          <TopBarNotification />
-        </div>
-
         {/* TopBarPromotion - hides on scroll */}
         <div
           style={{
