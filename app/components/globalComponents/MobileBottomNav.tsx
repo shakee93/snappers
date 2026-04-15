@@ -86,11 +86,11 @@ const MobileBottomNav = ({ categories }: { categories: any }) => {
 
             </div>
             <Link
-                href="/tag/clearance"
+                href="/deals"
                 className="flex pt-2 flex-1 flex-col justify-center items-center text-primaryColor gap-1 cursor-pointer"
             >
                 <Flame className="animate-bounce text-red-500" fill="orange"/>
-                <div className="text-[11px]">Clearance</div>
+                <div className="text-[11px]">Deals</div>
             </Link>
 
             {/* <div

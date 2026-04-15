@@ -60,9 +60,9 @@ const
                 </div>
               </div>
               <div className="flex flex-row gap-2">
-                <Link href="/tag/clearance">
+                <Link href="/deals">
                   <button className="bg-white border border-[#1B40AF] text-[#1B40AF] text-xs px-1 sm:px-4 py-1 rounded-full hover:bg-blue-50 transition-colors">
-                    Explore Clearance
+                    Explore Deals
                   </button>
                 </Link>
                 <Link href={`/products/${product.slug}`} target="_blank" rel="noopener noreferrer">

@@ -42,8 +42,8 @@ const navLinks: NavLinkItem[] = [
     name: "Shop",
   },
   {
-    href: "/tag/clearance",
-    name: "Clearance",
+    href: "/deals",
+    name: "Deals",
     special: true,
   },
   {

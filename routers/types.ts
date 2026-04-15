@@ -23,6 +23,7 @@ export interface LocationStates {
   "/contact"?: {};
   "/login"?: {};
   "/signup"?: {};
+  "/deals"?: {};
   "/forgot-pass"?: {};
   "/reset-password"?: {};
   "/page404"?: {};

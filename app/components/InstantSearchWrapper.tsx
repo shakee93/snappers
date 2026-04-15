@@ -56,6 +56,8 @@ interface InstantSearchWrapperProps {
   sort?: boolean;
   tag?: string;
   searchQueryValue?: string;
+  dealsType?: ("clearance" | "offers")[];
+  dealTags?: string[];
 }
 
 const typesenseConfig = {
@@ -101,7 +103,9 @@ const InstantSearchWrapper = ({
   category,
   sort,
   tag,
-  searchQueryValue
+  searchQueryValue,
+  dealsType,
+  dealTags,
 }: InstantSearchWrapperProps) => {
   const { sidebar, setSearchMounted, syncCategories, syncBrands, synPriceRange, setInStock, syncOnSale, setSort, syncVariations, isTyping } = useStore();
   const [differedSidebar] = useDebounce(sidebar, 800);
@@ -140,9 +144,11 @@ const InstantSearchWrapper = ({
       sidebar.on_sale ? "onSale:true" : null,
       sidebar.in_stock ? "stockStatus:IN_STOCK && productTags.nodes.slug:!=pre-order" : null,
       sidebar.out_of_stock ? "stockStatus:OUT_OF_STOCK" : null,
-      tag
-        ? `productTags.nodes.slug:${tag}`
-        : null,
+      dealTags && dealTags.length > 0
+        ? `productTags.nodes.slug:[${dealTags.join(",")}]`
+        : tag
+          ? `productTags.nodes.slug:${tag}`
+          : null,
     ];
 
     // Add variation filters
@@ -161,7 +167,7 @@ const InstantSearchWrapper = ({
   useEffect(() => {
     setFilterQuery(getFilterQuery);
     // setSortQuery(differedSidebar.sort);
-  }, [differedSidebar]);
+  }, [differedSidebar, tag, JSON.stringify(dealTags || [])]);
 
   useEffect(() => {
     if (!search) {
@@ -329,6 +335,7 @@ const InstantSearchWrapper = ({
                   categories={categories}
                   brands={brands}
                   sort={sort}
+                  dealsType={dealsType}
                 />
               )}
             </div>
