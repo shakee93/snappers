@@ -9,6 +9,7 @@ type Props = {
   lineSubtotal?: string | null;
   catalogPrice?: string | null;
   catalogSalePrice?: string | null;
+  showOriginalPrice?: boolean;
   contentClass?: string;
   className?: string;
 };
@@ -19,6 +20,7 @@ export default function LineOrCartPriceLabel({
   lineSubtotal,
   catalogPrice,
   catalogSalePrice,
+  showOriginalPrice = true,
   contentClass,
   className,
 }: Props) {
@@ -34,7 +36,7 @@ export default function LineOrCartPriceLabel({
   return (
     <Prices
       price={catalogPrice}
-      salePrice={catalogSalePrice}
+      salePrice={showOriginalPrice ? catalogSalePrice : null}
       contentClass={contentClass}
       className={className}
     />
