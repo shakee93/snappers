@@ -59,6 +59,11 @@ interface ArchiveLayoutProps {
   category?: any;
   sort?: boolean;
   tag?: string;
+  headingOverride?: string;
+  descriptionOverride?: string;
+  topLinks?: { href: string; label: string; active?: boolean }[];
+  dealsType?: ("clearance" | "offers")[];
+  dealTags?: string[];
 }
 
 const ArchiveLayout = async ({
@@ -69,7 +74,12 @@ const ArchiveLayout = async ({
   brand,
   category,
   sort,
-  tag
+  tag,
+  headingOverride,
+  descriptionOverride,
+  topLinks,
+  dealsType,
+  dealTags,
 }: ArchiveLayoutProps) => {
 
   const { productCategories, brands, nestedCategories, tagDetails } = await getData(category?.databaseId ?? '', tag);
@@ -84,14 +94,31 @@ const ArchiveLayout = async ({
       <div className="space-y-4 lg:space-y-6">
         <div className="max-w-screen-sm">
           <h1 className="block capitalize text-2xl sm:text-3xl lg:text-4xl font-semibold">
-            {tagDetails.length > 0 ? tagDetails[0].name : title}
+            {headingOverride || (tagDetails.length > 0 ? tagDetails[0].name : title)}
           </h1>
           <span className="block mt-2 lg:mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
-            {tagDetails.length > 0 && tagDetails[0].description
+            {descriptionOverride || (tagDetails.length > 0 && tagDetails[0].description
               ? tagDetails[0].description
-              : description || "Explore GQ Mobiles Collections – where style meets functionality. Elevate your experience with quality and diverse options. Shop now for a seamless blend of style and substance!"}
+              : description || "Explore GQ Mobiles Collections – where style meets functionality. Elevate your experience with quality and diverse options. Shop now for a seamless blend of style and substance!")}
           </span>
         </div>
+        {topLinks && topLinks.length > 0 ? (
+          <div className="flex flex-wrap gap-2">
+            {topLinks.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`rounded-md px-4 py-2 text-sm border ${
+                  item.active
+                    ? "bg-primaryColor text-white border-primaryColor"
+                    : "bg-white text-primaryColor border-primaryColor"
+                }`}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </div>
+        ) : null}
 
         <div className="flex flex-wrap gap-2 text-sm">
           {nestedCategories.map((item: any, index: number) => (
@@ -123,6 +150,8 @@ const ArchiveLayout = async ({
                 sort={sort}
                 tag={tag}
                 routing={true}
+                dealsType={dealsType}
+                dealTags={dealTags}
               />
             </div>
           </div>

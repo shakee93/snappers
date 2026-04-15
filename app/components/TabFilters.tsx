@@ -9,6 +9,7 @@ import OnSaleFilter from "@/app/components/Filters/OnSaleFilter";
 import SortOrderFilter from "@/app/components/Filters/SortOrderFilter";
 import InStockFilter from "./Filters/InStockFilter";
 import DynamicVariationFilters from "@/app/components/Filters/DynamicVariationFilters";
+import DealsTypeFilter from "@/app/components/Filters/DealsTypeFilter";
 
 interface TabFilterProps {
     categories?: ProductCategory[];
@@ -16,6 +17,7 @@ interface TabFilterProps {
     brands?: Brand[];
     brand?: Brand;
     sort?: Boolean;
+    dealsType?: ("clearance" | "offers")[];
 }
 
 
@@ -25,6 +27,7 @@ const TabFilters = ({
     brand,
     category,
     sort,
+    dealsType,
 }: TabFilterProps) => {
 
     const {
@@ -40,6 +43,7 @@ const TabFilters = ({
     return (
         <div className="flex flex-col gap-0 lg:gap-3 lg:space-x-4">
             <div className="hidden lg:flex flex-col justify-start items-start flex-1 space-y-3">
+                {dealsType ? <DealsTypeFilter activeTypes={dealsType} /> : null}
                 <InStockFilter />
                 {!category && <CategoryFilter categories={categories} />}
                 {!brand && <BrandFilter brands={brands} />}
