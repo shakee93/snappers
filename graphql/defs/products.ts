@@ -56,6 +56,14 @@ export const GET_PRODUCTS_BY_DATABASE_IDS = gql`
         databaseId
         name
         slug
+        image {
+          sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
+        }
+        featuredImage {
+          node {
+            sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
+          }
+        }
         brands {
           nodes {
             slug
@@ -72,6 +80,14 @@ export const GET_PRODUCT_BY_DATABASE_ID = gql`
       databaseId
       name
       slug
+      image {
+        sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
+      }
+      featuredImage {
+        node {
+          sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
+        }
+      }
       ... on SimpleProduct {
         brands {
           nodes {
@@ -120,11 +136,22 @@ export const GET_PRODUCT_VARIATION_BY_DATABASE_ID = gql`
     productVariation(id: $id, idType: DATABASE_ID) {
       databaseId
       name
+      image {
+        sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
+      }
       parent {
         node {
           databaseId
           name
           slug
+          image {
+            sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
+          }
+          featuredImage {
+            node {
+              sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
+            }
+          }
           ... on VariableProduct {
             brands {
               nodes {
