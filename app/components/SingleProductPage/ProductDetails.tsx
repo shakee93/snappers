@@ -740,15 +740,28 @@ const ProductDetails = ({
                       leaveTo="opacity-0"
                     >
                       <Listbox.Options className="absolute z-20 mt-2 max-h-60 w-full overflow-auto rounded-2xl bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                        {attr.options
-                          ?.slice()
-                          .sort((a, b) => {
+                        {(() => {
+                          const variations = (product as VariableProduct).variations?.nodes || [];
+                          const isOptionOutOfStock = (option: string | null) => {
+                            const matching = variations.filter((v: ProductVariation) =>
+                              v.attributes?.nodes.some(
+                                (node: any) => node.name === attr.name && node.value === option
+                              )
+                            );
+                            return matching.length > 0 && matching.every((v) => v.stockStatus !== "IN_STOCK");
+                          };
+                          return attr.options?.slice().sort((a, b) => {
+                            // In-stock options first, out-of-stock after
+                            const aOut = isOptionOutOfStock(a) ? 1 : 0;
+                            const bOut = isOptionOutOfStock(b) ? 1 : 0;
+                            if (aOut !== bOut) return aOut - bOut;
                             // Extract first number from each option (e.g., "12gb-256gb" -> 12)
                             const numA = a ? parseInt(a.match(/\d+/)?.[0] || "0", 10) : 0;
                             const numB = b ? parseInt(b.match(/\d+/)?.[0] || "0", 10) : 0;
                             return numA - numB; // Ascending order: 12, 16, 24
-                          })
-                          .map((option, optionIndex) => {
+                          });
+                        })()
+                          ?.map((option, optionIndex) => {
                             const matchingVariations = (
                               product as VariableProduct
                             ).variations?.nodes.filter((v: ProductVariation) => {
