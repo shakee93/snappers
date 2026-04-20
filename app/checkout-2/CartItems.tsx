@@ -139,6 +139,7 @@ const cartItems = ({
                 <LineOrCartPriceLabel
                   lineTotal={total}
                   lineSubtotal={subtotal}
+                  showOriginalPrice={false}
                   contentClass="py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium h-full"
                   catalogPrice={
                     type === "VARIABLE" ? variation?.node.price : price
@@ -157,6 +158,7 @@ const cartItems = ({
               <LineOrCartPriceLabel
                 lineTotal={total}
                 lineSubtotal={subtotal}
+                showOriginalPrice={false}
                 catalogPrice={
                   type === "VARIABLE" ? variation?.node.price : price
                 }

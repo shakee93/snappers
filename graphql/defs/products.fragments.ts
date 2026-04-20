@@ -479,6 +479,7 @@ export const ProductContentFull = gql`
       }
     }
     ... on SimpleProduct {
+      happiestCustomersGallery
       onSale
       stockStatus
       price
@@ -508,6 +509,7 @@ export const ProductContentFull = gql`
       }
     }
     ... on VariableProduct {
+      happiestCustomersGallery
       allPaCapacity {
         nodes {
           name
