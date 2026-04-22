@@ -7,6 +7,10 @@ on:
 
 jobs:
   trigger-deploy:
+    # Vercel's Git integration already auto-deploys pushes from the
+    # connected account (shakee93). Only fire this fallback for pushes
+    # from team members whose GitHub accounts aren't linked to Vercel.
+    if: github.actor != 'shakee93'
     runs-on: ubuntu-latest
     steps:
       - name: Trigger Vercel Deploy
