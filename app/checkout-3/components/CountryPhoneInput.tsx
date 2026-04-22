@@ -225,7 +225,7 @@ const CountryPhoneInput: React.FC<CountryPhoneInputProps> = ({
   onPhoneChange
 }) => {
   return (
-    <div className="max-w-full">
+    <div className="max-w-lg">
       <div className="flex gap-2 mt-1.5">
         <select
           className="w-24 px-2 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"

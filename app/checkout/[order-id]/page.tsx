@@ -6,7 +6,7 @@ import {
   GET_CHECKOUT_USER_DETAILS,
   GET_SINGLE_ORDER,
 } from "@/graphql/defs/order";
-import { useEffect, useMemo, useRef, useState, use } from "react";
+import { useCallback, useEffect, useMemo, use } from "react";
 import ProductTable, { OrderDetails } from "./Comps";
 import { toast } from "sonner";
 import Link from "next/link";
@@ -18,88 +18,51 @@ export default function OrderPaymentPage(props: OrderPaymentPageProps) {
   const params = use(props.params);
   const router = useRouter();
   const orderId = params["order-id"];
+  const searchParams = useSearchParams().get("email");
 
-  // Call useSearchParams once and reuse it
-  const searchParamsObj = useSearchParams();
-  const searchParams = searchParamsObj.get("email");
 
-  // All hooks must be called at the top level, before any conditional returns
-  const { getCart, clearCart, refreshCart } = useCart();
   const [getUserData, { data: customerData }] = useLazyQuery(
     GET_CHECKOUT_USER_DETAILS,
     { fetchPolicy: "no-cache" },
   );
 
-  const order_id = searchParamsObj.get('order_id');
-  const first_name = searchParamsObj.get('first_name');
-  const last_name = searchParamsObj.get('last_name');
-  const email = searchParamsObj.get('email');
-  const address = searchParamsObj.get('address');
-  const amount = searchParamsObj.get('amount');
-  const items = searchParamsObj.get('items');
-  const shippingTotal = searchParamsObj.get('shippingTotal');
-  const subtotal = searchParamsObj.get('subtotal');
-  const date = searchParamsObj.get('date');
-  const shippingaddress1 = searchParamsObj.get('shippingaddress1');
-  const shippingaddress2 = searchParamsObj.get('shippingaddress2');
-  const billingaddress1 = searchParamsObj.get('billingaddress1');
-  const billingaddress2 = searchParamsObj.get('billingaddress2');
-  const city = searchParamsObj.get('city');
-  const lineItemsParam = searchParamsObj.get('lineItems');
+
+
+  const order_id = useSearchParams().get('order_id');
+  const first_name = useSearchParams().get('first_name');
+  const last_name = useSearchParams().get('last_name');
+  const email = useSearchParams().get('email');
+  const address = useSearchParams().get('address');
+  const amount = useSearchParams().get('amount');
+  const items = useSearchParams().get('items');
+  const shippingTotal = useSearchParams().get('shippingTotal');
+  const subtotal = useSearchParams().get('subtotal');
+  const date = useSearchParams().get('date');
+  const shippingaddress1 = useSearchParams().get('shippingaddress1');
+  const shippingaddress2 = useSearchParams().get('shippingaddress2');
+  const billingaddress1 = useSearchParams().get('billingaddress1');
+  const billingaddress2 = useSearchParams().get('billingaddress2');
+  const city = useSearchParams().get('city');
+  const lineItemsParam = useSearchParams().get('lineItems');
   const lineItems = lineItemsParam && lineItemsParam !== "undefined"
     ? JSON.parse(lineItemsParam)
     : { nodes: [] };
-  const ordermethod = searchParamsObj.get('ordermethod');
+  const ordermethod = useSearchParams().get('ordermethod');
 
   //Koko Payment
-  const trnId = searchParamsObj.get('trnId');
-  const orderIdParam = searchParamsObj.get('orderId') || (typeof window !== 'undefined' ? window.location.pathname.split('/')[2] || '' : '');
-  const orderIdUrl = typeof window !== 'undefined' ? window.location.pathname.split('/')[2] : '';
-  const status = searchParamsObj.get('status');
-  const desc = searchParamsObj.get('desc');
-  const key = searchParamsObj.get('key');
-  const wcApi = searchParamsObj.get('wc-api');
+  const trnId = useSearchParams().get('trnId');
+  const orderIdParam = useSearchParams().get('orderId') || (window.location.pathname.split('/')[2] || '');
+  const orderIdUrl = window.location.pathname.split('/')[2]
+  const status = useSearchParams().get('status');
+  const desc = useSearchParams().get('desc');
+  const key = useSearchParams().get('key');
+  const wcApi = useSearchParams().get('wc-api');
 
 
-  const hasClearedGuestRef = useRef(false);
-  const hasClearedSimpleRef = useRef(false);
-  const hasClearedOrderRef = useRef(false);
-
-  // State for localStorage order data (for guest NDB Pay orders)
-  const [localStorageOrderData, setLocalStorageOrderData] = useState<any>(null);
-  const [isCheckingLocalStorage, setIsCheckingLocalStorage] = useState(true);
-
-  // Check localStorage for guest order data (similar to PayHere guest orders)
-  useEffect(() => {
-    if (typeof window !== 'undefined' && orderId) {
-      try {
-        const lastOrder = localStorage.getItem('last_order');
-        if (lastOrder) {
-          const parsedOrder = JSON.parse(lastOrder);
-          // Check if the order ID matches and it's likely a guest order
-          const storedOrderId = parsedOrder?.checkout?.order?.databaseId?.toString();
-          if (storedOrderId === orderId) {
-            setLocalStorageOrderData(parsedOrder);
-          }
-        }
-      } catch (error) {
-        console.error('Error reading localStorage order data:', error);
-      } finally {
-        setIsCheckingLocalStorage(false);
-      }
-    } else {
-      setIsCheckingLocalStorage(false);
-    }
-  }, [orderId]);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const lastOrder = localStorage.getItem('last_order');
-      if (lastOrder && trnId && status !== "FAILURE") {
-        router.push(`/checkout/koko/guest_order?orderId=${orderIdUrl}&status=${status}`);
-      }
-    }
-  }, [trnId, status, orderIdUrl, router]);
+  const lastOrder = localStorage.getItem('last_order');
+  if (lastOrder && trnId && status !== "FAILURE") {
+    router.push(`/checkout/koko/guest_order?orderId=${orderIdUrl}&status=${status}`);
+  }
 
   useEffect(() => {
     const sendKokoVerification = async () => {
@@ -124,221 +87,80 @@ export default function OrderPaymentPage(props: OrderPaymentPageProps) {
     };
 
     sendKokoVerification();
-  }, [orderId, status, orderIdUrl]); // Dependencies to trigger the effect
+  }, [orderId, status]); // Dependencies to trigger the effect
 
-  // Query for order data (will be skipped for guest checkouts)
-  const { data: orderData, error: orderError } = useQuery(GET_SINGLE_ORDER, {
-    variables: { orderID: orderId },
-    skip: !orderId || orderId === "guest_checkout" || orderId === "ItemNo12345" || orderId === "12345" || ordermethod === "guest",
-  });
-
-  // Clear cart for guest checkout with ordermethod=guest
-  useEffect(() => {
-    if (ordermethod === "guest" && !hasClearedGuestRef.current) {
-      hasClearedGuestRef.current = true;
-      const clearCartSafely = async () => {
-        try {
-          await clearCart();
-          await refreshCart();
-        } catch (error: unknown) {
-          // Silently handle errors - cart might already be cleared or session invalid
-          if (
-            error instanceof Error &&
-            !error.message.includes("No items in cart to remove") &&
-            !error.message.includes("500")
-          ) {
-            console.error("Error clearing cart:", error);
-          }
-        }
-      };
-      void clearCartSafely();
-    }
-  }, [ordermethod, clearCart, refreshCart]);
-
-  // Clear cart for simple guest checkout completion
-  useEffect(() => {
-    if (orderId === "guest_checkout" && searchParams && !hasClearedSimpleRef.current) {
-      hasClearedSimpleRef.current = true;
-      const clearCartSafely = async () => {
-        try {
-          await clearCart();
-          await refreshCart();
-        } catch (error: unknown) {
-          // Silently handle errors - cart might already be cleared or session invalid
-          if (
-            error instanceof Error &&
-            !error.message.includes("No items in cart to remove") &&
-            !error.message.includes("500")
-          ) {
-            console.error("Error clearing cart:", error);
-          }
-        }
-      };
-      void clearCartSafely();
-    }
-  }, [orderId, searchParams, clearCart, refreshCart]);
-
-  // Clear cart for regular order completion (non-guest) or NDB Pay guest orders
-  useEffect(() => {
-    // For NDB Pay guest orders (using localStorage data)
-    if (localStorageOrderData && !hasClearedOrderRef.current) {
-      hasClearedOrderRef.current = true;
-      const clearCartSafely = async () => {
-        try {
-          await clearCart();
-          await refreshCart();
-        } catch (error: unknown) {
-          // Silently handle errors - cart might already be cleared or session invalid
-          if (
-            error instanceof Error &&
-            !error.message.includes("No items in cart to remove") &&
-            !error.message.includes("500")
-          ) {
-            console.error("Error clearing cart:", error);
-          }
-        }
-      };
-      void clearCartSafely();
-      return;
-    }
-    
-    // For regular logged-in orders
-    if (orderId && orderId !== "guest_checkout" && orderId !== "ItemNo12345" && orderId !== "12345" && ordermethod !== "guest" && !hasClearedOrderRef.current) {
-      hasClearedOrderRef.current = true;
-      const clearCartSafely = async () => {
-        try {
-          await clearCart();
-          await refreshCart();
-        } catch (error: unknown) {
-          // Silently handle errors - cart might already be cleared or session invalid
-          if (
-            error instanceof Error &&
-            !error.message.includes("No items in cart to remove") &&
-            !error.message.includes("500")
-          ) {
-            console.error("Error clearing cart:", error);
-          }
-        }
-      };
-      getUserData();
-      void clearCartSafely();
-    } else if (orderId && orderId !== "guest_checkout" && orderId !== "ItemNo12345" && orderId !== "12345" && ordermethod !== "guest") {
-      getUserData();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [orderId, ordermethod, localStorageOrderData]); // Only run when orderId, ordermethod, or localStorageOrderData changes
-
-  // Prepare guest order data
-  const guestOrderData = ordermethod === "guest" ? {
-    order: {
-      orderNumber: order_id,
-      total: amount,
-      subtotal: subtotal,
-      shippingTotal: shippingTotal,
-      lineItems: {
-        nodes: lineItems.nodes,
-      },
-      date: date,
-    },
-  } : null;
-
-  // Guest checkout payment details
-  const guestPaymentDetails: PaymentDetailsWithoutUrls = useMemo(
-    () => ({
-      order_id: guestOrderData?.order?.orderNumber ?? "",
-      subtotal: guestOrderData?.order?.subtotal,
-      amount: guestOrderData?.order?.total ?? "",
-      currency: "LKR",
-      first_name:
-        customerData?.customer?.shipping?.firstName ?? "no_first_name",
-      last_name: customerData?.customer?.shipping?.lastName ?? "no_last_name",
-      email: customerData?.customer?.email ?? "no_email",
-      phone: customerData?.customer?.shipping?.phone ?? "no_phone",
-      shippingAddress1:
-        shippingaddress1 ?? "no_shipping_address1",
-      shippingAddress2:
-        shippingaddress2 ?? "no_shipping_address2",
-      billingAddress1:
-        billingaddress1 ?? "no_billing_address1",
-      billingAddress2:
-        billingaddress2 ?? "no_billing_address2",
-      city: city ?? "no_city",
-      country: "Sri Lanka",
-    }),
-    [guestOrderData, customerData, shippingaddress1, shippingaddress2, billingaddress1, billingaddress2, city],
-  );
-
-  // Regular order payment details
-  const regularPaymentDetails: PaymentDetailsWithoutUrls = useMemo(
-    () => ({
-      order_id: orderData?.order?.orderNumber ?? "",
-      items: orderData?.order?.lineItems?.nodes ?? [],
-      subtotal: orderData?.order?.subtotal,
-      amount: orderData?.order?.total ?? "",
-      currency: "LKR",
-      first_name:
-        customerData?.customer?.shipping?.firstName ?? "no_first_name",
-      last_name: customerData?.customer?.shipping?.lastName ?? "no_last_name",
-      email: customerData?.customer?.email ?? "no_email",
-      phone: customerData?.customer?.shipping?.phone ?? "no_phone",
-      shippingAddress1:
-        customerData?.customer?.shipping?.address1 ?? "no_shipping_address1",
-      shippingAddress2:
-        customerData?.customer?.shipping?.address2 ?? "no_shipping_address2",
-      billingAddress1:
-        customerData?.customer?.billing?.address1 ?? "no_billing_address1",
-      billingAddress2:
-        customerData?.customer?.billing?.address2 ?? "no_billing_address2",
-      city: customerData?.customer?.shipping?.city ?? "no_city",
-      country: "Sri Lanka",
-    }),
-    [orderData, customerData],
-  );
-
-  // If we have localStorage data, use it to create payment details
-  const localStoragePaymentDetails: PaymentDetailsWithoutUrls = useMemo(
-    () => {
-      if (!localStorageOrderData?.checkout) return regularPaymentDetails;
-      
-      const checkout = localStorageOrderData.checkout;
-      return {
-        order_id: checkout?.order?.orderNumber ?? checkout?.order?.databaseId?.toString() ?? "",
-        items: checkout?.order?.lineItems?.nodes ?? [],
-        subtotal: checkout?.order?.subtotal,
-        amount: checkout?.order?.total ?? "",
-        currency: "LKR",
-        first_name: checkout?.customer?.billing?.firstName ?? checkout?.customer?.shipping?.firstName ?? "no_first_name",
-        last_name: checkout?.customer?.billing?.lastName ?? checkout?.customer?.shipping?.lastName ?? "no_last_name",
-        email: checkout?.customer?.billing?.email ?? checkout?.customer?.email ?? "no_email",
-        phone: checkout?.customer?.billing?.phone ?? checkout?.customer?.shipping?.phone ?? "no_phone",
-        shippingAddress1: checkout?.customer?.shipping?.address1 ?? "no_shipping_address1",
-        shippingAddress2: checkout?.customer?.shipping?.address2 ?? "no_shipping_address2",
-        billingAddress1: checkout?.customer?.billing?.address1 ?? "no_billing_address1",
-        billingAddress2: checkout?.customer?.billing?.address2 ?? "no_billing_address2",
-        city: checkout?.customer?.shipping?.city ?? "no_city",
-        country: "Sri Lanka",
-      };
-    },
-    [localStorageOrderData, regularPaymentDetails],
-  );
-
-  // Empty effect for potential future use
-  useEffect(() => {
-    // window.location.reload()
-  }, []);
 
   if (ordermethod === "guest") {
+    // Clear cart for guest checkout completion
+    const { clearCart: guestClearCart, refreshCart: guestRefreshCart } = useCart();
+    
+    useEffect(() => {
+      const clearCartSafely = async () => {
+        try {
+          await guestClearCart();
+          await guestRefreshCart();
+        } catch (error: unknown) {
+          if (
+            error instanceof Error &&
+            !error.message.includes("No items in cart to remove")
+          ) {
+            console.error("Error clearing cart:", error);
+          }
+        }
+      };
+      void clearCartSafely();
+    }, [guestClearCart, guestRefreshCart]);
+
+    const orderData = {
+      order: {
+        orderNumber: order_id,
+        total: amount,
+        subtotal: subtotal,
+        shippingTotal: shippingTotal,
+        lineItems: {
+          nodes: lineItems.nodes,
+        },
+        date: date,
+      },
+    };
+
+    const temporaryPaymentDetails: PaymentDetailsWithoutUrls = useMemo(
+      () => ({
+        order_id: orderData?.order?.orderNumber ?? "",
+        // items: orderData?.order?.lineItems?.nodes ?? [],
+        subtotal: orderData?.order?.subtotal,
+        amount: orderData?.order?.total ?? "",
+        currency: "LKR",
+        first_name:
+          customerData?.customer?.shipping?.firstName ?? "no_first_name",
+        last_name: customerData?.customer?.shipping?.lastName ?? "no_last_name",
+        email: customerData?.customer?.email ?? "no_email",
+        phone: customerData?.customer?.shipping?.phone ?? "no_phone",
+        shippingAddress1:
+          shippingaddress1 ?? "no_shipping_address1",
+        shippingAddress2:
+          shippingaddress2 ?? "no_shipping_address2",
+        billingAddress1:
+          billingaddress1 ?? "no_billing_address1",
+        billingAddress2:
+          billingaddress2 ?? "no_billing_address2",
+        city: city ?? "no_city",
+        country: "Sri Lanka",
+      }),
+      [orderData, customerData],
+    );
+
     return (
       <>
         <div className="container mx-auto rounded-3xl text-center lg:p-20">
           <div className="my-4">
-            <OrderDetails orderData={guestOrderData} />
+            <OrderDetails orderData={orderData} />
             <div className="">
               <div className="">
                 <ProductTable
-                  lineItems={guestOrderData?.order?.lineItems?.nodes}
-                  orderData={guestOrderData}
-                  paymentDetails={guestPaymentDetails}
+                  lineItems={orderData?.order?.lineItems?.nodes}
+                  orderData={orderData}
+                  paymentDetails={temporaryPaymentDetails}
                 />
               </div>
             </div>
@@ -350,8 +172,10 @@ export default function OrderPaymentPage(props: OrderPaymentPageProps) {
             <ButtonPrimary>Shop More</ButtonPrimary>
           </Link>
         </div>
+
       </>
     );
+
   }
 
 
@@ -384,6 +208,26 @@ export default function OrderPaymentPage(props: OrderPaymentPageProps) {
   }
 
   if (orderId === "guest_checkout" && searchParams) {
+    // Clear cart for simple guest checkout completion
+    const { clearCart: simpleClearCart, refreshCart: simpleRefreshCart } = useCart();
+    
+    useEffect(() => {
+      const clearCartSafely = async () => {
+        try {
+          await simpleClearCart();
+          await simpleRefreshCart();
+        } catch (error: unknown) {
+          if (
+            error instanceof Error &&
+            !error.message.includes("No items in cart to remove")
+          ) {
+            console.error("Error clearing cart:", error);
+          }
+        }
+      };
+      void clearCartSafely();
+    }, [simpleClearCart, simpleRefreshCart]);
+
     return (
       <div className="container mx-auto grid items-center justify-center">
         <h1 className="pt-20 text-center text-2xl font-bold">
@@ -401,6 +245,42 @@ export default function OrderPaymentPage(props: OrderPaymentPageProps) {
     );
   }
 
+  const { getCart, clearCart } = useCart();
+
+  const refreshCart = useCallback(async () => {
+    try {
+      await getCart();
+    } catch (error: any) {
+      console.error("Error refreshing the cart:", error);
+      throw error;
+    }
+  }, [getCart]);
+
+
+  const { data: orderData, error: orderError } = useQuery(GET_SINGLE_ORDER, {
+    variables: { orderID: orderId },
+  });
+
+
+  useEffect(() => {
+    const clearCartSafely = async () => {
+      try {
+        await clearCart();
+        await refreshCart();
+      } catch (error: unknown) {
+        if (
+          error instanceof Error &&
+          !error.message.includes("No items in cart to remove")
+        ) {
+          console.error("Error clearing cart:", error);
+        }
+      }
+    };
+
+    getUserData();
+    void clearCartSafely();
+  }, [getUserData, clearCart, refreshCart]);
+
   if (status === "FAILURE") {
     return (
       <div className="container mx-auto grid items-center justify-center">
@@ -412,11 +292,7 @@ export default function OrderPaymentPage(props: OrderPaymentPageProps) {
     );
   }
 
-  // Prefer query data (complete) over localStorage (may be incomplete); fall back to localStorage for guest orders
-  const finalOrderData = orderData || localStorageOrderData?.checkout;
-
-  // If query failed and we have no localStorage data, show error
-  if (orderError && !localStorageOrderData && !isCheckingLocalStorage) {
+  if (orderError) {
     return (
       <div className="container mx-auto grid items-center justify-center">
         <h1 className="py-20 text-center text-2xl font-bold">
@@ -431,46 +307,48 @@ export default function OrderPaymentPage(props: OrderPaymentPageProps) {
     );
   }
 
-  // Show loading while checking localStorage
-  if (isCheckingLocalStorage && !orderData && !localStorageOrderData) {
-    return (
-      <div className="container mx-auto grid items-center justify-center py-20">
-        <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
-          <p className="mt-4 text-lg">Loading order details...</p>
-        </div>
-      </div>
-    );
-  }
 
-  const displayOrderData = orderData || localStorageOrderData?.checkout;
-  const displayPaymentDetails = localStorageOrderData && !orderData ? localStoragePaymentDetails : regularPaymentDetails;
 
-  if (!displayOrderData) {
-    return (
-      <div className="container mx-auto grid items-center justify-center">
-        <h1 className="py-20 text-center text-2xl font-bold">
-          Order not found
-        </h1>
-        <Link href={`/`}>
-          <div className="self-center text-center font-bold text-blue-500 underline hover:cursor-pointer hover:text-blue-800">
-            Back to Home
-          </div>
-        </Link>
-      </div>
-    );
-  }
+  const temporaryPaymentDetails: PaymentDetailsWithoutUrls = useMemo(
+    () => ({
+      order_id: orderData?.order?.orderNumber ?? "",
+      items: orderData?.order?.lineItems?.nodes ?? [],
+      subtotal: orderData?.order?.subtotal,
+      amount: orderData?.order?.total ?? "",
+      currency: "LKR",
+      first_name:
+        customerData?.customer?.shipping?.firstName ?? "no_first_name",
+      last_name: customerData?.customer?.shipping?.lastName ?? "no_last_name",
+      email: customerData?.customer?.email ?? "no_email",
+      phone: customerData?.customer?.shipping?.phone ?? "no_phone",
+      shippingAddress1:
+        customerData?.customer?.shipping?.address1 ?? "no_shipping_address1",
+      shippingAddress2:
+        customerData?.customer?.shipping?.address2 ?? "no_shipping_address2",
+      billingAddress1:
+        customerData?.customer?.billing?.address1 ?? "no_billing_address1",
+      billingAddress2:
+        customerData?.customer?.billing?.address2 ?? "no_billing_address2",
+      city: customerData?.customer?.shipping?.city ?? "no_city",
+      country: "Sri Lanka",
+    }),
+    [orderData, customerData],
+  );
+
+  useEffect(() => {
+    // window.location.reload()
+  }, []);
 
   return (
     <div className="container mx-auto rounded-3xl text-center lg:p-20">
       <div className="my-4">
-        <OrderDetails orderData={displayOrderData} />
+        <OrderDetails orderData={orderData} />
         <div className="">
           <div className="">
             <ProductTable
-              lineItems={displayOrderData?.order?.lineItems?.nodes}
-              orderData={displayOrderData}
-              paymentDetails={displayPaymentDetails}
+              lineItems={orderData?.order?.lineItems?.nodes}
+              orderData={orderData}
+              paymentDetails={temporaryPaymentDetails}
             />
           </div>
         </div>

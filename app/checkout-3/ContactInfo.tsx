@@ -3,6 +3,7 @@ import Label from "components/Label/Label";
 import Link from "next/link";
 import { FC, useEffect, useState } from "react";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
+import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Input from "shared/Input/Input";
 import CountryPhoneInput, { countries } from "./components/CountryPhoneInput";
 
@@ -61,11 +62,43 @@ const ContactInfo = ({
 
   const renderAccount = () => {
     return (
-      <>
-      <div>
-        <h3 className="text-lg font-semibold">Contact infomation</h3>
+      <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden z-0">
+        <div className="flex flex-col sm:flex-row items-start p-6 ">
+          <div className="flex flex-row items-center gap-4 md:gap-0 flex-1">
+            <h1 className="h-10 w-10 border-blue-700 text-blue-700 rounded-xl border-2 flex items-center justify-center text-xl font-bold">
+              1
+            </h1>
+            <div className="sm:ml-8 flex-1">
+              <div className=" text-slate-700 items-center dark:text-slate-300 flex ">
+                <h3 className="text-lg font-semibold">Contact infomation</h3>
+              </div>
+              <div className="md:block  mt-1 text-sm">
+                <span className="">{email ?? ""}</span>
+                <span className=" block ml-0 mt-2 md:mt-2 tracking-tighter">
+                  {phone || ""}
+                </span>
+              </div>
+            </div>
+          </div>
+
+            {!isActive && (
+              <ButtonSecondary
+                sizeClass="py-2 px-4 sm:w-fit w-full"
+                fontSize="text-sm font-medium"
+                className="bg-slate-50 dark:bg-slate-800 mt-5 sm:mt-0 sm:ml-4 !rounded-lg"
+                onClick={() => onOpenActive()}
+              >
+                Change
+              </ButtonSecondary>
+            )}
+
+        </div>
         <form onSubmit={handleContactSubmit}>
-          <div className="py-4 space-y-2 sm:space-y-2">
+          <div
+            className={`border-t border-slate-200 dark:border-slate-700 px-6 py-7 space-y-2 sm:space-y-2 ${
+              isActive ? "block" : "hidden"
+            }`}
+          >
             <div className="flex justify-between flex-wrap items-baseline">
               {!initialData?.displayName && (
                 <span className="block text-sm my-1 md:my-0">
@@ -106,19 +139,6 @@ const ContactInfo = ({
           </div>
         </form>
       </div>
-      <div className="border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden z-0">
-        <div className="flex flex-col sm:flex-row items-start p-6 ">
-          <div className="flex flex-row items-center gap-4 md:gap-0 flex-1">
-            <div className="sm:ml-8 flex-1">
-              <div className=" text-slate-700 items-center dark:text-slate-300 flex ">
-                <h3 className="text-lg font-semibold">Contact infomation</h3>
-              </div>
-            </div>
-          </div>
-        </div>
-        
-      </div>
-      </>
     );
   };
 

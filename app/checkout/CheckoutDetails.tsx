@@ -1,15 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import ContactInfo from "./ContactInfo";
-import DeliveryAddress from "./DeliveryAddress";
-import PaymentMethod from "./PaymentMethod";
+import UnifiedCheckoutForm from "./UnifiedCheckoutForm";
 import { QueryResult, useQuery } from "@apollo/client";
 import { GET_CHECKOUT_USER_DETAILS } from "@/graphql/defs/order";
 import { GET_PRICE_FLUCTUATION_NOTICE } from "@/graphql/defs/options";
 import { Customer, CustomerAddress } from "@/graphql/types/graphql";
 import { contactInformation } from "@/data/types";
-import BillingAddress from "./BillingAddress";
 import { CheckoutDetailsSkeleton } from "@/app/checkout/[order-id]/Skeleton";
 
 interface CheckoutLeftProps {
@@ -39,8 +36,6 @@ interface CheckoutLeftProps {
   totalPayment: any;
   setIsKokoPayment: any;
   isKokoPayment: boolean;
-  pickupType: "store_uber_pickme" | "courier" | null;
-  setPickupType: (type: "store_uber_pickme" | "courier" | null) => void;
 }
 
 const CheckoutDetails = ({
@@ -58,8 +53,6 @@ const CheckoutDetails = ({
   totalPayment,
   setIsKokoPayment,
   isKokoPayment,
-  pickupType,
-  setPickupType
 }: CheckoutLeftProps) => {
 
   const { data, loading: dataLoading }: QueryResult = useQuery(GET_CHECKOUT_USER_DETAILS);
@@ -75,16 +68,16 @@ const CheckoutDetails = ({
   const [isBillingAddressHidden, setIsBillingAddressHidden] = useState(false);
 
   useEffect(() => {
-    if (pickupType === "store_uber_pickme") {
+    if (isStorePickup == true) {
       setIsStorePickup(true);
       handleConfirmationChange("billingAddress", true);
     }
-    setIsBillingAddressHidden(isBillingSameAsShipping || pickupType === "store_uber_pickme");
+    setIsBillingAddressHidden(isBillingSameAsShipping || isStorePickup);
     if (!isBillingAddressHidden) {
       handleConfirmationChange("billingAddress", true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pickupType, isBillingSameAsShipping]);
+  }, [isStorePickup, isBillingSameAsShipping]);
 
 
   useEffect(() => {
@@ -110,115 +103,26 @@ const CheckoutDetails = ({
 
   return (
     <div className="space-y-8">
-      {/*{JSON.stringify(dataLoading)}*/}
-      <div id="ContactInfo" className="scroll-mt-24">
-
-        <ContactInfo
-          isActive={tabActive === "ContactInfo"}
-          onOpenActive={() => {
-            setTabActive("ContactInfo");
-            handleScrollToEl("ContactInfo");
-          }}
-          onCloseActive={() => {
-            setTabActive("DeliveryAddress");
-            handleScrollToEl("DeliveryAddress");
-          }}
-          updateFormData={(section, data) => {
-            updateFormData(section, data);
-          }}
-          formData={formData}
-          initialData={initContactInformation!}
-          handleConfirmationChange={(value: any) =>
-            handleConfirmationChange("contactInfo", value)
-          }
-        />
-      </div>
-
-      <div id="DeliveryAddress" className="scroll-mt-24">
-        <DeliveryAddress
-          isActive={tabActive === "DeliveryAddress"}
-          onOpenActive={() => {
-            setTabActive("DeliveryAddress");
-            handleScrollToEl("DeliveryAddress");
-          }}
-          onCloseActive={() => {
-            if (isBillingAddressHidden) {
-              setTabActive("PaymentMethod");
-              handleScrollToEl("PaymentMethod");
-            } else {
-              setTabActive("BillingAddress");
-              handleScrollToEl("BillingAddress");
-            }
-          }}
-          updateFormData={(section, data) => {
-            updateFormData(section, data);
-          }}
-          initialData={shippingDetails!}
-          formData={formData}
-          handleConfirmationChange={(value: any) =>
-            handleConfirmationChange("deliveryAddress", value)
-          }
-          toggleConfirmationBillingAddress={(value: any) =>
-            handleConfirmationChange("billingAddress", value)
-          }
-          updateBillingVisibility={(isVisible: boolean) =>
-            setIsBillingAddressHidden(isVisible)
-          }
-          isStorePickup={isStorePickup}
-          setStorePickup={setIsStorePickup}
-          setDeliveryAddress={setIsBillingSameAsShipping}
-          pickupType={pickupType}
-          setPickupType={setPickupType}
-        />
-      </div>
-
-      {/* {!isBillingAddressHidden && (
-        <div id="BillingAddress" className="scroll-mt-24">
-          <BillingAddress
-            isActive={tabActive === "BillingAddress"}
-            onOpenActive={() => {
-              setTabActive("BillingAddress");
-              handleScrollToEl("BillingAddress");
-            }}
-            onCloseActive={() => {
-              setTabActive("PaymentMethod");
-              handleScrollToEl("");
-            }}
-            updateFormData={(section, data) => {
-              updateFormData(section, data);
-            }}
-            initialData={billingDetails!}
-            handleConfirmationChange={(value: any) =>
-              handleConfirmationChange("billingAddress", value)
-            }
-          />
-        </div>
-      )} */}
-
-      <div id="PaymentMethod" className="scroll-mt-24">
-        <PaymentMethod
-          isActive={tabActive === "PaymentMethod"}
-          onOpenActive={() => {
-            setTabActive("PaymentMethod");
-            handleScrollToEl("PaymentMethod");
-          }}
-          onCloseActive={() => setTabActive("order-cart")}
-          paymentGateways={paymentGateways}
-          updateFormData={(section, data) => {
-            updateFormData(section, data);
-          }}
-          isBillingAddressEnabled={isBillingAddressHidden}
-          handleConfirmationChange={(value: any) =>
-            handleConfirmationChange("paymentMethod", value)
-          }
-          isCardPayment={isCardPayment}
-          setIsCardPayment={setIsCardPayment}
-          isPriceFluctuation={isPriceFluctuation}
-          totalPayment={totalPayment}
-          setIsKokoPayment={setIsKokoPayment}
-          isKokoPayment={isKokoPayment}
-        />
-      </div>
+      <UnifiedCheckoutForm
+        updateFormData={updateFormData}
+        formData={formData}
+        initialContactData={initContactInformation!}
+        initialShippingData={shippingDetails}
+        paymentGateways={paymentGateways}
+        handleConfirmationChange={handleConfirmationChange}
+        setIsStorePickup={setIsStorePickup}
+        isStorePickup={isStorePickup}
+        setIsCardPayment={setIsCardPayment}
+        isCardPayment={isCardPayment}
+        totalPayment={totalPayment}
+        setIsKokoPayment={setIsKokoPayment}
+        isKokoPayment={isKokoPayment}
+        isPriceFluctuation={isPriceFluctuation}
+        onFormSubmit={() => {
+          setTabActive("order-cart");
+          handleScrollToEl("order-cart");
+        }}
+      />
     </div>
   );
 };
