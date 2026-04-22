@@ -19,7 +19,7 @@ jobs:
           echo "📝 Commit message: ${{ github.event.head_commit.message }}"
           echo "👤 Committed by: ${{ github.event.head_commit.author.name }}"
 
-          RESPONSE=$(curl -s -w "\n%{http_code}" -X GET "https://api.vercel.com/v1/integrations/deploy/prj_FOQsQ9z4D5zkNybakSXxWmOjZfsd/GU0dOje7mE")
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X GET "$VERCEL_DEPLOY_HOOK")
           HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
           BODY=$(echo "$RESPONSE" | sed '$d')
 
