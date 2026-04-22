@@ -116,6 +116,7 @@ const CheckoutPage = () => {
   const [couponStatus, setCouponStatus] = useState<"idle" | "success" | "error">("idle");
   const [couponMessage, setCouponMessage] = useState<string | null>(null);
   const [isCouponSyncingCart, setIsCouponSyncingCart] = useState(false);
+  const [hasSeenCartWithItems, setHasSeenCartWithItems] = useState(false);
 
   const [applyCouponMutation, { loading: applyingCoupon }] = useMutation(APPLY_COUPON);
   const [removeCouponsMutation, { loading: removingCoupon }] = useMutation(REMOVE_COUPONS);
@@ -129,13 +130,26 @@ const CheckoutPage = () => {
   };
   // TODO: Uncomment this for the redirect on cart free
   useEffect(() => {
-    if (!isCouponSyncingCart && !applyingCoupon && !removingCoupon && cart && cart?.contents?.nodes?.length === 0) {
+    if (cart?.contents?.nodes?.length > 0) {
+      setHasSeenCartWithItems(true);
+    }
+  }, [cart]);
+
+  useEffect(() => {
+    if (
+      !hasSeenCartWithItems &&
+      !isCouponSyncingCart &&
+      !applyingCoupon &&
+      !removingCoupon &&
+      cart &&
+      cart?.contents?.nodes?.length === 0
+    ) {
       router.push("/");
     }
     if (cart?.total !== null && cart?.total !== undefined) {
       setOrderTotal(cart?.total);
     }
-  }, [cart, isCouponSyncingCart, applyingCoupon, removingCoupon]);
+  }, [cart, hasSeenCartWithItems, isCouponSyncingCart, applyingCoupon, removingCoupon]);
 
   useEffect(() => {
     fetchCustomer();
