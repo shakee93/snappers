@@ -130,7 +130,7 @@ const CheckoutPage = () => {
   };
   // TODO: Uncomment this for the redirect on cart free
   useEffect(() => {
-    if (cart?.contents?.nodes?.length > 0) {
+    if ((cart?.contents?.nodes?.length ?? 0) > 0) {
       setHasSeenCartWithItems(true);
     }
   }, [cart]);
