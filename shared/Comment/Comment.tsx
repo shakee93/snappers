@@ -1,6 +1,7 @@
 import { _getPersonNameRd } from "@/contains/fakeData";
 import React from "react";
 import { FC } from "react";
+import Link from "next/link";
 import Avatar from "@/shared/Avatar/Avatar";
 
 export interface CommentProps {
@@ -15,12 +16,12 @@ const Comment: FC<CommentProps> = ({ isSmall }) => {
       </div>
       <div className="flex-grow flex flex-col p-4 ml-2 text-sm border border-neutral-200 rounded-xl sm:ml-3 sm:text-base dark:border-neutral-700">
         <div className="relative flex items-center pr-6">
-          <a
+          <Link
             className="flex-shrink-0 font-semibold text-neutral-800 dark:text-neutral-100"
             href="/ncmaz/author/the-demo-author-slug"
           >
             {_getPersonNameRd()}
-          </a>
+          </Link>
           <span className="mx-2">·</span>
           <span className="text-neutral-500 dark:text-neutral-400 text-xs line-clamp-1 sm:text-sm">
             May 20, 2021
