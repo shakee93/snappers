@@ -115,6 +115,7 @@ const CheckoutPage = () => {
   const [couponCode, setCouponCode] = useState("");
   const [couponStatus, setCouponStatus] = useState<"idle" | "success" | "error">("idle");
   const [couponMessage, setCouponMessage] = useState<string | null>(null);
+  const [isCouponSyncingCart, setIsCouponSyncingCart] = useState(false);
 
   const [applyCouponMutation, { loading: applyingCoupon }] = useMutation(APPLY_COUPON);
   const [removeCouponsMutation, { loading: removingCoupon }] = useMutation(REMOVE_COUPONS);
@@ -128,13 +129,13 @@ const CheckoutPage = () => {
   };
   // TODO: Uncomment this for the redirect on cart free
   useEffect(() => {
-    if (cart && cart?.contents?.nodes?.length === 0) {
+    if (!isCouponSyncingCart && !applyingCoupon && !removingCoupon && cart && cart?.contents?.nodes?.length === 0) {
       router.push("/");
     }
     if (cart?.total !== null && cart?.total !== undefined) {
       setOrderTotal(cart?.total);
     }
-  }, [cart]);
+  }, [cart, isCouponSyncingCart, applyingCoupon, removingCoupon]);
 
   useEffect(() => {
     fetchCustomer();
@@ -1207,6 +1208,7 @@ const CheckoutPage = () => {
                         return;
                       }
                       try {
+                        setIsCouponSyncingCart(true);
                         setCouponStatus("idle");
                         setCouponMessage(null);
 
@@ -1236,6 +1238,8 @@ const CheckoutPage = () => {
                         toast.error(cleanedMessage);
                         setCouponStatus("error");
                         setCouponMessage(cleanedMessage);
+                      } finally {
+                        setIsCouponSyncingCart(false);
                       }
                     }}
                     disabled={applyingCoupon}
@@ -1294,6 +1298,7 @@ const CheckoutPage = () => {
                             type="button"
                             onClick={async () => {
                               try {
+                                setIsCouponSyncingCart(true);
                                 const { data } = await removeCouponsMutation({
                                   variables: { codes: [applied.code] },
                                 });
@@ -1310,6 +1315,8 @@ const CheckoutPage = () => {
                                   error?.message ||
                                   "Failed to remove coupon.";
                                 toast.error(message);
+                              } finally {
+                                setIsCouponSyncingCart(false);
                               }
                             }}
                             disabled={removingCoupon}
