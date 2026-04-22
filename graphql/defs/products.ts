@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { ProductContentFull, ProductSpecs } from "@/graphql/defs/products.fragments";
+import { ProductContentCard, ProductContentFull, ProductSpecs } from "@/graphql/defs/products.fragments";
 
 export const GET_BRANDS = gql`
   query getBrands($slug: [String] = []) {
@@ -327,12 +327,12 @@ export const GET_BRAND_ARCHIVE = gql`
     ) {
       edges {
         node {
-          ...ProductContentFull
+          ...ProductContentCard
         }
       }
     }
   }
-  ${ProductContentFull}
+  ${ProductContentCard}
 `;
 
 export const GET_CATEGORY_ARCHIVE = gql`
@@ -340,12 +340,12 @@ export const GET_CATEGORY_ARCHIVE = gql`
     products(first: $first, where: { categoryIdIn: $categoryIdIn }) {
       edges {
         node {
-          ...ProductContentFull
+          ...ProductContentCard
         }
       }
     }
   }
-  ${ProductContentFull}
+  ${ProductContentCard}
 `;
 
 export const GET_CATEGORY_ARCHIVE_IN_STOCK = gql`
@@ -353,12 +353,12 @@ export const GET_CATEGORY_ARCHIVE_IN_STOCK = gql`
     products(first: $first, where: { categoryIdIn: $categoryIdIn, stockStatus: IN_STOCK }) {
       edges {
         node {
-          ...ProductContentFull
+          ...ProductContentCard
         }
       }
     }
   }
-  ${ProductContentFull}
+  ${ProductContentCard}
 `;
 
 export const GET_PRODUCTS_NODES = gql`
@@ -372,11 +372,11 @@ export const GET_PRODUCTS_NODES = gql`
       }
     ) {
       nodes {
-        ...ProductContentFull
+        ...ProductContentCard
       }
     }
   }
-  ${ProductContentFull}
+  ${ProductContentCard}
 `;
 
 export const GET_BENTO_SLIDER = gql`
@@ -427,11 +427,11 @@ export const GET_PRODUCTS_NODES_HOMEPAGE = gql`
     }
     ) {
       nodes {
-        ...ProductContentFull
+        ...ProductContentCard
       }
     }
   }
-  ${ProductContentFull}
+  ${ProductContentCard}
 `;
 
 /** Products tagged for BOGO / free offers (WP plugin syncs tag slug `bogo-offer`). */
@@ -442,11 +442,11 @@ export const GET_PRODUCTS_BY_BOGO_TAG = gql`
       where: { tagIn: $tagIn, orderby: { field: DATE, order: DESC } }
     ) {
       nodes {
-        ...ProductContentFull
+        ...ProductContentCard
       }
     }
   }
-  ${ProductContentFull}
+  ${ProductContentCard}
 `;
 
 export const GET_PRODUCTS = gql`
@@ -663,11 +663,11 @@ export const GET_NEW_ARRIVALS = gql`
   query GET_NEW_ARRIVALS {
     products(where: { orderby: { field: DATE, order: DESC } }) {
       nodes {
-        ...ProductContentFull
+        ...ProductContentCard
       }
     }
   }
-  ${ProductContentFull}
+  ${ProductContentCard}
 `;
 
 //productContentFull fragment is not working

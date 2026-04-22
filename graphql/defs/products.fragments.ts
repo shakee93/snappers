@@ -170,6 +170,119 @@ export const ProductVariationContentSlice = gql`
   }
 `;
 
+// Slim fragment used by listing cards (homepage sliders, archives, search).
+// Covers every field ProductCard3 + AddedToCart + useProductLink read.
+// For PDP-only fields (description, galleryImages, upsell, attributes,
+// happiestCustomersGallery, etc.) use ProductContentFull below.
+export const ProductContentCard = gql`
+  fragment ProductContentCard on Product {
+    id
+    databaseId
+    slug
+    name
+    type
+    reviewCount
+    image {
+      id
+      sourceUrl
+      altText
+      databaseId
+    }
+    brands {
+      nodes {
+        databaseId
+        name
+        slug
+        count
+        brandImage
+      }
+    }
+    metaData {
+      key
+      value
+      id
+    }
+    bogoPluginMeta: metaData(
+      keysIn: [
+        "_wc_bogo_enabled",
+        "_wc_bogo_buy_qty",
+        "_wc_bogo_get_qty",
+        "_wc_bogo_max_free_qty",
+        "_wc_bogo_free_product_ids",
+        "_wc_bogo_free_product_id"
+      ]
+    ) {
+      key
+      value
+      id
+    }
+    productTags(first: 20) {
+      nodes {
+        id
+        slug
+        name
+      }
+    }
+    ... on SimpleProduct {
+      onSale
+      stockStatus
+      price
+      rawPrice: price(format: RAW)
+      regularPrice
+      salePrice
+    }
+    ... on VariableProduct {
+      # allPa* fields are dynamically accessed by AddedToCart at
+      # product[allPa+label], so they must stay on the card fragment.
+      allPaCapacity { nodes { name slug } }
+      allPaColor { nodes { name slug } }
+      allPaColour { nodes { name slug } }
+      allPaSpecification { nodes { name slug } }
+      allPaVariant { nodes { name slug } }
+      allPaWarranty { nodes { name slug } }
+      allPaModel { nodes { name slug } }
+      allPaWatchSize { nodes { name slug } }
+      allPaConnectivity { nodes { name slug } }
+      allPaPacks { nodes { name slug } }
+      allPaSize { nodes { name slug } }
+      allPaConnectorType { nodes { name slug } }
+      allPaBandType { nodes { name slug } }
+      allPaShape { nodes { name slug } }
+      allPaCompatibility { nodes { name slug } }
+      allPaNetwork { nodes { name slug } }
+      allPaAmount { nodes { name slug } }
+
+      onSale
+      price
+      rawPrice: price(format: RAW)
+      regularPrice
+      salePrice
+      stockStatus
+      variations(first: 50) {
+        nodes {
+          price
+          regularPrice
+          stockStatus
+          image {
+            sourceUrl
+          }
+          attributes {
+            nodes {
+              # "label" is intentionally omitted. AddedToCart reads it via
+              # product[allPa + label], but is only invoked with a variation
+              # from the PDP, where ProductContentFull supplies label. If a
+              # listing card ever passes a variation into AddedToCart, add
+              # label here too.
+              name
+              value
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const ProductContentFull = gql`
   fragment ProductContentFull on Product {
     id
