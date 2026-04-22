@@ -1,10 +1,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import NcInputNumber from "components/NcInputNumber";
-import Prices from "components/Prices";
+import LineOrCartPriceLabel from "@/app/components/LineOrCartPriceLabel";
 import { Fragment } from "react";
 import AttributeIcon from "@/app/components/AttributeIcon";
 import { VariableProduct, PaCapacity } from "@/graphql/types/graphql";
+import { isLineItemFree } from "@/lib/cartLinePricing";
 
 export interface CartItem {
   extraData?: null | any;
@@ -26,6 +27,7 @@ export interface CartItemProductNode {
   id: number;
   name: string;
   price: number;
+  regularPrice?: string;
   slug: string;
   type: string;
   image: {
@@ -51,8 +53,9 @@ const cartItems = ({
   onRemove,
 }: CartItemsProps) => {
   const { product, quantity, key, subtotal, total, variation } = item;
+  const lineIsFree = isLineItemFree(total, subtotal);
   const { node } = product || {};
-  const { name, price, image, terms, brands, type } = node || {};
+  const { name, price, regularPrice, image, terms, brands, type } = node || {};
   const brandSlug = brands?.nodes[0]?.slug;
 
   return (
@@ -123,7 +126,8 @@ const cartItems = ({
                 <select
                   name="qty"
                   id="qty"
-                  className="form-select text-sm rounded-md py-1 border-slate-200 dark:border-slate-700 relative z-10 dark:bg-slate-800 "
+                  disabled={lineIsFree}
+                  className="form-select text-sm rounded-md py-1 border-slate-200 dark:border-slate-700 relative z-10 dark:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   <option value="1">1</option>
                   <option value="2">2</option>
@@ -133,18 +137,39 @@ const cartItems = ({
                   <option value="6">6</option>
                   <option value="7">7</option>
                 </select>
-                <Prices
+                <LineOrCartPriceLabel
+                  lineTotal={total}
+                  lineSubtotal={subtotal}
+                  showOriginalPrice={false}
                   contentClass="py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium h-full"
-                  price={price}
+                  catalogPrice={
+                    type === "VARIABLE" ? variation?.node.price : price
+                  }
+                  catalogSalePrice={
+                    type === "VARIABLE"
+                      ? variation?.node.regularPrice
+                      : regularPrice
+                  }
                 />
 
               </div>
             </div>
 
             <div className="hidden flex-1 sm:flex justify-end">
-              <Prices
-                price={type === 'VARIABLE' ? variation?.node.price : price}
-                className="mt-0.5" />
+              <LineOrCartPriceLabel
+                lineTotal={total}
+                lineSubtotal={subtotal}
+                showOriginalPrice={false}
+                catalogPrice={
+                  type === "VARIABLE" ? variation?.node.price : price
+                }
+                catalogSalePrice={
+                  type === "VARIABLE"
+                    ? variation?.node.regularPrice
+                    : regularPrice
+                }
+                className="mt-0.5"
+              />
             </div>
           </div>
         </div>
@@ -158,6 +183,7 @@ const cartItems = ({
               }}
               defaultValue={quantity || 1}
               className="relative z-10"
+              disabled={lineIsFree}
             />
           </div>
           <span

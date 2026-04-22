@@ -2,6 +2,7 @@
 import { OrderPaymentPageProps } from "@/data/types";
 import { useQuery } from "@apollo/client";
 import { GET_SINGLE_ORDER } from "@/graphql/defs/order";
+import { isLineItemFree, stripHtmlMoney } from "@/lib/cartLinePricing";
 
 const ThankYouPage = ({ params }: OrderPaymentPageProps) => {
   // const dummyProducts = [
@@ -100,7 +101,13 @@ const ThankYouPage = ({ params }: OrderPaymentPageProps) => {
                                   {item?.product.node.quantity}
                                 </td>
                                 <td className="whitespace-nowrap px-6 py-4 text-right  text-gray-800 dark:text-gray-200">
-                                  ${item?.subtotal}
+                                  {isLineItemFree(item?.total, item?.subtotal) ? (
+                                    <span className="font-semibold text-green-600">
+                                      Free
+                                    </span>
+                                  ) : (
+                                    <>${stripHtmlMoney(item?.total ?? item?.subtotal)}</>
+                                  )}
                                 </td>
                               </tr>
                             ),

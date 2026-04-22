@@ -201,6 +201,21 @@ export const ProductContentFull = gql`
       value
       id
     }
+    # WooCommerce BOGO plugin meta is often omitted from unfiltered metaData; fetch explicitly.
+    bogoPluginMeta: metaData(
+      keysIn: [
+        "_wc_bogo_enabled",
+        "_wc_bogo_buy_qty",
+        "_wc_bogo_get_qty",
+        "_wc_bogo_max_free_qty",
+        "_wc_bogo_free_product_ids",
+        "_wc_bogo_free_product_id"
+      ]
+    ) {
+      key
+      value
+      id
+    }
     galleryImages {
       nodes {
         id
@@ -464,6 +479,7 @@ export const ProductContentFull = gql`
       }
     }
     ... on SimpleProduct {
+      happiestCustomersGallery
       onSale
       stockStatus
       price
@@ -493,6 +509,7 @@ export const ProductContentFull = gql`
       }
     }
     ... on VariableProduct {
+      happiestCustomersGallery
       allPaCapacity {
         nodes {
           name

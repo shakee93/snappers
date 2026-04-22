@@ -6,6 +6,7 @@ import Heading from "@/app/components/Heading/Heading";
 import { getClient } from "@/graphql/apollo-ssr";
 import {
   GET_BRANDS,
+  GET_PRODUCTS_BY_BOGO_TAG,
   GET_PRODUCTS_NODES,
   GET_PRODUCTS_NODES_HOMEPAGE,
 } from "@/graphql/defs/products";
@@ -26,8 +27,20 @@ import SectionHero4 from "./components/HomePage/SectionHero4";
  * Get the data for the home page
   * @returns { Promise<{ newArrivals: (SimpleProduct & VariableProduct)[], mobiles: (SimpleProduct & VariableProduct)[], speakers: (SimpleProduct & VariableProduct)[], watches: (SimpleProduct & VariableProduct)[], backInStock: (SimpleProduct & VariableProduct)[], brands: Brand[], slides: Slide[], options: Option[], reviews: Review[], bentoSlider: BentoSlider[] }> }
  */
+const BOGO_OFFER_TAG_SLUGS = ["bogo-offer"];
+
 const getData = async () => {
   const queries = [
+    getClient()
+      .query({
+        query: GET_PRODUCTS_BY_BOGO_TAG,
+        variables: { first: 50, tagIn: BOGO_OFFER_TAG_SLUGS },
+      })
+      .then((res) => res.data?.products?.nodes || [])
+      .catch(() => {
+        console.error("Error fetching free offers products");
+        return [];
+      }),
     getClient()
       .query({ query: GET_PRODUCTS_NODES, variables: { first: 25 } })
       .then((res) => {
@@ -37,7 +50,6 @@ const getData = async () => {
         console.error("Error fetching new arrivals");
         return [];
       }),
-
     getClient()
       .query({
         query: GET_PRODUCTS_NODES,
@@ -148,6 +160,7 @@ const getData = async () => {
   ];
 
   const [
+    freeOffersRaw,
     newArrivals,
     mobiles,
     speakers,
@@ -161,6 +174,7 @@ const getData = async () => {
   ] = await Promise.all(queries);
 
   return {
+    freeOffersRaw: freeOffersRaw as (SimpleProduct & VariableProduct)[],
     newArrivals: newArrivals as (SimpleProduct & VariableProduct)[],
     mobiles: mobiles as (SimpleProduct & VariableProduct)[],
     speakers: speakers as (SimpleProduct & VariableProduct)[],
@@ -176,6 +190,7 @@ const getData = async () => {
 
 export default async function Home() {
   const {
+    freeOffersRaw,
     newArrivals,
     mobiles,
     speakers,
@@ -186,6 +201,13 @@ export default async function Home() {
     reviews,
     bentoSlider,
   } = await getData();
+
+  const inStockOffers = freeOffersRaw.filter((p) => p.stockStatus === "IN_STOCK");
+  const soldOutOffers = freeOffersRaw.filter((p) => p.stockStatus !== "IN_STOCK");
+  const freeOffersProducts =
+    inStockOffers.length >= 5
+      ? inStockOffers
+      : [...inStockOffers, ...soldOutOffers];
 
   return (
     <main>
@@ -200,6 +222,14 @@ export default async function Home() {
               products={newArrivals}
               heading="New Arrivals"
               link="new-arrivals"
+            />
+          </div>
+
+          <div>
+            <SectionSliderProductCard
+              products={freeOffersProducts}
+              heading="Free Offers"
+              link="tag/bogo-offer"
             />
           </div>
 

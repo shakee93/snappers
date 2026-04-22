@@ -25,8 +25,8 @@ const MobileNavLinks = () => {
     },
     {
       id: 3,
-      href: "/tag/clearance",
-      name: "Clearance",
+      href: "/deals",
+      name: "Deals",
     },
     {
       id: 4,

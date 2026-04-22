@@ -1,7 +1,7 @@
 import {LineItem, PaCapacity, SimpleProduct, VariableProduct,} from "@/graphql/types/graphql";
 import Image from "next/image";
 import Link from "next/link";
-import Prices from "@/app/components/Prices";
+import { isLineItemFree, stripHtmlMoney } from "@/lib/cartLinePricing";
 import useProductLink from "@/hooks/useProductLink";
 import React, {Fragment} from "react";
 import AttributeIcon from "@/app/components/AttributeIcon";
@@ -17,8 +17,7 @@ const OrderItemProduct = ({
 
     const link = useProductLink(orderItem.product?.node);
 
-    const {variation} = orderItem;
-    const {total} = orderItem;
+    const { variation, total, subtotal } = orderItem;
     // console.log("orderItem", orderItem);
     if (!orderItem.product?.node) {
         // console.log("orderItem.product?.node: ", orderItem);
@@ -102,30 +101,37 @@ const OrderItemProduct = ({
                                 className={`flex items-center mt-2 border-2 w-fit border-gray-300 rounded-lg p-2 `}
                             >
                                 <span className="text-slate-950 text-xs lg:text-sm font-bold !leading-none">
-                                    Rs.{total}
+                                    {isLineItemFree(total, subtotal) ? (
+                                        <span className="text-green-600">Free</span>
+                                    ) : (
+                                        <>Rs.{stripHtmlMoney(total ?? subtotal)}</>
+                                    )}
                                 </span>
                             </div>
 
                             <div className="mt-3 flex justify-between w-full sm:hidden relative">
-
-                                <Prices
-                                    contentClass="py-1 px-2 md:py-1.5 md:px-2.5 text-sm font-medium h-full"
-                                    price={total}
-                                    salePrice={total}
-                                />
+                                <span className="py-1 px-2 text-sm font-medium text-slate-950">
+                                    {isLineItemFree(total, subtotal) ? (
+                                        <span className="font-bold text-green-600">Free</span>
+                                    ) : (
+                                        <>Rs.{stripHtmlMoney(total ?? subtotal)}</>
+                                    )}
+                                </span>
                             </div>
                         </div>
 
                         <div className="hidden flex-1 sm:flex justify-end">
-                            <Prices
-                                salePrice={
-                                    type === "VARIABLE"
-                                        ? variation?.node.regularPrice
-                                        : regularPrice
-                                }
-                                price={type === "VARIABLE" ? variation?.node.price : price}
-                                className="mt-0.5 flex-col"
-                            />
+                            <div className="mt-0.5 flex flex-col items-end">
+                                {isLineItemFree(total, subtotal) ? (
+                                    <span className="text-base font-bold text-green-600">
+                                        Free
+                                    </span>
+                                ) : (
+                                    <span className="text-base font-bold text-slate-950">
+                                        Rs.{stripHtmlMoney(total ?? subtotal)}
+                                    </span>
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>

@@ -49,6 +49,122 @@ export const GET_PRODUCT = gql`
   }
 `;
 
+export const GET_PRODUCTS_BY_DATABASE_IDS = gql`
+  query GetProductsByDatabaseIds($ids: [Int]) {
+    products(first: 25, where: { include: $ids }) {
+      nodes {
+        databaseId
+        name
+        slug
+        image {
+          sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
+        }
+        featuredImage {
+          node {
+            sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
+          }
+        }
+        brands {
+          nodes {
+            slug
+          }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_PRODUCT_BY_DATABASE_ID = gql`
+  query GetProductByDatabaseId($id: ID!) {
+    product(id: $id, idType: DATABASE_ID) {
+      databaseId
+      name
+      slug
+      image {
+        sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
+      }
+      featuredImage {
+        node {
+          sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
+        }
+      }
+      ... on SimpleProduct {
+        brands {
+          nodes {
+            slug
+          }
+        }
+      }
+      ... on VariableProduct {
+        brands {
+          nodes {
+            slug
+          }
+        }
+      }
+    }
+  }
+`;
+
+/** Batch-fetch BOGO plugin meta for InstantSearch / Typesense hits (no Woo meta on the hit). */
+export const GET_PRODUCTS_BOGO_PLUGIN_META = gql`
+  query GetProductsBogoPluginMeta($ids: [Int]) {
+    products(first: 100, where: { include: $ids }) {
+      nodes {
+        databaseId
+        bogoPluginMeta: metaData(
+          keysIn: [
+            "_wc_bogo_enabled",
+            "_wc_bogo_buy_qty",
+            "_wc_bogo_get_qty",
+            "_wc_bogo_max_free_qty",
+            "_wc_bogo_free_product_ids",
+            "_wc_bogo_free_product_id"
+          ]
+        ) {
+          key
+          value
+          id
+        }
+      }
+    }
+  }
+`;
+
+export const GET_PRODUCT_VARIATION_BY_DATABASE_ID = gql`
+  query GetProductVariationByDatabaseId($id: ID!) {
+    productVariation(id: $id, idType: DATABASE_ID) {
+      databaseId
+      name
+      image {
+        sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
+      }
+      parent {
+        node {
+          databaseId
+          name
+          slug
+          image {
+            sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
+          }
+          featuredImage {
+            node {
+              sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
+            }
+          }
+          ... on VariableProduct {
+            brands {
+              nodes {
+                slug
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 
 export const GET_TAG_DETAILS_BY_SLUG = gql`
   query GetTagDetailsBySlug($slug: [String]!) {
@@ -309,6 +425,21 @@ export const GET_PRODUCTS_NODES_HOMEPAGE = gql`
       tagId: $tagId
     stockStatus: IN_STOCK
     }
+    ) {
+      nodes {
+        ...ProductContentFull
+      }
+    }
+  }
+  ${ProductContentFull}
+`;
+
+/** Products tagged for BOGO / free offers (WP plugin syncs tag slug `bogo-offer`). */
+export const GET_PRODUCTS_BY_BOGO_TAG = gql`
+  query GetProductsByBogoTag($first: Int = 50, $tagIn: [String] = ["bogo-offer"]) {
+    products(
+      first: $first
+      where: { tagIn: $tagIn, orderby: { field: DATE, order: DESC } }
     ) {
       nodes {
         ...ProductContentFull

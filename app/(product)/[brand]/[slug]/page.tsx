@@ -11,6 +11,8 @@ import Features from "@/app/components/SingleProductPage/FeatureCard";
 import ProductOverview from "@/app/components/SingleProductPage/ProductOverview";
 import Link from "next/link";
 import ProductImage from "@/app/components/SingleProductPage/ProductImage2";
+import FreeGiftPreview from "@/app/components/SingleProductPage/FreeGiftPreview";
+import HappiestCustomersGallery from "@/app/components/SingleProductPage/HappiestCustomersGallery";
 import { Suspense } from "react";
 import { Metadata, ResolvingMetadata } from "next";
 import { ImageProvider } from "@/context/ImageChangeGrabber";
@@ -151,6 +153,7 @@ const Page = async (props: Props) => {
   } = await getData(params.slug, params.brand);
 
   const productSchema = getProductSchema(product, brand);
+  const happiestCustomersImages = ((product as any)?.happiestCustomersGallery || []) as string[];
 
   return (
     <div className="mt-5 md:mt-10">
@@ -171,6 +174,7 @@ const Page = async (props: Props) => {
               <Suspense fallback={<>loading...</>}>
                 <ProductImage product={product} />
               </Suspense>
+              <FreeGiftPreview product={product} />
               <div className="hidden lg:block w-full mt-6">
                 <Features />
               </div>
@@ -180,6 +184,7 @@ const Page = async (props: Props) => {
             </div>
           </ImageProvider>
         </div>
+        <HappiestCustomersGallery images={happiestCustomersImages} />
         {/* Image Gallery */}
         <ProductOverview product={product} />
         <div className=" lg:hidden w-full lg:w-1/5 p-3 bg-white rounded-3xl my-5">

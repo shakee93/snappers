@@ -1,4 +1,5 @@
 import { LineItem } from "@/graphql/types/graphql";
+import { isLineItemFree, stripHtmlMoney } from "@/lib/cartLinePricing";
 
 export const createProductList = (orderData: any): LineItem[] | null => {
   if (!orderData) return null;
@@ -32,7 +33,11 @@ export const ProductTableRows = ({
           {item?.quantity ?? 0}
         </td>
         <td className="px-6 py-4 text-right whitespace-nowrap text-gray-800 dark:text-gray-200">
-          Rs. {item?.subtotal ?? 0}
+          {isLineItemFree(item?.total, item?.subtotal) ? (
+            <span className="font-semibold text-green-600">Free</span>
+          ) : (
+            <>Rs. {stripHtmlMoney(item?.total ?? item?.subtotal ?? 0)}</>
+          )}
         </td>
       </tr>
     ))}
