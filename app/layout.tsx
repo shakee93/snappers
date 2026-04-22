@@ -121,7 +121,10 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body className="bg-gray-100 text-base dark:bg-slate-900 text-slate-900 dark:text-slate-200">
+      <body
+        suppressHydrationWarning
+        className="bg-gray-100 text-base dark:bg-slate-900 text-slate-900 dark:text-slate-200"
+      >
         <ApolloWrapper>
           <CartProvider>
             <SessionProvider>
