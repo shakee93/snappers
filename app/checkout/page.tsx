@@ -799,6 +799,8 @@ const CheckoutPage = () => {
 
   const numericOrderTotal = replaceStringinInt(orderTotal);
   const cartSubtotal = replaceStringinInt(cart?.subtotal);
+  const numericDiscountTotal = replaceStringinInt(cart?.discountTotal);
+  const hasDiscount = Number.isFinite(numericDiscountTotal) && numericDiscountTotal > 0;
   const threePercentFromTotal = numericOrderTotal * 0.03;
   const TotalWithKoko = (cartSubtotal / 88) * 100;
   const taxWithTotal = (numericOrderTotal + threePercentFromTotal).toFixed(2);
@@ -1333,18 +1335,20 @@ const CheckoutPage = () => {
                 </span>
               </div>
 
-              <div className="flex justify-between py-2.5">
-                <span>Discount</span>
-                <span className="font-semibold text-emerald-600">
-                  <span
-                    dangerouslySetInnerHTML={{
-                      __html: cart?.discountTotal
-                        ? `- ${cart.discountTotal}`
-                        : "0.00",
-                    }}
-                  />
-                </span>
-              </div>
+              {hasDiscount && (
+                <div className="flex justify-between py-2.5">
+                  <span>Discount</span>
+                  <span className="font-semibold text-emerald-600">
+                    <span
+                      dangerouslySetInnerHTML={{
+                        __html: cart?.discountTotal
+                          ? `- ${cart.discountTotal}`
+                          : "0.00",
+                      }}
+                    />
+                  </span>
+                </div>
+              )}
 
               {pickupType !== "store_uber_pickme" && (
                 <div className="flex justify-between py-2.5">
