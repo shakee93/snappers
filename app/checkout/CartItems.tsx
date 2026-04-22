@@ -126,6 +126,7 @@ const cartItems = ({
                 <select
                   name="qty"
                   id="qty"
+                  disabled={lineIsFree}
                   className="form-select text-sm rounded-md py-1 border-slate-200 dark:border-slate-700 relative z-10 dark:bg-slate-800 "
                 >
                   <option value="1">1</option>
