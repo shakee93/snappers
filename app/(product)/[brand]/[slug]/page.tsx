@@ -40,7 +40,11 @@ async function getData(slug: string, brand: string) {
       variables: {
         productId: slug,
       },
-      context: { fetchOptions: { next: { revalidate: 60 } } },
+      // PDP: keep freshness tighter than the 30-min SSR default, but not so
+      // tight it stampedes WP. Stock accuracy is enforced at add-to-cart by
+      // the client Apollo's un-cached mutation — a user loading a stale
+      // "in stock" PDP still gets rejected server-side on the mutation.
+      context: { fetchOptions: { next: { revalidate: 300 } } },
     });
 
     if (error) {
