@@ -81,6 +81,20 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
+## Backend GraphQL caching
+
+The WordPress backend runs WPGraphQL with the **Smart Cache** plugin enabled. Responses for catalog / chrome / sitemap operations are cached in Redis; anything user- or session-scoped (cart, checkout, customer, orders) bypasses cache and hits PHP live.
+
+The policy is an **explicit allowlist** defined in `wp-content/mu-plugins/graphql-cache-skip-session.php` on the server. When you add a new GraphQL operation to the frontend it is **not cached by default**. To opt a new catalog-style operation in:
+
+1. Verify the response is session-independent (no `cart`, `customer`, `viewer` fields).
+2. Add the operation name to the `$allow` array in the mu-plugin.
+3. Watch `/tmp/smart-cache-audit.log` inside the WP container for 5–10 min to confirm it shows `WOULD_CACHE` only when expected.
+
+User-specific queries stay client-only. `context/CartProvider.tsx` is `'use client'` with `fetchPolicy: 'no-cache'` on every cart query and mutation — Vercel SSR never renders cart state, which is what makes the allowlist safe.
+
+Cache TTL is 10 min; event-based purges (stock updates, product edits, WooGraphQL mutations) invalidate affected entries within a second. See **[docs/PERFORMANCE-WORDPRESS.md](docs/PERFORMANCE-WORDPRESS.md)** for the full allowlist, invalidation hooks, and operational commands.
+
 ## Branching and Contribution Flow
 
 Direct pushes to `main` are blocked (including for admins). All changes must go through a pull request.
