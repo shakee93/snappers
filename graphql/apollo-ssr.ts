@@ -52,13 +52,21 @@ export const { getClient } = registerApolloClient(() => {
             retryLink,
             httpLink,
         ]),
-        // Leave fetchPolicy at Apollo's default (`cache-first`) so duplicate
-        // queries within a single SSR render are deduped via the per-request
-        // InMemoryCache. `no-cache` disabled that dedup and forced every
-        // occurrence through the network.
+        // IMPORTANT: keep `fetchPolicy: 'no-cache'` here. Apollo's default
+        // (`cache-first`) uses InMemoryCache normalization, which requires a
+        // `possibleTypes` map to resolve `... on SimpleProduct` / `... on
+        // VariableProduct` inline fragments on the WPGraphQL `Product`
+        // interface. Without that map, fragment fields are silently dropped
+        // when reading back from the normalized cache, which on the homepage
+        // renders empty product sliders. `no-cache` bypasses normalization
+        // entirely — the raw network response is returned with all fragment
+        // fields intact. The dedup savings from `cache-first` are small in
+        // SSR (per-request client) and not worth the fragility here.
+        // Next.js's fetch-layer cache (set via httpLink fetchOptions.next)
+        // still caches the raw response, which is where the actual win is.
         defaultOptions: {
-            watchQuery: { errorPolicy: 'ignore' },
-            query: { errorPolicy: 'all' },
+            watchQuery: { fetchPolicy: 'no-cache', errorPolicy: 'ignore' },
+            query: { fetchPolicy: 'no-cache', errorPolicy: 'all' },
         },
     });
 });
