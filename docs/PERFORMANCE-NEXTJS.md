@@ -6,11 +6,25 @@ File paths and line numbers are from `main` at `2040cb0`.
 
 ---
 
+## Shipped
+
+**2026-04-22 — `perf(graphql): split listings off the full product fragment` (#35, `e3b9d17`)**
+- Introduced slim `ProductContentCard` fragment for all listing/archive/slider contexts.
+- Keeps `ProductContentFull` only on PDP.
+- Addresses items #1 and #2 (partial — listings no longer carry the PDP-only fields).
+
+**2026-04-23 — `perf(graphql): trim metaData and reuse card fragment for upsells` (#37, `262c22d`)**
+- Both `ProductContentCard` and `ProductContentFull` now use `metaData(keysIn: ["tech_spec", "tech_spec_data", "warranty_type", "warranty_period", "inside_the_box"])` instead of the unfiltered dump of every `wp_postmeta` row.
+- `ProductContentFull.upsell` no longer inlines the ~240-line `SimpleProduct` / `VariableProduct` tree (17 `allPa*` taxonomies + `variations(first: 50)`). It now spreads `...ProductContentCard`, matching how upsells actually render (`UpsellProducts` → `SectionSliderProductCard` → `ProductCard3`).
+- **Measured effect on prod:** load avg 1m 30 → 11, WP container RSS 4.4 GiB → 0.96 GiB, MySQL CPU 119% → 14%, `/graphql` p90 response size 174 KB → 104 KB.
+
+---
+
 ## Tier 1 — highest-impact, low-risk fixes
 
 ### BOGO feature
 
-1. **`ProductContentFull` fragment got `bogoPluginMeta` appended** (`graphql/defs/products.fragments.ts:204-214`) and now runs a 6-key `metaData` lookup for every product in every listing (homepage sliders, category, brand, related, tag archive). Split into two fragments: `ProductContentCard` (listings, slim) and `ProductContentFull` (PDP only).
+1. ~~**`ProductContentFull` fragment got `bogoPluginMeta` appended** (`graphql/defs/products.fragments.ts:204-214`) and now runs a 6-key `metaData` lookup for every product in every listing (homepage sliders, category, brand, related, tag archive). Split into two fragments: `ProductContentCard` (listings, slim) and `ProductContentFull` (PDP only).~~ **Done (2026-04-22 #35; follow-up #37 on 2026-04-23 further trimmed `metaData` to explicit `keysIn` and collapsed the upsell subtree to reuse `ProductContentCard`).**
 
 2. **`happiestCustomersGallery` added to both `SimpleProduct` and `VariableProduct` in `ProductContentFull`** (`products.fragments.ts:482,512`). Only used on PDP. Move to a PDP-only fragment or inline into `GET_PRODUCT`.
 
@@ -136,7 +150,7 @@ File paths and line numbers are from `main` at `2040cb0`.
 | 1 | Add `revalidate` to homepage + archive/brand/collection/tag pages (#5, #6) | **~80–95% reduction in SSR `/graphql` hits** | 30 min |
 | 2 | De-duplicate `generateMetadata` + `Page` `getData()` (#7) | **~50% reduction in per-page queries** | 1 hr |
 | 3 | Lift header/footer/archive shared fetches into root layout with `cache()` (#8–#10) | 2–3 req/page saved | 1 hr |
-| 4 | Split `ProductContentFull` into card + full fragments (#1, #2) | Cuts per-row WP work on every listing | 2 hr |
+| 4 | ~~Split `ProductContentFull` into card + full fragments (#1, #2)~~ **Done (#35, #37)** | Cuts per-row WP work on every listing | 2 hr |
 | 5 | Switch SSR Apollo to `cache-first` (#11) | Same-request dedup | 15 min |
 | 6 | Resolve BOGO free-gift products in PDP SSR, delete client hooks (#12) | Eliminates all PDP-side BOGO `/graphql` | 2 hr |
 | 7 | Mega-menu via props, not `useQuery` (#13, #14) | –2 client req / menu open | 1 hr |
