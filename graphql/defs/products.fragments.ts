@@ -197,7 +197,15 @@ export const ProductContentCard = gql`
         brandImage
       }
     }
-    metaData {
+    metaData(
+      keysIn: [
+        "tech_spec"
+        "tech_spec_data"
+        "warranty_type"
+        "warranty_period"
+        "inside_the_box"
+      ]
+    ) {
       key
       value
       id
@@ -268,12 +276,11 @@ export const ProductContentCard = gql`
           }
           attributes {
             nodes {
-              # "label" is intentionally omitted. AddedToCart reads it via
-              # product[allPa + label], but is only invoked with a variation
-              # from the PDP, where ProductContentFull supplies label. If a
-              # listing card ever passes a variation into AddedToCart, add
-              # label here too.
+              # "label" is required by AddedToCart's dynamic product[allPa + label]
+              # lookup. Kept on the card fragment so any future listing-card path
+              # that passes a variation into AddedToCart works without a silent break.
               name
+              label
               value
             }
           }
@@ -309,7 +316,15 @@ export const ProductContentFull = gql`
         brandImage
       }
     }
-    metaData {
+    metaData(
+      keysIn: [
+        "tech_spec"
+        "tech_spec_data"
+        "warranty_type"
+        "warranty_period"
+        "inside_the_box"
+      ]
+    ) {
       key
       value
       id
@@ -353,242 +368,12 @@ export const ProductContentFull = gql`
         options
       }
     }
+    # Upsells render through ProductCard3 (via SectionSliderProductCard), identical
+    # to listing cards — reuse ProductContentCard to avoid duplicating the full
+    # variable-product + taxonomy tree per upsell.
     upsell {
       nodes {
-        id
-        name
-        databaseId
-        onSale
-        slug
-        type
-        image {
-          altText
-          link
-          sourceUrl
-        }
-        type
-
-        ... on SimpleProduct {
-          onSale
-          stockStatus
-          price
-          rawPrice: price(format: RAW)
-          regularPrice
-          salePrice
-          stockStatus
-          purchasable
-          stockQuantity
-          soldIndividually
-          productCategories {
-            edges {
-              node {
-                id
-                name
-                slug
-              }
-            }
-          }
-          galleryImages {
-            nodes {
-              id
-              sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
-              altText
-              databaseId
-            }
-          }
-          brands {
-            nodes {
-              databaseId
-              name
-              slug
-              count
-            }
-          }
-        }
-        ... on VariableProduct {
-          allPaCapacity {
-            nodes {
-              name
-              slug
-            }
-          }
-          allPaColor {
-            nodes {
-              name
-              slug
-            }
-          }
-          allPaColour {
-            nodes {
-              name
-              slug
-            }
-          }
-          allPaSpecification {
-            nodes {
-              name
-              slug
-            }
-          }
-          allPaVariant {
-            nodes {
-              name
-              slug
-            }
-          }
-          allPaWarranty {
-            nodes {
-              name
-              slug
-            }
-          }
-          allPaModel {
-            nodes {
-              name
-              slug
-            }
-          }
-          allPaWatchSize {
-            nodes {
-              name
-              slug
-            }
-          }
-          allPaConnectivity {
-            nodes {
-              name
-              slug
-            }
-          }
-          allPaPacks {
-            nodes {
-              name
-              slug
-            }
-          }
-          allPaSize {
-            nodes {
-              name
-              slug
-            }
-          }
-          allPaConnectorType {
-            nodes {
-              name
-              slug
-            }
-          }
-          allPaBandType {
-            nodes {
-              name
-              slug
-            }
-          }
-          allPaShape {
-            nodes {
-              name
-              slug
-            }
-          }
-          allPaCompatibility {
-            nodes {
-              name
-              slug
-            }
-          }
-          allPaNetwork {
-            nodes {
-              name
-              slug
-            }
-          }
-          allPaAmount {
-            nodes {
-              name
-              slug
-            }
-          }
-
-          onSale
-          price
-          rawPrice: price(format: RAW)
-          regularPrice
-          salePrice
-          stockStatus
-          purchasable
-          stockQuantity
-          soldIndividually
-          defaultAttributes {
-            nodes {
-              id
-              name
-              label
-              value
-            }
-          }
-          globalAttributes {
-            nodes {
-              id
-              slug
-              name
-              label
-            }
-          }
-          productCategories {
-            edges {
-              node {
-                id
-                databaseId
-                name
-                slug
-              }
-            }
-          }
-          galleryImages {
-            nodes {
-              id
-              sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
-              altText
-              databaseId
-            }
-          }
-          brands {
-            nodes {
-              databaseId
-              name
-              slug
-              count
-            }
-          }
-          variations(first: 50) {
-            nodes {
-              id
-              databaseId
-              name
-              price
-              stockStatus
-              stockQuantity
-              rawPrice: price(format: RAW)
-              regularPrice
-              salePrice
-              onSale
-              image {
-                sourceUrl
-                id
-                databaseId
-              }
-
-              attributes {
-                nodes {
-                  id
-                  name
-                  label
-                  value
-                }
-              }
-            }
-          }
-        }
+        ...ProductContentCard
       }
     }
     ... on SimpleProduct {

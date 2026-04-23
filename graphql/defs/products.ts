@@ -41,6 +41,7 @@ export const GET_ALL_BRANDS = gql`
 
 
 export const GET_PRODUCT = gql`
+  ${ProductContentCard}
   ${ProductContentFull}
   query GetProduct($productId: ID!) {
     product(id: $productId, idType: SLUG) {
