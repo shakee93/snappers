@@ -40,7 +40,7 @@ async function getData(slug: string, brand: string) {
       variables: {
         productId: slug,
       },
-      // fetchPolicy: "no-cache",
+      context: { fetchOptions: { next: { revalidate: 60 } } },
     });
 
     if (error) {

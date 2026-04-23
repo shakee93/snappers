@@ -276,12 +276,11 @@ export const ProductContentCard = gql`
           }
           attributes {
             nodes {
-              # "label" is intentionally omitted. AddedToCart reads it via
-              # product[allPa + label], but is only invoked with a variation
-              # from the PDP, where ProductContentFull supplies label. If a
-              # listing card ever passes a variation into AddedToCart, add
-              # label here too.
+              # "label" is required by AddedToCart's dynamic product[allPa + label]
+              # lookup. Kept on the card fragment so any future listing-card path
+              # that passes a variation into AddedToCart works without a silent break.
               name
+              label
               value
             }
           }

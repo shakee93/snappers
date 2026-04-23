@@ -81,10 +81,48 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## Branching and Contribution Flow
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Direct pushes to `main` are blocked (including for admins). All changes must go through a pull request.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+1. Create a branch off `main`:
+   ```bash
+   git checkout main && git pull
+   git checkout -b feat/short-description
+   ```
+2. Commit your changes and push the branch.
+3. Open a PR against `main`:
+   ```bash
+   gh pr create
+   ```
+4. Wait for the `lint` status check to pass and get **one approving review**.
+5. Merge via the GitHub UI or `gh pr merge`. Force-pushing to `main` and deleting `main` are disabled.
+
+### CI
+
+GitHub Actions runs on every PR and every `main` push:
+
+- **`lint`** (`.github/workflows/lint.yml`) — runs `npm ci && npm run lint` (ESLint 9, flat config at `eslint.config.mjs`). This check is **required** by branch protection.
+
+To run the same lint locally:
+
+```bash
+npm run lint
+```
+
+Currently many `react-hooks/*` rules are set to `warn` (not `error`) because Next 16's react-hooks plugin v7 introduced strict rules the codebase hasn't been migrated to. The warnings are tracked work, not blockers.
+
+## Deployment
+
+Deployment is handled by **Vercel's Git integration** — no manual step required:
+
+- **Production:** every merge to `main` triggers a production deploy to Vercel.
+- **Preview:** every PR gets a preview deployment; the URL is posted as a check on the PR.
+
+Because `main` is protected, production deploys are always reviewed + lint-checked code.
+
+### Environment variables
+
+Production and preview environment variables are managed in the Vercel project dashboard, not in the repo. Update them there when adding new configuration.
 
 
