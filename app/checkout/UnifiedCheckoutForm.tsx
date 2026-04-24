@@ -898,52 +898,53 @@ const UnifiedCheckoutForm = ({
 
             {isPreOrderCart && <PreOrderNotice className="mt-2" />}
 
-            <div
+            <label
+                htmlFor="toc"
                 id="toc-section"
-                className={`flex items-start text-sm rounded-lg transition-colors ${
+                className={`flex items-start gap-2 text-sm rounded-lg p-3 cursor-pointer transition-colors ${
                     tocError
-                        ? "text-red-600 bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-800 p-3"
-                        : "text-slate-500 dark:text-slate-400"
+                        ? "text-red-600 bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-800"
+                        : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/40"
                 }`}
             >
-                <div className="relative flex gap-2">
-                    <Checkbox
-                        name="toc"
-                        defaultChecked={isTOC}
-                        onChange={onTOCChange}
-                        sizeClassName="w-4 h-4"
-                        className="pt-1"
-                    />
+                <Checkbox
+                    name="toc"
+                    defaultChecked={isTOC}
+                    onChange={onTOCChange}
+                    sizeClassName="w-4 h-4"
+                    className="pt-1"
+                />
+                <div className="flex-1">
                     <div>
-                        <div>
-                            By proceeding with your purchase you agree to our{" "}
-                            <Link
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                href="/terms-and-conditions"
-                                className="font-medium text-slate-900 underline dark:text-slate-200"
-                            >
-                                Terms and Conditions
-                            </Link>
-                            {" "}and{" "}
-                            <Link
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                href="/privacy"
-                                className="font-medium text-slate-900 underline dark:text-slate-200"
-                            >
-                                Privacy Policy
-                            </Link>
-                            .
-                        </div>
-                        {tocError && (
-                            <div className="mt-1 text-xs font-medium text-red-600">
-                                Please agree to the terms to continue.
-                            </div>
-                        )}
+                        By proceeding with your purchase you agree to our{" "}
+                        <Link
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href="/terms-and-conditions"
+                            onClick={(e) => e.stopPropagation()}
+                            className="font-medium text-slate-900 underline dark:text-slate-200"
+                        >
+                            Terms and Conditions
+                        </Link>
+                        {" "}and{" "}
+                        <Link
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href="/privacy"
+                            onClick={(e) => e.stopPropagation()}
+                            className="font-medium text-slate-900 underline dark:text-slate-200"
+                        >
+                            Privacy Policy
+                        </Link>
+                        .
                     </div>
+                    {tocError && (
+                        <div className="mt-1 text-xs font-medium text-red-600">
+                            Please agree to the terms to continue.
+                        </div>
+                    )}
                 </div>
-            </div>
+            </label>
 
             <div className="pt-2 flex flex-col-reverse sm:flex-row gap-3 sm:items-center sm:justify-between">
                 <Link
