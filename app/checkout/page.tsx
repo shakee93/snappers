@@ -3,8 +3,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { FetchResult, useMutation, useQuery } from "@apollo/client";
-import ButtonPrimary from "shared/Button/ButtonPrimary";
-import Checkbox from "@/shared/Checkbox/Checkbox";
 import Input from "shared/Input/Input";
 import Label from "components/Label/Label";
 import Link from "next/link";
@@ -46,7 +44,6 @@ import {
 import { useStats } from "react-instantsearch";
 import { Metadata } from "next/types";
 import Image from "next/image";
-import PreOrderNotice from "@/components/PreOrderNotice";
 interface FormData {
   contactInfo: Record<string, any>;
   deliveryAddress: any;
@@ -731,6 +728,18 @@ const CheckoutPage = () => {
   const TotalWithKoko = (cartSubtotal / 88) * 100;
   const taxWithTotal = (numericOrderTotal + threePercentFromTotal).toFixed(2);
 
+  const formatRs = (n: number) =>
+    `Rs ${new Intl.NumberFormat("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(n)}`;
+
+  const orderTotalLabel = isCardPayment
+    ? formatRs(numericOrderTotal + threePercentFromTotal)
+    : isKokoPayment
+    ? formatRs(TotalWithKoko + (isStorePickup ? 0 : 500))
+    : (orderTotal || "");
+
   useEffect(() => {
     setTotalWithTax(taxWithTotal);
   }, [taxWithTotal]);
@@ -985,7 +994,7 @@ const CheckoutPage = () => {
         }}
         onError={() => console.error("Error loading PayHere script")}
       />
-      <div className="flex flex-col lg:flex-row mx-auto">
+      <div className="flex flex-col-reverse lg:flex-row mx-auto">
         <div className="lg:w-1/2 w-full bg-white border-gray-300">
           <div className="p-6 max-w-[625px] ml-auto">
           <CheckoutDetails
@@ -1001,6 +1010,11 @@ const CheckoutPage = () => {
               setIsKokoPayment={setIsKokoPayment}
               isKokoPayment={isKokoPayment}
               onCheckoutSubmit={submitCheckout}
+              isTOC={isTOC}
+              onTOCChange={handleTOC}
+              tocError={tocError}
+              loading={loading}
+              orderTotalLabel={orderTotalLabel}
             />
           </div>
         </div>
@@ -1296,73 +1310,6 @@ const CheckoutPage = () => {
               )}
             </div>
 
-            <div
-              id="toc-section"
-              className={`mt-5 flex justify-center items-start text-sm rounded-lg transition-colors ${
-                tocError
-                  ? "text-red-600 bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-800 p-3"
-                  : "text-slate-500 dark:text-slate-400"
-              }`}
-            >
-              <div className="relative flex gap-2">
-                <Checkbox
-                  key={1}
-                  label=""
-                  name="toc"
-                  defaultChecked={isTOC}
-                  onChange={handleTOC}
-                  sizeClassName="w-4 h-4"
-                  className="pt-1"
-                />
-
-                <div>
-                  <div>
-                    By proceeding with your purchase you agree to our{" "}
-                    <Link
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      href={"/terms-and-conditions"}
-                      className="font-medium text-slate-900 underline dark:text-slate-200"
-                    >
-                      Terms and Conditions
-                    </Link>
-                    {" "}and{" "}
-                    <Link
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      href={"/privacy"}
-                      className="font-medium text-slate-900 underline dark:text-slate-200"
-                    >
-                      Privacy Policy
-                    </Link>
-                    .
-                  </div>
-                  {tocError && (
-                    <div className="mt-1 text-xs font-medium text-red-600">
-                      Please agree to the terms to continue.
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Pre-order Notice */}
-            {isPreOrderCart && (
-              <PreOrderNotice className="mt-6" />
-            )}
-
-            <ButtonPrimary
-              type="submit"
-              form="checkout-form"
-              disabled={loading}
-              className={`mt-8 w-full bg-primary hover:bg-primary-dark`}
-            >
-              {loading ? (
-                <Loader className="animate-spin text-gray-100 " />
-              ) : (
-                "Confirm Order"
-              )}
-            </ButtonPrimary>
             <div id="ndb-pay-form-wrapper" className="mt-6"></div>
           </div>
           </div>

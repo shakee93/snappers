@@ -19,6 +19,11 @@ interface CheckoutLeftProps {
   setIsKokoPayment: (v: boolean) => void;
   isKokoPayment: boolean;
   onCheckoutSubmit: (payload: CheckoutSubmitPayload) => Promise<void> | void;
+  isTOC: boolean;
+  onTOCChange: () => void;
+  tocError: boolean;
+  loading: boolean;
+  orderTotalLabel: string;
 }
 
 const CheckoutDetails = ({
@@ -31,6 +36,11 @@ const CheckoutDetails = ({
   setIsKokoPayment,
   isKokoPayment,
   onCheckoutSubmit,
+  isTOC,
+  onTOCChange,
+  tocError,
+  loading,
+  orderTotalLabel,
 }: CheckoutLeftProps) => {
 
   const { data, loading: dataLoading }: QueryResult = useQuery(GET_CHECKOUT_USER_DETAILS);
@@ -73,6 +83,11 @@ const CheckoutDetails = ({
         isKokoPayment={isKokoPayment}
         isPriceFluctuation={isPriceFluctuation}
         onCheckoutSubmit={onCheckoutSubmit}
+        isTOC={isTOC}
+        onTOCChange={onTOCChange}
+        tocError={tocError}
+        loading={loading}
+        orderTotalLabel={orderTotalLabel}
       />
     </div>
   );

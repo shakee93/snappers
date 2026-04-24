@@ -11,6 +11,9 @@ import Select from "shared/Select/Select";
 import { toast } from "sonner";
 import { SRI_LANKAN_STATES } from "@/components/AddressPageComps/HelperComps";
 import { useCart } from "@/context/CartProvider";
+import Checkbox from "@/shared/Checkbox/Checkbox";
+import ButtonPrimary from "shared/Button/ButtonPrimary";
+import PreOrderNotice from "@/components/PreOrderNotice";
 import {
     Store,
     Truck,
@@ -18,6 +21,9 @@ import {
     Banknote,
     Landmark,
     Check,
+    ChevronRight,
+    ArrowLeft,
+    Loader,
 } from "lucide-react";
 
 export interface CheckoutSubmitPayload {
@@ -50,6 +56,64 @@ export interface CheckoutSubmitPayload {
     };
     isStorePickup: boolean;
 }
+
+type StepKey = "contact" | "delivery" | "payment" | "review";
+
+interface CheckoutStepperProps {
+    currentStep: StepKey;
+}
+
+const STEP_ORDER: StepKey[] = ["contact", "delivery", "payment", "review"];
+const STEP_LABELS: Record<StepKey, string> = {
+    contact: "Contact",
+    delivery: "Delivery",
+    payment: "Payment",
+    review: "Review",
+};
+
+const CheckoutStepper = ({ currentStep }: CheckoutStepperProps) => {
+    const currentIndex = STEP_ORDER.indexOf(currentStep);
+    return (
+        <nav
+            aria-label="Checkout progress"
+            className="flex items-center flex-wrap gap-y-1 text-xs sm:text-sm mb-6 -mt-2"
+        >
+            <Link
+                href="/cart"
+                className="text-slate-500 hover:text-primaryColor underline-offset-2 hover:underline"
+            >
+                Cart
+            </Link>
+            {STEP_ORDER.map((key, idx) => {
+                const isCurrent = key === currentStep;
+                const isComplete = idx < currentIndex;
+                return (
+                    <span key={key} className="flex items-center">
+                        <ChevronRight
+                            className="mx-1.5 sm:mx-2 w-3.5 h-3.5 text-slate-400 shrink-0"
+                            strokeWidth={2}
+                        />
+                        <span
+                            className={
+                                isCurrent
+                                    ? "font-semibold text-slate-900 dark:text-slate-100"
+                                    : isComplete
+                                    ? "text-slate-600 dark:text-slate-300 inline-flex items-center gap-1"
+                                    : "text-slate-400 dark:text-slate-500"
+                            }
+                            aria-current={isCurrent ? "step" : undefined}
+                        >
+                            {isComplete && (
+                                <Check className="w-3 h-3 text-emerald-600" strokeWidth={3} />
+                            )}
+                            {STEP_LABELS[key]}
+                        </span>
+                    </span>
+                );
+            })}
+        </nav>
+    );
+};
 
 const BrandBadge = ({ src, alt }: { src: string; alt: string }) => (
     <span className="inline-flex items-center justify-center w-7 h-7 rounded-md overflow-hidden bg-white ring-1 ring-slate-200 dark:ring-slate-700">
@@ -135,6 +199,11 @@ interface Props {
     isKokoPayment: boolean;
     isPriceFluctuation: any;
     onCheckoutSubmit: (payload: CheckoutSubmitPayload) => Promise<void> | void;
+    isTOC: boolean;
+    onTOCChange: () => void;
+    tocError: boolean;
+    loading: boolean;
+    orderTotalLabel: string;
 }
 
 const UnifiedCheckoutForm = ({
@@ -150,6 +219,11 @@ const UnifiedCheckoutForm = ({
     isKokoPayment,
     isPriceFluctuation,
     onCheckoutSubmit,
+    isTOC,
+    onTOCChange,
+    tocError,
+    loading,
+    orderTotalLabel,
 }: Props) => {
     // Contact Info State
     const [phone, setPhone] = useState("");
@@ -608,8 +682,29 @@ const UnifiedCheckoutForm = ({
         );
     };
 
+    const contactDone = phone.length >= 9 && /.+@.+\..+/.test(email);
+    const courierAddressDone =
+        !!firstName && !!address && !!city && !!state;
+    const deliveryDone =
+        pickupType !== null &&
+        !!firstName &&
+        (pickupType === "store_uber_pickme" || courierAddressDone);
+    const paymentDone =
+        !!selectedGateway.id &&
+        (selectedGateway.id !== "bacs" || !!bankSlipFile);
+
+    const currentStep: StepKey = !contactDone
+        ? "contact"
+        : !deliveryDone
+        ? "delivery"
+        : !paymentDone
+        ? "payment"
+        : "review";
+
     return (
         <form id="checkout-form" onSubmit={handleFormSubmit} className="space-y-8">
+            <CheckoutStepper currentStep={currentStep} />
+
             {/* Contact Information Section */}
             <div className=" overflow-hidden">
                 <div className="p-0">
@@ -803,6 +898,87 @@ const UnifiedCheckoutForm = ({
                     </div>
                 </div>
             )}
+
+            {isPreOrderCart && <PreOrderNotice className="mt-2" />}
+
+            <div
+                id="toc-section"
+                className={`flex items-start text-sm rounded-lg transition-colors ${
+                    tocError
+                        ? "text-red-600 bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-800 p-3"
+                        : "text-slate-500 dark:text-slate-400"
+                }`}
+            >
+                <div className="relative flex gap-2">
+                    <Checkbox
+                        name="toc"
+                        defaultChecked={isTOC}
+                        onChange={onTOCChange}
+                        sizeClassName="w-4 h-4"
+                        className="pt-1"
+                    />
+                    <div>
+                        <div>
+                            By proceeding with your purchase you agree to our{" "}
+                            <Link
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                href="/terms-and-conditions"
+                                className="font-medium text-slate-900 underline dark:text-slate-200"
+                            >
+                                Terms and Conditions
+                            </Link>
+                            {" "}and{" "}
+                            <Link
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                href="/privacy"
+                                className="font-medium text-slate-900 underline dark:text-slate-200"
+                            >
+                                Privacy Policy
+                            </Link>
+                            .
+                        </div>
+                        {tocError && (
+                            <div className="mt-1 text-xs font-medium text-red-600">
+                                Please agree to the terms to continue.
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
+            <div className="pt-2 flex flex-col-reverse sm:flex-row gap-3 sm:items-center sm:justify-between">
+                <Link
+                    href="/cart"
+                    className="inline-flex items-center gap-1 text-sm font-medium text-primary-500 hover:underline self-center sm:self-auto"
+                >
+                    <ArrowLeft className="w-4 h-4" />
+                    Back to cart
+                </Link>
+                <ButtonPrimary
+                    type="submit"
+                    disabled={loading}
+                    className="sm:min-w-[240px] w-full sm:w-auto"
+                >
+                    {loading ? (
+                        <Loader className="animate-spin text-gray-100 w-5 h-5" />
+                    ) : (
+                        <span className="inline-flex items-center gap-2">
+                            <span>Confirm Order</span>
+                            {orderTotalLabel && (
+                                <>
+                                    <span aria-hidden="true">·</span>
+                                    <span
+                                        className="font-semibold"
+                                        dangerouslySetInnerHTML={{ __html: orderTotalLabel }}
+                                    />
+                                </>
+                            )}
+                        </span>
+                    )}
+                </ButtonPrimary>
+            </div>
 
         </form>
     );
