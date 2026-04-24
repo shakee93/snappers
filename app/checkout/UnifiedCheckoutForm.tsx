@@ -10,10 +10,7 @@ import { CustomerAddress, PaymentGateway } from "@/graphql/types/graphql";
 import { contactInformation } from "@/data/types";
 import Select from "shared/Select/Select";
 import { toast } from "sonner";
-import {
-    SelectField,
-    SRI_LANKAN_STATES,
-} from "@/components/AddressPageComps/HelperComps";
+import { SRI_LANKAN_STATES } from "@/components/AddressPageComps/HelperComps";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import Radio from "shared/Radio/Radio";
 import { useCart } from "@/context/CartProvider";
@@ -78,7 +75,7 @@ const UnifiedCheckoutForm = ({
     });
 
     const [isBillingSameAsShipping, setIsBillingSameAsShipping] = useState(true);
-    const [pickupType, setPickupType] = useState<"store_uber_pickme" | "courier" | null>(null);
+    const [pickupType, setPickupType] = useState<"store_uber_pickme" | "courier">("courier");
 
     const [bankSlipFile, setBankSlipFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -121,35 +118,33 @@ const UnifiedCheckoutForm = ({
         }
     }, [initialShippingData]);
 
-    const handlePickupTypeChange = (type: "store_uber_pickme" | "courier" | null) => {
-        if (pickupType === type) {
-            setPickupType(null);
-            setIsStorePickup(false);
+    // Seed parent with the default delivery method (Courier) on mount
+    useEffect(() => {
+        setIsStorePickup(false);
+        updateFormData("shippingDetails", {
+            databaseId: null,
+            id: null,
+            title: "Courier",
+        });
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const handlePickupTypeChange = (type: "store_uber_pickme" | "courier") => {
+        setPickupType(type);
+        const isPickup = type === "store_uber_pickme";
+        setIsStorePickup(isPickup);
+        if (isPickup) {
+            updateFormData("shippingDetails", {
+                databaseId: "local_pickup",
+                id: "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==",
+                title: "Store / Uber / PickMe",
+            });
+        } else {
             updateFormData("shippingDetails", {
                 databaseId: null,
                 id: null,
-                title: null,
+                title: "Courier",
             });
-        } else {
-            if (type === null) {
-                return;
-            }
-            setPickupType(type);
-            const isPickup = type === "store_uber_pickme";
-            setIsStorePickup(isPickup);
-            if (isPickup) {
-                updateFormData("shippingDetails", {
-                    databaseId: "local_pickup",
-                    id: "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==",
-                    title: "Store / Uber / PickMe",
-                });
-            } else {
-                updateFormData("shippingDetails", {
-                    databaseId: null,
-                    id: null,
-                    title: "Courier",
-                });
-            }
         }
     };
 
@@ -475,7 +470,7 @@ const UnifiedCheckoutForm = ({
                     <div className="space-y-4">
                         {!initialContactData?.displayName && (
                             <span className="block text-sm">
-                                Do not have an account?{` `}
+                                Already have an account?{` `}
                                 <Link href="/login" className="text-primary-500 font-medium">
                                     Log in
                                 </Link>
@@ -492,11 +487,15 @@ const UnifiedCheckoutForm = ({
                         </div>
 
                         <div className="max-w-full">
+                            <label htmlFor="checkout-email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                                Email address
+                            </label>
                             <Input
-                                placeholder="Email*"
-                                className="mt-2"
+                                id="checkout-email"
+                                placeholder="you@example.com"
                                 value={email}
                                 type="email"
+                                autoComplete="email"
                                 onChange={(e) => setEmail(e.target.value)}
                                 required={true}
                             />
@@ -513,42 +512,30 @@ const UnifiedCheckoutForm = ({
                     <div className="space-y-4">
                         <div className="w-full border border-slate-200 dark:border-slate-700 rounded-xl p-4">
                             <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
-                                Pickup
+                                Delivery Method
                             </h4>
                             <div className="flex flex-wrap gap-4">
-                                <label
-                                    className="flex items-center cursor-pointer"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        handlePickupTypeChange("store_uber_pickme");
-                                    }}
-                                >
+                                <label className="flex items-center cursor-pointer">
                                     <input
                                         type="radio"
                                         name="pickup"
                                         value="store_uber_pickme"
                                         checked={pickupType === "store_uber_pickme"}
-                                        readOnly
-                                        className="w-4 h-4 text-primaryColor border-gray-300 focus:ring-primaryColor focus:ring-2 pointer-events-none"
+                                        onChange={() => handlePickupTypeChange("store_uber_pickme")}
+                                        className="w-4 h-4 text-primaryColor border-gray-300 focus:ring-primaryColor focus:ring-2"
                                     />
                                     <span className="ml-2 text-sm text-slate-700 dark:text-slate-300">
                                         Store / Uber / PickMe
                                     </span>
                                 </label>
-                                <label
-                                    className="flex items-center cursor-pointer"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        handlePickupTypeChange("courier");
-                                    }}
-                                >
+                                <label className="flex items-center cursor-pointer">
                                     <input
                                         type="radio"
                                         name="pickup"
                                         value="courier"
                                         checked={pickupType === "courier"}
-                                        readOnly
-                                        className="w-4 h-4 text-primaryColor border-gray-300 focus:ring-primaryColor focus:ring-2 pointer-events-none"
+                                        onChange={() => handlePickupTypeChange("courier")}
+                                        className="w-4 h-4 text-primaryColor border-gray-300 focus:ring-primaryColor focus:ring-2"
                                     />
                                     <span className="ml-2 text-sm text-slate-700 dark:text-slate-300">
                                         Courier
@@ -557,77 +544,102 @@ const UnifiedCheckoutForm = ({
                             </div>
                         </div>
 
-                        <div className="grid md:grid-cols-1 sm:grid-cols-2 sm:gap-3">
-                            <div className="w-full">
-                                <Input
-                                    className="mt-1.5 capitalize"
-                                    value={firstName}
-                                    placeholder="Name*"
-                                    onChange={(e) => setFirstName(e.target.value)}
-                                    required={true}
-                                />
-                            </div>
+                        <div>
+                            <label htmlFor="checkout-name" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                                Full name
+                            </label>
+                            <Input
+                                id="checkout-name"
+                                className="capitalize"
+                                value={firstName}
+                                placeholder="e.g. Amila Perera"
+                                autoComplete="name"
+                                onChange={(e) => setFirstName(e.target.value)}
+                                required={true}
+                            />
                         </div>
 
-                        <div className="sm:flex sm:space-x-3">
-                            <div className="flex-1">
-                                <Input
-                                    className="mt-1.5 capitalize"
-                                    placeholder="Address Line 1*"
-                                    name="address1"
-                                    value={address}
-                                    type="text"
-                                    onChange={(e) => setAddress(e.target.value)}
-                                    required={true}
-                                />
-                            </div>
-                            <div className="sm:w-1/3">
-                                <Input
-                                    className="mt-1.5 capitalize"
-                                    placeholder="Address Line 2*"
-                                    name="address2"
-                                    value={apartment}
-                                    onChange={(e) => setApartment(e.target.value)}
-                                    required={true}
-                                />
-                            </div>
-                        </div>
+                        {pickupType === "courier" ? (
+                            <>
+                                <div className="sm:flex sm:space-x-3 sm:space-y-0 space-y-4">
+                                    <div className="flex-1">
+                                        <label htmlFor="checkout-address1" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                                            Address line 1
+                                        </label>
+                                        <Input
+                                            id="checkout-address1"
+                                            className="capitalize"
+                                            placeholder="Street address"
+                                            name="address1"
+                                            value={address}
+                                            type="text"
+                                            autoComplete="address-line1"
+                                            onChange={(e) => setAddress(e.target.value)}
+                                            required={true}
+                                        />
+                                    </div>
+                                    <div className="sm:w-1/3">
+                                        <label htmlFor="checkout-address2" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                                            Address line 2 <span className="text-slate-400 font-normal">(optional)</span>
+                                        </label>
+                                        <Input
+                                            id="checkout-address2"
+                                            className="capitalize"
+                                            placeholder="Apartment, suite, etc."
+                                            name="address2"
+                                            value={apartment}
+                                            autoComplete="address-line2"
+                                            onChange={(e) => setApartment(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
 
-                        <div className="grid grid-cols-1 mt-0 sm:grid-cols-2 gap-0 sm:gap-3">
-                            <div>
-                                <Input
-                                    className="sm:mt-1.5 mt-0 normal-case"
-                                    placeholder="Address Line 3"
-                                    value={city}
-                                    onChange={(e) => setCity(e.target.value)}
-                                    required={false}
-                                />
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
+                                    <div>
+                                        <label htmlFor="checkout-city" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                                            City
+                                        </label>
+                                        <Input
+                                            id="checkout-city"
+                                            className="normal-case"
+                                            placeholder="e.g. Colombo"
+                                            value={city}
+                                            autoComplete="address-level2"
+                                            onChange={(e) => setCity(e.target.value)}
+                                            required={true}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="checkout-state" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                                            Province
+                                        </label>
+                                        <Select
+                                            id="checkout-state"
+                                            name="state"
+                                            value={state || ""}
+                                            onChange={(e) => setState(e.target.value)}
+                                            required={true}
+                                        >
+                                            <option value="" disabled>Select province</option>
+                                            {SRI_LANKAN_STATES.map((s) => (
+                                                <option key={s} value={s}>
+                                                    {s}
+                                                </option>
+                                            ))}
+                                        </Select>
+                                    </div>
+                                </div>
+                            </>
+                        ) : (
+                            <div className="rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 p-4 text-sm text-slate-600 dark:text-slate-300">
+                                <p className="font-medium text-slate-900 dark:text-slate-100 mb-1">
+                                    Ready for pickup from our store
+                                </p>
+                                <p>
+                                    We&apos;ll notify you on the phone number above when your order is ready. You can collect in-store or arrange an Uber / PickMe from our location.
+                                </p>
                             </div>
-                            <div>
-                                <Select
-                                    value="LK"
-                                    className="mt-1.5 capitalize"
-                                    placeholder="Country (e.g., Sri Lanka)*"
-                                    onChange={(e) => setAddressCountry(e.target.value)}
-                                    disabled={true}
-                                >
-                                    <option value="Sri Lanka">Sri Lanka</option>
-                                </Select>
-                            </div>
-                            <div>
-                                <SelectField
-                                    sizeClass="mt-0 sm:mt-1.5"
-                                    className="mt-0 sm:mt-1.5"
-                                    name="state"
-                                    value={state}
-                                    options={SRI_LANKAN_STATES.map((state) => ({
-                                        value: state,
-                                        label: state,
-                                    }))}
-                                    onChange={(e: any) => setState(e.target.value)}
-                                />
-                            </div>
-                        </div>
+                        )}
                     </div>
                 </div>
             </div>

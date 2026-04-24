@@ -445,24 +445,36 @@ const CheckoutPage = () => {
       formData.deliveryAddress.country = "LK";
 
       const shippingMethod = getShippingMethod(shippingTotal);
+      const storePickupAddressOverride = {
+        address1: "Store Pickup",
+        address2: "",
+        city: "Store Pickup",
+        state: "",
+        postcode: "",
+        country: "LK",
+      };
+
       const shippingDetails = isStorePickup
         ? {
           ...transformAddress(formData.deliveryAddress),
-          address1: "Store Pickup",
-          address2: "",
-          city: "Store Pickup",
-          state: "",
-          postcode: "",
+          ...storePickupAddressOverride,
         }
         : transformAddress(formData.deliveryAddress);
 
       const email = formData?.contactInfo?.email;
 
-      const billingDetails = {
-        ...transformAddress(formData.billingAddress),
-        email: formData?.contactInfo?.email,
-        phone: formData?.contactInfo?.phone,
-      };
+      const billingDetails = isStorePickup
+        ? {
+          ...transformAddress(formData.billingAddress),
+          ...storePickupAddressOverride,
+          email: formData?.contactInfo?.email,
+          phone: formData?.contactInfo?.phone,
+        }
+        : {
+          ...transformAddress(formData.billingAddress),
+          email: formData?.contactInfo?.email,
+          phone: formData?.contactInfo?.phone,
+        };
 
       const customerNoteHTML = `
             <p><strong>Customer Email:</strong> ${email}</p>
@@ -1296,8 +1308,8 @@ const CheckoutPage = () => {
                 </div>
               )}
               {(isCardPayment || isKokoPayment) && (
-                <div className="flex justify-between py-2.5">
-                  <span className="text-red-500 font-medium">Sorry your missed the discount</span>
+                <div className="flex justify-between py-2.5 text-xs text-slate-500">
+                  <span>Includes a 3% service fee for this payment method</span>
                 </div>
               )}
               {isKokoPayment && (
