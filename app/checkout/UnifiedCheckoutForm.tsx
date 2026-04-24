@@ -455,7 +455,6 @@ const UnifiedCheckoutForm = ({
                         <div className="flex items-center gap-1.5">
                             <BrandBadge src="/logos/visa.png" alt="Visa" />
                             <BrandBadge src="/logos/mastercard.png" alt="Mastercard" />
-                            <span className="ml-1 text-xs font-semibold text-slate-500 dark:text-slate-400">+3% fee</span>
                         </div>
                     ),
                 };

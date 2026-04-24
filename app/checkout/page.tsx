@@ -1238,8 +1238,8 @@ const CheckoutPage = () => {
                 </div>
               )}
               {(isCardPayment || isKokoPayment) && (
-                <div className="flex justify-between py-2.5 text-xs text-slate-500">
-                  <span>Includes a 3% service fee for this payment method</span>
+                <div className="flex justify-between py-2.5">
+                  <span className="text-red-500 font-medium">Sorry you missed the discount</span>
                 </div>
               )}
               {isKokoPayment && (
