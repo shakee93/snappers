@@ -1007,6 +1007,7 @@ const CheckoutPage = () => {
               setIsCardPayment={setIsCardPayment}
               isCardPayment={isCardPayment}
               totalPayment={numericOrderTotal}
+              kokoTotal={TotalWithKoko + (isStorePickup ? 0 : 500)}
               setIsKokoPayment={setIsKokoPayment}
               isKokoPayment={isKokoPayment}
               onCheckoutSubmit={submitCheckout}

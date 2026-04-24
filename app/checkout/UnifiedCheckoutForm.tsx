@@ -193,6 +193,7 @@ interface Props {
     setIsCardPayment: (v: boolean) => void;
     isCardPayment: boolean;
     totalPayment: number;
+    kokoTotal: number;
     setIsKokoPayment: (v: boolean) => void;
     isKokoPayment: boolean;
     isPriceFluctuation: any;
@@ -213,6 +214,7 @@ const UnifiedCheckoutForm = ({
     setIsCardPayment,
     isCardPayment,
     totalPayment,
+    kokoTotal,
     setIsKokoPayment,
     isKokoPayment,
     isPriceFluctuation,
@@ -466,7 +468,8 @@ const UnifiedCheckoutForm = ({
                     trailing: null,
                 };
             case "darazbnpl": {
-                const perInstallment = totalPayment > 0 ? Math.ceil(totalPayment / 3) : 0;
+                const kokoBase = kokoTotal > 0 ? kokoTotal : totalPayment;
+                const perInstallment = kokoBase > 0 ? kokoBase / 3 : 0;
                 return {
                     title: gateway.title || "Koko Pay",
                     subtitle: "Split into 3 interest-free installments",
@@ -474,7 +477,7 @@ const UnifiedCheckoutForm = ({
                     trailing: perInstallment ? (
                         <div className="flex items-center gap-2">
                             <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">
-                                3 × Rs {new Intl.NumberFormat("en-US").format(perInstallment)}
+                                3 × Rs {new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(perInstallment)}
                             </span>
                             <Image src="/koko.png" alt="Koko" width={36} height={18} className="h-4 w-auto" />
                         </div>

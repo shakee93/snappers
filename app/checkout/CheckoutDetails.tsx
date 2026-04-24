@@ -16,6 +16,7 @@ interface CheckoutLeftProps {
   isCardPayment: boolean;
   setIsCardPayment: (v: boolean) => void;
   totalPayment: any;
+  kokoTotal: number;
   setIsKokoPayment: (v: boolean) => void;
   isKokoPayment: boolean;
   onCheckoutSubmit: (payload: CheckoutSubmitPayload) => Promise<void> | void;
@@ -33,6 +34,7 @@ const CheckoutDetails = ({
   isCardPayment,
   setIsCardPayment,
   totalPayment,
+  kokoTotal,
   setIsKokoPayment,
   isKokoPayment,
   onCheckoutSubmit,
@@ -79,6 +81,7 @@ const CheckoutDetails = ({
         setIsCardPayment={setIsCardPayment}
         isCardPayment={isCardPayment}
         totalPayment={totalPayment}
+        kokoTotal={kokoTotal}
         setIsKokoPayment={setIsKokoPayment}
         isKokoPayment={isKokoPayment}
         isPriceFluctuation={isPriceFluctuation}
