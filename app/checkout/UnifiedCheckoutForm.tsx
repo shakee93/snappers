@@ -10,8 +10,15 @@ import { contactInformation } from "@/data/types";
 import Select from "shared/Select/Select";
 import { toast } from "sonner";
 import { SRI_LANKAN_STATES } from "@/components/AddressPageComps/HelperComps";
-import Radio from "shared/Radio/Radio";
 import { useCart } from "@/context/CartProvider";
+import {
+    Store,
+    Truck,
+    CreditCard,
+    Banknote,
+    Landmark,
+    Check,
+} from "lucide-react";
 
 export interface CheckoutSubmitPayload {
     contactInfo: { phone: string; email: string; country: string };
@@ -43,6 +50,77 @@ export interface CheckoutSubmitPayload {
     };
     isStorePickup: boolean;
 }
+
+const BrandBadge = ({ src, alt }: { src: string; alt: string }) => (
+    <span className="inline-flex items-center justify-center w-7 h-7 rounded-md overflow-hidden bg-white ring-1 ring-slate-200 dark:ring-slate-700">
+        <Image src={src} alt={alt} width={28} height={28} className="object-cover w-full h-full" />
+    </span>
+);
+
+interface DeliveryOptionProps {
+    value: "store_uber_pickme" | "courier";
+    selected: boolean;
+    onSelect: (v: "store_uber_pickme" | "courier") => void;
+    icon: React.ReactNode;
+    title: string;
+    subtitle: string;
+    trailing?: React.ReactNode;
+}
+
+const DeliveryOption = ({
+    value,
+    selected,
+    onSelect,
+    icon,
+    title,
+    subtitle,
+    trailing,
+}: DeliveryOptionProps) => (
+    <label
+        className={`group flex items-center gap-4 w-full p-4 rounded-xl border cursor-pointer transition-colors ${
+            selected
+                ? "border-primaryColor bg-primary-50/60 dark:bg-primary-900/20"
+                : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+        }`}
+    >
+        <input
+            type="radio"
+            name="pickup"
+            value={value}
+            checked={selected}
+            onChange={() => onSelect(value)}
+            className="sr-only"
+        />
+        <span
+            aria-hidden="true"
+            className={`flex items-center justify-center w-5 h-5 rounded-full border-2 shrink-0 transition-colors ${
+                selected
+                    ? "border-primaryColor bg-primaryColor"
+                    : "border-slate-300 dark:border-slate-600 group-hover:border-slate-400"
+            }`}
+        >
+            {selected && <span className="w-2 h-2 rounded-full bg-white" />}
+        </span>
+        <span
+            className={`flex items-center justify-center w-10 h-10 rounded-lg shrink-0 ${
+                selected
+                    ? "bg-primaryColor/10 text-primaryColor"
+                    : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+            }`}
+        >
+            {icon}
+        </span>
+        <div className="flex-1 min-w-0">
+            <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                {title}
+            </div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                {subtitle}
+            </div>
+        </div>
+        {trailing && <div className="shrink-0">{trailing}</div>}
+    </label>
+);
 
 interface Props {
     initialContactData: contactInformation;
@@ -96,7 +174,7 @@ const UnifiedCheckoutForm = ({
         title: null,
     });
 
-    const [pickupType, setPickupType] = useState<"store_uber_pickme" | "courier">("courier");
+    const [pickupType, setPickupType] = useState<"store_uber_pickme" | "courier" | null>(null);
 
     const [bankSlipFile, setBankSlipFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -250,6 +328,11 @@ const UnifiedCheckoutForm = ({
     const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
+        if (!pickupType) {
+            toast.error("Please select a delivery method.");
+            return;
+        }
+
         if (!selectedGateway.id) {
             toast.error("Please select a payment method.");
             return;
@@ -289,141 +372,214 @@ const UnifiedCheckoutForm = ({
         await onCheckoutSubmit(payload);
     };
 
-    const PaymentMethods = ({ gateway }: { gateway: PaymentGateway }) => {
+    const getGatewayMeta = (gateway: PaymentGateway) => {
+        switch (gateway.id) {
+            case "payhere":
+                return {
+                    title: "Pay Online",
+                    subtitle: "Visa, Mastercard, Amex — secure online payment",
+                    icon: <CreditCard className="w-5 h-5" strokeWidth={1.75} />,
+                    trailing: <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">+3% fee</span>,
+                };
+            case "cod":
+                return {
+                    title: gateway.title || "Cash on delivery",
+                    subtitle: "Pay with cash when your order arrives",
+                    icon: <Banknote className="w-5 h-5" strokeWidth={1.75} />,
+                    trailing: null,
+                };
+            case "darazbnpl":
+                return {
+                    title: gateway.title || "Koko Pay",
+                    subtitle: "Split into 3 interest-free installments",
+                    icon: <div className="w-8 h-5 flex items-center justify-center"><Image src="/koko.png" alt="Koko" width={40} height={20} /></div>,
+                    trailing: null,
+                };
+            case "bacs":
+                return {
+                    title: gateway.title || "Direct bank transfer",
+                    subtitle: "Commercial Bank — upload your slip after transfer",
+                    icon: <Landmark className="w-5 h-5" strokeWidth={1.75} />,
+                    trailing: null,
+                };
+            case "geniebiz":
+                return {
+                    title: gateway.title || "Genie Pay",
+                    subtitle: "Pay with your Genie mobile wallet",
+                    icon: <CreditCard className="w-5 h-5" strokeWidth={1.75} />,
+                    trailing: null,
+                };
+            case "ndb-pay":
+                return {
+                    title: gateway.title || "NDB Pay",
+                    subtitle: "Visa, Mastercard, Amex — secure online payment",
+                    icon: <CreditCard className="w-5 h-5" strokeWidth={1.75} />,
+                    trailing: null,
+                };
+            default:
+                return {
+                    title: gateway.title || "Other",
+                    subtitle: "",
+                    icon: <CreditCard className="w-5 h-5" strokeWidth={1.75} />,
+                    trailing: null,
+                };
+        }
+    };
+
+    const selectGateway = (gateway: PaymentGateway) => {
+        setMethodActive(gateway.id);
+        setSelectedGateway({ id: gateway.id, title: gateway.title });
+
+        if (gateway.id !== "bacs") {
+            setBankSlipFile(null);
+            if (previewUrl) {
+                URL.revokeObjectURL(previewUrl);
+                setPreviewUrl(null);
+            }
+        }
+
+        setIsKokoPayment(gateway.id === "darazbnpl");
+        setIsCardPayment(gateway.id === "payhere");
+    };
+
+    const PaymentMethodCard = ({ gateway }: { gateway: PaymentGateway }) => {
         const active = methodActive === gateway.id;
+        const meta = getGatewayMeta(gateway);
 
         return (
-            <div className="flex items-start cursor-pointer space-x-4 sm:space-x-6">
-                <Radio
-                    className="cursor-pointer"
-                    name="payment-method"
-                    id={gateway.id}
-                    checked={active}
-                    onChange={(e) => {
-                        setMethodActive(e as any);
-                        setSelectedGateway({
-                            id: gateway.id,
-                            title: gateway.title,
-                        });
-
-                        if (gateway.id !== "bacs") {
-                            setBankSlipFile(null);
-                            if (previewUrl) {
-                                URL.revokeObjectURL(previewUrl);
-                                setPreviewUrl(null);
-                            }
-                        }
-
-                        if (gateway.id === "darazbnpl") {
-                            setIsKokoPayment(true);
-                        } else {
-                            setIsKokoPayment(false);
-                        }
-
-                        if (gateway.id === "payhere") {
-                            setIsCardPayment(true);
-                        } else {
-                            setIsCardPayment(false);
-                        }
-                    }}
-                />
-                <div className="flex-1">
-                    <label
-                        htmlFor={gateway.id}
-                        className="flex items-center space-x-4 sm:space-x-6"
+            <div
+                className={`rounded-xl border transition-colors ${
+                    active
+                        ? "border-primaryColor bg-primary-50/60 dark:bg-primary-900/20"
+                        : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+                }`}
+            >
+                <label
+                    htmlFor={gateway.id}
+                    className="flex items-center gap-4 p-4 cursor-pointer"
+                >
+                    <input
+                        id={gateway.id}
+                        type="radio"
+                        name="payment-method"
+                        checked={active}
+                        onChange={() => selectGateway(gateway)}
+                        className="sr-only"
+                    />
+                    <span
+                        aria-hidden="true"
+                        className={`flex items-center justify-center w-5 h-5 rounded-full border-2 shrink-0 transition-colors ${
+                            active
+                                ? "border-primaryColor bg-primaryColor"
+                                : "border-slate-300 dark:border-slate-600"
+                        }`}
                     >
-                        <p className="font-medium">
-                            {gateway.id === "payhere" ? "Pay Online" : gateway.title}
-                        </p>
-                    </label>
-                    <div className={`mt-6 mb-4 ${active ? "block" : "hidden"}`}>
-                        {gateway.id !== "darazbnpl" && (
-                            <>
-                                {gateway.id === "bacs" ? (
-                                    <div className="space-y-4">
-                                        <p className="text-sm dark:text-slate-300">
-                                            Your order will be delivered to you after you transfer the payment to our bank account.
-                                        </p>
-                                        <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-lg">
-                                            <p className="text-sm font-medium text-slate-900 dark:text-slate-200 mb-2">
-                                                Bank Details:
-                                            </p>
-                                            <p className="text-sm text-slate-700 dark:text-slate-300">
-                                                Bank Name: Commercial Bank
-                                                <br />
-                                                Account Name: GQ Mobiles Pvt Ltd
-                                                <br />
-                                                Account Number: 1000475584
-                                                <br />
-                                                Branch: Head office
-                                            </p>
-                                        </div>
-                                        <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
-                                            <label className="block text-sm font-medium text-slate-900 dark:text-slate-200 mb-2">
-                                                Upload Bank Slip <span className="text-red-500">*</span>
-                                            </label>
-                                            <input
-                                                type="file"
-                                                id={`bank-slip-upload-${gateway.id}`}
-                                                accept="image/png, image/gif, image/jpeg, image/heic, image/heif, image/webp, image/bmp, image/tiff, application/pdf"
-                                                onChange={handleBankSlipChange}
-                                                className="block w-full text-sm text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primaryColor file:text-white hover:file:bg-slate-800 file:cursor-pointer cursor-pointer"
-                                            />
-                                            {previewUrl && bankSlipFile && (
-                                                <div className="mt-3">
-                                                    <p className="text-xs text-slate-600 dark:text-slate-400 mb-2">Preview:</p>
-                                                    {bankSlipFile.type.startsWith("image/") ? (
-                                                        <div className="relative w-full max-w-xs border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
-                                                            <Image
-                                                                src={previewUrl}
-                                                                alt="Bank slip preview"
-                                                                width={400}
-                                                                height={300}
-                                                                className="w-full h-auto object-contain"
-                                                            />
-                                                        </div>
-                                                    ) : (
-                                                        <p className="text-xs text-slate-600 dark:text-slate-400">{bankSlipFile.name}</p>
-                                                    )}
-                                                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{bankSlipFile.name}</p>
-                                                </div>
-                                            )}
-                                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-                                                Please upload your bank transfer slip after completing the payment.
-                                            </p>
-                                        </div>
-                                        {gateway.description && (
-                                            <div className="text-slate-900 dark:text-slate-200 font-medium text-sm">
-                                                <span dangerouslySetInnerHTML={{ __html: gateway.description }} />
-                                            </div>
-                                        )}
-                                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                                            Make your payment directly into our bank account. Please attach your payment slip to this order. Your order will not be shipped until the funds have cleared in our account.
-                                        </p>
-                                    </div>
-                                ) : (
-                                    <>
-                                        <p className="text-sm dark:text-slate-300">
-                                            Your order will be delivered to you after you{" "}
-                                            {gateway.title || "transfer funds"} to:
-                                        </p>
-                                        <ul className="mt-3.5 text-sm text-slate-500 dark:text-slate-400 space-y-2">
-                                            <li>
-                                                {gateway.description && (
-                                                    <span className="text-slate-900 dark:text-slate-200 font-medium">
-                                                        <span
-                                                            dangerouslySetInnerHTML={{ __html: gateway.description }}
-                                                        />
-                                                    </span>
-                                                )}
-                                            </li>
-                                        </ul>
-                                    </>
-                                )}
-                            </>
+                        {active && <span className="w-2 h-2 rounded-full bg-white" />}
+                    </span>
+                    <span
+                        className={`flex items-center justify-center w-10 h-10 rounded-lg shrink-0 ${
+                            active
+                                ? "bg-primaryColor/10 text-primaryColor"
+                                : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+                        }`}
+                    >
+                        {meta.icon}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                        <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                            {meta.title}
+                        </div>
+                        {meta.subtitle && (
+                            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                                {meta.subtitle}
+                            </div>
                         )}
                     </div>
-                </div>
+                    {meta.trailing && <div className="shrink-0">{meta.trailing}</div>}
+                </label>
+
+                {active && gateway.id === "bacs" && (
+                    <div className="px-4 pb-4 pt-1 space-y-3 border-t border-slate-200 dark:border-slate-700 mt-1">
+                        <p className="text-sm text-slate-600 dark:text-slate-300 pt-3">
+                            Your order will be delivered to you after you transfer the payment to our bank account.
+                        </p>
+                        <div className="rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-3">
+                            <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5">
+                                Bank details
+                            </div>
+                            <dl className="text-sm space-y-1 text-slate-700 dark:text-slate-300">
+                                <div className="flex justify-between gap-3">
+                                    <dt className="text-slate-500">Bank</dt>
+                                    <dd>Commercial Bank</dd>
+                                </div>
+                                <div className="flex justify-between gap-3">
+                                    <dt className="text-slate-500">Account name</dt>
+                                    <dd>GQ Mobiles Pvt Ltd</dd>
+                                </div>
+                                <div className="flex justify-between gap-3">
+                                    <dt className="text-slate-500">Account no.</dt>
+                                    <dd className="font-mono">1000475584</dd>
+                                </div>
+                                <div className="flex justify-between gap-3">
+                                    <dt className="text-slate-500">Branch</dt>
+                                    <dd>Head office</dd>
+                                </div>
+                            </dl>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-slate-900 dark:text-slate-200 mb-1.5">
+                                Upload bank slip <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="file"
+                                id={`bank-slip-upload-${gateway.id}`}
+                                accept="image/png, image/gif, image/jpeg, image/heic, image/heif, image/webp, image/bmp, image/tiff, application/pdf"
+                                onChange={handleBankSlipChange}
+                                className="block w-full text-sm text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primaryColor file:text-white hover:file:bg-slate-800 file:cursor-pointer cursor-pointer"
+                            />
+                            {previewUrl && bankSlipFile && (
+                                <div className="mt-2 flex items-center gap-3">
+                                    {bankSlipFile.type.startsWith("image/") ? (
+                                        <div className="relative w-16 h-16 rounded-md border border-slate-200 dark:border-slate-700 overflow-hidden shrink-0">
+                                            <Image
+                                                src={previewUrl}
+                                                alt="Bank slip preview"
+                                                fill
+                                                className="object-cover"
+                                            />
+                                        </div>
+                                    ) : (
+                                        <Check className="w-5 h-5 text-emerald-600" />
+                                    )}
+                                    <span className="text-xs text-slate-600 dark:text-slate-400 break-all">
+                                        {bankSlipFile.name}
+                                    </span>
+                                </div>
+                            )}
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5">
+                                Please upload your bank transfer slip after completing the payment.
+                            </p>
+                        </div>
+                        {gateway.description ? (
+                            <div
+                                className="text-sm text-slate-700 dark:text-slate-200"
+                                dangerouslySetInnerHTML={{ __html: gateway.description }}
+                            />
+                        ) : (
+                            <p className="text-sm text-slate-700 dark:text-slate-200">
+                                Make your payment directly into our bank account. Please attach your payment slip to this order. Your order will not be shipped until the funds have cleared in our account.
+                            </p>
+                        )}
+                    </div>
+                )}
+
+                {active && gateway.id !== "bacs" && gateway.description && (
+                    <div className="px-4 pb-4 pt-0">
+                        <div className="text-xs text-slate-600 dark:text-slate-300 border-t border-slate-200 dark:border-slate-700 pt-3">
+                            <span dangerouslySetInnerHTML={{ __html: gateway.description }} />
+                        </div>
+                    </div>
+                )}
             </div>
         );
     };
@@ -472,46 +628,46 @@ const UnifiedCheckoutForm = ({
                 </div>
             </div>
 
-            {/* Shipping Address Section */}
-            <div className=" overflow-hidden">
+            {/* Delivery Method Section */}
+            <div className="overflow-hidden">
                 <div className="p-0">
-                    <h3 className="text-lg font-semibold mb-4">Shipping Address</h3>
+                    <h3 className="text-lg font-semibold mb-4">Delivery Method</h3>
 
-                    <div className="space-y-4">
-                        <div className="w-full border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-                            <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
-                                Delivery Method
-                            </h4>
-                            <div className="flex flex-wrap gap-4">
-                                <label className="flex items-center cursor-pointer">
-                                    <input
-                                        type="radio"
-                                        name="pickup"
-                                        value="store_uber_pickme"
-                                        checked={pickupType === "store_uber_pickme"}
-                                        onChange={() => handlePickupTypeChange("store_uber_pickme")}
-                                        className="w-4 h-4 text-primaryColor border-gray-300 focus:ring-primaryColor focus:ring-2"
-                                    />
-                                    <span className="ml-2 text-sm text-slate-700 dark:text-slate-300">
-                                        Store / Uber / PickMe
-                                    </span>
-                                </label>
-                                <label className="flex items-center cursor-pointer">
-                                    <input
-                                        type="radio"
-                                        name="pickup"
-                                        value="courier"
-                                        checked={pickupType === "courier"}
-                                        onChange={() => handlePickupTypeChange("courier")}
-                                        className="w-4 h-4 text-primaryColor border-gray-300 focus:ring-primaryColor focus:ring-2"
-                                    />
-                                    <span className="ml-2 text-sm text-slate-700 dark:text-slate-300">
-                                        Courier
-                                    </span>
-                                </label>
-                            </div>
+                    <div className="space-y-3">
+                        <DeliveryOption
+                            value="courier"
+                            selected={pickupType === "courier"}
+                            onSelect={handlePickupTypeChange}
+                            icon={<Truck className="w-5 h-5" strokeWidth={1.75} />}
+                            title="Courier delivery"
+                            subtitle="Island-wide delivery in 2–3 business days"
+                            trailing={<span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Rs 500</span>}
+                        />
+                        <DeliveryOption
+                            value="store_uber_pickme"
+                            selected={pickupType === "store_uber_pickme"}
+                            onSelect={handlePickupTypeChange}
+                            icon={<Store className="w-5 h-5" strokeWidth={1.75} />}
+                            title="Store Pickup / Uber / PickMe"
+                            subtitle="Collect in-store or arrange a ride from our location"
+                            trailing={
+                                <div className="flex items-center gap-1.5">
+                                    <BrandBadge src="/logos/uber.png" alt="Uber" />
+                                    <BrandBadge src="/logos/pickme.png" alt="PickMe" />
+                                </div>
+                            }
+                        />
+                    </div>
+
+                    {!pickupType && (
+                        <div className="mt-3 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                            <span className="inline-block w-1 h-1 rounded-full bg-primaryColor animate-pulse" />
+                            Select a delivery method to continue
                         </div>
+                    )}
 
+                    {pickupType && (
+                    <div className="mt-6 space-y-4">
                         <div>
                             <label htmlFor="checkout-name" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
                                 Full name
@@ -599,8 +755,8 @@ const UnifiedCheckoutForm = ({
                                 </div>
                             </>
                         ) : (
-                            <div className="rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 p-4 text-sm text-slate-600 dark:text-slate-300">
-                                <p className="font-medium text-slate-900 dark:text-slate-100 mb-1">
+                            <div className="rounded-xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900 p-4 text-sm text-slate-700 dark:text-slate-300">
+                                <p className="font-semibold text-slate-900 dark:text-slate-100 mb-1">
                                     Ready for pickup from our store
                                 </p>
                                 <p>
@@ -609,21 +765,21 @@ const UnifiedCheckoutForm = ({
                             </div>
                         )}
                     </div>
+                    )}
                 </div>
             </div>
 
             {/* Payment Method Section */}
-            <div className="overflow-hidden">
-                <div className="p-0">
+            {pickupType && (
+                <div>
                     <h3 className="text-lg font-semibold mb-4">Payment Method</h3>
-
-                    <div className="space-y-6">
+                    <div className="space-y-3">
                         {visiblePaymentGateways.map((gateway) => (
-                            <PaymentMethods key={gateway.id} gateway={gateway} />
+                            <PaymentMethodCard key={gateway.id} gateway={gateway} />
                         ))}
                     </div>
                 </div>
-            </div>
+            )}
 
         </form>
     );
