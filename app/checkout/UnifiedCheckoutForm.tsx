@@ -57,16 +57,15 @@ export interface CheckoutSubmitPayload {
     isStorePickup: boolean;
 }
 
-type StepKey = "contact" | "delivery" | "payment" | "review";
+type StepKey = "details" | "payment" | "review";
 
 interface CheckoutStepperProps {
     currentStep: StepKey;
 }
 
-const STEP_ORDER: StepKey[] = ["contact", "delivery", "payment", "review"];
+const STEP_ORDER: StepKey[] = ["details", "payment", "review"];
 const STEP_LABELS: Record<StepKey, string> = {
-    contact: "Contact",
-    delivery: "Delivery",
+    details: "Details",
     payment: "Payment",
     review: "Review",
 };
@@ -688,14 +687,13 @@ const UnifiedCheckoutForm = ({
         pickupType !== null &&
         !!firstName &&
         (pickupType === "store_uber_pickme" || courierAddressDone);
+    const detailsDone = contactDone && deliveryDone;
     const paymentDone =
         !!selectedGateway.id &&
         (selectedGateway.id !== "bacs" || !!bankSlipFile);
 
-    const currentStep: StepKey = !contactDone
-        ? "contact"
-        : !deliveryDone
-        ? "delivery"
+    const currentStep: StepKey = !detailsDone
+        ? "details"
         : !paymentDone
         ? "payment"
         : "review";
