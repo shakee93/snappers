@@ -73,6 +73,7 @@ const STEP_LABELS: Record<StepKey, string> = {
 
 const CheckoutStepper = ({ currentStep }: CheckoutStepperProps) => {
     const currentIndex = STEP_ORDER.indexOf(currentStep);
+    const visibleSteps = STEP_ORDER.slice(0, currentIndex + 1);
     return (
         <nav
             aria-label="Checkout progress"
@@ -84,7 +85,7 @@ const CheckoutStepper = ({ currentStep }: CheckoutStepperProps) => {
             >
                 Cart
             </Link>
-            {STEP_ORDER.map((key, idx) => {
+            {visibleSteps.map((key, idx) => {
                 const isCurrent = key === currentStep;
                 const isComplete = idx < currentIndex;
                 return (
@@ -97,9 +98,7 @@ const CheckoutStepper = ({ currentStep }: CheckoutStepperProps) => {
                             className={
                                 isCurrent
                                     ? "font-semibold text-slate-900 dark:text-slate-100"
-                                    : isComplete
-                                    ? "text-slate-600 dark:text-slate-300 inline-flex items-center gap-1"
-                                    : "text-slate-400 dark:text-slate-500"
+                                    : "text-slate-600 dark:text-slate-300 inline-flex items-center gap-1"
                             }
                             aria-current={isCurrent ? "step" : undefined}
                         >
