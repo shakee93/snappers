@@ -92,7 +92,7 @@ const CheckoutPage = () => {
   const [totalWithTax, setTotalWithTax] = useState<string | null>();
   const [isTOC, setTOC] = useState<boolean>(false);
   const [freeShipping, setFreeShipping] = useState<boolean>(false);
-  const [confirmOrderErrors, setConfirmOrderErrors] = useState<string[]>([]);
+  const [tocError, setTocError] = useState(false);
   const [guestCheckoutData, setGuestCheckoutData] = useState<any>();
   const [isConfirmingOrder, setIsConfirmingOrder] = useState(false);
   const [htmlFormResponse, setHtmlFormResponse] = useState<string | null>(null);
@@ -106,11 +106,11 @@ const CheckoutPage = () => {
   const [removeCouponsMutation, { loading: removingCoupon }] = useMutation(REMOVE_COUPONS);
 
   const handleTOC = () => {
-    // Toggle the state and get the updated value
     const updatedTOC = !isTOC;
     setTOC(updatedTOC);
-
-    // Log the updated value
+    if (updatedTOC) {
+      setTocError(false);
+    }
   };
   // TODO: Uncomment this for the redirect on cart free
   useEffect(() => {
@@ -333,10 +333,12 @@ const CheckoutPage = () => {
 
   const submitCheckout = async (data: CheckoutSubmitPayload) => {
     if (!isTOC) {
-      setConfirmOrderErrors(["Please accept the terms and conditions."]);
+      setTocError(true);
+      const el = document.getElementById("toc-section");
+      el?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
-    setConfirmOrderErrors([]);
+    setTocError(false);
 
     // Sync form state for downstream effects (e.g. paymentData → COD redirect)
     updateFormData("contactInfo", data.contactInfo);
@@ -355,7 +357,6 @@ const CheckoutPage = () => {
       const bankSlipFile = data.paymentMethod.bankSlipFile;
       if (!bankSlipFile) {
         toast.error("Please upload your bank slip before confirming the order.");
-        setConfirmOrderErrors(["Bank slip upload is required for Bank Transfer."]);
         return;
       }
 
@@ -1295,8 +1296,15 @@ const CheckoutPage = () => {
               )}
             </div>
 
-            <div className="mt-5 flex justify-center items-center text-sm text-slate-500 dark:text-slate-400">
-              <div className=" relative flex gap-2">
+            <div
+              id="toc-section"
+              className={`mt-5 flex justify-center items-start text-sm rounded-lg transition-colors ${
+                tocError
+                  ? "text-red-600 bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-800 p-3"
+                  : "text-slate-500 dark:text-slate-400"
+              }`}
+            >
+              <div className="relative flex gap-2">
                 <Checkbox
                   key={1}
                   label=""
@@ -1308,27 +1316,32 @@ const CheckoutPage = () => {
                 />
 
                 <div>
-                  <div>By proceeding with your purchase you agree to our </div>
-                  <Link
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href={"/terms-and-conditions"}
-                    className="font-medium text-slate-900 underline dark:text-slate-200"
-                  >
-                    Terms and Conditions
-                  </Link>
-                  <span>
-                    {` `}and{` `}
-                  </span>
-                  <Link
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href={"/privacy"}
-                    className="font-medium text-slate-900 underline dark:text-slate-200"
-                  >
-                    Privacy Policy
-                  </Link>
-                  {` `}.
+                  <div>
+                    By proceeding with your purchase you agree to our{" "}
+                    <Link
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href={"/terms-and-conditions"}
+                      className="font-medium text-slate-900 underline dark:text-slate-200"
+                    >
+                      Terms and Conditions
+                    </Link>
+                    {" "}and{" "}
+                    <Link
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      href={"/privacy"}
+                      className="font-medium text-slate-900 underline dark:text-slate-200"
+                    >
+                      Privacy Policy
+                    </Link>
+                    .
+                  </div>
+                  {tocError && (
+                    <div className="mt-1 text-xs font-medium text-red-600">
+                      Please agree to the terms to continue.
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -1351,13 +1364,6 @@ const CheckoutPage = () => {
               )}
             </ButtonPrimary>
             <div id="ndb-pay-form-wrapper" className="mt-6"></div>
-            <div className="text-xs space-y-1.5 mt-4 pl-5">
-              {confirmOrderErrors.map((error, index) => (
-                <div key={index} className="text-red-500">
-                  *{error}
-                </div>
-              ))}
-            </div>
           </div>
           </div>
         </div>
