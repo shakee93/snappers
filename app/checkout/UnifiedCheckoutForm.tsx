@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import ButtonPrimary from "shared/Button/ButtonPrimary";
 import Input from "shared/Input/Input";
 import CountryPhoneInput from "./components/CountryPhoneInput";
 import Link from "next/link";
@@ -11,36 +10,59 @@ import { contactInformation } from "@/data/types";
 import Select from "shared/Select/Select";
 import { toast } from "sonner";
 import { SRI_LANKAN_STATES } from "@/components/AddressPageComps/HelperComps";
-import Checkbox from "@/shared/Checkbox/Checkbox";
 import Radio from "shared/Radio/Radio";
 import { useCart } from "@/context/CartProvider";
-import { Check } from "lucide-react";
+
+export interface CheckoutSubmitPayload {
+    contactInfo: { phone: string; email: string; country: string };
+    deliveryAddress: {
+        firstName: string;
+        lastName: string;
+        address: string;
+        apartment: string;
+        city: string;
+        state: string;
+        postal: string;
+        country: string;
+        addressType: string;
+    };
+    billingAddress: {
+        firstName: string;
+        lastName: string;
+        address: string;
+        apartment: string;
+        city: string;
+        state: string;
+        postal: string;
+        country: string;
+        addressType: string;
+    };
+    paymentMethod: {
+        selectedGateway: { id: string; title: string | null };
+        bankSlipFile: File | null;
+    };
+    isStorePickup: boolean;
+}
 
 interface Props {
-    updateFormData: (section: string, data: any) => void;
-    formData: any;
     initialContactData: contactInformation;
     initialShippingData: CustomerAddress | null;
     paymentGateways: PaymentGateway[];
-    handleConfirmationChange: any;
-    setIsStorePickup: any;
+    setIsStorePickup: (v: boolean) => void;
     isStorePickup: boolean;
-    setIsCardPayment: any;
+    setIsCardPayment: (v: boolean) => void;
     isCardPayment: boolean;
     totalPayment: number;
-    setIsKokoPayment: any;
+    setIsKokoPayment: (v: boolean) => void;
     isKokoPayment: boolean;
     isPriceFluctuation: any;
-    onFormSubmit: () => void;
+    onCheckoutSubmit: (payload: CheckoutSubmitPayload) => Promise<void> | void;
 }
 
 const UnifiedCheckoutForm = ({
-    updateFormData,
-    formData,
     initialContactData,
     initialShippingData,
     paymentGateways,
-    handleConfirmationChange,
     setIsStorePickup,
     isStorePickup,
     setIsCardPayment,
@@ -49,7 +71,7 @@ const UnifiedCheckoutForm = ({
     setIsKokoPayment,
     isKokoPayment,
     isPriceFluctuation,
-    onFormSubmit,
+    onCheckoutSubmit,
 }: Props) => {
     // Contact Info State
     const [phone, setPhone] = useState("");
@@ -74,13 +96,10 @@ const UnifiedCheckoutForm = ({
         title: null,
     });
 
-    const [isBillingSameAsShipping, setIsBillingSameAsShipping] = useState(true);
     const [pickupType, setPickupType] = useState<"store_uber_pickme" | "courier">("courier");
 
     const [bankSlipFile, setBankSlipFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-
-    const [submitState, setSubmitState] = useState<"idle" | "loading" | "success">("idle");
 
     const { cart } = useCart();
 
@@ -118,34 +137,10 @@ const UnifiedCheckoutForm = ({
         }
     }, [initialShippingData]);
 
-    // Seed parent with the default delivery method (Courier) on mount
-    useEffect(() => {
-        setIsStorePickup(false);
-        updateFormData("shippingDetails", {
-            databaseId: null,
-            id: null,
-            title: "Courier",
-        });
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
 
     const handlePickupTypeChange = (type: "store_uber_pickme" | "courier") => {
         setPickupType(type);
-        const isPickup = type === "store_uber_pickme";
-        setIsStorePickup(isPickup);
-        if (isPickup) {
-            updateFormData("shippingDetails", {
-                databaseId: "local_pickup",
-                id: "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==",
-                title: "Store / Uber / PickMe",
-            });
-        } else {
-            updateFormData("shippingDetails", {
-                databaseId: null,
-                id: null,
-                title: "Courier",
-            });
-        }
+        setIsStorePickup(type === "store_uber_pickme");
     };
 
     const removePayhereOnMobileAndTab = () => {
@@ -265,20 +260,7 @@ const UnifiedCheckoutForm = ({
             return;
         }
 
-        setSubmitState("loading");
-        await new Promise<void>((r) => requestAnimationFrame(() => r()));
-
-        // Update Contact Info
-        const contactInfo = {
-            phone,
-            email,
-            country,
-        };
-        updateFormData("contactInfo", contactInfo);
-        handleConfirmationChange("contactInfo", true);
-
-        // Update Delivery Address
-        const shippingAddressData = {
+        const addressFields = {
             firstName,
             lastName,
             address,
@@ -286,39 +268,25 @@ const UnifiedCheckoutForm = ({
             city,
             state,
             postal,
-            country: addressCountry,
+            country: "LK",
             addressType,
         };
 
-        updateFormData("deliveryAddress", shippingAddressData);
-        handleConfirmationChange("deliveryAddress", true);
-
-        if (isStorePickup || isBillingSameAsShipping) {
-            updateFormData("billingAddress", shippingAddressData);
-            handleConfirmationChange("billingAddress", true);
-        }
-
-        if (isStorePickup) {
-            updateFormData("shippingDetails", {
-                databaseId: "local_pickup",
-                id: "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==",
-                title: "StorePickup",
-            });
-        }
-
-        // Update Payment Method
-        const paymethod = {
-            selectedGateway,
-            bankSlipFile: selectedGateway.id === "bacs" ? bankSlipFile : null,
+        const payload: CheckoutSubmitPayload = {
+            contactInfo: { phone, email, country },
+            deliveryAddress: addressFields,
+            billingAddress: addressFields,
+            paymentMethod: {
+                selectedGateway: {
+                    id: selectedGateway.id,
+                    title: selectedGateway.title ?? null,
+                },
+                bankSlipFile: selectedGateway.id === "bacs" ? bankSlipFile : null,
+            },
+            isStorePickup: pickupType === "store_uber_pickme",
         };
-        updateFormData("paymentMethod", paymethod);
-        handleConfirmationChange("paymentMethod", true);
 
-        await new Promise<void>((r) => setTimeout(r, 400));
-
-        onFormSubmit();
-        setSubmitState("success");
-        window.setTimeout(() => setSubmitState("idle"), 2500);
+        await onCheckoutSubmit(payload);
     };
 
     const PaymentMethods = ({ gateway }: { gateway: PaymentGateway }) => {
@@ -461,7 +429,7 @@ const UnifiedCheckoutForm = ({
     };
 
     return (
-        <form onSubmit={handleFormSubmit} className="space-y-8">
+        <form id="checkout-form" onSubmit={handleFormSubmit} className="space-y-8">
             {/* Contact Information Section */}
             <div className=" overflow-hidden">
                 <div className="p-0">
@@ -657,24 +625,6 @@ const UnifiedCheckoutForm = ({
                 </div>
             </div>
 
-            {/* Submit Button */}
-            <div className="flex flex-col gap-2 pt-6">
-                <ButtonPrimary
-                    type="submit"
-                    className="sm:!px-7 shadow-none min-w-[200px]"
-                    loading={submitState === "loading"}
-                    disabled={submitState === "success"}
-                >
-                    {submitState === "success" ? (
-                        <span className="inline-flex items-center justify-center gap-2">
-                            <Check className="w-5 h-5 shrink-0" strokeWidth={2.5} aria-hidden />
-                            Saved successfully
-                        </span>
-                    ) : (
-                        "Save and Continue"
-                    )}
-                </ButtonPrimary>
-            </div>
         </form>
     );
 };

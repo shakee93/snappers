@@ -27,6 +27,7 @@ import {
 } from "@/graphql/types/graphql";
 import koko from "@/public/koko.png";
 import CheckoutDetails from "./CheckoutDetails";
+import { CheckoutSubmitPayload } from "./UnifiedCheckoutForm";
 import CartItems from "./CartItems";
 import { toast } from "sonner";
 import { PayhereStatus, PaymentDetailsWithoutUrls } from "@/data/types";
@@ -64,13 +65,6 @@ const CheckoutPage = () => {
   const { customer, fetchCustomer } = useSession();
 
   const { paymentGateways } = usePaymentGateways();
-  const [tabActive, setTabActive] = useState<
-    | "ContactInfo"
-    | "DeliveryAddress"
-    | "BillingAddress"
-    | "PaymentMethod"
-    | "order-cart"
-  >("ContactInfo");
 
   const [formData, setFormData] = useState<FormData>({
     contactInfo: {},
@@ -89,12 +83,6 @@ const CheckoutPage = () => {
   const [isStorePickup, setIsStorePickup] = useState(false);
   const [isCardPayment, setIsCardPayment] = useState(false);
   const [isKokoPayment, setIsKokoPayment] = useState(false);
-  const [isConfirmed, setIsConfirmed] = useState({
-    contactInfo: false,
-    deliveryAddress: false,
-    paymentMethod: false,
-    billingAddress: false,
-  });
 
   const [shippingTotal, setShippingTotal] = useState();
   const [orderTotal, setOrderTotal] = useState<string | null>(null);
@@ -209,15 +197,6 @@ const CheckoutPage = () => {
       return {
         ...prevData,
         [section as keyof FormData]: updatedSection,
-      };
-    });
-  };
-
-  const handleConfirmationChange = (component: string, value: boolean) => {
-    setIsConfirmed((prevConfirmed) => {
-      return {
-        ...prevConfirmed,
-        [component]: value,
       };
     });
   };
@@ -352,42 +331,28 @@ const CheckoutPage = () => {
     }
   }, [paymentData]);
 
-  const handleCheckoutProcess = async () => {
-    let errors = [];
-    if (!isConfirmed.contactInfo) {
-      errors.push("Contact info is missing.");
-    }
-    if (!isConfirmed.deliveryAddress) {
-      errors.push("Delivery address is missing.");
-    }
-    if (!isConfirmed.billingAddress) {
-      errors.push("Billing address is missing.");
-    }
-    if (!isConfirmed.paymentMethod) {
-      errors.push("Payment method is missing.");
-    }
+  const submitCheckout = async (data: CheckoutSubmitPayload) => {
     if (!isTOC) {
-      errors.push("Terms and conditions are not accepted.");
-    }
-    if (errors.length > 0) {
-      setConfirmOrderErrors(errors);
+      setConfirmOrderErrors(["Please accept the terms and conditions."]);
       return;
     }
+    setConfirmOrderErrors([]);
 
-    const isBankTransfer =
-      formData?.paymentMethod?.selectedGateway?.id == "bacs";
-    const isPayhere = formData?.paymentMethod?.selectedGateway?.id == "payhere";
-    const isCashOnDelivery =
-      formData?.paymentMethod?.selectedGateway?.id == "cod";
-    const isKokoPayment =
-      formData?.paymentMethod?.selectedGateway?.id == "darazbnpl";
-    const isGeniePayment =
-      formData?.paymentMethod?.selectedGateway?.id == "geniebiz";
-    const isNdbPay =
-      formData?.paymentMethod?.selectedGateway?.id == "ndb-pay";
+    // Sync form state for downstream effects (e.g. paymentData → COD redirect)
+    updateFormData("contactInfo", data.contactInfo);
+    updateFormData("deliveryAddress", data.deliveryAddress);
+    updateFormData("billingAddress", data.billingAddress);
+    updateFormData("paymentMethod", data.paymentMethod);
+
+    await handleCheckoutProcess(data);
+  };
+
+  const handleCheckoutProcess = async (data: CheckoutSubmitPayload) => {
+    const gatewayId = data.paymentMethod.selectedGateway.id;
+    const isBankTransfer = gatewayId === "bacs";
 
     if (isBankTransfer) {
-      const bankSlipFile = formData?.paymentMethod?.bankSlipFile;
+      const bankSlipFile = data.paymentMethod.bankSlipFile;
       if (!bankSlipFile) {
         toast.error("Please upload your bank slip before confirming the order.");
         setConfirmOrderErrors(["Bank slip upload is required for Bank Transfer."]);
@@ -395,7 +360,7 @@ const CheckoutPage = () => {
       }
 
       try {
-        const checkoutResult = await handleCheckout();
+        const checkoutResult = await handleCheckout(data);
         if (checkoutResult && checkoutResult.order_id) {
           await uploadBankSlip(bankSlipFile, checkoutResult);
         }
@@ -406,45 +371,28 @@ const CheckoutPage = () => {
       }
       return;
     }
-    if (isGeniePayment) {
-      await handleCheckout();
-      return;
-    }
 
-    if (isPayhere) {
-      await handleCheckout();
-      return;
-    }
-
-    if (isNdbPay) {
-      await handleCheckout();
-      return;
-    }
-
-    if (isCashOnDelivery || isKokoPayment) {
-      await handleCheckout();
-    }
+    await handleCheckout(data);
   };
 
-  const handleCheckout = async () => {
+  const handleCheckout = async (data: CheckoutSubmitPayload) => {
     setLoading(true);
 
     try {
-      const isPayhere =
-        formData?.paymentMethod?.selectedGateway?.id == "payhere";
+      const gatewayId = data.paymentMethod.selectedGateway.id;
+      const isPayhere = gatewayId === "payhere";
+      const paymentMethodId = gatewayId;
+      const isStorePickupOrder = data.isStorePickup;
+      const contactEmail = data.contactInfo.email;
+      const contactPhone = data.contactInfo.phone;
 
-      const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
-
-      if (paymentMethodId === undefined || paymentMethodId === null || paymentMethodId === "") {
+      if (!paymentMethodId) {
         console.error("Payment method ID is missing");
         toast.error("Payment Method was not chosen.");
         return null;
       }
 
-      formData.billingAddress.country = "LK";
-      formData.deliveryAddress.country = "LK";
-
-      const shippingMethod = getShippingMethod(shippingTotal);
+      const shippingMethod = getShippingMethod(shippingTotal, isStorePickupOrder);
       const storePickupAddressOverride = {
         address1: "Store Pickup",
         address2: "",
@@ -454,37 +402,34 @@ const CheckoutPage = () => {
         country: "LK",
       };
 
-      const shippingDetails = isStorePickup
+      const shippingDetails = isStorePickupOrder
         ? {
-          ...transformAddress(formData.deliveryAddress),
+          ...transformAddress(data.deliveryAddress),
           ...storePickupAddressOverride,
         }
-        : transformAddress(formData.deliveryAddress);
+        : transformAddress(data.deliveryAddress);
 
-      const email = formData?.contactInfo?.email;
-
-      const billingDetails = isStorePickup
+      const billingDetails = isStorePickupOrder
         ? {
-          ...transformAddress(formData.billingAddress),
+          ...transformAddress(data.billingAddress),
           ...storePickupAddressOverride,
-          email: formData?.contactInfo?.email,
-          phone: formData?.contactInfo?.phone,
+          email: contactEmail,
+          phone: contactPhone,
         }
         : {
-          ...transformAddress(formData.billingAddress),
-          email: formData?.contactInfo?.email,
-          phone: formData?.contactInfo?.phone,
+          ...transformAddress(data.billingAddress),
+          email: contactEmail,
+          phone: contactPhone,
         };
 
       const customerNoteHTML = `
-            <p><strong>Customer Email:</strong> ${email}</p>
-            <p><strong>Phone Number:</strong> ${formData?.contactInfo?.phone
-        }</p>
-            ${isStorePickup
+            <p><strong>Customer Email:</strong> ${contactEmail}</p>
+            <p><strong>Phone Number:</strong> ${contactPhone}</p>
+            ${isStorePickupOrder
           ? "<p><strong>Pickup Location:</strong> Store</p>"
           : ""
         }
-            ${formData?.paymentMethod?.selectedGateway?.id === "darazbnpl"
+            ${gatewayId === "darazbnpl"
           ? "<p><strong>Payment Method:</strong> Koko Pay</p>"
           : ""
         }
@@ -506,7 +451,7 @@ const CheckoutPage = () => {
         },
       };
 
-      const { data, errors } =
+      const { data: mutationData, errors } =
         customer?.id === "guest"
           ? await guestCheckout({ variables })
           : await checkoutMutation({ variables });
@@ -519,47 +464,43 @@ const CheckoutPage = () => {
         return null;
       }
 
-      if (!data?.checkout) {
+      if (!mutationData?.checkout) {
         toast.error("Checkout failed. Please try again.");
         return null;
       }
 
       // Store order data in localStorage for both guest and logged-in users
-      localStorage.setItem("last_order", JSON.stringify(data));
+      localStorage.setItem("last_order", JSON.stringify(mutationData));
 
-      const isKokoGateway =
-        formData?.paymentMethod?.selectedGateway?.id === "darazbnpl";
-
-      if (isKokoGateway) {
+      if (gatewayId === "darazbnpl") {
         const orderData = {
-          order_id: data?.checkout?.order?.databaseId,
+          order_id: mutationData?.checkout?.order?.databaseId,
         };
         handleKoko(orderData);
         return null;
       }
 
       // NDB-Pay payment flow
-      const isNdbPay = formData?.paymentMethod?.selectedGateway?.id == "ndb-pay";
-      if (isNdbPay) {
-        const orderTotalRaw = data?.checkout?.order?.total;
+      if (gatewayId === "ndb-pay") {
+        const orderTotalRaw = mutationData?.checkout?.order?.total;
         const rawAmount = orderTotalRaw?.replace(/[^0-9.]/g, "") || "0.00";
         const numericAmount = parseFloat(rawAmount).toFixed(2);
 
-        const billingAddress = transformAddress(formData.billingAddress);
-        const shippingAddress = isStorePickup
+        const billingAddress = transformAddress(data.billingAddress);
+        const shippingAddress = isStorePickupOrder
           ? {
-              ...transformAddress(formData.deliveryAddress),
+              ...transformAddress(data.deliveryAddress),
               address1: "Store / Uber / PickMe",
               city: "Store / Uber / PickMe",
             }
-          : transformAddress(formData.deliveryAddress);
+          : transformAddress(data.deliveryAddress);
 
         const orderData = {
-          order_id: data?.checkout?.order?.databaseId,
+          order_id: mutationData?.checkout?.order?.databaseId,
           amount: numericAmount,
           currency: "LKR",
-          email: formData?.contactInfo?.email,
-          phone: formData?.contactInfo?.phone,
+          email: contactEmail,
+          phone: contactPhone,
           bill_to_forename: billingAddress.firstName || "",
           bill_to_surname: billingAddress.lastName || "",
           bill_to_address_line1: billingAddress.address1 || "",
@@ -568,8 +509,8 @@ const CheckoutPage = () => {
           bill_to_address_state: billingAddress.state || "",
           bill_to_address_postal_code: billingAddress.postcode || "",
           bill_to_address_country: billingAddress.country || "LK",
-          bill_to_email: formData?.contactInfo?.email || "",
-          bill_to_phone: formData?.contactInfo?.phone || "",
+          bill_to_email: contactEmail || "",
+          bill_to_phone: contactPhone || "",
           ship_to_forename: shippingAddress.firstName || "",
           ship_to_surname: shippingAddress.lastName || "",
           ship_to_address_line1: shippingAddress.address1 || "",
@@ -580,35 +521,30 @@ const CheckoutPage = () => {
           ship_to_address_country: shippingAddress.country || "LK",
         };
 
-        localStorage.setItem("last_order", JSON.stringify(data));
+        localStorage.setItem("last_order", JSON.stringify(mutationData));
         handleNdbPay(orderData);
         return null;
       }
 
-      // FOR GUEST CHECKOUT
-      let guestCheckoutData = data;
-
-      const isBankTransfer =
-        formData?.paymentMethod?.selectedGateway?.id == "bacs";
-
+      const isBankTransfer = gatewayId === "bacs";
       const isGuest = customer?.id === "guest";
 
       if (isPayhere && isGuest) {
-        const orderDbId = data?.checkout?.order?.databaseId;
+        const orderDbId = mutationData?.checkout?.order?.databaseId;
         if (!orderDbId) {
           toast.error("Could not create order for payment.");
           return null;
         }
         localStorage.setItem(
           "payhere_last_order",
-          JSON.stringify(guestCheckoutData)
+          JSON.stringify(mutationData)
         );
         router.push(`/checkout/payhere/guest_order`);
         return null;
       }
 
       if (isPayhere && !isGuest) {
-        const orderId = data?.checkout?.order?.databaseId;
+        const orderId = mutationData?.checkout?.order?.databaseId;
         if (!orderId) {
           toast.error("Could not create order for payment.");
           return null;
@@ -618,11 +554,9 @@ const CheckoutPage = () => {
       }
 
       // Genie Payment Redirect
-      const isGeniePayment = formData?.paymentMethod?.selectedGateway?.id == "geniebiz";
-      if (isGeniePayment && data?.checkout?.redirect) {
-        // Check if checkout was successful
-        if (data?.checkout?.result === "success") {
-          handleGeniePayment(data);
+      if (gatewayId === "geniebiz" && mutationData?.checkout?.redirect) {
+        if (mutationData?.checkout?.result === "success") {
+          handleGeniePayment(mutationData);
           return;
         } else {
           toast.error("Checkout failed. Please try again.");
@@ -630,8 +564,8 @@ const CheckoutPage = () => {
         }
       }
 
-      if (data) {
-        const checkoutDetails = savePaymentDetails(data);
+      if (mutationData) {
+        const checkoutDetails = savePaymentDetails(mutationData);
         setPaymentData(checkoutDetails);
 
         if (isBankTransfer) {
@@ -661,20 +595,20 @@ const CheckoutPage = () => {
     }
   };
 
-  const getShippingMethod = (shippingTotal: any) => {
-    const methodId = isStorePickup
+  const getShippingMethod = (shippingTotal: any, storePickup: boolean) => {
+    const methodId = storePickup
       ? "pickup_location:0"
       : freeShipping
         ? "wbs:5c9bd062_free_shipping"
         : "wbs:0dd3bc79_weight_based_shipping";
 
-    const methodTitle = isStorePickup
+    const methodTitle = storePickup
       ? "Store Pickup"
       : freeShipping
         ? "Free Shipping"
         : "Weight Based Shipping";
 
-    const total = isStorePickup ? "0" : shippingTotal;
+    const total = storePickup ? "0" : shippingTotal;
 
     return { methodId, methodTitle, total };
   };
@@ -780,13 +714,6 @@ const CheckoutPage = () => {
 
     // Fallback for unknown errors
     toast.error("An unexpected error occurred during checkout. Please try again or contact support if the problem persists.");
-  };
-
-  const handleScrollToEl = (id: string) => {
-    const element = document.getElementById(id);
-    setTimeout(() => {
-      element?.scrollIntoView({ behavior: "smooth" });
-    }, 80);
   };
 
   const replaceStringinInt = (orderTotalString: any) => {
@@ -1061,23 +988,10 @@ const CheckoutPage = () => {
         <div className="lg:w-1/2 w-full bg-white border-gray-300">
           <div className="p-6 max-w-[625px] ml-auto">
           <CheckoutDetails
-              tabActive={tabActive}
-              setTabActive={(
-                value:
-                  | "ContactInfo"
-                  | "BillingAddress"
-                  | "DeliveryAddress"
-                  | "PaymentMethod"
-                  | "order-cart"
-              ) => setTabActive(value)}
-              handleScrollToEl={handleScrollToEl}
-              updateFormData={updateFormData}
-              formData={formData}
               paymentGateways={isPreOrderCart
                 ? (paymentGateways || []).filter((g: any) => g.id === 'cod' || g.id === 'bacs')
                 : (paymentGateways || [])
               }
-              handleConfirmationChange={handleConfirmationChange}
               setIsStorePickup={setIsStorePickup}
               isStorePickup={isStorePickup}
               setIsCardPayment={setIsCardPayment}
@@ -1085,6 +999,7 @@ const CheckoutPage = () => {
               totalPayment={numericOrderTotal}
               setIsKokoPayment={setIsKokoPayment}
               isKokoPayment={isKokoPayment}
+              onCheckoutSubmit={submitCheckout}
             />
           </div>
         </div>
@@ -1424,7 +1339,9 @@ const CheckoutPage = () => {
             )}
 
             <ButtonPrimary
-              onClick={handleCheckoutProcess}
+              type="submit"
+              form="checkout-form"
+              disabled={loading}
               className={`mt-8 w-full bg-primary hover:bg-primary-dark`}
             >
               {loading ? (
