@@ -18,6 +18,7 @@ import {
     Banknote,
     Landmark,
     Check,
+    Clock,
 } from "lucide-react";
 
 export interface CheckoutSubmitPayload {
@@ -392,21 +393,36 @@ const UnifiedCheckoutForm = ({
                     title: gateway.title || "Cash on delivery",
                     subtitle: "Pay with cash when your order arrives",
                     icon: <Banknote className="w-5 h-5" strokeWidth={1.75} />,
-                    trailing: null,
+                    trailing: (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+                            Most popular
+                        </span>
+                    ),
                 };
-            case "darazbnpl":
+            case "darazbnpl": {
+                const perInstallment = totalPayment > 0 ? Math.ceil(totalPayment / 3) : 0;
                 return {
                     title: gateway.title || "Koko Pay",
                     subtitle: "Split into 3 interest-free installments",
                     icon: <div className="w-8 h-5 flex items-center justify-center"><Image src="/koko.png" alt="Koko" width={40} height={20} /></div>,
-                    trailing: null,
+                    trailing: perInstallment ? (
+                        <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">
+                            3 × Rs {new Intl.NumberFormat("en-US").format(perInstallment)}
+                        </span>
+                    ) : null,
                 };
+            }
             case "bacs":
                 return {
                     title: gateway.title || "Direct bank transfer",
                     subtitle: "Commercial Bank — upload your slip after transfer",
                     icon: <Landmark className="w-5 h-5" strokeWidth={1.75} />,
-                    trailing: null,
+                    trailing: (
+                        <span className="inline-flex items-center gap-1 text-xs font-medium text-slate-500 dark:text-slate-400">
+                            <Clock className="w-3.5 h-3.5" strokeWidth={2} />
+                            1–2 days
+                        </span>
+                    ),
                 };
             case "geniebiz":
                 return {
