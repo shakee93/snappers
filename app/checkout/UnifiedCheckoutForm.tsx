@@ -162,7 +162,7 @@ const UnifiedCheckoutForm = ({
     const [address, setAddress] = useState("");
     const [apartment, setApartment] = useState("");
     const [city, setCity] = useState("");
-    const [state, setState] = useState("");
+    const [state, setState] = useState("Western");
     const [postal, setPostal] = useState("");
     const [addressCountry, setAddressCountry] = useState("");
     const [addressType, setAddressType] = useState("home");
@@ -208,7 +208,7 @@ const UnifiedCheckoutForm = ({
             setAddress(initialShippingData.address1 || "");
             setApartment(initialShippingData.address2 || "");
             setCity(initialShippingData.city || "");
-            setState(initialShippingData.state || "");
+            setState(initialShippingData.state || "Western");
             setPostal(initialShippingData.postcode || "");
             setAddressCountry(initialShippingData.country || "");
             setAddressType("home");
@@ -740,11 +740,10 @@ const UnifiedCheckoutForm = ({
                                         <Select
                                             id="checkout-state"
                                             name="state"
-                                            value={state || ""}
+                                            value={state || "Western"}
                                             onChange={(e) => setState(e.target.value)}
                                             required={true}
                                         >
-                                            <option value="" disabled>Select province</option>
                                             {SRI_LANKAN_STATES.map((s) => (
                                                 <option key={s} value={s}>
                                                     {s}
