@@ -18,7 +18,6 @@ import {
     Banknote,
     Landmark,
     Check,
-    Clock,
 } from "lucide-react";
 
 export interface CheckoutSubmitPayload {
@@ -393,11 +392,7 @@ const UnifiedCheckoutForm = ({
                     title: gateway.title || "Cash on delivery",
                     subtitle: "Pay with cash when your order arrives",
                     icon: <Banknote className="w-5 h-5" strokeWidth={1.75} />,
-                    trailing: (
-                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
-                            Most popular
-                        </span>
-                    ),
+                    trailing: null,
                 };
             case "darazbnpl": {
                 const perInstallment = totalPayment > 0 ? Math.ceil(totalPayment / 3) : 0;
@@ -406,9 +401,12 @@ const UnifiedCheckoutForm = ({
                     subtitle: "Split into 3 interest-free installments",
                     icon: <div className="w-8 h-5 flex items-center justify-center"><Image src="/koko.png" alt="Koko" width={40} height={20} /></div>,
                     trailing: perInstallment ? (
-                        <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">
-                            3 × Rs {new Intl.NumberFormat("en-US").format(perInstallment)}
-                        </span>
+                        <div className="flex items-center gap-2">
+                            <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">
+                                3 × Rs {new Intl.NumberFormat("en-US").format(perInstallment)}
+                            </span>
+                            <Image src="/koko.png" alt="Koko" width={36} height={18} className="h-4 w-auto" />
+                        </div>
                     ) : null,
                 };
             }
@@ -418,9 +416,8 @@ const UnifiedCheckoutForm = ({
                     subtitle: "Commercial Bank — upload your slip after transfer",
                     icon: <Landmark className="w-5 h-5" strokeWidth={1.75} />,
                     trailing: (
-                        <span className="inline-flex items-center gap-1 text-xs font-medium text-slate-500 dark:text-slate-400">
-                            <Clock className="w-3.5 h-3.5" strokeWidth={2} />
-                            1–2 days
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+                            Instant
                         </span>
                     ),
                 };
@@ -676,7 +673,7 @@ const UnifiedCheckoutForm = ({
                             onSelect={handlePickupTypeChange}
                             icon={<Store className="w-5 h-5" strokeWidth={1.75} />}
                             title="Store Pickup / Uber / PickMe"
-                            subtitle="Collect in-store or arrange a ride from our location"
+                            subtitle="Ready in ~2 hours · Colombo · during working hours"
                             trailing={
                                 <div className="flex items-center gap-1.5">
                                     <BrandBadge src="/logos/uber.png" alt="Uber" />
@@ -783,10 +780,10 @@ const UnifiedCheckoutForm = ({
                         ) : (
                             <div className="rounded-xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900 p-4 text-sm text-slate-700 dark:text-slate-300">
                                 <p className="font-semibold text-slate-900 dark:text-slate-100 mb-1">
-                                    Ready for pickup from our store
+                                    Ready in ~2 hours (Colombo, working hours)
                                 </p>
                                 <p>
-                                    We&apos;ll notify you on the phone number above when your order is ready. You can collect in-store or arrange an Uber / PickMe from our location.
+                                    We&apos;ll notify you on the phone number above when your order is ready. You can collect in-store or arrange an Uber / PickMe from our Colombo location.
                                 </p>
                             </div>
                         )}
