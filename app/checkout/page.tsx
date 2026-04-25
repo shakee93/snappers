@@ -1044,7 +1044,7 @@ const CheckoutPage = () => {
               {cart?.contents?.nodes.map((item, index) => (
                 <CartItems
                   index={index}
-                  key={index}
+                  key={(item as any)?.key ?? index}
                   item={item as any}
                   onQuantityChange={updateCart}
                   onRemove={removeFromCart}
