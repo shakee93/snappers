@@ -2,7 +2,6 @@ import { getClient } from "@/graphql/apollo-ssr";
 import { GET_ALL_PRODUCTS } from "@/graphql/defs/products";
 import { GET_OPTIONS } from "@/graphql/defs/options";
 import { Brand, ProductCategory } from "@/graphql/types/graphql";
-import { isPaymentPage } from "./paymentPageCheckUtilsServer";
 import TopBarPromotion from "@/components/TopBarPromotion";
 import HeaderContent from "./HeaderContent";
 import HeaderSearchResults from "@/app/components/globalComponents/HeaderSearchResults";
@@ -27,10 +26,6 @@ const getData = async () => {
 };
 
 const Header = async () => {
-  if (await isPaymentPage()) {
-    return <></>;
-  }
-
   const { productCategories, brands, options } = await getData();
 
   return (

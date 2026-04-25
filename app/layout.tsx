@@ -6,6 +6,7 @@ import { SessionProvider } from "@/context/SessionProvider";
 import { CartProvider } from "@/context/CartProvider";
 import { PaymentProvider } from "@/context/PaymentProvider";
 import Header from "@/app/components/globalComponents/header";
+import HeaderGate from "@/app/components/globalComponents/HeaderGate";
 import { Toaster } from "sonner";
 import Footer from "@/app/components/globalComponents/footer";
 import { Suspense } from "react";
@@ -135,11 +136,15 @@ export default async function RootLayout({
                 <GoogleAnalytics />
               </Suspense>
 
-              <Header />
+              <HeaderGate>
+                <Header />
+              </HeaderGate>
               <ContentWrapper>{children}</ContentWrapper>
               <WhatsappLogoComponent />
               <Toaster />
-              <Footer />
+              <HeaderGate>
+                <Footer />
+              </HeaderGate>
               {/* <ScreenSizeIndicator /> */}
             </SessionProvider>
           </CartProvider>

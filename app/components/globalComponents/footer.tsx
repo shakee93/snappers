@@ -6,7 +6,6 @@ import { GET_BRANDS } from "@/graphql/defs/products";
 import { Brand } from "@/graphql/types/graphql";
 import { Clock, Copyright, Facebook, Heart, Instagram, Mail, MapPinned } from "lucide-react";
 import { PiFacebookLogoDuotone, PiInstagramLogoDuotone, PiTiktokLogo, PiTiktokLogoDuotone } from "react-icons/pi";
-import { isPaymentPage } from "./paymentPageCheckUtilsServer";
 import { Divider } from "@nextui-org/react";
 import { HeartFilledIcon } from "@radix-ui/react-icons";
 
@@ -21,10 +20,6 @@ const getData = async () => {
 const Footer = async () => {
   const brands = await getData();
   const iconSize = 18;
-
-  if (await isPaymentPage()) {
-    return <></>;
-  }
 
   return (
     <footer className="border-t pb-20 md:pb-0 text-black">

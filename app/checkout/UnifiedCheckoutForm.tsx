@@ -119,6 +119,8 @@ const BrandBadge = ({ src, alt }: { src: string; alt: string }) => (
     </span>
 );
 
+const FIELD_CLASS = "border-2 border-slate-300 placeholder:text-slate-400 hover:border-slate-400 focus:!ring-0 focus:!border-primaryColor focus:outline-none dark:border-slate-600 dark:hover:border-slate-500";
+
 interface DeliveryOptionProps {
     value: "store_uber_pickme" | "courier";
     selected: boolean;
@@ -139,10 +141,10 @@ const DeliveryOption = ({
     trailing,
 }: DeliveryOptionProps) => (
     <label
-        className={`group flex items-center gap-4 w-full p-4 rounded-xl border cursor-pointer transition-colors ${
+        className={`group flex items-center gap-4 w-full p-4 rounded-xl border-2 cursor-pointer transition-colors ${
             selected
                 ? "border-primaryColor bg-primary-50/60 dark:bg-primary-900/20"
-                : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+                : "border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/40 hover:border-slate-300 hover:bg-slate-100 dark:hover:border-slate-600"
         }`}
     >
         <input
@@ -546,10 +548,10 @@ const UnifiedCheckoutForm = ({
 
         return (
             <div
-                className={`rounded-xl border transition-colors ${
+                className={`rounded-xl border-2 transition-colors ${
                     active
                         ? "border-primaryColor bg-primary-50/60 dark:bg-primary-900/20"
-                        : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+                        : "border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/40 hover:border-slate-300 hover:bg-slate-100 dark:hover:border-slate-600"
                 }`}
             >
                 <label
@@ -729,11 +731,12 @@ const UnifiedCheckoutForm = ({
                         </div>
 
                         <div className="max-w-full">
-                            <label htmlFor="checkout-email" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                            <label htmlFor="checkout-email" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
                                 Email address
                             </label>
                             <Input
                                 id="checkout-email"
+                                className={FIELD_CLASS}
                                 placeholder="you@example.com"
                                 value={email}
                                 type="email"
@@ -787,12 +790,12 @@ const UnifiedCheckoutForm = ({
                     {pickupType && (
                     <div className="mt-6 space-y-4">
                         <div>
-                            <label htmlFor="checkout-name" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                            <label htmlFor="checkout-name" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
                                 Full name
                             </label>
                             <Input
                                 id="checkout-name"
-                                className="capitalize"
+                                className={`capitalize ${FIELD_CLASS}`}
                                 value={firstName}
                                 placeholder="e.g. Amila Perera"
                                 autoComplete="name"
@@ -805,12 +808,12 @@ const UnifiedCheckoutForm = ({
                             <>
                                 <div className="sm:flex sm:space-x-3 sm:space-y-0 space-y-4">
                                     <div className="flex-1">
-                                        <label htmlFor="checkout-address1" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                                        <label htmlFor="checkout-address1" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
                                             Address line 1
                                         </label>
                                         <Input
                                             id="checkout-address1"
-                                            className="capitalize"
+                                            className={`capitalize ${FIELD_CLASS}`}
                                             placeholder="Street address"
                                             name="address1"
                                             value={address}
@@ -821,12 +824,12 @@ const UnifiedCheckoutForm = ({
                                         />
                                     </div>
                                     <div className="sm:w-1/3">
-                                        <label htmlFor="checkout-address2" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                                        <label htmlFor="checkout-address2" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
                                             Address line 2 <span className="text-slate-400 font-normal">(optional)</span>
                                         </label>
                                         <Input
                                             id="checkout-address2"
-                                            className="capitalize"
+                                            className={`capitalize ${FIELD_CLASS}`}
                                             placeholder="Apartment, suite, etc."
                                             name="address2"
                                             value={apartment}
@@ -838,12 +841,12 @@ const UnifiedCheckoutForm = ({
 
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
                                     <div>
-                                        <label htmlFor="checkout-city" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                                        <label htmlFor="checkout-city" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
                                             City
                                         </label>
                                         <Input
                                             id="checkout-city"
-                                            className="normal-case"
+                                            className={`normal-case ${FIELD_CLASS}`}
                                             placeholder="e.g. Colombo"
                                             value={city}
                                             autoComplete="address-level2"
@@ -852,12 +855,13 @@ const UnifiedCheckoutForm = ({
                                         />
                                     </div>
                                     <div>
-                                        <label htmlFor="checkout-state" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+                                        <label htmlFor="checkout-state" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
                                             Province
                                         </label>
                                         <Select
                                             id="checkout-state"
                                             name="state"
+                                            className={FIELD_CLASS}
                                             value={state || "Western"}
                                             onChange={(e) => setState(e.target.value)}
                                             required={true}
@@ -948,7 +952,7 @@ const UnifiedCheckoutForm = ({
                 </div>
             </label>
 
-            <div className="pt-2 flex flex-col-reverse sm:flex-row gap-3 sm:items-center sm:justify-between">
+            <div className="pt-2 pb-10 md:pb-14 flex flex-col-reverse sm:flex-row gap-3 sm:items-center sm:justify-between">
                 <Link
                     href="/cart"
                     className="inline-flex items-center gap-1 text-sm font-medium text-primary-500 hover:underline self-center sm:self-auto"

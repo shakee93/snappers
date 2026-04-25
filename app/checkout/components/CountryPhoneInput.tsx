@@ -237,14 +237,14 @@ const CountryPhoneInput: React.FC<CountryPhoneInputProps> = ({
 
   return (
     <div className="max-w-full">
-      <label htmlFor="checkout-phone" className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">
+      <label htmlFor="checkout-phone" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
         Phone number
       </label>
       <div className="flex gap-2">
         {showCountrySelect ? (
           <select
             aria-label="Country calling code"
-            className="w-28 px-2 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+            className="w-28 px-2 py-2 border-2 border-slate-300 hover:border-slate-400 dark:border-slate-600 dark:hover:border-slate-500 rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
             value={country}
             onChange={(e) => onCountryChange(e.target.value)}
             required={true}
@@ -258,7 +258,7 @@ const CountryPhoneInput: React.FC<CountryPhoneInputProps> = ({
         ) : (
           <div
             aria-label="Calling code: Sri Lanka, +94"
-            className="flex items-center gap-1.5 px-3 py-2 border border-slate-300 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm whitespace-nowrap"
+            className="flex items-center gap-1.5 px-3 py-2 border-2 border-slate-300 dark:border-slate-600 rounded-lg bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-sm whitespace-nowrap"
           >
             <span aria-hidden="true" className="text-base leading-none">🇱🇰</span>
             <span className="font-medium">+94</span>
@@ -266,7 +266,7 @@ const CountryPhoneInput: React.FC<CountryPhoneInputProps> = ({
         )}
         <Input
           id="checkout-phone"
-          className="flex-1"
+          className="flex-1 border-2 border-slate-300 placeholder:text-slate-400 hover:border-slate-400 focus:!ring-0 focus:!border-primaryColor focus:outline-none dark:border-slate-600 dark:hover:border-slate-500"
           placeholder={"Phone (9–12 digits)"}
           value={phone}
           type="tel"
