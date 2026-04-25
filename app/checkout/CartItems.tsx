@@ -1,7 +1,11 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import LineOrCartPriceLabel from "@/app/components/LineOrCartPriceLabel";
-import { Fragment } from "react";
+import { Fragment, useState } from "react";
+import { Loader } from "lucide-react";
+import { toast } from "sonner";
 import AttributeIcon from "@/app/components/AttributeIcon";
 import { VariableProduct, PaCapacity } from "@/graphql/types/graphql";
 import { isLineItemFree } from "@/lib/cartLinePricing";
@@ -41,8 +45,8 @@ export interface CartItemProductNode {
 interface CartItemsProps {
   item: CartItem;
   index: number;
-  onQuantityChange: (key: string, quantity: number) => void;
-  onRemove: (keys: string[]) => void;
+  onQuantityChange: (key: string, quantity: number) => Promise<unknown> | unknown;
+  onRemove: (keys: string[]) => Promise<unknown> | unknown;
 }
 
 const cartItems = ({
@@ -56,6 +60,34 @@ const cartItems = ({
   const { node } = product || {};
   const { name, price, regularPrice, image, terms, brands, type } = node || {};
   const brandSlug = brands?.nodes[0]?.slug;
+
+  const [isUpdatingQty, setIsUpdatingQty] = useState(false);
+  const [isRemoving, setIsRemoving] = useState(false);
+
+  const handleQty = async (newQty: number) => {
+    if (isUpdatingQty || isRemoving || newQty === quantity) return;
+    setIsUpdatingQty(true);
+    try {
+      await onQuantityChange(key, newQty);
+    } catch (e: any) {
+      toast.error(e?.message || "Couldn't update quantity. Please try again.");
+    } finally {
+      setIsUpdatingQty(false);
+    }
+  };
+
+  const handleRemove = async () => {
+    if (isRemoving) return;
+    setIsRemoving(true);
+    try {
+      await onRemove([key]);
+    } catch (e: any) {
+      toast.error(e?.message || "Couldn't remove item. Please try again.");
+      setIsRemoving(false);
+    }
+  };
+
+  const isBusy = isUpdatingQty || isRemoving;
 
   return (
     <div key={index} className="relative flex gap-4 py-4 first:pt-0 last:pb-0">
@@ -109,20 +141,25 @@ const cartItems = ({
                 <button
                   type="button"
                   aria-label="Decrease quantity"
-                  onClick={async () => onQuantityChange(key, Math.max(1, quantity - 1))}
-                  className="px-2 py-1 text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800 rounded-l-md disabled:opacity-40"
-                  disabled={quantity <= 1}
+                  onClick={() => handleQty(Math.max(1, quantity - 1))}
+                  className="px-2 py-1 text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800 rounded-l-md disabled:opacity-40 disabled:cursor-not-allowed"
+                  disabled={quantity <= 1 || isBusy}
                 >
                   −
                 </button>
-                <span className="px-2 min-w-[1.5rem] text-center font-medium text-slate-700 dark:text-slate-200">
-                  {quantity}
+                <span className="px-2 min-w-[1.75rem] text-center font-medium text-slate-700 dark:text-slate-200 inline-flex items-center justify-center">
+                  {isUpdatingQty ? (
+                    <Loader className="w-3 h-3 animate-spin text-slate-500" aria-label="Updating" />
+                  ) : (
+                    quantity
+                  )}
                 </span>
                 <button
                   type="button"
                   aria-label="Increase quantity"
-                  onClick={async () => onQuantityChange(key, quantity + 1)}
-                  className="px-2 py-1 text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800 rounded-r-md"
+                  onClick={() => handleQty(quantity + 1)}
+                  className="px-2 py-1 text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800 rounded-r-md disabled:opacity-40 disabled:cursor-not-allowed"
+                  disabled={isBusy}
                 >
                   +
                 </button>
@@ -130,15 +167,22 @@ const cartItems = ({
             )}
             <button
               type="button"
-              onClick={async () => onRemove([key])}
-              className="relative z-10 text-slate-500 hover:text-red-600 dark:text-slate-400 dark:hover:text-red-400"
+              onClick={handleRemove}
+              className="relative z-10 text-slate-500 hover:text-red-600 dark:text-slate-400 dark:hover:text-red-400 disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-1"
+              disabled={isBusy}
             >
-              Remove
+              {isRemoving && <Loader className="w-3 h-3 animate-spin" />}
+              {isRemoving ? "Removing…" : "Remove"}
             </button>
           </div>
         </div>
 
-        <div className="text-right shrink-0">
+        <div
+          className={`text-right shrink-0 transition-opacity ${
+            isBusy ? "opacity-50" : "opacity-100"
+          }`}
+          aria-busy={isBusy}
+        >
           <LineOrCartPriceLabel
             lineTotal={total}
             lineSubtotal={subtotal}
