@@ -1333,15 +1333,6 @@ const CheckoutPage = () => {
                 </div>
               )}
 
-              {catalogSavings > 0 && (
-                <div className="mt-3 rounded-lg bg-gradient-to-r from-amber-50 to-amber-100/60 dark:from-amber-900/20 dark:to-amber-800/10 px-3 py-2 text-center text-sm">
-                  <span className="text-amber-900 dark:text-amber-200">
-                    You save{" "}
-                    <span className="font-bold">{formatRs(catalogSavings)}</span>
-                    {" "}on this order
-                  </span>
-                </div>
-              )}
             </div>
             </>
             )}
