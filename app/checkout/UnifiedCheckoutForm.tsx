@@ -257,6 +257,22 @@ const UnifiedCheckoutForm = ({
 
     const { cart } = useCart();
 
+    const courierShippingLabel = useMemo(() => {
+        const rates = (cart as any)?.availableShippingMethods?.[0]?.rates as
+            | Array<{ label?: string | null; cost?: string | null; methodId?: string | null }>
+            | undefined;
+        const flat = rates?.find(
+            (r) => r?.methodId === "flat_rate" || /flat rate|courier/i.test(r?.label || "")
+        );
+        const cost = flat?.cost ?? rates?.[0]?.cost;
+        const numeric = typeof cost === "string" ? parseFloat(cost) : Number(cost);
+        if (!Number.isFinite(numeric) || numeric <= 0) return null;
+        return `Rs ${new Intl.NumberFormat("en-US", {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format(numeric)}`;
+    }, [cart]);
+
     const handleBankSlipChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const fileList = event.target.files;
         if (fileList?.[0]) {
@@ -762,7 +778,11 @@ const UnifiedCheckoutForm = ({
                             icon={<Truck className="w-5 h-5" strokeWidth={1.75} />}
                             title="Courier delivery"
                             subtitle="Island-wide delivery in 2–3 business days"
-                            trailing={<span className="text-sm font-semibold text-slate-700 dark:text-slate-200">Rs 500</span>}
+                            trailing={courierShippingLabel ? (
+                                <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                                    {courierShippingLabel}
+                                </span>
+                            ) : null}
                         />
                         <DeliveryOption
                             value="store_uber_pickme"
