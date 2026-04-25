@@ -7,7 +7,7 @@ import { GET_CHECKOUT_USER_DETAILS } from "@/graphql/defs/order";
 import { GET_PRICE_FLUCTUATION_NOTICE } from "@/graphql/defs/options";
 import { Customer, CustomerAddress } from "@/graphql/types/graphql";
 import { contactInformation } from "@/data/types";
-import { CheckoutDetailsSkeleton } from "@/app/checkout/[order-id]/Skeleton";
+import { CheckoutFormSkeleton } from "./CheckoutSkeletons";
 
 interface CheckoutLeftProps {
   paymentGateways: any[];
@@ -67,7 +67,7 @@ const CheckoutDetails = ({
   }, [data]);
 
   if (dataLoading) {
-    return <CheckoutDetailsSkeleton />
+    return <CheckoutFormSkeleton />
   }
 
   return (

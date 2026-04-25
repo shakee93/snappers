@@ -27,6 +27,7 @@ import koko from "@/public/koko.png";
 import CheckoutDetails from "./CheckoutDetails";
 import { CheckoutSubmitPayload } from "./UnifiedCheckoutForm";
 import CartItems from "./CartItems";
+import { OrderSummarySkeleton } from "./CheckoutSkeletons";
 import { toast } from "sonner";
 import { PayhereStatus, PaymentDetailsWithoutUrls } from "@/data/types";
 import Script from "next/script";
@@ -57,7 +58,7 @@ interface FormData {
 }
 
 const CheckoutPage = () => {
-  const { cart, removeFromCart, updateCart, clearCart, refreshCart } = useCart();
+  const { cart, removeFromCart, updateCart, clearCart, refreshCart, loading: cartLoading } = useCart();
   const [finalOrderTotal, setFinalOrderTotal] = useState(null);
   const { customer, fetchCustomer } = useSession();
 
@@ -1031,6 +1032,10 @@ const CheckoutPage = () => {
         <div className="lg:w-1/2 w-full border-l-1 border-gray-300">
           <div className="lg:sticky lg:top-[80px] p-6 max-w-[625px] mr-auto">
           <div id="order-cart" className="w-full">
+            {(!cart || (cartLoading && !cart?.contents?.nodes?.length)) ? (
+              <OrderSummarySkeleton items={2} />
+            ) : (
+            <>
             <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
               Order summary
               {cart?.contents?.nodes?.length ? (
@@ -1212,23 +1217,35 @@ const CheckoutPage = () => {
                 <div className="flex justify-between">
                   <span className="text-slate-600 dark:text-slate-400">Subtotal</span>
                   <span className="font-medium text-slate-900 dark:text-slate-200">
-                    <span
-                      dangerouslySetInnerHTML={{
-                        __html: cart?.subtotal || "0.00",
-                      }}
-                    />
+                    {catalogSavings > 0
+                      ? formatRs(cartSubtotal + catalogSavings)
+                      : (
+                        <span
+                          dangerouslySetInnerHTML={{
+                            __html: cart?.subtotal || "0.00",
+                          }}
+                        />
+                      )}
                   </span>
                 </div>
 
+                {catalogSavings > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600 dark:text-slate-400">Promotion</span>
+                    <span className="inline-flex items-center rounded-md bg-red-500 px-2 py-0.5 text-xs font-semibold text-white">
+                      − {formatRs(catalogSavings)}
+                    </span>
+                  </div>
+                )}
+
                 {hasDiscount && (
-                  <div className="flex justify-between">
-                    <span className="text-slate-600 dark:text-slate-400">Discount</span>
-                    <span className="font-medium text-emerald-600">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600 dark:text-slate-400">Coupon</span>
+                    <span className="inline-flex items-center rounded-md bg-red-500 px-2 py-0.5 text-xs font-semibold text-white">
+                      −{" "}
                       <span
                         dangerouslySetInnerHTML={{
-                          __html: cart?.discountTotal
-                            ? `- ${cart.discountTotal}`
-                            : "0.00",
+                          __html: cart?.discountTotal || "0.00",
                         }}
                       />
                     </span>
@@ -1285,55 +1302,34 @@ const CheckoutPage = () => {
               {isCardPayment && (
                 <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100">
                   <span className="text-base font-semibold">Order total</span>
-                  <span className="flex items-baseline gap-2">
-                    {catalogSavings > 0 && (
-                      <span className="text-sm text-slate-400 line-through">
-                        {formatRs(numericOrderTotal + threePercentFromTotal + catalogSavings)}
-                      </span>
-                    )}
-                    <span
-                      className="text-xl font-bold"
-                      dangerouslySetInnerHTML={{
-                        __html: formatRs(numericOrderTotal + threePercentFromTotal),
-                      }}
-                    />
-                  </span>
+                  <span
+                    className="text-xl font-bold"
+                    dangerouslySetInnerHTML={{
+                      __html: formatRs(numericOrderTotal + threePercentFromTotal),
+                    }}
+                  />
                 </div>
               )}
 
               {isKokoPayment && (
                 <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100">
                   <span className="text-base font-semibold">Order total</span>
-                  <span className="flex items-baseline gap-2">
-                    {catalogSavings > 0 && (
-                      <span className="text-sm text-slate-400 line-through">
-                        {formatRs(TotalWithKoko + (isStorePickup ? 0 : 500) + catalogSavings)}
-                      </span>
-                    )}
-                    <span
-                      className="text-xl font-bold"
-                      dangerouslySetInnerHTML={{
-                        __html: formatRs(TotalWithKoko + (isStorePickup ? 0 : 500)),
-                      }}
-                    />
-                  </span>
+                  <span
+                    className="text-xl font-bold"
+                    dangerouslySetInnerHTML={{
+                      __html: formatRs(TotalWithKoko + (isStorePickup ? 0 : 500)),
+                    }}
+                  />
                 </div>
               )}
 
               {!isCardPayment && !isKokoPayment && (
                 <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100">
                   <span className="text-base font-semibold">Order total</span>
-                  <span className="flex items-baseline gap-2">
-                    {catalogSavings > 0 && (
-                      <span className="text-sm text-slate-400 line-through">
-                        {formatRs(numericOrderTotal + catalogSavings)}
-                      </span>
-                    )}
-                    <span
-                      className="text-xl font-bold"
-                      dangerouslySetInnerHTML={{ __html: orderTotal || "0.00" }}
-                    />
-                  </span>
+                  <span
+                    className="text-xl font-bold"
+                    dangerouslySetInnerHTML={{ __html: orderTotal || "0.00" }}
+                  />
                 </div>
               )}
 
@@ -1347,6 +1343,8 @@ const CheckoutPage = () => {
                 </div>
               )}
             </div>
+            </>
+            )}
 
             <div id="ndb-pay-form-wrapper" className="mt-6"></div>
           </div>
