@@ -91,24 +91,26 @@ const cartItems = ({
 
   return (
     <div key={index} className="relative flex gap-4 py-4 first:pt-0 last:pb-0">
-      <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-slate-100 ring-1 ring-slate-200/70 dark:ring-slate-700">
-        <Image
-          fill
-          style={{ objectFit: "cover" }}
-          src={product.node.type === "VARIABLE"
-            ? variation?.node.image?.sourceUrl || ""
-            : product.node.image?.sourceUrl || image?.sourceUrl || ""}
-          alt={name}
-          className="h-full w-full object-contain object-center"
-        />
-        <span className="absolute -top-1.5 -right-1.5 z-10 inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full bg-slate-900 text-white text-[11px] font-semibold ring-2 ring-white dark:ring-slate-900">
+      <div className="relative h-20 w-20 flex-shrink-0">
+        <div className="relative h-full w-full overflow-hidden rounded-lg bg-slate-100 ring-1 ring-slate-200/70 dark:ring-slate-700">
+          <Image
+            fill
+            style={{ objectFit: "cover" }}
+            src={product.node.type === "VARIABLE"
+              ? variation?.node.image?.sourceUrl || ""
+              : product.node.image?.sourceUrl || image?.sourceUrl || ""}
+            alt={name}
+            className="h-full w-full object-contain object-center"
+          />
+          <Link
+            href={`/${brandSlug}/${product.node.slug}`}
+            className="absolute inset-0"
+            aria-label={name}
+          />
+        </div>
+        <span className="absolute -top-1.5 -right-1.5 z-10 inline-flex items-center justify-center min-w-[22px] h-[22px] px-1.5 rounded-full bg-slate-900 text-white text-[11px] font-semibold ring-2 ring-white dark:ring-slate-900 pointer-events-none">
           {quantity}
         </span>
-        <Link
-          href={`/${brandSlug}/${product.node.slug}`}
-          className="absolute inset-0"
-          aria-label={name}
-        />
       </div>
 
       <div className="flex flex-1 min-w-0 items-start justify-between gap-3">
