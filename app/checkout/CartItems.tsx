@@ -49,7 +49,7 @@ interface CartItemsProps {
   onRemove: (keys: string[]) => Promise<unknown> | unknown;
 }
 
-const cartItems = ({
+const CartItems = ({
   item,
   index,
   onQuantityChange,
@@ -201,4 +201,4 @@ const cartItems = ({
   );
 };
 
-export default cartItems;
+export default CartItems;
