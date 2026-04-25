@@ -724,6 +724,15 @@ const CheckoutPage = () => {
   const cartSubtotal = replaceStringinInt(cart?.subtotal);
   const numericDiscountTotal = replaceStringinInt(cart?.discountTotal);
   const hasDiscount = Number.isFinite(numericDiscountTotal) && numericDiscountTotal > 0;
+
+  const catalogSavings = (cart?.contents?.nodes || []).reduce((sum: number, item: any) => {
+    const node = item?.product?.node;
+    const isVariable = node?.type === "VARIABLE";
+    const sale = replaceStringinInt(isVariable ? item?.variation?.node?.price : node?.price);
+    const regular = replaceStringinInt(isVariable ? item?.variation?.node?.regularPrice : node?.regularPrice);
+    if (!Number.isFinite(sale) || !Number.isFinite(regular) || regular <= sale) return sum;
+    return sum + (regular - sale) * (item?.quantity || 0);
+  }, 0);
   const threePercentFromTotal = numericOrderTotal * 0.03;
   const TotalWithKoko = (cartSubtotal / 88) * 100;
   const taxWithTotal = (numericOrderTotal + threePercentFromTotal).toFixed(2);
@@ -1020,9 +1029,18 @@ const CheckoutPage = () => {
           </div>
         </div>
         <div className="lg:w-1/2 w-full border-l-1 border-gray-300">
-          <div className="lg:sticky lg:top-[125px] p-6 max-w-[625px] mr-auto">
+          <div className="lg:sticky lg:top-[80px] p-6 max-w-[625px] mr-auto">
           <div id="order-cart" className="w-full">
-            <div className=" divide-y divide-slate-200/70 dark:divide-slate-700 pr-5">
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Order summary
+              {cart?.contents?.nodes?.length ? (
+                <span className="text-slate-400">
+                  {" · "}
+                  {cart.contents.nodes.length} item{cart.contents.nodes.length === 1 ? "" : "s"}
+                </span>
+              ) : null}
+            </h3>
+            <div className="divide-y divide-slate-200/70 dark:divide-slate-700 pr-5">
               {cart?.contents?.nodes.map((item, index) => (
                 <CartItems
                   index={index}
@@ -1034,7 +1052,7 @@ const CheckoutPage = () => {
               ))}
             </div>
 
-            <div className="mt-10 border-t border-slate-200/70 pt-6 text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400 ">
+            <div className="mt-6 border-t border-slate-200/70 pt-5 text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400 ">
               <div>
                 <Label className="text-sm">Discount code</Label>
                 <div className="mt-1.5 flex gap-2">
@@ -1190,54 +1208,52 @@ const CheckoutPage = () => {
                 )}
               </div>
 
-              <div className="mt-4 flex justify-between py-2.5">
-                <span>Subtotal</span>
-                <span className="font-semibold text-slate-900 dark:text-slate-200">
-                  <span
-                    dangerouslySetInnerHTML={{
-                      __html: cart?.subtotal || "0.00",
-                    }}
-                  />
-                </span>
-              </div>
-
-              {hasDiscount && (
-                <div className="flex justify-between py-2.5">
-                  <span>Discount</span>
-                  <span className="font-semibold text-emerald-600">
+              <div className="mt-5 space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-slate-600 dark:text-slate-400">Subtotal</span>
+                  <span className="font-medium text-slate-900 dark:text-slate-200">
                     <span
                       dangerouslySetInnerHTML={{
-                        __html: cart?.discountTotal
-                          ? `- ${cart.discountTotal}`
-                          : "0.00",
+                        __html: cart?.subtotal || "0.00",
                       }}
                     />
                   </span>
                 </div>
-              )}
 
-              {!isStorePickup && (
-                <div className="flex justify-between py-2.5">
-                  <span>
-                    {freeShipping ? `Free Shipping` : `Shipping estimate`}
-                  </span>
-                  <span className="font-semibold text-slate-900 dark:text-slate-200">
-                    {freeShipping ? (
+                {hasDiscount && (
+                  <div className="flex justify-between">
+                    <span className="text-slate-600 dark:text-slate-400">Discount</span>
+                    <span className="font-medium text-emerald-600">
                       <span
                         dangerouslySetInnerHTML={{
-                          __html: "0.00",
+                          __html: cart?.discountTotal
+                            ? `- ${cart.discountTotal}`
+                            : "0.00",
                         }}
                       />
-                    ) : (
-                      <span
-                        dangerouslySetInnerHTML={{
-                          __html: cart?.shippingTotal || "0.00",
-                        }}
-                      />
-                    )}
-                  </span>
-                </div>
-              )}
+                    </span>
+                  </div>
+                )}
+
+                {!isStorePickup && (
+                  <div className="flex justify-between">
+                    <span className="text-slate-600 dark:text-slate-400">
+                      {freeShipping ? `Free Shipping` : `Shipping estimate`}
+                    </span>
+                    <span className="font-medium text-slate-900 dark:text-slate-200">
+                      {freeShipping ? (
+                        <span dangerouslySetInnerHTML={{ __html: "0.00" }} />
+                      ) : (
+                        <span
+                          dangerouslySetInnerHTML={{
+                            __html: cart?.shippingTotal || "0.00",
+                          }}
+                        />
+                      )}
+                    </span>
+                  </div>
+                )}
+              </div>
               {(isCardPayment || isKokoPayment) && (
                 <div className="flex justify-between py-2.5">
                   <span className="text-red-500 font-medium">Sorry you missed the discount</span>
@@ -1267,46 +1283,67 @@ const CheckoutPage = () => {
               )}
 
               {isCardPayment && (
-                <div className="flex justify-between pt-4 text-base font-semibold text-slate-900 dark:text-slate-200">
-                  <span>Order total</span>
-                  <span
-                    dangerouslySetInnerHTML={{
-                      __html:
-                        `Rs ${new Intl.NumberFormat("en-US", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        }).format(
-                          numericOrderTotal + threePercentFromTotal
-                        )}` || "0.00",
-                    }}
-                  />
+                <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100">
+                  <span className="text-base font-semibold">Order total</span>
+                  <span className="flex items-baseline gap-2">
+                    {catalogSavings > 0 && (
+                      <span className="text-sm text-slate-400 line-through">
+                        {formatRs(numericOrderTotal + threePercentFromTotal + catalogSavings)}
+                      </span>
+                    )}
+                    <span
+                      className="text-xl font-bold"
+                      dangerouslySetInnerHTML={{
+                        __html: formatRs(numericOrderTotal + threePercentFromTotal),
+                      }}
+                    />
+                  </span>
                 </div>
               )}
 
               {isKokoPayment && (
-                <div className="flex justify-between pt-4 text-base font-semibold text-slate-900 dark:text-slate-200">
-                  <span>Order total</span>
-                  <span
-                    dangerouslySetInnerHTML={{
-                      __html:
-                        `Rs ${new Intl.NumberFormat("en-US", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        }).format(
-                          TotalWithKoko + (isStorePickup ? 0 : 500)
-                        )}` || "0.00",
-                    }}
-                  />
+                <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100">
+                  <span className="text-base font-semibold">Order total</span>
+                  <span className="flex items-baseline gap-2">
+                    {catalogSavings > 0 && (
+                      <span className="text-sm text-slate-400 line-through">
+                        {formatRs(TotalWithKoko + (isStorePickup ? 0 : 500) + catalogSavings)}
+                      </span>
+                    )}
+                    <span
+                      className="text-xl font-bold"
+                      dangerouslySetInnerHTML={{
+                        __html: formatRs(TotalWithKoko + (isStorePickup ? 0 : 500)),
+                      }}
+                    />
+                  </span>
                 </div>
               )}
 
               {!isCardPayment && !isKokoPayment && (
-                <div className="flex justify-between pt-4 text-base font-semibold text-slate-900 dark:text-slate-200">
-                  <span>Order total</span>
+                <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100">
+                  <span className="text-base font-semibold">Order total</span>
+                  <span className="flex items-baseline gap-2">
+                    {catalogSavings > 0 && (
+                      <span className="text-sm text-slate-400 line-through">
+                        {formatRs(numericOrderTotal + catalogSavings)}
+                      </span>
+                    )}
+                    <span
+                      className="text-xl font-bold"
+                      dangerouslySetInnerHTML={{ __html: orderTotal || "0.00" }}
+                    />
+                  </span>
+                </div>
+              )}
 
-                  <span
-                    dangerouslySetInnerHTML={{ __html: orderTotal || "0.00" }}
-                  />
+              {catalogSavings > 0 && (
+                <div className="mt-3 rounded-lg bg-gradient-to-r from-amber-50 to-amber-100/60 dark:from-amber-900/20 dark:to-amber-800/10 px-3 py-2 text-center text-sm">
+                  <span className="text-amber-900 dark:text-amber-200">
+                    You save{" "}
+                    <span className="font-bold">{formatRs(catalogSavings)}</span>
+                    {" "}on this order
+                  </span>
                 </div>
               )}
             </div>

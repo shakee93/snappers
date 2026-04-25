@@ -10,7 +10,7 @@ const SUPPORT_WHATSAPP = "https://wa.me/94722299944";
 
 const CheckoutHeader = () => {
   return (
-    <header className="border-b bg-white">
+    <header className="sticky top-0 z-40 border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
       <div className="container flex h-14 md:h-16 items-center justify-between gap-3">
         <Link href="/" aria-label="GQ Mobiles home" className="shrink-0">
           <Image
