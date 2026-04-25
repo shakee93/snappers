@@ -15,7 +15,7 @@ export const OrderDetails = ({ orderData }: OrderDetailsProps) => {
   
 
   const rows = [
-    { label: "Order Id", value: orderData.order.orderNumber ?? "Not found" },
+    { label: "Order Id", value: orderData.order.orderNumber ?? orderData.order.databaseId ?? orderData.order.id ?? "Not found" },
     { label: "Date", value: date },
     { label: "Order Total", value: orderData.order.total },
     {
