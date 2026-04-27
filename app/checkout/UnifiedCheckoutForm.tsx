@@ -185,13 +185,13 @@ const DeliveryOption = ({
             {icon}
         </span>
         <div className="flex-1 min-w-0">
-            <div className="flex flex-col items-start gap-1">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                 <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                     {title}
                 </span>
                 {chip && (
                     <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold whitespace-nowrap ${CHIP_TONES[chip.tone]}`}
+                        className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold whitespace-nowrap ${CHIP_TONES[chip.tone]}`}
                     >
                         {chip.label}
                     </span>
