@@ -34,7 +34,7 @@ const getData = async () => {
     getClient()
       .query({
         query: GET_PRODUCTS_BY_BOGO_TAG,
-        variables: { first: 50, tagIn: BOGO_OFFER_TAG_SLUGS },
+        variables: { first: 20, tagIn: BOGO_OFFER_TAG_SLUGS },
       })
       .then((res) => res.data?.products?.nodes || [])
       .catch(() => {
