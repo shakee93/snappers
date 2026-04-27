@@ -40,11 +40,11 @@ async function getData(slug: string, brand: string) {
       variables: {
         productId: slug,
       },
-      // PDP: keep freshness tighter than the 30-min SSR default, but not so
-      // tight it stampedes WP. Stock accuracy is enforced at add-to-cart by
-      // the client Apollo's un-cached mutation — a user loading a stale
-      // "in stock" PDP still gets rejected server-side on the mutation.
-      context: { fetchOptions: { next: { revalidate: 300 } } },
+      // PDP rides the SSR default (force-cache). WP fires the revalidate
+      // webhook on product / stock edits, busting the PDP path near-real-
+      // time. Stock accuracy on a missed webhook is enforced at the client
+      // Apollo's un-cached add-to-cart mutation — a user loading a stale
+      // "in stock" PDP gets rejected server-side on the mutation.
     });
 
     if (error) {

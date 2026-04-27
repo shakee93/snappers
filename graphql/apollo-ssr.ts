@@ -24,11 +24,16 @@ export const { getClient } = registerApolloClient(() => {
     const httpLink = new HttpLink({
         uri: process.env.NEXT_PUBLIC_WP_GRAPHQL,
         fetchOptions: {
-            // Default TTL for SSR GraphQL fetches — listings, archives, editorial.
-            // 30 min is the "safe for anything that isn't per-product stock" floor.
-            // Override per-call via `context: { fetchOptions: { next: { revalidate: N } } }`
-            // for queries where freshness matters more (e.g. PDP at 300s), or
-            // `cache: 'no-store'` for anything auth-scoped.
+            // Indefinite Vercel cache — busted by the WP → /api/revalidate
+            // webhook on product / category / content edits. This is the
+            // setup that ran from 2024-01-30 to 2026-04-22 with no issues,
+            // before the TTL-based experiments that replaced it.
+            //
+            // No backstop TTL: if the webhook is ever missed, the entry
+            // stays cached until the next deploy or another webhook hit on
+            // the same path. That tradeoff is the entire point — the
+            // webhook is the source of truth for invalidation, and it
+            // covers products, categories, and homepage paths.
             //
             // Caching here relies on Next hashing the fetch body into the
             // cache key, so this SSR client MUST stay anonymous — don't add
@@ -36,10 +41,7 @@ export const { getClient } = registerApolloClient(() => {
             // go through it, or responses will either leak across users or
             // blow up cache-key cardinality. Move anything user-scoped to
             // the client Apollo in graphql/apollo-client.tsx.
-            //
-            // For WP-driven invalidation, the path forward is
-            // `next: { tags: [...] }` + `revalidateTag()` from a WP webhook.
-            next: { revalidate: 1800 },
+            cache: 'force-cache',
         },
     })
 
