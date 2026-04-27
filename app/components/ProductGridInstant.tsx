@@ -87,10 +87,16 @@ const ProductGridInstant = ({
   }, [statusState])
 
 
+  // Keep hits mounted whenever we have any. InstantSearch flips status to
+  // 'loading'/'stalled' on cache reads and widget churn even without a real
+  // network round-trip; unmounting the grid for those transitions causes a
+  // visible flicker. Only show the skeleton on the very first load.
+  const showSkeleton = hits.length === 0 && (statusState === 'stalled' || statusState === 'loading');
+
   return (
     <>
       <div className='h-[185px] md:h-60 bottom-3 right-3 hidden'></div>
-      {statusState === 'idle' &&
+      {hits.length > 0 && (
         <div className="flex-1 grid  grid-cols-2 lg:grid-cols-4 md:grid-cols-4 gap-x-2 gap-y-2 lg:gap-x-3 lg:gap-y-4">
           {hits.map((item, index) => (
             <ProductCard
@@ -101,15 +107,15 @@ const ProductGridInstant = ({
             />
           ))}
         </div>
-      }
+      )}
 
-      {(statusState === 'stalled' || statusState === 'loading') &&
+      {showSkeleton && (
         <div className='flex-1 grid grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-2 lg:gap-x-8 lg:gap-y-10'>
           {Array(grid).fill(null).map((x, index) =>
             <ProductCardLoading key={index} />
           )}
         </div>
-      }
+      )}
 
       {(results?.nbHits === 0 && statusState === 'idle') && (
         <div className="text-center text-slate-500 flex flex-col items-center gap-20 py-12">

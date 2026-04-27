@@ -1,62 +1,39 @@
-import React, { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useMemo, useState } from "react";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import { useStore } from "@/store/store";
-import { useRefinementList, useInstantSearch } from "react-instantsearch";
+import { useHits } from "react-instantsearch";
 import { ChevronDown } from "lucide-react";
 import { Transition } from "@headlessui/react";
-import { UiState } from "instantsearch.js";
 
 interface VariationFilterProps {
     attribute: string;
     label: string;
 }
 
-type MyUiState = UiState & {
-    product: {
-        variations: Record<string, string[]>;
-        query?: string;
-    }
-}
+type FacetItem = { value: string; count: number };
 
 const VariationFilter = ({ attribute, label }: VariationFilterProps) => {
     const { syncVariations, sidebar: { variations }, getTermLabel } = useStore();
-    const [firstFacets, setFirstFacets] = useState<any[]>([]);
     const [showAll, setShowAll] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
-    const { setUiState } = useInstantSearch<MyUiState>();
+    const { results } = useHits();
 
-    const { items: facets } = useRefinementList({
-        attribute: `variation_facets.${attribute}`,
-        limit: 50,
-    });
+    // Read facet items from the search response directly. We deliberately
+    // avoid useRefinementList here: registering a widget after the first
+    // search returns triggers a second multi_search round-trip (visible flicker).
+    // The facet_by config on the typesense adapter already returns
+    // variation_facets.* on every search, so we have what we need.
+    const facets: FacetItem[] = useMemo(() => {
+        const raw = (results as any)?._rawResults?.[0]?.facets?.[`variation_facets.${attribute}`];
+        if (!raw || typeof raw !== 'object') return [];
+        return Object.entries(raw).map(([value, count]) => ({ value, count: Number(count) || 0 }));
+    }, [results, attribute]);
 
     const currentValues = variations[attribute] || [];
-
-    // URL synchronization is now handled by InstantSearch routing
-    // No need for manual URL manipulation
-
-    useEffect(() => {
-        if (firstFacets.length === 0) {
-            setFirstFacets(facets);
-        }
-    }, [facets]);
 
     const handleChange = useCallback((checked: boolean, value: string) => {
         if (value === "all" && checked) {
             syncVariations(attribute, []);
-            setUiState(prev => {
-                return {
-                    ...prev,
-                    product: {
-                        ...(prev.product || {}),
-                        variations: {
-                            ...(prev.product?.variations || {}),
-                            [attribute]: []
-                        },
-                        query: prev.product?.query || '',
-                    }
-                }
-            });
             return;
         }
 
@@ -64,23 +41,8 @@ const VariationFilter = ({ attribute, label }: VariationFilterProps) => {
             ? [...currentValues, value]
             : currentValues.filter((v) => v !== value);
 
-        // Update UI state
-        setUiState(prev => {
-            return {
-                ...prev,
-                product: {
-                    ...(prev.product || {}),
-                    variations: {
-                        ...(prev.product?.variations || {}),
-                        [attribute]: newValues
-                    },
-                    query: prev.product?.query || '',
-                }
-            }
-        });
-
         syncVariations(attribute, newValues);
-    }, [currentValues, attribute, setUiState, syncVariations]);
+    }, [currentValues, attribute, syncVariations]);
 
     const sortedFacets = useMemo(() => {
         return [...facets].sort((a, b) => b.count - a.count);
@@ -98,7 +60,7 @@ const VariationFilter = ({ attribute, label }: VariationFilterProps) => {
             .map(value => ({ value, count: 0 }));
 
         return [...sortedFacets, ...selectedNotInFacets];
-    }, [sortedFacets, currentValues]);
+    }, [sortedFacets, currentValues, facets]);
 
     // Don't render if no facets available AND no selected values
     if (facets.length === 0 && currentValues.length === 0) {

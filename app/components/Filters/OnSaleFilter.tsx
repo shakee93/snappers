@@ -1,57 +1,18 @@
-import { Popover, Transition } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import React, { Fragment, useEffect, useState } from "react";
+import React from "react";
 import Checkbox from "@/shared/Checkbox/Checkbox";
-import ButtonThird from "@/shared/Button/ButtonThird";
-import ButtonPrimary from "@/shared/Button/ButtonPrimary";
-import { Brand, ProductCategory } from "@/graphql/types/graphql";
 import { useStore } from "@/store/store";
-import FilterPopover from "@/app/components/Filters/FilterPopover";
-import Slider from "rc-slider";
-import { XIcon } from "lucide-react";
-import { useInstantSearch } from "react-instantsearch";
-import { UiState } from "instantsearch.js";
 
 interface BrandFilterProps {
 }
 
-type MyUiState = UiState & {
-    product: {
-        on_sale: boolean;
-        query?: string;
-    }
-}
-
 const OnSaleFilter = ({ }: BrandFilterProps) => {
-    const { syncOnSale } = useStore();
-    const [isOnSale, setIsOnSale] = useState(false);
-    const { setUiState } = useInstantSearch<MyUiState>();
-
-    // URL synchronization is now handled by InstantSearch routing
-    // No need for manual URL manipulation
-
-    useEffect(() => {
-        // Update store
-        syncOnSale(isOnSale);
-
-        // Update UI state
-        setUiState(prev => {
-            return {
-                ...prev,
-                product: {
-                    ...(prev.product || {}),
-                    on_sale: isOnSale,
-                    query: prev.product?.query || '',
-                }
-            }
-        });
-    }, [isOnSale, setUiState, syncOnSale]);
+    const { syncOnSale, sidebar: { on_sale: isOnSale } } = useStore();
 
     return (
         <div
             className={`flex flex-col items-start justify-start px-3 py-3 text-xs rounded-xl w-full border focus:outline-none cursor-pointer select-none bg-white ${"border-neutral-200 gap-4 dark:border-neutral-700 text-neutral-600 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
                 }`}
-            onClick={() => setIsOnSale(!isOnSale)}
+            onClick={() => syncOnSale(!isOnSale)}
         >
             <div className='hidden items-center'>
                 <svg
@@ -97,7 +58,7 @@ const OnSaleFilter = ({ }: BrandFilterProps) => {
                     name='On Sale'
                     label='On Sale'
                     defaultChecked={isOnSale}
-                    onChange={(checked) => setIsOnSale(checked)}
+                    onChange={(checked) => syncOnSale(checked)}
                 />
             </div>
         </div>

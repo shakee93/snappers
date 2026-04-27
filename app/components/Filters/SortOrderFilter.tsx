@@ -1,15 +1,6 @@
-import { Popover, Transition } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import React, { Fragment, useEffect, useState } from "react";
-import Checkbox from "@/shared/Checkbox/Checkbox";
-import ButtonThird from "@/shared/Button/ButtonThird";
-import ButtonPrimary from "@/shared/Button/ButtonPrimary";
-import { ProductCategory } from "@/graphql/types/graphql";
+import React from "react";
 import { useStore } from "@/store/store";
-import FilterPopover from "@/app/components/Filters/FilterPopover";
 import Radio from "@/shared/Radio/Radio";
-import { useInstantSearch } from "react-instantsearch";
-import { UiState } from "instantsearch.js";
 
 const DATA_sortOrderRadios = [
     { name: "Name", id: "name:asc" },
@@ -20,37 +11,9 @@ const DATA_sortOrderRadios = [
     { name: "Price High - Low", id: "rawPriceNumber(missing_values: last):desc" },
 ];
 
-type MyUiState = UiState & {
-    product: {
-        sort: string;
-        query?: string;
-    }
-}
-
 const SortOrderFilter = ({ sorts }: { sorts: any }) => {
-    const { setSort, sidebar: { sort } } = useStore()
-    const [sortOrderStates, setSortOrderStates] = useState<string>(sorts ? "databaseId:desc" : "");
-    const { setUiState } = useInstantSearch<MyUiState>();
-
-    // URL synchronization is now handled by InstantSearch routing
-    // No need for manual URL manipulation
-
-    useEffect(() => {
-        // Update store
-        setSort(sortOrderStates);
-
-        // Update UI state
-        setUiState(prev => {
-            return {
-                ...prev,
-                product: {
-                    ...(prev.product || {}),
-                    sort: sortOrderStates,
-                    query: prev.product?.query || '',
-                }
-            }
-        });
-    }, [sortOrderStates, setSort, setUiState]);
+    const { setSort, sidebar: { sort } } = useStore();
+    const activeSort = sort || (sorts ? "databaseId:desc" : "");
 
     const icon = <svg className="w-4 h-4" viewBox="0 0 20 20" fill="none">
         <path
@@ -104,8 +67,8 @@ const SortOrderFilter = ({ sorts }: { sorts: any }) => {
                         key={item.id}
                         name="radioNameSort"
                         label={item.name}
-                        defaultChecked={sortOrderStates === item.id}
-                        onChange={v => setSortOrderStates(v)}
+                        defaultChecked={activeSort === item.id}
+                        onChange={v => setSort(v)}
                     />
                 ))}
             </div>
