@@ -25,7 +25,7 @@ import {
 } from "@/graphql/types/graphql";
 import koko from "@/public/koko.png";
 import CheckoutDetails from "./CheckoutDetails";
-import { CheckoutSubmitPayload } from "./UnifiedCheckoutForm";
+import { CheckoutSubmitPayload, DeliveryType } from "./UnifiedCheckoutForm";
 import CartItems from "./CartItems";
 import { OrderSummarySkeleton } from "./CheckoutSkeletons";
 import { toast } from "sonner";
@@ -78,7 +78,8 @@ const CheckoutPage = () => {
   const [payhereHandleStatus, setPayhereHandleStatus] =
     useState<PayhereStatus>("idle");
 
-  const [isStorePickup, setIsStorePickup] = useState(false);
+  const [deliveryType, setDeliveryType] = useState<DeliveryType | null>(null);
+  const noShipping = deliveryType === "store_pickup" || deliveryType === "flash_delivery";
   const [isCardPayment, setIsCardPayment] = useState(false);
   const [isKokoPayment, setIsKokoPayment] = useState(false);
 
@@ -208,7 +209,7 @@ const CheckoutPage = () => {
     }
 
     try {
-      const shippingMethods = isStorePickup
+      const shippingMethods = noShipping
         ? "pickup_location:0"
         : freeShipping
           ? "wbs:5c9bd062_free_shipping"
@@ -220,7 +221,7 @@ const CheckoutPage = () => {
       if (customer?.id === "guest") {
         const subtotal: any = cart?.subtotal;
 
-        if (isStorePickup || freeShipping) {
+        if (noShipping || freeShipping) {
           setOrderTotal(subtotal);
         } else {
           setOrderTotal(total);
@@ -258,7 +259,7 @@ const CheckoutPage = () => {
 
   useEffect(() => {
     updateShippingTotal().then((r) => r);
-  }, [isStorePickup, updateCartShippingTotalMutation, freeShipping]);
+  }, [deliveryType, updateCartShippingTotalMutation, freeShipping]);
 
   const paymentDetails = useMemo(() => {
     return paymentData;
@@ -381,7 +382,9 @@ const CheckoutPage = () => {
       const gatewayId = data.paymentMethod.selectedGateway.id;
       const isPayhere = gatewayId === "payhere";
       const paymentMethodId = gatewayId;
-      const isStorePickupOrder = data.isStorePickup;
+      const orderDeliveryType = data.deliveryType;
+      const isStorePickupOrder = orderDeliveryType === "store_pickup";
+      const isFlashDeliveryOrder = orderDeliveryType === "flash_delivery";
       const contactEmail = data.contactInfo.email;
       const contactPhone = data.contactInfo.phone;
 
@@ -391,7 +394,7 @@ const CheckoutPage = () => {
         return null;
       }
 
-      const shippingMethod = getShippingMethod(shippingTotal, isStorePickupOrder);
+      const shippingMethod = getShippingMethod(shippingTotal, orderDeliveryType);
       const storePickupAddressOverride = {
         address1: "Store Pickup",
         address2: "",
@@ -426,6 +429,10 @@ const CheckoutPage = () => {
             <p><strong>Phone Number:</strong> ${contactPhone}</p>
             ${isStorePickupOrder
           ? "<p><strong>Pickup Location:</strong> Store</p>"
+          : ""
+        }
+            ${isFlashDeliveryOrder
+          ? "<p><strong>Delivery Method:</strong> Flash Delivery — customer arranges Uber/PickMe pickup</p>"
           : ""
         }
             ${gatewayId === "darazbnpl"
@@ -489,8 +496,8 @@ const CheckoutPage = () => {
         const shippingAddress = isStorePickupOrder
           ? {
               ...transformAddress(data.deliveryAddress),
-              address1: "Store / Uber / PickMe",
-              city: "Store / Uber / PickMe",
+              address1: "Store Pickup",
+              city: "Store Pickup",
             }
           : transformAddress(data.deliveryAddress);
 
@@ -594,20 +601,29 @@ const CheckoutPage = () => {
     }
   };
 
-  const getShippingMethod = (shippingTotal: any, storePickup: boolean) => {
-    const methodId = storePickup
+  const getShippingMethod = (
+    shippingTotal: any,
+    orderDeliveryType: DeliveryType | null,
+  ) => {
+    const noCharge =
+      orderDeliveryType === "store_pickup" ||
+      orderDeliveryType === "flash_delivery";
+
+    const methodId = noCharge
       ? "pickup_location:0"
       : freeShipping
         ? "wbs:5c9bd062_free_shipping"
         : "wbs:0dd3bc79_weight_based_shipping";
 
-    const methodTitle = storePickup
+    const methodTitle = orderDeliveryType === "store_pickup"
       ? "Store Pickup"
-      : freeShipping
-        ? "Free Shipping"
-        : "Weight Based Shipping";
+      : orderDeliveryType === "flash_delivery"
+        ? "Flash Delivery (Uber/PickMe)"
+        : freeShipping
+          ? "Free Shipping"
+          : "Weight Based Shipping";
 
-    const total = storePickup ? "0" : shippingTotal;
+    const total = noCharge ? "0" : shippingTotal;
 
     return { methodId, methodTitle, total };
   };
@@ -747,7 +763,7 @@ const CheckoutPage = () => {
   const orderTotalLabel = isCardPayment
     ? formatRs(numericOrderTotal + threePercentFromTotal)
     : isKokoPayment
-    ? formatRs(TotalWithKoko + (isStorePickup ? 0 : 500))
+    ? formatRs(TotalWithKoko + (noShipping ? 0 : 500))
     : (orderTotal || "");
 
   useEffect(() => {
@@ -1012,12 +1028,12 @@ const CheckoutPage = () => {
                 ? (paymentGateways || []).filter((g: any) => g.id === 'cod' || g.id === 'bacs')
                 : (paymentGateways || [])
               }
-              setIsStorePickup={setIsStorePickup}
-              isStorePickup={isStorePickup}
+              setDeliveryType={setDeliveryType}
+              deliveryType={deliveryType}
               setIsCardPayment={setIsCardPayment}
               isCardPayment={isCardPayment}
               totalPayment={numericOrderTotal}
-              kokoTotal={TotalWithKoko + (isStorePickup ? 0 : 500)}
+              kokoTotal={TotalWithKoko + (noShipping ? 0 : 500)}
               setIsKokoPayment={setIsKokoPayment}
               isKokoPayment={isKokoPayment}
               onCheckoutSubmit={submitCheckout}
@@ -1252,7 +1268,7 @@ const CheckoutPage = () => {
                   </div>
                 )}
 
-                {!isStorePickup && (
+                {!noShipping && (
                   <div className="flex justify-between">
                     <span className="text-slate-600 dark:text-slate-400">
                       {freeShipping ? `Free Shipping` : `Shipping estimate`}
@@ -1282,7 +1298,7 @@ const CheckoutPage = () => {
                   <span className="font-semibold mx-1">
                     {(
                       parseFloat(
-                        (TotalWithKoko + (isStorePickup ? 0 : 500) || "0")
+                        (TotalWithKoko + (noShipping ? 0 : 500) || "0")
                           .toString()
                           .replace(/[^\d.]/g, "")
                       ) / 3
@@ -1317,7 +1333,7 @@ const CheckoutPage = () => {
                   <span
                     className="text-xl font-bold"
                     dangerouslySetInnerHTML={{
-                      __html: formatRs(TotalWithKoko + (isStorePickup ? 0 : 500)),
+                      __html: formatRs(TotalWithKoko + (noShipping ? 0 : 500)),
                     }}
                   />
                 </div>

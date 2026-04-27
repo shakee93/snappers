@@ -17,6 +17,7 @@ import PreOrderNotice from "@/components/PreOrderNotice";
 import {
     Store,
     Truck,
+    Zap,
     CreditCard,
     Banknote,
     Landmark,
@@ -25,6 +26,8 @@ import {
     ArrowLeft,
     Loader,
 } from "lucide-react";
+
+export type DeliveryType = "courier" | "store_pickup" | "flash_delivery";
 
 export interface CheckoutSubmitPayload {
     contactInfo: { phone: string; email: string; country: string };
@@ -54,7 +57,7 @@ export interface CheckoutSubmitPayload {
         selectedGateway: { id: string; title: string | null };
         bankSlipFile: File | null;
     };
-    isStorePickup: boolean;
+    deliveryType: DeliveryType;
 }
 
 type StepKey = "details" | "payment" | "review";
@@ -122,14 +125,20 @@ const BrandBadge = ({ src, alt }: { src: string; alt: string }) => (
 const FIELD_CLASS = "border-2 border-slate-300 placeholder:text-slate-400 hover:border-slate-400 focus:!ring-0 focus:!border-primaryColor focus:outline-none dark:border-slate-600 dark:hover:border-slate-500";
 
 interface DeliveryOptionProps {
-    value: "store_uber_pickme" | "courier";
+    value: DeliveryType;
     selected: boolean;
-    onSelect: (v: "store_uber_pickme" | "courier") => void;
+    onSelect: (v: DeliveryType) => void;
     icon: React.ReactNode;
     title: string;
     subtitle: string;
+    chip?: { label: string; tone: "emerald" | "blue" };
     trailing?: React.ReactNode;
 }
+
+const CHIP_TONES = {
+    emerald: "bg-emerald-500 text-white",
+    blue: "bg-blue-500 text-white",
+} as const;
 
 const DeliveryOption = ({
     value,
@@ -138,6 +147,7 @@ const DeliveryOption = ({
     icon,
     title,
     subtitle,
+    chip,
     trailing,
 }: DeliveryOptionProps) => (
     <label
@@ -175,8 +185,17 @@ const DeliveryOption = ({
             {icon}
         </span>
         <div className="flex-1 min-w-0">
-            <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                {title}
+            <div className="flex flex-col items-start gap-1">
+                <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                    {title}
+                </span>
+                {chip && (
+                    <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-semibold whitespace-nowrap ${CHIP_TONES[chip.tone]}`}
+                    >
+                        {chip.label}
+                    </span>
+                )}
             </div>
             <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 {subtitle}
@@ -190,8 +209,8 @@ interface Props {
     initialContactData: contactInformation;
     initialShippingData: CustomerAddress | null;
     paymentGateways: PaymentGateway[];
-    setIsStorePickup: (v: boolean) => void;
-    isStorePickup: boolean;
+    setDeliveryType: (v: DeliveryType | null) => void;
+    deliveryType: DeliveryType | null;
     setIsCardPayment: (v: boolean) => void;
     isCardPayment: boolean;
     totalPayment: number;
@@ -211,8 +230,8 @@ const UnifiedCheckoutForm = ({
     initialContactData,
     initialShippingData,
     paymentGateways,
-    setIsStorePickup,
-    isStorePickup,
+    setDeliveryType,
+    deliveryType,
     setIsCardPayment,
     isCardPayment,
     totalPayment,
@@ -249,8 +268,6 @@ const UnifiedCheckoutForm = ({
         id: "",
         title: null,
     });
-
-    const [pickupType, setPickupType] = useState<"store_uber_pickme" | "courier" | null>(null);
 
     const [bankSlipFile, setBankSlipFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -308,9 +325,8 @@ const UnifiedCheckoutForm = ({
     }, [initialShippingData]);
 
 
-    const handlePickupTypeChange = (type: "store_uber_pickme" | "courier") => {
-        setPickupType(type);
-        setIsStorePickup(type === "store_uber_pickme");
+    const handlePickupTypeChange = (type: DeliveryType) => {
+        setDeliveryType(type);
     };
 
     const removePayhereOnMobileAndTab = () => {
@@ -420,7 +436,7 @@ const UnifiedCheckoutForm = ({
     const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        if (!pickupType) {
+        if (!deliveryType) {
             toast.error("Please select a delivery method.");
             return;
         }
@@ -458,7 +474,7 @@ const UnifiedCheckoutForm = ({
                 },
                 bankSlipFile: selectedGateway.id === "bacs" ? bankSlipFile : null,
             },
-            isStorePickup: pickupType === "store_uber_pickme",
+            deliveryType,
         };
 
         await onCheckoutSubmit(payload);
@@ -701,12 +717,12 @@ const UnifiedCheckoutForm = ({
     };
 
     const contactDone = phone.length >= 9 && /.+@.+\..+/.test(email);
-    const courierAddressDone =
+    const fullAddressDone =
         !!firstName && !!address && !!city && !!state;
     const deliveryDone =
-        pickupType !== null &&
+        deliveryType !== null &&
         !!firstName &&
-        (pickupType === "store_uber_pickme" || courierAddressDone);
+        (deliveryType === "store_pickup" || fullAddressDone);
     const detailsDone = contactDone && deliveryDone;
     const paymentDone =
         !!selectedGateway.id &&
@@ -773,7 +789,7 @@ const UnifiedCheckoutForm = ({
                     <div className="space-y-3">
                         <DeliveryOption
                             value="courier"
-                            selected={pickupType === "courier"}
+                            selected={deliveryType === "courier"}
                             onSelect={handlePickupTypeChange}
                             icon={<Truck className="w-5 h-5" strokeWidth={1.75} />}
                             title="Courier delivery"
@@ -785,14 +801,29 @@ const UnifiedCheckoutForm = ({
                             ) : null}
                         />
                         <DeliveryOption
-                            value="store_uber_pickme"
-                            selected={pickupType === "store_uber_pickme"}
+                            value="store_pickup"
+                            selected={deliveryType === "store_pickup"}
                             onSelect={handlePickupTypeChange}
                             icon={<Store className="w-5 h-5" strokeWidth={1.75} />}
-                            title="Store Pickup / Uber / PickMe"
-                            subtitle="Ready in ~2 hours · Colombo · during working hours"
+                            title="Store Pickup"
+                            subtitle="Ready during working hours"
+                            chip={{ label: "Instant Pickup · Colombo", tone: "emerald" }}
                             trailing={
-                                <div className="flex items-center gap-1.5">
+                                <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+                                    Free
+                                </span>
+                            }
+                        />
+                        <DeliveryOption
+                            value="flash_delivery"
+                            selected={deliveryType === "flash_delivery"}
+                            onSelect={handlePickupTypeChange}
+                            icon={<Zap className="w-5 h-5" strokeWidth={1.75} />}
+                            title="Flash Delivery"
+                            subtitle="You arrange Uber / PickMe pickup"
+                            chip={{ label: "~1hr Instant Delivery · Colombo", tone: "blue" }}
+                            trailing={
+                                <div className="hidden sm:flex items-center gap-1.5">
                                     <BrandBadge src="/logos/uber.png" alt="Uber" />
                                     <BrandBadge src="/logos/pickme.png" alt="PickMe" />
                                 </div>
@@ -800,14 +831,14 @@ const UnifiedCheckoutForm = ({
                         />
                     </div>
 
-                    {!pickupType && (
+                    {!deliveryType && (
                         <div className="mt-3 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2">
                             <span className="inline-block w-1 h-1 rounded-full bg-primaryColor animate-pulse" />
                             Select a delivery method to continue
                         </div>
                     )}
 
-                    {pickupType && (
+                    {deliveryType && (
                     <div className="mt-6 space-y-4">
                         <div>
                             <label htmlFor="checkout-name" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
@@ -824,7 +855,7 @@ const UnifiedCheckoutForm = ({
                             />
                         </div>
 
-                        {pickupType === "courier" ? (
+                        {deliveryType !== "store_pickup" ? (
                             <>
                                 <div className="sm:flex sm:space-x-3 sm:space-y-0 space-y-4">
                                     <div className="flex-1">
@@ -901,7 +932,7 @@ const UnifiedCheckoutForm = ({
                                     Ready in ~2 hours (Colombo, working hours)
                                 </p>
                                 <p>
-                                    We&apos;ll notify you on the phone number above when your order is ready. You can collect in-store or arrange an Uber / PickMe from our Colombo location.
+                                    We&apos;ll notify you on the phone number above when your order is ready to collect from our Colombo store.
                                 </p>
                             </div>
                         )}
@@ -911,7 +942,7 @@ const UnifiedCheckoutForm = ({
             </div>
 
             {/* Payment Method Section */}
-            {pickupType && (
+            {deliveryType && (
                 <div>
                     <h3 className="text-lg font-semibold mb-4">Payment Method</h3>
                     <div className="space-y-3">

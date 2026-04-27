@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import UnifiedCheckoutForm, { CheckoutSubmitPayload } from "./UnifiedCheckoutForm";
+import UnifiedCheckoutForm, { CheckoutSubmitPayload, DeliveryType } from "./UnifiedCheckoutForm";
 import { QueryResult, useQuery } from "@apollo/client";
 import { GET_CHECKOUT_USER_DETAILS } from "@/graphql/defs/order";
 import { GET_PRICE_FLUCTUATION_NOTICE } from "@/graphql/defs/options";
@@ -11,8 +11,8 @@ import { CheckoutFormSkeleton } from "./CheckoutSkeletons";
 
 interface CheckoutLeftProps {
   paymentGateways: any[];
-  setIsStorePickup: (v: boolean) => void;
-  isStorePickup: boolean;
+  setDeliveryType: (v: DeliveryType | null) => void;
+  deliveryType: DeliveryType | null;
   isCardPayment: boolean;
   setIsCardPayment: (v: boolean) => void;
   totalPayment: any;
@@ -29,8 +29,8 @@ interface CheckoutLeftProps {
 
 const CheckoutDetails = ({
   paymentGateways,
-  setIsStorePickup,
-  isStorePickup,
+  setDeliveryType,
+  deliveryType,
   isCardPayment,
   setIsCardPayment,
   totalPayment,
@@ -76,8 +76,8 @@ const CheckoutDetails = ({
         initialContactData={initContactInformation!}
         initialShippingData={shippingDetails}
         paymentGateways={paymentGateways}
-        setIsStorePickup={setIsStorePickup}
-        isStorePickup={isStorePickup}
+        setDeliveryType={setDeliveryType}
+        deliveryType={deliveryType}
         setIsCardPayment={setIsCardPayment}
         isCardPayment={isCardPayment}
         totalPayment={totalPayment}
