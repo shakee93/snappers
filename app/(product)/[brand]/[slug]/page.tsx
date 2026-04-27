@@ -1,7 +1,6 @@
 import { getClient } from "@/graphql/apollo-ssr";
 import {
   GET_BRANDS,
-  GET_CATEGORY_ARCHIVE_IN_STOCK,
   GET_PRODUCT,
 } from "@/graphql/defs/products";
 import { Brand, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
@@ -55,20 +54,6 @@ async function getData(slug: string, brand: string) {
       notFound();
     }
 
-    const { data: categoryData } = await getClient().query({
-      query: GET_CATEGORY_ARCHIVE_IN_STOCK,
-      variables: {
-        categoryIdIn:
-          data.product?.productCategories?.edges?.map(
-            (cat: any) => cat.node.databaseId
-          ) || [],
-        first: 10,
-      },
-    });
-
-    const upsellProducts =
-      categoryData?.products?.edges.map((edge: any) => edge.node) || [];
-
     const productBrand = data.product?.brands?.nodes?.[0] || {
       name: "Product",
       slug: "product",
@@ -77,7 +62,7 @@ async function getData(slug: string, brand: string) {
     return {
       product: data.product,
       brand: productBrand,
-      upsellProducts: upsellProducts,
+      upsellProducts: [],
     };
   } catch (e) {
     console.error("Error fetching product data:", e);
