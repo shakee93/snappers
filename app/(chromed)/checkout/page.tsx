@@ -140,7 +140,7 @@ const CheckoutPage = () => {
   }, []);
 
   // MUTATIONS
-  const [updateCartShippingTotalMutation] = useMutation(UPDATE_SHIPPING_TOTAL);
+  const [updateCartShippingTotalMutation, { loading: shippingUpdating }] = useMutation(UPDATE_SHIPPING_TOTAL);
   const [
     checkoutMutation,
     {
@@ -1310,12 +1310,14 @@ const CheckoutPage = () => {
                 )}
 
                 {!noShipping && (
-                  <div className="flex justify-between">
+                  <div className="flex justify-between" aria-busy={shippingUpdating}>
                     <span className="text-slate-600 dark:text-slate-400">
                       {freeShipping ? `Free Shipping` : `Shipping estimate`}
                     </span>
                     <span className="font-medium text-slate-900 dark:text-slate-200">
-                      {freeShipping ? (
+                      {shippingUpdating ? (
+                        <span className="inline-block w-20 h-5 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
+                      ) : freeShipping ? (
                         <span dangerouslySetInnerHTML={{ __html: "0.00" }} />
                       ) : (
                         // shippingTotal here is local state set from the
@@ -1355,36 +1357,48 @@ const CheckoutPage = () => {
               )}
 
               {isCardPayment && (
-                <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100">
+                <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100" aria-busy={shippingUpdating}>
                   <span className="text-base font-semibold">Order total</span>
-                  <span
-                    className="text-xl font-bold"
-                    dangerouslySetInnerHTML={{
-                      __html: formatRs(numericOrderTotal + threePercentFromTotal),
-                    }}
-                  />
+                  {shippingUpdating ? (
+                    <span className="inline-block w-32 h-7 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
+                  ) : (
+                    <span
+                      className="text-xl font-bold"
+                      dangerouslySetInnerHTML={{
+                        __html: formatRs(numericOrderTotal + threePercentFromTotal),
+                      }}
+                    />
+                  )}
                 </div>
               )}
 
               {isKokoPayment && (
-                <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100">
+                <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100" aria-busy={shippingUpdating}>
                   <span className="text-base font-semibold">Order total</span>
-                  <span
-                    className="text-xl font-bold"
-                    dangerouslySetInnerHTML={{
-                      __html: formatRs(kokoOrderTotal),
-                    }}
-                  />
+                  {shippingUpdating ? (
+                    <span className="inline-block w-32 h-7 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
+                  ) : (
+                    <span
+                      className="text-xl font-bold"
+                      dangerouslySetInnerHTML={{
+                        __html: formatRs(kokoOrderTotal),
+                      }}
+                    />
+                  )}
                 </div>
               )}
 
               {!isCardPayment && !isKokoPayment && (
-                <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100">
+                <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100" aria-busy={shippingUpdating}>
                   <span className="text-base font-semibold">Order total</span>
-                  <span
-                    className="text-xl font-bold"
-                    dangerouslySetInnerHTML={{ __html: orderTotal || "0.00" }}
-                  />
+                  {shippingUpdating ? (
+                    <span className="inline-block w-32 h-7 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
+                  ) : (
+                    <span
+                      className="text-xl font-bold"
+                      dangerouslySetInnerHTML={{ __html: orderTotal || "0.00" }}
+                    />
+                  )}
                 </div>
               )}
 
