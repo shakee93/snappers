@@ -1,5 +1,12 @@
 # Backend Dev Guide — `api.gqmobiles.lk`
 
+> **INTERNAL — DO NOT SHARE.** This document contains backend topology, the
+> production VM IP, container names, mu-plugin internals, Redis key shape, and
+> CDN identifiers. No secrets, but the combination is a recon-friendly map of
+> `api.gqmobiles.lk`. Treat it as confidential: do not link from public docs,
+> do not paste into external tickets, and do not include it in screenshots
+> shared outside the team. Owners of this repo only.
+
 Living doc. What's deployed on the WP backend, why, and how to revert each piece. This is the thing to read first when resource usage spikes, something breaks, or you're continuing perf work.
 
 ## Topology
