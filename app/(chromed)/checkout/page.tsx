@@ -1108,7 +1108,10 @@ const CheckoutPage = () => {
               isTOC={isTOC}
               onTOCChange={handleTOC}
               tocError={tocError}
-              loading={loading}
+              // Disable the Confirm button while either the checkout
+              // mutation OR the shipping recalculation is in flight, so
+              // the user can't submit at a stale total.
+              loading={loading || shippingUpdating}
               orderTotalLabel={orderTotalLabel}
             />
           </div>
