@@ -19,8 +19,6 @@ import UpsellProducts from "@/app/components/globalComponents/UpsellProducts";
 import { getProductSchema } from "@/lib/jsonld/productSchema";
 // import LoadingProduct from "./loading";
 
-export const dynamic = "force-dynamic";
-
 type Props = {
   params: Promise<{
     slug: string;
