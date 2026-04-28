@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, Suspense } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Brand, ProductCategory } from "@/graphql/types/graphql";
 import TopBarPromotion from "@/components/TopBarPromotion";
 import HeaderContent from "./HeaderContent";
@@ -12,12 +12,14 @@ interface HeaderClientWrapperProps {
   productCategories: ProductCategory[];
   brands: Brand[];
   options: any;
+  navCategories: ProductCategory[];
 }
 
 const HeaderClientWrapper = ({
   productCategories,
   brands,
-  options
+  options,
+  navCategories
 }: HeaderClientWrapperProps) => {
   const [isDesktop, setIsDesktop] = useState(false);
   const [isTopBarVisible, setIsTopBarVisible] = useState(true);
@@ -96,9 +98,7 @@ const HeaderClientWrapper = ({
         </div>
 
         {/* HeaderContent - always visible when sticky */}
-        <Suspense fallback={null}>
-          <HeaderContent />
-        </Suspense>
+        <HeaderContent navCategories={navCategories} />
       </header>
 
       {/* Add padding to content when header is sticky */}
@@ -106,12 +106,10 @@ const HeaderClientWrapper = ({
 
       <MobileNavLinks />
 
-      <Suspense fallback={null}>
-        <HeaderSearchResults
-          productCategories={productCategories}
-          brands={brands}
-        />
-      </Suspense>
+      <HeaderSearchResults
+        productCategories={productCategories}
+        brands={brands}
+      />
 
       <div className="lg:hidden">
         <MobileBottomNav categories={productCategories} />

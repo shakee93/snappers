@@ -1,13 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { ProductCategory } from "@/graphql/types/graphql";
 import AvatarDropdown from "../Header/AvatarDropdown";
 import Logo from "./Logo";
 import NavLinks from "./NavLinks";
 import SearchBar from "./SearchBar";
 import SideCart from "../SideCart/SideCart";
 
-const HeaderContent = () => {
+interface HeaderContentProps {
+  navCategories: ProductCategory[];
+}
+
+const HeaderContent = ({ navCategories }: HeaderContentProps) => {
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [showNavLinks, setShowNavLinks] = useState(true);
 
@@ -42,7 +47,7 @@ const HeaderContent = () => {
           {/* Navigation Links - Hidden when search is expanded */}
           <div className={`hidden lg:flex items-center relative px-4 transition-all duration-300 ease-in-out ${showNavLinks ? 'opacity-100' : 'opacity-0'}`}>
             <div className="lg:block">
-              <NavLinks />
+              <NavLinks navCategories={navCategories} />
             </div>
           </div>
         </div>

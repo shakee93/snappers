@@ -1,5 +1,5 @@
 import { Dialog, Transition } from "@headlessui/react";
-import React, { Fragment, useEffect, useMemo, useState } from "react";
+import React, { Fragment, useMemo, useState } from "react";
 import ButtonClose from "@/shared/ButtonClose/ButtonClose";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import { twMerge } from "tailwind-merge";
@@ -48,23 +48,11 @@ const MobileFilterSheet = ({
 }: TabFilterProps) => {
 
     const [isOpenMoreFilter, setisOpenMoreFilter] = useState(false);
-    const [isOnSale, setIsIsOnSale] = useState(false);
-    const [rangePrices, setRangePrices] = useState([500, 500000]);
-    const [colorsState, setColorsState] = useState<string[]>([]);
-    const [sizesState, setSizesState] = useState<string[]>([]);
-    const [sortOrderStates, setSortOrderStates] = useState<string>(
-        sort ? "databaseId:desc" : ""
-    );
-    const [brandsState, setBrandsState] = useState<number[]>([]);
-    const [categoriesState, setCategoriesState] = useState<number[]>([]);
-    const [inStock, setInStockState] = useState(false);
-    const [outOfStock, setOutOfStockState] = useState(false);
 
     const {
         sidebar,
         syncCategories,
         syncBrands,
-        setMounted,
         synPriceRange,
         syncOnSale,
         setInStock,
@@ -72,22 +60,23 @@ const MobileFilterSheet = ({
         setSort,
     } = useStore();
 
+    const isOnSale = sidebar.on_sale;
+    const rangePrices = sidebar.priceRange;
+    const sortOrderStates = sidebar.sort || (sort ? "databaseId:desc" : "");
+    const brandsState = sidebar.brands;
+    const categoriesState = sidebar.categories;
+    const inStock = sidebar.in_stock;
+
     const filterCount = useMemo(() => {
         return categoriesState.length +
             brandsState.length +
-            colorsState.length +
-            sizesState.length +
             (isOnSale ? 1 : 0) +
             (sortOrderStates ? 1 : 0) +
             (rangePrices.join('') !== PRICE_RANGE.join('') ? 1 : 0);
     }, [
         categoriesState,
         brandsState,
-        colorsState,
-        sizesState,
         isOnSale,
-        inStock,
-        outOfStock,
         sortOrderStates,
         rangePrices,
     ])
@@ -126,65 +115,22 @@ const MobileFilterSheet = ({
         return sortedCategories;
     }, [categoriesFacet, categories])
 
-    // URL synchronization is now handled by InstantSearch routing
-    // No need for manual URL manipulation
-
-    useEffect(() => {
-        // Update store when price range changes
-        if (rangePrices.join('') !== PRICE_RANGE.join('')) {
-            synPriceRange(rangePrices);
-        }
-    }, [rangePrices]);
-
-    useEffect(() => {
-        // Update store when sale status changes
-        syncOnSale(isOnSale);
-    }, [isOnSale]);
-
-    useEffect(() => {
-        // Update store when stock status changes
-        setInStock(inStock);
-        setOutOfStock(false);
-    }, [inStock]);
-
-    useEffect(() => {
-        // Update store when sort order changes
-        setSort(sortOrderStates);
-    }, [sortOrderStates]);
-
-    useEffect(() => {
-        // Update store when categories change
-        syncCategories(categoriesState);
-    }, [categoriesState]);
-
-    useEffect(() => {
-        // Update store when brands change
-        syncBrands(brandsState);
-    }, [brandsState]);
-
     const closeModalMoreFilter = () => setisOpenMoreFilter(false);
     const openModalMoreFilter = () => setisOpenMoreFilter(true);
 
     const handleClearFilters = () => {
-        // Clear local state
-        setRangePrices(PRICE_RANGE);
-        setColorsState([]);
-        setSortOrderStates("");
-        setBrandsState([]);
+        synPriceRange(PRICE_RANGE);
         syncBrands([]);
-        setCategoriesState([]);
         syncCategories([]);
-        setIsIsOnSale(false);
-        setInStockState(false);
-        setOutOfStockState(false);
-        setSortOrderStates("");
+        syncOnSale(false);
+        setInStock(false);
+        setOutOfStock(false);
         setSort("");
         closeModalMoreFilter();
     };
 
     const handleChangeCategories = (checked: boolean, name: number) => {
         if (name === 0 && checked) {
-            setCategoriesState([]);
             syncCategories([]);
             return;
         }
@@ -193,13 +139,11 @@ const MobileFilterSheet = ({
             ? [...categoriesState, name]
             : categoriesState.filter((i) => i !== name);
 
-        setCategoriesState(newCategories);
         syncCategories(newCategories);
     };
 
     const handleChangeBrands = (checked: boolean, name: number) => {
         if (name === 0 && checked) {
-            setBrandsState([]);
             syncBrands([]);
             return;
         }
@@ -208,7 +152,6 @@ const MobileFilterSheet = ({
             ? [...brandsState, name]
             : brandsState.filter((i) => i !== name);
 
-        setBrandsState(newBrands);
         syncBrands(newBrands);
     };
 
@@ -457,14 +400,16 @@ const MobileFilterSheet = ({
                                                             : "dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
                                                         }`}
                                                     onClick={() => {
-                                                        setInStockState(!inStock);
+                                                        setInStock(!inStock);
+                                                        setOutOfStock(false);
                                                     }}
                                                 >
                                                     <input
                                                         type="checkbox"
                                                         checked={inStock}
                                                         onChange={() => {
-                                                            setInStockState(!inStock);
+                                                            setInStock(!inStock);
+                                                            setOutOfStock(false);
                                                         }}
                                                         className="w-6 h-6 mr-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-sm bg-transparent
                                                         focus:ring-primary-500 focus:ring-action-primary"
@@ -496,7 +441,7 @@ const MobileFilterSheet = ({
                                                         defaultValue={[rangePrices[0], rangePrices[1]]}
                                                         allowCross={false}
                                                         onChange={(_input: number | number[]) =>
-                                                            setRangePrices(_input as number[])
+                                                            synPriceRange(_input as number[])
                                                         }
                                                     />
                                                 </div>
@@ -523,8 +468,8 @@ const MobileFilterSheet = ({
                                                                 className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
                                                                 value={rangePrices[0]}
                                                                 onChange={(e) =>
-                                                                    setRangePrices([
-                                                                        e.target.value as unknown as number,
+                                                                    synPriceRange([
+                                                                        parseInt(e.target.value) || PRICE_RANGE[0],
                                                                         rangePrices[1],
                                                                     ])
                                                                 }
@@ -551,9 +496,9 @@ const MobileFilterSheet = ({
                                                                 className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
                                                                 value={rangePrices[1]}
                                                                 onChange={(e) =>
-                                                                    setRangePrices([
+                                                                    synPriceRange([
                                                                         rangePrices[0],
-                                                                        e.target.value as unknown as number,
+                                                                        parseInt(e.target.value) || PRICE_RANGE[1],
                                                                     ])
                                                                 }
                                                             />
@@ -575,7 +520,7 @@ const MobileFilterSheet = ({
                                                             label={item.name}
                                                             defaultChecked={sortOrderStates === item.id}
                                                             onChange={(v) => {
-                                                                setSortOrderStates(v);
+                                                                setSort(v);
                                                             }}
                                                         />
                                                     ))}
@@ -592,7 +537,7 @@ const MobileFilterSheet = ({
                                                             ? "border-primary-500 bg-primary-50 text-primary-900"
                                                             : "border-neutral-300 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-neutral-400 dark:hover:border-neutral-500"
                                                             }`}
-                                                        onClick={() => setIsIsOnSale(!isOnSale)}
+                                                        onClick={() => syncOnSale(!isOnSale)}
                                                     >
                                                         <svg
                                                             className="w-4 h-4"
@@ -660,11 +605,7 @@ const MobileFilterSheet = ({
                                         Clear
                                     </ButtonThird>
                                     <ButtonPrimary
-                                        onClick={() => {
-                                            syncBrands(brandsState);
-                                            syncCategories(categoriesState);
-                                            closeModalMoreFilter();
-                                        }}
+                                        onClick={closeModalMoreFilter}
                                         sizeClass="py-2.5 px-5"
                                     >
                                         Apply

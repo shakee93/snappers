@@ -12,15 +12,15 @@ import {
 } from "@/graphql/defs/products";
 import { GET_SLIDES, GET_REVIEWS } from "@/graphql/defs/slides";
 import { Brand, SimpleProduct, Slide, VariableProduct } from "@/graphql/types/graphql";
-import SectionSliderBrandCard from "./components/SectionSliderBrandCard";
-import CardSkeleton from "./components/Skeletons/CardSkeleton";
+import SectionSliderBrandCard from "@/app/components/SectionSliderBrandCard";
+import CardSkeleton from "@/app/components/Skeletons/CardSkeleton";
 import { GET_OPTIONS } from "@/graphql/defs/options";
 import FancyTestimonialsSlider from "@/app/components/TestimonialsSlider";
 import GoogleReviewsSection from "@/app/components/HomePage/GoogleReviewsSection";
-import FAQ from "./components/HomePage/FAQSection";
+import FAQ from "@/app/components/HomePage/FAQSection";
 import TikTokSection from "@/components/TikTokSection";
 import { GET_BENTO_SLIDER } from "@/graphql/defs/products";
-import SectionHero4 from "./components/HomePage/SectionHero4";
+import SectionHero4 from "@/app/components/HomePage/SectionHero4";
 
 
 /**
@@ -34,7 +34,7 @@ const getData = async () => {
     getClient()
       .query({
         query: GET_PRODUCTS_BY_BOGO_TAG,
-        variables: { first: 50, tagIn: BOGO_OFFER_TAG_SLUGS },
+        variables: { first: 20, tagIn: BOGO_OFFER_TAG_SLUGS },
       })
       .then((res) => res.data?.products?.nodes || [])
       .catch(() => {

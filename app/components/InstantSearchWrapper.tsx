@@ -107,7 +107,7 @@ const InstantSearchWrapper = ({
   dealsType,
   dealTags,
 }: InstantSearchWrapperProps) => {
-  const { sidebar, setSearchMounted, syncCategories, syncBrands, synPriceRange, setInStock, syncOnSale, setSort, syncVariations, isTyping } = useStore();
+  const { sidebar, setSearchMounted, isTyping } = useStore();
   const [differedSidebar] = useDebounce(sidebar, 800);
   const [hitsPerPage, setHitsPerPage] = useState<number>(12);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -124,25 +124,60 @@ const InstantSearchWrapper = ({
     setSearchMounted();
   }, []);
 
+  // Effective filter values: when the URL has a filter param we honor it
+  // directly. This way the SSR-rendered filter already matches a shared
+  // /collections/X?in_stock=true link — the server-issued search returns
+  // the right hits and the client doesn't have to re-search after the
+  // queueMicrotask sync below catches the store up to the URL.
+  const effective = useMemo(() => {
+    const brandsParam = searchParams.get('brands');
+    const categoriesParam = searchParams.get('categories');
+    const priceRangeParam = searchParams.get('priceRange');
+
+    let urlPriceRange: number[] | null = null;
+    if (priceRangeParam) {
+      const range = priceRangeParam.split(',').filter(Boolean).map(Number);
+      if (range.length === 2) urlPriceRange = range;
+    }
+
+    const urlVariations: Record<string, string[]> = {};
+    let hasUrlVariations = false;
+    searchParams.forEach((value, key) => {
+      if (key.startsWith('variation_') && value) {
+        urlVariations[key.replace('variation_', '')] = value.split(',').filter(Boolean);
+        hasUrlVariations = true;
+      }
+    });
+
+    return {
+      brands: brandsParam ? brandsParam.split(',').filter(Boolean).map(Number) : sidebar.brands,
+      categories: categoriesParam ? categoriesParam.split(',').filter(Boolean).map(Number) : sidebar.categories,
+      priceRange: urlPriceRange ?? sidebar.priceRange,
+      on_sale: searchParams.has('on_sale') ? searchParams.get('on_sale') === 'true' : sidebar.on_sale,
+      in_stock: searchParams.has('in_stock') ? searchParams.get('in_stock') === 'true' : sidebar.in_stock,
+      variations: hasUrlVariations ? urlVariations : sidebar.variations,
+    };
+  }, [searchParams, sidebar]);
+
   const getFilterQuery: () => string = () => {
     const f = [
-      sidebar.priceRange.join("") !== PRICE_RANGE.join("")
-        ? `rawPrice:[${sidebar.priceRange[0]}..${sidebar.priceRange[1]}]`
+      effective.priceRange.join("") !== PRICE_RANGE.join("")
+        ? `rawPrice:[${effective.priceRange[0]}..${effective.priceRange[1]}]`
         : null,
       category
         ? `productCategories.edges.node.databaseId:${category.databaseId}`
-        : sidebar.categories.length > 0
-          ? `productCategories.edges.node.databaseId:[${sidebar.categories.join(
+        : effective.categories.length > 0
+          ? `productCategories.edges.node.databaseId:[${effective.categories.join(
             ","
           )}]`
           : null,
       brand
         ? `brands.nodes.databaseId:${brand.databaseId}`
-        : sidebar.brands.length > 0
-          ? `brands.nodes.databaseId:[${sidebar.brands.join(",")}]`
+        : effective.brands.length > 0
+          ? `brands.nodes.databaseId:[${effective.brands.join(",")}]`
           : null,
-      sidebar.on_sale ? "onSale:true" : null,
-      sidebar.in_stock ? "stockStatus:IN_STOCK && productTags.nodes.slug:!=pre-order" : null,
+      effective.on_sale ? "onSale:true" : null,
+      effective.in_stock ? "stockStatus:IN_STOCK && productTags.nodes.slug:!=pre-order" : null,
       sidebar.out_of_stock ? "stockStatus:OUT_OF_STOCK" : null,
       dealTags && dealTags.length > 0
         ? `productTags.nodes.slug:[${dealTags.join(",")}]`
@@ -152,7 +187,7 @@ const InstantSearchWrapper = ({
     ];
 
     // Add variation filters
-    Object.entries(sidebar.variations).forEach(([attribute, values]) => {
+    Object.entries(effective.variations).forEach(([attribute, values]) => {
       if (values.length > 0) {
         f.push(`variation_facets.${attribute}:[${values.join(",")}]`);
       }
@@ -176,105 +211,129 @@ const InstantSearchWrapper = ({
     // setSortQuery(differedSidebar.sort);
   }, [search]);
 
-  // this maps the ui state to the route state
+  // Map UiState → URL. Reads the live Zustand store (where filter changes
+  // land); when the store is still at default, falls back to parsing the
+  // current window.location.search directly. We can't trust uiState as the
+  // fallback because react-instantsearch normalises UiState through widget
+  // connectors and drops custom keys (categories, brands, …) that no
+  // widget reads — without the URL fallback, the initial-mount race where
+  // stateToRoute fires before our queueMicrotask sync would write an
+  // empty params object and strip a shared-link URL like ?brands=1625.
   const stateToRoute = useCallback((uiState: CustomUiState) => {
+    const _sidebar = useStore.getState().sidebar;
+    const urlParams = typeof window !== 'undefined'
+      ? new URLSearchParams(window.location.search)
+      : null;
+    const fromUrl = (key: string): string | null => urlParams?.get(key) ?? null;
+    const parseNumList = (s: string | null) =>
+      s ? s.split(',').filter(Boolean).map(Number) : [];
 
-    const _state = useStore.getState();
-    const _sidebar = _state.sidebar;
+    const brands = _sidebar.brands.length > 0
+      ? _sidebar.brands
+      : parseNumList(fromUrl('brands'));
+    const categories = _sidebar.categories.length > 0
+      ? _sidebar.categories
+      : parseNumList(fromUrl('categories'));
 
-    // Build URL params object
-    const params: Record<string, string | undefined> = {
-      query: uiState.product.query || undefined,
-      categories: _sidebar?.categories?.join(',') || undefined,
-      brands: _sidebar?.brands?.join(',') || undefined,
-      priceRange: (_sidebar?.priceRange === PRICE_RANGE) ? undefined : _sidebar?.priceRange?.join(',') || undefined,
-      on_sale: _sidebar?.on_sale ? 'true' : undefined,
-      in_stock: _sidebar?.in_stock ? 'true' : undefined,
-      sort: _sidebar?.sort || undefined,
-    };
+    const storePriceCustom = _sidebar.priceRange.join('') !== PRICE_RANGE.join('');
+    let priceRange: number[] | null = storePriceCustom ? _sidebar.priceRange : null;
+    if (!priceRange) {
+      const p = fromUrl('priceRange');
+      if (p) {
+        const r = p.split(',').filter(Boolean).map(Number);
+        if (r.length === 2 && r.join('') !== PRICE_RANGE.join('')) priceRange = r;
+      }
+    }
 
-    // Handle variations object
-    const variationEntries = Object.entries(_sidebar?.variations || {});
-    if (variationEntries.length > 0) {
-      variationEntries.forEach(([attribute, values]) => {
-        if (values.length > 0) {
-          params[`variation_${attribute}`] = values.join(',');
+    const on_sale = _sidebar.on_sale || fromUrl('on_sale') === 'true';
+    const in_stock = _sidebar.in_stock || fromUrl('in_stock') === 'true';
+    const sort = _sidebar.sort || fromUrl('sort') || '';
+
+    let variationsSource: Record<string, string[]> = _sidebar.variations;
+    if (Object.keys(variationsSource).length === 0 && urlParams) {
+      const fromUrlVars: Record<string, string[]> = {};
+      urlParams.forEach((value, key) => {
+        if (key.startsWith('variation_') && value) {
+          fromUrlVars[key.replace('variation_', '')] = value.split(',').filter(Boolean);
         }
       });
+      if (Object.keys(fromUrlVars).length > 0) variationsSource = fromUrlVars;
     }
 
-    // Remove undefined values
-    return Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== undefined));
-  }, [sidebar]);
-
-  // this maps the route state to the ui state
-  const routeToState = useCallback((routeState: any) => {
-
-    // Sync categories
-
-
-    // Sync brands
-    if (routeState?.brands?.length > 0) {
-      syncBrands(routeState.brands.split(',').filter(Boolean).map(Number) || []);
-    }
-
-    // Sync price range
-    if (routeState?.priceRange?.length > 0) {
-      const priceRange = routeState.priceRange.split(',').filter(Boolean).map(Number);
-      if (priceRange.length === 2) {
-        synPriceRange(priceRange);
-      }
-    }
-
-    // Sync on_sale
-    if (routeState?.on_sale === 'true') {
-      syncOnSale(true);
-    }
-
-    // Sync in_stock
-    if (routeState?.in_stock === 'true') {
-      setInStock(true);
-    }
-
-    // Sync sort
-    if (routeState?.sort) {
-      setSort(routeState.sort);
-    }
-
-    // Sync variations
-    const variations: Record<string, string[]> = {};
-    Object.keys(routeState || {}).forEach(key => {
-      if (key.startsWith('variation_')) {
-        const attribute = key.replace('variation_', '');
-        if (routeState[key]) {
-          variations[attribute] = routeState[key].split(',').filter(Boolean);
-        }
-      }
-    });
-
-    // Apply variations to store
-    Object.entries(variations).forEach(([attribute, values]) => {
-      syncVariations(attribute, values);
-    });
-
-    if (routeState?.categories?.length > 0) {
-      console.log('sync categories', routeState.categories.split(',').filter(Boolean).map(Number) || []);
-      syncCategories(routeState.categories.split(',').filter(Boolean).map(Number) || []);
-    }
-
-    return {
-      product: {
-        query: routeState.query || '',
-        categories: sidebar.categories,
-        brands: sidebar.brands,
-        priceRange: sidebar.priceRange,
-        on_sale: sidebar.on_sale,
-        in_stock: sidebar.in_stock,
-        sort: sidebar.sort,
-        variations: sidebar.variations,
-      },
+    const params: Record<string, string | undefined> = {
+      query: uiState.product?.query || undefined,
+      categories: categories.length > 0 ? categories.join(',') : undefined,
+      brands: brands.length > 0 ? brands.join(',') : undefined,
+      priceRange: priceRange ? priceRange.join(',') : undefined,
+      on_sale: on_sale ? 'true' : undefined,
+      in_stock: in_stock ? 'true' : undefined,
+      sort: sort || undefined,
     };
-  }, [syncCategories, syncBrands, synPriceRange, syncOnSale, setInStock, setSort, syncVariations]);
+
+    Object.entries(variationsSource).forEach(([attribute, values]) => {
+      if (values && values.length > 0) {
+        params[`variation_${attribute}`] = values.join(',');
+      }
+    });
+
+    return Object.fromEntries(Object.entries(params).filter(([_, v]) => v !== undefined));
+  }, []);
+
+  // Map URL → InstantSearch UiState + Zustand store. We do TWO things:
+  //   1. Return UiState that mirrors the URL params synchronously, so
+  //      InstantSearch's canonical UiState is correct on the very first
+  //      render (no shared-link strip on mount).
+  //   2. Schedule a microtask that fully resets the store from the URL —
+  //      including clearing fields the URL omits, which fixes back/forward
+  //      navigation. The deferral avoids React's setState-in-render warning.
+  const routeToState = useCallback((routeState: any) => {
+    const ui = {
+      query: routeState?.query || '',
+      categories: routeState?.categories
+        ? routeState.categories.split(',').filter(Boolean).map(Number)
+        : [],
+      brands: routeState?.brands
+        ? routeState.brands.split(',').filter(Boolean).map(Number)
+        : [],
+      priceRange: (() => {
+        if (!routeState?.priceRange) return PRICE_RANGE;
+        const range = routeState.priceRange.split(',').filter(Boolean).map(Number);
+        return range.length === 2 ? range : PRICE_RANGE;
+      })(),
+      on_sale: routeState?.on_sale === 'true',
+      in_stock: routeState?.in_stock === 'true',
+      sort: routeState?.sort || '',
+      variations: (() => {
+        const v: Record<string, string[]> = {};
+        Object.keys(routeState || {}).forEach(key => {
+          if (key.startsWith('variation_') && routeState[key]) {
+            v[key.replace('variation_', '')] = routeState[key].split(',').filter(Boolean);
+          }
+        });
+        return v;
+      })(),
+    };
+
+    queueMicrotask(() => {
+      // Full reset — fields not present in URL go back to default. Single
+      // setState call so subscribers re-render once.
+      useStore.setState((state) => ({
+        ...state,
+        sidebar: {
+          ...state.sidebar,
+          categories: ui.categories,
+          brands: ui.brands,
+          priceRange: ui.priceRange,
+          on_sale: ui.on_sale,
+          in_stock: ui.in_stock,
+          sort: ui.sort,
+          variations: ui.variations,
+        },
+      }));
+    });
+
+    return { product: ui };
+  }, []);
 
   // Create reactive stateMapping that updates when sidebar changes
   return (

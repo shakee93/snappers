@@ -1,4 +1,4 @@
-import CartPage from "@/app/containers/ProductDetailPage/CartPage";
+import CartPage from "@/app/(chromed)/containers/ProductDetailPage/CartPage";
 import {Metadata} from "next";
 
 export const metadata: Metadata = {

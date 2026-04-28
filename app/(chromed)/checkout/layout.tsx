@@ -2,7 +2,11 @@ import { PaymentProvider } from "@/context/PaymentProvider";
 import CheckoutHeader from "./CheckoutHeader";
 import CheckoutFooter from "./CheckoutFooter";
 
-const CheckoutLayout = ({ children }: { children: React.ReactNode }) => {
+export default function CheckoutLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <PaymentProvider>
       <CheckoutHeader />
@@ -10,6 +14,4 @@ const CheckoutLayout = ({ children }: { children: React.ReactNode }) => {
       <CheckoutFooter />
     </PaymentProvider>
   );
-};
-
-export default CheckoutLayout;
+}

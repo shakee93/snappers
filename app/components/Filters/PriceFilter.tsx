@@ -1,52 +1,21 @@
 "use client"
-import { Popover, Transition } from "@headlessui/react";
-import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import React, { Fragment, useEffect, useState, useCallback } from "react";
-import Checkbox from "@/shared/Checkbox/Checkbox";
-import ButtonThird from "@/shared/Button/ButtonThird";
-import ButtonPrimary from "@/shared/Button/ButtonPrimary";
-import { Brand, ProductCategory } from "@/graphql/types/graphql";
+import React, { useState } from "react";
 import { useStore } from "@/store/store";
-import FilterPopover from "@/app/components/Filters/FilterPopover";
 import Slider from "rc-slider";
-import { useInstantSearch } from "react-instantsearch";
-import { UiState } from "instantsearch.js";
 
 interface BrandFilterProps {
 }
 
 export const PRICE_RANGE = [500, 500000];
 
-type MyUiState = UiState & {
-    product: {
-        priceRange: number[];
-        query?: string;
-    }
-}
-
 const PriceFilter = ({ }: BrandFilterProps) => {
-    const { synPriceRange, sidebar: { priceRange } } = useStore()
+    const { synPriceRange, sidebar: { priceRange } } = useStore();
     const [rangePrices, setRangePrices] = useState(priceRange || PRICE_RANGE);
-    const { setUiState } = useInstantSearch<MyUiState>();
 
-    // URL synchronization is now handled by InstantSearch routing
-    // No need for manual URL manipulation
-
-    useEffect(() => {
-        // Update store
-        synPriceRange(rangePrices);
-
-        // Update UI state
-        setUiState(prev => {
-            return {
-                ...prev,
-                product: {
-                    ...(prev.product || {}),
-                    priceRange: rangePrices,
-                }
-            }
-        });
-    }, [rangePrices, setUiState, synPriceRange]);
+    const commitRange = (next: number[]) => {
+        setRangePrices(next);
+        synPriceRange(next);
+    };
 
     const icon = <svg
         className="w-4 h-4"
@@ -93,7 +62,7 @@ const PriceFilter = ({ }: BrandFilterProps) => {
                             defaultValue={[rangePrices[0], rangePrices[1]]}
                             allowCross={false}
                             onChange={(_input: number | number[]) =>
-                                setRangePrices(_input as number[])
+                                commitRange(_input as number[])
                             }
                         />
                     </div>
@@ -119,7 +88,7 @@ const PriceFilter = ({ }: BrandFilterProps) => {
                                 id="minPrice"
                                 className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
                                 value={rangePrices[0]}
-                                onChange={e => setRangePrices([parseInt(e.target.value) || PRICE_RANGE[0], rangePrices[1]])}
+                                onChange={e => commitRange([parseInt(e.target.value) || PRICE_RANGE[0], rangePrices[1]])}
                             />
                         </div>
                     </div>
@@ -142,7 +111,7 @@ const PriceFilter = ({ }: BrandFilterProps) => {
                                 id="maxPrice"
                                 className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
                                 value={rangePrices[1]}
-                                onChange={e => setRangePrices([rangePrices[0], parseInt(e.target.value) || PRICE_RANGE[1]])}
+                                onChange={e => commitRange([rangePrices[0], parseInt(e.target.value) || PRICE_RANGE[1]])}
                             />
                         </div>
                     </div>

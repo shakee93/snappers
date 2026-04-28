@@ -1,7 +1,6 @@
 import { getClient } from "@/graphql/apollo-ssr";
 import {
   GET_BRANDS,
-  GET_CATEGORY_ARCHIVE_IN_STOCK,
   GET_PRODUCT,
 } from "@/graphql/defs/products";
 import { Brand, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
@@ -19,8 +18,6 @@ import { ImageProvider } from "@/context/ImageChangeGrabber";
 import UpsellProducts from "@/app/components/globalComponents/UpsellProducts";
 import { getProductSchema } from "@/lib/jsonld/productSchema";
 // import LoadingProduct from "./loading";
-
-export const dynamic = "force-dynamic";
 
 type Props = {
   params: Promise<{
@@ -40,11 +37,11 @@ async function getData(slug: string, brand: string) {
       variables: {
         productId: slug,
       },
-      // PDP: keep freshness tighter than the 30-min SSR default, but not so
-      // tight it stampedes WP. Stock accuracy is enforced at add-to-cart by
-      // the client Apollo's un-cached mutation — a user loading a stale
-      // "in stock" PDP still gets rejected server-side on the mutation.
-      context: { fetchOptions: { next: { revalidate: 300 } } },
+      // PDP rides the SSR default (force-cache). WP fires the revalidate
+      // webhook on product / stock edits, busting the PDP path near-real-
+      // time. Stock accuracy on a missed webhook is enforced at the client
+      // Apollo's un-cached add-to-cart mutation — a user loading a stale
+      // "in stock" PDP gets rejected server-side on the mutation.
     });
 
     if (error) {
@@ -55,20 +52,6 @@ async function getData(slug: string, brand: string) {
       notFound();
     }
 
-    const { data: categoryData } = await getClient().query({
-      query: GET_CATEGORY_ARCHIVE_IN_STOCK,
-      variables: {
-        categoryIdIn:
-          data.product?.productCategories?.edges?.map(
-            (cat: any) => cat.node.databaseId
-          ) || [],
-        first: 10,
-      },
-    });
-
-    const upsellProducts =
-      categoryData?.products?.edges.map((edge: any) => edge.node) || [];
-
     const productBrand = data.product?.brands?.nodes?.[0] || {
       name: "Product",
       slug: "product",
@@ -77,7 +60,7 @@ async function getData(slug: string, brand: string) {
     return {
       product: data.product,
       brand: productBrand,
-      upsellProducts: upsellProducts,
+      upsellProducts: [],
     };
   } catch (e) {
     console.error("Error fetching product data:", e);

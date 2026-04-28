@@ -1,26 +1,22 @@
 "use client";
-import { useQuery } from "@apollo/client";
-import { GET_NAV_CATEGORIES } from "@/graphql/defs/nav";
 import Link from "next/link";
 import { ProductCategory } from "@/graphql/types/graphql";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
-import CategoriesMenuSkeleton from "../../Skeletons/CategorySkeleton";
 import { useMemo } from "react";
 import { orderCollectionNavRoots } from "@/lib/collectionNavOrder";
 
 type NavCategoriesProps = {
   onClose: () => void;
+  categories: ProductCategory[];
 };
 
 type CategoryWithChildren = Omit<ProductCategory, 'children'> & {
   children?: ProductCategory[];
 };
 
-export default function NavCategories({ onClose }: NavCategoriesProps) {
-  const { data, loading, error } = useQuery(GET_NAV_CATEGORIES);
-
-  const flatCategories: ProductCategory[] = data?.productCategories?.nodes || [];
+export default function NavCategories({ onClose, categories }: NavCategoriesProps) {
+  const flatCategories: ProductCategory[] = categories ?? [];
 
   // Build parent-child tree structure from flat categories
   const buildCategoryTree = (
@@ -102,16 +98,7 @@ export default function NavCategories({ onClose }: NavCategoriesProps) {
       </div>
 
       <div className="flex flex-col md:flex-row gap-6 md:gap-8 p-3 pt-1 w-full">
-        {loading ? (
-          <div className="flex-1 w-full">
-            <CategoriesMenuSkeleton />
-          </div>
-        ) : error ? (
-          <div className="flex-1 w-full">
-            <p>Error loading categories</p>
-          </div>
-        ) : (
-          categoryColumns.map((columnItems, colIndex) => (
+        {categoryColumns.map((columnItems, colIndex) => (
             <div
               key={`nav-col-${colIndex}`}
               className="flex-1 flex flex-col gap-y-2 min-w-0"
@@ -166,10 +153,8 @@ export default function NavCategories({ onClose }: NavCategoriesProps) {
                 </div>
               ))}
             </div>
-          ))
-        )}
+          ))}
       </div>
     </div>
   );
 }
-// t

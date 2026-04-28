@@ -4,19 +4,13 @@ import "rc-slider/assets/index.css";
 import ApolloWrapper from "@/graphql/apollo-client";
 import { SessionProvider } from "@/context/SessionProvider";
 import { CartProvider } from "@/context/CartProvider";
-import { PaymentProvider } from "@/context/PaymentProvider";
-import Header from "@/app/components/globalComponents/header";
-import HeaderGate from "@/app/components/globalComponents/HeaderGate";
 import { Toaster } from "sonner";
-import Footer from "@/app/components/globalComponents/footer";
 import { Suspense } from "react";
 import { NavigationEvents } from "@/app/components/NavigationEvents";
 import { Metadata } from "next";
 import WhatsappLogoComponent from "@/app/components/WhatsAppLogo";
 import Script from "next/script";
-import ScreenSizeIndicator from "@/app/components/ScreenSizeIndicator";
 import GoogleAnalytics from "@/app/components/GoogleAnalytics";
-import AttributeMappingsInitializer from "@/app/components/AttributeMappingsInitializer";
 import ContentWrapper from "@/app/components/ContentWrapper";
 
 export const metadata: Metadata = {
@@ -136,16 +130,9 @@ export default async function RootLayout({
                 <GoogleAnalytics />
               </Suspense>
 
-              <HeaderGate>
-                <Header />
-              </HeaderGate>
               <ContentWrapper>{children}</ContentWrapper>
               <WhatsappLogoComponent />
               <Toaster />
-              <HeaderGate>
-                <Footer />
-              </HeaderGate>
-              {/* <ScreenSizeIndicator /> */}
             </SessionProvider>
           </CartProvider>
         </ApolloWrapper>
