@@ -259,7 +259,6 @@ const UnifiedCheckoutForm = ({
     const [city, setCity] = useState("");
     const [state, setState] = useState("Western");
     const [postal, setPostal] = useState("");
-    const [addressCountry, setAddressCountry] = useState("");
     const [addressType, setAddressType] = useState("home");
 
     // Payment Method State
@@ -275,9 +274,7 @@ const UnifiedCheckoutForm = ({
     const { cart } = useCart();
 
     const courierShippingLabel = useMemo(() => {
-        const rates = (cart as any)?.availableShippingMethods?.[0]?.rates as
-            | Array<{ label?: string | null; cost?: string | null; methodId?: string | null }>
-            | undefined;
+        const rates = cart?.availableShippingMethods?.[0]?.rates;
         const flat = rates?.find(
             (r) => r?.methodId === "flat_rate" || /flat rate|courier/i.test(r?.label || "")
         );
@@ -300,6 +297,14 @@ const UnifiedCheckoutForm = ({
         }
     };
 
+    // Revoke any outstanding blob URL when the component unmounts so we don't
+    // leak it (the user navigating away from /checkout, or HMR during dev).
+    useEffect(() => {
+        return () => {
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+        };
+    }, [previewUrl]);
+
     // Initialize Contact Info
     useEffect(() => {
         if (initialContactData) {
@@ -319,7 +324,6 @@ const UnifiedCheckoutForm = ({
             setCity(initialShippingData.city || "");
             setState(initialShippingData.state || "Western");
             setPostal(initialShippingData.postcode || "");
-            setAddressCountry(initialShippingData.country || "");
             setAddressType("home");
         }
     }, [initialShippingData]);

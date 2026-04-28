@@ -26,7 +26,7 @@ import {
 import koko from "@/public/koko.png";
 import CheckoutDetails from "./CheckoutDetails";
 import { CheckoutSubmitPayload, DeliveryType } from "./UnifiedCheckoutForm";
-import CartItems from "./CartItems";
+import CartItems, { CartItem } from "./CartItems";
 import { OrderSummarySkeleton } from "./CheckoutSkeletons";
 import { toast } from "sonner";
 import { PayhereStatus, PaymentDetailsWithoutUrls } from "@/data/types";
@@ -759,6 +759,21 @@ const CheckoutPage = () => {
   const TotalWithKoko = (cartSubtotal / 88) * 100;
   const taxWithTotal = (numericOrderTotal + threePercentFromTotal).toFixed(2);
 
+  // Real shipping amount for Koko's installment math. Was hardcoded at 500
+  // LKR which silently disagreed with the actual courier rate the rest of
+  // the page renders. Source the same value the cart shows; fall back to
+  // 500 only if the cart hasn't loaded yet.
+  const kokoShippingAmount = (() => {
+    if (noShipping) return 0;
+    const fromCart = replaceStringinInt(cart?.shippingTotal);
+    if (Number.isFinite(fromCart) && fromCart > 0) return fromCart;
+    const rateCost = cart?.availableShippingMethods?.[0]?.rates?.[0]?.cost;
+    const fromRate = typeof rateCost === "string" ? parseFloat(rateCost) : Number(rateCost);
+    if (Number.isFinite(fromRate) && fromRate > 0) return fromRate;
+    return 500;
+  })();
+  const kokoOrderTotal = TotalWithKoko + kokoShippingAmount;
+
   const formatRs = (n: number) =>
     `Rs ${new Intl.NumberFormat("en-US", {
       minimumFractionDigits: 2,
@@ -768,7 +783,7 @@ const CheckoutPage = () => {
   const orderTotalLabel = isCardPayment
     ? formatRs(numericOrderTotal + threePercentFromTotal)
     : isKokoPayment
-    ? formatRs(TotalWithKoko + (noShipping ? 0 : 500))
+    ? formatRs(kokoOrderTotal)
     : (orderTotal || "");
 
   useEffect(() => {
@@ -1038,7 +1053,7 @@ const CheckoutPage = () => {
               setIsCardPayment={setIsCardPayment}
               isCardPayment={isCardPayment}
               totalPayment={numericOrderTotal}
-              kokoTotal={TotalWithKoko + (noShipping ? 0 : 500)}
+              kokoTotal={kokoOrderTotal}
               setIsKokoPayment={setIsKokoPayment}
               isKokoPayment={isKokoPayment}
               onCheckoutSubmit={submitCheckout}
@@ -1070,8 +1085,8 @@ const CheckoutPage = () => {
               {cart?.contents?.nodes.map((item, index) => (
                 <CartItems
                   index={index}
-                  key={(item as any)?.key ?? index}
-                  item={item as any}
+                  key={item?.key ?? index}
+                  item={item as unknown as CartItem}
                   onQuantityChange={updateCart}
                   onRemove={removeFromCart}
                 />
@@ -1301,13 +1316,7 @@ const CheckoutPage = () => {
                 <div className="flex flex-wrap items-center text-xs text-gray-500 mt-1">
                   <span>pay in 3 x Rs</span>
                   <span className="font-semibold mx-1">
-                    {(
-                      parseFloat(
-                        (TotalWithKoko + (noShipping ? 0 : 500) || "0")
-                          .toString()
-                          .replace(/[^\d.]/g, "")
-                      ) / 3
-                    ).toFixed(2)}
+                    {(kokoOrderTotal / 3).toFixed(2)}
                   </span>
                   <span>with</span>
                   <span className="ml-1 inline-block">
@@ -1338,7 +1347,7 @@ const CheckoutPage = () => {
                   <span
                     className="text-xl font-bold"
                     dangerouslySetInnerHTML={{
-                      __html: formatRs(TotalWithKoko + (noShipping ? 0 : 500)),
+                      __html: formatRs(kokoOrderTotal),
                     }}
                   />
                 </div>
