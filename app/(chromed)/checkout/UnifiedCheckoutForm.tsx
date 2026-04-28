@@ -384,7 +384,6 @@ const UnifiedCheckoutForm = ({
 
             return currentCart.contents.nodes.some((node: any) => {
                 const productNode = node.product?.node || node.product;
-                console.log("[PreOrder Debug] Cart item product:", productNode?.name, "tags:", productNode?.productTags?.nodes);
                 return isPreOrderProduct(productNode);
             });
         } catch (error) {
@@ -416,22 +415,40 @@ const UnifiedCheckoutForm = ({
         });
     }, [paymentGateways, isPreOrderCart, isPriceFluctuation, totalPayment, cart]);
 
+    // Gateways that should appear but be greyed-out for the current delivery
+    // method. Cash on Delivery is incompatible with Flash Delivery — the
+    // courier driver doesn't collect cash on our behalf.
+    const gatewayDisabledReason = (gatewayId: string): string | null => {
+        if (deliveryType === "flash_delivery" && gatewayId === "cod") {
+            return "Not available with Flash Delivery — pay online instead";
+        }
+        return null;
+    };
+
+    // Auto-select first enabled gateway when none is selected.
     useEffect(() => {
         if (!visiblePaymentGateways.length || selectedGateway.id) return;
-        const g = visiblePaymentGateways[0];
+        const g = visiblePaymentGateways.find((gw) => !gatewayDisabledReason(gw.id));
+        if (!g) return;
         setMethodActive(g.id);
         setSelectedGateway({ id: g.id, title: g.title });
-        if (g.id === "darazbnpl") {
-            setIsKokoPayment(true);
-        } else {
-            setIsKokoPayment(false);
-        }
-        if (g.id === "payhere") {
-            setIsCardPayment(true);
-        } else {
-            setIsCardPayment(false);
-        }
-    }, [visiblePaymentGateways, selectedGateway.id, setIsCardPayment, setIsKokoPayment]);
+        setIsKokoPayment(g.id === "darazbnpl");
+        setIsCardPayment(g.id === "payhere");
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- gatewayDisabledReason depends on deliveryType which is already in deps
+    }, [visiblePaymentGateways, selectedGateway.id, deliveryType, setIsCardPayment, setIsKokoPayment]);
+
+    // If the currently-selected gateway becomes disabled (e.g. user picks COD
+    // then switches to Flash Delivery), clear it so the form can't submit
+    // through an option the user can no longer see as available.
+    useEffect(() => {
+        if (!selectedGateway.id) return;
+        if (!gatewayDisabledReason(selectedGateway.id)) return;
+        setSelectedGateway({ id: "", title: null });
+        setMethodActive("");
+        setIsKokoPayment(false);
+        setIsCardPayment(false);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [deliveryType, selectedGateway.id]);
 
     const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -559,6 +576,7 @@ const UnifiedCheckoutForm = ({
     };
 
     const selectGateway = (gateway: PaymentGateway) => {
+        if (gatewayDisabledReason(gateway.id)) return;
         setMethodActive(gateway.id);
         setSelectedGateway({ id: gateway.id, title: gateway.title });
 
@@ -577,57 +595,71 @@ const UnifiedCheckoutForm = ({
     const PaymentMethodCard = ({ gateway }: { gateway: PaymentGateway }) => {
         const active = methodActive === gateway.id;
         const meta = getGatewayMeta(gateway);
+        const disabledReason = gatewayDisabledReason(gateway.id);
+        const isDisabled = !!disabledReason;
 
         return (
             <div
                 className={`rounded-xl border-2 transition-colors ${
-                    active
-                        ? "border-primaryColor bg-primary-50/60 dark:bg-primary-900/20"
-                        : "border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/40 hover:border-slate-300 hover:bg-slate-100 dark:hover:border-slate-600"
+                    isDisabled
+                        ? "border-slate-200 bg-slate-100/60 dark:border-slate-800 dark:bg-slate-900/40 opacity-60"
+                        : active
+                            ? "border-primaryColor bg-primary-50/60 dark:bg-primary-900/20"
+                            : "border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/40 hover:border-slate-300 hover:bg-slate-100 dark:hover:border-slate-600"
                 }`}
+                aria-disabled={isDisabled || undefined}
             >
                 <label
                     htmlFor={gateway.id}
-                    className="flex items-center gap-4 p-4 cursor-pointer"
+                    className={`flex items-center gap-4 p-4 ${isDisabled ? "cursor-not-allowed" : "cursor-pointer"}`}
                 >
                     <input
                         id={gateway.id}
                         type="radio"
                         name="payment-method"
                         checked={active}
+                        disabled={isDisabled}
                         onChange={() => selectGateway(gateway)}
                         className="sr-only"
                     />
                     <span
                         aria-hidden="true"
                         className={`flex items-center justify-center w-5 h-5 rounded-full border-2 shrink-0 transition-colors ${
-                            active
-                                ? "border-primaryColor bg-primaryColor"
-                                : "border-slate-300 dark:border-slate-600"
+                            isDisabled
+                                ? "border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-800"
+                                : active
+                                    ? "border-primaryColor bg-primaryColor"
+                                    : "border-slate-300 dark:border-slate-600"
                         }`}
                     >
-                        {active && <span className="w-2 h-2 rounded-full bg-white" />}
+                        {active && !isDisabled && <span className="w-2 h-2 rounded-full bg-white" />}
                     </span>
                     <span
                         className={`flex items-center justify-center w-10 h-10 rounded-lg shrink-0 ${
-                            active
-                                ? "bg-primaryColor/10 text-primaryColor"
-                                : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+                            isDisabled
+                                ? "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500"
+                                : active
+                                    ? "bg-primaryColor/10 text-primaryColor"
+                                    : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
                         }`}
                     >
                         {meta.icon}
                     </span>
                     <div className="flex-1 min-w-0">
-                        <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                        <div className={`text-sm font-semibold ${isDisabled ? "text-slate-500 dark:text-slate-400" : "text-slate-900 dark:text-slate-100"}`}>
                             {meta.title}
                         </div>
-                        {meta.subtitle && (
+                        {isDisabled ? (
+                            <div className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+                                {disabledReason}
+                            </div>
+                        ) : meta.subtitle ? (
                             <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                                 {meta.subtitle}
                             </div>
-                        )}
+                        ) : null}
                     </div>
-                    {meta.trailing && <div className="shrink-0">{meta.trailing}</div>}
+                    {!isDisabled && meta.trailing && <div className="shrink-0">{meta.trailing}</div>}
                 </label>
 
                 {active && gateway.id === "bacs" && (
@@ -716,12 +748,13 @@ const UnifiedCheckoutForm = ({
         );
     };
 
-    const contactDone = phone.length >= 9 && /.+@.+\..+/.test(email);
+    const contactDone = /^[0-9]{9,12}$/.test(phone) && /.+@.+\..+/.test(email);
+    const nameDone = !!firstName && !!lastName;
     const fullAddressDone =
-        !!firstName && !!address && !!city && !!state;
+        nameDone && !!address && !!city && !!state && !!postal;
     const deliveryDone =
         deliveryType !== null &&
-        !!firstName &&
+        nameDone &&
         (deliveryType === "store_pickup" || fullAddressDone);
     const detailsDone = contactDone && deliveryDone;
     const paymentDone =
@@ -840,19 +873,35 @@ const UnifiedCheckoutForm = ({
 
                     {deliveryType && (
                     <div className="mt-6 space-y-4">
-                        <div>
-                            <label htmlFor="checkout-name" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
-                                Full name
-                            </label>
-                            <Input
-                                id="checkout-name"
-                                className={`capitalize ${FIELD_CLASS}`}
-                                value={firstName}
-                                placeholder="e.g. Amila Perera"
-                                autoComplete="name"
-                                onChange={(e) => setFirstName(e.target.value)}
-                                required={true}
-                            />
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
+                            <div>
+                                <label htmlFor="checkout-firstname" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
+                                    First name
+                                </label>
+                                <Input
+                                    id="checkout-firstname"
+                                    className={`capitalize ${FIELD_CLASS}`}
+                                    value={firstName}
+                                    placeholder="e.g. Amila"
+                                    autoComplete="given-name"
+                                    onChange={(e) => setFirstName(e.target.value)}
+                                    required={true}
+                                />
+                            </div>
+                            <div>
+                                <label htmlFor="checkout-lastname" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
+                                    Last name
+                                </label>
+                                <Input
+                                    id="checkout-lastname"
+                                    className={`capitalize ${FIELD_CLASS}`}
+                                    value={lastName}
+                                    placeholder="e.g. Perera"
+                                    autoComplete="family-name"
+                                    onChange={(e) => setLastName(e.target.value)}
+                                    required={true}
+                                />
+                            </div>
                         </div>
 
                         {deliveryType !== "store_pickup" ? (
@@ -890,7 +939,7 @@ const UnifiedCheckoutForm = ({
                                     </div>
                                 </div>
 
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-3">
                                     <div>
                                         <label htmlFor="checkout-city" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
                                             City
@@ -923,6 +972,22 @@ const UnifiedCheckoutForm = ({
                                                 </option>
                                             ))}
                                         </Select>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="checkout-postal" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
+                                            Postal code
+                                        </label>
+                                        <Input
+                                            id="checkout-postal"
+                                            className={FIELD_CLASS}
+                                            placeholder="e.g. 10100"
+                                            value={postal}
+                                            inputMode="numeric"
+                                            pattern="[0-9]{4,6}"
+                                            autoComplete="postal-code"
+                                            onChange={(e) => setPostal(e.target.value)}
+                                            required={true}
+                                        />
                                     </div>
                                 </div>
                             </>
