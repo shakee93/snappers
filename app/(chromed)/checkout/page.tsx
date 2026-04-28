@@ -258,8 +258,13 @@ const CheckoutPage = () => {
   };
 
   useEffect(() => {
+    // Skip until the cart has actually loaded. Firing the WBS mutation
+    // against an empty/unready cart on first paint produces a hung/error
+    // state that froze the page on the first add-to-cart → /checkout flow.
+    if (!cart?.contents?.itemCount) return;
     updateShippingTotal().then((r) => r);
-  }, [deliveryType, updateCartShippingTotalMutation, freeShipping]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally omit the unstable mutation fn ref
+  }, [deliveryType, freeShipping, cart?.contents?.itemCount]);
 
   const paymentDetails = useMemo(() => {
     return paymentData;
