@@ -209,11 +209,18 @@ const CheckoutPage = () => {
     }
 
     try {
-      const shippingMethods = noShipping
-        ? "pickup_location:0"
-        : freeShipping
-          ? "wbs:5c9bd062_free_shipping"
-          : "wbs:0dd3bc79_weight_based_shipping";
+      // Mirror the mapping in getShippingMethod: store_pickup uses the
+      // block-based pickup_location, flash_delivery uses the zone-bound
+      // flat_rate:4 (free, configured backend-side as "Flash Delivery
+      // (Uber/PickMe)").
+      const shippingMethods =
+        deliveryType === "flash_delivery"
+          ? "flat_rate:4"
+          : deliveryType === "store_pickup"
+            ? "pickup_location:0"
+            : freeShipping
+              ? "wbs:5c9bd062_free_shipping"
+              : "wbs:0dd3bc79_weight_based_shipping";
 
       const total: any = cart?.total;
       setOrderTotal(freeShipping ? cart?.subtotal : total);
@@ -614,12 +621,26 @@ const CheckoutPage = () => {
       orderDeliveryType === "store_pickup" ||
       orderDeliveryType === "flash_delivery";
 
-    const methodId = noCharge
-      ? "pickup_location:0"
-      : freeShipping
-        ? "wbs:5c9bd062_free_shipping"
-        : "wbs:0dd3bc79_weight_based_shipping";
+    // store_pickup → block-based pickup_location method (instance 0).
+    // flash_delivery → zone-bound flat_rate instance 4 ("Flash Delivery
+    // (Uber/PickMe)" at cost 0). Configured via WooCommerce > Settings >
+    // Shipping > Sri Lanka. Different mechanism from store pickup, but
+    // both resolve to a free shipping line — and flat_rate keeps the
+    // title verbatim so order admin shows "Flash Delivery (Uber/PickMe)"
+    // instead of the pickup_location plugin's "<title> (<location>)" template.
+    const methodId =
+      orderDeliveryType === "flash_delivery"
+        ? "flat_rate:4"
+        : orderDeliveryType === "store_pickup"
+          ? "pickup_location:0"
+          : freeShipping
+            ? "wbs:5c9bd062_free_shipping"
+            : "wbs:0dd3bc79_weight_based_shipping";
 
+    // methodTitle is the display string for the order summary; for
+    // flat_rate WC writes the zone-config title, for pickup_location WC
+    // writes its own templated title — either way this string is
+    // cosmetic on the cart side.
     const methodTitle = orderDeliveryType === "store_pickup"
       ? "Store Pickup"
       : orderDeliveryType === "flash_delivery"
