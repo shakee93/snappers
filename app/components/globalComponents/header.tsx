@@ -2,21 +2,21 @@ import { Suspense } from "react";
 import { getClient } from "@/graphql/apollo-ssr";
 import { GET_ALL_PRODUCTS } from "@/graphql/defs/products";
 import { GET_OPTIONS } from "@/graphql/defs/options";
+import { GET_NAV_CATEGORIES } from "@/graphql/defs/nav";
 import HeaderClientWrapper from "./HeaderClientWrapper";
 
 const getData = async () => {
-  const { data: productsData } = await getClient().query({
-    query: GET_ALL_PRODUCTS,
-  });
-
-  const { data: optionsData } = await getClient().query({
-    query: GET_OPTIONS,
-  });
+  const [productsResult, optionsResult, navCategoriesResult] = await Promise.all([
+    getClient().query({ query: GET_ALL_PRODUCTS }),
+    getClient().query({ query: GET_OPTIONS }),
+    getClient().query({ query: GET_NAV_CATEGORIES }),
+  ]);
 
   return {
-    productCategories: productsData?.productCategories?.nodes || [],
-    brands: productsData?.brands?.nodes || [],
-    options: optionsData || {},
+    productCategories: productsResult.data?.productCategories?.nodes || [],
+    brands: productsResult.data?.brands?.nodes || [],
+    options: optionsResult.data || {},
+    navCategories: navCategoriesResult.data?.productCategories?.nodes || [],
   };
 };
 
@@ -29,13 +29,14 @@ const HeaderSkeleton = () => (
 );
 
 const HeaderInner = async () => {
-  const { productCategories, brands, options } = await getData();
+  const { productCategories, brands, options, navCategories } = await getData();
 
   return (
     <HeaderClientWrapper
       productCategories={productCategories}
       brands={brands}
       options={options}
+      navCategories={navCategories}
     />
   );
 };

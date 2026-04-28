@@ -12,12 +12,14 @@ interface HeaderClientWrapperProps {
   productCategories: ProductCategory[];
   brands: Brand[];
   options: any;
+  navCategories: ProductCategory[];
 }
 
 const HeaderClientWrapper = ({
   productCategories,
   brands,
-  options
+  options,
+  navCategories
 }: HeaderClientWrapperProps) => {
   const [isDesktop, setIsDesktop] = useState(false);
   const [isTopBarVisible, setIsTopBarVisible] = useState(true);
@@ -96,7 +98,7 @@ const HeaderClientWrapper = ({
         </div>
 
         {/* HeaderContent - always visible when sticky */}
-        <HeaderContent />
+        <HeaderContent navCategories={navCategories} />
       </header>
 
       {/* Add padding to content when header is sticky */}

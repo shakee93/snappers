@@ -12,13 +12,13 @@ import {
   NavigationMenuViewport,
 } from "@radix-ui/react-navigation-menu";
 import { CaretDownIcon } from "@radix-ui/react-icons";
+import { ProductCategory } from "@/graphql/types/graphql";
 import NavCategories from "./mega-menu/categories";
-import BrandsMenu from "./mega-menu/brands";
 
 type NavLinkItem = {
   href: string;
   name: string;
-  component?: React.ComponentType<{ onClose: () => void }>;
+  menu?: "categories";
   special?: boolean;
 };
 
@@ -30,12 +30,11 @@ const navLinks: NavLinkItem[] = [
   {
     href: "/collections",
     name: "Collections",
-    component: NavCategories,
+    menu: "categories",
   },
   {
     href: "/brands",
     name: "Brands",
-    // component: BrandsMenu,
   },
   {
     href: "/collections/all",
@@ -56,7 +55,11 @@ const navLinks: NavLinkItem[] = [
   },
 ];
 
-export default function NavLinks() {
+interface NavLinksProps {
+  navCategories: ProductCategory[];
+}
+
+export default function NavLinks({ navCategories }: NavLinksProps) {
   const [openMenu, setOpenMenu] = React.useState<string>("");
 
   const closeMenu = () => {
@@ -72,13 +75,13 @@ export default function NavLinks() {
       <NavigationMenuList className="NavigationMenuList">
         {navLinks.map((item) => (
           <NavigationMenuItem key={item.href}>
-            {item.component ? (
+            {item.menu === "categories" ? (
               <>
                 <NavigationMenuTrigger className="NavigationMenuTrigger">
                   {item.name} <CaretDownIcon className="CaretDown" aria-hidden />
                 </NavigationMenuTrigger>
                 <NavigationMenuContent className="NavigationMenuContent test">
-                  {React.createElement(item.component, { onClose: closeMenu })}
+                  <NavCategories onClose={closeMenu} categories={navCategories} />
                 </NavigationMenuContent>
               </>
             ) : (
