@@ -1,7 +1,7 @@
 "use client";
 import { useQuery } from "@apollo/client";
 import { GET_MY_ORDERS } from "@/graphql/defs/order";
-import OrderItemProduct from "@/app/containers/ProductDetailPage/OrderItem";
+import OrderItemProduct from "@/app/(chromed)/containers/ProductDetailPage/OrderItem";
 import LoadingSkeleton from "@/components/OrderPageSkeleton";
 import { useSession } from "@/context/SessionProvider";
 import Link from "next/link";

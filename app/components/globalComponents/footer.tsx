@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import SiteLogo from "@/public/global/gq-logo.png";
@@ -6,7 +7,6 @@ import { GET_BRANDS } from "@/graphql/defs/products";
 import { Brand } from "@/graphql/types/graphql";
 import { Clock, Copyright, Facebook, Heart, Instagram, Mail, MapPinned } from "lucide-react";
 import { PiFacebookLogoDuotone, PiInstagramLogoDuotone, PiTiktokLogo, PiTiktokLogoDuotone } from "react-icons/pi";
-import { isPaymentPage } from "./paymentPageCheckUtilsServer";
 import { Divider } from "@nextui-org/react";
 import { HeartFilledIcon } from "@radix-ui/react-icons";
 
@@ -18,13 +18,18 @@ const getData = async () => {
   return data.brands?.nodes;
 };
 
-const Footer = async () => {
+const FooterSkeleton = () => (
+  <footer className="border-t pb-20 md:pb-0" aria-hidden>
+    <div className="container py-8">
+      <div className="h-8" />
+    </div>
+    <div className="bg-primaryColor h-12" />
+  </footer>
+);
+
+const FooterInner = async () => {
   const brands = await getData();
   const iconSize = 18;
-
-  if (await isPaymentPage()) {
-    return <></>;
-  }
 
   return (
     <footer className="border-t pb-20 md:pb-0 text-black">
@@ -336,5 +341,11 @@ const Footer = async () => {
     </footer >
   );
 };
+
+const Footer = () => (
+  <Suspense fallback={<FooterSkeleton />}>
+    <FooterInner />
+  </Suspense>
+);
 
 export default Footer;

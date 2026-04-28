@@ -1,7 +1,7 @@
 'use client'
 
 import InnerImageZoom from "react-inner-image-zoom";
-import ImageGallery from "@/app/(brand-archive)/[brand]/imageGallery";
+import ImageGallery from "@/app/(chromed)/(brand-archive)/[brand]/imageGallery";
 import {useState} from "react";
 import {SimpleProduct, VariableProduct} from "@/graphql/types/graphql";
 import 'react-inner-image-zoom/lib/InnerImageZoom/styles.min.css';

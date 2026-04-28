@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import FAQ from "../components/HomePage/FAQSection";
+import FAQ from "@/app/components/HomePage/FAQSection";
 
 const FAQPage = () => {
   return (

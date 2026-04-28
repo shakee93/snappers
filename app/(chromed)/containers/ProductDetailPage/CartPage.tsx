@@ -13,7 +13,7 @@ import {
   VariableProduct,
 } from "@/graphql/types/graphql";
 import Prices from "@/app/components/Prices";
-import CartItemProduct from "@/app/containers/ProductDetailPage/CartItem";
+import CartItemProduct from "@/app/(chromed)/containers/ProductDetailPage/CartItem";
 import { Loader } from "lucide-react";
 import BackdropSpinner from "@/app/components/BackdropSpinner";
 

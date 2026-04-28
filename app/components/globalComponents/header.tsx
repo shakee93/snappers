@@ -1,13 +1,7 @@
+import { Suspense } from "react";
 import { getClient } from "@/graphql/apollo-ssr";
 import { GET_ALL_PRODUCTS } from "@/graphql/defs/products";
 import { GET_OPTIONS } from "@/graphql/defs/options";
-import { Brand, ProductCategory } from "@/graphql/types/graphql";
-import { isPaymentPage } from "./paymentPageCheckUtilsServer";
-import TopBarPromotion from "@/components/TopBarPromotion";
-import HeaderContent from "./HeaderContent";
-import HeaderSearchResults from "@/app/components/globalComponents/HeaderSearchResults";
-import MobileNavLinks from "./MobileNavLinks";
-import MobileBottomNav from "@/app/components/globalComponents/MobileBottomNav";
 import HeaderClientWrapper from "./HeaderClientWrapper";
 
 const getData = async () => {
@@ -26,20 +20,30 @@ const getData = async () => {
   };
 };
 
-const Header = async () => {
-  if (await isPaymentPage()) {
-    return <></>;
-  }
+const HeaderSkeleton = () => (
+  <div className="bg-white border-b border-gray-100" aria-hidden>
+    <div className="h-8 bg-primaryColor/5" />
+    <div className="h-16 md:h-20" />
+    <div className="h-10 hidden md:block bg-gray-50" />
+  </div>
+);
 
+const HeaderInner = async () => {
   const { productCategories, brands, options } = await getData();
 
   return (
     <HeaderClientWrapper
-        productCategories={productCategories}
-        brands={brands}
+      productCategories={productCategories}
+      brands={brands}
       options={options}
-      />
+    />
   );
 };
+
+const Header = () => (
+  <Suspense fallback={<HeaderSkeleton />}>
+    <HeaderInner />
+  </Suspense>
+);
 
 export default Header;

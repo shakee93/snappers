@@ -2,7 +2,7 @@
 
 import React from "react";
 import Image from "next/image";
-import SectionHero4 from "../components/HomePage/SectionHero4";
+import SectionHero4 from "@/app/components/HomePage/SectionHero4";
 import { GET_BENTO_SLIDER } from "@/graphql/defs/products";
 import { getClient } from "@/graphql/apollo-ssr";
 
