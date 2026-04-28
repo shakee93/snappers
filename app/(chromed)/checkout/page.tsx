@@ -1297,9 +1297,13 @@ const CheckoutPage = () => {
                       {freeShipping ? (
                         <span dangerouslySetInnerHTML={{ __html: "0.00" }} />
                       ) : (
+                        // shippingTotal here is local state set from the
+                        // updateShippingMethod mutation response (line 245);
+                        // cart?.shippingTotal from CartProvider is stale until
+                        // the next cart refetch.
                         <span
                           dangerouslySetInnerHTML={{
-                            __html: cart?.shippingTotal || "0.00",
+                            __html: shippingTotal || cart?.shippingTotal || "0.00",
                           }}
                         />
                       )}
