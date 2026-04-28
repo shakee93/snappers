@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FetchResult, useMutation, useQuery } from "@apollo/client";
 import Input from "shared/Input/Input";
 import Label from "components/Label/Label";
@@ -200,6 +200,13 @@ const CheckoutPage = () => {
     });
   };
 
+  // AbortController for in-flight updateShippingMethod calls. If the user
+  // toggles delivery method rapidly, an older call's response can land
+  // after a newer one and overwrite local state with the wrong numbers.
+  // We abort the previous call before starting a new one and bail on any
+  // stale response that does come back.
+  const shippingAbortRef = useRef<AbortController | null>(null);
+
   const updateShippingTotal = async () => {
     const hasFreeShipping: any = cart?.appliedCoupons?.some(
       (coupon) => coupon?.code === "free-shipping"
@@ -207,6 +214,10 @@ const CheckoutPage = () => {
     if (hasFreeShipping) {
       setFreeShipping(true);
     }
+
+    shippingAbortRef.current?.abort();
+    const controller = new AbortController();
+    shippingAbortRef.current = controller;
 
     try {
       // Mirror the mapping in getShippingMethod: store_pickup uses the
@@ -237,7 +248,11 @@ const CheckoutPage = () => {
 
       const { data, errors } = await updateCartShippingTotalMutation({
         variables: { input: { shippingMethods } },
+        context: { fetchOptions: { signal: controller.signal } },
       });
+
+      // Stale response — a newer call has been started since we fired this one.
+      if (controller.signal.aborted) return;
 
       if (errors) {
         console.error("Error updating cart shipping total:", errors);
@@ -260,6 +275,10 @@ const CheckoutPage = () => {
         );
       }
     } catch (error) {
+      // AbortError is expected when superseded — don't log as an error.
+      if (controller.signal.aborted) return;
+      const name = (error as { name?: string })?.name;
+      if (name === "AbortError") return;
       console.error("An error occurred while updating shipping total:", error);
     }
   };
@@ -272,6 +291,14 @@ const CheckoutPage = () => {
     updateShippingTotal().then((r) => r);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally omit the unstable mutation fn ref
   }, [deliveryType, freeShipping, cart?.contents?.itemCount]);
+
+  // Abort any pending shipping-update on unmount so we don't write to
+  // unmounted-component state.
+  useEffect(() => {
+    return () => {
+      shippingAbortRef.current?.abort();
+    };
+  }, []);
 
   const paymentDetails = useMemo(() => {
     return paymentData;
