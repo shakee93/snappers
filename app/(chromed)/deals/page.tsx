@@ -29,7 +29,7 @@ const getDealsData = async () => {
     getClient()
       .query({
         query: GET_PRODUCTS_BY_BOGO_TAG,
-        variables: { first: 20, tagIn: ["free-gift", "gift", "bogo-offer"] },
+        variables: { first: 20, tagIn: ["free-gift"] },
       })
       .then((res) => res.data?.products?.nodes || [])
       .catch(() => []),

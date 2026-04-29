@@ -128,6 +128,10 @@ const ProductCard: FC<ProductCardProps> = ({
     ) || false;
   };
 
+  const isFreeGiftProduct = data?.productTags?.nodes?.some(
+    (tag: any) => tag.slug === 'free-gift'
+  ) || false;
+
   // Extract the last segment of the pathname
   const segments = pathname.split("/");
   const productName = segments[segments.length - 1];
@@ -363,14 +367,14 @@ const ProductCard: FC<ProductCardProps> = ({
             stockStatus === "IN_STOCK" ? "top-4" : "top-12"
           }`}
         >
-          {/* Mobile / touch: full label. md+: only "Free"; on card hover swap to full BOGO text. */}
-          <span className="block whitespace-nowrap px-3 py-1.5 md:hidden">{bogo.label}</span>
+          {/* Mobile / touch: full label. md+: only "Free"; on card hover swap to full label. */}
+          <span className="block whitespace-nowrap px-3 py-1.5 md:hidden">{isFreeGiftProduct ? "Free Gift" : bogo.label}</span>
           <div className="hidden md:block">
             <span className="block whitespace-nowrap px-3 py-1.5 font-semibold group-hover:hidden">
               Free
             </span>
             <span className="hidden max-w-[min(16rem,calc(100vw-3rem))] whitespace-nowrap px-3 py-1.5 group-hover:block">
-              {bogo.label}
+              {isFreeGiftProduct ? "Free Gift" : bogo.label}
             </span>
           </div>
         </div>
