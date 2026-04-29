@@ -324,7 +324,7 @@ const ProductCard: FC<ProductCardProps> = ({
       data-nc-id="ProductCard"
     >
       {/* Sale Badge - Outside image container */}
-      {stockStatus === "IN_STOCK" && (
+	      {stockStatus === "IN_STOCK" && !bogo?.isBogoEnabled && (
         (() => {
 
           if ((parsePrice(salePrice) > 0 && parsePrice(regularPrice) > 0) && parsePrice(salePrice) < parsePrice(regularPrice)) {
@@ -348,21 +348,17 @@ const ProductCard: FC<ProductCardProps> = ({
       )}
 
       {/* Clearance fire tag - icon only by default, text reveals on card hover */}
-      {isClearanceProduct() && (
+      {/* {isClearanceProduct() && (
         <div className="absolute left-0 top-12 z-10 flex items-center gap-1 bg-orange-500 w-fit font-normal text-xs text-white py-1.5 px-3 rounded-r-full shadow-md md:pl-2 md:pr-2 md:group-hover:pr-3 transition-all duration-200">
           <Flame className="w-3.5 h-3.5 flex-shrink-0 hidden md:block" />
           <span className="whitespace-nowrap md:max-w-0 md:overflow-hidden md:opacity-0 md:transition-all md:duration-200 md:group-hover:max-w-[100px] md:group-hover:opacity-100">
             Clearance
           </span>
         </div>
-      )}
+      )} */}
 
       {bogo.isBogoEnabled && (
-        <div
-          className={`absolute left-0 z-10 w-fit cursor-default rounded-r-full bg-green-600 text-xs font-normal text-white shadow-md ${
-            isClearanceProduct() ? "top-20" : "top-12"
-          }`}
-        >
+        <div className="absolute left-0 top-4 z-10 w-fit cursor-default rounded-r-full bg-green-600 text-xs font-normal text-white shadow-md">
           {/* Mobile / touch: full label. md+: only "Free"; on card hover swap to full BOGO text. */}
           <span className="block whitespace-nowrap px-3 py-1.5 md:hidden">{bogo.label}</span>
           <div className="hidden md:block">
