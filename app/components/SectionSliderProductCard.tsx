@@ -1,5 +1,6 @@
 "use client";
 import React, { FC, useEffect, useState, useCallback, useRef } from "react";
+import Link from "next/link";
 import Heading from "@/app/components/Heading/Heading";
 import ProductCard from "@/app/components/ProductCard3";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
@@ -34,6 +35,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
   products = [],
   link,
 }) => {
+  const isExternalLink = Boolean(link && /^https?:\/\//.test(link));
   const [mounted, setMounted] = useState(false);
   const [showSkeleton, setShowSkeleton] = useState(true);
   const [api, setApi] = useState<CarouselApi>();
@@ -173,14 +175,23 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
             {/* See More button at the bottom */}
             {link && (
               <div className="flex justify-center mt-6">
-                <a
-                  href={link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-700 bg-white rounded-full shadow-lg hover:shadow-md transition-all duration-200"
-                >
-                  See More
-                </a>
+                {isExternalLink ? (
+                  <a
+                    href={link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-700 bg-white rounded-full shadow-lg hover:shadow-md transition-all duration-200"
+                  >
+                    See More
+                  </a>
+                ) : (
+                  <Link
+                    href={link}
+                    className="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-700 bg-white rounded-full shadow-lg hover:shadow-md transition-all duration-200"
+                  >
+                    See More
+                  </Link>
+                )}
               </div>
             )}
           </div>

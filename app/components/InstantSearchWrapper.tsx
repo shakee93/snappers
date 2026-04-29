@@ -58,6 +58,7 @@ interface InstantSearchWrapperProps {
   searchQueryValue?: string;
   dealsType?: ("clearance" | "offers")[];
   dealTags?: string[];
+  desktopColumns?: 4 | 5;
 }
 
 const typesenseConfig = {
@@ -106,6 +107,7 @@ const InstantSearchWrapper = ({
   searchQueryValue,
   dealsType,
   dealTags,
+  desktopColumns = 4,
 }: InstantSearchWrapperProps) => {
   const { sidebar, setSearchMounted, isTyping } = useStore();
   const [differedSidebar] = useDebounce(sidebar, 800);
@@ -381,7 +383,7 @@ const InstantSearchWrapper = ({
           </div>
           <div className='grid grid-cols-12 gap-4'>
 
-            <div className='col-span-0 lg:col-span-3'>
+            <div className={filters ? 'col-span-0 lg:col-span-3' : 'hidden'}>
               {typeof window !== 'undefined' && (
                 <DelayedRender delay={5000}>
                   <SortInput />
@@ -399,8 +401,12 @@ const InstantSearchWrapper = ({
               )}
             </div>
 
-            <div className='col-span-12 lg:col-span-9'>
-              <ProductGridInstant hitsPerPage={hitsPerPage} setHitsPerPage={setHitsPerPage} />
+            <div className={filters ? 'col-span-12 lg:col-span-9' : 'col-span-12'}>
+              <ProductGridInstant
+                hitsPerPage={hitsPerPage}
+                setHitsPerPage={setHitsPerPage}
+                desktopColumns={desktopColumns}
+              />
             </div>
 
           </div>

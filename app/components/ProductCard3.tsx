@@ -358,7 +358,11 @@ const ProductCard: FC<ProductCardProps> = ({
       )} */}
 
       {bogo.isBogoEnabled && (
-        <div className="absolute left-0 top-4 z-10 w-fit cursor-default rounded-r-full bg-green-600 text-xs font-normal text-white shadow-md">
+        <div
+          className={`absolute left-0 z-10 w-fit cursor-default rounded-r-full bg-green-600 text-xs font-normal text-white shadow-md ${
+            stockStatus === "IN_STOCK" ? "top-4" : "top-12"
+          }`}
+        >
           {/* Mobile / touch: full label. md+: only "Free"; on card hover swap to full BOGO text. */}
           <span className="block whitespace-nowrap px-3 py-1.5 md:hidden">{bogo.label}</span>
           <div className="hidden md:block">

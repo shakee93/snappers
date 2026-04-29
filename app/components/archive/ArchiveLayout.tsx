@@ -64,6 +64,8 @@ interface ArchiveLayoutProps {
   topLinks?: { href: string; label: string; active?: boolean }[];
   dealsType?: ("clearance" | "offers")[];
   dealTags?: string[];
+  desktopColumns?: 4 | 5;
+  compactContent?: boolean;
 }
 
 const ArchiveLayout = async ({
@@ -80,6 +82,8 @@ const ArchiveLayout = async ({
   topLinks,
   dealsType,
   dealTags,
+  desktopColumns,
+  compactContent = false,
 }: ArchiveLayoutProps) => {
 
   const { productCategories, brands, nestedCategories, tagDetails } = await getData(category?.databaseId ?? '', tag);
@@ -90,8 +94,8 @@ const ArchiveLayout = async ({
   // console.log('descriptoin', description);
 
   return (
-    <div className="container py-8 lg:py-12 space-y-16 sm:space-y-20 lg:space-y-28">
-      <div className="space-y-4 lg:space-y-6">
+    <div className="container py-8 lg:py-12">
+      <div className={compactContent ? "space-y-3 lg:space-y-4" : "space-y-4 lg:space-y-6"}>
         <div className="max-w-screen-sm">
           <h1 className="block capitalize text-2xl sm:text-3xl lg:text-4xl font-semibold">
             {headingOverride || (tagDetails.length > 0 ? tagDetails[0].name : title)}
@@ -132,7 +136,7 @@ const ArchiveLayout = async ({
           ))}
         </div>
 
-        <hr className="border-slate-200 dark:border-slate-700 " />
+        {!compactContent && <hr className="border-slate-200 dark:border-slate-700 " />}
 
         <main>
           <div className="flex flex-col lg:flex-row">
@@ -152,6 +156,7 @@ const ArchiveLayout = async ({
                 routing={true}
                 dealsType={dealsType}
                 dealTags={dealTags}
+                desktopColumns={desktopColumns}
               />
             </div>
           </div>

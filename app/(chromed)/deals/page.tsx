@@ -1,45 +1,88 @@
-import ArchiveLayout from "@/app/components/archive/ArchiveLayout";
+import SectionSliderProductCard from "@/app/components/SectionSliderProductCard";
+import { getClient } from "@/graphql/apollo-ssr";
+import { GET_PRODUCTS_BY_BOGO_TAG } from "@/graphql/defs/products";
+import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import { Metadata } from "next";
-
-const DEAL_FILTERS = {
-  clearance: "clearance",
-  offers: "bogo-offer",
-} as const;
-
-type DealsFilterKey = keyof typeof DEAL_FILTERS;
 
 export const metadata: Metadata = {
   title: "Deals",
-  description: "Browse clearance deals and BOGO free offers at GQ Mobiles.",
+  description:
+    "Browse Up to 75% off, Buy One Get One, and Free Gift deals at GQ Mobiles.",
 };
 
-export default async function DealsPage(props: {
-  searchParams: Promise<{ filter?: string | string[] }>;
-}) {
-  const searchParams = await props.searchParams;
-  const rawFilter = searchParams.filter;
-  const rawValues = Array.isArray(rawFilter)
-    ? rawFilter
-    : typeof rawFilter === "string"
-    ? rawFilter.split(",")
-    : [];
+const getDealsData = async () => {
+  const [clearance, bogo, freeGift] = await Promise.all([
+    getClient()
+      .query({
+        query: GET_PRODUCTS_BY_BOGO_TAG,
+        variables: { first: 20, tagIn: ["clearance"] },
+      })
+      .then((res) => res.data?.products?.nodes || [])
+      .catch(() => []),
+    getClient()
+      .query({
+        query: GET_PRODUCTS_BY_BOGO_TAG,
+        variables: { first: 20, tagIn: ["bogo-offer"] },
+      })
+      .then((res) => res.data?.products?.nodes || [])
+      .catch(() => []),
+    getClient()
+      .query({
+        query: GET_PRODUCTS_BY_BOGO_TAG,
+        variables: { first: 20, tagIn: ["free-gift", "gift", "bogo-offer"] },
+      })
+      .then((res) => res.data?.products?.nodes || [])
+      .catch(() => []),
+  ]);
 
-  const selectedTypes = (rawValues
-    .map((v) => v.trim())
-    .filter((v): v is DealsFilterKey => v === "clearance" || v === "offers")) as DealsFilterKey[];
+  const prioritizeInStock = (items: (SimpleProduct & VariableProduct)[]) => {
+    const inStock = items.filter((p) => p.stockStatus === "IN_STOCK");
+    const soldOut = items.filter((p) => p.stockStatus !== "IN_STOCK");
+    return [...inStock, ...soldOut];
+  };
 
-  const uniqueSelectedTypes = Array.from(new Set(selectedTypes));
-  const effectiveTypes = uniqueSelectedTypes.length > 0 ? uniqueSelectedTypes : (["clearance"] as DealsFilterKey[]);
-  const dealTags = effectiveTypes.map((key) => DEAL_FILTERS[key]);
+  return {
+    clearance: prioritizeInStock(clearance as (SimpleProduct & VariableProduct)[]),
+    bogo: prioritizeInStock(bogo as (SimpleProduct & VariableProduct)[]),
+    freeGift: prioritizeInStock(freeGift as (SimpleProduct & VariableProduct)[]),
+  };
+};
+
+export default async function DealsPage() {
+  const { clearance, bogo, freeGift } = await getDealsData();
 
   return (
-    <ArchiveLayout
-      title="Deals"
-      headingOverride="Deals"
-      descriptionOverride="Explore clearance products and free offers in one place."
-      filters
-      dealsType={effectiveTypes}
-      dealTags={dealTags}
-    />
+    <main>
+      <div className="nc-PageHome relative flex flex-col overflow-hidden">
+        <div className="flex flex-col px-3 gap-8 lg:gap-10 sm:container sm:max-w-screen-2xl py-8 lg:py-12">
+          <div className="max-w-screen-md">
+            <h1 className="block capitalize text-2xl sm:text-3xl lg:text-4xl font-semibold">
+              Deals
+            </h1>
+            <span className="block mt-2 lg:mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
+              Explore the best savings, BOGO offers, and free gift promotions in one place.
+            </span>
+          </div>
+
+          <SectionSliderProductCard
+            products={clearance}
+            heading="Up to 75% off"
+            link="/tag/clearance"
+          />
+
+          <SectionSliderProductCard
+            products={bogo}
+            heading="Buy One Get One"
+            link="/tag/bogo-offer"
+          />
+
+          <SectionSliderProductCard
+            products={freeGift}
+            heading="Free Gift"
+            link="/tag/free-gift"
+          />
+        </div>
+      </div>
+    </main>
   );
 }
