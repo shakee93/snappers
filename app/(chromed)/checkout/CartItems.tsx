@@ -4,7 +4,6 @@ import NcInputNumber from "components/NcInputNumber";
 import LineOrCartPriceLabel from "@/app/components/LineOrCartPriceLabel";
 import { Fragment } from "react";
 import AttributeIcon from "@/app/components/AttributeIcon";
-import { VariableProduct, PaCapacity } from "@/graphql/types/graphql";
 import { isLineItemFree } from "@/lib/cartLinePricing";
 
 export interface CartItem {
@@ -98,20 +97,7 @@ const cartItems = ({
                                 className="w-4"
                               />{" "}
                               <span key={attr?.value}>
-
-                                {/* {attr?.label}: */}
-                                {attr?.value}
-                                {" "}
-                                {
-                                  (product.node as unknown as VariableProduct)[
-                                    `allPa${attr?.label as unknown as "Capacity"
-                                    }`
-                                  ]?.nodes.find(
-                                    (node: PaCapacity) =>
-                                      node.slug === attr?.value
-                                  )?.name
-                                }
-
+                                {attr?.displayValue || attr?.value}
                               </span>
                             </div>
                           </Fragment>
