@@ -34,6 +34,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
   products = [],
   link,
 }) => {
+  const HIDDEN_PRODUCT_SLUGS = new Set(["demo"]);
   const [mounted, setMounted] = useState(false);
   const [showSkeleton, setShowSkeleton] = useState(true);
   const [api, setApi] = useState<CarouselApi>();
@@ -86,25 +87,30 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
     };
   }, [api, mounted]);
 
-  const filteredProducts = products.filter((product) => {
-    if (product?.price || product?.regularPrice || product?.salePrice) {
-      return true;
-    }
+  const filteredProducts = products
+    .filter((product) => {
+      const slug = String(product?.slug || "").toLowerCase();
+      return !HIDDEN_PRODUCT_SLUGS.has(slug);
+    })
+    .filter((product) => {
+      if (product?.price || product?.regularPrice || product?.salePrice) {
+        return true;
+      }
 
-    const variationNodes = (product?.variations as {
-      nodes?: Array<{
-        price?: string | null;
-        regularPrice?: string | null;
-        salePrice?: string | null;
-      }>;
-    } | null)?.nodes;
+      const variationNodes = (product?.variations as {
+        nodes?: Array<{
+          price?: string | null;
+          regularPrice?: string | null;
+          salePrice?: string | null;
+        }>;
+      } | null)?.nodes;
 
-    return (
-      variationNodes?.some(
-        (variation) => variation?.price || variation?.regularPrice || variation?.salePrice
-      ) ?? false
-    );
-  });
+      return (
+        variationNodes?.some(
+          (variation) => variation?.price || variation?.regularPrice || variation?.salePrice
+        ) ?? false
+      );
+    });
 
   if (!filteredProducts.length) {
     return null;

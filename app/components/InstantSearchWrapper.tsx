@@ -67,6 +67,8 @@ const typesenseConfig = {
   protocol: process.env.NEXT_PUBLIC_TYPESENSE_PROTOCOL || "https",
 };
 
+const HIDDEN_PRODUCT_SLUGS = ["demo"];
+
 
 const typesenseInstantSearchAdapter = new TypesenseInstantSearchAdapter({
   server: {
@@ -161,6 +163,7 @@ const InstantSearchWrapper = ({
 
   const getFilterQuery: () => string = () => {
     const f = [
+      `slug:!=${HIDDEN_PRODUCT_SLUGS.join(" && slug:!=")}`,
       effective.priceRange.join("") !== PRICE_RANGE.join("")
         ? `rawPrice:[${effective.priceRange[0]}..${effective.priceRange[1]}]`
         : null,

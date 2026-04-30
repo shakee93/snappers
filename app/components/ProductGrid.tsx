@@ -13,6 +13,7 @@ interface ProductGridProps {
 }
 
 const ProductGrid = ({ products, brand, category }: ProductGridProps) => {
+    const HIDDEN_PRODUCT_SLUGS = new Set(["demo"]);
 
     const { sidebar: { categories, brands, mounted } } = useStore();
     const [_products, setProducts] = useState<{ node: Product }[]>(products);
@@ -53,9 +54,12 @@ const ProductGrid = ({ products, brand, category }: ProductGridProps) => {
         <div>loading...</div>
     ) : (
         <div className="flex-1 grid  sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10">
-            {_products.map((item, index: number) =>
-                <ProductCard key={item.node.slug} data={item.node} />
-            )}
+            {_products
+                .filter((item) => {
+                    const slug = String(item?.node?.slug || "").toLowerCase();
+                    return !HIDDEN_PRODUCT_SLUGS.has(slug);
+                })
+                .map((item) => <ProductCard key={item.node.slug} data={item.node} />)}
         </div>
     );
 };
