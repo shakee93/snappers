@@ -1318,9 +1318,9 @@ const CheckoutPage = () => {
 
                 {catalogSavings > 0 && (
                   <div className="flex justify-between items-center">
-                    <span className="text-slate-600 dark:text-slate-400">Promotion</span>
+                    <span className="text-slate-600 dark:text-slate-400">Promotion <span className="text-xs font-semibold text-[#059669] ">(You saved)</span></span>
                     <span className="inline-flex items-center rounded-md bg-red-500 px-2 py-0.5 text-xs font-semibold text-white">
-                      − {formatRs(catalogSavings)}
+                      -{formatRs(catalogSavings)}
                     </span>
                   </div>
                 )}
