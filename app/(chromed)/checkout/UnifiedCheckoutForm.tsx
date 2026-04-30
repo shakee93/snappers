@@ -517,7 +517,7 @@ const UnifiedCheckoutForm = ({
             case "cod":
                 return {
                     title: gateway.title || "Cash on delivery: Powered by Prompt Express",
-                    subtitle: "Pay with cash when your order arrives",
+                    subtitle: "Powered by Prompt Express",
                     icon: (
                         <div className="w-8 h-5 flex items-center justify-center">
                             <Image src="/prompt_express.png" alt="Prompt Express" width={40} height={20} />
