@@ -162,9 +162,11 @@ const Page = async (props: Props) => {
                 <ProductImage product={product} />
               </Suspense>
               <FreeGiftPreview product={product} />
-              <div className="hidden lg:block w-full mt-6">
-                <Features />
-              </div>
+              {product.price && (
+                <div className="hidden lg:block w-full mt-6">
+                  <Features />
+                </div>
+              )}
             </div>
             <div className="md:w-6/12 flex flex-col p-2 gap-y-1 md:gap-y-1.5">
               <ProductDetails brand={brand} product={product} />
@@ -174,9 +176,11 @@ const Page = async (props: Props) => {
         <HappiestCustomersGallery images={happiestCustomersImages} />
         {/* Image Gallery */}
         <ProductOverview product={product} />
-        <div className=" lg:hidden w-full lg:w-1/5 p-3 bg-white rounded-3xl my-5">
-          <Features />
-        </div>
+        {product.price && (
+          <div className=" lg:hidden w-full lg:w-1/5 p-3 bg-white rounded-3xl my-5">
+            <Features />
+          </div>
+        )}
 
         <div className="mt-5 md:mt-10">
           <UpsellProducts newArrivals={upsellProductsFromData} />
