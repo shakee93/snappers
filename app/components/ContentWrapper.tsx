@@ -12,7 +12,7 @@ export default function ContentWrapper({ children }: ContentWrapperProps) {
   const isCheckout = pathname?.startsWith("/checkout");
 
   return (
-    <div className={isCheckoutPage ? "" : ""}>
+    <div className={isCheckout ? "" : ""}>
       {children}
     </div>
   );
