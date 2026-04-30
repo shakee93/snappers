@@ -1,9 +1,11 @@
 import nextCoreWebVitals from "eslint-config-next/core-web-vitals";
+import reactHooks from "eslint-plugin-react-hooks";
 
 export default [
   {
     ignores: [
       ".next/**",
+      ".vercel/**",
       "node_modules/**",
       "out/**",
       "build/**",
@@ -14,6 +16,9 @@ export default [
   },
   ...nextCoreWebVitals,
   {
+    plugins: {
+      "react-hooks": reactHooks,
+    },
     rules: {
       "react-hooks/set-state-in-effect": "warn",
       "react-hooks/purity": "warn",

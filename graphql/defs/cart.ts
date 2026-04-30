@@ -1,5 +1,5 @@
 import { gql } from '@apollo/client';
-import { CartContent, CartItemContent } from "@/graphql/defs/cart.fragments";
+import { CartContent, CartContentSlim, CartItemContent } from "@/graphql/defs/cart.fragments";
 import {CustomerFragment} from "@/graphql/defs/auth.fragments";
 
 
@@ -9,15 +9,14 @@ export const ADD_TO_CART = gql`
             input: {productId: $productId, variationId: $variationId, quantity: $quantity, extraData: $extraData}
         ) {
             cart {
-                ...CartContent
+                ...CartContentSlim
             }
             cartItem {
                 ...CartItemContent
             }
-           
         }
     }
-    ${CartContent}
+    ${CartContentSlim}
     ${CartItemContent}
 `;
 

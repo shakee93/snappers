@@ -1,10 +1,7 @@
 import {
   CartItem,
-  PaCapacity,
-  Product,
   SimpleProduct,
   VariableProduct,
-  VariationAttribute,
 } from "@/graphql/types/graphql";
 import Image from "next/image";
 import Link from "next/link";
@@ -73,7 +70,7 @@ const CartItemProduct = ({
                 <div className="mt-1.5 flex text-sm text-slate-600 sm:mt-2.5 dark:text-slate-300">
                   {type === "VARIABLE" && (
                     <div className="my-1 text-sm text-slate-500 dark:text-slate-400">
-                      {variation?.attributes?.map((attr, index) => (
+                      {variation?.attributes?.map((attr: any, index: number) => (
                         <Fragment key={index}>
                           <div className="flex items-center gap-1">
                             <AttributeIcon
@@ -81,16 +78,7 @@ const CartItemProduct = ({
                               className="w-4"
                             />{" "}
                             <span key={attr?.value}>
-                              {" "}
-                              {
-                                (product.node as unknown as VariableProduct)[
-                                  `allPa${attr?.label as unknown as "Capacity"}`
-                                ]?.nodes.find(
-                                  (node: PaCapacity) =>
-                                    node.slug === attr?.value,
-                                )?.name || 
-                                type === "VARIABLE" && variation ? attr?.value : ""
-                              }
+                              {attr?.displayValue || attr?.value}
                             </span>
                           </div>
                         </Fragment>

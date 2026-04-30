@@ -41,3 +41,6 @@ next-env.d.ts
 typesense-data
 
 .env*.prod
+
+# claude code — project-local skills (may contain secrets)
+.claude/skills/

@@ -1,6 +1,5 @@
 import {
   CartItem,
-  PaCapacity,
   SimpleProduct,
   VariableProduct,
 } from "@/graphql/types/graphql";
@@ -35,13 +34,8 @@ const CartDropdownItem = ({ item, close }: CartDropdownItemProps) => {
     name,
     image,
     price,
-    slug,
-    salePrice,
     type,
-    stockQuantity,
-    variations,
     regularPrice,
-    brands,
   }: SimpleProduct & VariableProduct = product?.node;
 
   const link = useProductLink(product?.node);
@@ -121,15 +115,7 @@ const CartDropdownItem = ({ item, close }: CartDropdownItemProps) => {
                                 className="w-4"
                               />{" "}
                               <span key={attr?.value}>
-                                {attr?.value}{" "}
-                                {
-                                  (product.node as unknown as VariableProduct)[
-                                    `allPa${attr?.label as unknown as "Capacity"}`
-                                  ]?.nodes.find(
-                                    (node: PaCapacity) =>
-                                      node.slug === attr?.value
-                                  )?.name
-                                }
+                                {attr?.displayValue || attr?.value}
                               </span>
                             </div>
                           </Fragment>
