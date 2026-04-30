@@ -14,6 +14,7 @@ const WhatsappLogoComponent = () => {
   const { navigation } = useStore()
 
   const params = useParams()
+  const pathname = usePathname()
 
   const isProduct = useMemo(() => {
 
@@ -38,6 +39,10 @@ const WhatsappLogoComponent = () => {
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  if (pathname?.startsWith("/checkout")) {
+    return null;
+  }
 
   return (
     <div className={twMerge(

@@ -13,6 +13,7 @@ export interface ButtonProps {
   loading?: boolean;
   disabled?: boolean;
   type?: ButtonHTMLAttributes<HTMLButtonElement>["type"];
+  form?: ButtonHTMLAttributes<HTMLButtonElement>["form"];
   // href?: keyof LocationStates | "#" | LinkProps["to"];
   href?: keyof LocationStates;
   targetBlank?: boolean;
@@ -30,6 +31,7 @@ const Button: FC<ButtonProps> = ({
   children,
   targetBlank,
   type,
+  form,
   loading,
   onClick = () => {},
 }) => {
@@ -82,6 +84,7 @@ const Button: FC<ButtonProps> = ({
       className={`${CLASSES}`}
       onClick={onClick}
       type={type}
+      form={form}
     >
       {loading && _renderLoading()}
       {children || `This is Button`}

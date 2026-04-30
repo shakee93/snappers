@@ -1,10 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { FetchResult, useMutation, useQuery } from "@apollo/client";
-import ButtonPrimary from "shared/Button/ButtonPrimary";
-import Checkbox from "@/shared/Checkbox/Checkbox";
 import Input from "shared/Input/Input";
 import Label from "components/Label/Label";
 import Link from "next/link";
@@ -27,7 +25,9 @@ import {
 } from "@/graphql/types/graphql";
 import koko from "@/public/koko.png";
 import CheckoutDetails from "./CheckoutDetails";
-import CartItems from "./CartItems";
+import { CheckoutSubmitPayload, DeliveryType } from "./UnifiedCheckoutForm";
+import CartItems, { CartItem } from "./CartItems";
+import { OrderSummarySkeleton } from "./CheckoutSkeletons";
 import { toast } from "sonner";
 import { PayhereStatus, PaymentDetailsWithoutUrls } from "@/data/types";
 import Script from "next/script";
@@ -45,7 +45,6 @@ import {
 import { useStats } from "react-instantsearch";
 import { Metadata } from "next/types";
 import Image from "next/image";
-import PreOrderNotice from "@/components/PreOrderNotice";
 interface FormData {
   contactInfo: Record<string, any>;
   deliveryAddress: any;
@@ -59,18 +58,11 @@ interface FormData {
 }
 
 const CheckoutPage = () => {
-  const { cart, removeFromCart, updateCart, clearCart, refreshCart } = useCart();
+  const { cart, removeFromCart, updateCart, clearCart, refreshCart, loading: cartLoading } = useCart();
   const [finalOrderTotal, setFinalOrderTotal] = useState(null);
   const { customer, fetchCustomer } = useSession();
 
   const { paymentGateways } = usePaymentGateways();
-  const [tabActive, setTabActive] = useState<
-    | "ContactInfo"
-    | "DeliveryAddress"
-    | "BillingAddress"
-    | "PaymentMethod"
-    | "order-cart"
-  >("ContactInfo");
 
   const [formData, setFormData] = useState<FormData>({
     contactInfo: {},
@@ -86,15 +78,10 @@ const CheckoutPage = () => {
   const [payhereHandleStatus, setPayhereHandleStatus] =
     useState<PayhereStatus>("idle");
 
-  const [isStorePickup, setIsStorePickup] = useState(false);
+  const [deliveryType, setDeliveryType] = useState<DeliveryType | null>(null);
+  const noShipping = deliveryType === "store_pickup" || deliveryType === "flash_delivery";
   const [isCardPayment, setIsCardPayment] = useState(false);
   const [isKokoPayment, setIsKokoPayment] = useState(false);
-  const [isConfirmed, setIsConfirmed] = useState({
-    contactInfo: false,
-    deliveryAddress: false,
-    paymentMethod: false,
-    billingAddress: false,
-  });
 
   const [shippingTotal, setShippingTotal] = useState();
   const [orderTotal, setOrderTotal] = useState<string | null>(null);
@@ -104,7 +91,7 @@ const CheckoutPage = () => {
   const [totalWithTax, setTotalWithTax] = useState<string | null>();
   const [isTOC, setTOC] = useState<boolean>(false);
   const [freeShipping, setFreeShipping] = useState<boolean>(false);
-  const [confirmOrderErrors, setConfirmOrderErrors] = useState<string[]>([]);
+  const [tocError, setTocError] = useState(false);
   const [guestCheckoutData, setGuestCheckoutData] = useState<any>();
   const [isConfirmingOrder, setIsConfirmingOrder] = useState(false);
   const [htmlFormResponse, setHtmlFormResponse] = useState<string | null>(null);
@@ -118,11 +105,11 @@ const CheckoutPage = () => {
   const [removeCouponsMutation, { loading: removingCoupon }] = useMutation(REMOVE_COUPONS);
 
   const handleTOC = () => {
-    // Toggle the state and get the updated value
     const updatedTOC = !isTOC;
     setTOC(updatedTOC);
-
-    // Log the updated value
+    if (updatedTOC) {
+      setTocError(false);
+    }
   };
   // TODO: Uncomment this for the redirect on cart free
   useEffect(() => {
@@ -153,7 +140,7 @@ const CheckoutPage = () => {
   }, []);
 
   // MUTATIONS
-  const [updateCartShippingTotalMutation] = useMutation(UPDATE_SHIPPING_TOTAL);
+  const [updateCartShippingTotalMutation, { loading: shippingUpdating }] = useMutation(UPDATE_SHIPPING_TOTAL);
   const [
     checkoutMutation,
     {
@@ -213,14 +200,12 @@ const CheckoutPage = () => {
     });
   };
 
-  const handleConfirmationChange = (component: string, value: boolean) => {
-    setIsConfirmed((prevConfirmed) => {
-      return {
-        ...prevConfirmed,
-        [component]: value,
-      };
-    });
-  };
+  // AbortController for in-flight updateShippingMethod calls. If the user
+  // toggles delivery method rapidly, an older call's response can land
+  // after a newer one and overwrite local state with the wrong numbers.
+  // We abort the previous call before starting a new one and bail on any
+  // stale response that does come back.
+  const shippingAbortRef = useRef<AbortController | null>(null);
 
   const updateShippingTotal = async () => {
     const hasFreeShipping: any = cart?.appliedCoupons?.some(
@@ -230,12 +215,23 @@ const CheckoutPage = () => {
       setFreeShipping(true);
     }
 
+    shippingAbortRef.current?.abort();
+    const controller = new AbortController();
+    shippingAbortRef.current = controller;
+
     try {
-      const shippingMethods = isStorePickup
-        ? "pickup_location:0"
-        : freeShipping
-          ? "wbs:5c9bd062_free_shipping"
-          : "wbs:0dd3bc79_weight_based_shipping";
+      // Mirror the mapping in getShippingMethod: store_pickup uses the
+      // block-based pickup_location, flash_delivery uses the zone-bound
+      // flat_rate:4 (free, configured backend-side as "Flash Delivery
+      // (Uber/PickMe)").
+      const shippingMethods =
+        deliveryType === "flash_delivery"
+          ? "flat_rate:4"
+          : deliveryType === "store_pickup"
+            ? "pickup_location:0"
+            : freeShipping
+              ? "wbs:5c9bd062_free_shipping"
+              : "wbs:0dd3bc79_weight_based_shipping";
 
       const total: any = cart?.total;
       setOrderTotal(freeShipping ? cart?.subtotal : total);
@@ -243,7 +239,7 @@ const CheckoutPage = () => {
       if (customer?.id === "guest") {
         const subtotal: any = cart?.subtotal;
 
-        if (isStorePickup || freeShipping) {
+        if (noShipping || freeShipping) {
           setOrderTotal(subtotal);
         } else {
           setOrderTotal(total);
@@ -252,7 +248,11 @@ const CheckoutPage = () => {
 
       const { data, errors } = await updateCartShippingTotalMutation({
         variables: { input: { shippingMethods } },
+        context: { fetchOptions: { signal: controller.signal } },
       });
+
+      // Stale response — a newer call has been started since we fired this one.
+      if (controller.signal.aborted) return;
 
       if (errors) {
         console.error("Error updating cart shipping total:", errors);
@@ -275,13 +275,30 @@ const CheckoutPage = () => {
         );
       }
     } catch (error) {
+      // AbortError is expected when superseded — don't log as an error.
+      if (controller.signal.aborted) return;
+      const name = (error as { name?: string })?.name;
+      if (name === "AbortError") return;
       console.error("An error occurred while updating shipping total:", error);
     }
   };
 
   useEffect(() => {
+    // Skip until the cart has actually loaded. Firing the WBS mutation
+    // against an empty/unready cart on first paint produces a hung/error
+    // state that froze the page on the first add-to-cart → /checkout flow.
+    if (!cart?.contents?.itemCount) return;
     updateShippingTotal().then((r) => r);
-  }, [isStorePickup, updateCartShippingTotalMutation, freeShipping]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally omit the unstable mutation fn ref
+  }, [deliveryType, freeShipping, cart?.contents?.itemCount]);
+
+  // Abort any pending shipping-update on unmount so we don't write to
+  // unmounted-component state.
+  useEffect(() => {
+    return () => {
+      shippingAbortRef.current?.abort();
+    };
+  }, []);
 
   const paymentDetails = useMemo(() => {
     return paymentData;
@@ -352,50 +369,37 @@ const CheckoutPage = () => {
     }
   }, [paymentData]);
 
-  const handleCheckoutProcess = async () => {
-    let errors = [];
-    if (!isConfirmed.contactInfo) {
-      errors.push("Contact info is missing.");
-    }
-    if (!isConfirmed.deliveryAddress) {
-      errors.push("Delivery address is missing.");
-    }
-    if (!isConfirmed.billingAddress) {
-      errors.push("Billing address is missing.");
-    }
-    if (!isConfirmed.paymentMethod) {
-      errors.push("Payment method is missing.");
-    }
+  const submitCheckout = async (data: CheckoutSubmitPayload) => {
     if (!isTOC) {
-      errors.push("Terms and conditions are not accepted.");
-    }
-    if (errors.length > 0) {
-      setConfirmOrderErrors(errors);
+      setTocError(true);
+      const el = document.getElementById("toc-section");
+      el?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
+    setTocError(false);
 
-    const isBankTransfer =
-      formData?.paymentMethod?.selectedGateway?.id == "bacs";
-    const isPayhere = formData?.paymentMethod?.selectedGateway?.id == "payhere";
-    const isCashOnDelivery =
-      formData?.paymentMethod?.selectedGateway?.id == "cod";
-    const isKokoPayment =
-      formData?.paymentMethod?.selectedGateway?.id == "darazbnpl";
-    const isGeniePayment =
-      formData?.paymentMethod?.selectedGateway?.id == "geniebiz";
-    const isNdbPay =
-      formData?.paymentMethod?.selectedGateway?.id == "ndb-pay";
+    // Sync form state for downstream effects (e.g. paymentData → COD redirect)
+    updateFormData("contactInfo", data.contactInfo);
+    updateFormData("deliveryAddress", data.deliveryAddress);
+    updateFormData("billingAddress", data.billingAddress);
+    updateFormData("paymentMethod", data.paymentMethod);
+
+    await handleCheckoutProcess(data);
+  };
+
+  const handleCheckoutProcess = async (data: CheckoutSubmitPayload) => {
+    const gatewayId = data.paymentMethod.selectedGateway.id;
+    const isBankTransfer = gatewayId === "bacs";
 
     if (isBankTransfer) {
-      const bankSlipFile = formData?.paymentMethod?.bankSlipFile;
+      const bankSlipFile = data.paymentMethod.bankSlipFile;
       if (!bankSlipFile) {
         toast.error("Please upload your bank slip before confirming the order.");
-        setConfirmOrderErrors(["Bank slip upload is required for Bank Transfer."]);
         return;
       }
 
       try {
-        const checkoutResult = await handleCheckout();
+        const checkoutResult = await handleCheckout(data);
         if (checkoutResult && checkoutResult.order_id) {
           await uploadBankSlip(bankSlipFile, checkoutResult);
         }
@@ -406,73 +410,71 @@ const CheckoutPage = () => {
       }
       return;
     }
-    if (isGeniePayment) {
-      await handleCheckout();
-      return;
-    }
 
-    if (isPayhere) {
-      await handleCheckout();
-      return;
-    }
-
-    if (isNdbPay) {
-      await handleCheckout();
-      return;
-    }
-
-    if (isCashOnDelivery || isKokoPayment) {
-      await handleCheckout();
-    }
+    await handleCheckout(data);
   };
 
-  const handleCheckout = async () => {
+  const handleCheckout = async (data: CheckoutSubmitPayload) => {
     setLoading(true);
 
     try {
-      const isPayhere =
-        formData?.paymentMethod?.selectedGateway?.id == "payhere";
+      const gatewayId = data.paymentMethod.selectedGateway.id;
+      const isPayhere = gatewayId === "payhere";
+      const paymentMethodId = gatewayId;
+      const orderDeliveryType = data.deliveryType;
+      const isStorePickupOrder = orderDeliveryType === "store_pickup";
+      const isFlashDeliveryOrder = orderDeliveryType === "flash_delivery";
+      const contactEmail = data.contactInfo.email;
+      const contactPhone = data.contactInfo.phone;
 
-      const paymentMethodId = formData?.paymentMethod?.selectedGateway?.id;
-
-      if (paymentMethodId === undefined || paymentMethodId === null || paymentMethodId === "") {
+      if (!paymentMethodId) {
         console.error("Payment method ID is missing");
         toast.error("Payment Method was not chosen.");
         return null;
       }
 
-      formData.billingAddress.country = "LK";
-      formData.deliveryAddress.country = "LK";
-
-      const shippingMethod = getShippingMethod(shippingTotal);
-      const shippingDetails = isStorePickup
-        ? {
-          ...transformAddress(formData.deliveryAddress),
-          address1: "Store Pickup",
-          address2: "",
-          city: "Store Pickup",
-          state: "",
-          postcode: "",
-        }
-        : transformAddress(formData.deliveryAddress);
-
-      const email = formData?.contactInfo?.email;
-
-      const billingDetails = {
-        ...transformAddress(formData.billingAddress),
-        email: formData?.contactInfo?.email,
-        phone: formData?.contactInfo?.phone,
+      const shippingMethod = getShippingMethod(shippingTotal, orderDeliveryType);
+      const storePickupAddressOverride = {
+        address1: "Store Pickup",
+        address2: "",
+        city: "Store Pickup",
+        state: "",
+        postcode: "",
+        country: "LK",
       };
 
+      const shippingDetails = isStorePickupOrder
+        ? {
+          ...transformAddress(data.deliveryAddress),
+          ...storePickupAddressOverride,
+        }
+        : transformAddress(data.deliveryAddress);
+
+      const billingDetails = isStorePickupOrder
+        ? {
+          ...transformAddress(data.billingAddress),
+          ...storePickupAddressOverride,
+          email: contactEmail,
+          phone: contactPhone,
+        }
+        : {
+          ...transformAddress(data.billingAddress),
+          email: contactEmail,
+          phone: contactPhone,
+        };
+
       const customerNoteHTML = `
-            <p><strong>Customer Email:</strong> ${email}</p>
-            <p><strong>Phone Number:</strong> ${formData?.contactInfo?.phone
-        }</p>
-            ${isStorePickup
+            <p><strong>Customer Email:</strong> ${contactEmail}</p>
+            <p><strong>Phone Number:</strong> ${contactPhone}</p>
+            ${isStorePickupOrder
           ? "<p><strong>Pickup Location:</strong> Store</p>"
           : ""
         }
-            ${formData?.paymentMethod?.selectedGateway?.id === "darazbnpl"
+            ${isFlashDeliveryOrder
+          ? "<p><strong>Delivery Method:</strong> Flash Delivery — customer arranges Uber/PickMe pickup</p>"
+          : ""
+        }
+            ${gatewayId === "darazbnpl"
           ? "<p><strong>Payment Method:</strong> Koko Pay</p>"
           : ""
         }
@@ -494,7 +496,7 @@ const CheckoutPage = () => {
         },
       };
 
-      const { data, errors } =
+      const { data: mutationData, errors } =
         customer?.id === "guest"
           ? await guestCheckout({ variables })
           : await checkoutMutation({ variables });
@@ -507,47 +509,43 @@ const CheckoutPage = () => {
         return null;
       }
 
-      if (!data?.checkout) {
+      if (!mutationData?.checkout) {
         toast.error("Checkout failed. Please try again.");
         return null;
       }
 
       // Store order data in localStorage for both guest and logged-in users
-      localStorage.setItem("last_order", JSON.stringify(data));
+      localStorage.setItem("last_order", JSON.stringify(mutationData));
 
-      const isKokoGateway =
-        formData?.paymentMethod?.selectedGateway?.id === "darazbnpl";
-
-      if (isKokoGateway) {
+      if (gatewayId === "darazbnpl") {
         const orderData = {
-          order_id: data?.checkout?.order?.databaseId,
+          order_id: mutationData?.checkout?.order?.databaseId,
         };
         handleKoko(orderData);
         return null;
       }
 
       // NDB-Pay payment flow
-      const isNdbPay = formData?.paymentMethod?.selectedGateway?.id == "ndb-pay";
-      if (isNdbPay) {
-        const orderTotalRaw = data?.checkout?.order?.total;
+      if (gatewayId === "ndb-pay") {
+        const orderTotalRaw = mutationData?.checkout?.order?.total;
         const rawAmount = orderTotalRaw?.replace(/[^0-9.]/g, "") || "0.00";
         const numericAmount = parseFloat(rawAmount).toFixed(2);
 
-        const billingAddress = transformAddress(formData.billingAddress);
-        const shippingAddress = isStorePickup
+        const billingAddress = transformAddress(data.billingAddress);
+        const shippingAddress = isStorePickupOrder
           ? {
-              ...transformAddress(formData.deliveryAddress),
-              address1: "Store / Uber / PickMe",
-              city: "Store / Uber / PickMe",
+              ...transformAddress(data.deliveryAddress),
+              address1: "Store Pickup",
+              city: "Store Pickup",
             }
-          : transformAddress(formData.deliveryAddress);
+          : transformAddress(data.deliveryAddress);
 
         const orderData = {
-          order_id: data?.checkout?.order?.databaseId,
+          order_id: mutationData?.checkout?.order?.databaseId,
           amount: numericAmount,
           currency: "LKR",
-          email: formData?.contactInfo?.email,
-          phone: formData?.contactInfo?.phone,
+          email: contactEmail,
+          phone: contactPhone,
           bill_to_forename: billingAddress.firstName || "",
           bill_to_surname: billingAddress.lastName || "",
           bill_to_address_line1: billingAddress.address1 || "",
@@ -556,8 +554,8 @@ const CheckoutPage = () => {
           bill_to_address_state: billingAddress.state || "",
           bill_to_address_postal_code: billingAddress.postcode || "",
           bill_to_address_country: billingAddress.country || "LK",
-          bill_to_email: formData?.contactInfo?.email || "",
-          bill_to_phone: formData?.contactInfo?.phone || "",
+          bill_to_email: contactEmail || "",
+          bill_to_phone: contactPhone || "",
           ship_to_forename: shippingAddress.firstName || "",
           ship_to_surname: shippingAddress.lastName || "",
           ship_to_address_line1: shippingAddress.address1 || "",
@@ -568,35 +566,30 @@ const CheckoutPage = () => {
           ship_to_address_country: shippingAddress.country || "LK",
         };
 
-        localStorage.setItem("last_order", JSON.stringify(data));
+        localStorage.setItem("last_order", JSON.stringify(mutationData));
         handleNdbPay(orderData);
         return null;
       }
 
-      // FOR GUEST CHECKOUT
-      let guestCheckoutData = data;
-
-      const isBankTransfer =
-        formData?.paymentMethod?.selectedGateway?.id == "bacs";
-
+      const isBankTransfer = gatewayId === "bacs";
       const isGuest = customer?.id === "guest";
 
       if (isPayhere && isGuest) {
-        const orderDbId = data?.checkout?.order?.databaseId;
+        const orderDbId = mutationData?.checkout?.order?.databaseId;
         if (!orderDbId) {
           toast.error("Could not create order for payment.");
           return null;
         }
         localStorage.setItem(
           "payhere_last_order",
-          JSON.stringify(guestCheckoutData)
+          JSON.stringify(mutationData)
         );
         router.push(`/checkout/payhere/guest_order`);
         return null;
       }
 
       if (isPayhere && !isGuest) {
-        const orderId = data?.checkout?.order?.databaseId;
+        const orderId = mutationData?.checkout?.order?.databaseId;
         if (!orderId) {
           toast.error("Could not create order for payment.");
           return null;
@@ -606,11 +599,9 @@ const CheckoutPage = () => {
       }
 
       // Genie Payment Redirect
-      const isGeniePayment = formData?.paymentMethod?.selectedGateway?.id == "geniebiz";
-      if (isGeniePayment && data?.checkout?.redirect) {
-        // Check if checkout was successful
-        if (data?.checkout?.result === "success") {
-          handleGeniePayment(data);
+      if (gatewayId === "geniebiz" && mutationData?.checkout?.redirect) {
+        if (mutationData?.checkout?.result === "success") {
+          handleGeniePayment(mutationData);
           return;
         } else {
           toast.error("Checkout failed. Please try again.");
@@ -618,8 +609,8 @@ const CheckoutPage = () => {
         }
       }
 
-      if (data) {
-        const checkoutDetails = savePaymentDetails(data);
+      if (mutationData) {
+        const checkoutDetails = savePaymentDetails(mutationData);
         setPaymentData(checkoutDetails);
 
         if (isBankTransfer) {
@@ -649,20 +640,43 @@ const CheckoutPage = () => {
     }
   };
 
-  const getShippingMethod = (shippingTotal: any) => {
-    const methodId = isStorePickup
-      ? "pickup_location:0"
-      : freeShipping
-        ? "wbs:5c9bd062_free_shipping"
-        : "wbs:0dd3bc79_weight_based_shipping";
+  const getShippingMethod = (
+    shippingTotal: any,
+    orderDeliveryType: DeliveryType | null,
+  ) => {
+    const noCharge =
+      orderDeliveryType === "store_pickup" ||
+      orderDeliveryType === "flash_delivery";
 
-    const methodTitle = isStorePickup
+    // store_pickup → block-based pickup_location method (instance 0).
+    // flash_delivery → zone-bound flat_rate instance 4 ("Flash Delivery
+    // (Uber/PickMe)" at cost 0). Configured via WooCommerce > Settings >
+    // Shipping > Sri Lanka. Different mechanism from store pickup, but
+    // both resolve to a free shipping line — and flat_rate keeps the
+    // title verbatim so order admin shows "Flash Delivery (Uber/PickMe)"
+    // instead of the pickup_location plugin's "<title> (<location>)" template.
+    const methodId =
+      orderDeliveryType === "flash_delivery"
+        ? "flat_rate:4"
+        : orderDeliveryType === "store_pickup"
+          ? "pickup_location:0"
+          : freeShipping
+            ? "wbs:5c9bd062_free_shipping"
+            : "wbs:0dd3bc79_weight_based_shipping";
+
+    // methodTitle is the display string for the order summary; for
+    // flat_rate WC writes the zone-config title, for pickup_location WC
+    // writes its own templated title — either way this string is
+    // cosmetic on the cart side.
+    const methodTitle = orderDeliveryType === "store_pickup"
       ? "Store Pickup"
-      : freeShipping
-        ? "Free Shipping"
-        : "Weight Based Shipping";
+      : orderDeliveryType === "flash_delivery"
+        ? "Flash Delivery (Uber/PickMe)"
+        : freeShipping
+          ? "Free Shipping"
+          : "Weight Based Shipping";
 
-    const total = isStorePickup ? "0" : shippingTotal;
+    const total = noCharge ? "0" : shippingTotal;
 
     return { methodId, methodTitle, total };
   };
@@ -770,13 +784,6 @@ const CheckoutPage = () => {
     toast.error("An unexpected error occurred during checkout. Please try again or contact support if the problem persists.");
   };
 
-  const handleScrollToEl = (id: string) => {
-    const element = document.getElementById(id);
-    setTimeout(() => {
-      element?.scrollIntoView({ behavior: "smooth" });
-    }, 80);
-  };
-
   const replaceStringinInt = (orderTotalString: any) => {
     const numericString = orderTotalString?.replace(/₨|&nbsp;|,|[^0-9.]/g, "");
     const orderTotalNumber = parseFloat(numericString);
@@ -787,9 +794,45 @@ const CheckoutPage = () => {
   const cartSubtotal = replaceStringinInt(cart?.subtotal);
   const numericDiscountTotal = replaceStringinInt(cart?.discountTotal);
   const hasDiscount = Number.isFinite(numericDiscountTotal) && numericDiscountTotal > 0;
+
+  const catalogSavings = (cart?.contents?.nodes || []).reduce((sum: number, item: any) => {
+    const node = item?.product?.node;
+    const isVariable = node?.type === "VARIABLE";
+    const sale = replaceStringinInt(isVariable ? item?.variation?.node?.price : node?.price);
+    const regular = replaceStringinInt(isVariable ? item?.variation?.node?.regularPrice : node?.regularPrice);
+    if (!Number.isFinite(sale) || !Number.isFinite(regular) || regular <= sale) return sum;
+    return sum + (regular - sale) * (item?.quantity || 0);
+  }, 0);
   const threePercentFromTotal = numericOrderTotal * 0.03;
   const TotalWithKoko = (cartSubtotal / 88) * 100;
   const taxWithTotal = (numericOrderTotal + threePercentFromTotal).toFixed(2);
+
+  // Real shipping amount for Koko's installment math. Was hardcoded at 500
+  // LKR which silently disagreed with the actual courier rate the rest of
+  // the page renders. Source the same value the cart shows; fall back to
+  // 500 only if the cart hasn't loaded yet.
+  const kokoShippingAmount = (() => {
+    if (noShipping) return 0;
+    const fromCart = replaceStringinInt(cart?.shippingTotal);
+    if (Number.isFinite(fromCart) && fromCart > 0) return fromCart;
+    const rateCost = cart?.availableShippingMethods?.[0]?.rates?.[0]?.cost;
+    const fromRate = typeof rateCost === "string" ? parseFloat(rateCost) : Number(rateCost);
+    if (Number.isFinite(fromRate) && fromRate > 0) return fromRate;
+    return 500;
+  })();
+  const kokoOrderTotal = TotalWithKoko + kokoShippingAmount;
+
+  const formatRs = (n: number) =>
+    `Rs ${new Intl.NumberFormat("en-US", {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(n)}`;
+
+  const orderTotalLabel = isCardPayment
+    ? formatRs(numericOrderTotal + threePercentFromTotal)
+    : isKokoPayment
+    ? formatRs(kokoOrderTotal)
+    : (orderTotal || "");
 
   useEffect(() => {
     setTotalWithTax(taxWithTotal);
@@ -1045,53 +1088,63 @@ const CheckoutPage = () => {
         }}
         onError={() => console.error("Error loading PayHere script")}
       />
-      <div className="flex flex-col lg:flex-row mx-auto">
+      <div className="flex flex-col-reverse lg:flex-row mx-auto">
         <div className="lg:w-1/2 w-full bg-white border-gray-300">
           <div className="p-6 max-w-[625px] ml-auto">
           <CheckoutDetails
-              tabActive={tabActive}
-              setTabActive={(
-                value:
-                  | "ContactInfo"
-                  | "BillingAddress"
-                  | "DeliveryAddress"
-                  | "PaymentMethod"
-                  | "order-cart"
-              ) => setTabActive(value)}
-              handleScrollToEl={handleScrollToEl}
-              updateFormData={updateFormData}
-              formData={formData}
               paymentGateways={isPreOrderCart
                 ? (paymentGateways || []).filter((g: any) => g.id === 'cod' || g.id === 'bacs')
                 : (paymentGateways || [])
               }
-              handleConfirmationChange={handleConfirmationChange}
-              setIsStorePickup={setIsStorePickup}
-              isStorePickup={isStorePickup}
+              setDeliveryType={setDeliveryType}
+              deliveryType={deliveryType}
               setIsCardPayment={setIsCardPayment}
               isCardPayment={isCardPayment}
               totalPayment={numericOrderTotal}
+              kokoTotal={kokoOrderTotal}
               setIsKokoPayment={setIsKokoPayment}
               isKokoPayment={isKokoPayment}
+              onCheckoutSubmit={submitCheckout}
+              isTOC={isTOC}
+              onTOCChange={handleTOC}
+              tocError={tocError}
+              // Disable the Confirm button while either the checkout
+              // mutation OR the shipping recalculation is in flight, so
+              // the user can't submit at a stale total.
+              loading={loading || shippingUpdating}
+              orderTotalLabel={orderTotalLabel}
             />
           </div>
         </div>
         <div className="lg:w-1/2 w-full border-l-1 border-gray-300">
-          <div className="lg:sticky lg:top-[125px] p-6 max-w-[625px] mr-auto">
+          <div className="lg:sticky lg:top-[80px] p-6 max-w-[625px] mr-auto">
           <div id="order-cart" className="w-full">
-            <div className=" divide-y divide-slate-200/70 dark:divide-slate-700 pr-5">
+            {(!cart || (cartLoading && !cart?.contents?.nodes?.length)) ? (
+              <OrderSummarySkeleton items={2} />
+            ) : (
+            <>
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
+              Order summary
+              {cart?.contents?.nodes?.length ? (
+                <span className="text-slate-400">
+                  {" · "}
+                  {cart.contents.nodes.length} item{cart.contents.nodes.length === 1 ? "" : "s"}
+                </span>
+              ) : null}
+            </h3>
+            <div className="divide-y divide-slate-200/70 dark:divide-slate-700 pr-5">
               {cart?.contents?.nodes.map((item, index) => (
                 <CartItems
                   index={index}
-                  key={index}
-                  item={item as any}
+                  key={item?.key ?? index}
+                  item={item as unknown as CartItem}
                   onQuantityChange={updateCart}
                   onRemove={removeFromCart}
                 />
               ))}
             </div>
 
-            <div className="mt-10 border-t border-slate-200/70 pt-6 text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400 ">
+            <div className="mt-6 border-t border-slate-200/70 pt-5 text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400 ">
               <div>
                 <Label className="text-sm">Discount code</Label>
                 <div className="mt-1.5 flex gap-2">
@@ -1247,70 +1300,80 @@ const CheckoutPage = () => {
                 )}
               </div>
 
-              <div className="mt-4 flex justify-between py-2.5">
-                <span>Subtotal</span>
-                <span className="font-semibold text-slate-900 dark:text-slate-200">
-                  <span
-                    dangerouslySetInnerHTML={{
-                      __html: cart?.subtotal || "0.00",
-                    }}
-                  />
-                </span>
+              <div className="mt-5 space-y-2 text-sm">
+                <div className="flex justify-between">
+                  <span className="text-slate-600 dark:text-slate-400">Subtotal</span>
+                  <span className="font-medium text-slate-900 dark:text-slate-200">
+                    {catalogSavings > 0
+                      ? formatRs(cartSubtotal + catalogSavings)
+                      : (
+                        <span
+                          dangerouslySetInnerHTML={{
+                            __html: cart?.subtotal || "0.00",
+                          }}
+                        />
+                      )}
+                  </span>
+                </div>
+
+                {catalogSavings > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600 dark:text-slate-400">Promotion</span>
+                    <span className="inline-flex items-center rounded-md bg-red-500 px-2 py-0.5 text-xs font-semibold text-white">
+                      − {formatRs(catalogSavings)}
+                    </span>
+                  </div>
+                )}
+
+                {hasDiscount && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600 dark:text-slate-400">Coupon</span>
+                    <span className="inline-flex items-center rounded-md bg-red-500 px-2 py-0.5 text-xs font-semibold text-white">
+                      −{" "}
+                      <span
+                        dangerouslySetInnerHTML={{
+                          __html: cart?.discountTotal || "0.00",
+                        }}
+                      />
+                    </span>
+                  </div>
+                )}
+
+                {!noShipping && (
+                  <div className="flex justify-between" aria-busy={shippingUpdating}>
+                    <span className="text-slate-600 dark:text-slate-400">
+                      {freeShipping ? `Free Shipping` : `Shipping estimate`}
+                    </span>
+                    <span className="font-medium text-slate-900 dark:text-slate-200">
+                      {shippingUpdating ? (
+                        <span className="inline-block w-20 h-5 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
+                      ) : freeShipping ? (
+                        <span dangerouslySetInnerHTML={{ __html: "0.00" }} />
+                      ) : (
+                        // shippingTotal here is local state set from the
+                        // updateShippingMethod mutation response (line 245);
+                        // cart?.shippingTotal from CartProvider is stale until
+                        // the next cart refetch.
+                        <span
+                          dangerouslySetInnerHTML={{
+                            __html: shippingTotal || cart?.shippingTotal || "0.00",
+                          }}
+                        />
+                      )}
+                    </span>
+                  </div>
+                )}
               </div>
-
-              {hasDiscount && (
-                <div className="flex justify-between py-2.5">
-                  <span>Discount</span>
-                  <span className="font-semibold text-emerald-600">
-                    <span
-                      dangerouslySetInnerHTML={{
-                        __html: cart?.discountTotal
-                          ? `- ${cart.discountTotal}`
-                          : "0.00",
-                      }}
-                    />
-                  </span>
-                </div>
-              )}
-
-              {!isStorePickup && (
-                <div className="flex justify-between py-2.5">
-                  <span>
-                    {freeShipping ? `Free Shipping` : `Shipping estimate`}
-                  </span>
-                  <span className="font-semibold text-slate-900 dark:text-slate-200">
-                    {freeShipping ? (
-                      <span
-                        dangerouslySetInnerHTML={{
-                          __html: "0.00",
-                        }}
-                      />
-                    ) : (
-                      <span
-                        dangerouslySetInnerHTML={{
-                          __html: cart?.shippingTotal || "0.00",
-                        }}
-                      />
-                    )}
-                  </span>
-                </div>
-              )}
               {(isCardPayment || isKokoPayment) && (
                 <div className="flex justify-between py-2.5">
-                  <span className="text-red-500 font-medium">Sorry your missed the discount</span>
+                  <span className="text-red-500 font-medium">Sorry you missed the discount</span>
                 </div>
               )}
               {isKokoPayment && (
                 <div className="flex flex-wrap items-center text-xs text-gray-500 mt-1">
                   <span>pay in 3 x Rs</span>
                   <span className="font-semibold mx-1">
-                    {(
-                      parseFloat(
-                        (TotalWithKoko + (isStorePickup ? 0 : 500) || "0")
-                          .toString()
-                          .replace(/[^\d.]/g, "")
-                      ) / 3
-                    ).toFixed(2)}
+                    {(kokoOrderTotal / 3).toFixed(2)}
                   </span>
                   <span>with</span>
                   <span className="ml-1 inline-block">
@@ -1324,111 +1387,56 @@ const CheckoutPage = () => {
               )}
 
               {isCardPayment && (
-                <div className="flex justify-between pt-4 text-base font-semibold text-slate-900 dark:text-slate-200">
-                  <span>Order total</span>
-                  <span
-                    dangerouslySetInnerHTML={{
-                      __html:
-                        `Rs ${new Intl.NumberFormat("en-US", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        }).format(
-                          numericOrderTotal + threePercentFromTotal
-                        )}` || "0.00",
-                    }}
-                  />
+                <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100" aria-busy={shippingUpdating}>
+                  <span className="text-base font-semibold">Order total</span>
+                  {shippingUpdating ? (
+                    <span className="inline-block w-32 h-7 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
+                  ) : (
+                    <span
+                      className="text-xl font-bold"
+                      dangerouslySetInnerHTML={{
+                        __html: formatRs(numericOrderTotal + threePercentFromTotal),
+                      }}
+                    />
+                  )}
                 </div>
               )}
 
               {isKokoPayment && (
-                <div className="flex justify-between pt-4 text-base font-semibold text-slate-900 dark:text-slate-200">
-                  <span>Order total</span>
-                  <span
-                    dangerouslySetInnerHTML={{
-                      __html:
-                        `Rs ${new Intl.NumberFormat("en-US", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        }).format(
-                          TotalWithKoko + (isStorePickup ? 0 : 500)
-                        )}` || "0.00",
-                    }}
-                  />
+                <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100" aria-busy={shippingUpdating}>
+                  <span className="text-base font-semibold">Order total</span>
+                  {shippingUpdating ? (
+                    <span className="inline-block w-32 h-7 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
+                  ) : (
+                    <span
+                      className="text-xl font-bold"
+                      dangerouslySetInnerHTML={{
+                        __html: formatRs(kokoOrderTotal),
+                      }}
+                    />
+                  )}
                 </div>
               )}
 
               {!isCardPayment && !isKokoPayment && (
-                <div className="flex justify-between pt-4 text-base font-semibold text-slate-900 dark:text-slate-200">
-                  <span>Order total</span>
-
-                  <span
-                    dangerouslySetInnerHTML={{ __html: orderTotal || "0.00" }}
-                  />
+                <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100" aria-busy={shippingUpdating}>
+                  <span className="text-base font-semibold">Order total</span>
+                  {shippingUpdating ? (
+                    <span className="inline-block w-32 h-7 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
+                  ) : (
+                    <span
+                      className="text-xl font-bold"
+                      dangerouslySetInnerHTML={{ __html: orderTotal || "0.00" }}
+                    />
+                  )}
                 </div>
               )}
+
             </div>
-
-            <div className="mt-5 flex justify-center items-center text-sm text-slate-500 dark:text-slate-400">
-              <div className=" relative flex gap-2">
-                <Checkbox
-                  key={1}
-                  label=""
-                  name="toc"
-                  defaultChecked={isTOC}
-                  onChange={handleTOC}
-                  sizeClassName="w-4 h-4"
-                  className="pt-1"
-                />
-
-                <div>
-                  <div>By proceeding with your purchase you agree to our </div>
-                  <Link
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href={"/terms-and-conditions"}
-                    className="font-medium text-slate-900 underline dark:text-slate-200"
-                  >
-                    Terms and Conditions
-                  </Link>
-                  <span>
-                    {` `}and{` `}
-                  </span>
-                  <Link
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    href={"/privacy"}
-                    className="font-medium text-slate-900 underline dark:text-slate-200"
-                  >
-                    Privacy Policy
-                  </Link>
-                  {` `}.
-                </div>
-              </div>
-            </div>
-
-            {/* Pre-order Notice */}
-            {isPreOrderCart && (
-              <PreOrderNotice className="mt-6" />
+            </>
             )}
 
-            <ButtonPrimary
-              onClick={handleCheckoutProcess}
-              className={`mt-8 w-full bg-primary hover:bg-primary-dark`}
-            >
-              {loading ? (
-                <Loader className="animate-spin text-gray-100 " />
-              ) : (
-                "Confirm Order"
-              )}
-            </ButtonPrimary>
             <div id="ndb-pay-form-wrapper" className="mt-6"></div>
-            <div className="text-xs space-y-1.5 mt-4 pl-5">
-              {confirmOrderErrors.map((error, index) => (
-                <div key={index} className="text-red-500">
-                  *{error}
-                </div>
-              ))}
-            </div>
           </div>
           </div>
         </div>

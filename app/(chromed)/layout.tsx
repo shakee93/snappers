@@ -1,5 +1,6 @@
 import Header from "@/app/components/globalComponents/header";
 import Footer from "@/app/components/globalComponents/footer";
+import HeaderGate from "@/app/components/globalComponents/HeaderGate";
 
 export default function ChromedLayout({
   children,
@@ -8,9 +9,13 @@ export default function ChromedLayout({
 }) {
   return (
     <>
-      <Header />
+      <HeaderGate>
+        <Header />
+      </HeaderGate>
       {children}
-      <Footer />
+      <HeaderGate>
+        <Footer />
+      </HeaderGate>
     </>
   );
 }
