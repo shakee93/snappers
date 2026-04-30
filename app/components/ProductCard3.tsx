@@ -8,7 +8,7 @@ import {
   ShoppingCart,
   XIcon,
 } from "lucide-react";
-import { FC, useEffect, useRef, useState } from "react";
+import { FC, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
@@ -121,16 +121,10 @@ const ProductCard: FC<ProductCardProps> = ({
     ) || false;
   };
 
-  // Check if product is a clearance product
-  const isClearanceProduct = () => {
-    return data?.productTags?.nodes?.some(
-      (tag: any) => tag.slug === 'clearance'
-    ) || false;
-  };
-
-  const isFreeGiftProduct = data?.productTags?.nodes?.some(
-    (tag: any) => tag.slug === 'free-gift'
-  ) || false;
+  const isFreeGiftProduct = useMemo(
+    () => data?.productTags?.nodes?.some((tag: any) => tag.slug === 'free-gift') ?? false,
+    [data?.productTags?.nodes]
+  );
 
   // Extract the last segment of the pathname
   const segments = pathname.split("/");
@@ -145,13 +139,16 @@ const ProductCard: FC<ProductCardProps> = ({
     productDbId != null && bogoPluginMetaByProductId
       ? bogoPluginMetaByProductId[productDbId]
       : undefined;
-  const bogo = normalizeBogoConfig(
-    mergeProductMetaForBogo(
-      batchBogoMeta !== undefined
-        ? { metaData: data?.metaData, bogoPluginMeta: batchBogoMeta }
-        : data
+  const bogo = useMemo(
+    () => normalizeBogoConfig(
+      mergeProductMetaForBogo(
+        batchBogoMeta !== undefined
+          ? { metaData: data?.metaData, bogoPluginMeta: batchBogoMeta }
+          : data
+      ),
+      productDbId ?? data?.databaseId
     ),
-    productDbId ?? data?.databaseId
+    [data, batchBogoMeta, productDbId]
   );
 
   const handleHoverOut = () => {
@@ -328,16 +325,14 @@ const ProductCard: FC<ProductCardProps> = ({
       data-nc-id="ProductCard"
     >
       {/* Sale Badge - Outside image container */}
-	      {stockStatus === "IN_STOCK" && !bogo?.isBogoEnabled && (
+      {stockStatus === "IN_STOCK" && (
         (() => {
-
           if ((parsePrice(salePrice) > 0 && parsePrice(regularPrice) > 0) && parsePrice(salePrice) < parsePrice(regularPrice)) {
-            // Calculate discount in 5% increments
             let rawDiscount =
               ((parsePrice(regularPrice) - parsePrice(salePrice)) / parsePrice(regularPrice)) * 100;
             let roundedDiscount = Math.round(rawDiscount / 5) * 5;
             return (
-              <div className="absolute left-0 top-4 z-10 cursor-pointer bg-green-600 w-fit font-normal text-xs text-white px-3 py-1.5 rounded-r-full shadow-md">
+              <div className={`absolute left-0 z-10 cursor-pointer bg-green-600 w-fit font-normal text-xs text-white px-3 py-1.5 rounded-r-full shadow-md ${bogo.isBogoEnabled ? "top-12" : "top-4"}`}>
                 {roundedDiscount}% OFF!
               </div>
             );
@@ -350,16 +345,6 @@ const ProductCard: FC<ProductCardProps> = ({
           Sold Out
         </div>
       )}
-
-      {/* Clearance fire tag - icon only by default, text reveals on card hover */}
-      {/* {isClearanceProduct() && (
-        <div className="absolute left-0 top-12 z-10 flex items-center gap-1 bg-orange-500 w-fit font-normal text-xs text-white py-1.5 px-3 rounded-r-full shadow-md md:pl-2 md:pr-2 md:group-hover:pr-3 transition-all duration-200">
-          <Flame className="w-3.5 h-3.5 flex-shrink-0 hidden md:block" />
-          <span className="whitespace-nowrap md:max-w-0 md:overflow-hidden md:opacity-0 md:transition-all md:duration-200 md:group-hover:max-w-[100px] md:group-hover:opacity-100">
-            Clearance
-          </span>
-        </div>
-      )} */}
 
       {bogo.isBogoEnabled && (
         <div

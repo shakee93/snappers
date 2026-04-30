@@ -21,7 +21,7 @@ export interface SectionSliderProductCardProps {
   headingFontClassName?: string;
   headingClassName?: string;
   subHeading?: string;
-  products?: (SimpleProduct & VariableProduct)[];
+  products?: (SimpleProduct | VariableProduct)[];
   link?: string;
 }
 
@@ -93,7 +93,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
       return true;
     }
 
-    const variationNodes = (product?.variations as {
+    const variationNodes = ((product as VariableProduct)?.variations as {
       nodes?: Array<{
         price?: string | null;
         regularPrice?: string | null;

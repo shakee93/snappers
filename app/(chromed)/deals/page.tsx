@@ -10,41 +10,34 @@ export const metadata: Metadata = {
     "Browse Up to 75% off, Buy One Get One, and Free Gift deals at GQ Mobiles.",
 };
 
+// Fallback ISR revalidation — the primary cache is invalidated by the WP webhook at /api/revalidate.
+export const revalidate = 300;
+
+type DealProduct = SimpleProduct | VariableProduct;
+
+const fetchByTag = (tagIn: string[]): Promise<DealProduct[]> =>
+  getClient()
+    .query({ query: GET_PRODUCTS_BY_BOGO_TAG, variables: { first: 20, tagIn } })
+    .then((res) => (res.data?.products?.nodes ?? []) as DealProduct[])
+    .catch(() => []);
+
+const prioritizeInStock = (items: DealProduct[]): DealProduct[] => {
+  const inStock = items.filter((p) => p.stockStatus === "IN_STOCK");
+  const soldOut = items.filter((p) => p.stockStatus !== "IN_STOCK");
+  return [...inStock, ...soldOut];
+};
+
 const getDealsData = async () => {
   const [clearance, bogo, freeGift] = await Promise.all([
-    getClient()
-      .query({
-        query: GET_PRODUCTS_BY_BOGO_TAG,
-        variables: { first: 20, tagIn: ["clearance"] },
-      })
-      .then((res) => res.data?.products?.nodes || [])
-      .catch(() => []),
-    getClient()
-      .query({
-        query: GET_PRODUCTS_BY_BOGO_TAG,
-        variables: { first: 20, tagIn: ["bogo-offer"] },
-      })
-      .then((res) => res.data?.products?.nodes || [])
-      .catch(() => []),
-    getClient()
-      .query({
-        query: GET_PRODUCTS_BY_BOGO_TAG,
-        variables: { first: 20, tagIn: ["free-gift"] },
-      })
-      .then((res) => res.data?.products?.nodes || [])
-      .catch(() => []),
+    fetchByTag(["clearance"]),
+    fetchByTag(["bogo-offer"]),
+    fetchByTag(["free-gift"]),
   ]);
 
-  const prioritizeInStock = (items: (SimpleProduct & VariableProduct)[]) => {
-    const inStock = items.filter((p) => p.stockStatus === "IN_STOCK");
-    const soldOut = items.filter((p) => p.stockStatus !== "IN_STOCK");
-    return [...inStock, ...soldOut];
-  };
-
   return {
-    clearance: prioritizeInStock(clearance as (SimpleProduct & VariableProduct)[]),
-    bogo: prioritizeInStock(bogo as (SimpleProduct & VariableProduct)[]),
-    freeGift: prioritizeInStock(freeGift as (SimpleProduct & VariableProduct)[]),
+    clearance: prioritizeInStock(clearance),
+    bogo: prioritizeInStock(bogo),
+    freeGift: prioritizeInStock(freeGift),
   };
 };
 
