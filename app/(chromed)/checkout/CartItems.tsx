@@ -7,7 +7,6 @@ import { Fragment, useState } from "react";
 import { Loader } from "lucide-react";
 import { toast } from "sonner";
 import AttributeIcon from "@/app/components/AttributeIcon";
-import { VariableProduct, PaCapacity } from "@/graphql/types/graphql";
 import { isLineItemFree } from "@/lib/cartLinePricing";
 
 export interface CartItem {
@@ -125,12 +124,7 @@ const CartItems = ({
                 <Fragment key={idx}>
                   <span className="inline-flex items-center gap-1">
                     <AttributeIcon name={attr?.name || ""} className="w-3.5" />
-                    <span>
-                      {attr?.value}{" "}
-                      {(product.node as unknown as VariableProduct)[
-                        `allPa${attr?.label as unknown as "Capacity"}`
-                      ]?.nodes.find((n: PaCapacity) => n.slug === attr?.value)?.name}
-                    </span>
+                    <span>{attr?.displayValue || attr?.value}</span>
                   </span>
                 </Fragment>
               ))}
