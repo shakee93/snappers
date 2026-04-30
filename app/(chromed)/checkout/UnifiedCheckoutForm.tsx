@@ -19,7 +19,6 @@ import {
     Truck,
     Zap,
     CreditCard,
-    Banknote,
     Landmark,
     Check,
     ChevronRight,
@@ -517,9 +516,13 @@ const UnifiedCheckoutForm = ({
                 };
             case "cod":
                 return {
-                    title: gateway.title || "Cash on delivery",
+                    title: gateway.title || "Cash on delivery: Powered by Prompt Express",
                     subtitle: "Pay with cash when your order arrives",
-                    icon: <Banknote className="w-5 h-5" strokeWidth={1.75} />,
+                    icon: (
+                        <div className="w-8 h-5 flex items-center justify-center">
+                            <Image src="/prompt_express.png" alt="Prompt Express" width={40} height={20} />
+                        </div>
+                    ),
                     trailing: null,
                 };
             case "darazbnpl": {
@@ -830,7 +833,7 @@ const UnifiedCheckoutForm = ({
                             onSelect={handlePickupTypeChange}
                             icon={<Truck className="w-5 h-5" strokeWidth={1.75} />}
                             title="Courier delivery"
-                            subtitle="Island-wide delivery in 2–3 business days"
+                            subtitle="Island-wide delivery in 2–3 business working days"
                             trailing={courierShippingLabel ? (
                                 <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
                                     {courierShippingLabel}
