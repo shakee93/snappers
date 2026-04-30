@@ -24,6 +24,11 @@ const TopBarPromotion: React.FC<{ options?: Options }> = ({ options }) => {
     topBarButtonLink = "/series/samsung-s25",
     topBarButtonText = "Shop Now",
   } = options || {};
+  const shouldShowButton =
+    typeof topBarButtonLink === "string" &&
+    topBarButtonLink.trim().length > 0 &&
+    typeof topBarButtonText === "string" &&
+    topBarButtonText.trim().length > 0;
 
 // console.log('TopBarPromotion', topBarButtonLink, topBarBgColor, topBarBeforeText);
 
@@ -37,14 +42,16 @@ const TopBarPromotion: React.FC<{ options?: Options }> = ({ options }) => {
               <span style={{ color: topBarHighlightedColor }}> {topBarHighlightedText} </span>{" "}
               <span>{topBarAfterText}</span>{" "}
             </div>
-            <div className="text-xs">
-              <Link
-                href={topBarButtonLink}
-                className="bg-blue-700 text-white font-semibold py-1 px-2 md:py-1 md:px-4 rounded transition duration-300 ease-in-out hover:bg-blue-800"
-              >
-                {topBarButtonText} 
-              </Link>
-            </div>
+            {shouldShowButton && (
+              <div className="text-xs">
+                <Link
+                  href={topBarButtonLink}
+                  className="bg-blue-700 text-white font-semibold py-1 px-2 md:py-1 md:px-4 rounded transition duration-300 ease-in-out hover:bg-blue-800"
+                >
+                  {topBarButtonText}
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>
