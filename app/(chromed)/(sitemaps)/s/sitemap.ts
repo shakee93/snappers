@@ -6,8 +6,8 @@ import { GET_BRAND_PRODUCTS } from '@/graphql/defs/sitemap-queries'
 import { GET_BRAND_DETAILS } from '@/graphql/defs/products'
 import { BrandIdType } from '@/graphql/types/graphql'
 
-export const dynamic = 'force-dynamic'    // 👈 run on every request
-export const runtime = 'nodejs'         // if you call a DB/REST API
+export const revalidate = 86400         // ISR: refresh once per day; warm on first crawler hit
+export const runtime = 'nodejs'
 
 
 
@@ -75,8 +75,8 @@ export async function generateSitemaps() {
 }
 
 
-export default async function sitemap(id: { id: string }): Promise<MetadataRoute.Sitemap> {
-  const slug = id.id
+export default async function sitemap({ id }: { id: Promise<string> | string }): Promise<MetadataRoute.Sitemap> {
+  const slug = await id
   // slug example: apple, samsung, huawei, oppo
 
   const products = await getProducts(slug)
