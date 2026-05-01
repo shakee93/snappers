@@ -45,6 +45,9 @@ export const CartItemProductSlim = gql`
         ... on SimpleProduct {
             price
             regularPrice
+            stockStatus
+            stockQuantity
+            manageStock
         }
         ... on VariableProduct {
             price

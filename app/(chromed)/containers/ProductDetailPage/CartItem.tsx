@@ -12,6 +12,7 @@ import useProductLink from "@/hooks/useProductLink";
 import { Fragment } from "react";
 import AttributeIcon from "@/app/components/AttributeIcon";
 import { isLineItemFree } from "@/lib/cartLinePricing";
+import { getCartLineStockCap } from "@/lib/cartLineStockCap";
 
 const CartItemProduct = ({
   cartItem,
@@ -37,9 +38,11 @@ const CartItemProduct = ({
     slug,
     salePrice,
     type,
-    stockQuantity,
     regularPrice,
   }: SimpleProduct & VariableProduct = product.node;
+
+  const { maxQty } = getCartLineStockCap(cartItem);
+  const maxQtyProp = maxQty ?? undefined;
 
 
   return (
@@ -123,6 +126,7 @@ const CartItemProduct = ({
                   await updateCart(key, q);
                 }}
                 defaultValue={quantity || 1}
+                max={maxQtyProp}
                 className="relative z-10"
                 disabled={lineIsFree}
               />

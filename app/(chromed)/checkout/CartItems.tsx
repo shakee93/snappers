@@ -8,6 +8,7 @@ import { Loader } from "lucide-react";
 import { toast } from "sonner";
 import AttributeIcon from "@/app/components/AttributeIcon";
 import { isLineItemFree } from "@/lib/cartLinePricing";
+import { getCartLineStockCap } from "@/lib/cartLineStockCap";
 
 export interface CartItem {
   extraData?: null | any;
@@ -60,11 +61,20 @@ const CartItems = ({
   const { name, price, regularPrice, image, terms, brands, type } = node || {};
   const brandSlug = brands?.nodes[0]?.slug;
 
+  const { maxQty, atMax } = getCartLineStockCap(item);
+  const atMaxStock = atMax(quantity);
+
   const [isUpdatingQty, setIsUpdatingQty] = useState(false);
   const [isRemoving, setIsRemoving] = useState(false);
 
   const handleQty = async (newQty: number) => {
     if (isUpdatingQty || isRemoving || newQty === quantity) return;
+    if (maxQty !== null && newQty > maxQty) {
+      toast.error(
+        `Only ${maxQty} of "${name}" available — please reduce the quantity.`
+      );
+      return;
+    }
     setIsUpdatingQty(true);
     try {
       await onQuantityChange(key, newQty);
@@ -155,7 +165,8 @@ const CartItems = ({
                   aria-label="Increase quantity"
                   onClick={() => handleQty(quantity + 1)}
                   className="px-2 py-1 text-slate-600 hover:text-slate-900 hover:bg-slate-50 dark:text-slate-300 dark:hover:bg-slate-800 rounded-r-md disabled:opacity-40 disabled:cursor-not-allowed"
-                  disabled={isBusy}
+                  disabled={isBusy || atMaxStock}
+                  title={atMaxStock ? `Only ${maxQty} in stock` : undefined}
                 >
                   +
                 </button>
@@ -170,6 +181,11 @@ const CartItems = ({
               {isRemoving && <Loader className="w-3 h-3 animate-spin" />}
               {isRemoving ? "Removing…" : "Remove"}
             </button>
+            {atMaxStock && !lineIsFree && (
+              <span className="text-amber-600 dark:text-amber-400">
+                Only {maxQty} in stock
+              </span>
+            )}
           </div>
         </div>
 

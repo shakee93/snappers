@@ -681,6 +681,53 @@ const CheckoutPage = () => {
     return { methodId, methodTitle, total };
   };
 
+  // WooCommerce's cart-stock validator emits two distinct messages we want
+  // to surface differently:
+  //   • Out of stock  — `Sorry, "<name>" is not in stock. ...`
+  //   • Insufficient  — `Sorry, we do not have enough "<name>" in stock to
+  //                      fulfill your order (N available)`. Older WC
+  //                      versions used "(N in stock)" — match the integer
+  //                      and ignore the suffix wording.
+  // The previous handler matched any substring "stock" and showed a single
+  // "out of stock" toast, which mis-states the insufficient-quantity case.
+  //
+  // This is also the safety net for cap drift — getCartLineStockCap reads
+  // stockQuantity from the cart fragment at fetch time, so if WP stock
+  // changes between cart render and order submit, the FE cap may be stale
+  // but WC's server-side validator still rejects and we surface the live
+  // available count here.
+  // Strings come from English-only WC; flag for i18n if the storefront
+  // ever localises (the regex is keyed on English wording).
+  const parseStockError = (errorMessage?: string): string | null => {
+    if (!errorMessage) return null;
+
+    const insufficient = errorMessage.match(
+      /not have enough\s+"([^"]+)"\s+in stock.*?\((\d+)\s*[^)]*\)/i
+    );
+    if (insufficient) {
+      const [, productName, available] = insufficient;
+      return `Only ${available} of "${productName.trim()}" left — please reduce the quantity in your cart.`;
+    }
+
+    const outOfStock = errorMessage.match(/"([^"]+)"\s+is not in stock/i);
+    if (outOfStock) {
+      return `"${outOfStock[1]}" is out of stock. Please remove it from your cart.`;
+    }
+
+    if (
+      errorMessage.toLowerCase().includes("out of stock") ||
+      errorMessage.toLowerCase().includes("not in stock")
+    ) {
+      return "An item in your cart is out of stock. Please update your cart and try again.";
+    }
+
+    if (errorMessage.toLowerCase().includes("not have enough")) {
+      return "There isn't enough stock for an item in your cart. Please reduce the quantity.";
+    }
+
+    return null;
+  };
+
   const handleCheckoutError = (error: any) => {
     setLoading(false);
 
@@ -714,8 +761,9 @@ const CheckoutPage = () => {
       const graphQLError = error.graphQLErrors[0];
       const errorMessage = graphQLError.message || graphQLError.extensions?.message;
 
-      if (errorMessage?.includes("out of stock") || errorMessage?.includes("stock")) {
-        toast.error("Some items in your cart are out of stock. Please update your cart and try again.");
+      const stockToast = parseStockError(errorMessage);
+      if (stockToast) {
+        toast.error(stockToast);
         return;
       }
 

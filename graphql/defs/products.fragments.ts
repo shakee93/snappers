@@ -167,6 +167,9 @@ export const ProductVariationContentSlice = gql`
     }
     price
     regularPrice
+    stockStatus
+    stockQuantity
+    manageStock
   }
 `;
 

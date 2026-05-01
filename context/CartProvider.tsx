@@ -278,7 +278,16 @@ export function CartProvider({ children }: {
                 const graphQLError = error.graphQLErrors[0];
                 const errorMessage = graphQLError.message || graphQLError.extensions?.message;
 
-                if (errorMessage?.includes("out of stock") || errorMessage?.includes("stock")) {
+                if (errorMessage?.toLowerCase().includes("not have enough")) {
+                    toast.error("There isn't enough stock for that quantity. Please try a smaller amount.");
+                    return { error: "Insufficient stock" };
+                }
+
+                if (
+                    errorMessage?.toLowerCase().includes("out of stock") ||
+                    errorMessage?.toLowerCase().includes("not in stock") ||
+                    errorMessage?.toLowerCase().includes("stock")
+                ) {
                     toast.error("This product is currently out of stock.");
                     return { error: "Out of stock" };
                 }

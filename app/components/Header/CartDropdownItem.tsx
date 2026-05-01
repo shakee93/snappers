@@ -13,6 +13,7 @@ import { useCart } from "@/context/CartProvider";
 import NcInputNumber from "@/components/NcInputNumber";
 import { Trash } from "lucide-react";
 import { isLineItemFree } from "@/lib/cartLinePricing";
+import { getCartLineStockCap } from "@/lib/cartLineStockCap";
 
 interface CartDropdownItemProps {
   item: CartItem;
@@ -37,6 +38,9 @@ const CartDropdownItem = ({ item, close }: CartDropdownItemProps) => {
     type,
     regularPrice,
   }: SimpleProduct & VariableProduct = product?.node;
+
+  const { maxQty } = getCartLineStockCap(item);
+  const maxQtyProp = maxQty ?? undefined;
 
   const link = useProductLink(product?.node);
 
@@ -146,6 +150,7 @@ const CartDropdownItem = ({ item, close }: CartDropdownItemProps) => {
                 <NcInputNumber
                   onChange={(q) => !isRemoving && !isUpdating && handleQuantityUpdate(q)}
                   defaultValue={quantity || 1}
+                  max={maxQtyProp}
                   className={`relative z-10 ${(isRemoving || isUpdating) ? 'opacity-50 pointer-events-none' : ''}`}
                   disabled={lineIsFree || isRemoving || isUpdating}
                 />
