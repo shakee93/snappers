@@ -516,11 +516,11 @@ const UnifiedCheckoutForm = ({
                 };
             case "cod":
                 return {
-                    title: gateway.title || "Cash on delivery: Powered by Prompt Express",
-                    subtitle: "Powered by Prompt Express",
+                    title: gateway.title || "Cash on delivery: Powered by Citypak",
+                    subtitle: "Powered by Citypak",
                     icon: (
                         <div className="w-8 h-5 flex items-center justify-center">
-                            <Image src="/prompt_express.png" alt="Prompt Express" width={40} height={20} />
+                            <Image src="/citypak.png" alt="citypak" width={40} height={20} />
                         </div>
                     ),
                     trailing: null,
@@ -999,14 +999,9 @@ const UnifiedCheckoutForm = ({
                                 </div>
                             </>
                         ) : (
-                            <div className="rounded-xl bg-blue-50/70 dark:bg-blue-950/30 border border-blue-100 dark:border-blue-900 p-4 text-sm text-slate-700 dark:text-slate-300">
-                                <p className="font-semibold text-slate-900 dark:text-slate-100 mb-1">
-                                    Ready in ~2 hours (Colombo, working hours)
-                                </p>
-                                <p>
-                                    We&apos;ll notify you on the phone number above when your order is ready to collect from our Colombo store.
-                                </p>
-                            </div>
+                            <p className="text-sm text-slate-600 dark:text-slate-400">
+                                Visit GQ Mobiles to collect your order.
+                            </p>
                         )}
                     </div>
                     )}
