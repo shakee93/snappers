@@ -6,7 +6,7 @@ import ProductGridInstant from "@/app/components/ProductGridInstant";
 import SearchInput from "@/app/components/SearchInput";
 import TabFilters from "@/app/components/TabFilters";
 import { Brand, ProductCategory } from "@/graphql/types/graphql";
-import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useStore } from "@/store/store";
 import { PRICE_RANGE } from "@/app/components/Filters/PriceFilter";
 import SortInput from "@/app/components/SortInput";
@@ -15,21 +15,6 @@ import MobileFilterSheet from "@/app/components/MobileFilterSheet";
 import { history } from "instantsearch.js/es/lib/routers";
 import { UiState } from "instantsearch.js";
 import { useSearchParams } from "next/navigation";
-
-// `useSearchParams` forces any client component that calls it to opt out of
-// static prerender. Isolating the hook into this tiny child lets the parent
-// `InstantSearchNext` tree prerender (and cache) with default filter state,
-// then the bridge mounts after hydration and pushes URL params up. Shared
-// filtered URLs flicker one frame from default → filtered, then settle.
-const ClientUrlParamsBridge = ({ onChange }: { onChange: (sp: URLSearchParams) => void }) => {
-  const params = useSearchParams();
-  useEffect(() => {
-    const url = new URLSearchParams();
-    params.forEach((value, key) => url.append(key, value));
-    onChange(url);
-  }, [params, onChange]);
-  return null;
-};
 
 type CustomUiState = UiState & {
   product: {
@@ -126,13 +111,14 @@ const InstantSearchWrapper = ({
   const [differedSidebar] = useDebounce(sidebar, 800);
   const [hitsPerPage, setHitsPerPage] = useState<number>(12);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  // URL params are populated on the client by `<ClientUrlParamsBridge>`. On
-  // SSR / first paint this is null — `searchParams` falls back to an empty
-  // URLSearchParams so the rest of the component renders with default filter
-  // state. After hydration the bridge fires once, filter recomputes, and
-  // shared filtered URLs settle into the right hits.
-  const [urlParams, setUrlParams] = useState<URLSearchParams | null>(null);
-  const searchParams = useMemo(() => urlParams ?? new URLSearchParams(), [urlParams]);
+  // useSearchParams here triggers BAILOUT_TO_CLIENT_SIDE_RENDERING for the
+  // InstantSearch subtree on routes that wrap ArchiveLayout in <Suspense>.
+  // That bailout is what makes the response cacheable at the edge — without
+  // it, InstantSearchNext runs SSR and its internal headers() call marks
+  // the response private/no-store. Don't replace this hook with a state +
+  // effect bridge: that breaks ISR caching for /new-arrivals and the
+  // ArchiveLayout-using routes (verified via prod cache headers post-merge).
+  const searchParams = useSearchParams();
   const [debouncedIsTyping] = useDebounce(isTyping, 500);
 
   useEffect(() => {
@@ -380,9 +366,6 @@ const InstantSearchWrapper = ({
   // Create reactive stateMapping that updates when sidebar changes
   return (
     <div>
-      <Suspense fallback={null}>
-        <ClientUrlParamsBridge onChange={setUrlParams} />
-      </Suspense>
       <InstantSearchNext
         stalledSearchDelay={200}
         future={{
