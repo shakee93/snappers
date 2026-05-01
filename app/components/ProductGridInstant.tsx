@@ -6,6 +6,7 @@ import { GET_PRODUCTS_BOGO_PLUGIN_META } from "@/graphql/defs/products";
 import { useQuery } from "@apollo/client";
 import ProductCard from "./ProductCard3";
 import { getDatabaseIdFromProductLike } from "@/lib/bogo";
+import { HIDDEN_PRODUCT_SLUGS } from "@/lib/hidden-products";
 import { useHits, useInstantSearch } from "react-instantsearch";
 import Pagination from "@/shared/Pagination/Pagination";
 import Image from "next/image";
@@ -29,8 +30,6 @@ const ProductGridInstant = ({
   hitsPerPage,
   setHitsPerPage,
 }: ProductGridProps) => {
-  const HIDDEN_PRODUCT_SLUGS = new Set(["demo"]);
-
   const { hits, results } = useHits();
   const { status: statusState } = useInstantSearch();
   const { setSearchStatus, search, search_status, navigation } = useStore();

@@ -12,6 +12,7 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import { HIDDEN_PRODUCT_SLUGS } from "@/lib/hidden-products";
 
 export interface SectionSliderProductCardProps {
   className?: string;
@@ -34,7 +35,6 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
   products = [],
   link,
 }) => {
-  const HIDDEN_PRODUCT_SLUGS = new Set(["demo"]);
   const [mounted, setMounted] = useState(false);
   const [showSkeleton, setShowSkeleton] = useState(true);
   const [api, setApi] = useState<CarouselApi>();

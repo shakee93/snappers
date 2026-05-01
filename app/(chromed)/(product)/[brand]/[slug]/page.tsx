@@ -17,6 +17,7 @@ import { Metadata, ResolvingMetadata } from "next";
 import { ImageProvider } from "@/context/ImageChangeGrabber";
 import UpsellProducts from "@/app/components/globalComponents/UpsellProducts";
 import { getProductSchema } from "@/lib/jsonld/productSchema";
+import { HIDDEN_PRODUCT_SLUGS } from "@/lib/hidden-products";
 // import LoadingProduct from "./loading";
 
 type Props = {
@@ -31,6 +32,10 @@ export async function generateStaticParams() {
 }
 
 async function getData(slug: string, brand: string) {
+  if (HIDDEN_PRODUCT_SLUGS.has(slug.toLowerCase())) {
+    notFound();
+  }
+
   try {
     const { data, error } = await getClient().query({
       query: GET_PRODUCT,

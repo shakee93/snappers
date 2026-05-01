@@ -1,5 +1,6 @@
 "use client"
 import { Brand, Category, Product } from "@/graphql/types/graphql";
+import { HIDDEN_PRODUCT_SLUGS } from "@/lib/hidden-products";
 import { useStore } from "@/store/store";
 import { useEffect, useState } from "react";
 import { GET_BRAND_ARCHIVE } from "@/graphql/defs/products";
@@ -13,8 +14,6 @@ interface ProductGridProps {
 }
 
 const ProductGrid = ({ products, brand, category }: ProductGridProps) => {
-    const HIDDEN_PRODUCT_SLUGS = new Set(["demo"]);
-
     const { sidebar: { categories, brands, mounted } } = useStore();
     const [_products, setProducts] = useState<{ node: Product }[]>(products);
     const [mounts, setMounts] = useState(0)

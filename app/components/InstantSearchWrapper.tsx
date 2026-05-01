@@ -15,6 +15,7 @@ import MobileFilterSheet from "@/app/components/MobileFilterSheet";
 import { history } from "instantsearch.js/es/lib/routers";
 import { UiState } from "instantsearch.js";
 import { useSearchParams } from "next/navigation";
+import { HIDDEN_PRODUCT_SLUGS } from "@/lib/hidden-products";
 
 type CustomUiState = UiState & {
   product: {
@@ -66,8 +67,6 @@ const typesenseConfig = {
   path: process.env.NEXT_PUBLIC_TYPESENSE_PATH || "",
   protocol: process.env.NEXT_PUBLIC_TYPESENSE_PROTOCOL || "https",
 };
-
-const HIDDEN_PRODUCT_SLUGS = ["demo"];
 
 
 const typesenseInstantSearchAdapter = new TypesenseInstantSearchAdapter({
@@ -163,7 +162,7 @@ const InstantSearchWrapper = ({
 
   const getFilterQuery: () => string = () => {
     const f = [
-      `slug:!=${HIDDEN_PRODUCT_SLUGS.join(" && slug:!=")}`,
+      `slug:!=${[...HIDDEN_PRODUCT_SLUGS].join(" && slug:!=")}`,
       effective.priceRange.join("") !== PRICE_RANGE.join("")
         ? `rawPrice:[${effective.priceRange[0]}..${effective.priceRange[1]}]`
         : null,
