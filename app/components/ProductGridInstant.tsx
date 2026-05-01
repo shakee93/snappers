@@ -6,7 +6,6 @@ import { GET_PRODUCTS_BOGO_PLUGIN_META } from "@/graphql/defs/products";
 import { useQuery } from "@apollo/client";
 import ProductCard from "./ProductCard3";
 import { getDatabaseIdFromProductLike } from "@/lib/bogo";
-import { HIDDEN_PRODUCT_SLUGS } from "@/lib/hidden-products";
 import { useHits, useInstantSearch } from "react-instantsearch";
 import Pagination from "@/shared/Pagination/Pagination";
 import Image from "next/image";
@@ -92,17 +91,13 @@ const ProductGridInstant = ({
   // network round-trip; unmounting the grid for those transitions causes a
   // visible flicker. Only show the skeleton on the very first load.
   const showSkeleton = hits.length === 0 && (statusState === 'stalled' || statusState === 'loading');
-  const visibleHits = hits.filter((item) => {
-    const slug = String((item as { slug?: string | null })?.slug || "").toLowerCase();
-    return !HIDDEN_PRODUCT_SLUGS.has(slug);
-  });
 
   return (
     <>
       <div className='h-[185px] md:h-60 bottom-3 right-3 hidden'></div>
-      {visibleHits.length > 0 && (
+      {hits.length > 0 && (
         <div className="flex-1 grid  grid-cols-2 lg:grid-cols-4 md:grid-cols-4 gap-x-2 gap-y-2 lg:gap-x-3 lg:gap-y-4">
-          {visibleHits.map((item, index) => (
+          {hits.map((item, index) => (
             <ProductCard
               key={item?.slug as unknown as string}
               data={item as unknown as Product}
@@ -121,7 +116,7 @@ const ProductGridInstant = ({
         </div>
       )}
 
-      {(visibleHits.length === 0 && statusState === 'idle') && (
+      {(results?.nbHits === 0 && statusState === 'idle') && (
         <div className="text-center text-slate-500 flex flex-col items-center gap-20 py-12">
           <div>
             <Image className="w-64" src={NotFound} alt="No Search Results" />
