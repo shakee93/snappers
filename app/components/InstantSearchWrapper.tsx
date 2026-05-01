@@ -162,7 +162,7 @@ const InstantSearchWrapper = ({
 
   const getFilterQuery: () => string = () => {
     const f = [
-      `slug:!=${[...HIDDEN_PRODUCT_SLUGS].join(" && slug:!=")}`,
+      `slug:!=${Array.from(HIDDEN_PRODUCT_SLUGS).join(" && slug:!=")}`,
       effective.priceRange.join("") !== PRICE_RANGE.join("")
         ? `rawPrice:[${effective.priceRange[0]}..${effective.priceRange[1]}]`
         : null,
