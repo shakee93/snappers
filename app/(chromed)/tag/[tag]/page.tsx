@@ -5,6 +5,8 @@ import { Metadata, ResolvingMetadata } from "next";
 import { Suspense } from "react";
 
 
+export const revalidate = 1800;
+
 export async function generateMetadata(props: { params: Promise<{ tag: string }> }, parent: ResolvingMetadata): Promise<Metadata> {
   const params = await props.params;
 
@@ -21,22 +23,34 @@ export async function generateMetadata(props: { params: Promise<{ tag: string }>
   };
 }
 
+// ArchiveLayout fetches the real tag name and renders that as the H1; this
+// fallback only surfaces when the WP tag lookup returns nothing. Humanizing
+// the slug keeps the visible text and og:title sane in that case rather
+// than the literal "Default Title".
+function humanizeSlug(slug: string): string {
+  return slug
+    .split('-')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
 export default async function Page(
   props: {
     params: Promise<{ tag: string }>,
-    searchParams: Promise<{ title?: string }>
   }
 ) {
-  const searchParams = await props.searchParams;
   const params = await props.params;
   const tag = params.tag;
-  const title = searchParams.title || 'Default Title';
+  const fallbackTitle = tag ? humanizeSlug(tag) : 'Custom Collection';
 
   return (
-    <ArchiveLayout
-      title={title}
-      filters
-      tag={tag ? tag.toString() : 'default-tag'}
-    />
+    <Suspense>
+      <ArchiveLayout
+        title={fallbackTitle}
+        filters
+        tag={tag ? tag.toString() : 'default-tag'}
+      />
+    </Suspense>
   );
 }

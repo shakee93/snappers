@@ -6,7 +6,7 @@ import ProductGridInstant from "@/app/components/ProductGridInstant";
 import SearchInput from "@/app/components/SearchInput";
 import TabFilters from "@/app/components/TabFilters";
 import { Brand, ProductCategory } from "@/graphql/types/graphql";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { Suspense, useCallback, useEffect, useMemo, useState } from "react";
 import { useStore } from "@/store/store";
 import { PRICE_RANGE } from "@/app/components/Filters/PriceFilter";
 import SortInput from "@/app/components/SortInput";
@@ -15,6 +15,21 @@ import MobileFilterSheet from "@/app/components/MobileFilterSheet";
 import { history } from "instantsearch.js/es/lib/routers";
 import { UiState } from "instantsearch.js";
 import { useSearchParams } from "next/navigation";
+
+// `useSearchParams` forces any client component that calls it to opt out of
+// static prerender. Isolating the hook into this tiny child lets the parent
+// `InstantSearchNext` tree prerender (and cache) with default filter state,
+// then the bridge mounts after hydration and pushes URL params up. Shared
+// filtered URLs flicker one frame from default → filtered, then settle.
+const ClientUrlParamsBridge = ({ onChange }: { onChange: (sp: URLSearchParams) => void }) => {
+  const params = useSearchParams();
+  useEffect(() => {
+    const url = new URLSearchParams();
+    params.forEach((value, key) => url.append(key, value));
+    onChange(url);
+  }, [params, onChange]);
+  return null;
+};
 
 type CustomUiState = UiState & {
   product: {
@@ -111,7 +126,13 @@ const InstantSearchWrapper = ({
   const [differedSidebar] = useDebounce(sidebar, 800);
   const [hitsPerPage, setHitsPerPage] = useState<number>(12);
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const searchParams = useSearchParams();
+  // URL params are populated on the client by `<ClientUrlParamsBridge>`. On
+  // SSR / first paint this is null — `searchParams` falls back to an empty
+  // URLSearchParams so the rest of the component renders with default filter
+  // state. After hydration the bridge fires once, filter recomputes, and
+  // shared filtered URLs settle into the right hits.
+  const [urlParams, setUrlParams] = useState<URLSearchParams | null>(null);
+  const searchParams = useMemo(() => urlParams ?? new URLSearchParams(), [urlParams]);
   const [debouncedIsTyping] = useDebounce(isTyping, 500);
 
   useEffect(() => {
@@ -159,6 +180,27 @@ const InstantSearchWrapper = ({
     };
   }, [searchParams, sidebar]);
 
+  // /deals reads its tab selection from `?filter=clearance,offers` so
+  // we keep the deals page itself static (no SSR searchParams read) and
+  // let the bridge feed the override here. `clearance` and `offers` are
+  // mapped to the same WP tag slugs the page uses for the SSR default.
+  // Gated on `dealTags` so the override only applies on routes that
+  // already opt-in (i.e. /deals); without this guard, /samsung?filter=clearance
+  // would silently filter brand pages by the clearance tag.
+  const effectiveDealTags = useMemo(() => {
+    if (!dealTags) return dealTags;
+    const filterParam = searchParams.get('filter');
+    if (!filterParam) return dealTags;
+    const slugs = filterParam
+      .split(',')
+      .map((v) => v.trim())
+      .map((v): 'clearance' | 'bogo-offer' | null =>
+        v === 'offers' ? 'bogo-offer' : v === 'clearance' ? 'clearance' : null,
+      )
+      .filter((v): v is 'clearance' | 'bogo-offer' => v !== null);
+    return slugs.length > 0 ? slugs : dealTags;
+  }, [searchParams, dealTags]);
+
   const getFilterQuery: () => string = () => {
     const f = [
       effective.priceRange.join("") !== PRICE_RANGE.join("")
@@ -179,8 +221,8 @@ const InstantSearchWrapper = ({
       effective.on_sale ? "onSale:true" : null,
       effective.in_stock ? "stockStatus:IN_STOCK && productTags.nodes.slug:!=pre-order" : null,
       sidebar.out_of_stock ? "stockStatus:OUT_OF_STOCK" : null,
-      dealTags && dealTags.length > 0
-        ? `productTags.nodes.slug:[${dealTags.join(",")}]`
+      effectiveDealTags && effectiveDealTags.length > 0
+        ? `productTags.nodes.slug:[${effectiveDealTags.join(",")}]`
         : tag
           ? `productTags.nodes.slug:${tag}`
           : null,
@@ -202,7 +244,7 @@ const InstantSearchWrapper = ({
   useEffect(() => {
     setFilterQuery(getFilterQuery);
     // setSortQuery(differedSidebar.sort);
-  }, [differedSidebar, tag, JSON.stringify(dealTags || [])]);
+  }, [differedSidebar, tag, JSON.stringify(effectiveDealTags || [])]);
 
   useEffect(() => {
     if (!search) {
@@ -338,6 +380,9 @@ const InstantSearchWrapper = ({
   // Create reactive stateMapping that updates when sidebar changes
   return (
     <div>
+      <Suspense fallback={null}>
+        <ClientUrlParamsBridge onChange={setUrlParams} />
+      </Suspense>
       <InstantSearchNext
         stalledSearchDelay={200}
         future={{

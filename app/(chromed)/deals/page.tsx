@@ -1,45 +1,33 @@
 import ArchiveLayout from "@/app/components/archive/ArchiveLayout";
 import { Metadata } from "next";
+import { Suspense } from "react";
 
-const DEAL_FILTERS = {
-  clearance: "clearance",
-  offers: "bogo-offer",
-} as const;
-
-type DealsFilterKey = keyof typeof DEAL_FILTERS;
+export const revalidate = 1800;
 
 export const metadata: Metadata = {
   title: "Deals",
   description: "Browse clearance deals and BOGO free offers at GQ Mobiles.",
 };
 
-export default async function DealsPage(props: {
-  searchParams: Promise<{ filter?: string | string[] }>;
-}) {
-  const searchParams = await props.searchParams;
-  const rawFilter = searchParams.filter;
-  const rawValues = Array.isArray(rawFilter)
-    ? rawFilter
-    : typeof rawFilter === "string"
-    ? rawFilter.split(",")
-    : [];
+// SSR default = clearance. The `?filter=` URL override is applied
+// client-side by InstantSearchWrapper (reads it via the search-params
+// bridge and rebuilds the Typesense filter) and by DealsTypeFilter for
+// the tab UI. Reading searchParams here would force the page dynamic
+// and uncacheable.
+const DEFAULT_DEALS_TYPE: ("clearance" | "offers")[] = ["clearance"];
+const DEFAULT_DEAL_TAGS = ["clearance"];
 
-  const selectedTypes = (rawValues
-    .map((v) => v.trim())
-    .filter((v): v is DealsFilterKey => v === "clearance" || v === "offers")) as DealsFilterKey[];
-
-  const uniqueSelectedTypes = Array.from(new Set(selectedTypes));
-  const effectiveTypes = uniqueSelectedTypes.length > 0 ? uniqueSelectedTypes : (["clearance"] as DealsFilterKey[]);
-  const dealTags = effectiveTypes.map((key) => DEAL_FILTERS[key]);
-
+export default function DealsPage() {
   return (
-    <ArchiveLayout
-      title="Deals"
-      headingOverride="Deals"
-      descriptionOverride="Explore clearance products and free offers in one place."
-      filters
-      dealsType={effectiveTypes}
-      dealTags={dealTags}
-    />
+    <Suspense>
+      <ArchiveLayout
+        title="Deals"
+        headingOverride="Deals"
+        descriptionOverride="Explore clearance products and free offers in one place."
+        filters
+        dealsType={DEFAULT_DEALS_TYPE}
+        dealTags={DEFAULT_DEAL_TAGS}
+      />
+    </Suspense>
   );
 }

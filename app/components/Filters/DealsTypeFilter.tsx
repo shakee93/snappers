@@ -2,16 +2,30 @@
 
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import { ChevronDown } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo, useState } from "react";
 
 type DealsTypeFilterProps = {
+  // SSR default — mirrors what the deals page passes when there's no
+  // `?filter=` in the URL. After hydration we read the URL directly so
+  // tab clicks toggle the active state without needing the page itself
+  // to re-render (the page is intentionally static for edge caching).
   activeTypes: ("clearance" | "offers")[];
 };
 
-const DealsTypeFilter = ({ activeTypes }: DealsTypeFilterProps) => {
+const DealsTypeFilter = ({ activeTypes: defaultActiveTypes }: DealsTypeFilterProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const activeTypes = useMemo<("clearance" | "offers")[]>(() => {
+    const raw = searchParams.get("filter");
+    if (!raw) return defaultActiveTypes;
+    const parsed = raw
+      .split(",")
+      .map((v) => v.trim())
+      .filter((v): v is "clearance" | "offers" => v === "clearance" || v === "offers");
+    return parsed.length > 0 ? Array.from(new Set(parsed)) : defaultActiveTypes;
+  }, [searchParams, defaultActiveTypes]);
 
   const handleToggle = (type: "clearance" | "offers", checked: boolean) => {
     const current = new Set(activeTypes);
