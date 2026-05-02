@@ -74,10 +74,10 @@ export const GET_SITEMAP_PRODUCTS_BY_BRAND = gql`
   }
 `;
 export const GET_BRAND_PRODUCTS = gql`
-  query GetBrandProducts($brandSlug: ID!, $idType: BrandIdType!) {
+  query GetBrandProducts($brandSlug: ID!, $idType: BrandIdType!, $after: String) {
     brand(id: $brandSlug, idType: $idType) {
       brandId
-      products(first: 100) {
+      products(first: 100, after: $after) {
         nodes {
           id
           slug
