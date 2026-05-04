@@ -3,14 +3,15 @@ import { getClient } from "@/graphql/apollo-ssr";
 import { GET_PRODUCTS_BY_BOGO_TAG } from "@/graphql/defs/products";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import { Metadata } from "next";
+import { unstable_cache } from "next/cache";
+import { Suspense } from "react";
 
 export const metadata: Metadata = {
   title: "Deals",
-  description:
-    "Browse Up to 75% off, Buy One Get One, and Free Gift deals at GQ Mobiles.",
+  description: "Up to 75% off, Buy One Get One, and Free Gift deals at GQ Mobiles.",
 };
 
-// Fallback ISR revalidation — the primary cache is invalidated by the WP webhook at /api/revalidate.
+// Safety-net ISR — primary invalidation is via revalidateTag('deals') from /api/revalidate.
 export const revalidate = 300;
 
 type DealProduct = SimpleProduct | VariableProduct;
@@ -21,29 +22,43 @@ const fetchByTag = (tagIn: string[]): Promise<DealProduct[]> =>
     .then((res) => (res.data?.products?.nodes ?? []) as DealProduct[])
     .catch(() => []);
 
-const prioritizeInStock = (items: DealProduct[]): DealProduct[] => {
-  const inStock = items.filter((p) => p.stockStatus === "IN_STOCK");
-  const soldOut = items.filter((p) => p.stockStatus !== "IN_STOCK");
-  return [...inStock, ...soldOut];
-};
+const getDealsData = unstable_cache(
+  async () => {
+    const [clearance, bogo, freeGift] = await Promise.all([
+      fetchByTag(["clearance"]),
+      fetchByTag(["bogo-offer"]),
+      fetchByTag(["free-gift"]),
+    ]);
+    return { clearance, bogo, freeGift };
+  },
+  ["deals-sliders"],
+  { tags: ["deals"], revalidate: 300 }
+);
 
-const getDealsData = async () => {
-  const [clearance, bogo, freeGift] = await Promise.all([
-    fetchByTag(["clearance"]),
-    fetchByTag(["bogo-offer"]),
-    fetchByTag(["free-gift"]),
-  ]);
-
-  return {
-    clearance: prioritizeInStock(clearance),
-    bogo: prioritizeInStock(bogo),
-    freeGift: prioritizeInStock(freeGift),
-  };
-};
-
-export default async function DealsPage() {
+async function DealsSliders() {
   const { clearance, bogo, freeGift } = await getDealsData();
+  return (
+    <>
+      <SectionSliderProductCard
+        products={clearance}
+        heading="Up to 75% off"
+        link="/tag/clearance"
+      />
+      <SectionSliderProductCard
+        products={bogo}
+        heading="Buy One Get One"
+        link="/tag/bogo-offer"
+      />
+      <SectionSliderProductCard
+        products={freeGift}
+        heading="Free Gift"
+        link="/tag/free-gift"
+      />
+    </>
+  );
+}
 
+export default function DealsPage() {
   return (
     <main>
       <div className="nc-PageHome relative flex flex-col overflow-hidden">
@@ -57,23 +72,9 @@ export default async function DealsPage() {
             </span>
           </div>
 
-          <SectionSliderProductCard
-            products={clearance}
-            heading="Up to 75% off"
-            link="/tag/clearance"
-          />
-
-          <SectionSliderProductCard
-            products={bogo}
-            heading="Buy One Get One"
-            link="/tag/bogo-offer"
-          />
-
-          <SectionSliderProductCard
-            products={freeGift}
-            heading="Free Gift"
-            link="/tag/free-gift"
-          />
+          <Suspense>
+            <DealsSliders />
+          </Suspense>
         </div>
       </div>
     </main>

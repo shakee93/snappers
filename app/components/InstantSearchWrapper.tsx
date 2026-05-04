@@ -58,7 +58,6 @@ interface InstantSearchWrapperProps {
   searchQueryValue?: string;
   dealsType?: ("clearance" | "offers")[];
   dealTags?: string[];
-  desktopColumns?: 4 | 5;
 }
 
 const typesenseConfig = {
@@ -107,7 +106,6 @@ const InstantSearchWrapper = ({
   searchQueryValue,
   dealsType,
   dealTags,
-  desktopColumns = 4,
 }: InstantSearchWrapperProps) => {
   const { sidebar, setSearchMounted, isTyping } = useStore();
   const [differedSidebar] = useDebounce(sidebar, 800);
@@ -405,7 +403,6 @@ const InstantSearchWrapper = ({
               <ProductGridInstant
                 hitsPerPage={hitsPerPage}
                 setHitsPerPage={setHitsPerPage}
-                desktopColumns={desktopColumns}
               />
             </div>
 

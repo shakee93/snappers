@@ -19,7 +19,6 @@ interface ProductGridProps {
   pages?: number;
   hitsPerPage?: number;
   setHitsPerPage?: (hitsPerPage: number) => void;
-  desktopColumns?: 4 | 5;
 }
 
 const ProductGridInstant = ({
@@ -29,7 +28,6 @@ const ProductGridInstant = ({
   pages,
   hitsPerPage,
   setHitsPerPage,
-  desktopColumns = 4,
 }: ProductGridProps) => {
 
   const { hits, results } = useHits();
@@ -93,8 +91,7 @@ const ProductGridInstant = ({
   // 'loading'/'stalled' on cache reads and widget churn even without a real
   // network round-trip; unmounting the grid for those transitions causes a
   // visible flicker. Only show the skeleton on the very first load.
-  const desktopGridClass =
-    desktopColumns === 5 ? "lg:grid-cols-5" : "lg:grid-cols-4";
+  const desktopGridClass = "lg:grid-cols-4";
   const showSkeleton = hits.length === 0 && (statusState === 'stalled' || statusState === 'loading');
 
   return (
