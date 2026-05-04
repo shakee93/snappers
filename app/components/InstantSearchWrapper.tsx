@@ -15,6 +15,7 @@ import MobileFilterSheet from "@/app/components/MobileFilterSheet";
 import { history } from "instantsearch.js/es/lib/routers";
 import { UiState } from "instantsearch.js";
 import { useSearchParams } from "next/navigation";
+import { HIDDEN_PRODUCT_SLUGS } from "@/lib/hidden-products";
 
 type CustomUiState = UiState & {
   product: {
@@ -189,6 +190,9 @@ const InstantSearchWrapper = ({
 
   const getFilterQuery: () => string = () => {
     const f = [
+      HIDDEN_PRODUCT_SLUGS.size > 0
+        ? Array.from(HIDDEN_PRODUCT_SLUGS).map(s => `slug:!=${s}`).join(" && ")
+        : null,
       effective.priceRange.join("") !== PRICE_RANGE.join("")
         ? `rawPrice:[${effective.priceRange[0]}..${effective.priceRange[1]}]`
         : null,

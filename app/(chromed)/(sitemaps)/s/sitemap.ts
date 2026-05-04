@@ -1,5 +1,6 @@
 import { BASE_URL, getBrands } from '@/app/sitemap-helpers'
 import { Brand } from '@/graphql/types/graphql';
+import { HIDDEN_PRODUCT_SLUGS } from '@/lib/hidden-products';
 import type { MetadataRoute } from 'next'
 import { getClient } from '@/graphql/apollo-ssr'
 import { GET_BRAND_PRODUCTS } from '@/graphql/defs/sitemap-queries'
@@ -99,10 +100,12 @@ export default async function sitemap({ id }: { id: Promise<string> | string }):
 
   const products = await getProducts(slug)
 
-  return products.map((product) => ({ 
-    url: `${BASE_URL}/${slug}/${product.slug}`,
-    changeFrequency: 'weekly',
-    priority: 0.7,
-    lastModified: product.date,
-  }))
+  return products
+    .filter((product) => !HIDDEN_PRODUCT_SLUGS.has(product.slug.toLowerCase()))
+    .map((product) => ({
+      url: `${BASE_URL}/${slug}/${product.slug}`,
+      changeFrequency: 'weekly',
+      priority: 0.7,
+      lastModified: product.date,
+    }))
 }

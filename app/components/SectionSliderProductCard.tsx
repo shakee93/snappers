@@ -12,6 +12,7 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from "@/components/ui/carousel";
+import { filterHiddenProducts } from "@/lib/hidden-products";
 
 export interface SectionSliderProductCardProps {
   className?: string;
@@ -86,25 +87,26 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
     };
   }, [api, mounted]);
 
-  const filteredProducts = products.filter((product) => {
-    if (product?.price || product?.regularPrice || product?.salePrice) {
-      return true;
-    }
+  const filteredProducts = filterHiddenProducts(products)
+    .filter((product) => {
+      if (product?.price || product?.regularPrice || product?.salePrice) {
+        return true;
+      }
 
-    const variationNodes = (product?.variations as {
-      nodes?: Array<{
-        price?: string | null;
-        regularPrice?: string | null;
-        salePrice?: string | null;
-      }>;
-    } | null)?.nodes;
+      const variationNodes = (product?.variations as {
+        nodes?: Array<{
+          price?: string | null;
+          regularPrice?: string | null;
+          salePrice?: string | null;
+        }>;
+      } | null)?.nodes;
 
-    return (
-      variationNodes?.some(
-        (variation) => variation?.price || variation?.regularPrice || variation?.salePrice
-      ) ?? false
-    );
-  });
+      return (
+        variationNodes?.some(
+          (variation) => variation?.price || variation?.regularPrice || variation?.salePrice
+        ) ?? false
+      );
+    });
 
   if (!filteredProducts.length) {
     return null;
