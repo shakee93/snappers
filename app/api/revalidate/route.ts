@@ -1,5 +1,6 @@
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { NextRequest } from 'next/server'
+import { DEALS_CACHE_TAG } from '@/lib/cache-tags'
 
 // NOTE: IF you want to revalidate all routes, use `/api/revalidate?path=all`;
 // just use `/api/revalidate`.
@@ -10,7 +11,7 @@ export async function GET(request: NextRequest) {
 
         if (path === 'all') {
             revalidatePath('/', 'layout');
-            revalidateTag('deals', 'max');
+            revalidateTag(DEALS_CACHE_TAG, 'max');
             return Response.json({ revalidated: 'all', now: Date.now() })
         }
 
@@ -24,9 +25,9 @@ export async function GET(request: NextRequest) {
         }
 
         revalidatePath(path);
-        // Product tag changes should also bust the deals sliders
+        // Bust deals sliders when a product or tag page changes
         if (path.startsWith('/product') || path.startsWith('/tag')) {
-            revalidateTag('deals', 'max');
+            revalidateTag(DEALS_CACHE_TAG, 'max');
         }
         return Response.json({ revalidated: true, now: Date.now() })
     }

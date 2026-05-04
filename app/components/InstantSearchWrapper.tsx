@@ -381,7 +381,7 @@ const InstantSearchWrapper = ({
           </div>
           <div className='grid grid-cols-12 gap-4'>
 
-            <div className={filters ? 'col-span-0 lg:col-span-3' : 'hidden'}>
+            <div className={filters ? 'hidden lg:block lg:col-span-3' : 'hidden'}>
               {typeof window !== 'undefined' && (
                 <DelayedRender delay={5000}>
                   <SortInput />

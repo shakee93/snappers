@@ -148,7 +148,7 @@ const ProductCard: FC<ProductCardProps> = ({
       ),
       productDbId ?? data?.databaseId
     ),
-    [data, batchBogoMeta, productDbId]
+    [data?.metaData, batchBogoMeta, productDbId]
   );
 
   const handleHoverOut = () => {

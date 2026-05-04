@@ -81,13 +81,9 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
       return true;
     }
 
-    const variationNodes = ((product as VariableProduct)?.variations as {
-      nodes?: Array<{
-        price?: string | null;
-        regularPrice?: string | null;
-        salePrice?: string | null;
-      }>;
-    } | null)?.nodes;
+    const variationNodes = ('variations' in product && product.variations)
+      ? (product.variations as { nodes?: Array<{ price?: string | null; regularPrice?: string | null; salePrice?: string | null }> } | null)?.nodes
+      : undefined;
 
     return (
       variationNodes?.some(
@@ -149,15 +145,14 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
               className="w-full"
             >
               <CarouselContent className="-ml-2 md:-ml-4">
-                {filteredProducts.map((item, index) => (
+                {filteredProducts.map((item) => (
                   <CarouselItem
-                    key={index}
+                    key={item.slug}
                     className={`pl-2 md:pl-4 ${itemClassName} basis-1/2 sm:basis-1/3 lg:basis-1/5`}
                   >
                     <div className="w-full">
                       <ProductCard
                         className="transition-opacity duration-300"
-                        key={item.slug}
                         data={item}
                       />
                     </div>
@@ -174,9 +169,9 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
         ) : (
           // Pre-hydration: static flex-scroll so product names/links are in the server HTML
           <div className="py-4 -ml-2 md:-ml-4 flex overflow-x-auto">
-            {filteredProducts.map((item, index) => (
+            {filteredProducts.map((item) => (
               <div
-                key={index}
+                key={item.slug}
                 className={`pl-2 md:pl-4 flex-shrink-0 basis-1/2 sm:basis-1/3 lg:basis-1/5`}
               >
                 <ProductCard data={item} />

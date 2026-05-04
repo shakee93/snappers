@@ -2,6 +2,7 @@ import SectionSliderProductCard from "@/app/components/SectionSliderProductCard"
 import { getClient } from "@/graphql/apollo-ssr";
 import { GET_PRODUCTS_BY_BOGO_TAG } from "@/graphql/defs/products";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
+import { DEALS_CACHE_TAG } from "@/lib/cache-tags";
 import { Metadata } from "next";
 import { unstable_cache } from "next/cache";
 import { Suspense } from "react";
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
   description: "Up to 75% off, Buy One Get One, and Free Gift deals at GQ Mobiles.",
 };
 
-// Safety-net ISR — primary invalidation is via revalidateTag('deals') from /api/revalidate.
+// Safety-net ISR — primary invalidation is via revalidateTag(DEALS_CACHE_TAG) from /api/revalidate.
 export const revalidate = 300;
 
 type DealProduct = SimpleProduct | VariableProduct;
@@ -20,7 +21,10 @@ const fetchByTag = (tagIn: string[]): Promise<DealProduct[]> =>
   getClient()
     .query({ query: GET_PRODUCTS_BY_BOGO_TAG, variables: { first: 20, tagIn } })
     .then((res) => (res.data?.products?.nodes ?? []) as DealProduct[])
-    .catch(() => []);
+    .catch((e) => {
+      console.error("[deals] fetch failed", e);
+      return [];
+    });
 
 const getDealsData = unstable_cache(
   async () => {
@@ -32,11 +36,20 @@ const getDealsData = unstable_cache(
     return { clearance, bogo, freeGift };
   },
   ["deals-sliders"],
-  { tags: ["deals"], revalidate: 300 }
+  { tags: [DEALS_CACHE_TAG], revalidate: 300 }
 );
 
 async function DealsSliders() {
   const { clearance, bogo, freeGift } = await getDealsData();
+
+  if (!clearance.length && !bogo.length && !freeGift.length) {
+    return (
+      <p className="text-neutral-500 dark:text-neutral-400 text-sm">
+        No active deals right now — check back soon.
+      </p>
+    );
+  }
+
   return (
     <>
       <SectionSliderProductCard
