@@ -1,5 +1,8 @@
 import ArchiveLayout from "@/app/components/archive/ArchiveLayout";
 import { Metadata, ResolvingMetadata } from "next";
+import { Suspense } from "react";
+
+export const revalidate = 1800;
 
 export const metadata: Metadata = {
   title: 'All Collections',
@@ -10,7 +13,9 @@ export const metadata: Metadata = {
 const Page = () => {
 
   return (
-    <ArchiveLayout title="All Collections" filters />
+    <Suspense>
+      <ArchiveLayout title="All Collections" filters />
+    </Suspense>
   );
 };
 

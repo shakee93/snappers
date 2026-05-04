@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import ButtonPrimary from "shared/Button/ButtonPrimary";
 import Input from "shared/Input/Input";
 import CountryPhoneInput from "./components/CountryPhoneInput";
 import Link from "next/link";
@@ -10,49 +9,241 @@ import { CustomerAddress, PaymentGateway } from "@/graphql/types/graphql";
 import { contactInformation } from "@/data/types";
 import Select from "shared/Select/Select";
 import { toast } from "sonner";
-import {
-    SelectField,
-    SRI_LANKAN_STATES,
-} from "@/components/AddressPageComps/HelperComps";
-import Checkbox from "@/shared/Checkbox/Checkbox";
-import Radio from "shared/Radio/Radio";
+import { SRI_LANKAN_STATES } from "@/components/AddressPageComps/HelperComps";
 import { useCart } from "@/context/CartProvider";
-import { Check } from "lucide-react";
+import Checkbox from "@/shared/Checkbox/Checkbox";
+import ButtonPrimary from "shared/Button/ButtonPrimary";
+import PreOrderNotice from "@/components/PreOrderNotice";
+import {
+    Store,
+    Truck,
+    Zap,
+    CreditCard,
+    Landmark,
+    Check,
+    ChevronRight,
+    ArrowLeft,
+    Loader,
+} from "lucide-react";
+
+export type DeliveryType = "courier" | "store_pickup" | "flash_delivery";
+
+export interface CheckoutSubmitPayload {
+    contactInfo: { phone: string; email: string; country: string };
+    deliveryAddress: {
+        firstName: string;
+        lastName: string;
+        address: string;
+        apartment: string;
+        city: string;
+        state: string;
+        postal: string;
+        country: string;
+        addressType: string;
+    };
+    billingAddress: {
+        firstName: string;
+        lastName: string;
+        address: string;
+        apartment: string;
+        city: string;
+        state: string;
+        postal: string;
+        country: string;
+        addressType: string;
+    };
+    paymentMethod: {
+        selectedGateway: { id: string; title: string | null };
+        bankSlipFile: File | null;
+    };
+    deliveryType: DeliveryType;
+}
+
+type StepKey = "details" | "payment" | "review";
+
+interface CheckoutStepperProps {
+    currentStep: StepKey;
+}
+
+const STEP_ORDER: StepKey[] = ["details", "payment", "review"];
+const STEP_LABELS: Record<StepKey, string> = {
+    details: "Details",
+    payment: "Payment",
+    review: "Review",
+};
+
+const CheckoutStepper = ({ currentStep }: CheckoutStepperProps) => {
+    const currentIndex = STEP_ORDER.indexOf(currentStep);
+    const visibleSteps = STEP_ORDER.slice(0, currentIndex + 1);
+    return (
+        <nav
+            aria-label="Checkout progress"
+            className="flex items-center flex-wrap gap-y-1 text-xs sm:text-sm mb-6 -mt-2"
+        >
+            <Link
+                href="/cart"
+                className="text-slate-500 hover:text-primaryColor underline-offset-2 hover:underline"
+            >
+                Cart
+            </Link>
+            {visibleSteps.map((key, idx) => {
+                const isCurrent = key === currentStep;
+                const isComplete = idx < currentIndex;
+                return (
+                    <span key={key} className="flex items-center">
+                        <ChevronRight
+                            className="mx-1.5 sm:mx-2 w-3.5 h-3.5 text-slate-400 shrink-0"
+                            strokeWidth={2}
+                        />
+                        <span
+                            className={
+                                isCurrent
+                                    ? "font-semibold text-slate-900 dark:text-slate-100"
+                                    : "text-slate-600 dark:text-slate-300 inline-flex items-center gap-1"
+                            }
+                            aria-current={isCurrent ? "step" : undefined}
+                        >
+                            {isComplete && (
+                                <Check className="w-3 h-3 text-emerald-600" strokeWidth={3} />
+                            )}
+                            {STEP_LABELS[key]}
+                        </span>
+                    </span>
+                );
+            })}
+        </nav>
+    );
+};
+
+const BrandBadge = ({ src, alt }: { src: string; alt: string }) => (
+    <span className="inline-flex items-center justify-center w-7 h-7 rounded-md overflow-hidden bg-white ring-1 ring-slate-200 dark:ring-slate-700">
+        <Image src={src} alt={alt} width={28} height={28} className="object-cover w-full h-full" />
+    </span>
+);
+
+const FIELD_CLASS = "border-2 border-slate-300 placeholder:text-slate-400 hover:border-slate-400 focus:!ring-0 focus:!border-primaryColor focus:outline-none dark:border-slate-600 dark:hover:border-slate-500";
+
+interface DeliveryOptionProps {
+    value: DeliveryType;
+    selected: boolean;
+    onSelect: (v: DeliveryType) => void;
+    icon: React.ReactNode;
+    title: string;
+    subtitle: string;
+    chip?: { label: string; tone: "emerald" | "blue" };
+    trailing?: React.ReactNode;
+}
+
+const CHIP_TONES = {
+    emerald: "bg-emerald-500 text-white",
+    blue: "bg-blue-500 text-white",
+} as const;
+
+const DeliveryOption = ({
+    value,
+    selected,
+    onSelect,
+    icon,
+    title,
+    subtitle,
+    chip,
+    trailing,
+}: DeliveryOptionProps) => (
+    <label
+        className={`group flex items-center gap-4 w-full p-4 rounded-xl border-2 cursor-pointer transition-colors ${
+            selected
+                ? "border-primaryColor bg-primary-50/60 dark:bg-primary-900/20"
+                : "border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/40 hover:border-slate-300 hover:bg-slate-100 dark:hover:border-slate-600"
+        }`}
+    >
+        <input
+            type="radio"
+            name="pickup"
+            value={value}
+            checked={selected}
+            onChange={() => onSelect(value)}
+            className="sr-only"
+        />
+        <span
+            aria-hidden="true"
+            className={`flex items-center justify-center w-5 h-5 rounded-full border-2 shrink-0 transition-colors ${
+                selected
+                    ? "border-primaryColor bg-primaryColor"
+                    : "border-slate-300 dark:border-slate-600 group-hover:border-slate-400"
+            }`}
+        >
+            {selected && <span className="w-2 h-2 rounded-full bg-white" />}
+        </span>
+        <span
+            className={`flex items-center justify-center w-10 h-10 rounded-lg shrink-0 ${
+                selected
+                    ? "bg-primaryColor/10 text-primaryColor"
+                    : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+            }`}
+        >
+            {icon}
+        </span>
+        <div className="flex-1 min-w-0">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                    {title}
+                </span>
+                {chip && (
+                    <span
+                        className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold whitespace-nowrap ${CHIP_TONES[chip.tone]}`}
+                    >
+                        {chip.label}
+                    </span>
+                )}
+            </div>
+            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                {subtitle}
+            </div>
+        </div>
+        {trailing && <div className="shrink-0">{trailing}</div>}
+    </label>
+);
 
 interface Props {
-    updateFormData: (section: string, data: any) => void;
-    formData: any;
     initialContactData: contactInformation;
     initialShippingData: CustomerAddress | null;
     paymentGateways: PaymentGateway[];
-    handleConfirmationChange: any;
-    setIsStorePickup: any;
-    isStorePickup: boolean;
-    setIsCardPayment: any;
+    setDeliveryType: (v: DeliveryType | null) => void;
+    deliveryType: DeliveryType | null;
+    setIsCardPayment: (v: boolean) => void;
     isCardPayment: boolean;
     totalPayment: number;
-    setIsKokoPayment: any;
+    kokoTotal: number;
+    setIsKokoPayment: (v: boolean) => void;
     isKokoPayment: boolean;
     isPriceFluctuation: any;
-    onFormSubmit: () => void;
+    onCheckoutSubmit: (payload: CheckoutSubmitPayload) => Promise<void> | void;
+    isTOC: boolean;
+    onTOCChange: () => void;
+    tocError: boolean;
+    loading: boolean;
+    orderTotalLabel: string;
 }
 
 const UnifiedCheckoutForm = ({
-    updateFormData,
-    formData,
     initialContactData,
     initialShippingData,
     paymentGateways,
-    handleConfirmationChange,
-    setIsStorePickup,
-    isStorePickup,
+    setDeliveryType,
+    deliveryType,
     setIsCardPayment,
     isCardPayment,
     totalPayment,
+    kokoTotal,
     setIsKokoPayment,
     isKokoPayment,
     isPriceFluctuation,
-    onFormSubmit,
+    onCheckoutSubmit,
+    isTOC,
+    onTOCChange,
+    tocError,
+    loading,
+    orderTotalLabel,
 }: Props) => {
     // Contact Info State
     const [phone, setPhone] = useState("");
@@ -65,9 +256,8 @@ const UnifiedCheckoutForm = ({
     const [address, setAddress] = useState("");
     const [apartment, setApartment] = useState("");
     const [city, setCity] = useState("");
-    const [state, setState] = useState("");
+    const [state, setState] = useState("Western");
     const [postal, setPostal] = useState("");
-    const [addressCountry, setAddressCountry] = useState("");
     const [addressType, setAddressType] = useState("home");
 
     // Payment Method State
@@ -77,15 +267,24 @@ const UnifiedCheckoutForm = ({
         title: null,
     });
 
-    const [isBillingSameAsShipping, setIsBillingSameAsShipping] = useState(true);
-    const [pickupType, setPickupType] = useState<"store_uber_pickme" | "courier" | null>(null);
-
     const [bankSlipFile, setBankSlipFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-    const [submitState, setSubmitState] = useState<"idle" | "loading" | "success">("idle");
-
     const { cart } = useCart();
+
+    const courierShippingLabel = useMemo(() => {
+        const rates = cart?.availableShippingMethods?.[0]?.rates;
+        const flat = rates?.find(
+            (r) => r?.methodId === "flat_rate" || /flat rate|courier/i.test(r?.label || "")
+        );
+        const cost = flat?.cost ?? rates?.[0]?.cost;
+        const numeric = typeof cost === "string" ? parseFloat(cost) : Number(cost);
+        if (!Number.isFinite(numeric) || numeric <= 0) return null;
+        return `Rs ${new Intl.NumberFormat("en-US", {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+        }).format(numeric)}`;
+    }, [cart]);
 
     const handleBankSlipChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const fileList = event.target.files;
@@ -96,6 +295,14 @@ const UnifiedCheckoutForm = ({
             setPreviewUrl(URL.createObjectURL(file));
         }
     };
+
+    // Revoke any outstanding blob URL when the component unmounts so we don't
+    // leak it (the user navigating away from /checkout, or HMR during dev).
+    useEffect(() => {
+        return () => {
+            if (previewUrl) URL.revokeObjectURL(previewUrl);
+        };
+    }, [previewUrl]);
 
     // Initialize Contact Info
     useEffect(() => {
@@ -114,43 +321,15 @@ const UnifiedCheckoutForm = ({
             setAddress(initialShippingData.address1 || "");
             setApartment(initialShippingData.address2 || "");
             setCity(initialShippingData.city || "");
-            setState(initialShippingData.state || "");
+            setState(initialShippingData.state || "Western");
             setPostal(initialShippingData.postcode || "");
-            setAddressCountry(initialShippingData.country || "");
             setAddressType("home");
         }
     }, [initialShippingData]);
 
-    const handlePickupTypeChange = (type: "store_uber_pickme" | "courier" | null) => {
-        if (pickupType === type) {
-            setPickupType(null);
-            setIsStorePickup(false);
-            updateFormData("shippingDetails", {
-                databaseId: null,
-                id: null,
-                title: null,
-            });
-        } else {
-            if (type === null) {
-                return;
-            }
-            setPickupType(type);
-            const isPickup = type === "store_uber_pickme";
-            setIsStorePickup(isPickup);
-            if (isPickup) {
-                updateFormData("shippingDetails", {
-                    databaseId: "local_pickup",
-                    id: "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==",
-                    title: "Store / Uber / PickMe",
-                });
-            } else {
-                updateFormData("shippingDetails", {
-                    databaseId: null,
-                    id: null,
-                    title: "Courier",
-                });
-            }
-        }
+
+    const handlePickupTypeChange = (type: DeliveryType) => {
+        setDeliveryType(type);
     };
 
     const removePayhereOnMobileAndTab = () => {
@@ -208,7 +387,6 @@ const UnifiedCheckoutForm = ({
 
             return currentCart.contents.nodes.some((node: any) => {
                 const productNode = node.product?.node || node.product;
-                console.log("[PreOrder Debug] Cart item product:", productNode?.name, "tags:", productNode?.productTags?.nodes);
                 return isPreOrderProduct(productNode);
             });
         } catch (error) {
@@ -240,25 +418,48 @@ const UnifiedCheckoutForm = ({
         });
     }, [paymentGateways, isPreOrderCart, isPriceFluctuation, totalPayment, cart]);
 
+    // Gateways that should appear but be greyed-out for the current delivery
+    // method. Cash on Delivery is incompatible with Flash Delivery — the
+    // courier driver doesn't collect cash on our behalf.
+    const gatewayDisabledReason = (gatewayId: string): string | null => {
+        if (deliveryType === "flash_delivery" && gatewayId === "cod") {
+            return "Not available with Flash Delivery — pay online instead";
+        }
+        return null;
+    };
+
+    // Auto-select first enabled gateway when none is selected.
     useEffect(() => {
         if (!visiblePaymentGateways.length || selectedGateway.id) return;
-        const g = visiblePaymentGateways[0];
+        const g = visiblePaymentGateways.find((gw) => !gatewayDisabledReason(gw.id));
+        if (!g) return;
         setMethodActive(g.id);
         setSelectedGateway({ id: g.id, title: g.title });
-        if (g.id === "darazbnpl") {
-            setIsKokoPayment(true);
-        } else {
-            setIsKokoPayment(false);
-        }
-        if (g.id === "payhere") {
-            setIsCardPayment(true);
-        } else {
-            setIsCardPayment(false);
-        }
-    }, [visiblePaymentGateways, selectedGateway.id, setIsCardPayment, setIsKokoPayment]);
+        setIsKokoPayment(g.id === "darazbnpl");
+        setIsCardPayment(g.id === "payhere");
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- gatewayDisabledReason depends on deliveryType which is already in deps
+    }, [visiblePaymentGateways, selectedGateway.id, deliveryType, setIsCardPayment, setIsKokoPayment]);
+
+    // If the currently-selected gateway becomes disabled (e.g. user picks COD
+    // then switches to Flash Delivery), clear it so the form can't submit
+    // through an option the user can no longer see as available.
+    useEffect(() => {
+        if (!selectedGateway.id) return;
+        if (!gatewayDisabledReason(selectedGateway.id)) return;
+        setSelectedGateway({ id: "", title: null });
+        setMethodActive("");
+        setIsKokoPayment(false);
+        setIsCardPayment(false);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [deliveryType, selectedGateway.id]);
 
     const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
+
+        if (!deliveryType) {
+            toast.error("Please select a delivery method.");
+            return;
+        }
 
         if (!selectedGateway.id) {
             toast.error("Please select a payment method.");
@@ -270,20 +471,7 @@ const UnifiedCheckoutForm = ({
             return;
         }
 
-        setSubmitState("loading");
-        await new Promise<void>((r) => requestAnimationFrame(() => r()));
-
-        // Update Contact Info
-        const contactInfo = {
-            phone,
-            email,
-            country,
-        };
-        updateFormData("contactInfo", contactInfo);
-        handleConfirmationChange("contactInfo", true);
-
-        // Update Delivery Address
-        const shippingAddressData = {
+        const addressFields = {
             firstName,
             lastName,
             address,
@@ -291,182 +479,305 @@ const UnifiedCheckoutForm = ({
             city,
             state,
             postal,
-            country: addressCountry,
+            country: "LK",
             addressType,
         };
 
-        updateFormData("deliveryAddress", shippingAddressData);
-        handleConfirmationChange("deliveryAddress", true);
-
-        if (isStorePickup || isBillingSameAsShipping) {
-            updateFormData("billingAddress", shippingAddressData);
-            handleConfirmationChange("billingAddress", true);
-        }
-
-        if (isStorePickup) {
-            updateFormData("shippingDetails", {
-                databaseId: "local_pickup",
-                id: "c2hpcHBpbmdfbWV0aG9kOmxvY2FsX3BpY2t1cA==",
-                title: "StorePickup",
-            });
-        }
-
-        // Update Payment Method
-        const paymethod = {
-            selectedGateway,
-            bankSlipFile: selectedGateway.id === "bacs" ? bankSlipFile : null,
+        const payload: CheckoutSubmitPayload = {
+            contactInfo: { phone, email, country },
+            deliveryAddress: addressFields,
+            billingAddress: addressFields,
+            paymentMethod: {
+                selectedGateway: {
+                    id: selectedGateway.id,
+                    title: selectedGateway.title ?? null,
+                },
+                bankSlipFile: selectedGateway.id === "bacs" ? bankSlipFile : null,
+            },
+            deliveryType,
         };
-        updateFormData("paymentMethod", paymethod);
-        handleConfirmationChange("paymentMethod", true);
 
-        await new Promise<void>((r) => setTimeout(r, 400));
-
-        onFormSubmit();
-        setSubmitState("success");
-        window.setTimeout(() => setSubmitState("idle"), 2500);
+        await onCheckoutSubmit(payload);
     };
 
-    const PaymentMethods = ({ gateway }: { gateway: PaymentGateway }) => {
+    const getGatewayMeta = (gateway: PaymentGateway) => {
+        switch (gateway.id) {
+            case "payhere":
+                return {
+                    title: "Pay Online",
+                    subtitle: "Secure online card payment",
+                    icon: <CreditCard className="w-5 h-5" strokeWidth={1.75} />,
+                    trailing: (
+                        <div className="flex items-center gap-1.5">
+                            <BrandBadge src="/logos/visa.png" alt="Visa" />
+                            <BrandBadge src="/logos/mastercard.png" alt="Mastercard" />
+                        </div>
+                    ),
+                };
+            case "cod":
+                return {
+                    title: gateway.title || "Cash on delivery: Powered by Citypak",
+                    subtitle: "Powered by Citypak",
+                    icon: (
+                        <div className="w-8 h-5 flex items-center justify-center">
+                            <Image src="/citypak.png" alt="citypak" width={40} height={20} />
+                        </div>
+                    ),
+                    trailing: null,
+                };
+            case "darazbnpl": {
+                const kokoBase = kokoTotal > 0 ? kokoTotal : totalPayment;
+                const perInstallment = kokoBase > 0 ? kokoBase / 3 : 0;
+                return {
+                    title: gateway.title || "Koko Pay",
+                    subtitle: "Split into 3 interest-free installments",
+                    icon: <div className="w-8 h-5 flex items-center justify-center"><Image src="/koko.png" alt="Koko" width={40} height={20} /></div>,
+                    trailing: perInstallment ? (
+                        <div className="flex items-center gap-2">
+                            <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">
+                                3 × Rs {new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(perInstallment)}
+                            </span>
+                            <Image src="/koko.png" alt="Koko" width={36} height={18} className="h-4 w-auto" />
+                        </div>
+                    ) : null,
+                };
+            }
+            case "bacs":
+                return {
+                    title: gateway.title || "Direct bank transfer",
+                    subtitle: "Commercial Bank — upload your slip after transfer",
+                    icon: <Landmark className="w-5 h-5" strokeWidth={1.75} />,
+                    trailing: (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
+                            Instant
+                        </span>
+                    ),
+                };
+            case "geniebiz":
+                return {
+                    title: gateway.title || "Genie Pay",
+                    subtitle: "Pay with your Genie mobile wallet",
+                    icon: <CreditCard className="w-5 h-5" strokeWidth={1.75} />,
+                    trailing: null,
+                };
+            case "ndb-pay":
+                return {
+                    title: gateway.title || "NDB Pay",
+                    subtitle: "Secure online card payment",
+                    icon: <CreditCard className="w-5 h-5" strokeWidth={1.75} />,
+                    trailing: (
+                        <div className="flex items-center gap-1.5">
+                            <BrandBadge src="/logos/visa.png" alt="Visa" />
+                            <BrandBadge src="/logos/mastercard.png" alt="Mastercard" />
+                        </div>
+                    ),
+                };
+            default:
+                return {
+                    title: gateway.title || "Other",
+                    subtitle: "",
+                    icon: <CreditCard className="w-5 h-5" strokeWidth={1.75} />,
+                    trailing: null,
+                };
+        }
+    };
+
+    const selectGateway = (gateway: PaymentGateway) => {
+        if (gatewayDisabledReason(gateway.id)) return;
+        setMethodActive(gateway.id);
+        setSelectedGateway({ id: gateway.id, title: gateway.title });
+
+        if (gateway.id !== "bacs") {
+            setBankSlipFile(null);
+            if (previewUrl) {
+                URL.revokeObjectURL(previewUrl);
+                setPreviewUrl(null);
+            }
+        }
+
+        setIsKokoPayment(gateway.id === "darazbnpl");
+        setIsCardPayment(gateway.id === "payhere");
+    };
+
+    const PaymentMethodCard = ({ gateway }: { gateway: PaymentGateway }) => {
         const active = methodActive === gateway.id;
+        const meta = getGatewayMeta(gateway);
+        const disabledReason = gatewayDisabledReason(gateway.id);
+        const isDisabled = !!disabledReason;
 
         return (
-            <div className="flex items-start cursor-pointer space-x-4 sm:space-x-6">
-                <Radio
-                    className="cursor-pointer"
-                    name="payment-method"
-                    id={gateway.id}
-                    checked={active}
-                    onChange={(e) => {
-                        setMethodActive(e as any);
-                        setSelectedGateway({
-                            id: gateway.id,
-                            title: gateway.title,
-                        });
-
-                        if (gateway.id !== "bacs") {
-                            setBankSlipFile(null);
-                            if (previewUrl) {
-                                URL.revokeObjectURL(previewUrl);
-                                setPreviewUrl(null);
-                            }
-                        }
-
-                        if (gateway.id === "darazbnpl") {
-                            setIsKokoPayment(true);
-                        } else {
-                            setIsKokoPayment(false);
-                        }
-
-                        if (gateway.id === "payhere") {
-                            setIsCardPayment(true);
-                        } else {
-                            setIsCardPayment(false);
-                        }
-                    }}
-                />
-                <div className="flex-1">
-                    <label
-                        htmlFor={gateway.id}
-                        className="flex items-center space-x-4 sm:space-x-6"
+            <div
+                className={`rounded-xl border-2 transition-colors ${
+                    isDisabled
+                        ? "border-slate-200 bg-slate-100/60 dark:border-slate-800 dark:bg-slate-900/40 opacity-60"
+                        : active
+                            ? "border-primaryColor bg-primary-50/60 dark:bg-primary-900/20"
+                            : "border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/40 hover:border-slate-300 hover:bg-slate-100 dark:hover:border-slate-600"
+                }`}
+                aria-disabled={isDisabled || undefined}
+            >
+                <label
+                    htmlFor={gateway.id}
+                    className={`flex items-center gap-4 p-4 ${isDisabled ? "cursor-not-allowed" : "cursor-pointer"}`}
+                >
+                    <input
+                        id={gateway.id}
+                        type="radio"
+                        name="payment-method"
+                        checked={active}
+                        disabled={isDisabled}
+                        onChange={() => selectGateway(gateway)}
+                        className="sr-only"
+                    />
+                    <span
+                        aria-hidden="true"
+                        className={`flex items-center justify-center w-5 h-5 rounded-full border-2 shrink-0 transition-colors ${
+                            isDisabled
+                                ? "border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-800"
+                                : active
+                                    ? "border-primaryColor bg-primaryColor"
+                                    : "border-slate-300 dark:border-slate-600"
+                        }`}
                     >
-                        <p className="font-medium">
-                            {gateway.id === "payhere" ? "Pay Online" : gateway.title}
+                        {active && !isDisabled && <span className="w-2 h-2 rounded-full bg-white" />}
+                    </span>
+                    <span
+                        className={`flex items-center justify-center w-10 h-10 rounded-lg shrink-0 ${
+                            isDisabled
+                                ? "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500"
+                                : active
+                                    ? "bg-primaryColor/10 text-primaryColor"
+                                    : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+                        }`}
+                    >
+                        {meta.icon}
+                    </span>
+                    <div className="flex-1 min-w-0">
+                        <div className={`text-sm font-semibold ${isDisabled ? "text-slate-500 dark:text-slate-400" : "text-slate-900 dark:text-slate-100"}`}>
+                            {meta.title}
+                        </div>
+                        {isDisabled ? (
+                            <div className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+                                {disabledReason}
+                            </div>
+                        ) : meta.subtitle ? (
+                            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                                {meta.subtitle}
+                            </div>
+                        ) : null}
+                    </div>
+                    {!isDisabled && meta.trailing && <div className="shrink-0">{meta.trailing}</div>}
+                </label>
+
+                {active && gateway.id === "bacs" && (
+                    <div className="px-4 pb-4 pt-1 space-y-3 border-t border-slate-200 dark:border-slate-700 mt-1">
+                        <p className="text-sm text-slate-600 dark:text-slate-300 pt-3">
+                            Your order will be delivered to you after you transfer the payment to our bank account.
                         </p>
-                    </label>
-                    <div className={`mt-6 mb-4 ${active ? "block" : "hidden"}`}>
-                        {gateway.id !== "darazbnpl" && (
-                            <>
-                                {gateway.id === "bacs" ? (
-                                    <div className="space-y-4">
-                                        <p className="text-sm dark:text-slate-300">
-                                            Your order will be delivered to you after you transfer the payment to our bank account.
-                                        </p>
-                                        <div className="bg-slate-50 dark:bg-slate-800 p-4 rounded-lg">
-                                            <p className="text-sm font-medium text-slate-900 dark:text-slate-200 mb-2">
-                                                Bank Details:
-                                            </p>
-                                            <p className="text-sm text-slate-700 dark:text-slate-300">
-                                                Bank Name: Commercial Bank
-                                                <br />
-                                                Account Name: GQ Mobiles Pvt Ltd
-                                                <br />
-                                                Account Number: 1000475584
-                                                <br />
-                                                Branch: Head office
-                                            </p>
-                                        </div>
-                                        <div className="mt-4 pt-4 border-t border-slate-200 dark:border-slate-700">
-                                            <label className="block text-sm font-medium text-slate-900 dark:text-slate-200 mb-2">
-                                                Upload Bank Slip <span className="text-red-500">*</span>
-                                            </label>
-                                            <input
-                                                type="file"
-                                                id={`bank-slip-upload-${gateway.id}`}
-                                                accept="image/png, image/gif, image/jpeg, image/heic, image/heif, image/webp, image/bmp, image/tiff, application/pdf"
-                                                onChange={handleBankSlipChange}
-                                                className="block w-full text-sm text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primaryColor file:text-white hover:file:bg-slate-800 file:cursor-pointer cursor-pointer"
+                        <div className="rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 p-3">
+                            <div className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wide mb-1.5">
+                                Bank details
+                            </div>
+                            <dl className="text-sm space-y-1 text-slate-700 dark:text-slate-300">
+                                <div className="flex justify-between gap-3">
+                                    <dt className="text-slate-500">Bank</dt>
+                                    <dd>Commercial Bank</dd>
+                                </div>
+                                <div className="flex justify-between gap-3">
+                                    <dt className="text-slate-500">Account name</dt>
+                                    <dd>GQ Mobiles Pvt Ltd</dd>
+                                </div>
+                                <div className="flex justify-between gap-3">
+                                    <dt className="text-slate-500">Account no.</dt>
+                                    <dd className="font-mono">1000475584</dd>
+                                </div>
+                                <div className="flex justify-between gap-3">
+                                    <dt className="text-slate-500">Branch</dt>
+                                    <dd>Head office</dd>
+                                </div>
+                            </dl>
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-slate-900 dark:text-slate-200 mb-1.5">
+                                Upload bank slip <span className="text-red-500">*</span>
+                            </label>
+                            <input
+                                type="file"
+                                id={`bank-slip-upload-${gateway.id}`}
+                                accept="image/png, image/gif, image/jpeg, image/heic, image/heif, image/webp, image/bmp, image/tiff, application/pdf"
+                                onChange={handleBankSlipChange}
+                                className="block w-full text-sm text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primaryColor file:text-white hover:file:bg-slate-800 file:cursor-pointer cursor-pointer"
+                            />
+                            {previewUrl && bankSlipFile && (
+                                <div className="mt-2 flex items-center gap-3">
+                                    {bankSlipFile.type.startsWith("image/") ? (
+                                        <div className="relative w-16 h-16 rounded-md border border-slate-200 dark:border-slate-700 overflow-hidden shrink-0">
+                                            <Image
+                                                src={previewUrl}
+                                                alt="Bank slip preview"
+                                                fill
+                                                className="object-cover"
                                             />
-                                            {previewUrl && bankSlipFile && (
-                                                <div className="mt-3">
-                                                    <p className="text-xs text-slate-600 dark:text-slate-400 mb-2">Preview:</p>
-                                                    {bankSlipFile.type.startsWith("image/") ? (
-                                                        <div className="relative w-full max-w-xs border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden">
-                                                            <Image
-                                                                src={previewUrl}
-                                                                alt="Bank slip preview"
-                                                                width={400}
-                                                                height={300}
-                                                                className="w-full h-auto object-contain"
-                                                            />
-                                                        </div>
-                                                    ) : (
-                                                        <p className="text-xs text-slate-600 dark:text-slate-400">{bankSlipFile.name}</p>
-                                                    )}
-                                                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">{bankSlipFile.name}</p>
-                                                </div>
-                                            )}
-                                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-                                                Please upload your bank transfer slip after completing the payment.
-                                            </p>
                                         </div>
-                                        {gateway.description && (
-                                            <div className="text-slate-900 dark:text-slate-200 font-medium text-sm">
-                                                <span dangerouslySetInnerHTML={{ __html: gateway.description }} />
-                                            </div>
-                                        )}
-                                        <p className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                                            Make your payment directly into our bank account. Please attach your payment slip to this order. Your order will not be shipped until the funds have cleared in our account.
-                                        </p>
-                                    </div>
-                                ) : (
-                                    <>
-                                        <p className="text-sm dark:text-slate-300">
-                                            Your order will be delivered to you after you{" "}
-                                            {gateway.title || "transfer funds"} to:
-                                        </p>
-                                        <ul className="mt-3.5 text-sm text-slate-500 dark:text-slate-400 space-y-2">
-                                            <li>
-                                                {gateway.description && (
-                                                    <span className="text-slate-900 dark:text-slate-200 font-medium">
-                                                        <span
-                                                            dangerouslySetInnerHTML={{ __html: gateway.description }}
-                                                        />
-                                                    </span>
-                                                )}
-                                            </li>
-                                        </ul>
-                                    </>
-                                )}
-                            </>
+                                    ) : (
+                                        <Check className="w-5 h-5 text-emerald-600" />
+                                    )}
+                                    <span className="text-xs text-slate-600 dark:text-slate-400 break-all">
+                                        {bankSlipFile.name}
+                                    </span>
+                                </div>
+                            )}
+                            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1.5">
+                                Please upload your bank transfer slip after completing the payment.
+                            </p>
+                        </div>
+                        {gateway.description ? (
+                            <div
+                                className="text-sm text-slate-700 dark:text-slate-200"
+                                dangerouslySetInnerHTML={{ __html: gateway.description }}
+                            />
+                        ) : (
+                            <p className="text-sm text-slate-700 dark:text-slate-200">
+                                Make your payment directly into our bank account. Please attach your payment slip to this order. Your order will not be shipped until the funds have cleared in our account.
+                            </p>
                         )}
                     </div>
-                </div>
+                )}
+
+                {active && gateway.id !== "bacs" && gateway.description && (
+                    <div className="px-4 pb-4 pt-0">
+                        <div className="text-xs text-slate-600 dark:text-slate-300 border-t border-slate-200 dark:border-slate-700 pt-3">
+                            <span dangerouslySetInnerHTML={{ __html: gateway.description }} />
+                        </div>
+                    </div>
+                )}
             </div>
         );
     };
 
+    const contactDone = /^[0-9]{9,12}$/.test(phone) && /.+@.+\..+/.test(email);
+    const nameDone = !!firstName && !!lastName;
+    const fullAddressDone =
+        nameDone && !!address && !!city && !!state && !!postal;
+    const deliveryDone =
+        deliveryType !== null &&
+        nameDone &&
+        (deliveryType === "store_pickup" || fullAddressDone);
+    const detailsDone = contactDone && deliveryDone;
+    const paymentDone =
+        !!selectedGateway.id &&
+        (selectedGateway.id !== "bacs" || !!bankSlipFile);
+
+    const currentStep: StepKey = !detailsDone
+        ? "details"
+        : !paymentDone
+        ? "payment"
+        : "review";
+
     return (
-        <form onSubmit={handleFormSubmit} className="space-y-8">
+        <form id="checkout-form" onSubmit={handleFormSubmit} className="space-y-8">
+            <CheckoutStepper currentStep={currentStep} />
+
             {/* Contact Information Section */}
             <div className=" overflow-hidden">
                 <div className="p-0">
@@ -475,7 +786,7 @@ const UnifiedCheckoutForm = ({
                     <div className="space-y-4">
                         {!initialContactData?.displayName && (
                             <span className="block text-sm">
-                                Do not have an account?{` `}
+                                Already have an account?{` `}
                                 <Link href="/login" className="text-primary-500 font-medium">
                                     Log in
                                 </Link>
@@ -492,11 +803,16 @@ const UnifiedCheckoutForm = ({
                         </div>
 
                         <div className="max-w-full">
+                            <label htmlFor="checkout-email" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
+                                Email address
+                            </label>
                             <Input
-                                placeholder="Email*"
-                                className="mt-2"
+                                id="checkout-email"
+                                className={FIELD_CLASS}
+                                placeholder="you@example.com"
                                 value={email}
                                 type="email"
+                                autoComplete="email"
                                 onChange={(e) => setEmail(e.target.value)}
                                 required={true}
                             />
@@ -505,164 +821,287 @@ const UnifiedCheckoutForm = ({
                 </div>
             </div>
 
-            {/* Shipping Address Section */}
-            <div className=" overflow-hidden">
+            {/* Delivery Method Section */}
+            <div className="overflow-hidden">
                 <div className="p-0">
-                    <h3 className="text-lg font-semibold mb-4">Shipping Address</h3>
+                    <h3 className="text-lg font-semibold mb-4">Delivery Method</h3>
 
-                    <div className="space-y-4">
-                        <div className="w-full border border-slate-200 dark:border-slate-700 rounded-xl p-4">
-                            <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
-                                Pickup
-                            </h4>
-                            <div className="flex flex-wrap gap-4">
-                                <label
-                                    className="flex items-center cursor-pointer"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        handlePickupTypeChange("store_uber_pickme");
-                                    }}
-                                >
-                                    <input
-                                        type="radio"
-                                        name="pickup"
-                                        value="store_uber_pickme"
-                                        checked={pickupType === "store_uber_pickme"}
-                                        readOnly
-                                        className="w-4 h-4 text-primaryColor border-gray-300 focus:ring-primaryColor focus:ring-2 pointer-events-none"
-                                    />
-                                    <span className="ml-2 text-sm text-slate-700 dark:text-slate-300">
-                                        Store / Uber / PickMe
-                                    </span>
-                                </label>
-                                <label
-                                    className="flex items-center cursor-pointer"
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        handlePickupTypeChange("courier");
-                                    }}
-                                >
-                                    <input
-                                        type="radio"
-                                        name="pickup"
-                                        value="courier"
-                                        checked={pickupType === "courier"}
-                                        readOnly
-                                        className="w-4 h-4 text-primaryColor border-gray-300 focus:ring-primaryColor focus:ring-2 pointer-events-none"
-                                    />
-                                    <span className="ml-2 text-sm text-slate-700 dark:text-slate-300">
-                                        Courier
-                                    </span>
-                                </label>
-                            </div>
+                    <div className="space-y-3">
+                        <DeliveryOption
+                            value="courier"
+                            selected={deliveryType === "courier"}
+                            onSelect={handlePickupTypeChange}
+                            icon={<Truck className="w-5 h-5" strokeWidth={1.75} />}
+                            title="Courier delivery"
+                            subtitle="Island-wide delivery in 2–3 business working days"
+                            trailing={courierShippingLabel ? (
+                                <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                                    {courierShippingLabel}
+                                </span>
+                            ) : null}
+                        />
+                        <DeliveryOption
+                            value="store_pickup"
+                            selected={deliveryType === "store_pickup"}
+                            onSelect={handlePickupTypeChange}
+                            icon={<Store className="w-5 h-5" strokeWidth={1.75} />}
+                            title="Store Pickup"
+                            subtitle="Ready during working hours"
+                            chip={{ label: "Instant Pickup · Colombo", tone: "emerald" }}
+                            trailing={
+                                <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
+                                    Free
+                                </span>
+                            }
+                        />
+                        <DeliveryOption
+                            value="flash_delivery"
+                            selected={deliveryType === "flash_delivery"}
+                            onSelect={handlePickupTypeChange}
+                            icon={<Zap className="w-5 h-5" strokeWidth={1.75} />}
+                            title="Flash Delivery"
+                            subtitle="You arrange Uber / PickMe pickup"
+                            chip={{ label: "~1hr Instant Delivery · Colombo", tone: "blue" }}
+                            trailing={
+                                <div className="hidden sm:flex items-center gap-1.5">
+                                    <BrandBadge src="/logos/uber.png" alt="Uber" />
+                                    <BrandBadge src="/logos/pickme.png" alt="PickMe" />
+                                </div>
+                            }
+                        />
+                    </div>
+
+                    {!deliveryType && (
+                        <div className="mt-3 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                            <span className="inline-block w-1 h-1 rounded-full bg-primaryColor animate-pulse" />
+                            Select a delivery method to continue
                         </div>
+                    )}
 
-                        <div className="grid md:grid-cols-1 sm:grid-cols-2 sm:gap-3">
-                            <div className="w-full">
+                    {deliveryType && (
+                    <div className="mt-6 space-y-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
+                            <div>
+                                <label htmlFor="checkout-firstname" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
+                                    First name
+                                </label>
                                 <Input
-                                    className="mt-1.5 capitalize"
+                                    id="checkout-firstname"
+                                    className={`capitalize ${FIELD_CLASS}`}
                                     value={firstName}
-                                    placeholder="Name*"
+                                    placeholder="e.g. Amila"
+                                    autoComplete="given-name"
                                     onChange={(e) => setFirstName(e.target.value)}
                                     required={true}
                                 />
                             </div>
-                        </div>
-
-                        <div className="sm:flex sm:space-x-3">
-                            <div className="flex-1">
+                            <div>
+                                <label htmlFor="checkout-lastname" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
+                                    Last name
+                                </label>
                                 <Input
-                                    className="mt-1.5 capitalize"
-                                    placeholder="Address Line 1*"
-                                    name="address1"
-                                    value={address}
-                                    type="text"
-                                    onChange={(e) => setAddress(e.target.value)}
-                                    required={true}
-                                />
-                            </div>
-                            <div className="sm:w-1/3">
-                                <Input
-                                    className="mt-1.5 capitalize"
-                                    placeholder="Address Line 2*"
-                                    name="address2"
-                                    value={apartment}
-                                    onChange={(e) => setApartment(e.target.value)}
+                                    id="checkout-lastname"
+                                    className={`capitalize ${FIELD_CLASS}`}
+                                    value={lastName}
+                                    placeholder="e.g. Perera"
+                                    autoComplete="family-name"
+                                    onChange={(e) => setLastName(e.target.value)}
                                     required={true}
                                 />
                             </div>
                         </div>
 
-                        <div className="grid grid-cols-1 mt-0 sm:grid-cols-2 gap-0 sm:gap-3">
-                            <div>
-                                <Input
-                                    className="sm:mt-1.5 mt-0 normal-case"
-                                    placeholder="Address Line 3"
-                                    value={city}
-                                    onChange={(e) => setCity(e.target.value)}
-                                    required={false}
-                                />
-                            </div>
-                            <div>
-                                <Select
-                                    value="LK"
-                                    className="mt-1.5 capitalize"
-                                    placeholder="Country (e.g., Sri Lanka)*"
-                                    onChange={(e) => setAddressCountry(e.target.value)}
-                                    disabled={true}
-                                >
-                                    <option value="Sri Lanka">Sri Lanka</option>
-                                </Select>
-                            </div>
-                            <div>
-                                <SelectField
-                                    sizeClass="mt-0 sm:mt-1.5"
-                                    className="mt-0 sm:mt-1.5"
-                                    name="state"
-                                    value={state}
-                                    options={SRI_LANKAN_STATES.map((state) => ({
-                                        value: state,
-                                        label: state,
-                                    }))}
-                                    onChange={(e: any) => setState(e.target.value)}
-                                />
-                            </div>
-                        </div>
+                        {deliveryType !== "store_pickup" ? (
+                            <>
+                                <div className="sm:flex sm:space-x-3 sm:space-y-0 space-y-4">
+                                    <div className="flex-1">
+                                        <label htmlFor="checkout-address1" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
+                                            Address line 1
+                                        </label>
+                                        <Input
+                                            id="checkout-address1"
+                                            className={`capitalize ${FIELD_CLASS}`}
+                                            placeholder="Street address"
+                                            name="address1"
+                                            value={address}
+                                            type="text"
+                                            autoComplete="address-line1"
+                                            onChange={(e) => setAddress(e.target.value)}
+                                            required={true}
+                                        />
+                                    </div>
+                                    <div className="sm:w-1/3">
+                                        <label htmlFor="checkout-address2" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
+                                            Address line 2 <span className="text-slate-400 font-normal">(optional)</span>
+                                        </label>
+                                        <Input
+                                            id="checkout-address2"
+                                            className={`capitalize ${FIELD_CLASS}`}
+                                            placeholder="Apartment, suite, etc."
+                                            name="address2"
+                                            value={apartment}
+                                            autoComplete="address-line2"
+                                            onChange={(e) => setApartment(e.target.value)}
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-3">
+                                    <div>
+                                        <label htmlFor="checkout-city" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
+                                            City
+                                        </label>
+                                        <Input
+                                            id="checkout-city"
+                                            className={`normal-case ${FIELD_CLASS}`}
+                                            placeholder="e.g. Colombo"
+                                            value={city}
+                                            autoComplete="address-level2"
+                                            onChange={(e) => setCity(e.target.value)}
+                                            required={true}
+                                        />
+                                    </div>
+                                    <div>
+                                        <label htmlFor="checkout-state" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
+                                            Province
+                                        </label>
+                                        <Select
+                                            id="checkout-state"
+                                            name="state"
+                                            className={FIELD_CLASS}
+                                            value={state || "Western"}
+                                            onChange={(e) => setState(e.target.value)}
+                                            required={true}
+                                        >
+                                            {SRI_LANKAN_STATES.map((s) => (
+                                                <option key={s} value={s}>
+                                                    {s}
+                                                </option>
+                                            ))}
+                                        </Select>
+                                    </div>
+                                    <div>
+                                        <label htmlFor="checkout-postal" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
+                                            Postal code
+                                        </label>
+                                        <Input
+                                            id="checkout-postal"
+                                            className={FIELD_CLASS}
+                                            placeholder="e.g. 10100"
+                                            value={postal}
+                                            inputMode="numeric"
+                                            pattern="[0-9]{4,6}"
+                                            autoComplete="postal-code"
+                                            onChange={(e) => setPostal(e.target.value)}
+                                            required={true}
+                                        />
+                                    </div>
+                                </div>
+                            </>
+                        ) : (
+                            <p className="text-sm text-slate-600 dark:text-slate-400">
+                                Visit GQ Mobiles to collect your order.
+                            </p>
+                        )}
                     </div>
+                    )}
                 </div>
             </div>
 
             {/* Payment Method Section */}
-            <div className="overflow-hidden">
-                <div className="p-0">
+            {deliveryType && (
+                <div>
                     <h3 className="text-lg font-semibold mb-4">Payment Method</h3>
-
-                    <div className="space-y-6">
+                    <div className="space-y-3">
                         {visiblePaymentGateways.map((gateway) => (
-                            <PaymentMethods key={gateway.id} gateway={gateway} />
+                            <PaymentMethodCard key={gateway.id} gateway={gateway} />
                         ))}
                     </div>
                 </div>
-            </div>
+            )}
 
-            {/* Submit Button */}
-            <div className="flex flex-col gap-2 pt-6">
+            {isPreOrderCart && <PreOrderNotice className="mt-2" />}
+
+            <label
+                htmlFor="toc"
+                id="toc-section"
+                className={`flex items-start gap-2 text-sm rounded-lg p-3 cursor-pointer transition-colors ${
+                    tocError
+                        ? "text-red-600 bg-red-50 dark:bg-red-900/20 border border-red-300 dark:border-red-800"
+                        : "text-slate-500 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800/40"
+                }`}
+            >
+                <Checkbox
+                    name="toc"
+                    defaultChecked={isTOC}
+                    onChange={onTOCChange}
+                    sizeClassName="w-4 h-4"
+                    className="pt-1"
+                />
+                <div className="flex-1">
+                    <div>
+                        By proceeding with your purchase you agree to our{" "}
+                        <Link
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href="/terms-and-conditions"
+                            onClick={(e) => e.stopPropagation()}
+                            className="font-medium text-slate-900 underline dark:text-slate-200"
+                        >
+                            Terms and Conditions
+                        </Link>
+                        {" "}and{" "}
+                        <Link
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            href="/privacy"
+                            onClick={(e) => e.stopPropagation()}
+                            className="font-medium text-slate-900 underline dark:text-slate-200"
+                        >
+                            Privacy Policy
+                        </Link>
+                        .
+                    </div>
+                    {tocError && (
+                        <div className="mt-1 text-xs font-medium text-red-600">
+                            Please agree to the terms to continue.
+                        </div>
+                    )}
+                </div>
+            </label>
+
+            <div className="pt-2 pb-10 md:pb-14 flex flex-col-reverse sm:flex-row gap-3 sm:items-center sm:justify-between">
+                <Link
+                    href="/cart"
+                    className="inline-flex items-center gap-1 text-sm font-medium text-primary-500 hover:underline self-center sm:self-auto"
+                >
+                    <ArrowLeft className="w-4 h-4" />
+                    Back to cart
+                </Link>
                 <ButtonPrimary
                     type="submit"
-                    className="sm:!px-7 shadow-none min-w-[200px]"
-                    loading={submitState === "loading"}
-                    disabled={submitState === "success"}
+                    disabled={loading}
+                    className="sm:min-w-[240px] w-full sm:w-auto"
                 >
-                    {submitState === "success" ? (
-                        <span className="inline-flex items-center justify-center gap-2">
-                            <Check className="w-5 h-5 shrink-0" strokeWidth={2.5} aria-hidden />
-                            Saved successfully
-                        </span>
+                    {loading ? (
+                        <Loader className="animate-spin text-gray-100 w-5 h-5" />
                     ) : (
-                        "Save and Continue"
+                        <span className="inline-flex items-center gap-2">
+                            <span>Confirm Order</span>
+                            {orderTotalLabel && (
+                                <>
+                                    <span aria-hidden="true">·</span>
+                                    <span
+                                        className="font-semibold"
+                                        dangerouslySetInnerHTML={{ __html: orderTotalLabel }}
+                                    />
+                                </>
+                            )}
+                        </span>
                     )}
                 </ButtonPrimary>
             </div>
+
         </form>
     );
 };

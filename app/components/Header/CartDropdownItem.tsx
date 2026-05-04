@@ -1,6 +1,5 @@
 import {
   CartItem,
-  PaCapacity,
   SimpleProduct,
   VariableProduct,
 } from "@/graphql/types/graphql";
@@ -14,6 +13,7 @@ import { useCart } from "@/context/CartProvider";
 import NcInputNumber from "@/components/NcInputNumber";
 import { Trash } from "lucide-react";
 import { isLineItemFree } from "@/lib/cartLinePricing";
+import { getCartLineStockCap } from "@/lib/cartLineStockCap";
 
 interface CartDropdownItemProps {
   item: CartItem;
@@ -35,14 +35,12 @@ const CartDropdownItem = ({ item, close }: CartDropdownItemProps) => {
     name,
     image,
     price,
-    slug,
-    salePrice,
     type,
-    stockQuantity,
-    variations,
     regularPrice,
-    brands,
   }: SimpleProduct & VariableProduct = product?.node;
+
+  const { maxQty } = getCartLineStockCap(item);
+  const maxQtyProp = maxQty ?? undefined;
 
   const link = useProductLink(product?.node);
 
@@ -121,15 +119,7 @@ const CartDropdownItem = ({ item, close }: CartDropdownItemProps) => {
                                 className="w-4"
                               />{" "}
                               <span key={attr?.value}>
-                                {attr?.value}{" "}
-                                {
-                                  (product.node as unknown as VariableProduct)[
-                                    `allPa${attr?.label as unknown as "Capacity"}`
-                                  ]?.nodes.find(
-                                    (node: PaCapacity) =>
-                                      node.slug === attr?.value
-                                  )?.name
-                                }
+                                {attr?.displayValue || attr?.value}
                               </span>
                             </div>
                           </Fragment>
@@ -160,6 +150,7 @@ const CartDropdownItem = ({ item, close }: CartDropdownItemProps) => {
                 <NcInputNumber
                   onChange={(q) => !isRemoving && !isUpdating && handleQuantityUpdate(q)}
                   defaultValue={quantity || 1}
+                  max={maxQtyProp}
                   className={`relative z-10 ${(isRemoving || isUpdating) ? 'opacity-50 pointer-events-none' : ''}`}
                   disabled={lineIsFree || isRemoving || isUpdating}
                 />

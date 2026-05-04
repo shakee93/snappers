@@ -1,5 +1,6 @@
 "use client"
 import { Brand, Category, Product } from "@/graphql/types/graphql";
+import { filterHiddenProducts } from "@/lib/hidden-products";
 import { useStore } from "@/store/store";
 import { useEffect, useState } from "react";
 import { GET_BRAND_ARCHIVE } from "@/graphql/defs/products";
@@ -13,7 +14,6 @@ interface ProductGridProps {
 }
 
 const ProductGrid = ({ products, brand, category }: ProductGridProps) => {
-
     const { sidebar: { categories, brands, mounted } } = useStore();
     const [_products, setProducts] = useState<{ node: Product }[]>(products);
     const [mounts, setMounts] = useState(0)
@@ -53,9 +53,8 @@ const ProductGrid = ({ products, brand, category }: ProductGridProps) => {
         <div>loading...</div>
     ) : (
         <div className="flex-1 grid  sm:grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-10">
-            {_products.map((item, index: number) =>
-                <ProductCard key={item.node.slug} data={item.node} />
-            )}
+            {filterHiddenProducts(_products.map(i => i.node))
+                .map((node) => <ProductCard key={node.slug} data={node} />)}
         </div>
     );
 };

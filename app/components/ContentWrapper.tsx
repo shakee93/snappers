@@ -9,10 +9,10 @@ interface ContentWrapperProps {
 
 export default function ContentWrapper({ children }: ContentWrapperProps) {
   const pathname = usePathname();
-  const isCheckoutPage = pathname === "/checkout-2";
+  const isCheckout = pathname?.startsWith("/checkout");
 
   return (
-    <div className={isCheckoutPage ? "" : "pb-8 md:pb-24"}>
+    <div className={isCheckout ? "" : ""}>
       {children}
     </div>
   );

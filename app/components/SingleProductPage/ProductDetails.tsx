@@ -479,15 +479,11 @@ const ProductDetails = ({
 
           </div>
         </div>
-      ) : (
+      ) : product.price ? (
         <div className="flex flex-wrap items-center gap-2 text-base font-bold text-gray-600 md:text-2xl">
 
           <div className="flex flex-col gap-2">
-            {!!product.price ? (
-              <span dangerouslySetInnerHTML={{ __html: product.price || "" }} />
-            ) : (
-              <span>Can not be purchased now</span>
-            )}
+            <span dangerouslySetInnerHTML={{ __html: product.price || "" }} />
           </div>
 
           {product.salePrice &&
@@ -536,6 +532,10 @@ const ProductDetails = ({
             </span>
           </div>
 
+        </div>
+      ) : (
+        <div className="w-max rounded-full bg-gray-600 px-4 py-1.5 text-center text-xs font-medium text-white">
+          Currently Unavailable
         </div>
       )}
 

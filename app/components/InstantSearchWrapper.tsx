@@ -15,6 +15,7 @@ import MobileFilterSheet from "@/app/components/MobileFilterSheet";
 import { history } from "instantsearch.js/es/lib/routers";
 import { UiState } from "instantsearch.js";
 import { useSearchParams } from "next/navigation";
+import { HIDDEN_PRODUCT_SLUGS } from "@/lib/hidden-products";
 
 type CustomUiState = UiState & {
   product: {
@@ -111,6 +112,13 @@ const InstantSearchWrapper = ({
   const [differedSidebar] = useDebounce(sidebar, 800);
   const [hitsPerPage, setHitsPerPage] = useState<number>(12);
   const [searchQuery, setSearchQuery] = useState<string>("");
+  // useSearchParams here triggers BAILOUT_TO_CLIENT_SIDE_RENDERING for the
+  // InstantSearch subtree on routes that wrap ArchiveLayout in <Suspense>.
+  // That bailout is what makes the response cacheable at the edge — without
+  // it, InstantSearchNext runs SSR and its internal headers() call marks
+  // the response private/no-store. Don't replace this hook with a state +
+  // effect bridge: that breaks ISR caching for /new-arrivals and the
+  // ArchiveLayout-using routes (verified via prod cache headers post-merge).
   const searchParams = useSearchParams();
   const [debouncedIsTyping] = useDebounce(isTyping, 500);
 
@@ -159,8 +167,32 @@ const InstantSearchWrapper = ({
     };
   }, [searchParams, sidebar]);
 
+  // /deals reads its tab selection from `?filter=clearance,offers` so
+  // we keep the deals page itself static (no SSR searchParams read) and
+  // let the bridge feed the override here. `clearance` and `offers` are
+  // mapped to the same WP tag slugs the page uses for the SSR default.
+  // Gated on `dealTags` so the override only applies on routes that
+  // already opt-in (i.e. /deals); without this guard, /samsung?filter=clearance
+  // would silently filter brand pages by the clearance tag.
+  const effectiveDealTags = useMemo(() => {
+    if (!dealTags) return dealTags;
+    const filterParam = searchParams.get('filter');
+    if (!filterParam) return dealTags;
+    const slugs = filterParam
+      .split(',')
+      .map((v) => v.trim())
+      .map((v): 'clearance' | 'bogo-offer' | null =>
+        v === 'offers' ? 'bogo-offer' : v === 'clearance' ? 'clearance' : null,
+      )
+      .filter((v): v is 'clearance' | 'bogo-offer' => v !== null);
+    return slugs.length > 0 ? slugs : dealTags;
+  }, [searchParams, dealTags]);
+
   const getFilterQuery: () => string = () => {
     const f = [
+      HIDDEN_PRODUCT_SLUGS.size > 0
+        ? Array.from(HIDDEN_PRODUCT_SLUGS).map(s => `slug:!=${s}`).join(" && ")
+        : null,
       effective.priceRange.join("") !== PRICE_RANGE.join("")
         ? `rawPrice:[${effective.priceRange[0]}..${effective.priceRange[1]}]`
         : null,
@@ -179,8 +211,8 @@ const InstantSearchWrapper = ({
       effective.on_sale ? "onSale:true" : null,
       effective.in_stock ? "stockStatus:IN_STOCK && productTags.nodes.slug:!=pre-order" : null,
       sidebar.out_of_stock ? "stockStatus:OUT_OF_STOCK" : null,
-      dealTags && dealTags.length > 0
-        ? `productTags.nodes.slug:[${dealTags.join(",")}]`
+      effectiveDealTags && effectiveDealTags.length > 0
+        ? `productTags.nodes.slug:[${effectiveDealTags.join(",")}]`
         : tag
           ? `productTags.nodes.slug:${tag}`
           : null,
@@ -202,7 +234,7 @@ const InstantSearchWrapper = ({
   useEffect(() => {
     setFilterQuery(getFilterQuery);
     // setSortQuery(differedSidebar.sort);
-  }, [differedSidebar, tag, JSON.stringify(dealTags || [])]);
+  }, [differedSidebar, tag, JSON.stringify(effectiveDealTags || [])]);
 
   useEffect(() => {
     if (!search) {

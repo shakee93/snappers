@@ -4,10 +4,13 @@ import { notFound } from "next/navigation";
 
 import ArchiveLayout from "@/app/components/archive/ArchiveLayout";
 import { Metadata, ResolvingMetadata } from "next";
+import { Suspense } from "react";
 
 type Props = {
   params: Promise<{ brand: string }>;
 };
+
+export const revalidate = 1800;
 
 async function getData(slug: string | null = null) {
   const { data } = await getClient().query({
@@ -72,12 +75,14 @@ const Page = async (props: { params: Promise<{ brand: string }> }) => {
   const params = await props.params;
   const { brand } = await getData(params.brand);
   return (
-    <ArchiveLayout
-      title={brand.name}
-      description={brand.description}
-      brand={brand}
-      filters
-    />
+    <Suspense>
+      <ArchiveLayout
+        title={brand.name}
+        description={brand.description}
+        brand={brand}
+        filters
+      />
+    </Suspense>
   );
 };
 

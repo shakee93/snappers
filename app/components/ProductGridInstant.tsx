@@ -29,7 +29,6 @@ const ProductGridInstant = ({
   hitsPerPage,
   setHitsPerPage,
 }: ProductGridProps) => {
-
   const { hits, results } = useHits();
   const { status: statusState } = useInstantSearch();
   const { setSearchStatus, search, search_status, navigation } = useStore();

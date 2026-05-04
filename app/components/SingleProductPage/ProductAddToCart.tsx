@@ -44,7 +44,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
         },
         body: JSON.stringify({
           xoo_wl_user_email: userEmail || "",
-          _xoo_wl_product_id: variation.databaseId,
+          _xoo_wl_product_id: variation?.databaseId ?? product.databaseId,
           xoo_wl_required_qty: "1",
         }),
       });
@@ -322,19 +322,6 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   // console.log('product', product);
   // console.log('variation', variation);
 
-  if (product.type === "VARIABLE" && !variation) {
-    return (
-      <button
-        className={twMerge(
-          "relative w-auto my-8 grow bg-gray-600 md:flex-none h-auto inline-flex cursor-pointer items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 dark:bg-slate-100 text-slate-50 dark:text-slate-800 shadow-xl flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0",
-          "opacity-50 disabled:cursor-not-allowed"
-        )}
-      >
-        <span className=" cursor-pointer">Not Available</span>
-      </button>
-    )
-  }
-
   return (
     <div className="w-full">
       {/* Pre-order Notice */}
@@ -345,11 +332,13 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
       <div
         className="flex items-center justify-center md:justify-start gap-4 md:gap-0 md:space-x-3.5 py-2 px-2 md:py-4 fixed bottom-[82px] left-0 z-10 md:z-10 bg-white md:bg-transparent w-full md:static"
       >
-        <div className="flex border border-primaryColor/20 items-center justify-center dark:bg-slate-800/70 px-2 py-1 sm:p-2 rounded-full">
-          <div className="flex items-center justify-between space-x-5 w-full">
-            <NcInputNumber onChange={(v) => setQuantity(v)} defaultValue={quantity} />
+        {!(product.type === "VARIABLE" && !variation) && (
+          <div className="flex border border-primaryColor/20 items-center justify-center dark:bg-slate-800/70 px-2 py-1 sm:p-2 rounded-full">
+            <div className="flex items-center justify-between space-x-5 w-full">
+              <NcInputNumber onChange={(v) => setQuantity(v)} defaultValue={quantity} />
+            </div>
           </div>
-        </div>
+        )}
 
 
         {(product.type === "SIMPLE" && product.stockStatus === "IN_STOCK") ||
