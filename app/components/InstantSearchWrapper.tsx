@@ -413,7 +413,7 @@ const InstantSearchWrapper = ({
           </div>
           <div className='grid grid-cols-12 gap-4'>
 
-            <div className='col-span-0 lg:col-span-3'>
+            <div className={filters ? 'hidden lg:block lg:col-span-3' : 'hidden'}>
               {typeof window !== 'undefined' && (
                 <DelayedRender delay={5000}>
                   <SortInput />
@@ -431,8 +431,11 @@ const InstantSearchWrapper = ({
               )}
             </div>
 
-            <div className='col-span-12 lg:col-span-9'>
-              <ProductGridInstant hitsPerPage={hitsPerPage} setHitsPerPage={setHitsPerPage} />
+            <div className={filters ? 'col-span-12 lg:col-span-9' : 'col-span-12'}>
+              <ProductGridInstant
+                hitsPerPage={hitsPerPage}
+                setHitsPerPage={setHitsPerPage}
+              />
             </div>
 
           </div>

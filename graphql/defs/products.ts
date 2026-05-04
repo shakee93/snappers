@@ -1,5 +1,5 @@
 import { gql } from "@apollo/client";
-import { ProductContentCard, ProductContentFull, ProductSpecs } from "@/graphql/defs/products.fragments";
+import { ProductContentCard, ProductContentFull } from "@/graphql/defs/products.fragments";
 
 export const GET_BRANDS = gql`
   query getBrands($slug: [String] = []) {
@@ -440,7 +440,7 @@ export const GET_PRODUCTS_BY_BOGO_TAG = gql`
   query GetProductsByBogoTag($first: Int = 50, $tagIn: [String] = ["bogo-offer"]) {
     products(
       first: $first
-      where: { tagIn: $tagIn, orderby: { field: DATE, order: DESC } }
+      where: { tagIn: $tagIn, stockStatus: IN_STOCK, orderby: { field: DATE, order: DESC } }
     ) {
       nodes {
         ...ProductContentCard

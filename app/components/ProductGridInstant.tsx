@@ -90,13 +90,14 @@ const ProductGridInstant = ({
   // 'loading'/'stalled' on cache reads and widget churn even without a real
   // network round-trip; unmounting the grid for those transitions causes a
   // visible flicker. Only show the skeleton on the very first load.
+  const desktopGridClass = "lg:grid-cols-4";
   const showSkeleton = hits.length === 0 && (statusState === 'stalled' || statusState === 'loading');
 
   return (
     <>
       <div className='h-[185px] md:h-60 bottom-3 right-3 hidden'></div>
       {hits.length > 0 && (
-        <div className="flex-1 grid  grid-cols-2 lg:grid-cols-4 md:grid-cols-4 gap-x-2 gap-y-2 lg:gap-x-3 lg:gap-y-4">
+        <div className={`flex-1 grid grid-cols-2 md:grid-cols-4 ${desktopGridClass} gap-x-2 gap-y-2 lg:gap-x-3 lg:gap-y-4`}>
           {hits.map((item, index) => (
             <ProductCard
               key={item?.slug as unknown as string}
@@ -109,7 +110,7 @@ const ProductGridInstant = ({
       )}
 
       {showSkeleton && (
-        <div className='flex-1 grid grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-2 lg:gap-x-8 lg:gap-y-10'>
+        <div className={`flex-1 grid grid-cols-2 ${desktopGridClass} gap-x-2 gap-y-2 lg:gap-x-8 lg:gap-y-10`}>
           {Array(grid).fill(null).map((x, index) =>
             <ProductCardLoading key={index} />
           )}

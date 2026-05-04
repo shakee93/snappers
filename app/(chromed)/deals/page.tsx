@@ -1,33 +1,95 @@
-import ArchiveLayout from "@/app/components/archive/ArchiveLayout";
+import SectionSliderProductCard from "@/app/components/SectionSliderProductCard";
+import { getClient } from "@/graphql/apollo-ssr";
+import { GET_PRODUCTS_BY_BOGO_TAG } from "@/graphql/defs/products";
+import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
+import { DEALS_CACHE_TAG } from "@/lib/cache-tags";
 import { Metadata } from "next";
+import { unstable_cache } from "next/cache";
 import { Suspense } from "react";
-
-export const revalidate = 1800;
 
 export const metadata: Metadata = {
   title: "Deals",
-  description: "Browse clearance deals and BOGO free offers at GQ Mobiles.",
+  description: "Up to 75% off, Buy One Get One, and Free Gift deals at GQ Mobiles.",
 };
 
-// SSR default = clearance. The `?filter=` URL override is applied
-// client-side by InstantSearchWrapper (reads it via the search-params
-// bridge and rebuilds the Typesense filter) and by DealsTypeFilter for
-// the tab UI. Reading searchParams here would force the page dynamic
-// and uncacheable.
-const DEFAULT_DEALS_TYPE: ("clearance" | "offers")[] = ["clearance"];
-const DEFAULT_DEAL_TAGS = ["clearance"];
+// Safety-net ISR — primary invalidation is via revalidateTag(DEALS_CACHE_TAG) from /api/revalidate.
+export const revalidate = 300;
+
+type DealProduct = SimpleProduct | VariableProduct;
+
+const fetchByTag = (tagIn: string[]): Promise<DealProduct[]> =>
+  getClient()
+    .query({ query: GET_PRODUCTS_BY_BOGO_TAG, variables: { first: 20, tagIn } })
+    .then((res) => (res.data?.products?.nodes ?? []) as DealProduct[])
+    .catch((e) => {
+      console.error("[deals] fetch failed", e);
+      return [];
+    });
+
+const getDealsData = unstable_cache(
+  async () => {
+    const [clearance, bogo, freeGift] = await Promise.all([
+      fetchByTag(["clearance"]),
+      fetchByTag(["bogo-offer"]),
+      fetchByTag(["free-gift"]),
+    ]);
+    return { clearance, bogo, freeGift };
+  },
+  ["deals-sliders"],
+  { tags: [DEALS_CACHE_TAG], revalidate: 300 }
+);
+
+async function DealsSliders() {
+  const { clearance, bogo, freeGift } = await getDealsData();
+
+  if (!clearance.length && !bogo.length && !freeGift.length) {
+    return (
+      <p className="text-neutral-500 dark:text-neutral-400 text-sm">
+        No active deals right now — check back soon.
+      </p>
+    );
+  }
+
+  return (
+    <>
+      <SectionSliderProductCard
+        products={clearance}
+        heading="Up to 75% off"
+        link="/tag/clearance"
+      />
+      <SectionSliderProductCard
+        products={bogo}
+        heading="Buy One Get One"
+        link="/tag/bogo-offer"
+      />
+      <SectionSliderProductCard
+        products={freeGift}
+        heading="Free Gift"
+        link="/tag/free-gift"
+      />
+    </>
+  );
+}
 
 export default function DealsPage() {
   return (
-    <Suspense>
-      <ArchiveLayout
-        title="Deals"
-        headingOverride="Deals"
-        descriptionOverride="Explore clearance products and free offers in one place."
-        filters
-        dealsType={DEFAULT_DEALS_TYPE}
-        dealTags={DEFAULT_DEAL_TAGS}
-      />
-    </Suspense>
+    <main>
+      <div className="nc-PageHome relative flex flex-col overflow-hidden">
+        <div className="flex flex-col px-3 gap-8 lg:gap-10 sm:container sm:max-w-screen-2xl py-8 lg:py-12">
+          <div className="max-w-screen-md">
+            <h1 className="block capitalize text-2xl sm:text-3xl lg:text-4xl font-semibold">
+              Deals
+            </h1>
+            <span className="block mt-2 lg:mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
+              Explore the best savings, BOGO offers, and free gift promotions in one place.
+            </span>
+          </div>
+
+          <Suspense>
+            <DealsSliders />
+          </Suspense>
+        </div>
+      </div>
+    </main>
   );
 }

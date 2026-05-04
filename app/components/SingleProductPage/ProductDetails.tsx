@@ -172,6 +172,9 @@ const ProductDetails = ({
     mergeProductMetaForBogo(product as Parameters<typeof mergeProductMetaForBogo>[0]),
     product?.databaseId
   );
+  const isFreeGiftProduct = product?.productTags?.nodes?.some(
+    (tag: any) => tag.slug === 'free-gift'
+  ) ?? false;
   const crossProductFreeIds = bogo.freeProductIds.filter(
     (id) => id !== product?.databaseId
   );
@@ -542,7 +545,7 @@ const ProductDetails = ({
       {bogo.isBogoEnabled && (
         <div className="mt-2 flex flex-wrap items-center gap-2 text-xs md:text-sm">
           <span className="inline-flex items-center rounded-full bg-green-600 px-2.5 py-1 font-semibold text-white">
-            {bogo.label}
+            {isFreeGiftProduct ? "Free Gift" : bogo.label}
           </span>
           <span className="text-gray-600">{freeGiftDetailLine}</span>
         </div>

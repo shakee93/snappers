@@ -2,13 +2,12 @@ import { getClient } from "@/graphql/apollo-ssr";
 import { GET_ALL_PRODUCTS } from "@/graphql/defs/products";
 import { GET_NESTED_CATEGORIES } from "@/graphql/defs/nav";
 import InstantSearchWrapper from "@/app/components/InstantSearchWrapper";
-import { Brand, ProductCategory } from "@/graphql/types/graphql";
+import { Brand } from "@/graphql/types/graphql";
 import Link from "next/link";
-import { Metadata, ResolvingMetadata } from "next";
 import { GET_TAG_DETAILS_BY_SLUG } from "@/graphql/defs/products";
 
 async function getData(parentId?: number, tagSlug?: string) {
-  const { data, error } = await getClient().query({
+  const { data } = await getClient().query({
     query: GET_ALL_PRODUCTS,
   });
 

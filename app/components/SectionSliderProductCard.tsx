@@ -1,9 +1,9 @@
 "use client";
-import React, { FC, useEffect, useState, useCallback, useRef } from "react";
+import React, { FC, useEffect, useState, useRef } from "react";
+import Link from "next/link";
 import Heading from "@/app/components/Heading/Heading";
 import ProductCard from "@/app/components/ProductCard3";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
-import CardSkeleton from "./Skeletons/CardSkeleton";
 import {
   Carousel,
   CarouselContent,
@@ -12,7 +12,6 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from "@/components/ui/carousel";
-import { filterHiddenProducts } from "@/lib/hidden-products";
 
 export interface SectionSliderProductCardProps {
   className?: string;
@@ -21,7 +20,7 @@ export interface SectionSliderProductCardProps {
   headingFontClassName?: string;
   headingClassName?: string;
   subHeading?: string;
-  products?: (SimpleProduct & VariableProduct)[];
+  products?: (SimpleProduct | VariableProduct)[];
   link?: string;
 }
 
@@ -35,22 +34,16 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
   products = [],
   link,
 }) => {
+  const isExternalLink = Boolean(link && /^https?:\/\//.test(link));
   const [mounted, setMounted] = useState(false);
-  const [showSkeleton, setShowSkeleton] = useState(true);
   const [api, setApi] = useState<CarouselApi>();
   const carouselRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    // Simulate loading time and then show the carousel
-    const timer = setTimeout(() => {
-      setShowSkeleton(false);
-      setMounted(true);
-    }, 1000);
-
-    return () => clearTimeout(timer);
+    setMounted(true);
   }, []);
 
-  // Auto-slide functionality with pause on hover
+  // Auto-slide with pause on hover — only active after carousel mounts
   useEffect(() => {
     if (!api || !mounted) return;
 
@@ -63,54 +56,68 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
     };
 
     const stopAutoSlide = () => {
-      if (interval) {
-        clearInterval(interval);
-      }
+      if (interval) clearInterval(interval);
     };
 
-    // Start auto-slide initially
     startAutoSlide();
 
-    // Add event listeners for pause on hover using ref
     const carouselElement = carouselRef.current;
     if (carouselElement) {
-      carouselElement.addEventListener('mouseenter', stopAutoSlide);
-      carouselElement.addEventListener('mouseleave', startAutoSlide);
+      carouselElement.addEventListener("mouseenter", stopAutoSlide);
+      carouselElement.addEventListener("mouseleave", startAutoSlide);
     }
 
     return () => {
       stopAutoSlide();
       if (carouselElement) {
-        carouselElement.removeEventListener('mouseenter', stopAutoSlide);
-        carouselElement.removeEventListener('mouseleave', startAutoSlide);
+        carouselElement.removeEventListener("mouseenter", stopAutoSlide);
+        carouselElement.removeEventListener("mouseleave", startAutoSlide);
       }
     };
   }, [api, mounted]);
 
-  const filteredProducts = filterHiddenProducts(products)
-    .filter((product) => {
-      if (product?.price || product?.regularPrice || product?.salePrice) {
-        return true;
-      }
+  const filteredProducts = products.filter((product) => {
+    if (product?.price || product?.regularPrice || product?.salePrice) {
+      return true;
+    }
 
-      const variationNodes = (product?.variations as {
-        nodes?: Array<{
-          price?: string | null;
-          regularPrice?: string | null;
-          salePrice?: string | null;
-        }>;
-      } | null)?.nodes;
+    const variationNodes = ('variations' in product && product.variations)
+      ? (product.variations as { nodes?: Array<{ price?: string | null; regularPrice?: string | null; salePrice?: string | null }> } | null)?.nodes
+      : undefined;
 
-      return (
-        variationNodes?.some(
-          (variation) => variation?.price || variation?.regularPrice || variation?.salePrice
-        ) ?? false
-      );
-    });
+    return (
+      variationNodes?.some(
+        (variation) =>
+          variation?.price || variation?.regularPrice || variation?.salePrice
+      ) ?? false
+    );
+  });
 
   if (!filteredProducts.length) {
     return null;
   }
+
+  const seeMoreButton = link && (
+    <div className="flex justify-center mt-6">
+      {isExternalLink ? (
+        <a
+          href={link}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-700 bg-white rounded-full shadow-lg hover:shadow-md transition-all duration-200"
+        >
+          See More
+        </a>
+      ) : (
+        <Link
+          href={link}
+          className="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-700 bg-white rounded-full shadow-lg hover:shadow-md transition-all duration-200"
+        >
+          See More
+        </Link>
+      )}
+    </div>
+  );
 
   return (
     <div className={`nc-SectionSliderProductCard ${className}`}>
@@ -125,21 +132,8 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
           {heading}
         </Heading>
 
-        {/* Show Skeleton while loading */}
-        {showSkeleton && (
-          <div className="py-4">
-            <div className="flex gap-4 overflow-hidden">
-              {Array.from({ length: Math.min(filteredProducts.length || 5, 5) }).map((_, index) => (
-                <div key={index} className="flex-shrink-0 basis-1/2 sm:basis-1/3 md:basis-1/3 lg:basis-1/5">
-                  <CardSkeleton cardCount={1} className="w-full" />
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Show Carousel when loaded */}
-        {!showSkeleton && mounted && (
+        {mounted ? (
+          // Post-hydration: full interactive carousel
           <div ref={carouselRef} className="py-4 relative">
             <Carousel
               opts={{
@@ -151,15 +145,14 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
               className="w-full"
             >
               <CarouselContent className="-ml-2 md:-ml-4">
-                {filteredProducts.map((item, index) => (
+                {filteredProducts.map((item) => (
                   <CarouselItem
-                    key={index}
+                    key={item.slug}
                     className={`pl-2 md:pl-4 ${itemClassName} basis-1/2 sm:basis-1/3 lg:basis-1/5`}
                   >
                     <div className="w-full">
                       <ProductCard
                         className="transition-opacity duration-300"
-                        key={item.slug}
                         data={item}
                       />
                     </div>
@@ -167,24 +160,23 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
                 ))}
               </CarouselContent>
 
-              {/* Side navigation arrows for product rows */}
               <CarouselPrevious className="hidden md:flex absolute xl:-left-14 -left-2 top-1/2 -translate-y-1/2 z-10 border-0 bg-[#cecfd0] text-white hover:bg-[#9e9fa0] hover:text-white transition-colors duration-200 p-1 md:p-2 w-8 h-8 md:w-10 md:h-10 [&>svg]:w-4 [&>svg]:h-4 md:[&>svg]:w-6 md:[&>svg]:h-6" />
               <CarouselNext className="hidden md:flex absolute xl:-right-14 -right-2 top-1/2 -translate-y-1/2 z-10 border-0 bg-[#cecfd0] text-white hover:bg-[#9e9fa0] hover:text-white transition-colors duration-200 p-1 md:p-2 w-8 h-8 md:w-10 md:h-10 [&>svg]:w-4 [&>svg]:h-4 md:[&>svg]:w-6 md:[&>svg]:h-6" />
             </Carousel>
-            
-            {/* See More button at the bottom */}
-            {link && (
-              <div className="flex justify-center mt-6">
-                <a
-                  href={link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center px-6 py-3 text-sm font-medium text-gray-700 bg-white rounded-full shadow-lg hover:shadow-md transition-all duration-200"
-                >
-                  See More
-                </a>
+
+            {seeMoreButton}
+          </div>
+        ) : (
+          // Pre-hydration: static flex-scroll so product names/links are in the server HTML
+          <div className="py-4 -ml-2 md:-ml-4 flex overflow-x-auto">
+            {filteredProducts.map((item) => (
+              <div
+                key={item.slug}
+                className={`pl-2 md:pl-4 flex-shrink-0 basis-1/2 sm:basis-1/3 lg:basis-1/5`}
+              >
+                <ProductCard data={item} />
               </div>
-            )}
+            ))}
           </div>
         )}
       </div>
