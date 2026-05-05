@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import Link from "next/link";
+import { HIDDEN_PRODUCT_SLUGS } from "@/lib/hidden-products";
 
 interface FeatureProductData {
   name: string;
@@ -17,6 +18,10 @@ interface FeatureProductCardProps {
 }
 
 const FeatureProductCard = ({ product }: FeatureProductCardProps) => {
+  if (HIDDEN_PRODUCT_SLUGS.has((product.slug ?? "").toLowerCase())) {
+    return null;
+  }
+
   // Calculate discount percentage
   const calculateDiscountPercentage = (regularPrice: string, salePrice: string) => {
     if (!regularPrice || !salePrice) return 0;

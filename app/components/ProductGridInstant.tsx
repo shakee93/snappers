@@ -11,6 +11,7 @@ import Pagination from "@/shared/Pagination/Pagination";
 import Image from "next/image";
 import NotFound from "@/public/not_found.svg";
 import ProductCardLoading from "@/components/Loading/ProductCardLoading";
+import { filterHiddenProducts } from "@/lib/hidden-products";
 
 interface ProductGridProps {
   products?: { node: Product }[];
@@ -62,6 +63,11 @@ const ProductGridInstant = ({
     return acc;
   }, [bogoBatchData]);
 
+  const visibleHits = useMemo(
+    () => filterHiddenProducts(hits as Array<{ slug?: string | null }>),
+    [hits]
+  );
+
   const grid = 8;
 
   // useEffect(() => {
@@ -91,14 +97,14 @@ const ProductGridInstant = ({
   // network round-trip; unmounting the grid for those transitions causes a
   // visible flicker. Only show the skeleton on the very first load.
   const desktopGridClass = "lg:grid-cols-4";
-  const showSkeleton = hits.length === 0 && (statusState === 'stalled' || statusState === 'loading');
+  const showSkeleton = visibleHits.length === 0 && (statusState === 'stalled' || statusState === 'loading');
 
   return (
     <>
       <div className='h-[185px] md:h-60 bottom-3 right-3 hidden'></div>
-      {hits.length > 0 && (
+      {visibleHits.length > 0 && (
         <div className={`flex-1 grid grid-cols-2 md:grid-cols-4 ${desktopGridClass} gap-x-2 gap-y-2 lg:gap-x-3 lg:gap-y-4`}>
-          {hits.map((item, index) => (
+          {visibleHits.map((item) => (
             <ProductCard
               key={item?.slug as unknown as string}
               data={item as unknown as Product}
@@ -117,7 +123,7 @@ const ProductGridInstant = ({
         </div>
       )}
 
-      {(results?.nbHits === 0 && statusState === 'idle') && (
+      {(visibleHits.length === 0 && statusState === 'idle') && (
         <div className="text-center text-slate-500 flex flex-col items-center gap-20 py-12">
           <div>
             <Image className="w-64" src={NotFound} alt="No Search Results" />
@@ -127,7 +133,9 @@ const ProductGridInstant = ({
       )}
 
 
-      {results && results?.nbHits > results?.hitsPerPage && (
+      {/* `nbHits` / `nbPages` are pre-filter counts from Typesense. We gate
+          pagination on visible hits to avoid rendering controls on a hidden-only page. */}
+      {results && visibleHits.length > 0 && results?.nbHits > results?.hitsPerPage && (
         <>
           <hr className="border-slate-200 mb-2 lg:my-6 lg:mb-0 dark:border-slate-700" />
 

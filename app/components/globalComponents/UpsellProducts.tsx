@@ -2,10 +2,8 @@
 
 import React from 'react';
 import SectionSliderProductCard from '../SectionSliderProductCard';
-import { SimpleProduct } from '@/graphql/types/graphql';
 
 const UpsellProducts = ({ newArrivals }: any) => {
-
   return (
     <div>
       <SectionSliderProductCard

@@ -2,6 +2,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { HIDDEN_PRODUCT_SLUGS } from "@/lib/hidden-products";
 
 interface SaleProductData {
   name: string;
@@ -20,6 +21,10 @@ interface SaleProductCardProps {
 
 const
   SaleProductCard = ({ product, tiktokLink }: SaleProductCardProps) => {
+    if (HIDDEN_PRODUCT_SLUGS.has((product.slug ?? "").toLowerCase())) {
+      return null;
+    }
+
     return (
       <div className="w-full md:w-2/3 lg:w-full xl:w-2/3 block h-full bg-white rounded-[18px] overflow-hidden relative border border-gray-200">
         <div className="w-full h-full flex items-center justify-between p-3">
