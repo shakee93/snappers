@@ -5,6 +5,25 @@ import type { MetadataRoute } from 'next'
 
 export const BASE_URL = 'https://gqmobiles.lk'
 
+function getGraphqlErrorCode(error: unknown): string | undefined {
+  const graphQLErrors = (error as { graphQLErrors?: Array<{ extensions?: { code?: unknown } }> })?.graphQLErrors
+  const firstCode = graphQLErrors?.[0]?.extensions?.code
+  return typeof firstCode === 'string' ? firstCode : undefined
+}
+
+function shouldRetrySitemapFetch(error: unknown): boolean {
+  const statusCode = (error as { networkError?: { statusCode?: unknown } })?.networkError?.statusCode
+  const numericStatusCode = typeof statusCode === 'number' ? statusCode : undefined
+
+  if (numericStatusCode === 429) return true
+  if (typeof numericStatusCode === 'number' && numericStatusCode >= 500 && numericStatusCode < 600) return true
+
+  const graphQLErrorCode = getGraphqlErrorCode(error)
+  if (graphQLErrorCode === 'RATE_LIMITED' || graphQLErrorCode === 'TOO_MANY_REQUESTS') return true
+
+  return false
+}
+
 export const getBrands = async (): Promise<Brand[]> => {
   const client = await getClient()
 
@@ -14,9 +33,8 @@ export const getBrands = async (): Promise<Brand[]> => {
         query: GET_SITEMAP_BRANDS
       })
       return data?.brands?.nodes ?? []
-    } catch (error: any) {
-      const statusCode = error?.networkError?.statusCode
-      const shouldRetry = statusCode === 429 || (statusCode >= 500 && statusCode < 600)
+    } catch (error: unknown) {
+      const shouldRetry = shouldRetrySitemapFetch(error)
 
       if (!shouldRetry || attempt === 2) {
         console.error('Failed to fetch sitemap brands', error)
@@ -24,6 +42,7 @@ export const getBrands = async (): Promise<Brand[]> => {
       }
 
       const retryDelayMs = 300 * (attempt + 1)
+      console.warn(`Retrying sitemap brands fetch (attempt ${attempt + 2}/3)`)
       await new Promise((resolve) => setTimeout(resolve, retryDelayMs))
     }
   }

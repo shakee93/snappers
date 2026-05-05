@@ -5,6 +5,7 @@ import MainSlider from "./MainSlider";
 import FeatureProductCard from "./FeatureProductCard";
 import SaleProductCard from "./SaleProductCard";
 import VideoSection from "./VideoSection";
+import { HIDDEN_PRODUCT_SLUGS } from "@/lib/hidden-products";
 
 // GraphQL Data Interfaces
 interface SlideType {
@@ -110,6 +111,13 @@ const SectionHero4 = ({ className = "", data }: SectionHero4Props) => {
   const tiktokLink = data?.tiktokVideo?.tiktokLink || "";
   const productLink = data?.tiktokVideo?.productLink || "";
 
+  const shouldShowFeatureProduct = !HIDDEN_PRODUCT_SLUGS.has(
+    (featureSlideData.slug ?? "").toLowerCase()
+  );
+  const shouldShowSaleProduct = !HIDDEN_PRODUCT_SLUGS.has(
+    (saleProductData.slug ?? "").toLowerCase()
+  );
+
 
   return (
     <div>
@@ -123,10 +131,10 @@ const SectionHero4 = ({ className = "", data }: SectionHero4Props) => {
 
           <div className="flex w-full h-[150px] gap-4 md:gap-6 rounded-[18px]">
             {/* Feature Product Card */}
-            <FeatureProductCard product={featureSlideData} />
+            {shouldShowFeatureProduct ? <FeatureProductCard product={featureSlideData} /> : null}
 
             {/* Sale Product Card */}
-            <SaleProductCard product={saleProductData} tiktokLink={tiktokLink} />
+            {shouldShowSaleProduct ? <SaleProductCard product={saleProductData} tiktokLink={tiktokLink} /> : null}
           </div>
         </div>
 

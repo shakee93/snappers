@@ -133,7 +133,9 @@ const ProductGridInstant = ({
       )}
 
 
-      {results && results?.nbHits > results?.hitsPerPage && (
+      {/* `nbHits` / `nbPages` are pre-filter counts from Typesense. We gate
+          pagination on visible hits to avoid rendering controls on a hidden-only page. */}
+      {results && visibleHits.length > 0 && results?.nbHits > results?.hitsPerPage && (
         <>
           <hr className="border-slate-200 mb-2 lg:my-6 lg:mb-0 dark:border-slate-700" />
 

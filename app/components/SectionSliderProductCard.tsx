@@ -1,5 +1,5 @@
 "use client";
-import React, { FC, useEffect, useState, useRef } from "react";
+import React, { FC, useEffect, useState, useRef, useMemo } from "react";
 import Link from "next/link";
 import Heading from "@/app/components/Heading/Heading";
 import ProductCard from "@/app/components/ProductCard3";
@@ -77,7 +77,10 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
     };
   }, [api, mounted]);
 
-  const visibleProducts = filterHiddenProducts(products);
+  const visibleProducts = useMemo(
+    () => filterHiddenProducts(products),
+    [products]
+  );
 
   const filteredProducts = visibleProducts.filter((product) => {
     if (product?.price || product?.regularPrice || product?.salePrice) {
