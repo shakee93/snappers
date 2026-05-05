@@ -42,7 +42,9 @@ export const getBrands = async (): Promise<Brand[]> => {
       }
 
       const retryDelayMs = 300 * (attempt + 1)
-      console.warn(`Retrying sitemap brands fetch (attempt ${attempt + 2}/3)`)
+      console.warn(
+        `Retrying sitemap brands fetch after attempt ${attempt + 1} failed (next: ${attempt + 2}/3)`
+      )
       await new Promise((resolve) => setTimeout(resolve, retryDelayMs))
     }
   }
