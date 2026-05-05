@@ -823,6 +823,8 @@ const ProductDetails = ({
                               optionText += " (Out of Stock)";
                             } else if (isAvailable) {
                               optionText += " (In Stock)";
+                            } else if (isSelected && currentCombinationUnavailable) {
+                              optionText += " (Out of Stock)";
                             }
 
                             return (
