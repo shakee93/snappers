@@ -4,6 +4,7 @@ import React, { createContext, ReactNode, useContext, useEffect, useState, useRe
 import { ApolloError, useLazyQuery, useMutation } from '@apollo/client';
 import { ADD_TO_CART, GET_CART, REMOVE_ITEMS_FROM_CART, UPDATE_CART_ITEM_QUANTITY } from "@/graphql/defs/cart";
 import { Cart, Customer } from "@/graphql/types/graphql";
+import { AUTH_TOKEN_KEY } from "@/context/SessionProvider";
 import { toast } from "sonner";
 
 
@@ -52,13 +53,14 @@ export function CartProvider({ children }: {
     const [loading, setLoading] = useState(false)
     const processedRemoveDataRef = useRef<string | null>(null)
     const isClearingRef = useRef(false)
-    const AUTH_TOKEN_KEY = 'wp_auth_token'
 
     const isGuestCustomer = (value: Customer | null | undefined) => {
         if (!value) return true
-        return value.id === 'guest'
+        const normalizedId = `${value.id ?? ''}`.toLowerCase()
+        return normalizedId === 'guest' || normalizedId.endsWith(':guest')
     }
 
+    // Intentionally reads latest render state; memoizing with empty deps can capture stale customer.
     const shouldPreserveAuthenticatedCustomer = (incomingCustomer: Customer | null | undefined) => {
         if (typeof window === 'undefined') return false
         const hasAuthToken = !!localStorage.getItem(AUTH_TOKEN_KEY)

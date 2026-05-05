@@ -70,13 +70,18 @@ export function SessionProvider({ children }: {
         if (!data) return;
 
         const sessionTokenFromPayload = data?.sessionToken ?? data?.customer?.sessionToken ?? '';
+        const normalizedSessionToken = sessionTokenFromPayload || null;
 
         localStorage.setItem(USER_DATA_KEY, JSON.stringify(data?.customer));
         localStorage.setItem(AUTH_TOKEN_KEY, data?.authToken || '');
-        localStorage.setItem(SESSION_TOKEN_KEY, sessionTokenFromPayload);
+        if (normalizedSessionToken) {
+            localStorage.setItem(SESSION_TOKEN_KEY, normalizedSessionToken);
+        } else {
+            localStorage.removeItem(SESSION_TOKEN_KEY);
+        }
         localStorage.setItem(REFRESH_TOKEN_KEY, data?.refreshToken || '');
 
-        setSessionToken(sessionTokenFromPayload || null);
+        setSessionToken(normalizedSessionToken);
         setCustomer(data?.customer as Customer);
 
         await getCart();
