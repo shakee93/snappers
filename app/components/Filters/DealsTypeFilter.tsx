@@ -4,8 +4,7 @@ import Checkbox from "@/shared/Checkbox/Checkbox";
 import { ChevronDown } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
-
-type DealFilterType = "clearance" | "offers" | "free-shipping";
+import { DealFilterType, VALID_DEAL_FILTER_TYPES } from "@/lib/dealFilters";
 
 type DealsTypeFilterProps = {
   // SSR default — mirrors what the deals page passes when there's no
@@ -14,8 +13,6 @@ type DealsTypeFilterProps = {
   // to re-render (the page is intentionally static for edge caching).
   activeTypes: DealFilterType[];
 };
-
-const VALID_FILTER_TYPES: DealFilterType[] = ["clearance", "offers", "free-shipping"];
 
 const DealsTypeFilter = ({ activeTypes: defaultActiveTypes }: DealsTypeFilterProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
@@ -27,7 +24,7 @@ const DealsTypeFilter = ({ activeTypes: defaultActiveTypes }: DealsTypeFilterPro
     const parsed = raw
       .split(",")
       .map((v) => v.trim())
-      .filter((v): v is DealFilterType => VALID_FILTER_TYPES.includes(v as DealFilterType));
+      .filter((v): v is DealFilterType => VALID_DEAL_FILTER_TYPES.includes(v as DealFilterType));
     return parsed.length > 0 ? Array.from(new Set(parsed)) : defaultActiveTypes;
   }, [searchParams, defaultActiveTypes]);
 

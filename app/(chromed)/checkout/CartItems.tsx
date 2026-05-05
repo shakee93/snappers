@@ -71,7 +71,7 @@ const CartItems = ({
       return isVariationFreeShipping(variation?.node, node);
     }
     return isSimpleProductFreeShipping(node);
-  }, [type, variation, node]);
+  }, [type, variation?.node, node]);
   const brandSlug = brands?.nodes[0]?.slug;
 
   const { maxQty, atMax } = getCartLineStockCap(item);

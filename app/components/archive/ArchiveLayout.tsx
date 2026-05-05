@@ -5,6 +5,7 @@ import InstantSearchWrapper from "@/app/components/InstantSearchWrapper";
 import { Brand } from "@/graphql/types/graphql";
 import Link from "next/link";
 import { GET_TAG_DETAILS_BY_SLUG } from "@/graphql/defs/products";
+import { DealFilterType } from "@/lib/dealFilters";
 
 async function getData(parentId?: number, tagSlug?: string) {
   const { data } = await getClient().query({
@@ -61,7 +62,7 @@ interface ArchiveLayoutProps {
   headingOverride?: string;
   descriptionOverride?: string;
   topLinks?: { href: string; label: string; active?: boolean }[];
-  dealsType?: ("clearance" | "offers" | "free-shipping")[];
+  dealsType?: DealFilterType[];
   dealTags?: string[];
 }
 
