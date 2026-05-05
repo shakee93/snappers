@@ -34,10 +34,23 @@ const BOGO_OFFER_TAG_SLUGS = ["bogo-offer"];
 // Hero/bento slider data is invalidated via revalidateTag(HERO_SECTION_CACHE_TAG)
 // from /api/revalidate?tag=hero-section, fired by WP acf/save_post on the
 // Hero Section options page (and by save_post on the slide CPT).
+//
+// Two cache layers need the tag:
+//   1. unstable_cache (this wrapper) — `tags` option below.
+//   2. The underlying Next.js fetch cache used by Apollo's HttpLink, which
+//      ships with `cache: 'force-cache'` (see graphql/apollo-ssr.ts) and
+//      keys entries by GraphQL request body. Without an explicit tag, that
+//      layer is unreachable by revalidateTag and serves stale data forever.
+//      Pass `next.tags` via `context.fetchOptions` so the link merges it
+//      into the fetch call.
+const HERO_QUERY_CONTEXT = {
+  fetchOptions: { next: { tags: [HERO_SECTION_CACHE_TAG] } },
+};
+
 const getSlidesCached = unstable_cache(
   () =>
     getClient()
-      .query({ query: GET_SLIDES })
+      .query({ query: GET_SLIDES, context: HERO_QUERY_CONTEXT })
       .then((res) => res.data?.slides?.nodes || [])
       .catch(() => {
         console.error("Error fetching slides");
@@ -50,7 +63,7 @@ const getSlidesCached = unstable_cache(
 const getBentoSliderCached = unstable_cache(
   () =>
     getClient()
-      .query({ query: GET_BENTO_SLIDER })
+      .query({ query: GET_BENTO_SLIDER, context: HERO_QUERY_CONTEXT })
       .then((res) => res.data || [])
       .catch(() => {
         console.error("Error fetching bento slider");
