@@ -5,6 +5,12 @@ import { DEALS_CACHE_TAG } from '@/lib/cache-tags'
 // NOTE: IF you want to revalidate all routes, use `/api/revalidate?path=all`;
 // just use `/api/revalidate`.
 export async function GET(request: NextRequest) {
+    const tag = request.nextUrl.searchParams.get('tag')
+    if (tag) {
+        revalidateTag(tag, 'max')
+        return Response.json({ revalidated: tag, now: Date.now() })
+    }
+
     const path = request.nextUrl.searchParams.get('path')
 
     if (path) {

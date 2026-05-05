@@ -21,6 +21,8 @@ import FAQ from "@/app/components/HomePage/FAQSection";
 import TikTokSection from "@/components/TikTokSection";
 import { GET_BENTO_SLIDER } from "@/graphql/defs/products";
 import SectionHero4 from "@/app/components/HomePage/SectionHero4";
+import { unstable_cache } from "next/cache";
+import { HERO_SECTION_CACHE_TAG } from "@/lib/cache-tags";
 
 
 /**
@@ -28,6 +30,35 @@ import SectionHero4 from "@/app/components/HomePage/SectionHero4";
   * @returns { Promise<{ newArrivals: (SimpleProduct & VariableProduct)[], mobiles: (SimpleProduct & VariableProduct)[], speakers: (SimpleProduct & VariableProduct)[], watches: (SimpleProduct & VariableProduct)[], backInStock: (SimpleProduct & VariableProduct)[], brands: Brand[], slides: Slide[], options: Option[], reviews: Review[], bentoSlider: BentoSlider[] }> }
  */
 const BOGO_OFFER_TAG_SLUGS = ["bogo-offer"];
+
+// Hero/bento slider data is invalidated via revalidateTag(HERO_SECTION_CACHE_TAG)
+// from /api/revalidate?tag=hero-section, fired by WP acf/save_post on the
+// Hero Section options page (and by save_post on the slide CPT).
+const getSlidesCached = unstable_cache(
+  () =>
+    getClient()
+      .query({ query: GET_SLIDES })
+      .then((res) => res.data?.slides?.nodes || [])
+      .catch(() => {
+        console.error("Error fetching slides");
+        return [];
+      }),
+  ["homepage-slides"],
+  { tags: [HERO_SECTION_CACHE_TAG], revalidate: 86400 }
+);
+
+const getBentoSliderCached = unstable_cache(
+  () =>
+    getClient()
+      .query({ query: GET_BENTO_SLIDER })
+      .then((res) => res.data || [])
+      .catch(() => {
+        console.error("Error fetching bento slider");
+        return [];
+      }),
+  ["homepage-bento-slider"],
+  { tags: [HERO_SECTION_CACHE_TAG], revalidate: 86400 }
+);
 
 const getData = async () => {
   const queries = [
@@ -114,17 +145,7 @@ const getData = async () => {
         return [];
       }),
 
-    getClient()
-      .query({
-        query: GET_SLIDES,
-      })
-      .then((res) => {
-        return res.data?.slides?.nodes || [];
-      })
-      .catch(() => {
-        console.error("Error fetching slides");
-        return [];
-      }),
+    getSlidesCached(),
     getClient()
       .query({
         query: GET_OPTIONS,
@@ -146,17 +167,7 @@ const getData = async () => {
         return [];
       }),
 
-    getClient()
-      .query({
-        query: GET_BENTO_SLIDER,
-      })
-      .then((res) => {
-        return res.data || [];
-      })
-      .catch(() => {
-        console.error("Error fetching bento slider");
-        return [];
-      }),
+    getBentoSliderCached(),
   ];
 
   const [
