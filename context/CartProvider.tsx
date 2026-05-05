@@ -52,6 +52,18 @@ export function CartProvider({ children }: {
     const [loading, setLoading] = useState(false)
     const processedRemoveDataRef = useRef<string | null>(null)
     const isClearingRef = useRef(false)
+    const AUTH_TOKEN_KEY = 'wp_auth_token'
+
+    const isGuestCustomer = (value: Customer | null | undefined) => {
+        if (!value) return true
+        return value.id === 'guest'
+    }
+
+    const shouldPreserveAuthenticatedCustomer = (incomingCustomer: Customer | null | undefined) => {
+        if (typeof window === 'undefined') return false
+        const hasAuthToken = !!localStorage.getItem(AUTH_TOKEN_KEY)
+        return hasAuthToken && !isGuestCustomer(customer) && isGuestCustomer(incomingCustomer)
+    }
 
     const refreshData = (data: any) => {
         // Handle removeItemsFromCart mutation response
@@ -85,12 +97,18 @@ export function CartProvider({ children }: {
         // Handle GET_CART query response (has both cart and customer)
         const key = Object.keys(data)[0]
         if (key && data[key]) {
+            const incomingCustomer = data[key].customer || data.customer || null
             setCart(data[key].cart || data.cart || null)
-            setCustomer(data[key].customer || data.customer || null)
+            if (!shouldPreserveAuthenticatedCustomer(incomingCustomer)) {
+                setCustomer(incomingCustomer)
+            }
         } else {
             // Fallback for direct cart/customer structure
+            const incomingCustomer = data?.customer || null
             setCart(data?.cart || null)
-            setCustomer(data?.customer || null)
+            if (!shouldPreserveAuthenticatedCustomer(incomingCustomer)) {
+                setCustomer(incomingCustomer)
+            }
         }
     }
 

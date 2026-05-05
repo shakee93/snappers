@@ -64,31 +64,22 @@ export function SessionProvider({ children }: {
     const [registerCustomer] = useMutation(REGISTER_CUSTOMER_MUTATION);
     const [loginCustomer] = useMutation(LOGIN_CUSTOMER_MUTATION);
 
-    function saveResponseToLocalStorage(response: any, type: AuthType = "registerCustomer") {
+    async function saveResponseToLocalStorage(response: any, type: AuthType = "registerCustomer") {
 
         const data: LoginPayload & RegisterCustomerPayload = response?.data?.[type]
+        if (!data) return;
 
-        if (type === "login") {
-            localStorage.setItem(USER_DATA_KEY, JSON.stringify(data?.customer));
-            // console.log("setting customer: ", data?.customer)
-            setCustomer(data?.customer as Customer)
+        const sessionTokenFromPayload = data?.sessionToken ?? data?.customer?.sessionToken ?? '';
 
-            localStorage.setItem(AUTH_TOKEN_KEY, data?.authToken || '');
-            localStorage.setItem(SESSION_TOKEN_KEY, data?.sessionToken || '');
-            localStorage.setItem(REFRESH_TOKEN_KEY, data?.refreshToken || '');
-        }
+        localStorage.setItem(USER_DATA_KEY, JSON.stringify(data?.customer));
+        localStorage.setItem(AUTH_TOKEN_KEY, data?.authToken || '');
+        localStorage.setItem(SESSION_TOKEN_KEY, sessionTokenFromPayload);
+        localStorage.setItem(REFRESH_TOKEN_KEY, data?.refreshToken || '');
 
-        if (type == "registerCustomer") {
-            localStorage.setItem(USER_DATA_KEY, JSON.stringify(data?.customer));
-            setCustomer(data?.customer as Customer)
+        setSessionToken(sessionTokenFromPayload || null);
+        setCustomer(data?.customer as Customer);
 
-            localStorage.setItem(AUTH_TOKEN_KEY, data?.authToken || '');
-            localStorage.setItem(SESSION_TOKEN_KEY, data?.customer?.sessionToken || '');
-            localStorage.setItem(REFRESH_TOKEN_KEY, data.refreshToken || '');
-        }
-
-        getCart()
-        fetchCustomer()
+        await getCart();
     }
 
     const signUp = async (email: string, password: string) => {
@@ -105,7 +96,7 @@ export function SessionProvider({ children }: {
 
             // console.log("Sign up",response);
 
-            saveResponseToLocalStorage(response);
+            await saveResponseToLocalStorage(response);
 
             return { data: "registered", error: null };
         } catch (error) {
@@ -136,8 +127,7 @@ export function SessionProvider({ children }: {
                 },
             })
 
-            saveResponseToLocalStorage(response, "login");
-            fetchCustomer();
+            await saveResponseToLocalStorage(response, "login");
             return { data: "logged_in", error: null };
         } catch (error) {
             let errorMessage = "An error occurred while login.";
