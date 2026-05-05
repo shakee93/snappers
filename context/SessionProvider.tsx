@@ -101,6 +101,7 @@ export function SessionProvider({ children }: {
             // console.log("Sign up",response);
 
             await saveResponseToLocalStorage(response);
+            await fetchCustomer(true);
 
             return { data: "registered", error: null };
         } catch (error) {
@@ -131,6 +132,7 @@ export function SessionProvider({ children }: {
             })
 
             await saveResponseToLocalStorage(response, "login");
+            await fetchCustomer(true);
             return { data: "logged_in", error: null };
         } catch (error) {
             let errorMessage = "An error occurred while login.";
@@ -160,11 +162,11 @@ export function SessionProvider({ children }: {
         setCustomer(null)
     };
 
-    const fetchCustomer = async () => {
+    const fetchCustomer = async (forceRemote = false) => {
 
         const userData = localStorage.getItem(USER_DATA_KEY);
         // console.log("userData", JSON.parse(userData!));
-        if (userData) {
+        if (userData && !forceRemote) {
             // console.log(JSON.parse(userData));
             setCustomer(JSON.parse(userData) as unknown as Customer)
             return userData

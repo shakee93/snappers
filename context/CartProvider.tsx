@@ -57,7 +57,7 @@ export function CartProvider({ children }: {
     const isGuestCustomer = (value: Customer | null | undefined) => {
         if (!value) return true
         const normalizedId = `${value.id ?? ''}`.toLowerCase()
-        const databaseId = Number((value as any)?.databaseId ?? NaN)
+        const databaseId = Number(value.databaseId ?? NaN)
         return databaseId === 0 || normalizedId === 'guest' || normalizedId.endsWith(':guest')
     }
 
