@@ -4,7 +4,6 @@ import React, { createContext, ReactNode, useContext, useEffect, useState, useRe
 import { ApolloError, useLazyQuery, useMutation } from '@apollo/client';
 import { ADD_TO_CART, GET_CART, REMOVE_ITEMS_FROM_CART, UPDATE_CART_ITEM_QUANTITY } from "@/graphql/defs/cart";
 import { Cart, Customer } from "@/graphql/types/graphql";
-import { AUTH_TOKEN_KEY } from "@/utils/storage-keys";
 import { toast } from "sonner";
 
 
@@ -54,20 +53,6 @@ export function CartProvider({ children }: {
     const processedRemoveDataRef = useRef<string | null>(null)
     const isClearingRef = useRef(false)
 
-    const isGuestCustomer = (value: Customer | null | undefined) => {
-        if (!value) return true
-        const normalizedId = `${value.id ?? ''}`.toLowerCase()
-        const databaseId = Number(value.databaseId ?? NaN)
-        return databaseId === 0 || normalizedId === 'guest' || normalizedId.endsWith(':guest')
-    }
-
-    // Intentionally reads latest render state; memoizing with empty deps can capture stale customer.
-    const shouldPreserveAuthenticatedCustomer = (incomingCustomer: Customer | null | undefined) => {
-        if (typeof window === 'undefined') return false
-        const hasAuthToken = !!localStorage.getItem(AUTH_TOKEN_KEY)
-        return hasAuthToken && !isGuestCustomer(customer) && isGuestCustomer(incomingCustomer)
-    }
-
     const refreshData = (data: any) => {
         // Handle removeItemsFromCart mutation response
         if (data?.removeItemsFromCart) {
@@ -100,18 +85,10 @@ export function CartProvider({ children }: {
         // Handle GET_CART query response (has both cart and customer)
         const key = Object.keys(data)[0]
         if (key && data[key]) {
-            const incomingCustomer = data[key].customer || data.customer || null
             setCart(data[key].cart || data.cart || null)
-            if (!shouldPreserveAuthenticatedCustomer(incomingCustomer)) {
-                setCustomer(incomingCustomer)
-            }
         } else {
             // Fallback for direct cart/customer structure
-            const incomingCustomer = data?.customer || null
             setCart(data?.cart || null)
-            if (!shouldPreserveAuthenticatedCustomer(incomingCustomer)) {
-                setCustomer(incomingCustomer)
-            }
         }
     }
 
