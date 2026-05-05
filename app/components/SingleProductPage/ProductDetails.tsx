@@ -31,7 +31,7 @@ import {
 import koko from "@/public/koko.png";
 import Image from "next/image";
 import { BanknotesIcon } from "@heroicons/react/24/outline";
-import { Flame } from "lucide-react";
+import { Flame, Truck } from "lucide-react";
 import BrandLogo from "./BrandLogo";
 import ShareButtons from "./ShareButtons";
 import { AnimatePresence, motion } from "framer-motion";
@@ -39,6 +39,10 @@ import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { mergeProductMetaForBogo, normalizeBogoConfig } from "@/lib/bogo";
 import { getPreferredVariation } from "@/lib/getPreferredVariation";
+import {
+  isSimpleProductFreeShipping,
+  isVariationFreeShipping,
+} from "@/lib/freeShipping";
 const ProductDetails = ({
   product,
   brand,
@@ -175,6 +179,16 @@ const ProductDetails = ({
   const isFreeGiftProduct = product?.productTags?.nodes?.some(
     (tag: any) => tag.slug === 'free-gift'
   ) ?? false;
+  // Match the WP plugin's per-variation eligibility (`cart_item_has_free_shipping`):
+  // variation meta wins, parent meta is the fallback. Using only the parent
+  // `free-shipping` tag would show the badge for every variant whenever any
+  // sibling variation qualifies.
+  const isFreeShippingProduct = useMemo(() => {
+    if (product?.type === "VARIABLE") {
+      return isVariationFreeShipping(activeVariation, product);
+    }
+    return isSimpleProductFreeShipping(product);
+  }, [product, activeVariation]);
   const crossProductFreeIds = bogo.freeProductIds.filter(
     (id) => id !== product?.databaseId
   );
@@ -416,6 +430,12 @@ const ProductDetails = ({
             <span className="inline-flex items-center gap-1 bg-orange-500 text-white text-xs font-semibold px-2.5 py-0.5 rounded-full">
               <Flame className="w-3 h-3" />
               Clearance
+            </span>
+          )}
+          {isFreeShippingProduct && (
+            <span className="inline-flex items-center gap-1 bg-blue-600 text-white text-xs font-semibold px-2.5 py-0.5 rounded-full">
+              <Truck className="w-3 h-3" />
+              Free Shipping
             </span>
           )}
         </div>

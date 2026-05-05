@@ -3,12 +3,16 @@
 import Image from "next/image";
 import Link from "next/link";
 import LineOrCartPriceLabel from "@/app/components/LineOrCartPriceLabel";
-import { Fragment, useState } from "react";
-import { Loader } from "lucide-react";
+import { Fragment, useMemo, useState } from "react";
+import { Loader, Truck } from "lucide-react";
 import { toast } from "sonner";
 import AttributeIcon from "@/app/components/AttributeIcon";
 import { isLineItemFree } from "@/lib/cartLinePricing";
 import { getCartLineStockCap } from "@/lib/cartLineStockCap";
+import {
+  isSimpleProductFreeShipping,
+  isVariationFreeShipping,
+} from "@/lib/freeShipping";
 
 export interface CartItem {
   extraData?: null | any;
@@ -40,6 +44,7 @@ export interface CartItemProductNode {
   brands: {
     nodes: any;
   };
+  freeShippingMeta?: Array<{ key?: string | null; value?: string | null }>;
 }
 
 interface CartItemsProps {
@@ -59,6 +64,14 @@ const CartItems = ({
   const lineIsFree = isLineItemFree(total, subtotal);
   const { node } = product || {};
   const { name, price, regularPrice, image, terms, brands, type } = node || {};
+  // Match the WP plugin's per-variation eligibility: variation meta wins,
+  // parent meta is the fallback. Same priority as cart_item_has_free_shipping.
+  const hasFreeShipping = useMemo(() => {
+    if (type === "VARIABLE") {
+      return isVariationFreeShipping(variation?.node, node);
+    }
+    return isSimpleProductFreeShipping(node);
+  }, [type, variation?.node, node]);
   const brandSlug = brands?.nodes[0]?.slug;
 
   const { maxQty, atMax } = getCartLineStockCap(item);
@@ -138,6 +151,13 @@ const CartItems = ({
                   </span>
                 </Fragment>
               ))}
+            </div>
+          )}
+
+          {hasFreeShipping && (
+            <div className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-blue-600 dark:text-blue-400">
+              <Truck className="w-3 h-3 shrink-0" />
+              Free Shipping
             </div>
           )}
 

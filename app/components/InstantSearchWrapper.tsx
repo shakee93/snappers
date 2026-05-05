@@ -16,6 +16,7 @@ import { history } from "instantsearch.js/es/lib/routers";
 import { UiState } from "instantsearch.js";
 import { useSearchParams } from "next/navigation";
 import { HIDDEN_PRODUCT_SLUGS } from "@/lib/hidden-products";
+import { DealFilterType, DealTagSlug, DEAL_FILTER_TO_TAG, VALID_DEAL_FILTER_TYPES } from "@/lib/dealFilters";
 
 type CustomUiState = UiState & {
   product: {
@@ -57,7 +58,7 @@ interface InstantSearchWrapperProps {
   sort?: boolean;
   tag?: string;
   searchQueryValue?: string;
-  dealsType?: ("clearance" | "offers")[];
+  dealsType?: DealFilterType[];
   dealTags?: string[];
 }
 
@@ -181,10 +182,10 @@ const InstantSearchWrapper = ({
     const slugs = filterParam
       .split(',')
       .map((v) => v.trim())
-      .map((v): 'clearance' | 'bogo-offer' | null =>
-        v === 'offers' ? 'bogo-offer' : v === 'clearance' ? 'clearance' : null,
+      .filter((v): v is DealFilterType =>
+        VALID_DEAL_FILTER_TYPES.includes(v as DealFilterType),
       )
-      .filter((v): v is 'clearance' | 'bogo-offer' => v !== null);
+      .map((v): DealTagSlug => DEAL_FILTER_TO_TAG[v]);
     return slugs.length > 0 ? slugs : dealTags;
   }, [searchParams, dealTags]);
 

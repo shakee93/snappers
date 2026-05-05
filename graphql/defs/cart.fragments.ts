@@ -42,6 +42,12 @@ export const CartItemProductSlim = gql`
                 name
             }
         }
+        # Parent free-shipping flag — fallback when the cart line's variation
+        # has no explicit value. Variation flag is on ProductVariationContentSlice.
+        freeShippingMeta: metaData(keysIn: ["_wc_product_free_shipping"]) {
+            key
+            value
+        }
         ... on SimpleProduct {
             price
             regularPrice

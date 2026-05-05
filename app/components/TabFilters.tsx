@@ -10,6 +10,7 @@ import SortOrderFilter from "@/app/components/Filters/SortOrderFilter";
 import InStockFilter from "./Filters/InStockFilter";
 import DynamicVariationFilters from "@/app/components/Filters/DynamicVariationFilters";
 import DealsTypeFilter from "@/app/components/Filters/DealsTypeFilter";
+import { DealFilterType } from "@/lib/dealFilters";
 
 interface TabFilterProps {
     categories?: ProductCategory[];
@@ -17,7 +18,7 @@ interface TabFilterProps {
     brands?: Brand[];
     brand?: Brand;
     sort?: Boolean;
-    dealsType?: ("clearance" | "offers")[];
+    dealsType?: DealFilterType[];
 }
 
 
