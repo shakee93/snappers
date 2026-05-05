@@ -4,6 +4,7 @@ import Link from "next/link";
 import Heading from "@/app/components/Heading/Heading";
 import ProductCard from "@/app/components/ProductCard3";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
+import { filterHiddenProducts } from "@/lib/hidden-products";
 import {
   Carousel,
   CarouselContent,
@@ -76,7 +77,9 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
     };
   }, [api, mounted]);
 
-  const filteredProducts = products.filter((product) => {
+  const visibleProducts = filterHiddenProducts(products);
+
+  const filteredProducts = visibleProducts.filter((product) => {
     if (product?.price || product?.regularPrice || product?.salePrice) {
       return true;
     }
