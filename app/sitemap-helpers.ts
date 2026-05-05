@@ -7,10 +7,28 @@ export const BASE_URL = 'https://gqmobiles.lk'
 
 export const getBrands = async (): Promise<Brand[]> => {
   const client = await getClient()
-  const { data } = await client.query({
-    query: GET_SITEMAP_BRANDS
-  })
-  return data.brands.nodes
+
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const { data } = await client.query({
+        query: GET_SITEMAP_BRANDS
+      })
+      return data?.brands?.nodes ?? []
+    } catch (error: any) {
+      const statusCode = error?.networkError?.statusCode
+      const shouldRetry = statusCode === 429 || (statusCode >= 500 && statusCode < 600)
+
+      if (!shouldRetry || attempt === 2) {
+        console.error('Failed to fetch sitemap brands', error)
+        return []
+      }
+
+      const retryDelayMs = 300 * (attempt + 1)
+      await new Promise((resolve) => setTimeout(resolve, retryDelayMs))
+    }
+  }
+
+  return []
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
