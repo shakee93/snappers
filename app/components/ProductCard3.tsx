@@ -6,6 +6,7 @@ import {
   MousePointerClick,
   Settings2,
   ShoppingCart,
+  Truck,
   XIcon,
 } from "lucide-react";
 import { FC, useEffect, useMemo, useRef, useState } from "react";
@@ -126,6 +127,11 @@ const ProductCard: FC<ProductCardProps> = ({
     [data?.productTags?.nodes]
   );
 
+  const isFreeShippingProduct = useMemo(
+    () => data?.productTags?.nodes?.some((tag: any) => tag.slug === 'free-shipping') ?? false,
+    [data?.productTags?.nodes]
+  );
+
   // Extract the last segment of the pathname
   const segments = pathname.split("/");
   const productName = segments[segments.length - 1];
@@ -214,6 +220,22 @@ const ProductCard: FC<ProductCardProps> = ({
   const parsePrice = (priceString: any) => {
     return parseFloat(priceString?.replace(/[^\d.]/g, ""));
   };
+
+  // Compute the absolute top offset for the free-shipping badge so it never
+  // overlaps the BOGO, Sold Out, or Sale badges above it.
+  const freeShippingBadgeTop = useMemo((): string | null => {
+    if (!isFreeShippingProduct) return null;
+    const inStock = stockStatus === "IN_STOCK";
+    const hasBogo = bogo.isBogoEnabled;
+    const hasSale = inStock
+      && parsePrice(salePrice) > 0
+      && parsePrice(regularPrice) > 0
+      && parsePrice(salePrice) < parsePrice(regularPrice);
+    if (!inStock) return hasBogo ? "top-20" : "top-12";
+    if (hasBogo && hasSale) return "top-20";
+    if (hasBogo || hasSale) return "top-12";
+    return "top-4";
+  }, [isFreeShippingProduct, stockStatus, bogo.isBogoEnabled, salePrice, regularPrice]);
 
   // Calculate the lowest and highest prices among in-stock variations
   let lowestPrice = price;
@@ -360,6 +382,26 @@ const ProductCard: FC<ProductCardProps> = ({
             </span>
             <span className="hidden max-w-[min(16rem,calc(100vw-3rem))] whitespace-nowrap px-3 py-1.5 group-hover:block">
               {isFreeGiftProduct ? "Free Gift" : bogo.label}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {freeShippingBadgeTop && (
+        <div
+          className={`absolute left-0 z-10 w-fit cursor-default rounded-r-full bg-blue-600 text-xs font-normal text-white shadow-md ${freeShippingBadgeTop}`}
+        >
+          <span className="flex items-center gap-1 whitespace-nowrap px-3 py-1.5 md:hidden">
+            <Truck className="w-3 h-3 shrink-0" />
+            Free Shipping
+          </span>
+          <div className="hidden md:block">
+            <span className="flex items-center justify-center px-3 py-1.5 group-hover:hidden">
+              <Truck className="w-3 h-3" />
+            </span>
+            <span className="hidden items-center gap-1 whitespace-nowrap px-3 py-1.5 group-hover:flex">
+              <Truck className="w-3 h-3 shrink-0" />
+              Free Shipping
             </span>
           </div>
         </div>

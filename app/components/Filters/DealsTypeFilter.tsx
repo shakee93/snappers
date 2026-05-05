@@ -5,29 +5,33 @@ import { ChevronDown } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo, useState } from "react";
 
+type DealFilterType = "clearance" | "offers" | "free-shipping";
+
 type DealsTypeFilterProps = {
   // SSR default — mirrors what the deals page passes when there's no
   // `?filter=` in the URL. After hydration we read the URL directly so
   // tab clicks toggle the active state without needing the page itself
   // to re-render (the page is intentionally static for edge caching).
-  activeTypes: ("clearance" | "offers")[];
+  activeTypes: DealFilterType[];
 };
+
+const VALID_FILTER_TYPES: DealFilterType[] = ["clearance", "offers", "free-shipping"];
 
 const DealsTypeFilter = ({ activeTypes: defaultActiveTypes }: DealsTypeFilterProps) => {
   const [isCollapsed, setIsCollapsed] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const activeTypes = useMemo<("clearance" | "offers")[]>(() => {
+  const activeTypes = useMemo<DealFilterType[]>(() => {
     const raw = searchParams.get("filter");
     if (!raw) return defaultActiveTypes;
     const parsed = raw
       .split(",")
       .map((v) => v.trim())
-      .filter((v): v is "clearance" | "offers" => v === "clearance" || v === "offers");
+      .filter((v): v is DealFilterType => VALID_FILTER_TYPES.includes(v as DealFilterType));
     return parsed.length > 0 ? Array.from(new Set(parsed)) : defaultActiveTypes;
   }, [searchParams, defaultActiveTypes]);
 
-  const handleToggle = (type: "clearance" | "offers", checked: boolean) => {
+  const handleToggle = (type: DealFilterType, checked: boolean) => {
     const current = new Set(activeTypes);
     if (checked) {
       current.add(type);
@@ -70,6 +74,13 @@ const DealsTypeFilter = ({ activeTypes: defaultActiveTypes }: DealsTypeFilterPro
               label="Buy one Get one"
               defaultChecked={activeTypes.includes("offers")}
               onChange={(checked) => handleToggle("offers", checked)}
+            />
+
+            <Checkbox
+              name="deals-free-shipping"
+              label="Free Shipping"
+              defaultChecked={activeTypes.includes("free-shipping")}
+              onChange={(checked) => handleToggle("free-shipping", checked)}
             />
           </div>
         ) : null}

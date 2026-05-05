@@ -17,7 +17,7 @@ interface TabFilterProps {
     brands?: Brand[];
     brand?: Brand;
     sort?: Boolean;
-    dealsType?: ("clearance" | "offers")[];
+    dealsType?: ("clearance" | "offers" | "free-shipping")[];
 }
 
 

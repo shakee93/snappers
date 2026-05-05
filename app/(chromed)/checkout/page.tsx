@@ -859,13 +859,20 @@ const CheckoutPage = () => {
   // LKR which silently disagreed with the actual courier rate the rest of
   // the page renders. Source the same value the cart shows; fall back to
   // 500 only if the cart hasn't loaded yet.
+  // Note: 0 is a valid loaded value when the cart contains a free-shipping
+  // product (plugin zeros the rate) or has the free-shipping coupon applied,
+  // so we cannot reject it with `> 0` — that would overcharge Koko by 500.
   const kokoShippingAmount = (() => {
     if (noShipping) return 0;
-    const fromCart = replaceStringinInt(cart?.shippingTotal);
-    if (Number.isFinite(fromCart) && fromCart > 0) return fromCart;
+    if (cart?.shippingTotal != null) {
+      const fromCart = replaceStringinInt(cart.shippingTotal);
+      if (Number.isFinite(fromCart)) return fromCart;
+    }
     const rateCost = cart?.availableShippingMethods?.[0]?.rates?.[0]?.cost;
-    const fromRate = typeof rateCost === "string" ? parseFloat(rateCost) : Number(rateCost);
-    if (Number.isFinite(fromRate) && fromRate > 0) return fromRate;
+    if (rateCost != null) {
+      const fromRate = typeof rateCost === "string" ? parseFloat(rateCost) : Number(rateCost);
+      if (Number.isFinite(fromRate)) return fromRate;
+    }
     return 500;
   })();
   const kokoOrderTotal = TotalWithKoko + kokoShippingAmount;

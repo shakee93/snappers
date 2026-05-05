@@ -61,7 +61,7 @@ interface ArchiveLayoutProps {
   headingOverride?: string;
   descriptionOverride?: string;
   topLinks?: { href: string; label: string; active?: boolean }[];
-  dealsType?: ("clearance" | "offers")[];
+  dealsType?: ("clearance" | "offers" | "free-shipping")[];
   dealTags?: string[];
 }
 

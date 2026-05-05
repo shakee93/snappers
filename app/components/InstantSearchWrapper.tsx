@@ -57,7 +57,7 @@ interface InstantSearchWrapperProps {
   sort?: boolean;
   tag?: string;
   searchQueryValue?: string;
-  dealsType?: ("clearance" | "offers")[];
+  dealsType?: ("clearance" | "offers" | "free-shipping")[];
   dealTags?: string[];
 }
 
@@ -181,10 +181,12 @@ const InstantSearchWrapper = ({
     const slugs = filterParam
       .split(',')
       .map((v) => v.trim())
-      .map((v): 'clearance' | 'bogo-offer' | null =>
-        v === 'offers' ? 'bogo-offer' : v === 'clearance' ? 'clearance' : null,
+      .map((v): 'clearance' | 'bogo-offer' | 'free-shipping' | null =>
+        v === 'offers' ? 'bogo-offer' :
+        v === 'clearance' ? 'clearance' :
+        v === 'free-shipping' ? 'free-shipping' : null,
       )
-      .filter((v): v is 'clearance' | 'bogo-offer' => v !== null);
+      .filter((v): v is 'clearance' | 'bogo-offer' | 'free-shipping' => v !== null);
     return slugs.length > 0 ? slugs : dealTags;
   }, [searchParams, dealTags]);
 

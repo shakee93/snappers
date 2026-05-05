@@ -28,21 +28,22 @@ const fetchByTag = (tagIn: string[]): Promise<DealProduct[]> =>
 
 const getDealsData = unstable_cache(
   async () => {
-    const [clearance, bogo, freeGift] = await Promise.all([
+    const [clearance, bogo, freeGift, freeShipping] = await Promise.all([
       fetchByTag(["clearance"]),
       fetchByTag(["bogo-offer"]),
       fetchByTag(["free-gift"]),
+      fetchByTag(["free-shipping"]),
     ]);
-    return { clearance, bogo, freeGift };
+    return { clearance, bogo, freeGift, freeShipping };
   },
   ["deals-sliders"],
   { tags: [DEALS_CACHE_TAG], revalidate: 300 }
 );
 
 async function DealsSliders() {
-  const { clearance, bogo, freeGift } = await getDealsData();
+  const { clearance, bogo, freeGift, freeShipping } = await getDealsData();
 
-  if (!clearance.length && !bogo.length && !freeGift.length) {
+  if (!clearance.length && !bogo.length && !freeGift.length && !freeShipping.length) {
     return (
       <p className="text-neutral-500 dark:text-neutral-400 text-sm">
         No active deals right now — check back soon.
@@ -66,6 +67,11 @@ async function DealsSliders() {
         products={freeGift}
         heading="Free Gift"
         link="/tag/free-gift"
+      />
+      <SectionSliderProductCard
+        products={freeShipping}
+        heading="Free Shipping"
+        link="/tag/free-shipping"
       />
     </>
   );

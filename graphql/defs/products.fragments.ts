@@ -170,6 +170,12 @@ export const ProductVariationContentSlice = gql`
     stockStatus
     stockQuantity
     manageStock
+    # Per-variation free-shipping flag (BOGO plugin meta). Variation value
+    # wins; the parent's value is the fallback when this is empty.
+    freeShippingMeta: metaData(keysIn: ["_wc_product_free_shipping"]) {
+      key
+      value
+    }
   }
 `;
 
@@ -346,6 +352,11 @@ export const ProductContentFull = gql`
       key
       value
       id
+    }
+    # Parent free-shipping flag (used as fallback when a variation's value is empty).
+    freeShippingMeta: metaData(keysIn: ["_wc_product_free_shipping"]) {
+      key
+      value
     }
     galleryImages {
       nodes {
@@ -580,6 +591,12 @@ export const ProductContentFull = gql`
               label
               value
             }
+          }
+          # Per-variation free-shipping flag. Variation value wins; parent
+          # freeShippingMeta above is the fallback when this is empty.
+          freeShippingMeta: metaData(keysIn: ["_wc_product_free_shipping"]) {
+            key
+            value
           }
         }
       }
