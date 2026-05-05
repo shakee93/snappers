@@ -18,6 +18,12 @@ import {
     RegisterCustomerPayload
 } from "@/graphql/types/graphql";
 import { useCart } from "@/context/CartProvider";
+import {
+    AUTH_TOKEN_KEY,
+    REFRESH_TOKEN_KEY,
+    SESSION_TOKEN_KEY,
+    USER_DATA_KEY
+} from "@/utils/storage-keys";
 
 const SessionContext = createContext<Session>({
     sessionToken: null,
@@ -38,12 +44,6 @@ export function useSession() {
 }
 
 type AuthType = "registerCustomer" | "login";
-
-export const REFRESH_TOKEN_KEY = 'wp_refresh_token';
-export const SESSION_TOKEN_KEY = 'wp_session_token';
-export const AUTH_TOKEN_KEY = 'wp_auth_token';
-
-export const USER_DATA_KEY = 'wp_user'
 
 export function SessionProvider({ children }: {
     children: ReactNode

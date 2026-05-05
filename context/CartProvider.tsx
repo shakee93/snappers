@@ -4,7 +4,7 @@ import React, { createContext, ReactNode, useContext, useEffect, useState, useRe
 import { ApolloError, useLazyQuery, useMutation } from '@apollo/client';
 import { ADD_TO_CART, GET_CART, REMOVE_ITEMS_FROM_CART, UPDATE_CART_ITEM_QUANTITY } from "@/graphql/defs/cart";
 import { Cart, Customer } from "@/graphql/types/graphql";
-import { AUTH_TOKEN_KEY } from "@/context/SessionProvider";
+import { AUTH_TOKEN_KEY } from "@/utils/storage-keys";
 import { toast } from "sonner";
 
 
@@ -57,7 +57,8 @@ export function CartProvider({ children }: {
     const isGuestCustomer = (value: Customer | null | undefined) => {
         if (!value) return true
         const normalizedId = `${value.id ?? ''}`.toLowerCase()
-        return normalizedId === 'guest' || normalizedId.endsWith(':guest')
+        const databaseId = Number((value as any)?.databaseId ?? NaN)
+        return databaseId === 0 || normalizedId === 'guest' || normalizedId.endsWith(':guest')
     }
 
     // Intentionally reads latest render state; memoizing with empty deps can capture stale customer.

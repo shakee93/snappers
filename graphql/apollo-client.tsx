@@ -15,7 +15,7 @@ import {
   REFRESH_TOKEN_KEY,
   SESSION_TOKEN_KEY,
   USER_DATA_KEY,
-} from "@/context/SessionProvider";
+} from "@/utils/storage-keys";
 import { onError } from "@apollo/client/link/error";
 import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
 import { Results } from "@/types";
