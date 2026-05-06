@@ -706,7 +706,15 @@ const CheckoutPage = () => {
     );
     if (insufficient) {
       const [, productName, available] = insufficient;
-      return `Only ${available} of "${productName.trim()}" left — please reduce the quantity in your cart.`;
+      const name = productName.trim();
+      // "(0 available)" from this WC branch is structurally a pending-order
+      // hold (true OOS hits the "is not in stock" branch above instead), but
+      // hedge the wording so we don't falsely promise a retry if a plugin
+      // reuses this phrasing with different semantics.
+      if (available === "0") {
+        return `"${name}" is currently unavailable — it may be held by another in-progress order, or out of stock. Please try again in a few minutes, or remove it from your cart.`;
+      }
+      return `Only ${available} of "${name}" left in stock — please reduce the quantity in your cart.`;
     }
 
     const outOfStock = errorMessage.match(/"([^"]+)"\s+is not in stock/i);
