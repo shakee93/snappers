@@ -1,4 +1,4 @@
-import React, { FC } from "react";
+import React from "react";
 import Link from "next/link";
 import { Metadata } from "next/types";
 
@@ -7,21 +7,189 @@ export const metadata: Metadata = {
   title: "terms and conditions",
 };
 
+const sections: { id: string; label: string }[] = [
+  { id: "warranty-return-policy", label: "Warranty & Return Policy" },
+  { id: "shipping-delivery", label: "Shipping & Delivery" },
+  { id: "third-party-delivery", label: "PickMe & Uber Flash Delivery" },
+  { id: "welcome", label: "Welcome" },
+  { id: "cookies", label: "Cookies" },
+  { id: "license", label: "License" },
+  { id: "hyperlinking", label: "Hyperlinking to our Content" },
+  { id: "iframes", label: "iFrames" },
+  { id: "content-liability", label: "Content Liability" },
+  { id: "your-privacy", label: "Your Privacy" },
+  { id: "copyright", label: "Copyright" },
+  { id: "trademarks", label: "Trademarks" },
+  { id: "use-of-site", label: "Use Of Site" },
+  { id: "reservation-of-rights", label: "Reservation of Rights" },
+  { id: "removal-of-links", label: "Removal of Links" },
+  { id: "disclaimer", label: "Disclaimer" },
+];
+
 const PageTerm = () => {
   return (
     <div
-      className={` overflow-hidden relative`}
+      className="overflow-hidden relative scroll-smooth"
       data-nc-id="Pageterms"
     >
-
       <div className="container py-10 lg:py-10 space-y-16 lg:space-y-28">
         <div className="py-8">
-          <h2 className="text-3xl !leading-tight font-semibold text-neutral-900 md:text-4xl xl:text-5xl dark:text-neutral-100 pb-10">
+          <h2 className="text-3xl !leading-tight font-semibold text-neutral-900 md:text-4xl xl:text-5xl dark:text-neutral-100 pb-6">
             Terms and Conditions.
           </h2>
 
+          {/* Table of Contents */}
+          <nav
+            aria-label="Sections"
+            className="sticky top-0 z-10 -mx-4 px-4 mb-10 bg-white/90 dark:bg-neutral-900/90 backdrop-blur supports-[backdrop-filter]:bg-white/70 border-b border-neutral-200 dark:border-neutral-800"
+          >
+            <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400 pt-3 pb-2">
+              Jump to section
+            </p>
+            <ul className="flex gap-2 overflow-x-auto pb-3 scrollbar-thin">
+              {sections.map((s) => (
+                <li key={s.id} className="shrink-0">
+                  <a
+                    href={`#${s.id}`}
+                    className="inline-block whitespace-nowrap rounded-full border border-neutral-200 dark:border-neutral-700 px-4 py-1.5 text-sm text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition"
+                  >
+                    {s.label}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+
+          {/* Warranty & Return Policy section */}
+          <section id="warranty-return-policy" className="mb-8 scroll-mt-32">
+            <h2 className="text-3xl font-semibold mb-4">
+              Warranty & Return Policy
+            </h2>
+
+            {/* Return Policy */}
+            <h3 className="text-xl font-semibold mb-2">Return & Exchange Policy</h3>
+            <p className="mb-4 leading-8">
+              Goods once sold cannot be returned or exchanged under any circumstances.
+            </p>
+
+            {/* Warranty Terms */}
+            <h3 className="text-xl font-semibold mb-2 mt-6">Warranty Terms</h3>
+            <ul className="list-disc pl-5 mb-4 leading-8">
+              <li>
+                <span className="font-semibold">Repairs only</span> — No replacements will be provided.
+              </li>
+              <li>
+                The product must be presented with the <span className="font-semibold">original box, cables, and all accessories</span> to claim warranty.
+              </li>
+              <li>
+                AppleCare or manufacturer warranty claims may take a <span className="font-semibold">minimum of 45 days</span> to process.
+              </li>
+              <li>
+                Warranty processing time depends on the <span className="font-semibold">availability of spare parts and shipping schedules</span>.
+              </li>
+            </ul>
+
+            {/* Warranty Exclusions */}
+            <h3 className="text-xl font-semibold mb-2 mt-6">Warranty Does Not Cover</h3>
+            <p className="mb-4 leading-8">
+              The following conditions and damages are <span className="font-semibold">not covered</span> under warranty:
+            </p>
+            <ul className="list-disc pl-5 mb-4 leading-8">
+              <li>Liquid or water damage</li>
+              <li>Display or display line issues</li>
+              <li>Touch panel faults</li>
+              <li>Charging port damage</li>
+              <li>Burn marks</li>
+              <li>Drops or physical damage</li>
+              <li>Power fluctuations</li>
+              <li>No-power issues</li>
+              <li>Improper usage or misuse</li>
+              <li>Products used outside normal domestic conditions</li>
+            </ul>
+
+            {/* Display Warranty Note */}
+            <h3 className="text-xl font-semibold mb-2 mt-6">Display Warranty</h3>
+            <p className="mb-4 leading-8">
+              Display warranty covers <span className="font-semibold">7 days</span> to check the device for any manufacturing defects.
+            </p>
+
+            <p className="mb-4 leading-8">
+              For complete warranty information, please visit our{" "}
+              <Link href="/warranty-terms" className="text-blue-500">
+                Warranty Terms
+              </Link>{" "}
+              page.
+            </p>
+          </section>
+
+          {/* Shipping & Delivery section */}
+          <section id="shipping-delivery" className="mb-8 scroll-mt-32">
+            <h2 className="text-3xl font-semibold mb-4">Shipping & Delivery</h2>
+            <p className="mb-6 leading-8">
+              At this time, GQMobile ships within Sri Lanka.
+            </p>
+          </section>
+
+          {/* Third-Party Delivery section (PickMe / Uber Flash) */}
+          <section id="third-party-delivery" className="mb-8 scroll-mt-32">
+            <h2 className="text-3xl font-semibold mb-4">
+              PickMe & Uber Flash Delivery
+            </h2>
+            <p className="mb-4 leading-8">
+              When a customer chooses to receive their order through a
+              third-party on-demand delivery service such as{" "}
+              <span className="font-semibold">PickMe Flash</span> or{" "}
+              <span className="font-semibold">Uber Flash</span>, the customer
+              acknowledges and agrees to the terms set out in this section.
+            </p>
+            <p className="mb-4 leading-8">
+              GQ Mobiles only acts as the sender handing the package over to the
+              rider arranged by the customer. Once the package is handed over to
+              the rider, the order leaves our possession and our delivery
+              responsibility ends.
+            </p>
+            <p className="mb-4 leading-8">
+              By selecting PickMe Flash, Uber Flash, or any similar third-party
+              courier service, the{" "}
+              <span className="font-semibold">customer takes full responsibility</span>{" "}
+              for the package, including:
+            </p>
+            <ul className="list-disc pl-5 mb-4 leading-8">
+              <li>
+                Loss, theft, or misplacement of the package after it is handed
+                to the rider.
+              </li>
+              <li>
+                Any damage to the device or its packaging that occurs during
+                transit by the third-party rider.
+              </li>
+              <li>
+                Delivery delays, incorrect delivery addresses, or failed
+                deliveries caused by the third-party service or the rider.
+              </li>
+              <li>
+                Disputes regarding the condition of the package on arrival, as
+                we are unable to verify handling once the rider has collected
+                the order.
+              </li>
+            </ul>
+            <p className="mb-4 leading-8">
+              We strongly recommend customers inspect the package and device in
+              the rider’s presence at the point of delivery. GQ Mobiles will not
+              be liable for any claims relating to loss, theft, or damage that
+              occur after a third-party rider has accepted the package on the
+              customer’s behalf.
+            </p>
+            <p className="mb-4 leading-8">
+              Payment for the third-party delivery service (PickMe Flash, Uber
+              Flash, etc.) is settled directly between the customer and the
+              service provider and is not part of the order total paid to GQ
+              Mobiles.
+            </p>
+          </section>
+
           {/* Welcome section */}
-          <div className="mb-6">
+          <section id="welcome" className="mb-6 scroll-mt-32">
             <h3 className="text-xl font-semibold mb-2">
               Welcome to GQ Mobiles!
             </h3>
@@ -58,10 +226,10 @@ const PageTerm = () => {
               capitalization, and/or he/she or they, are taken as
               interchangeable and therefore as referring to the same.
             </p>
-          </div>
+          </section>
 
           {/* Cookies section */}
-          <div className="mb-6">
+          <section id="cookies" className="mb-6 scroll-mt-32">
             <h3 className="text-xl font-semibold mb-2">Cookies</h3>
             <p className="mb-4 leading-8">
               We employ the use of cookies. By accessing GQ Mobiles, you agree
@@ -74,10 +242,10 @@ const PageTerm = () => {
               people visiting our website. Some of our affiliate/advertising
               partners may also use cookies.
             </p>
-          </div>
+          </section>
 
           {/* License section */}
-          <div className="mb-6">
+          <section id="license" className="mb-6 scroll-mt-32">
             <h3 className="text-xl font-semibold mb-2">License</h3>
             <p className="mb-4 leading-8">
               Unless otherwise stated, GQ Mobiles and/or its licensors own the
@@ -137,293 +305,174 @@ const PageTerm = () => {
               reproduce, edit, and authorize others to use, reproduce, and edit
               any of your Comments in any and all forms, formats, or media.
             </p>
-          </div>
+          </section>
 
-          <div className="mb-6">
+          {/* Hyperlinking section */}
+          <section id="hyperlinking" className="mb-6 scroll-mt-32">
             <h2 className="text-3xl font-semibold mb-4">
               Hyperlinking to our Content
             </h2>
-
-            {/* Organizations section */}
-            <div className="mb-6">
-              <p className="mb-4 leading-8">
-                The following organizations may link to our Website without
-                prior written approval:
-              </p>
-              <ul className="list-disc pl-5 mb-4 leading-8">
-                <li>Government agencies;</li>
-                <li>Search engines;</li>
-                <li>News organizations;</li>
-                <li>
-                  Online directory distributors may link to our Website in the
-                  same manner as they hyperlink to the Websites of other listed
-                  businesses; and
-                </li>
-                <li>
-                  System-wide Accredited Businesses except soliciting non-profit
-                  organizations, charity shopping malls, and charity fundraising
-                  groups which may not hyperlink to our Web site.
-                </li>
-              </ul>
-              <p className="mb-4 leading-8">
-                These organizations may link to our home page, to publications,
-                or to other Website information so long as the link: (a) is not
-                in any way deceptive; (b) does not falsely imply sponsorship,
-                endorsement, or approval of the linking party and its products
-                and/or services; and (c) fits within the context of the linking
-                party’s site.
-              </p>
-              {/* More types of organizations */}
-              <p className="mb-4 leading-8">
-                We may consider and approve other link requests from the
-                following types of organizations:
-              </p>
-              <ul className="list-disc pl-5 mb-4 leading-8">
-                <li>
-                  Commonly-known consumer and/or business information sources;
-                </li>
-                <li>Dot.com community sites;</li>
-                <li>Associations or other groups representing charities;</li>
-                <li>Online directory distributors;</li>
-                <li>Internet portals;</li>
-                <li>Accounting, law and consulting firms; and</li>
-                <li>Educational institutions and trade associations.</li>
-              </ul>
-              <p className="mb-4 leading-8">
-                We will approve link requests from these organizations if we
-                decide that: (a) the link would not make us look unfavorably to
-                ourselves or to our accredited businesses; (b) the organization
-                does not have any negative records with us; (c) the benefit to
-                us from the visibility of the hyperlink compensates the absence
-                of GQ Mobiles; and (d) the link is in the context of general
-                resource information.
-              </p>
-              {/* Approved organizations */}
-              <p className="mb-4 leading-8">
-                These organizations may link to our home page so long as the
-                link: (a) is not in any way deceptive; (b) does not falsely
-                imply sponsorship, endorsement or approval of the linking party
-                and its products or services; and (c) fits within the context of
-                the linking party’s site.
-              </p>
-              <p className="mb-4 leading-8">
-                If you are one of the organizations listed in paragraph 2 above
-                and are interested in linking to our website, you must inform us
-                by sending an e-mail to GQ Mobiles. Please include your name,
-                your organization name, contact information as well as the URL
-                of your site, a list of any URLs from which you intend to link
-                to our Website, and a list of the URLs on our site to which you
-                would like to link. Wait 2-3 weeks for a response.
-              </p>
-              {/* Approved organizations hyperlinking */}
-              <p className="mb-4 leading-8">
-                Approved organizations may hyperlink to our Website as follows:
-              </p>
-              <ul className="list-disc pl-5 mb-4 leading-8">
-                <li>By use of our corporate name; or</li>
-                <li>
-                  By use of the uniform resource locator being linked to; or
-                </li>
-                <li>
-                  By use of any other description of our Website being linked to
-                  that makes sense within the context and format of content on
-                  the linking party’s site.
-                </li>
-              </ul>
-              <p className="mb-4 leading-8">
-                No use of GQ Mobiles’s logo or other artwork will be allowed for
-                linking absent a trademark license agreement.
-              </p>
-            </div>
-
-            {/* iFrames section */}
-            <div className="mb-6">
-              <h2 className="text-3xl font-semibold mb-4">iFrames</h2>
-              <p className="mb-4 leading-8">
-                Without prior approval and written permission, you may not
-                create frames around our Webpages that alter in any way the
-                visual presentation or appearance of our Website.
-              </p>
-            </div>
-
-            {/* Content Liability section */}
-            <div className="mb-6">
-              <h2 className="text-3xl font-semibold mb-4">Content Liability</h2>
-              <p className="mb-4 leading-8">
-                We shall not be held responsible for any content that appears on
-                your Website. You agree to protect and defend us against all
-                claims that are rising on your Website. No link(s) should appear
-                on any Website that may be interpreted as libelous, obscene, or
-                criminal, or which infringes, otherwise violates, or advocates
-                the infringement or other violation of, any third party rights.
-              </p>
-            </div>
-
-            {/* Your Privacy section */}
-            <div className="mb-6">
-              <h2 className="text-3xl font-semibold mb-4">Your Privacy</h2>
-              <p className="mb-4 leading-8">
-                Please read{" "}
-                <Link href="/privacy" className="text-blue-500">
-                  Privacy Policy
-                </Link>
-                .
-              </p>
-            </div>
-
-            {/* Return & Refund Policy section */}
-            <div className="mb-6">
-              {/* <h2 className="text-3xl font-semibold mb-4">
-                Return Policy
-              </h2>
-              <p className="mb-4 leading-8">
-                Thanks for shopping at the{" "}
-                <Link href={"https://gqmobiles.lk"}>
-                  {" "}
-                  https://gqmobiles.lk.
-                </Link>
-                . If you are not entirely satisfied with your purchase, we’re
-                here to help.
-              </p> */}
-              {/* Returns section */}
-              {/* <h3 className="text-xl font-semibold mb-2">Returns</h3>
-              <ul className="list-disc pl-5 mb-4 leading-8">
-                <li>
-                  You have 7 calendar days to return an item from the date you
-                  received it.
-                </li>
-                <li>
-                  To be eligible for a return, your item must be unused and in
-                  the same condition that you received it.
-                </li>
-                <li>Your item must be in the original packaging.</li>
-                <li>
-                  Your item needs to have the receipt or proof of purchase.
-                </li>
-              </ul> */}
-              {/* Refunds section */}
-              {/* <h3 className="text-xl font-semibold mb-2">Refunds</h3>
-              <p className="mb-4 leading-8">
-                Once we receive your item, we will inspect it and notify you
-                that we have received your returned item. We will immediately
-                notify you of the status of your refund after inspecting the
-                item. If your return is approved, we will initiate a refund to
-                your credit card (or original method of payment). You will
-                receive the credit within a certain amount of days, depending on
-                your card issuer’s policies. If you have any questions on how to
-                return your item to us, <Link href={"/contact"}> COntact</Link>.
-              </p> */}
-            </div>
-
-            {/* Warranty & Return Policy section */}
-            <div className="mb-6">
-              <h2 className="text-3xl font-semibold mb-4">
-                Warranty & Return Policy
-              </h2>
-              
-              {/* Return Policy */}
-              <h3 className="text-xl font-semibold mb-2">Return & Exchange Policy</h3>
-              <p className="mb-4 leading-8">
-                Goods once sold cannot be returned or exchanged under any circumstances.
-              </p>
-
-              {/* Warranty Terms */}
-              <h3 className="text-xl font-semibold mb-2 mt-6">Warranty Terms</h3>
-              <ul className="list-disc pl-5 mb-4 leading-8">
-                <li>
-                  <span className="font-semibold">Repairs only</span> — No replacements will be provided.
-                </li>
-                <li>
-                  The product must be presented with the <span className="font-semibold">original box, cables, and all accessories</span> to claim warranty.
-                </li>
-                <li>
-                  AppleCare or manufacturer warranty claims may take a <span className="font-semibold">minimum of 45 days</span> to process.
-                </li>
-                <li>
-                  Warranty processing time depends on the <span className="font-semibold">availability of spare parts and shipping schedules</span>.
-                </li>
-              </ul>
-
-              {/* Warranty Exclusions */}
-              <h3 className="text-xl font-semibold mb-2 mt-6">Warranty Does Not Cover</h3>
-              <p className="mb-4 leading-8">
-                The following conditions and damages are <span className="font-semibold">not covered</span> under warranty:
-              </p>
-              <ul className="list-disc pl-5 mb-4 leading-8">
-                <li>Liquid or water damage</li>
-                <li>Display or display line issues</li>
-                <li>Touch panel faults</li>
-                <li>Charging port damage</li>
-                <li>Burn marks</li>
-                <li>Drops or physical damage</li>
-                <li>Power fluctuations</li>
-                <li>No-power issues</li>
-                <li>Improper usage or misuse</li>
-                <li>Products used outside normal domestic conditions</li>
-              </ul>
-
-              {/* Display Warranty Note */}
-              <h3 className="text-xl font-semibold mb-2 mt-6">Display Warranty</h3>
-              <p className="mb-4 leading-8">
-                Display warranty covers <span className="font-semibold">7 days</span> to check the device for any manufacturing defects.
-              </p>
-
-              <p className="mb-4 leading-8">
-                For complete warranty information, please visit our{" "}
-                <Link href="/warranty-terms" className="text-blue-500">
-                  Warranty Terms
-                </Link>{" "}
-                page.
-              </p>
-            </div>
-
-            {/* Copyright section */}
-            <div className="mb-6">
-              <h2 className="text-3xl font-semibold mb-4">Copyright</h2>
-              <p className="mb-4 leading-8">
-                All content appearing on this Web site is the property of:
-                GQMOBILE Company. Address
-              </p>
-            </div>
-
-            {/* Trademarks section */}
-            <div className="mb-6">
-              <h2 className="text-3xl font-semibold mb-4">Trademarks</h2>
-              <p className="mb-4 leading-8">
-                All brand, product, service, and process names appearing on this
-                Web site are trademarks of their respective holders. Reference
-                to or use of a product, service, or process does not imply
-                recommendation, approval, affiliation, or sponsorship of that
-                product, service, or process by GQMobile.
-              </p>
-            </div>
-
-            {/* Use Of Site section */}
-            <div className="mb-6">
-              <h2 className="text-3xl font-semibold mb-4">Use Of Site</h2>
-              <p className="mb-4 leading-8">
-                This site may contain other proprietary notices and copyright
-                information, the terms of which must be observed and followed.
-                Information on this site may contain technical inaccuracies or
-                typographical errors. Information, including product pricing and
-                availability, may be changed or updated without notice. GQMobile
-                reserves the right to refuse service, terminate accounts, and/or
-                cancel orders in its discretion, including, without limitation,
-                if GQMobile-Shop believes that customer conduct violates
-                applicable law or is harmful to the interests of GQMobile.
-              </p>
-            </div>
-          </div>
-
-          <div className="mb-6">
-            <h2 className="text-3xl font-semibold mb-4">Shipping & Delivery</h2>
-
-            {/* Shipping details */}
-            <p className="mb-6 leading-8">
-              At this time, GQMobile ships within Sri Lanka.
+            <p className="mb-4 leading-8">
+              The following organizations may link to our Website without
+              prior written approval:
             </p>
+            <ul className="list-disc pl-5 mb-4 leading-8">
+              <li>Government agencies;</li>
+              <li>Search engines;</li>
+              <li>News organizations;</li>
+              <li>
+                Online directory distributors may link to our Website in the
+                same manner as they hyperlink to the Websites of other listed
+                businesses; and
+              </li>
+              <li>
+                System-wide Accredited Businesses except soliciting non-profit
+                organizations, charity shopping malls, and charity fundraising
+                groups which may not hyperlink to our Web site.
+              </li>
+            </ul>
+            <p className="mb-4 leading-8">
+              These organizations may link to our home page, to publications,
+              or to other Website information so long as the link: (a) is not
+              in any way deceptive; (b) does not falsely imply sponsorship,
+              endorsement, or approval of the linking party and its products
+              and/or services; and (c) fits within the context of the linking
+              party’s site.
+            </p>
+            <p className="mb-4 leading-8">
+              We may consider and approve other link requests from the
+              following types of organizations:
+            </p>
+            <ul className="list-disc pl-5 mb-4 leading-8">
+              <li>
+                Commonly-known consumer and/or business information sources;
+              </li>
+              <li>Dot.com community sites;</li>
+              <li>Associations or other groups representing charities;</li>
+              <li>Online directory distributors;</li>
+              <li>Internet portals;</li>
+              <li>Accounting, law and consulting firms; and</li>
+              <li>Educational institutions and trade associations.</li>
+            </ul>
+            <p className="mb-4 leading-8">
+              We will approve link requests from these organizations if we
+              decide that: (a) the link would not make us look unfavorably to
+              ourselves or to our accredited businesses; (b) the organization
+              does not have any negative records with us; (c) the benefit to
+              us from the visibility of the hyperlink compensates the absence
+              of GQ Mobiles; and (d) the link is in the context of general
+              resource information.
+            </p>
+            <p className="mb-4 leading-8">
+              These organizations may link to our home page so long as the
+              link: (a) is not in any way deceptive; (b) does not falsely
+              imply sponsorship, endorsement or approval of the linking party
+              and its products or services; and (c) fits within the context of
+              the linking party’s site.
+            </p>
+            <p className="mb-4 leading-8">
+              If you are one of the organizations listed in paragraph 2 above
+              and are interested in linking to our website, you must inform us
+              by sending an e-mail to GQ Mobiles. Please include your name,
+              your organization name, contact information as well as the URL
+              of your site, a list of any URLs from which you intend to link
+              to our Website, and a list of the URLs on our site to which you
+              would like to link. Wait 2-3 weeks for a response.
+            </p>
+            <p className="mb-4 leading-8">
+              Approved organizations may hyperlink to our Website as follows:
+            </p>
+            <ul className="list-disc pl-5 mb-4 leading-8">
+              <li>By use of our corporate name; or</li>
+              <li>
+                By use of the uniform resource locator being linked to; or
+              </li>
+              <li>
+                By use of any other description of our Website being linked to
+                that makes sense within the context and format of content on
+                the linking party’s site.
+              </li>
+            </ul>
+            <p className="mb-4 leading-8">
+              No use of GQ Mobiles’s logo or other artwork will be allowed for
+              linking absent a trademark license agreement.
+            </p>
+          </section>
 
-            {/* Reservation of Rights section */}
+          {/* iFrames section */}
+          <section id="iframes" className="mb-6 scroll-mt-32">
+            <h2 className="text-3xl font-semibold mb-4">iFrames</h2>
+            <p className="mb-4 leading-8">
+              Without prior approval and written permission, you may not
+              create frames around our Webpages that alter in any way the
+              visual presentation or appearance of our Website.
+            </p>
+          </section>
+
+          {/* Content Liability section */}
+          <section id="content-liability" className="mb-6 scroll-mt-32">
+            <h2 className="text-3xl font-semibold mb-4">Content Liability</h2>
+            <p className="mb-4 leading-8">
+              We shall not be held responsible for any content that appears on
+              your Website. You agree to protect and defend us against all
+              claims that are rising on your Website. No link(s) should appear
+              on any Website that may be interpreted as libelous, obscene, or
+              criminal, or which infringes, otherwise violates, or advocates
+              the infringement or other violation of, any third party rights.
+            </p>
+          </section>
+
+          {/* Your Privacy section */}
+          <section id="your-privacy" className="mb-6 scroll-mt-32">
+            <h2 className="text-3xl font-semibold mb-4">Your Privacy</h2>
+            <p className="mb-4 leading-8">
+              Please read{" "}
+              <Link href="/privacy" className="text-blue-500">
+                Privacy Policy
+              </Link>
+              .
+            </p>
+          </section>
+
+          {/* Copyright section */}
+          <section id="copyright" className="mb-6 scroll-mt-32">
+            <h2 className="text-3xl font-semibold mb-4">Copyright</h2>
+            <p className="mb-4 leading-8">
+              All content appearing on this Web site is the property of:
+              GQMOBILE Company. Address
+            </p>
+          </section>
+
+          {/* Trademarks section */}
+          <section id="trademarks" className="mb-6 scroll-mt-32">
+            <h2 className="text-3xl font-semibold mb-4">Trademarks</h2>
+            <p className="mb-4 leading-8">
+              All brand, product, service, and process names appearing on this
+              Web site are trademarks of their respective holders. Reference
+              to or use of a product, service, or process does not imply
+              recommendation, approval, affiliation, or sponsorship of that
+              product, service, or process by GQMobile.
+            </p>
+          </section>
+
+          {/* Use Of Site section */}
+          <section id="use-of-site" className="mb-6 scroll-mt-32">
+            <h2 className="text-3xl font-semibold mb-4">Use Of Site</h2>
+            <p className="mb-4 leading-8">
+              This site may contain other proprietary notices and copyright
+              information, the terms of which must be observed and followed.
+              Information on this site may contain technical inaccuracies or
+              typographical errors. Information, including product pricing and
+              availability, may be changed or updated without notice. GQMobile
+              reserves the right to refuse service, terminate accounts, and/or
+              cancel orders in its discretion, including, without limitation,
+              if GQMobile-Shop believes that customer conduct violates
+              applicable law or is harmful to the interests of GQMobile.
+            </p>
+          </section>
+
+          {/* Reservation of Rights section */}
+          <section id="reservation-of-rights" className="mb-6 scroll-mt-32">
             <h2 className="text-3xl font-semibold mb-4">
               Reservation of Rights
             </h2>
@@ -435,8 +484,10 @@ const PageTerm = () => {
               time. By continuously linking to our Website, you agree to be
               bound to and follow these linking terms and conditions.
             </p>
+          </section>
 
-            {/* Removal of links section */}
+          {/* Removal of links section */}
+          <section id="removal-of-links" className="mb-6 scroll-mt-32">
             <h2 className="text-3xl font-semibold mb-4">
               Removal of links from our website
             </h2>
@@ -446,8 +497,10 @@ const PageTerm = () => {
               will consider requests to remove links but we are not obligated to
               do so or to respond to you directly.
             </p>
+          </section>
 
-            {/* Disclaimer section */}
+          {/* Disclaimer section */}
+          <section id="disclaimer" className="mb-6 scroll-mt-32">
             <h2 className="text-3xl font-semibold mb-4">Disclaimer</h2>
             <p className="mb-4 leading-8">
               To the maximum extent permitted by applicable law, we exclude all
@@ -485,7 +538,7 @@ const PageTerm = () => {
               website are provided free of charge, we will not be liable for any
               loss or damage of any nature.
             </p>
-          </div>
+          </section>
         </div>
       </div>
     </div>
