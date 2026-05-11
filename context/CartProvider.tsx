@@ -18,7 +18,7 @@ type CartSession = {
     addToCart: (id: number, quantity?: number, variation?: number, productData?: any) => void | Promise<any>
     setCustomer: React.Dispatch<React.SetStateAction<Customer | null>>
     clearCart: () => void
-    refreshCart: () => void
+    refreshCart: () => Promise<any>
     isCartOpen: boolean
     setIsCartOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
@@ -34,7 +34,7 @@ const CartContext = createContext<CartSession>({
     getCart: () => { },
     setCustomer: () => { },
     clearCart: () => { },
-    refreshCart: () => { },
+    refreshCart: () => Promise.resolve(),
     isCartOpen: false,
     setIsCartOpen: () => { }
 });

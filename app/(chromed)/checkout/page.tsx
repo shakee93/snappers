@@ -634,7 +634,7 @@ const CheckoutPage = () => {
         return null;
       }
     } catch (error) {
-      handleCheckoutError(error);
+      await handleCheckoutError(error);
     } finally {
       setLoading(false);
     }
@@ -736,7 +736,7 @@ const CheckoutPage = () => {
     return null;
   };
 
-  const handleCheckoutError = (error: any) => {
+  const handleCheckoutError = async (error: any) => {
     setLoading(false);
 
     // Handle network errors
@@ -754,13 +754,26 @@ const CheckoutPage = () => {
     }
 
     // Handle session errors
+    // "Sorry, no session found." means the WC cart was empty server-side at
+    // process_checkout time — it does NOT mean the user is logged out.
+    // Redirecting to /login is wrong; recover the session/cart instead.
     if (error.message === "Sorry, no session found.") {
-      if (customer?.id !== "guest") {
-        toast.error("Please login or create an account to checkout");
-        router.push("/login");
-      } else {
-        toast.error("Session expired. Please reload the page or login again.");
+      // Use the return value — not the closed-over `cart` state, which is stale.
+      let refreshedItemCount = cart?.contents?.itemCount ?? 0;
+      try {
+        const result = await refreshCart();
+        refreshedItemCount = (result as any)?.data?.cart?.contents?.itemCount ?? refreshedItemCount;
+      } catch {
+        console.debug("refreshCart failed during session recovery — using last-known item count");
       }
+
+      if (refreshedItemCount === 0) {
+        toast.error("Your cart is empty. Please add items before checking out.");
+        router.push("/cart");
+        return;
+      }
+
+      toast.error("Session error — please reload the page to restore your cart.");
       return;
     }
 
