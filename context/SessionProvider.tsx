@@ -105,16 +105,16 @@ export function SessionProvider({ children }: {
 
             return { data: "registered", error: null };
         } catch (error) {
-            let errorMessage = "An error occurred.";
+            let errorMessage = "An error occurred while signing up.";
             if (error instanceof ApolloError) {
                 if (error.message.includes("An account is already registered with your email address")) {
                     errorMessage = "An account with this email address already exists. Please log in.";
                 } else {
-                    throw "An error occurred while Signup";
-                    // console.log("An ApolloError occurred:", error);
+                    console.error("Signup ApolloError:", error);
+                    errorMessage = error.message || errorMessage;
                 }
             } else {
-                // console.log("An error occurred:", error);
+                console.error("Signup error:", error);
             }
             return { data: null, error: errorMessage };
         }
