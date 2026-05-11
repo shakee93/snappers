@@ -18,6 +18,12 @@ import {
     RegisterCustomerPayload
 } from "@/graphql/types/graphql";
 import { useCart } from "@/context/CartProvider";
+import {
+    AUTH_TOKEN_KEY,
+    REFRESH_TOKEN_KEY,
+    SESSION_TOKEN_KEY,
+    USER_DATA_KEY
+} from "@/utils/storage-keys";
 
 const SessionContext = createContext<Session>({
     sessionToken: null,
@@ -39,12 +45,6 @@ export function useSession() {
 
 type AuthType = "registerCustomer" | "login";
 
-export const REFRESH_TOKEN_KEY = 'wp_refresh_token';
-export const SESSION_TOKEN_KEY = 'wp_session_token';
-export const AUTH_TOKEN_KEY = 'wp_auth_token';
-
-export const USER_DATA_KEY = 'wp_user'
-
 export function SessionProvider({ children }: {
     children: ReactNode
 }) {
@@ -64,35 +64,40 @@ export function SessionProvider({ children }: {
     const [registerCustomer] = useMutation(REGISTER_CUSTOMER_MUTATION);
     const [loginCustomer] = useMutation(LOGIN_CUSTOMER_MUTATION);
 
-    function saveResponseToLocalStorage(response: any, type: AuthType = "registerCustomer") {
+    async function saveResponseToLocalStorage(response: any, type: AuthType = "registerCustomer") {
 
         const data: LoginPayload & RegisterCustomerPayload = response?.data?.[type]
+        if (!data) return;
 
-        if (type === "login") {
-            localStorage.setItem(USER_DATA_KEY, JSON.stringify(data?.customer));
-            // console.log("setting customer: ", data?.customer)
-            setCustomer(data?.customer as Customer)
+        const sessionTokenFromPayload = data?.sessionToken ?? data?.customer?.sessionToken ?? '';
+        const normalizedSessionToken = sessionTokenFromPayload || null;
 
-            localStorage.setItem(AUTH_TOKEN_KEY, data?.authToken || '');
-            localStorage.setItem(SESSION_TOKEN_KEY, data?.sessionToken || '');
-            localStorage.setItem(REFRESH_TOKEN_KEY, data?.refreshToken || '');
+        // Prefer the existing guest session token if one is set: keeping it means
+        // the next cart request carries `woocommerce-session: Session <guest>` +
+        // the new `Authorization: Bearer <auth>` header, which is what triggers
+        // WooCommerce to link the guest cart to the authenticated user. The
+        // sessionAfterware then rotates SESSION_TOKEN_KEY to the user-owned
+        // token via the woocommerce-session response header. Overwriting with
+        // the login payload's sessionToken here orphans the guest cart.
+        const existingGuestToken = localStorage.getItem(SESSION_TOKEN_KEY);
+        const tokenToStore = existingGuestToken || normalizedSessionToken;
+
+        localStorage.setItem(USER_DATA_KEY, JSON.stringify(data?.customer));
+        localStorage.setItem(AUTH_TOKEN_KEY, data?.authToken || '');
+        if (tokenToStore) {
+            localStorage.setItem(SESSION_TOKEN_KEY, tokenToStore);
+        } else {
+            localStorage.removeItem(SESSION_TOKEN_KEY);
         }
+        localStorage.setItem(REFRESH_TOKEN_KEY, data?.refreshToken || '');
 
-        if (type == "registerCustomer") {
-            localStorage.setItem(USER_DATA_KEY, JSON.stringify(data?.customer));
-            setCustomer(data?.customer as Customer)
+        setSessionToken(tokenToStore);
+        setCustomer(data?.customer as Customer);
 
-            localStorage.setItem(AUTH_TOKEN_KEY, data?.authToken || '');
-            localStorage.setItem(SESSION_TOKEN_KEY, data?.customer?.sessionToken || '');
-            localStorage.setItem(REFRESH_TOKEN_KEY, data.refreshToken || '');
-        }
-
-        getCart()
-        fetchCustomer()
+        await getCart();
     }
 
     const signUp = async (email: string, password: string) => {
-        logout()
         try {
             const response: FetchResult<RegisterCustomerMutation> = await registerCustomer({
                 variables: {
@@ -105,27 +110,27 @@ export function SessionProvider({ children }: {
 
             // console.log("Sign up",response);
 
-            saveResponseToLocalStorage(response);
+            await saveResponseToLocalStorage(response);
+            await fetchCustomer(true);
 
             return { data: "registered", error: null };
         } catch (error) {
-            let errorMessage = "An error occurred.";
+            let errorMessage = "An error occurred while signing up.";
             if (error instanceof ApolloError) {
                 if (error.message.includes("An account is already registered with your email address")) {
                     errorMessage = "An account with this email address already exists. Please log in.";
                 } else {
-                    throw "An error occurred while Signup";
-                    // console.log("An ApolloError occurred:", error);
+                    console.error("Signup ApolloError:", error);
+                    errorMessage = error.message || errorMessage;
                 }
             } else {
-                // console.log("An error occurred:", error);
+                console.error("Signup error:", error);
             }
             return { data: null, error: errorMessage };
         }
     };
 
     const login = async (email: string, password: string): Promise<LoginResponse> => {
-        await logout()
         try {
             const response: FetchResult<LoginCustomerMutation> = await loginCustomer({
                 variables: {
@@ -136,8 +141,8 @@ export function SessionProvider({ children }: {
                 },
             })
 
-            saveResponseToLocalStorage(response, "login");
-            fetchCustomer();
+            await saveResponseToLocalStorage(response, "login");
+            await fetchCustomer(true);
             return { data: "logged_in", error: null };
         } catch (error) {
             let errorMessage = "An error occurred while login.";
@@ -163,15 +168,15 @@ export function SessionProvider({ children }: {
         localStorage.removeItem(SESSION_TOKEN_KEY);
         localStorage.removeItem(USER_DATA_KEY);
 
+        setSessionToken(null)
         setCustomer(null)
-        getCart()
     };
 
-    const fetchCustomer = async () => {
+    const fetchCustomer = async (forceRemote = false) => {
 
         const userData = localStorage.getItem(USER_DATA_KEY);
         // console.log("userData", JSON.parse(userData!));
-        if (userData) {
+        if (userData && !forceRemote) {
             // console.log(JSON.parse(userData));
             setCustomer(JSON.parse(userData) as unknown as Customer)
             return userData

@@ -86,11 +86,9 @@ export function CartProvider({ children }: {
         const key = Object.keys(data)[0]
         if (key && data[key]) {
             setCart(data[key].cart || data.cart || null)
-            setCustomer(data[key].customer || data.customer || null)
         } else {
             // Fallback for direct cart/customer structure
             setCart(data?.cart || null)
-            setCustomer(data?.customer || null)
         }
     }
 
