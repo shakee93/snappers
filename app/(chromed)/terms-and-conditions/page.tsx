@@ -34,19 +34,19 @@ const PageTerm = () => {
     >
       <div className="container py-10 lg:py-10 space-y-16 lg:space-y-28">
         <div className="py-8">
-          <h2 className="text-3xl !leading-tight font-semibold text-neutral-900 md:text-4xl xl:text-5xl dark:text-neutral-100 pb-6">
+          <h1 className="text-3xl !leading-tight font-semibold text-neutral-900 md:text-4xl xl:text-5xl dark:text-neutral-100 pb-6">
             Terms and Conditions.
-          </h2>
+          </h1>
 
           {/* Table of Contents */}
           <nav
             aria-label="Sections"
-            className="sticky top-0 z-10 -mx-4 px-4 mb-10 bg-white/90 dark:bg-neutral-900/90 backdrop-blur supports-[backdrop-filter]:bg-white/70 border-b border-neutral-200 dark:border-neutral-800"
+            className="sticky top-16 z-10 -mx-4 px-4 mb-10 bg-white/90 dark:bg-neutral-900/90 backdrop-blur supports-[backdrop-filter]:bg-white/70 border-b border-neutral-200 dark:border-neutral-800"
           >
             <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400 pt-3 pb-2">
               Jump to section
             </p>
-            <ul className="flex gap-2 overflow-x-auto pb-3 scrollbar-thin">
+            <ul className="flex flex-wrap gap-2 pb-3">
               {sections.map((s) => (
                 <li key={s.id} className="shrink-0">
                   <a
@@ -76,23 +76,23 @@ const PageTerm = () => {
             <h3 className="text-xl font-semibold mb-2 mt-6">Warranty Terms</h3>
             <ul className="list-disc pl-5 mb-4 leading-8">
               <li>
-                <span className="font-semibold">Repairs only</span> — No replacements will be provided.
+                <strong>Repairs only</strong> — No replacements will be provided.
               </li>
               <li>
-                The product must be presented with the <span className="font-semibold">original box, cables, and all accessories</span> to claim warranty.
+                The product must be presented with the <strong>original box, cables, and all accessories</strong> to claim warranty.
               </li>
               <li>
-                AppleCare or manufacturer warranty claims may take a <span className="font-semibold">minimum of 45 days</span> to process.
+                AppleCare or manufacturer warranty claims may take a <strong>minimum of 45 days</strong> to process.
               </li>
               <li>
-                Warranty processing time depends on the <span className="font-semibold">availability of spare parts and shipping schedules</span>.
+                Warranty processing time depends on the <strong>availability of spare parts and shipping schedules</strong>.
               </li>
             </ul>
 
             {/* Warranty Exclusions */}
             <h3 className="text-xl font-semibold mb-2 mt-6">Warranty Does Not Cover</h3>
             <p className="mb-4 leading-8">
-              The following conditions and damages are <span className="font-semibold">not covered</span> under warranty:
+              The following conditions and damages are <strong>not covered</strong> under warranty:
             </p>
             <ul className="list-disc pl-5 mb-4 leading-8">
               <li>Liquid or water damage</li>
@@ -110,7 +110,7 @@ const PageTerm = () => {
             {/* Display Warranty Note */}
             <h3 className="text-xl font-semibold mb-2 mt-6">Display Warranty</h3>
             <p className="mb-4 leading-8">
-              Display warranty covers <span className="font-semibold">7 days</span> to check the device for any manufacturing defects.
+              Display warranty covers <strong>7 days</strong> to check the device for any manufacturing defects.
             </p>
 
             <p className="mb-4 leading-8">
@@ -138,8 +138,8 @@ const PageTerm = () => {
             <p className="mb-4 leading-8">
               When a customer chooses to receive their order through a
               third-party on-demand delivery service such as{" "}
-              <span className="font-semibold">PickMe Flash</span> or{" "}
-              <span className="font-semibold">Uber Flash</span>, the customer
+              <strong>PickMe Flash</strong> or{" "}
+              <strong>Uber Flash</strong>, the customer
               acknowledges and agrees to the terms set out in this section.
             </p>
             <p className="mb-4 leading-8">
@@ -151,7 +151,7 @@ const PageTerm = () => {
             <p className="mb-4 leading-8">
               By selecting PickMe Flash, Uber Flash, or any similar third-party
               courier service, the{" "}
-              <span className="font-semibold">customer takes full responsibility</span>{" "}
+              <strong>customer takes full responsibility</strong>{" "}
               for the package, including:
             </p>
             <ul className="list-disc pl-5 mb-4 leading-8">
