@@ -12,6 +12,7 @@ import { GraphQLClient } from "graphql-request";
 import { GET_AUTH_TOKEN } from "./defs/auth";
 import {
   AUTH_TOKEN_KEY,
+  AUTH_INVALIDATED_EVENT,
   REFRESH_TOKEN_KEY,
   SESSION_TOKEN_KEY,
   USER_DATA_KEY,
@@ -147,7 +148,8 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
                 localStorage.removeItem(REFRESH_TOKEN_KEY);
                 localStorage.removeItem(SESSION_TOKEN_KEY);
                 localStorage.removeItem(USER_DATA_KEY);
-
+                // Tell SessionProvider to clear in-memory customer/session state.
+                window.dispatchEvent(new Event(AUTH_INVALIDATED_EVENT));
                 observer.error(error);
               });
           });

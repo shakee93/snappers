@@ -6,7 +6,7 @@ export type Session = {
     // login: (email: string, password: string) => Promise<LoginResponse>,
     login:any, 
     logout:  any,
-    fetchCustomer: () => any
+    fetchCustomer: () => Promise<any>
     customer: Maybe<Customer | undefined>
     updateCustomer: any
 

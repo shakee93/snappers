@@ -20,6 +20,7 @@ import {
 import { useCart } from "@/context/CartProvider";
 import {
     AUTH_TOKEN_KEY,
+    AUTH_INVALIDATED_EVENT,
     REFRESH_TOKEN_KEY,
     SESSION_TOKEN_KEY,
     USER_DATA_KEY
@@ -34,7 +35,7 @@ const SessionContext = createContext<Session>({
         return { data: null, error: null };
     },
     logout: () => { },
-    fetchCustomer: () => { },
+    fetchCustomer: () => Promise.resolve(),
     customer: undefined,
     updateCustomer: undefined
 });
@@ -108,10 +109,8 @@ export function SessionProvider({ children }: {
                 },
             });
 
-            // console.log("Sign up",response);
-
             await saveResponseToLocalStorage(response);
-            await fetchCustomer(true);
+            await fetchCustomer();
 
             return { data: "registered", error: null };
         } catch (error) {
@@ -142,7 +141,7 @@ export function SessionProvider({ children }: {
             })
 
             await saveResponseToLocalStorage(response, "login");
-            await fetchCustomer(true);
+            await fetchCustomer();
             return { data: "logged_in", error: null };
         } catch (error) {
             let errorMessage = "An error occurred while login.";
@@ -172,24 +171,40 @@ export function SessionProvider({ children }: {
         setCustomer(null)
     };
 
-    const fetchCustomer = async (forceRemote = false) => {
+    const fetchCustomer = async () => {
+        const cached = localStorage.getItem(USER_DATA_KEY);
+        const hasAuthToken = !!localStorage.getItem(AUTH_TOKEN_KEY);
 
-        const userData = localStorage.getItem(USER_DATA_KEY);
-        // console.log("userData", JSON.parse(userData!));
-        if (userData && !forceRemote) {
-            // console.log(JSON.parse(userData));
-            setCustomer(JSON.parse(userData) as unknown as Customer)
-            return userData
+        // Optimistic: paint cached state only when there is an auth token —
+        // no token means the cache is definitionally stale, skip the flash.
+        // Only set when customer is not already loaded to avoid redundant renders.
+        if (cached && hasAuthToken && !customer) {
+            try {
+                const parsed = JSON.parse(cached) as unknown;
+                if (parsed && typeof parsed === 'object' && 'id' in parsed) {
+                    setCustomer(parsed as Customer);
+                }
+            } catch {
+                // Corrupted cache — fall through to server validation.
+            }
         }
 
-        const { data } = await getUser();
-
-        if (data?.customer) {
-            setCustomer(data.customer as Customer)
-            // saveResponseToLocalStorage(data.customer, "login");
-            return data
+        try {
+            const { data } = await getUser();
+            if (data?.customer && data.customer.id !== 'guest') {
+                setCustomer(data.customer as Customer);
+                localStorage.setItem(USER_DATA_KEY, JSON.stringify(data.customer));
+                return data;
+            }
+            // Server says guest — cached data is stale; clear it.
+            setCustomer(null);
+            localStorage.removeItem(USER_DATA_KEY);
+            return null;
+        } catch {
+            console.warn('fetchCustomer: server validation failed — clearing customer state');
+            setCustomer(null);
+            return null;
         }
-        return null
     }
 
     const [updateCustomerMutation] = useMutation(UPDATE_ACCOUNT_INFORMATION);
@@ -213,6 +228,15 @@ export function SessionProvider({ children }: {
             return { data: null, error: "An error occurred while updating customer." };
         }
     };
+
+    useEffect(() => {
+        const handleAuthInvalidated = () => {
+            setCustomer(null);
+            setSessionToken(null);
+        };
+        window.addEventListener(AUTH_INVALIDATED_EVENT, handleAuthInvalidated);
+        return () => window.removeEventListener(AUTH_INVALIDATED_EVENT, handleAuthInvalidated);
+    }, []);
 
     useEffect(() => {
         async function fetchAndStoreSessionToken() {

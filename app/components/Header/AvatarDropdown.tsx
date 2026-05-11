@@ -82,7 +82,7 @@ export default function AvatarDropdown() {
                   <div className="relative grid grid-cols-1 gap-6 bg-white dark:bg-neutral-800 py-7 px-6">
                     {isLoading ? (
                       <AvatarSkeleton /> // Show skeleton for the menu while loading
-                    ) : customer?.id === "guest" ? (
+                    ) : !customer || customer.id === "guest" ? (
                       <>
                         <Link
                           href={"/login"}
