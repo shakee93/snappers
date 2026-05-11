@@ -7,24 +7,6 @@ export const metadata: Metadata = {
   title: "terms and conditions",
 };
 
-const sections: { id: string; label: string }[] = [
-  { id: "warranty-return-policy", label: "Warranty & Return Policy" },
-  { id: "shipping-delivery", label: "Shipping & Delivery" },
-  { id: "third-party-delivery", label: "PickMe & Uber Flash Delivery" },
-  { id: "welcome", label: "Welcome" },
-  { id: "cookies", label: "Cookies" },
-  { id: "license", label: "License" },
-  { id: "hyperlinking", label: "Hyperlinking to our Content" },
-  { id: "iframes", label: "iFrames" },
-  { id: "content-liability", label: "Content Liability" },
-  { id: "your-privacy", label: "Your Privacy" },
-  { id: "copyright", label: "Copyright" },
-  { id: "trademarks", label: "Trademarks" },
-  { id: "use-of-site", label: "Use Of Site" },
-  { id: "reservation-of-rights", label: "Reservation of Rights" },
-  { id: "removal-of-links", label: "Removal of Links" },
-  { id: "disclaimer", label: "Disclaimer" },
-];
 
 const PageTerm = () => {
   return (
@@ -38,27 +20,6 @@ const PageTerm = () => {
             Terms and Conditions.
           </h1>
 
-          {/* Table of Contents */}
-          <nav
-            aria-label="Sections"
-            className="sticky top-16 z-10 -mx-4 px-4 mb-10 bg-white/90 dark:bg-neutral-900/90 backdrop-blur supports-[backdrop-filter]:bg-white/70 border-b border-neutral-200 dark:border-neutral-800"
-          >
-            <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400 pt-3 pb-2">
-              Jump to section
-            </p>
-            <ul className="flex flex-wrap gap-2 pb-3">
-              {sections.map((s) => (
-                <li key={s.id} className="shrink-0">
-                  <a
-                    href={`#${s.id}`}
-                    className="inline-block whitespace-nowrap rounded-full border border-neutral-200 dark:border-neutral-700 px-4 py-1.5 text-sm text-neutral-700 dark:text-neutral-200 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition"
-                  >
-                    {s.label}
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </nav>
 
           {/* Warranty & Return Policy section */}
           <section id="warranty-return-policy" className="mb-8 scroll-mt-32">
