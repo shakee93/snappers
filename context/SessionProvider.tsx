@@ -1,8 +1,7 @@
 'use client';
 
 import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
-import { ApolloError, FetchResult, useLazyQuery, useMutation, useQuery } from '@apollo/client';
-import { GET_CART } from "@/graphql/defs/cart";
+import { ApolloError, FetchResult, useLazyQuery, useMutation } from '@apollo/client';
 import {
     GET_ACCOUNT_DETAILS,
     LOGIN_CUSTOMER_MUTATION,
@@ -53,10 +52,6 @@ export function SessionProvider({ children }: {
         typeof window !== "undefined" ? localStorage.getItem(SESSION_TOKEN_KEY) : null);
 
     const { getCart, customer, setCustomer } = useCart()
-
-    const { data, refetch } = useQuery(GET_CART, {
-        skip: true
-    })
 
     const [getUser] = useLazyQuery(GET_ACCOUNT_DETAILS, {
         fetchPolicy: 'no-cache'
@@ -236,28 +231,6 @@ export function SessionProvider({ children }: {
         };
         window.addEventListener(AUTH_INVALIDATED_EVENT, handleAuthInvalidated);
         return () => window.removeEventListener(AUTH_INVALIDATED_EVENT, handleAuthInvalidated);
-    }, []);
-
-    useEffect(() => {
-        async function fetchAndStoreSessionToken() {
-            try {
-                const { data } = await refetch()
-
-                if (data && data?.customer?.sessionToken) {
-                    const newSessionToken = data.customer.sessionToken;
-                    setSessionToken(newSessionToken)
-                    localStorage.setItem(SESSION_TOKEN_KEY, newSessionToken);
-                }
-
-            } catch (error) {
-                console.error('Error fetching session token:', error);
-            }
-        }
-
-        if (!sessionToken && !localStorage.getItem(REFRESH_TOKEN_KEY)) {
-            fetchAndStoreSessionToken();
-        }
-
     }, []);
 
     return (
