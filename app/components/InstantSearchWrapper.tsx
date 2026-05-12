@@ -28,6 +28,7 @@ type CustomUiState = UiState & {
     in_stock: boolean;
     sort: string;
     variations: Record<string, string[]>;
+    page?: number;
   };
 };
 
@@ -293,6 +294,7 @@ const InstantSearchWrapper = ({
       if (Object.keys(fromUrlVars).length > 0) variationsSource = fromUrlVars;
     }
 
+    const currentPage = uiState.product?.page;
     const params: Record<string, string | undefined> = {
       query: uiState.product?.query || undefined,
       categories: categories.length > 0 ? categories.join(',') : undefined,
@@ -301,6 +303,7 @@ const InstantSearchWrapper = ({
       on_sale: on_sale ? 'true' : undefined,
       in_stock: in_stock ? 'true' : undefined,
       sort: sort || undefined,
+      page: currentPage && currentPage > 1 ? String(currentPage) : undefined,
     };
 
     Object.entries(variationsSource).forEach(([attribute, values]) => {
@@ -345,6 +348,7 @@ const InstantSearchWrapper = ({
         });
         return v;
       })(),
+      page: (() => { const n = Number(routeState?.page); return Number.isInteger(n) && n > 1 ? n : undefined; })(),
     };
 
     queueMicrotask(() => {
