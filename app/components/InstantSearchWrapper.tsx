@@ -12,7 +12,6 @@ import { PRICE_RANGE } from "@/app/components/Filters/PriceFilter";
 import SortInput from "@/app/components/SortInput";
 import { useDebounce } from "use-debounce";
 import MobileFilterSheet from "@/app/components/MobileFilterSheet";
-import { history } from "instantsearch.js/es/lib/routers";
 import { UiState } from "instantsearch.js";
 import { useSearchParams } from "next/navigation";
 import { HIDDEN_PRODUCT_SLUGS } from "@/lib/hidden-products";
@@ -30,6 +29,21 @@ type CustomUiState = UiState & {
     variations: Record<string, string[]>;
     page?: number;
   };
+};
+
+const arrEq = (a: number[], b: number[]) =>
+  a.length === b.length && a.every((v, i) => v === b[i]);
+
+const variationsEq = (a: Record<string, string[]>, b: Record<string, string[]>) => {
+  const ak = Object.keys(a).sort();
+  const bk = Object.keys(b).sort();
+  if (ak.length !== bk.length) return false;
+  return ak.every((k, i) => {
+    if (k !== bk[i]) return false;
+    const av = a[k];
+    const bv = b[k];
+    return av.length === bv.length && av.every((v, j) => v === bv[j]);
+  });
 };
 
 const DelayedRender: React.FC<{ delay: number; children: React.ReactNode }> = ({ delay, children }) => {
@@ -347,19 +361,36 @@ const InstantSearchWrapper = ({
     queueMicrotask(() => {
       // Full reset — fields not present in URL go back to default. Single
       // setState call so subscribers re-render once.
-      useStore.setState((state) => ({
-        ...state,
-        sidebar: {
-          ...state.sidebar,
-          categories: ui.categories,
-          brands: ui.brands,
-          priceRange: ui.priceRange,
-          on_sale: ui.on_sale,
-          in_stock: ui.in_stock,
-          sort: ui.sort,
-          variations: ui.variations,
-        },
-      }));
+      // Bail out when values are unchanged to avoid triggering differedSidebar
+      // on every pagination click, which causes setFilterQuery to fire 800 ms
+      // later and can race with a live Typesense response to reset the page.
+      useStore.setState((state) => {
+        const sb = state.sidebar;
+        if (
+          sb.on_sale === ui.on_sale &&
+          sb.in_stock === ui.in_stock &&
+          sb.sort === ui.sort &&
+          sb.priceRange.join(',') === ui.priceRange.join(',') &&
+          arrEq(sb.categories, ui.categories) &&
+          arrEq(sb.brands, ui.brands) &&
+          variationsEq(sb.variations, ui.variations)
+        ) {
+          return state;
+        }
+        return {
+          ...state,
+          sidebar: {
+            ...state.sidebar,
+            categories: ui.categories,
+            brands: ui.brands,
+            priceRange: ui.priceRange,
+            on_sale: ui.on_sale,
+            in_stock: ui.in_stock,
+            sort: ui.sort,
+            variations: ui.variations,
+          },
+        };
+      });
     });
 
     return { product: ui };
@@ -376,6 +407,11 @@ const InstantSearchWrapper = ({
         routing={{
           router: {
             cleanUrlOnDispose: true,
+            // writeDelay: 0 eliminates the default 400 ms debounce on URL writes.
+            // With the default delay, IS fires router.write({page:'2'}) then the
+            // debounced differedSidebar effect can fire router.write({}) before the
+            // URL commits, wiping the page param and sending the user back to page 1.
+            writeDelay: 0,
           },
           stateMapping: {
             stateToRoute,
