@@ -103,13 +103,8 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
     }, [setSearch]);
 
     useEffect(() => {
-
-        if (search.length > 0) {
-            setSearchValue(search);
-        } else {
-            setSearchValue('');
-        }
-    }, [searchMounted]);
+        setSearchValue(search);
+    }, [search]);
 
     const handleFocus = () => {
         setIsFocused(true);

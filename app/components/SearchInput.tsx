@@ -1,20 +1,12 @@
-import { useInstantSearch, useSearchBox } from "react-instantsearch";
+import React, { useEffect, useState } from "react";
+import { useSearchBox } from "react-instantsearch";
 import { Search } from "lucide-react";
 import { useStore } from "@/store/store";
-import { useEffect } from "react";
-import React from 'react';
-import { UiState } from "instantsearch.js";
-
-type MyUiState = UiState & {
-    product: {
-        query?: string;
-    }
-}
 
 interface SearchInputProps {
     bindToStore?: boolean;
     show?: boolean;
-    onSearchChange?: (value: any) => void;
+    onSearchChange?: (value: string) => void;
 }
 
 // Module-level timer for debouncing
@@ -25,13 +17,19 @@ const SearchInput: React.FC<SearchInputProps> = ({ show = true, bindToStore = fa
     const {
         query,
         refine,
-        clear,
     } = useSearchBox({
         queryHook: queryHook
     });
 
     const { search } = useStore()
-    const { setUiState } = useInstantSearch<MyUiState>();
+
+    // Controlled value mirrors IS query so that navigation-driven clears
+    // (routeToState sets query to '') are reflected in the DOM immediately.
+    const [inputValue, setInputValue] = useState(query);
+
+    useEffect(() => {
+        setInputValue(query);
+    }, [query]);
 
     useEffect(() => {
         if (!bindToStore) {
@@ -41,22 +39,16 @@ const SearchInput: React.FC<SearchInputProps> = ({ show = true, bindToStore = fa
         refine(search);
     }, [search])
 
-    useEffect(() => {
-
-        // this state update here to prevent race condition between the search input and the instantsearch search query. so on route change, the search query is not erased.
-        // setUiState(p => {
-        //     return p
-        // })
-    }, [search])
-
     const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setInputValue(event.target.value);
+        refine(event.target.value);
         if (onSearchChange) {
             onSearchChange(event.target.value);
         }
     };
 
     if (!show) {
-        return <></>
+        return null;
     }
 
 
@@ -67,8 +59,8 @@ const SearchInput: React.FC<SearchInputProps> = ({ show = true, bindToStore = fa
             <input
                 type="text"
                 placeholder="Type to Quick"
-                defaultValue={query}
-                onChange={(e) => refine(e.target.value)}
+                value={inputValue}
+                onChange={handleChange}
                 className="border-none bg-transparent focus:outline-none focus:ring-0 w-full text-base"
                 autoFocus
             />

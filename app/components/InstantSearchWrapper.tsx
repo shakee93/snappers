@@ -113,7 +113,6 @@ const InstantSearchWrapper = ({
   const { sidebar, setSearchMounted, isTyping } = useStore();
   const [differedSidebar] = useDebounce(sidebar, 800);
   const [hitsPerPage, setHitsPerPage] = useState<number>(12);
-  const [searchQuery, setSearchQuery] = useState<string>("");
   // useSearchParams here triggers BAILOUT_TO_CLIENT_SIDE_RENDERING for the
   // InstantSearch subtree on routes that wrap ArchiveLayout in <Suspense>.
   // That bailout is what makes the response cacheable at the edge — without
@@ -123,12 +122,6 @@ const InstantSearchWrapper = ({
   // ArchiveLayout-using routes (verified via prod cache headers post-merge).
   const searchParams = useSearchParams();
   const [debouncedIsTyping] = useDebounce(isTyping, 500);
-
-  useEffect(() => {
-    if (searchParams.get('q')) {
-      setSearchQuery(searchParams.get('q') || '');
-    }
-  }, [searchParams]);
 
   useEffect(() => {
     setSearchMounted();
@@ -407,7 +400,7 @@ const InstantSearchWrapper = ({
       > */}
 
         <div className="flex lg:gap-6 flex-col">
-          <SearchInput bindToStore={bindToStore} show={search} onSearchChange={(value) => setSearchQuery(value)} />
+          <SearchInput bindToStore={bindToStore} show={search} />
 
           <div className='flex overflow-x-auto lg:hidden w-full'>
             <MobileFilterSheet category={category}
