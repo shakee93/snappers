@@ -13,7 +13,7 @@ import SortInput from "@/app/components/SortInput";
 import { useDebounce } from "use-debounce";
 import MobileFilterSheet from "@/app/components/MobileFilterSheet";
 import { UiState } from "instantsearch.js";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { HIDDEN_PRODUCT_SLUGS } from "@/lib/hidden-products";
 import { DealFilterType, DealTagSlug, DEAL_FILTER_TO_TAG, VALID_DEAL_FILTER_TYPES } from "@/lib/dealFilters";
 
@@ -135,6 +135,7 @@ const InstantSearchWrapper = ({
   // effect bridge: that breaks ISR caching for /new-arrivals and the
   // ArchiveLayout-using routes (verified via prod cache headers post-merge).
   const searchParams = useSearchParams();
+  const router = useRouter();
   const [debouncedIsTyping] = useDebounce(isTyping, 500);
 
   useEffect(() => {
@@ -406,12 +407,26 @@ const InstantSearchWrapper = ({
         }}
         routing={{
           router: {
-            cleanUrlOnDispose: true,
-            // writeDelay: 0 eliminates the default 400 ms debounce on URL writes.
-            // With the default delay, IS fires router.write({page:'2'}) then the
-            // debounced differedSidebar effect can fire router.write({}) before the
-            // URL commits, wiping the page param and sending the user back to page 1.
+            // LOAD-BEARING: must stay `false` while the custom `push` below has
+            // no dispose guard. The default push in react-instantsearch-nextjs
+            // skips `write({})` when `isDisposed && isUnmounting.current`; our
+            // override drops that check because `cleanUrlOnDispose: false`
+            // prevents IS from ever scheduling a dispose-time write. Flipping
+            // this back to `true` would cause IS to push the bare path through
+            // `router.push` mid-unmount, navigating users away unexpectedly.
+            cleanUrlOnDispose: false,
             writeDelay: 0,
+            // Route URL writes through Next.js's router instead of the default
+            // history.pushState. On live, the default path raced with Next.js's
+            // own navigation handling for ?page=N — the param appeared then was
+            // wiped on the first click. router.push stays inside Next.js's
+            // navigation pipeline so the URL update isn't reverted, and keeps
+            // the browser back/forward buttons working across pagination.
+            push(url: string) {
+              const parsed = new URL(url, window.location.href);
+              const target = parsed.pathname + parsed.search + parsed.hash;
+              router.push(target, { scroll: false });
+            },
           },
           stateMapping: {
             stateToRoute,
