@@ -1,6 +1,15 @@
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { NextRequest } from 'next/server'
-import { DEALS_CACHE_TAG } from '@/lib/cache-tags'
+import { DEALS_CACHE_TAG, productTag } from '@/lib/cache-tags'
+
+// Accepted values for the optional ?type= query param. Forwarded as the
+// second arg to revalidatePath. For App Router dynamic routes like
+// /[brand]/[slug], passing 'page' is what makes revalidatePath actually
+// invalidate the cached entry instead of silently no-op'ing.
+type RevalidatePathType = 'page' | 'layout'
+function parseType(raw: string | null): RevalidatePathType | undefined {
+    return raw === 'page' || raw === 'layout' ? raw : undefined
+}
 
 // Structured log so WP-side [REVALIDATE] lines can be correlated with the
 // Vercel-side processing of the same call. Vercel returns 200 even when
@@ -49,15 +58,29 @@ export async function GET(request: NextRequest) {
             return Response.json({ revalidated: 'homepage', now: Date.now() })
         }
 
+        const type = parseType(request.nextUrl.searchParams.get('type'))
         try {
-            revalidatePath(path);
-            // Bust deals sliders when a product or tag page changes
-            if (path.startsWith('/product') || path.startsWith('/tag')) {
-                revalidateTag(DEALS_CACHE_TAG, 'max');
+            if (type) {
+                revalidatePath(path, type);
+            } else {
+                revalidatePath(path);
             }
-            logRevalidate({ kind: 'path', path, ms: Date.now() - startedAt })
+            if (path.startsWith('/product') || path.startsWith('/tag')) {
+                // Tag/collection pages — bust deals sliders.
+                revalidateTag(DEALS_CACHE_TAG, 'max');
+            } else {
+                // PDP paths follow /<brand>/<slug>. Bust the per-product tag
+                // attached to GET_PRODUCT's SSR fetch so a regen actually
+                // re-pulls WPGraphQL instead of re-serving the stale fetch-
+                // cache entry on a path that was already invalidated.
+                const productSlug = path.match(/^\/[^/]+\/([^/]+)$/)?.[1]
+                if (productSlug) {
+                    revalidateTag(productTag(productSlug), 'max');
+                }
+            }
+            logRevalidate({ kind: 'path', path, type: type ?? '', ms: Date.now() - startedAt })
         } catch (e) {
-            logRevalidate({ kind: 'path', path, threw: String(e), ms: Date.now() - startedAt })
+            logRevalidate({ kind: 'path', path, type: type ?? '', threw: String(e), ms: Date.now() - startedAt })
             throw e
         }
         return Response.json({ revalidated: true, now: Date.now() })

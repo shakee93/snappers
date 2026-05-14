@@ -17,6 +17,7 @@ import { Metadata, ResolvingMetadata } from "next";
 import { ImageProvider } from "@/context/ImageChangeGrabber";
 import UpsellProducts from "@/app/components/globalComponents/UpsellProducts";
 import { getProductSchema } from "@/lib/jsonld/productSchema";
+import { productTag } from "@/lib/cache-tags";
 // import LoadingProduct from "./loading";
 
 type Props = {
@@ -42,6 +43,21 @@ async function getData(slug: string, brand: string) {
       // time. Stock accuracy on a missed webhook is enforced at the client
       // Apollo's un-cached add-to-cart mutation — a user loading a stale
       // "in stock" PDP gets rejected server-side on the mutation.
+      //
+      // Tag the underlying fetch so /api/revalidate?tag=product:<slug> can
+      // bust the GraphQL response itself. revalidatePath alone leaves this
+      // fetch-cache entry intact on dynamic routes, so a regen triggered
+      // while WP is still committing (variation price/stock) bakes the
+      // partial answer into the page cache and it sticks until the next
+      // WP edit. Apollo HttpLink shallow-merges context.fetchOptions onto
+      // the link's fetchOptions, so cache:'force-cache' must be repeated
+      // here or it gets dropped.
+      context: {
+        fetchOptions: {
+          cache: 'force-cache',
+          next: { tags: [productTag(slug)] },
+        },
+      },
     });
 
     if (error) {
