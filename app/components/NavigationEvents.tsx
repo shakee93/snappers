@@ -33,20 +33,27 @@ export function NavigationEvents() {
 
     useEffect(() => {
         pushNavigation(pathname);
-        // Reset all sidebar filters when navigating to a new pathname so each
-        // page starts from a clean slate. routeToState then re-applies any
-        // filters that the destination URL itself carries (e.g. shared links).
         setSearch('')
-        syncCategories([])
-        syncBrands([])
-        synPriceRange(PRICE_RANGE)
-        syncOnSale(false)
-        setInStock(false)
-        setSort('')
-        clearVariations()
 
+        // Only clear filters the destination URL does NOT carry. routeToState
+        // re-applies URL-carried filters via a microtask whose order vs this
+        // effect isn't guaranteed by InstantSearchNext — making the reset
+        // URL-aware removes the race entirely (per PR #107 review).
+        if (!searchParams.get('categories')) syncCategories([])
+        if (!searchParams.get('brands')) syncBrands([])
+        if (!searchParams.get('priceRange')) synPriceRange(PRICE_RANGE)
+        if (searchParams.get('on_sale') !== 'true') syncOnSale(false)
+        if (searchParams.get('in_stock') !== 'true') setInStock(false)
+        if (!searchParams.get('sort')) setSort('')
+
+        let hasVariations = false
+        searchParams.forEach((_, key) => {
+            if (key.startsWith('variation_')) hasVariations = true
+        })
+        if (!hasVariations) clearVariations()
     }, [
         pathname,
+        searchParams,
         pushNavigation,
         setSearch,
         syncCategories,

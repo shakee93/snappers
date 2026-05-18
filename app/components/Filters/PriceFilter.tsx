@@ -29,10 +29,20 @@ const PriceFilter = ({ }: BrandFilterProps) => {
             clamp(Number.isFinite(next[0]) ? next[0] : PRICE_RANGE[0], PRICE_RANGE[0], PRICE_RANGE[1]),
             clamp(Number.isFinite(next[1]) ? next[1] : PRICE_RANGE[1], PRICE_RANGE[0], PRICE_RANGE[1]),
         ];
-        if (clamped[0] > clamped[1]) clamped[0] = clamped[1];
+        // Swap rather than collapse so a typo (e.g. max=1000 while min=50000)
+        // doesn't silently rewrite the OTHER bound to the wrong value.
+        if (clamped[0] > clamped[1]) {
+            const tmp = clamped[0];
+            clamped[0] = clamped[1];
+            clamped[1] = tmp;
+        }
         setRangePrices(clamped);
         synPriceRange(clamped);
     };
+
+    const minBelowFloor = rangePrices[0] < PRICE_RANGE[0];
+    const maxBelowFloor = rangePrices[1] < PRICE_RANGE[0];
+    const minExceedsMax = !minBelowFloor && !maxBelowFloor && rangePrices[0] > rangePrices[1];
 
     const icon = <svg
         className="w-4 h-4"
@@ -106,7 +116,7 @@ const PriceFilter = ({ }: BrandFilterProps) => {
                                 min={PRICE_RANGE[0]}
                                 name="minPrice"
                                 id="minPrice"
-                                aria-invalid={rangePrices[0] < PRICE_RANGE[0]}
+                                aria-invalid={minBelowFloor || minExceedsMax}
                                 aria-describedby="minPrice-hint"
                                 className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
                                 value={rangePrices[0]}
@@ -115,11 +125,17 @@ const PriceFilter = ({ }: BrandFilterProps) => {
                                     setRangePrices([Number.isFinite(v) ? v : 0, rangePrices[1]]);
                                 }}
                                 onBlur={() => commitRange(rangePrices)}
+                                onKeyDown={e => { if (e.key === 'Enter') commitRange(rangePrices); }}
                             />
                         </div>
-                        {rangePrices[0] < PRICE_RANGE[0] && (
+                        {minBelowFloor && (
                             <p id="minPrice-hint" className="mt-1 text-xs text-red-600 dark:text-red-400">
                                 Minimum price is LKR {PRICE_RANGE[0].toLocaleString()}
+                            </p>
+                        )}
+                        {minExceedsMax && (
+                            <p id="minPrice-hint" className="mt-1 text-xs text-red-600 dark:text-red-400">
+                                Min price must be less than max
                             </p>
                         )}
                     </div>
@@ -140,7 +156,7 @@ const PriceFilter = ({ }: BrandFilterProps) => {
                                 min={PRICE_RANGE[0]}
                                 name="maxPrice"
                                 id="maxPrice"
-                                aria-invalid={rangePrices[1] < PRICE_RANGE[0]}
+                                aria-invalid={maxBelowFloor || minExceedsMax}
                                 aria-describedby="maxPrice-hint"
                                 className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
                                 value={rangePrices[1]}
@@ -149,9 +165,10 @@ const PriceFilter = ({ }: BrandFilterProps) => {
                                     setRangePrices([rangePrices[0], Number.isFinite(v) ? v : 0]);
                                 }}
                                 onBlur={() => commitRange(rangePrices)}
+                                onKeyDown={e => { if (e.key === 'Enter') commitRange(rangePrices); }}
                             />
                         </div>
-                        {rangePrices[1] < PRICE_RANGE[0] && (
+                        {maxBelowFloor && (
                             <p id="maxPrice-hint" className="mt-1 text-xs text-red-600 dark:text-red-400">
                                 Minimum price is LKR {PRICE_RANGE[0].toLocaleString()}
                             </p>

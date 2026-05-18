@@ -13,6 +13,7 @@ import { Brand, ProductCategory } from "@/graphql/types/graphql";
 import { useRefinementList } from "react-instantsearch";
 import InStockFilter from "./Filters/InStockFilter";
 import DynamicVariationFilters from "./Filters/DynamicVariationFilters";
+import { PRICE_RANGE } from "@/app/components/Filters/PriceFilter";
 
 interface TabFilterProps {
     categories?: ProductCategory[];
@@ -30,8 +31,6 @@ const DATA_sortOrderRadios = [
     { name: "Price Low - High", id: "rawPriceNumber(missing_values: last):asc" },
     { name: "Price High - Low", id: "rawPriceNumber(missing_values: last):desc" },
 ];
-
-const PRICE_RANGE = [500, 500000];
 
 const MobileFilterSheet = ({
     categories = [],
@@ -67,10 +66,19 @@ const MobileFilterSheet = ({
             clampPrice(Number.isFinite(next[0]) ? next[0] : PRICE_RANGE[0]),
             clampPrice(Number.isFinite(next[1]) ? next[1] : PRICE_RANGE[1]),
         ];
-        if (clamped[0] > clamped[1]) clamped[0] = clamped[1];
+        // Swap rather than collapse so a typo doesn't silently rewrite the
+        // other bound to the wrong value.
+        if (clamped[0] > clamped[1]) {
+            const tmp = clamped[0];
+            clamped[0] = clamped[1];
+            clamped[1] = tmp;
+        }
         setRangePrices(clamped);
         synPriceRange(clamped);
     };
+    const minBelowFloor = rangePrices[0] < PRICE_RANGE[0];
+    const maxBelowFloor = rangePrices[1] < PRICE_RANGE[0];
+    const minExceedsMax = !minBelowFloor && !maxBelowFloor && rangePrices[0] > rangePrices[1];
     const sortOrderStates = sidebar.sort || (sort ? "databaseId:desc" : "");
     const brandsState = sidebar.brands;
     const categoriesState = sidebar.categories;
@@ -474,7 +482,7 @@ const MobileFilterSheet = ({
                                                                 min={PRICE_RANGE[0]}
                                                                 name="minPrice"
                                                                 id="minPrice"
-                                                                aria-invalid={rangePrices[0] < PRICE_RANGE[0]}
+                                                                aria-invalid={minBelowFloor || minExceedsMax}
                                                                 aria-describedby="minPrice-mobile-hint"
                                                                 className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
                                                                 value={rangePrices[0]}
@@ -483,11 +491,17 @@ const MobileFilterSheet = ({
                                                                     setRangePrices([Number.isFinite(v) ? v : 0, rangePrices[1]]);
                                                                 }}
                                                                 onBlur={() => commitPriceRange(rangePrices)}
+                                                                onKeyDown={(e) => { if (e.key === 'Enter') commitPriceRange(rangePrices); }}
                                                             />
                                                         </div>
-                                                        {rangePrices[0] < PRICE_RANGE[0] && (
+                                                        {minBelowFloor && (
                                                             <p id="minPrice-mobile-hint" className="mt-1 text-xs text-red-600 dark:text-red-400">
                                                                 Minimum price is LKR {PRICE_RANGE[0].toLocaleString()}
+                                                            </p>
+                                                        )}
+                                                        {minExceedsMax && (
+                                                            <p id="minPrice-mobile-hint" className="mt-1 text-xs text-red-600 dark:text-red-400">
+                                                                Min price must be less than max
                                                             </p>
                                                         )}
                                                     </div>
@@ -508,7 +522,7 @@ const MobileFilterSheet = ({
                                                                 min={PRICE_RANGE[0]}
                                                                 name="maxPrice"
                                                                 id="maxPrice"
-                                                                aria-invalid={rangePrices[1] < PRICE_RANGE[0]}
+                                                                aria-invalid={maxBelowFloor || minExceedsMax}
                                                                 aria-describedby="maxPrice-mobile-hint"
                                                                 className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
                                                                 value={rangePrices[1]}
@@ -517,9 +531,10 @@ const MobileFilterSheet = ({
                                                                     setRangePrices([rangePrices[0], Number.isFinite(v) ? v : 0]);
                                                                 }}
                                                                 onBlur={() => commitPriceRange(rangePrices)}
+                                                                onKeyDown={(e) => { if (e.key === 'Enter') commitPriceRange(rangePrices); }}
                                                             />
                                                         </div>
-                                                        {rangePrices[1] < PRICE_RANGE[0] && (
+                                                        {maxBelowFloor && (
                                                             <p id="maxPrice-mobile-hint" className="mt-1 text-xs text-red-600 dark:text-red-400">
                                                                 Minimum price is LKR {PRICE_RANGE[0].toLocaleString()}
                                                             </p>
