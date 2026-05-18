@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useStore } from "@/store/store";
 import Slider from "rc-slider";
 
@@ -8,13 +8,30 @@ interface BrandFilterProps {
 
 export const PRICE_RANGE = [500, 500000];
 
+const clamp = (v: number, lo: number, hi: number) => Math.min(Math.max(v, lo), hi);
+
 const PriceFilter = ({ }: BrandFilterProps) => {
     const { synPriceRange, sidebar: { priceRange } } = useStore();
-    const [rangePrices, setRangePrices] = useState(priceRange || PRICE_RANGE);
+    const storeRange = priceRange && priceRange.length === 2 ? priceRange : PRICE_RANGE;
+    const [rangePrices, setRangePrices] = useState<number[]>(storeRange);
+
+    // Pull store updates (URL pre-fill, navigation reset, mobile sheet clear)
+    // back into local UI state. Compare by content so a same-value store
+    // re-render doesn't yank focus while the user is typing.
+    useEffect(() => {
+        setRangePrices(prev =>
+            prev[0] === storeRange[0] && prev[1] === storeRange[1] ? prev : storeRange,
+        );
+    }, [storeRange[0], storeRange[1]]);
 
     const commitRange = (next: number[]) => {
-        setRangePrices(next);
-        synPriceRange(next);
+        const clamped: number[] = [
+            clamp(Number.isFinite(next[0]) ? next[0] : PRICE_RANGE[0], PRICE_RANGE[0], PRICE_RANGE[1]),
+            clamp(Number.isFinite(next[1]) ? next[1] : PRICE_RANGE[1], PRICE_RANGE[0], PRICE_RANGE[1]),
+        ];
+        if (clamped[0] > clamped[1]) clamped[0] = clamped[1];
+        setRangePrices(clamped);
+        synPriceRange(clamped);
     };
 
     const icon = <svg
@@ -59,9 +76,12 @@ const PriceFilter = ({ }: BrandFilterProps) => {
                             min={PRICE_RANGE[0]}
                             max={PRICE_RANGE[1]}
                             step={1}
-                            defaultValue={[rangePrices[0], rangePrices[1]]}
+                            value={[rangePrices[0], rangePrices[1]]}
                             allowCross={false}
                             onChange={(_input: number | number[]) =>
+                                setRangePrices(_input as number[])
+                            }
+                            onChangeComplete={(_input: number | number[]) =>
                                 commitRange(_input as number[])
                             }
                         />
@@ -88,7 +108,11 @@ const PriceFilter = ({ }: BrandFilterProps) => {
                                 id="minPrice"
                                 className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
                                 value={rangePrices[0]}
-                                onChange={e => commitRange([parseInt(e.target.value) || PRICE_RANGE[0], rangePrices[1]])}
+                                onChange={e => {
+                                    const v = e.target.value === '' ? 0 : Number(e.target.value);
+                                    setRangePrices([Number.isFinite(v) ? v : 0, rangePrices[1]]);
+                                }}
+                                onBlur={() => commitRange(rangePrices)}
                             />
                         </div>
                     </div>
@@ -111,7 +135,11 @@ const PriceFilter = ({ }: BrandFilterProps) => {
                                 id="maxPrice"
                                 className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
                                 value={rangePrices[1]}
-                                onChange={e => commitRange([rangePrices[0], parseInt(e.target.value) || PRICE_RANGE[1]])}
+                                onChange={e => {
+                                    const v = e.target.value === '' ? 0 : Number(e.target.value);
+                                    setRangePrices([rangePrices[0], Number.isFinite(v) ? v : 0]);
+                                }}
+                                onBlur={() => commitRange(rangePrices)}
                             />
                         </div>
                     </div>

@@ -46,20 +46,6 @@ const variationsEq = (a: Record<string, string[]>, b: Record<string, string[]>) 
   });
 };
 
-const DelayedRender: React.FC<{ delay: number; children: React.ReactNode }> = ({ delay, children }) => {
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsVisible(true);
-    }, delay);
-
-    return () => clearTimeout(timer);
-  }, [delay]);
-
-  return isVisible ? <>{children}</> : null;
-};
-
 interface InstantSearchWrapperProps {
   search?: boolean;
   filters?: boolean;
@@ -142,12 +128,30 @@ const InstantSearchWrapper = ({
     setSearchMounted();
   }, []);
 
-  // Effective filter values: when the URL has a filter param we honor it
-  // directly. This way the SSR-rendered filter already matches a shared
-  // /collections/X?in_stock=true link — the server-issued search returns
-  // the right hits and the client doesn't have to re-search after the
-  // queueMicrotask sync below catches the store up to the URL.
+  // The URL precedence below is only needed for the very first render so the
+  // SSR-built filterQuery already reflects a shared-link's params before
+  // routeToState's queueMicrotask catches the store up. After that one frame
+  // the store is the source of truth — otherwise stale URL params mask
+  // subsequent user changes (slider drag, mobile sheet clear) because the URL
+  // doesn't update until stateToRoute fires from a UiState change, which
+  // priceRange/on_sale/in_stock don't trigger on their own.
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => {
+    setHydrated(true);
+  }, []);
+
   const effective = useMemo(() => {
+    if (hydrated) {
+      return {
+        brands: sidebar.brands,
+        categories: sidebar.categories,
+        priceRange: sidebar.priceRange,
+        on_sale: sidebar.on_sale,
+        in_stock: sidebar.in_stock,
+        variations: sidebar.variations,
+      };
+    }
+
     const brandsParam = searchParams.get('brands');
     const categoriesParam = searchParams.get('categories');
     const priceRangeParam = searchParams.get('priceRange');
@@ -175,7 +179,7 @@ const InstantSearchWrapper = ({
       in_stock: searchParams.has('in_stock') ? searchParams.get('in_stock') === 'true' : sidebar.in_stock,
       variations: hasUrlVariations ? urlVariations : sidebar.variations,
     };
-  }, [searchParams, sidebar]);
+  }, [hydrated, searchParams, sidebar]);
 
   // /deals reads its tab selection from `?filter=clearance,offers` so
   // we keep the deals page itself static (no SSR searchParams read) and
@@ -220,7 +224,6 @@ const InstantSearchWrapper = ({
           : null,
       effective.on_sale ? "onSale:true" : null,
       effective.in_stock ? "stockStatus:IN_STOCK && productTags.nodes.slug:!=pre-order" : null,
-      sidebar.out_of_stock ? "stockStatus:OUT_OF_STOCK" : null,
       effectiveDealTags && effectiveDealTags.length > 0
         ? `productTags.nodes.slug:[${effectiveDealTags.join(",")}]`
         : tag
@@ -394,7 +397,18 @@ const InstantSearchWrapper = ({
       });
     });
 
-    return { product: ui };
+    // Inject sortBy under the standard IS UiState key so useSortBy (which is
+    // what actually drives the Typesense virtual sort index) doesn't get its
+    // value wiped out when IS applies this routeToState return. Without this,
+    // refine() writes sortBy → routeToState returns UiState without sortBy →
+    // IS replaces UiState → useSortBy falls back to default → products revert
+    // to the default sort about a second after selection.
+    return {
+      product: {
+        ...ui,
+        sortBy: ui.sort ? `product/sort/${ui.sort}` : 'product',
+      },
+    };
   }, []);
 
   // Create reactive stateMapping that updates when sidebar changes
@@ -422,9 +436,18 @@ const InstantSearchWrapper = ({
             // wiped on the first click. router.push stays inside Next.js's
             // navigation pipeline so the URL update isn't reverted, and keeps
             // the browser back/forward buttons working across pagination.
+            //
+            // Skip writes when the target equals the current URL so the
+            // initial UiState→URL pass (which Next.js 16 rejects with "Router
+            // action dispatched before initialization") becomes a no-op
+            // instead of an error, while real navigations still go through
+            // synchronously — deferring real pushes to a microtask races with
+            // IS's internal state tracking and causes sort to bounce back.
             push(url: string) {
               const parsed = new URL(url, window.location.href);
               const target = parsed.pathname + parsed.search + parsed.hash;
+              const current = window.location.pathname + window.location.search + window.location.hash;
+              if (target === current) return;
               router.push(target, { scroll: false });
             },
           },
@@ -436,7 +459,7 @@ const InstantSearchWrapper = ({
         searchClient={typesenseInstantSearchAdapter.searchClient}
         indexName="product"
       >
-        {/* @ts-expect-error - filters prop is valid with Typesense adapter */}
+        {/* @ts-expect-error - filters is forwarded to the Typesense adapter as a searchParameter */}
         <Configure filters={filterQuery} hitsPerPage={hitsPerPage} />
         {/* <InstantSearchComponent
         searchClient={searchClient}
@@ -463,11 +486,7 @@ const InstantSearchWrapper = ({
           <div className='grid grid-cols-12 gap-4'>
 
             <div className={filters ? 'hidden lg:block lg:col-span-3' : 'hidden'}>
-              {typeof window !== 'undefined' && (
-                <DelayedRender delay={5000}>
-                  <SortInput />
-                </DelayedRender>
-              )}
+              <SortInput />
               {filters && (
                 <TabFilters
                   category={category}

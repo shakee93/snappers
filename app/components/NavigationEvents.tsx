@@ -19,18 +19,44 @@ const revalidationToast = (message: string, type: 'success' | 'error') => {
 export function NavigationEvents() {
     const pathname = usePathname()
     const searchParams = useSearchParams()
-    const { pushNavigation, setSearch, syncCategories, syncBrands, synPriceRange, clearVariations } = useStore()
+    const {
+        pushNavigation,
+        setSearch,
+        syncCategories,
+        syncBrands,
+        synPriceRange,
+        syncOnSale,
+        setInStock,
+        setSort,
+        clearVariations,
+    } = useStore()
 
     useEffect(() => {
         pushNavigation(pathname);
-        // Only reset filters when navigating to a completely different page, not when URL params change
+        // Reset all sidebar filters when navigating to a new pathname so each
+        // page starts from a clean slate. routeToState then re-applies any
+        // filters that the destination URL itself carries (e.g. shared links).
         setSearch('')
         syncCategories([])
         syncBrands([])
         synPriceRange(PRICE_RANGE)
+        syncOnSale(false)
+        setInStock(false)
+        setSort('')
         clearVariations()
 
-    }, [pathname, pushNavigation, setSearch, syncCategories, syncBrands, synPriceRange, clearVariations])
+    }, [
+        pathname,
+        pushNavigation,
+        setSearch,
+        syncCategories,
+        syncBrands,
+        synPriceRange,
+        syncOnSale,
+        setInStock,
+        setSort,
+        clearVariations,
+    ])
 
     useEffect(() => {
         // If 'q' is present as a search param, update the URL to use 'query' instead.

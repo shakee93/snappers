@@ -2,11 +2,10 @@ import React from "react";
 import { useStore } from "@/store/store";
 
 const InStockFilter = () => {
-    const { setInStock, setOutOfStock, sidebar: { in_stock } } = useStore();
+    const { setInStock, sidebar: { in_stock } } = useStore();
 
     const handleInStockChange = () => {
         setInStock(!in_stock);
-        setOutOfStock(false);
     };
 
     return (

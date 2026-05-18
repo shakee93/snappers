@@ -1,5 +1,5 @@
 import { Dialog, Transition } from "@headlessui/react";
-import React, { Fragment, useMemo, useState } from "react";
+import React, { Fragment, useEffect, useMemo, useState } from "react";
 import ButtonClose from "@/shared/ButtonClose/ButtonClose";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import { twMerge } from "tailwind-merge";
@@ -27,14 +27,8 @@ const DATA_sortOrderRadios = [
     { name: "Most Popular", id: "totalSales(missing_values: last):desc" },
     { name: "Best Rating", id: "reviewCount(missing_values: last):desc" },
     { name: "Newest", id: "databaseId:desc" },
-    {
-        name: "Price Low - High",
-        id: "rawPriceNumber(missing_values: last):asc",
-    },
-    {
-        name: "Price High - Low",
-        id: "rawPriceNumber(missing_values: last):desc",
-    },
+    { name: "Price Low - High", id: "rawPriceNumber(missing_values: last):asc" },
+    { name: "Price High - Low", id: "rawPriceNumber(missing_values: last):desc" },
 ];
 
 const PRICE_RANGE = [500, 500000];
@@ -56,12 +50,27 @@ const MobileFilterSheet = ({
         synPriceRange,
         syncOnSale,
         setInStock,
-        setOutOfStock,
         setSort,
     } = useStore();
 
     const isOnSale = sidebar.on_sale;
-    const rangePrices = sidebar.priceRange;
+    const storeRange = sidebar.priceRange && sidebar.priceRange.length === 2 ? sidebar.priceRange : PRICE_RANGE;
+    const [rangePrices, setRangePrices] = useState<number[]>(storeRange);
+    useEffect(() => {
+        setRangePrices(prev =>
+            prev[0] === storeRange[0] && prev[1] === storeRange[1] ? prev : storeRange,
+        );
+    }, [storeRange[0], storeRange[1]]);
+    const clampPrice = (v: number) => Math.min(Math.max(v, PRICE_RANGE[0]), PRICE_RANGE[1]);
+    const commitPriceRange = (next: number[]) => {
+        const clamped = [
+            clampPrice(Number.isFinite(next[0]) ? next[0] : PRICE_RANGE[0]),
+            clampPrice(Number.isFinite(next[1]) ? next[1] : PRICE_RANGE[1]),
+        ];
+        if (clamped[0] > clamped[1]) clamped[0] = clamped[1];
+        setRangePrices(clamped);
+        synPriceRange(clamped);
+    };
     const sortOrderStates = sidebar.sort || (sort ? "databaseId:desc" : "");
     const brandsState = sidebar.brands;
     const categoriesState = sidebar.categories;
@@ -124,7 +133,6 @@ const MobileFilterSheet = ({
         syncCategories([]);
         syncOnSale(false);
         setInStock(false);
-        setOutOfStock(false);
         setSort("");
         closeModalMoreFilter();
     };
@@ -401,7 +409,6 @@ const MobileFilterSheet = ({
                                                         }`}
                                                     onClick={() => {
                                                         setInStock(!inStock);
-                                                        setOutOfStock(false);
                                                     }}
                                                 >
                                                     <input
@@ -409,7 +416,6 @@ const MobileFilterSheet = ({
                                                         checked={inStock}
                                                         onChange={() => {
                                                             setInStock(!inStock);
-                                                            setOutOfStock(false);
                                                         }}
                                                         className="w-6 h-6 mr-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-sm bg-transparent
                                                         focus:ring-primary-500 focus:ring-action-primary"
@@ -438,10 +444,13 @@ const MobileFilterSheet = ({
                                                             width: 30,
                                                             marginTop: -13,
                                                         }}
-                                                        defaultValue={[rangePrices[0], rangePrices[1]]}
+                                                        value={[rangePrices[0], rangePrices[1]]}
                                                         allowCross={false}
                                                         onChange={(_input: number | number[]) =>
-                                                            synPriceRange(_input as number[])
+                                                            setRangePrices(_input as number[])
+                                                        }
+                                                        onChangeComplete={(_input: number | number[]) =>
+                                                            commitPriceRange(_input as number[])
                                                         }
                                                     />
                                                 </div>
@@ -467,12 +476,11 @@ const MobileFilterSheet = ({
                                                                 id="minPrice"
                                                                 className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
                                                                 value={rangePrices[0]}
-                                                                onChange={(e) =>
-                                                                    synPriceRange([
-                                                                        parseInt(e.target.value) || PRICE_RANGE[0],
-                                                                        rangePrices[1],
-                                                                    ])
-                                                                }
+                                                                onChange={(e) => {
+                                                                    const v = e.target.value === '' ? 0 : Number(e.target.value);
+                                                                    setRangePrices([Number.isFinite(v) ? v : 0, rangePrices[1]]);
+                                                                }}
+                                                                onBlur={() => commitPriceRange(rangePrices)}
                                                             />
                                                         </div>
                                                     </div>
@@ -495,12 +503,11 @@ const MobileFilterSheet = ({
                                                                 id="maxPrice"
                                                                 className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
                                                                 value={rangePrices[1]}
-                                                                onChange={(e) =>
-                                                                    synPriceRange([
-                                                                        rangePrices[0],
-                                                                        parseInt(e.target.value) || PRICE_RANGE[1],
-                                                                    ])
-                                                                }
+                                                                onChange={(e) => {
+                                                                    const v = e.target.value === '' ? 0 : Number(e.target.value);
+                                                                    setRangePrices([rangePrices[0], Number.isFinite(v) ? v : 0]);
+                                                                }}
+                                                                onBlur={() => commitPriceRange(rangePrices)}
                                                             />
                                                         </div>
                                                     </div>
