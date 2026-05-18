@@ -7,6 +7,10 @@ import HeaderContent from "./HeaderContent";
 import HeaderSearchResults from "@/app/components/globalComponents/HeaderSearchResults";
 import MobileNavLinks from "./MobileNavLinks";
 import MobileBottomNav from "@/app/components/globalComponents/MobileBottomNav";
+import {
+  ADD_TO_CART_DISABLED,
+  CHECKOUT_PAUSED_NOTICE,
+} from "@/lib/addToCartDisabled";
 
 interface HeaderClientWrapperProps {
   productCategories: ProductCategory[];
@@ -84,6 +88,13 @@ const HeaderClientWrapper = ({
           flex flex-col justify-between bg-transparent z-[100] transition-all duration-100 md:border-b
         `}
       >
+        {/* Checkout-paused notice - always visible (does not hide on scroll) */}
+        {ADD_TO_CART_DISABLED && (
+          <div className="bg-amber-500 text-slate-900 text-center text-xs md:text-sm font-semibold px-3 py-2 leading-snug">
+            {CHECKOUT_PAUSED_NOTICE}
+          </div>
+        )}
+
         {/* TopBarPromotion - hides on scroll */}
         <div
           style={{
@@ -102,7 +113,9 @@ const HeaderClientWrapper = ({
       </header>
 
       {/* Add padding to content when header is sticky */}
-      {isHeaderSticky && <div className="h-16"></div>}
+      {isHeaderSticky && (
+        <div className={ADD_TO_CART_DISABLED ? "h-24" : "h-16"}></div>
+      )}
 
       <MobileNavLinks />
 
