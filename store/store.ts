@@ -16,7 +16,6 @@ type State = {
         on_sale: boolean,
         sort: string
         in_stock: boolean
-        out_of_stock: boolean
         variations: Record<string, string[]>
     }
     product: {
@@ -32,7 +31,6 @@ type Actions = {
     syncCategories: (categories: number[]) => void
     syncOnSale: (onSale: boolean) => void
     setInStock: (onSale: boolean) => void
-    setOutOfStock: (outOfStock: boolean) => void
     toggleMobileMenu: (onSale?: boolean) => void
     setSort: (sort: string) => void
     setSearch: (search: string) => void
@@ -66,7 +64,6 @@ export const useStore = create<State & Actions>((set, get) => ({
         on_sale: false,
         sort: "",
         in_stock: false,
-        out_of_stock: false,
         variations: {}
     },
     searchMounted: false,
@@ -122,13 +119,6 @@ export const useStore = create<State & Actions>((set, get) => ({
         sidebar: {
             ...state.sidebar,
             in_stock
-        },
-    })),
-    setOutOfStock: (out_of_stock: boolean) => set((state) => ({
-        ...state,
-        sidebar: {
-            ...state.sidebar,
-            out_of_stock
         },
     })),
     syncOnSale: (on_sale: boolean) => set((state) => ({

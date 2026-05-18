@@ -19,18 +19,51 @@ const revalidationToast = (message: string, type: 'success' | 'error') => {
 export function NavigationEvents() {
     const pathname = usePathname()
     const searchParams = useSearchParams()
-    const { pushNavigation, setSearch, syncCategories, syncBrands, synPriceRange, clearVariations } = useStore()
+    const {
+        pushNavigation,
+        setSearch,
+        syncCategories,
+        syncBrands,
+        synPriceRange,
+        syncOnSale,
+        setInStock,
+        setSort,
+        clearVariations,
+    } = useStore()
 
     useEffect(() => {
         pushNavigation(pathname);
-        // Only reset filters when navigating to a completely different page, not when URL params change
         setSearch('')
-        syncCategories([])
-        syncBrands([])
-        synPriceRange(PRICE_RANGE)
-        clearVariations()
 
-    }, [pathname, pushNavigation, setSearch, syncCategories, syncBrands, synPriceRange, clearVariations])
+        // Only clear filters the destination URL does NOT carry. routeToState
+        // re-applies URL-carried filters via a microtask whose order vs this
+        // effect isn't guaranteed by InstantSearchNext — making the reset
+        // URL-aware removes the race entirely (per PR #107 review).
+        if (!searchParams.get('categories')) syncCategories([])
+        if (!searchParams.get('brands')) syncBrands([])
+        if (!searchParams.get('priceRange')) synPriceRange(PRICE_RANGE)
+        if (searchParams.get('on_sale') !== 'true') syncOnSale(false)
+        if (searchParams.get('in_stock') !== 'true') setInStock(false)
+        if (!searchParams.get('sort')) setSort('')
+
+        let hasVariations = false
+        searchParams.forEach((_, key) => {
+            if (key.startsWith('variation_')) hasVariations = true
+        })
+        if (!hasVariations) clearVariations()
+    }, [
+        pathname,
+        searchParams,
+        pushNavigation,
+        setSearch,
+        syncCategories,
+        syncBrands,
+        synPriceRange,
+        syncOnSale,
+        setInStock,
+        setSort,
+        clearVariations,
+    ])
 
     useEffect(() => {
         // If 'q' is present as a search param, update the URL to use 'query' instead.

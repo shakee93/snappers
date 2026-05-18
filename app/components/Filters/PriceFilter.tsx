@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useStore } from "@/store/store";
 import Slider from "rc-slider";
 
@@ -8,14 +8,41 @@ interface BrandFilterProps {
 
 export const PRICE_RANGE = [500, 500000];
 
+const clamp = (v: number, lo: number, hi: number) => Math.min(Math.max(v, lo), hi);
+
 const PriceFilter = ({ }: BrandFilterProps) => {
     const { synPriceRange, sidebar: { priceRange } } = useStore();
-    const [rangePrices, setRangePrices] = useState(priceRange || PRICE_RANGE);
+    const storeRange = priceRange && priceRange.length === 2 ? priceRange : PRICE_RANGE;
+    const [rangePrices, setRangePrices] = useState<number[]>(storeRange);
+
+    // Pull store updates (URL pre-fill, navigation reset, mobile sheet clear)
+    // back into local UI state. Compare by content so a same-value store
+    // re-render doesn't yank focus while the user is typing.
+    useEffect(() => {
+        setRangePrices(prev =>
+            prev[0] === storeRange[0] && prev[1] === storeRange[1] ? prev : storeRange,
+        );
+    }, [storeRange[0], storeRange[1]]);
 
     const commitRange = (next: number[]) => {
-        setRangePrices(next);
-        synPriceRange(next);
+        const clamped: number[] = [
+            clamp(Number.isFinite(next[0]) ? next[0] : PRICE_RANGE[0], PRICE_RANGE[0], PRICE_RANGE[1]),
+            clamp(Number.isFinite(next[1]) ? next[1] : PRICE_RANGE[1], PRICE_RANGE[0], PRICE_RANGE[1]),
+        ];
+        // Swap rather than collapse so a typo (e.g. max=1000 while min=50000)
+        // doesn't silently rewrite the OTHER bound to the wrong value.
+        if (clamped[0] > clamped[1]) {
+            const tmp = clamped[0];
+            clamped[0] = clamped[1];
+            clamped[1] = tmp;
+        }
+        setRangePrices(clamped);
+        synPriceRange(clamped);
     };
+
+    const minBelowFloor = rangePrices[0] < PRICE_RANGE[0];
+    const maxBelowFloor = rangePrices[1] < PRICE_RANGE[0];
+    const minExceedsMax = !minBelowFloor && !maxBelowFloor && rangePrices[0] > rangePrices[1];
 
     const icon = <svg
         className="w-4 h-4"
@@ -59,9 +86,12 @@ const PriceFilter = ({ }: BrandFilterProps) => {
                             min={PRICE_RANGE[0]}
                             max={PRICE_RANGE[1]}
                             step={1}
-                            defaultValue={[rangePrices[0], rangePrices[1]]}
+                            value={[rangePrices[0], rangePrices[1]]}
                             allowCross={false}
                             onChange={(_input: number | number[]) =>
+                                setRangePrices(_input as number[])
+                            }
+                            onChangeComplete={(_input: number | number[]) =>
                                 commitRange(_input as number[])
                             }
                         />
@@ -86,11 +116,28 @@ const PriceFilter = ({ }: BrandFilterProps) => {
                                 min={PRICE_RANGE[0]}
                                 name="minPrice"
                                 id="minPrice"
+                                aria-invalid={minBelowFloor || minExceedsMax}
+                                aria-describedby="minPrice-hint"
                                 className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
                                 value={rangePrices[0]}
-                                onChange={e => commitRange([parseInt(e.target.value) || PRICE_RANGE[0], rangePrices[1]])}
+                                onChange={e => {
+                                    const v = e.target.value === '' ? 0 : Number(e.target.value);
+                                    setRangePrices([Number.isFinite(v) ? v : 0, rangePrices[1]]);
+                                }}
+                                onBlur={() => commitRange(rangePrices)}
+                                onKeyDown={e => { if (e.key === 'Enter') commitRange(rangePrices); }}
                             />
                         </div>
+                        {minBelowFloor && (
+                            <p id="minPrice-hint" className="mt-1 text-xs text-red-600 dark:text-red-400">
+                                Minimum price is LKR {PRICE_RANGE[0].toLocaleString()}
+                            </p>
+                        )}
+                        {minExceedsMax && (
+                            <p id="minPrice-hint" className="mt-1 text-xs text-red-600 dark:text-red-400">
+                                Min price must be less than max
+                            </p>
+                        )}
                     </div>
                     <div>
                         <label
@@ -109,11 +156,23 @@ const PriceFilter = ({ }: BrandFilterProps) => {
                                 min={PRICE_RANGE[0]}
                                 name="maxPrice"
                                 id="maxPrice"
+                                aria-invalid={maxBelowFloor || minExceedsMax}
+                                aria-describedby="maxPrice-hint"
                                 className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
                                 value={rangePrices[1]}
-                                onChange={e => commitRange([rangePrices[0], parseInt(e.target.value) || PRICE_RANGE[1]])}
+                                onChange={e => {
+                                    const v = e.target.value === '' ? 0 : Number(e.target.value);
+                                    setRangePrices([rangePrices[0], Number.isFinite(v) ? v : 0]);
+                                }}
+                                onBlur={() => commitRange(rangePrices)}
+                                onKeyDown={e => { if (e.key === 'Enter') commitRange(rangePrices); }}
                             />
                         </div>
+                        {maxBelowFloor && (
+                            <p id="maxPrice-hint" className="mt-1 text-xs text-red-600 dark:text-red-400">
+                                Minimum price is LKR {PRICE_RANGE[0].toLocaleString()}
+                            </p>
+                        )}
                     </div>
                 </div>
             </div>

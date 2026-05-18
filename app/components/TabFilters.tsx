@@ -44,14 +44,14 @@ const TabFilters = ({
     return (
         <div className="flex flex-col gap-0 lg:gap-3 lg:space-x-4">
             <div className="hidden lg:flex flex-col justify-start items-start flex-1 space-y-3">
+                <SortOrderFilter sorts={sort} />
                 {dealsType ? <DealsTypeFilter activeTypes={dealsType} /> : null}
                 <InStockFilter />
+                <OnSaleFilter />
                 {!category && <CategoryFilter categories={categories} />}
                 {!brand && <BrandFilter brands={brands} />}
-                <DynamicVariationFilters />
                 <PriceFilter />
-                <OnSaleFilter />
-                <SortOrderFilter sorts={sort} />
+                <DynamicVariationFilters />
             </div>
         </div>
     );
