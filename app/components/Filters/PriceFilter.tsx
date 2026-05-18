@@ -106,6 +106,8 @@ const PriceFilter = ({ }: BrandFilterProps) => {
                                 min={PRICE_RANGE[0]}
                                 name="minPrice"
                                 id="minPrice"
+                                aria-invalid={rangePrices[0] < PRICE_RANGE[0]}
+                                aria-describedby="minPrice-hint"
                                 className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
                                 value={rangePrices[0]}
                                 onChange={e => {
@@ -115,6 +117,11 @@ const PriceFilter = ({ }: BrandFilterProps) => {
                                 onBlur={() => commitRange(rangePrices)}
                             />
                         </div>
+                        {rangePrices[0] < PRICE_RANGE[0] && (
+                            <p id="minPrice-hint" className="mt-1 text-xs text-red-600 dark:text-red-400">
+                                Minimum price is LKR {PRICE_RANGE[0].toLocaleString()}
+                            </p>
+                        )}
                     </div>
                     <div>
                         <label
@@ -133,6 +140,8 @@ const PriceFilter = ({ }: BrandFilterProps) => {
                                 min={PRICE_RANGE[0]}
                                 name="maxPrice"
                                 id="maxPrice"
+                                aria-invalid={rangePrices[1] < PRICE_RANGE[0]}
+                                aria-describedby="maxPrice-hint"
                                 className="block w-32 pr-10 pl-4 sm:text-sm border-neutral-200 dark:border-neutral-700 rounded-full bg-transparent"
                                 value={rangePrices[1]}
                                 onChange={e => {
@@ -142,6 +151,11 @@ const PriceFilter = ({ }: BrandFilterProps) => {
                                 onBlur={() => commitRange(rangePrices)}
                             />
                         </div>
+                        {rangePrices[1] < PRICE_RANGE[0] && (
+                            <p id="maxPrice-hint" className="mt-1 text-xs text-red-600 dark:text-red-400">
+                                Minimum price is LKR {PRICE_RANGE[0].toLocaleString()}
+                            </p>
+                        )}
                     </div>
                 </div>
             </div>
