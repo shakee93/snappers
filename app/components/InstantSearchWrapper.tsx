@@ -6,7 +6,7 @@ import ProductGridInstant from "@/app/components/ProductGridInstant";
 import SearchInput from "@/app/components/SearchInput";
 import TabFilters from "@/app/components/TabFilters";
 import { Brand, ProductCategory } from "@/graphql/types/graphql";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useStore } from "@/store/store";
 import { PRICE_RANGE } from "@/app/components/Filters/PriceFilter";
 import SortInput from "@/app/components/SortInput";
@@ -15,6 +15,8 @@ import MobileFilterSheet from "@/app/components/MobileFilterSheet";
 import { UiState } from "instantsearch.js";
 import { useSearchParams, useRouter } from "next/navigation";
 import { HIDDEN_PRODUCT_SLUGS } from "@/lib/hidden-products";
+import { isHiddenVariationAttribute } from "@/lib/hidden-variation-attributes";
+import { SORT_PRICE_ASC_ID } from "@/lib/sortOrders";
 import { DealFilterType, DealTagSlug, DEAL_FILTER_TO_TAG, VALID_DEAL_FILTER_TYPES } from "@/lib/dealFilters";
 
 type CustomUiState = UiState & {
@@ -203,12 +205,16 @@ const InstantSearchWrapper = ({
   }, [searchParams, dealTags]);
 
   const getFilterQuery: () => string = () => {
+    // `rawPrice` is an array of all variation prices, so a range on it matches
+    // when ANY variation falls in range — that bled in Rs 9,900 products when
+    // the user picked 10,000–50,000. `rawPriceNumber` is the single canonical
+    // price (the same field sort uses), so the range bound is strict.
     const f = [
       HIDDEN_PRODUCT_SLUGS.size > 0
         ? Array.from(HIDDEN_PRODUCT_SLUGS).map(s => `slug:!=${s}`).join(" && ")
         : null,
       effective.priceRange.join("") !== PRICE_RANGE.join("")
-        ? `rawPrice:[${effective.priceRange[0]}..${effective.priceRange[1]}]`
+        ? `rawPriceNumber:[${effective.priceRange[0]}..${effective.priceRange[1]}]`
         : null,
       category
         ? `productCategories.edges.node.databaseId:${category.databaseId}`
@@ -229,11 +235,18 @@ const InstantSearchWrapper = ({
         : tag
           ? `productTags.nodes.slug:${tag}`
           : null,
+      // When sorting Price Low → High, exclude products with no/zero raw price
+      // so unpriced records (Rs 0.00) don't bubble to the top of the list.
+      // Exact-equality against the radio's id so a future tiebreaker added to
+      // the sort string doesn't accidentally trip this filter.
+      sidebar.sort === SORT_PRICE_ASC_ID ? "rawPriceNumber:>0" : null,
     ];
 
-    // Add variation filters
+    // Add variation filters, but skip attributes flagged as hidden so a
+    // stale URL like `?variation_pa_colour=black` doesn't silently filter
+    // products through a taxonomy we removed from the UI.
     Object.entries(effective.variations).forEach(([attribute, values]) => {
-      if (values.length > 0) {
+      if (values.length > 0 && !isHiddenVariationAttribute(attribute)) {
         f.push(`variation_facets.${attribute}:[${values.join(",")}]`);
       }
     });
@@ -257,13 +270,22 @@ const InstantSearchWrapper = ({
   }, [search]);
 
   // Map UiState → URL. Reads the live Zustand store (where filter changes
-  // land); when the store is still at default, falls back to parsing the
-  // current window.location.search directly. We can't trust uiState as the
-  // fallback because react-instantsearch normalises UiState through widget
-  // connectors and drops custom keys (categories, brands, …) that no
-  // widget reads — without the URL fallback, the initial-mount race where
-  // stateToRoute fires before our queueMicrotask sync would write an
-  // empty params object and strip a shared-link URL like ?brands=1625.
+  // land); when the store is still at default AND we haven't completed the
+  // first routeToState microtask yet, falls back to parsing the current
+  // window.location.search directly. We can't trust uiState as the fallback
+  // because react-instantsearch normalises UiState through widget connectors
+  // and drops custom keys (categories, brands, …) that no widget reads —
+  // without the URL fallback, the initial-mount race where stateToRoute
+  // fires before our queueMicrotask sync would write an empty params object
+  // and strip a shared-link URL like ?brands=1625.
+  //
+  // The `storeHydratedRef` gate is load-bearing: once routeToState has
+  // populated the store from the URL (or the first user action lands in the
+  // store), an empty/false value means the user CLEARED that filter — re-
+  // injecting from URL at that point would silently re-enable filters
+  // (e.g. unchecking On Sale, then selecting a category would re-write
+  // ?on_sale=true into the URL because it lingered there).
+  const storeHydratedRef = useRef(false);
   const stateToRoute = useCallback((uiState: CustomUiState) => {
     const _sidebar = useStore.getState().sidebar;
     const urlParams = typeof window !== 'undefined'
@@ -272,17 +294,18 @@ const InstantSearchWrapper = ({
     const fromUrl = (key: string): string | null => urlParams?.get(key) ?? null;
     const parseNumList = (s: string | null) =>
       s ? s.split(',').filter(Boolean).map(Number) : [];
+    const allowUrlFallback = !storeHydratedRef.current;
 
     const brands = _sidebar.brands.length > 0
       ? _sidebar.brands
-      : parseNumList(fromUrl('brands'));
+      : allowUrlFallback ? parseNumList(fromUrl('brands')) : [];
     const categories = _sidebar.categories.length > 0
       ? _sidebar.categories
-      : parseNumList(fromUrl('categories'));
+      : allowUrlFallback ? parseNumList(fromUrl('categories')) : [];
 
     const storePriceCustom = _sidebar.priceRange.join('') !== PRICE_RANGE.join('');
     let priceRange: number[] | null = storePriceCustom ? _sidebar.priceRange : null;
-    if (!priceRange) {
+    if (!priceRange && allowUrlFallback) {
       const p = fromUrl('priceRange');
       if (p) {
         const r = p.split(',').filter(Boolean).map(Number);
@@ -290,12 +313,12 @@ const InstantSearchWrapper = ({
       }
     }
 
-    const on_sale = _sidebar.on_sale || fromUrl('on_sale') === 'true';
-    const in_stock = _sidebar.in_stock || fromUrl('in_stock') === 'true';
-    const sort = _sidebar.sort || fromUrl('sort') || '';
+    const on_sale = _sidebar.on_sale || (allowUrlFallback && fromUrl('on_sale') === 'true');
+    const in_stock = _sidebar.in_stock || (allowUrlFallback && fromUrl('in_stock') === 'true');
+    const sort = _sidebar.sort || (allowUrlFallback ? fromUrl('sort') || '' : '');
 
     let variationsSource: Record<string, string[]> = _sidebar.variations;
-    if (Object.keys(variationsSource).length === 0 && urlParams) {
+    if (Object.keys(variationsSource).length === 0 && urlParams && allowUrlFallback) {
       const fromUrlVars: Record<string, string[]> = {};
       urlParams.forEach((value, key) => {
         if (key.startsWith('variation_') && value) {
@@ -395,6 +418,12 @@ const InstantSearchWrapper = ({
           },
         };
       });
+      // Store now mirrors the URL — stateToRoute can stop falling back to
+      // window.location.search and instead trust the store as the source of
+      // truth. Without this, clearing a filter (e.g. unchecking On Sale) and
+      // then changing any other filter would re-inject the cleared param
+      // from the URL it hasn't yet been written out of.
+      storeHydratedRef.current = true;
     });
 
     // Inject sortBy under the standard IS UiState key so useSortBy (which is

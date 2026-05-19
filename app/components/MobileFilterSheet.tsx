@@ -14,6 +14,7 @@ import { useRefinementList } from "react-instantsearch";
 import InStockFilter from "./Filters/InStockFilter";
 import DynamicVariationFilters from "./Filters/DynamicVariationFilters";
 import { PRICE_RANGE } from "@/app/components/Filters/PriceFilter";
+import { SORT_ORDER_OPTIONS } from "@/lib/sortOrders";
 
 interface TabFilterProps {
     categories?: ProductCategory[];
@@ -22,15 +23,6 @@ interface TabFilterProps {
     brand?: Brand;
     sort?: Boolean;
 }
-
-const DATA_sortOrderRadios = [
-    { name: "Name", id: "name:asc" },
-    { name: "Most Popular", id: "totalSales(missing_values: last):desc" },
-    { name: "Best Rating", id: "reviewCount(missing_values: last):desc" },
-    { name: "Newest", id: "databaseId:desc" },
-    { name: "Price Low - High", id: "rawPriceNumber(missing_values: last):asc" },
-    { name: "Price High - Low", id: "rawPriceNumber(missing_values: last):desc" },
-];
 
 const MobileFilterSheet = ({
     categories = [],
@@ -447,11 +439,11 @@ const MobileFilterSheet = ({
                                                         min={PRICE_RANGE[0]}
                                                         max={PRICE_RANGE[1]}
                                                         step={1}
-                                                        handleStyle={{
-                                                            height: 30,
-                                                            width: 30,
-                                                            marginTop: -13,
-                                                        }}
+                                                        trackStyle={[{ backgroundColor: "var(--c-primary-500)" }]}
+                                                        handleStyle={[
+                                                            { height: 30, width: 30, marginTop: -13, borderColor: "var(--c-primary-500)", opacity: 1 },
+                                                            { height: 30, width: 30, marginTop: -13, borderColor: "var(--c-primary-500)", opacity: 1 },
+                                                        ]}
                                                         value={[rangePrices[0], rangePrices[1]]}
                                                         allowCross={false}
                                                         onChange={(_input: number | number[]) =>
@@ -548,7 +540,7 @@ const MobileFilterSheet = ({
                                             <h3 className="text-md font-medium">Sort Order</h3>
                                             <div className="mt-6 relative ">
                                                 <div className="relative flex flex-col space-y-3">
-                                                    {DATA_sortOrderRadios.map((item) => (
+                                                    {SORT_ORDER_OPTIONS.map((item) => (
                                                         <Radio
                                                             id={item.id}
                                                             key={item.id}

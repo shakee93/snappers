@@ -46,19 +46,19 @@ const CategoryFilter = ({ categories }: CategoryFilterProps) => {
     // URL synchronization is now handled by InstantSearch routing
     // No need for manual URL manipulation
 
+    // Refresh the facet snapshot whenever no category is selected, so other
+    // filters (in_stock, on_sale, brand, price, variations) can update the
+    // "All Categories" total and per-category counts. Once a category is
+    // selected we freeze the snapshot so the unselected categories don't all
+    // collapse to (0) — they're filtered out of the active result set by the
+    // category clause, but the sidebar should still show how many items the
+    // user could switch to. The search page is the exception: there we want
+    // counts to follow the query live even with categories selected.
     useEffect(() => {
-        if (firstCategoryFacets.length === 0) {
-            setFirstCategoryFacets(categoriesFacet)
-        }
-    }, [categoriesFacet, brand])
-
-    useEffect(() => {
-        if (search.length === 0) {
-            // Do nothing
-        } else {
+        if (catState.length === 0 || search.length > 0) {
             setFirstCategoryFacets(categoriesFacet);
         }
-    }, [categoriesFacet, search])
+    }, [categoriesFacet, catState.length, search])
 
     const handleChangeCategories = useCallback(
         (checked: boolean, name: number) => {

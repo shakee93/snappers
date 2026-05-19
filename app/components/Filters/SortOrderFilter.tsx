@@ -1,15 +1,7 @@
 import React from "react";
 import { useStore } from "@/store/store";
 import Radio from "@/shared/Radio/Radio";
-
-const DATA_sortOrderRadios = [
-    { name: "Name", id: "name:asc" },
-    { name: "Most Popular", id: "totalSales(missing_values: last):desc" },
-    { name: "Best Rating", id: "reviewCount(missing_values: last):desc" },
-    { name: "Newest", id: "databaseId:desc" },
-    { name: "Price Low - High", id: "rawPriceNumber(missing_values: last):asc" },
-    { name: "Price High - Low", id: "rawPriceNumber(missing_values: last):desc" },
-];
+import { SORT_ORDER_OPTIONS } from "@/lib/sortOrders";
 
 const SortOrderFilter = ({ sorts }: { sorts: any }) => {
     const { setSort, sidebar: { sort } } = useStore();
@@ -61,7 +53,7 @@ const SortOrderFilter = ({ sorts }: { sorts: any }) => {
         <div className="overflow-hidden rounded-xl w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
             <div className="relative flex flex-col px-4 py-4 w-full space-y-2">
                 <span className="font-medium text-sm">Sort By</span>
-                {DATA_sortOrderRadios.map((item) => (
+                {SORT_ORDER_OPTIONS.map((item) => (
                     <Radio
                         id={item.id}
                         key={item.id}

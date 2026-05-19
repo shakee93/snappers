@@ -40,6 +40,7 @@ import {
   mergeProductMetaForBogo,
   normalizeBogoConfig,
 } from "@/lib/bogo";
+import { parsePriceString, resolveProductSale } from "@/lib/productSale";
 
 export interface ProductCardProps {
   className?: string;
@@ -223,9 +224,14 @@ const ProductCard: FC<ProductCardProps> = ({
     }
   };
 
-  const parsePrice = (priceString: any) => {
-    return parseFloat(priceString?.replace(/[^\d.]/g, ""));
-  };
+  // Resolved sale used by the % OFF badge. Returns null when no in-stock
+  // variation has a discount that rounds above 0%; that null also drives
+  // the On-Sale post-filter in ProductGridInstant so a card without a
+  // visible discount can't render under the On Sale filter at all.
+  const saleDiscount = useMemo(
+    () => resolveProductSale({ type, salePrice, regularPrice, variations }),
+    [type, salePrice, regularPrice, variations]
+  );
 
   // Compute the absolute top offset for the free-shipping badge so it never
   // overlaps the BOGO, Sold Out, or Sale badges above it.
@@ -233,14 +239,12 @@ const ProductCard: FC<ProductCardProps> = ({
     if (!isFreeShippingProduct) return null;
     const inStock = stockStatus === "IN_STOCK";
     const hasBogo = bogo.isBogoEnabled;
-    const sale = parsePrice(salePrice);
-    const regular = parsePrice(regularPrice);
-    const hasSale = inStock && sale > 0 && regular > 0 && sale < regular;
+    const hasSale = inStock && !!saleDiscount;
     if (!inStock) return hasBogo ? "top-20" : "top-12";
     if (hasBogo && hasSale) return "top-20";
     if (hasBogo || hasSale) return "top-12";
     return "top-4";
-  }, [isFreeShippingProduct, stockStatus, bogo.isBogoEnabled, salePrice, regularPrice]);
+  }, [isFreeShippingProduct, stockStatus, bogo.isBogoEnabled, saleDiscount]);
 
   // Calculate the lowest and highest prices among in-stock variations
   let lowestPrice = price;
@@ -263,13 +267,13 @@ const ProductCard: FC<ProductCardProps> = ({
     if (inStockVariations.length > 0) {
       const lowestPriceVariation = inStockVariations.reduce(
         (prev: any, curr: any) => {
-          return parsePrice(curr.price) < parsePrice(prev.price) ? curr : prev;
+          return parsePriceString(curr.price) < parsePriceString(prev.price) ? curr : prev;
         }
       );
 
       const lowestSalePriceVariation = inStockVariations.reduce(
         (prev: any, curr: any) => {
-          return parsePrice(curr.regularPrice) < parsePrice(prev.regularPrice)
+          return parsePriceString(curr.regularPrice) < parsePriceString(prev.regularPrice)
             ? curr
             : prev;
         }
@@ -352,20 +356,10 @@ const ProductCard: FC<ProductCardProps> = ({
       data-nc-id="ProductCard"
     >
       {/* Sale Badge - Outside image container */}
-      {stockStatus === "IN_STOCK" && (
-        (() => {
-          if ((parsePrice(salePrice) > 0 && parsePrice(regularPrice) > 0) && parsePrice(salePrice) < parsePrice(regularPrice)) {
-            let rawDiscount =
-              ((parsePrice(regularPrice) - parsePrice(salePrice)) / parsePrice(regularPrice)) * 100;
-            let roundedDiscount = Math.round(rawDiscount / 5) * 5;
-            return (
-              <div className={`absolute left-0 z-10 cursor-pointer bg-green-600 w-fit font-normal text-xs text-white px-3 py-1.5 rounded-r-full shadow-md ${bogo.isBogoEnabled ? "top-12" : "top-4"}`}>
-                {roundedDiscount}% OFF!
-              </div>
-            );
-          }
-          return null;
-        })()
+      {stockStatus === "IN_STOCK" && saleDiscount && (
+        <div className={`absolute left-0 z-10 cursor-pointer bg-green-600 w-fit font-normal text-xs text-white px-3 py-1.5 rounded-r-full shadow-md ${bogo.isBogoEnabled ? "top-12" : "top-4"}`}>
+          {saleDiscount.roundedPercent}% OFF!
+        </div>
       )}
       {stockStatus !== "IN_STOCK" && (
         <div className="absolute left-0 top-4 z-10 cursor-pointer bg-red-600 w-fit font-normal text-xs text-white px-3 py-1.5 rounded-r-full shadow-md">

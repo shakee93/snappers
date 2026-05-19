@@ -12,6 +12,7 @@ import Image from "next/image";
 import NotFound from "@/public/not_found.svg";
 import ProductCardLoading from "@/components/Loading/ProductCardLoading";
 import { filterHiddenProducts } from "@/lib/hidden-products";
+import { resolveProductSale, type SaleResolvableProduct } from "@/lib/productSale";
 
 interface ProductGridProps {
   products?: { node: Product }[];
@@ -32,7 +33,7 @@ const ProductGridInstant = ({
 }: ProductGridProps) => {
   const { hits, results } = useHits();
   const { status: statusState } = useInstantSearch();
-  const { setSearchStatus, search, search_status, navigation } = useStore();
+  const { setSearchStatus, search, search_status, navigation, sidebar } = useStore();
 
   const bogoDatabaseIds = useMemo(() => {
     const s = new Set<number>();
@@ -63,10 +64,25 @@ const ProductGridInstant = ({
     return acc;
   }, [bogoBatchData]);
 
-  const visibleHits = useMemo(
-    () => filterHiddenProducts(hits as Array<{ slug?: string | null }>),
-    [hits]
-  );
+  // When the On Sale filter is active, Typesense returns every product whose
+  // `onSale` flag is true — but that flag stays true even after the last
+  // in-stock variation discount expires, so products like Sony WH-1000XM5
+  // and Apple AirPods Max leak in with no visible % OFF. Post-filter on the
+  // same discount-resolution the card uses so the grid only shows products
+  // that would actually render a badge. (Backend WP→Typesense sync needs to
+  // recompute `onSale` from live variation prices to fix at the root.)
+  //
+  // Known tradeoff (QA): `results.nbHits` / `results.nbPages` are pre-filter,
+  // so an On-Sale page can render fewer than `hitsPerPage` cards, and in the
+  // worst case the empty state can show for a single page while later pages
+  // still have results. Acceptable while the backend `onSale` flag is mostly
+  // correct (this is cleanup for stragglers); the WP→Typesense sync fix is
+  // the long-term resolution.
+  const visibleHits = useMemo(() => {
+    const filtered = filterHiddenProducts(hits as Array<{ slug?: string | null }>);
+    if (!sidebar.on_sale) return filtered;
+    return filtered.filter((hit) => resolveProductSale(hit as SaleResolvableProduct) !== null);
+  }, [hits, sidebar.on_sale]);
 
   const grid = 8;
 

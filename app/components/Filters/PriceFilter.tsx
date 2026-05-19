@@ -88,6 +88,11 @@ const PriceFilter = ({ }: BrandFilterProps) => {
                             step={1}
                             value={[rangePrices[0], rangePrices[1]]}
                             allowCross={false}
+                            trackStyle={[{ backgroundColor: "var(--c-primary-500)" }]}
+                            handleStyle={[
+                                { borderColor: "var(--c-primary-500)", opacity: 1 },
+                                { borderColor: "var(--c-primary-500)", opacity: 1 },
+                            ]}
                             onChange={(_input: number | number[]) =>
                                 setRangePrices(_input as number[])
                             }
