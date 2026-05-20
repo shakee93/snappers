@@ -12,6 +12,43 @@ import { NextRequest, NextResponse } from "next/server";
 // upstream WP slugs; this is the safety net.
 const ASCII_PRINTABLE = /^[\x20-\x7E]*$/;
 
+// Paths that fall through to the dynamic `/[brand]` route, which calls
+// notFound(). Vercel's CDN does not cache 404 responses by default, so every
+// scanner hit becomes a billable edge request + function invocation +
+// upstream GraphQL call. By returning the 404 from middleware with explicit
+// cache headers, the response becomes CDN-cacheable and repeats are served
+// without invoking a function.
+//
+// Only include paths that can NEVER be real routes on this storefront. If
+// you add e.g. /home or /admin as a real page under app/, remove the
+// matching entry. Real routes like /about and /contact are intentionally
+// NOT listed here.
+const RESERVED_404_PATHS = new Set([
+  // WordPress probes
+  "/wp-admin",
+  "/wp-login.php",
+  "/wp-content",
+  "/wp-includes",
+  "/wp-config.php",
+  "/xmlrpc.php",
+  // PHP / generic admin probes
+  "/phpmyadmin",
+  "/phpinfo.php",
+  "/admin",
+  "/administrator",
+  // Secrets / VCS probes
+  "/.env",
+  "/.git",
+  "/.git/config",
+  "/.DS_Store",
+  // Hot scanner target with no real route on this site
+  "/home",
+]);
+
+const RESERVED_404_HEADERS = {
+  "cache-control": "public, max-age=0, s-maxage=86400, stale-while-revalidate=86400",
+};
+
 export function middleware(request: NextRequest) {
   let pathname: string;
   try {
@@ -21,6 +58,13 @@ export function middleware(request: NextRequest) {
   }
   if (!ASCII_PRINTABLE.test(pathname)) {
     return new NextResponse(null, { status: 404 });
+  }
+  const normalized = pathname.toLowerCase().replace(/\/+$/, "") || "/";
+  if (RESERVED_404_PATHS.has(normalized)) {
+    return new NextResponse(null, {
+      status: 404,
+      headers: RESERVED_404_HEADERS,
+    });
   }
   return NextResponse.next();
 }
