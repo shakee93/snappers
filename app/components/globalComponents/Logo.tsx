@@ -3,16 +3,14 @@ import Link from "next/link";
 import Image from "next/image";
 import SiteLogo from "@/public/global/gq-logo.png";
 import { twMerge } from "tailwind-merge";
-import { useStore } from "@/store/store";
+import { useClearSearch } from "@/hooks/useClearSearch";
 
 
 const Logo = ({ className = '', imageClass = '' }: { className?: string, imageClass?: string }) => {
-  const { search, setSearch, search_status } = useStore()
+  const clearSearch = useClearSearch();
   return (
     <Link href={"/"} className={className}
-      onClick={() => {
-        setSearch('')
-      }}>
+      onClick={clearSearch}>
       <Image
         width={320}
         height={266}

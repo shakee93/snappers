@@ -14,6 +14,7 @@ import {
 import { CaretDownIcon } from "@radix-ui/react-icons";
 import { ProductCategory } from "@/graphql/types/graphql";
 import NavCategories from "./mega-menu/categories";
+import { useClearSearch } from "@/hooks/useClearSearch";
 
 type NavLinkItem = {
   href: string;
@@ -61,6 +62,7 @@ interface NavLinksProps {
 
 export default function NavLinks({ navCategories }: NavLinksProps) {
   const [openMenu, setOpenMenu] = React.useState<string>("");
+  const clearSearch = useClearSearch();
 
   const closeMenu = () => {
     setOpenMenu("");
@@ -88,6 +90,7 @@ export default function NavLinks({ navCategories }: NavLinksProps) {
               <NavigationMenuLink asChild>
                 <Link
                   href={item.href}
+                  onClick={item.href === "/" ? clearSearch : undefined}
                   className={`NavigationMenuLink ${
                     item.special
                       ? "relative px-3 animate-bounce flex items-center gap-1"
