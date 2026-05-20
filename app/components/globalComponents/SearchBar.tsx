@@ -3,9 +3,9 @@ import { ChevronLeft, Loader, Search, XIcon } from "lucide-react";
 import HeaderSearchResults from "@/app/components/globalComponents/HeaderSearchResults";
 import { Brand, ProductCategory } from "@/graphql/types/graphql";
 import { useStore } from "@/store/store";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { usePathname } from "next/navigation";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useRef, useState } from "react";
 import { cn } from "@/lib/utils";
 import { PRICE_RANGE } from "@/app/components/Filters/PriceFilter";
 
@@ -17,11 +17,15 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
     const { search, setSearch, search_status, syncCategories, syncBrands, synPriceRange, syncOnSale, setInStock, setSort, clearVariations, searchMounted } = useStore();
     const router = useRouter();
     const path = usePathname();
-    const searchParams = useSearchParams();
     const [searchValue, setSearchValue] = useState('');
+    // Tracks the last value the user typed locally. Used to ignore the
+    // store→input mirror effect while typing — otherwise rapid deletion races
+    // with URL/router echoes that briefly re-set store.search to a stale value
+    // and flicker the deleted letters back into the input.
+    const lastTypedRef = useRef('');
+    const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const [mounted, setMounted] = useState(false);
-    const [isInitialized, setIsInitialized] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
     const [scrollHeight, setScrollHeight] = useState(0);
 
@@ -54,6 +58,8 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
     // }, [searchParams, setSearch, isInitialized, mounted]);
 
     const handleSearchClear = () => {
+        // Cancel any pending typed-debounce so it can't overwrite the clear.
+        if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
         // Clear search state
         setSearch("");
 
@@ -66,6 +72,7 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
         setSort("");
         clearVariations();
         setSearchValue('');
+        lastTypedRef.current = '';
 
         // Clear all URL parameters
         const url = new URL(window.location.href);
@@ -90,19 +97,46 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
         router.push(url.pathname + url.search);
     };
 
-    const handleSearchChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value;
 
+        lastTypedRef.current = value;
         setSearchValue(value);
 
-        const timeoutId = setTimeout(() => {
+        // Defer firing the actual search (which drives results + URL updates)
+        // until the user has paused for 1s. Both typing and deleting feel
+        // instant in the input, but no result/URL churn happens mid-stream.
+        if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+        searchDebounceRef.current = setTimeout(() => {
             setSearch(value);
-        }, 50);
+        }, 1000);
+    };
 
-        return () => clearTimeout(timeoutId);
-    }, [setSearch]);
+    const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        // Pressing Enter commits the current value immediately and bypasses
+        // the 1s debounce — gives power users a way to skip the wait.
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+            setSearch(searchValue);
+        }
+    };
 
     useEffect(() => {
+        return () => {
+            if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+        };
+    }, []);
+
+    useEffect(() => {
+        // Only mirror store→input on external changes (navigation, clear, URL
+        // sync). Skipping when it matches what the user just typed prevents
+        // stale store echoes from overwriting in-flight deletions. External
+        // changes also cancel any pending typed-debounce so it can't overwrite
+        // the reset a moment later.
+        if (search === lastTypedRef.current) return;
+        if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+        lastTypedRef.current = search;
         setSearchValue(search);
     }, [search]);
 
@@ -134,6 +168,7 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
                         <input
                             value={mounted ? searchValue : ''}
                             onChange={handleSearchChange}
+                            onKeyDown={handleSearchKeyDown}
                             onFocus={handleFocus}
                             onBlur={handleBlur}
                             type="text"
