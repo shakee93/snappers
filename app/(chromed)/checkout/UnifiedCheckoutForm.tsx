@@ -143,13 +143,22 @@ const EMPTY_ADDRESS: AddressFieldValues = {
     postal: "",
 };
 
+const isAddressComplete = (addr: AddressFieldValues) =>
+    !!addr.firstName &&
+    !!addr.lastName &&
+    !!addr.address &&
+    !!addr.city &&
+    !!addr.state &&
+    !!addr.postal;
+
 interface AddressFieldsProps {
     idPrefix: string;
     values: AddressFieldValues;
     onChange: (patch: Partial<AddressFieldValues>) => void;
+    nameOnly?: boolean;
 }
 
-const AddressFields = memo(({ idPrefix, values, onChange }: AddressFieldsProps) => (
+const AddressFields = memo(({ idPrefix, values, onChange, nameOnly = false }: AddressFieldsProps) => (
     <>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
             <div>
@@ -182,6 +191,8 @@ const AddressFields = memo(({ idPrefix, values, onChange }: AddressFieldsProps) 
             </div>
         </div>
 
+        {nameOnly ? null : (
+        <>
         <div className="sm:flex sm:space-x-3 sm:space-y-0 space-y-4">
             <div className="flex-1">
                 <label htmlFor={`${idPrefix}-address1`} className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
@@ -266,6 +277,8 @@ const AddressFields = memo(({ idPrefix, values, onChange }: AddressFieldsProps) 
                 />
             </div>
         </div>
+        </>
+        )}
     </>
 ));
 AddressFields.displayName = "AddressFields";
@@ -619,18 +632,25 @@ const UnifiedCheckoutForm = ({
             return;
         }
 
+        if (
+            shippingDifferent &&
+            deliveryType !== "store_pickup" &&
+            !isAddressComplete(shippingAddress)
+        ) {
+            toast.error("Please complete the shipping address.");
+            return;
+        }
+
         const billingFields = {
             ...billingAddress,
             country: "LK",
             addressType: "home",
         };
 
-        const useSeparateShipping =
-            shippingDifferent && deliveryType !== "store_pickup";
-
-        const shippingFields = useSeparateShipping
-            ? { ...shippingAddress, country: "LK", addressType: "home" }
-            : billingFields;
+        const shippingFields =
+            shippingDifferent && deliveryType !== "store_pickup"
+                ? { ...shippingAddress, country: "LK", addressType: "home" }
+                : billingFields;
 
         const payload: CheckoutSubmitPayload = {
             contactInfo: { phone, email, country },
@@ -906,16 +926,14 @@ const UnifiedCheckoutForm = ({
 
     const contactDone = /^[0-9]{9,12}$/.test(phone) && /.+@.+\..+/.test(email);
     const nameDone = !!billingAddress.firstName && !!billingAddress.lastName;
-    const fullAddressDone =
-        nameDone &&
-        !!billingAddress.address &&
-        !!billingAddress.city &&
-        !!billingAddress.state &&
-        !!billingAddress.postal;
+    const useSeparateShipping =
+        shippingDifferent && deliveryType !== "store_pickup";
     const deliveryDone =
         deliveryType !== null &&
         nameDone &&
-        (deliveryType === "store_pickup" || fullAddressDone);
+        (deliveryType === "store_pickup" ||
+            (isAddressComplete(billingAddress) &&
+                (!useSeparateShipping || isAddressComplete(shippingAddress))));
     const detailsDone = contactDone && deliveryDone;
     const paymentDone =
         !!selectedGateway.id &&
@@ -1035,36 +1053,12 @@ const UnifiedCheckoutForm = ({
                     <div className="mt-6 space-y-4">
                         {deliveryType === "store_pickup" ? (
                             <>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
-                                    <div>
-                                        <label htmlFor="checkout-firstname" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
-                                            First name
-                                        </label>
-                                        <Input
-                                            id="checkout-firstname"
-                                            className={`capitalize ${FIELD_CLASS}`}
-                                            value={billingAddress.firstName}
-                                            placeholder="e.g. Amila"
-                                            autoComplete="given-name"
-                                            onChange={(e) => handleBillingChange({ firstName: e.target.value })}
-                                            required={true}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label htmlFor="checkout-lastname" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
-                                            Last name
-                                        </label>
-                                        <Input
-                                            id="checkout-lastname"
-                                            className={`capitalize ${FIELD_CLASS}`}
-                                            value={billingAddress.lastName}
-                                            placeholder="e.g. Perera"
-                                            autoComplete="family-name"
-                                            onChange={(e) => handleBillingChange({ lastName: e.target.value })}
-                                            required={true}
-                                        />
-                                    </div>
-                                </div>
+                                <AddressFields
+                                    idPrefix="checkout"
+                                    values={billingAddress}
+                                    onChange={handleBillingChange}
+                                    nameOnly
+                                />
                                 <p className="text-sm text-slate-600 dark:text-slate-400">
                                     Visit GQ Mobiles to collect your order.
                                 </p>
@@ -1083,7 +1077,7 @@ const UnifiedCheckoutForm = ({
                                 <Checkbox
                                     name="shipping-different"
                                     label="Shipping address different from billing address"
-                                    defaultChecked={shippingDifferent}
+                                    checked={shippingDifferent}
                                     onChange={setShippingDifferent}
                                 />
 
