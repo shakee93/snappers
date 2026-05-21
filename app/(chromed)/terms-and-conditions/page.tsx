@@ -408,7 +408,7 @@ const PageTerm = () => {
           <section id="trademarks" className="mb-6 scroll-mt-32">
             <h2 className="text-3xl font-semibold mb-4">Trademarks</h2>
             <p className="mb-4 leading-8">
-              All brand, product, service, and process names appearing on this
+              All brands, product, service, and process names appearing on this
               Web site are trademarks of their respective holders. Reference
               to or use of a product, service, or process does not imply
               recommendation, approval, affiliation, or sponsorship of that
@@ -424,8 +424,13 @@ const PageTerm = () => {
               information, the terms of which must be observed and followed.
               Information on this site may contain technical inaccuracies or
               typographical errors. Information, including product pricing and
-              availability, may be changed or updated without notice. GQMobile
-              reserves the right to refuse service, terminate accounts, and/or
+              availability, may be changed or updated without notice.
+            </p>
+            <p className="mb-4 leading-8">
+              If we are unable to process your order due to an unexpected pricing mismatch, we will notify you and cancel the transaction. Rest assured, your payment will be promptly refunded, with the funds credited back to your account based on your bank&apos;s specific processing guidelines and timeframes.
+            </p>
+            <p className="mb-4 leading-8">
+              GQMobile reserves the right to refuse service, terminate accounts, and/or
               cancel orders in its discretion, including, without limitation,
               if GQMobile-Shop believes that customer conduct violates
               applicable law or is harmful to the interests of GQMobile.
