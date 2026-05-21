@@ -408,7 +408,7 @@ const PageTerm = () => {
           <section id="trademarks" className="mb-6 scroll-mt-32">
             <h2 className="text-3xl font-semibold mb-4">Trademarks</h2>
             <p className="mb-4 leading-8">
-              All brand, product, service, and process names appearing on this
+              All brands, product, service, and process names appearing on this
               Web site are trademarks of their respective holders. Reference
               to or use of a product, service, or process does not imply
               recommendation, approval, affiliation, or sponsorship of that
