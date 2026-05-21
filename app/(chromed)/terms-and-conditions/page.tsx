@@ -427,7 +427,7 @@ const PageTerm = () => {
               availability, may be changed or updated without notice.
             </p>
             <p className="mb-4 leading-8">
-               If we are unable to process your order due to an unexpected pricing mismatch, we will notify you and cancel the transaction. Rest assured, your payment will be promptly refunded, with the funds credited back to your account based on your bank's specific processing guidelines and timeframes.
+              If we are unable to process your order due to an unexpected pricing mismatch, we will notify you and cancel the transaction. Rest assured, your payment will be promptly refunded, with the funds credited back to your account based on your bank&apos;s specific processing guidelines and timeframes.
             </p>
             <p className="mb-4 leading-8">
               GQMobile reserves the right to refuse service, terminate accounts, and/or
