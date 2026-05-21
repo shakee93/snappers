@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Input from "shared/Input/Input";
 import CountryPhoneInput from "./components/CountryPhoneInput";
@@ -122,6 +122,166 @@ const BrandBadge = ({ src, alt }: { src: string; alt: string }) => (
 );
 
 const FIELD_CLASS = "border-2 border-slate-300 placeholder:text-slate-400 hover:border-slate-400 focus:!ring-0 focus:!border-primaryColor focus:outline-none dark:border-slate-600 dark:hover:border-slate-500";
+
+type AddressFieldValues = {
+    firstName: string;
+    lastName: string;
+    address: string;
+    apartment: string;
+    city: string;
+    state: string;
+    postal: string;
+};
+
+const EMPTY_ADDRESS: AddressFieldValues = {
+    firstName: "",
+    lastName: "",
+    address: "",
+    apartment: "",
+    city: "",
+    state: "Western",
+    postal: "",
+};
+
+const isAddressComplete = (addr: AddressFieldValues) =>
+    !!addr.firstName &&
+    !!addr.lastName &&
+    !!addr.address &&
+    !!addr.city &&
+    !!addr.state &&
+    !!addr.postal;
+
+interface AddressFieldsProps {
+    idPrefix: string;
+    values: AddressFieldValues;
+    onChange: (patch: Partial<AddressFieldValues>) => void;
+    nameOnly?: boolean;
+}
+
+const AddressFields = memo(({ idPrefix, values, onChange, nameOnly = false }: AddressFieldsProps) => (
+    <>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
+            <div>
+                <label htmlFor={`${idPrefix}-firstname`} className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
+                    First name
+                </label>
+                <Input
+                    id={`${idPrefix}-firstname`}
+                    className={`capitalize ${FIELD_CLASS}`}
+                    value={values.firstName}
+                    placeholder="e.g. Amila"
+                    autoComplete="given-name"
+                    onChange={(e) => onChange({ firstName: e.target.value })}
+                    required={true}
+                />
+            </div>
+            <div>
+                <label htmlFor={`${idPrefix}-lastname`} className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
+                    Last name
+                </label>
+                <Input
+                    id={`${idPrefix}-lastname`}
+                    className={`capitalize ${FIELD_CLASS}`}
+                    value={values.lastName}
+                    placeholder="e.g. Perera"
+                    autoComplete="family-name"
+                    onChange={(e) => onChange({ lastName: e.target.value })}
+                    required={true}
+                />
+            </div>
+        </div>
+
+        {nameOnly ? null : (
+        <>
+        <div className="sm:flex sm:space-x-3 sm:space-y-0 space-y-4">
+            <div className="flex-1">
+                <label htmlFor={`${idPrefix}-address1`} className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
+                    Address line 1
+                </label>
+                <Input
+                    id={`${idPrefix}-address1`}
+                    className={`capitalize ${FIELD_CLASS}`}
+                    placeholder="Street address"
+                    name={`${idPrefix}-address1`}
+                    value={values.address}
+                    type="text"
+                    autoComplete="address-line1"
+                    onChange={(e) => onChange({ address: e.target.value })}
+                    required={true}
+                />
+            </div>
+            <div className="sm:w-1/3">
+                <label htmlFor={`${idPrefix}-address2`} className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
+                    Address line 2 <span className="text-slate-400 font-normal">(optional)</span>
+                </label>
+                <Input
+                    id={`${idPrefix}-address2`}
+                    className={`capitalize ${FIELD_CLASS}`}
+                    placeholder="Apartment, suite, etc."
+                    name={`${idPrefix}-address2`}
+                    value={values.apartment}
+                    autoComplete="address-line2"
+                    onChange={(e) => onChange({ apartment: e.target.value })}
+                />
+            </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-3">
+            <div>
+                <label htmlFor={`${idPrefix}-city`} className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
+                    City
+                </label>
+                <Input
+                    id={`${idPrefix}-city`}
+                    className={`normal-case ${FIELD_CLASS}`}
+                    placeholder="e.g. Colombo"
+                    value={values.city}
+                    autoComplete="address-level2"
+                    onChange={(e) => onChange({ city: e.target.value })}
+                    required={true}
+                />
+            </div>
+            <div>
+                <label htmlFor={`${idPrefix}-state`} className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
+                    Province
+                </label>
+                <Select
+                    id={`${idPrefix}-state`}
+                    name={`${idPrefix}-state`}
+                    className={FIELD_CLASS}
+                    value={values.state || "Western"}
+                    onChange={(e) => onChange({ state: e.target.value })}
+                    required={true}
+                >
+                    {SRI_LANKAN_STATES.map((s) => (
+                        <option key={s} value={s}>
+                            {s}
+                        </option>
+                    ))}
+                </Select>
+            </div>
+            <div>
+                <label htmlFor={`${idPrefix}-postal`} className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
+                    Postal code
+                </label>
+                <Input
+                    id={`${idPrefix}-postal`}
+                    className={FIELD_CLASS}
+                    placeholder="e.g. 10100"
+                    value={values.postal}
+                    inputMode="numeric"
+                    pattern="[0-9]{4,6}"
+                    autoComplete="postal-code"
+                    onChange={(e) => onChange({ postal: e.target.value })}
+                    required={true}
+                />
+            </div>
+        </div>
+        </>
+        )}
+    </>
+));
+AddressFields.displayName = "AddressFields";
 
 interface DeliveryOptionProps {
     value: DeliveryType;
@@ -250,15 +410,16 @@ const UnifiedCheckoutForm = ({
     const [email, setEmail] = useState("");
     const [country, setCountry] = useState("LK");
 
-    // Delivery Address State
-    const [firstName, setFirstName] = useState("");
-    const [lastName, setLastName] = useState("");
-    const [address, setAddress] = useState("");
-    const [apartment, setApartment] = useState("");
-    const [city, setCity] = useState("");
-    const [state, setState] = useState("Western");
-    const [postal, setPostal] = useState("");
-    const [addressType, setAddressType] = useState("home");
+    const [billingAddress, setBillingAddress] = useState<AddressFieldValues>(EMPTY_ADDRESS);
+    const [shippingAddress, setShippingAddress] = useState<AddressFieldValues>(EMPTY_ADDRESS);
+    const [shippingDifferent, setShippingDifferent] = useState(false);
+
+    const handleBillingChange = useCallback((patch: Partial<AddressFieldValues>) => {
+        setBillingAddress((prev) => ({ ...prev, ...patch }));
+    }, []);
+    const handleShippingChange = useCallback((patch: Partial<AddressFieldValues>) => {
+        setShippingAddress((prev) => ({ ...prev, ...patch }));
+    }, []);
 
     // Payment Method State
     const [methodActive, setMethodActive] = useState<string>("");
@@ -313,17 +474,17 @@ const UnifiedCheckoutForm = ({
         }
     }, [initialContactData]);
 
-    // Initialize Shipping Address
     useEffect(() => {
         if (initialShippingData) {
-            setFirstName(initialShippingData.firstName || "");
-            setLastName(initialShippingData.lastName || "");
-            setAddress(initialShippingData.address1 || "");
-            setApartment(initialShippingData.address2 || "");
-            setCity(initialShippingData.city || "");
-            setState(initialShippingData.state || "Western");
-            setPostal(initialShippingData.postcode || "");
-            setAddressType("home");
+            setBillingAddress({
+                firstName: initialShippingData.firstName || "",
+                lastName: initialShippingData.lastName || "",
+                address: initialShippingData.address1 || "",
+                apartment: initialShippingData.address2 || "",
+                city: initialShippingData.city || "",
+                state: initialShippingData.state || "Western",
+                postal: initialShippingData.postcode || "",
+            });
         }
     }, [initialShippingData]);
 
@@ -471,22 +632,30 @@ const UnifiedCheckoutForm = ({
             return;
         }
 
-        const addressFields = {
-            firstName,
-            lastName,
-            address,
-            apartment,
-            city,
-            state,
-            postal,
+        if (
+            shippingDifferent &&
+            deliveryType !== "store_pickup" &&
+            !isAddressComplete(shippingAddress)
+        ) {
+            toast.error("Please complete the shipping address.");
+            return;
+        }
+
+        const billingFields = {
+            ...billingAddress,
             country: "LK",
-            addressType,
+            addressType: "home",
         };
+
+        const shippingFields =
+            shippingDifferent && deliveryType !== "store_pickup"
+                ? { ...shippingAddress, country: "LK", addressType: "home" }
+                : billingFields;
 
         const payload: CheckoutSubmitPayload = {
             contactInfo: { phone, email, country },
-            deliveryAddress: addressFields,
-            billingAddress: addressFields,
+            deliveryAddress: shippingFields,
+            billingAddress: billingFields,
             paymentMethod: {
                 selectedGateway: {
                     id: selectedGateway.id,
@@ -756,13 +925,15 @@ const UnifiedCheckoutForm = ({
     };
 
     const contactDone = /^[0-9]{9,12}$/.test(phone) && /.+@.+\..+/.test(email);
-    const nameDone = !!firstName && !!lastName;
-    const fullAddressDone =
-        nameDone && !!address && !!city && !!state && !!postal;
+    const nameDone = !!billingAddress.firstName && !!billingAddress.lastName;
+    const useSeparateShipping =
+        shippingDifferent && deliveryType !== "store_pickup";
     const deliveryDone =
         deliveryType !== null &&
         nameDone &&
-        (deliveryType === "store_pickup" || fullAddressDone);
+        (deliveryType === "store_pickup" ||
+            (isAddressComplete(billingAddress) &&
+                (!useSeparateShipping || isAddressComplete(shippingAddress))));
     const detailsDone = contactDone && deliveryDone;
     const paymentDone =
         !!selectedGateway.id &&
@@ -880,128 +1051,49 @@ const UnifiedCheckoutForm = ({
 
                     {deliveryType && (
                     <div className="mt-6 space-y-4">
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
-                            <div>
-                                <label htmlFor="checkout-firstname" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
-                                    First name
-                                </label>
-                                <Input
-                                    id="checkout-firstname"
-                                    className={`capitalize ${FIELD_CLASS}`}
-                                    value={firstName}
-                                    placeholder="e.g. Amila"
-                                    autoComplete="given-name"
-                                    onChange={(e) => setFirstName(e.target.value)}
-                                    required={true}
-                                />
-                            </div>
-                            <div>
-                                <label htmlFor="checkout-lastname" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
-                                    Last name
-                                </label>
-                                <Input
-                                    id="checkout-lastname"
-                                    className={`capitalize ${FIELD_CLASS}`}
-                                    value={lastName}
-                                    placeholder="e.g. Perera"
-                                    autoComplete="family-name"
-                                    onChange={(e) => setLastName(e.target.value)}
-                                    required={true}
-                                />
-                            </div>
-                        </div>
-
-                        {deliveryType !== "store_pickup" ? (
+                        {deliveryType === "store_pickup" ? (
                             <>
-                                <div className="sm:flex sm:space-x-3 sm:space-y-0 space-y-4">
-                                    <div className="flex-1">
-                                        <label htmlFor="checkout-address1" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
-                                            Address line 1
-                                        </label>
-                                        <Input
-                                            id="checkout-address1"
-                                            className={`capitalize ${FIELD_CLASS}`}
-                                            placeholder="Street address"
-                                            name="address1"
-                                            value={address}
-                                            type="text"
-                                            autoComplete="address-line1"
-                                            onChange={(e) => setAddress(e.target.value)}
-                                            required={true}
-                                        />
-                                    </div>
-                                    <div className="sm:w-1/3">
-                                        <label htmlFor="checkout-address2" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
-                                            Address line 2 <span className="text-slate-400 font-normal">(optional)</span>
-                                        </label>
-                                        <Input
-                                            id="checkout-address2"
-                                            className={`capitalize ${FIELD_CLASS}`}
-                                            placeholder="Apartment, suite, etc."
-                                            name="address2"
-                                            value={apartment}
-                                            autoComplete="address-line2"
-                                            onChange={(e) => setApartment(e.target.value)}
-                                        />
-                                    </div>
-                                </div>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-3">
-                                    <div>
-                                        <label htmlFor="checkout-city" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
-                                            City
-                                        </label>
-                                        <Input
-                                            id="checkout-city"
-                                            className={`normal-case ${FIELD_CLASS}`}
-                                            placeholder="e.g. Colombo"
-                                            value={city}
-                                            autoComplete="address-level2"
-                                            onChange={(e) => setCity(e.target.value)}
-                                            required={true}
-                                        />
-                                    </div>
-                                    <div>
-                                        <label htmlFor="checkout-state" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
-                                            Province
-                                        </label>
-                                        <Select
-                                            id="checkout-state"
-                                            name="state"
-                                            className={FIELD_CLASS}
-                                            value={state || "Western"}
-                                            onChange={(e) => setState(e.target.value)}
-                                            required={true}
-                                        >
-                                            {SRI_LANKAN_STATES.map((s) => (
-                                                <option key={s} value={s}>
-                                                    {s}
-                                                </option>
-                                            ))}
-                                        </Select>
-                                    </div>
-                                    <div>
-                                        <label htmlFor="checkout-postal" className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
-                                            Postal code
-                                        </label>
-                                        <Input
-                                            id="checkout-postal"
-                                            className={FIELD_CLASS}
-                                            placeholder="e.g. 10100"
-                                            value={postal}
-                                            inputMode="numeric"
-                                            pattern="[0-9]{4,6}"
-                                            autoComplete="postal-code"
-                                            onChange={(e) => setPostal(e.target.value)}
-                                            required={true}
-                                        />
-                                    </div>
-                                </div>
+                                <AddressFields
+                                    idPrefix="checkout"
+                                    values={billingAddress}
+                                    onChange={handleBillingChange}
+                                    nameOnly
+                                />
+                                <p className="text-sm text-slate-600 dark:text-slate-400">
+                                    Visit GQ Mobiles to collect your order.
+                                </p>
                             </>
                         ) : (
-                            <p className="text-sm text-slate-600 dark:text-slate-400">
-                                Visit GQ Mobiles to collect your order.
-                            </p>
+                            <>
+                                <h4 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                                    Billing address
+                                </h4>
+                                <AddressFields
+                                    idPrefix="checkout"
+                                    values={billingAddress}
+                                    onChange={handleBillingChange}
+                                />
+
+                                <Checkbox
+                                    name="shipping-different"
+                                    label="Shipping address different from billing address"
+                                    checked={shippingDifferent}
+                                    onChange={setShippingDifferent}
+                                />
+
+                                {shippingDifferent && (
+                                    <div className="pt-4 space-y-4 border-t border-slate-200 dark:border-slate-700">
+                                        <h4 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                                            Shipping address
+                                        </h4>
+                                        <AddressFields
+                                            idPrefix="ship"
+                                            values={shippingAddress}
+                                            onChange={handleShippingChange}
+                                        />
+                                    </div>
+                                )}
+                            </>
                         )}
                     </div>
                     )}
