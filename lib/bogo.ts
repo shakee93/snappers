@@ -199,6 +199,47 @@ export function normalizeBogoConfig(
   };
 }
 
+type BogoMetaSource = {
+  metaData?: MetaEntryLike[] | null;
+  bogoPluginMeta?: MetaEntryLike[] | null;
+  databaseId?: number | null;
+} | null | undefined;
+
+/**
+ * Mirrors the plugin's runtime precedence (variation meta wins, parent is the
+ * fallback). If the variation has `_wc_bogo_enabled === "yes"`, the variation's
+ * rule drives the UI; otherwise the parent's rule applies.
+ */
+export function resolveBogoConfig(
+  parent: BogoMetaSource,
+  variation?: BogoMetaSource
+): BogoConfig {
+  if (variation) {
+    const variationMeta = mergeProductMetaForBogo(variation);
+    if (isBogoEnabledRaw(getMetaValue(variationMeta, "_wc_bogo_enabled"))) {
+      return normalizeBogoConfig(variationMeta, variation.databaseId ?? null);
+    }
+  }
+  const parentMeta = mergeProductMetaForBogo(parent);
+  return normalizeBogoConfig(parentMeta, parent?.databaseId ?? null);
+}
+
+/**
+ * Returns the first variation (in source order) whose own meta enables BOGO.
+ * Used by surfaces that render before a variation is actively selected so the
+ * "+ Free" preview still appears when only a variation carries the rule.
+ */
+export function findBogoEnabledVariation<T extends BogoMetaSource>(
+  variations: readonly T[] | null | undefined
+): T | undefined {
+  if (!variations?.length) return undefined;
+  return variations.find((v) => {
+    if (!v) return false;
+    const meta = mergeProductMetaForBogo(v);
+    return isBogoEnabledRaw(getMetaValue(meta, "_wc_bogo_enabled"));
+  });
+}
+
 export function calculateBogoFreeQty(cartQty: number, bogo: Pick<BogoConfig, "buyQty" | "getQty" | "maxFreeQty">): number {
   const normalizedCartQty = Math.max(0, Math.floor(cartQty));
   const buyQty = toPositiveIntOrDefault(bogo.buyQty, DEFAULT_BUY_QTY);

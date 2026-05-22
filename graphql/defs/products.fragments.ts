@@ -1,5 +1,46 @@
 import { gql } from "@apollo/client";
 
+// Single source of truth for the WooCommerce BOGO plugin meta keys.
+// Use BogoPluginMetaOnProduct for Product types and BogoPluginMetaOnVariation
+// for ProductVariation — the key list lives only here, so adding/removing a
+// plugin field is a one-line change.
+export const BogoPluginMetaOnProduct = gql`
+  fragment BogoPluginMetaOnProduct on Product {
+    bogoPluginMeta: metaData(
+      keysIn: [
+        "_wc_bogo_enabled"
+        "_wc_bogo_buy_qty"
+        "_wc_bogo_get_qty"
+        "_wc_bogo_max_free_qty"
+        "_wc_bogo_free_product_ids"
+        "_wc_bogo_free_product_id"
+      ]
+    ) {
+      key
+      value
+      id
+    }
+  }
+`;
+
+export const BogoPluginMetaOnVariation = gql`
+  fragment BogoPluginMetaOnVariation on ProductVariation {
+    bogoPluginMeta: metaData(
+      keysIn: [
+        "_wc_bogo_enabled"
+        "_wc_bogo_buy_qty"
+        "_wc_bogo_get_qty"
+        "_wc_bogo_max_free_qty"
+        "_wc_bogo_free_product_ids"
+        "_wc_bogo_free_product_id"
+      ]
+    ) {
+      key
+      value
+    }
+  }
+`;
+
 export const ProductSpecs = gql`
   fragment ProductSpecs on Product {
     metaData(key: "tech_spec") {
@@ -184,6 +225,7 @@ export const ProductVariationContentSlice = gql`
 // For PDP-only fields (description, galleryImages, upsell, attributes,
 // happiestCustomersGallery, etc.) use ProductContentFull below.
 export const ProductContentCard = gql`
+  ${BogoPluginMetaOnProduct}
   fragment ProductContentCard on Product {
     id
     databaseId
@@ -219,20 +261,7 @@ export const ProductContentCard = gql`
       value
       id
     }
-    bogoPluginMeta: metaData(
-      keysIn: [
-        "_wc_bogo_enabled",
-        "_wc_bogo_buy_qty",
-        "_wc_bogo_get_qty",
-        "_wc_bogo_max_free_qty",
-        "_wc_bogo_free_product_ids",
-        "_wc_bogo_free_product_id"
-      ]
-    ) {
-      key
-      value
-      id
-    }
+    ...BogoPluginMetaOnProduct
     productTags(first: 20) {
       nodes {
         id
@@ -300,6 +329,7 @@ export const ProductContentCard = gql`
 `;
 
 export const ProductContentFull = gql`
+  ${BogoPluginMetaOnProduct}
   fragment ProductContentFull on Product {
     id
     databaseId
@@ -339,20 +369,7 @@ export const ProductContentFull = gql`
       id
     }
     # WooCommerce BOGO plugin meta is often omitted from unfiltered metaData; fetch explicitly.
-    bogoPluginMeta: metaData(
-      keysIn: [
-        "_wc_bogo_enabled",
-        "_wc_bogo_buy_qty",
-        "_wc_bogo_get_qty",
-        "_wc_bogo_max_free_qty",
-        "_wc_bogo_free_product_ids",
-        "_wc_bogo_free_product_id"
-      ]
-    ) {
-      key
-      value
-      id
-    }
+    ...BogoPluginMetaOnProduct
     # Parent free-shipping flag (used as fallback when a variation's value is empty).
     freeShippingMeta: metaData(keysIn: ["_wc_product_free_shipping"]) {
       key

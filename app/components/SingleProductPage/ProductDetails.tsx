@@ -23,11 +23,8 @@ import {
   GET_PRICE_FLUCTUATION_NOTICE,
 } from "@/graphql/defs/options";
 import { useQuery } from '@apollo/client';
-import {
-  GET_PRODUCT_BY_DATABASE_ID,
-  GET_PRODUCTS_BY_DATABASE_IDS,
-  GET_PRODUCT_VARIATION_BY_DATABASE_ID,
-} from "@/graphql/defs/products";
+import { GET_PRODUCTS_BY_DATABASE_IDS } from "@/graphql/defs/products";
+import { useUnresolvedFreeGifts } from "@/hooks/useUnresolvedFreeGifts";
 import koko from "@/public/koko.png";
 import Image from "next/image";
 import { BanknotesIcon } from "@heroicons/react/24/outline";
@@ -37,7 +34,7 @@ import ShareButtons from "./ShareButtons";
 import { AnimatePresence, motion } from "framer-motion";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
-import { mergeProductMetaForBogo, normalizeBogoConfig } from "@/lib/bogo";
+import { resolveBogoConfig } from "@/lib/bogo";
 import { getPreferredVariation } from "@/lib/getPreferredVariation";
 import {
   isSimpleProductFreeShipping,
@@ -54,6 +51,7 @@ const ProductDetails = ({
     product: { attribute },
     setAttribute,
     clearAttributes,
+    setActiveVariationId,
   } = useStore();
 
   const preferredVariation = getPreferredVariation(product?.variations?.nodes);
@@ -91,6 +89,15 @@ const ProductDetails = ({
     setVariationId(activeVariation?.image?.databaseId);
     setActiveVariation(activeVariation);
   }, [activeVariation]);
+
+  // Sync the active variation's ID to the store on a primitive dep so the
+  // write fires only when the ID actually changes — keeps subscribers
+  // (FreeGiftPreview) from re-rendering on no-op activeVariation updates.
+  const activeVariationDbId =
+    (activeVariation as { databaseId?: number } | null | undefined)?.databaseId ?? null;
+  useEffect(() => {
+    setActiveVariationId(activeVariationDbId);
+  }, [activeVariationDbId, setActiveVariationId]);
 
   const activeAttr = useCallback(
     (attr: ProductAttribute) => {
@@ -172,9 +179,11 @@ const ProductDetails = ({
 
   const { data, loading, error } = useQuery(GET_PRICE_FLUCTUATION_NOTICE);
   const isPriceFluctuation = data?.topBarPriceFluctuationNotice || false;
-  const bogo = normalizeBogoConfig(
-    mergeProductMetaForBogo(product as Parameters<typeof mergeProductMetaForBogo>[0]),
-    product?.databaseId
+  // Variation meta wins, parent is the fallback — mirrors the WP plugin's
+  // runtime rule resolution so per-variation BOGO offers render correctly.
+  const bogo = useMemo(
+    () => resolveBogoConfig(product, activeVariation),
+    [product, activeVariation]
   );
   const isFreeGiftProduct = product?.productTags?.nodes?.some(
     (tag: any) => tag.slug === 'free-gift'
@@ -189,127 +198,119 @@ const ProductDetails = ({
     }
     return isSimpleProductFreeShipping(product);
   }, [product, activeVariation]);
+  // If the BOGO rule resolved from the variation (variation `_wc_bogo_enabled`
+  // wins), the fallback for an empty `_wc_bogo_free_product_ids` becomes the
+  // variation's own ID — strip it from the cross-product list so we don't
+  // try to load it as a separate gift product.
+  const bogoSourceId = useMemo(() => {
+    const variationId = (activeVariation as { databaseId?: number } | null | undefined)?.databaseId;
+    if (
+      variationId &&
+      bogo.freeProductIds.length === 1 &&
+      bogo.freeProductIds[0] === variationId
+    ) {
+      return variationId;
+    }
+    return product?.databaseId;
+  }, [activeVariation, bogo.freeProductIds, product?.databaseId]);
   const crossProductFreeIds = bogo.freeProductIds.filter(
-    (id) => id !== product?.databaseId
+    (id) => id !== bogoSourceId
   );
   const { data: freeGiftData, loading: freeGiftLoading } = useQuery(
     GET_PRODUCTS_BY_DATABASE_IDS,
     {
       variables: { ids: crossProductFreeIds },
       skip: !bogo.isBogoEnabled || crossProductFreeIds.length === 0,
-      fetchPolicy: "network-only",
+      fetchPolicy: "cache-first",
     }
   );
-  const freeGiftNodes =
-    freeGiftData?.products?.nodes?.filter(
-      (p: { name?: string | null } | null): p is NonNullable<typeof p> =>
-        !!p?.name
-    ) ?? [];
-  const resolvedProductIds = new Set(
-    freeGiftNodes
-      .map((p: { databaseId?: number }) => p?.databaseId)
-      .filter((id: number | undefined): id is number => Number.isFinite(id))
+  const freeGiftNodes = useMemo(
+    () =>
+      freeGiftData?.products?.nodes?.filter(
+        (p: { name?: string | null } | null): p is NonNullable<typeof p> =>
+          !!p?.name
+      ) ?? [],
+    [freeGiftData]
   );
-  const unresolvedFreeIds = crossProductFreeIds.filter(
-    (id) => !resolvedProductIds.has(id)
+  const unresolvedFreeIds = useMemo(() => {
+    const resolved = new Set(
+      freeGiftNodes
+        .map((p: { databaseId?: number }) => p?.databaseId)
+        .filter((id: number | undefined): id is number => Number.isFinite(id))
+    );
+    return crossProductFreeIds.filter((id) => !resolved.has(id));
+  }, [crossProductFreeIds, freeGiftNodes]);
+
+  const unresolvedIdsForHook = useMemo(
+    () => (bogo.isBogoEnabled ? unresolvedFreeIds : []),
+    [bogo.isBogoEnabled, unresolvedFreeIds]
   );
-  const firstUnresolvedFreeId = unresolvedFreeIds[0];
-  const {
-    data: freeGiftSingleProductData,
-    loading: freeGiftSingleProductLoading,
-  } = useQuery(GET_PRODUCT_BY_DATABASE_ID, {
-    variables: { id: String(firstUnresolvedFreeId) },
-    skip: !bogo.isBogoEnabled || !firstUnresolvedFreeId,
-    fetchPolicy: "network-only",
-  });
-  const fallbackSingleProduct = freeGiftSingleProductData?.product;
-  const {
-    data: freeGiftVariationData,
-    loading: freeGiftVariationLoading,
-  } = useQuery(GET_PRODUCT_VARIATION_BY_DATABASE_ID, {
-    variables: { id: String(firstUnresolvedFreeId) },
-    skip:
-      !bogo.isBogoEnabled ||
-      !firstUnresolvedFreeId ||
-      freeGiftNodes.length === crossProductFreeIds.length,
-    fetchPolicy: "network-only",
-  });
-  const fallbackVariationParent = freeGiftVariationData?.productVariation?.parent?.node;
+  const { resolved: unresolvedResolved, loading: unresolvedLoading } =
+    useUnresolvedFreeGifts(unresolvedIdsForHook);
+
+  type FreeGiftMention = {
+    key: string | number;
+    name: string;
+    href?: string | null;
+  };
+
+  const giftMentions = useMemo<FreeGiftMention[]>(
+    () => [
+      ...freeGiftNodes.map(
+        (
+          p: {
+            databaseId?: number;
+            name?: string | null;
+            slug?: string | null;
+            brands?: { nodes?: { slug?: string | null }[] };
+          },
+          i: number
+        ): FreeGiftMention => {
+          const brandSlug = p.brands?.nodes?.[0]?.slug;
+          const href = brandSlug && p.slug ? `/${brandSlug}/${p.slug}` : null;
+          return {
+            key: p.databaseId ?? `r-${i}`,
+            name: p.name ?? "Free gift",
+            href,
+          };
+        }
+      ),
+      ...unresolvedResolved.map(
+        (r): FreeGiftMention => ({
+          key: r.databaseId ?? `u-${r.id}`,
+          name: r.name,
+          href: r.href ?? null,
+        })
+      ),
+    ],
+    [freeGiftNodes, unresolvedResolved]
+  );
+
   const freeGiftDetailLine =
     crossProductFreeIds.length === 0 ? (
       <>Free item applies to this product</>
-    ) : freeGiftLoading || freeGiftSingleProductLoading || freeGiftVariationLoading ? (
+    ) : freeGiftLoading || unresolvedLoading ? (
       <>Loading free gift details…</>
-    ) : freeGiftNodes.length > 0 ? (
+    ) : giftMentions.length > 0 ? (
       <>
         Free gift included:{" "}
-        {freeGiftNodes.map(
-          (
-            p: {
-              databaseId?: number;
-              name?: string | null;
-              slug?: string | null;
-              brands?: { nodes?: { slug?: string | null }[] };
-            },
-            i: number
-          ) => {
-            const brandSlug = p.brands?.nodes?.[0]?.slug;
-            const href =
-              brandSlug && p.slug ? `/${brandSlug}/${p.slug}` : null;
-            return (
-              <span key={p.databaseId ?? i}>
-                {i > 0 ? ", " : null}
-                {href ? (
-                  <Link
-                    href={href}
-                    className="font-medium text-primaryColor underline"
-                  >
-                    {p.name}
-                  </Link>
-                ) : (
-                  <span className="font-medium">{p.name}</span>
-                )}
-              </span>
-            );
-          }
-        )}
+        {giftMentions.map((entry, i) => (
+          <span key={entry.key}>
+            {i > 0 ? ", " : null}
+            {entry.href ? (
+              <Link
+                href={entry.href}
+                className="font-medium text-primaryColor underline"
+              >
+                {entry.name}
+              </Link>
+            ) : (
+              <span className="font-medium">{entry.name}</span>
+            )}
+          </span>
+        ))}
       </>
-    ) : fallbackSingleProduct?.name ? (
-      <>
-        Free gift included:{" "}
-        {fallbackSingleProduct?.brands?.nodes?.[0]?.slug && fallbackSingleProduct?.slug ? (
-          <Link
-            href={`/${fallbackSingleProduct.brands.nodes[0].slug}/${fallbackSingleProduct.slug}`}
-            className="font-medium text-primaryColor underline"
-          >
-            {fallbackSingleProduct.name}
-          </Link>
-        ) : (
-          <span className="font-medium">{fallbackSingleProduct.name}</span>
-        )}
-      </>
-    ) : fallbackVariationParent?.name ? (
-      <>
-        Free gift included:{" "}
-        {fallbackVariationParent?.brands?.nodes?.[0]?.slug && fallbackVariationParent?.slug ? (
-          <Link
-            href={`/${fallbackVariationParent.brands.nodes[0].slug}/${fallbackVariationParent.slug}`}
-            className="font-medium text-primaryColor underline"
-          >
-            {fallbackVariationParent.name}
-          </Link>
-        ) : (
-          <span className="font-medium">{fallbackVariationParent.name}</span>
-        )}
-      </>
-    ) : (
-      <>
-        Free gift product
-        {crossProductFreeIds.length === 1 ? "" : "s"} (ID
-        {crossProductFreeIds.length === 1 ? "" : "s"}: {crossProductFreeIds.join(", ")}
-        ) — could not load details from the catalog.
-      </>
-    );
+    ) : null;
 
   const [highestPrice, setHighestPrice] = useState<string>('');
 
@@ -562,7 +563,7 @@ const ProductDetails = ({
       {/* Commented */}
 
       <h1 className="text-2xl text-primaryColor font-bold md:text-3xl">{product.name}</h1>
-      {bogo.isBogoEnabled && (
+      {bogo.isBogoEnabled && freeGiftDetailLine !== null && (
         <div className="mt-2 flex flex-wrap items-center gap-2 text-xs md:text-sm">
           <span className="inline-flex items-center rounded-full bg-green-600 px-2.5 py-1 font-semibold text-white">
             {isFreeGiftProduct ? "Free Gift" : bogo.label}
