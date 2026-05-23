@@ -1,5 +1,10 @@
 import { gql } from "@apollo/client";
-import { ProductContentCard, ProductContentFull } from "@/graphql/defs/products.fragments";
+import {
+  BogoPluginMetaOnProduct,
+  BogoPluginMetaOnVariation,
+  ProductContentCard,
+  ProductContentFull,
+} from "@/graphql/defs/products.fragments";
 
 export const GET_BRANDS = gql`
   query getBrands($slug: [String] = []) {
@@ -43,9 +48,22 @@ export const GET_ALL_BRANDS = gql`
 export const GET_PRODUCT = gql`
   ${ProductContentCard}
   ${ProductContentFull}
+  ${BogoPluginMetaOnVariation}
   query GetProduct($productId: ID!) {
     product(id: $productId, idType: SLUG) {
       ...ProductContentFull
+      # Per-variation BOGO rule (variation meta wins, parent meta is the
+      # fallback). PDP-only — kept out of ProductContentFull so brand /
+      # category / homepage archives that share that fragment don't pay
+      # the extra per-variation meta fetch.
+      ... on VariableProduct {
+        variations(first: 50) {
+          nodes {
+            databaseId
+            ...BogoPluginMetaOnVariation
+          }
+        }
+      }
     }
   }
 `;
@@ -109,24 +127,12 @@ export const GET_PRODUCT_BY_DATABASE_ID = gql`
 
 /** Batch-fetch BOGO plugin meta for InstantSearch / Typesense hits (no Woo meta on the hit). */
 export const GET_PRODUCTS_BOGO_PLUGIN_META = gql`
+  ${BogoPluginMetaOnProduct}
   query GetProductsBogoPluginMeta($ids: [Int]) {
     products(first: 100, where: { include: $ids }) {
       nodes {
         databaseId
-        bogoPluginMeta: metaData(
-          keysIn: [
-            "_wc_bogo_enabled",
-            "_wc_bogo_buy_qty",
-            "_wc_bogo_get_qty",
-            "_wc_bogo_max_free_qty",
-            "_wc_bogo_free_product_ids",
-            "_wc_bogo_free_product_id"
-          ]
-        ) {
-          key
-          value
-          id
-        }
+        ...BogoPluginMetaOnProduct
       }
     }
   }

@@ -20,6 +20,7 @@ type State = {
     }
     product: {
         attribute: any[]
+        activeVariationId: number | null
     }
     searchMounted: boolean
     isTyping: boolean
@@ -44,6 +45,7 @@ type Actions = {
     setSearchMounted: () => void
     setIsTyping: (isTyping: boolean) => void
     clearAttributes: () => void
+    setActiveVariationId: (id: number | null) => void
     setAttribute: (attr: ProductAttribute | VariationAttribute, option: string) => void
     setAttributeMappings: (mappings: Map<string, AttributeMapping>) => void
     setAttributeMappingsLoaded: (loaded: boolean) => void
@@ -69,7 +71,8 @@ export const useStore = create<State & Actions>((set, get) => ({
     searchMounted: false,
     isTyping: false,
     product: {
-        attribute: []
+        attribute: [],
+        activeVariationId: null,
     },
     attributeMappings: new Map(),
     attributeMappingsLoaded: false,
@@ -175,7 +178,8 @@ export const useStore = create<State & Actions>((set, get) => ({
     })),
     setAttribute: (value: VariationAttribute, option) => set((state) => {
         const product = {
-            attribute: state.product.attribute
+            attribute: state.product.attribute,
+            activeVariationId: state.product.activeVariationId,
         }
 
         const paAttr = product.attribute.find(a => a.name === value.name);
@@ -205,7 +209,15 @@ export const useStore = create<State & Actions>((set, get) => ({
     clearAttributes: () => set((state) => ({
         ...state,
         product: {
-            attribute: []
+            attribute: [],
+            activeVariationId: null,
+        }
+    })),
+    setActiveVariationId: (activeVariationId: number | null) => set((state) => ({
+        ...state,
+        product: {
+            ...state.product,
+            activeVariationId,
         }
     })),
     setAttributeMappings: (mappings: Map<string, AttributeMapping>) => set((state) => ({
