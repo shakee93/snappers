@@ -158,8 +158,10 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
 
   const isDesiredQuantityAvailable = () => {
     const cartItems = cart?.contents?.nodes ?? [];
-    const existingCartItem = cartItems.find(
-      (item: any) => item.product.node.databaseId === product.databaseId
+    const existingCartItem = cartItems.find((item: any) =>
+      product.type === "VARIABLE"
+        ? item.variation?.node?.databaseId === variation?.databaseId
+        : item.product?.node?.databaseId === product.databaseId
     );
 
     const existingCartQuantity = existingCartItem?.quantity ?? 0;
