@@ -4,6 +4,8 @@ import Label from "../Label/Label";
 import React from "react";
 import { CheckoutPayload, CustomerAddressInput } from "@/graphql/types/graphql";
 import { PaymentDetailsWithoutUrls } from "@/data/types";
+import { siteConfig } from "@/site.config";
+import { apiUrl } from "@/lib/api";
 
 const SRI_LANKAN_STATES = [
   "Western",
@@ -145,7 +147,7 @@ const getRandomWelcomeMessage = () => {
 
 const MERCHANT_ID = process.env.NEXT_PUBLIC_MERCHANT_ID;
 const TEST: boolean = process.env.NEXT_PUBLIC_PAYHERE_IS_TESTING === "true" ? true : false;
-const host = TEST ? "localhost:3000" : "gqmobiles.lk";
+const host = TEST ? "localhost:3000" : new URL(siteConfig.url.base).host;
 const notify_url = `https://${host}/api/notify`
 
 const STATIC_DATA = {
@@ -250,7 +252,7 @@ function numberFormat(
 
 const sentConfirmation = async (orderId: number | string): Promise<any> => {
   const confirmationResponse = await fetch(
-    "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/order-confirmation",
+    apiUrl("/wp-json/api/gq_mobile/v1/order-confirmation"),
     {
       method: "POST",
       headers: {

@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useStore } from "@/store/store";
 import Slider from "rc-slider";
+import { currencyCode } from "@/lib/formatPrice";
 
 interface BrandFilterProps {
 }
@@ -79,7 +80,7 @@ const PriceFilter = ({ }: BrandFilterProps) => {
                 <div className="space-y-3">
                     <span className="font-medium text-sm">Price range</span>
                     <br />
-                    <span className='pt-1'>LKR {rangePrices[0].toLocaleString()} - LKR {rangePrices[1].toLocaleString()}</span>
+                    <span className='pt-1'>{currencyCode} {rangePrices[0].toLocaleString()} - {currencyCode} {rangePrices[1].toLocaleString()}</span>
                     <div className="w-full">
                         <Slider
                             range
@@ -113,7 +114,7 @@ const PriceFilter = ({ }: BrandFilterProps) => {
                         </label>
                         <div className="mt-1 flex flex-row items-center gap-4 rounded-md">
                             <span className="pointer-events-none text-neutral-500 sm:text-sm">
-                                LKR
+                                {currencyCode}
                             </span>
                             <input
                                 type="number"
@@ -135,7 +136,7 @@ const PriceFilter = ({ }: BrandFilterProps) => {
                         </div>
                         {minBelowFloor && (
                             <p id="minPrice-hint" className="mt-1 text-xs text-red-600 dark:text-red-400">
-                                Minimum price is LKR {PRICE_RANGE[0].toLocaleString()}
+                                Minimum price is {currencyCode} {PRICE_RANGE[0].toLocaleString()}
                             </p>
                         )}
                         {minExceedsMax && (
@@ -153,7 +154,7 @@ const PriceFilter = ({ }: BrandFilterProps) => {
                         </label>
                         <div className="mt-1 flex flex-row items-center gap-4 rounded-md">
                             <span className="pointer-events-none text-neutral-500 sm:text-sm">
-                                LKR
+                                {currencyCode}
                             </span>
                             <input
                                 type="number"
@@ -175,7 +176,7 @@ const PriceFilter = ({ }: BrandFilterProps) => {
                         </div>
                         {maxBelowFloor && (
                             <p id="maxPrice-hint" className="mt-1 text-xs text-red-600 dark:text-red-400">
-                                Minimum price is LKR {PRICE_RANGE[0].toLocaleString()}
+                                Minimum price is {currencyCode} {PRICE_RANGE[0].toLocaleString()}
                             </p>
                         )}
                     </div>

@@ -1,5 +1,6 @@
 import { stripHtml } from "@/components/AddressPageComps/HelperComps";
 import { Product, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
+import { siteConfig } from "@/site.config";
 
 interface ProductSpec {
   name: string;
@@ -12,11 +13,7 @@ interface WarrantyInfo {
   description: string;
 }
 
-const DEFAULT_WARRANTY: WarrantyInfo = {
-  duration: 6,
-  unit: "MON",
-  description: "Covers manufacturing defects in materials and workmanship for 6 months from date of purchase"
-};
+const DEFAULT_WARRANTY: WarrantyInfo = siteConfig.product.defaultWarranty;
 
 function getWarrantySchema(warranty: WarrantyInfo = DEFAULT_WARRANTY) {
   return {
@@ -36,14 +33,14 @@ function getWarrantySchema(warranty: WarrantyInfo = DEFAULT_WARRANTY) {
 function getBaseOfferSchema(product: any, brand: any) {
   return {
     "@type": "Offer",
-    "url": `https://gqmobiles.lk/${brand.slug}/${product.slug}`,
+    "url": `${siteConfig.url.base}/${brand.slug}/${product.slug}`,
     "price": Number((product.price ?? "0").replace(/[^0-9.]/g, "")),
-    "priceCurrency": "LKR",
+    "priceCurrency": siteConfig.locale.currencyCode,
     "availability": product.stockStatus === "IN_STOCK"
       ? "https://schema.org/InStock"
       : "https://schema.org/OutOfStock",
     "itemCondition": "https://schema.org/NewCondition",
-    "seller": { "@type": "Organization", name: "GQ Mobiles" },
+    "seller": { "@type": "Organization", name: siteConfig.brand.name },
     "warranty": getWarrantySchema()
   };
 }

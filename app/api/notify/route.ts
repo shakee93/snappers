@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { md5 } from "js-md5";
+import { apiUrl } from "@/lib/api";
 
 function validateRequiredFields(data: any) {
   console.log("Starting validateRequiredFields with data:", data);
@@ -36,7 +37,7 @@ const sentPayhereConfirmation = async (
 
   console.log("Making request to WordPress API...");
   const confirmationResponse = await fetch(
-    "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/payhere-order-confirmation",
+    apiUrl("/wp-json/api/gq_mobile/v1/payhere-order-confirmation"),
     {
       method: "POST",
       headers: {

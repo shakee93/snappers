@@ -2,6 +2,7 @@
 import React, { FormEvent, useState } from "react";
 import { toast } from "sonner";
 import { Loader } from "lucide-react";
+import { apiUrl } from "@/lib/api";
 
 type OrderBankReceiptUploadProps = {
   orderNumber: string;
@@ -41,7 +42,7 @@ const OrderBankReceiptUpload: React.FC<OrderBankReceiptUploadProps> = ({
       formData.append("order_id", orderId);
 
       const response = await fetch(
-        "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/upload",
+        apiUrl("/wp-json/api/gq_mobile/v1/upload"),
         {
           method: "POST",
           body: formData,

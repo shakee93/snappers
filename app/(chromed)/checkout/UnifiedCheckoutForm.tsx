@@ -12,6 +12,8 @@ import { toast } from "sonner";
 import { SRI_LANKAN_STATES } from "@/components/AddressPageComps/HelperComps";
 import { useCart } from "@/context/CartProvider";
 import checkoutCopy from "@/content/checkout-copy.json";
+import { formatPrice } from "@/lib/formatPrice";
+import { PAYHERE_HIDE_THRESHOLD } from "@/lib/checkoutMath";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import PreOrderNotice from "@/components/PreOrderNotice";
@@ -442,10 +444,7 @@ const UnifiedCheckoutForm = ({
         const cost = flat?.cost ?? rates?.[0]?.cost;
         const numeric = typeof cost === "string" ? parseFloat(cost) : Number(cost);
         if (!Number.isFinite(numeric) || numeric <= 0) return null;
-        return `Rs ${new Intl.NumberFormat("en-US", {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-        }).format(numeric)}`;
+        return formatPrice(numeric, { decimals: 0 });
     }, [cart]);
 
     const handleBankSlipChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -572,7 +571,7 @@ const UnifiedCheckoutForm = ({
             if (
                 gateway.id === "payhere" &&
                 isPriceFluctuation?.topBarPriceFluctuationNotice &&
-                totalPayment >= 100000
+                totalPayment >= PAYHERE_HIDE_THRESHOLD
             ) {
                 return false;
             }
@@ -705,7 +704,7 @@ const UnifiedCheckoutForm = ({
                     trailing: perInstallment ? (
                         <div className="flex items-center gap-2">
                             <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">
-                                3 × Rs {new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(perInstallment)}
+                                3 × {formatPrice(perInstallment)}
                             </span>
                             <Image src="/koko.png" alt="Koko" width={36} height={18} className="h-4 w-auto" />
                         </div>

@@ -3,6 +3,7 @@ import { useRouter } from "next/navigation";
 import React, { FormEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
 import BankDetails from "./BankDetails";
+import { apiUrl } from "@/lib/api";
 import { PaymentDetailsWithoutUrls } from "@/data/types";
 import { Loader } from "lucide-react";
 import { useSession } from "@/context/SessionProvider";
@@ -111,7 +112,7 @@ const BankTransfer: React.FC<BankTransferProps> = ({
       formData.append("order_id", order_id);
 
       const response = await fetch(
-        "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/upload",
+        apiUrl("/wp-json/api/gq_mobile/v1/upload"),
         {
           method: "POST",
           body: formData,

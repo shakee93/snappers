@@ -5,6 +5,7 @@ import Link from "next/link";
 import { PinIcon, CheckCircle2 } from "lucide-react";
 import ContactBg from "./ContactBg";
 import contactContent from "@/content/contact.json";
+import { apiUrl } from "@/lib/api";
 
 interface ContactTextAreaProps {
   row: any;
@@ -54,7 +55,7 @@ const Contact = () => {
     };
     // console.log("Form Data:", formDataToSend);
 
-    const response = await fetch('https://api.gqmobiles.lk/wp-json/contact-form/v1/submit', {
+    const response = await fetch(apiUrl('/wp-json/contact-form/v1/submit'), {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'

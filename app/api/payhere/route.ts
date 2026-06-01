@@ -1,12 +1,16 @@
 import { md5 } from "js-md5";
+import { siteConfig } from "@/site.config";
 
 export async function POST(req: Request) {
   const { merchant_id, order_id, amount, currency } = await req.json();
 
   const host = req.headers.get("host") as string;
-  
+
+  // Live keys only when served from the tenant's production host; preview/
+  // local hosts fall back to the sandbox key.
+  const liveHost = new URL(siteConfig.url.base).hostname;
   let live = false;
-  if (host.includes("gqmobiles")) {
+  if (host.includes(liveHost)) {
     live = true;
   }
 

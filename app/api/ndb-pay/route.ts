@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { apiUrl } from "@/lib/api";
 
 export async function POST(request: Request) {
     try {
@@ -11,7 +12,7 @@ export async function POST(request: Request) {
 
         // Send order details to WordPress backend
         // WordPress will generate the signed CyberSource form with access_key, profile_id, secret_key
-        const response = await fetch('https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/ndb-pay-post-data', {
+        const response = await fetch(apiUrl('/wp-json/api/gq_mobile/v1/ndb-pay-post-data'), {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

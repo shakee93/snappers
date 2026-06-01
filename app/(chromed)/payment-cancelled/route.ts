@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
+import { apiUrl } from "@/lib/api";
 
 /**
  * Handle POST requests from CyberSource/NDB at /payment-cancelled
@@ -45,7 +46,7 @@ async function updateOrderStatusToCancelled(orderId: string, transactionId: stri
     console.log('Updating order status to cancelled:', { orderId, transactionId });
     
     const confirmationResponse = await fetch(
-      "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/payhere-order-confirmation",
+      apiUrl("/wp-json/api/gq_mobile/v1/payhere-order-confirmation"),
       {
         method: "POST",
         headers: {

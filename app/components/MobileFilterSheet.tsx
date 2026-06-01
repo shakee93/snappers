@@ -6,6 +6,7 @@ import { twMerge } from "tailwind-merge";
 import Slider from "rc-slider";
 import Radio from "@/shared/Radio/Radio";
 import { Package, XIcon } from "lucide-react";
+import { currencyCode } from "@/lib/formatPrice";
 import ButtonThird from "@/shared/Button/ButtonThird";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import { useStore } from "@/store/store";
@@ -453,7 +454,7 @@ const MobileFilterSheet = ({
                                                     <span className="text-md font-medium">Price range</span>
                                                     <br />
                                                     <span className="pt-1">
-                                                        LKR {rangePrices[0].toLocaleString()} - LKR{" "}
+                                                        {currencyCode} {rangePrices[0].toLocaleString()} - {currencyCode}{" "}
                                                         {rangePrices[1].toLocaleString()}
                                                     </span>
                                                     <Slider
@@ -488,7 +489,7 @@ const MobileFilterSheet = ({
                                                         <div className="flex flex-row gap-2 mt-1 rounded-md">
                                                             <span
                                                                 className="flex items-center pointer-events-none text-neutral-500 sm:text-sm">
-                                                                LKR
+                                                                {currencyCode}
                                                             </span>
                                                             <input
                                                                 type="number"
@@ -510,7 +511,7 @@ const MobileFilterSheet = ({
                                                         </div>
                                                         {minBelowFloor && (
                                                             <p id="minPrice-mobile-hint" className="mt-1 text-xs text-red-600 dark:text-red-400">
-                                                                Minimum price is LKR {PRICE_RANGE[0].toLocaleString()}
+                                                                Minimum price is {currencyCode} {PRICE_RANGE[0].toLocaleString()}
                                                             </p>
                                                         )}
                                                         {minExceedsMax && (
@@ -528,7 +529,7 @@ const MobileFilterSheet = ({
                                                         </label>
                                                         <div className="flex flex-row gap-2 mt-1 rounded-md">
                                                             <span className=" flex items-center pointer-events-none text-neutral-500 sm:text-sm">
-                                                                LKR
+                                                                {currencyCode}
                                                             </span>
                                                             <input
                                                                 type="number"
@@ -550,7 +551,7 @@ const MobileFilterSheet = ({
                                                         </div>
                                                         {maxBelowFloor && (
                                                             <p id="maxPrice-mobile-hint" className="mt-1 text-xs text-red-600 dark:text-red-400">
-                                                                Minimum price is LKR {PRICE_RANGE[0].toLocaleString()}
+                                                                Minimum price is {currencyCode} {PRICE_RANGE[0].toLocaleString()}
                                                             </p>
                                                         )}
                                                     </div>

@@ -60,6 +60,15 @@ export const siteConfig = {
   analytics: {
     googleAnalyticsId: "G-LS3EVR93ZH",
   },
+  product: {
+    // Default warranty used in product JSON-LD when a product has none set.
+    defaultWarranty: {
+      duration: 6,
+      unit: "MON",
+      description:
+        "Covers manufacturing defects in materials and workmanship for 6 months from date of purchase",
+    },
+  },
 } as const;
 
 export type SiteConfig = typeof siteConfig;
