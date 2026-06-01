@@ -526,7 +526,7 @@ const InstantSearchWrapper = ({
         <div className="flex lg:gap-6 flex-col">
           <SearchInput bindToStore={bindToStore} show={search} />
 
-          <div className='flex overflow-x-auto lg:hidden w-full'>
+          <div className='flex overflow-x-auto lg:hidden w-full mb-4 lg:mb-0'>
             <MobileFilterSheet category={category}
               brand={brand}
               categories={categories}
