@@ -5,8 +5,7 @@ import ButtonClose from "@/shared/ButtonClose/ButtonClose";
 import ProductQuickView from "./ProductQuickView3";
 import ProductQuickView2 from "@/components/ProductQuickView";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
-import { useLazyQuery, useQuery } from "@apollo/client";
-import { GET_QUICK_VIEW_PRODUCT } from "@/graphql/defs/products";
+import { useQuickViewProduct } from "@/hooks/useQuickViewProduct";
 
 export interface ModalQuickViewProps {
   show: boolean;
@@ -24,7 +23,7 @@ const ModalQuickView: FC<ModalQuickViewProps> = ({
 
   const [product, setProduct] = useState()
 
-  const [getProduct, { loading, error, data }] = useLazyQuery(GET_QUICK_VIEW_PRODUCT);
+  const [getProduct, { loading, error, data }] = useQuickViewProduct();
 
 
   useEffect(() => {

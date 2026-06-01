@@ -19,8 +19,7 @@ import {
   ProductVariation,
 } from "@/graphql/types/graphql";
 
-import { GET_TECH_SPEC } from "@/graphql/defs/products";
-import { useLazyQuery, useQuery } from "@apollo/client";
+import { useTechSpec } from "@/hooks/useTechSpec";
 import ProductDetails from "@/app/components/SingleProductPage/ProductDetailsQuickView";
 import { Loader } from "lucide-react";
 
@@ -64,7 +63,7 @@ const ProductQuickView = ({
   ];
 
 
-  const [getTechSpec, { loading, error, data }] = useLazyQuery(GET_TECH_SPEC);
+  const [getTechSpec, { loading, error, data }] = useTechSpec();
 
 
 

@@ -1,9 +1,8 @@
-import { GET_SLIDES } from "@/graphql/defs/slides";
+import { useSlides } from "@/hooks/useSlides";
 import backgroundLineSvg from "@/public/images/Moon.svg";
 import imageRightPng2 from "@/public/images/hero-right-2.png";
 import imageRightPng3 from "@/public/images/hero-right-3.png";
 import imageRightPng from "@/public/images/hero-right.png";
-import { useQuery } from "@apollo/client";
 import Image, { StaticImageData } from "next/image";
 import { FC, useEffect, useState } from "react";
 import useBoolean from "react-use/lib/useBoolean";
@@ -65,7 +64,7 @@ let TIME_OUT: NodeJS.Timeout | null = null;
 
 const SectionHero: FC<SectionHero2Props> = ({ className = "" }) => {
   const [slide, setSlide] = useState<SlideType[]>([]);
-  let { loading, error, data, refetch } = useQuery(GET_SLIDES);
+  let { loading, error, data, refetch } = useSlides();
 
   useEffect(() => {
     if (!loading && data?.slides?.nodes?.length > 0) {

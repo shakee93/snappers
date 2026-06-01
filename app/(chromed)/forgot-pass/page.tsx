@@ -2,19 +2,18 @@
 
 import { FormEvent, useState } from "react";
 import Link from "next/link";
-import { useMutation } from "@apollo/client";
 import Input from "@/shared/Input/Input";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import { Loader } from "lucide-react";
 import { toast } from "sonner";
-import { SEND_PASSWORD_RESET_EMAIL } from "@/graphql/defs/auth";
+import { useForgotPassword } from "@/hooks/useForgotPassword";
 
 const ForgotPasswordPage = () => {
   const [email, setEmail] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const [sendResetEmail] = useMutation(SEND_PASSWORD_RESET_EMAIL);
+  const [sendResetEmail] = useForgotPassword();
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();

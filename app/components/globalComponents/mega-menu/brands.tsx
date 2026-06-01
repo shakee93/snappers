@@ -1,17 +1,15 @@
 "use client";
 
 import React, { useCallback } from "react";
-import { useQuery } from "@apollo/client";
-import { GET_NAV_BRANDS } from "@/graphql/defs/nav";
 import Link from "next/link";
 import { Brand } from "@/graphql/types/graphql";
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import NavMenuSkeleton from "../../Skeletons/NavMenuSkeleton";
+import { useNavBrands } from "@/hooks/useNavBrands";
 
 export default function BrandsMenu({ onClose }: { onClose: () => void }) {
-  const { data, loading, error } = useQuery(GET_NAV_BRANDS);
-  const brands: Brand[] = data?.brands?.nodes || [];
+  const { brands, loading, error } = useNavBrands();
 
   const splitIntoColumns = useCallback(
     (items: Brand[], columnCount: number): Brand[][] => {

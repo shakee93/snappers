@@ -25,9 +25,10 @@ import skullcandy from "@/public/images/brandLogo/skullcandy.jpg";
 import tecno from "@/public/images/brandLogo/tecno.jpg";
 
 import { StaticImageData } from "next/image";
-import { useLazyQuery, useQuery } from "@apollo/client";
-import { GET_PRODUCTS, GET_BRANDS } from "@/graphql/defs/products";
+import { useLazyQuery } from "@apollo/client";
+import { GET_PRODUCTS } from "@/graphql/defs/products";
 import { GET_BRAND_DETAILS } from "@/graphql/defs/products";
+import { useBrands } from "@/hooks/useBrands";
 import { Brand } from "@/graphql/types/graphql";
 
 interface ExploreType {
@@ -126,7 +127,7 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
   const [tabActive, setTabActive] =
     useState<keyof typeof hardcodedBrands>("Mobiles");
 
-  const { loading, error, data, refetch } = useQuery(GET_BRANDS);
+  const { loading, error, data, refetch } = useBrands();
 
   const fetchBrandsForCategory = async (category: keyof typeof hardcodedBrands) => {
 

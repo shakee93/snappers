@@ -2,8 +2,7 @@
 import { Brand, Category, Product } from "@/graphql/types/graphql";
 import { useStore } from "@/store/store";
 import { useEffect, useMemo } from "react";
-import { GET_PRODUCTS_BOGO_PLUGIN_META } from "@/graphql/defs/products";
-import { useQuery } from "@apollo/client";
+import { useBogoPluginMeta } from "@/hooks/useBogoPluginMeta";
 import ProductCard from "./ProductCard3";
 import { getDatabaseIdFromProductLike } from "@/lib/bogo";
 import { useHits, useInstantSearch } from "react-instantsearch";
@@ -44,11 +43,7 @@ const ProductGridInstant = ({
     return Array.from(s);
   }, [hits]);
 
-  const { data: bogoBatchData } = useQuery(GET_PRODUCTS_BOGO_PLUGIN_META, {
-    variables: { ids: bogoDatabaseIds },
-    skip: bogoDatabaseIds.length === 0,
-    fetchPolicy: "cache-first",
-  });
+  const { data: bogoBatchData } = useBogoPluginMeta(bogoDatabaseIds);
 
   const bogoPluginMetaByProductId = useMemo(() => {
     const acc: Record<

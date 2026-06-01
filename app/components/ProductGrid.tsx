@@ -3,8 +3,7 @@ import { Brand, Category, Product } from "@/graphql/types/graphql";
 import { filterHiddenProducts } from "@/lib/hidden-products";
 import { useStore } from "@/store/store";
 import { useEffect, useState } from "react";
-import { GET_BRAND_ARCHIVE } from "@/graphql/defs/products";
-import { useLazyQuery } from "@apollo/client";
+import { useBrandArchive } from "@/hooks/useBrandArchive";
 import ProductCard from "./ProductCard3";
 
 interface ProductGridProps {
@@ -18,9 +17,7 @@ const ProductGrid = ({ products, brand, category }: ProductGridProps) => {
     const [_products, setProducts] = useState<{ node: Product }[]>(products);
     const [mounts, setMounts] = useState(0)
 
-    let [getArchiveData, { loading, error }] = useLazyQuery(GET_BRAND_ARCHIVE, {
-        fetchPolicy: 'no-cache'
-    });
+    let [getArchiveData, { loading, error }] = useBrandArchive();
 
     useEffect(() => {
 

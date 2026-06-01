@@ -3,12 +3,11 @@
 import { FormEvent, Suspense, useMemo, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useMutation } from "@apollo/client";
 import { toast } from "sonner";
 import { Loader } from "lucide-react";
 import Input from "@/shared/Input/Input";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
-import { RESET_USER_PASSWORD } from "@/graphql/defs/auth";
+import { useResetPassword } from "@/hooks/useResetPassword";
 
 const ResetPasswordContent = () => {
   const searchParams = useSearchParams();
@@ -20,7 +19,7 @@ const ResetPasswordContent = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const [resetPassword] = useMutation(RESET_USER_PASSWORD);
+  const [resetPassword] = useResetPassword();
 
   const hasValidResetParams = useMemo(() => Boolean(key && login), [key, login]);
 

@@ -3,13 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo } from "react";
-import { useQuery } from "@apollo/client";
-import { GET_PRODUCTS_BY_DATABASE_IDS } from "@/graphql/defs/products";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import { findBogoEnabledVariation, resolveBogoConfig } from "@/lib/bogo";
 import { getPreferredVariation } from "@/lib/getPreferredVariation";
 import { useStore } from "@/store/store";
 import { useUnresolvedFreeGifts } from "@/hooks/useUnresolvedFreeGifts";
+import { useFreeGiftProducts } from "@/hooks/useFreeGiftProducts";
 
 type GiftCardItem = {
   id: number | string;
@@ -104,22 +103,9 @@ export default function FreeGiftPreview({
     bogo.freeProductIds.length > 0 &&
     crossProductFreeIds.length === 0;
 
-  const { data: freeGiftData, loading: freeGiftLoading } = useQuery(
-    GET_PRODUCTS_BY_DATABASE_IDS,
-    {
-      variables: { ids: crossProductFreeIds },
-      skip: !bogo.isBogoEnabled || crossProductFreeIds.length === 0,
-      fetchPolicy: "cache-first",
-    }
-  );
-
-  const freeGiftNodes = useMemo(
-    () =>
-      freeGiftData?.products?.nodes?.filter(
-        (p: { name?: string | null } | null): p is NonNullable<typeof p> =>
-          !!p?.name
-      ) ?? [],
-    [freeGiftData]
+  const { nodes: freeGiftNodes, loading: freeGiftLoading } = useFreeGiftProducts(
+    crossProductFreeIds,
+    { enabled: bogo.isBogoEnabled }
   );
 
   const unresolvedFreeIds = useMemo(() => {

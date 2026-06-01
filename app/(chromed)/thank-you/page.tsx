@@ -1,9 +1,8 @@
 "use client";
 import { OrderPaymentPageProps } from "@/data/types";
-import { useQuery } from "@apollo/client";
-import { GET_SINGLE_ORDER } from "@/graphql/defs/order";
 import { isLineItemFree, stripHtmlMoney } from "@/lib/cartLinePricing";
 import { siteConfig } from "@/site.config";
+import { useOrderById } from "@/hooks/useOrderById";
 
 const ThankYouPage = ({ params }: OrderPaymentPageProps) => {
   // const dummyProducts = [
@@ -15,11 +14,7 @@ const ThankYouPage = ({ params }: OrderPaymentPageProps) => {
   // const orderId = params['order-id'];
   const orderId = "b3JkZXI6NjQzOA==";
 
-  const { loading, error, data, refetch } = useQuery(GET_SINGLE_ORDER, {
-    variables: {
-      orderID: orderId,
-    },
-  });
+  const { loading, error, data, refetch } = useOrderById(orderId);
 
   return (
     <div className="container mt-4 rounded-3xl text-center lg:p-20">

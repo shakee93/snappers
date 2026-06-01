@@ -2,22 +2,13 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FetchResult, useMutation, useQuery } from "@apollo/client";
 import Input from "shared/Input/Input";
 import Label from "components/Label/Label";
 import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
-import {
-  UPDATE_SHIPPING_TOTAL,
-  APPLY_COUPON,
-  REMOVE_COUPONS,
-} from "@/graphql/defs/cart";
-import {
-  CHECKOUT,
-  COMPLETE_ORDER_PAYMENT,
-  GUEST_CHECKOUT,
-  GUEST_CHECKOUT_MUTATION,
-} from "@/graphql/defs/order";
+import { useCoupon } from "@/hooks/useCoupon";
+import { useShipping } from "@/hooks/useShipping";
+import { useCheckout } from "@/hooks/useCheckout";
 import {
   CheckoutPayload,
   CustomerAddressInput,
@@ -105,8 +96,7 @@ const CheckoutPage = () => {
   const [isCouponSyncingCart, setIsCouponSyncingCart] = useState(false);
   const [hasSeenCartWithItems, setHasSeenCartWithItems] = useState(false);
 
-  const [applyCouponMutation, { loading: applyingCoupon }] = useMutation(APPLY_COUPON);
-  const [removeCouponsMutation, { loading: removingCoupon }] = useMutation(REMOVE_COUPONS);
+  const { applyCouponMutation, removeCouponsMutation, applyingCoupon, removingCoupon } = useCoupon();
 
   const handleTOC = () => {
     const updatedTOC = !isTOC;
@@ -144,29 +134,21 @@ const CheckoutPage = () => {
   }, []);
 
   // MUTATIONS
-  const [updateCartShippingTotalMutation, { loading: shippingUpdating }] = useMutation(UPDATE_SHIPPING_TOTAL);
-  const [
+  const { updateCartShippingTotalMutation, shippingUpdating } = useShipping();
+  const {
     checkoutMutation,
-    {
-      data: realCheckoutData,
-      loading: realCheckoutLoading,
-      error: realCheckoutError,
-    },
-  ] = useMutation(CHECKOUT);
-
-  const [completeOrderPayment] = useMutation(COMPLETE_ORDER_PAYMENT);
-  // const  [createOrderGuest] = useMutation(GUEST_CHECKOUT_MUTATION)
-  const [
+    realCheckoutData,
+    realCheckoutLoading,
+    realCheckoutError,
+    completeOrderPayment,
     guestCheckout,
-    { loading: guestCheckoutLoading, error: guestCheckoutError },
-  ] = useMutation(GUEST_CHECKOUT);
-
-
-  // Creating a Order using For Guest. Instead of using direct checkout mutation.
-  const [
+    guestCheckoutLoading,
+    guestCheckoutError,
     createOrderGuest,
-    { loading: checkoutLoading, error: checkoutError, data: checkoutData },
-  ] = useMutation(GUEST_CHECKOUT_MUTATION);
+    checkoutLoading,
+    checkoutError,
+    checkoutData,
+  } = useCheckout();
 
   // Contexts
   const router = useRouter();
