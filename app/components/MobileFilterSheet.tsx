@@ -101,16 +101,34 @@ const MobileFilterSheet = ({
         limit: 20,
     });
 
+    // Snapshot the facet list on first non-empty result and keep it stable.
+    // Once a brand is selected the InstantSearchWrapper filter narrows results
+    // to that brand, so brandsFacet collapses to just the selected value and
+    // every other checkbox would disappear — blocking multi-select. Pinning
+    // the initial facet keeps the full list (and counts) visible while the
+    // user is making selections. Same reasoning for categories. setState
+    // during render is React's recommended pattern for derived snapshot
+    // state — guarded so it only fires once when the facet first populates.
+    const [firstBrandsFacet, setFirstBrandsFacet] = useState<typeof brandsFacet>([]);
+    if (firstBrandsFacet.length === 0 && brandsFacet.length > 0) {
+        setFirstBrandsFacet(brandsFacet);
+    }
+    const [firstCategoriesFacet, setFirstCategoriesFacet] = useState<typeof categoriesFacet>([]);
+    if (firstCategoriesFacet.length === 0 && categoriesFacet.length > 0) {
+        setFirstCategoriesFacet(categoriesFacet);
+    }
+
+    const brandsFacetView = firstBrandsFacet.length > 0 ? firstBrandsFacet : brandsFacet;
+    const categoriesFacetView = firstCategoriesFacet.length > 0 ? firstCategoriesFacet : categoriesFacet;
+
     const facetedBrands = useMemo(() => {
-        return brands.filter(b =>
-            brandsFacet.map(f => Number(f.value)).includes(b.databaseId)
-        )
-    }, [brands, brandsFacet])
+        const ids = brandsFacetView.map(f => Number(f.value));
+        return brands.filter(b => ids.includes(b.databaseId));
+    }, [brands, brandsFacetView])
 
     const facetedCategories = useMemo(() => {
-        const sortedCategories = categories.filter(b =>
-            categoriesFacet.map(f => Number(f.value)).includes(b.databaseId)
-        );
+        const ids = categoriesFacetView.map(f => Number(f.value));
+        const sortedCategories = categories.filter(b => ids.includes(b.databaseId));
 
         // Sort categories to have 1484 first and 1483 second
         sortedCategories.sort((a, b) => {
@@ -124,7 +142,7 @@ const MobileFilterSheet = ({
         });
 
         return sortedCategories;
-    }, [categoriesFacet, categories])
+    }, [categoriesFacetView, categories])
 
     const closeModalMoreFilter = () => setisOpenMoreFilter(false);
     const openModalMoreFilter = () => setisOpenMoreFilter(true);
@@ -328,7 +346,7 @@ const MobileFilterSheet = ({
                                                                         <div key={item.databaseId} className="">
                                                                             <Checkbox
                                                                                 name={item.slug || ""}
-                                                                                label={`${item.name} (${categoriesFacet.find(f => item.databaseId === Number(f.value))?.count})`}
+                                                                                label={`${item.name} (${categoriesFacetView.find(f => item.databaseId === Number(f.value))?.count ?? 0})`}
                                                                                 defaultChecked={categoriesState.includes(
                                                                                     item.databaseId
                                                                                 )}
@@ -377,7 +395,7 @@ const MobileFilterSheet = ({
                                                                         <div key={item.databaseId} className="">
                                                                             <Checkbox
                                                                                 name={item.slug || ""}
-                                                                                label={`${item.name} (${brandsFacet.find(f => item.databaseId === Number(f.value))?.count})`}
+                                                                                label={`${item.name} (${brandsFacetView.find(f => item.databaseId === Number(f.value))?.count ?? 0})`}
                                                                                 defaultChecked={brandsState.includes(
                                                                                     item.databaseId
                                                                                 )}
