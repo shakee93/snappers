@@ -56,23 +56,23 @@ const
                 </div>
                 <div className="flex flex-col gap-1">
                   {product.regularPrice && product.regularPrice !== product.price && (
-                    <span className="text-[#D71E1E] font-medium leading-none line-through text-[9px]">
+                    <span className="text-danger font-medium leading-none line-through text-[9px]">
                       {product.regularPrice} {product.currency}
                     </span>
                   )}
-                  <span className="text-[#1B40AF] font-bold text-sm leading-none">
+                  <span className="text-primaryColor font-bold text-sm leading-none">
                     {product.price} {product.currency}
                   </span>
                 </div>
               </div>
               <div className="flex flex-row gap-2">
                 <Link href="/deals">
-                  <button className="bg-white border border-[#1B40AF] text-[#1B40AF] text-xs px-1 sm:px-4 py-1 rounded-full hover:bg-blue-50 transition-colors">
+                  <button className="bg-white border border-primaryColor text-primaryColor text-xs px-1 sm:px-4 py-1 rounded-full hover:bg-blue-50 transition-colors">
                     Explore Deals
                   </button>
                 </Link>
                 <Link href={`/products/${product.slug}`} target="_blank" rel="noopener noreferrer">
-                  <button className="bg-[#1B40AF] text-white text-xs px-4 py-1 rounded-full hover:bg-blue-600 transition-colors">
+                  <button className="bg-primaryColor text-white text-xs px-4 py-1 rounded-full hover:bg-blue-600 transition-colors">
                     Buy Now
                   </button>
                 </Link>

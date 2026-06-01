@@ -41,6 +41,10 @@ const config: Config = {
 			colors: {
 				transparent: 'transparent',
 				primaryColor: '#1b40af',
+				// Semantic status tokens (a fork swaps these). Plain hex so they
+				// render identically to the literals they replace.
+				success: '#059669',
+				danger: '#d71e1e',
 				primary: {
 					'50': 'customColors("--c-primary-50")',
 					'100': 'customColors("--c-primary-100")',
