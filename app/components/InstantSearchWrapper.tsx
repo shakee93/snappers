@@ -16,7 +16,7 @@ import { UiState } from "instantsearch.js";
 import { useSearchParams, useRouter } from "next/navigation";
 import { HIDDEN_PRODUCT_SLUGS } from "@/lib/hidden-products";
 import { isHiddenVariationAttribute } from "@/lib/hidden-variation-attributes";
-import { SORT_PRICE_ASC_ID } from "@/lib/sortOrders";
+import { SORT_PRICE_ASC_ID, SORT_NEWEST_ID } from "@/lib/sortOrders";
 import { DealFilterType, DealTagSlug, DEAL_FILTER_TO_TAG, VALID_DEAL_FILTER_TYPES } from "@/lib/dealFilters";
 
 type CustomUiState = UiState & {
@@ -63,6 +63,7 @@ interface InstantSearchWrapperProps {
   searchQueryValue?: string;
   dealsType?: DealFilterType[];
   dealTags?: string[];
+  inStockOnly?: boolean;
 }
 
 const typesenseConfig = {
@@ -111,8 +112,21 @@ const InstantSearchWrapper = ({
   searchQueryValue,
   dealsType,
   dealTags,
+  inStockOnly = false,
 }: InstantSearchWrapperProps) => {
   const { sidebar, setSearchMounted, isTyping } = useStore();
+
+  // Pages that opt in via `sort` (i.e. /new-arrivals) lead with the most
+  // recently published products. Typesense has no publish-date field, so
+  // SORT_NEWEST_ID (databaseId:desc) is the canonical proxy — the same id the
+  // Newest radio uses. We apply it purely at the InstantSearch UiState layer
+  // (SortInput + routeToState below) and deliberately DO NOT write it to the
+  // store or the URL: doing so routes the sort through the same ?sort= →
+  // router.push pipeline as filters and races the ?page=N writes, which breaks
+  // pagination. Kept in a ref so the []-memoised routeToState reads it live.
+  const defaultSort = sort ? SORT_NEWEST_ID : "";
+  const defaultSortRef = useRef(defaultSort);
+  defaultSortRef.current = defaultSort;
   const [differedSidebar] = useDebounce(sidebar, 800);
   const [hitsPerPage, setHitsPerPage] = useState<number>(12);
   // useSearchParams here triggers BAILOUT_TO_CLIENT_SIDE_RENDERING for the
@@ -229,7 +243,10 @@ const InstantSearchWrapper = ({
           ? `brands.nodes.databaseId:[${effective.brands.join(",")}]`
           : null,
       effective.on_sale ? "onSale:true" : null,
-      effective.in_stock ? "stockStatus:IN_STOCK && productTags.nodes.slug:!=pre-order" : null,
+      // `inStockOnly` (e.g. /new-arrivals) forces the in-stock filter at the
+      // query layer regardless of the sidebar toggle, so it never routes
+      // through the ?in_stock= → router.push pipeline that races pagination.
+      (inStockOnly || effective.in_stock) ? "stockStatus:IN_STOCK && productTags.nodes.slug:!=pre-order" : null,
       effectiveDealTags && effectiveDealTags.length > 0
         ? `productTags.nodes.slug:[${effectiveDealTags.join(",")}]`
         : tag
@@ -435,7 +452,11 @@ const InstantSearchWrapper = ({
     return {
       product: {
         ...ui,
-        sortBy: ui.sort ? `product/sort/${ui.sort}` : 'product',
+        sortBy: ui.sort
+          ? `product/sort/${ui.sort}`
+          : defaultSortRef.current
+            ? `product/sort/${defaultSortRef.current}`
+            : 'product',
       },
     };
   }, []);
@@ -510,12 +531,13 @@ const InstantSearchWrapper = ({
               brand={brand}
               categories={categories}
               brands={brands}
-              sort={sort} />
+              sort={sort}
+              inStockOnly={inStockOnly} />
           </div>
           <div className='grid grid-cols-12 gap-4'>
 
             <div className={filters ? 'hidden lg:block lg:col-span-3' : 'hidden'}>
-              <SortInput />
+              <SortInput defaultSort={defaultSort} />
               {filters && (
                 <TabFilters
                   category={category}
@@ -524,6 +546,7 @@ const InstantSearchWrapper = ({
                   brands={brands}
                   sort={sort}
                   dealsType={dealsType}
+                  inStockOnly={inStockOnly}
                 />
               )}
             </div>

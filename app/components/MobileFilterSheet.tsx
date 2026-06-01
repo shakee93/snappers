@@ -14,7 +14,7 @@ import { useRefinementList } from "react-instantsearch";
 import InStockFilter from "./Filters/InStockFilter";
 import DynamicVariationFilters from "./Filters/DynamicVariationFilters";
 import { PRICE_RANGE } from "@/app/components/Filters/PriceFilter";
-import { SORT_ORDER_OPTIONS } from "@/lib/sortOrders";
+import { SORT_ORDER_OPTIONS, SORT_NEWEST_ID } from "@/lib/sortOrders";
 
 interface TabFilterProps {
     categories?: ProductCategory[];
@@ -22,6 +22,7 @@ interface TabFilterProps {
     brands?: Brand[];
     brand?: Brand;
     sort?: Boolean;
+    inStockOnly?: boolean;
 }
 
 const MobileFilterSheet = ({
@@ -30,6 +31,7 @@ const MobileFilterSheet = ({
     brand,
     category,
     sort,
+    inStockOnly = false,
 }: TabFilterProps) => {
 
     const [isOpenMoreFilter, setisOpenMoreFilter] = useState(false);
@@ -71,7 +73,7 @@ const MobileFilterSheet = ({
     const minBelowFloor = rangePrices[0] < PRICE_RANGE[0];
     const maxBelowFloor = rangePrices[1] < PRICE_RANGE[0];
     const minExceedsMax = !minBelowFloor && !maxBelowFloor && rangePrices[0] > rangePrices[1];
-    const sortOrderStates = sidebar.sort || (sort ? "databaseId:desc" : "");
+    const sortOrderStates = sidebar.sort || (sort ? SORT_NEWEST_ID : "");
     const brandsState = sidebar.brands;
     const categoriesState = sidebar.categories;
     const inStock = sidebar.in_stock;
@@ -398,6 +400,7 @@ const MobileFilterSheet = ({
                                             </div>
                                         )}
 
+                                        {!inStockOnly && (
                                         <div className="py-4 w-full">
                                             <h3 className="text-md font-medium">Stock Status</h3>
                                             <div className="mt-3 flex flex-col gap-2">
@@ -424,6 +427,7 @@ const MobileFilterSheet = ({
                                                 </div>
                                             </div>
                                         </div>
+                                        )}
 
                                         <div className="py-4">
                                             <div className="relative flex flex-col space-y-8">
