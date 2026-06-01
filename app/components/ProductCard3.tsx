@@ -29,8 +29,6 @@ import {
 import AddedToCart from "@/app/components/Notifications/added-to-cart";
 import { useCart } from "@/context/CartProvider";
 import { twMerge } from "tailwind-merge";
-import { GET_QUICK_VIEW_PRODUCT } from "@/graphql/defs/products";
-import { useQuery } from "@apollo/client";
 import { Highlight } from "react-instantsearch";
 import { redirect, useRouter, usePathname } from "next/navigation";
 import { useStore } from "@/store/store";

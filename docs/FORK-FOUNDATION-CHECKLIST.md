@@ -115,9 +115,19 @@ definition-of-done. To finish the fork foundation for legal content, do the foll
 
 ## Phase 4 — component reorganization
 
-- [ ] Files moved into `components/{layout,primitives,ui}/`; imports updated
-- [ ] Dead/debug artifacts removed (test page, page2, httpbin fetches, dead imports, bare-IP route)
-- [ ] Verify: **every route** in the per-route smoke test above (import churn = highest risk)
+**Done (this PR): dead-code pruning only.**
+- [x] Removed dead/orphan files: `test/page.tsx`, `thank-you/page2.tsx`, `terms-and-conditions/{SectionFounder,SectionHero,SectionStatistic}.tsx`, dead `api/banktransfer/` route, `ProductCard3` dead query imports
+- [x] Pruned 16 unimported legacy root `components/` files (verified by build)
+
+**Deferred (separate focused effort) — the directory moves:**
+- [ ] Move files into `components/{layout,primitives,ui}/` with import rewrites
+      (needs the audit's per-file classification — not in the plan doc; ~80 files;
+      highest import-churn risk; do as small per-category passes)
+- [ ] Resolve remaining legacy root `components/` files that are still referenced
+      (SectionPromo*, SectionHero/2, TikTokSection, SectionSliderLargeProduct*, etc.) —
+      determine if referenced by live code or dead chains, then move/delete
+- [ ] httpbin debug fetches in legal pages → tracked under the Legal section above
+- [ ] Verify: **every route** in the per-route smoke test (import churn = highest risk)
 
 ## Phase 5 — theme tokens end-to-end
 
