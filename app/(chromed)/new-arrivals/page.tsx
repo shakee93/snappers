@@ -13,7 +13,8 @@ const Page = () => {
         title="New Arrivals"
         filters
         sort={true}
-        inStockOnly />
+        inStockOnly
+        defaultNewest />
     </Suspense>
   );
 };

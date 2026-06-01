@@ -64,6 +64,7 @@ interface InstantSearchWrapperProps {
   dealsType?: DealFilterType[];
   dealTags?: string[];
   inStockOnly?: boolean;
+  defaultNewest?: boolean;
 }
 
 const typesenseConfig = {
@@ -113,20 +114,19 @@ const InstantSearchWrapper = ({
   dealsType,
   dealTags,
   inStockOnly = false,
+  defaultNewest = false,
 }: InstantSearchWrapperProps) => {
   const { sidebar, setSearchMounted, isTyping } = useStore();
 
-  // Pages that opt in via `sort` (i.e. /new-arrivals) lead with the most
-  // recently published products. Typesense has no publish-date field, so
+  // Pages that opt in via `defaultNewest` (i.e. /new-arrivals) lead with the
+  // most recently published products. Typesense has no publish-date field, so
   // SORT_NEWEST_ID (databaseId:desc) is the canonical proxy — the same id the
   // Newest radio uses. We apply it purely at the InstantSearch UiState layer
   // (SortInput + routeToState below) and deliberately DO NOT write it to the
   // store or the URL: doing so routes the sort through the same ?sort= →
   // router.push pipeline as filters and races the ?page=N writes, which breaks
-  // pagination. Kept in a ref so the []-memoised routeToState reads it live.
-  const defaultSort = sort ? SORT_NEWEST_ID : "";
-  const defaultSortRef = useRef(defaultSort);
-  defaultSortRef.current = defaultSort;
+  // pagination.
+  const defaultSort = defaultNewest ? SORT_NEWEST_ID : "";
   const [differedSidebar] = useDebounce(sidebar, 800);
   const [hitsPerPage, setHitsPerPage] = useState<number>(12);
   // useSearchParams here triggers BAILOUT_TO_CLIENT_SIDE_RENDERING for the
@@ -454,12 +454,12 @@ const InstantSearchWrapper = ({
         ...ui,
         sortBy: ui.sort
           ? `product/sort/${ui.sort}`
-          : defaultSortRef.current
-            ? `product/sort/${defaultSortRef.current}`
+          : defaultSort
+            ? `product/sort/${defaultSort}`
             : 'product',
       },
     };
-  }, []);
+  }, [defaultSort]);
 
   // Create reactive stateMapping that updates when sidebar changes
   return (

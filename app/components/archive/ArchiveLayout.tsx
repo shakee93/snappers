@@ -65,6 +65,7 @@ interface ArchiveLayoutProps {
   dealsType?: DealFilterType[];
   dealTags?: string[];
   inStockOnly?: boolean;
+  defaultNewest?: boolean;
 }
 
 const ArchiveLayout = async ({
@@ -82,6 +83,7 @@ const ArchiveLayout = async ({
   dealsType,
   dealTags,
   inStockOnly,
+  defaultNewest,
 }: ArchiveLayoutProps) => {
 
   const { productCategories, brands, nestedCategories, tagDetails } = await getData(category?.databaseId ?? '', tag);
@@ -155,6 +157,7 @@ const ArchiveLayout = async ({
                 dealsType={dealsType}
                 dealTags={dealTags}
                 inStockOnly={inStockOnly}
+                defaultNewest={defaultNewest}
               />
             </div>
           </div>
