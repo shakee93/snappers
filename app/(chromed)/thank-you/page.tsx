@@ -3,6 +3,7 @@ import { OrderPaymentPageProps } from "@/data/types";
 import { useQuery } from "@apollo/client";
 import { GET_SINGLE_ORDER } from "@/graphql/defs/order";
 import { isLineItemFree, stripHtmlMoney } from "@/lib/cartLinePricing";
+import { siteConfig } from "@/site.config";
 
 const ThankYouPage = ({ params }: OrderPaymentPageProps) => {
   // const dummyProducts = [
@@ -154,7 +155,7 @@ const ThankYouPage = ({ params }: OrderPaymentPageProps) => {
       <div className="py-8">
         <p className="text-left text-2xl">Our Bank Details</p>
         <div className="">
-          <h1 className="py-8 text-left text-xl ">GQ Mobile</h1>
+          <h1 className="py-8 text-left text-xl ">{siteConfig.brand.name}</h1>
 
           <ul className="list-disc pl-4 ">
             <li className="mb-2 text-left ">

@@ -6,6 +6,7 @@ import Image from "next/image";
 import StoreImageSlider from "./StoreImageSlide"
 import { EmblaOptionsType } from "embla-carousel";
 import Link from "next/link";
+import storePromo from "@/content/store-promo.json";
 
 import "styles/embla.css";
 
@@ -34,9 +35,7 @@ const SectionPromo1: FC<SectionPromo1Props> = ({ className = "" }) => {
           Together We Shine.
         </h2>
         <span className="block text-slate-500 dark:text-slate-400 ">
-          Located in the heart of Colombo, you can visit our GQ Mobiles
-          stores and experience the greatest purchase experience in
-          Sri Lanka for an affordable price
+          {storePromo.description}
         </span>
         <div className="flex space-x-2 sm:space-x-5 ">
           <Link href="/collections/all">

@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useStore } from "@/store/store";
 import { useSession } from "@/context/SessionProvider";
+import { siteConfig } from "@/site.config";
 
 const MobileNavLinks = () => {
   const iconSize = 18;
@@ -105,29 +106,29 @@ const MobileNavLinks = () => {
           <div className="flex  justify-center text-primaryColor text-base gap-2 items-center">
 
             <Link
-              href={"tel:0777555665"}
+              href={`tel:${siteConfig.contact.primaryPhone}`}
               className="flex  gap-2 items-center justify-center"
             >
-              <PhoneCall size={iconSize} /> 0777555665
+              <PhoneCall size={iconSize} /> {siteConfig.contact.primaryPhone}
             </Link>
             <div>|</div>
             <Link
-              href={"tel:0777988665"}
+              href={`tel:${siteConfig.contact.secondaryPhone}`}
               className="flex gap-2 items-center justify-center"
             >
               <PhoneCall size={iconSize} />
-              0777988665
+              {siteConfig.contact.secondaryPhone}
             </Link>
           </div>
 
           <div className="flex gap-2 justify-center text-primaryColor">
-            <Link href={"https://www.facebook.com/gqmobilestore"}>
+            <Link href={`https://www.facebook.com/${siteConfig.social.facebook}`}>
               <Facebook size={24} />
             </Link>
-            <Link href={"https://www.instagram.com/gqthemobilestoreunlimited"}>
+            <Link href={`https://www.instagram.com/${siteConfig.social.instagram}`}>
               <Instagram size={24} />
             </Link>
-            <Link href={"https://www.tiktok.com/@gqmobiles"}>
+            <Link href={`https://www.tiktok.com/${siteConfig.social.tiktok}`}>
               <FaTiktok size={24} />
             </Link>
           </div>

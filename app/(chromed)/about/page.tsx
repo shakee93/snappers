@@ -1,4 +1,5 @@
 import BgGlassmorphism from "@/components/BgGlassmorphism/BgGlassmorphism";
+import { siteConfig } from "@/site.config";
 import Image from "next/image";
 import StoreImg from "public/store/GqMobiles-Buy-geniune-branded-eletronics-from-GQMobiles-for-best-price-1-1.webp";
 import Img1 from "public/aboutpage/about-img-1-1.jpg";
@@ -18,7 +19,7 @@ const AccountPage = () => {
       id: 2,
       img: Img2,
       title: "What We Do",
-      desc: "We provide the latest mobile phones and accessories to our customers with great service and support for their tech products all around Sri Lanka.",
+      desc: `We provide the latest mobile phones and accessories to our customers with great service and support for their tech products all around ${siteConfig.locale.countryName}.`,
     },
     {
       id: 3,
@@ -68,7 +69,7 @@ const AccountPage = () => {
             <div className="block text-base xl:text-base text-neutral-6000 dark:text-neutral-400 lg:text-justify">
               For more than 20 years,{" "}
               <span className="text-primaryColor">
-                GQ Mobiles
+                {siteConfig.brand.name}
               </span>{" "}
               has demonstrated excellence in the retail industry by
               distinguishing itself with a commitment to delivering complete

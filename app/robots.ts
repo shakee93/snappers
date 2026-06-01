@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next'
- 
+import { siteConfig } from '@/site.config'
+
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
@@ -7,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: '/private/',
     },
-    sitemap: 'https://gqmobiles.lk/sitemap.xml',
+    sitemap: `${siteConfig.url.base}/sitemap.xml`,
   }
 }

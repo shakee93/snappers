@@ -4,6 +4,7 @@ import { Brand } from "@/graphql/types/graphql";
 import Link from "next/link";
 import SiteLogo from "@/public/global/gq-logo.png";
 import Image from "next/image";
+import brandsPageContent from "@/content/brands-page.json";
 
 async function getData(categories: number[] | null = null) {
   const { data, error } = await getClient().query({
@@ -28,9 +29,7 @@ const Page = async () => {
               Browse
             </h2>
             <span className="block mt-2 lg:mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
-              {
-                " Welcome to GQ Mobiles Brands – acurated selection of style and innovation. Discover unique brands that define excellence in every product. Elevate your experience with quality and aesthetics at GQ Mobiles. Shop now for a statement in style!"
-              }
+              {brandsPageContent.heroDescription}
             </span>
           </div>
           <hr className="border-slate-200 dark:border-slate-700 !mt-4" />

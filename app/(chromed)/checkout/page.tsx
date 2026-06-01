@@ -45,6 +45,7 @@ import {
 import { useStats } from "react-instantsearch";
 import { Metadata } from "next/types";
 import Image from "next/image";
+import { siteConfig } from "@/site.config";
 interface FormData {
   contactInfo: Record<string, any>;
   deliveryAddress: any;
@@ -230,8 +231,8 @@ const CheckoutPage = () => {
           : deliveryType === "store_pickup"
             ? "pickup_location:0"
             : freeShipping
-              ? "wbs:5c9bd062_free_shipping"
-              : "wbs:0dd3bc79_weight_based_shipping";
+              ? siteConfig.shipping.freeShippingMethodId
+              : siteConfig.shipping.weightBasedShippingMethodId;
 
       const total: any = cart?.total;
       setOrderTotal(freeShipping ? cart?.subtotal : total);
@@ -543,7 +544,7 @@ const CheckoutPage = () => {
         const orderData = {
           order_id: mutationData?.checkout?.order?.databaseId,
           amount: numericAmount,
-          currency: "LKR",
+          currency: siteConfig.locale.currencyCode,
           email: contactEmail,
           phone: contactPhone,
           bill_to_forename: billingAddress.firstName || "",
@@ -661,8 +662,8 @@ const CheckoutPage = () => {
         : orderDeliveryType === "store_pickup"
           ? "pickup_location:0"
           : freeShipping
-            ? "wbs:5c9bd062_free_shipping"
-            : "wbs:0dd3bc79_weight_based_shipping";
+            ? siteConfig.shipping.freeShippingMethodId
+            : siteConfig.shipping.weightBasedShippingMethodId;
 
     // methodTitle is the display string for the order summary; for
     // flat_rate WC writes the zone-config title, for pickup_location WC

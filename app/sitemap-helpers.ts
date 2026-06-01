@@ -2,8 +2,9 @@ import { getClient } from '@/graphql/apollo-ssr'
 import { GET_SITEMAP_BRANDS } from '@/graphql/defs/sitemap-queries'
 import { Brand } from '@/graphql/types/graphql'
 import type { MetadataRoute } from 'next'
+import { siteConfig } from '@/site.config'
 
-export const BASE_URL = 'https://gqmobiles.lk'
+export const BASE_URL = siteConfig.url.base
 
 function getGraphqlErrorCode(error: unknown): string | undefined {
   const graphQLErrors = (error as { graphQLErrors?: Array<{ extensions?: { code?: unknown } }> })?.graphQLErrors

@@ -9,6 +9,7 @@ import { Clock, Copyright, Facebook, Heart, Instagram, Mail, MapPinned } from "l
 import { PiFacebookLogoDuotone, PiInstagramLogoDuotone, PiTiktokLogo, PiTiktokLogoDuotone } from "react-icons/pi";
 import { Divider } from "@nextui-org/react";
 import { HeartFilledIcon } from "@radix-ui/react-icons";
+import { siteConfig } from "@/site.config";
 
 const getData = async () => {
   const { data } = await getClient().query({
@@ -38,19 +39,19 @@ const FooterInner = async () => {
 
         <div className="py-8 flex flex-row gap-6 justify-center">
           <Link className="flex gap-2"
-            href={"https://www.facebook.com/gqmobilestore"}
+            href={`https://www.facebook.com/${siteConfig.social.facebook}`}
           >
             <PiFacebookLogoDuotone size={32} strokeWidth={1.25} className="text-primaryColor" />
           </Link>
           <Link
             className="flex gap-2"
-            href={"https://www.instagram.com/gqthemobilestore/"}
+            href={`https://www.instagram.com/${siteConfig.social.instagram}`}
           >
             <PiInstagramLogoDuotone size={32} strokeWidth={1.25} className="text-primaryColor" />
           </Link>
           <Link
             className="flex gap-2"
-            href="https://www.tiktok.com/@gqmobiles"
+            href={`https://www.tiktok.com/${siteConfig.social.tiktok}`}
           >
             <PiTiktokLogoDuotone size={32} strokeWidth={1.25} className="text-primaryColor" />
           </Link>
@@ -273,8 +274,8 @@ const FooterInner = async () => {
                 </div>
                 <div className="flex flex-col">
                   <div>
-                    <Link href={"mailto:Inquires@gqmobiles.lk"}>
-                      Inquires@gqmobiles.lk
+                    <Link href={`mailto:${siteConfig.contact.email}`}>
+                      {siteConfig.contact.email}
                     </Link>
                   </div>
                 </div>
@@ -323,7 +324,7 @@ const FooterInner = async () => {
 
       <div className="text-center text-xs text-white py-4 bg-primaryColor">
         <div className="container flex gap-4 justify-center flex-wrap">
-          <div className="flex gap-2 items-center"><Copyright size={16} /> {new Date().getFullYear()} GQ Mobiles (Pvt) Ltd.</div>
+          <div className="flex gap-2 items-center"><Copyright size={16} /> {new Date().getFullYear()} {siteConfig.brand.legalName}.</div>
           <div>{" | "} </div>
           <div className="flex gap-2 items-center">
             Handcrafted with <HeartFilledIcon className="text-red-500" /> by {" "}

@@ -7,6 +7,7 @@ import React, { FC, useEffect, useState, ChangeEvent, FormEvent } from "react";
 // GraphQL and Apollo Imports
 import { useLazyQuery, useMutation } from "@apollo/client";
 import { GET_ADDRESSES, UPDATE_ADDRESS } from "@/graphql/defs/order";
+import { siteConfig } from "@/site.config";
 
 // Component Imports
 import Input from "@/shared/Input/Input";
@@ -160,7 +161,7 @@ const BillingForm: FC = () => {
                   label="Country"
                   name="country"
                   value={formData.country}
-                  options={[{ value: "LK", label: "Sri Lanka" }]}
+                  options={[{ value: siteConfig.locale.countryCode, label: siteConfig.locale.countryName }]}
                   onChange={handleChange}
                   disabled={true}
                 />

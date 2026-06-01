@@ -2,6 +2,7 @@
 
 import { usePathname } from "next/navigation";
 import { useEffect } from "react";
+import { siteConfig } from "@/site.config";
 
 declare global {
   interface Window {
@@ -9,7 +10,7 @@ declare global {
   }
 }
 
-const GA_TRACKING_ID = "G-LS3EVR93ZH";
+const GA_TRACKING_ID = siteConfig.analytics.googleAnalyticsId;
 
 // Log page views
 export const pageview = (url: string) => {

@@ -18,6 +18,7 @@ import { ImageProvider } from "@/context/ImageChangeGrabber";
 import UpsellProducts from "@/app/components/globalComponents/UpsellProducts";
 import { getProductSchema } from "@/lib/jsonld/productSchema";
 import { productTag } from "@/lib/cache-tags";
+import { siteConfig } from "@/site.config";
 // import LoadingProduct from "./loading";
 
 type Props = {
@@ -84,7 +85,7 @@ async function getData(slug: string, brand: string) {
   }
 }
 
-const DEFAULT_OG_IMAGE = "https://cdn.gqmobiles.lk/wp-content/uploads/2025/10/gq.png";
+const DEFAULT_OG_IMAGE = siteConfig.url.defaultOgImage;
 
 function getProductOgImage(product: SimpleProduct & VariableProduct): string {
   // Main product image
@@ -113,8 +114,8 @@ export async function generateMetadata(props: Props, parent: ResolvingMetadata):
     : "the best price";
 
   const ogImageUrl = getProductOgImage(product);
-  const pageUrl = `https://gqmobiles.lk/${brand.slug}/${product.slug}`;
-  const description = `This ${product.name} is at GQMobiles.lk. The best price in Sri Lanka for ${brand.name} priced at Rs.${price}.`;
+  const pageUrl = `${siteConfig.url.base}/${brand.slug}/${product.slug}`;
+  const description = `This ${product.name} is at ${siteConfig.brand.name}. The best price in ${siteConfig.locale.countryName} for ${brand.name} priced at ${siteConfig.locale.currencySymbol}.${price}.`;
 
   return {
     title: product.name,
@@ -130,7 +131,7 @@ export async function generateMetadata(props: Props, parent: ResolvingMetadata):
           url: ogImageUrl,
           width: 1200,
           height: 630,
-          alt: product.name || `${brand.name} - GQ Mobiles`,
+          alt: product.name || `${brand.name} - ${siteConfig.brand.name}`,
         },
       ],
     },

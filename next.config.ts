@@ -1,15 +1,19 @@
-const path = require("path");
+import type { NextConfig } from "next";
+import path from "path";
+import { siteConfig } from "./site.config";
 
-/** @type {import('next').NextConfig} */
-const nextConfig = {
-  output: 'standalone',
+const apiHostname = new URL(siteConfig.url.api).hostname;
+const cdnHostname = new URL(siteConfig.url.cdn).hostname;
+
+const nextConfig: NextConfig = {
+  output: "standalone",
   sassOptions: {
     includePaths: [path.join(__dirname, "styles")],
   },
   logging: {
     fetches: {
-      fullUrl: true
-    }
+      fullUrl: true,
+    },
   },
   images: {
     unoptimized: true,
@@ -46,7 +50,13 @@ const nextConfig = {
       },
       {
         protocol: "https",
-        hostname: "api.gqmobiles.lk",
+        hostname: apiHostname,
+        port: "",
+        pathname: "/*/**",
+      },
+      {
+        protocol: "https",
+        hostname: cdnHostname,
         port: "",
         pathname: "/*/**",
       },
@@ -54,5 +64,4 @@ const nextConfig = {
   },
 };
 
-
-module.exports = nextConfig;
+export default nextConfig;

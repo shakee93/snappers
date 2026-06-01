@@ -67,8 +67,14 @@ interface InstantSearchWrapperProps {
   defaultNewest?: boolean;
 }
 
+const typesenseHost = process.env.NEXT_PUBLIC_TYPESENSE_HOST;
+if (!typesenseHost) {
+  // No tenant fallback: a fork must point search at its own cluster.
+  throw new Error("NEXT_PUBLIC_TYPESENSE_HOST is required");
+}
+
 const typesenseConfig = {
-  host: process.env.NEXT_PUBLIC_TYPESENSE_HOST || "api.gqmobiles.lk",
+  host: typesenseHost,
   port: (process.env.NEXT_PUBLIC_TYPESENSE_PORT as unknown as number) || 80,
   path: process.env.NEXT_PUBLIC_TYPESENSE_PATH || "",
   protocol: process.env.NEXT_PUBLIC_TYPESENSE_PROTOCOL || "https",

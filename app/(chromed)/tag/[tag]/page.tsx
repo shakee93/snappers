@@ -3,6 +3,7 @@ import { getClient } from "@/graphql/apollo-ssr";
 import { GET_TAG_DETAILS_BY_SLUG } from "@/graphql/defs/products";
 import { Metadata, ResolvingMetadata } from "next";
 import { Suspense } from "react";
+import { siteConfig } from "@/site.config";
 
 
 export const revalidate = 1800;
@@ -19,7 +20,7 @@ export async function generateMetadata(props: { params: Promise<{ tag: string }>
 
   return {
     title: tagData?.productTags?.nodes[0]?.name || 'Custom Collection',
-    description: tagData?.productTags?.nodes[0]?.description || 'Discover our handpicked selection of premium products at GQ Mobiles. Browse through our curated collection featuring the latest smartphones, accessories and more. Find exactly what you\'re looking for with our custom product filters.',
+    description: tagData?.productTags?.nodes[0]?.description || `Discover our handpicked selection of premium products at ${siteConfig.brand.name}. Browse through our curated collection featuring the latest smartphones, accessories and more. Find exactly what you're looking for with our custom product filters.`,
   };
 }
 

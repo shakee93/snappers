@@ -5,6 +5,7 @@ import {
   PaymentDetailsWithoutUrls,
 } from "@/data/types";
 import { extractRawAmount, getPaymentHash, numberFormat, TEST_STATIC_DATA } from "@/components/AddressPageComps/HelperComps";
+import { siteConfig } from "@/site.config";
 
 // const MERCHANT_ID = "1225436";
 const MERCHANT_ID = process.env.NEXT_PUBLIC_MERCHANT_ID;
@@ -38,8 +39,8 @@ const tranformDataForPayhere = async (
     ? "100.00"
     : numberFormat(extractRawAmount(paymentDetails_?.amount), 2, ".", ""); 
 
-  let host = window.location.host 
-  let notify_url = `https://gqmobiles.lk/api/notify`
+  let host = window.location.host
+  let notify_url = `${siteConfig.url.base}/api/notify`
 
   return {
     sandbox: TEST ? true : false,
@@ -51,14 +52,14 @@ const tranformDataForPayhere = async (
     items: JSON.stringify(paymentDetails_?.items) ?? "gq mobiles",
     hash: hash,
     amount: amount,
-    currency: "LKR",
+    currency: siteConfig.locale.currencyCode,
     first_name: paymentDetails_?.first_name,
     last_name: paymentDetails_?.last_name,
     email: paymentDetails_?.email,
     phone: paymentDetails_?.phone ?? "0771234567",
     address: paymentDetails_?.address,
     city: paymentDetails_?.city,
-    country: "Sri Lanka",
+    country: siteConfig.locale.countryName,
   };
 };
 

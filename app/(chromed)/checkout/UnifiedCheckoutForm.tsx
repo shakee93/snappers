@@ -11,6 +11,7 @@ import Select from "shared/Select/Select";
 import { toast } from "sonner";
 import { SRI_LANKAN_STATES } from "@/components/AddressPageComps/HelperComps";
 import { useCart } from "@/context/CartProvider";
+import checkoutCopy from "@/content/checkout-copy.json";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import PreOrderNotice from "@/components/PreOrderNotice";
@@ -1018,7 +1019,7 @@ const UnifiedCheckoutForm = ({
                             icon={<Store className="w-5 h-5" strokeWidth={1.75} />}
                             title="Store Pickup"
                             subtitle="Ready during working hours"
-                            chip={{ label: "Instant Pickup · Colombo", tone: "emerald" }}
+                            chip={{ label: checkoutCopy.pickupChipLabel, tone: "emerald" }}
                             trailing={
                                 <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
                                     Free
@@ -1032,7 +1033,7 @@ const UnifiedCheckoutForm = ({
                             icon={<Zap className="w-5 h-5" strokeWidth={1.75} />}
                             title="Flash Delivery"
                             subtitle="You arrange Uber / PickMe pickup"
-                            chip={{ label: "~1hr Instant Delivery · Colombo", tone: "blue" }}
+                            chip={{ label: checkoutCopy.flashDeliveryChipLabel, tone: "blue" }}
                             trailing={
                                 <div className="hidden sm:flex items-center gap-1.5">
                                     <BrandBadge src="/logos/uber.png" alt="Uber" />
@@ -1060,7 +1061,7 @@ const UnifiedCheckoutForm = ({
                                     nameOnly
                                 />
                                 <p className="text-sm text-slate-600 dark:text-slate-400">
-                                    Visit GQ Mobiles to collect your order.
+                                    {checkoutCopy.storePickupNote}
                                 </p>
                             </>
                         ) : (

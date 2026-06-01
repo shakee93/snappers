@@ -3,6 +3,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { HIDDEN_PRODUCT_SLUGS } from "@/lib/hidden-products";
+import { siteConfig } from "@/site.config";
 
 interface SaleProductData {
   name: string;
@@ -46,8 +47,8 @@ const
                 <div className="flex gap-2 justify-center items-center font-semibold">
                   <span className="text-[33px] font-normal">at</span>
                   <Image
-                    src="https://cdn.gqmobiles.lk/wp-content/uploads/2025/08/gq-logo.9de22309.png"
-                    alt="star"
+                    src={`${siteConfig.url.cdn}/wp-content/uploads/2025/08/gq-logo.9de22309.png`}
+                    alt={`${siteConfig.brand.name} logo`}
                     width={30}
                     height={30}
                     className="w-10 h-auto"

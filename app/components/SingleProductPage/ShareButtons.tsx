@@ -4,8 +4,7 @@ import { useState, useCallback } from "react";
 import { FaFacebookF, FaWhatsapp } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 import { Share2, Check } from "lucide-react";
-
-const BASE_URL = "https://gqmobiles.lk";
+import { siteConfig } from "@/site.config";
 
 type ShareButtonsProps = {
   url: string;
@@ -31,7 +30,7 @@ export default function ShareButtons({
 }: ShareButtonsProps) {
   const [copied, setCopied] = useState(false);
 
-  const shareText = text || `Check out ${title} at GQ Mobiles!`;
+  const shareText = text || `Check out ${title} at ${siteConfig.brand.name}!`;
 
   const handleCopyLink = useCallback(async () => {
     try {

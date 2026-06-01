@@ -4,6 +4,7 @@ import {
 } from "@/components/AddressPageComps/HelperComps";
 import { CustomerAddress } from "@/graphql/types/graphql";
 import { FC, useEffect, useState } from "react";
+import { siteConfig } from "@/site.config";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
 import Input from "shared/Input/Input";
@@ -257,13 +258,13 @@ const DeliveryAddress: FC<Props> = ({
               <div>
                 {/* <Label className="text-sm">Country</Label> */}
                 <Select
-                  value="LK"
+                  value={siteConfig.locale.countryCode}
                   className="mt-1.5 capitalize"
-                  placeholder="Country (e.g., Sri Lanka)*"
+                  placeholder={`Country (e.g., ${siteConfig.locale.countryName})*`}
                   onChange={(e) => setCountry(e.target.value)}
                   disabled={true}
                 >
-                  <option value="Sri Lanka">Sri Lanka</option>
+                  <option value={siteConfig.locale.countryName}>{siteConfig.locale.countryName}</option>
                 </Select>
               </div>
               <div>

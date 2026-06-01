@@ -40,6 +40,7 @@ import {
   isSimpleProductFreeShipping,
   isVariationFreeShipping,
 } from "@/lib/freeShipping";
+import { siteConfig } from "@/site.config";
 const ProductDetails = ({
   product,
   brand,
@@ -404,7 +405,7 @@ const ProductDetails = ({
     <>
       {isPriceFluctuation && (
         <div className="p-4 mb-2 bg-red-400 text-white text-base rounded-md">
-          Prices are being updated. For current pricing, please contact us on WhatsApp 0777555665 / 0777988665.
+          Prices are being updated. For current pricing, please contact us on WhatsApp {siteConfig.contact.primaryPhone} / {siteConfig.contact.secondaryPhone}.
           Updated prices will be on the site soon!
         </div>
       )}
@@ -576,7 +577,7 @@ const ProductDetails = ({
       </div>
 
       <ShareButtons
-        url={`https://gqmobiles.lk/${brand.slug}/${product.slug}`}
+        url={`${siteConfig.url.base}/${brand.slug}/${product.slug}`}
         title={product.name || "Product"}
         className="mt-3"
       />

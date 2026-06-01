@@ -6,6 +6,7 @@ import { Brand } from "@/graphql/types/graphql";
 import Link from "next/link";
 import { GET_TAG_DETAILS_BY_SLUG } from "@/graphql/defs/products";
 import { DealFilterType } from "@/lib/dealFilters";
+import { siteConfig } from "@/site.config";
 
 async function getData(parentId?: number, tagSlug?: string) {
   const { data } = await getClient().query({
@@ -103,7 +104,7 @@ const ArchiveLayout = async ({
           <span className="block mt-2 lg:mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
             {descriptionOverride || (tagDetails.length > 0 && tagDetails[0].description
               ? tagDetails[0].description
-              : description || "Explore GQ Mobiles Collections – where style meets functionality. Elevate your experience with quality and diverse options. Shop now for a seamless blend of style and substance!")}
+              : description || `Explore ${siteConfig.brand.name} Collections – where style meets functionality. Elevate your experience with quality and diverse options. Shop now for a seamless blend of style and substance!`)}
           </span>
         </div>
         {topLinks && topLinks.length > 0 ? (

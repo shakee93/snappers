@@ -2,8 +2,9 @@ import { getClient } from '@/graphql/apollo-ssr'
 import { GET_SITEMAP_COLLECTIONS } from '@/graphql/defs/sitemap-queries'
 import { ProductCategory } from '@/graphql/types/graphql'
 import type { MetadataRoute } from 'next'
+import { siteConfig } from '@/site.config'
 
-const BASE_URL = 'https://gqmobiles.lk'
+const BASE_URL = siteConfig.url.base
 
 // Dummy collections data - to be replaced with GraphQL later
 const COLLECTIONS = [

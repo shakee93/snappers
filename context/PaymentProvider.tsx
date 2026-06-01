@@ -3,6 +3,7 @@ import React, { createContext, useContext, ReactNode } from "react";
 import { useQuery } from "@apollo/client";
 import { GET_PAYMENT_GATEWAYS } from "@/graphql/defs/cart";
 import { PaymentGateway } from "@/graphql/types/graphql";
+import { siteConfig } from "@/site.config";
 
 interface PaymentContextType {
   paymentGateways: PaymentGateway[] | null;
@@ -19,7 +20,7 @@ export const PaymentProvider: React.FC<{ children: ReactNode }> = ({
   const { data, loading, error } = useQuery(GET_PAYMENT_GATEWAYS);
 
   // Define custom order for payment gateways
-  const gatewayOrder = ['payhere', 'ndb-pay', 'cod', 'darazbnpl', 'bacs'];
+  const gatewayOrder: readonly string[] = siteConfig.payment.gatewayOrder;
 
   // Sort payment gateways based on custom order
   const paymentGateways: PaymentGateway[] = (data?.paymentGateways?.nodes || [])
@@ -34,7 +35,7 @@ export const PaymentProvider: React.FC<{ children: ReactNode }> = ({
     });
 
   // Check if Koko payment (darazbnpl) is enabled
-  const isKokoEnabled = paymentGateways.some(gateway => gateway.id === "darazbnpl");
+  const isKokoEnabled = paymentGateways.some(gateway => gateway.id === siteConfig.payment.kokoGatewayId);
 
   return (
     <PaymentContext.Provider
