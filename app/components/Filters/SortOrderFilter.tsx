@@ -1,11 +1,11 @@
 import React from "react";
 import { useStore } from "@/store/store";
 import Radio from "@/shared/Radio/Radio";
-import { SORT_ORDER_OPTIONS } from "@/lib/sortOrders";
+import { SORT_ORDER_OPTIONS, SORT_NEWEST_ID } from "@/lib/sortOrders";
 
 const SortOrderFilter = ({ sorts }: { sorts: any }) => {
     const { setSort, sidebar: { sort } } = useStore();
-    const activeSort = sort || (sorts ? "databaseId:desc" : "");
+    const activeSort = sort || (sorts ? SORT_NEWEST_ID : "");
 
     const icon = <svg className="w-4 h-4" viewBox="0 0 20 20" fill="none">
         <path

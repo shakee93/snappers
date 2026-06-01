@@ -19,6 +19,7 @@ interface TabFilterProps {
     brand?: Brand;
     sort?: Boolean;
     dealsType?: DealFilterType[];
+    inStockOnly?: boolean;
 }
 
 
@@ -29,6 +30,7 @@ const TabFilters = ({
     category,
     sort,
     dealsType,
+    inStockOnly = false,
 }: TabFilterProps) => {
 
     const {
@@ -44,7 +46,7 @@ const TabFilters = ({
     return (
         <div className="flex flex-col gap-0 lg:gap-3 lg:space-x-4">
             <div className="hidden lg:flex flex-col justify-start items-start flex-1 space-y-3">
-                <InStockFilter />
+                {!inStockOnly && <InStockFilter />}
                 <OnSaleFilter />
                 <SortOrderFilter sorts={sort} />
                 {dealsType ? <DealsTypeFilter activeTypes={dealsType} /> : null}

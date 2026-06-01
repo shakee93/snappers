@@ -13,13 +13,22 @@ import { useEffect } from "react";
 // each render, which would re-fire the effect on every render.
 const SORT_BY_ITEMS = [{ label: "Default", value: "product" }];
 
-const SortInput = () => {
+interface SortInputProps {
+    // Sort id applied when the user hasn't picked one (store sort is empty).
+    // Used by /new-arrivals to default to newest without writing ?sort= to the
+    // URL — see InstantSearchWrapper for why store/URL seeding is avoided.
+    defaultSort?: string;
+}
+
+const SortInput = ({ defaultSort = "" }: SortInputProps) => {
     const { refine } = useSortBy({ items: SORT_BY_ITEMS });
     const { sidebar } = useStore();
 
+    const activeSort = sidebar.sort || defaultSort;
+
     useEffect(() => {
-        refine(sidebar.sort ? `product/sort/${sidebar.sort}` : "product");
-    }, [sidebar.sort, refine]);
+        refine(activeSort ? `product/sort/${activeSort}` : "product");
+    }, [activeSort, refine]);
 
     return null;
 };

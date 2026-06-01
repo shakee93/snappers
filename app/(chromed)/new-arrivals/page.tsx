@@ -12,7 +12,9 @@ const Page = () => {
       <ArchiveLayout
         title="New Arrivals"
         filters
-        sort={true} />
+        sort={true}
+        inStockOnly
+        defaultNewest />
     </Suspense>
   );
 };
