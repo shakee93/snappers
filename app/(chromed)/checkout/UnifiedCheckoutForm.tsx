@@ -5,6 +5,13 @@ import Image from "next/image";
 import Input from "shared/Input/Input";
 import CountryPhoneInput from "./components/CountryPhoneInput";
 import Link from "next/link";
+import { siteConfig } from "@/site.config";
+
+// Account shown inline in the BACS panel — sourced from site.config so the
+// full bank list (rendered on the bank-details view) stays the single source.
+const FEATURED_BANK_ACCOUNT =
+    siteConfig.payment.bankAccounts.find((a) => a.featuredAtCheckout) ??
+    siteConfig.payment.bankAccounts[0];
 import { CustomerAddress, PaymentGateway } from "@/graphql/types/graphql";
 import { contactInformation } from "@/data/types";
 import Select from "shared/Select/Select";
@@ -714,7 +721,7 @@ const UnifiedCheckoutForm = ({
             case "bacs":
                 return {
                     title: gateway.title || "Direct bank transfer",
-                    subtitle: "Commercial Bank — upload your slip after transfer",
+                    subtitle: `${FEATURED_BANK_ACCOUNT.bank} — upload your slip after transfer`,
                     icon: <Landmark className="w-5 h-5" strokeWidth={1.75} />,
                     trailing: (
                         <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
@@ -850,19 +857,19 @@ const UnifiedCheckoutForm = ({
                             <dl className="text-sm space-y-1 text-slate-700 dark:text-slate-300">
                                 <div className="flex justify-between gap-3">
                                     <dt className="text-slate-500">Bank</dt>
-                                    <dd>Commercial Bank</dd>
+                                    <dd>{FEATURED_BANK_ACCOUNT.bank}</dd>
                                 </div>
                                 <div className="flex justify-between gap-3">
                                     <dt className="text-slate-500">Account name</dt>
-                                    <dd>GQ Mobiles Pvt Ltd</dd>
+                                    <dd>{FEATURED_BANK_ACCOUNT.accName}</dd>
                                 </div>
                                 <div className="flex justify-between gap-3">
                                     <dt className="text-slate-500">Account no.</dt>
-                                    <dd className="font-mono">1000475584</dd>
+                                    <dd className="font-mono">{FEATURED_BANK_ACCOUNT.accNo}</dd>
                                 </div>
                                 <div className="flex justify-between gap-3">
                                     <dt className="text-slate-500">Branch</dt>
-                                    <dd>Head office</dd>
+                                    <dd>{FEATURED_BANK_ACCOUNT.branch}</dd>
                                 </div>
                             </dl>
                         </div>

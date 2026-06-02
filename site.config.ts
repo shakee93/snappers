@@ -52,6 +52,46 @@ export const siteConfig = {
       hideAboveAmount: 100000,
       cardSurchargeRate: 0.03,
     },
+    // Bank accounts shown for the BACS / bank-transfer gateway. The full list
+    // renders on the bank-details view; the one flagged `featuredAtCheckout`
+    // is the single account shown inline in the checkout BACS panel.
+    bankAccounts: [
+      {
+        bank: "Sampath Bank",
+        accName: "GQ Mobiles Pvt Ltd",
+        accNo: "004210015529",
+        branch: "Mainstreet Branch",
+        featuredAtCheckout: false,
+      },
+      {
+        bank: "Commercial Bank",
+        accName: "GQ Mobiles Pvt Ltd",
+        accNo: "1000475584",
+        branch: "Head office",
+        featuredAtCheckout: true,
+      },
+      {
+        bank: "People’s Bank",
+        accName: "GQ MOBILES (PVT) LTD",
+        accNo: "309100120010779",
+        branch: "Liberty Plaza",
+        featuredAtCheckout: false,
+      },
+      {
+        bank: "HNB",
+        accName: "GQ Mobile Store",
+        accNo: "007010313159",
+        branch: "Mainstreet Branch",
+        featuredAtCheckout: false,
+      },
+      {
+        bank: "NTB",
+        accName: "GQ Mobile Store",
+        accNo: "100030010564",
+        branch: "Bankshall Street Branch",
+        featuredAtCheckout: false,
+      },
+    ],
   },
   shipping: {
     freeShippingMethodId: "wbs:5c9bd062_free_shipping",
