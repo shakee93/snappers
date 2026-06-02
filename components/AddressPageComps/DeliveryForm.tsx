@@ -5,8 +5,7 @@
 import React, { FC, useEffect, useState, ChangeEvent, FormEvent } from "react";
 
 // GraphQL and Apollo Imports
-import { useLazyQuery, useMutation } from "@apollo/client";
-import { GET_ADDRESSES, UPDATE_ADDRESS } from "@/graphql/defs/order";
+import { useAddresses } from "@/hooks/useAddresses";
 import { siteConfig } from "@/site.config";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 
@@ -33,12 +32,8 @@ const SRI_LANKAN_STATES = [
 
 const DeliveryForm: FC = () => {
   const { customer, fetchCustomer, updateCustomer } = useSession();
-  const [getAddresses, { loading, data, error }] = useLazyQuery(GET_ADDRESSES, {
-    fetchPolicy: "no-cache",
-  });
+  const { getAddresses, data, error, updateAddress } = useAddresses();
   const [saveBothAddresses, setSaveBothAddresses] = useState(false);
-
-  const [updateShipping] = useMutation(UPDATE_ADDRESS);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -73,7 +68,7 @@ const DeliveryForm: FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      await updateShipping({
+      await updateAddress({
         variables: {
           input: {
             shipping: {

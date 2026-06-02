@@ -6,8 +6,6 @@ import Image from "next/image";
 
 import { Cart, PaymentGateway } from "@/graphql/types/graphql";
 import { useCart } from "@/context/CartProvider";
-import { GET_PRODUCT } from "@/graphql/defs/products";
-import { useQuery } from "@apollo/client";
 import { PAYHERE_HIDE_THRESHOLD } from "@/lib/checkoutMath";
 
 interface Props {

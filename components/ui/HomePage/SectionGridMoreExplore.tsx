@@ -25,9 +25,6 @@ import skullcandy from "@/public/images/brandLogo/skullcandy.jpg";
 import tecno from "@/public/images/brandLogo/tecno.jpg";
 
 import { StaticImageData } from "next/image";
-import { useLazyQuery } from "@apollo/client";
-import { GET_PRODUCTS } from "@/graphql/defs/products";
-import { GET_BRAND_DETAILS } from "@/graphql/defs/products";
 import { useBrands } from "@/hooks/useBrands";
 import { Brand } from "@/graphql/types/graphql";
 

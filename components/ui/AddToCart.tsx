@@ -2,8 +2,6 @@
 
 
 import {Product} from "@/graphql/types/graphql";
-import {useMutation, useQuery} from "@apollo/client";
-import {ADD_TO_CART, GET_CART} from "@/graphql/defs/cart";
 import {useSession} from "@/context/SessionProvider";
 import {useCart} from "@/context/CartProvider";
 
