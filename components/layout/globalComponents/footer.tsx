@@ -64,33 +64,14 @@ const FooterInner = async () => {
           <div className="flex gap-1 col-span-6 md:gap-4 md:col-span-3 p-2 flex-col items-start md:items-center">
             <div className="grid gap-2 md:gap-4">
               <div className="text-base md:text-lg text-left font-medium text-primaryColor">
-                Quick Links
+                {siteConfig.navigation.footerQuickLinks.heading}
               </div>
               <ul className="text-xs text-left lg:text-sm text-gray-500 flex flex-col gap-3 ">
-                {/* <li className="hover:text-primaryColor">
-                  <Link href={"/"}>Home</Link>
-                </li> */}
-                <li className="hover:text-primaryColor">
-                  <Link href={"/collections/all"}>Shop</Link>
-                </li>
-                <li className="hover:text-primaryColor">
-                  <Link href={"/about"}>About us</Link>
-                </li>
-                <li className="hover:text-primaryColor">
-                  <Link href={"/contact"}>Contact Us</Link>
-                </li>
-                {/* <li className="hover:text-primaryColor">
-                  <Link href={"/search"}>Search Products</Link>
-                </li> */}
-                <li className="hover:text-primaryColor">
-                  <Link href={"/privacy"}>Privacy Policy</Link>
-                </li>
-                <li className="hover:text-primaryColor">
-                  <Link href={"/warranty-terms"}>Warranty Terms</Link>
-                </li>
-                <li className="hover:text-primaryColor">
-                  <Link href={"/terms-and-conditions"}>Terms & Conditions</Link>
-                </li>
+                {siteConfig.navigation.footerQuickLinks.links.map((item) => (
+                  <li key={item.href} className="hover:text-primaryColor">
+                    <Link href={item.href}>{item.name}</Link>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>

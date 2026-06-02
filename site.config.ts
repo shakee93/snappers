@@ -64,7 +64,7 @@ export const siteConfig = {
       { label: "Sunday", hours: "Closed" },
     ],
   },
-  /** Desktop header primary nav (see `NavLinks`). */
+  /** Header + footer navigation (see `NavLinks`, `footer`). */
   navigation: {
     main: [
       { href: "/", name: "Home" },
@@ -75,6 +75,17 @@ export const siteConfig = {
       { href: "/contact", name: "Location" },
       { href: "/tag/pre-order", name: "Pre-Order" },
     ],
+    footerQuickLinks: {
+      heading: "Quick Links",
+      links: [
+        { href: "/collections/all", name: "Shop" },
+        { href: "/about", name: "About us" },
+        { href: "/contact", name: "Contact Us" },
+        { href: "/privacy", name: "Privacy Policy" },
+        { href: "/warranty-terms", name: "Warranty Terms" },
+        { href: "/terms-and-conditions", name: "Terms & Conditions" },
+      ],
+    },
   },
   social: {
     facebook: "gqmobilestore",
@@ -151,3 +162,5 @@ export const siteConfig = {
 
 export type SiteConfig = typeof siteConfig;
 export type SiteNavLink = SiteConfig["navigation"]["main"][number];
+export type SiteFooterQuickLink =
+  SiteConfig["navigation"]["footerQuickLinks"]["links"][number];
