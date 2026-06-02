@@ -49,14 +49,14 @@ const MobileBottomNav = ({ categories }: { categories: any }) => {
             </div>
             <Link
                 href="/collections"
-                className="flex-1 pt-2 flex flex-col justify-center items-center text-primary-500 gap-1 cursor-pointer"
+                className="flex-1 pt-2 flex flex-col justify-center items-center text-primaryColor gap-1 cursor-pointer"
             >
                 <LayoutGrid />
                 <div className="text-[11px]">Collections</div>
             </Link>
             <Link
                 href="/brands"
-                className="flex pt-2 flex-1 flex-col justify-center items-center text-primary-500 gap-1 cursor-pointer"
+                className="flex pt-2 flex-1 flex-col justify-center items-center text-primaryColor gap-1 cursor-pointer"
             >
                 <Codesandbox />
                 <div className="text-[11px]">Brands</div>
@@ -70,12 +70,12 @@ const MobileBottomNav = ({ categories }: { categories: any }) => {
             >
 
                 <div
-                    className="flex pt-2 flex-col justify-center items-center text-primary-500 gap-1"
+                    className="flex pt-2 flex-col justify-center items-center text-primaryColor gap-1"
                 >
                     <div className='relative'>
                         {!!cart?.contents?.itemCount &&
                             <div
-                                className="w-4 h-4 flex items-center justify-center bg-primary-500 absolute -top-1 -right-1.5 rounded-full text-[10px] leading-none text-white font-medium">
+                                className="w-4 h-4 flex items-center justify-center bg-primaryColor absolute -top-1 -right-1.5 rounded-full text-[10px] leading-none text-white font-medium">
                                 <span className="mt-[1px]">{cart?.contents?.itemCount}</span>
                             </div>
                         }
@@ -87,14 +87,14 @@ const MobileBottomNav = ({ categories }: { categories: any }) => {
             </div>
             <Link
                 href="/deals"
-                className="flex pt-2 flex-1 flex-col justify-center items-center text-primary-500 gap-1 cursor-pointer"
+                className="flex pt-2 flex-1 flex-col justify-center items-center text-primaryColor gap-1 cursor-pointer"
             >
                 <Flame className="animate-bounce text-red-500" fill="orange"/>
                 <div className="text-[11px]">Deals</div>
             </Link>
 
             {/* <div
-                className="flex pt-2 flex-1 flex-col justify-center items-center text-primary-500 gap-1 cursor-pointer"
+                className="flex pt-2 flex-1 flex-col justify-center items-center text-primaryColor gap-1 cursor-pointer"
                 onClick={async () => {
                     const fetchedCustomer = await fetchCustomer();
                     if (!fetchedCustomer || fetchedCustomer?.id === "guest") {
@@ -110,7 +110,7 @@ const MobileBottomNav = ({ categories }: { categories: any }) => {
             </div> */}
             <div
                 onClick={e => toggleMobileMenu()}
-                className="flex pt-2 flex-col justify-center items-center text-primary-500 gap-1"
+                className="flex pt-2 flex-col justify-center items-center text-primaryColor gap-1"
             >
                 {mobileMenu ? <XIcon /> : (!customer || customer?.id === "guest" ? <Menu /> : <CircleEllipsis />)}
                 <div className="text-[11px]">Menu</div>

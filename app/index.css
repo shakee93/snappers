@@ -68,32 +68,7 @@
         --chart-5: 27 87% 67%;
         --radius: 0.5rem;
 
-        /* Brand theme scale (space-separated RGB channels, consumed in
-           tailwind.config.ts as `rgb(var(--c-*) / <alpha-value>)`).
-           A fork swaps these values to re-skin the storefront — this is the
-           single source of truth for the primary/secondary palette.
-           primary-500 == brand blue #1b40af. */
-        --c-primary-50: 237 240 249;
-        --c-primary-100: 221 226 243;
-        --c-primary-200: 187 198 231;
-        --c-primary-300: 146 163 217;
-        --c-primary-400: 91 117 197;
-        --c-primary-500: 27 64 175;
-        --c-primary-600: 24 56 154;
-        --c-primary-700: 20 48 131;
-        --c-primary-800: 16 38 105;
-        --c-primary-900: 12 29 79;
-
-        --c-secondary-50: 240 253 250;
-        --c-secondary-100: 204 251 241;
-        --c-secondary-200: 153 246 228;
-        --c-secondary-300: 94 234 212;
-        --c-secondary-400: 45 212 191;
-        --c-secondary-500: 20 184 166;
-        --c-secondary-600: 13 148 136;
-        --c-secondary-700: 15 118 110;
-        --c-secondary-800: 17 94 89;
-        --c-secondary-900: 19 78 74;
+        /* Brand primary/secondary scales: site.config.ts → SiteThemeStyles */
     }
   .dark {
         --background: 0 0% 3.9%;

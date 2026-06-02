@@ -14,6 +14,7 @@ import GoogleAnalytics from "@/components/layout/GoogleAnalytics";
 import ContentWrapper from "@/components/layout/ContentWrapper";
 import { siteConfig } from "@/site.config";
 import { getSiteMetadataIcons, getSiteTwitterImage } from "@/lib/siteAssets";
+import SiteThemeStyles from "@/components/theme/SiteThemeStyles";
 
 const defaultTitle = `${siteConfig.brand.name} - ${siteConfig.brand.tagline}`;
 
@@ -60,6 +61,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <head>
+        <SiteThemeStyles />
         <meta
           name="google-site-verification"
           content="1jxvcjKwBJHZpD2gN7mtEpCc1WQfzu7Wfp0RlyA0zA4"

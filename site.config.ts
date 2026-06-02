@@ -2,7 +2,8 @@
  * Single source of truth for every tenant-specific value in the storefront.
  *
  * Forking this repo for a new tenant means editing THIS file (plus `content/`
- * and `app/globals.css`) — not hunting hardcoded strings through components.
+ * `app/index.css` (shadcn base tokens only), and this file — not hunting hardcoded
+ * strings through components.
  * Anything brand-, locale-, contact-, payment-, or analytics-specific lives
  * here. See docs/FORK-FOUNDATION-PLAN.md §2.
  */
@@ -19,6 +20,46 @@ export const siteConfig = {
    * Paths are under `public/` (e.g. `/global/logo.png` → `public/global/logo.png`).
    * Provide separate `dark` entries for class-based UI; favicons use OS `prefers-color-scheme`.
    */
+  /**
+   * Brand palette — space-separated RGB channels (e.g. "27 64 175" for #1b40af).
+   * Drives Tailwind `primary-*`, `primaryColor`, and `secondary-*` via CSS variables
+   * injected in the root layout (`SiteThemeStyles`).
+   */
+  theme: {
+    brandHex: {
+      primary: "#1b40af",
+    },
+    colors: {
+      primary: {
+        "50": "237 240 249",
+        "100": "221 226 243",
+        "200": "187 198 231",
+        "300": "146 163 217",
+        "400": "91 117 197",
+        "500": "27 64 175",
+        "600": "24 56 154",
+        "700": "20 48 131",
+        "800": "16 38 105",
+        "900": "12 29 79",
+      },
+      secondary: {
+        "50": "240 253 250",
+        "100": "204 251 241",
+        "200": "153 246 228",
+        "300": "94 234 212",
+        "400": "45 212 191",
+        "500": "20 184 166",
+        "600": "13 148 136",
+        "700": "15 118 110",
+        "800": "17 94 89",
+        "900": "19 78 74",
+      },
+    },
+    semantic: {
+      success: "#059669",
+      danger: "#d71e1e",
+    },
+  },
   assets: {
     logo: {
       light: "/global/gq-logo.png",

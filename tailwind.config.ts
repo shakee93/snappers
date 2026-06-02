@@ -2,11 +2,10 @@ import {  nextui  } from "@nextui-org/react";
 import type { Config } from 'tailwindcss';
 import defaultTheme from "tailwindcss/defaultTheme";
 import plugin from 'tailwindcss/plugin';
+import { siteConfig } from "./site.config";
 
-// Brand color tokens resolve to CSS variables defined in app/index.css as
-// space-separated RGB channels (e.g. `--c-primary-500: 27 64 175`). The
-// `<alpha-value>` placeholder lets Tailwind opacity modifiers (e.g.
-// `bg-primary-500/10`) work natively. A fork re-skins by editing index.css.
+// Brand color tokens resolve to CSS variables from site.config.ts (injected via
+// SiteThemeStyles). Space-separated RGB channels; `<alpha-value>` enables opacity.
 const tokenColor = (cssVar: string) => `rgb(var(${cssVar}) / <alpha-value>)`;
 
 const config: Config = {
@@ -35,10 +34,12 @@ const config: Config = {
 		extend: {
 			colors: {
 				transparent: 'transparent',
+				// Legacy alias — same brand blue as primary-500 (#1b40af).
+				primaryColor: tokenColor("--c-primary-500"),
 				// Semantic status tokens (a fork swaps these). Plain hex so they
 				// render identically to the literals they replace.
-				success: '#059669',
-				danger: '#d71e1e',
+				success: siteConfig.theme.semantic.success,
+				danger: siteConfig.theme.semantic.danger,
 				primary: {
 					'50': tokenColor("--c-primary-50"),
 					'100': tokenColor("--c-primary-100"),
