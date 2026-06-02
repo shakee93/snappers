@@ -429,7 +429,7 @@ const ProductCard: FC<ProductCardProps> = ({
                 ) => (
                   <div
                     key={index}
-                    className="w-full flex-shrink-0 bg-[#fefefe] relative overflow-hidden"
+                    className="w-full flex-shrink-0 bg-white relative overflow-hidden"
                   >
                     <Image
                       src={

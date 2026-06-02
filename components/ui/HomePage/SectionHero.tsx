@@ -182,7 +182,7 @@ const SectionHero: FC<SectionHero2Props> = ({ className = "" }) => {
         />
 
         {/* BG */}
-        <div className="absolute inset-0 bg-[#CCE0EF]">
+        <div className="absolute inset-0 bg-primary-100">
           <Image
             fill
             style={{ objectFit: "cover" }}

@@ -166,8 +166,8 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
                 ))}
               </CarouselContent>
 
-              <CarouselPrevious className="hidden md:flex absolute xl:-left-14 -left-2 top-1/2 -translate-y-1/2 z-10 border-0 bg-[#cecfd0] text-white hover:bg-[#9e9fa0] hover:text-white transition-colors duration-200 p-1 md:p-2 w-8 h-8 md:w-10 md:h-10 [&>svg]:w-4 [&>svg]:h-4 md:[&>svg]:w-6 md:[&>svg]:h-6" />
-              <CarouselNext className="hidden md:flex absolute xl:-right-14 -right-2 top-1/2 -translate-y-1/2 z-10 border-0 bg-[#cecfd0] text-white hover:bg-[#9e9fa0] hover:text-white transition-colors duration-200 p-1 md:p-2 w-8 h-8 md:w-10 md:h-10 [&>svg]:w-4 [&>svg]:h-4 md:[&>svg]:w-6 md:[&>svg]:h-6" />
+              <CarouselPrevious className="hidden md:flex absolute xl:-left-14 -left-2 top-1/2 -translate-y-1/2 z-10 border-0 bg-neutral-300 text-white hover:bg-neutral-400 hover:text-white transition-colors duration-200 p-1 md:p-2 w-8 h-8 md:w-10 md:h-10 [&>svg]:w-4 [&>svg]:h-4 md:[&>svg]:w-6 md:[&>svg]:h-6" />
+              <CarouselNext className="hidden md:flex absolute xl:-right-14 -right-2 top-1/2 -translate-y-1/2 z-10 border-0 bg-neutral-300 text-white hover:bg-neutral-400 hover:text-white transition-colors duration-200 p-1 md:p-2 w-8 h-8 md:w-10 md:h-10 [&>svg]:w-4 [&>svg]:h-4 md:[&>svg]:w-6 md:[&>svg]:h-6" />
             </Carousel>
 
             {seeMoreButton}
