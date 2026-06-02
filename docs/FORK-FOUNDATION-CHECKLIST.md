@@ -136,12 +136,22 @@ definition-of-done. To finish the fork foundation for legal content, do the foll
 - [ ] httpbin debug fetches in legal pages → tracked under the Legal section above
 - [ ] Verify: **every route** in the per-route smoke test (import churn = highest risk)
 
-## Phase 5 — theme tokens end-to-end
+## Phase 5 — theme tokens end-to-end (look-preserving scope)
 
-- [ ] Full CSS var scale in `globals.css`; `primaryColor` removed from `tailwind.config`
-- [ ] `bg-[#…]` hex escapes swapped to tokens; scrollbar leftover fixed
-- [ ] Verify: primary/secondary/danger/success colors render correctly on cards, sale badges,
-      hero, checkout; dark mode; no stray hardcoded colors
+**Done:**
+- [x] `success`/`danger` tokens added; SaleProductCard `#1B40AF`/`#D71E1E` → tokens;
+      checkout `#059669` → `text-success`; scrollbar dev-leftover fixed
+- [x] `TestimonialsSlider` `bg-[#1e40af]` dot → `bg-blue-800` (exact same colour)
+
+**Left as-is (no exact token; cosmetic/decorative, non-brand — preserves look):**
+- carousel grays `bg-[#cecfd0]`/`bg-[#9e9fa0]` (3 sliders), `ProductCard3` `bg-[#fefefe]`,
+  `SectionHero` `bg-[#CCE0EF]`, `BgGlassmorphism` decorative blobs, 3rd-party FB/WA colors.
+
+**Deferred (the actual theme unification — needs a designer call):**
+- [ ] Fix the buggy quoted-string `customColors("--c-...")` values in `tailwind.config.ts`
+      (the `primary-*`/`secondary-*` scale likely emits invalid CSS today)
+- [ ] Unify the two blues (sky `primary-*` vs brand `primaryColor`/`#1b40af`) and
+      remove `primaryColor`; this repaints elements, so it's a visible design decision.
 
 ## Phase 6 — backend Docker base (separate repo `gq-backend-plugins`)
 

@@ -153,8 +153,8 @@ export default function TestimonialsSlider({ reviews }: TestimonialsSliderProps)
                             key={index}
                             onClick={() => api?.scrollTo(index)}
                             className={`w-3 h-3 rounded-full transition-colors ${
-                                current === index + 1 
-                                    ? 'bg-[#1e40af] w-6' 
+                                current === index + 1
+                                    ? 'bg-blue-800 w-6'
                                     : 'bg-gray-300 hover:bg-gray-400'
                             }`}
                         />
