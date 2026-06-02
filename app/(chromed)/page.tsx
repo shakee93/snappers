@@ -24,6 +24,11 @@ import SectionHero4 from "@/components/ui/HomePage/SectionHero4";
 import { unstable_cache } from "next/cache";
 import { HERO_SECTION_CACHE_TAG } from "@/lib/cache-tags";
 
+// ISR safety net: the WP → /api/revalidate webhook is the primary cache buster,
+// but this ensures the homepage (slides, reviews, etc.) self-heals if a webhook
+// is missed — and lets local dev pick up fresh data without clearing .next.
+export const revalidate = 1800;
+
 
 /**
  * Get the data for the home page
