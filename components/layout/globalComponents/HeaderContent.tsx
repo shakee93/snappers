@@ -1,13 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { ProductCategory } from "@/graphql/types/graphql";
 import AvatarDropdown from "../Header/AvatarDropdown";
 import Logo from "./Logo";
 import NavLinks from "./NavLinks";
 import SearchBar from "./SearchBar";
 import SideCart from "../SideCart/SideCart";
-import HeaderUtilityIcons from "./HeaderUtilityIcons";
 
 interface HeaderContentProps {
   navCategories: ProductCategory[];
@@ -61,8 +60,7 @@ const HeaderContent = ({ navCategories }: HeaderContentProps) => {
           </div>
 
           {/* User Actions - Fixed position */}
-          <div className="flex items-center gap-2 flex-shrink-0">
-            <HeaderUtilityIcons />
+          <div className="flex items-center gap-4 flex-shrink-0">
             <AvatarDropdown />
             <SideCart />
           </div>
