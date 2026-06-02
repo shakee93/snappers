@@ -7,6 +7,7 @@ import Logo from "./Logo";
 import NavLinks from "./NavLinks";
 import SearchBar from "./SearchBar";
 import SideCart from "../SideCart/SideCart";
+import HeaderUtilityIcons from "./HeaderUtilityIcons";
 
 interface HeaderContentProps {
   navCategories: ProductCategory[];
@@ -60,7 +61,8 @@ const HeaderContent = ({ navCategories }: HeaderContentProps) => {
           </div>
 
           {/* User Actions - Fixed position */}
-          <div className="flex items-center gap-4 flex-shrink-0">
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <HeaderUtilityIcons />
             <AvatarDropdown />
             <SideCart />
           </div>
