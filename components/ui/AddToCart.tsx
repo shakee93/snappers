@@ -2,7 +2,6 @@
 
 
 import {Product} from "@/graphql/types/graphql";
-import {useSession} from "@/context/SessionProvider";
 import {useCart} from "@/context/CartProvider";
 
 const AddToCart = ({ product }: {product: Product}) => {

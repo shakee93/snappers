@@ -2,6 +2,11 @@
 
 import Script from "next/script";
 import { useState, useEffect } from "react";
+import { siteConfig } from "@/site.config";
+
+// TikTok handle from config — "@handle" form for URLs, bare for data-unique-id.
+const TIKTOK_HANDLE = siteConfig.social.tiktok;
+const TIKTOK_UNIQUE_ID = TIKTOK_HANDLE.replace(/^@/, "");
 
 // TikTok Embed Skeleton Component
 function TikTokSkeleton() {
@@ -74,8 +79,8 @@ export default function TikTokSection() {
       <div className={isLoading ? "hidden" : "block"}>
         <blockquote
           className="tiktok-embed"
-          cite="https://www.tiktok.com/@gqmobiles"
-          data-unique-id="gqmobiles"
+          cite={`https://www.tiktok.com/${TIKTOK_HANDLE}`}
+          data-unique-id={TIKTOK_UNIQUE_ID}
           data-embed-type="creator"
           style={{ maxWidth: 780, minWidth: 288 }}
         >
@@ -83,9 +88,9 @@ export default function TikTokSection() {
             <a
               target="_blank"
               rel="noreferrer"
-              href="https://www.tiktok.com/@gqmobiles?refer=creator_embed"
+              href={`https://www.tiktok.com/${TIKTOK_HANDLE}?refer=creator_embed`}
             >
-              @gqmobiles
+              {TIKTOK_HANDLE}
             </a>
           </section>
         </blockquote>

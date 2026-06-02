@@ -5,34 +5,7 @@ import { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Privacy Policy",
 };
-async function measureRequestDuration() {
-  try {
-    const start = performance.now(); // Start timing
-
-    const response = await fetch("https://httpbin.org/delay/3",
-        { cache: 'force-cache' }
-    ); // Send the fetch request
-
-    // Check if the fetch request was successful
-    if (!response.ok) {
-      throw new Error(`HTTP error!     status: ${response.status}`);
-    }
-
-    const end = performance.now(); // End timing
-
-    const duration = end - start; // Calculate the duration
-
-    // console.log(`Request to took ${duration.toFixed(0)}ms`); // Log duration to console
-
-    return await response.json()
-  } catch (error: any) {
-    console.error('Fetch error:', error.message); // Log any errors that occur
-  }
-}
-export default async function PagePrivacy() {
-
-  let data = await measureRequestDuration()
-
+export default function PagePrivacy() {
   return (
     <div
       className={`overflow-hidden relative`}
