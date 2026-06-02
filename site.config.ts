@@ -34,7 +34,7 @@ export const siteConfig = {
     primaryPhone: "0777555665",
     secondaryPhone: "0777988665",
     whatsapp: "94722299944",
-    email: "Inquires@gqmobiles.lk",
+    email: "inquiries@gqmobiles.lk",
     storeAddress:
       "No. 250 | 53–54 Ground Floor, Liberty Plaza, Colombo 03",
   },

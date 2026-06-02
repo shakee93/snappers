@@ -28,7 +28,6 @@ import { useSession } from "@/context/SessionProvider";
 import { usePaymentGateways } from "@/context/PaymentProvider";
 import { Info, Loader, Clock } from "lucide-react";
 import {
-  dummyPaymentData,
   savePaymentDetails,
   sentConfirmation,
   transformAddress,

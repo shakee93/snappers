@@ -6,6 +6,7 @@ import { CheckoutPayload, CustomerAddressInput } from "@/graphql/types/graphql";
 import { PaymentDetailsWithoutUrls } from "@/data/types";
 import { siteConfig } from "@/site.config";
 import { apiUrl } from "@/lib/api";
+import WelcomeMessages from "@/content/welcome-messages.json";
 
 const SRI_LANKAN_STATES = [
   "Western",
@@ -125,18 +126,6 @@ const savePaymentDetails = (
   // console.log("saved_data: for payment", saved_data);
   return saved_data;
 };
-
-const WelcomeMessages = [
-  "Welcome back! We're delighted to see you again.",
-  "Hello again! It's great to have you back with us.",
-  "Welcome back to our Shop.",
-  "You're back! We missed you. Welcome!",
-  "We've been waiting for you! Welcome back!",
-  "Welcome to GQ Mobiles once more.",
-  "Welcome back, valued customer! Your presence brightens our day.",
-  "Guess who's back? It's you! Welcome!",
-  "It's a pleasure to have you back! Welcome to GQ Mobiles.",
-];
 
 const getRandomWelcomeMessage = () => {
   const randomIndex = Math.floor(Math.random() * WelcomeMessages.length);
@@ -272,81 +261,6 @@ const sentConfirmation = async (orderId: number | string): Promise<any> => {
 };
 
 
-const dummyPaymentData = {
-  "checkout": {
-      "clientMutationId": null,
-      "redirect": "https://api.gqmobiles.lk/checkout/order-pay/18038/?key=wc_order_mH2xaPihZnpnw",
-      "result": "success",
-      "customer": {
-          "displayName": null,
-          "shipping": {
-              "firstName": "shadeer",
-              "lastName": "sadikeen",
-              "address1": "120/21/5b",
-              "address2": "araliya uyana, megoda kolonnawa",
-              "city": "wellampitiya , colombo",
-              "country": "LK",
-              "state": null,
-              "postcode": null,
-              "phone": null,
-              "email": null,
-              "__typename": "CustomerAddress"
-          },
-          "billing": {
-              "firstName": "shadeer",
-              "lastName": "sadikeen",
-              "address1": "120/21/5b",
-              "address2": "araliya uyana, megoda kolonnawa",
-              "city": "wellampitiya , colombo",
-              "country": "LK",
-              "state": null,
-              "postcode": null,
-              "phone": null,
-              "email": "test@gmail.com",
-              "__typename": "CustomerAddress"
-          },
-          "email": null,
-          "__typename": "Customer"
-      },
-      "order": {
-          "total": "₨&nbsp;520.60",
-          "subtotal": "₨&nbsp;20.00",
-          "shippingTotal": "₨&nbsp;500.00",
-          "date": "2025-01-29T08:17:15+00:00",
-          "id": "b3JkZXI6MTgwMzg=",
-          "databaseId": 18038,
-          "lineItems": {
-              "nodes": [
-                  {
-                      "databaseId": 3108,
-                      "subtotal": "20",
-                      "quantity": 1,
-                      "product": {
-                          "node": {
-                              "name": "testing product 2",
-                              "databaseId": 14158,
-                              "featuredImage": {
-                                  "node": {
-                                      "sourceUrl": "https://api.gqmobiles.lk/wp-content/uploads/2024/01/gq-mobiles-netbooks-apple-macbook-air-m1-chip-13_-13-inch-2020-gold-2.png",
-                                      "__typename": "MediaItem"
-                                  },
-                                  "__typename": "NodeWithFeaturedImageToMediaItemConnectionEdge"
-                              },
-                              "__typename": "VariableProduct"
-                          },
-                          "__typename": "LineItemToProductConnectionEdge"
-                      },
-                      "__typename": "LineItem"
-                  }
-              ],
-              "__typename": "OrderToLineItemConnection"
-          },
-          "__typename": "Order"
-      },
-      "__typename": "CheckoutPayload"
-  }
-}
-
 /** Utility -------------------------------------------------------------- */
 const stripHtml = (html: string = '') =>
   html.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
@@ -373,7 +287,6 @@ export {
   getPaymentHash,
   numberFormat,
   sentConfirmation,
-  dummyPaymentData,
   stripHtml,
   stripHtmlTags
 };
