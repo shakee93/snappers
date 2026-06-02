@@ -1,5 +1,5 @@
 import { PayhereStatus, PaymentDetailsWithoutUrls } from "@/data/types";
-import { usePayhere } from "@/app/components/Payment/Payhere";
+import { usePayhere } from "@/components/ui/Payment/Payhere";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import { useState } from "react";
 import { toast } from "sonner";

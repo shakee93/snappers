@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { ProductAttribute, VariationAttribute } from "@/graphql/types/graphql";
-import { PRICE_RANGE } from "@/app/components/Filters/PriceFilter";
+import { PRICE_RANGE } from "@/components/primitives/Filters/PriceFilter";
 import { AttributeMapping } from "@/utils/attributeMappingService";
 
 type State = {

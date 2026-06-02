@@ -1,4 +1,4 @@
-import SectionSliderProductCard from "@/app/components/SectionSliderProductCard";
+import SectionSliderProductCard from "@/components/ui/SectionSliderProductCard";
 import { getClient } from "@/graphql/apollo-ssr";
 import { GET_PRODUCTS_BY_BOGO_TAG } from "@/graphql/defs/products";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";

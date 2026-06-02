@@ -1,4 +1,4 @@
-import ArchiveLayout from "@/app/components/archive/ArchiveLayout";
+import ArchiveLayout from "@/components/primitives/archive/ArchiveLayout";
 import { getClient } from "@/graphql/apollo-ssr";
 import { GET_TAG_DETAILS_BY_SLUG } from "@/graphql/defs/products";
 import { Metadata, ResolvingMetadata } from "next";

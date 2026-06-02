@@ -2,7 +2,7 @@ import { Disclosure } from "@headlessui/react";
 import { MinusIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { FC } from "react";
 
-import ProductSpecifications from "@/app/components/SingleProductPage/ProductSpecifications";
+import ProductSpecifications from "@/components/ui/SingleProductPage/ProductSpecifications";
 
 
 const DEMO_DATA = [

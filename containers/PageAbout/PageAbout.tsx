@@ -7,7 +7,7 @@ import { Helmet } from "react-helmet-async";
 import BgGlassmorphism from "components/BgGlassmorphism/BgGlassmorphism";
 import BackgroundSection from "components/BackgroundSection/BackgroundSection";
 import SectionHero from "./SectionHero";
-import SectionClientSay from "@/app/components/SectionClientSay/SectionClientSay";
+import SectionClientSay from "@/components/ui/SectionClientSay/SectionClientSay";
 import SectionPromo3 from "components/SectionPromo3";
 
 export interface PageAboutProps {

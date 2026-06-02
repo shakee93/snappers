@@ -4,7 +4,7 @@ import React, { FC } from "react";
 // import googleSvg from "@/public/images/Google.svg";
 import Image from "next/image";
 import Link from "next/link";
-import LoginForm from "@/app/components/LoginSignupPage/LoginForm";
+import LoginForm from "@/components/ui/LoginSignupPage/LoginForm";
 
 
 // const loginSocials = [

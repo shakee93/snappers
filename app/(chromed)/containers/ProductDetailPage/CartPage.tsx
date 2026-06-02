@@ -12,10 +12,10 @@ import {
   SimpleProduct,
   VariableProduct,
 } from "@/graphql/types/graphql";
-import Prices from "@/app/components/Prices";
+import Prices from "@/components/ui/Prices";
 import CartItemProduct from "@/app/(chromed)/containers/ProductDetailPage/CartItem";
 import { Loader } from "lucide-react";
-import BackdropSpinner from "@/app/components/BackdropSpinner";
+import BackdropSpinner from "@/components/ui/BackdropSpinner";
 
 const CartPage = () => {
   const { cart, loading } = useCart();

@@ -6,12 +6,12 @@ import { SessionProvider } from "@/context/SessionProvider";
 import { CartProvider } from "@/context/CartProvider";
 import { Toaster } from "sonner";
 import { Suspense } from "react";
-import { NavigationEvents } from "@/app/components/NavigationEvents";
+import { NavigationEvents } from "@/components/layout/NavigationEvents";
 import { Metadata } from "next";
-import WhatsappLogoComponent from "@/app/components/WhatsAppLogo";
+import WhatsappLogoComponent from "@/components/layout/WhatsAppLogo";
 import Script from "next/script";
-import GoogleAnalytics from "@/app/components/GoogleAnalytics";
-import ContentWrapper from "@/app/components/ContentWrapper";
+import GoogleAnalytics from "@/components/layout/GoogleAnalytics";
+import ContentWrapper from "@/components/layout/ContentWrapper";
 import { siteConfig } from "@/site.config";
 
 const defaultTitle = `${siteConfig.brand.name} - ${siteConfig.brand.tagline}`;

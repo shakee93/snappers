@@ -22,7 +22,7 @@ import { OrderSummarySkeleton } from "./CheckoutSkeletons";
 import { toast } from "sonner";
 import { PayhereStatus, PaymentDetailsWithoutUrls } from "@/data/types";
 import Script from "next/script";
-import { usePayhere } from "@/app/components/Payment/Payhere";
+import { usePayhere } from "@/components/ui/Payment/Payhere";
 import { redirect, useRouter } from "next/navigation";
 import { useSession } from "@/context/SessionProvider";
 import { usePaymentGateways } from "@/context/PaymentProvider";

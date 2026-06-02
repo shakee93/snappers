@@ -1,6 +1,6 @@
 "use client";
 import React, { useState } from "react";
-import EmailTemplate from "@/app/components/Email/EmailTemplate";
+import EmailTemplate from "@/components/ui/Email/EmailTemplate";
 
 const Page = () => {
     const [data, setData] = useState(null);

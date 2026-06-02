@@ -8,7 +8,7 @@ import {
   GET_VARIATIONS_PRODUCT,
 } from "@/graphql/defs/products";
 import { notFound, redirect } from "next/navigation";
-import ArchiveLayout from "@/app/components/archive/ArchiveLayout";
+import ArchiveLayout from "@/components/primitives/archive/ArchiveLayout";
 import { Metadata, ResolvingMetadata } from "next";
 import { Suspense } from "react";
 import { siteConfig } from "@/site.config";

@@ -5,12 +5,12 @@ import {
 } from "@/graphql/types/graphql";
 import Image from "next/image";
 import Link from "next/link";
-import LineOrCartPriceLabel from "@/app/components/LineOrCartPriceLabel";
+import LineOrCartPriceLabel from "@/components/ui/LineOrCartPriceLabel";
 import NcInputNumber from "@/components/NcInputNumber";
 import { useCart } from "@/context/CartProvider";
 import useProductLink from "@/hooks/useProductLink";
 import { Fragment } from "react";
-import AttributeIcon from "@/app/components/AttributeIcon";
+import AttributeIcon from "@/components/primitives/AttributeIcon";
 import { isLineItemFree } from "@/lib/cartLinePricing";
 import { getCartLineStockCap } from "@/lib/cartLineStockCap";
 

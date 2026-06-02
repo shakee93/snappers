@@ -5,7 +5,7 @@ import LoadingSkeleton from "@/components/OrderPageSkeleton";
 import { useSession } from "@/context/SessionProvider";
 import Link from "next/link";
 import { useEffect } from "react";
-import OrderBankReceiptUpload from "@/app/components/OrderBankReceiptUpload";
+import OrderBankReceiptUpload from "@/components/ui/OrderBankReceiptUpload";
 
 const AccountOrder = () => {
   const { loading, error, data, refetch } = useMyOrders();
