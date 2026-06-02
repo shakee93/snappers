@@ -80,12 +80,12 @@ hardcoded brand tokens, so they are the **known exception** to the Phase 1 grep
 definition-of-done. To finish the fork foundation for legal content, do the following
 (with a human review of the copy — the extraction is mechanical but the content is sensitive):
 
-- [ ] Extract `app/(chromed)/privacy/page.tsx` body → `content/legal/privacy.md`
-- [ ] Extract `app/(chromed)/terms-and-conditions/page.tsx` body → `content/legal/terms.md`
-- [ ] Extract `app/(chromed)/warranty-terms/page.tsx` body → `content/legal/warranty.md`
-- [ ] Render the `.md` via `react-markdown` (already installed) + `remark-gfm` (confirm installed)
+- [x] Extract `app/(chromed)/privacy/page.tsx` body → `content/legal/privacy.md`
+- [x] Extract `app/(chromed)/terms-and-conditions/page.tsx` body → `content/legal/terms.md`
+- [x] Extract `app/(chromed)/warranty-terms/page.tsx` body → `content/legal/warranty.md`
+- [x] Render the `.md` via `react-markdown` + `remark-gfm`
 - [ ] Wire any brand tokens left in the page shells (titles, contact lines) to `siteConfig`
-- [ ] **Remove the `httpbin.org` debug fetches** — `privacy/page.tsx:12` and
+- [x] **Remove the `httpbin.org` debug fetches** — `privacy/page.tsx:12` and
       `warranty-terms/page.tsx:8` call `fetch("https://httpbin.org/delay/3")`; result is
       unused, adds 3s latency, breaks offline/CI (plan §6 edge case #1)
 - [ ] **Delete the orphan scaffold** in `terms-and-conditions/` — `SectionFounder.tsx`,
