@@ -119,13 +119,20 @@ definition-of-done. To finish the fork foundation for legal content, do the foll
 - [x] Removed dead/orphan files: `test/page.tsx`, `thank-you/page2.tsx`, `terms-and-conditions/{SectionFounder,SectionHero,SectionStatistic}.tsx`, dead `api/banktransfer/` route, `ProductCard3` dead query imports
 - [x] Pruned 16 unimported legacy root `components/` files (verified by build)
 
-**Deferred (separate focused effort) — the directory moves:**
-- [ ] Move files into `components/{layout,primitives,ui}/` with import rewrites
-      (needs the audit's per-file classification — not in the plan doc; ~80 files;
-      highest import-churn risk; do as small per-category passes)
-- [ ] Resolve remaining legacy root `components/` files that are still referenced
-      (SectionPromo*, SectionHero/2, TikTokSection, SectionSliderLargeProduct*, etc.) —
-      determine if referenced by live code or dead chains, then move/delete
+**Done (later passes):**
+- [x] Moved the entire active `app/components/` tree into `components/{layout,primitives,ui}/`
+      with repo-wide import rewrites (144 files; build green)
+- [x] Removed the dead Ciseco legacy tree via transitive reachability from `app/`:
+      17 root loose files + 15 root legacy dirs + 9 unused `containers/` page templates
+
+**Remaining (needs dedup, not a move):**
+- [ ] ~22 live root `components/` stragglers are **name-duplicates of the bucketed
+      `ui/` components** (root `ProductQuickView`/`BagIcon`/`LikeButton`/`Prices`/
+      `NotifyAddTocart` + dirs `Heading`/`Header`/`CardCategories`), still wired via a
+      legacy chain (`ui/ModalQuickView` → root `ProductQuickView` → …). Bucketing collides;
+      resolving requires **deduplicating** to one implementation, then deleting the legacy
+      chain. Focused refactor, not a mechanical move.
+- [ ] `containers/ProductDetailPage` (live, used by cart) — move to a bucket or keep as a container.
 - [ ] httpbin debug fetches in legal pages → tracked under the Legal section above
 - [ ] Verify: **every route** in the per-route smoke test (import churn = highest risk)
 
