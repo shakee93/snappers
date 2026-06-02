@@ -18,7 +18,7 @@ import { GET_OPTIONS } from "@/graphql/defs/options";
 import FancyTestimonialsSlider from "@/components/ui/TestimonialsSlider";
 import GoogleReviewsSection from "@/components/ui/HomePage/GoogleReviewsSection";
 import FAQ from "@/components/ui/HomePage/FAQSection";
-import TikTokSection from "@/components/TikTokSection";
+import TikTokSection from "@/components/ui/TikTokSection";
 import { GET_BENTO_SLIDER } from "@/graphql/defs/products";
 import SectionHero4 from "@/components/ui/HomePage/SectionHero4";
 import { unstable_cache } from "next/cache";

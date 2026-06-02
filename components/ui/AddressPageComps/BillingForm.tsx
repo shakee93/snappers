@@ -10,7 +10,7 @@ import { siteConfig } from "@/site.config";
 
 // Component Imports
 import Input from "@/shared/Input/Input";
-import Label from "@/components/Label/Label";
+import Label from "@/components/primitives/Label/Label";
 import Select from "@/shared/Select/Select";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 

@@ -130,7 +130,7 @@ const AddedToCart = ({
           <div className="flex">
             <Link
               href={"/cart"}
-              className="font-medium text-primary-6000 dark:text-primary-500 "
+              className="font-medium text-primary-600 dark:text-primary-500 "
             >
               View cart
             </Link>

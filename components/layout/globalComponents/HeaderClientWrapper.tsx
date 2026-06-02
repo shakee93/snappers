@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import { Brand, ProductCategory } from "@/graphql/types/graphql";
-import TopBarPromotion from "@/components/TopBarPromotion";
+import TopBarPromotion from "@/components/layout/TopBarPromotion";
 import HeaderContent from "./HeaderContent";
 import HeaderSearchResults from "@/components/layout/globalComponents/HeaderSearchResults";
 import MobileNavLinks from "./MobileNavLinks";

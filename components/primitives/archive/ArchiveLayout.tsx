@@ -115,8 +115,8 @@ const ArchiveLayout = async ({
                 href={item.href}
                 className={`rounded-md px-4 py-2 text-sm border ${
                   item.active
-                    ? "bg-primaryColor text-white border-primaryColor"
-                    : "bg-white text-primaryColor border-primaryColor"
+                    ? "bg-primary-500 text-white border-primary-500"
+                    : "bg-white text-primary-500 border-primary-500"
                 }`}
               >
                 {item.label}
@@ -130,7 +130,7 @@ const ArchiveLayout = async ({
             <Link
               href={item.slug}
               key={index}
-              className="flex-shrink-0 rounded-md py-2 px-4 bg-white border border-primaryColor"
+              className="flex-shrink-0 rounded-md py-2 px-4 bg-white border border-primary-500"
             >
               {item.name}
             </Link>

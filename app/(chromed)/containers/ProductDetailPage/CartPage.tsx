@@ -1,6 +1,6 @@
 "use client";
 import { CheckIcon } from "@heroicons/react/24/outline";
-import NcInputNumber from "components/NcInputNumber";
+import NcInputNumber from "components/primitives/NcInputNumber";
 import Image from "next/image";
 
 import ButtonPrimary from "shared/Button/ButtonPrimary";

@@ -171,7 +171,7 @@ const ProductDetails = ({
             (attr: ProductAttribute, index: number) => (
               <div key={index} className="py-2 text-gray-500">
                 <div className="flex items-center gap-1 py-2 text-sm">
-                  <span className="text-primaryColor flex items-center gap-1">
+                  <span className="text-primary-500 flex items-center gap-1">
                     <AttributeIcon name={attr?.name || ""} className="w-4" />
                     {attr.label}:
                   </span>
@@ -221,7 +221,7 @@ const ProductDetails = ({
                         className={twMerge(
                           "relative inline-block cursor-pointer rounded border bg-gray-200/80 px-3.5 py-2 text-xs text-black md:text-sm",
                           activeAttr(attr)?.val === option &&
-                          "border-primaryColor text-primaryColor bg-white shadow-md",
+                          "border-primary-500 text-primary-500 bg-white shadow-md",
                           allOutOfStock && "diag-line bg-gray-100 text-gray-500"
                         )}
                         style={{ opacity: allOutOfStock ? 0.9 : 1 }}

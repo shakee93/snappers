@@ -55,7 +55,7 @@ const SearchInput: React.FC<SearchInputProps> = ({ show = true, bindToStore = fa
     return <form
         className="flex-1 text-primary-700"
     >
-        <div className="bg-primaryColor/5 border border-primaryColor/20 py-2 flex items-center space-x-1.5 px-5 rounded-2xl h-full ">
+        <div className="bg-primary-500/5 border border-primary-500/20 py-2 flex items-center space-x-1.5 px-5 rounded-2xl h-full ">
             <input
                 type="text"
                 placeholder="Type to Quick"
@@ -65,7 +65,7 @@ const SearchInput: React.FC<SearchInputProps> = ({ show = true, bindToStore = fa
                 autoFocus
             />
 
-            <Search className='text-primaryColor' />
+            <Search className='text-primary-500' />
         </div>
         <input type="submit" hidden value="" />
     </form>;

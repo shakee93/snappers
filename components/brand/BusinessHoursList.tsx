@@ -19,7 +19,7 @@ export default function BusinessHoursList({
   return (
     <div className="flex gap-3">
       <div className="shrink-0">
-        <Clock size={iconSize} className="text-primaryColor" aria-hidden />
+        <Clock size={iconSize} className="text-primary-500" aria-hidden />
       </div>
       <div className={className}>
         {schedule.map((entry) => (

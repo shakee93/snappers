@@ -8,7 +8,7 @@ import { useSession } from "@/context/SessionProvider";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Loader } from "lucide-react";
-import { getRandomWelcomeMessage } from "@/components/AddressPageComps/HelperComps";
+import { getRandomWelcomeMessage } from "@/components/ui/AddressPageComps/HelperComps";
 import Link from "next/link";
 
 const LoginForm = () => {

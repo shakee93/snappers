@@ -7,7 +7,7 @@ import {
   VariableProduct,
   ProductTag,
 } from "@/graphql/types/graphql";
-import NcInputNumber from "@/components/NcInputNumber";
+import NcInputNumber from "@/components/primitives/NcInputNumber";
 import React, { useState, useEffect } from "react";
 import { toast } from "sonner";
 import AddedToCart from "@/components/ui/Notifications/added-to-cart";
@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "@/context/SessionProvider";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
 import Input from "shared/Input/Input";
-import PreOrderNotice from "@/components/PreOrderNotice";
+import PreOrderNotice from "@/components/ui/PreOrderNotice";
 
 interface ProductAddToCartProps {
   product: SimpleProduct & VariableProduct;
@@ -335,7 +335,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
         className="flex items-center justify-center md:justify-start gap-4 md:gap-0 md:space-x-3.5 py-2 px-2 md:py-4 fixed bottom-[82px] left-0 z-10 md:z-10 bg-white md:bg-transparent w-full md:static"
       >
         {!(product.type === "VARIABLE" && !variation) && (
-          <div className="flex border border-primaryColor/20 items-center justify-center dark:bg-slate-800/70 px-2 py-1 sm:p-2 rounded-full">
+          <div className="flex border border-primary-500/20 items-center justify-center dark:bg-slate-800/70 px-2 py-1 sm:p-2 rounded-full">
             <div className="flex items-center justify-between space-x-5 w-full">
               <NcInputNumber onChange={(v) => setQuantity(v)} defaultValue={quantity} />
             </div>
@@ -352,8 +352,8 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
               "relative w-auto grow md:flex-none h-auto inline-flex cursor-pointer items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90",
               isPreOrderProduct()
                 ? "bg-blue-800 dark:bg-slate-100 text-slate-50 dark:text-slate-800"
-                : "bg-primaryColor dark:bg-slate-100 text-slate-50 dark:text-slate-800",
-              "shadow-xl flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0",
+                : "bg-primary-500 dark:bg-slate-100 text-slate-50 dark:text-slate-800",
+              "shadow-xl flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 dark:focus:ring-offset-0",
               isAddToCartDisabled && "opacity-50 disabled:cursor-not-allowed"
             )}
           >
@@ -373,7 +373,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
             disabled={isNotifyClicked}
             onClick={handleNotifyClick}
             className={twMerge(
-              "relative w-auto grow md:flex-none h-auto inline-flex cursor-pointer items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-primaryColor dark:bg-slate-100 text-slate-50 dark:text-slate-800 shadow-xl flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-6000 dark:focus:ring-offset-0",
+              "relative w-auto grow md:flex-none h-auto inline-flex cursor-pointer items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-primary-500 dark:bg-slate-100 text-slate-50 dark:text-slate-800 shadow-xl flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 dark:focus:ring-offset-0",
               isNotifyClicked && "opacity-50 disabled:cursor-not-allowed"
             )}
           >
@@ -425,7 +425,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
                         Close
                       </Button>
                       {!customer?.email && (
-                        <Button className="bg-transparent text-primaryColor hover:bg-blue-500 hover:text-white transition-colors duration-200 ease-in-out"
+                        <Button className="bg-transparent text-primary-500 hover:bg-blue-500 hover:text-white transition-colors duration-200 ease-in-out"
                           onPress={handleSubmitEmail}>
                           Submit
                         </Button>

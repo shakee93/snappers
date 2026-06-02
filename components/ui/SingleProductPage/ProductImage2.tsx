@@ -411,7 +411,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
                   }}
                 >
                   <div className="bg-white bg-opacity-90 rounded-[2rem] p-4 md:p-6 shadow-2xl group-hover:bg-opacity-100 group-hover:scale-110 transition-all duration-300">
-                    <PlayIcon className="w-12 h-12 md:w-16 md:h-16 text-primaryColor ml-1" />
+                    <PlayIcon className="w-12 h-12 md:w-16 md:h-16 text-primary-500 ml-1" />
                   </div>
                 </div>
               )}

@@ -9,7 +9,7 @@ import { useHits, useInstantSearch } from "react-instantsearch";
 import Pagination from "@/shared/Pagination/Pagination";
 import Image from "next/image";
 import NotFound from "@/public/not_found.svg";
-import ProductCardLoading from "@/components/Loading/ProductCardLoading";
+import ProductCardLoading from "@/components/primitives/Loading/ProductCardLoading";
 import { filterHiddenProducts } from "@/lib/hidden-products";
 import { resolveProductSale, type SaleResolvableProduct } from "@/lib/productSale";
 

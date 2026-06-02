@@ -20,7 +20,7 @@ const CheckoutFooter = () => {
         <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
           {policyLinks.map(({ href, label }) => (
             <li key={href}>
-              <Link href={href} className="hover:text-primaryColor">
+              <Link href={href} className="hover:text-primary-500">
                 {label}
               </Link>
             </li>

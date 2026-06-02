@@ -3,22 +3,11 @@ import type { Config } from 'tailwindcss';
 import defaultTheme from "tailwindcss/defaultTheme";
 import plugin from 'tailwindcss/plugin';
 
-interface CustomColorsParams {
-	opacityVariable?: string;
-	opacityValue?: number;
-}
-
-function customColors(cssVar: string) {
-	return ({ opacityVariable, opacityValue }: CustomColorsParams) => {
-		if (opacityValue !== undefined) {
-			return `rgba(var(${cssVar}), ${opacityValue})`;
-		}
-		if (opacityVariable !== undefined) {
-			return `rgba(var(${cssVar}), var(${opacityVariable}, 1))`;
-		}
-		return `rgb(var(${cssVar}))`;
-	};
-}
+// Brand color tokens resolve to CSS variables defined in app/index.css as
+// space-separated RGB channels (e.g. `--c-primary-500: 27 64 175`). The
+// `<alpha-value>` placeholder lets Tailwind opacity modifiers (e.g.
+// `bg-primary-500/10`) work natively. A fork re-skins by editing index.css.
+const tokenColor = (cssVar: string) => `rgb(var(${cssVar}) / <alpha-value>)`;
 
 const config: Config = {
 	content: [
@@ -46,36 +35,35 @@ const config: Config = {
 		extend: {
 			colors: {
 				transparent: 'transparent',
-				primaryColor: '#1b40af',
 				// Semantic status tokens (a fork swaps these). Plain hex so they
 				// render identically to the literals they replace.
 				success: '#059669',
 				danger: '#d71e1e',
 				primary: {
-					'50': 'customColors("--c-primary-50")',
-					'100': 'customColors("--c-primary-100")',
-					'200': 'customColors("--c-primary-200")',
-					'300': 'customColors("--c-primary-300")',
-					'400': 'customColors("--c-primary-400")',
-					'500': 'customColors("--c-primary-500")',
-					'700': 'customColors("--c-primary-700")',
-					'800': 'customColors("--c-primary-800")',
-					'900': 'customColors("--c-primary-900")',
-					'6000': 'customColors("--c-primary-600")',
+					'50': tokenColor("--c-primary-50"),
+					'100': tokenColor("--c-primary-100"),
+					'200': tokenColor("--c-primary-200"),
+					'300': tokenColor("--c-primary-300"),
+					'400': tokenColor("--c-primary-400"),
+					'500': tokenColor("--c-primary-500"),
+					'600': tokenColor("--c-primary-600"),
+					'700': tokenColor("--c-primary-700"),
+					'800': tokenColor("--c-primary-800"),
+					'900': tokenColor("--c-primary-900"),
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'
 				},
 				secondary: {
-					'50': 'customColors("--c-secondary-50")',
-					'100': 'customColors("--c-secondary-100")',
-					'200': 'customColors("--c-secondary-200")',
-					'300': 'customColors("--c-secondary-300")',
-					'400': 'customColors("--c-secondary-400")',
-					'500': 'customColors("--c-secondary-500")',
-					'700': 'customColors("--c-secondary-700")',
-					'800': 'customColors("--c-secondary-800")',
-					'900': 'customColors("--c-secondary-900")',
-					'6000': 'customColors("--c-secondary-600")',
+					'50': tokenColor("--c-secondary-50"),
+					'100': tokenColor("--c-secondary-100"),
+					'200': tokenColor("--c-secondary-200"),
+					'300': tokenColor("--c-secondary-300"),
+					'400': tokenColor("--c-secondary-400"),
+					'500': tokenColor("--c-secondary-500"),
+					'600': tokenColor("--c-secondary-600"),
+					'700': tokenColor("--c-secondary-700"),
+					'800': tokenColor("--c-secondary-800"),
+					'900': tokenColor("--c-secondary-900"),
 					DEFAULT: 'hsl(var(--secondary))',
 					foreground: 'hsl(var(--secondary-foreground))'
 				},

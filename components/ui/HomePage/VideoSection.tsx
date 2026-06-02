@@ -158,7 +158,7 @@ const VideoSection = ({
           {productLink && (
             <button
               onClick={() => window.open(productLink, "_blank")}
-              className=" bg-primaryColor rounded-full text-xs px-4 flex items-center justify-center text-white hover:bg-blue-700 transition-all duration-200"
+              className=" bg-primary-500 rounded-full text-xs px-4 flex items-center justify-center text-white hover:bg-blue-700 transition-all duration-200"
               aria-label="View product"
               title="View product"
             >

@@ -64,7 +64,7 @@ const ThankYouPage = ({ params }: OrderPaymentPageProps) => {
                   <div className="inline-block min-w-full p-1.5 align-middle">
                     <div className="overflow-hidden">
                       <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead className="texy-primaryColor bg-gray-200 py-2 text-lg ">
+                        <thead className="text-primary-500 bg-gray-200 py-2 text-lg ">
                           <tr>
                             <th
                               scope="col"

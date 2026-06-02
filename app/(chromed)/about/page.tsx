@@ -1,4 +1,4 @@
-import BgGlassmorphism from "@/components/BgGlassmorphism/BgGlassmorphism";
+import BgGlassmorphism from "@/components/ui/BgGlassmorphism/BgGlassmorphism";
 import { siteConfig } from "@/site.config";
 import aboutContent from "@/content/about.json";
 import Image from "next/image";
@@ -26,7 +26,7 @@ const AccountPage = () => {
             </h1>
             <div className="block text-base xl:text-base text-neutral-6000 dark:text-neutral-400 lg:text-justify">
               For more than 20 years,{" "}
-              <span className="text-primaryColor">
+              <span className="text-primary-500">
                 {siteConfig.brand.name}
               </span>{" "}
               has demonstrated excellence in the retail industry by
@@ -56,7 +56,7 @@ const AccountPage = () => {
                   className="rounded-3xl"
                 />
               </div>
-              <div className="text-xl xl:text-3xl !leading-tight font-semibold  dark:text-neutral-400 ytext-primaryColor">
+              <div className="text-xl xl:text-3xl !leading-tight font-semibold  dark:text-neutral-400 text-primary-500">
                 {item.title}
               </div>
               <div className="text-base xl:text-base text-neutral-6000 dark:text-neutral-400 ">
@@ -72,7 +72,7 @@ const AccountPage = () => {
           </h2>
           {services.map((service, index) => (
             <div key={index} className="flex flex-col gap-3">
-              <div className="text-primaryColor font-medium text-lg leading-tight md:text-xl">
+              <div className="text-primary-500 font-medium text-lg leading-tight md:text-xl">
                 {service.title}
               </div>
               <div className="text-base xl:text-base text-neutral-6000 dark:text-neutral-400 ">
@@ -93,7 +93,7 @@ const AccountPage = () => {
                   <dt className="text-base leading-7 text-gray-900">
                     {stat.name}
                   </dt>
-                  <dd className="order-first text-4xl font-semibold tracking-tight text-primaryColor sm:text-6xl">
+                  <dd className="order-first text-4xl font-semibold tracking-tight text-primary-500 sm:text-6xl">
                     {stat.value}
                   </dd>
                 </div>
@@ -107,7 +107,7 @@ const AccountPage = () => {
             <h3 className="mb-3 text-2xl !leading-tight font-semibold text-neutral-900 md:text-3xl xl:text-4xl dark:text-neutral-100">
               Happy Customers.
             </h3>
-            <div className="text-primaryColor font-medium text-lg leading-tight md:text-xl">
+            <div className="text-primary-500 font-medium text-lg leading-tight md:text-xl">
               Know what our loyal customers think about our store
             </div>
           </div>

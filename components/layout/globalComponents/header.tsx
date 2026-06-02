@@ -22,7 +22,7 @@ const getData = async () => {
 
 const HeaderSkeleton = () => (
   <div className="bg-white border-b border-gray-100" aria-hidden>
-    <div className="h-8 bg-primaryColor/5" />
+    <div className="h-8 bg-primary-500/5" />
     <div className="h-16 md:h-20" />
     <div className="h-10 hidden md:block bg-gray-50" />
   </div>

@@ -1,6 +1,6 @@
 import Input from "@/shared/Input/Input";
 import Select from "@/shared/Select/Select";
-import Label from "../Label/Label";
+import Label from "@/components/primitives/Label/Label";
 import React from "react";
 import { CheckoutPayload, CustomerAddressInput } from "@/graphql/types/graphql";
 import { PaymentDetailsWithoutUrls } from "@/data/types";

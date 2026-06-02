@@ -48,8 +48,8 @@ const HeaderSearchResults = ({ brands, productCategories }: SearchBarProps) => {
             <Suspense fallback={'loading...'}>
                 <AttributeMappingsInitializer />
                 <h2 className="mb-8 ml-6 block text-sm md:text-lg font-semibold mt-14">
-                    Search Results for <span className='text-primaryColor'>{search}</span>
-                    {isTyping && <span className='text-primaryColor'>Searching...</span>}
+                    Search Results for <span className='text-primary-500'>{search}</span>
+                    {isTyping && <span className='text-primary-500'>Searching...</span>}
                 </h2>
                 <InstantSearchWrapper
                     filters

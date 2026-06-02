@@ -71,7 +71,7 @@ const MobileNavLinks = () => {
         <div className="bg-gray-300 m-auto py-0.5 w-1/5 rounded-xl"></div>
 
         <div className="flex flex-col gap-5 mt-3">
-          <ul className="gap-1 text-base text-center items-center font-medium  text-primaryColor ">
+          <ul className="gap-1 text-base text-center items-center font-medium  text-primary-500 ">
             {navLinks.map((item) => (
               <li
                 key={item.id}
@@ -95,7 +95,7 @@ const MobileNavLinks = () => {
 
           {customer && customer?.id !== "guest" && (
             <div
-              className="gap-1 text-base cursor-pointer text-center items-center font-medium  text-primaryColor "
+              className="gap-1 text-base cursor-pointer text-center items-center font-medium  text-primary-500 "
               onClick={handleLogout}
             >
               Log Out
@@ -103,7 +103,7 @@ const MobileNavLinks = () => {
           )}
 
 
-          <div className="flex  justify-center text-primaryColor text-base gap-2 items-center">
+          <div className="flex  justify-center text-primary-500 text-base gap-2 items-center">
 
             <Link
               href={`tel:${siteConfig.contact.primaryPhone}`}
@@ -121,7 +121,7 @@ const MobileNavLinks = () => {
             </Link>
           </div>
 
-          <div className="flex gap-2 justify-center text-primaryColor">
+          <div className="flex gap-2 justify-center text-primary-500">
             <Link href={`https://www.facebook.com/${siteConfig.social.facebook}`}>
               <Facebook size={24} />
             </Link>

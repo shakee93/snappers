@@ -60,19 +60,19 @@ const
                       {product.regularPrice} {product.currency}
                     </span>
                   )}
-                  <span className="text-primaryColor font-bold text-sm leading-none">
+                  <span className="text-primary-500 font-bold text-sm leading-none">
                     {product.price} {product.currency}
                   </span>
                 </div>
               </div>
               <div className="flex flex-row gap-2">
                 <Link href="/deals">
-                  <button className="bg-white border border-primaryColor text-primaryColor text-xs px-1 sm:px-4 py-1 rounded-full hover:bg-blue-50 transition-colors">
+                  <button className="bg-white border border-primary-500 text-primary-500 text-xs px-1 sm:px-4 py-1 rounded-full hover:bg-blue-50 transition-colors">
                     Explore Deals
                   </button>
                 </Link>
                 <Link href={`/products/${product.slug}`} target="_blank" rel="noopener noreferrer">
-                  <button className="bg-primaryColor text-white text-xs px-4 py-1 rounded-full hover:bg-blue-600 transition-colors">
+                  <button className="bg-primary-500 text-white text-xs px-4 py-1 rounded-full hover:bg-blue-600 transition-colors">
                     Buy Now
                   </button>
                 </Link>

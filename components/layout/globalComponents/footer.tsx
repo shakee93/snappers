@@ -24,7 +24,7 @@ const FooterSkeleton = () => (
     <div className="container py-8">
       <div className="h-8" />
     </div>
-    <div className="bg-primaryColor h-12" />
+    <div className="bg-primary-500 h-12" />
   </footer>
 );
 
@@ -41,19 +41,19 @@ const FooterInner = async () => {
           <Link className="flex gap-2"
             href={`https://www.facebook.com/${siteConfig.social.facebook}`}
           >
-            <PiFacebookLogoDuotone size={32} strokeWidth={1.25} className="text-primaryColor" />
+            <PiFacebookLogoDuotone size={32} strokeWidth={1.25} className="text-primary-500" />
           </Link>
           <Link
             className="flex gap-2"
             href={`https://www.instagram.com/${siteConfig.social.instagram}`}
           >
-            <PiInstagramLogoDuotone size={32} strokeWidth={1.25} className="text-primaryColor" />
+            <PiInstagramLogoDuotone size={32} strokeWidth={1.25} className="text-primary-500" />
           </Link>
           <Link
             className="flex gap-2"
             href={`https://www.tiktok.com/${siteConfig.social.tiktok}`}
           >
-            <PiTiktokLogoDuotone size={32} strokeWidth={1.25} className="text-primaryColor" />
+            <PiTiktokLogoDuotone size={32} strokeWidth={1.25} className="text-primary-500" />
           </Link>
 
         </div>
@@ -63,12 +63,12 @@ const FooterInner = async () => {
 
           <div className="flex gap-1 col-span-6 md:gap-4 md:col-span-3 p-2 flex-col items-start md:items-center">
             <div className="grid gap-2 md:gap-4">
-              <div className="text-base md:text-lg text-left font-medium text-primaryColor">
+              <div className="text-base md:text-lg text-left font-medium text-primary-500">
                 {siteConfig.navigation.footerQuickLinks.heading}
               </div>
               <ul className="text-xs text-left lg:text-sm text-gray-500 flex flex-col gap-3 ">
                 {siteConfig.navigation.footerQuickLinks.links.map((item) => (
-                  <li key={item.href} className="hover:text-primaryColor">
+                  <li key={item.href} className="hover:text-primary-500">
                     <Link href={item.href}>{item.name}</Link>
                   </li>
                 ))}
@@ -78,19 +78,19 @@ const FooterInner = async () => {
 
           <div className="flex gap-1 col-span-6 md:gap-4 md:col-span-3 pt-2 px-2 flex-col items-start md:items-center">
             <div className="grid gap-2 md:gap-4">
-              <div className="text-base  md:text-lg font-medium text-primaryColor">
+              <div className="text-base  md:text-lg font-medium text-primary-500">
                 Top Brands
               </div>
               <ul className="text-xs md:hidden text-left lg:text-sm text-gray-500 grid grid-cols-2 md:grid-cols-3 gap-x-4 md:gap-x-3 gap-y-3">
                 {brands.slice(0, 12).map((brand: Brand, index: number) => (
-                  <li key={index} className="hover:text-primaryColor">
+                  <li key={index} className="hover:text-primary-500">
                     <Link href={`/${brand.slug}`}>{brand.name}</Link>
                   </li>
                 ))}
               </ul>
               <ul className="hidden md:grid text-xs text-left lg:text-sm text-gray-500 grid grid-cols-2 md:grid-cols-2 gap-x-4 md:gap-x-3 gap-y-3">
                 {brands.slice(0, 12).map((brand: Brand, index: number) => (
-                  <li key={index} className="hover:text-primaryColor">
+                  <li key={index} className="hover:text-primary-500">
                     <Link href={`/${brand.slug}`}>{brand.name}</Link>
                   </li>
                 ))}
@@ -99,19 +99,19 @@ const FooterInner = async () => {
           </div>
 
           <div className="xl:flex gap-1 col-span-6 md:col-span-3 md:gap-3 p-2 flex-col items-center md:items-start">
-            <div className="text-base  md:text-lg font-medium text-primaryColor">
+            <div className="text-base  md:text-lg font-medium text-primary-500">
               Address
             </div>
             <ul className="flex text-xs flex-col gap-3 pb-4">
               {footerContent.locations.map((location) => (
                 <li key={location.name} className="lg:text-sm text-gray-500 flex gap-3">
                   <div>
-                    <MapPinned size={iconSize} className="text-primaryColor" />
+                    <MapPinned size={iconSize} className="text-primary-500" />
                   </div>
                   <div className="flex flex-col">
                     <div>{location.name}</div>
                     <div>{location.address}</div>
-                    <div className="flex flex-col mt-2 text-primaryColor">
+                    <div className="flex flex-col mt-2 text-primary-500">
                       {location.phones.map((phone) => (
                         <Link key={phone.tel} href={`tel:${phone.tel}`}>
                           {phone.display}
@@ -125,7 +125,7 @@ const FooterInner = async () => {
           </div>
 
           <div className="xl:flex gap-1 col-span-6 md:col-span-3 md:gap-3 p-2 flex-col items-center md:items-start">
-            <div className="text-base  md:text-lg font-medium text-primaryColor">
+            <div className="text-base  md:text-lg font-medium text-primary-500">
               {siteConfig.businessHours.heading}
             </div>
             <ul className="flex text-xs flex-col gap-3 pb-4">
@@ -134,7 +134,7 @@ const FooterInner = async () => {
               </li>
               <li className="lg:text-sm text-gray-500 flex gap-3">
                 <div>
-                  <Mail size={iconSize} className="text-primaryColor" />
+                  <Mail size={iconSize} className="text-primary-500" />
                 </div>
                 <div className="flex flex-col">
                   <div>
@@ -160,7 +160,7 @@ const FooterInner = async () => {
 
       </div>
 
-      <div className="text-center text-xs text-white py-4 bg-primaryColor">
+      <div className="text-center text-xs text-white py-4 bg-primary-500">
         <div className="container flex gap-4 justify-center flex-wrap">
           <div className="flex gap-2 items-center"><Copyright size={16} /> {new Date().getFullYear()} {siteConfig.brand.legalName}.</div>
           <div>{" | "} </div>

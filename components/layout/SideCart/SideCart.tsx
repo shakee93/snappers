@@ -25,12 +25,12 @@ export default function SideCart() {
                     className="group w-10 h-10 sm:w-10 sm:h-10 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full inline-flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 relative"
                 >
                     {!!cart?.contents?.itemCount && (
-                        <div className="w-5 bg-primaryColor h-5 flex items-center justify-center bg-primary-500 absolute top-0 right-0 rounded-full text-[11px] leading-none text-white font-medium">
+                        <div className="w-5 bg-primary-500 h-5 flex items-center justify-center bg-primary-500 absolute top-0 right-0 rounded-full text-[11px] leading-none text-white font-medium">
                             <span className="mt-[1px] font-bold">{cart?.contents?.itemCount}</span>
                         </div>
                     )}
 
-                    <div className="text-primaryColor flex items-center justify-center w-10 sm:h-10">
+                    <div className="text-primary-500 flex items-center justify-center w-10 sm:h-10">
                         <ShoppingCart className="w-5" />
                     </div>
 
@@ -83,7 +83,7 @@ export default function SideCart() {
                                     className={
                                         "relative w-full h-auto flex-1 items-center justify-center rounded-full \
                                         transition-colors disabled:cursor-not-allowed text-sm sm:text-base font-medium py-3 px-4 sm:py-3 sm:px-6 \
-                                        disabled:bg-opacity-90 bg-primaryColor text-white"
+                                        disabled:bg-opacity-90 bg-primary-500 text-white"
                                     }
                                 >
                                     <span className="">Checkout</span>

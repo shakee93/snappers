@@ -6,7 +6,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import LineOrCartPriceLabel from "@/components/ui/LineOrCartPriceLabel";
-import NcInputNumber from "@/components/NcInputNumber";
+import NcInputNumber from "@/components/primitives/NcInputNumber";
 import { useCart } from "@/context/CartProvider";
 import useProductLink from "@/hooks/useProductLink";
 import { Fragment } from "react";
@@ -160,7 +160,7 @@ const CartItemProduct = ({
 
           <button
             onClick={(e) => removeFromCart([key])}
-            className="text-primary-6000 hover:text-primary-500 relative z-10 mt-3 flex items-center text-sm font-medium"
+            className="text-primary-600 hover:text-primary-500 relative z-10 mt-3 flex items-center text-sm font-medium"
           >
             <span>Remove</span>
           </button>

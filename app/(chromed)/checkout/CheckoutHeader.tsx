@@ -31,10 +31,10 @@ const CheckoutHeader = () => {
           <span className="hidden md:inline text-gray-500">Need help?</span>
           <Link
             href={SUPPORT_PHONE_TEL}
-            className="inline-flex items-center gap-1.5 text-gray-700 hover:text-primaryColor"
+            className="inline-flex items-center gap-1.5 text-gray-700 hover:text-primary-500"
             aria-label={`Call ${SUPPORT_PHONE_DISPLAY}`}
           >
-            <Phone size={14} className="text-primaryColor" />
+            <Phone size={14} className="text-primary-500" />
             <span className="hidden sm:inline">{SUPPORT_PHONE_DISPLAY}</span>
           </Link>
           <Link

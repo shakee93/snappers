@@ -1,7 +1,7 @@
 "use client";
 import { useMyOrders } from "@/hooks/useMyOrders";
 import OrderItemProduct from "@/app/(chromed)/containers/ProductDetailPage/OrderItem";
-import LoadingSkeleton from "@/components/OrderPageSkeleton";
+import LoadingSkeleton from "@/components/primitives/OrderPageSkeleton";
 import { useSession } from "@/context/SessionProvider";
 import Link from "next/link";
 import { useEffect } from "react";

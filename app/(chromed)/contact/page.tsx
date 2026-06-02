@@ -89,7 +89,7 @@ const Contact = () => {
           <div className="-mx-4 flex flex-wrap lg:justify-between">
             <div className="w-full px-4 lg:w-1/2 xl:w-6/12">
               <div className="mb-12 max-w-[570px] lg:mb-0">
-                <span className="mb-4 block text-xl font-semibold text-primaryColor">
+                <span className="mb-4 block text-xl font-semibold text-primary-500">
                   Contact Us
                 </span>
                 <h2 className="mb-6 text-[32px] font-bold uppercase text-dark dark:text-white sm:text-[40px] lg:text-[36px] xl:text-[40px]">
@@ -112,18 +112,18 @@ const Contact = () => {
                     </svg>
                   </div>
                   <div className="w-full">
-                    <h4 className="mb-4 text-xl font-bold text-primaryColor">
+                    <h4 className="mb-4 text-xl font-bold text-primary-500">
                       Our Locations & contact
                     </h4>
                     <div className="space-y-6">
                       {contactContent.locations.map((location) => (
                         <div
                           key={location.name}
-                          className="group relative overflow-hidden rounded-xl border border-neutral-200 bg-white p-6 transition-all duration-300 hover:border-primaryColor hover:shadow-lg dark:border-neutral-700 dark:bg-neutral-900"
+                          className="group relative overflow-hidden rounded-xl border border-neutral-200 bg-white p-6 transition-all duration-300 hover:border-primary-500 hover:shadow-lg dark:border-neutral-700 dark:bg-neutral-900"
                         >
-                          <div className="absolute -right-2 -top-2 h-20 w-20 rotate-12 transform bg-primaryColor/10 transition-transform group-hover:scale-150" />
+                          <div className="absolute -right-2 -top-2 h-20 w-20 rotate-12 transform bg-primary-500/10 transition-transform group-hover:scale-150" />
                           <p className="relative mb-3 flex items-center text-base font-medium text-neutral-900 dark:text-neutral-100">
-                            <PinIcon className="mr-3 h-5 w-5 text-primaryColor" />
+                            <PinIcon className="mr-3 h-5 w-5 text-primary-500" />
                             {location.name}
                           </p>
                           <div className="relative ml-8 space-y-2">
@@ -136,7 +136,7 @@ const Contact = () => {
                                 <Link
                                   key={phone.tel}
                                   href={`tel:${phone.tel}`}
-                                  className="inline-flex items-center text-base text-primaryColor transition-colors hover:text-primary-700"
+                                  className="inline-flex items-center text-base text-primary-500 transition-colors hover:text-primary-700"
                                 >
                                   {phone.display}
                                 </Link>
@@ -166,7 +166,7 @@ const Contact = () => {
                     </svg>
                   </div>
                   <div className="w-full">
-                    <h4 className="mb-1 text-xl font-bold text-primaryColor">
+                    <h4 className="mb-1 text-xl font-bold text-primary-500">
                       Email Address
                     </h4>
                     <p className="text-base text-body-color dark:text-dark-6">
@@ -183,7 +183,7 @@ const Contact = () => {
                 {
                   showSuccessMessage ? (
                     <div>
-                      <p className="flex flex-col items-center gap-y-3.5 text-xl font-bold text-primaryColor mb-6 text-center">
+                      <p className="flex flex-col items-center gap-y-3.5 text-xl font-bold text-primary-500 mb-6 text-center">
                         <CheckCircle2 className="text-center w-8 h-8" />
                         Just confirming that we got your message. We&apos;re on it.
                       </p>
@@ -225,7 +225,7 @@ const Contact = () => {
                       <div>
                         <button
                           type="submit"
-                          className="w-full rounded border border-primary bg-primaryColor p-3 text-white transition hover:bg-opacity-90"
+                          className="w-full rounded border border-primary bg-primary-500 p-3 text-white transition hover:bg-opacity-90"
                         >
                           Send Message
                         </button>

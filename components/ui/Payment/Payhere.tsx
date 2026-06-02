@@ -4,7 +4,7 @@ import {
   PayhereTransactionData,
   PaymentDetailsWithoutUrls,
 } from "@/data/types";
-import { extractRawAmount, getPaymentHash, numberFormat, TEST_STATIC_DATA } from "@/components/AddressPageComps/HelperComps";
+import { extractRawAmount, getPaymentHash, numberFormat, TEST_STATIC_DATA } from "@/components/ui/AddressPageComps/HelperComps";
 import { siteConfig } from "@/site.config";
 
 // const MERCHANT_ID = "1225436";

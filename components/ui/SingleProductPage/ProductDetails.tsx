@@ -285,7 +285,7 @@ const ProductDetails = ({
             {entry.href ? (
               <Link
                 href={entry.href}
-                className="font-medium text-primaryColor underline"
+                className="font-medium text-primary-500 underline"
               >
                 {entry.name}
               </Link>
@@ -397,7 +397,7 @@ const ProductDetails = ({
         <Link
           href={`/${brand?.slug}`}
           target="_blank"
-          className="bg-primaryColor rounded-xl px-2.5 py-1 text-white"
+          className="bg-primary-500 rounded-xl px-2.5 py-1 text-white"
         >
           {brand?.name}
         </Link>
@@ -406,7 +406,7 @@ const ProductDetails = ({
       {/* <div className="text-2xl font-medium md:text-3xl">{product.name}</div> */}
       {product.price && (
         <div className="flex items-center gap-2 mt-2">
-          <div className="text-sm text-primaryColor flex items-center gap-1">
+          <div className="text-sm text-primary-500 flex items-center gap-1">
             <BanknotesIcon className="w-4 h-4" />
             <span className="text-gray-500 font-medium">Cash Price</span>
           </div>
@@ -547,7 +547,7 @@ const ProductDetails = ({
 
       {/* Commented */}
 
-      <h1 className="text-2xl text-primaryColor font-bold md:text-3xl">{product.name}</h1>
+      <h1 className="text-2xl text-primary-500 font-bold md:text-3xl">{product.name}</h1>
       {bogo.isBogoEnabled && freeGiftDetailLine !== null && (
         <div className="mt-2 flex flex-wrap items-center gap-2 text-xs md:text-sm">
           <span className="inline-flex items-center rounded-full bg-green-600 px-2.5 py-1 font-semibold text-white">
@@ -704,7 +704,7 @@ const ProductDetails = ({
             (attr: ProductAttribute, index: number) => (
               <div key={index} className="flex flex-col w-full text-gray-500">
                 <div className="flex items-center gap-1 mb-2 text-sm h-6">
-                  <span className="text-primaryColor flex items-center gap-1">
+                  <span className="text-primary-500 flex items-center gap-1">
                     <AttributeIcon name={attr?.name || ""} className="w-4 h-4 flex-shrink-0" />
                     <span className="whitespace-nowrap">{attr.label}:</span>
                   </span>
@@ -718,7 +718,7 @@ const ProductDetails = ({
                   }}
                 >
                   <div className="relative">
-                    <Listbox.Button className="relative w-full cursor-default rounded-2xl border border-gray-300 bg-white h-11 pl-4 pr-10 text-left text-sm focus:border-primaryColor focus:outline-none focus:ring-2 focus:ring-primaryColor focus:ring-opacity-50 flex items-center">
+                    <Listbox.Button className="relative w-full cursor-default rounded-2xl border border-gray-300 bg-white h-11 pl-4 pr-10 text-left text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-opacity-50 flex items-center">
                       <span className="block truncate">
                         {(() => {
                           const selectedOption = activeAttr(attr)?.val;
@@ -840,7 +840,7 @@ const ProductDetails = ({
                                 className={({ active }) =>
                                   twMerge(
                                     "relative cursor-pointer select-none py-2 pl-10 pr-4",
-                                    active && "bg-primaryColor/10 text-primaryColor",
+                                    active && "bg-primary-500/10 text-primary-500",
                                     isSelected && "font-medium"
                                   )
                                 }
@@ -857,7 +857,7 @@ const ProductDetails = ({
                                       {optionText}
                                     </span>
                                     {selected ? (
-                                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-primaryColor">
+                                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-primary-500">
                                         <CheckIcon className="h-5 w-5" aria-hidden="true" />
                                       </span>
                                     ) : null}
@@ -891,7 +891,7 @@ const ProductDetails = ({
             <span className="">
               In-stock
               <span className="ml-1 font-medium">{availabilityMessage.attr.label?.toLowerCase()}:
-                <span className="ml-1 text-primaryColor font-medium">
+                <span className="ml-1 text-primary-500 font-medium">
                   {availabilityMessage.availableValues.join(", ")}
                 </span>
 
@@ -913,7 +913,7 @@ const ProductDetails = ({
             <Link
               href={`/collections/${category.node.slug}`}
               key={index}
-              className="border border-primaryColor inline-block min-w-max 
+              className="border border-primary-500 inline-block min-w-max 
               rounded-md text-black px-3 py-1 text-xs md:text-sm bg-white"
             >
               {category.node.name}

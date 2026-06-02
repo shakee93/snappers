@@ -1,4 +1,4 @@
-import Label from "components/Label/Label";
+import Label from "components/primitives/Label/Label";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import Input from "shared/Input/Input";
 

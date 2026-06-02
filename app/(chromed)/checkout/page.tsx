@@ -3,7 +3,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Input from "shared/Input/Input";
-import Label from "components/Label/Label";
+import Label from "components/primitives/Label/Label";
 import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
 import { useCoupon } from "@/hooks/useCoupon";
@@ -31,7 +31,7 @@ import {
   savePaymentDetails,
   sentConfirmation,
   transformAddress,
-} from "@/components/AddressPageComps/HelperComps";
+} from "@/components/ui/AddressPageComps/HelperComps";
 import { useStats } from "react-instantsearch";
 import { Metadata } from "next/types";
 import Image from "next/image";

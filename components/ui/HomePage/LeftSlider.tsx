@@ -134,7 +134,7 @@ const LeftSlider = ({ slides }: LeftSliderProps) => {
             onClick={() => goToLeftSlide(index)}
             className={`w-2 h-2 rounded-full transition-all duration-300 ${
               index === safeCurrentSlide
-                ? "bg-primaryColor w-4"
+                ? "bg-primary-500 w-4"
                 : "bg-white/50 hover:bg-white/75"
             }`}
             aria-label={`Go to left slide ${index + 1}`}

@@ -1,4 +1,4 @@
-import { stripHtml } from "@/components/AddressPageComps/HelperComps";
+import { stripHtml } from "@/components/ui/AddressPageComps/HelperComps";
 import { Product, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import { siteConfig } from "@/site.config";
 

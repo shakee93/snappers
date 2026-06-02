@@ -16,14 +16,14 @@ import { CustomerAddress, PaymentGateway } from "@/graphql/types/graphql";
 import { contactInformation } from "@/data/types";
 import Select from "shared/Select/Select";
 import { toast } from "sonner";
-import { SRI_LANKAN_STATES } from "@/components/AddressPageComps/HelperComps";
+import { SRI_LANKAN_STATES } from "@/components/ui/AddressPageComps/HelperComps";
 import { useCart } from "@/context/CartProvider";
 import checkoutCopy from "@/content/checkout-copy.json";
 import { formatPrice } from "@/lib/formatPrice";
 import { PAYHERE_HIDE_THRESHOLD } from "@/lib/checkoutMath";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
-import PreOrderNotice from "@/components/PreOrderNotice";
+import PreOrderNotice from "@/components/ui/PreOrderNotice";
 import {
     Store,
     Truck,
@@ -92,7 +92,7 @@ const CheckoutStepper = ({ currentStep }: CheckoutStepperProps) => {
         >
             <Link
                 href="/cart"
-                className="text-slate-500 hover:text-primaryColor underline-offset-2 hover:underline"
+                className="text-slate-500 hover:text-primary-500 underline-offset-2 hover:underline"
             >
                 Cart
             </Link>
@@ -131,7 +131,7 @@ const BrandBadge = ({ src, alt }: { src: string; alt: string }) => (
     </span>
 );
 
-const FIELD_CLASS = "border-2 border-slate-300 placeholder:text-slate-400 hover:border-slate-400 focus:!ring-0 focus:!border-primaryColor focus:outline-none dark:border-slate-600 dark:hover:border-slate-500";
+const FIELD_CLASS = "border-2 border-slate-300 placeholder:text-slate-400 hover:border-slate-400 focus:!ring-0 focus:!border-primary-500 focus:outline-none dark:border-slate-600 dark:hover:border-slate-500";
 
 type AddressFieldValues = {
     firstName: string;
@@ -322,7 +322,7 @@ const DeliveryOption = ({
     <label
         className={`group flex items-center gap-4 w-full p-4 rounded-xl border-2 cursor-pointer transition-colors ${
             selected
-                ? "border-primaryColor bg-primary-50/60 dark:bg-primary-900/20"
+                ? "border-primary-500 bg-primary-50/60 dark:bg-primary-900/20"
                 : "border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/40 hover:border-slate-300 hover:bg-slate-100 dark:hover:border-slate-600"
         }`}
     >
@@ -338,7 +338,7 @@ const DeliveryOption = ({
             aria-hidden="true"
             className={`flex items-center justify-center w-5 h-5 rounded-full border-2 shrink-0 transition-colors ${
                 selected
-                    ? "border-primaryColor bg-primaryColor"
+                    ? "border-primary-500 bg-primary-500"
                     : "border-slate-300 dark:border-slate-600 group-hover:border-slate-400"
             }`}
         >
@@ -347,7 +347,7 @@ const DeliveryOption = ({
         <span
             className={`flex items-center justify-center w-10 h-10 rounded-lg shrink-0 ${
                 selected
-                    ? "bg-primaryColor/10 text-primaryColor"
+                    ? "bg-primary-500/10 text-primary-500"
                     : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
             }`}
         >
@@ -787,7 +787,7 @@ const UnifiedCheckoutForm = ({
                     isDisabled
                         ? "border-slate-200 bg-slate-100/60 dark:border-slate-800 dark:bg-slate-900/40 opacity-60"
                         : active
-                            ? "border-primaryColor bg-primary-50/60 dark:bg-primary-900/20"
+                            ? "border-primary-500 bg-primary-50/60 dark:bg-primary-900/20"
                             : "border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/40 hover:border-slate-300 hover:bg-slate-100 dark:hover:border-slate-600"
                 }`}
                 aria-disabled={isDisabled || undefined}
@@ -811,7 +811,7 @@ const UnifiedCheckoutForm = ({
                             isDisabled
                                 ? "border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-800"
                                 : active
-                                    ? "border-primaryColor bg-primaryColor"
+                                    ? "border-primary-500 bg-primary-500"
                                     : "border-slate-300 dark:border-slate-600"
                         }`}
                     >
@@ -822,7 +822,7 @@ const UnifiedCheckoutForm = ({
                             isDisabled
                                 ? "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500"
                                 : active
-                                    ? "bg-primaryColor/10 text-primaryColor"
+                                    ? "bg-primary-500/10 text-primary-500"
                                     : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
                         }`}
                     >
@@ -882,7 +882,7 @@ const UnifiedCheckoutForm = ({
                                 id={`bank-slip-upload-${gateway.id}`}
                                 accept="image/png, image/gif, image/jpeg, image/heic, image/heif, image/webp, image/bmp, image/tiff, application/pdf"
                                 onChange={handleBankSlipChange}
-                                className="block w-full text-sm text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primaryColor file:text-white hover:file:bg-slate-800 file:cursor-pointer cursor-pointer"
+                                className="block w-full text-sm text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-500 file:text-white hover:file:bg-slate-800 file:cursor-pointer cursor-pointer"
                             />
                             {previewUrl && bankSlipFile && (
                                 <div className="mt-2 flex items-center gap-3">
@@ -1051,7 +1051,7 @@ const UnifiedCheckoutForm = ({
 
                     {!deliveryType && (
                         <div className="mt-3 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                            <span className="inline-block w-1 h-1 rounded-full bg-primaryColor animate-pulse" />
+                            <span className="inline-block w-1 h-1 rounded-full bg-primary-500 animate-pulse" />
                             Select a delivery method to continue
                         </div>
                     )}

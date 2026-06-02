@@ -2,7 +2,7 @@
 import React, { FC, useEffect, useState, useRef } from "react";
 import Heading from "@/components/primitives/Heading/Heading";
 import { Brand } from "@/graphql/types/graphql";
-import BrandCard from "@/components/BrandCard";
+import BrandCard from "@/components/ui/BrandCard";
 import {
   Carousel,
   CarouselContent,

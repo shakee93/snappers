@@ -1,9 +1,9 @@
 import {
   SRI_LANKAN_STATES,
   SelectField,
-} from "@/components/AddressPageComps/HelperComps";
+} from "@/components/ui/AddressPageComps/HelperComps";
 import { CustomerAddress } from "@/graphql/types/graphql";
-import Label from "components/Label/Label";
+import Label from "components/primitives/Label/Label";
 import { siteConfig } from "@/site.config";
 import { BadgeMinus, Check, Receipt } from "lucide-react";
 import { FC, useEffect, useState } from "react";

@@ -10,7 +10,7 @@ import { Fragment, useState } from "react";
 import AttributeIcon from "@/components/primitives/AttributeIcon";
 import LineOrCartPriceLabel from "@/components/ui/LineOrCartPriceLabel";
 import { useCart } from "@/context/CartProvider";
-import NcInputNumber from "@/components/NcInputNumber";
+import NcInputNumber from "@/components/primitives/NcInputNumber";
 import { Trash } from "lucide-react";
 import { isLineItemFree } from "@/lib/cartLinePricing";
 import { getCartLineStockCap } from "@/lib/cartLineStockCap";

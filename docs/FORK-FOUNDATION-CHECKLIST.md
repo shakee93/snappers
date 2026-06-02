@@ -125,16 +125,20 @@ definition-of-done. To finish the fork foundation for legal content, do the foll
 - [x] Removed the dead Ciseco legacy tree via transitive reachability from `app/`:
       17 root loose files + 15 root legacy dirs + 9 unused `containers/` page templates
 
-**Remaining (needs dedup, not a move):**
-- [ ] ~22 live root `components/` stragglers are **name-duplicates of the bucketed
-      `ui/` components** (root `ProductQuickView`/`BagIcon`/`LikeButton`/`Prices`/
-      `NotifyAddTocart` + dirs `Heading`/`Header`/`CardCategories`), still wired via a
-      legacy chain (`ui/ModalQuickView` → root `ProductQuickView` → …). Bucketing collides;
-      resolving requires **deduplicating** to one implementation, then deleting the legacy
-      chain. Focused refactor, not a mechanical move.
-- [ ] `containers/ProductDetailPage` (live, used by cart) — move to a bucket or keep as a container.
-- [ ] httpbin debug fetches in legal pages → tracked under the Legal section above
-- [ ] Verify: **every route** in the per-route smoke test (import churn = highest risk)
+**Done (root dedup + dead-web removal):**
+- [x] Resolved every root `components/` straggler via sound import-graph reachability from `app/`
+      (case-insensitive + relative-aware). The 12 **live** stragglers were bucketed
+      (`TopBarPromotion`→layout; `BrandCard`/`IconDiscount`/`PreOrderNotice`/`TikTokSection`/
+      `AddressPageComps`/`BgGlassmorphism`→ui; `NcInputNumber`/`OrderPageSkeleton`/`Label`/`Loading`→primitives).
+- [x] Deleted the full connected dead Ciseco web (106 files: the legacy root duplicates
+      `Header`/`CardCategories`/`Heading`/`ProductQuickView`/`Prices`/etc. + the dead `shared/`
+      nav/footer/avatar/menu tree + dead bucketed leftovers). Deleting the whole closed set was
+      required — partial deletion left dangling imports. Sound scan now reports **0 dead files** in `components/`+`shared/`.
+- [x] Deleted debug `/containers` route (`app/(chromed)/containers/page.tsx`) + stray tracked `components/desktop.ini`.
+- [x] `containers/ProductDetailPage` (CartItem/CartPage/OrderItem) **kept as a container** (live, cart-coupled — allowed).
+- [x] Root `components/` now contains only `layout/`, `primitives/`, `ui/`.
+- [x] `npm run lint` 0 errors · `tsc --noEmit` 0 errors · `npm run build` ✓ Compiled successfully (429 SSG excepted).
+- [ ] Verify: **every route** in the per-route smoke test (import churn = highest risk — human step before merge)
 
 ## Phase 5 — theme tokens end-to-end (look-preserving scope)
 
@@ -147,11 +151,23 @@ definition-of-done. To finish the fork foundation for legal content, do the foll
 - carousel grays `bg-[#cecfd0]`/`bg-[#9e9fa0]` (3 sliders), `ProductCard3` `bg-[#fefefe]`,
   `SectionHero` `bg-[#CCE0EF]`, `BgGlassmorphism` decorative blobs, 3rd-party FB/WA colors.
 
-**Deferred (the actual theme unification — needs a designer call):**
-- [ ] Fix the buggy quoted-string `customColors("--c-...")` values in `tailwind.config.ts`
-      (the `primary-*`/`secondary-*` scale likely emits invalid CSS today)
-- [ ] Unify the two blues (sky `primary-*` vs brand `primaryColor`/`#1b40af`) and
-      remove `primaryColor`; this repaints elements, so it's a visible design decision.
+**Done (theme unification — wired to brand blue, approved repaint):**
+- [x] Fixed the bug: the `primary-*`/`secondary-*` scale was emitting the literal invalid string
+      `customColors("--c-...")` (quoted), so ~70 usages across 44 files were dead no-ops. Replaced
+      with Tailwind-native `rgb(var(--c-*) / <alpha-value>)` (type-safe; opacity modifiers like
+      `bg-primary-500/10` now work). Fixed the `6000`→`600` key + the missing `600` shade.
+- [x] Defined the full `--c-primary-50..900` / `--c-secondary-50..900` RGB scale in the **imported**
+      stylesheet `app/index.css` (note: `app/globals.css` is NOT imported — only `index.css` is).
+      `primary-500` == brand blue `#1b40af`. This is the single source of truth a fork edits.
+- [x] Migrated all `primaryColor`/`#1b40af` literals (119 class usages + 2 SVG fills) and
+      `primary-6000` → `primary-*` tokens across 41 files; removed `primaryColor` from the config.
+      Also fixed pre-existing `texy-`/`ytext-primaryColor` typos.
+- [x] Compiled CSS verified valid: `.text-primary-500{color:rgb(var(--c-primary-500)/...)}`, etc.
+
+> **Visible repaint (needs your eyes):** the ~44 files whose `primary-*` classes were dead no-ops
+> now render the brand blue (focus rings, checkboxes, inputs, pagination, cart accents). The 119
+> migrated `primaryColor` literals are look-neutral (same `#1b40af`). Review via `npm run dev`.
+> `secondary-*` (1 use: a blurred decorative `BgGlassmorphism` blob) now resolves to a teal scale.
 
 ## Phase 6 — backend Docker base (separate repo `gq-backend-plugins`)
 
@@ -166,7 +182,8 @@ definition-of-done. To finish the fork foundation for legal content, do the foll
 1. [ ] Clone repo → new tenant repo
 2. [ ] Edit `site.config.ts` (brand, urls, locale, contact, gateways, GA id)
 3. [ ] Replace `content/*.json` (+ legal copy)
-4. [ ] Swap CSS variable values in `app/globals.css`
+4. [ ] Swap CSS variable values in `app/index.css` (the imported stylesheet — holds the
+       `--c-primary-*`/`--c-secondary-*` brand scale; `app/globals.css` is NOT imported)
 5. [ ] Replace `components/ui/*` per the new design
 6. [ ] Run `npm run codegen` against the tenant's WC backend
 7. [ ] Adjust route dirs + `revalidatePath` calls; delete unused gateway API routes

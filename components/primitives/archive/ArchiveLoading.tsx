@@ -1,4 +1,4 @@
-import ProductCardLoading from "@/components/Loading/ProductCardLoading";
+import ProductCardLoading from "@/components/primitives/Loading/ProductCardLoading";
 
 
 const ArchiveLoading = () => {

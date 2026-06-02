@@ -6,7 +6,7 @@ import {
   ClockIcon,
   SparklesIcon,
 } from "@heroicons/react/24/outline";
-import IconDiscount from "@/components/IconDiscount";
+import IconDiscount from "@/components/ui/IconDiscount";
 import { toast } from "sonner";
 import NotifyAddTocart from "./NotifyAddTocart";
 import AccordionInfo from "@/components/ui/SingleProductPage/AccordionInfo";
@@ -131,7 +131,7 @@ const ProductQuickView = ({
                 key={index}
                 onClick={() => setVariantActive(index)}
                 className={`w-auto relative flex-1 max-w-[75px] h-16 rounded-full border-2 cursor-pointer ${variantActive === index
-                  ? "border-primary-6000 dark:border-primary-500"
+                  ? "border-primary-600 dark:border-primary-500"
                   : "border-transparent"
                   }`}
               >

@@ -38,7 +38,7 @@ const HappiestCustomersGallery = ({ images = [] }: HappiestCustomersGalleryProps
 
   return (
     <section className="mt-6 rounded-3xl bg-white p-4 md:p-6">
-      <h2 className="text-xl md:text-2xl font-semibold text-primaryColor text-center">
+      <h2 className="text-xl md:text-2xl font-semibold text-primary-500 text-center">
         Happiest Customers
       </h2>
 
