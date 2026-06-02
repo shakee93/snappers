@@ -4,21 +4,26 @@ import {RetryLink} from "@apollo/client/link/retry";
 
 export const { getClient } = registerApolloClient(() => {
 
-    // Retry only on true network failures (timeouts, DNS, connection reset).
-    // Skip retries when the server responded — retrying on 500s amplifies
-    // backend load during a spike and turns a single failed request into a
-    // retry storm.
+    // Retry true network failures (timeouts, DNS, connection reset) AND HTTP 429.
+    // We still DON'T retry 5xx — retrying those during a spike amplifies backend
+    // load and turns one failed request into a retry storm. 429 is different:
+    // it's the backend explicitly saying "slow down", so a bounded, backed-off
+    // retry is the correct response. This matters most during the build's
+    // static-generation burst, where WPGraphQL rate-limits concurrent requests
+    // and an un-retried 429 hard-fails whichever page hits it first.
     const retryLink = new RetryLink({
         attempts: {
-            max: 2, // 1 original + 1 retry
+            max: 4, // 1 original + 3 retries (backed off) for transient 429s
             retryIf: (error) => {
                 if (!error) return false;
-                // ServerError / ServerParseError from Apollo carry `statusCode`.
-                // If we got a response at all, don't retry — it's the server's job.
-                return !('statusCode' in error);
+                const statusCode = (error as { statusCode?: number }).statusCode;
+                // No statusCode = true network failure → retry.
+                if (statusCode === undefined) return true;
+                // Server responded: only retry the explicit rate-limit code.
+                return statusCode === 429;
             },
         },
-        delay: { initial: 300, max: 2000, jitter: true },
+        delay: { initial: 500, max: 5000, jitter: true },
     });
 
     const httpLink = new HttpLink({

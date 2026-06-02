@@ -6,15 +6,21 @@ import SiteLogo from "@/public/global/gq-logo.png";
 import Image from "next/image";
 import brandsPageContent from "@/content/brands-page.json";
 
-async function getData(categories: number[] | null = null) {
-  const { data, error } = await getClient().query({
-    query: GET_ALL_BRANDS,
-  });
+// Safety-net ISR — primary invalidation is the WP webhook; this keeps the
+// page self-healing if a build-time fetch is rate-limited.
+export const revalidate = 1800;
 
-  return {
-    productCategories: data.brands.nodes,
-    brands: data.brands.nodes,
-  };
+async function getData(): Promise<{ brands: Brand[] }> {
+  // The SSR client retries transient 429s with backoff; if it still fails,
+  // degrade to an empty list so the build doesn't hard-fail — ISR/webhook
+  // revalidation backfills the brands shortly after.
+  try {
+    const { data } = await getClient().query({ query: GET_ALL_BRANDS });
+    return { brands: data?.brands?.nodes ?? [] };
+  } catch (error: unknown) {
+    console.error("Failed to fetch brands for /brands page", error);
+    return { brands: [] };
+  }
 }
 
 const Page = async () => {
