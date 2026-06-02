@@ -1,27 +1,27 @@
-"use client"
+"use client";
+
 import Link from "next/link";
-import Image from "next/image";
-import SiteLogo from "@/public/global/gq-logo.png";
 import { twMerge } from "tailwind-merge";
 import { useClearSearch } from "@/hooks/useClearSearch";
+import SiteLogoImage from "@/components/brand/SiteLogoImage";
 
-
-const Logo = ({ className = '', imageClass = '' }: { className?: string, imageClass?: string }) => {
+const Logo = ({
+  className = "",
+  imageClass = "",
+}: {
+  className?: string;
+  imageClass?: string;
+}) => {
   const clearSearch = useClearSearch();
   return (
-    <Link href={"/"} className={className}
-      onClick={clearSearch}>
-      <Image
-        width={320}
-        height={266}
-        priority={true}
-        src={SiteLogo}
-        alt="logo"
+    <Link href={"/"} className={className} onClick={clearSearch}>
+      <SiteLogoImage
+        priority
         className={twMerge(
-          "h-28 md:h-16 hover:scale-110 transition-all max-w-[80px] md:max-w-[320px] w-auto relative rounded-b-2xl",
+          "relative h-28 w-auto max-w-[80px] rounded-b-2xl transition-all hover:scale-110 md:h-16 md:max-w-[320px]",
           imageClass
         )}
-      ></Image>
+      />
     </Link>
   );
 };

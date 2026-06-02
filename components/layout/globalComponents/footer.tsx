@@ -1,11 +1,11 @@
 import { Suspense } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import SiteLogo from "@/public/global/gq-logo.png";
+import SiteLogoImage from "@/components/brand/SiteLogoImage";
 import { getClient } from "@/graphql/apollo-ssr";
 import { GET_BRANDS } from "@/graphql/defs/products";
 import { Brand } from "@/graphql/types/graphql";
-import { Clock, Copyright, Mail, MapPinned } from "lucide-react";
+import { Copyright, Mail, MapPinned } from "lucide-react";
+import BusinessHoursList from "@/components/brand/BusinessHoursList";
 import { PiFacebookLogoDuotone, PiInstagramLogoDuotone, PiTiktokLogoDuotone } from "react-icons/pi";
 import { HeartFilledIcon } from "@radix-ui/react-icons";
 import { siteConfig } from "@/site.config";
@@ -145,24 +145,11 @@ const FooterInner = async () => {
 
           <div className="xl:flex gap-1 col-span-6 md:col-span-3 md:gap-3 p-2 flex-col items-center md:items-start">
             <div className="text-base  md:text-lg font-medium text-primaryColor">
-              Business Hours
+              {siteConfig.businessHours.heading}
             </div>
             <ul className="flex text-xs flex-col gap-3 pb-4">
-              <li className="lg:text-sm text-gray-500 flex gap-3">
-                <div>
-                  <Clock size={iconSize} className="text-primaryColor" />
-                </div>
-                <div className="flex flex-col gap-1 md:gap-2 text-xs md:text-sm leading-tight md:leading-snug">
-                  <div className="font-medium text-gray-800 ">Monday - Saturday&nbsp;
-                    <span className="block font-normal text-gray-500">10AM&nbsp;-&nbsp;8PM</span>
-                  </div>
-                  <div className="font-medium text-gray-800 ">Poya Day&nbsp;
-                    <span className="block font-normal text-gray-500">10AM&nbsp;-&nbsp;6PM</span>
-                  </div>
-                  <div className="font-medium text-gray-800 ">Sunday&nbsp;
-                    <span className="block font-normal text-gray-500">Closed</span>
-                  </div>
-                </div>
+              <li className="lg:text-sm text-gray-500">
+                <BusinessHoursList iconSize={iconSize} />
               </li>
               <li className="lg:text-sm text-gray-500 flex gap-3">
                 <div>
@@ -178,11 +165,10 @@ const FooterInner = async () => {
               </li>
 
               <Link href={"/"} className="flex justify-center pr-16 mt-3">
-                <Image
+                <SiteLogoImage
                   width={100}
-                  src={SiteLogo}
-                  alt="logo"
-                  className="h-28 md:h-20 lg:h-32 w-auto rounded-b-2xl"
+                  height={80}
+                  className="h-28 w-auto rounded-b-2xl md:h-20 lg:h-32"
                 />
               </Link>
             </ul>

@@ -15,6 +15,24 @@ export const siteConfig = {
     description:
       "Shop the best mobile phones, smartwatches, and accessories at GQ Mobiles. Find the latest tech from top brands.",
   },
+  /**
+   * Paths are under `public/` (e.g. `/global/logo.png` → `public/global/logo.png`).
+   * Provide separate `dark` entries for class-based UI; favicons use OS `prefers-color-scheme`.
+   */
+  assets: {
+    logo: {
+      light: "/global/gq-logo.png",
+      dark: "/global/gq-logo.png",
+      width: 320,
+      height: 266,
+    },
+    favicon: {
+      light: "/global/gq-logo.png",
+      dark: "/global/gq-logo.png",
+    },
+    // Optional; defaults to favicon light when omitted.
+    // appleTouchIcon: "/global/apple-touch-icon.png",
+  },
   url: {
     base: "https://gqmobiles.lk",
     api: "https://api.gqmobiles.lk",
@@ -37,6 +55,14 @@ export const siteConfig = {
     email: "inquiries@gqmobiles.lk",
     storeAddress:
       "No. 250 | 53–54 Ground Floor, Liberty Plaza, Colombo 03",
+  },
+  businessHours: {
+    heading: "Business Hours",
+    schedule: [
+      { label: "Monday - Saturday", hours: "10AM - 8PM" },
+      { label: "Poya Day", hours: "10AM - 6PM" },
+      { label: "Sunday", hours: "Closed" },
+    ],
   },
   social: {
     facebook: "gqmobilestore",

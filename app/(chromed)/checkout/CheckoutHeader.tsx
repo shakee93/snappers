@@ -1,9 +1,8 @@
 import Link from "next/link";
-import Image from "next/image";
-import SiteLogo from "@/public/global/gq-logo.png";
 import { Lock, Phone } from "lucide-react";
 import { PiWhatsappLogoDuotone } from "react-icons/pi";
 import { siteConfig } from "@/site.config";
+import SiteLogoImage from "@/components/brand/SiteLogoImage";
 
 const SUPPORT_PHONE_DISPLAY = siteConfig.contact.secondaryPhone;
 const SUPPORT_PHONE_TEL = `tel:${siteConfig.contact.secondaryPhone}`;
@@ -14,13 +13,12 @@ const CheckoutHeader = () => {
     <header className="sticky top-0 z-40 border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
       <div className="container flex h-14 md:h-16 items-center justify-between gap-3">
         <Link href="/" aria-label={`${siteConfig.brand.name} home`} className="shrink-0">
-          <Image
-            src={SiteLogo}
-            alt={siteConfig.brand.name}
+          <SiteLogoImage
+            lightOnly
+            priority
             width={160}
             height={40}
-            priority
-            className="h-8 md:h-10 w-auto"
+            className="h-8 w-auto md:h-10"
           />
         </Link>
 

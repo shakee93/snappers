@@ -13,6 +13,7 @@ import Script from "next/script";
 import GoogleAnalytics from "@/components/layout/GoogleAnalytics";
 import ContentWrapper from "@/components/layout/ContentWrapper";
 import { siteConfig } from "@/site.config";
+import { getSiteMetadataIcons, getSiteTwitterImage } from "@/lib/siteAssets";
 
 const defaultTitle = `${siteConfig.brand.name} - ${siteConfig.brand.tagline}`;
 
@@ -22,6 +23,7 @@ export const metadata: Metadata = {
     default: defaultTitle,
   },
   description: siteConfig.brand.description,
+  icons: getSiteMetadataIcons(),
   openGraph: {
     title: defaultTitle,
     description: siteConfig.brand.description,
@@ -42,7 +44,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: defaultTitle,
     description: siteConfig.brand.description,
-    images: ["/global/gq-logo.png"],
+    images: [getSiteTwitterImage()],
   },
 };
 

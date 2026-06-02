@@ -2,9 +2,9 @@ import { getClient } from "@/graphql/apollo-ssr";
 import { GET_ALL_BRANDS } from "@/graphql/defs/products";
 import { Brand } from "@/graphql/types/graphql";
 import Link from "next/link";
-import SiteLogo from "@/public/global/gq-logo.png";
 import Image from "next/image";
 import brandsPageContent from "@/content/brands-page.json";
+import { getLogoSources } from "@/lib/siteAssets";
 
 // Safety-net ISR — primary invalidation is the WP webhook; this keeps the
 // page self-healing if a build-time fetch is rate-limited.
@@ -25,6 +25,7 @@ async function getData(): Promise<{ brands: Brand[] }> {
 
 const Page = async () => {
   const { brands } = await getData();
+  const { light: brandLogoFallback } = getLogoSources();
 
   return (
     <div>
@@ -52,7 +53,11 @@ const Page = async () => {
                       >
                         <div className="w-40 h-28 flex items-center justify-center mb-3 bg-white dark:bg-gray-800 rounded-2xl shadow-sm ">
                           <Image
-                            src={brand.brandImage && brand.brandImage.trim() !== "" ? brand.brandImage : SiteLogo}
+                            src={
+                              brand.brandImage && brand.brandImage.trim() !== ""
+                                ? brand.brandImage
+                                : brandLogoFallback
+                            }
                             alt={brand.name || "Brand"}
                             width={80}
                             height={80}

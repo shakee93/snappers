@@ -1,8 +1,7 @@
 import React, { FC } from "react"
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import ButtonSecondary from "shared/Button/ButtonSecondary";
-import SiteLogo from "@/public/global/gq-logo.png";
-import Image from "next/image";
+import SiteLogoImage from "@/components/brand/SiteLogoImage";
 import StoreImageSlider from "./StoreImageSlide"
 import { EmblaOptionsType } from "embla-carousel";
 import Link from "next/link";
@@ -22,13 +21,7 @@ const SectionPromo1: FC<SectionPromo1Props> = ({ className = "" }) => {
     <div className="bg-blue-100 flex flex-col justify-between p-5 md:p-12 lg:flex-row gap-5 lg:gap-3 rounded-3xl">
       <div className="lg:w-1/2 w-full gap-4 justify-center flex flex-col">
         <div>
-          <Image
-            width={320}
-            height={266}
-            src={SiteLogo}
-            alt="logo"
-            className="h-20 lg:h-20 w-auto"
-          />
+          <SiteLogoImage className="h-20 w-auto lg:h-20" />
         </div>
         <h2 className="font-semibold text-2xl sm:text-4xl leading-[1.2] tracking-tight">
           This is Our Store! <br />
