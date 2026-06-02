@@ -21,7 +21,14 @@ function customColors(cssVar: string) {
 }
 
 const config: Config = {
-	content: ["./app/**/*.{js,jsx,ts,tsx}", "./public/index.html", "./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}"],
+	content: [
+		"./app/**/*.{js,jsx,ts,tsx}",
+		"./components/**/*.{js,jsx,ts,tsx}",
+		"./containers/**/*.{js,jsx,ts,tsx}",
+		"./shared/**/*.{js,jsx,ts,tsx}",
+		"./public/index.html",
+		"./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}",
+	],
 	darkMode: ["class", "class"],
 	theme: {
 		container: {
