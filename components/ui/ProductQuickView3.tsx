@@ -9,7 +9,7 @@ import {
 import IconDiscount from "@/components/IconDiscount";
 import { toast } from "sonner";
 import NotifyAddTocart from "./NotifyAddTocart";
-import AccordionInfo from "@/containers/ProductDetailPage/AccordionInfo";
+import AccordionInfo from "@/components/ui/SingleProductPage/AccordionInfo";
 import Image from "next/image";
 import useProductLink from "@/hooks/useProductLink";
 

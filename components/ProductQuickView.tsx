@@ -17,7 +17,7 @@ import detail1JPG from "@/public/images/products/detail1.jpg";
 import detail2JPG from "@/public/images/products/detail2.jpg";
 import detail3JPG from "@/public/images/products/detail3.jpg";
 import NotifyAddTocart from "./NotifyAddTocart";
-import AccordionInfo from "containers/ProductDetailPage/AccordionInfo";
+import AccordionInfo from "@/components/ui/SingleProductPage/AccordionInfo";
 import Link from "next/link";
 import Image from "next/image";
 
