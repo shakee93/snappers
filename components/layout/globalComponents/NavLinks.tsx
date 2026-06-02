@@ -15,46 +15,9 @@ import { CaretDownIcon } from "@radix-ui/react-icons";
 import { ProductCategory } from "@/graphql/types/graphql";
 import NavCategories from "./mega-menu/categories";
 import { useClearSearch } from "@/hooks/useClearSearch";
+import { siteConfig } from "@/site.config";
 
-type NavLinkItem = {
-  href: string;
-  name: string;
-  menu?: "categories";
-  special?: boolean;
-};
-
-const navLinks: NavLinkItem[] = [
-  {
-    href: "/",
-    name: "Home",
-  },
-  {
-    href: "/collections",
-    name: "Collections",
-    menu: "categories",
-  },
-  {
-    href: "/brands",
-    name: "Brands",
-  },
-  {
-    href: "/collections/all",
-    name: "Shop",
-  },
-  {
-    href: "/deals",
-    name: "Deals",
-    special: true,
-  },
-  {
-    href: "/contact",
-    name: "Location",
-  },
-  {
-    href: "/tag/pre-order",
-    name: "Pre-Order",
-  },
-];
+const navLinks = siteConfig.navigation.main;
 
 interface NavLinksProps {
   navCategories: ProductCategory[];
@@ -77,7 +40,7 @@ export default function NavLinks({ navCategories }: NavLinksProps) {
       <NavigationMenuList className="NavigationMenuList">
         {navLinks.map((item) => (
           <NavigationMenuItem key={item.href}>
-            {item.menu === "categories" ? (
+            {"menu" in item && item.menu === "categories" ? (
               <>
                 <NavigationMenuTrigger className="NavigationMenuTrigger">
                   {item.name} <CaretDownIcon className="CaretDown" aria-hidden />
@@ -92,12 +55,12 @@ export default function NavLinks({ navCategories }: NavLinksProps) {
                   href={item.href}
                   onClick={item.href === "/" ? clearSearch : undefined}
                   className={`NavigationMenuLink ${
-                    item.special
+                    "special" in item && item.special
                       ? "relative px-3 animate-bounce flex items-center gap-1"
                       : ""
                   }`}
                 >
-                  {item.special && (
+                  {"special" in item && item.special && (
                     <span className="mr-1">🔥</span>
                   )}
                   {item.name}

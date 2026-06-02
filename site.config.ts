@@ -64,6 +64,18 @@ export const siteConfig = {
       { label: "Sunday", hours: "Closed" },
     ],
   },
+  /** Desktop header primary nav (see `NavLinks`). */
+  navigation: {
+    main: [
+      { href: "/", name: "Home" },
+      { href: "/collections", name: "Collections", menu: "categories" },
+      { href: "/brands", name: "Brands" },
+      { href: "/collections/all", name: "Shop" },
+      { href: "/deals", name: "Deals", special: true },
+      { href: "/contact", name: "Location" },
+      { href: "/tag/pre-order", name: "Pre-Order" },
+    ],
+  },
   social: {
     facebook: "gqmobilestore",
     instagram: "gqthemobilestoreunlimited",
@@ -138,3 +150,4 @@ export const siteConfig = {
 } as const;
 
 export type SiteConfig = typeof siteConfig;
+export type SiteNavLink = SiteConfig["navigation"]["main"][number];
