@@ -5,11 +5,11 @@ import SiteLogo from "@/public/global/gq-logo.png";
 import { getClient } from "@/graphql/apollo-ssr";
 import { GET_BRANDS } from "@/graphql/defs/products";
 import { Brand } from "@/graphql/types/graphql";
-import { Clock, Copyright, Facebook, Heart, Instagram, Mail, MapPinned } from "lucide-react";
-import { PiFacebookLogoDuotone, PiInstagramLogoDuotone, PiTiktokLogo, PiTiktokLogoDuotone } from "react-icons/pi";
-import { Divider } from "@nextui-org/react";
+import { Clock, Copyright, Mail, MapPinned } from "lucide-react";
+import { PiFacebookLogoDuotone, PiInstagramLogoDuotone, PiTiktokLogoDuotone } from "react-icons/pi";
 import { HeartFilledIcon } from "@radix-ui/react-icons";
 import { siteConfig } from "@/site.config";
+import footerContent from "@/content/footer.json";
 
 const getData = async () => {
   const { data } = await getClient().query({
@@ -60,73 +60,6 @@ const FooterInner = async () => {
 
         <div className="pb-8 grid grid-cols-12 gap-x-1 gap-y-3 md:grid-cols-12 xl:grid-cols-12 justify-between">
 
-          {/* <div className=" xl:flex gap-1 col-span-12 md:col-span-4 lg:col-span-3 md:gap-3 p-2 flex-col items-center md:items-start justify-center">
-            <Link href={"/"} className="flex justify-center">
-              <Image
-                width={100}
-                src={SiteLogo}
-                alt="logo"
-                className="h-28 md:h-20  lg:h-24 pb-5   w-auto rounded-b-2xl"
-              />
-            </Link>
-
-            <ul className="flex text-xs flex-col gap-3 pb-4">
-              <li className="lg:text-sm text-gray-500 flex gap-3">
-                <div>
-                  <MapPinned size={iconSize} className="text-primaryColor" />
-                </div>
-                <div className="flex flex-col">
-                  <div>GQ — The Mobile Store</div>
-                  <div>
-                    No. 250 | 53 - 54 Ground Floor, Liberty Plaza, Colombo 03.
-                  </div>
-                  <div className="flex flex-col mt-2">
-                    <Link href={"tel:0777555665"}>0777 555 665</Link>
-                    <Link href={"tel:0112372665"}>0112 372 665</Link>
-                  </div>
-                </div>
-              </li>
-              <li className="lg:text-sm text-gray-500 flex gap-3">
-                <div>
-                  <MapPinned size={iconSize} className="text-primaryColor" />
-                </div>
-                <div className="flex flex-col">
-                  <div>GQ — The Authentic Store</div>
-                  <div>
-                    No. 250 | 1 | 161 First Floor, Liberty Plaza, Colombo 03.
-                  </div>
-                  <div className="flex flex-col mt-2">
-                    <Link href={"tel:0777988665"}>0777 988 665</Link>
-                    <Link href={"tel:0754555665"}>0754 555 665</Link>
-                    <Link href={"tel:0112447489"}>0112 447 489</Link>
-                  </div>
-                </div>
-              </li>
-              <li className="lg:text-sm text-gray-500 flex gap-3">
-                <div>
-                  <Clock size={iconSize} className="text-primaryColor" />
-                </div>
-                <div className="flex flex-col">
-                  <div>Business Hours:</div>
-                  <div>Mon - Sat (10.00AM - 08.00PM)</div>
-                  <div>Poya Day (10.00AM - 06.00PM)</div>
-                  <div>Sunday (Closed)</div>
-                </div>
-              </li>
-              <li className="lg:text-sm text-gray-500 flex gap-3">
-                <div>
-                  <Mail size={iconSize} className="text-primaryColor" />
-                </div>
-                <div className="flex flex-col">
-                  <div>
-                    <Link href={"mailto:Inquires@gqmobiles.lk"}>
-                      Inquires@gqmobiles.lk
-                    </Link>
-                  </div>
-                </div>
-              </li>
-            </ul>
-          </div> */}
 
           <div className="flex gap-1 col-span-6 md:gap-4 md:col-span-3 p-2 flex-col items-start md:items-center">
             <div className="grid gap-2 md:gap-4">
@@ -189,61 +122,24 @@ const FooterInner = async () => {
               Address
             </div>
             <ul className="flex text-xs flex-col gap-3 pb-4">
-              <li className="lg:text-sm text-gray-500 flex gap-3">
-                <div>
-                  <MapPinned size={iconSize} className="text-primaryColor" />
-                </div>
-                <div className="flex flex-col">
-                  <div>GQ Mobiles</div>
+              {footerContent.locations.map((location) => (
+                <li key={location.name} className="lg:text-sm text-gray-500 flex gap-3">
                   <div>
-                    No. 250 | 53 - 54 Ground Floor, Liberty Plaza, Colombo 03.
+                    <MapPinned size={iconSize} className="text-primaryColor" />
                   </div>
-                  <div className="flex flex-col mt-2 text-primaryColor">
-                    <Link href={"tel:0777988665"}>0777 988 665</Link>
-                    <Link href={"tel:0727988665"}>0727 988 665</Link>
-                    <Link href={"tel:0112372665"}>0112 372 665</Link>
+                  <div className="flex flex-col">
+                    <div>{location.name}</div>
+                    <div>{location.address}</div>
+                    <div className="flex flex-col mt-2 text-primaryColor">
+                      {location.phones.map((phone) => (
+                        <Link key={phone.tel} href={`tel:${phone.tel}`}>
+                          {phone.display}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              </li>
-              <li className="lg:text-sm text-gray-500 flex gap-3">
-                <div>
-                  <MapPinned size={iconSize} className="text-primaryColor" />
-                </div>
-                <div className="flex flex-col">
-                  <div>GQ Authentics</div>
-                  <div>
-                    No. 250 | 1/61 First Floor, Liberty Plaza, Colombo 03.
-                  </div>
-                  <div className="flex flex-col mt-2 text-primaryColor">
-                    <Link href={"tel:0777555665"}>0777 555 665</Link>
-                    <Link href={"tel:0754555665"}>0754 555 665</Link>
-                    <Link href={"tel:0112447489"}>0112 447 489</Link>
-                  </div>
-                </div>
-              </li>
-              {/* <li className="lg:text-sm text-gray-500 flex gap-3">
-                <div>
-                  <Clock size={iconSize} className="text-primaryColor" />
-                </div>
-                <div className="flex flex-col">
-                  <div>Business Hours:</div>
-                  <div>Mon - Sat (10.00AM - 08.00PM)</div>
-                  <div>Poya Day (10.00AM - 06.00PM)</div>
-                  <div>Sunday (Closed)</div>
-                </div>
-              </li>
-              <li className="lg:text-sm text-gray-500 flex gap-3">
-                <div>
-                  <Mail size={iconSize} className="text-primaryColor" />
-                </div>
-                <div className="flex flex-col">
-                  <div>
-                    <Link href={"mailto:Inquires@gqmobiles.lk"}>
-                      Inquires@gqmobiles.lk
-                    </Link>
-                  </div>
-                </div>
-              </li> */}
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -292,31 +188,6 @@ const FooterInner = async () => {
             </ul>
           </div>
 
-          {/* <div className=" flex gap-3 md:gap-4 md:hidden lg:flex md:col-span-2 col-span-12 p-2 flex-col items-start md:items-center">
-            <div className="grid gap-2 md:gap-4">
-              <div className="text-base md:text-lg font-medium text-primaryColor">
-                Follow us
-              </div>
-
-              <div className="flex md:flex-col gap-3 justify-center text-xs text-gray-500">
-                <Link
-                  className="flex gap-2"
-                  href={"https://www.facebook.com/gqmobilestore"}
-                >
-                  <Facebook size={iconSize} className="text-primaryColor" />
-                  <span>Facebook</span>
-                </Link>
-                <Link
-                  className="flex gap-2"
-                  href={"https://www.instagram.com/gqthemobilestoreunlimited"}
-                >
-                  <Instagram size={iconSize} className="text-primaryColor" />
-                  <span>Instagram</span>
-                </Link>
-              </div>
-            </div>
-
-          </div> */}
 
         </div>
 

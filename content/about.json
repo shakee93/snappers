@@ -1,0 +1,50 @@
+{
+  "cards": [
+    {
+      "title": "Our Vision",
+      "desc": "Our vision is to create a place where you can buy the latest and best mobile phones and accessories with better best customer care services, all for a great price."
+    },
+    {
+      "title": "What We Do",
+      "desc": "We provide the latest mobile phones and accessories to our customers with great service and support for their tech products all around Sri Lanka."
+    },
+    {
+      "title": "Company History",
+      "desc": "GQ mobiles Pvt Ltd was founded in 2002. We have now expanded our operations into main branch at Liberty Plaza to better serve our loyal customers."
+    }
+  ],
+  "stats": [
+    { "name": "Products", "value": "500+" },
+    { "name": "Orders Completed", "value": "1200+" }
+  ],
+  "services": [
+    {
+      "title": "Online Ordering. Your phone delivered to your doorstep!",
+      "body": "Prefer to purchase online? Then visit our online store. You can search by Brand, budget, or even model name. Once you've decided just complete the payment details. We promise to deliver your phone within 07 working days straight to your doorstep. We even give a cashback guarantee if you're not satisfied."
+    },
+    {
+      "title": "After Sales support. Fast response and solutions that satisfy.",
+      "body": "Nothing more frustrating than when a phone starts playing up. We understand! That's why we aim to provide you fast and reliable after-sales support. For any support just call us on +94 75 455 5665"
+    }
+  ],
+  "testimonials": [
+    {
+      "name": "Rushad Jiffry",
+      "role": "Production Manager It Cordinator at D Studio CMB",
+      "content": "“GQ is the Great Place to Buy Genuine Products! Very Professional their rates are competitive and fair. Thank you for the genuine chrome cast I am extremely happy with The Product . I would like to recommend this place anyone who likes to buy genuine branded products.”",
+      "ratings": 5
+    },
+    {
+      "name": "Gayan De Silva",
+      "role": "Project Manager at Calcey Technologies Pvt Ltd",
+      "content": "“Have bought multiple smart phones and smart watches. Got agent warranty on the phones and the prices have been the best in the market as well. Would recommend their products + the service ”",
+      "ratings": 4
+    },
+    {
+      "name": "Shal Jayatunga",
+      "role": "Works at Audi Sri Lanka",
+      "content": "“I was looking for a phone to buy urgently and a friend of mine put me on to this shop. I got a super service from them and a good price for the phone I wanted to buy. They even delivered the phone to my office. I can highly recommend them to anyone. All the best! ”",
+      "ratings": 5
+    }
+  ]
+}
