@@ -3,7 +3,6 @@ import React, { FC, Fragment, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import ButtonClose from "@/shared/ButtonClose/ButtonClose";
 import ProductQuickView from "./ProductQuickView3";
-import ProductQuickView2 from "@/components/ProductQuickView";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import { useQuickViewProduct } from "@/hooks/useQuickViewProduct";
 

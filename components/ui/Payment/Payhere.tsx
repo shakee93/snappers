@@ -64,17 +64,6 @@ const tranformDataForPayhere = async (
 };
 
 export const usePayhere = () => {
-  // const [completeOrderPayment] = useMutation(COMPLETE_ORDER_PAYMENT);
-
-  // const completePaymentWithOrder = async (orderId: string) => {
-  //   const { data } = await completeOrderPayment({
-  //     variables: {
-  //       input: { orderId: TEST ? 1234 : orderId, status: "COMPLETED" }
-  //     },
-  //   });
-  //   return data;
-  // };
-
   const initiatePayment = async (
     paymentDetails: PaymentDetailsWithoutUrls | null,
     setPayhereHandleStatus: (status: PayhereStatus) => void
