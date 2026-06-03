@@ -52,7 +52,7 @@ interface FormData {
 }
 
 const CheckoutPage = () => {
-  const { cart, removeFromCart, updateCart, clearCart, refreshCart, loading: cartLoading } = useCart();
+  const { cart, removeFromCart, updateCart, changeCartItemVariation, clearCart, refreshCart, loading: cartLoading } = useCart();
   const [finalOrderTotal, setFinalOrderTotal] = useState(null);
   const { customer, fetchCustomer } = useSession();
 
@@ -1194,6 +1194,7 @@ const CheckoutPage = () => {
                   key={item?.key ?? index}
                   item={item as unknown as CartItem}
                   onQuantityChange={updateCart}
+                  onVariationChange={changeCartItemVariation}
                   onRemove={removeFromCart}
                 />
               ))}

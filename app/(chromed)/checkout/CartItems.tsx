@@ -3,10 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import LineOrCartPriceLabel from "@/components/global/ui/LineOrCartPriceLabel";
-import { Fragment, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
+import CartVariationPicker from "@/components/cart/CartVariationPicker";
+import type { CartItem as GraphqlCartItem } from "@/graphql/types/graphql";
 import { Loader, Truck } from "lucide-react";
 import { toast } from "sonner";
-import AttributeIcon from "@/components/global/primitives/AttributeIcon";
 import { isLineItemFree } from "@/lib/cartLinePricing";
 import { getCartLineStockCap } from "@/lib/cartLineStockCap";
 import {
@@ -51,6 +52,12 @@ interface CartItemsProps {
   item: CartItem;
   index: number;
   onQuantityChange: (key: string, quantity: number) => Promise<unknown> | unknown;
+  onVariationChange: (
+    cartItemKey: string,
+    productId: number,
+    newVariationId: number,
+    quantity: number
+  ) => Promise<unknown> | unknown;
   onRemove: (keys: string[]) => Promise<unknown> | unknown;
 }
 
@@ -58,6 +65,7 @@ const CartItems = ({
   item,
   index,
   onQuantityChange,
+  onVariationChange,
   onRemove,
 }: CartItemsProps) => {
   const { product, quantity, key, subtotal, total, variation } = item;
@@ -142,16 +150,11 @@ const CartItems = ({
           </h3>
 
           {type === "VARIABLE" && (
-            <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-              {variation?.attributes?.map((attr: any, idx: number) => (
-                <Fragment key={idx}>
-                  <span className="inline-flex items-center gap-1">
-                    <AttributeIcon name={attr?.name || ""} className="w-3.5" />
-                    <span>{attr?.displayValue || attr?.value}</span>
-                  </span>
-                </Fragment>
-              ))}
-            </div>
+            <CartVariationPicker
+              cartItem={item as unknown as GraphqlCartItem}
+              onVariationChange={onVariationChange}
+              compact
+            />
           )}
 
           {hasFreeShipping && (

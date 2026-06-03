@@ -9,8 +9,7 @@ import LineOrCartPriceLabel from "@/components/global/ui/LineOrCartPriceLabel";
 import NcInputNumber from "@/components/global/primitives/NcInputNumber";
 import { useCart } from "@/context/CartProvider";
 import useProductLink from "@/hooks/useProductLink";
-import { Fragment } from "react";
-import AttributeIcon from "@/components/global/primitives/AttributeIcon";
+import CartVariationPicker from "@/components/cart/CartVariationPicker";
 import { isLineItemFree } from "@/lib/cartLinePricing";
 import { getCartLineStockCap } from "@/lib/cartLineStockCap";
 
@@ -24,7 +23,7 @@ const CartItemProduct = ({
   const { product, quantity, variation, key, total, subtotal } = cartItem;
   const lineIsFree = isLineItemFree(total, subtotal);
 
-  const { removeFromCart, updateCart } = useCart();
+  const { removeFromCart, updateCart, changeCartItemVariation } = useCart();
   const link = useProductLink(product?.node);
 
   if (!product?.node) {
@@ -70,25 +69,10 @@ const CartItemProduct = ({
               </h3>
 
               {type === "VARIABLE" && (
-                <div className="mt-1.5 flex text-sm text-slate-600 sm:mt-2.5 dark:text-slate-300">
-                  {type === "VARIABLE" && (
-                    <div className="my-1 text-sm text-slate-500 dark:text-slate-400">
-                      {variation?.attributes?.map((attr: any, index: number) => (
-                        <Fragment key={index}>
-                          <div className="flex items-center gap-1">
-                            <AttributeIcon
-                              name={attr?.name || ""}
-                              className="w-4"
-                            />{" "}
-                            <span key={attr?.value}>
-                              {attr?.displayValue || attr?.value}
-                            </span>
-                          </div>
-                        </Fragment>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                <CartVariationPicker
+                  cartItem={cartItem}
+                  onVariationChange={changeCartItemVariation}
+                />
               )}
               <div className="relative mt-3 flex w-full justify-between sm:hidden">
                 <select

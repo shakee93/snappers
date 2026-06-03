@@ -115,4 +115,36 @@ mutation RemoveCoupons($codes: [String]) {
 }
 ${CartContent}`
 
- 
+/** Variation options for in-cart attribute changes — kept slim (no PDP fragments). */
+export const GET_CART_VARIATION_OPTIONS = gql`
+  query GetCartVariationOptions($productId: ID!) {
+    product(id: $productId, idType: DATABASE_ID) {
+      databaseId
+      type
+      ... on VariableProduct {
+        attributes {
+          nodes {
+            name
+            label
+            options
+          }
+        }
+        variations(first: 100) {
+          nodes {
+            databaseId
+            stockStatus
+            stockQuantity
+            manageStock
+            attributes {
+              nodes {
+                name
+                value
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+

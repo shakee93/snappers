@@ -6,8 +6,8 @@ import {
 import useProductLink from "@/hooks/useProductLink";
 import Image from "next/image";
 import Link from "next/link";
-import { Fragment, useState } from "react";
-import AttributeIcon from "@/components/global/primitives/AttributeIcon";
+import { useState } from "react";
+import CartVariationPicker from "@/components/cart/CartVariationPicker";
 import LineOrCartPriceLabel from "@/components/global/ui/LineOrCartPriceLabel";
 import { useCart } from "@/context/CartProvider";
 import NcInputNumber from "@/components/global/primitives/NcInputNumber";
@@ -21,7 +21,7 @@ interface CartDropdownItemProps {
 }
 
 const CartDropdownItem = ({ item, close }: CartDropdownItemProps) => {
-  const { removeFromCart, updateCart } = useCart();
+  const { removeFromCart, updateCart, changeCartItemVariation } = useCart();
 
   const { product, variation, quantity, key, total, subtotal } = item;
   const lineIsFree = isLineItemFree(total, subtotal);
@@ -107,27 +107,11 @@ const CartDropdownItem = ({ item, close }: CartDropdownItemProps) => {
               </h3>
 
               {type === "VARIABLE" && (
-                <div className="flex text-sm text-slate-600 dark:text-slate-300">
-                  {type === "VARIABLE" && (
-                    <div className="my-1 text-sm text-slate-500 dark:text-slate-400">
-                      {variation?.attributes?.map(
-                        (attr: any, index: number) => (
-                          <Fragment key={index}>
-                            <div className="flex items-center gap-1">
-                              <AttributeIcon
-                                name={attr?.name || ""}
-                                className="w-4"
-                              />{" "}
-                              <span key={attr?.value}>
-                                {attr?.displayValue || attr?.value}
-                              </span>
-                            </div>
-                          </Fragment>
-                        )
-                      )}
-                    </div>
-                  )}
-                </div>
+                <CartVariationPicker
+                  cartItem={item}
+                  onVariationChange={changeCartItemVariation}
+                  compact
+                />
               )}
 
               <LineOrCartPriceLabel
