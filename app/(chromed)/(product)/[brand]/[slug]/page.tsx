@@ -18,6 +18,7 @@ import { ImageProvider } from "@/context/ImageChangeGrabber";
 import UpsellProducts from "@/components/product/UpsellProducts";
 import { getProductSchema } from "@/lib/jsonld/productSchema";
 import { productTag } from "@/lib/cache-tags";
+import { getPdpRelatedProducts } from "@/lib/pdpRelatedProducts";
 import { siteConfig } from "@/site.config";
 // import LoadingProduct from "./loading";
 
@@ -74,10 +75,15 @@ async function getData(slug: string, brand: string) {
       slug: "product",
     };
 
+    const upsellProducts = await getPdpRelatedProducts(
+      data.product,
+      productTag(slug)
+    );
+
     return {
       product: data.product,
       brand: productBrand,
-      upsellProducts: [],
+      upsellProducts,
     };
   } catch (e) {
     console.error("Error fetching product data:", e);
