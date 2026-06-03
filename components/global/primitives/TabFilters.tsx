@@ -10,6 +10,7 @@ import SortOrderFilter from "@/components/global/primitives/Filters/SortOrderFil
 import InStockFilter from "./Filters/InStockFilter";
 import DynamicVariationFilters from "@/components/global/primitives/Filters/DynamicVariationFilters";
 import DealsTypeFilter from "@/components/global/primitives/Filters/DealsTypeFilter";
+import FilterResetButton from "@/components/global/primitives/Filters/FilterResetButton";
 import { DealFilterType } from "@/lib/dealFilters";
 
 interface TabFilterProps {
@@ -20,6 +21,7 @@ interface TabFilterProps {
     sort?: Boolean;
     dealsType?: DealFilterType[];
     inStockOnly?: boolean;
+    defaultSort?: string;
 }
 
 
@@ -31,6 +33,7 @@ const TabFilters = ({
     sort,
     dealsType,
     inStockOnly = false,
+    defaultSort = "",
 }: TabFilterProps) => {
 
     const {
@@ -46,6 +49,14 @@ const TabFilters = ({
     return (
         <div className="flex flex-col gap-0 lg:gap-3 lg:space-x-4">
             <div className="hidden lg:flex flex-col justify-start items-start flex-1 space-y-3">
+                <div className="flex w-full items-center justify-between border-b border-neutral-200 pb-2">
+                    <span className="text-sm font-semibold text-neutral-900">Filters</span>
+                    <FilterResetButton
+                        defaultSort={defaultSort}
+                        resetDealsFilter={!!dealsType}
+                        ignoreInStock={inStockOnly}
+                    />
+                </div>
                 {!inStockOnly && <InStockFilter />}
                 <OnSaleFilter />
                 <SortOrderFilter sorts={sort} />

@@ -5,17 +5,18 @@ import Checkbox from "@/shared/Checkbox/Checkbox";
 import { twMerge } from "tailwind-merge";
 import Slider from "rc-slider";
 import Radio from "@/shared/Radio/Radio";
-import { Package, XIcon } from "lucide-react";
+import { XIcon } from "lucide-react";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { currencyCode } from "@/lib/formatPrice";
 import ButtonThird from "@/shared/Button/ButtonThird";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import { useStore } from "@/store/store";
 import { Brand, ProductCategory } from "@/graphql/types/graphql";
 import { useRefinementList } from "react-instantsearch";
-import InStockFilter from "./Filters/InStockFilter";
 import DynamicVariationFilters from "./Filters/DynamicVariationFilters";
 import { PRICE_RANGE } from "@/components/global/primitives/Filters/PriceFilter";
 import { SORT_ORDER_OPTIONS, SORT_NEWEST_ID } from "@/lib/sortOrders";
+import FilterResetButton from "./Filters/FilterResetButton";
 
 interface TabFilterProps {
     categories?: ProductCategory[];
@@ -24,6 +25,8 @@ interface TabFilterProps {
     brand?: Brand;
     sort?: Boolean;
     inStockOnly?: boolean;
+    defaultSort?: string;
+    resetDealsFilter?: boolean;
 }
 
 const MobileFilterSheet = ({
@@ -33,9 +36,14 @@ const MobileFilterSheet = ({
     category,
     sort,
     inStockOnly = false,
+    defaultSort = "",
+    resetDealsFilter = false,
 }: TabFilterProps) => {
 
     const [isOpenMoreFilter, setisOpenMoreFilter] = useState(false);
+    const router = useRouter();
+    const pathname = usePathname();
+    const searchParams = useSearchParams();
 
     const {
         sidebar,
@@ -45,6 +53,7 @@ const MobileFilterSheet = ({
         syncOnSale,
         setInStock,
         setSort,
+        resetSidebarFilters,
     } = useStore();
 
     const isOnSale = sidebar.on_sale;
@@ -74,7 +83,7 @@ const MobileFilterSheet = ({
     const minBelowFloor = rangePrices[0] < PRICE_RANGE[0];
     const maxBelowFloor = rangePrices[1] < PRICE_RANGE[0];
     const minExceedsMax = !minBelowFloor && !maxBelowFloor && rangePrices[0] > rangePrices[1];
-    const sortOrderStates = sidebar.sort || (sort ? SORT_NEWEST_ID : "");
+    const sortOrderStates = sidebar.sort || (sort ? SORT_NEWEST_ID : defaultSort);
     const brandsState = sidebar.brands;
     const categoriesState = sidebar.categories;
     const inStock = sidebar.in_stock;
@@ -83,15 +92,21 @@ const MobileFilterSheet = ({
         return categoriesState.length +
             brandsState.length +
             (isOnSale ? 1 : 0) +
-            (sortOrderStates ? 1 : 0) +
-            (rangePrices.join('') !== PRICE_RANGE.join('') ? 1 : 0);
+            (!inStockOnly && inStock ? 1 : 0) +
+            (sortOrderStates && sortOrderStates !== defaultSort ? 1 : 0) +
+            (rangePrices.join("") !== PRICE_RANGE.join("") ? 1 : 0) +
+            Object.values(sidebar.variations).filter((values) => values.length > 0).length;
     }, [
         categoriesState,
         brandsState,
         isOnSale,
+        inStock,
+        inStockOnly,
         sortOrderStates,
+        defaultSort,
         rangePrices,
-    ])
+        sidebar.variations,
+    ]);
 
     const { items: categoriesFacet } = useRefinementList({
         attribute: 'categories_facet',
@@ -149,12 +164,11 @@ const MobileFilterSheet = ({
     const openModalMoreFilter = () => setisOpenMoreFilter(true);
 
     const handleClearFilters = () => {
-        synPriceRange(PRICE_RANGE);
-        syncBrands([]);
-        syncCategories([]);
-        syncOnSale(false);
-        setInStock(false);
-        setSort("");
+        resetSidebarFilters(defaultSort);
+        setRangePrices(PRICE_RANGE);
+        if (resetDealsFilter && searchParams.get("filter")) {
+            router.push(pathname, { scroll: false });
+        }
         closeModalMoreFilter();
     };
 
@@ -308,14 +322,21 @@ const MobileFilterSheet = ({
                                 className="fixed inset-0 w-full text-left align-middle transition-all transform bg-white dark:bg-neutral-900 dark:border dark:border-neutral-700 dark:text-neutral-100 h-full">
                                 <div
                                     className="fixed top-0 z-[100] w-full px-6 py-4 bg-white border-b border-neutral-200 dark:border-neutral-800 text-center">
+                                    <span className="absolute left-3 top-3">
+                                        <ButtonClose onClick={closeModalMoreFilter} />
+                                    </span>
                                     <Dialog.Title
                                         as="h3"
                                         className="text-lg font-medium leading-6 text-gray-900"
                                     >
                                         Products filters
                                     </Dialog.Title>
-                                    <span className="absolute left-3 top-3">
-                                        <ButtonClose onClick={closeModalMoreFilter} />
+                                    <span className="absolute right-3 top-3">
+                                        <FilterResetButton
+                                            defaultSort={defaultSort}
+                                            resetDealsFilter={resetDealsFilter}
+                                            ignoreInStock={inStockOnly}
+                                        />
                                     </span>
                                 </div>
 
@@ -653,7 +674,7 @@ const MobileFilterSheet = ({
                                         onClick={handleClearFilters}
                                         sizeClass="py-2.5 px-5"
                                     >
-                                        Clear
+                                        Reset
                                     </ButtonThird>
                                     <ButtonPrimary
                                         onClick={closeModalMoreFilter}

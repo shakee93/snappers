@@ -532,13 +532,15 @@ const InstantSearchWrapper = ({
         <div className="flex lg:gap-6 flex-col">
           <SearchInput bindToStore={bindToStore} show={search} />
 
-          <div className='flex overflow-x-auto lg:hidden w-full mb-4 lg:mb-0'>
+            <div className='flex overflow-x-auto lg:hidden w-full mb-4 lg:mb-0'>
             <MobileFilterSheet category={category}
               brand={brand}
               categories={categories}
               brands={brands}
               sort={sort}
-              inStockOnly={inStockOnly} />
+              inStockOnly={inStockOnly}
+              defaultSort={defaultSort}
+              resetDealsFilter={!!dealsType} />
           </div>
           <div className='grid grid-cols-12 gap-4'>
 
@@ -553,6 +555,7 @@ const InstantSearchWrapper = ({
                   sort={sort}
                   dealsType={dealsType}
                   inStockOnly={inStockOnly}
+                  defaultSort={defaultSort}
                 />
               )}
             </div>
