@@ -7,7 +7,7 @@ import Input from "shared/Input/Input";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import Link from "next/link";
 import Image from "next/image";
-import SignUpForm from "@/components/ui/LoginSignupPage/SignUpForm";
+import SignUpForm from "@/components/auth/SignUpForm";
 
 
 export interface PageSignUpProps {

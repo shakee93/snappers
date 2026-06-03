@@ -1,5 +1,5 @@
 import { Resend } from "resend";
-import EmailTemplate from "@/components/ui/Email/EmailTemplate";
+import EmailTemplate from "@/components/global/ui/Email/EmailTemplate";
 // Initialize the Resend instance with your API key
 const resend = new Resend("re_gq8K6rg5_6g41qckEAmjexiattAiZoHiz");
 

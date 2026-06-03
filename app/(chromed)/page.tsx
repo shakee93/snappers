@@ -1,8 +1,8 @@
-import CategoryBlockSection from "@/components/ui/HomePage/CategoryBlocksSection";
-import SectionHero3 from "@/components/ui/HomePage/SectionHero3";
-import SectionSliderProductCard from "@/components/ui/SectionSliderProductCard";
-import SectionPromo1 from "@/components/ui/HomePage/SectionPromo1";
-import Heading from "@/components/primitives/Heading/Heading";
+import CategoryBlockSection from "@/components/home/CategoryBlocksSection";
+import SectionHero3 from "@/components/home/SectionHero3";
+import SectionSliderProductCard from "@/components/global/ui/SectionSliderProductCard";
+import SectionPromo1 from "@/components/home/SectionPromo1";
+import Heading from "@/components/global/primitives/Heading/Heading";
 import { getClient } from "@/graphql/apollo-ssr";
 import {
   GET_BRANDS,
@@ -12,15 +12,15 @@ import {
 } from "@/graphql/defs/products";
 import { GET_SLIDES, GET_REVIEWS } from "@/graphql/defs/slides";
 import { Brand, SimpleProduct, Slide, VariableProduct } from "@/graphql/types/graphql";
-import SectionSliderBrandCard from "@/components/ui/SectionSliderBrandCard";
-import CardSkeleton from "@/components/primitives/Skeletons/CardSkeleton";
+import SectionSliderBrandCard from "@/components/global/ui/SectionSliderBrandCard";
+import CardSkeleton from "@/components/global/primitives/Skeletons/CardSkeleton";
 import { GET_OPTIONS } from "@/graphql/defs/options";
-import FancyTestimonialsSlider from "@/components/ui/TestimonialsSlider";
-import GoogleReviewsSection from "@/components/ui/HomePage/GoogleReviewsSection";
-import FAQ from "@/components/ui/HomePage/FAQSection";
-import TikTokSection from "@/components/ui/TikTokSection";
+import FancyTestimonialsSlider from "@/components/home/TestimonialsSlider";
+import GoogleReviewsSection from "@/components/home/GoogleReviewsSection";
+import FAQ from "@/components/home/FAQSection";
+import TikTokSection from "@/components/home/TikTokSection";
 import { GET_BENTO_SLIDER } from "@/graphql/defs/products";
-import SectionHero4 from "@/components/ui/HomePage/SectionHero4";
+import SectionHero4 from "@/components/home/SectionHero4";
 import { unstable_cache } from "next/cache";
 import { HERO_SECTION_CACHE_TAG } from "@/lib/cache-tags";
 

@@ -16,14 +16,14 @@ import { CustomerAddress, PaymentGateway } from "@/graphql/types/graphql";
 import { contactInformation } from "@/data/types";
 import Select from "shared/Select/Select";
 import { toast } from "sonner";
-import { SRI_LANKAN_STATES } from "@/components/ui/AddressPageComps/HelperComps";
+import { SRI_LANKAN_STATES } from "@/components/global/forms/HelperComps";
 import { useCart } from "@/context/CartProvider";
 import checkoutCopy from "@/content/checkout-copy.json";
 import { formatPrice } from "@/lib/formatPrice";
 import { PAYHERE_HIDE_THRESHOLD } from "@/lib/checkoutMath";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
-import PreOrderNotice from "@/components/ui/PreOrderNotice";
+import PreOrderNotice from "@/components/global/ui/PreOrderNotice";
 import {
     Store,
     Truck,

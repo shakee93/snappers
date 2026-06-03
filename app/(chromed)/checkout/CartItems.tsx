@@ -2,11 +2,11 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import LineOrCartPriceLabel from "@/components/ui/LineOrCartPriceLabel";
+import LineOrCartPriceLabel from "@/components/global/ui/LineOrCartPriceLabel";
 import { Fragment, useMemo, useState } from "react";
 import { Loader, Truck } from "lucide-react";
 import { toast } from "sonner";
-import AttributeIcon from "@/components/primitives/AttributeIcon";
+import AttributeIcon from "@/components/global/primitives/AttributeIcon";
 import { isLineItemFree } from "@/lib/cartLinePricing";
 import { getCartLineStockCap } from "@/lib/cartLineStockCap";
 import {

@@ -1,4 +1,4 @@
-import BrandsSkeleton from "@/components/primitives/Skeletons/BrandsSkeleton";
+import BrandsSkeleton from "@/components/global/primitives/Skeletons/BrandsSkeleton";
 
 const LoadingBrands = () => {
     return <BrandsSkeleton />;

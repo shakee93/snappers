@@ -1,6 +1,6 @@
 import { Metadata } from "next";
 
-import { LegalMarkdown } from "@/components/primitives/LegalMarkdown";
+import { LegalMarkdown } from "@/components/global/primitives/LegalMarkdown";
 import { readLegalMarkdown } from "@/lib/legalContent";
 
 export const metadata: Metadata = {

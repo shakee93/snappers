@@ -2,7 +2,7 @@ import Link from "next/link";
 import { Lock, Phone } from "lucide-react";
 import { PiWhatsappLogoDuotone } from "react-icons/pi";
 import { siteConfig } from "@/site.config";
-import SiteLogoImage from "@/components/brand/SiteLogoImage";
+import SiteLogoImage from "@/components/global/brand/SiteLogoImage";
 
 const SUPPORT_PHONE_DISPLAY = siteConfig.contact.secondaryPhone;
 const SUPPORT_PHONE_TEL = `tel:${siteConfig.contact.secondaryPhone}`;

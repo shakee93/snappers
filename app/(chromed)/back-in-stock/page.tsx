@@ -1,4 +1,4 @@
-import ArchiveLayout from "@/components/primitives/archive/ArchiveLayout";
+import ArchiveLayout from "@/components/global/primitives/archive/ArchiveLayout";
 import { Metadata } from "next";
 import { Suspense } from "react";
 

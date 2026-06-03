@@ -1,5 +1,5 @@
 import { contactInformation } from "@/data/types";
-import Label from "components/primitives/Label/Label";
+import Label from "@/components/global/primitives/Label/Label";
 import Link from "next/link";
 import { FC, useEffect, useState } from "react";
 import ButtonPrimary from "shared/Button/ButtonPrimary";

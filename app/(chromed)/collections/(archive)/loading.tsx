@@ -1,4 +1,4 @@
-import ArchiveLoading from "@/components/primitives/archive/ArchiveLoading";
+import ArchiveLoading from "@/components/global/primitives/archive/ArchiveLoading";
 
 
 const LoadingBrands = () => {

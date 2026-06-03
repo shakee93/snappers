@@ -3,7 +3,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Input from "shared/Input/Input";
-import Label from "components/primitives/Label/Label";
+import Label from "@/components/global/primitives/Label/Label";
 import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
 import { useCoupon } from "@/hooks/useCoupon";
@@ -22,7 +22,7 @@ import { OrderSummarySkeleton } from "./CheckoutSkeletons";
 import { toast } from "sonner";
 import { PayhereStatus, PaymentDetailsWithoutUrls } from "@/data/types";
 import Script from "next/script";
-import { usePayhere } from "@/components/ui/Payment/Payhere";
+import { usePayhere } from "@/components/global/payment/Payhere";
 import { redirect, useRouter } from "next/navigation";
 import { useSession } from "@/context/SessionProvider";
 import { usePaymentGateways } from "@/context/PaymentProvider";
@@ -31,7 +31,7 @@ import {
   savePaymentDetails,
   sentConfirmation,
   transformAddress,
-} from "@/components/ui/AddressPageComps/HelperComps";
+} from "@/components/global/forms/HelperComps";
 import { useStats } from "react-instantsearch";
 import { Metadata } from "next/types";
 import Image from "next/image";

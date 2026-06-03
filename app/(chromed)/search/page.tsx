@@ -1,6 +1,6 @@
 import {getClient} from "@/graphql/apollo-ssr";
 import {GET_ALL_PRODUCTS} from "@/graphql/defs/products";
-import InstantSearchWrapper from "@/components/primitives/InstantSearchWrapper";
+import InstantSearchWrapper from "@/components/global/primitives/InstantSearchWrapper";
 
 export const dynamic = 'force-dynamic'
 

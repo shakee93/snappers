@@ -1,6 +1,6 @@
 import { FC } from "react";
 import Link from "next/link";
-import UserDetails from "@/components/ui/Account/UserDetails";
+import UserDetails from "@/components/account/UserDetails";
 
 export interface CommonLayoutProps {
   children?: React.ReactNode;

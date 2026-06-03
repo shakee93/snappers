@@ -5,7 +5,7 @@ import { isLineItemFree, stripHtmlMoney } from "@/lib/cartLinePricing";
 import { currencySymbol } from "@/lib/formatPrice";
 import useProductLink from "@/hooks/useProductLink";
 import React, {Fragment} from "react";
-import AttributeIcon from "@/components/primitives/AttributeIcon";
+import AttributeIcon from "@/components/global/primitives/AttributeIcon";
 
 const OrderItemProduct = ({
                               orderItem,

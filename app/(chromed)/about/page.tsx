@@ -1,4 +1,4 @@
-import BgGlassmorphism from "@/components/ui/BgGlassmorphism/BgGlassmorphism";
+import BgGlassmorphism from "@/components/global/ui/BgGlassmorphism/BgGlassmorphism";
 import { siteConfig } from "@/site.config";
 import aboutContent from "@/content/about.json";
 import Image from "next/image";

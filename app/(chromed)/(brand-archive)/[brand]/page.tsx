@@ -2,7 +2,7 @@ import { getClient } from "@/graphql/apollo-ssr";
 import { GET_BRAND } from "@/graphql/defs/products";
 import { notFound } from "next/navigation";
 
-import ArchiveLayout from "@/components/primitives/archive/ArchiveLayout";
+import ArchiveLayout from "@/components/global/primitives/archive/ArchiveLayout";
 import { Metadata, ResolvingMetadata } from "next";
 import { Suspense } from "react";
 import { siteConfig } from "@/site.config";

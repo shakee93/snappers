@@ -1,6 +1,6 @@
 "use client";
 import { CheckIcon } from "@heroicons/react/24/outline";
-import NcInputNumber from "components/primitives/NcInputNumber";
+import NcInputNumber from "@/components/global/primitives/NcInputNumber";
 import Image from "next/image";
 
 import ButtonPrimary from "shared/Button/ButtonPrimary";
@@ -12,10 +12,10 @@ import {
   SimpleProduct,
   VariableProduct,
 } from "@/graphql/types/graphql";
-import Prices from "@/components/ui/Prices";
+import Prices from "@/components/global/ui/Prices";
 import CartItemProduct from "@/app/(chromed)/containers/ProductDetailPage/CartItem";
 import { Loader } from "lucide-react";
-import BackdropSpinner from "@/components/ui/BackdropSpinner";
+import BackdropSpinner from "@/components/global/ui/BackdropSpinner";
 
 const CartPage = () => {
   const { cart, loading } = useCart();

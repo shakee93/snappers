@@ -1,7 +1,7 @@
 import {
   SelectField,
   SRI_LANKAN_STATES,
-} from "@/components/ui/AddressPageComps/HelperComps";
+} from "@/components/global/forms/HelperComps";
 import { CustomerAddress } from "@/graphql/types/graphql";
 import { FC, useEffect, useState } from "react";
 import { siteConfig } from "@/site.config";

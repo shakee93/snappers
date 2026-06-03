@@ -1,8 +1,8 @@
 "use client";
 import React, { FC, useState } from "react";
-import BillingForm from "@/components/ui/AddressPageComps/BillingForm";
+import BillingForm from "@/components/global/forms/BillingForm";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
-import DeliveryForm from "@/components/ui/AddressPageComps/DeliveryForm";
+import DeliveryForm from "@/components/global/forms/DeliveryForm";
 
 const AddressSection: FC<{ title: string; onClick: () => void }> = ({
   title,
