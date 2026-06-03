@@ -26,7 +26,11 @@ import Checkbox from "@/shared/Checkbox/Checkbox";
 // Constants
 
 
-const BillingForm: FC = () => {
+type BillingFormProps = {
+  onSaved?: () => void | Promise<void>;
+};
+
+const BillingForm: FC<BillingFormProps> = ({ onSaved }) => {
   const { customer, fetchCustomer, updateCustomer } = useSession();
   const { getAddresses, data, error, updateAddress } = useAddresses();
   const [saveBothAddresses, setSaveBothAddresses] = useState(false);
@@ -49,7 +53,18 @@ const BillingForm: FC = () => {
   useEffect(() => {
     if (data?.customer?.billing) {
       const { billing } = data.customer;
-      setFormData((prevData) => ({ ...prevData, ...billing }));
+      setFormData((prevData) => ({
+        ...prevData,
+        firstName: billing.firstName ?? "",
+        lastName: billing.lastName ?? "",
+        address1: billing.address1 ?? "",
+        address2: billing.address2 ?? "",
+        city: billing.city ?? "",
+        state: billing.state ?? "Western",
+        postcode: billing.postcode ?? "",
+        phone: billing.phone ?? "",
+        country: billing.country ?? siteConfig.locale.countryCode,
+      }));
     }
   }, [data]);
 
@@ -94,10 +109,11 @@ const BillingForm: FC = () => {
           input: updatingValues,
         },
       });
+      await onSaved?.();
 
-      toast.success("Shipping address updated successfully");
+      toast.success("Billing address updated successfully");
     } catch (error: any) {
-      toast.error("Error updating shipping address:", error);
+      toast.error("Error updating billing address:", error);
     }
   };
 
@@ -131,14 +147,14 @@ const BillingForm: FC = () => {
               <div className="flex gap-2">
                 <InputField
                   label="Street Address"
-                  name="address2"
+                  name="address1"
                   placeholder="Street Address"
                   value={formData.address1}
                   onChange={handleChange}
                 />
                 <InputField
                   label="Apt, Suite, etc."
-                  name="address1"
+                  name="address2"
                   placeholder="Apt, Suite, etc."
                   value={formData.address2}
                   onChange={handleChange}
@@ -172,7 +188,6 @@ const BillingForm: FC = () => {
                 <SelectField
                   label="State"
                   name="state"
-                  defaultValue={SRI_LANKAN_STATES[0]}
                   value={formData.state}
                   options={SRI_LANKAN_STATES.map((state) => ({
                     value: state,

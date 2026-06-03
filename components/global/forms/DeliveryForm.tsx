@@ -30,7 +30,11 @@ const SRI_LANKAN_STATES = [
   "Sabaragamuwa",
 ];
 
-const DeliveryForm: FC = () => {
+type DeliveryFormProps = {
+  onSaved?: () => void | Promise<void>;
+};
+
+const DeliveryForm: FC<DeliveryFormProps> = ({ onSaved }) => {
   const { customer, fetchCustomer, updateCustomer } = useSession();
   const { getAddresses, data, error, updateAddress } = useAddresses();
   const [saveBothAddresses, setSaveBothAddresses] = useState(false);
@@ -98,6 +102,7 @@ const DeliveryForm: FC = () => {
           },
         },
       });
+      await onSaved?.();
       toast.success("Shipping address updated successfully");
     } catch (error: any) {
       toast.error("Error updating shipping address:", error);
