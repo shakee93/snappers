@@ -4,8 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import LineOrCartPriceLabel from "@/components/global/ui/LineOrCartPriceLabel";
 import { useMemo, useState } from "react";
-import CartVariationPicker from "@/components/cart/CartVariationPicker";
-import type { CartItem as GraphqlCartItem } from "@/graphql/types/graphql";
 import { Loader, Truck } from "lucide-react";
 import { toast } from "sonner";
 import { isLineItemFree } from "@/lib/cartLinePricing";
@@ -52,12 +50,6 @@ interface CartItemsProps {
   item: CartItem;
   index: number;
   onQuantityChange: (key: string, quantity: number) => Promise<unknown> | unknown;
-  onVariationChange: (
-    cartItemKey: string,
-    productId: number,
-    newVariationId: number,
-    quantity: number
-  ) => Promise<unknown> | unknown;
   onRemove: (keys: string[]) => Promise<unknown> | unknown;
 }
 
@@ -65,7 +57,6 @@ const CartItems = ({
   item,
   index,
   onQuantityChange,
-  onVariationChange,
   onRemove,
 }: CartItemsProps) => {
   const { product, quantity, key, subtotal, total, variation } = item;
@@ -148,14 +139,6 @@ const CartItems = ({
           <h3 className="text-sm font-semibold leading-snug text-slate-900 dark:text-slate-100 line-clamp-2">
             <Link href={`/${brandSlug}/${product.node.slug}`}>{name}</Link>
           </h3>
-
-          {type === "VARIABLE" && (
-            <CartVariationPicker
-              cartItem={item as unknown as GraphqlCartItem}
-              onVariationChange={onVariationChange}
-              compact
-            />
-          )}
 
           {hasFreeShipping && (
             <div className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-blue-600 dark:text-blue-400">

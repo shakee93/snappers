@@ -9,7 +9,6 @@ import LineOrCartPriceLabel from "@/components/global/ui/LineOrCartPriceLabel";
 import NcInputNumber from "@/components/global/primitives/NcInputNumber";
 import { useCart } from "@/context/CartProvider";
 import useProductLink from "@/hooks/useProductLink";
-import CartVariationPicker from "@/components/cart/CartVariationPicker";
 import { isLineItemFree } from "@/lib/cartLinePricing";
 import { getCartLineStockCap } from "@/lib/cartLineStockCap";
 
@@ -23,7 +22,7 @@ const CartItemProduct = ({
   const { product, quantity, variation, key, total, subtotal } = cartItem;
   const lineIsFree = isLineItemFree(total, subtotal);
 
-  const { removeFromCart, updateCart, changeCartItemVariation } = useCart();
+  const { removeFromCart, updateCart } = useCart();
   const link = useProductLink(product?.node);
 
   if (!product?.node) {
@@ -68,12 +67,6 @@ const CartItemProduct = ({
                 <Link href={`${link}`}>{name}</Link>
               </h3>
 
-              {type === "VARIABLE" && (
-                <CartVariationPicker
-                  cartItem={cartItem}
-                  onVariationChange={changeCartItemVariation}
-                />
-              )}
               <div className="relative mt-3 flex w-full justify-between sm:hidden">
                 <select
                   name="qty"

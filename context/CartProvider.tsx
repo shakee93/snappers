@@ -13,12 +13,6 @@ type CartSession = {
     loading: boolean | null
     error?: ApolloError
     updateCart: (key: string, quantity: number) => void
-    changeCartItemVariation: (
-        cartItemKey: string,
-        productId: number,
-        newVariationId: number,
-        quantity: number
-    ) => Promise<unknown>
     removeFromCart: (keys: string[]) => void
     getCart: () => void
     addToCart: (id: number, quantity?: number, variation?: number, productData?: any) => void | Promise<any>
@@ -37,7 +31,6 @@ const CartContext = createContext<CartSession>({
     removeFromCart: (keys) => { },
     addToCart: (id, quantity, variation, productData) => { },
     updateCart: (key, q) => { },
-    changeCartItemVariation: () => Promise.resolve(),
     getCart: () => { },
     setCustomer: () => { },
     clearCart: () => { },
@@ -340,60 +333,6 @@ export function CartProvider({ children }: {
         }).finally(() => setLoading(false))
     }
 
-    const changeCartItemVariation = useCallback(async (
-        cartItemKey: string,
-        productId: number,
-        newVariationId: number,
-        quantity: number
-    ) => {
-        const line = cart?.contents?.nodes?.find((item) => item.key === cartItemKey);
-        const currentVariationId = line?.variation?.node?.databaseId;
-        if (currentVariationId === newVariationId) {
-            return;
-        }
-
-        const productData = line?.product?.node;
-
-        if (productData && isPreOrderProduct(productData) && cartHasNonPreOrderProducts()) {
-            toast.error("You can't add pre-order products with regular products in your cart.");
-            throw new Error("Pre-order restriction");
-        }
-        if (productData && !isPreOrderProduct(productData) && cartHasPreOrderProducts()) {
-            toast.error("You can't add regular products with pre-order products in your cart.");
-            throw new Error("Pre-order restriction");
-        }
-
-        setLoading(true);
-        try {
-            const addResult = await _addToCart({
-                variables: {
-                    productId,
-                    quantity,
-                    variationId: newVariationId,
-                },
-            });
-
-            if (addResult.errors?.length) {
-                throw new Error(addResult.errors[0].message);
-            }
-
-            await removeFromCart([cartItemKey]);
-            return addResult;
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                const msg = error.message.toLowerCase();
-                if (msg.includes("not have enough") || msg.includes("stock")) {
-                    toast.error("There isn't enough stock for that option.");
-                } else if (!msg.includes("pre-order")) {
-                    toast.error("Couldn't update option. Please try again.");
-                }
-            }
-            throw error;
-        } finally {
-            setLoading(false);
-        }
-    }, [cart, _addToCart, removeFromCart]);
-
     useEffect(() => {
         getCart()
     }, [])
@@ -405,7 +344,6 @@ export function CartProvider({ children }: {
             loading,
             error,
             updateCart,
-            changeCartItemVariation,
             removeFromCart,
             addToCart,
             getCart,

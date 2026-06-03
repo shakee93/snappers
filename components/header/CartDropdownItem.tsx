@@ -7,7 +7,6 @@ import useProductLink from "@/hooks/useProductLink";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import CartVariationPicker from "@/components/cart/CartVariationPicker";
 import LineOrCartPriceLabel from "@/components/global/ui/LineOrCartPriceLabel";
 import { useCart } from "@/context/CartProvider";
 import NcInputNumber from "@/components/global/primitives/NcInputNumber";
@@ -21,7 +20,7 @@ interface CartDropdownItemProps {
 }
 
 const CartDropdownItem = ({ item, close }: CartDropdownItemProps) => {
-  const { removeFromCart, updateCart, changeCartItemVariation } = useCart();
+  const { removeFromCart, updateCart } = useCart();
 
   const { product, variation, quantity, key, total, subtotal } = item;
   const lineIsFree = isLineItemFree(total, subtotal);
@@ -105,14 +104,6 @@ const CartDropdownItem = ({ item, close }: CartDropdownItemProps) => {
               <h3 className="text-base font-semibold mt-3">
                 <Link href={link}>{name}</Link>
               </h3>
-
-              {type === "VARIABLE" && (
-                <CartVariationPicker
-                  cartItem={item}
-                  onVariationChange={changeCartItemVariation}
-                  compact
-                />
-              )}
 
               <LineOrCartPriceLabel
                 lineTotal={total}
