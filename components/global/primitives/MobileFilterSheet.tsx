@@ -12,7 +12,8 @@ import ButtonThird from "@/shared/Button/ButtonThird";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import { useStore } from "@/store/store";
 import { Brand, ProductCategory } from "@/graphql/types/graphql";
-import { useRefinementList } from "react-instantsearch";
+import { useRefinementList, useInstantSearch } from "react-instantsearch";
+import { UiState } from "instantsearch.js";
 import DynamicVariationFilters from "./Filters/DynamicVariationFilters";
 import { PRICE_RANGE } from "@/components/global/primitives/Filters/PriceFilter";
 import { SORT_ORDER_OPTIONS, SORT_NEWEST_ID } from "@/lib/sortOrders";
@@ -27,6 +28,7 @@ interface TabFilterProps {
     inStockOnly?: boolean;
     defaultSort?: string;
     resetDealsFilter?: boolean;
+    resetSearchQuery?: boolean;
 }
 
 const MobileFilterSheet = ({
@@ -38,12 +40,14 @@ const MobileFilterSheet = ({
     inStockOnly = false,
     defaultSort = "",
     resetDealsFilter = false,
+    resetSearchQuery = false,
 }: TabFilterProps) => {
 
     const [isOpenMoreFilter, setisOpenMoreFilter] = useState(false);
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
+    const { setUiState } = useInstantSearch<UiState & { product?: Record<string, unknown> }>();
 
     const {
         sidebar,
@@ -54,6 +58,7 @@ const MobileFilterSheet = ({
         setInStock,
         setSort,
         resetSidebarFilters,
+        setSearch,
     } = useStore();
 
     const isOnSale = sidebar.on_sale;
@@ -166,6 +171,24 @@ const MobileFilterSheet = ({
     const handleClearFilters = () => {
         resetSidebarFilters(defaultSort);
         setRangePrices(PRICE_RANGE);
+        if (resetSearchQuery) {
+            setSearch("");
+            setUiState((prev) => ({
+                ...prev,
+                product: {
+                    ...(prev.product || {}),
+                    query: "",
+                    page: 1,
+                    categories: [],
+                    brands: [],
+                    priceRange: PRICE_RANGE,
+                    on_sale: false,
+                    in_stock: false,
+                    sort: defaultSort,
+                    variations: {},
+                },
+            }));
+        }
         if (resetDealsFilter && searchParams.get("filter")) {
             router.push(pathname, { scroll: false });
         }
@@ -336,6 +359,7 @@ const MobileFilterSheet = ({
                                             defaultSort={defaultSort}
                                             resetDealsFilter={resetDealsFilter}
                                             ignoreInStock={inStockOnly}
+                                            resetSearchQuery={resetSearchQuery}
                                         />
                                     </span>
                                 </div>

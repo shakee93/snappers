@@ -22,6 +22,7 @@ interface TabFilterProps {
     dealsType?: DealFilterType[];
     inStockOnly?: boolean;
     defaultSort?: string;
+    resetSearchQuery?: boolean;
 }
 
 
@@ -34,6 +35,7 @@ const TabFilters = ({
     dealsType,
     inStockOnly = false,
     defaultSort = "",
+    resetSearchQuery = false,
 }: TabFilterProps) => {
 
     const {
@@ -55,6 +57,7 @@ const TabFilters = ({
                         defaultSort={defaultSort}
                         resetDealsFilter={!!dealsType}
                         ignoreInStock={inStockOnly}
+                        resetSearchQuery={resetSearchQuery}
                     />
                 </div>
                 {!inStockOnly && <InStockFilter />}

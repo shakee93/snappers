@@ -12,6 +12,8 @@ import { PRICE_RANGE } from "@/components/global/primitives/Filters/PriceFilter"
 import SortInput from "@/components/global/primitives/SortInput";
 import { useDebounce } from "use-debounce";
 import MobileFilterSheet from "@/components/global/primitives/MobileFilterSheet";
+import SearchResultsHeader from "@/components/global/primitives/SearchResultsHeader";
+import FilterResetButton from "@/components/global/primitives/Filters/FilterResetButton";
 import { UiState } from "instantsearch.js";
 import { useSearchParams, useRouter } from "next/navigation";
 import { HIDDEN_PRODUCT_SLUGS } from "@/lib/hidden-products";
@@ -133,6 +135,7 @@ const InstantSearchWrapper = ({
   // router.push pipeline as filters and races the ?page=N writes, which breaks
   // pagination.
   const defaultSort = defaultNewest ? SORT_NEWEST_ID : "";
+  const resetSearchQuery = search || bindToStore;
   const [differedSidebar] = useDebounce(sidebar, 800);
   const [hitsPerPage, setHitsPerPage] = useState<number>(12);
   // useSearchParams here triggers BAILOUT_TO_CLIENT_SIDE_RENDERING for the
@@ -530,7 +533,24 @@ const InstantSearchWrapper = ({
       > */}
 
         <div className="flex lg:gap-6 flex-col">
+          {bindToStore ? (
+            <SearchResultsHeader
+              defaultSort={defaultSort}
+              resetDealsFilter={!!dealsType}
+              ignoreInStock={inStockOnly}
+            />
+          ) : null}
           <SearchInput bindToStore={bindToStore} show={search} />
+          {search && !bindToStore ? (
+            <div className="flex justify-end">
+              <FilterResetButton
+                resetSearchQuery
+                defaultSort={defaultSort}
+                resetDealsFilter={!!dealsType}
+                ignoreInStock={inStockOnly}
+              />
+            </div>
+          ) : null}
 
             <div className='flex overflow-x-auto lg:hidden w-full mb-4 lg:mb-0'>
             <MobileFilterSheet category={category}
@@ -540,7 +560,8 @@ const InstantSearchWrapper = ({
               sort={sort}
               inStockOnly={inStockOnly}
               defaultSort={defaultSort}
-              resetDealsFilter={!!dealsType} />
+              resetDealsFilter={!!dealsType}
+              resetSearchQuery={resetSearchQuery} />
           </div>
           <div className='grid grid-cols-12 gap-4'>
 
@@ -556,6 +577,7 @@ const InstantSearchWrapper = ({
                   dealsType={dealsType}
                   inStockOnly={inStockOnly}
                   defaultSort={defaultSort}
+                  resetSearchQuery={resetSearchQuery}
                 />
               )}
             </div>
