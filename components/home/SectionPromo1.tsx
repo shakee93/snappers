@@ -6,6 +6,7 @@ import StoreImageSlider from "./StoreImageSlide"
 import { EmblaOptionsType } from "embla-carousel";
 import Link from "next/link";
 import storePromo from "@/content/store-promo.json";
+import { siteConfig } from "@/site.config";
 
 import "styles/embla.css";
 
@@ -28,7 +29,7 @@ const SectionPromo1: FC<SectionPromo1Props> = ({ className = "" }) => {
           Together We Shine.
         </h2>
         <span className="block text-slate-500 dark:text-slate-400 ">
-          {storePromo.description}
+          {storePromo.description.replaceAll("{brand}", siteConfig.brand.name)}
         </span>
         <div className="flex space-x-2 sm:space-x-5 ">
           <Link href="/collections/all">

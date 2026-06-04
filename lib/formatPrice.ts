@@ -12,8 +12,11 @@ export function formatPrice(
   amount: number,
   { decimals = 2 }: { decimals?: number } = {},
 ): string {
+  // Guard against NaN / undefined slipping in (e.g. unparsed price strings) so
+  // users never see "Rs NaN".
+  const safeAmount = Number.isFinite(amount) ? amount : 0;
   return `${currencySymbol} ${new Intl.NumberFormat("en-US", {
     minimumFractionDigits: decimals,
     maximumFractionDigits: decimals,
-  }).format(amount)}`;
+  }).format(safeAmount)}`;
 }

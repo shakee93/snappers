@@ -6,6 +6,7 @@ import { PinIcon, CheckCircle2 } from "lucide-react";
 import ContactBg from "./ContactBg";
 import contactContent from "@/content/contact.json";
 import { apiUrl } from "@/lib/api";
+import { siteConfig } from "@/site.config";
 
 interface ContactTextAreaProps {
   row: any;
@@ -170,8 +171,8 @@ const Contact = () => {
                       Email Address
                     </h4>
                     <p className="text-base text-body-color dark:text-dark-6">
-                      <Link href={`mailto:${contactContent.email}`}>
-                        {contactContent.email}
+                      <Link href={`mailto:${siteConfig.contact.email}`}>
+                        {siteConfig.contact.email}
                       </Link>
                     </p>
                   </div>

@@ -9,14 +9,14 @@ import BusinessHoursList from "@/components/global/brand/BusinessHoursList";
 import { PiFacebookLogoDuotone, PiInstagramLogoDuotone, PiTiktokLogoDuotone } from "react-icons/pi";
 import { HeartFilledIcon } from "@radix-ui/react-icons";
 import { siteConfig } from "@/site.config";
-import footerContent from "@/content/footer.json";
+import contactContent from "@/content/contact.json";
 
-const getData = async () => {
+const getData = async (): Promise<Brand[]> => {
   const { data } = await getClient().query({
     query: GET_BRANDS,
   });
 
-  return data.brands?.nodes;
+  return (data.brands?.nodes ?? []) as Brand[];
 };
 
 const FooterSkeleton = () => (
@@ -81,16 +81,9 @@ const FooterInner = async () => {
               <div className="text-base  md:text-lg font-medium text-primaryColor">
                 Top Brands
               </div>
-              <ul className="text-xs md:hidden text-left lg:text-sm text-gray-500 grid grid-cols-2 md:grid-cols-3 gap-x-4 md:gap-x-3 gap-y-3">
-                {brands.slice(0, 12).map((brand: Brand, index: number) => (
-                  <li key={index} className="hover:text-primaryColor">
-                    <Link href={`/${brand.slug}`}>{brand.name}</Link>
-                  </li>
-                ))}
-              </ul>
-              <ul className="hidden md:grid text-xs text-left lg:text-sm text-gray-500 grid grid-cols-2 md:grid-cols-2 gap-x-4 md:gap-x-3 gap-y-3">
-                {brands.slice(0, 12).map((brand: Brand, index: number) => (
-                  <li key={index} className="hover:text-primaryColor">
+              <ul className="text-xs text-left lg:text-sm text-gray-500 grid grid-cols-2 gap-x-4 md:gap-x-3 gap-y-3">
+                {brands.slice(0, 12).map((brand: Brand) => (
+                  <li key={brand.slug} className="hover:text-primaryColor">
                     <Link href={`/${brand.slug}`}>{brand.name}</Link>
                   </li>
                 ))}
@@ -103,14 +96,14 @@ const FooterInner = async () => {
               Address
             </div>
             <ul className="flex text-xs flex-col gap-3 pb-4">
-              {footerContent.locations.map((location) => (
+              {contactContent.locations.map((location) => (
                 <li key={location.name} className="lg:text-sm text-gray-500 flex gap-3">
                   <div>
                     <MapPinned size={iconSize} className="text-primaryColor" />
                   </div>
                   <div className="flex flex-col">
                     <div>{location.name}</div>
-                    <div>{location.address}</div>
+                    <div>{location.addressLine1} {location.addressLine2}</div>
                     <div className="flex flex-col mt-2 text-primaryColor">
                       {location.phones.map((phone) => (
                         <Link key={phone.tel} href={`tel:${phone.tel}`}>

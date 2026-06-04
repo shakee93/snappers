@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import brandsPageContent from "@/content/brands-page.json";
 import { getLogoSources } from "@/lib/siteAssets";
+import { siteConfig } from "@/site.config";
 
 // Safety-net ISR — primary invalidation is the WP webhook; this keeps the
 // page self-healing if a build-time fetch is rate-limited.
@@ -36,7 +37,7 @@ const Page = async () => {
               Browse
             </h2>
             <span className="block mt-2 lg:mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
-              {brandsPageContent.heroDescription}
+              {brandsPageContent.heroDescription.replaceAll("{brand}", siteConfig.brand.name)}
             </span>
           </div>
           <hr className="border-slate-200 dark:border-slate-700 !mt-4" />

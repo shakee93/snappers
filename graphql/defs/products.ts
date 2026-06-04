@@ -52,6 +52,14 @@ export const GET_PRODUCT = gql`
   query GetProduct($productId: ID!) {
     product(id: $productId, idType: SLUG) {
       ...ProductContentFull
+      # Related products feed the PDP "you may also like" slider. PDP-only —
+      # kept out of ProductContentFull so brand / category / homepage archives
+      # that share that fragment don't each pull 12 extra product cards.
+      related(first: 12) {
+        nodes {
+          ...ProductContentCard
+        }
+      }
       # Per-variation BOGO rule (variation meta wins, parent meta is the
       # fallback). PDP-only — kept out of ProductContentFull so brand /
       # category / homepage archives that share that fragment don't pay
@@ -356,8 +364,15 @@ export const GET_CATEGORY_ARCHIVE = gql`
 `;
 
 export const GET_CATEGORY_ARCHIVE_IN_STOCK = gql`
-  query GetCategoryArchiveInStock($categoryIdIn: [Int] = null, $first: Int = 10) {
-    products(first: $first, where: { categoryIdIn: $categoryIdIn, stockStatus: IN_STOCK }) {
+  query GetCategoryArchiveInStock(
+    $categoryIdIn: [Int] = null
+    $first: Int = 10
+    $exclude: [Int] = null
+  ) {
+    products(
+      first: $first
+      where: { categoryIdIn: $categoryIdIn, stockStatus: IN_STOCK, exclude: $exclude }
+    ) {
       edges {
         node {
           ...ProductContentCard

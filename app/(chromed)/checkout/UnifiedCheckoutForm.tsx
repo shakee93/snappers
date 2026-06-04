@@ -6,12 +6,6 @@ import Input from "shared/Input/Input";
 import CountryPhoneInput from "./components/CountryPhoneInput";
 import Link from "next/link";
 import { siteConfig } from "@/site.config";
-
-// Account shown inline in the BACS panel — sourced from site.config so the
-// full bank list (rendered on the bank-details view) stays the single source.
-const FEATURED_BANK_ACCOUNT =
-    siteConfig.payment.bankAccounts.find((a) => a.featuredAtCheckout) ??
-    siteConfig.payment.bankAccounts[0];
 import { CustomerAddress, PaymentGateway } from "@/graphql/types/graphql";
 import { contactInformation } from "@/data/types";
 import Select from "shared/Select/Select";
@@ -35,6 +29,12 @@ import {
     ArrowLeft,
     Loader,
 } from "lucide-react";
+
+// Account shown inline in the BACS panel — sourced from site.config so the
+// full bank list (rendered on the bank-details view) stays the single source.
+const FEATURED_BANK_ACCOUNT =
+    siteConfig.payment.bankAccounts.find((a) => a.featuredAtCheckout) ??
+    siteConfig.payment.bankAccounts[0];
 
 export type DeliveryType = "courier" | "store_pickup" | "flash_delivery";
 

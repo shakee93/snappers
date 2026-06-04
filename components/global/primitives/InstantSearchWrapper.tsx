@@ -69,44 +69,48 @@ interface InstantSearchWrapperProps {
   defaultNewest?: boolean;
 }
 
+type SearchClient = TypesenseInstantSearchAdapter["searchClient"];
+
+// No tenant fallback: a fork must point search at its own cluster. When the
+// host is unset we render a fallback below rather than throwing at module eval,
+// which would crash every page that imports this client component.
 const typesenseHost = process.env.NEXT_PUBLIC_TYPESENSE_HOST;
-if (!typesenseHost) {
-  // No tenant fallback: a fork must point search at its own cluster.
-  throw new Error("NEXT_PUBLIC_TYPESENSE_HOST is required");
-}
 
-const typesenseConfig = {
-  host: typesenseHost,
-  port: (process.env.NEXT_PUBLIC_TYPESENSE_PORT as unknown as number) || 80,
-  path: process.env.NEXT_PUBLIC_TYPESENSE_PATH || "",
-  protocol: process.env.NEXT_PUBLIC_TYPESENSE_PROTOCOL || "https",
-};
+const typesenseConfig = typesenseHost
+  ? {
+      host: typesenseHost,
+      port: (process.env.NEXT_PUBLIC_TYPESENSE_PORT as unknown as number) || 80,
+      path: process.env.NEXT_PUBLIC_TYPESENSE_PATH || "",
+      protocol: process.env.NEXT_PUBLIC_TYPESENSE_PROTOCOL || "https",
+    }
+  : null;
 
+const typesenseInstantSearchAdapter = typesenseConfig
+  ? new TypesenseInstantSearchAdapter({
+      server: {
+        apiKey: "xyz",
+        nodes: [typesenseConfig],
+        cacheSearchResultsForSeconds: 2 * 60,
+        retryIntervalSeconds: 500,
+        numRetries: 3000,
+        connectionTimeoutSeconds: 10,
+      },
+      additionalSearchParameters: {
+        query_by: "name, description, productTags",
+        query_by_weights: "3,1,1",
+        exclude_fields: "description, shortDescription, galleryImages, attributes",
+        facet_by: "brands_facet, categories_facet, variation_facets.*",
+        max_facet_values: 20,
+        // use_cache: false,
+        // filter_by: filterQuery,
+        sort_by: "in_stock:desc",
+        prefix: true,
+        num_typos: 1,
+      },
+    })
+  : null;
 
-const typesenseInstantSearchAdapter = new TypesenseInstantSearchAdapter({
-  server: {
-    apiKey: "xyz",
-    nodes: [typesenseConfig],
-    cacheSearchResultsForSeconds: 2 * 60,
-    retryIntervalSeconds: 500,
-    numRetries: 3000,
-    connectionTimeoutSeconds: 10,
-  },
-  additionalSearchParameters: {
-    query_by: "name, description, productTags",
-    query_by_weights: "3,1,1",
-    exclude_fields: "description, shortDescription, galleryImages, attributes",
-    facet_by: "brands_facet, categories_facet, variation_facets.*",
-    max_facet_values: 20,
-    // use_cache: false,
-    // filter_by: filterQuery,
-    sort_by: "in_stock:desc",
-    prefix: true,
-    num_typos: 1,
-  },
-});
-
-const InstantSearchWrapper = ({
+const InstantSearchWrapperInner = ({
   bindToStore = false,
   search = false,
   filters = true,
@@ -123,7 +127,8 @@ const InstantSearchWrapper = ({
   dealTags,
   inStockOnly = false,
   defaultNewest = false,
-}: InstantSearchWrapperProps) => {
+  searchClient,
+}: InstantSearchWrapperProps & { searchClient: SearchClient }) => {
   const { sidebar, setSearchMounted, isTyping } = useStore();
 
   // Pages that opt in via `defaultNewest` (i.e. /new-arrivals) lead with the
@@ -515,7 +520,7 @@ const InstantSearchWrapper = ({
             routeToState,
           },
         }}
-        searchClient={typesenseInstantSearchAdapter.searchClient}
+        searchClient={searchClient}
         indexName="product"
       >
         {/* @ts-expect-error - filters is forwarded to the Typesense adapter as a searchParameter */}
@@ -593,6 +598,25 @@ const InstantSearchWrapper = ({
         </div>
       </InstantSearchNext>
     </div>
+  );
+};
+
+const InstantSearchWrapper = (props: InstantSearchWrapperProps) => {
+  if (!typesenseInstantSearchAdapter) {
+    // NEXT_PUBLIC_TYPESENSE_HOST is unset — surface a quiet fallback instead of
+    // crashing the page. This is a deploy-config issue, not a user error.
+    return (
+      <div className="container py-16 text-center text-sm text-gray-500">
+        Search is temporarily unavailable.
+      </div>
+    );
+  }
+
+  return (
+    <InstantSearchWrapperInner
+      {...props}
+      searchClient={typesenseInstantSearchAdapter.searchClient}
+    />
   );
 };
 

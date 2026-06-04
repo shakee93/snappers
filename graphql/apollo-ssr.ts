@@ -17,10 +17,17 @@ export const { getClient } = registerApolloClient(() => {
             retryIf: (error) => {
                 if (!error) return false;
                 const statusCode = (error as { statusCode?: number }).statusCode;
-                // No statusCode = true network failure → retry.
-                if (statusCode === undefined) return true;
-                // Server responded: only retry the explicit rate-limit code.
-                return statusCode === 429;
+                // Server responded with a status: only retry the explicit
+                // rate-limit code (429); never 5xx (see comment above).
+                if (statusCode !== undefined) return statusCode === 429;
+                // GraphQL-level errors (validation, resolver failures) carry
+                // graphQLErrors and no statusCode. They are not transport
+                // failures — retrying just repeats the same failure, so skip.
+                const graphQLErrors = (error as { graphQLErrors?: readonly unknown[] }).graphQLErrors;
+                if (graphQLErrors && graphQLErrors.length > 0) return false;
+                // No statusCode and no GraphQL errors = true network failure
+                // (timeout, DNS, connection reset) → retry.
+                return true;
             },
         },
         delay: { initial: 500, max: 5000, jitter: true },

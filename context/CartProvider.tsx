@@ -145,10 +145,8 @@ export function CartProvider({ children }: {
                 },
             })
 
-            if (result.data?.removeItemsFromCart) {
-                refreshData(result.data)
-            }
-
+            // Cart state is refreshed by the removeCartData useEffect above,
+            // which also resets isClearingRef — keep that as the single path.
             return result
         } finally {
             setLoading(false)

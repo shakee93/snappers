@@ -2,17 +2,24 @@ import {
   CartItem,
   SimpleProduct,
   VariableProduct,
+  VariationAttribute,
 } from "@/graphql/types/graphql";
 import useProductLink from "@/hooks/useProductLink";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { Fragment, useState } from "react";
+import AttributeIcon from "@/components/global/primitives/AttributeIcon";
 import LineOrCartPriceLabel from "@/components/global/ui/LineOrCartPriceLabel";
 import { useCart } from "@/context/CartProvider";
 import NcInputNumber from "@/components/global/primitives/NcInputNumber";
 import { Trash } from "lucide-react";
 import { isLineItemFree } from "@/lib/cartLinePricing";
 import { getCartLineStockCap } from "@/lib/cartLineStockCap";
+
+// `displayValue` is resolved by the graphql-cart-attribute-display-value
+// mu-plugin and fetched in the cart fragment, but isn't part of the generated
+// VariationAttribute type — augment it here rather than reaching for `any`.
+type CartLineAttribute = VariationAttribute & { displayValue?: string | null };
 
 interface CartDropdownItemProps {
   item: CartItem;
@@ -104,6 +111,24 @@ const CartDropdownItem = ({ item, close }: CartDropdownItemProps) => {
               <h3 className="text-base font-semibold mt-3">
                 <Link href={link}>{name}</Link>
               </h3>
+
+              {type === "VARIABLE" && (
+                <div className="my-1 text-sm text-slate-500 dark:text-slate-400">
+                  {variation?.attributes?.map(
+                    (attr: CartLineAttribute | null, index: number) => (
+                      <Fragment key={index}>
+                        <div className="flex items-center gap-1">
+                          <AttributeIcon
+                            name={attr?.name || ""}
+                            className="w-4"
+                          />{" "}
+                          <span>{attr?.displayValue || attr?.value}</span>
+                        </div>
+                      </Fragment>
+                    )
+                  )}
+                </div>
+              )}
 
               <LineOrCartPriceLabel
                 lineTotal={total}

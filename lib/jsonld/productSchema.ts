@@ -1,11 +1,5 @@
 import { stripHtml } from "@/components/global/forms/HelperComps";
-import { Product, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import { siteConfig } from "@/site.config";
-
-interface ProductSpec {
-  name: string;
-  value: string;
-}
 
 interface WarrantyInfo {
   duration: number;
@@ -13,9 +7,45 @@ interface WarrantyInfo {
   description: string;
 }
 
+interface SchemaAttribute {
+  name?: string | null;
+  value?: string | null;
+}
+
+interface SchemaImage {
+  sourceUrl?: string | null;
+}
+
+interface SchemaVariationNode {
+  name?: string | null;
+  databaseId: number;
+  image?: SchemaImage | null;
+  rawPrice?: string | null;
+  attributes?: { nodes?: Array<SchemaAttribute | null> | null } | null;
+}
+
+interface SchemaProduct {
+  slug?: string | null;
+  name?: string | null;
+  description?: string | null;
+  price?: string | null;
+  stockStatus?: string | null;
+  image?: SchemaImage | null;
+  galleryImages?: { nodes?: Array<SchemaImage | null> | null } | null;
+  attributes?: { nodes?: Array<SchemaAttribute | null> | null } | null;
+  variations?: { nodes?: Array<SchemaVariationNode | null> | null } | null;
+}
+
+interface SchemaBrand {
+  slug?: string | null;
+  name?: string | null;
+}
+
+type JsonLd = Record<string, unknown>;
+
 const DEFAULT_WARRANTY: WarrantyInfo = siteConfig.product.defaultWarranty;
 
-function getWarrantySchema(warranty: WarrantyInfo = DEFAULT_WARRANTY) {
+function getWarrantySchema(warranty: WarrantyInfo = DEFAULT_WARRANTY): JsonLd {
   return {
     "@type": "WarrantyPromise",
     "durationOfWarranty": {
@@ -30,7 +60,7 @@ function getWarrantySchema(warranty: WarrantyInfo = DEFAULT_WARRANTY) {
   };
 }
 
-function getBaseOfferSchema(product: any, brand: any) {
+function getBaseOfferSchema(product: SchemaProduct, brand: SchemaBrand): JsonLd {
   return {
     "@type": "Offer",
     "url": `${siteConfig.url.base}/${brand.slug}/${product.slug}`,
@@ -45,23 +75,26 @@ function getBaseOfferSchema(product: any, brand: any) {
   };
 }
 
-function getProductSpecs(product: any): ProductSpec[] {
-  // Extract specifications from product attributes or custom fields
-  // This is a placeholder - you'll need to implement the actual logic based on your data structure
-  const specs = product.attributes?.nodes?.filter((attr: any) => 
-    !['pa_color'].includes(attr.name)
-  ).map((attr: any) => ({
-    "@type": "PropertyValue",
-    "name": attr.name.replace('pa_', '').toUpperCase(),
-    "value": attr.value
-  })) || [];
-
-  return specs;
+function getProductSpecs(
+  source: Pick<SchemaProduct, "attributes">
+): JsonLd[] {
+  return (
+    source.attributes?.nodes
+      ?.filter((attr): attr is SchemaAttribute => !!attr && !["pa_color"].includes(attr.name ?? ""))
+      .map((attr) => ({
+        "@type": "PropertyValue",
+        "name": (attr.name ?? "").replace("pa_", "").toUpperCase(),
+        "value": attr.value
+      })) ?? []
+  );
 }
 
-export function getProductSchema(product: any, brand: any) {
+export function getProductSchema(product: SchemaProduct, brand: SchemaBrand): JsonLd {
   // If product has variations, return ProductGroup schema
-  if (product.variations?.nodes?.length) {
+  const variationNodes = product.variations?.nodes?.filter(
+    (v): v is SchemaVariationNode => !!v
+  );
+  if (variationNodes?.length) {
     return {
       "@context": "https://schema.org",
       "@type": "ProductGroup",
@@ -71,12 +104,12 @@ export function getProductSchema(product: any, brand: any) {
       "brand": { "@type": "Brand", name: brand.name },
       "image": product.image?.sourceUrl,
       "variesBy": ["https://schema.org/color"],
-      "hasVariant": product.variations.nodes.map((v: any) => ({
+      "hasVariant": variationNodes.map((v) => ({
         "@type": "Product",
         "name": v.name,
         "sku": v.databaseId.toString(),
         "image": v.image?.sourceUrl,
-        "color": v.attributes.nodes.find((a: any) => a.name === "pa_color")?.value,
+        "color": v.attributes?.nodes?.find((a) => a?.name === "pa_color")?.value,
         "offers": {
           ...getBaseOfferSchema(product, brand),
           "price": Number((v.rawPrice ?? product.price ?? "0").toString().replace(/[^0-9.]/g, "") || "0")
@@ -97,9 +130,9 @@ export function getProductSchema(product: any, brand: any) {
     "brand": { "@type": "Brand", name: brand.name },
     "image": [
       product.image?.sourceUrl,
-      ...(product.galleryImages?.nodes?.map((i: any) => i?.sourceUrl ?? "") || [])
+      ...(product.galleryImages?.nodes?.map((i) => i?.sourceUrl ?? "") ?? [])
     ].filter(Boolean),
     "offers": getBaseOfferSchema(product, brand),
     "additionalProperty": getProductSpecs(product)
   };
-} 
+}

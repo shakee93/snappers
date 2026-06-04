@@ -3,8 +3,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import LineOrCartPriceLabel from "@/components/global/ui/LineOrCartPriceLabel";
-import { useMemo, useState } from "react";
+import { Fragment, useMemo, useState } from "react";
+import AttributeIcon from "@/components/global/primitives/AttributeIcon";
+import type { VariationAttribute } from "@/graphql/types/graphql";
 import { Loader, Truck } from "lucide-react";
+
+// `displayValue` is resolved by the graphql-cart-attribute-display-value
+// mu-plugin and fetched in the cart fragment, but isn't part of the generated
+// VariationAttribute type — augment it here rather than reaching for `any`.
+type CartLineAttribute = VariationAttribute & { displayValue?: string | null };
 import { toast } from "sonner";
 import { isLineItemFree } from "@/lib/cartLinePricing";
 import { getCartLineStockCap } from "@/lib/cartLineStockCap";
@@ -139,6 +146,21 @@ const CartItems = ({
           <h3 className="text-sm font-semibold leading-snug text-slate-900 dark:text-slate-100 line-clamp-2">
             <Link href={`/${brandSlug}/${product.node.slug}`}>{name}</Link>
           </h3>
+
+          {type === "VARIABLE" && (
+            <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+              {variation?.attributes?.map(
+                (attr: CartLineAttribute | null, idx: number) => (
+                  <Fragment key={idx}>
+                    <span className="inline-flex items-center gap-1">
+                      <AttributeIcon name={attr?.name || ""} className="w-3.5" />
+                      <span>{attr?.displayValue || attr?.value}</span>
+                    </span>
+                  </Fragment>
+                )
+              )}
+            </div>
+          )}
 
           {hasFreeShipping && (
             <div className="mt-1 inline-flex items-center gap-1 text-xs font-medium text-blue-600 dark:text-blue-400">

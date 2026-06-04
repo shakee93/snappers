@@ -129,7 +129,7 @@ const savePaymentDetails = (
 
 const getRandomWelcomeMessage = () => {
   const randomIndex = Math.floor(Math.random() * WelcomeMessages.length);
-  return WelcomeMessages[randomIndex];
+  return WelcomeMessages[randomIndex].replaceAll("{brand}", siteConfig.brand.name);
 };
 
 //PAYMENT FUNCTIONS

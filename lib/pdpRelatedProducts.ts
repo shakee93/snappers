@@ -49,9 +49,11 @@ export async function getPdpRelatedProducts(
     return [];
   }
 
+  // Exclude the current product server-side and over-fetch a buffer so the
+  // client-side stock refinement below can't shrink the slider under 12.
   const { data } = await getClient().query({
     query: GET_CATEGORY_ARCHIVE_IN_STOCK,
-    variables: { categoryIdIn: categoryIds, first: 12 },
+    variables: { categoryIdIn: categoryIds, first: 18, exclude: [excludeId] },
     context: {
       fetchOptions: {
         cache: "force-cache",
@@ -66,9 +68,7 @@ export async function getPdpRelatedProducts(
     .map((edge) => edge?.node)
     .filter(
       (p): p is ProductNode =>
-        p != null &&
-        typeof p.databaseId === "number" &&
-        p.databaseId !== excludeId &&
-        isProductInStock(p)
-    );
+        p != null && typeof p.databaseId === "number" && isProductInStock(p)
+    )
+    .slice(0, 12);
 }

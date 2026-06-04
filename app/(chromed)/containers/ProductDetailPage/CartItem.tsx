@@ -2,15 +2,23 @@ import {
   CartItem,
   SimpleProduct,
   VariableProduct,
+  VariationAttribute,
 } from "@/graphql/types/graphql";
 import Image from "next/image";
 import Link from "next/link";
+import { Fragment } from "react";
 import LineOrCartPriceLabel from "@/components/global/ui/LineOrCartPriceLabel";
 import NcInputNumber from "@/components/global/primitives/NcInputNumber";
+import AttributeIcon from "@/components/global/primitives/AttributeIcon";
 import { useCart } from "@/context/CartProvider";
 import useProductLink from "@/hooks/useProductLink";
 import { isLineItemFree } from "@/lib/cartLinePricing";
 import { getCartLineStockCap } from "@/lib/cartLineStockCap";
+
+// `displayValue` is resolved by the graphql-cart-attribute-display-value
+// mu-plugin and fetched in the cart fragment, but isn't part of the generated
+// VariationAttribute type — augment it here rather than reaching for `any`.
+type CartLineAttribute = VariationAttribute & { displayValue?: string | null };
 
 const CartItemProduct = ({
   cartItem,
@@ -66,6 +74,21 @@ const CartItemProduct = ({
               <h3 className="text-base font-semibold">
                 <Link href={`${link}`}>{name}</Link>
               </h3>
+
+              {type === "VARIABLE" && (
+                <div className="my-1 text-sm text-slate-500 dark:text-slate-400">
+                  {variation?.attributes?.map(
+                    (attr: CartLineAttribute | null, index: number) => (
+                      <Fragment key={index}>
+                        <div className="flex items-center gap-1">
+                          <AttributeIcon name={attr?.name || ""} className="w-4" />{" "}
+                          <span>{attr?.displayValue || attr?.value}</span>
+                        </div>
+                      </Fragment>
+                    )
+                  )}
+                </div>
+              )}
 
               <div className="relative mt-3 flex w-full justify-between sm:hidden">
                 <select

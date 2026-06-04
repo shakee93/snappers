@@ -407,11 +407,6 @@ export const ProductContentFull = gql`
         ...ProductContentCard
       }
     }
-    related(first: 12) {
-      nodes {
-        ...ProductContentCard
-      }
-    }
     ... on SimpleProduct {
       happiestCustomersGallery
       onSale
