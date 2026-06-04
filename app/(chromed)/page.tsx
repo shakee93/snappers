@@ -57,10 +57,7 @@ const getSlidesCached = unstable_cache(
     getClient()
       .query({ query: GET_SLIDES, context: HERO_QUERY_CONTEXT })
       .then((res) => res.data?.slides?.nodes || [])
-      .catch(() => {
-        console.error("Error fetching slides");
-        return [];
-      }),
+      .catch(() => []),
   ["homepage-slides"],
   { tags: [HERO_SECTION_CACHE_TAG], revalidate: 86400 }
 );
@@ -70,10 +67,7 @@ const getBentoSliderCached = unstable_cache(
     getClient()
       .query({ query: GET_BENTO_SLIDER, context: HERO_QUERY_CONTEXT })
       .then((res) => res.data || [])
-      .catch(() => {
-        console.error("Error fetching bento slider");
-        return [];
-      }),
+      .catch(() => []),
   ["homepage-bento-slider"],
   { tags: [HERO_SECTION_CACHE_TAG], revalidate: 86400 }
 );
@@ -86,19 +80,13 @@ const getData = async () => {
         variables: { first: 20, tagIn: BOGO_OFFER_TAG_SLUGS },
       })
       .then((res) => res.data?.products?.nodes || [])
-      .catch(() => {
-        console.error("Error fetching free offers products");
-        return [];
-      }),
+      .catch(() => []),
     getClient()
       .query({ query: GET_PRODUCTS_NODES, variables: { first: 25 } })
       .then((res) => {
         return res.data?.products?.nodes || [];
       })
-      .catch(() => {
-        console.error("Error fetching new arrivals");
-        return [];
-      }),
+      .catch(() => []),
     getClient()
       .query({
         query: GET_PRODUCTS_NODES,
@@ -107,10 +95,7 @@ const getData = async () => {
       .then((res) => {
         return res.data?.products?.nodes || [];
       })
-      .catch(() => {
-        console.error("Error fetching mobiles");
-        return [];
-      }),
+      .catch(() => []),
 
     getClient()
       .query({
@@ -120,10 +105,7 @@ const getData = async () => {
       .then((res) => {
         return res.data?.products?.nodes || [];
       })
-      .catch(() => {
-        console.error("Error fetching speakers");
-        return [];
-      }),
+      .catch(() => []),
 
     getClient()
       .query({
@@ -133,10 +115,7 @@ const getData = async () => {
       .then((res) => {
         return res.data?.products?.nodes || [];
       })
-      .catch(() => {
-        console.error("Error fetching watches");
-        return [];
-      }),
+      .catch(() => []),
 
     getClient()
       .query({
@@ -146,10 +125,7 @@ const getData = async () => {
       .then((res) => {
         return res.data?.products?.nodes || [];
       })
-      .catch(() => {
-        console.error("Error fetching back in stock");
-        return [];
-      }),
+      .catch(() => []),
 
     getClient()
       .query({
@@ -158,10 +134,7 @@ const getData = async () => {
       .then((res) => {
         return res.data?.brands?.nodes || [];
       })
-      .catch(() => {
-        console.error("Error fetching brands");
-        return [];
-      }),
+      .catch(() => []),
 
     getSlidesCached(),
     getClient()
@@ -169,10 +142,7 @@ const getData = async () => {
         query: GET_OPTIONS,
       })
       .then((res) => res.data || [])
-      .catch(() => {
-        console.error("Error fetching options");
-        return [];
-      }),
+      .catch(() => []),
     getClient()
       .query({
         query: GET_REVIEWS,
@@ -180,10 +150,7 @@ const getData = async () => {
       .then((res) => {
         return res.data?.customerReviewFields || [];
       })
-      .catch(() => {
-        console.error("Error fetching reviews");
-        return [];
-      }),
+      .catch(() => []),
 
     getBentoSliderCached(),
   ];
