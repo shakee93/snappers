@@ -8,9 +8,10 @@ import {
   GET_VARIATIONS_PRODUCT,
 } from "@/graphql/defs/products";
 import { notFound, redirect } from "next/navigation";
-import ArchiveLayout from "@/app/components/archive/ArchiveLayout";
+import ArchiveLayout from "@/components/global/primitives/archive/ArchiveLayout";
 import { Metadata, ResolvingMetadata } from "next";
 import { Suspense } from "react";
+import { siteConfig } from "@/site.config";
 
 type Props = { params: Promise<{ collection: string }> };
 
@@ -46,10 +47,10 @@ export async function generateMetadata(props: Props, parent: ResolvingMetadata):
   const pageDescription =
     productCategory.description ||
     `Discover our exclusive collection in the ${productCategory.name} category. Shop now for top-quality products at unbeatable prices.`;
-  const pageUrl = `https://gqmobiles.lk/collections/${id}`;
+  const pageUrl = `${siteConfig.url.base}/collections/${id}`;
   const imageUrl =
     productCategory.image?.sourceUrl ||
-    "https://gqmobiles.lk/default-og-image.jpg";
+    siteConfig.url.defaultOgImage;
 
   return {
     title: pageTitle,
@@ -63,7 +64,7 @@ export async function generateMetadata(props: Props, parent: ResolvingMetadata):
           url: imageUrl,
           width: 800,
           height: 600,
-          alt: `${productCategory.name} Collection - GQ Mobiles`,
+          alt: `${productCategory.name} Collection - ${siteConfig.brand.name}`,
         },
       ],
     },

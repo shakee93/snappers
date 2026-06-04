@@ -5,15 +5,19 @@ import Image from "next/image";
 import Input from "shared/Input/Input";
 import CountryPhoneInput from "./components/CountryPhoneInput";
 import Link from "next/link";
+import { siteConfig } from "@/site.config";
 import { CustomerAddress, PaymentGateway } from "@/graphql/types/graphql";
 import { contactInformation } from "@/data/types";
 import Select from "shared/Select/Select";
 import { toast } from "sonner";
-import { SRI_LANKAN_STATES } from "@/components/AddressPageComps/HelperComps";
+import { SRI_LANKAN_STATES } from "@/components/global/forms/HelperComps";
 import { useCart } from "@/context/CartProvider";
+import checkoutCopy from "@/content/checkout-copy.json";
+import { formatPrice } from "@/lib/formatPrice";
+import { PAYHERE_HIDE_THRESHOLD } from "@/lib/checkoutMath";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
-import PreOrderNotice from "@/components/PreOrderNotice";
+import PreOrderNotice from "@/components/global/ui/PreOrderNotice";
 import {
     Store,
     Truck,
@@ -25,6 +29,12 @@ import {
     ArrowLeft,
     Loader,
 } from "lucide-react";
+
+// Account shown inline in the BACS panel — sourced from site.config so the
+// full bank list (rendered on the bank-details view) stays the single source.
+const FEATURED_BANK_ACCOUNT =
+    siteConfig.payment.bankAccounts.find((a) => a.featuredAtCheckout) ??
+    siteConfig.payment.bankAccounts[0];
 
 export type DeliveryType = "courier" | "store_pickup" | "flash_delivery";
 
@@ -82,7 +92,7 @@ const CheckoutStepper = ({ currentStep }: CheckoutStepperProps) => {
         >
             <Link
                 href="/cart"
-                className="text-slate-500 hover:text-primaryColor underline-offset-2 hover:underline"
+                className="text-slate-500 hover:text-primary-500 underline-offset-2 hover:underline"
             >
                 Cart
             </Link>
@@ -121,7 +131,7 @@ const BrandBadge = ({ src, alt }: { src: string; alt: string }) => (
     </span>
 );
 
-const FIELD_CLASS = "border-2 border-slate-300 placeholder:text-slate-400 hover:border-slate-400 focus:!ring-0 focus:!border-primaryColor focus:outline-none dark:border-slate-600 dark:hover:border-slate-500";
+const FIELD_CLASS = "border-2 border-slate-300 placeholder:text-slate-400 hover:border-slate-400 focus:!ring-0 focus:!border-primary-500 focus:outline-none dark:border-slate-600 dark:hover:border-slate-500";
 
 type AddressFieldValues = {
     firstName: string;
@@ -312,7 +322,7 @@ const DeliveryOption = ({
     <label
         className={`group flex items-center gap-4 w-full p-4 rounded-xl border-2 cursor-pointer transition-colors ${
             selected
-                ? "border-primaryColor bg-primary-50/60 dark:bg-primary-900/20"
+                ? "border-primary-500 bg-primary-50/60 dark:bg-primary-900/20"
                 : "border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/40 hover:border-slate-300 hover:bg-slate-100 dark:hover:border-slate-600"
         }`}
     >
@@ -328,7 +338,7 @@ const DeliveryOption = ({
             aria-hidden="true"
             className={`flex items-center justify-center w-5 h-5 rounded-full border-2 shrink-0 transition-colors ${
                 selected
-                    ? "border-primaryColor bg-primaryColor"
+                    ? "border-primary-500 bg-primary-500"
                     : "border-slate-300 dark:border-slate-600 group-hover:border-slate-400"
             }`}
         >
@@ -337,7 +347,7 @@ const DeliveryOption = ({
         <span
             className={`flex items-center justify-center w-10 h-10 rounded-lg shrink-0 ${
                 selected
-                    ? "bg-primaryColor/10 text-primaryColor"
+                    ? "bg-primary-500/10 text-primary-500"
                     : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
             }`}
         >
@@ -441,10 +451,7 @@ const UnifiedCheckoutForm = ({
         const cost = flat?.cost ?? rates?.[0]?.cost;
         const numeric = typeof cost === "string" ? parseFloat(cost) : Number(cost);
         if (!Number.isFinite(numeric) || numeric <= 0) return null;
-        return `Rs ${new Intl.NumberFormat("en-US", {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
-        }).format(numeric)}`;
+        return formatPrice(numeric, { decimals: 0 });
     }, [cart]);
 
     const handleBankSlipChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -571,7 +578,7 @@ const UnifiedCheckoutForm = ({
             if (
                 gateway.id === "payhere" &&
                 isPriceFluctuation?.topBarPriceFluctuationNotice &&
-                totalPayment >= 100000
+                totalPayment >= PAYHERE_HIDE_THRESHOLD
             ) {
                 return false;
             }
@@ -704,7 +711,7 @@ const UnifiedCheckoutForm = ({
                     trailing: perInstallment ? (
                         <div className="flex items-center gap-2">
                             <span className="text-xs font-semibold text-slate-700 dark:text-slate-200">
-                                3 × Rs {new Intl.NumberFormat("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(perInstallment)}
+                                3 × {formatPrice(perInstallment)}
                             </span>
                             <Image src="/koko.png" alt="Koko" width={36} height={18} className="h-4 w-auto" />
                         </div>
@@ -714,7 +721,7 @@ const UnifiedCheckoutForm = ({
             case "bacs":
                 return {
                     title: gateway.title || "Direct bank transfer",
-                    subtitle: "Commercial Bank — upload your slip after transfer",
+                    subtitle: `${FEATURED_BANK_ACCOUNT.bank} — upload your slip after transfer`,
                     icon: <Landmark className="w-5 h-5" strokeWidth={1.75} />,
                     trailing: (
                         <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
@@ -780,7 +787,7 @@ const UnifiedCheckoutForm = ({
                     isDisabled
                         ? "border-slate-200 bg-slate-100/60 dark:border-slate-800 dark:bg-slate-900/40 opacity-60"
                         : active
-                            ? "border-primaryColor bg-primary-50/60 dark:bg-primary-900/20"
+                            ? "border-primary-500 bg-primary-50/60 dark:bg-primary-900/20"
                             : "border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/40 hover:border-slate-300 hover:bg-slate-100 dark:hover:border-slate-600"
                 }`}
                 aria-disabled={isDisabled || undefined}
@@ -804,7 +811,7 @@ const UnifiedCheckoutForm = ({
                             isDisabled
                                 ? "border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-800"
                                 : active
-                                    ? "border-primaryColor bg-primaryColor"
+                                    ? "border-primary-500 bg-primary-500"
                                     : "border-slate-300 dark:border-slate-600"
                         }`}
                     >
@@ -815,7 +822,7 @@ const UnifiedCheckoutForm = ({
                             isDisabled
                                 ? "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500"
                                 : active
-                                    ? "bg-primaryColor/10 text-primaryColor"
+                                    ? "bg-primary-500/10 text-primary-500"
                                     : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
                         }`}
                     >
@@ -850,19 +857,19 @@ const UnifiedCheckoutForm = ({
                             <dl className="text-sm space-y-1 text-slate-700 dark:text-slate-300">
                                 <div className="flex justify-between gap-3">
                                     <dt className="text-slate-500">Bank</dt>
-                                    <dd>Commercial Bank</dd>
+                                    <dd>{FEATURED_BANK_ACCOUNT.bank}</dd>
                                 </div>
                                 <div className="flex justify-between gap-3">
                                     <dt className="text-slate-500">Account name</dt>
-                                    <dd>GQ Mobiles Pvt Ltd</dd>
+                                    <dd>{FEATURED_BANK_ACCOUNT.accName}</dd>
                                 </div>
                                 <div className="flex justify-between gap-3">
                                     <dt className="text-slate-500">Account no.</dt>
-                                    <dd className="font-mono">1000475584</dd>
+                                    <dd className="font-mono">{FEATURED_BANK_ACCOUNT.accNo}</dd>
                                 </div>
                                 <div className="flex justify-between gap-3">
                                     <dt className="text-slate-500">Branch</dt>
-                                    <dd>Head office</dd>
+                                    <dd>{FEATURED_BANK_ACCOUNT.branch}</dd>
                                 </div>
                             </dl>
                         </div>
@@ -875,7 +882,7 @@ const UnifiedCheckoutForm = ({
                                 id={`bank-slip-upload-${gateway.id}`}
                                 accept="image/png, image/gif, image/jpeg, image/heic, image/heif, image/webp, image/bmp, image/tiff, application/pdf"
                                 onChange={handleBankSlipChange}
-                                className="block w-full text-sm text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primaryColor file:text-white hover:file:bg-slate-800 file:cursor-pointer cursor-pointer"
+                                className="block w-full text-sm text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-500 file:text-white hover:file:bg-slate-800 file:cursor-pointer cursor-pointer"
                             />
                             {previewUrl && bankSlipFile && (
                                 <div className="mt-2 flex items-center gap-3">
@@ -1018,7 +1025,7 @@ const UnifiedCheckoutForm = ({
                             icon={<Store className="w-5 h-5" strokeWidth={1.75} />}
                             title="Store Pickup"
                             subtitle="Ready during working hours"
-                            chip={{ label: "Instant Pickup · Colombo", tone: "emerald" }}
+                            chip={{ label: checkoutCopy.pickupChipLabel, tone: "emerald" }}
                             trailing={
                                 <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
                                     Free
@@ -1032,7 +1039,7 @@ const UnifiedCheckoutForm = ({
                             icon={<Zap className="w-5 h-5" strokeWidth={1.75} />}
                             title="Flash Delivery"
                             subtitle="You arrange Uber / PickMe pickup"
-                            chip={{ label: "~1hr Instant Delivery · Colombo", tone: "blue" }}
+                            chip={{ label: checkoutCopy.flashDeliveryChipLabel, tone: "blue" }}
                             trailing={
                                 <div className="hidden sm:flex items-center gap-1.5">
                                     <BrandBadge src="/logos/uber.png" alt="Uber" />
@@ -1044,7 +1051,7 @@ const UnifiedCheckoutForm = ({
 
                     {!deliveryType && (
                         <div className="mt-3 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                            <span className="inline-block w-1 h-1 rounded-full bg-primaryColor animate-pulse" />
+                            <span className="inline-block w-1 h-1 rounded-full bg-primary-500 animate-pulse" />
                             Select a delivery method to continue
                         </div>
                     )}
@@ -1060,7 +1067,7 @@ const UnifiedCheckoutForm = ({
                                     nameOnly
                                 />
                                 <p className="text-sm text-slate-600 dark:text-slate-400">
-                                    Visit GQ Mobiles to collect your order.
+                                    {checkoutCopy.storePickupNote}
                                 </p>
                             </>
                         ) : (

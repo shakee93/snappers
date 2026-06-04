@@ -6,8 +6,7 @@ import Image from "next/image";
 
 import { Cart, PaymentGateway } from "@/graphql/types/graphql";
 import { useCart } from "@/context/CartProvider";
-import { GET_PRODUCT } from "@/graphql/defs/products";
-import { useQuery } from "@apollo/client";
+import { PAYHERE_HIDE_THRESHOLD } from "@/lib/checkoutMath";
 
 interface Props {
   isActive: boolean;
@@ -125,7 +124,7 @@ const PaymentMethod: FC<Props> = ({
     const active = methodActive === gateway.id;
 
     let is_tab_or_mobile = hidePayhereForMobileAndTablets ? gateway.id == "payhere" && hidePayhere : false;
-    const shouldHidePayhere = gateway.id === 'payhere' && isPriceFluctuation?.topBarPriceFluctuationNotice && totalPayment >= 100000;
+    const shouldHidePayhere = gateway.id === 'payhere' && isPriceFluctuation?.topBarPriceFluctuationNotice && totalPayment >= PAYHERE_HIDE_THRESHOLD;
     
     // Hide Koko and Pay Online for pre-order products
     const shouldHideForPreOrder = isPreOrderCart && (gateway.id === 'darazbnpl' || gateway.id === 'payhere');

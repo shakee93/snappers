@@ -38,11 +38,11 @@ html {
  
 /* Handle */
 ::-webkit-scrollbar-thumb {
-  background: red; 
+  background: #cbd5e1;
   border-radius: 10px;
 }
 
 /* Handle on hover */
 ::-webkit-scrollbar-thumb:hover {
-  background: #b30000; 
+  background: #94a3b8;
 }

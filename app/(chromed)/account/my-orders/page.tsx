@@ -1,15 +1,14 @@
 "use client";
-import { useQuery } from "@apollo/client";
-import { GET_MY_ORDERS } from "@/graphql/defs/order";
+import { useMyOrders } from "@/hooks/useMyOrders";
 import OrderItemProduct from "@/app/(chromed)/containers/ProductDetailPage/OrderItem";
-import LoadingSkeleton from "@/components/OrderPageSkeleton";
+import LoadingSkeleton from "@/components/global/primitives/OrderPageSkeleton";
 import { useSession } from "@/context/SessionProvider";
 import Link from "next/link";
 import { useEffect } from "react";
-import OrderBankReceiptUpload from "@/app/components/OrderBankReceiptUpload";
+import OrderBankReceiptUpload from "@/components/global/ui/OrderBankReceiptUpload";
 
 const AccountOrder = () => {
-  const { loading, error, data, refetch } = useQuery(GET_MY_ORDERS);
+  const { loading, error, data, refetch } = useMyOrders();
   const { customer } = useSession();
 
   useEffect(() => {

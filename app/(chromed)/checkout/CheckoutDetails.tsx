@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import UnifiedCheckoutForm, { CheckoutSubmitPayload, DeliveryType } from "./UnifiedCheckoutForm";
-import { QueryResult, useQuery } from "@apollo/client";
-import { GET_CHECKOUT_USER_DETAILS } from "@/graphql/defs/order";
-import { GET_PRICE_FLUCTUATION_NOTICE } from "@/graphql/defs/options";
+import { QueryResult } from "@apollo/client";
+import { useCheckoutUserDetails } from "@/hooks/useCheckoutUserDetails";
+import { usePriceFluctuationNotice } from "@/hooks/usePriceFluctuationNotice";
 import { Customer, CustomerAddress } from "@/graphql/types/graphql";
 import { contactInformation } from "@/data/types";
 import { CheckoutFormSkeleton } from "./CheckoutSkeletons";
@@ -45,8 +45,8 @@ const CheckoutDetails = ({
   orderTotalLabel,
 }: CheckoutLeftProps) => {
 
-  const { data, loading: dataLoading }: QueryResult = useQuery(GET_CHECKOUT_USER_DETAILS);
-  const { data: isPriceFluctuation } = useQuery(GET_PRICE_FLUCTUATION_NOTICE);
+  const { data, loading: dataLoading }: QueryResult = useCheckoutUserDetails();
+  const { data: isPriceFluctuation } = usePriceFluctuationNotice();
   const [shippingDetails, setShippingDetails] = useState<CustomerAddress | null>(null);
 
   const [initContactInformation, setInitContactInformation] =

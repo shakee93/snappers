@@ -6,40 +6,46 @@ import { SessionProvider } from "@/context/SessionProvider";
 import { CartProvider } from "@/context/CartProvider";
 import { Toaster } from "sonner";
 import { Suspense } from "react";
-import { NavigationEvents } from "@/app/components/NavigationEvents";
+import { NavigationEvents } from "@/components/global/layout/NavigationEvents";
 import { Metadata } from "next";
-import WhatsappLogoComponent from "@/app/components/WhatsAppLogo";
+import WhatsappLogoComponent from "@/components/global/layout/WhatsAppLogo";
 import Script from "next/script";
-import GoogleAnalytics from "@/app/components/GoogleAnalytics";
-import ContentWrapper from "@/app/components/ContentWrapper";
+import GoogleAnalytics from "@/components/global/layout/GoogleAnalytics";
+import ContentWrapper from "@/components/global/layout/ContentWrapper";
+import { siteConfig } from "@/site.config";
+import { getSiteMetadataIcons, getSiteTwitterImage } from "@/lib/siteAssets";
+import SiteThemeStyles from "@/components/global/theme/SiteThemeStyles";
+
+const defaultTitle = `${siteConfig.brand.name} - ${siteConfig.brand.tagline}`;
 
 export const metadata: Metadata = {
   title: {
-    template: "%s - GQ Mobiles",
-    default: "GQ Mobiles - Best mobile phones in the market",
+    template: `%s - ${siteConfig.brand.name}`,
+    default: defaultTitle,
   },
-  description: "Shop the best mobile phones, smartwatches, and accessories at GQ Mobiles. Find the latest tech from top brands.",
+  description: siteConfig.brand.description,
+  icons: getSiteMetadataIcons(),
   openGraph: {
-    title: "GQ Mobiles - Best mobile phones in the market",
-    description: "Shop the best mobile phones, smartwatches, and accessories at GQ Mobiles. Find the latest tech from top brands.",
-    url: "https://gqmobiles.lk",
-    siteName: "GQ Mobiles",
+    title: defaultTitle,
+    description: siteConfig.brand.description,
+    url: siteConfig.url.base,
+    siteName: siteConfig.brand.name,
     images: [
       {
-        url: "https://cdn.gqmobiles.lk/wp-content/uploads/2025/10/gq.png",
+        url: siteConfig.url.defaultOgImage,
         width: 1200,
         height: 630,
-        alt: "GQ Mobiles Logo",
+        alt: `${siteConfig.brand.name} Logo`,
       },
     ],
-    locale: "en_US",
+    locale: siteConfig.locale.ogLocale,
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
-    title: "GQ Mobiles - Best mobile phones in the market",
-    description: "Shop the best mobile phones, smartwatches, and accessories at GQ Mobiles. Find the latest tech from top brands.",
-    images: ["/global/gq-logo.png"],
+    title: defaultTitle,
+    description: siteConfig.brand.description,
+    images: [getSiteTwitterImage()],
   },
 };
 
@@ -55,6 +61,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <head>
+        <SiteThemeStyles />
         <meta
           name="google-site-verification"
           content="1jxvcjKwBJHZpD2gN7mtEpCc1WQfzu7Wfp0RlyA0zA4"
@@ -64,7 +71,7 @@ export default async function RootLayout({
           <>
             <Script
               async
-              src="https://www.googletagmanager.com/gtag/js?id=G-LS3EVR93ZH"
+              src={`https://www.googletagmanager.com/gtag/js?id=${siteConfig.analytics.googleAnalyticsId}`}
               strategy="afterInteractive"
             />
             <Script id="google-analytics" strategy="afterInteractive">
@@ -72,9 +79,8 @@ export default async function RootLayout({
                 window.dataLayer = window.dataLayer || [];
                 function gtag(){dataLayer.push(arguments);}
                 gtag('js', new Date());
-                gtag('config', 'G-LS3EVR93ZH', {
-                  page_title: document.title,
-                  page_location: window.location.href,
+                gtag('config', '${siteConfig.analytics.googleAnalyticsId}', {
+                  send_page_view: false,
                 });
               `}
             </Script>

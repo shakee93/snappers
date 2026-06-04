@@ -2,22 +2,13 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FetchResult, useMutation, useQuery } from "@apollo/client";
 import Input from "shared/Input/Input";
-import Label from "components/Label/Label";
+import Label from "@/components/global/primitives/Label/Label";
 import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
-import {
-  UPDATE_SHIPPING_TOTAL,
-  APPLY_COUPON,
-  REMOVE_COUPONS,
-} from "@/graphql/defs/cart";
-import {
-  CHECKOUT,
-  COMPLETE_ORDER_PAYMENT,
-  GUEST_CHECKOUT,
-  GUEST_CHECKOUT_MUTATION,
-} from "@/graphql/defs/order";
+import { useCoupon } from "@/hooks/useCoupon";
+import { useShipping } from "@/hooks/useShipping";
+import { useCheckout } from "@/hooks/useCheckout";
 import {
   CheckoutPayload,
   CustomerAddressInput,
@@ -31,20 +22,23 @@ import { OrderSummarySkeleton } from "./CheckoutSkeletons";
 import { toast } from "sonner";
 import { PayhereStatus, PaymentDetailsWithoutUrls } from "@/data/types";
 import Script from "next/script";
-import { usePayhere } from "@/app/components/Payment/Payhere";
+import { usePayhere } from "@/components/global/payment/Payhere";
 import { redirect, useRouter } from "next/navigation";
 import { useSession } from "@/context/SessionProvider";
 import { usePaymentGateways } from "@/context/PaymentProvider";
 import { Info, Loader, Clock } from "lucide-react";
 import {
-  dummyPaymentData,
   savePaymentDetails,
   sentConfirmation,
   transformAddress,
-} from "@/components/AddressPageComps/HelperComps";
+} from "@/components/global/forms/HelperComps";
 import { useStats } from "react-instantsearch";
 import { Metadata } from "next/types";
 import Image from "next/image";
+import { siteConfig } from "@/site.config";
+import { formatPrice } from "@/lib/formatPrice";
+import { CARD_SURCHARGE_RATE } from "@/lib/checkoutMath";
+import { apiUrl } from "@/lib/api";
 interface FormData {
   contactInfo: Record<string, any>;
   deliveryAddress: any;
@@ -101,8 +95,7 @@ const CheckoutPage = () => {
   const [isCouponSyncingCart, setIsCouponSyncingCart] = useState(false);
   const [hasSeenCartWithItems, setHasSeenCartWithItems] = useState(false);
 
-  const [applyCouponMutation, { loading: applyingCoupon }] = useMutation(APPLY_COUPON);
-  const [removeCouponsMutation, { loading: removingCoupon }] = useMutation(REMOVE_COUPONS);
+  const { applyCouponMutation, removeCouponsMutation, applyingCoupon, removingCoupon } = useCoupon();
 
   const handleTOC = () => {
     const updatedTOC = !isTOC;
@@ -140,29 +133,21 @@ const CheckoutPage = () => {
   }, []);
 
   // MUTATIONS
-  const [updateCartShippingTotalMutation, { loading: shippingUpdating }] = useMutation(UPDATE_SHIPPING_TOTAL);
-  const [
+  const { updateCartShippingTotalMutation, shippingUpdating } = useShipping();
+  const {
     checkoutMutation,
-    {
-      data: realCheckoutData,
-      loading: realCheckoutLoading,
-      error: realCheckoutError,
-    },
-  ] = useMutation(CHECKOUT);
-
-  const [completeOrderPayment] = useMutation(COMPLETE_ORDER_PAYMENT);
-  // const  [createOrderGuest] = useMutation(GUEST_CHECKOUT_MUTATION)
-  const [
+    realCheckoutData,
+    realCheckoutLoading,
+    realCheckoutError,
+    completeOrderPayment,
     guestCheckout,
-    { loading: guestCheckoutLoading, error: guestCheckoutError },
-  ] = useMutation(GUEST_CHECKOUT);
-
-
-  // Creating a Order using For Guest. Instead of using direct checkout mutation.
-  const [
+    guestCheckoutLoading,
+    guestCheckoutError,
     createOrderGuest,
-    { loading: checkoutLoading, error: checkoutError, data: checkoutData },
-  ] = useMutation(GUEST_CHECKOUT_MUTATION);
+    checkoutLoading,
+    checkoutError,
+    checkoutData,
+  } = useCheckout();
 
   // Contexts
   const router = useRouter();
@@ -230,8 +215,8 @@ const CheckoutPage = () => {
           : deliveryType === "store_pickup"
             ? "pickup_location:0"
             : freeShipping
-              ? "wbs:5c9bd062_free_shipping"
-              : "wbs:0dd3bc79_weight_based_shipping";
+              ? siteConfig.shipping.freeShippingMethodId
+              : siteConfig.shipping.weightBasedShippingMethodId;
 
       const total: any = cart?.total;
       setOrderTotal(freeShipping ? cart?.subtotal : total);
@@ -543,7 +528,7 @@ const CheckoutPage = () => {
         const orderData = {
           order_id: mutationData?.checkout?.order?.databaseId,
           amount: numericAmount,
-          currency: "LKR",
+          currency: siteConfig.locale.currencyCode,
           email: contactEmail,
           phone: contactPhone,
           bill_to_forename: billingAddress.firstName || "",
@@ -661,8 +646,8 @@ const CheckoutPage = () => {
         : orderDeliveryType === "store_pickup"
           ? "pickup_location:0"
           : freeShipping
-            ? "wbs:5c9bd062_free_shipping"
-            : "wbs:0dd3bc79_weight_based_shipping";
+            ? siteConfig.shipping.freeShippingMethodId
+            : siteConfig.shipping.weightBasedShippingMethodId;
 
     // methodTitle is the display string for the order summary; for
     // flat_rate WC writes the zone-config title, for pickup_location WC
@@ -872,7 +857,7 @@ const CheckoutPage = () => {
     if (!Number.isFinite(sale) || !Number.isFinite(regular) || regular <= sale) return sum;
     return sum + (regular - sale) * (item?.quantity || 0);
   }, 0);
-  const threePercentFromTotal = numericOrderTotal * 0.03;
+  const threePercentFromTotal = numericOrderTotal * CARD_SURCHARGE_RATE;
   const TotalWithKoko = (cartSubtotal / 88) * 100;
   const taxWithTotal = (numericOrderTotal + threePercentFromTotal).toFixed(2);
 
@@ -898,16 +883,10 @@ const CheckoutPage = () => {
   })();
   const kokoOrderTotal = TotalWithKoko + kokoShippingAmount;
 
-  const formatRs = (n: number) =>
-    `Rs ${new Intl.NumberFormat("en-US", {
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2,
-    }).format(n)}`;
-
   const orderTotalLabel = isCardPayment
-    ? formatRs(numericOrderTotal + threePercentFromTotal)
+    ? formatPrice(numericOrderTotal + threePercentFromTotal)
     : isKokoPayment
-    ? formatRs(kokoOrderTotal)
+    ? formatPrice(kokoOrderTotal)
     : (orderTotal || "");
 
   useEffect(() => {
@@ -1099,7 +1078,7 @@ const CheckoutPage = () => {
       formDataUpload.append("order_id", String(orderId));
 
       const response = await fetch(
-        "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/upload",
+        apiUrl("/wp-json/api/gq_mobile/v1/upload"),
         {
           method: "POST",
           body: formDataUpload,
@@ -1381,7 +1360,7 @@ const CheckoutPage = () => {
                   <span className="text-slate-600 dark:text-slate-400">Subtotal</span>
                   <span className="font-medium text-slate-900 dark:text-slate-200">
                     {catalogSavings > 0
-                      ? formatRs(cartSubtotal + catalogSavings)
+                      ? formatPrice(cartSubtotal + catalogSavings)
                       : (
                         <span
                           dangerouslySetInnerHTML={{
@@ -1394,9 +1373,9 @@ const CheckoutPage = () => {
 
                 {catalogSavings > 0 && (
                   <div className="flex justify-between items-center">
-                    <span className="text-slate-600 dark:text-slate-400">Promotion <span className="text-xs font-semibold text-[#059669] ">(You saved)</span></span>
+                    <span className="text-slate-600 dark:text-slate-400">Promotion <span className="text-xs font-semibold text-success ">(You saved)</span></span>
                     <span className="inline-flex items-center rounded-md bg-red-500 px-2 py-0.5 text-xs font-semibold text-white">
-                      -{formatRs(catalogSavings)}
+                      -{formatPrice(catalogSavings)}
                     </span>
                   </div>
                 )}
@@ -1471,7 +1450,7 @@ const CheckoutPage = () => {
                     <span
                       className="text-xl font-bold"
                       dangerouslySetInnerHTML={{
-                        __html: formatRs(numericOrderTotal + threePercentFromTotal),
+                        __html: formatPrice(numericOrderTotal + threePercentFromTotal),
                       }}
                     />
                   )}
@@ -1487,7 +1466,7 @@ const CheckoutPage = () => {
                     <span
                       className="text-xl font-bold"
                       dangerouslySetInnerHTML={{
-                        __html: formatRs(kokoOrderTotal),
+                        __html: formatPrice(kokoOrderTotal),
                       }}
                     />
                   )}

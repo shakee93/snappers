@@ -1,60 +1,19 @@
-import BgGlassmorphism from "@/components/BgGlassmorphism/BgGlassmorphism";
+import BgGlassmorphism from "@/components/global/ui/BgGlassmorphism/BgGlassmorphism";
+import { siteConfig } from "@/site.config";
+import aboutContent from "@/content/about.json";
 import Image from "next/image";
 import StoreImg from "public/store/GqMobiles-Buy-geniune-branded-eletronics-from-GQMobiles-for-best-price-1-1.webp";
 import Img1 from "public/aboutpage/about-img-1-1.jpg";
 import Img2 from "public/aboutpage/about-img-2-1.jpg";
 import Img3 from "public/aboutpage/about-img-3-1.jpg";
 
+const cardImages = [Img1, Img2, Img3];
 
 const AccountPage = () => {
-  const about = [
-    {
-      id: 1,
-      img: Img1,
-      title: "Our Vision",
-      desc: "Our vision is to create a place where you can buy the latest and best mobile phones and accessories with better best customer care services, all for a great price.",
-    },
-    {
-      id: 2,
-      img: Img2,
-      title: "What We Do",
-      desc: "We provide the latest mobile phones and accessories to our customers with great service and support for their tech products all around Sri Lanka.",
-    },
-    {
-      id: 3,
-      img: Img3,
-      title: "Company History",
-      desc: "GQ mobiles Pvt Ltd was founded in 2002. We have now expanded our operations into main branch at Liberty Plaza to better serve our loyal customers.",
-    },
-  ];
-  const stats = [
-    { id: 1, name: "Products", value: "500+" },
-    { id: 2, name: "Orders Completed", value: "1200+" },
-  ];
-
-  const testimonialData = [
-    {
-      name: "Rushad Jiffry",
-      role: "Production Manager It Cordinator at D Studio CMB",
-      content:
-        "“GQ is the Great Place to Buy Genuine Products! Very Professional their rates are competitive and fair. Thank you for the genuine chrome cast I am extremely happy with The Product . I would like to recommend this place anyone who likes to buy genuine branded products.”",
-      ratings: 5,
-    },
-    {
-      name: "Gayan De Silva",
-      role: "Project Manager at Calcey Technologies Pvt Ltd",
-      content:
-        "“Have bought multiple smart phones and smart watches. Got agent warranty on the phones and the prices have been the best in the market as well. Would recommend their products + the service ”",
-      ratings: 4,
-    },
-    {
-      name: "Shal Jayatunga",
-      role: "Works at Audi Sri Lanka",
-      content:
-        "“I was looking for a phone to buy urgently and a friend of mine put me on to this shop. I got a super service from them and a good price for the phone I wanted to buy. They even delivered the phone to my office. I can highly recommend them to anyone. All the best! ”",
-      ratings: 5,
-    },
-  ];
+  const about = aboutContent.cards;
+  const stats = aboutContent.stats;
+  const services = aboutContent.services;
+  const testimonialData = aboutContent.testimonials;
 
   return (
     <div>
@@ -67,8 +26,8 @@ const AccountPage = () => {
             </h1>
             <div className="block text-base xl:text-base text-neutral-6000 dark:text-neutral-400 lg:text-justify">
               For more than 20 years,{" "}
-              <span className="text-primaryColor">
-                GQ Mobiles
+              <span className="text-primary-500">
+                {siteConfig.brand.name}
               </span>{" "}
               has demonstrated excellence in the retail industry by
               distinguishing itself with a commitment to delivering complete
@@ -88,16 +47,16 @@ const AccountPage = () => {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 p-5  lg:py-20">
-          {about.map((item) => (
-            <div key={item.id} className="gap-2 md:gap-5 flex flex-col">
+          {about.map((item, index) => (
+            <div key={index} className="gap-2 md:gap-5 flex flex-col">
               <div className="">
                 <Image
-                  src={item.img}
+                  src={cardImages[index]}
                   alt={item.title}
                   className="rounded-3xl"
                 />
               </div>
-              <div className="text-xl xl:text-3xl !leading-tight font-semibold  dark:text-neutral-400 ytext-primaryColor">
+              <div className="text-xl xl:text-3xl !leading-tight font-semibold  dark:text-neutral-400 text-primary-500">
                 {item.title}
               </div>
               <div className="text-base xl:text-base text-neutral-6000 dark:text-neutral-400 ">
@@ -111,42 +70,30 @@ const AccountPage = () => {
           <h2 className="text-2xl !leading-tight font-semibold text-neutral-900 md:text-3xl xl:text-4xl dark:text-neutral-100">
             Our Services.
           </h2>
-          <div className="flex flex-col gap-3">
-            <div className="text-primaryColor font-medium text-lg leading-tight md:text-xl">
-              Online Ordering. Your phone delivered to your doorstep!
+          {services.map((service, index) => (
+            <div key={index} className="flex flex-col gap-3">
+              <div className="text-primary-500 font-medium text-lg leading-tight md:text-xl">
+                {service.title}
+              </div>
+              <div className="text-base xl:text-base text-neutral-6000 dark:text-neutral-400 ">
+                {service.body}
+              </div>
             </div>
-            <div className="text-base xl:text-base text-neutral-6000 dark:text-neutral-400 ">
-              Prefer to purchase online? Then visit our online store. You can
-              search by Brand, budget, or even model name. Once you’ve decided
-              just complete the payment details. We promise to deliver your
-              phone within 07 working days straight to your doorstep. We even
-              give a cashback guarantee if you’re not satisfied.
-            </div>
-          </div>
-          <div className="flex flex-col gap-3">
-            <div className="text-primaryColor font-medium text-lg leading-tight md:text-xl">
-              After Sales support. Fast response and solutions that satisfy.
-            </div>
-            <div className="text-base xl:text-base text-neutral-6000 dark:text-neutral-400 ">
-              Nothing more frustrating than when a phone starts playing up. We
-              understand! That’s why we aim to provide you fast and reliable
-              after-sales support. For any support just call us on +94 75 455 5665
-            </div>
-          </div>
+          ))}
         </div>
 
         <div className="bg-transparent py-16 lg:py-20 rounded-3xl">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
             <dl className="grid grid-cols-1 gap-x-8 gap-y-16 text-center md:grid-cols-2">
-              {stats.map((stat) => (
+              {stats.map((stat, index) => (
                 <div
-                  key={stat.id}
+                  key={index}
                   className="mx-auto flex max-w-xs flex-col gap-y-4"
                 >
                   <dt className="text-base leading-7 text-gray-900">
                     {stat.name}
                   </dt>
-                  <dd className="order-first text-4xl font-semibold tracking-tight text-primaryColor sm:text-6xl">
+                  <dd className="order-first text-4xl font-semibold tracking-tight text-primary-500 sm:text-6xl">
                     {stat.value}
                   </dd>
                 </div>
@@ -160,7 +107,7 @@ const AccountPage = () => {
             <h3 className="mb-3 text-2xl !leading-tight font-semibold text-neutral-900 md:text-3xl xl:text-4xl dark:text-neutral-100">
               Happy Customers.
             </h3>
-            <div className="text-primaryColor font-medium text-lg leading-tight md:text-xl">
+            <div className="text-primary-500 font-medium text-lg leading-tight md:text-xl">
               Know what our loyal customers think about our store
             </div>
           </div>

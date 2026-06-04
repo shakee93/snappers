@@ -1,8 +1,8 @@
 "use client";
 import { OrderPaymentPageProps } from "@/data/types";
-import { useQuery } from "@apollo/client";
-import { GET_SINGLE_ORDER } from "@/graphql/defs/order";
 import { isLineItemFree, stripHtmlMoney } from "@/lib/cartLinePricing";
+import { siteConfig } from "@/site.config";
+import { useOrderById } from "@/hooks/useOrderById";
 
 const ThankYouPage = ({ params }: OrderPaymentPageProps) => {
   // const dummyProducts = [
@@ -14,11 +14,7 @@ const ThankYouPage = ({ params }: OrderPaymentPageProps) => {
   // const orderId = params['order-id'];
   const orderId = "b3JkZXI6NjQzOA==";
 
-  const { loading, error, data, refetch } = useQuery(GET_SINGLE_ORDER, {
-    variables: {
-      orderID: orderId,
-    },
-  });
+  const { loading, error, data, refetch } = useOrderById(orderId);
 
   return (
     <div className="container mt-4 rounded-3xl text-center lg:p-20">
@@ -68,7 +64,7 @@ const ThankYouPage = ({ params }: OrderPaymentPageProps) => {
                   <div className="inline-block min-w-full p-1.5 align-middle">
                     <div className="overflow-hidden">
                       <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead className="texy-primaryColor bg-gray-200 py-2 text-lg ">
+                        <thead className="text-primary-500 bg-gray-200 py-2 text-lg ">
                           <tr>
                             <th
                               scope="col"
@@ -154,7 +150,7 @@ const ThankYouPage = ({ params }: OrderPaymentPageProps) => {
       <div className="py-8">
         <p className="text-left text-2xl">Our Bank Details</p>
         <div className="">
-          <h1 className="py-8 text-left text-xl ">GQ Mobile</h1>
+          <h1 className="py-8 text-left text-xl ">{siteConfig.brand.name}</h1>
 
           <ul className="list-disc pl-4 ">
             <li className="mb-2 text-left ">

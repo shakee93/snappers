@@ -2,22 +2,31 @@ import { getClient } from "@/graphql/apollo-ssr";
 import { GET_ALL_BRANDS } from "@/graphql/defs/products";
 import { Brand } from "@/graphql/types/graphql";
 import Link from "next/link";
-import SiteLogo from "@/public/global/gq-logo.png";
 import Image from "next/image";
+import brandsPageContent from "@/content/brands-page.json";
+import { getLogoSources } from "@/lib/siteAssets";
+import { siteConfig } from "@/site.config";
 
-async function getData(categories: number[] | null = null) {
-  const { data, error } = await getClient().query({
-    query: GET_ALL_BRANDS,
-  });
+// Safety-net ISR — primary invalidation is the WP webhook; this keeps the
+// page self-healing if a build-time fetch is rate-limited.
+export const revalidate = 1800;
 
-  return {
-    productCategories: data.brands.nodes,
-    brands: data.brands.nodes,
-  };
+async function getData(): Promise<{ brands: Brand[] }> {
+  // The SSR client retries transient 429s with backoff; if it still fails,
+  // degrade to an empty list so the build doesn't hard-fail — ISR/webhook
+  // revalidation backfills the brands shortly after.
+  try {
+    const { data } = await getClient().query({ query: GET_ALL_BRANDS });
+    return { brands: data?.brands?.nodes ?? [] };
+  } catch (error: unknown) {
+    console.error("Failed to fetch brands for /brands page", error);
+    return { brands: [] };
+  }
 }
 
 const Page = async () => {
   const { brands } = await getData();
+  const { light: brandLogoFallback } = getLogoSources();
 
   return (
     <div>
@@ -28,9 +37,7 @@ const Page = async () => {
               Browse
             </h2>
             <span className="block mt-2 lg:mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
-              {
-                " Welcome to GQ Mobiles Brands – acurated selection of style and innovation. Discover unique brands that define excellence in every product. Elevate your experience with quality and aesthetics at GQ Mobiles. Shop now for a statement in style!"
-              }
+              {brandsPageContent.heroDescription.replaceAll("{brand}", siteConfig.brand.name)}
             </span>
           </div>
           <hr className="border-slate-200 dark:border-slate-700 !mt-4" />
@@ -47,7 +54,11 @@ const Page = async () => {
                       >
                         <div className="w-40 h-28 flex items-center justify-center mb-3 bg-white dark:bg-gray-800 rounded-2xl shadow-sm ">
                           <Image
-                            src={brand.brandImage && brand.brandImage.trim() !== "" ? brand.brandImage : SiteLogo}
+                            src={
+                              brand.brandImage && brand.brandImage.trim() !== ""
+                                ? brand.brandImage
+                                : brandLogoFallback
+                            }
                             alt={brand.name || "Brand"}
                             width={80}
                             height={80}

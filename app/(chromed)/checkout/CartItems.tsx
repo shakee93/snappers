@@ -2,11 +2,17 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import LineOrCartPriceLabel from "@/app/components/LineOrCartPriceLabel";
+import LineOrCartPriceLabel from "@/components/global/ui/LineOrCartPriceLabel";
 import { Fragment, useMemo, useState } from "react";
+import AttributeIcon from "@/components/global/primitives/AttributeIcon";
+import type { VariationAttribute } from "@/graphql/types/graphql";
 import { Loader, Truck } from "lucide-react";
+
+// `displayValue` is resolved by the graphql-cart-attribute-display-value
+// mu-plugin and fetched in the cart fragment, but isn't part of the generated
+// VariationAttribute type — augment it here rather than reaching for `any`.
+type CartLineAttribute = VariationAttribute & { displayValue?: string | null };
 import { toast } from "sonner";
-import AttributeIcon from "@/app/components/AttributeIcon";
 import { isLineItemFree } from "@/lib/cartLinePricing";
 import { getCartLineStockCap } from "@/lib/cartLineStockCap";
 import {
@@ -143,14 +149,16 @@ const CartItems = ({
 
           {type === "VARIABLE" && (
             <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-              {variation?.attributes?.map((attr: any, idx: number) => (
-                <Fragment key={idx}>
-                  <span className="inline-flex items-center gap-1">
-                    <AttributeIcon name={attr?.name || ""} className="w-3.5" />
-                    <span>{attr?.displayValue || attr?.value}</span>
-                  </span>
-                </Fragment>
-              ))}
+              {variation?.attributes?.map(
+                (attr: CartLineAttribute | null, idx: number) => (
+                  <Fragment key={idx}>
+                    <span className="inline-flex items-center gap-1">
+                      <AttributeIcon name={attr?.name || ""} className="w-3.5" />
+                      <span>{attr?.displayValue || attr?.value}</span>
+                    </span>
+                  </Fragment>
+                )
+              )}
             </div>
           )}
 

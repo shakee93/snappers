@@ -1,5 +1,5 @@
 import { PayhereStatus, PaymentDetailsWithoutUrls } from "@/data/types";
-import { usePayhere } from "@/app/components/Payment/Payhere";
+import { usePayhere } from "@/components/global/payment/Payhere";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import { useState } from "react";
 
@@ -125,7 +125,7 @@ const ProductTable: React.FC<ProductTableProps> = ({
         <div className="flex flex-col overflow-hidden">
           <div className="overflow-x-auto">
             <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-              <thead className="text-lg bg-gray-200 py-2 texy-primaryColor">
+              <thead className="text-lg bg-gray-200 py-2 text-primary-500">
                 <tr>
                   <th scope="col" className="px-6 py-3 text-center font-medium">
                     Product

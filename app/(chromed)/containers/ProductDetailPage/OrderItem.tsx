@@ -2,9 +2,10 @@ import {LineItem, PaCapacity, SimpleProduct, VariableProduct,} from "@/graphql/t
 import Image from "next/image";
 import Link from "next/link";
 import { isLineItemFree, stripHtmlMoney } from "@/lib/cartLinePricing";
+import { currencySymbol } from "@/lib/formatPrice";
 import useProductLink from "@/hooks/useProductLink";
 import React, {Fragment} from "react";
-import AttributeIcon from "@/app/components/AttributeIcon";
+import AttributeIcon from "@/components/global/primitives/AttributeIcon";
 
 const OrderItemProduct = ({
                               orderItem,
@@ -104,7 +105,7 @@ const OrderItemProduct = ({
                                     {isLineItemFree(total, subtotal) ? (
                                         <span className="text-green-600">Free</span>
                                     ) : (
-                                        <>Rs.{stripHtmlMoney(total ?? subtotal)}</>
+                                        <>{currencySymbol}.{stripHtmlMoney(total ?? subtotal)}</>
                                     )}
                                 </span>
                             </div>
@@ -114,7 +115,7 @@ const OrderItemProduct = ({
                                     {isLineItemFree(total, subtotal) ? (
                                         <span className="font-bold text-green-600">Free</span>
                                     ) : (
-                                        <>Rs.{stripHtmlMoney(total ?? subtotal)}</>
+                                        <>{currencySymbol}.{stripHtmlMoney(total ?? subtotal)}</>
                                     )}
                                 </span>
                             </div>
@@ -128,7 +129,7 @@ const OrderItemProduct = ({
                                     </span>
                                 ) : (
                                     <span className="text-base font-bold text-slate-950">
-                                        Rs.{stripHtmlMoney(total ?? subtotal)}
+                                        {currencySymbol}.{stripHtmlMoney(total ?? subtotal)}
                                     </span>
                                 )}
                             </div>

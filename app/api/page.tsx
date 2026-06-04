@@ -1,4 +1,4 @@
-import SectionGridMoreExplore from "@/app/components/HomePage/SectionGridMoreExplore";
+import SectionGridMoreExplore from "@/components/home/SectionGridMoreExplore";
 import { notFound } from "next/navigation";
 
 const Page = () => {

@@ -1,0 +1,22 @@
+{
+  "locations": [
+    {
+      "name": "Ground Floor - Liberty Plaza",
+      "addressLine1": "No. 250 | 53 - 54 Ground Floor,",
+      "addressLine2": "Liberty Plaza, Colombo 03.",
+      "phones": [
+        { "display": "077 755 5665", "tel": "0777555665" },
+        { "display": "072 798 8665", "tel": "0727988665" }
+      ]
+    },
+    {
+      "name": "First Floor - Liberty Plaza",
+      "addressLine1": "No. 250 | 1 | 161 First Floor,",
+      "addressLine2": "Liberty Plaza, Colombo 03.",
+      "phones": [
+        { "display": "077 798 8665", "tel": "0777988665" },
+        { "display": "075 455 5665", "tel": "0754555665" }
+      ]
+    }
+  ]
+}

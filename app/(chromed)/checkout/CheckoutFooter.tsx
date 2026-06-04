@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ShieldCheck } from "lucide-react";
+import { siteConfig } from "@/site.config";
 
 const policyLinks = [
   { href: "/privacy", label: "Privacy" },
@@ -19,13 +20,13 @@ const CheckoutFooter = () => {
         <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1">
           {policyLinks.map(({ href, label }) => (
             <li key={href}>
-              <Link href={href} className="hover:text-primaryColor">
+              <Link href={href} className="hover:text-primary-500">
                 {label}
               </Link>
             </li>
           ))}
         </ul>
-        <div>© {new Date().getFullYear()} GQ Mobiles (Pvt) Ltd.</div>
+        <div>© {new Date().getFullYear()} {siteConfig.brand.legalName}.</div>
       </div>
     </footer>
   );

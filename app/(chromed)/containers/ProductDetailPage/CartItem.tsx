@@ -2,17 +2,23 @@ import {
   CartItem,
   SimpleProduct,
   VariableProduct,
+  VariationAttribute,
 } from "@/graphql/types/graphql";
 import Image from "next/image";
 import Link from "next/link";
-import LineOrCartPriceLabel from "@/app/components/LineOrCartPriceLabel";
-import NcInputNumber from "@/components/NcInputNumber";
+import { Fragment } from "react";
+import LineOrCartPriceLabel from "@/components/global/ui/LineOrCartPriceLabel";
+import NcInputNumber from "@/components/global/primitives/NcInputNumber";
+import AttributeIcon from "@/components/global/primitives/AttributeIcon";
 import { useCart } from "@/context/CartProvider";
 import useProductLink from "@/hooks/useProductLink";
-import { Fragment } from "react";
-import AttributeIcon from "@/app/components/AttributeIcon";
 import { isLineItemFree } from "@/lib/cartLinePricing";
 import { getCartLineStockCap } from "@/lib/cartLineStockCap";
+
+// `displayValue` is resolved by the graphql-cart-attribute-display-value
+// mu-plugin and fetched in the cart fragment, but isn't part of the generated
+// VariationAttribute type — augment it here rather than reaching for `any`.
+type CartLineAttribute = VariationAttribute & { displayValue?: string | null };
 
 const CartItemProduct = ({
   cartItem,
@@ -70,26 +76,20 @@ const CartItemProduct = ({
               </h3>
 
               {type === "VARIABLE" && (
-                <div className="mt-1.5 flex text-sm text-slate-600 sm:mt-2.5 dark:text-slate-300">
-                  {type === "VARIABLE" && (
-                    <div className="my-1 text-sm text-slate-500 dark:text-slate-400">
-                      {variation?.attributes?.map((attr: any, index: number) => (
-                        <Fragment key={index}>
-                          <div className="flex items-center gap-1">
-                            <AttributeIcon
-                              name={attr?.name || ""}
-                              className="w-4"
-                            />{" "}
-                            <span key={attr?.value}>
-                              {attr?.displayValue || attr?.value}
-                            </span>
-                          </div>
-                        </Fragment>
-                      ))}
-                    </div>
+                <div className="my-1 text-sm text-slate-500 dark:text-slate-400">
+                  {variation?.attributes?.map(
+                    (attr: CartLineAttribute | null, index: number) => (
+                      <Fragment key={index}>
+                        <div className="flex items-center gap-1">
+                          <AttributeIcon name={attr?.name || ""} className="w-4" />{" "}
+                          <span>{attr?.displayValue || attr?.value}</span>
+                        </div>
+                      </Fragment>
+                    )
                   )}
                 </div>
               )}
+
               <div className="relative mt-3 flex w-full justify-between sm:hidden">
                 <select
                   name="qty"
@@ -160,7 +160,7 @@ const CartItemProduct = ({
 
           <button
             onClick={(e) => removeFromCart([key])}
-            className="text-primary-6000 hover:text-primary-500 relative z-10 mt-3 flex items-center text-sm font-medium"
+            className="text-primary-600 hover:text-primary-500 relative z-10 mt-3 flex items-center text-sm font-medium"
           >
             <span>Remove</span>
           </button>

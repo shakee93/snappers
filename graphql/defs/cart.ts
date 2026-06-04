@@ -115,4 +115,3 @@ mutation RemoveCoupons($codes: [String]) {
 }
 ${CartContent}`
 
- 

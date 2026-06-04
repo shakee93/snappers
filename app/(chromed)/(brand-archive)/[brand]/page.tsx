@@ -2,9 +2,10 @@ import { getClient } from "@/graphql/apollo-ssr";
 import { GET_BRAND } from "@/graphql/defs/products";
 import { notFound } from "next/navigation";
 
-import ArchiveLayout from "@/app/components/archive/ArchiveLayout";
+import ArchiveLayout from "@/components/global/primitives/archive/ArchiveLayout";
 import { Metadata, ResolvingMetadata } from "next";
 import { Suspense } from "react";
+import { siteConfig } from "@/site.config";
 
 type Props = {
   params: Promise<{ brand: string }>;
@@ -41,10 +42,10 @@ export async function generateMetadata(props: Props, parent: ResolvingMetadata):
   const pageTitle = `Shop by Brand – ${brand.name}`;
   const pageDescription =
     brand.description ||
-    `Discover premium products from ${brand.name}. Explore exclusive collections at unbeatable prices. Shop with GQ Mobiles for quality and style.`;
-  const pageUrl = `https://gqmobiles.lk/brands/${id}`;
+    `Discover premium products from ${brand.name}. Explore exclusive collections at unbeatable prices. Shop with ${siteConfig.brand.name} for quality and style.`;
+  const pageUrl = `${siteConfig.url.base}/brands/${id}`;
   const imageUrl =
-    brand.image?.sourceUrl || "https://gqmobiles.lk/default-og-image.jpg";
+    brand.image?.sourceUrl || siteConfig.url.defaultOgImage;
 
   return {
     title: pageTitle,
@@ -58,7 +59,7 @@ export async function generateMetadata(props: Props, parent: ResolvingMetadata):
           url: imageUrl,
           width: 800,
           height: 600,
-          alt: `${brand.name} Collection - GQ Mobiles`,
+          alt: `${brand.name} Collection - ${siteConfig.brand.name}`,
         },
       ],
     },

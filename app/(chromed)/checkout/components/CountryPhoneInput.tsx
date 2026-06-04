@@ -266,7 +266,7 @@ const CountryPhoneInput: React.FC<CountryPhoneInputProps> = ({
         )}
         <Input
           id="checkout-phone"
-          className="flex-1 border-2 border-slate-300 placeholder:text-slate-400 hover:border-slate-400 focus:!ring-0 focus:!border-primaryColor focus:outline-none dark:border-slate-600 dark:hover:border-slate-500"
+          className="flex-1 border-2 border-slate-300 placeholder:text-slate-400 hover:border-slate-400 focus:!ring-0 focus:!border-primary-500 focus:outline-none dark:border-slate-600 dark:hover:border-slate-500"
           placeholder={"Phone (9–12 digits)"}
           value={phone}
           type="tel"

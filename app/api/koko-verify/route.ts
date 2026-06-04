@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { apiUrl } from "@/lib/api";
 
 export async function POST(request: Request) {
   try {
@@ -11,7 +12,7 @@ export async function POST(request: Request) {
     orderStatus = status === "SUCCESS" ? "processing" : status === "FAILURE" ? "cancelled" : "";
 
     const confirmationResponse = await fetch(
-      "https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/payhere-order-confirmation",
+      apiUrl("/wp-json/api/gq_mobile/v1/payhere-order-confirmation"),
       {
         method: "POST",
         headers: {

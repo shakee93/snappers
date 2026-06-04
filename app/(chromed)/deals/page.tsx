@@ -1,4 +1,4 @@
-import SectionSliderProductCard from "@/app/components/SectionSliderProductCard";
+import SectionSliderProductCard from "@/components/global/ui/SectionSliderProductCard";
 import { getClient } from "@/graphql/apollo-ssr";
 import { GET_PRODUCTS_BY_BOGO_TAG } from "@/graphql/defs/products";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
@@ -6,10 +6,11 @@ import { DEALS_CACHE_TAG } from "@/lib/cache-tags";
 import { Metadata } from "next";
 import { unstable_cache } from "next/cache";
 import { Suspense } from "react";
+import { siteConfig } from "@/site.config";
 
 export const metadata: Metadata = {
   title: "Deals",
-  description: "Up to 75% off, Buy One Get One, and Free Gift deals at GQ Mobiles.",
+  description: `Up to 75% off, Buy One Get One, and Free Gift deals at ${siteConfig.brand.name}.`,
 };
 
 // Safety-net ISR — primary invalidation is via revalidateTag(DEALS_CACHE_TAG) from /api/revalidate.

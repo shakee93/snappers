@@ -1,19 +1,13 @@
+import navCategoryPriority from "@/content/nav-category-priority.json";
+
 /**
  * Priority order for collection nav (mega menu + BrandBar "All Categories").
- * Matches WooCommerce category slugs; each group is one slug (first match wins that slot).
+ * Matches WooCommerce category slugs; each group is one slug (first match wins
+ * that slot). The data lives in `content/nav-category-priority.json` so a fork
+ * re-orders its nav without touching this logic.
  */
-export const COLLECTION_NAV_PRIORITY_SLUG_GROUPS = [
-  ["mobiles-and-tablets"],
-  ["wearable-technology"],
-  ["headphones-speakers"],
-  ["cameras-accessories"],
-  ["console-gaming-and-accessories"],
-  ["memory-cards-usb-flash-drives-pen-drives"],
-  ["laptops-accessories"],
-  ["miscellaneous"],
-  ["gift-vouchers"],
-  ["uncategorized"],
-] as const;
+export const COLLECTION_NAV_PRIORITY_SLUG_GROUPS: readonly (readonly string[])[] =
+  navCategoryPriority;
 
 function slugInGroup(
   slug: string | null | undefined,

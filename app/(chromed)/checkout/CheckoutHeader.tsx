@@ -1,25 +1,24 @@
 import Link from "next/link";
-import Image from "next/image";
-import SiteLogo from "@/public/global/gq-logo.png";
 import { Lock, Phone } from "lucide-react";
 import { PiWhatsappLogoDuotone } from "react-icons/pi";
+import { siteConfig } from "@/site.config";
+import SiteLogoImage from "@/components/global/brand/SiteLogoImage";
 
-const SUPPORT_PHONE_DISPLAY = "0777 988 665";
-const SUPPORT_PHONE_TEL = "tel:0777988665";
-const SUPPORT_WHATSAPP = "https://wa.me/94722299944";
+const SUPPORT_PHONE_DISPLAY = siteConfig.contact.secondaryPhone;
+const SUPPORT_PHONE_TEL = `tel:${siteConfig.contact.secondaryPhone}`;
+const SUPPORT_WHATSAPP = `https://wa.me/${siteConfig.contact.whatsapp}`;
 
 const CheckoutHeader = () => {
   return (
     <header className="sticky top-0 z-40 border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80">
       <div className="container flex h-14 md:h-16 items-center justify-between gap-3">
-        <Link href="/" aria-label="GQ Mobiles home" className="shrink-0">
-          <Image
-            src={SiteLogo}
-            alt="GQ Mobiles"
+        <Link href="/" aria-label={`${siteConfig.brand.name} home`} className="shrink-0">
+          <SiteLogoImage
+            lightOnly
+            priority
             width={160}
             height={40}
-            priority
-            className="h-8 md:h-10 w-auto"
+            className="h-8 w-auto md:h-10"
           />
         </Link>
 
@@ -32,10 +31,10 @@ const CheckoutHeader = () => {
           <span className="hidden md:inline text-gray-500">Need help?</span>
           <Link
             href={SUPPORT_PHONE_TEL}
-            className="inline-flex items-center gap-1.5 text-gray-700 hover:text-primaryColor"
+            className="inline-flex items-center gap-1.5 text-gray-700 hover:text-primary-500"
             aria-label={`Call ${SUPPORT_PHONE_DISPLAY}`}
           >
-            <Phone size={14} className="text-primaryColor" />
+            <Phone size={14} className="text-primary-500" />
             <span className="hidden sm:inline">{SUPPORT_PHONE_DISPLAY}</span>
           </Link>
           <Link

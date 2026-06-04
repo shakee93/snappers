@@ -50,7 +50,6 @@ export function CartProvider({ children }: {
     const [customer, setCustomer] = useState<Customer | null>(null)
     const [isCartOpen, setIsCartOpen] = useState(false)
     const [loading, setLoading] = useState(false)
-    const processedRemoveDataRef = useRef<string | null>(null)
     const isClearingRef = useRef(false)
 
     const refreshData = (data: any) => {
@@ -113,23 +112,10 @@ export function CartProvider({ children }: {
         }
     }, [data]);
 
-    // Handle data from removeFromCart mutation
+    // Handle data from removeFromCart mutation (also applied in removeFromCart onCompleted)
     useEffect(() => {
         if (removeCartData) {
-            // Create a unique key to prevent processing the same response multiple times
-            const cartId = removeCartData?.removeItemsFromCart?.cart?.databaseId
-            const itemCount = removeCartData?.removeItemsFromCart?.cart?.contents?.nodes?.length || 0
-            const dataKey = `${cartId}-${itemCount}`
-            
-            // Skip if we've already processed this exact response
-            if (processedRemoveDataRef.current === dataKey) {
-                return
-            }
-            
-            processedRemoveDataRef.current = dataKey
             refreshData(removeCartData)
-            
-            // Reset clearing flag after processing the response
             isClearingRef.current = false
         }
     }, [removeCartData]);
@@ -151,12 +137,20 @@ export function CartProvider({ children }: {
     const removeFromCart = useCallback(async (keys: string[] = [], all: boolean = false) => {
         setLoading(true)
 
-        return await _removeFromCart({
-            variables: {
-                keys: keys,
-                all: all
-            }
-        }).finally(() => setLoading(false))
+        try {
+            const result = await _removeFromCart({
+                variables: {
+                    keys: keys,
+                    all: all
+                },
+            })
+
+            // Cart state is refreshed by the removeCartData useEffect above,
+            // which also resets isClearingRef — keep that as the single path.
+            return result
+        } finally {
+            setLoading(false)
+        }
     }, [_removeFromCart])
 
     const clearCart = useCallback(async () => {
@@ -173,9 +167,6 @@ export function CartProvider({ children }: {
         isClearingRef.current = true
         
         try {
-            // Reset the processed data ref to allow processing the new response
-            processedRemoveDataRef.current = null
-            
             const result = await removeFromCart([], true)
             return result
         } catch (error: any) {

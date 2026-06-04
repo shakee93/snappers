@@ -1,6 +1,6 @@
-import Header from "@/app/components/globalComponents/header";
-import Footer from "@/app/components/globalComponents/footer";
-import HeaderGate from "@/app/components/globalComponents/HeaderGate";
+import Header from "@/components/header/Header";
+import Footer from "@/components/footer/Footer";
+import HeaderGate from "@/components/header/HeaderGate";
 
 export default function ChromedLayout({
   children,

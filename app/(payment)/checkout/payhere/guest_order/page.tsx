@@ -9,6 +9,7 @@ import { useSearchParams } from "next/navigation";
 import { useCart } from "@/context/CartProvider";
 import { useEffect, useState } from "react";
 import OrderPaymentPageSkeleton from "./Skeleton";
+import { siteConfig } from "@/site.config";
 
 // No Order Message Component
 const NoOrderMessage = () => {
@@ -25,14 +26,14 @@ const NoOrderMessage = () => {
         <div className="space-y-2 text-lg">
           <p>
             <span className="font-semibold">Phone:</span>{" "}
-            <a href="tel:0777555665" className="text-blue-600 hover:underline">077 755 5665</a>
+            <a href={`tel:${siteConfig.contact.primaryPhone}`} className="text-blue-600 hover:underline">{siteConfig.contact.primaryPhone}</a>
             {" / "}
-            <a href="tel:0777988665" className="text-blue-600 hover:underline">077 798 8665</a>
+            <a href={`tel:${siteConfig.contact.secondaryPhone}`} className="text-blue-600 hover:underline">{siteConfig.contact.secondaryPhone}</a>
           </p>
           <p>
             <span className="font-semibold">Email:</span>{" "}
-            <a href="mailto:inquiries@gqmobiles.lk" className="text-blue-600 hover:underline">
-              inquiries@gqmobiles.lk
+            <a href={`mailto:${siteConfig.contact.email}`} className="text-blue-600 hover:underline">
+              {siteConfig.contact.email}
             </a>
           </p>
         </div>

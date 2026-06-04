@@ -1,7 +1,8 @@
 import { create } from 'zustand'
 import { ProductAttribute, VariationAttribute } from "@/graphql/types/graphql";
-import { PRICE_RANGE } from "@/app/components/Filters/PriceFilter";
+import { PRICE_RANGE } from "@/components/global/primitives/Filters/PriceFilter";
 import { AttributeMapping } from "@/utils/attributeMappingService";
+import { getDefaultSidebarFilters } from "@/lib/sidebarFilters";
 
 type State = {
     search: string,
@@ -41,6 +42,7 @@ type Actions = {
     synPriceRange: (brands: number[]) => void
     syncVariations: (attribute: string, values: string[]) => void
     clearVariations: () => void
+    resetSidebarFilters: (defaultSort?: string) => void
     setMounted: () => void
     setSearchMounted: () => void
     setIsTyping: (isTyping: boolean) => void
@@ -167,6 +169,13 @@ export const useStore = create<State & Actions>((set, get) => ({
         sidebar: {
             ...state.sidebar,
             variations: {}
+        },
+    })),
+    resetSidebarFilters: (defaultSort = "") => set((state) => ({
+        ...state,
+        sidebar: {
+            ...state.sidebar,
+            ...getDefaultSidebarFilters(defaultSort),
         },
     })),
     setMounted: () => set((state) => ({

@@ -2,6 +2,7 @@ import { getClient } from "@/graphql/apollo-ssr";
 import { GET_ALL_PRODUCTS } from "@/graphql/defs/products";
 import { Category } from "@/graphql/types/graphql";
 import Link from "next/link";
+import { siteConfig } from "@/site.config";
 
 async function getData(categories: number[] | null = null) {
   const { data, error } = await getClient().query({
@@ -37,7 +38,7 @@ const Page = async () => {
             </h2>
 
             <span className="block mt-2 lg:mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
-              Explore GQ Mobiles Collections – where style meets functionality.
+              Explore {siteConfig.brand.name} Collections – where style meets functionality.
               Elevate your experience with quality and diverse options. Shop
               now for a seamless blend of style and substance!
             </span>

@@ -2,7 +2,7 @@
 
 import { FC, useEffect, useState } from "react";
 import Input from "@/shared/Input/Input";
-import Label from "@/components/Label/Label";
+import Label from "@/components/global/primitives/Label/Label";
 import Select from "@/shared/Select/Select";
 import ButtonPrimary from "@/shared/Button/ButtonPrimary";
 import { useSession } from "@/context/SessionProvider";

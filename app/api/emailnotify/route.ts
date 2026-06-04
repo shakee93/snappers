@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { NextResponse } from "next/server";
+import { apiUrl } from "@/lib/api";
 
 export async function POST(req: Request) {
 
@@ -19,7 +20,7 @@ export async function POST(req: Request) {
 
             // console.log('body', body);
 
-            const response = await fetch("https://api.gqmobiles.lk/wp-json/api/gq_mobile/v1/handle_waitlist_form_submit", {
+            const response = await fetch(apiUrl("/wp-json/api/gq_mobile/v1/handle_waitlist_form_submit"), {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/x-www-form-urlencoded",

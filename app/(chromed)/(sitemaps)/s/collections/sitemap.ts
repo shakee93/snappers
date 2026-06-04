@@ -2,29 +2,23 @@ import { getClient } from '@/graphql/apollo-ssr'
 import { GET_SITEMAP_COLLECTIONS } from '@/graphql/defs/sitemap-queries'
 import { ProductCategory } from '@/graphql/types/graphql'
 import type { MetadataRoute } from 'next'
+import { siteConfig } from '@/site.config'
 
-const BASE_URL = 'https://gqmobiles.lk'
+const BASE_URL = siteConfig.url.base
 
-// Dummy collections data - to be replaced with GraphQL later
-const COLLECTIONS = [
-  'smartphones',
-  'tablets',
-  'accessories',
-  'wearables',
-  'audio',
-  'cases',
-  'screen-protectors',
-  'chargers',
-  'cables',
-  'power-banks'
-]
-
+// The SSR client retries transient 429s with backoff; if it still fails,
+// degrade to an empty list so the sitemap build doesn't hard-fail — the root
+// collection entries below still ship, and ISR/webhook revalidation backfills
+// the per-collection URLs.
 const getCollections = async (): Promise<ProductCategory[]> => {
-  const client = await getClient()
-  const { data } = await client.query({
-    query: GET_SITEMAP_COLLECTIONS
-  })
-  return data.productCategories.nodes
+  try {
+    const client = await getClient()
+    const { data } = await client.query({ query: GET_SITEMAP_COLLECTIONS })
+    return data?.productCategories?.nodes ?? []
+  } catch (error: unknown) {
+    console.error('Failed to fetch sitemap collections', error)
+    return []
+  }
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
