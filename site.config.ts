@@ -76,7 +76,7 @@ export const siteConfig = {
   },
   url: {
     base: "https://gqmobiles.lk",
-    api: "https://api.gqmobiles.lk",
+    api: "https://catlitter-api.freshpixl.com",
     cdn: "https://cdn.gqmobiles.lk",
     defaultOgImage:
       "https://cdn.gqmobiles.lk/wp-content/uploads/2025/10/gq.png",
