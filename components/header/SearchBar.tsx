@@ -11,9 +11,13 @@ import { PRICE_RANGE } from "@/components/global/primitives/Filters/PriceFilter"
 
 interface SearchBarProps {
     onSearchExpand?: (expanded: boolean) => void;
+    placeholder?: string;
+    /** "utility" renders the solid-white pill used in the green header bar. */
+    variant?: "default" | "utility";
 }
 
-const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
+const SearchBar = ({ onSearchExpand, placeholder = "Quick Search", variant = "default" }: SearchBarProps) => {
+    const isUtility = variant === "utility";
     const { search, setSearch, search_status, syncCategories, syncBrands, synPriceRange, syncOnSale, setInStock, setSort, clearVariations, searchMounted } = useStore();
     const router = useRouter();
     const path = usePathname();
@@ -151,8 +155,8 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
     };
 
     return (
-        <div className="w-full pt-2 px-3 md:p-0">
-            <div className={cn("flex-1 transition-all duration-200 flex items-center gap-1 mx-auto", (isFocused || scrollHeight < 100) ? "w-full" : "md:w-full w-1/2")}>
+        <div className={cn("w-full", !isUtility && "pt-2 px-3 md:p-0")}>
+            <div className={cn("flex-1 transition-all duration-200 flex items-center gap-1 mx-auto", isUtility ? "w-full" : (isFocused || scrollHeight < 100) ? "w-full" : "md:w-full w-1/2")}>
                 {path !== '/' && (
                     <button
                         onClick={() => router.back()}
@@ -162,9 +166,13 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
                     </button>
                 )}
 
-                <div className="text-primary-700 flex-1 p-1 lg:p-0 bg-transparent w-1/2 lg:bg-transparent">
-                    <div className="bg-white/60 backdrop-blur-sm border lg:border border-primaryColor/20 py-1 md:py-1 flex
-                items-center space-x-0 lg:space-x-1.5 px-2 pr-3 xl:px-5 rounded-full lg:rounded-[25px] h-10 lg:h-full">
+                <div className={cn("flex-1 bg-transparent", isUtility ? "" : "text-primary-700 p-1 lg:p-0 w-1/2 lg:bg-transparent")}>
+                    <div className={cn(
+                        "flex items-center rounded-full",
+                        isUtility
+                            ? "bg-white h-[43px] w-full px-5"
+                            : "bg-white/60 backdrop-blur-sm border lg:border border-primaryColor/20 py-1 md:py-1 space-x-0 lg:space-x-1.5 px-2 pr-3 xl:px-5 lg:rounded-[25px] h-10 lg:h-full"
+                    )}>
                         <input
                             value={mounted ? searchValue : ''}
                             onChange={handleSearchChange}
@@ -172,18 +180,21 @@ const SearchBar = ({ onSearchExpand }: SearchBarProps) => {
                             onFocus={handleFocus}
                             onBlur={handleBlur}
                             type="text"
-                            placeholder="Quick Search"
-                            className="text-primaryColor/80 border-none focus:border-none focus:outline-none focus:ring-0 bg-transparent w-full text-base"
+                            placeholder={placeholder}
+                            className={cn(
+                                "border-none focus:border-none focus:outline-none focus:ring-0 bg-transparent w-full text-base",
+                                isUtility ? "text-neutral-700 placeholder:text-neutral-400" : "text-primaryColor/80"
+                            )}
                             suppressHydrationWarning
                         />
                         {(search_status === 'stalled' || search_status === 'loading') ? (
-                            <Loader className="text-primaryColor animate-spin w-5 h-5 lg:w-auto lg:h-auto" />
+                            <Loader className={cn("animate-spin w-5 h-5 lg:w-auto lg:h-auto", isUtility ? "text-neutral-400" : "text-primaryColor")} />
                         ) : search.length > 0 ? (
                             <button onClick={handleSearchClear} className={mounted ? '' : 'opacity-0'}>
-                                <XIcon className="text-primaryColor w-5 h-5 lg:w-auto lg:h-auto" />
+                                <XIcon className={cn("w-5 h-5 lg:w-auto lg:h-auto", isUtility ? "text-neutral-500" : "text-primaryColor")} />
                             </button>
                         ) : (
-                            <Search className="text-primaryColor/80 w-5 h-5 lg:w-auto lg:h-auto mr-4" />
+                            <Search className={cn("w-5 h-5 lg:w-auto lg:h-auto", isUtility ? "text-neutral-400" : "text-primaryColor/80 mr-4")} />
                         )}
                     </div>
                 </div>

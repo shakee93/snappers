@@ -10,7 +10,7 @@ import {
   GET_PRODUCTS_NODES,
   GET_PRODUCTS_NODES_HOMEPAGE,
 } from "@/graphql/defs/products";
-import { GET_SLIDES, GET_REVIEWS } from "@/graphql/defs/slides";
+import { GET_SLIDES, GET_REVIEWS, GET_HERO_SETTINGS } from "@/graphql/defs/slides";
 import { Brand, SimpleProduct, Slide, VariableProduct } from "@/graphql/types/graphql";
 import SectionSliderBrandCard from "@/components/global/ui/SectionSliderBrandCard";
 import CardSkeleton from "@/components/global/primitives/Skeletons/CardSkeleton";
@@ -19,8 +19,9 @@ import FancyTestimonialsSlider from "@/components/home/TestimonialsSlider";
 import GoogleReviewsSection from "@/components/home/GoogleReviewsSection";
 import FAQ from "@/components/home/FAQSection";
 import TikTokSection from "@/components/home/TikTokSection";
-import { GET_BENTO_SLIDER } from "@/graphql/defs/products";
-import SectionHero4 from "@/components/home/SectionHero4";
+import SectionHeroPets, {
+  type HeroSettingsFields,
+} from "@/components/home/SectionHeroPets";
 import { unstable_cache } from "next/cache";
 import { HERO_SECTION_CACHE_TAG } from "@/lib/cache-tags";
 
@@ -62,13 +63,13 @@ const getSlidesCached = unstable_cache(
   { tags: [HERO_SECTION_CACHE_TAG], revalidate: 86400 }
 );
 
-const getBentoSliderCached = unstable_cache(
+const getHeroSettingsCached = unstable_cache(
   () =>
     getClient()
-      .query({ query: GET_BENTO_SLIDER, context: HERO_QUERY_CONTEXT })
-      .then((res) => res.data || [])
-      .catch(() => []),
-  ["homepage-bento-slider"],
+      .query({ query: GET_HERO_SETTINGS, context: HERO_QUERY_CONTEXT })
+      .then((res) => res.data?.heroSettings?.heroSettingsFields ?? null)
+      .catch(() => null),
+  ["homepage-hero-settings"],
   { tags: [HERO_SECTION_CACHE_TAG], revalidate: 86400 }
 );
 
@@ -152,7 +153,7 @@ const getData = async () => {
       })
       .catch(() => []),
 
-    getBentoSliderCached(),
+    getHeroSettingsCached(),
   ];
 
   const [
@@ -166,7 +167,7 @@ const getData = async () => {
     slides,
     options,
     reviews,
-    bentoSlider,
+    heroSettings,
   ] = await Promise.all(queries);
 
   return {
@@ -180,7 +181,7 @@ const getData = async () => {
     slides,
     options,
     reviews,
-    bentoSlider,
+    heroSettings: heroSettings as HeroSettingsFields | null,
   };
 };
 
@@ -195,7 +196,7 @@ export default async function Home() {
     brands,
     slides,
     reviews,
-    bentoSlider,
+    heroSettings,
   } = await getData();
 
   const inStockOffers = freeOffersRaw.filter((p) => p.stockStatus === "IN_STOCK");
@@ -209,10 +210,10 @@ export default async function Home() {
     <main>
       <div className="nc-PageHome relative flex flex-col overflow-hidden">
         <div className="z-0">
-          <SectionHero4 data={bentoSlider} />
+          <SectionHeroPets data={heroSettings} />
         </div>
 
-        <div className="flex flex-col px-3 gap-10 lg:gap-10 sm:container sm:max-w-screen-2xl">
+        <div className="flex flex-col px-3 gap-10 lg:gap-10 mx-auto w-full max-w-[1368px]">
           <div className="mt-5 md:mt-10">
             <SectionSliderProductCard
               products={newArrivals}

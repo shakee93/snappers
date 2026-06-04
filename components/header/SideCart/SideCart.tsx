@@ -22,17 +22,14 @@ export default function SideCart() {
         <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
             <SheetTrigger asChild>
                 <button
-                    className="group w-10 h-10 sm:w-10 sm:h-10 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-full inline-flex items-center justify-center focus:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 relative"
+                    aria-label="Open basket"
+                    className="group relative inline-flex items-center gap-2 rounded-xl bg-header-accent px-4 py-2.5 text-neutral-900 transition-[filter] hover:brightness-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-header-accent focus-visible:ring-offset-1"
                 >
-                    {!!cart?.contents?.itemCount && (
-                        <div className="w-5 bg-primary-500 h-5 flex items-center justify-center absolute top-0 right-0 rounded-full text-[11px] leading-none text-white font-medium">
-                            <span className="mt-[1px] font-bold">{cart?.contents?.itemCount}</span>
-                        </div>
-                    )}
-
-                    <div className="text-primary-500 flex items-center justify-center w-10 sm:h-10">
-                        <ShoppingCart className="w-5" />
-                    </div>
+                    <ShoppingCart className="w-[18px]" />
+                    <span className="text-sm font-semibold">Basket</span>
+                    <span className="ml-1 text-sm font-bold tabular-nums">
+                        {cart?.contents?.itemCount ?? 0}
+                    </span>
 
                     <Link className="block md:hidden absolute inset-0" href={"/cart"} />
                 </button>

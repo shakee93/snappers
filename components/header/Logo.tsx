@@ -18,7 +18,7 @@ const Logo = ({
       <SiteLogoImage
         priority
         className={twMerge(
-          "relative h-28 w-auto max-w-[80px] rounded-b-2xl transition-all hover:scale-110 md:h-16 md:max-w-[320px]",
+          "relative h-[31px] w-auto max-w-[320px] transition-all hover:scale-110",
           imageClass
         )}
       />

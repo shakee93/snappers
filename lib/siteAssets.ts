@@ -3,6 +3,7 @@ import { siteConfig } from "@/site.config";
 
 /** Public URL for a logo or favicon path from `site.config` (`/global/...`). */
 export function getPublicAssetUrl(path: string): string {
+  if (/^https?:\/\//.test(path)) return path;
   return path.startsWith("/") ? path : `/${path}`;
 }
 

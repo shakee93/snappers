@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import Link from "next/link";
+import { Heart, Truck } from "lucide-react";
 import { ProductCategory } from "@/graphql/types/graphql";
 import AvatarDropdown from "./AvatarDropdown";
 import Logo from "./Logo";
@@ -12,61 +13,52 @@ interface HeaderContentProps {
   navCategories: ProductCategory[];
 }
 
+const iconButtonClass =
+  "flex h-10 w-10 items-center justify-center rounded-xl bg-header-peach text-neutral-900 transition-[filter] hover:brightness-95";
+
 const HeaderContent = ({ navCategories }: HeaderContentProps) => {
-  const [isSearchExpanded, setIsSearchExpanded] = useState(false);
-  const [showNavLinks, setShowNavLinks] = useState(true);
-
-  const handleSearchExpand = (expanded: boolean) => {
-    setIsSearchExpanded(expanded);
-
-    if (expanded) {
-      // Hide nav links immediately when search expands
-      setShowNavLinks(false);
-    } else {
-      // Show nav links after search animation completes (300ms)
-      setTimeout(() => {
-        setShowNavLinks(true);
-      }, 300);
-    }
-  };
-
   return (
-    <div className="py-0 xl:container flex justify-between items-center lg:items-stretch lg:py-2 px-0">
-      <div className="lg:hidden lg:px-2 gap-2  lg:py-2 flex-1 justify-center items-center">
-        <SearchBar onSearchExpand={handleSearchExpand} />
+    <>
+      {/* Mobile: search only — desktop nav/search live in the bars below */}
+      <div className="lg:hidden gap-2 flex-1 justify-center items-center">
+        <SearchBar />
       </div>
 
-      <div className="hidden lg:flex relative items-center justify-between w-full px-3">
-        {/* Left side: Logo */}
-        <div className="flex items-center mr-10">
-          <Logo />
-        </div>
-
-        {/* Center area: Navigation Links */}
-        <div className={`flex items-center flex-1 justify-between transition-all duration-300 ease-in-out ${isSearchExpanded ? 'opacity-0 w-0 overflow-hidden' : 'opacity-100 w-auto'}`}>
-          {/* Navigation Links - Hidden when search is expanded */}
-          <div className={`hidden lg:flex items-center relative px-4 transition-all duration-300 ease-in-out ${showNavLinks ? 'opacity-100' : 'opacity-0'}`}>
-            <div className="lg:block">
-              <NavLinks navCategories={navCategories} />
-            </div>
-          </div>
-        </div>
-
-        {/* Right side: Search and User Actions */}
-        <div className={`flex items-center gap-4 transition-all duration-300 ease-in-out ${isSearchExpanded ? 'w-full' : 'w-auto'}`}>
-          {/* Search Bar - Takes full remaining width when expanded */}
-          <div className={`relative transition-all duration-300 ease-in-out ${isSearchExpanded ? 'w-full' : 'w-auto'}`}>
-            <SearchBar onSearchExpand={handleSearchExpand} />
+      {/* Desktop cream top bar: logo · nav · account + basket */}
+      <div className="hidden lg:block bg-header-cream">
+        <div className="grid h-[86px] w-full grid-cols-[1fr_auto_1fr] items-center gap-6 px-6">
+          {/* Left: Logo */}
+          <div className="flex min-w-0 items-center justify-start">
+            <Logo />
           </div>
 
-          {/* User Actions - Fixed position */}
-          <div className="flex items-center gap-4 flex-shrink-0">
+          {/* Center: main navigation */}
+          <div className="flex items-center justify-center">
+            <NavLinks navCategories={navCategories} />
+          </div>
+
+          {/* Right: saved list · orders · account · basket */}
+          <div className="flex min-w-0 items-center justify-end gap-2.5">
+            <Link
+              href="/account/save-lists"
+              aria-label="Saved items"
+              className={iconButtonClass}
+            >
+              <Heart className="w-[18px]" />
+            </Link>
+            <Link
+              href="/account/my-orders"
+              aria-label="My orders"
+              className={iconButtonClass}
+            >
+              <Truck className="w-[18px]" />
+            </Link>
             <AvatarDropdown />
             <SideCart />
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

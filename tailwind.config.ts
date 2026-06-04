@@ -54,6 +54,13 @@ const config: Config = {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'
 				},
+				// Header bars (cream top bar + dark-green utility bar) from site.config.
+				header: {
+					cream: tokenColor("--c-header-cream"),
+					green: tokenColor("--c-header-green"),
+					peach: tokenColor("--c-header-peach"),
+					accent: tokenColor("--c-header-accent"),
+				},
 				secondary: {
 					'50': tokenColor("--c-secondary-50"),
 					'100': tokenColor("--c-secondary-100"),

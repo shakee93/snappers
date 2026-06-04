@@ -38,11 +38,6 @@ h4 {
 }
 
 :root {
-  --font-display: Poppins;
-  --font-body: Poppins;
-}
-
-.theme-animals {
-  --font-display: Inter;
-  --font-body: Inter;
+  --font-display: var(--font-inter), Poppins, sans-serif;
+  --font-body: var(--font-inter), Poppins, sans-serif;
 }

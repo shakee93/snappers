@@ -1,6 +1,7 @@
 import "../styles/index.scss";
 import "./index.css";
 import "rc-slider/assets/index.css";
+import { Inter } from "next/font/google";
 import ApolloWrapper from "@/graphql/apollo-client";
 import { SessionProvider } from "@/context/SessionProvider";
 import { CartProvider } from "@/context/CartProvider";
@@ -15,6 +16,12 @@ import ContentWrapper from "@/components/global/layout/ContentWrapper";
 import { siteConfig } from "@/site.config";
 import { getSiteMetadataIcons, getSiteTwitterImage } from "@/lib/siteAssets";
 import SiteThemeStyles from "@/components/global/theme/SiteThemeStyles";
+
+const inter = Inter({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-inter",
+});
 
 const defaultTitle = `${siteConfig.brand.name} - ${siteConfig.brand.tagline}`;
 
@@ -59,7 +66,7 @@ export default async function RootLayout({
   const isLocalhost = process.env.NODE_ENV === 'development';
 
   return (
-    <html lang="en">
+    <html lang="en" className={inter.variable}>
       <head>
         <SiteThemeStyles />
         <meta
