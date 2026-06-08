@@ -2,10 +2,12 @@ import { getClient } from "@/graphql/apollo-ssr";
 import { GET_ALL_PRODUCTS } from "@/graphql/defs/products";
 import { GET_NESTED_CATEGORIES } from "@/graphql/defs/nav";
 import InstantSearchWrapper from "@/components/global/primitives/InstantSearchWrapper";
+import ProductGridGraphQL from "@/components/global/primitives/archive/ProductGridGraphQL";
 import { Brand } from "@/graphql/types/graphql";
 import Link from "next/link";
 import { GET_TAG_DETAILS_BY_SLUG } from "@/graphql/defs/products";
 import { DealFilterType } from "@/lib/dealFilters";
+import { useGraphqlArchive } from "@/lib/archiveSource";
 import { siteConfig } from "@/site.config";
 
 async function getData(parentId?: number, tagSlug?: string) {
@@ -86,7 +88,7 @@ const ArchiveLayout = async ({
   inStockOnly,
   defaultNewest,
 }: ArchiveLayoutProps) => {
-
+  const graphqlArchive = useGraphqlArchive();
   const { productCategories, brands, nestedCategories, tagDetails } = await getData(category?.databaseId ?? '', tag);
 
   // console.log('tagDetails', tagDetails);
@@ -145,21 +147,28 @@ const ArchiveLayout = async ({
               {/* {JSON.stringify(search, null, 2)}
               {JSON.stringify(productCategories, null, 2)}
               {JSON.stringify(brand, null, 2)} */}
-              <InstantSearchWrapper
-                categories={productCategories}
-                brands={brands}
-                brand={brand}
-                category={category}
-                filters={filters}
-                search={search}
-                sort={sort}
-                tag={tag}
-                routing={true}
-                dealsType={dealsType}
-                dealTags={dealTags}
-                inStockOnly={inStockOnly}
-                defaultNewest={defaultNewest}
-              />
+              {graphqlArchive ? (
+                <ProductGridGraphQL
+                  categoryId={category?.databaseId}
+                  first={45}
+                />
+              ) : (
+                <InstantSearchWrapper
+                  categories={productCategories}
+                  brands={brands}
+                  brand={brand}
+                  category={category}
+                  filters={filters}
+                  search={search}
+                  sort={sort}
+                  tag={tag}
+                  routing={true}
+                  dealsType={dealsType}
+                  dealTags={dealTags}
+                  inStockOnly={inStockOnly}
+                  defaultNewest={defaultNewest}
+                />
+              )}
             </div>
           </div>
         </main>

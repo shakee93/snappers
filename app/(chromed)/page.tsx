@@ -6,9 +6,12 @@ import Heading from "@/components/global/primitives/Heading/Heading";
 import { getClient } from "@/graphql/apollo-ssr";
 import {
   GET_BRANDS,
+  GET_HOMEPAGE_DEAL_PRODUCTS,
+  GET_HOMEPAGE_HEALTH_PRODUCTS,
   GET_PRODUCTS_BY_BOGO_TAG,
   GET_PRODUCTS_NODES,
   GET_PRODUCTS_NODES_HOMEPAGE,
+  GET_SHOP_BY_CATEGORIES,
 } from "@/graphql/defs/products";
 import { GET_SLIDES, GET_REVIEWS, GET_HERO_SETTINGS } from "@/graphql/defs/slides";
 import { Brand, SimpleProduct, Slide, VariableProduct } from "@/graphql/types/graphql";
@@ -22,6 +25,14 @@ import TikTokSection from "@/components/home/TikTokSection";
 import SectionHeroPets, {
   type HeroSettingsFields,
 } from "@/components/home/SectionHeroPets";
+import SectionFeatureBadges from "@/components/home/SectionFeatureBadges";
+import SectionShopByCategory, {
+  type SectionShopByCategoryProps,
+} from "@/components/home/SectionShopByCategory";
+import SectionDealCountdown from "@/components/home/SectionDealCountdown";
+import SectionDealProducts from "@/components/home/SectionDealProducts";
+import SectionHealthBanner from "@/components/home/SectionHealthBanner";
+import SectionHealthProducts from "@/components/home/SectionHealthProducts";
 import { unstable_cache } from "next/cache";
 import { HERO_SECTION_CACHE_TAG } from "@/lib/cache-tags";
 
@@ -154,6 +165,24 @@ const getData = async () => {
       .catch(() => []),
 
     getHeroSettingsCached(),
+
+    getClient()
+      .query({ query: GET_SHOP_BY_CATEGORIES, variables: { first: 6 } })
+      .then((res) => res.data?.productCategories?.nodes || [])
+      .catch(() => []),
+
+    getClient()
+      .query({ query: GET_HOMEPAGE_DEAL_PRODUCTS, variables: { first: 4 } })
+      .then((res) => res.data?.products?.nodes || [])
+      .catch(() => []),
+
+    getClient()
+      .query({
+        query: GET_HOMEPAGE_HEALTH_PRODUCTS,
+        variables: { first: 4, categoryIn: ["health"] },
+      })
+      .then((res) => res.data?.products?.nodes || [])
+      .catch(() => []),
   ];
 
   const [
@@ -168,6 +197,9 @@ const getData = async () => {
     options,
     reviews,
     heroSettings,
+    categories,
+    dealProducts,
+    healthProducts,
   ] = await Promise.all(queries);
 
   return {
@@ -182,6 +214,9 @@ const getData = async () => {
     options,
     reviews,
     heroSettings: heroSettings as HeroSettingsFields | null,
+    categories: categories as SectionShopByCategoryProps["categories"],
+    dealProducts: dealProducts as (SimpleProduct & VariableProduct)[],
+    healthProducts: healthProducts as (SimpleProduct & VariableProduct)[],
   };
 };
 
@@ -197,6 +232,9 @@ export default async function Home() {
     slides,
     reviews,
     heroSettings,
+    categories,
+    dealProducts,
+    healthProducts,
   } = await getData();
 
   const inStockOffers = freeOffersRaw.filter((p) => p.stockStatus === "IN_STOCK");
@@ -211,6 +249,27 @@ export default async function Home() {
       <div className="nc-PageHome relative flex flex-col overflow-hidden">
         <div className="z-0">
           <SectionHeroPets data={heroSettings} />
+          <SectionFeatureBadges />
+        </div>
+
+        <div className="mt-16 md:mt-24">
+          <SectionShopByCategory categories={categories} />
+        </div>
+
+        <div className="mt-16 md:mt-24">
+          <SectionDealCountdown />
+        </div>
+
+        <div className="mt-8 md:mt-10">
+          <SectionDealProducts products={dealProducts} />
+        </div>
+
+        <div className="mt-16 md:mt-24">
+          <SectionHealthBanner />
+        </div>
+
+        <div className="mt-8 md:mt-10">
+          <SectionHealthProducts products={healthProducts} />
         </div>
 
         <div className="flex flex-col px-3 gap-10 lg:gap-10 mx-auto w-full max-w-[1368px]">

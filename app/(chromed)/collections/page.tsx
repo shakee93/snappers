@@ -1,6 +1,7 @@
 import { getClient } from "@/graphql/apollo-ssr";
 import { GET_ALL_PRODUCTS } from "@/graphql/defs/products";
 import { Category } from "@/graphql/types/graphql";
+import { orderCollectionNavForDropdown } from "@/lib/collectionNavOrder";
 import Link from "next/link";
 import { siteConfig } from "@/site.config";
 
@@ -17,16 +18,10 @@ async function getData(categories: number[] | null = null) {
 
 const Page = async () => {
   const { productCategories } = await getData();
-  
-  productCategories.sort((a: Category, b: Category) => {
-      if (a.databaseId === 1484) return -1;
-      if (b.databaseId === 1484) return 1;
-      if (a.databaseId === 1483) return -1;
-      if (b.databaseId === 1483) return 1;
-      if (a.databaseId === 1485) return -1;
-      if (b.databaseId === 1485) return 1;
-      return 0;
-  });
+
+  const sortedCategories = orderCollectionNavForDropdown(
+    productCategories as Category[]
+  );
 
   return (
     <div>
@@ -54,7 +49,7 @@ const Page = async () => {
           <main>
             <div className="flex flex-col lg:flex-row">
               <ul className="py-2 grid gird-cols-1 md:grid-cols-3 text-left text-sm text-gray-700 dark:text-gray-200">
-                {productCategories
+                {sortedCategories
                   ?.filter(
                     (category: Category) => category.count && category.count > 0
                   )

@@ -73,8 +73,8 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
   const slide = slides[activeIndex];
 
   return (
-    <div className={`mx-auto mt-5 w-full max-w-[1368px] px-3 md:mt-10 lg:px-0 ${className}`}>
-      <div className="flex flex-col gap-4 lg:flex-row lg:justify-between lg:gap-0">
+    <div className={`mx-auto mt-5 w-full max-w-[1368px] px-3 md:mt-10 lg:px-0 pt-[50px] ${className}`}>
+      <div className="flex flex-col gap-4 lg:flex-row mt-20S lg:justify-between lg:gap-0">
         {/* Left: promo slider */}
         {slide && (
           <div className="relative h-[280px] min-h-[451px] w-full overflow-hidden rounded-[24px] sm:h-[360px] lg:h-[451px] lg:w-[72.368%]">
@@ -147,23 +147,40 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
           </div>
         )}
 
-        {/* Right: deal banner */}
+        {/* Right: deal banner — hangs and gently sways from the strap top */}
         {deal && (
-          <div className="relative h-[220px] w-full overflow-hidden rounded-[24px] lg:h-[451px] lg:w-[25.512%]">
+          <motion.div
+            className="relative w-full lg:w-[25.512%]"
+            style={{ transformOrigin: "50% -135px" }}
+            animate={{ rotate: [-1.5, 1.5, -1.5] }}
+            transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
+          >
+            {/* Hanging tag decoration */}
             <Image
-              src={deal.backgroundImage!.node!.sourceUrl!}
-              alt={deal.dealContent?.replace(/<[^>]+>/g, " ") ?? "Deal"}
-              fill
-              sizes="(max-width: 1024px) 100vw, 33vw"
-              className="object-cover"
+              src="/homepage/slider/tag.png"
+              alt=""
+              width={34}
+              height={167}
+              aria-hidden
+              className="pointer-events-none absolute -top-[135px] left-1/2 z-10 -translate-x-1/2"
             />
-            {deal.dealContent && (
-              <h3
-                className="absolute inset-x-0 top-0 p-6 text-xl font-bold leading-tight text-neutral-800 sm:text-2xl lg:p-8"
-                dangerouslySetInnerHTML={{ __html: deal.dealContent }}
+
+            <div className="relative h-[220px] w-full overflow-hidden rounded-[24px] lg:h-[451px]">
+              <Image
+                src={deal.backgroundImage!.node!.sourceUrl!}
+                alt={deal.dealContent?.replace(/<[^>]+>/g, " ") ?? "Deal"}
+                fill
+                sizes="(max-width: 1024px) 100vw, 33vw"
+                className="object-cover"
               />
-            )}
-          </div>
+              {deal.dealContent && (
+                <h3
+                  className="absolute inset-x-0 top-0 p-8 text-xl font-bold leading-tight text-neutral-800 sm:text-2xl lg:p-12"
+                  dangerouslySetInnerHTML={{ __html: deal.dealContent }}
+                />
+              )}
+            </div>
+          </motion.div>
         )}
       </div>
     </div>

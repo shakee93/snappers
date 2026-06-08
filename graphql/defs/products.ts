@@ -227,6 +227,21 @@ export const GET_CATEGORY_SLUGS = gql`
   }
 `;
 
+export const GET_SHOP_BY_CATEGORIES = gql`
+  query ShopByCategories($first: Int = 6) {
+    productCategories(first: $first) {
+      nodes {
+        id
+        name
+        slug
+        image {
+          sourceUrl
+        }
+      }
+    }
+  }
+`;
+
 export const GET_VARIATIONS_PRODUCT = gql`
   query GetAllProductVariations($categoryIdIn: [Int]) {
     products(first: 25, where: { categoryIdIn: $categoryIdIn }) {
@@ -447,6 +462,47 @@ export const GET_PRODUCTS_NODES_HOMEPAGE = gql`
       tagId: $tagId
     stockStatus: IN_STOCK
     }
+    ) {
+      nodes {
+        ...ProductContentCard
+      }
+    }
+  }
+  ${ProductContentCard}
+`;
+
+/** Homepage deals grid — in-stock products currently on sale. */
+export const GET_HOMEPAGE_DEAL_PRODUCTS = gql`
+  query GetHomepageDealProducts($first: Int = 4) {
+    products(
+      first: $first
+      where: {
+        onSale: true
+        stockStatus: IN_STOCK
+        orderby: { field: DATE, order: DESC }
+      }
+    ) {
+      nodes {
+        ...ProductContentCard
+      }
+    }
+  }
+  ${ProductContentCard}
+`;
+
+/** Homepage health grid — in-stock products in the health category. */
+export const GET_HOMEPAGE_HEALTH_PRODUCTS = gql`
+  query GetHomepageHealthProducts(
+    $first: Int = 4
+    $categoryIn: [String] = ["health"]
+  ) {
+    products(
+      first: $first
+      where: {
+        categoryIn: $categoryIn
+        stockStatus: IN_STOCK
+        orderby: { field: DATE, order: DESC }
+      }
     ) {
       nodes {
         ...ProductContentCard
