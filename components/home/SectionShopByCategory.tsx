@@ -36,14 +36,14 @@ const SectionShopByCategory = ({
     <section
       className={`mx-auto w-full max-w-[1024px] px-3 lg:px-0 ${className}`}
     >
-      <div className="mx-auto max-w-2xl text-center">
-        <p className="text-sm font-bold uppercase tracking-wider text-neutral-700">
+      <div className="mx-auto max-w-4xl text-center">
+        <p className="text-base font-bold uppercase tracking-wider text-[#092412]">
           Shop by Categories
         </p>
-        <h2 className="mt-3 text-4xl font-bold leading-tight text-[#23351F] sm:text-5xl">
-          Everything for every <span className="text-[#5C9B6A]">pet parent</span>
+        <h2 className="md:mt-5 mt-3 text-4xl font-albra text-center font-bold md:text-nowrap  leading-tight text-[#092412] sm:text-6xl">
+          Everything for every <span className="text-[#769F5F]">pet parent</span>
         </h2>
-        <p className="mt-4 text-base text-neutral-500">
+        <p className="mt-6 max-w-2xl mx-auto font-medium text-lg text-[#00000099] text-center">
           From premium food and fun toys to grooming and beyond, discover
           everything your pet needs, all in one place.
         </p>
