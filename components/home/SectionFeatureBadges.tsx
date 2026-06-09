@@ -1,40 +1,39 @@
-import { PawPrint, Package, Headphones, type LucideIcon } from "lucide-react";
+import Image from "next/image";
 
 interface FeatureBadge {
   id: string;
-  icon: LucideIcon;
+  iconSrc: string;
+  iconAlt: string;
   title: string;
   subtitle: string;
-  /** Pill background + icon tint. */
   background: string;
-  iconColor: string;
 }
 
 // Static trust badges shown under the hero. Edit copy/colors here.
 const badges: FeatureBadge[] = [
   {
     id: "trusted",
-    icon: PawPrint,
+    iconSrc: "/icons/paw-feat.png",
+    iconAlt: "Well trusted",
     title: "WELL TRUSTED",
     subtitle: "Over 900+ customers",
-    background: "#FCE7D8",
-    iconColor: "#E79A72",
+    background: "#FDE6D6",
   },
   {
     id: "fast",
-    icon: Package,
+    iconSrc: "/icons/box-feat.png",
+    iconAlt: "Super fast delivery",
     title: "SUPER FAST",
     subtitle: "With Express delivery",
-    background: "#DCEFDD",
-    iconColor: "#5C9B6A",
+    background: "#EBF3EF",
   },
   {
     id: "help",
-    icon: Headphones,
+    iconSrc: "/icons/support-feat.png",
+    iconAlt: "Expert help",
     title: "EXPERT HELP",
     subtitle: "24/7 customer support",
-    background: "#E9E3F4",
-    iconColor: "#9183C0",
+    background: "#EAE8F3",
   },
 ];
 
@@ -43,13 +42,19 @@ const SectionFeatureBadges = ({ className = "" }: { className?: string }) => {
   return (
     <div className={`mx-auto mt-12 w-full max-w-[1368px] px-3 lg:px-0 ${className}`}>
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-6">
-        {badges.map(({ id, icon: Icon, title, subtitle, background, iconColor }) => (
+        {badges.map(({ id, iconSrc, iconAlt, title, subtitle, background }) => (
           <div
             key={id}
             style={{ backgroundColor: background }}
-            className="flex items-center gap-3 rounded-lg px-8 py-5"
+            className="flex items-center gap-3 rounded-xl px-8 py-5"
           >
-            <Icon className="h-6 w-6 flex-shrink-0" style={{ color: iconColor }} />
+            <Image
+              src={iconSrc}
+              alt={iconAlt}
+              width={32}
+              height={32}
+              className="h-10 w-10 shrink-0 object-contain"
+            />
             <div className="leading-tight">
               <p className="text-base font-bold tracking-wide text-black">
                 {title}

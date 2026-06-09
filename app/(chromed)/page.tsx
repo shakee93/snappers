@@ -1,5 +1,4 @@
 import SectionSliderProductCard from "@/components/global/ui/SectionSliderProductCard";
-import Heading from "@/components/global/primitives/Heading/Heading";
 import { getClient } from "@/graphql/apollo-ssr";
 import {
   GET_BRANDS,
@@ -14,7 +13,6 @@ import { GET_HERO_SETTINGS } from "@/graphql/defs/slides";
 import { Brand, SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import SectionSliderBrandCard from "@/components/global/ui/SectionSliderBrandCard";
 import CardSkeleton from "@/components/global/primitives/Skeletons/CardSkeleton";
-import FAQ from "@/components/home/FAQSection";
 import SectionHeroPets, {
   type HeroSettingsFields,
 } from "@/components/home/SectionHeroPets";
@@ -195,11 +193,6 @@ export default async function Home() {
               heading="Back In Stock"
               link="back-in-stock"
             />
-          </div>
-
-          <div>
-            <Heading>Frequently Asked Questions</Heading>
-            <FAQ />
           </div>
         </div>
       </div>
