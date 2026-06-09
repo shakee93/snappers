@@ -2,6 +2,7 @@ import "../styles/index.scss";
 import "./index.css";
 import "rc-slider/assets/index.css";
 import { Inter } from "next/font/google";
+import localFont from "next/font/local";
 import ApolloWrapper from "@/graphql/apollo-client";
 import { SessionProvider } from "@/context/SessionProvider";
 import { CartProvider } from "@/context/CartProvider";
@@ -21,6 +22,13 @@ const inter = Inter({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-inter",
+});
+
+const albraSans = localFont({
+  src: "../fonts/AlbraSansTRIAL-Semi.otf",
+  variable: "--font-albra",
+  weight: "600",
+  display: "swap",
 });
 
 const defaultTitle = `${siteConfig.brand.name} - ${siteConfig.brand.tagline}`;
@@ -66,7 +74,7 @@ export default async function RootLayout({
   const isLocalhost = process.env.NODE_ENV === 'development';
 
   return (
-    <html lang="en" className={inter.variable}>
+    <html lang="en" className={`${inter.variable} ${albraSans.variable}`}>
       <head>
         <SiteThemeStyles />
         <meta

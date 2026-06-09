@@ -28,7 +28,8 @@ const config: Config = {
 		},
 		fontFamily: {
 			display: ["var(--font-display)", ...defaultTheme.fontFamily.sans],
-			body: ["var(--font-body)", ...defaultTheme.fontFamily.sans]
+			body: ["var(--font-body)", ...defaultTheme.fontFamily.sans],
+			albra: ["var(--font-albra)", ...defaultTheme.fontFamily.sans],
 		},
 		darkMode: 'class',
 		extend: {

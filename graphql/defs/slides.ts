@@ -43,6 +43,8 @@ query HeroSettings {
       dealBannerSettings {
         deals {
           dealContent
+          textPosition
+          textColor
           backgroundImage {
             node {
               sourceUrl
