@@ -39,13 +39,13 @@ const Footer = () => {
   return (
     <footer className="pb-20 text-white md:pb-0 mt-20">
       {/* Brand hero */}
-      <div className="relative overflow-hidden bg-[#38461F]">
+      <div className="relative overflow-hidden bg-header-green">
         <Image
           src="/homepage/footer-overlay.png"
           alt=""
           fill
           aria-hidden
-          priority
+          sizes="100vw"
           className="object-cover"
         />
         <div className="container relative flex justify-center items-center h-60">
@@ -55,7 +55,6 @@ const Footer = () => {
               alt={siteConfig.brand.name}
               width={819}
               height={119}
-              priority
               className="h-12 w-auto md:h-16"
             />
           </Link>
@@ -63,7 +62,7 @@ const Footer = () => {
       </div>
 
       {/* Newsletter */}
-      <div className="bg-[#38461F] border-y border-white/10">
+      <div className="bg-header-green border-y border-white/10">
         <div className="mx-auto flex max-w-[1088px] flex-col items-center justify-between gap-4 px-4 py-8 md:flex-row">
           <p className="text-base font-semibold">{footer.newsletter.heading}</p>
           <NewsletterSignup />
@@ -71,7 +70,7 @@ const Footer = () => {
       </div>
 
       {/* Link columns */}
-      <div className="bg-[#38461F]">
+      <div className="bg-header-green">
         <div className="mx-auto md:flex max-w-[1088px] justify-between grid grid-cols-1 gap-x-8 gap-y-10 px-4 py-12 md:grid-cols-4 md:gap-20">
           <div>
             <h3 className={headingClass}>{footer.openTime.heading}</h3>
@@ -182,6 +181,7 @@ const Footer = () => {
                   key={label}
                   href={href}
                   target="_blank"
+                  rel="noopener noreferrer"
                   aria-label={label}
                   className="text-white/40 hover:text-white"
                 >

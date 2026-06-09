@@ -43,7 +43,7 @@ export default function NewsletterSignup() {
       />
       <button
         type="submit"
-        className="flex items-center gap-1.5 rounded-md bg-[#ACDA5A] px-5 py-2.5 text-base font-semibold text-[black] transition-colors hover:bg-[#b4d653]"
+        className="flex items-center gap-1.5 rounded-md bg-[#ACDA5A] px-5 py-2.5 text-base font-semibold text-black transition-colors hover:bg-[#b4d653]"
       >
         {buttonLabel}
         <ArrowRight size={16} />
