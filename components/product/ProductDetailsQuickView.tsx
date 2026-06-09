@@ -3,7 +3,6 @@ import Link from "next/link";
 import ProductAddToCart from "./ProductAddToCart";
 import {
   Brand,
-  PaCapacity,
   Attribute,
   ProductAttribute,
   ProductVariation,
@@ -16,6 +15,8 @@ import { useStore } from "@/store/store";
 import { twMerge } from "tailwind-merge";
 import { useImage } from "@/context/ImageChangeGrabber";
 import AttributeIcon from "@/components/global/primitives/AttributeIcon";
+import { getCategoryPath } from "@/lib/productUrl";
+import { toDisplayCurrency } from "@/lib/formatPrice";
 
 const ProductDetails = ({
   product,
@@ -176,14 +177,7 @@ const ProductDetails = ({
                     {attr.label}:
                   </span>
                   <span className="font-medium text-gray-700">
-                    {
-                      (product as unknown as Record<string, any>)[
-                        `allPa${attr?.label as unknown as "Capacity"}`
-                      ]?.nodes.find(
-                        (node: PaCapacity) =>
-                          node.slug === activeAttr(attr)?.val
-                      )?.name
-                    }
+                    {activeAttr(attr)?.val}
                   </span>{" "}
                 </div>
 
@@ -227,13 +221,7 @@ const ProductDetails = ({
                         style={{ opacity: allOutOfStock ? 0.9 : 1 }}
                         title={allOutOfStock ? "Out of stock" : ""}
                       >
-                        {(product as any)[
-                          `allPa${(attr?.label as unknown as "Capacity")
-                            ?.split(" ")
-                            .join("")}`
-                        ]?.nodes.find((node: PaCapacity) => {
-                          return node.slug === option;
-                        })?.name || "OPTION"}
+                        {option || "OPTION"}
 
 
                         {/* {allOutOfStock && (
@@ -259,13 +247,13 @@ const ProductDetails = ({
         <div>
           <div className="flex gap-4 text-base py-2 flex-wrap md:text-lg font-medium text-gray-600">
             {/* <span>{activeVariation.price}</span> */}
-            <span dangerouslySetInnerHTML={{ __html: activeVariation.price }} />
+            <span dangerouslySetInnerHTML={{ __html: toDisplayCurrency(activeVariation.price) }} />
 
             {!!activeVariation.salePrice &&
               activeVariation.salePrice !== activeVariation.regularPrice && (
                 <span className="text-red-400">
                   {/*  {activeVariation.regularPrice} */}
-                  <s dangerouslySetInnerHTML={{ __html: activeVariation?.regularPrice }} />
+                  <s dangerouslySetInnerHTML={{ __html: toDisplayCurrency(activeVariation?.regularPrice) }} />
                 </span>
               )}
           </div>
@@ -273,13 +261,13 @@ const ProductDetails = ({
       ) : (
         <div className="flex gap-2 text-base py-2 flex-wrap md:text-lg font-medium text-gray-600">
           {/* <span>{product?.price}</span> */}
-          <span dangerouslySetInnerHTML={{ __html: product?.price || '' }} />
+          <span dangerouslySetInnerHTML={{ __html: toDisplayCurrency(product?.price) }} />
 
           {!!product?.salePrice &&
             product?.salePrice !== product?.regularPrice && (
               <span className="text-red-400">
                 {/*  {product?.regularPrice} */}
-                <s dangerouslySetInnerHTML={{ __html: product?.regularPrice || '' }} />
+                <s dangerouslySetInnerHTML={{ __html: toDisplayCurrency(product?.regularPrice) }} />
               </span>
             )}
         </div>
@@ -305,7 +293,7 @@ const ProductDetails = ({
           ? product?.productCategories?.edges.map(
             (category: any, index: number) => (
               <Link
-                href={`/collections/${category.node.slug}`}
+                href={getCategoryPath(category.node.slug ?? "")}
                 key={index}
                 className="bg-primary-100 inline-block py-1 px-2  text-xs md:text-sm rounded-3xl"
               >
@@ -316,7 +304,7 @@ const ProductDetails = ({
           : product?.productCategories?.nodes.map(
             (category: any, index: number) => (
               <Link
-                href={`/collections/${category.slug}`}
+                href={getCategoryPath(category.slug ?? "")}
                 key={index}
                 className="bg-primary-100 inline-block py-1 px-2  text-xs md:text-sm rounded-3xl"
               >

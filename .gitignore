@@ -48,5 +48,3 @@ typesense-data
 !.claude/skills/gq-overview/
 # claude code — machine-local settings (may contain embedded shell commands with tokens)
 .claude/settings.local.json
-# claude code — temporary git worktrees (nested repo copies + build artifacts)
-.claude/worktrees/

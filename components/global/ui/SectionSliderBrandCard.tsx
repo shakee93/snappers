@@ -1,5 +1,6 @@
 "use client";
 import React, { FC, useEffect, useState, useRef } from "react";
+import { getBrandPath } from "@/lib/productUrl";
 import Heading from "@/components/global/primitives/Heading/Heading";
 import { Brand } from "@/graphql/types/graphql";
 import BrandCard from "@/components/global/ui/BrandCard";
@@ -147,7 +148,7 @@ const SectionSliderBrandCard: FC<SectionSliderBrandCardProps> = ({
                             ? brand.brandImage
                             : "https://via.placeholder.com/300"
                         }
-                        brandLink={brand.slug || "#"}
+                        brandLink={brand.slug ? getBrandPath(brand.slug) : "#"}
                         className="transition-opacity duration-300 h-full"
                       />
                     </div>

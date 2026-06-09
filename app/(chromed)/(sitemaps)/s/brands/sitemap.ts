@@ -1,4 +1,5 @@
 import { BASE_URL, getBrands } from '@/app/sitemap-helpers'
+import { getBrandPath } from '@/lib/productUrl'
 import type { MetadataRoute } from 'next'
 
 
@@ -20,7 +21,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   // Add individual brand pages
   brands.forEach(brand => {
     brandEntries.push({
-      url: `${BASE_URL}/${brand.slug}`,
+      url: `${BASE_URL}${getBrandPath(brand.slug ?? '')}`,
       lastModified: new Date(),
       changeFrequency: 'weekly',
       priority: 0.8,

@@ -153,7 +153,7 @@ const FooterInner = async () => {
 
       </div>
 
-      <div className="text-center text-xs text-white py-4 bg-primaryColor">
+      <div className="text-center text-xs text-white py-4 bg-[#38461F]">
         <div className="container flex gap-4 justify-center flex-wrap">
           <div className="flex gap-2 items-center"><Copyright size={16} /> {new Date().getFullYear()} {siteConfig.brand.legalName}.</div>
           <div>{" | "} </div>

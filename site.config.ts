@@ -9,12 +9,12 @@
  */
 export const siteConfig = {
   brand: {
-    name: "GQ Mobiles",
-    legalName: "GQ Mobiles (Pvt) Ltd",
-    shortName: "GQ",
-    tagline: "Best mobile phones in the market",
+    name: "Catlitter",
+    legalName: "Catlitter (Pvt) Ltd",
+    shortName: "",
+    tagline: "Best pet care in the market",
     description:
-      "Shop the best mobile phones, smartwatches, and accessories at GQ Mobiles. Find the latest tech from top brands.",
+      "Shop the best pet care products in the market. Find the latest products from top brands.",
   },
   /**
    * Paths are under `public/` (e.g. `/global/logo.png` → `public/global/logo.png`).
@@ -59,13 +59,25 @@ export const siteConfig = {
       success: "#059669",
       danger: "#d71e1e",
     },
+    /**
+     * Header palette — space-separated RGB channels (e.g. "62 75 35" for #3e4b23).
+     * Drives the cream top bar and dark-green utility bar via `--c-header-*`
+     * (injected in `SiteThemeStyles`) and the Tailwind `header-*` tokens.
+     */
+    header: {
+      cream: "254 244 234",
+      green: "56 70 31",
+      // Soft-peach action icons + Basket pill on the cream bar.
+      peach: "253 230 214",
+      accent: "243 168 130",
+    },
   },
   assets: {
     logo: {
-      light: "/global/gq-logo.png",
-      dark: "/global/gq-logo.png",
-      width: 320,
-      height: 266,
+      light: "https://catlitter-api.freshpixl.com/wp-content/uploads/2026/06/logo.png",
+      dark: "https://catlitter-api.freshpixl.com/wp-content/uploads/2026/06/logo.png",
+      width: 211,
+      height: 31,
     },
     favicon: {
       light: "/global/gq-logo.png",
@@ -85,7 +97,7 @@ export const siteConfig = {
     countryCode: "LK",
     countryName: "Sri Lanka",
     currencyCode: "LKR",
-    currencySymbol: "Rs",
+    currencySymbol: "LKR",
     phoneCountryCode: "+94",
     ogLocale: "en_US",
   },
@@ -100,7 +112,7 @@ export const siteConfig = {
   businessHours: {
     heading: "Business Hours",
     schedule: [
-      { label: "Monday - Saturday", hours: "10AM - 8PM" },
+      { label: "Monday - Saturday", hours: "5AM - 8PM" },
       { label: "Poya Day", hours: "10AM - 6PM" },
       { label: "Sunday", hours: "Closed" },
     ],
@@ -108,18 +120,27 @@ export const siteConfig = {
   /** Header + footer navigation (see `NavLinks`, `footer`). */
   navigation: {
     main: [
-      { href: "/", name: "Home" },
-      { href: "/collections", name: "Collections", menu: "categories" },
-      { href: "/brands", name: "Brands" },
-      { href: "/collections/all", name: "Shop" },
-      { href: "/deals", name: "Deals", special: true },
-      { href: "/contact", name: "Location" },
-      { href: "/tag/pre-order", name: "Pre-Order" },
+      { href: "/rabbit-hamsters", name: "Rabbit & Hamsters" },
+      { href: "/cat", name: "Cat" },
+      { href: "/dog", name: "Dog" },
+      { href: "/cat-dog", name: "Cat & dogs" },
+      { href: "/bird", name: "Birds" },
+      { href: "/aquarium", name: "Aquarium" },
     ],
+    /** Quick links on the dark-green utility bar (see `HeaderUtilityBar`). */
+    utility: {
+      links: [
+        { href: "/new-arrivals", name: "New Arrivals" },
+        { href: "/deals", name: "Flash deals" },
+        { href: "/shop", name: "Most Selling" },
+      ],
+      // Each entry renders on its own line in the utility bar.
+      message: ["Cash on Delivery Available Island-wide |", "Shop with Confidence"],
+    },
     footerQuickLinks: {
       heading: "Quick Links",
       links: [
-        { href: "/collections/all", name: "Shop" },
+        { href: "/shop", name: "Shop" },
         { href: "/about", name: "About us" },
         { href: "/contact", name: "Contact Us" },
         { href: "/privacy", name: "Privacy Policy" },
@@ -203,5 +224,7 @@ export const siteConfig = {
 
 export type SiteConfig = typeof siteConfig;
 export type SiteNavLink = SiteConfig["navigation"]["main"][number];
+export type SiteUtilityLink =
+  SiteConfig["navigation"]["utility"]["links"][number];
 export type SiteFooterQuickLink =
   SiteConfig["navigation"]["footerQuickLinks"]["links"][number];

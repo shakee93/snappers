@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Brand } from "@/graphql/types/graphql";
+import { getBrandPath } from "@/lib/productUrl";
 
 interface BrandLogoProps {
   brand: Brand | null | undefined;
@@ -19,7 +20,7 @@ const BrandLogo = ({ brand, className = "" }: BrandLogoProps) => {
 
   return (
     <Link
-      href={`/${brand.slug}`}
+      href={getBrandPath(brand.slug ?? "")}
       target="_blank"
       className={`inline-block ${className}`}
     >

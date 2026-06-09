@@ -2,7 +2,7 @@
 import React, { FC, useEffect, useState, useRef, useMemo } from "react";
 import Link from "next/link";
 import Heading from "@/components/global/primitives/Heading/Heading";
-import ProductCard from "@/components/global/ui/ProductCard3";
+import ProductCard from "@/components/home/ProductCard";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import { filterHiddenProducts } from "@/lib/hidden-products";
 import {
@@ -159,7 +159,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
                     <div className="w-full">
                       <ProductCard
                         className="transition-opacity duration-300"
-                        data={item}
+                        product={item}
                       />
                     </div>
                   </CarouselItem>
@@ -180,7 +180,7 @@ const SectionSliderProductCard: FC<SectionSliderProductCardProps> = ({
                 key={item.slug}
                 className={`pl-2 md:pl-4 flex-shrink-0 basis-1/2 sm:basis-1/3 lg:basis-1/5`}
               >
-                <ProductCard data={item} />
+                <ProductCard product={item} />
               </div>
             ))}
           </div>

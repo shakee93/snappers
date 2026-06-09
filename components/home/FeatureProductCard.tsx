@@ -2,6 +2,7 @@
 import React from "react";
 import Link from "next/link";
 import { HIDDEN_PRODUCT_SLUGS } from "@/lib/hidden-products";
+import { getProductPath } from "@/lib/productUrl";
 
 interface FeatureProductData {
   name: string;
@@ -35,7 +36,7 @@ const FeatureProductCard = ({ product }: FeatureProductCardProps) => {
 
   return (
     <Link
-      href={`/products/${product.slug}`}
+      href={getProductPath(product)}
       className="w-full md:w-1/3 hidden md:block lg:hidden xl:block h-full rounded-[18px] overflow-hidden relative bg-cover bg-center bg-no-repeat hover:scale-105 transition-transform duration-200"
       style={{
         backgroundImage: `url('${product.imageUrl}')`,

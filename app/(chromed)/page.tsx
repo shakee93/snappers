@@ -6,11 +6,14 @@ import Heading from "@/components/global/primitives/Heading/Heading";
 import { getClient } from "@/graphql/apollo-ssr";
 import {
   GET_BRANDS,
+  GET_HOMEPAGE_DEAL_PRODUCTS,
+  GET_HOMEPAGE_HEALTH_PRODUCTS,
   GET_PRODUCTS_BY_BOGO_TAG,
   GET_PRODUCTS_NODES,
   GET_PRODUCTS_NODES_HOMEPAGE,
+  GET_SHOP_BY_CATEGORIES,
 } from "@/graphql/defs/products";
-import { GET_SLIDES, GET_REVIEWS } from "@/graphql/defs/slides";
+import { GET_SLIDES, GET_REVIEWS, GET_HERO_SETTINGS } from "@/graphql/defs/slides";
 import { Brand, SimpleProduct, Slide, VariableProduct } from "@/graphql/types/graphql";
 import SectionSliderBrandCard from "@/components/global/ui/SectionSliderBrandCard";
 import CardSkeleton from "@/components/global/primitives/Skeletons/CardSkeleton";
@@ -19,8 +22,17 @@ import FancyTestimonialsSlider from "@/components/home/TestimonialsSlider";
 import GoogleReviewsSection from "@/components/home/GoogleReviewsSection";
 import FAQ from "@/components/home/FAQSection";
 import TikTokSection from "@/components/home/TikTokSection";
-import { GET_BENTO_SLIDER } from "@/graphql/defs/products";
-import SectionHero4 from "@/components/home/SectionHero4";
+import SectionHeroPets, {
+  type HeroSettingsFields,
+} from "@/components/home/SectionHeroPets";
+import SectionFeatureBadges from "@/components/home/SectionFeatureBadges";
+import SectionShopByCategory, {
+  type SectionShopByCategoryProps,
+} from "@/components/home/SectionShopByCategory";
+import SectionDealCountdown from "@/components/home/SectionDealCountdown";
+import SectionDealProducts from "@/components/home/SectionDealProducts";
+import SectionHealthBanner from "@/components/home/SectionHealthBanner";
+import SectionHealthProducts from "@/components/home/SectionHealthProducts";
 import { unstable_cache } from "next/cache";
 import { HERO_SECTION_CACHE_TAG } from "@/lib/cache-tags";
 
@@ -62,13 +74,13 @@ const getSlidesCached = unstable_cache(
   { tags: [HERO_SECTION_CACHE_TAG], revalidate: 86400 }
 );
 
-const getBentoSliderCached = unstable_cache(
+const getHeroSettingsCached = unstable_cache(
   () =>
     getClient()
-      .query({ query: GET_BENTO_SLIDER, context: HERO_QUERY_CONTEXT })
-      .then((res) => res.data || [])
-      .catch(() => []),
-  ["homepage-bento-slider"],
+      .query({ query: GET_HERO_SETTINGS, context: HERO_QUERY_CONTEXT })
+      .then((res) => res.data?.heroSettings?.heroSettingsFields ?? null)
+      .catch(() => null),
+  ["homepage-hero-settings"],
   { tags: [HERO_SECTION_CACHE_TAG], revalidate: 86400 }
 );
 
@@ -152,7 +164,25 @@ const getData = async () => {
       })
       .catch(() => []),
 
-    getBentoSliderCached(),
+    getHeroSettingsCached(),
+
+    getClient()
+      .query({ query: GET_SHOP_BY_CATEGORIES, variables: { first: 12 } })
+      .then((res) => res.data?.productCategories?.nodes || [])
+      .catch(() => []),
+
+    getClient()
+      .query({ query: GET_HOMEPAGE_DEAL_PRODUCTS, variables: { first: 4 } })
+      .then((res) => res.data?.products?.nodes || [])
+      .catch(() => []),
+
+    getClient()
+      .query({
+        query: GET_HOMEPAGE_HEALTH_PRODUCTS,
+        variables: { first: 4, categoryIn: ["health"] },
+      })
+      .then((res) => res.data?.products?.nodes || [])
+      .catch(() => []),
   ];
 
   const [
@@ -166,7 +196,10 @@ const getData = async () => {
     slides,
     options,
     reviews,
-    bentoSlider,
+    heroSettings,
+    categories,
+    dealProducts,
+    healthProducts,
   ] = await Promise.all(queries);
 
   return {
@@ -180,7 +213,10 @@ const getData = async () => {
     slides,
     options,
     reviews,
-    bentoSlider,
+    heroSettings: heroSettings as HeroSettingsFields | null,
+    categories: categories as SectionShopByCategoryProps["categories"],
+    dealProducts: dealProducts as (SimpleProduct & VariableProduct)[],
+    healthProducts: healthProducts as (SimpleProduct & VariableProduct)[],
   };
 };
 
@@ -195,7 +231,10 @@ export default async function Home() {
     brands,
     slides,
     reviews,
-    bentoSlider,
+    heroSettings,
+    categories,
+    dealProducts,
+    healthProducts,
   } = await getData();
 
   const inStockOffers = freeOffersRaw.filter((p) => p.stockStatus === "IN_STOCK");
@@ -209,10 +248,31 @@ export default async function Home() {
     <main>
       <div className="nc-PageHome relative flex flex-col overflow-hidden">
         <div className="z-0">
-          <SectionHero4 data={bentoSlider} />
+          <SectionHeroPets data={heroSettings} />
+          <SectionFeatureBadges />
         </div>
 
-        <div className="flex flex-col px-3 gap-10 lg:gap-10 sm:container sm:max-w-screen-2xl">
+        <div className="mt-16 md:mt-24">
+          <SectionShopByCategory categories={categories} />
+        </div>
+
+        <div className="mt-16 md:mt-24">
+          <SectionDealCountdown />
+        </div>
+
+        <div className="mt-8 md:mt-10">
+          <SectionDealProducts products={dealProducts} />
+        </div>
+
+        <div className="mt-16 md:mt-24">
+          <SectionHealthBanner />
+        </div>
+
+        <div className="mt-8 md:mt-10">
+          <SectionHealthProducts products={healthProducts} />
+        </div>
+
+        <div className="flex flex-col px-3 gap-10 lg:gap-10 mx-auto w-full max-w-[1368px]">
           <div className="mt-5 md:mt-10">
             <SectionSliderProductCard
               products={newArrivals}

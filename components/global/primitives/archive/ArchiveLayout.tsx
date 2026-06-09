@@ -2,10 +2,12 @@ import { getClient } from "@/graphql/apollo-ssr";
 import { GET_ALL_PRODUCTS } from "@/graphql/defs/products";
 import { GET_NESTED_CATEGORIES } from "@/graphql/defs/nav";
 import InstantSearchWrapper from "@/components/global/primitives/InstantSearchWrapper";
+import ProductGridGraphQL from "@/components/global/primitives/archive/ProductGridGraphQL";
 import { Brand } from "@/graphql/types/graphql";
 import Link from "next/link";
 import { GET_TAG_DETAILS_BY_SLUG } from "@/graphql/defs/products";
 import { DealFilterType } from "@/lib/dealFilters";
+import { useGraphqlArchive } from "@/lib/archiveSource";
 import { siteConfig } from "@/site.config";
 
 async function getData(parentId?: number, tagSlug?: string) {
@@ -50,6 +52,15 @@ async function getData(parentId?: number, tagSlug?: string) {
   };
 }
 
+function buildCategoryScopeIds(
+  category: { databaseId: number } | undefined,
+  nestedCategories: { databaseId: number }[],
+): number[] {
+  if (!category) return [];
+  const childIds = nestedCategories.map((item) => item.databaseId);
+  return [category.databaseId, ...childIds];
+}
+
 
 interface ArchiveLayoutProps {
   title: string;
@@ -86,8 +97,9 @@ const ArchiveLayout = async ({
   inStockOnly,
   defaultNewest,
 }: ArchiveLayoutProps) => {
-
+  const graphqlArchive = useGraphqlArchive();
   const { productCategories, brands, nestedCategories, tagDetails } = await getData(category?.databaseId ?? '', tag);
+  const categoryScopeIds = buildCategoryScopeIds(category, nestedCategories);
 
   // console.log('tagDetails', tagDetails);
   // console.log('categoryName', category.databaseId);
@@ -125,18 +137,6 @@ const ArchiveLayout = async ({
           </div>
         ) : null}
 
-        <div className="flex flex-wrap gap-2 text-sm">
-          {nestedCategories.map((item: any, index: number) => (
-            <Link
-              href={item.slug}
-              key={index}
-              className="flex-shrink-0 rounded-md py-2 px-4 bg-white border border-primary-500"
-            >
-              {item.name}
-            </Link>
-          ))}
-        </div>
-
         <hr className="border-slate-200 dark:border-slate-700 " />
 
         <main>
@@ -145,21 +145,30 @@ const ArchiveLayout = async ({
               {/* {JSON.stringify(search, null, 2)}
               {JSON.stringify(productCategories, null, 2)}
               {JSON.stringify(brand, null, 2)} */}
-              <InstantSearchWrapper
-                categories={productCategories}
-                brands={brands}
-                brand={brand}
-                category={category}
-                filters={filters}
-                search={search}
-                sort={sort}
-                tag={tag}
-                routing={true}
-                dealsType={dealsType}
-                dealTags={dealTags}
-                inStockOnly={inStockOnly}
-                defaultNewest={defaultNewest}
-              />
+              {graphqlArchive ? (
+                <ProductGridGraphQL
+                  categoryIds={categoryScopeIds}
+                  first={45}
+                />
+              ) : (
+                <InstantSearchWrapper
+                  categories={productCategories}
+                  brands={brands}
+                  brand={brand}
+                  category={category}
+                  categoryScopeIds={categoryScopeIds}
+                  subCategories={nestedCategories}
+                  filters={filters}
+                  search={search}
+                  sort={sort}
+                  tag={tag}
+                  routing={true}
+                  dealsType={dealsType}
+                  dealTags={dealTags}
+                  inStockOnly={inStockOnly}
+                  defaultNewest={defaultNewest}
+                />
+              )}
             </div>
           </div>
         </main>

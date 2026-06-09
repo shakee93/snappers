@@ -82,6 +82,12 @@ export const GET_BRAND_PRODUCTS = gql`
           id
           slug
           modified
+          productCategories {
+            nodes {
+              slug
+              parentDatabaseId
+            }
+          }
         }
         pageInfo {
           hasNextPage

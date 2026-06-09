@@ -1,15 +1,21 @@
-"use client"
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import ArchiveLayout from "@/components/global/primitives/archive/ArchiveLayout";
+import { Metadata } from "next";
+import { Suspense } from "react";
+import { siteConfig } from "@/site.config";
 
-const RedirectPage = () => {
-  const router = useRouter();
+export const revalidate = 1800;
 
-  useEffect(() => {
-    router.push('/');
-  }, []);
-
-  return null;
+export const metadata: Metadata = {
+  title: "All Products",
+  description: `Explore our complete range of pet food, health products, and accessories at ${siteConfig.brand.name}. Shop cat, dog, bird, and aquarium essentials in one place.`,
 };
 
-export default RedirectPage;
+const Page = () => {
+  return (
+    <Suspense>
+      <ArchiveLayout title="All Products" filters />
+    </Suspense>
+  );
+};
+
+export default Page;

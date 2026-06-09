@@ -8,6 +8,7 @@ import PriceFilter from "@/components/global/primitives/Filters/PriceFilter";
 import OnSaleFilter from "@/components/global/primitives/Filters/OnSaleFilter";
 import SortOrderFilter from "@/components/global/primitives/Filters/SortOrderFilter";
 import InStockFilter from "./Filters/InStockFilter";
+import SubCategoryFilter from "@/components/global/primitives/Filters/SubCategoryFilter";
 import DynamicVariationFilters from "@/components/global/primitives/Filters/DynamicVariationFilters";
 import DealsTypeFilter from "@/components/global/primitives/Filters/DealsTypeFilter";
 import FilterResetButton from "@/components/global/primitives/Filters/FilterResetButton";
@@ -15,6 +16,7 @@ import { DealFilterType } from "@/lib/dealFilters";
 
 interface TabFilterProps {
     categories?: ProductCategory[];
+    subCategories?: ProductCategory[];
     category?: ProductCategory;
     brands?: Brand[];
     brand?: Brand;
@@ -28,6 +30,7 @@ interface TabFilterProps {
 
 const TabFilters = ({
     categories = [],
+    subCategories = [],
     brands = [],
     brand,
     category,
@@ -61,6 +64,9 @@ const TabFilters = ({
                     />
                 </div>
                 {!inStockOnly && <InStockFilter />}
+                {subCategories.length > 0 ? (
+                    <SubCategoryFilter subCategories={subCategories} />
+                ) : null}
                 <OnSaleFilter />
                 <SortOrderFilter sorts={sort} />
                 {dealsType ? <DealsTypeFilter activeTypes={dealsType} /> : null}

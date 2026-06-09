@@ -40,6 +40,8 @@ export const CartItemProductSlim = gql`
             nodes {
                 id
                 name
+                slug
+                parentDatabaseId
             }
         }
         # Parent free-shipping flag — fallback when the cart line's variation

@@ -1,7 +1,7 @@
 'use client'
 
-import React from "react";
 import Link from "next/link";
+import { getCategoryPath } from "@/lib/productUrl";
 import { motion } from "framer-motion";
 import {
   DeviceMobile,
@@ -19,7 +19,7 @@ const categories = [
   {
     title: "Smart Phones",
     subtitle: "Infinite Possibilities",
-    href: "/collections/smart-phones",
+    href: getCategoryPath("smart-phones"),
     icon: DeviceMobile,
     pastelBg: "bg-blue-50",
     pastelBgHover: "group-hover:bg-blue-100",
@@ -28,7 +28,7 @@ const categories = [
   {
     title: "Tablets",
     subtitle: "Elevate Productivity",
-    href: "/collections/tablet-accessories",
+    href: getCategoryPath("tablet-accessories"),
     icon: DeviceTabletSpeaker,
     pastelBg: "bg-rose-50",
     pastelBgHover: "group-hover:bg-rose-100",
@@ -37,7 +37,7 @@ const categories = [
   {
     title: "Smartwatches",
     subtitle: "Stay Connected",
-    href: "/collections/smartwatches",
+    href: getCategoryPath("smartwatches"),
     icon: Watch,
     pastelBg: "bg-emerald-50",
     pastelBgHover: "group-hover:bg-emerald-100",
@@ -46,7 +46,7 @@ const categories = [
   {
     title: "Headphones",
     subtitle: "Immerse in Sound",
-    href: "/collections/headphones-and-headsets",
+    href: getCategoryPath("headphones-and-headsets"),
     icon: Headphones,
     pastelBg: "bg-purple-50",
     pastelBgHover: "group-hover:bg-purple-100",
@@ -55,7 +55,7 @@ const categories = [
   {
     title: "Wireless Earbuds",
     subtitle: "True Wireless Freedom",
-    href: "/collections/wireless-earbuds",
+    href: getCategoryPath("wireless-earbuds"),
     icon: Bluetooth,
     pastelBg: "bg-cyan-50",
     pastelBgHover: "group-hover:bg-cyan-100",
@@ -64,7 +64,7 @@ const categories = [
   {
     title: "Speakers",
     subtitle: "Surround Yourself",
-    href: "/collections/smart-speakers",
+    href: getCategoryPath("smart-speakers"),
     icon: SpeakerHigh,
     pastelBg: "bg-amber-50",
     pastelBgHover: "group-hover:bg-amber-100",
@@ -73,7 +73,7 @@ const categories = [
   {
     title: "Gaming",
     subtitle: "Level Up Your Setup",
-    href: "/collections/console-gaming-and-accessories",
+    href: getCategoryPath("console-gaming-and-accessories"),
     icon: GameController,
     pastelBg: "bg-red-50",
     pastelBgHover: "group-hover:bg-red-100",
@@ -82,7 +82,7 @@ const categories = [
   {
     title: "Mobile Accessories",
     subtitle: "Cases, Chargers & More",
-    href: "/collections/mobile-accessories-mobiles-and-tablets-2",
+    href: getCategoryPath("mobile-accessories-mobiles-and-tablets-2"),
     icon: Bag,
     pastelBg: "bg-slate-50",
     pastelBgHover: "group-hover:bg-slate-100",

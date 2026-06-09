@@ -1,25 +1,15 @@
-import {Brand, Product, TermNode} from "@/graphql/types/graphql";
-import {useEffect, useState} from "react";
-
+import { Product } from "@/graphql/types/graphql";
+import { useMemo } from "react";
+import { getProductPath } from "@/lib/productUrl";
 
 const useProductLink = (product?: Product | null) => {
+  return useMemo(() => {
+    if (!product) {
+      return "";
+    }
 
-    const [link, setLink] = useState('')
+    return getProductPath(product);
+  }, [product]);
+};
 
-    useEffect(() => {
-
-        if (!product) {
-            return;
-        }
-
-        const productBrand = product?.brands?.nodes[0] ||  {
-            name: 'Product',
-            slug: 'product'
-        };
-
-        setLink(`/${productBrand.slug}/${product.slug}`)
-    }, [product])
-    return link
-}
-
-export default useProductLink
+export default useProductLink;

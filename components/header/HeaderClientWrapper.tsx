@@ -2,8 +2,8 @@
 
 import { useEffect, useState, useRef } from "react";
 import { Brand, ProductCategory } from "@/graphql/types/graphql";
-import TopBarPromotion from "@/components/header/TopBarPromotion";
 import HeaderContent from "./HeaderContent";
+import HeaderUtilityBar from "./HeaderUtilityBar";
 import HeaderSearchResults from "@/components/header/HeaderSearchResults";
 import MobileNavLinks from "./MobileNavLinks";
 import MobileBottomNav from "@/components/header/MobileBottomNav";
@@ -22,17 +22,12 @@ interface HeaderClientWrapperProps {
 const HeaderClientWrapper = ({
   productCategories,
   brands,
-  options,
   navCategories
 }: HeaderClientWrapperProps) => {
   const [isDesktop, setIsDesktop] = useState(false);
-  const [isTopBarVisible, setIsTopBarVisible] = useState(true);
   const [isHeaderSticky, setIsHeaderSticky] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const stickyOffsetRef = useRef(0);
-
-  // Extract background color from options
-  const topBarBgColor = options?.topBarBgColor || 'white';
 
   // Check if device is desktop (lg and above)
   useEffect(() => {
@@ -55,14 +50,6 @@ const HeaderClientWrapper = ({
       }
 
       const currentScrollY = window.scrollY;
-      const scrollThreshold = 50; // When to start hiding top bar
-
-      // Handle top bar visibility
-      if (currentScrollY > scrollThreshold) {
-        setIsTopBarVisible(false);
-      } else {
-        setIsTopBarVisible(true);
-      }
 
       // Handle header stickiness
       if (currentScrollY > stickyOffsetRef.current) {
@@ -95,26 +82,18 @@ const HeaderClientWrapper = ({
           </div>
         )}
 
-        {/* TopBarPromotion - hides on scroll */}
-        <div
-          style={{
-            backgroundColor: !isDesktop ? topBarBgColor : 'white'
-          }}
-          className={`
-            transition-all duration-500 ease-out overflow-hidden
-            ${isTopBarVisible ? 'max-h-32 opacity-100' : 'max-h-0 opacity-0'}
-          `}
-        >
-          <TopBarPromotion options={options} />
-        </div>
-
-        {/* HeaderContent - always visible when sticky */}
+        {/* Cream top bar + dark-green utility bar - always visible when sticky */}
         <HeaderContent navCategories={navCategories} />
+        <HeaderUtilityBar />
       </header>
 
       {/* Add padding to content when header is sticky */}
       {isHeaderSticky && (
-        <div className={ADD_TO_CART_DISABLED ? "h-24" : "h-16"}></div>
+        <div
+          className={
+            ADD_TO_CART_DISABLED ? "h-24 lg:h-[212px]" : "h-16 lg:h-[172px]"
+          }
+        ></div>
       )}
 
       <MobileNavLinks />

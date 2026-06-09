@@ -3,13 +3,13 @@ import Prices from "@/components/global/ui/Prices";
 import Link from "next/link";
 import React, { Fragment } from "react";
 import {
-  PaCapacity,
   ProductVariation,
   SimpleProduct,
   VariableProduct,
   VariationAttribute,
 } from "@/graphql/types/graphql";
 import AttributeIcon from "@/components/global/primitives/AttributeIcon";
+import { getCategoryPath } from "@/lib/productUrl";
 
 const AddedToCart = ({
   quantity,
@@ -66,14 +66,7 @@ const AddedToCart = ({
                             />{" "}
                             <span key={attr?.value}>
                               {" "}
-                              {
-                                product[
-                                  `allPa${attr?.label as unknown as "Capacity"}`
-                                ]?.nodes.find(
-                                  (node: PaCapacity) =>
-                                    node.slug === attr?.value
-                                )?.name
-                              }
+                              {attr?.value}
                             </span>
                           </div>
                         </Fragment>
@@ -86,7 +79,7 @@ const AddedToCart = ({
                                 product.productCategories.edges ? (
                                     product.productCategories.edges.map((category: any, index: number) => (
                                         <Link
-                                            href={`/collections/${category.node.slug}`}
+                                            href={getCategoryPath(category.node.slug ?? "")}
                                             key={index}
                                             className="bg-primary-100 inline-block py-1 px-2 text-xs rounded-3xl"
                                         >
@@ -97,7 +90,7 @@ const AddedToCart = ({
                                     product.productCategories.nodes &&
                                     product.productCategories.nodes.map((category: any, index: number) => (
                                         <Link
-                                            href={`/collections/${category.slug}`}
+                                            href={getCategoryPath(category.slug ?? "")}
                                             key={index}
                                             className="bg-primary-100 inline-block py-1 px-2 text-xs rounded-3xl"
                                         >

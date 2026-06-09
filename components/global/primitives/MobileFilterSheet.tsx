@@ -18,9 +18,11 @@ import DynamicVariationFilters from "./Filters/DynamicVariationFilters";
 import { PRICE_RANGE } from "@/components/global/primitives/Filters/PriceFilter";
 import { SORT_ORDER_OPTIONS, SORT_NEWEST_ID } from "@/lib/sortOrders";
 import FilterResetButton from "./Filters/FilterResetButton";
+import SubCategoryFilter from "@/components/global/primitives/Filters/SubCategoryFilter";
 
 interface TabFilterProps {
     categories?: ProductCategory[];
+    subCategories?: ProductCategory[];
     category?: ProductCategory;
     brands?: Brand[];
     brand?: Brand;
@@ -33,6 +35,7 @@ interface TabFilterProps {
 
 const MobileFilterSheet = ({
     categories = [],
+    subCategories = [],
     brands = [],
     brand,
     category,
@@ -492,6 +495,12 @@ const MobileFilterSheet = ({
                                             </div>
                                         </div>
                                         )}
+
+                                        {subCategories.length > 0 ? (
+                                            <div className="py-4 w-full">
+                                                <SubCategoryFilter subCategories={subCategories} />
+                                            </div>
+                                        ) : null}
 
                                         <div className="py-4">
                                             <div className="relative flex flex-col space-y-8">

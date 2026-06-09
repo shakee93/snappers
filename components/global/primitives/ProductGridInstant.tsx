@@ -2,9 +2,14 @@
 import { Brand, Category, Product } from "@/graphql/types/graphql";
 import { useStore } from "@/store/store";
 import { useEffect, useMemo } from "react";
-import { useBogoPluginMeta } from "@/hooks/useBogoPluginMeta";
-import ProductCard from "@/components/global/ui/ProductCard3";
-import { getDatabaseIdFromProductLike } from "@/lib/bogo";
+import { useProductListingImages } from "@/hooks/useProductListingImages";
+import ProductCard, {
+  type ProductCardItem,
+} from "@/components/home/ProductCard";
+import {
+  buildListingImagePatchByProductId,
+  collectProductIdsNeedingImageBackfill,
+} from "@/lib/listingImagePatch";
 import { useHits, useInstantSearch } from "react-instantsearch";
 import Pagination from "@/shared/Pagination/Pagination";
 import Image from "next/image";
@@ -34,30 +39,32 @@ const ProductGridInstant = ({
   const { status: statusState } = useInstantSearch();
   const { setSearchStatus, search, search_status, navigation, sidebar } = useStore();
 
-  const bogoDatabaseIds = useMemo(() => {
-    const s = new Set<number>();
-    for (const h of hits) {
-      const id = getDatabaseIdFromProductLike(h);
-      if (id) s.add(id);
-    }
-    return Array.from(s);
-  }, [hits]);
+  const imageBackfillIds = useMemo(
+    () =>
+      collectProductIdsNeedingImageBackfill(
+        hits as Array<{
+          databaseId?: number | null;
+          image?: { sourceUrl?: string | null } | null;
+          variations?: {
+            nodes?: Array<{
+              image?: { sourceUrl?: string | null } | null;
+              stockStatus?: string | null;
+            } | null> | null;
+          } | null;
+        }>
+      ),
+    [hits]
+  );
 
-  const { data: bogoBatchData } = useBogoPluginMeta(bogoDatabaseIds);
+  const { data: listingImagesData } = useProductListingImages(imageBackfillIds);
 
-  const bogoPluginMetaByProductId = useMemo(() => {
-    const acc: Record<
-      number,
-      | Array<{ key: string; value?: string | null; id?: string | null } | null>
-      | null
-    > = {};
-    for (const n of bogoBatchData?.products?.nodes ?? []) {
-      if (n?.databaseId != null) {
-        acc[n.databaseId] = n.bogoPluginMeta ?? null;
-      }
-    }
-    return acc;
-  }, [bogoBatchData]);
+  const listingImageByProductId = useMemo(
+    () =>
+      buildListingImagePatchByProductId(
+        listingImagesData?.products?.nodes
+      ),
+    [listingImagesData]
+  );
 
   // When the On Sale filter is active, Typesense returns every product whose
   // `onSale` flag is true — but that flag stays true even after the last
@@ -118,9 +125,8 @@ const ProductGridInstant = ({
           {visibleHits.map((item) => (
             <ProductCard
               key={item?.slug as unknown as string}
-              data={item as unknown as Product}
-              fromSearch
-              bogoPluginMetaByProductId={bogoPluginMetaByProductId}
+              product={item as unknown as ProductCardItem}
+              listingImageByProductId={listingImageByProductId}
             />
           ))}
         </div>

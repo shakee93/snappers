@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import { useMemo } from "react";
 import { orderCollectionNavRoots } from "@/lib/collectionNavOrder";
+import { getCategoryPath } from "@/lib/productUrl";
 
 type NavCategoriesProps = {
   onClose: () => void;
@@ -89,10 +90,10 @@ export default function NavCategories({ onClose, categories }: NavCategoriesProp
     >
       <div className="text-sm p-3 text-muted-foreground mb-2 w-full border-b pb-2">
         <Link
-          href="/collections"
+          href="/c"
           className="flex items-center hover:underline hover:text-blue-800 transition-colors duration-200"
         >
-          <span>Browse all collections</span>
+          <span>Browse all categories</span>
           <ArrowRight className="ml-1 h-4 w-4 group-hover:text-blue-500" />
         </Link>
       </div>
@@ -115,7 +116,7 @@ export default function NavCategories({ onClose, categories }: NavCategoriesProp
                       }`}
                   >
                     <Link
-                      href={`/collections/${category.slug}`}
+                      href={getCategoryPath(category.slug ?? "")}
                       className="text-blue-950 hover:underline flex items-center"
                       onClick={onClose}
                     >
@@ -140,7 +141,7 @@ export default function NavCategories({ onClose, categories }: NavCategoriesProp
                       {category.children.map((child: ProductCategory) => (
                         <li key={`child-${child.slug}`} className="ml-2.5">
                           <Link
-                            href={`/collections/${child.slug}`}
+                            href={getCategoryPath(child.slug ?? "")}
                             className="text-sm text-muted-foreground hover:text-primary"
                             onClick={onClose}
                           >
