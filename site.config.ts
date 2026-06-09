@@ -80,8 +80,8 @@ export const siteConfig = {
       height: 31,
     },
     favicon: {
-      light: "/global/gq-logo.png",
-      dark: "/global/gq-logo.png",
+      light: "/favicon-black.ico",
+      dark: "/favicon-white.ico",
     },
     // Optional; defaults to favicon light when omitted.
     // appleTouchIcon: "/global/apple-touch-icon.png",
