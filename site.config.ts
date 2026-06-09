@@ -97,7 +97,7 @@ export const siteConfig = {
     countryCode: "LK",
     countryName: "Sri Lanka",
     currencyCode: "LKR",
-    currencySymbol: "Rs",
+    currencySymbol: "LKR",
     phoneCountryCode: "+94",
     ogLocale: "en_US",
   },

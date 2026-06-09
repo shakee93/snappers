@@ -38,6 +38,7 @@ import {
   isVariationFreeShipping,
 } from "@/lib/freeShipping";
 import { siteConfig } from "@/site.config";
+import { toDisplayCurrency, currencySymbol } from "@/lib/formatPrice";
 const ProductDetails = ({
   product,
   brand,
@@ -425,14 +426,14 @@ const ProductDetails = ({
         <div>
           <div className="flex flex-wrap items-center gap-4 text-base font-bold text-black-600 md:text-2xl">
             <span
-              dangerouslySetInnerHTML={{ __html: activeVariation.price }}
+              dangerouslySetInnerHTML={{ __html: toDisplayCurrency(activeVariation.price) }}
             />
             {!!activeVariation.salePrice &&
               activeVariation.salePrice !== activeVariation.regularPrice && (
                 <span className="text-red-400 line-through md:text-xl">
                   <span
                     dangerouslySetInnerHTML={{
-                      __html: activeVariation.regularPrice,
+                      __html: toDisplayCurrency(activeVariation.regularPrice),
                     }}
                   />
                 </span>
@@ -459,7 +460,7 @@ const ProductDetails = ({
             )}
 
             <div className="flex flex-wrap items-center text-xs text-gray-400">
-              <span>or pay in 3 x Rs</span>
+              <span>or pay in 3 x {currencySymbol}</span>
               <span className="font-semibold mx-1">
                 {(
                   parseFloat(
@@ -483,7 +484,7 @@ const ProductDetails = ({
         <div className="flex flex-wrap items-center gap-2 text-base font-bold text-gray-600 md:text-2xl">
 
           <div className="flex flex-col gap-2">
-            <span dangerouslySetInnerHTML={{ __html: product.price || "" }} />
+            <span dangerouslySetInnerHTML={{ __html: toDisplayCurrency(product.price) }} />
           </div>
 
           {product.salePrice &&
@@ -492,7 +493,7 @@ const ProductDetails = ({
                 <span className="text-red-400 line-through md:text-xl">
                   <span
                     dangerouslySetInnerHTML={{
-                      __html: product.regularPrice || "",
+                      __html: toDisplayCurrency(product.regularPrice),
                     }}
                   />
                 </span>
@@ -516,7 +517,7 @@ const ProductDetails = ({
           )}
 
           <div className="flex flex-wrap items-center text-xs text-gray-400">
-            <span>or pay in 3 x Rs</span>
+            <span>or pay in 3 x {currencySymbol}</span>
             <span className="font-semibold mx-1">
               {(
                 parseFloat(

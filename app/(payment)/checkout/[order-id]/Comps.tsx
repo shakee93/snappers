@@ -1,4 +1,5 @@
 import { isLineItemFree, stripHtmlMoney } from "@/lib/cartLinePricing";
+import { currencySymbol, toDisplayCurrency } from "@/lib/formatPrice";
 
 interface OrderDetailsProps {
   orderData: any;
@@ -101,7 +102,7 @@ const ProductTable = ({ lineItems, orderData, paymentDetails }: ProductTableProp
                           Free
                         </span>
                       ) : (
-                        <>Rs. {stripHtmlMoney(item?.total ?? item?.subtotal)}</>
+                        <>{currencySymbol} {stripHtmlMoney(item?.total ?? item?.subtotal)}</>
                       )}
                     </td>
                   </tr>
@@ -112,7 +113,7 @@ const ProductTable = ({ lineItems, orderData, paymentDetails }: ProductTableProp
                   </td>
                   <td></td>
                   <td className="px-6 text-right py-4  font-medium text-gray-800 dark:text-gray-200">
-                    <span dangerouslySetInnerHTML={{ __html: orderData?.order?.shippingTotal || '₨ 0.00' }} />
+                    <span dangerouslySetInnerHTML={{ __html: toDisplayCurrency(orderData?.order?.shippingTotal) || `${currencySymbol} 0.00` }} />
                   </td>
                 </tr>
 
@@ -140,7 +141,7 @@ const ProductTable = ({ lineItems, orderData, paymentDetails }: ProductTableProp
                         </td>
                         <td></td>
                         <td className="px-6 text-right py-4 font-medium text-gray-800 dark:text-gray-200">
-                          ₨ {bankCharge.toFixed(2)}
+                          {currencySymbol} {bankCharge.toFixed(2)}
                         </td>
                       </tr>
                     );
@@ -154,7 +155,7 @@ const ProductTable = ({ lineItems, orderData, paymentDetails }: ProductTableProp
                   </td>
                   <td></td>
                   <td className="px-6 text-right py-4 font-medium text-gray-800 dark:text-gray-200">
-                    <span dangerouslySetInnerHTML={{ __html: orderData.order?.total || '' }} />
+                    <span dangerouslySetInnerHTML={{ __html: toDisplayCurrency(orderData.order?.total) }} />
                   </td>
                 </tr>
               </tbody>

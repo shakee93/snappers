@@ -36,7 +36,7 @@ import { useStats } from "react-instantsearch";
 import { Metadata } from "next/types";
 import Image from "next/image";
 import { siteConfig } from "@/site.config";
-import { formatPrice } from "@/lib/formatPrice";
+import { formatPrice, currencySymbol } from "@/lib/formatPrice";
 import { CARD_SURCHARGE_RATE } from "@/lib/checkoutMath";
 import { apiUrl } from "@/lib/api";
 interface FormData {
@@ -1426,7 +1426,7 @@ const CheckoutPage = () => {
               )}
               {isKokoPayment && (
                 <div className="flex flex-wrap items-center text-xs text-gray-500 mt-1">
-                  <span>pay in 3 x Rs</span>
+                  <span>pay in 3 x {currencySymbol}</span>
                   <span className="font-semibold mx-1">
                     {(kokoOrderTotal / 3).toFixed(2)}
                   </span>

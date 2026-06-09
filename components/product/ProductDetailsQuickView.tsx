@@ -16,6 +16,7 @@ import { twMerge } from "tailwind-merge";
 import { useImage } from "@/context/ImageChangeGrabber";
 import AttributeIcon from "@/components/global/primitives/AttributeIcon";
 import { getCategoryPath } from "@/lib/productUrl";
+import { toDisplayCurrency } from "@/lib/formatPrice";
 
 const ProductDetails = ({
   product,
@@ -246,13 +247,13 @@ const ProductDetails = ({
         <div>
           <div className="flex gap-4 text-base py-2 flex-wrap md:text-lg font-medium text-gray-600">
             {/* <span>{activeVariation.price}</span> */}
-            <span dangerouslySetInnerHTML={{ __html: activeVariation.price }} />
+            <span dangerouslySetInnerHTML={{ __html: toDisplayCurrency(activeVariation.price) }} />
 
             {!!activeVariation.salePrice &&
               activeVariation.salePrice !== activeVariation.regularPrice && (
                 <span className="text-red-400">
                   {/*  {activeVariation.regularPrice} */}
-                  <s dangerouslySetInnerHTML={{ __html: activeVariation?.regularPrice }} />
+                  <s dangerouslySetInnerHTML={{ __html: toDisplayCurrency(activeVariation?.regularPrice) }} />
                 </span>
               )}
           </div>
@@ -260,13 +261,13 @@ const ProductDetails = ({
       ) : (
         <div className="flex gap-2 text-base py-2 flex-wrap md:text-lg font-medium text-gray-600">
           {/* <span>{product?.price}</span> */}
-          <span dangerouslySetInnerHTML={{ __html: product?.price || '' }} />
+          <span dangerouslySetInnerHTML={{ __html: toDisplayCurrency(product?.price) }} />
 
           {!!product?.salePrice &&
             product?.salePrice !== product?.regularPrice && (
               <span className="text-red-400">
                 {/*  {product?.regularPrice} */}
-                <s dangerouslySetInnerHTML={{ __html: product?.regularPrice || '' }} />
+                <s dangerouslySetInnerHTML={{ __html: toDisplayCurrency(product?.regularPrice) }} />
               </span>
             )}
         </div>

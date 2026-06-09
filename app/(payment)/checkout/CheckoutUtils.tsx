@@ -1,5 +1,6 @@
 import { LineItem } from "@/graphql/types/graphql";
 import { isLineItemFree, stripHtmlMoney } from "@/lib/cartLinePricing";
+import { currencySymbol } from "@/lib/formatPrice";
 
 export const createProductList = (orderData: any): LineItem[] | null => {
   if (!orderData) return null;
@@ -36,7 +37,7 @@ export const ProductTableRows = ({
           {isLineItemFree(item?.total, item?.subtotal) ? (
             <span className="font-semibold text-green-600">Free</span>
           ) : (
-            <>Rs. {stripHtmlMoney(item?.total ?? item?.subtotal ?? 0)}</>
+            <>{currencySymbol} {stripHtmlMoney(item?.total ?? item?.subtotal ?? 0)}</>
           )}
         </td>
       </tr>

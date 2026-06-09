@@ -252,6 +252,12 @@ const InstantSearchWrapperInner = ({
     // the user picked 10,000–50,000. `rawPriceNumber` is the single canonical
     // price (the same field sort uses), so the range bound is strict.
     const f = [
+      // Drop records WooCommerce can't sell (no price set → `purchasable:false`).
+      // These leak into the unfiltered shop/new-arrivals grids as broken cards
+      // with no price and a stale IN_STOCK status; category grids already hide
+      // them because the same stale records carry no category. They return
+      // automatically once the WP→Typesense sync re-indexes them with a price.
+      "purchasable:!=false",
       HIDDEN_PRODUCT_SLUGS.size > 0
         ? Array.from(HIDDEN_PRODUCT_SLUGS).map(s => `slug:!=${s}`).join(" && ")
         : null,

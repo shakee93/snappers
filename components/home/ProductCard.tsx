@@ -81,7 +81,7 @@ const ProductCard = ({
   const link = useProductLink(product);
   const router = useRouter();
 
-  const { name, image, stockStatus, type, rawPrice } = product;
+  const { name, image, stockStatus, type, rawPrice, purchasable } = product;
   const productDbId = getDatabaseIdFromProductLike(product) ?? product.databaseId;
 
   // Explicit label wins (Deals/Health); otherwise show the on-sale discount.
@@ -129,7 +129,12 @@ const ProductCard = ({
     !!productDbId;
   const isVariableInStock = type === "VARIABLE" && stockStatus === "IN_STOCK";
   const canAddToCart = isSimplePurchasable;
-  const isOutOfStock = stockStatus !== "IN_STOCK";
+  // WooCommerce flags products with no price as `purchasable: false` even while
+  // their stockStatus stays IN_STOCK (e.g. discontinued items left in stock
+  // with the price cleared). With no price they can't be added to cart, so the
+  // card would otherwise render a broken "Add to Basket" with no price and no
+  // badge. Treat them as out of stock so the badge and disabled state show.
+  const isOutOfStock = stockStatus !== "IN_STOCK" || purchasable === false;
 
   const handleAddToCart = async () => {
     if (isOutOfStock) return;

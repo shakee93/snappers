@@ -12,7 +12,11 @@ type ProductLike = {
   } | null;
 };
 
-const FALLBACK_CATEGORY_SLUG = "product";
+// Breadcrumb fallback for products with no real WooCommerce category. Uses the
+// shop archive slug rather than a synthetic "product" slug, which would resolve
+// to a 404 through `resolveSlug`. `FALLBACK_CATEGORY_NAME` is its label.
+const FALLBACK_CATEGORY_SLUG = "shop";
+export const FALLBACK_CATEGORY_NAME = "Shop";
 
 /** Product listing archive — all products with filters. */
 export const SHOP_PATH = "/shop";

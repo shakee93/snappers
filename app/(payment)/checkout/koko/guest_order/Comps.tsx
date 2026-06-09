@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 import { createProductList } from "../../CheckoutUtils";
 import { isLineItemFree, stripHtmlMoney } from "@/lib/cartLinePricing";
+import { currencySymbol, toDisplayCurrency } from "@/lib/formatPrice";
 
 interface OrderDetailsProps {
   orderData: any;
@@ -54,7 +55,7 @@ export const OrderDetails = ({ orderData }: OrderDetailsProps) => {
               ) : (
                 <p className="mt-1">
                   {typeof row.value === "string" ? (
-                    <span dangerouslySetInnerHTML={{ __html: row.value }} />
+                    <span dangerouslySetInnerHTML={{ __html: toDisplayCurrency(row.value) }} />
                   ) : (
                     row.value
                   )}
@@ -128,7 +129,7 @@ const ProductTable = ({ lineItems, orderData }: ProductTableProps) => {
                           Free
                         </span>
                       ) : (
-                        <>Rs. {stripHtmlMoney(item?.total ?? item?.subtotal ?? 0)}</>
+                        <>{currencySymbol} {stripHtmlMoney(item?.total ?? item?.subtotal ?? 0)}</>
                       )}
                     </td>
                   </tr>
@@ -142,7 +143,7 @@ const ProductTable = ({ lineItems, orderData }: ProductTableProps) => {
                   <td className="px-6 text-right py-4 font-medium text-gray-800 dark:text-gray-200">
                     <span
                       dangerouslySetInnerHTML={{
-                        __html: orderData.order?.shippingTotal || "N/A",
+                        __html: toDisplayCurrency(orderData.order?.shippingTotal) || "N/A",
                       }}
                     />
                   </td>
@@ -156,7 +157,7 @@ const ProductTable = ({ lineItems, orderData }: ProductTableProps) => {
                   <td className="px-6 text-right py-4 font-medium text-gray-800 dark:text-gray-200">
                     <span
                       dangerouslySetInnerHTML={{
-                        __html: orderData.order?.total || "N/A",
+                        __html: toDisplayCurrency(orderData.order?.total) || "N/A",
                       }}
                     />
                   </td>
