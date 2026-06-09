@@ -80,8 +80,8 @@ export const siteConfig = {
       height: 31,
     },
     favicon: {
-      light: "/global/gq-logo.png",
-      dark: "/global/gq-logo.png",
+      light: "/favicon-black.ico",
+      dark: "/favicon-white.ico",
     },
     // Optional; defaults to favicon light when omitted.
     // appleTouchIcon: "/global/apple-touch-icon.png",
@@ -149,10 +149,45 @@ export const siteConfig = {
       ],
     },
   },
+  /** Footer layout content (see `components/footer/Footer.tsx`). */
+  footer: {
+    newsletter: {
+      heading: "Sign up for our email newsletter",
+      placeholder: "yourname@mail.com",
+      buttonLabel: "Subscribe",
+    },
+    openTime: {
+      heading: "Open Time",
+      schedule: [
+        { label: "Monday - Friday", hours: "09:00 AM - 10.00 PM" },
+        { label: "Saturday", hours: "09:00 AM - 10.00 PM" },
+        { label: "Sunday & Poya", hours: "09:00 AM - 6.00 PM" },
+      ],
+    },
+    visitUsHeading: "Visit Us",
+    shopHeading: "Shop",
+    customerServices: {
+      heading: "Customer Services",
+      links: [
+        { href: "/about", name: "About Us" },
+        { href: "/privacy", name: "Privacy Policy" },
+        { href: "/terms-and-conditions", name: "Terms & Conditions" },
+        { href: "/delivery-details", name: "Delivery Details" },
+        { href: "/return-policy", name: "Return Policy" },
+      ],
+    },
+    support: {
+      heading: "Our experts are available 24/7",
+      phoneDisplay: "071 606 0123",
+      phoneTel: "0716060123",
+    },
+  },
   social: {
     facebook: "gqmobilestore",
     instagram: "gqthemobilestoreunlimited",
     tiktok: "@gqmobiles",
+    x: "catlitter",
+    linkedin: "catlitter",
     googleReviewUrl:
       "https://www.google.com/search?hl=en-LK&gl=lk&q=ground+floor,+GQ+-The+Mobile+Store,+250,+54+R.+A.+De+Mel+Mawatha,+Colombo+00300&ludocid=1458190955880003094&lsig=AB86z5VvNAV33q2slj2rSzJqGGyh#lrd=0x3ae25975d215fa97:0x143c88f2d3ea3616,3",
   },

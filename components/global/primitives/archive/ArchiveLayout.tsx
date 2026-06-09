@@ -7,7 +7,7 @@ import { Brand } from "@/graphql/types/graphql";
 import Link from "next/link";
 import { GET_TAG_DETAILS_BY_SLUG } from "@/graphql/defs/products";
 import { DealFilterType } from "@/lib/dealFilters";
-import { useGraphqlArchive } from "@/lib/archiveSource";
+import { isGraphqlArchive } from "@/lib/archiveSource";
 import { siteConfig } from "@/site.config";
 
 async function getData(parentId?: number, tagSlug?: string) {
@@ -97,7 +97,7 @@ const ArchiveLayout = async ({
   inStockOnly,
   defaultNewest,
 }: ArchiveLayoutProps) => {
-  const graphqlArchive = useGraphqlArchive();
+  const graphqlArchive = isGraphqlArchive();
   const { productCategories, brands, nestedCategories, tagDetails } = await getData(category?.databaseId ?? '', tag);
   const categoryScopeIds = buildCategoryScopeIds(category, nestedCategories);
 

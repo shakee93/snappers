@@ -3,7 +3,7 @@
  * from WPGraphQL. Use GraphQL when the search cluster still belongs to another
  * tenant (e.g. catlitter API + gqmobiles Typesense) or when explicitly opted in.
  */
-export function useGraphqlArchive(): boolean {
+export function isGraphqlArchive(): boolean {
   const source = process.env.NEXT_PUBLIC_ARCHIVE_SOURCE;
   if (source === "typesense") return false;
   if (source === "graphql") return true;
