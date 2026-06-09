@@ -1,0 +1,47 @@
+import { FC } from "react";
+import Link from "next/link";
+import UserDetails from "@/components/account/UserDetails";
+
+export interface CommonLayoutProps {
+  children?: React.ReactNode;
+}
+
+const menuItems = [
+  { name: "Account info", link: "/account" },
+  { name: "My orders", link: "/account/my-orders" },
+  { name: "Address", link: "/account/address" },
+  // { name: "Change password", link: "/account/change-password" },
+];
+
+const CommonLayout: FC<CommonLayoutProps> = async ({ children }) => {
+  return (
+    <div className="nc-CommonLayoutProps container">
+      <div className="mt-14 sm:mt-20 max-w-4xl mx-auto">
+        <UserDetails />
+        <hr className="mt-10 border-slate-200 dark:border-slate-700"></hr>
+
+        <div className="flex space-x-8 md:space-x-14 overflow-x-auto hiddenScrollbar">
+          {menuItems.map((item, index) => (
+            <Link
+              key={index}
+              href={item.link}
+              className={`block py-5 md:py-8 border-b-2 border-transparent flex-shrink-0 text-sm sm:text-base ${
+                true
+                  ? "border-primary-500 font-medium text-slate-900 dark:text-slate-200"
+                  : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+              }`}
+            >
+              {item.name}
+            </Link>
+          ))}
+        </div>
+        <hr className="border-slate-200 dark:border-slate-700"></hr>
+      </div>
+      <div className="max-w-4xl mx-auto pt-14 sm:pt-26 pb-24 lg:pb-32">
+        {children}
+      </div>
+    </div>
+  );
+};
+
+export default CommonLayout;

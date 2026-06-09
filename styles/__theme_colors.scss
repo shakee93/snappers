@@ -1,0 +1,14 @@
+// Primary/secondary brand scales come from site.config.ts (injected in layout).
+// Neutral grays remain here until moved into site.config.
+:root {
+  --c-neutral-50: 249 250 251;
+  --c-neutral-100: 243 244 246;
+  --c-neutral-200: 229 231 235;
+  --c-neutral-300: 209 213 219;
+  --c-neutral-400: 156 163 175;
+  --c-neutral-500: 107 114 128;
+  --c-neutral-600: 75 85 99;
+  --c-neutral-700: 55 65 81;
+  --c-neutral-800: 31 41 55;
+  --c-neutral-900: 17 24 39;
+}

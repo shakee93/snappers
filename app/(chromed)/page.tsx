@@ -1,0 +1,319 @@
+import CategoryBlockSection from "@/components/home/CategoryBlocksSection";
+import SectionHero3 from "@/components/home/SectionHero3";
+import SectionSliderProductCard from "@/components/global/ui/SectionSliderProductCard";
+import SectionPromo1 from "@/components/home/SectionPromo1";
+import Heading from "@/components/global/primitives/Heading/Heading";
+import { getClient } from "@/graphql/apollo-ssr";
+import {
+  GET_BRANDS,
+  GET_PRODUCTS_BY_BOGO_TAG,
+  GET_PRODUCTS_NODES,
+  GET_PRODUCTS_NODES_HOMEPAGE,
+} from "@/graphql/defs/products";
+import { GET_SLIDES, GET_REVIEWS } from "@/graphql/defs/slides";
+import { Brand, SimpleProduct, Slide, VariableProduct } from "@/graphql/types/graphql";
+import SectionSliderBrandCard from "@/components/global/ui/SectionSliderBrandCard";
+import CardSkeleton from "@/components/global/primitives/Skeletons/CardSkeleton";
+import { GET_OPTIONS } from "@/graphql/defs/options";
+import FancyTestimonialsSlider from "@/components/home/TestimonialsSlider";
+import GoogleReviewsSection from "@/components/home/GoogleReviewsSection";
+import FAQ from "@/components/home/FAQSection";
+import TikTokSection from "@/components/home/TikTokSection";
+import { GET_BENTO_SLIDER } from "@/graphql/defs/products";
+import SectionHero4 from "@/components/home/SectionHero4";
+import { unstable_cache } from "next/cache";
+import { HERO_SECTION_CACHE_TAG } from "@/lib/cache-tags";
+
+// ISR safety net: the WP → /api/revalidate webhook is the primary cache buster,
+// but this ensures the homepage (slides, reviews, etc.) self-heals if a webhook
+// is missed — and lets local dev pick up fresh data without clearing .next.
+export const revalidate = 1800;
+
+
+/**
+ * Get the data for the home page
+  * @returns { Promise<{ newArrivals: (SimpleProduct & VariableProduct)[], mobiles: (SimpleProduct & VariableProduct)[], speakers: (SimpleProduct & VariableProduct)[], watches: (SimpleProduct & VariableProduct)[], backInStock: (SimpleProduct & VariableProduct)[], brands: Brand[], slides: Slide[], options: Option[], reviews: Review[], bentoSlider: BentoSlider[] }> }
+ */
+const BOGO_OFFER_TAG_SLUGS = ["bogo-offer"];
+
+// Hero/bento slider data is invalidated via revalidateTag(HERO_SECTION_CACHE_TAG)
+// from /api/revalidate?tag=hero-section, fired by WP acf/save_post on the
+// Hero Section options page (and by save_post on the slide CPT).
+//
+// Two cache layers need the tag:
+//   1. unstable_cache (this wrapper) — `tags` option below.
+//   2. The underlying Next.js fetch cache used by Apollo's HttpLink, which
+//      ships with `cache: 'force-cache'` (see graphql/apollo-ssr.ts) and
+//      keys entries by GraphQL request body. Without an explicit tag, that
+//      layer is unreachable by revalidateTag and serves stale data forever.
+//      Pass `next.tags` via `context.fetchOptions` so the link merges it
+//      into the fetch call.
+const HERO_QUERY_CONTEXT = {
+  fetchOptions: { next: { tags: [HERO_SECTION_CACHE_TAG] } },
+};
+
+const getSlidesCached = unstable_cache(
+  () =>
+    getClient()
+      .query({ query: GET_SLIDES, context: HERO_QUERY_CONTEXT })
+      .then((res) => res.data?.slides?.nodes || [])
+      .catch(() => []),
+  ["homepage-slides"],
+  { tags: [HERO_SECTION_CACHE_TAG], revalidate: 86400 }
+);
+
+const getBentoSliderCached = unstable_cache(
+  () =>
+    getClient()
+      .query({ query: GET_BENTO_SLIDER, context: HERO_QUERY_CONTEXT })
+      .then((res) => res.data || [])
+      .catch(() => []),
+  ["homepage-bento-slider"],
+  { tags: [HERO_SECTION_CACHE_TAG], revalidate: 86400 }
+);
+
+const getData = async () => {
+  const queries = [
+    getClient()
+      .query({
+        query: GET_PRODUCTS_BY_BOGO_TAG,
+        variables: { first: 20, tagIn: BOGO_OFFER_TAG_SLUGS },
+      })
+      .then((res) => res.data?.products?.nodes || [])
+      .catch(() => []),
+    getClient()
+      .query({ query: GET_PRODUCTS_NODES, variables: { first: 25 } })
+      .then((res) => {
+        return res.data?.products?.nodes || [];
+      })
+      .catch(() => []),
+    getClient()
+      .query({
+        query: GET_PRODUCTS_NODES,
+        variables: { first: 10, categoryIdIn: [165] },
+      })
+      .then((res) => {
+        return res.data?.products?.nodes || [];
+      })
+      .catch(() => []),
+
+    getClient()
+      .query({
+        query: GET_PRODUCTS_NODES_HOMEPAGE,
+        variables: { first: 20, tagId: 538 },
+      })
+      .then((res) => {
+        return res.data?.products?.nodes || [];
+      })
+      .catch(() => []),
+
+    getClient()
+      .query({
+        query: GET_PRODUCTS_NODES,
+        variables: { first: 20, categoryIdIn: [302] },
+      })
+      .then((res) => {
+        return res.data?.products?.nodes || [];
+      })
+      .catch(() => []),
+
+    getClient()
+      .query({
+        query: GET_PRODUCTS_NODES_HOMEPAGE,
+        variables: { first: 10, tagId: 536 },
+      })
+      .then((res) => {
+        return res.data?.products?.nodes || [];
+      })
+      .catch(() => []),
+
+    getClient()
+      .query({
+        query: GET_BRANDS,
+      })
+      .then((res) => {
+        return res.data?.brands?.nodes || [];
+      })
+      .catch(() => []),
+
+    getSlidesCached(),
+    getClient()
+      .query({
+        query: GET_OPTIONS,
+      })
+      .then((res) => res.data || [])
+      .catch(() => []),
+    getClient()
+      .query({
+        query: GET_REVIEWS,
+      })
+      .then((res) => {
+        return res.data?.customerReviewFields || [];
+      })
+      .catch(() => []),
+
+    getBentoSliderCached(),
+  ];
+
+  const [
+    freeOffersRaw,
+    newArrivals,
+    mobiles,
+    speakers,
+    watches,
+    backInStock,
+    brands,
+    slides,
+    options,
+    reviews,
+    bentoSlider,
+  ] = await Promise.all(queries);
+
+  return {
+    freeOffersRaw: freeOffersRaw as (SimpleProduct & VariableProduct)[],
+    newArrivals: newArrivals as (SimpleProduct & VariableProduct)[],
+    mobiles: mobiles as (SimpleProduct & VariableProduct)[],
+    speakers: speakers as (SimpleProduct & VariableProduct)[],
+    watches: watches as (SimpleProduct & VariableProduct)[],
+    backInStock: backInStock as (SimpleProduct & VariableProduct)[],
+    brands: brands as Brand[],
+    slides,
+    options,
+    reviews,
+    bentoSlider,
+  };
+};
+
+export default async function Home() {
+  const {
+    freeOffersRaw,
+    newArrivals,
+    mobiles,
+    speakers,
+    watches,
+    backInStock,
+    brands,
+    slides,
+    reviews,
+    bentoSlider,
+  } = await getData();
+
+  const inStockOffers = freeOffersRaw.filter((p) => p.stockStatus === "IN_STOCK");
+  const soldOutOffers = freeOffersRaw.filter((p) => p.stockStatus !== "IN_STOCK");
+  const freeOffersProducts =
+    inStockOffers.length >= 5
+      ? inStockOffers
+      : [...inStockOffers, ...soldOutOffers];
+
+  return (
+    <main>
+      <div className="nc-PageHome relative flex flex-col overflow-hidden">
+        <div className="z-0">
+          <SectionHero4 data={bentoSlider} />
+        </div>
+
+        <div className="flex flex-col px-3 gap-10 lg:gap-10 sm:container sm:max-w-screen-2xl">
+          <div className="mt-5 md:mt-10">
+            <SectionSliderProductCard
+              products={newArrivals}
+              heading="New Arrivals"
+              link="new-arrivals"
+            />
+          </div>
+
+          <div>
+            <SectionSliderProductCard
+              products={freeOffersProducts}
+              heading="Free Offers"
+              link="tag/bogo-offer"
+            />
+          </div>
+
+          {brands ? (
+            <SectionSliderBrandCard
+              heading="Our Brands"
+              link="brands"
+              brands={brands}
+            />
+          ) : (
+            <CardSkeleton />
+          )}
+
+          {/* Back In Stock category */}
+          <div>
+            <SectionSliderProductCard
+              products={backInStock}
+              // subHeading=""
+              heading="Back In Stock"
+              link="back-in-stock"
+            />
+          </div>
+
+          {/*featured categoties */}
+          <div>
+            <Heading>Explore Our Range</Heading>
+            <CategoryBlockSection />
+          </div>
+
+          {/* TikTok Section */}
+          <div>
+            <Heading isCenter={true}>Take a look at our TikTok.</Heading>
+            <TikTokSection />
+          </div>
+
+          {/* Testimonials section */}
+          <div className="">
+            <Heading>What Our Customers Say</Heading>
+            <FancyTestimonialsSlider reviews={reviews} />
+          </div>
+
+          {/* Google Reviews Section */}
+          <GoogleReviewsSection />
+
+          {/*Mobile Category */}
+          <div className="block md:hidden">
+            <SectionSliderProductCard
+              products={mobiles}
+              heading="Latest Smartphones"
+            />
+          </div>
+
+          {/* About section */}
+          <div className="">
+            <SectionPromo1 />
+          </div>
+
+          {/* Speakers Category */}
+          <div>
+            <SectionSliderProductCard
+              products={speakers}
+              // subHeading=""
+              heading="Explore Speakers"
+              link="explore-speakers"
+            />
+          </div>
+
+          {/* brand section */}
+          {/* <div className="relative md:hidden"> */}
+          {/* <BackgroundSection /> */}
+          {/* <SectionGridMoreExplore /> */}
+          {/* </div> */}
+
+          {/* Smart Watches Section */}
+          <div>
+            <SectionSliderProductCard
+              products={watches}
+              heading="Smart Watches"
+              link="smartwatches"
+            />
+          </div>
+
+          <div>
+            <Heading>Frequently Asked Questions</Heading>
+            <FAQ />
+          </div>
+        </div>
+      </div>
+    </main>
+  );
+}

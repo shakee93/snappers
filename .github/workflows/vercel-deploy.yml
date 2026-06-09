@@ -1,0 +1,49 @@
+name: Trigger Vercel Deploy
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  trigger-deploy:
+    # Vercel's Git integration already auto-deploys pushes from the
+    # connected account (shakee93). Only fire this fallback for pushes
+    # from team members whose GitHub accounts aren't linked to Vercel.
+    if: github.actor != 'shakee93'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger Vercel Deploy
+        run: |
+          echo "🚀 Starting Vercel deployment trigger..."
+          echo "📝 Commit message: ${{ github.event.head_commit.message }}"
+          echo "👤 Committed by: ${{ github.event.head_commit.author.name }}"
+
+          RESPONSE=$(curl -s -w "\n%{http_code}" -X GET "$VERCEL_DEPLOY_HOOK")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n1)
+          BODY=$(echo "$RESPONSE" | sed '$d')
+
+          echo "📡 Vercel API Response Code: $HTTP_CODE"
+          echo "📦 Response Body: $BODY"
+
+          # Check HTTP status
+          if [ "$HTTP_CODE" -eq 200 ] || [ "$HTTP_CODE" -eq 201 ] || [ "$HTTP_CODE" -eq 202 ]; then
+            echo "✅ Vercel API accepted the deployment trigger."
+
+            # Extract deploy state using jq
+            STATE=$(echo "$BODY" | jq -r '.job.state')
+            echo "🧾 Deployment State: $STATE"
+
+            if [ "$STATE" = "PENDING" ] || [ "$STATE" = "READY" ]; then
+              echo "✅ Deployment state is acceptable: $STATE"
+            else
+              echo "❌ Unexpected deployment state: $STATE"
+              exit 1
+            fi
+          else
+            echo "❌ Deployment trigger failed with HTTP code: $HTTP_CODE"
+            exit 1
+          fi
+
+        env:
+          VERCEL_DEPLOY_HOOK: ${{ secrets.VERCEL_DEPLOY_HOOK }}
