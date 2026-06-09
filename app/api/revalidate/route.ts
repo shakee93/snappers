@@ -4,7 +4,7 @@ import { DEALS_CACHE_TAG, productTag } from '@/lib/cache-tags'
 
 // Accepted values for the optional ?type= query param. Forwarded as the
 // second arg to revalidatePath. For App Router dynamic routes like
-// /[brand]/[slug], passing 'page' is what makes revalidatePath actually
+// /[category]/[slug], passing 'page' is what makes revalidatePath actually
 // invalidate the cached entry instead of silently no-op'ing.
 type RevalidatePathType = 'page' | 'layout'
 function parseType(raw: string | null): RevalidatePathType | undefined {
@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
                 // Tag/collection pages — bust deals sliders.
                 revalidateTag(DEALS_CACHE_TAG, 'max');
             } else {
-                // PDP paths follow /<brand>/<slug>. Bust the per-product tag
+                // PDP paths follow /<category>/<slug>. Bust the per-product tag
                 // attached to GET_PRODUCT's SSR fetch so a regen actually
                 // re-pulls WPGraphQL instead of re-serving the stale fetch-
                 // cache entry on a path that was already invalidated.

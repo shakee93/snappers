@@ -19,6 +19,7 @@ import {
   isSimpleProductFreeShipping,
   isVariationFreeShipping,
 } from "@/lib/freeShipping";
+import { getProductPath } from "@/lib/productUrl";
 
 export interface CartItem {
   extraData?: null | any;
@@ -78,7 +79,7 @@ const CartItems = ({
     }
     return isSimpleProductFreeShipping(node);
   }, [type, variation?.node, node]);
-  const brandSlug = brands?.nodes[0]?.slug;
+  const productHref = node ? getProductPath(node) : "#";
 
   const { maxQty, atMax } = getCartLineStockCap(item);
   const atMaxStock = atMax(quantity);
@@ -131,7 +132,7 @@ const CartItems = ({
             className="h-full w-full object-contain object-center"
           />
           <Link
-            href={`/${brandSlug}/${product.node.slug}`}
+            href={productHref}
             className="absolute inset-0"
             aria-label={name}
           />
@@ -144,7 +145,7 @@ const CartItems = ({
       <div className="flex flex-1 min-w-0 items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
           <h3 className="text-sm font-semibold leading-snug text-slate-900 dark:text-slate-100 line-clamp-2">
-            <Link href={`/${brandSlug}/${product.node.slug}`}>{name}</Link>
+            <Link href={productHref}>{name}</Link>
           </h3>
 
           {type === "VARIABLE" && (

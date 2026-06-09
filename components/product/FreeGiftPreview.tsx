@@ -9,6 +9,7 @@ import { getPreferredVariation } from "@/lib/getPreferredVariation";
 import { useStore } from "@/store/store";
 import { useUnresolvedFreeGifts } from "@/hooks/useUnresolvedFreeGifts";
 import { useFreeGiftProducts } from "@/hooks/useFreeGiftProducts";
+import { getProductPath } from "@/lib/productUrl";
 
 type GiftCardItem = {
   id: number | string;
@@ -127,9 +128,7 @@ export default function FreeGiftPreview({
   const resolvedGiftCards = useMemo<GiftCardItem[]>(
     () =>
       freeGiftNodes.map((p: any) => {
-        const brandSlug = p?.brands?.nodes?.[0]?.slug;
-        const href =
-          brandSlug && p?.slug ? `/${brandSlug}/${p.slug}` : undefined;
+        const href = p?.slug ? getProductPath(p) : undefined;
         const imageUrl =
           p?.image?.sourceUrl ||
           p?.featuredImage?.node?.sourceUrl ||
@@ -161,10 +160,7 @@ export default function FreeGiftPreview({
         ? {
             id: product?.databaseId ?? product?.id ?? "self-free-product",
             name: product?.name || "Free gift",
-            href:
-              product?.brands?.nodes?.[0]?.slug && product?.slug
-                ? `/${product.brands.nodes[0].slug}/${product.slug}`
-                : undefined,
+            href: product?.slug ? getProductPath(product) : undefined,
             imageUrl:
               product?.image?.sourceUrl ||
               product?.featuredImage?.node?.sourceUrl ||

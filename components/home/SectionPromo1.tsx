@@ -6,6 +6,7 @@ import StoreImageSlider from "./StoreImageSlide"
 import { EmblaOptionsType } from "embla-carousel";
 import Link from "next/link";
 import storePromo from "@/content/store-promo.json";
+import { SHOP_PATH } from "@/lib/productUrl";
 import { siteConfig } from "@/site.config";
 
 import "styles/embla.css";
@@ -32,12 +33,12 @@ const SectionPromo1: FC<SectionPromo1Props> = ({ className = "" }) => {
           {storePromo.description.replaceAll("{brand}", siteConfig.brand.name)}
         </span>
         <div className="flex space-x-2 sm:space-x-5 ">
-          <Link href="/collections/all">
+          <Link href={SHOP_PATH}>
             <ButtonPrimary className="">
               Shop Now 
             </ButtonPrimary>
           </Link>
-          <Link href="/collections/all">
+          <Link href={SHOP_PATH}>
             <ButtonSecondary
               className="border border-slate-100 dark:border-slate-700"
             >

@@ -5,7 +5,6 @@ import ProductAddToCart from "./ProductAddToCart";
 import {
   Attribute,
   Brand,
-  PaCapacity,
   ProductAttribute,
   ProductVariation,
   SimpleProduct,
@@ -28,6 +27,7 @@ import { BanknotesIcon } from "@heroicons/react/24/outline";
 import { Flame, Truck } from "lucide-react";
 import BrandLogo from "./BrandLogo";
 import ShareButtons from "./ShareButtons";
+import { getCategoryPath, getProductPath } from "@/lib/productUrl";
 import { AnimatePresence, motion } from "framer-motion";
 import { Listbox, Transition } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
@@ -251,8 +251,7 @@ const ProductDetails = ({
           },
           i: number
         ): FreeGiftMention => {
-          const brandSlug = p.brands?.nodes?.[0]?.slug;
-          const href = brandSlug && p.slug ? `/${brandSlug}/${p.slug}` : null;
+          const href = p.slug ? getProductPath(p) : null;
           return {
             key: p.databaseId ?? `r-${i}`,
             name: p.name ?? "Free gift",
@@ -357,13 +356,8 @@ const ProductDetails = ({
             (node: VariationAttribute) => node.name === attr.name
           )?.value;
           if (attrValue && attrValue !== selectedValue) {
-            // Get the display name for this value
-            const displayName = (product as any)[
-              `allPa${attr?.label?.split(" ").join("")}`
-            ]?.nodes.find((node: PaCapacity) => node.slug === attrValue)?.name;
-            if (displayName) {
-              availableValues.add(displayName);
-            }
+            // Custom (non-taxonomy) attributes: the value is the display label.
+            availableValues.add(attrValue);
           }
         }
       });
@@ -561,7 +555,7 @@ const ProductDetails = ({
       </div>
 
       <ShareButtons
-        url={`${siteConfig.url.base}/${brand.slug}/${product.slug}`}
+        url={`${siteConfig.url.base}${getProductPath(product)}`}
         title={product.name || "Product"}
         className="mt-3"
       />
@@ -725,14 +719,7 @@ const ProductDetails = ({
                           if (!selectedOption) {
                             return `Select ${attr.label}`;
                           }
-                          const displayName = (product as any)[
-                            `allPa${(attr?.label as unknown as "Capacity")
-                              ?.split(" ")
-                              .join("")}`
-                          ]?.nodes.find(
-                            (node: PaCapacity) => node.slug === selectedOption
-                          )?.name || "OPTION";
-                          return displayName;
+                          return selectedOption;
                         })()}
                       </span>
                       <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
@@ -816,15 +803,7 @@ const ProductDetails = ({
                               isAvailable = !!availableVariation;
                             }
 
-                            const displayName = (product as any)[
-                              `allPa${(attr?.label as unknown as "Capacity")
-                                ?.split(" ")
-                                .join("")}`
-                            ]?.nodes.find(
-                              (node: PaCapacity) => node.slug === option
-                            )?.name || "OPTION";
-
-                            let optionText = displayName;
+                            let optionText = option || "OPTION";
                             if (allOutOfStock) {
                               optionText += " (Out of Stock)";
                             } else if (isAvailable) {
@@ -911,9 +890,9 @@ const ProductDetails = ({
         {product.productCategories?.edges.map(
           (category: any, index: number) => (
             <Link
-              href={`/collections/${category.node.slug}`}
+              href={getCategoryPath(category.node.slug ?? "")}
               key={index}
-              className="border border-primary-500 inline-block min-w-max 
+              className="border border-primary-500 inline-block min-w-max
               rounded-md text-black px-3 py-1 text-xs md:text-sm bg-white"
             >
               {category.node.name}

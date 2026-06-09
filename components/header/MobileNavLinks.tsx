@@ -21,7 +21,7 @@ const MobileNavLinks = () => {
   const navLinks = [
     {
       id: 2,
-      href: "/collections/all",
+      href: "/shop",
       name: "Shop",
     },
     {

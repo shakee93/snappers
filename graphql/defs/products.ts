@@ -115,6 +115,12 @@ export const GET_PRODUCT_BY_DATABASE_ID = gql`
           sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
         }
       }
+      productCategories {
+        nodes {
+          slug
+          parentDatabaseId
+        }
+      }
       ... on SimpleProduct {
         brands {
           nodes {
@@ -126,6 +132,30 @@ export const GET_PRODUCT_BY_DATABASE_ID = gql`
         brands {
           nodes {
             slug
+          }
+        }
+      }
+    }
+  }
+`;
+
+/** Batch-fetch listing images for Typesense hits that omit parent/variation media. */
+export const GET_PRODUCT_LISTING_IMAGES_BY_IDS = gql`
+  query GetProductListingImagesByIds($ids: [Int]) {
+    products(first: 100, where: { include: $ids }) {
+      nodes {
+        databaseId
+        image {
+          sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
+        }
+        ... on VariableProduct {
+          variations(first: 50) {
+            nodes {
+              stockStatus
+              image {
+                sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
+              }
+            }
           }
         }
       }
@@ -228,8 +258,11 @@ export const GET_CATEGORY_SLUGS = gql`
 `;
 
 export const GET_SHOP_BY_CATEGORIES = gql`
-  query ShopByCategories($first: Int = 6) {
-    productCategories(first: $first) {
+  # Top-level pet categories (parent: 0) for the "Shop by Categories" grid.
+  # Accessory sub-categories have no category image and would be filtered out
+  # client-side, so restrict to roots and fetch a few extra to fill the grid.
+  query ShopByCategories($first: Int = 12) {
+    productCategories(first: $first, where: { parent: 0 }) {
       nodes {
         id
         name
@@ -320,6 +353,9 @@ export const GET_CATEGORY = gql`
       name
       slug
       databaseId
+      image {
+        sourceUrl
+      }
     }
     productCategories(first: 100, where: { orderby: COUNT }) {
       nodes {

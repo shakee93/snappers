@@ -6,6 +6,7 @@ import {
   GET_PRODUCT_BY_DATABASE_ID,
   GET_PRODUCT_VARIATION_BY_DATABASE_ID,
 } from "@/graphql/defs/products";
+import { getProductPath } from "@/lib/productUrl";
 
 export type ResolvedFreeGift = {
   id: number;
@@ -22,6 +23,12 @@ type ResolvedSource = {
   name?: string | null;
   slug?: string | null;
   brands?: { nodes?: ({ slug?: string | null } | null)[] | null } | null;
+  productCategories?: {
+    nodes?: Array<{
+      slug?: string | null;
+      parentDatabaseId?: number | null;
+    } | null> | null;
+  } | null;
   image?: { sourceUrl?: string | null } | null;
   featuredImage?: { node?: { sourceUrl?: string | null } | null } | null;
 };
@@ -30,7 +37,7 @@ function toResolved(id: number, source: ResolvedSource | null | undefined): Reso
   if (!source?.name) return null;
   const brandSlug = source.brands?.nodes?.[0]?.slug ?? undefined;
   const slug = source.slug ?? undefined;
-  const href = brandSlug && slug ? `/${brandSlug}/${slug}` : undefined;
+  const href = slug ? getProductPath(source) : undefined;
   const imageUrl =
     source.image?.sourceUrl ||
     source.featuredImage?.node?.sourceUrl ||

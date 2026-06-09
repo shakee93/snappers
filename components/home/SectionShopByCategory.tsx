@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { getCategoryPath } from "@/lib/productUrl";
 
 interface CategoryNode {
   id: string;
@@ -56,7 +57,7 @@ const SectionShopByCategory = ({
           return (
             <Link
               key={category.id}
-              href={`/category/${category.slug}`}
+              href={getCategoryPath(category.slug!)}
               className="group flex flex-col items-center"
             >
               <div className="relative flex h-[200px] w-full items-end justify-center">

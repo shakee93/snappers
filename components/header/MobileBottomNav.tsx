@@ -48,11 +48,11 @@ const MobileBottomNav = ({ categories }: { categories: any }) => {
                 <Logo className='flex  h-full items-center justify-center' imageClass='h-[45px] p-0' />
             </div>
             <Link
-                href="/collections"
+                href="/c"
                 className="flex-1 pt-2 flex flex-col justify-center items-center text-primaryColor gap-1 cursor-pointer"
             >
                 <LayoutGrid />
-                <div className="text-[11px]">Collections</div>
+                <div className="text-[11px]">Categories</div>
             </Link>
             <Link
                 href="/brands"

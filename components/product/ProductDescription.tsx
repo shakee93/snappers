@@ -15,7 +15,11 @@ const ProductDescription: React.FC<ProductDescriptionProps> = ({ product }) => {
     return htmlContent.replace(/<ul>/g, '<ul class="list-disc pb-4 sm">');
   };
 
-  const isProductWarranty = (product?.allPaWarranty?.nodes?.length ?? 0) > 0;
+  // Warranty section shows when warranty meta is present (custom-attribute
+  // backends don't expose the global pa_warranty taxonomy).
+  const isProductWarranty = !!product?.metaData?.find(
+    (item) => item?.key === "warranty_type" && item?.value && item.value !== "null",
+  );
   const insideTheBoxMeta = product?.metaData?.find(meta => meta?.key === 'inside_the_box');
   const insideTheBoxValue = insideTheBoxMeta?.value || '';
 

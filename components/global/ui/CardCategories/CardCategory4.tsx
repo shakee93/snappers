@@ -1,5 +1,6 @@
 'use client'
 import React, { FC } from "react";
+import { getBrandPath } from "@/lib/productUrl";
 import NcImage from "shared/NcImage/NcImage";
 import Link from "next/link"
 import explore1Svg from "@/public/images/collections/explore1.svg";
@@ -30,7 +31,7 @@ const CardCategory4: FC<CardCategory4Props> = ({
 }) => {
 
   return (
-      <Link href={`/${slug}`}>
+      <Link href={getBrandPath(slug)}>
         <div
             className={`nc-CardCategory4 relative w-full rounded-3xl overflow-hidden bg-white dark:bg-neutral-900 group hover:nc-shadow-lg transition-shadow ${className}`}
             data-nc-id="CardCategory4"

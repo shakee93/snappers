@@ -53,16 +53,16 @@ export default function NavLinks({ navCategories }: NavLinksProps) {
               <NavigationMenuLink asChild>
                 <Link
                   href={item.href}
-                  onClick={item.href === "/" ? clearSearch : undefined}
+                  onClick={String(item.href) === "/" ? clearSearch : undefined}
                   className={`NavigationMenuLink ${
                     "special" in item && item.special
                       ? "relative px-3 animate-bounce flex items-center gap-1"
                       : ""
                   }`}
                 >
-                  {"special" in item && item.special && (
+                  {"special" in item && !!(item as { special?: boolean }).special ? (
                     <span className="mr-1">🔥</span>
-                  )}
+                  ) : null}
                   {item.name}
                 </Link>
               </NavigationMenuLink>

@@ -269,6 +269,13 @@ export const ProductContentCard = gql`
         name
       }
     }
+    productCategories {
+      nodes {
+        slug
+        name
+        parentDatabaseId
+      }
+    }
     ... on SimpleProduct {
       onSale
       stockStatus
@@ -278,26 +285,6 @@ export const ProductContentCard = gql`
       salePrice
     }
     ... on VariableProduct {
-      # allPa* fields are dynamically accessed by AddedToCart at
-      # product[allPa+label], so they must stay on the card fragment.
-      allPaCapacity { nodes { name slug } }
-      allPaColor { nodes { name slug } }
-      allPaColour { nodes { name slug } }
-      allPaSpecification { nodes { name slug } }
-      allPaVariant { nodes { name slug } }
-      allPaWarranty { nodes { name slug } }
-      allPaModel { nodes { name slug } }
-      allPaWatchSize { nodes { name slug } }
-      allPaConnectivity { nodes { name slug } }
-      allPaPacks { nodes { name slug } }
-      allPaSize { nodes { name slug } }
-      allPaConnectorType { nodes { name slug } }
-      allPaBandType { nodes { name slug } }
-      allPaShape { nodes { name slug } }
-      allPaCompatibility { nodes { name slug } }
-      allPaNetwork { nodes { name slug } }
-      allPaAmount { nodes { name slug } }
-
       onSale
       price
       rawPrice: price(format: RAW)
@@ -339,7 +326,6 @@ export const ProductContentFull = gql`
     description
     shortDescription(format: RAW)
     reviewCount
-    productVideoUrl
     image {
       id
       sourceUrl
@@ -425,6 +411,7 @@ export const ProductContentFull = gql`
             id
             name
             slug
+            parentDatabaseId
           }
         }
       }
@@ -439,108 +426,6 @@ export const ProductContentFull = gql`
     }
     ... on VariableProduct {
       happiestCustomersGallery
-      allPaCapacity {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaColor {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaColour {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaSpecification {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaVariant {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaWarranty {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaModel {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaWatchSize {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaConnectivity {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaPacks {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaSize {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaConnectorType {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaBandType {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaShape {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaCompatibility {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaNetwork {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaAmount {
-        nodes {
-          name
-          slug
-        }
-      }
       onSale
       price
       rawPrice: price(format: RAW)
@@ -573,6 +458,7 @@ export const ProductContentFull = gql`
             databaseId
             name
             slug
+            parentDatabaseId
           }
         }
       }

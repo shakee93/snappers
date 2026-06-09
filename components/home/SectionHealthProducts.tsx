@@ -1,12 +1,12 @@
-import PromoProductCard, {
-  type PromoProduct,
-} from "@/components/home/PromoProductCard";
+import ProductCard, {
+  type ProductCardItem,
+} from "@/components/home/ProductCard";
 
 const ACCENT_TEAL = "#2D8B7B";
 
 export interface SectionHealthProductsProps {
   className?: string;
-  products?: PromoProduct[];
+  products?: ProductCardItem[];
 }
 
 /** Row of health product cards shown beneath the health banner. */
@@ -20,7 +20,7 @@ const SectionHealthProducts = ({
     <section className={`mx-auto w-full max-w-[1368px] px-3 lg:px-0 ${className}`}>
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6">
         {products.map((product) => (
-          <PromoProductCard
+          <ProductCard
             key={product.id}
             product={product}
             badgeLabel="Health"

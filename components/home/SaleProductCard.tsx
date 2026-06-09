@@ -3,6 +3,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { HIDDEN_PRODUCT_SLUGS } from "@/lib/hidden-products";
+import { getProductPath } from "@/lib/productUrl";
 import { siteConfig } from "@/site.config";
 
 interface SaleProductData {
@@ -71,7 +72,7 @@ const
                     Explore Deals
                   </button>
                 </Link>
-                <Link href={`/products/${product.slug}`} target="_blank" rel="noopener noreferrer">
+                <Link href={getProductPath(product)} target="_blank" rel="noopener noreferrer">
                   <button className="bg-primary-500 text-white text-xs px-4 py-1 rounded-full hover:bg-blue-600 transition-colors">
                     Buy Now
                   </button>

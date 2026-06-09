@@ -123,8 +123,8 @@ export const siteConfig = {
       { href: "/rabbit-hamsters", name: "Rabbit & Hamsters" },
       { href: "/cat", name: "Cat" },
       { href: "/dog", name: "Dog" },
-      { href: "/cat-dogs", name: "Cat & dogs" },
-      { href: "/birds", name: "Birds" },
+      { href: "/cat-dog", name: "Cat & dogs" },
+      { href: "/bird", name: "Birds" },
       { href: "/aquarium", name: "Aquarium" },
     ],
     /** Quick links on the dark-green utility bar (see `HeaderUtilityBar`). */
@@ -132,7 +132,7 @@ export const siteConfig = {
       links: [
         { href: "/new-arrivals", name: "New Arrivals" },
         { href: "/deals", name: "Flash deals" },
-        { href: "/collections/all", name: "Most Selling" },
+        { href: "/shop", name: "Most Selling" },
       ],
       // Each entry renders on its own line in the utility bar.
       message: ["Cash on Delivery Available Island-wide |", "Shop with Confidence"],
@@ -140,7 +140,7 @@ export const siteConfig = {
     footerQuickLinks: {
       heading: "Quick Links",
       links: [
-        { href: "/collections/all", name: "Shop" },
+        { href: "/shop", name: "Shop" },
         { href: "/about", name: "About us" },
         { href: "/contact", name: "Contact Us" },
         { href: "/privacy", name: "Privacy Policy" },

@@ -1,4 +1,4 @@
-import ProductCard from "@/components/global/ui/ProductCard3";
+import ProductCard from "@/components/home/ProductCard";
 import { getClient } from "@/graphql/apollo-ssr";
 import {
   GET_CATEGORY_ARCHIVE_IN_STOCK,
@@ -7,24 +7,26 @@ import {
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 
 export interface ProductGridGraphQLProps {
-  categoryId?: number;
+  categoryIds?: number[];
   first?: number;
 }
 
 const ProductGridGraphQL = async ({
-  categoryId,
+  categoryIds,
   first = 45,
 }: ProductGridGraphQLProps) => {
+  const hasCategoryFilter = categoryIds && categoryIds.length > 0;
+
   const { data } = await getClient().query({
-    query: categoryId ? GET_CATEGORY_ARCHIVE_IN_STOCK : GET_PRODUCTS_NODES,
-    variables: categoryId
-      ? { categoryIdIn: [categoryId], first }
+    query: hasCategoryFilter ? GET_CATEGORY_ARCHIVE_IN_STOCK : GET_PRODUCTS_NODES,
+    variables: hasCategoryFilter
+      ? { categoryIdIn: categoryIds, first }
       : { first },
   });
 
   type ArchiveProduct = SimpleProduct & VariableProduct;
 
-  const products: ArchiveProduct[] = categoryId
+  const products: ArchiveProduct[] = hasCategoryFilter
     ? (data?.products?.edges ?? []).flatMap(
         (edge: { node?: ArchiveProduct | null }) =>
           edge.node ? [edge.node] : []
@@ -42,7 +44,7 @@ const ProductGridGraphQL = async ({
   return (
     <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-6">
       {products.map((product) => (
-        <ProductCard key={product.id} data={product} />
+        <ProductCard key={product.id} product={product} />
       ))}
     </div>
   );

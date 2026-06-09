@@ -3,6 +3,7 @@ import { GET_ALL_BRANDS } from "@/graphql/defs/products";
 import { Brand } from "@/graphql/types/graphql";
 import Link from "next/link";
 import Image from "next/image";
+import { getBrandPath } from "@/lib/productUrl";
 import brandsPageContent from "@/content/brands-page.json";
 import { getLogoSources } from "@/lib/siteAssets";
 import { siteConfig } from "@/site.config";
@@ -49,7 +50,7 @@ const Page = async () => {
                   .map((brand: Brand, index: number) => (
                     <li key={index} className="flex flex-col items-center">
                       <Link
-                        href={`/${brand.slug}`}
+                        href={getBrandPath(brand.slug ?? "")}
                         className="group flex flex-col items-center w-full h-full px-4 py-4 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white transition-colors"
                       >
                         <div className="w-40 h-28 flex items-center justify-center mb-3 bg-white dark:bg-gray-800 rounded-2xl shadow-sm ">

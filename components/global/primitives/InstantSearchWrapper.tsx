@@ -20,6 +20,12 @@ import { HIDDEN_PRODUCT_SLUGS } from "@/lib/hidden-products";
 import { isHiddenVariationAttribute } from "@/lib/hidden-variation-attributes";
 import { SORT_PRICE_ASC_ID, SORT_NEWEST_ID } from "@/lib/sortOrders";
 import { DealFilterType, DealTagSlug, DEAL_FILTER_TO_TAG, VALID_DEAL_FILTER_TYPES } from "@/lib/dealFilters";
+import {
+  buildDealTagsFilter,
+  buildInStockTypesenseFilter,
+  buildSingleTagFilter,
+  typesenseQueryBy,
+} from "@/lib/typesenseCapabilities";
 
 type CustomUiState = UiState & {
   product: {
@@ -57,6 +63,9 @@ interface InstantSearchWrapperProps {
   brands?: Brand[];
   brand?: Brand;
   category?: ProductCategory;
+  /** Parent category + direct children — used to include subcategory products on archive pages. */
+  categoryScopeIds?: number[];
+  subCategories?: ProductCategory[];
   routing?: boolean;
   bindToStore?: boolean;
   server?: boolean;
@@ -96,8 +105,11 @@ const typesenseInstantSearchAdapter = typesenseConfig
         connectionTimeoutSeconds: 10,
       },
       additionalSearchParameters: {
-        query_by: "name, description, productTags",
-        query_by_weights: "3,1,1",
+        query_by: typesenseQueryBy,
+        query_by_weights:
+          typesenseQueryBy === "name, description, productTags"
+            ? "3,1,1"
+            : "3,1",
         exclude_fields: "description, shortDescription, galleryImages, attributes",
         facet_by: "brands_facet, categories_facet, variation_facets.*",
         max_facet_values: 20,
@@ -120,6 +132,8 @@ const InstantSearchWrapperInner = ({
   brands,
   brand,
   category,
+  categoryScopeIds,
+  subCategories,
   sort,
   tag,
   searchQueryValue,
@@ -244,13 +258,25 @@ const InstantSearchWrapperInner = ({
       effective.priceRange.join("") !== PRICE_RANGE.join("")
         ? `rawPriceNumber:[${effective.priceRange[0]}..${effective.priceRange[1]}]`
         : null,
-      category
-        ? `productCategories.edges.node.databaseId:${category.databaseId}`
-        : effective.categories.length > 0
-          ? `productCategories.edges.node.databaseId:[${effective.categories.join(
-            ","
-          )}]`
-          : null,
+      category && categoryScopeIds && categoryScopeIds.length > 0
+        ? (() => {
+            const scopedSelection =
+              effective.categories.length > 0
+                ? effective.categories.filter((id) =>
+                    categoryScopeIds.includes(id),
+                  )
+                : [];
+            const ids =
+              scopedSelection.length > 0 ? scopedSelection : categoryScopeIds;
+            return `productCategories.edges.node.databaseId:[${ids.join(",")}]`;
+          })()
+        : category
+          ? `productCategories.edges.node.databaseId:${category.databaseId}`
+          : effective.categories.length > 0
+            ? `productCategories.edges.node.databaseId:[${effective.categories.join(
+              ","
+            )}]`
+            : null,
       brand
         ? `brands.nodes.databaseId:${brand.databaseId}`
         : effective.brands.length > 0
@@ -260,11 +286,13 @@ const InstantSearchWrapperInner = ({
       // `inStockOnly` (e.g. /new-arrivals) forces the in-stock filter at the
       // query layer regardless of the sidebar toggle, so it never routes
       // through the ?in_stock= → router.push pipeline that races pagination.
-      (inStockOnly || effective.in_stock) ? "stockStatus:IN_STOCK && productTags.nodes.slug:!=pre-order" : null,
+      inStockOnly || effective.in_stock
+        ? buildInStockTypesenseFilter(true)
+        : null,
       effectiveDealTags && effectiveDealTags.length > 0
-        ? `productTags.nodes.slug:[${effectiveDealTags.join(",")}]`
+        ? buildDealTagsFilter(effectiveDealTags)
         : tag
-          ? `productTags.nodes.slug:${tag}`
+          ? buildSingleTagFilter(tag)
           : null,
       // When sorting Price Low → High, exclude products with no/zero raw price
       // so unpriced records (Rs 0.00) don't bubble to the top of the list.
@@ -291,7 +319,7 @@ const InstantSearchWrapperInner = ({
   useEffect(() => {
     setFilterQuery(getFilterQuery);
     // setSortQuery(differedSidebar.sort);
-  }, [differedSidebar, tag, JSON.stringify(effectiveDealTags || [])]);
+  }, [differedSidebar, tag, JSON.stringify(effectiveDealTags || []), JSON.stringify(categoryScopeIds || [])]);
 
   useEffect(() => {
     if (!search) {
@@ -561,6 +589,7 @@ const InstantSearchWrapperInner = ({
             <MobileFilterSheet category={category}
               brand={brand}
               categories={categories}
+              subCategories={subCategories}
               brands={brands}
               sort={sort}
               inStockOnly={inStockOnly}
@@ -577,6 +606,7 @@ const InstantSearchWrapperInner = ({
                   category={category}
                   brand={brand}
                   categories={categories}
+                  subCategories={subCategories}
                   brands={brands}
                   sort={sort}
                   dealsType={dealsType}

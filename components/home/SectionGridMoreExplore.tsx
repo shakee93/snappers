@@ -215,7 +215,7 @@ const SectionGridMoreExplore: FC<SectionGridMoreExploreProps> = ({
 
   const modifySlugForLaptops = (brandSlug: string): string => {
     if (brandSlug === "apple" && tabActive === "Laptops") {
-      return "collections/macbooks";
+      return "categories/macbooks";
     }
     return brandSlug;
   };

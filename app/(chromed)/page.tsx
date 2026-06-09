@@ -167,7 +167,7 @@ const getData = async () => {
     getHeroSettingsCached(),
 
     getClient()
-      .query({ query: GET_SHOP_BY_CATEGORIES, variables: { first: 6 } })
+      .query({ query: GET_SHOP_BY_CATEGORIES, variables: { first: 12 } })
       .then((res) => res.data?.productCategories?.nodes || [])
       .catch(() => []),
 

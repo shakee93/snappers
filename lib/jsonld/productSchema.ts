@@ -1,3 +1,4 @@
+import { getProductPath } from "@/lib/productUrl";
 import { stripHtml } from "@/components/global/forms/HelperComps";
 import { siteConfig } from "@/site.config";
 
@@ -60,10 +61,10 @@ function getWarrantySchema(warranty: WarrantyInfo = DEFAULT_WARRANTY): JsonLd {
   };
 }
 
-function getBaseOfferSchema(product: SchemaProduct, brand: SchemaBrand): JsonLd {
+function getBaseOfferSchema(product: SchemaProduct): JsonLd {
   return {
     "@type": "Offer",
-    "url": `${siteConfig.url.base}/${brand.slug}/${product.slug}`,
+    "url": `${siteConfig.url.base}${getProductPath(product)}`,
     "price": Number((product.price ?? "0").replace(/[^0-9.]/g, "")),
     "priceCurrency": siteConfig.locale.currencyCode,
     "availability": product.stockStatus === "IN_STOCK"
@@ -89,7 +90,10 @@ function getProductSpecs(
   );
 }
 
-export function getProductSchema(product: SchemaProduct, brand: SchemaBrand): JsonLd {
+export function getProductSchema(
+  product: SchemaProduct,
+  brand: SchemaBrand,
+): JsonLd {
   // If product has variations, return ProductGroup schema
   const variationNodes = product.variations?.nodes?.filter(
     (v): v is SchemaVariationNode => !!v
@@ -111,7 +115,7 @@ export function getProductSchema(product: SchemaProduct, brand: SchemaBrand): Js
         "image": v.image?.sourceUrl,
         "color": v.attributes?.nodes?.find((a) => a?.name === "pa_color")?.value,
         "offers": {
-          ...getBaseOfferSchema(product, brand),
+          ...getBaseOfferSchema(product),
           "price": Number((v.rawPrice ?? product.price ?? "0").toString().replace(/[^0-9.]/g, "") || "0")
         },
         "additionalProperty": getProductSpecs(v)
@@ -132,7 +136,7 @@ export function getProductSchema(product: SchemaProduct, brand: SchemaBrand): Js
       product.image?.sourceUrl,
       ...(product.galleryImages?.nodes?.map((i) => i?.sourceUrl ?? "") ?? [])
     ].filter(Boolean),
-    "offers": getBaseOfferSchema(product, brand),
+    "offers": getBaseOfferSchema(product),
     "additionalProperty": getProductSpecs(product)
   };
 }
