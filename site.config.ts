@@ -120,12 +120,12 @@ export const siteConfig = {
   /** Header + footer navigation (see `NavLinks`, `footer`). */
   navigation: {
     main: [
-      { href: "/rabbit-hamsters", name: "Rabbit & Hamsters" },
       { href: "/cat", name: "Cat" },
       { href: "/dog", name: "Dog" },
       { href: "/cat-dog", name: "Cat & dogs" },
       { href: "/bird", name: "Birds" },
       { href: "/aquarium", name: "Aquarium" },
+      { href: "/rabbit-hamsters", name: "Rabbit & Hamsters" },
     ],
     /** Quick links on the dark-green utility bar (see `HeaderUtilityBar`). */
     utility: {

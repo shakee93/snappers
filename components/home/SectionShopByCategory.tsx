@@ -2,9 +2,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { getCategoryPath } from "@/lib/productUrl";
+import { sortByMainNavCategoryOrder } from "@/lib/browseCategories";
 
 interface CategoryNode {
   id: string;
+  databaseId?: number | null;
   name?: string | null;
   slug?: string | null;
   image?: { sourceUrl?: string | null } | null;
@@ -26,8 +28,10 @@ const SectionShopByCategory = ({
   className = "",
   categories,
 }: SectionShopByCategoryProps) => {
-  const items = (categories ?? []).filter(
-    (c): c is CategoryNode => !!c?.image?.sourceUrl && !!c?.slug
+  const items = sortByMainNavCategoryOrder(
+    (categories ?? []).filter(
+      (c): c is CategoryNode => !!c?.image?.sourceUrl && !!c?.slug,
+    ),
   );
 
   if (items.length === 0) return null;
