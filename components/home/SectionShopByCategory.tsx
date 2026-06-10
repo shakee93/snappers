@@ -40,10 +40,10 @@ const SectionShopByCategory = ({
         <p className="text-base font-bold uppercase tracking-wider text-[#092412]">
           Shop by Categories
         </p>
-        <h2 className="md:mt-5 mt-3 text-4xl font-albra text-center font-bold md:text-nowrap  leading-tight text-[#092412] sm:text-6xl">
+        <h2 className="mt-3 text-4xl font-albra font-bold leading-tight text-[#092412] sm:text-6xl md:mt-5 lg:text-nowrap">
           Everything for every <span className="text-[#769F5F]">pet parent</span>
         </h2>
-        <p className="mt-6 max-w-2xl mx-auto font-medium text-lg text-[#00000099] text-center">
+        <p className="mx-auto mt-6 max-w-2xl text-lg font-medium text-black/60">
           From premium food and fun toys to grooming and beyond, discover
           everything your pet needs, all in one place.
         </p>
