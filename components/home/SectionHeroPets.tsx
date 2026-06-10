@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import useInterval from "react-use/lib/useInterval";
+import type { ProductCardItem } from "@/components/home/ProductCard";
 
 interface MediaNode {
   node?: { sourceUrl?: string | null } | null;
@@ -29,9 +30,20 @@ interface HeroDeal {
   backgroundImage?: MediaNode | null;
 }
 
+/** One curated medicine-section entry: a feature image plus a linked product. */
+interface HealthSectionEntry {
+  featureImage?: MediaNode | null;
+  healthProduct?: {
+    edges?: ({ node?: ProductCardItem | null } | null)[] | null;
+  } | null;
+}
+
 export interface HeroSettingsFields {
   sliderSettings?: { slides?: (HeroSlide | null)[] | null } | null;
   dealBannerSettings?: { deals?: (HeroDeal | null)[] | null } | null;
+  healthSectionSettings?: {
+    healthProduct?: (HealthSectionEntry | null)[] | null;
+  } | null;
 }
 
 export interface SectionHeroPetsProps {

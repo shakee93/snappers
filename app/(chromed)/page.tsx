@@ -3,7 +3,6 @@ import { getClient } from "@/graphql/apollo-ssr";
 import {
   GET_BRANDS,
   GET_HOMEPAGE_DEAL_PRODUCTS,
-  GET_HOMEPAGE_HEALTH_PRODUCTS,
   GET_PRODUCTS_BY_BOGO_TAG,
   GET_PRODUCTS_NODES,
   GET_PRODUCTS_NODES_HOMEPAGE,
@@ -22,7 +21,6 @@ import SectionShopByCategory, {
 } from "@/components/home/SectionShopByCategory";
 import SectionDealCountdown from "@/components/home/SectionDealCountdown";
 import SectionDealProducts from "@/components/home/SectionDealProducts";
-import SectionHealthBanner from "@/components/home/SectionHealthBanner";
 import SectionHealthProducts from "@/components/home/SectionHealthProducts";
 import { unstable_cache } from "next/cache";
 import { HERO_SECTION_CACHE_TAG } from "@/lib/cache-tags";
@@ -44,7 +42,7 @@ const getHeroSettingsCached = unstable_cache(
       .query({ query: GET_HERO_SETTINGS, context: HERO_QUERY_CONTEXT })
       .then((res) => res.data?.heroSettings?.heroSettingsFields ?? null)
       .catch(() => null),
-  ["homepage-hero-settings"],
+  ["homepage-hero-settings-v3"],
   { tags: [HERO_SECTION_CACHE_TAG], revalidate: 86400 }
 );
 
@@ -81,13 +79,6 @@ const getData = async () => {
       .query({ query: GET_HOMEPAGE_DEAL_PRODUCTS, variables: { first: 4 } })
       .then((res) => res.data?.products?.nodes || [])
       .catch(() => []),
-    getClient()
-      .query({
-        query: GET_HOMEPAGE_HEALTH_PRODUCTS,
-        variables: { first: 4, categoryIn: ["health"] },
-      })
-      .then((res) => res.data?.products?.nodes || [])
-      .catch(() => []),
   ];
 
   const [
@@ -98,7 +89,6 @@ const getData = async () => {
     heroSettings,
     categories,
     dealProducts,
-    healthProducts,
   ] = await Promise.all(queries);
 
   return {
@@ -109,7 +99,6 @@ const getData = async () => {
     heroSettings: heroSettings as HeroSettingsFields | null,
     categories: categories as SectionShopByCategoryProps["categories"],
     dealProducts: dealProducts as (SimpleProduct & VariableProduct)[],
-    healthProducts: healthProducts as (SimpleProduct & VariableProduct)[],
   };
 };
 
@@ -122,7 +111,6 @@ export default async function Home() {
     heroSettings,
     categories,
     dealProducts,
-    healthProducts,
   } = await getData();
 
   const inStockOffers = freeOffersRaw.filter((p) => p.stockStatus === "IN_STOCK");
@@ -133,8 +121,8 @@ export default async function Home() {
       : [...inStockOffers, ...soldOutOffers];
 
   return (
-    <main>
-      <div className="nc-PageHome relative flex flex-col overflow-hidden">
+    <main className="overflow-x-hidden">
+      <div className="nc-PageHome relative flex flex-col overflow-x-hidden bg-white">
         <div className="z-0">
           <SectionHeroPets data={heroSettings} />
           <SectionFeatureBadges />
@@ -153,11 +141,9 @@ export default async function Home() {
         </div>
 
         <div className="mt-16 md:mt-24">
-          <SectionHealthBanner />
-        </div>
-
-        <div className="mt-8 md:mt-10">
-          <SectionHealthProducts products={healthProducts} />
+          <SectionHealthProducts
+            healthSectionSettings={heroSettings?.healthSectionSettings}
+          />
         </div>
 
         <div className="flex flex-col px-3 gap-10 lg:gap-10 mx-auto w-full max-w-[1368px]">

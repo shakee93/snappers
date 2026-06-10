@@ -77,7 +77,7 @@ const SectionDealCountdown = ({
               aria-hidden
               className="absolute -left-7 -top-5 h-5 w-5 sm:-left-4 sm:h-7 sm:w-7"
             />
-            <h2 className="text-3xl font-bold text-[#3B2A20] sm:text-4xl lg:text-5xl">
+            <h2 className="text-3xl font-albra font-bold text-[#092412] md:text-6xl">
               Deals for your <span className="text-[#E79A72]">pet</span>
             </h2>
             <Image
