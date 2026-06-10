@@ -1,9 +1,9 @@
 # Web fonts
 
-## Albra Sans Semi (`AlbraSans-Semi.woff2`)
+## Albra Sans Semi (`font-albra`)
 
-Headings use **Albra Sans Semi** via the `font-albra` Tailwind utility (`app/layout.tsx`).
+Headings use **Albra Sans Semi** via the `font-albra` Tailwind utility. Registration lives in `app/layout.tsx` (`--font-albra` on `<html>`).
 
-Replace `AlbraSans-Semi.woff2` with a **properly licensed** webfont file before production. Trial or desktop-only fonts must not be embedded on a public storefront.
+Web delivery uses `AlbraSans-Semi.woff2` (converted from the source OTF). `AlbraSansTRIAL-Semi.otf` is kept as a fallback source in the font stack.
 
-After swapping the file, no code changes are required unless the filename changes.
+Before production, replace both files with a **properly licensed** webfont bundle. Keep the `font-albra` class and `localFont` setup — only swap the font files.

@@ -25,9 +25,19 @@ const inter = Inter({
 });
 
 const albraSans = localFont({
-  src: "../fonts/AlbraSans-Semi.woff2",
+  src: [
+    {
+      path: "../fonts/AlbraSans-Semi.woff2",
+      weight: "600",
+      style: "normal",
+    },
+    {
+      path: "../fonts/AlbraSansTRIAL-Semi.otf",
+      weight: "600",
+      style: "normal",
+    },
+  ],
   variable: "--font-albra",
-  weight: "600",
   display: "swap",
 });
 
