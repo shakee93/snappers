@@ -289,6 +289,8 @@ export const GET_BROWSE_CATEGORY_TABS = gql`
         image {
           sourceUrl
         }
+        # Nested children are hard-capped at 3 levels — sufficient for the
+        # current taxonomy; deeper subcategories need BROWSE_CATEGORY_SCOPE_OVERRIDES.
         children {
           nodes {
             databaseId

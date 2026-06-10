@@ -11,7 +11,7 @@ import ProductCard, {
 } from "@/components/home/ProductCard";
 import {
   BROWSE_ALL_TAB_FEATURE_IMAGE,
-  BROWSE_FEATURE_IMAGES_PRELOAD,
+  BROWSE_CATEGORY_TAB_FETCH_BATCH,
   filterBrowseCategoryTabs,
   getBrowseFeatureImageForTabIndex,
   resolveBrowseCategoryScopeIds,
@@ -19,7 +19,6 @@ import {
 import { getCategoryPath } from "@/lib/productUrl";
 
 const PAGE_SIZE = 6;
-const FETCH_BATCH = 100;
 const ALL_TAB_KEY = "all";
 
 type TabProductCache = {
@@ -176,13 +175,6 @@ const SectionBrowseProducts = ({
     return activeCategory?.featureImage ?? defaultFeatureImage;
   }, [activeCategory?.featureImage, activeCategoryId, defaultFeatureImage]);
 
-  useEffect(() => {
-    BROWSE_FEATURE_IMAGES_PRELOAD.forEach((url) => {
-      const img = new window.Image();
-      img.src = url;
-    });
-  }, []);
-
   const activeFeatureAlt = useMemo(() => {
     if (activeCategory?.name) return `Featured ${activeCategory.name} products`;
     return "Featured pet products";
@@ -210,7 +202,7 @@ const SectionBrowseProducts = ({
       const { data } = await fetchBrowseProducts({
         variables: {
           categoryIdIn: categoryScopeIds,
-          first: FETCH_BATCH,
+          first: BROWSE_CATEGORY_TAB_FETCH_BATCH,
           after: after ?? undefined,
         },
       });
@@ -254,13 +246,6 @@ const SectionBrowseProducts = ({
       await promise;
     },
     [loadProducts],
-  );
-
-  const prefetchCategoryTab = useCallback(
-    (categoryId: number) => {
-      void ensureTabCache(categoryId);
-    },
-    [ensureTabCache],
   );
 
   const handleTabClick = useCallback(
@@ -379,8 +364,6 @@ const SectionBrowseProducts = ({
               key={category.id}
               type="button"
               onClick={() => handleTabClick(category.databaseId)}
-              onMouseEnter={() => prefetchCategoryTab(category.databaseId)}
-              onFocus={() => prefetchCategoryTab(category.databaseId)}
               aria-pressed={activeCategoryId === category.databaseId}
               className={`shrink-0 whitespace-nowrap rounded-lg px-3 py-2 text-xs font-bold transition-colors sm:px-4 sm:text-sm ${
                 activeCategoryId === category.databaseId

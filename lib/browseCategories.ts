@@ -5,6 +5,9 @@ import { buildCategoryScopeIds, type CategoryTreeNode } from "@/lib/categoryScop
 /** Homepage browse grid — first batch fetched per category tab on SSR. */
 export const BROWSE_CATEGORY_TAB_SSR_FIRST = 24;
 
+/** Client pagination batch after the SSR seed (larger cursor fetches). */
+export const BROWSE_CATEGORY_TAB_FETCH_BATCH = 100;
+
 /** Homepage browse tabs — same slugs/order as main nav pet categories. */
 export const BROWSE_TAB_SLUGS = siteConfig.navigation.main.map((item) =>
   item.href.replace(/^\//, ""),
@@ -25,23 +28,17 @@ export const BROWSE_CATEGORY_SCOPE_OVERRIDES: Record<string, number[]> = {
 
 /** Static browse banners under `public/homepage/categories/`. */
 export const BROWSE_CATEGORY_FEATURE_IMAGES: Record<string, string> = {
-  "rabbit-hamsters": "/homepage/categories/rabbit.png",
-  cat: "/homepage/categories/Cat.png",
-  dog: "/homepage/categories/Dog.png",
-  "cat-dog": "/homepage/categories/cat-dog.png",
-  bird: "/homepage/categories/bird.png",
-  aquarium: "/homepage/categories/fish.png",
+  "rabbit-hamsters": "/homepage/categories/rabbit.webp",
+  cat: "/homepage/categories/Cat.webp",
+  dog: "/homepage/categories/Dog.webp",
+  "cat-dog": "/homepage/categories/cat-dog.webp",
+  bird: "/homepage/categories/bird.webp",
+  aquarium: "/homepage/categories/fish.webp",
 };
 
 /** "All" tab banner — same artwork as the Dog category. */
 export const BROWSE_ALL_TAB_FEATURE_IMAGE =
   BROWSE_CATEGORY_FEATURE_IMAGES.dog;
-
-/** Every browse banner URL (All + nav-order categories) for preloading. */
-export const BROWSE_FEATURE_IMAGES_PRELOAD = [
-  BROWSE_ALL_TAB_FEATURE_IMAGE,
-  ...BROWSE_TAB_SLUGS.map((slug) => BROWSE_CATEGORY_FEATURE_IMAGES[slug]),
-].filter((url, index, urls) => !!url && urls.indexOf(url) === index);
 
 /** Feature banner for a nav tab slug (`cat`, `dog`, …). */
 export const getBrowseFeatureImageForNavSlug = (
