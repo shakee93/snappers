@@ -17,6 +17,18 @@ function slugInGroup(
   return (group as readonly string[]).includes(slug);
 }
 
+/** Prefer earlier slugs in the group (canonical before alias). */
+function findIndexForSlugGroup<T extends { slug?: string | null }>(
+  items: T[],
+  group: readonly string[],
+): number {
+  for (const slug of group) {
+    const index = items.findIndex((item) => item.slug === slug);
+    if (index !== -1) return index;
+  }
+  return items.findIndex((item) => slugInGroup(item.slug, group));
+}
+
 function partitionBySlugGroups<T extends { slug?: string | null }>(
   items: T[],
   slugGroups: readonly (readonly string[])[]
@@ -25,7 +37,7 @@ function partitionBySlugGroups<T extends { slug?: string | null }>(
   const front: T[] = [];
 
   for (const group of slugGroups) {
-    const index = remaining.findIndex((item) => slugInGroup(item.slug, group));
+    const index = findIndexForSlugGroup(remaining, group);
     if (index !== -1) {
       front.push(remaining[index]);
       remaining.splice(index, 1);

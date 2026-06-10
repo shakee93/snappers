@@ -265,10 +265,44 @@ export const GET_SHOP_BY_CATEGORIES = gql`
     productCategories(first: $first, where: { parent: 0 }) {
       nodes {
         id
+        databaseId
         name
         slug
         image {
           sourceUrl
+        }
+      }
+    }
+  }
+`;
+
+/** Main browse tabs with nested subcategories for scoped product filtering. */
+export const GET_BROWSE_CATEGORY_TABS = gql`
+  query BrowseCategoryTabs($first: Int = 12) {
+    productCategories(first: $first, where: { parent: 0 }) {
+      nodes {
+        id
+        databaseId
+        name
+        slug
+        parentDatabaseId
+        image {
+          sourceUrl
+        }
+        children {
+          nodes {
+            databaseId
+            children {
+              nodes {
+                databaseId
+                children {
+                  nodes {
+                    databaseId
+                  }
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -444,6 +478,33 @@ export const GET_PRODUCTS_NODES = gql`
         orderby: { field: DATE, order: DESC }
       }
     ) {
+      nodes {
+        ...ProductContentCard
+      }
+    }
+  }
+  ${ProductContentCard}
+`;
+
+/** Homepage browse grid — matches category archive (includes out-of-stock). */
+export const GET_BROWSE_SECTION_PRODUCTS = gql`
+  query GetBrowseSectionProducts(
+    $categoryIdIn: [Int] = null
+    $first: Int = 100
+    $after: String
+  ) {
+    products(
+      first: $first
+      after: $after
+      where: {
+        categoryIdIn: $categoryIdIn
+        orderby: { field: DATE, order: DESC }
+      }
+    ) {
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
       nodes {
         ...ProductContentCard
       }
