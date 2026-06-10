@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
@@ -75,10 +75,11 @@ function normalizeDealTextPosition(value?: string | null): DealTextPosition {
   if (normalized.includes("bottom") && normalized.includes("left")) {
     return "bottom-left";
   }
-  if (
-    (normalized.includes("top") && normalized.includes("right")) ||
-    normalized.includes("tight")
-  ) {
+  if (normalized.includes("top") && normalized.includes("right")) {
+    return "top-right";
+  }
+  // WP ACF occasionally stores "Top Tight" instead of "Top Right".
+  if (normalized.includes("tight")) {
     return "top-right";
   }
   return "top-left";
@@ -136,22 +137,6 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
     deals.length > 1 ? SLIDE_INTERVAL : null
   );
 
-  // Warm the browser cache for every slide so crossfades never hit a blank frame.
-  useEffect(() => {
-    slides.forEach((s) => {
-      const url = s.sliderBackgroundImage?.node?.sourceUrl;
-      if (!url) return;
-      const img = new window.Image();
-      img.src = url;
-    });
-    deals.forEach((d) => {
-      const url = d.backgroundImage?.node?.sourceUrl;
-      if (!url) return;
-      const img = new window.Image();
-      img.src = url;
-    });
-  }, [slides, deals]);
-
   if (slides.length === 0 && deals.length === 0) return null;
 
   const slide = slides[activeIndex];
@@ -161,7 +146,7 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
 
   return (
     <div className={`mx-auto mt-5 w-full max-w-[1368px] px-3 md:mt-10 lg:px-0 pt-[50px] ${className}`}>
-      <div className="flex flex-col gap-4 lg:flex-row mt-20S lg:justify-between lg:gap-0">
+      <div className="mt-20 flex flex-col gap-4 lg:flex-row lg:justify-between lg:gap-0">
         {/* Left: promo slider */}
         {slides.length > 0 && (
           <div className="relative h-[280px] min-h-[451px] w-full overflow-hidden rounded-[24px] bg-neutral-200 sm:h-[360px] lg:h-[451px] lg:w-[72.368%]">
@@ -171,7 +156,7 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
 
               return (
                 <motion.div
-                  key={src}
+                  key={`hero-slide-${index}`}
                   animate={{ opacity: isActive ? 1 : 0 }}
                   transition={CROSSFADE}
                   className="absolute inset-0"
@@ -282,7 +267,7 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
 
                 return (
                   <motion.div
-                    key={src}
+                    key={`hero-deal-${index}`}
                     animate={{ opacity: isActive ? 1 : 0 }}
                     transition={CROSSFADE}
                     className="absolute inset-0"

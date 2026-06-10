@@ -89,7 +89,8 @@ const HeaderClientWrapper = ({
         <HeaderUtilityBar />
       </header>
 
-      {/* Add padding to content when header is sticky */}
+      {/* Sticky-header spacer: announcement bar + cream HeaderContent + utility bar.
+          ~100px mobile / ~200px desktop (checkout notice adds ~32px when shown). */}
       {isHeaderSticky && (
         <div
           className={
