@@ -147,6 +147,10 @@ const config: Config = {
 					from: { opacity: '1' },
 					to: { opacity: '0' },
 				},
+				marquee: {
+					from: { transform: 'translateX(0)' },
+					to: { transform: 'translateX(-50%)' },
+				},
 			},
 			animation: {
 				scaleIn: 'scaleIn 200ms ease',
@@ -157,6 +161,8 @@ const config: Config = {
 				enterFromRight: 'enterFromRight 250ms ease',
 				exitToLeft: 'exitToLeft 250ms ease',
 				exitToRight: 'exitToRight 250ms ease',
+				'marquee-left': 'marquee 60s linear infinite',
+				'marquee-right': 'marquee 60s linear infinite reverse',
 			},
 		}
 	},
