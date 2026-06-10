@@ -120,7 +120,7 @@ export default async function RootLayout({
       </head>
       <body
         suppressHydrationWarning
-        className="bg-gray-100 text-base dark:bg-slate-900 text-slate-900 dark:text-slate-200"
+        className="bg-white text-base dark:bg-slate-900 text-slate-900 dark:text-slate-200"
       >
         <ApolloWrapper>
           <CartProvider>

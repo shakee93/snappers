@@ -1,4 +1,5 @@
 import { gql } from '@apollo/client';
+import { ProductContentCard } from './products.fragments';
 
 export const GET_SLIDES = gql`
 query SlidePostType {
@@ -20,6 +21,7 @@ query SlidePostType {
 `
 
 export const GET_HERO_SETTINGS = gql`
+  ${ProductContentCard}
 query HeroSettings {
   heroSettings {
     heroSettingsFields {
@@ -48,6 +50,26 @@ query HeroSettings {
           backgroundImage {
             node {
               sourceUrl
+            }
+          }
+        }
+      }
+      healthSectionSettings {
+        healthProduct {
+          featureImage {
+            node {
+              sourceUrl
+            }
+          }
+          healthProduct {
+            edges {
+              node {
+                ... on Product {
+                  shortDescription(format: RAW)
+                  description(format: RAW)
+                  ...ProductContentCard
+                }
+              }
             }
           }
         }

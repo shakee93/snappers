@@ -44,7 +44,7 @@ const formatLkr = (value: number) =>
     maximumFractionDigits: 2,
   });
 
-const resolveDisplayPrice = (product: ProductCardItem): string | null => {
+export const resolveDisplayPrice = (product: ProductCardItem): string | null => {
   const { type, price, regularPrice, variations } = product;
 
   if (type === "VARIABLE" && variations?.nodes?.length) {

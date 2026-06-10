@@ -1,32 +1,44 @@
-import ProductCard, {
-  type ProductCardItem,
-} from "@/components/home/ProductCard";
-
-const ACCENT_TEAL = "#2D8B7B";
+import { type ProductCardItem } from "@/components/home/ProductCard";
+import HealthProductCarousel from "@/components/home/HealthProductCarousel";
+import SectionHealthBanner from "@/components/home/SectionHealthBanner";
+import type { HeroSettingsFields } from "@/components/home/SectionHeroPets";
 
 export interface SectionHealthProductsProps {
   className?: string;
-  products?: ProductCardItem[];
+  /** Curated health entries from `heroSettings.healthSectionSettings`. */
+  healthSectionSettings?: HeroSettingsFields["healthSectionSettings"];
 }
 
-/** Row of health product cards shown beneath the health banner. */
+const mapHealthEntries = (
+  settings?: HeroSettingsFields["healthSectionSettings"],
+) =>
+  (settings?.healthProduct ?? [])
+    .map((entry) => ({
+      product: entry?.healthProduct?.edges?.[0]?.node ?? null,
+      featureImage: entry?.featureImage?.node?.sourceUrl ?? "",
+    }))
+    .filter(
+      (entry): entry is { product: ProductCardItem; featureImage: string } =>
+        !!entry.product,
+    );
+
+/** Health banner plus centre-aligned product carousel from hero settings ACF. */
 const SectionHealthProducts = ({
   className = "",
-  products = [],
+  healthSectionSettings,
 }: SectionHealthProductsProps) => {
-  if (!products.length) return null;
+  const entries = mapHealthEntries(healthSectionSettings);
+  if (!entries.length) return null;
+
+  const products = entries.map((entry) => entry.product);
+  const featureImages = entries.map((entry) => entry.featureImage);
 
   return (
-    <section className={`mx-auto w-full max-w-[1368px] px-3 lg:px-0 ${className}`}>
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6">
-        {products.map((product) => (
-          <ProductCard
-            key={product.id}
-            product={product}
-            badgeLabel="Health"
-            accentColor={ACCENT_TEAL}
-          />
-        ))}
+    <section className={`w-full ${className}`}>
+      <SectionHealthBanner />
+
+      <div className="mt-8 w-full max-w-[100%] overflow-x-clip overflow-y-visible md:mt-10">
+        <HealthProductCarousel products={products} featureImages={featureImages} />
       </div>
     </section>
   );
