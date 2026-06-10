@@ -170,7 +170,7 @@ const SearchBar = ({ onSearchExpand, placeholder = "Quick Search", variant = "de
                     <div className={cn(
                         "flex items-center rounded-full",
                         isUtility
-                            ? "bg-white h-[43px] w-full px-5"
+                            ? "bg-white h-11 w-full px-5 shadow-sm"
                             : "bg-white/60 backdrop-blur-sm border lg:border border-primaryColor/20 py-1 md:py-1 space-x-0 lg:space-x-1.5 px-2 pr-3 xl:px-5 lg:rounded-[25px] h-10 lg:h-full"
                     )}>
                         <input
@@ -182,8 +182,8 @@ const SearchBar = ({ onSearchExpand, placeholder = "Quick Search", variant = "de
                             type="text"
                             placeholder={placeholder}
                             className={cn(
-                                "border-none focus:border-none focus:outline-none focus:ring-0 bg-transparent w-full text-base",
-                                isUtility ? "text-neutral-700 placeholder:text-neutral-400" : "text-primaryColor/80"
+                                "border-none focus:border-none focus:outline-none focus:ring-0 bg-transparent w-full text-sm",
+                                isUtility ? "text-neutral-700 placeholder:text-neutral-400" : "text-primaryColor/80 text-base"
                             )}
                             suppressHydrationWarning
                         />

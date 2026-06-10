@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from "react";
 import { Brand, ProductCategory } from "@/graphql/types/graphql";
 import HeaderContent from "./HeaderContent";
+import HeaderAnnouncementBar from "./HeaderAnnouncementBar";
 import HeaderUtilityBar from "./HeaderUtilityBar";
 import HeaderSearchResults from "@/components/header/HeaderSearchResults";
 import MobileNavLinks from "./MobileNavLinks";
@@ -82,16 +83,18 @@ const HeaderClientWrapper = ({
           </div>
         )}
 
-        {/* Cream top bar + dark-green utility bar - always visible when sticky */}
+        {/* Top announcement · cream bar · utility bar */}
+        <HeaderAnnouncementBar />
         <HeaderContent navCategories={navCategories} />
         <HeaderUtilityBar />
       </header>
 
-      {/* Add padding to content when header is sticky */}
+      {/* Sticky-header spacer: announcement bar + cream HeaderContent + utility bar.
+          ~100px mobile / ~200px desktop (checkout notice adds ~32px when shown). */}
       {isHeaderSticky && (
         <div
           className={
-            ADD_TO_CART_DISABLED ? "h-24 lg:h-[212px]" : "h-16 lg:h-[172px]"
+            ADD_TO_CART_DISABLED ? "h-[132px] lg:h-[240px]" : "h-[100px] lg:h-[200px]"
           }
         ></div>
       )}

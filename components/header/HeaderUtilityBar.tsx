@@ -1,53 +1,62 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { siteConfig } from "@/site.config";
+import { cn } from "@/lib/utils";
 import SearchBar from "./SearchBar";
 
-const { links, message } = siteConfig.navigation.utility;
+const { links } = siteConfig.navigation.utility;
+
+function isUtilityLinkActive(pathname: string, href: string): boolean {
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
 
 /**
- * Desktop dark-green utility bar: quick links · search · delivery message.
- * Sits directly under the cream top bar (see `HeaderContent`).
+ * Desktop dark-green utility bar: search (left) · quick links (right).
+ * Announcement messages live in `HeaderAnnouncementBar` above the cream bar.
  */
 const HeaderUtilityBar = () => {
-  return (
-    <div className="hidden lg:block bg-header-green text-header-cream">
-      <div className="grid h-[80px] w-full grid-cols-[1fr_auto_1fr] items-center gap-6 px-6">
-        {/* Left: quick links */}
-        <nav className="flex min-w-0 items-center gap-6 xl:text-sm text-xs font-medium">
-          {links.map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className="whitespace-nowrap text-white/90 transition-colors hover:text-white"
-            >
-              {item.name}
-            </Link>
-          ))}
-        </nav>
+  const pathname = usePathname();
 
-        {/* Center: search */}
-        <div className="flex 2xl:w-[38rem] xl:w-[34rem] w-[20rem] max-w-full justify-center">
+  return (
+    <div className="hidden lg:block bg-header-green">
+      <div className="flex h-[72px] w-full items-center px-6">
+        {/* Left: pill search */}
+        <div className="min-w-0 w-full max-w-3xl">
           <SearchBar
             variant="utility"
             placeholder="Search for brand, products or categories..."
           />
         </div>
 
-        {/* Right: delivery message */}
-        <p className="min-w-0 justify-self-end text-right xl:text-sm text-xs font-medium text-white/90">
-          {message.map((line, i) => (
-            <span
-              key={line}
-              className={`block whitespace-nowrap xl:inline ${
-                i > 0 ? "xl:ml-1" : ""
-              }`}
-            >
-              {line}
-            </span>
-          ))}
-        </p>
+        {/* Right: quick links with active underline */}
+        <nav className="ml-auto flex shrink-0 items-center gap-8 pl-10 xl:gap-10">
+          {links.map((item) => {
+            const active = isUtilityLinkActive(pathname, item.href);
+
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  "relative whitespace-nowrap pb-2 text-sm font-semibold transition-colors",
+                  active ? "text-white" : "text-white/80 hover:text-white"
+                )}
+              >
+                {item.name}
+                <span
+                  aria-hidden
+                  className={cn(
+                    "absolute bottom-0 left-0 h-[3px] w-full rounded-full bg-header-accent transition-opacity",
+                    active ? "opacity-100" : "opacity-0"
+                  )}
+                />
+              </Link>
+            );
+          })}
+        </nav>
       </div>
     </div>
   );

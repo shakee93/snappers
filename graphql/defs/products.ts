@@ -527,27 +527,6 @@ export const GET_HOMEPAGE_DEAL_PRODUCTS = gql`
 `;
 
 /** Homepage health grid — in-stock products in the health category. */
-export const GET_HOMEPAGE_HEALTH_PRODUCTS = gql`
-  query GetHomepageHealthProducts(
-    $first: Int = 4
-    $categoryIn: [String] = ["health"]
-  ) {
-    products(
-      first: $first
-      where: {
-        categoryIn: $categoryIn
-        stockStatus: IN_STOCK
-        orderby: { field: DATE, order: DESC }
-      }
-    ) {
-      nodes {
-        ...ProductContentCard
-      }
-    }
-  }
-  ${ProductContentCard}
-`;
-
 /** Products tagged for BOGO / free offers (WP plugin syncs tag slug `bogo-offer`). */
 export const GET_PRODUCTS_BY_BOGO_TAG = gql`
   query GetProductsByBogoTag($first: Int = 50, $tagIn: [String] = ["bogo-offer"]) {
