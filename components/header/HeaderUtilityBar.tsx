@@ -22,7 +22,7 @@ const HeaderUtilityBar = () => {
 
   return (
     <div className="hidden lg:block bg-header-green">
-      <div className="flex h-[72px] w-full items-center px-6">
+      <div className="flex h-[72px] w-full items-center px-6 max-w-[1368px] mx-auto">
         {/* Left: pill search */}
         <div className="min-w-0 w-full max-w-3xl">
           <SearchBar

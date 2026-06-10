@@ -11,6 +11,8 @@ import {
 import HealthFeatureCard from "@/components/home/HealthFeatureCard";
 
 const SLIDE_INTERVAL = 6000;
+/** Embla disables loop when slides do not fill the viewport; pad until loop engages. */
+const MIN_SLIDES_FOR_LOOP = 20;
 
 /** Pick the slide whose centre is closest to the carousel viewport centre. */
 const getCenterSnap = (api: EmblaCarouselType): number => {
@@ -52,8 +54,8 @@ const HealthProductCarousel = ({
   products,
   featureImages = [],
 }: HealthProductCarouselProps) => {
-  const canLoop = products.length > 1;
   const slideCount = products.length;
+  const canLoop = slideCount > 1;
 
   const autoplay = useRef(
     Autoplay({
@@ -66,24 +68,15 @@ const HealthProductCarousel = ({
   const [emblaRef, emblaApi] = useEmblaCarousel(
     {
       align: "center",
-      loop: false,
-      containScroll: "trimSnaps",
-      startIndex: canLoop ? slideCount : 0,
+      loop: canLoop,
+      containScroll: false,
+      duration: 28,
     },
     canLoop ? [autoplay.current] : [],
   );
 
-  const [selectedIndex, setSelectedIndex] = useState(0);
   const [selectedSnap, setSelectedSnap] = useState(0);
-
-  const syncActiveFromViewport = useCallback(
-    (api: EmblaCarouselType) => {
-      const centerSnap = getCenterSnap(api);
-      setSelectedSnap(centerSnap);
-      setSelectedIndex(centerSnap % slideCount);
-    },
-    [slideCount],
-  );
+  const [selectedIndex, setSelectedIndex] = useState(0);
 
   const baseSlides = useMemo(
     () =>
@@ -95,7 +88,6 @@ const HealthProductCarousel = ({
     [products, featureImages],
   );
 
-  // Triple-clone slides so Embla can scroll infinitely without hitting an end.
   const carouselSlides = useMemo((): CarouselSlide[] => {
     if (!canLoop) {
       return baseSlides.map((slide, index) => ({
@@ -105,78 +97,90 @@ const HealthProductCarousel = ({
       }));
     }
 
-    const clones = (suffix: string) =>
+    const repeatCount = Math.max(5, Math.ceil(MIN_SLIDES_FOR_LOOP / slideCount));
+
+    return Array.from({ length: repeatCount }, (_, repeatIndex) =>
       baseSlides.map((slide, index) => ({
         ...slide,
-        key: `${slide.product.id}-${suffix}`,
+        key: `${slide.product.id}-r${repeatIndex}`,
         logicalIndex: index,
-      }));
+      })),
+    ).flat();
+  }, [baseSlides, canLoop, slideCount]);
 
-    return [...clones("a"), ...clones("b"), ...clones("c")];
-  }, [baseSlides, canLoop]);
-
-  const onSelect = useCallback(() => {
-    if (!emblaApi) return;
-
-    const snap = emblaApi.selectedScrollSnap();
-
-    if (canLoop) {
-      if (snap < slideCount) {
-        emblaApi.scrollTo(snap + slideCount, false);
-        return;
-      }
-      if (snap >= slideCount * 2) {
-        emblaApi.scrollTo(snap - slideCount, false);
-        return;
-      }
-    }
-
-    syncActiveFromViewport(emblaApi);
-  }, [emblaApi, slideCount, canLoop, syncActiveFromViewport]);
+  const syncActiveFromViewport = useCallback(
+    (api: EmblaCarouselType) => {
+      const centerSnap = getCenterSnap(api);
+      setSelectedSnap(centerSnap);
+      setSelectedIndex(
+        slideCount > 0
+          ? ((centerSnap % slideCount) + slideCount) % slideCount
+          : 0,
+      );
+    },
+    [slideCount],
+  );
 
   useEffect(() => {
     if (!emblaApi) return;
 
     const onInit = () => {
-      if (canLoop) {
-        emblaApi.scrollTo(slideCount, false);
-      }
-      const centerSnap = getCenterSnap(emblaApi);
-      if (centerSnap !== emblaApi.selectedScrollSnap()) {
-        emblaApi.scrollTo(centerSnap, false);
-      }
       syncActiveFromViewport(emblaApi);
-      if (canLoop) autoplay.current.play();
+      if (canLoop && emblaApi.internalEngine().options.loop) {
+        autoplay.current.play();
+      }
     };
 
     const onScroll = () => syncActiveFromViewport(emblaApi);
+    const onSelect = () => syncActiveFromViewport(emblaApi);
 
     emblaApi
       .on("init", onInit)
       .on("reInit", onInit)
-      .on("select", onSelect)
-      .on("scroll", onScroll);
+      .on("scroll", onScroll)
+      .on("select", onSelect);
     if (emblaApi.scrollSnapList().length > 0) onInit();
 
     return () => {
       emblaApi
         .off("init", onInit)
         .off("reInit", onInit)
-        .off("select", onSelect)
-        .off("scroll", onScroll);
+        .off("scroll", onScroll)
+        .off("select", onSelect);
     };
-  }, [emblaApi, onSelect, syncActiveFromViewport, canLoop, slideCount]);
+  }, [emblaApi, syncActiveFromViewport, canLoop]);
 
   const scrollTo = useCallback(
     (index: number) => {
       if (!emblaApi) return;
-      emblaApi.scrollTo(canLoop ? slideCount + index : index);
+
+      const current = getCenterSnap(emblaApi);
+      const totalSnaps = emblaApi.scrollSnapList().length;
+      let nearest = current;
+      let nearestDistance = Infinity;
+
+      for (let snap = 0; snap < totalSnaps; snap += 1) {
+        const logical =
+          slideCount > 0 ? ((snap % slideCount) + slideCount) % slideCount : 0;
+        if (logical !== index) continue;
+
+        const distance = Math.min(
+          Math.abs(snap - current),
+          totalSnaps - Math.abs(snap - current),
+        );
+        if (distance < nearestDistance) {
+          nearestDistance = distance;
+          nearest = snap;
+        }
+      }
+
+      emblaApi.scrollTo(nearest);
     },
-    [emblaApi, canLoop, slideCount],
+    [emblaApi, slideCount],
   );
 
   return (
-    <div className="w-full max-w-[100%] overflow-x-clip py-4 sm:py-6">
+    <div className="w-full max-w-[100%] overflow-x-clip py-4 sm:py-0">
       <div className="overflow-hidden" ref={emblaRef}>
         <div className="flex touch-pan-y items-center py-8 sm:py-10 lg:py-12">
           {carouselSlides.map(
@@ -185,7 +189,9 @@ const HealthProductCarousel = ({
               return (
                 <div
                   key={key}
-                  className="min-w-0 shrink-0 grow-0 basis-[94%] px-2 py-2 sm:basis-[82%] sm:px-2 lg:basis-[34%] lg:px-3 xl:basis-[32%]"
+                  className={`min-w-0 shrink-0 grow-0 basis-[94%] px-2 py-2 sm:basis-[82%] sm:px-2 lg:basis-[800px] lg:px-3 ${
+                    isActive ? "lg:min-w-[800px]" : ""
+                  }`}
                 >
                   <div
                     className={`origin-center transition-all duration-500 ease-out ${

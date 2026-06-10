@@ -145,11 +145,11 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
   const dealTextPosition = normalizeDealTextPosition(deal?.textPosition);
 
   return (
-    <div className={`mx-auto mt-5 w-full max-w-[1368px] px-3 md:mt-10 lg:px-0 pt-[50px] ${className}`}>
-      <div className="mt-20 flex flex-col gap-4 lg:flex-row lg:justify-between lg:gap-0">
-        {/* Left: promo slider */}
+    <div className={`mx-auto w-full max-w-[1368px] px-3 pt-5 md:pt-0 md:px-4 lg:pt-[50px] xl:px-0 ${className}`}>
+      <div className="isolate flex flex-col gap-4 md:mt-20 md:flex-row md:items-start md:justify-between md:gap-0">
+        {/* Left: promo slider — z-20 keeps it above the hanging deal tag */}
         {slides.length > 0 && (
-          <div className="relative h-[280px] min-h-[451px] w-full overflow-hidden rounded-[24px] bg-neutral-200 sm:h-[360px] lg:h-[451px] lg:w-[72.368%]">
+          <div className="relative z-20 h-[280px] w-full overflow-hidden rounded-[24px] bg-neutral-200 sm:h-[360px] md:h-[380px] xl:h-[451px] md:w-[72.368%]">
             {slides.map((item, index) => {
               const src = item.sliderBackgroundImage!.node!.sourceUrl!;
               const isActive = index === activeIndex;
@@ -168,7 +168,7 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
                     fill
                     priority={index === 0}
                     loading={index === 0 ? undefined : "eager"}
-                    sizes="(max-width: 1024px) 100vw, 66vw"
+                    sizes="(max-width: 768px) 100vw, 66vw"
                     className="object-cover"
                   />
                 </motion.div>
@@ -180,8 +180,8 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
               aria-hidden
             />
 
-            <div className="pointer-events-none absolute inset-0 z-10 flex max-w-[62%] flex-col justify-center gap-4 p-7 sm:p-10 lg:p-14">
-              <div className="relative min-h-[120px] w-full sm:min-h-[140px] lg:min-h-[180px]">
+            <div className="pointer-events-none absolute inset-0 z-10 flex max-w-[90%] flex-col justify-center gap-4 p-7 sm:p-10 md:max-w-[62%] md:p-14">
+              <div className="relative min-h-[120px] w-full sm:min-h-[140px] md:min-h-[180px]">
                 <AnimatePresence mode="wait" initial={false}>
                   <motion.div
                     key={activeIndex}
@@ -194,7 +194,7 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
                   {slide?.sliderTitle && (
                     <h2
                       style={{ color: slide.titleColor ?? undefined }}
-                      className="text-2xl font-albra font-bold leading-tight text-white sm:text-3xl lg:text-5xl"
+                      className="text-4xl font-albra font-bold leading-tight text-white sm:text-3xl lg:text-5xl"
                       dangerouslySetInnerHTML={{ __html: slide.sliderTitle }}
                     />
                   )}
@@ -245,7 +245,7 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
         {/* Right: deal banner — hangs and gently sways from the strap top */}
         {deals.length > 0 && (
           <motion.div
-            className="relative w-full lg:w-[25.512%]"
+            className="relative z-0 w-full md:w-[25.512%]"
             style={{ transformOrigin: "50% -135px" }}
             animate={{ rotate: [-1.5, 1.5, -1.5] }}
             transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
@@ -257,10 +257,10 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
               width={34}
               height={167}
               aria-hidden
-              className="pointer-events-none absolute -top-[135px] left-1/2 z-10 -translate-x-1/2"
+              className="pointer-events-none absolute -top-[135px] left-1/2 z-[1] -translate-x-1/2"
             />
 
-            <div className="relative h-[220px] w-full overflow-hidden rounded-[24px] bg-neutral-200 lg:h-[451px]">
+            <div className="relative mx-auto h-[350px] w-[280px] overflow-hidden rounded-[24px] bg-neutral-200 md:mx-0 md:h-[380px] xl:h-[451px] md:w-full">
               {deals.map((item, index) => {
                 const src = item.backgroundImage!.node!.sourceUrl!;
                 const isActive = index === activeDealIndex;
@@ -279,7 +279,7 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
                       fill
                       priority={index === 0}
                       loading={index === 0 ? undefined : "eager"}
-                      sizes="(max-width: 1024px) 100vw, 33vw"
+                      sizes="(max-width: 768px) 100vw, 33vw"
                       className="object-cover"
                     />
                   </motion.div>
@@ -298,7 +298,7 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
                   >
                     <h3
                       style={{ color: deal?.textColor ?? "#ffffff" }}
-                      className="text-xl font-albra font-bold leading-tight sm:text-2xl"
+                      className="text-xl font-albra font-bold leading-tight lg:text-2xl"
                       dangerouslySetInnerHTML={{ __html: deal!.dealContent! }}
                     />
                   </motion.div>

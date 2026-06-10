@@ -63,7 +63,7 @@ const Footer = () => {
 
       {/* Newsletter */}
       <div className="bg-header-green border-y border-white/10">
-        <div className="mx-auto flex max-w-[1088px] flex-col items-center justify-between gap-4 px-4 py-8 md:flex-row">
+        <div className="mx-auto flex max-w-[1088px] flex-col items-center justify-between gap-4 px-4 py-8 lg:flex-row">
           <p className="text-base font-semibold">{footer.newsletter.heading}</p>
           <NewsletterSignup />
         </div>
@@ -71,7 +71,7 @@ const Footer = () => {
 
       {/* Link columns */}
       <div className="bg-header-green">
-        <div className="mx-auto md:flex max-w-[1088px] justify-between grid grid-cols-1 gap-x-8 gap-y-10 px-4 py-12 md:grid-cols-4 md:gap-20">
+        <div className="mx-auto lg:flex max-w-[1088px] md:grid-cols-2 justify-between grid grid-cols-1 gap-x-8 gap-y-10 px-4 py-12 lg:grid-cols-4 xl:gap-20">
           <div>
             <h3 className={headingClass}>{footer.openTime.heading}</h3>
             <ul className="mt-5 space-y-2">

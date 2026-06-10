@@ -26,7 +26,7 @@ const HeaderContent = ({ navCategories }: HeaderContentProps) => {
 
       {/* Desktop cream top bar: logo · nav · account + basket */}
       <div className="hidden lg:block bg-header-cream">
-        <div className="grid h-[86px] w-full grid-cols-[1fr_auto_1fr] items-center gap-6 px-6">
+        <div className="grid h-[86px] w-full grid-cols-[1fr_auto_1fr] items-center gap-6 px-6 max-w-[1368px] mx-auto">
           {/* Left: Logo */}
           <div className="flex min-w-0 items-center justify-start">
             <Logo />
