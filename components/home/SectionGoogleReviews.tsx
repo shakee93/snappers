@@ -36,11 +36,17 @@ const REVIEW_PREVIEW_CHARS = 300;
 function reviewPlainText(html: string): string {
   return html
     .replace(/<[^>]+>/g, " ")
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, code: string) =>
+      String.fromCharCode(parseInt(code, 16))
+    )
     .replace(/&#(\d+);/g, (_, code: string) =>
       String.fromCharCode(Number(code))
     )
     .replace(/&amp;/g, "&")
     .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
     .replace(/&nbsp;/g, " ")
     .replace(/\s+/g, " ")
     .trim();
@@ -52,7 +58,13 @@ function truncateAtWord(text: string, max: number): string {
   return cut.slice(0, cut.lastIndexOf(" ")).trimEnd();
 }
 
-const ReviewCard = ({ item }: { item: GoogleReviewItem }) => {
+const ReviewCard = ({
+  item,
+  ariaHidden = false,
+}: {
+  item: GoogleReviewItem;
+  ariaHidden?: boolean;
+}) => {
   const images = (item.reviewImages?.nodes ?? []).filter(
     (img): img is ReviewImageNode => !!img?.sourceUrl
   );
@@ -63,6 +75,7 @@ const ReviewCard = ({ item }: { item: GoogleReviewItem }) => {
 
   return (
     <figure
+      aria-hidden={ariaHidden || undefined}
       className={`flex shrink-0 gap-4 rounded-2xl border border-black/5 bg-white p-4 shadow-sm ${
         images.length > 0 ? "w-[440px] sm:w-[600px]" : "w-[320px] sm:w-[400px]"
       }`}
@@ -91,7 +104,7 @@ const ReviewCard = ({ item }: { item: GoogleReviewItem }) => {
           </span>
           <span className="flex shrink-0 items-center gap-1.5 text-sm text-neutral-800">
             <StarIcon />
-            Rated {stars}.0 Star on Google
+            Rated {stars} {stars === 1 ? "star" : "stars"} on Google
           </span>
         </figcaption>
       </div>
@@ -128,14 +141,17 @@ const SectionGoogleReviews = ({
     .filter((row) => row.length > 0)
     .map((row) => {
       const repeats = Math.ceil(MIN_CARDS_PER_HALF / row.length);
-      return Array.from({ length: repeats }, () => row).flat();
+      return {
+        sourceLength: row.length,
+        cards: Array.from({ length: repeats }, () => row).flat(),
+      };
     });
 
   return (
     <section className={`w-full -mt-16 md:-mt-24 ${className}`}>
-      {/* Full-width banner artwork (transparent PNG, wave edge baked in) */}
+      {/* Full-width banner artwork (transparent WebP, wave edge baked in) */}
       <Image
-        src="/homepage/real-story-top.png"
+        src="/homepage/real-story-top.webp"
         alt=""
         width={1728}
         height={618}
@@ -174,8 +190,12 @@ const SectionGoogleReviews = ({
                     aria-hidden={half === 1}
                     className="flex gap-4 pr-4"
                   >
-                    {row.map((item, index) => (
-                      <ReviewCard key={index} item={item} />
+                    {row.cards.map((item, index) => (
+                      <ReviewCard
+                        key={`${item.reviewer?.trim() ?? "review"}-${half}-${index}`}
+                        item={item}
+                        ariaHidden={half === 1 || index >= row.sourceLength}
+                      />
                     ))}
                   </div>
                 ))}
