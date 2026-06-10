@@ -189,9 +189,7 @@ const HealthProductCarousel = ({
               return (
                 <div
                   key={key}
-                  className={`min-w-0 shrink-0 grow-0 basis-[94%] px-2 py-2 sm:basis-[82%] sm:px-2 lg:basis-[800px] lg:px-3 ${
-                    isActive ? "lg:min-w-[800px]" : ""
-                  }`}
+                  className="min-w-0 shrink-0 grow-0 basis-[94%] px-2 py-2 sm:basis-[82%] sm:px-2 lg:basis-[800px] lg:px-3"
                 >
                   <div
                     className={`origin-center transition-all duration-500 ease-out ${

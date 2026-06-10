@@ -194,7 +194,7 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
                   {slide?.sliderTitle && (
                     <h2
                       style={{ color: slide.titleColor ?? undefined }}
-                      className="text-4xl font-albra font-bold leading-tight text-white sm:text-3xl lg:text-5xl"
+                      className="text-3xl font-albra font-bold leading-tight text-white sm:text-4xl lg:text-5xl"
                       dangerouslySetInnerHTML={{ __html: slide.sliderTitle }}
                     />
                   )}
@@ -279,7 +279,7 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
                       fill
                       priority={index === 0}
                       loading={index === 0 ? undefined : "eager"}
-                      sizes="(max-width: 768px) 100vw, 33vw"
+                      sizes="(max-width: 768px) 280px, 33vw"
                       className="object-cover"
                     />
                   </motion.div>

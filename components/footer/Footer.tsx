@@ -71,7 +71,7 @@ const Footer = () => {
 
       {/* Link columns */}
       <div className="bg-header-green">
-        <div className="mx-auto lg:flex max-w-[1088px] md:grid-cols-2 justify-between grid grid-cols-1 gap-x-8 gap-y-10 px-4 py-12 lg:grid-cols-4 xl:gap-20">
+        <div className="mx-auto grid max-w-[1088px] grid-cols-1 gap-x-8 gap-y-10 px-4 py-12 md:grid-cols-2 lg:grid-cols-4 xl:gap-20">
           <div>
             <h3 className={headingClass}>{footer.openTime.heading}</h3>
             <ul className="mt-5 space-y-2">
