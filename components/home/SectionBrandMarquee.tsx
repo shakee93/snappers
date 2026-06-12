@@ -53,13 +53,15 @@ const SectionBrandMarquee = ({
               aria-hidden={half === 1}
               className="flex items-center gap-10 pr-10 md:gap-16 md:pr-16"
             >
-              {row.items.map((brand, index) => (
+              {row.items.map((brand, index) => {
+                const isHidden = half === 1 || index >= row.sourceLength;
+
+                return (
                 <Link
                   key={`${brand.slug}-${half}-${index}`}
                   href={getBrandPath(brand.slug)}
-                  aria-hidden={
-                    half === 1 || index >= row.sourceLength || undefined
-                  }
+                  aria-hidden={isHidden || undefined}
+                  tabIndex={isHidden ? -1 : undefined}
                   className="flex h-16 w-28 shrink-0 items-center justify-center sm:h-20 sm:w-36 md:h-24 md:w-44"
                 >
                   <Image
@@ -70,7 +72,8 @@ const SectionBrandMarquee = ({
                     className="h-full w-full object-contain"
                   />
                 </Link>
-              ))}
+                );
+              })}
             </div>
           ))}
         </div>

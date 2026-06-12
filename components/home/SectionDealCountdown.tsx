@@ -19,7 +19,6 @@ interface TimeLeft {
 
 const pad = (n: number) => n.toString().padStart(2, "0");
 
-const PLACEHOLDER_TIME: TimeLeft = { days: 0, hours: 0, minutes: 0 };
 
 const getTimeLeft = (target: number): TimeLeft => {
   const diff = Math.max(0, target - Date.now());
@@ -42,7 +41,7 @@ const SectionDealCountdown = ({
 }: SectionDealCountdownProps) => {
   // Countdown values depend on Date.now() — only compute after mount so SSR
   // and the first client render match (avoids hydration mismatch).
-  const [timeLeft, setTimeLeft] = useState<TimeLeft>(PLACEHOLDER_TIME);
+  const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
 
   useEffect(() => {
     const target = endsAt
@@ -56,11 +55,13 @@ const SectionDealCountdown = ({
     return () => window.clearInterval(id);
   }, [endsAt]);
 
-  const units = [
-    { label: "Days", value: timeLeft.days },
-    { label: "Hrs", value: timeLeft.hours },
-    { label: "Mins", value: timeLeft.minutes },
-  ];
+  const units = timeLeft
+    ? [
+        { label: "Days", value: timeLeft.days },
+        { label: "Hrs", value: timeLeft.hours },
+        { label: "Mins", value: timeLeft.minutes },
+      ]
+    : null;
 
   return (
     <section className={`mx-auto w-full max-w-[1368px] px-3 lg:px-0 mt-[-50px] ${className}`}>
@@ -103,22 +104,47 @@ const SectionDealCountdown = ({
               Hurry! Deals ends in:
             </span>
 
-            <div className="flex items-center">
-              {units.map((unit, index) => (
-                <div key={unit.label} className="flex items-center">
-                  {index > 0 && (
-                    <span className="mx-3 h-10 w-px bg-[#E7D9C7] sm:mx-4" aria-hidden />
-                  )}
-                  <div className="flex flex-col items-center">
-                    <span className="text-3xl font-bold tabular-nums text-[#3E251B] sm:text-4xl">
-                      {pad(unit.value)}
-                    </span>
-                    <span className="text-[10px] font-semibold uppercase tracking-wider text-[#EE9E7D] sm:text-xs">
-                      {unit.label}
-                    </span>
+            <div
+              className="flex min-h-[3.75rem] items-center sm:min-h-[4.25rem]"
+              aria-busy={!units}
+            >
+              {units ? (
+                units.map((unit, index) => (
+                  <div key={unit.label} className="flex items-center">
+                    {index > 0 && (
+                      <span
+                        className="mx-3 h-10 w-px bg-[#E7D9C7] sm:mx-4"
+                        aria-hidden
+                      />
+                    )}
+                    <div className="flex flex-col items-center">
+                      <span className="text-3xl font-bold tabular-nums text-[#3E251B] sm:text-4xl">
+                        {pad(unit.value)}
+                      </span>
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-[#EE9E7D] sm:text-xs">
+                        {unit.label}
+                      </span>
+                    </div>
                   </div>
+                ))
+              ) : (
+                <div className="flex w-full items-center justify-center gap-3 sm:gap-4">
+                  {[0, 1, 2].map((index) => (
+                    <div key={index} className="flex items-center">
+                      {index > 0 && (
+                        <span
+                          className="mx-3 h-10 w-px bg-[#E7D9C7] sm:mx-4"
+                          aria-hidden
+                        />
+                      )}
+                      <div className="flex flex-col items-center gap-1.5">
+                        <span className="h-8 w-10 animate-pulse rounded-md bg-[#E7D9C7]/80 sm:h-9 sm:w-12" />
+                        <span className="h-2.5 w-8 animate-pulse rounded bg-[#EE9E7D]/40" />
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              ))}
+              )}
             </div>
           </div>
         </div>

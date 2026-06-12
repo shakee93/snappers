@@ -57,7 +57,8 @@ const SectionOurStores = ({ className = "" }: SectionOurStoresProps) => {
                 <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl">
                   <Image
                     src={coverImage}
-                    alt={`${store.name} storefront`}
+                    alt=""
+                    aria-hidden
                     fill
                     sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw"
                     className="object-cover"

@@ -12,10 +12,10 @@
     },
     {
       "id": "scooby-doo",
-      "name": "Scooby-Doo!",
+      "name": "Scoody Doodle Pet Shop",
       "location": "Nugegoda store",
-      "details": "#526 Dutugemunu Mawatha, Nugegoda. Open 8:00 AM · Closes 8 PM. www.scoodydoodlepetshop.com",
-      "href": "https://www.scoodydoodlepetshop.com"
+      "details": "#526 Dutugemunu Mawatha, Nugegoda. Open 8:00 AM · Closes 8 PM.",
+      "href": "https://scoodydoodlepetshop.com"
     },
     {
       "id": "pet-store",
@@ -28,8 +28,8 @@
       "id": "wow-pet",
       "name": "Wow Pet",
       "location": "Maharagama store",
-      "details": "Open 8:00 AM · Closes 8 PM. www.wowpet.lk",
-      "href": "https://www.wowpet.lk"
+      "details": "Maharagama, Sri Lanka. Open 8:00 AM · Closes 8 PM.",
+      "href": "https://wowpet.lk"
     }
   ]
 }
