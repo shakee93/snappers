@@ -1,5 +1,6 @@
 import { getClient } from "@/graphql/apollo-ssr";
 import {
+  GET_ALL_BRANDS,
   GET_BROWSE_CATEGORY_TABS,
   GET_BROWSE_SECTION_PRODUCTS,
   GET_HOMEPAGE_DEAL_PRODUCTS,
@@ -29,6 +30,10 @@ import {
 import SectionGoogleReviews, {
   type GoogleReviewsFields,
 } from "@/components/home/SectionGoogleReviews";
+import SectionBrandMarquee, {
+  type BrandMarqueeItem,
+} from "@/components/home/SectionBrandMarquee";
+import SectionOurStores from "@/components/home/SectionOurStores";
 import { type CategoryTreeNode } from "@/lib/categoryScope";
 import { unstable_cache } from "next/cache";
 import { HERO_SECTION_CACHE_TAG } from "@/lib/cache-tags";
@@ -69,6 +74,7 @@ const getData = async () => {
     browseAllTab,
     browseCategories,
     googleReviews,
+    brands,
   ] = await Promise.all([
     getHeroSettingsCached(),
     getClient()
@@ -99,6 +105,10 @@ const getData = async () => {
       .query({ query: GET_GOOGLE_REVIEWS })
       .then((res) => res.data?.googleReviews?.googleReviewsFields ?? null)
       .catch(() => null),
+    getClient()
+      .query({ query: GET_ALL_BRANDS })
+      .then((res) => res.data?.brands?.nodes ?? [])
+      .catch(() => []),
   ]);
 
   const browseCategoryTabs = filterBrowseCategoryTabs(
@@ -151,6 +161,7 @@ const getData = async () => {
     browseCategoryScopes,
     browseCategoryTabCaches,
     googleReviews: googleReviews as GoogleReviewsFields | null,
+    brands: brands as BrandMarqueeItem[],
   };
 };
 
@@ -164,6 +175,7 @@ export default async function Home() {
     browseCategoryScopes,
     browseCategoryTabCaches,
     googleReviews,
+    brands,
   } = await getData();
 
   return (
@@ -204,6 +216,10 @@ export default async function Home() {
         <div className="mt-16 md:mt-24">
           <SectionGoogleReviews data={googleReviews} />
         </div>
+
+        <SectionBrandMarquee brands={brands} />
+
+        <SectionOurStores />
       </div>
     </main>
   );
