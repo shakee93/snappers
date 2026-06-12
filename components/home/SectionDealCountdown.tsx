@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import useInterval from "react-use/lib/useInterval";
 
 export interface SectionDealCountdownProps {
   className?: string;
@@ -19,6 +18,8 @@ interface TimeLeft {
 }
 
 const pad = (n: number) => n.toString().padStart(2, "0");
+
+const PLACEHOLDER_TIME: TimeLeft = { days: 0, hours: 0, minutes: 0 };
 
 const getTimeLeft = (target: number): TimeLeft => {
   const diff = Math.max(0, target - Date.now());
@@ -39,14 +40,21 @@ const SectionDealCountdown = ({
   backgroundImage = "/homepage/deal-bg.png",
   endsAt,
 }: SectionDealCountdownProps) => {
-  // Resolve the target once: the explicit `endsAt`, or two days out by default.
-  const [target] = useState(() =>
-    endsAt ? new Date(endsAt).getTime() : Date.now() + 1000 * 60 * 60 * 24 * 2
-  );
+  // Countdown values depend on Date.now() — only compute after mount so SSR
+  // and the first client render match (avoids hydration mismatch).
+  const [timeLeft, setTimeLeft] = useState<TimeLeft>(PLACEHOLDER_TIME);
 
-  const [timeLeft, setTimeLeft] = useState(() => getTimeLeft(target));
+  useEffect(() => {
+    const target = endsAt
+      ? new Date(endsAt).getTime()
+      : Date.now() + 1000 * 60 * 60 * 24 * 2;
 
-  useInterval(() => setTimeLeft(getTimeLeft(target)), 1000);
+    const tick = () => setTimeLeft(getTimeLeft(target));
+    tick();
+
+    const id = window.setInterval(tick, 1000);
+    return () => window.clearInterval(id);
+  }, [endsAt]);
 
   const units = [
     { label: "Days", value: timeLeft.days },
