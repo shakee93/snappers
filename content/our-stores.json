@@ -1,0 +1,35 @@
+{
+  "title": "Our store",
+  "subtitle": "Premium pet care, trusted by pet parents across Sri Lanka.",
+  "coverImage": "/homepage/stores/petshop-cover.webp",
+  "stores": [
+    {
+      "id": "meo",
+      "name": "Me-O",
+      "location": "Avissawella store",
+      "details": "RQ8 Private Bus Stand, Ratnapura Road, Avissawella 10700. Open 8:00 AM · Closes 8 PM.",
+      "href": "/contact"
+    },
+    {
+      "id": "scooby-doo",
+      "name": "Scoody Doodle Pet Shop",
+      "location": "Nugegoda store",
+      "details": "#526 Dutugemunu Mawatha, Nugegoda. Open 8:00 AM · Closes 8 PM.",
+      "href": "https://scoodydoodlepetshop.com"
+    },
+    {
+      "id": "pet-store",
+      "name": "Pet Store",
+      "location": "Mount Lavinia store",
+      "details": "No 148 Galle Rd, Mount Lavinia. Open 8:00 AM · Closes 8 PM.",
+      "href": "/contact"
+    },
+    {
+      "id": "wow-pet",
+      "name": "Wow Pet",
+      "location": "Maharagama store",
+      "details": "Maharagama, Sri Lanka. Open 8:00 AM · Closes 8 PM.",
+      "href": "https://wowpet.lk"
+    }
+  ]
+}
