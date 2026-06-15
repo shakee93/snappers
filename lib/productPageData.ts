@@ -30,16 +30,19 @@ export async function getProductPageData(
   { withRelated = true }: { withRelated?: boolean } = {},
 ): Promise<ProductPageData | null> {
   try {
+    const isDev = process.env.NODE_ENV === "development";
     const { data, error } = await getClient().query({
       query: GET_PRODUCT,
       variables: {
         productId: slug,
       },
       context: {
-        fetchOptions: {
-          cache: "force-cache",
-          next: { tags: [productTag(slug)] },
-        },
+        fetchOptions: isDev
+          ? { cache: "no-store" }
+          : {
+              cache: "force-cache",
+              next: { tags: [productTag(slug)] },
+            },
       },
     });
 

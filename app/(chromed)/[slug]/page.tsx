@@ -1,7 +1,4 @@
 import ProductDetails from "@/components/product/ProductDetails";
-import Features from "@/components/product/FeatureCard";
-import ProductOverview from "@/components/product/ProductOverview";
-import Link from "next/link";
 import ProductImage from "@/components/product/ProductImage2";
 import FreeGiftPreview from "@/components/product/FreeGiftPreview";
 import HappiestCustomersGallery from "@/components/product/HappiestCustomersGallery";
@@ -19,6 +16,7 @@ import { resolveSlug } from "@/lib/slugResolver";
 import { siteConfig } from "@/site.config";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import { notFound } from "next/navigation";
+import Link from "next/link";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -184,48 +182,54 @@ const Page = async (props: Props) => {
     ) as string[];
 
     return (
-      <div className="mt-5 md:mt-10">
-        <main className="flex flex-col px-3   sm:container sm:max-w-screen-2xl">
+      <div className="bg-white pb-6 lg:pb-12">
+        <main className="mx-auto flex max-w-[1368px] flex-col px-3 sm:px-4 lg:px-6">
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
           />
-          <div className="md:mt-0 text-sm md:px-5 md:text-[0.95rem] md:ml-4">
-            <Link href="/">Home</Link> &gt;{" "}
-            <Link href={getCategoryPath(primaryCategorySlug)}>
+
+          <nav
+            aria-label="Breadcrumb"
+            className="py-4 text-xs text-[#6B7280] sm:text-sm"
+          >
+            <Link href="/" className="hover:text-[#38461F]">
+              Home
+            </Link>
+            <span className="mx-1.5">&gt;</span>
+            <Link
+              href={getCategoryPath(primaryCategorySlug)}
+              className="hover:text-[#38461F]"
+            >
               {primaryCategoryName}
-            </Link>{" "}
-            &gt;{" "}
-            <Link href={canonicalPath}>{product.name}</Link>
-          </div>
-          <div></div>
-          <div className="flex flex-col md:flex-row p-3 rounded-3xl mt-5 md:mt-3 md:p-6 md:py-6 bg-white ">
+            </Link>
+            <span className="mx-1.5">&gt;</span>
+            <span className="text-[#1A1A1A]">{product.name}</span>
+          </nav>
+
+        <div className="grid grid-cols-1 gap-6 rounded-3xl bg-[#FAFAF8] p-4 sm:p-6 lg:grid-cols-7 lg:gap-10 lg:p-8">
             <ImageProvider>
-              <div className="w-full md:w-6/12 flex-col gap-6 md:pr-10">
-                <Suspense fallback={<>loading...</>}>
+              <div className="flex flex-col gap-4 lg:col-span-3 lg:gap-6">
+                <Suspense
+                  fallback={
+                    <div className="flex min-h-[280px] items-center justify-center rounded-2xl bg-[#F6F6F6] text-sm text-[#6B7280]">
+                      Loading images…
+                    </div>
+                  }
+                >
                   <ProductImage product={product} />
                 </Suspense>
                 <FreeGiftPreview product={product} />
-                {product.price && (
-                  <div className="hidden lg:block w-full mt-6">
-                    <Features />
-                  </div>
-                )}
+                <HappiestCustomersGallery images={happiestCustomersImages} />
               </div>
-              <div className="md:w-6/12 flex flex-col p-2 gap-y-1 md:gap-y-1.5">
+
+              <div className="flex flex-col lg:col-span-4">
                 <ProductDetails brand={brand} product={product} />
               </div>
             </ImageProvider>
           </div>
-          <HappiestCustomersGallery images={happiestCustomersImages} />
-          <ProductOverview product={product} />
-          {product.price && (
-            <div className=" lg:hidden w-full lg:w-1/5 p-3 bg-white rounded-3xl my-5">
-              <Features />
-            </div>
-          )}
 
-          <div className="mt-5 md:mt-10">
+          <div className="mt-8 lg:mt-12">
             <UpsellProducts newArrivals={upsellProducts} />
           </div>
         </main>

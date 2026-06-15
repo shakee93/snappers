@@ -1,19 +1,46 @@
+type VariationWithPrice = {
+  rawPrice?: string | null;
+  salePrice?: string | null;
+  price?: string | null;
+  stockStatus?: string | null;
+};
+
+export function getVariationNumericPrice(
+  variation: VariationWithPrice | null | undefined,
+): number {
+  const raw =
+    variation?.rawPrice ?? variation?.salePrice ?? variation?.price ?? "0";
+  return parseFloat(String(raw).replace(/[^\d.]/g, "")) || 0;
+}
+
+export function getLowestPriceVariation<T extends VariationWithPrice>(
+  variations: T[] | undefined | null,
+): T | undefined {
+  if (!variations?.length) return undefined;
+
+  return variations.reduce((lowest, variation) =>
+    getVariationNumericPrice(variation) < getVariationNumericPrice(lowest)
+      ? variation
+      : lowest,
+  );
+}
+
 /**
- * Returns the lowest-price in-stock variation, or falls back to the first variation
- * if none are in stock (or if the list is empty/undefined).
+ * Returns the lowest-price in-stock variation, or the lowest-price variation
+ * overall when none are in stock.
  */
-export function getPreferredVariation(
-  variations: any[] | undefined | null
-): any | undefined {
-  if (!variations || variations.length === 0) return undefined;
+export function getPreferredVariation<T extends VariationWithPrice>(
+  variations: T[] | undefined | null,
+): T | undefined {
+  if (!variations?.length) return undefined;
 
-  const inStockVariation = variations
-    .filter((v: any) => v.stockStatus === "IN_STOCK")
-    .reduce((lowest: any, v: any) => {
-      const currentPrice = parseFloat(v?.rawPrice || "0");
-      const lowestPrice = parseFloat(lowest?.rawPrice || "Infinity");
-      return currentPrice < lowestPrice ? v : lowest;
-    }, undefined);
+  const inStockVariations = variations.filter(
+    (variation) => variation.stockStatus === "IN_STOCK",
+  );
 
-  return inStockVariation || variations[0];
+  if (inStockVariations.length > 0) {
+    return getLowestPriceVariation(inStockVariations);
+  }
+
+  return getLowestPriceVariation(variations);
 }

@@ -45,6 +45,27 @@ export const GET_ALL_BRANDS = gql`
 `;
 
 
+export const GET_PRODUCT_STOCK = gql`
+  query GetProductStock($productId: ID!) {
+    product(id: $productId, idType: SLUG) {
+      ... on SimpleProduct {
+        stockStatus
+        stockQuantity
+      }
+      ... on VariableProduct {
+        stockStatus
+        variations(first: 50) {
+          nodes {
+            databaseId
+            stockStatus
+            stockQuantity
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const GET_PRODUCT = gql`
   ${ProductContentCard}
   ${ProductContentFull}

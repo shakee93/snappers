@@ -1,5 +1,6 @@
 "use client";
-import { Loader, ShoppingCart, Clock } from "lucide-react";
+import { Heart, Loader, Minus, Plus } from "lucide-react";
+import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
 import {
   ProductVariation,
@@ -7,9 +8,7 @@ import {
   VariableProduct,
   ProductTag,
 } from "@/graphql/types/graphql";
-import NcInputNumber from "@/components/global/primitives/NcInputNumber";
-import React, { useState, useEffect } from "react";
-import { toast } from "sonner";
+import React, { useState, useEffect } from "react";import { toast } from "sonner";
 import AddedToCart from "@/components/global/ui/notifications/added-to-cart";
 import { twMerge } from "tailwind-merge";
 import { useRouter } from "next/navigation";
@@ -192,7 +191,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
     return true;
   };
 
-  const addItemToCart = async () => {
+  const addItemToCart = async (redirectToCheckout = false) => {
     if (isProductOutOfStock()) {
       return;
     }
@@ -209,12 +208,19 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
         product?.databaseId,
         quantity,
         variationId,
-        product // Pass product data for pre-order validation
+        product
       );
 
-      handleAddToCartResponse(data, error);
-    } catch (error: any) {
-
+      const success = !error && !data?.error;
+      if (success) {
+        handleCartCompletion();
+        if (redirectToCheckout) {
+          router.push("/checkout");
+        }
+      } else {
+        handleAddToCartResponse(data, error);
+      }
+    } catch (error: unknown) {
       handleAddToCartError(error);
     } finally {
       setLoading(false);
@@ -228,13 +234,19 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
     }
   };
 
-  const handleAddToCartError = (error: any) => {
-    // console.log('error', error);
+  const handleAddToCartError = (error: unknown) => {
+    const err = error as {
+      graphQLErrors?: Array<{
+        message?: string;
+        extensions?: { debugMessage?: string; message?: string };
+      }>;
+      networkError?: unknown;
+      message?: string;
+    };
 
-    // Handle token expiration
     const isTokenExpired =
-      error.graphQLErrors?.[0]?.extensions?.debugMessage === "invalid-secret-key | Expired token" ||
-      error.graphQLErrors?.[0]?.extensions?.message?.includes("Expired token");
+      err.graphQLErrors?.[0]?.extensions?.debugMessage === "invalid-secret-key | Expired token" ||
+      err.graphQLErrors?.[0]?.extensions?.message?.includes("Expired token");
 
     if (isTokenExpired) {
       toast.error("You've been logged out. Please sign in again.");
@@ -243,14 +255,14 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
     }
 
     // Handle network errors
-    if (error.networkError) {
+    if (err.networkError) {
       toast.error("Unable to connect to the server. Please check your internet connection and try again.");
       return;
     }
 
     // Handle GraphQL errors
-    if (error.graphQLErrors && error.graphQLErrors.length > 0) {
-      const graphQLError = error.graphQLErrors[0];
+    if (err.graphQLErrors && err.graphQLErrors.length > 0) {
+      const graphQLError = err.graphQLErrors[0];
       const errorMessage = graphQLError.message || graphQLError.extensions?.message;
 
       // Handle specific GraphQL error cases
@@ -275,30 +287,28 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
     }
 
     // Handle generic errors
-    if (error.message) {
-      // Check for common error patterns
-      if (error.message.includes("fetch") || error.message.includes("network")) {
+    if (err.message) {
+      if (err.message.includes("fetch") || err.message.includes("network")) {
         toast.error("Unable to connect to the server. Please check your internet connection and try again.");
         return;
       }
 
-      if (error.message.includes("timeout")) {
+      if (err.message.includes("timeout")) {
         toast.error("The request timed out. Please try again.");
         return;
       }
 
-      if (error.message.includes("500") || error.message.includes("Internal Server Error")) {
+      if (err.message.includes("500") || err.message.includes("Internal Server Error")) {
         toast.error("Server error occurred. Please try again in a few moments.");
         return;
       }
 
-      if (error.message.includes("404") || error.message.includes("Not Found")) {
+      if (err.message.includes("404") || err.message.includes("Not Found")) {
         toast.error("Product not found. Please refresh the page and try again.");
         return;
       }
 
-      // For other specific errors, show the message but make it more user-friendly
-      toast.error(`Unable to add item to cart: ${error.message}`);
+      toast.error(`Unable to add item to cart: ${err.message}`);
       return;
     }
 
@@ -320,69 +330,84 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
     variation?.rawPrice == null ||
     isProductOutOfStock();
 
-  // console.log('isAddToCartDisabled', isAddToCartDisabled);
-  // console.log('product', product);
-  // console.log('variation', variation);
+  const cardControlClass =
+    "flex h-11 items-center justify-center rounded-lg border border-[#E8E8E8] bg-white";
+
+  const isInStock =
+    (product.type === "SIMPLE" && product.stockStatus === "IN_STOCK") ||
+    (product.type === "VARIABLE" && !isProductOutOfStock());
 
   return (
     <div className="w-full">
-      {/* Pre-order Notice */}
-      {isPreOrderProduct() && (
-        <PreOrderNotice className="mb-4" />
-      )}
+      {isPreOrderProduct() && <PreOrderNotice className="mb-4" />}
 
-      <div
-        className="flex items-center justify-center md:justify-start gap-4 md:gap-0 md:space-x-3.5 py-2 px-2 md:py-4 fixed bottom-[82px] left-0 z-10 md:z-10 bg-white md:bg-transparent w-full md:static"
-      >
+      <div className="fixed bottom-[82px] left-0 z-40 w-full border-t border-[#E8E8E8] bg-white p-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] lg:static lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none">
         {!(product.type === "VARIABLE" && !variation) && (
-          <div className="flex border border-primary-500/20 items-center justify-center dark:bg-slate-800/70 px-2 py-1 sm:p-2 rounded-full">
-            <div className="flex items-center justify-between space-x-5 w-full">
-              <NcInputNumber onChange={(v) => setQuantity(v)} defaultValue={quantity} />
-            </div>
+          <div className="flex items-center gap-2 pb-4 ">
+            {isInStock ? (
+              <>
+                <div
+                  className={`${cardControlClass} shrink-0 gap-3 px-3 justify-between min-w-[150px]`}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setQuantity((current) => Math.max(1, current - 1))}
+                    disabled={quantity <= 1}
+                    className="text-[#374151] disabled:cursor-not-allowed disabled:opacity-40"
+                    aria-label="Decrease quantity"
+                  >
+                    <Minus className="h-4 w-4" />
+                  </button>
+                  <span className="min-w-5 text-center text-sm font-medium text-[#1A1A1A]">
+                    {quantity}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setQuantity((current) => current + 1)}
+                    className="text-[#374151]"
+                    aria-label="Increase quantity"
+                  >
+                    <Plus className="h-4 w-4" />
+                  </button>
+                </div>
+
+                <button
+                  type="button"
+                  disabled={isAddToCartDisabled}
+                  onClick={() => addItemToCart(false)}
+                  className={twMerge(
+                    `${cardControlClass} min-w-0 flex-1 px-4 text-sm font-bold text-[#38461F] bg-[#ACDA5A] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50`,
+                  )}
+                >
+                  {loading ? (
+                    <Loader className="h-4 w-4 animate-spin" />
+                  ) : isPreOrderProduct() ? (
+                    "Pre-order"
+                  ) : (
+                    "Add to Basket"
+                  )}
+                </button>
+
+                <Link
+                  href="/account/save-lists"
+                  className={`${cardControlClass} w-11 shrink-0`}
+                  aria-label="Save to wishlist"
+                >
+                  <Heart className="h-5 w-5 text-[#374151]" />
+                </Link>
+              </>
+            ) : (
+              <button
+                type="button"
+                disabled={isNotifyClicked}
+                onClick={handleNotifyClick}
+                className={`${cardControlClass} w-full px-4 text-sm font-bold text-[#38461F] disabled:cursor-not-allowed disabled:opacity-50`}
+              >
+                Notify Me
+              </button>
+            )}
           </div>
         )}
-
-
-        {(product.type === "SIMPLE" && product.stockStatus === "IN_STOCK") ||
-          (product.type === "VARIABLE" && !isProductOutOfStock()) ? (
-          <button
-            disabled={isAddToCartDisabled}
-            onClick={addItemToCart}
-            className={twMerge(
-              "relative w-auto grow md:flex-none h-auto inline-flex cursor-pointer items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90",
-              isPreOrderProduct()
-                ? "bg-blue-800 dark:bg-slate-100 text-slate-50 dark:text-slate-800"
-                : "bg-primary-500 dark:bg-slate-100 text-slate-50 dark:text-slate-800",
-              "shadow-xl flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 dark:focus:ring-offset-0",
-              isAddToCartDisabled && "opacity-50 disabled:cursor-not-allowed"
-            )}
-          >
-            {loading ? <Loader className="animate-spin" /> : (
-              isPreOrderProduct() ? (
-                <Clock className="w-5 h-5" />
-              ) : (
-                <ShoppingCart />
-              )
-            )}
-            <span className="md:ml-3 cursor-pointer">
-              {isPreOrderProduct() ? "Pre-order Now" : "Add to cart"}
-            </span>
-          </button>
-        ) : (
-          <button
-            disabled={isNotifyClicked}
-            onClick={handleNotifyClick}
-            className={twMerge(
-              "relative w-auto grow md:flex-none h-auto inline-flex cursor-pointer items-center justify-center rounded-full transition-colors text-sm sm:text-base font-medium py-3 px-4 sm:py-3 sm:px-6 ttnc-ButtonPrimary disabled:bg-opacity-90 bg-primary-500 dark:bg-slate-100 text-slate-50 dark:text-slate-800 shadow-xl flex-shrink-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-600 dark:focus:ring-offset-0",
-              isNotifyClicked && "opacity-50 disabled:cursor-not-allowed"
-            )}
-          >
-            Notify Me When Available
-          </button>
-        )}
-
-
-        {/* Modal Implementation */}
         <Modal
           isOpen={isOpen}
           onOpenChange={onOpenChange}
