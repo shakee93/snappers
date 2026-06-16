@@ -88,7 +88,7 @@ const HealthFeatureDetails = ({
     {description ? (
       <p
         className={`shrink-0 text-sm leading-relaxed text-[#1A1A1A] sm:mt-3 sm:leading-[1.65] ${
-          isDesktop ? "line-clamp-4" : "line-clamp-7"
+          isDesktop ? "line-clamp-4" : "line-clamp-[7]"
         }`}
       >
         {description}

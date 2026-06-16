@@ -25,7 +25,7 @@ const SectionHealthBanner = ({
           width={371}
           height={167}
           aria-hidden
-          className="h-auto w-full object-cover md:hidden"
+          className="h-auto w-full rounded-[20px] object-cover md:hidden"
         />
         <Image
           src={backgroundImage}
