@@ -153,13 +153,18 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
     isVideo: true
   } : null;
 
-  const originalGalleryImages = product?.galleryImages?.nodes?.length ? product.galleryImages.nodes : [];
+  const galleryNodes = product?.galleryImages?.nodes;
+  const originalGalleryImages = galleryNodes?.length
+    ? galleryNodes
+    : product?.image?.sourceUrl
+      ? [product.image]
+      : [];
 
   const preferredVariation = getPreferredVariation(product?.variations?.nodes);
   const preferredImage = preferredVariation?.image;
 
   // If there's a preferred in-stock variation with an image, place it first
-  const initialGalleryImages = preferredImage
+  const initialGalleryImages = preferredImage?.sourceUrl
     ? [preferredImage, ...originalGalleryImages.slice(1)]
     : originalGalleryImages;
 
