@@ -1267,7 +1267,7 @@ const CheckoutPage = () => {
                       }
                     }}
                     disabled={applyingCoupon}
-                    className="inline-flex items-center justify-center rounded-full bg-slate-900 px-4 py-2 text-sm font-semibold text-white hover:bg-slate-800 disabled:opacity-60 disabled:cursor-not-allowed"
+                    className="inline-flex items-center justify-center rounded-full bg-[#ACDA5A] px-4 py-2 text-sm font-bold text-[#38461F] hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
                   >
                     {applyingCoupon ? (
                       <Loader className="w-4 h-4 animate-spin text-gray-100" />

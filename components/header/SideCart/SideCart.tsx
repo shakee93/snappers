@@ -37,7 +37,7 @@ export default function SideCart() {
 
             <SheetContent
                 side="right"
-                className="fixed inset-y-0 right-0 h-full w-10/12 border-l bg-background
+                className="fixed inset-y-0 right-0 h-full w-10/12 border-l bg-header-cream
                     data-[state=closed]:duration-300 data-[state=open]:duration-200
                     data-[state=open]:animate-in data-[state=closed]:animate-out
                     data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right
@@ -53,11 +53,16 @@ export default function SideCart() {
                     <div className="flex-1 min-h-0 overflow-y-auto">
                         <div className="flex gap-2 flex-col">
                             {cart?.contents?.nodes?.map((item, index) => (
-                                <CartDropdownItem
-                                    item={item}
+                                <div
                                     key={index}
-                                    close={() => setIsCartOpen(false)}
-                                />
+                                    className="overflow-hidden rounded-xl border border-[#E8E8E8] bg-[#FDE6D6]"
+                                >
+                                    <CartDropdownItem
+                                        item={item}
+                                        close={() => setIsCartOpen(false)}
+                                        wrapperClassName="flex px-3 py-4 relative border-0 bg-transparent"
+                                    />
+                                </div>
                             ))}
                         </div>
                     </div>
@@ -79,8 +84,8 @@ export default function SideCart() {
                                     onClick={() => setIsCartOpen(false)}
                                     className={
                                         "relative w-full h-auto flex-1 items-center justify-center rounded-full \
-                                        transition-colors disabled:cursor-not-allowed text-sm sm:text-base font-medium py-3 px-4 sm:py-3 sm:px-6 \
-                                        disabled:bg-opacity-90 bg-primary-500 text-white"
+                                        transition-opacity disabled:cursor-not-allowed text-sm sm:text-base font-bold py-3 px-4 sm:py-3 sm:px-6 \
+                                        disabled:opacity-50 bg-[#ACDA5A] text-[#38461F] hover:opacity-90"
                                     }
                                 >
                                     <span className="">Checkout</span>

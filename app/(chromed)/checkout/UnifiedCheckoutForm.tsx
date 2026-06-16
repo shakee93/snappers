@@ -305,8 +305,8 @@ interface DeliveryOptionProps {
 }
 
 const CHIP_TONES = {
-    emerald: "bg-emerald-500 text-white",
-    blue: "bg-blue-500 text-white",
+    emerald: "bg-[#ACDA5A] text-[#38461F]",
+    blue: "bg-header-accent text-[#38461F]",
 } as const;
 
 const DeliveryOption = ({
@@ -882,7 +882,7 @@ const UnifiedCheckoutForm = ({
                                 id={`bank-slip-upload-${gateway.id}`}
                                 accept="image/png, image/gif, image/jpeg, image/heic, image/heif, image/webp, image/bmp, image/tiff, application/pdf"
                                 onChange={handleBankSlipChange}
-                                className="block w-full text-sm text-slate-500 dark:text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-500 file:text-white hover:file:bg-slate-800 file:cursor-pointer cursor-pointer"
+                                className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-[#ACDA5A] file:text-[#38461F] hover:file:opacity-90 file:cursor-pointer cursor-pointer"
                             />
                             {previewUrl && bankSlipFile && (
                                 <div className="mt-2 flex items-center gap-3">
@@ -1180,10 +1180,10 @@ const UnifiedCheckoutForm = ({
                 <ButtonPrimary
                     type="submit"
                     disabled={loading}
-                    className="sm:min-w-[240px] w-full sm:w-auto"
+                    className="sm:min-w-[240px] w-full sm:w-auto !rounded-full !bg-[#ACDA5A] !text-[#38461F] hover:!opacity-90 !shadow-none hover:!bg-[#ACDA5A] font-bold"
                 >
                     {loading ? (
-                        <Loader className="animate-spin text-gray-100 w-5 h-5" />
+                        <Loader className="animate-spin text-[#38461F] w-5 h-5" />
                     ) : (
                         <span className="inline-flex items-center gap-2">
                             <span>Confirm Order</span>

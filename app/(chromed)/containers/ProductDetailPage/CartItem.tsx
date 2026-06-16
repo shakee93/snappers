@@ -160,7 +160,7 @@ const CartItemProduct = ({
 
           <button
             onClick={(e) => removeFromCart([key])}
-            className="text-primary-600 hover:text-primary-500 relative z-10 mt-3 flex items-center text-sm font-medium"
+            className="text-header-green hover:opacity-80 relative z-10 mt-3 flex items-center text-sm font-medium"
           >
             <span>Remove</span>
           </button>
