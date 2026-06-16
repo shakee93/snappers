@@ -12,8 +12,9 @@ import {
   CarouselPrevious,
   type CarouselApi,
 } from "@/components/global/ui/carousel";
+import { siteConfig } from "@/site.config";
 
-const ACCENT_GREEN = "#B8D962";
+const dealAccentHex = siteConfig.theme.brandHex.dealAccent;
 const AUTO_SLIDE_MS = 4000;
 /** Embla needs enough slides to engage loop when only a few products are on sale. */
 const MIN_SLIDES_FOR_LOOP = 16;
@@ -77,11 +78,17 @@ const DealProductCarousel = ({ products }: DealProductCarouselProps) => {
     const carouselElement = carouselRef.current;
     carouselElement?.addEventListener("mouseenter", stopAutoSlide);
     carouselElement?.addEventListener("mouseleave", startAutoSlide);
+    carouselElement?.addEventListener("pointerdown", stopAutoSlide);
+    carouselElement?.addEventListener("pointerup", startAutoSlide);
+    carouselElement?.addEventListener("pointercancel", startAutoSlide);
 
     return () => {
       stopAutoSlide();
       carouselElement?.removeEventListener("mouseenter", stopAutoSlide);
       carouselElement?.removeEventListener("mouseleave", startAutoSlide);
+      carouselElement?.removeEventListener("pointerdown", stopAutoSlide);
+      carouselElement?.removeEventListener("pointerup", startAutoSlide);
+      carouselElement?.removeEventListener("pointercancel", startAutoSlide);
     };
   }, [api, mounted]);
 
@@ -95,7 +102,7 @@ const DealProductCarousel = ({ products }: DealProductCarouselProps) => {
             <ProductCard
               product={product}
               badgeLabel="Deals"
-              accentColor={ACCENT_GREEN}
+              accentColor={dealAccentHex}
             />
           </div>
         ))}
@@ -124,14 +131,14 @@ const DealProductCarousel = ({ products }: DealProductCarouselProps) => {
               <ProductCard
                 product={product}
                 badgeLabel="Deals"
-                accentColor={ACCENT_GREEN}
+                accentColor={dealAccentHex}
               />
             </CarouselItem>
           ))}
         </CarouselContent>
 
-        <CarouselPrevious className="absolute -left-2 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 border-0 bg-[#3E251B] text-white hover:bg-[#3E251B]/90 hover:text-white md:flex lg:-left-12" />
-        <CarouselNext className="absolute -right-2 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 border-0 bg-[#3E251B] text-white hover:bg-[#3E251B]/90 hover:text-white md:flex lg:-right-12" />
+        <CarouselPrevious className="absolute -left-2 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 border-0 bg-deal-brown text-white hover:bg-deal-brown/90 hover:text-white md:flex lg:-left-12" />
+        <CarouselNext className="absolute -right-2 top-1/2 z-10 hidden h-9 w-9 -translate-y-1/2 border-0 bg-deal-brown text-white hover:bg-deal-brown/90 hover:text-white md:flex lg:-right-12" />
       </Carousel>
     </div>
   );
