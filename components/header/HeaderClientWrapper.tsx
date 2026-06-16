@@ -73,7 +73,7 @@ const HeaderClientWrapper = ({
         }}
         className={`
           ${isHeaderSticky ? 'fixed top-0 left-0 right-0' : 'relative'}
-          flex flex-col justify-between bg-transparent z-[100] transition-all duration-100 md:border-b
+          flex flex-col justify-between bg-transparent z-[100] transition-all duration-100
         `}
       >
         {/* Checkout-paused notice - always visible (does not hide on scroll) */}

@@ -15,6 +15,7 @@ import NcInputNumber from "@/components/global/primitives/NcInputNumber";
 import { Trash } from "lucide-react";
 import { isLineItemFree } from "@/lib/cartLinePricing";
 import { getCartLineStockCap } from "@/lib/cartLineStockCap";
+import { cn } from "@/lib/utils";
 
 // `displayValue` is resolved by the graphql-cart-attribute-display-value
 // mu-plugin and fetched in the cart fragment, but isn't part of the generated
@@ -24,9 +25,13 @@ type CartLineAttribute = VariationAttribute & { displayValue?: string | null };
 interface CartDropdownItemProps {
   item: CartItem;
   close: () => void;
+  wrapperClassName?: string;
 }
 
-const CartDropdownItem = ({ item, close }: CartDropdownItemProps) => {
+const DEFAULT_WRAPPER_CLASSNAME =
+  "flex px-3 py-4 border rounded-md relative bg-gradient-to-t from-gray-100/70 to-white";
+
+const CartDropdownItem = ({ item, close, wrapperClassName }: CartDropdownItemProps) => {
   const { removeFromCart, updateCart } = useCart();
 
   const { product, variation, quantity, key, total, subtotal } = item;
@@ -77,10 +82,16 @@ const CartDropdownItem = ({ item, close }: CartDropdownItemProps) => {
   };
 
   return (
-    <div className={`flex px-3 py-4 border rounded-md relative bg-gradient-to-t from-gray-100/70 to-white ${(isRemoving || isUpdating) ? 'opacity-70' : ''}`}>
+    <div
+      className={cn(
+        wrapperClassName ?? DEFAULT_WRAPPER_CLASSNAME,
+        "overflow-hidden",
+        (isRemoving || isUpdating) && "opacity-70"
+      )}
+    >
       {/* Loading overlay */}
       {(isRemoving || isUpdating) && (
-        <div className="absolute inset-0 bg-white/80 dark:bg-slate-900/50 rounded-md flex items-center justify-center z-40">
+        <div className="absolute inset-0 bg-white/80 dark:bg-slate-900/50 flex items-center justify-center z-40">
           <div className="flex items-center space-x-2">
             <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-primary-500"></div>
             <span className="text-sm font-medium text-slate-800 dark:text-slate-300">

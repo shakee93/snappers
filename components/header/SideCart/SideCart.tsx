@@ -2,17 +2,18 @@
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/global/ui/sheet";
 import { ShoppingCart } from "lucide-react";
-import { useRef, useState, useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
-import ButtonPrimary from "@/shared/Button/ButtonPrimary";
-import ButtonSecondary from "@/shared/Button/ButtonSecondary";
 import CartDropdownItem from "@/components/header/CartDropdownItem";
+import { BRAND_CTA_BUTTON_CLASS } from "@/shared/Button/ButtonBrand";
+
+const SIDE_CART_CHECKOUT_CLASS =
+    `relative w-full h-auto flex flex-1 items-center justify-center rounded-full text-sm sm:text-base font-bold py-3 px-4 sm:py-3 sm:px-6 ${BRAND_CTA_BUTTON_CLASS}`;
 
 export default function SideCart() {
     const { cart, isCartOpen, setIsCartOpen } = useCart();
-    let empty = cart?.contents?.itemCount == 0;
-
+    const checkoutDisabled = (cart?.contents?.itemCount ?? 0) === 0;
 
     const subTotal = useMemo(() => {
         return cart?.subtotal;
@@ -37,7 +38,7 @@ export default function SideCart() {
 
             <SheetContent
                 side="right"
-                className="fixed inset-y-0 right-0 h-full w-10/12 border-l bg-background
+                className="fixed inset-y-0 right-0 h-full w-10/12 border-l bg-header-cream
                     data-[state=closed]:duration-300 data-[state=open]:duration-200
                     data-[state=open]:animate-in data-[state=closed]:animate-out
                     data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right
@@ -53,11 +54,16 @@ export default function SideCart() {
                     <div className="flex-1 min-h-0 overflow-y-auto">
                         <div className="flex gap-2 flex-col">
                             {cart?.contents?.nodes?.map((item, index) => (
-                                <CartDropdownItem
-                                    item={item}
+                                <div
                                     key={index}
-                                    close={() => setIsCartOpen(false)}
-                                />
+                                    className="overflow-hidden rounded-xl border border-[#E8E8E8] bg-header-peach"
+                                >
+                                    <CartDropdownItem
+                                        item={item}
+                                        close={() => setIsCartOpen(false)}
+                                        wrapperClassName="flex px-3 py-4 relative border-0 bg-transparent"
+                                    />
+                                </div>
                             ))}
                         </div>
                     </div>
@@ -72,20 +78,24 @@ export default function SideCart() {
                             </span>
                             <span dangerouslySetInnerHTML={{ __html: subTotal || '' }} />
                         </div>
-                        <div className="flex space-x-2 mt-5">
-                            <Link className="flex-1" href={"/checkout"}>
+                        <div className="mt-5">
+                            {checkoutDisabled ? (
                                 <button
-                                    disabled={empty}
-                                    onClick={() => setIsCartOpen(false)}
-                                    className={
-                                        "relative w-full h-auto flex-1 items-center justify-center rounded-full \
-                                        transition-colors disabled:cursor-not-allowed text-sm sm:text-base font-medium py-3 px-4 sm:py-3 sm:px-6 \
-                                        disabled:bg-opacity-90 bg-primary-500 text-white"
-                                    }
+                                    type="button"
+                                    disabled
+                                    className={SIDE_CART_CHECKOUT_CLASS}
                                 >
-                                    <span className="">Checkout</span>
+                                    Checkout
                                 </button>
-                            </Link>
+                            ) : (
+                                <Link
+                                    href="/checkout"
+                                    onClick={() => setIsCartOpen(false)}
+                                    className={SIDE_CART_CHECKOUT_CLASS}
+                                >
+                                    Checkout
+                                </Link>
+                            )}
                         </div>
                     </div>
                 </div>
