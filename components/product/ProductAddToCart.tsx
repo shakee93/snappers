@@ -8,8 +8,8 @@ import {
   VariableProduct,
   ProductTag,
 } from "@/graphql/types/graphql";
-import React, { useState, useEffect } from "react";import { toast } from "sonner";
-import AddedToCart from "@/components/global/ui/notifications/added-to-cart";
+import React, { useState } from "react";
+import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/context/SessionProvider";
@@ -65,13 +65,14 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
           toast.error("Unable to add you to the notification list. Please try again.");
         }
       }
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Fetch error:", error);
+      const message = error instanceof Error ? error.message : "";
 
       // Handle network errors
-      if (error.message?.includes("fetch") || error.message?.includes("network")) {
+      if (message.includes("fetch") || message.includes("network")) {
         toast.error("Unable to connect to the server. Please check your internet connection and try again.");
-      } else if (error.message?.includes("timeout")) {
+      } else if (message.includes("timeout")) {
         toast.error("Request timed out. Please try again.");
       } else {
         toast.error("An unexpected error occurred. Please try again.");
@@ -80,16 +81,10 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   };
 
   const handleNotifyClick = async () => {
-    // console.log("Notify button clicked", customer?.email);
-
     if (userEmail) {
-
-      // console.log("Email submitted:", userEmail);
-
       try {
         sendNotificationRequest();
-      }
-      catch (error) {
+      } catch (error) {
         console.error("Fetch error:", error);
       } finally {
         onOpen();
@@ -104,11 +99,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   };
 
   const handleSubmitEmail = async () => {
-
     if (userEmail) {
-
-      // console.log("Email submitted:", userEmail);
-
       try {
         sendNotificationRequest();
       } catch (error) {
@@ -120,24 +111,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
       setIsThankYouModal(true);
       onOpenChange();
       setTimeout(onOpen, 500);
-    } else {
-      // console.log('no customer email');
     }
-  };
-
-  const notifyAddToCart = (quantity: number) => {
-    toast(
-      <div>
-        <div className="flex items-center justify-between text-base font-semibold leading-none">
-          Added to cart!
-        </div>
-        <div className="border-t border-slate-200 dark:border-slate-700 my-4" />
-        <AddedToCart product={product} variation={variation} quantity={quantity} />
-      </div>,
-      {
-        duration: 2000,
-      }
-    );
   };
 
   const handleCartCompletion = () => {
@@ -227,10 +201,12 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
     }
   };
 
-  const handleAddToCartResponse = (data: any, error: any) => {
+  const handleAddToCartResponse = (
+    data: { error?: unknown } | null | undefined,
+    error: unknown,
+  ) => {
     if (!error && !data?.error) {
       handleCartCompletion();
-      // notifyAddToCart(quantity);
     }
   };
 

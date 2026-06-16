@@ -3,7 +3,6 @@
 import { useMemo, useState } from "react";
 import { useMutation } from "@apollo/client";
 import { ApolloError } from "@apollo/client";
-import { useRouter } from "next/navigation";
 import { Loader, Star } from "lucide-react";
 import { toast } from "sonner";
 import { WRITE_PRODUCT_REVIEW } from "@/graphql/defs/reviews";
@@ -29,7 +28,6 @@ const ProductReviewsSection = ({
   averageRating,
   reviewCount,
 }: ProductReviewsSectionProps) => {
-  const router = useRouter();
   const { customer } = useSession();
   const isGuest = !customer || customer.id === "guest";
 
@@ -101,9 +99,7 @@ const ProductReviewsSection = ({
             commentOn: productDatabaseId,
             rating,
             content: content.trim(),
-            ...(isGuest
-              ? { author: name, authorEmail: email }
-              : { author: name, authorEmail: email }),
+            ...(isGuest ? { author: name, authorEmail: email } : {}),
           },
         },
       });
@@ -123,8 +119,6 @@ const ProductReviewsSection = ({
       toast.success(
         "Thank you! Your review has been submitted and will appear after approval.",
       );
-
-      router.refresh();
     } catch (error) {
       toast.error(getReviewErrorMessage(error));
     } finally {

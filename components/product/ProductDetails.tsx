@@ -1,5 +1,4 @@
-﻿/* eslint-disable react-hooks/exhaustive-deps */
-"use client";
+﻿"use client";
 import Link from "next/link";
 import ProductAddToCart from "./ProductAddToCart";
 import {
@@ -108,10 +107,11 @@ const ProductDetails = ({
     defaultVariation.attributes?.nodes?.forEach((attr: VariationAttribute) => {
       setAttribute(attr, attr.value || "");
     });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-only init
   }, []);
 
   // Sync the active variation's ID to the store on a primitive dep so the
-  // write fires only when the ID actually changes â€” keeps subscribers
+  // write fires only when the ID actually changes — keeps subscribers
   // (FreeGiftPreview) from re-rendering on no-op activeVariation updates.
   const activeVariationDbId =
     (activeVariation as { databaseId?: number } | null | undefined)?.databaseId ?? null;
@@ -186,7 +186,7 @@ const ProductDetails = ({
   );
 
   const { isPriceFluctuation } = usePriceFluctuationNotice();
-  // Variation meta wins, parent is the fallback â€” mirrors the WP plugin's
+  // Variation meta wins, parent is the fallback — mirrors the WP plugin's
   // runtime rule resolution so per-variation BOGO offers render correctly.
   const bogo = useMemo(
     () => resolveBogoConfig(product, activeVariation),
@@ -207,7 +207,7 @@ const ProductDetails = ({
   }, [product, activeVariation]);
   // If the BOGO rule resolved from the variation (variation `_wc_bogo_enabled`
   // wins), the fallback for an empty `_wc_bogo_free_product_ids` becomes the
-  // variation's own ID â€” strip it from the cross-product list so we don't
+  // variation's own ID — strip it from the cross-product list so we don't
   // try to load it as a separate gift product.
   const bogoSourceId = useMemo(() => {
     const variationId = (activeVariation as { databaseId?: number } | null | undefined)?.databaseId;
@@ -284,7 +284,7 @@ const ProductDetails = ({
     crossProductFreeIds.length === 0 ? (
       <>Free item applies to this product</>
     ) : freeGiftLoading || unresolvedLoading ? (
-      <>Loading free gift detailsâ€¦</>
+      <>Loading free gift details…</>
     ) : giftMentions.length > 0 ? (
       <>
         Free gift included:{" "}
@@ -326,14 +326,18 @@ const ProductDetails = ({
       if (!selectedValue) return;
 
       // Get all variations that match the other attributes but have different values for this attribute
-      const otherAttributes = attribute.filter((a) => a.name !== attr.name);
+      const otherAttributes = attribute.filter(
+        (a) => normalizeAttrName(a.name) !== normalizeAttrName(attr.name),
+      );
       const availableValues = new Set<string>();
 
       (product as VariableProduct).variations?.nodes.forEach((v: ProductVariation) => {
         // Check if this variation matches all other selected attributes
         const matchesOtherAttributes = otherAttributes.every((selectedAttr) => {
           return v.attributes?.nodes.some(
-            (node: any) => node.name === selectedAttr.name && node.value === selectedAttr.val
+            (node: VariationAttribute) =>
+              normalizeAttrName(node.name) === normalizeAttrName(selectedAttr.name) &&
+              node.value === selectedAttr.val,
           );
         });
 
@@ -342,8 +346,9 @@ const ProductDetails = ({
           matchesOtherAttributes &&
           resolveVariationStockStatus(v) === "IN_STOCK"
         ) {
-          const attrValue = (v.attributes?.nodes as unknown as VariationAttribute[])?.find(
-            (node: VariationAttribute) => node.name === attr.name
+          const attrValue = v.attributes?.nodes?.find(
+            (node: VariationAttribute) =>
+              normalizeAttrName(node.name) === normalizeAttrName(attr.name),
           )?.value;
           if (attrValue && attrValue !== selectedValue) {
             // Custom (non-taxonomy) attributes: the value is the display label.

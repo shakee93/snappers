@@ -1,8 +1,8 @@
 import Image, { type StaticImageData } from "next/image";
 
 import boxIcon from "@/public/product/box-product.png";
-import contactIcon from "@/public/product/contact-oriduct.png";
-import pawIcon from "@/public/product/pow-product.png";
+import contactIcon from "@/public/product/contact-product.png";
+import pawIcon from "@/public/product/paw-product.png";
 import timerIcon from "@/public/product/timer-product.png";
 
 const TRUST_ITEMS: ReadonlyArray<{
