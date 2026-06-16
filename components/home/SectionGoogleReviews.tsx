@@ -105,7 +105,7 @@ const ReviewCard = ({
           </span>
           <span
             className="flex shrink-0 items-center gap-0 text-sm text-neutral-800"
-            aria-label={`${rating} out of 5 stars`}
+            aria-label={`${starCount} out of 5 stars`}
           >
             {Array.from({ length: starCount }).map((_, index) => (
               <StarIcon key={index} />

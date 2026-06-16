@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Loader } from "lucide-react";
@@ -42,6 +42,20 @@ const toPlainText = (html?: string | null): string =>
 const packshotBoxClassName =
   "relative overflow-hidden rounded-xl border border-[#E8E8E8] bg-white";
 
+const SM_MEDIA_QUERY = "(min-width: 640px)";
+
+function useIsSmUp(): boolean {
+  return useSyncExternalStore(
+    (onStoreChange) => {
+      const mediaQueryList = window.matchMedia(SM_MEDIA_QUERY);
+      mediaQueryList.addEventListener("change", onStoreChange);
+      return () => mediaQueryList.removeEventListener("change", onStoreChange);
+    },
+    () => window.matchMedia(SM_MEDIA_QUERY).matches,
+    () => false,
+  );
+}
+
 type HealthFeatureDetailsProps = {
   name?: string | null;
   description: string;
@@ -73,13 +87,9 @@ const HealthFeatureDetails = ({
 
     {description ? (
       <p
-        className="shrink-0 text-sm leading-relaxed text-[#1A1A1A] sm:mt-3 sm:leading-[1.65]"
-        style={{
-          display: "-webkit-box",
-          WebkitLineClamp: isDesktop ? 4 : 7,
-          WebkitBoxOrient: "vertical",
-          overflow: "hidden",
-        }}
+        className={`shrink-0 text-sm leading-relaxed text-[#1A1A1A] sm:mt-3 sm:leading-[1.65] ${
+          isDesktop ? "line-clamp-4" : "line-clamp-7"
+        }`}
       >
         {description}
       </p>
@@ -157,6 +167,7 @@ const HealthFeatureCard = ({
   isActive = false,
 }: HealthFeatureCardProps) => {
   const [loading, setLoading] = useState(false);
+  const isSmUp = useIsSmUp();
   const { addToCart } = useCart();
   const link = useProductLink(product);
   const router = useRouter();
@@ -259,40 +270,40 @@ const HealthFeatureCard = ({
         isActive ? "sm:bg-[#F6F6F6]" : "sm:bg-white"
       }`}
     >
-      {/* Mobile: vertical card */}
-      <div className="grid h-full min-h-[440px] grid-rows-[auto_auto_minmax(0,1fr)_auto] gap-3 p-5 sm:hidden">
-        <HealthFeatureDetails {...detailsProps} footerLayout="mobile" />
-      </div>
-
-      {/* Desktop: feature image + same packshot sizing as mobile */}
-      <div className="hidden h-full sm:grid sm:grid-cols-2">
-        <Link
-          href={link || "#"}
-          className="flex h-full min-h-0 p-5 lg:p-6"
-          aria-label={name ?? "Product"}
-        >
-          {heroImageUrl ? (
-            <div className="relative h-full min-h-[240px] w-full overflow-hidden rounded-[20px] border border-[#E8E8E8]">
-              <Image
-                src={heroImageUrl}
-                alt={name ?? "Product"}
-                fill
-                sizes="22vw"
-                className="object-cover object-center"
+      {isSmUp ? (
+        <div className="grid h-full grid-cols-2">
+          <Link
+            href={link || "#"}
+            className="flex h-full min-h-0 p-5 lg:p-6"
+            aria-label={name ?? "Product"}
+          >
+            {heroImageUrl ? (
+              <div className="relative h-full min-h-[240px] w-full overflow-hidden rounded-[20px] border border-[#E8E8E8]">
+                <Image
+                  src={heroImageUrl}
+                  alt={name ?? "Product"}
+                  fill
+                  sizes="22vw"
+                  className="object-cover object-center"
+                />
+              </div>
+            ) : (
+              <div
+                className="h-full min-h-[240px] w-full rounded-[20px] border border-[#E8E8E8] bg-neutral-100"
+                aria-hidden
               />
-            </div>
-          ) : (
-            <div
-              className="h-full min-h-[240px] w-full rounded-[20px] border border-[#E8E8E8] bg-neutral-100"
-              aria-hidden
-            />
-          )}
-        </Link>
+            )}
+          </Link>
 
-        <div className="grid h-full min-h-0 grid-rows-[auto_auto_minmax(0,1fr)_auto] gap-3 px-7 py-6 lg:px-8 lg:py-7">
-          <HealthFeatureDetails {...detailsProps} footerLayout="desktop" />
+          <div className="grid h-full min-h-0 grid-rows-[auto_auto_minmax(0,1fr)_auto] gap-3 px-7 py-6 lg:px-8 lg:py-7">
+            <HealthFeatureDetails {...detailsProps} footerLayout="desktop" />
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="grid h-full min-h-[440px] grid-rows-[auto_auto_minmax(0,1fr)_auto] gap-3 p-5">
+          <HealthFeatureDetails {...detailsProps} footerLayout="mobile" />
+        </div>
+      )}
     </article>
   );
 };

@@ -81,7 +81,7 @@ const SectionDealCountdown = ({
               />
             )}
             <div className="flex flex-col items-center">
-              <span className="text-2xl font-bold tabular-nums text-[#3E251B] md:text-4xl">
+              <span className="text-2xl font-bold tabular-nums text-deal-brown md:text-4xl">
                 {pad(unit.value)}
               </span>
               <span className="text-[9px] leading-none py-1 md:py-2 font-semibold uppercase tracking-wider text-[#EE9E7D] md:text-xs">
@@ -120,7 +120,7 @@ const SectionDealCountdown = ({
           width={371}
           height={170}
           aria-hidden
-          className="h-auto w-full object-cover md:hidden"
+          className="h-auto w-full rounded-[20px] object-cover md:hidden"
         />
         <Image
           src={backgroundImage}
@@ -143,7 +143,7 @@ const SectionDealCountdown = ({
                 aria-hidden
                 className="absolute -left-5 -top-3 h-4 w-4 hidden md:block"
               />
-              <h2 className="text-[25px] font-albra font-bold leading-tight text-[#3E251B] mb-2">
+              <h2 className="mb-2 text-[25px] font-albra font-bold leading-tight text-deal-brown">
                 Deals for your <span className="text-[#E79A72]">pet</span>
               </h2>
               <Image
@@ -157,7 +157,7 @@ const SectionDealCountdown = ({
             </div>
 
             <div className="relative mt-2.5 w-full rounded-xl border border-[#E7D9C7] bg-white px-2 pb-1.5 pt-2.5">
-              <span className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-[#3E251B] px-1.5 py-1 text-[8px] font-bold uppercase leading-none tracking-wide !text-[#EE9E7D]">
+              <span className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-deal-brown px-1.5 py-1 text-[8px] font-bold uppercase leading-none tracking-wide !text-[#EE9E7D]">
                 Hurry! Deals ends in:
               </span>
               {countdownBody}
@@ -190,7 +190,7 @@ const SectionDealCountdown = ({
           </div>
 
           <div className="relative rounded-2xl border border-[#E7D9C7] bg-white/70 px-7 py-0 md:pb-3 md:pt-5 backdrop-blur-sm">
-            <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-[#3E251B] px-3 py-2 text-[10px] font-bold uppercase leading-none tracking-wider !text-[#EE9E7D]">
+            <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-deal-brown px-3 py-2 text-[10px] font-bold uppercase leading-none tracking-wider !text-[#EE9E7D]">
               Hurry! Deals ends in:
             </span>
             {countdownBody}
