@@ -107,7 +107,7 @@ const HeaderClientWrapper = ({
       />
 
       <div className="lg:hidden">
-        <MobileBottomNav categories={productCategories} />
+        <MobileBottomNav />
       </div>
     </>
   );

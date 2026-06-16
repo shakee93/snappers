@@ -109,7 +109,7 @@ const HealthFeatureCard = ({
 
   return (
     <article
-      className={`aspect-[4/3] w-full overflow-hidden rounded-[24px] border border-[#E8E8E8] transition-colors duration-300 ${
+      className={`aspect-[4/3] w-full overflow-hidden rounded-[24px] border border-[#E8E8E8] transition-colors duration-300 max-sm:aspect-auto ${
         isActive ? "bg-[#F6F6F6]" : "bg-white"
       }`}
     >
@@ -117,37 +117,37 @@ const HealthFeatureCard = ({
         {/* Left feature image with inset padding and rounded corners */}
         <Link
           href={link || "#"}
-          className="flex h-1/2 w-full shrink-0 p-4 sm:h-full sm:w-1/2 sm:p-5 lg:p-6"
+          className="block w-full p-4 sm:flex sm:h-full sm:w-1/2 sm:shrink-0 sm:p-5 lg:p-6"
           aria-label={name ?? "Product"}
         >
           {heroImageUrl ? (
-            <div className="relative h-full w-full overflow-hidden rounded-[20px] border border-[#E8E8E8]">
+            <div className="relative h-full w-full overflow-hidden rounded-[20px] border border-[#E8E8E8] max-sm:aspect-[4/3]">
               <Image
                 src={heroImageUrl}
                 alt={name ?? "Product"}
                 fill
-                sizes="(max-width: 640px) 45vw, 22vw"
+                sizes="(max-width: 640px) 90vw, 22vw"
                 className="object-cover object-center"
               />
             </div>
           ) : (
             <div
-              className="h-full w-full rounded-[20px] border border-[#E8E8E8] bg-neutral-100"
+              className="h-full w-full rounded-[20px] border border-[#E8E8E8] bg-neutral-100 max-sm:aspect-[4/3]"
               aria-hidden
             />
           )}
         </Link>
 
         {/* Right product details — grid gives the thumbnail row an explicit height */}
-        <div className="grid h-1/2 min-h-0 w-full grid-rows-[auto_auto_minmax(0,1fr)_auto] px-5 py-4 sm:h-full sm:w-1/2 sm:px-7 sm:py-6 lg:px-8 lg:py-7">
+        <div className="flex flex-col px-5 pb-5 pt-1 sm:grid sm:h-full sm:w-1/2 sm:min-h-0 sm:grid-rows-[auto_auto_minmax(0,1fr)_auto] sm:px-7 sm:py-6 lg:px-8 lg:py-7">
           <Link href={link || "#"} className="block">
-            <h3 className="font-albra text-[1.4rem] font-bold leading-[1.25] text-[#0A0A0A] sm:text-[1.65rem] lg:text-[1.85rem]">
+            <h3 className="font-albra text-[1.4rem] font-bold leading-[1.25] text-[#0A0A0A] max-sm:line-clamp-2 max-sm:text-[1.25rem] sm:text-[1.65rem] lg:text-[1.85rem]">
               {name}
             </h3>
           </Link>
 
           {description ? (
-            <p className="mt-2 line-clamp-3 text-[13px] leading-[1.55] text-[#1A1A1A] sm:mt-3 sm:line-clamp-4 sm:text-sm sm:leading-[1.65]">
+            <p className="mt-2 line-clamp-3 text-[13px] leading-[1.55] text-[#1A1A1A] max-sm:hidden sm:mt-3 sm:line-clamp-4 sm:text-sm sm:leading-[1.65]">
               {description}
             </p>
           ) : (
@@ -156,12 +156,12 @@ const HealthFeatureCard = ({
 
           {productImageUrl ? (
             <div className="mt-3 flex min-h-0 items-start sm:mt-4">
-              <div className="relative h-full min-h-[64px] w-auto max-w-full shrink-0 overflow-hidden rounded-xl border border-[#E8E8E8] [aspect-ratio:1/1]">
+              <div className="relative h-full min-h-[64px] w-auto max-w-full shrink-0 overflow-hidden rounded-xl border border-[#E8E8E8] [aspect-ratio:1/1] max-sm:size-[72px]">
                 <Image
                   src={productImageUrl}
                   alt={name ? `${name} product` : "Product"}
                   fill
-                  sizes="(max-width: 640px) 120px, 160px"
+                  sizes="(max-width: 640px) 72px, 160px"
                   className="object-cover object-left"
                 />
               </div>
@@ -170,10 +170,10 @@ const HealthFeatureCard = ({
             <div aria-hidden />
           )}
 
-          <div className="pt-3 sm:pt-8">
+          <div className="pt-3 max-sm:mt-3 sm:pt-8">
             <div className="flex flex-col gap-3 sm:gap-4">
               {numericPrice > 0 && (
-                <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
+                <div className="flex max-sm:flex-col max-sm:gap-1.5 flex-wrap items-center gap-x-1.5 gap-y-1">
                   <span className="text-base font-bold text-[#0A0A0A] sm:text-lg">
                     LKR {formatLkr(numericPrice)}
                   </span>
@@ -190,7 +190,7 @@ const HealthFeatureCard = ({
                 type="button"
                 disabled={loading || isOutOfStock}
                 onClick={handleAddToCart}
-                className="inline-flex shrink-0 items-center justify-center gap-2 self-end rounded-full bg-[#C5E066] px-6 py-3 text-sm font-bold text-[#0A0A0A] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:min-w-[160px]"
+                className="inline-flex max-sm:w-full shrink-0 items-center justify-center gap-2 self-end rounded-full bg-[#C5E066] px-6 py-3 text-sm font-bold text-[#0A0A0A] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:min-w-[160px]"
               >
                 {loading && <Loader className="h-4 w-4 animate-spin" />}
                 <span>{buttonLabel}</span>
