@@ -28,6 +28,8 @@ export const siteConfig = {
   theme: {
     brandHex: {
       primary: "#1b40af",
+      dealBrown: "#3E251B",
+      dealAccent: "#B8D962",
     },
     colors: {
       primary: {
@@ -70,6 +72,11 @@ export const siteConfig = {
       // Soft-peach action icons + Basket pill on the cream bar.
       peach: "253 230 214",
       accent: "243 168 130",
+    },
+    /** Deal section — countdown, carousel controls, product-card accent. */
+    deal: {
+      brown: "62 37 27",
+      accent: "184 217 98",
     },
   },
   assets: {

@@ -62,6 +62,10 @@ const config: Config = {
 					peach: tokenColor("--c-header-peach"),
 					accent: tokenColor("--c-header-accent"),
 				},
+				deal: {
+					brown: tokenColor("--c-deal-brown"),
+					accent: tokenColor("--c-deal-accent"),
+				},
 				secondary: {
 					'50': tokenColor("--c-secondary-50"),
 					'100': tokenColor("--c-secondary-100"),
