@@ -40,7 +40,7 @@ const badges: FeatureBadge[] = [
 /** Trust/feature badges row rendered beneath the hero slider. */
 const SectionFeatureBadges = ({ className = "" }: { className?: string }) => {
   return (
-    <div className={`mx-auto mt-12 w-full max-w-[1368px] px-3 lg:px-0 ${className}`}>
+    <div className={`mx-auto mt-12 w-full max-w-[300px] md:max-w-[1368px] px-3 lg:px-0 ${className}`}>
       <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:justify-center sm:gap-6">
         {badges.map(({ id, iconSrc, iconAlt, title, subtitle, background }) => (
           <div

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import useEmblaCarousel from "embla-carousel-react";
 import type { EmblaCarouselType } from "embla-carousel";
 import Autoplay from "embla-carousel-autoplay";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
   resolveDisplayPrice,
   type ProductCardItem,
@@ -179,23 +180,52 @@ const HealthProductCarousel = ({
     [emblaApi, slideCount],
   );
 
+  const scrollPrev = useCallback(() => {
+    emblaApi?.scrollPrev();
+  }, [emblaApi]);
+
+  const scrollNext = useCallback(() => {
+    emblaApi?.scrollNext();
+  }, [emblaApi]);
+
   return (
-    <div className="w-full max-w-[100%] overflow-x-clip py-4 sm:py-0">
-      <div className="overflow-hidden" ref={emblaRef}>
-        <div className="flex touch-pan-y items-center py-8 sm:py-10 lg:py-12">
+    <div className="relative w-full max-w-[100%] overflow-x-clip px-1 py-4 sm:px-0 sm:py-0">
+      {canLoop && (
+        <>
+          <button
+            type="button"
+            onClick={scrollPrev}
+            aria-label="Previous product"
+            className="absolute left-0 top-1/2 z-20 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-[#E8E8E8] bg-white text-[#9CA3AF] shadow-sm sm:hidden"
+          >
+            <ChevronLeft className="h-5 w-5" strokeWidth={2} />
+          </button>
+          <button
+            type="button"
+            onClick={scrollNext}
+            aria-label="Next product"
+            className="absolute right-0 top-1/2 z-20 flex h-9 w-9 -translate-y-1/2 items-center justify-center rounded-full border border-[#E8E8E8] bg-white text-[#9CA3AF] shadow-sm sm:hidden"
+          >
+            <ChevronRight className="h-5 w-5" strokeWidth={2} />
+          </button>
+        </>
+      )}
+
+      <div className="overflow-hidden sm:mx-0" ref={emblaRef}>
+        <div className="flex touch-pan-y items-stretch py-2 sm:items-center sm:py-10 lg:py-12">
           {carouselSlides.map(
             ({ key, product, price, featureImage }, physicalIndex) => {
               const isActive = physicalIndex === selectedSnap;
               return (
                 <div
                   key={key}
-                  className="min-w-0 shrink-0 grow-0 basis-[94%] px-2 py-2 sm:basis-[82%] sm:px-2 lg:basis-[800px] lg:px-3"
+                  className="flex min-h-0 shrink-0 grow-0 basis-full px-3 sm:basis-[82%] sm:px-2 lg:basis-[800px] lg:px-3"
                 >
                   <div
-                    className={`origin-center transition-all duration-500 ease-out ${
+                    className={`flex h-full w-full origin-center transition-all duration-500 ease-out ${
                       isActive
                         ? "z-10 scale-100 opacity-100"
-                        : "scale-[0.88] opacity-70"
+                        : "scale-100 opacity-100 sm:scale-[0.88] sm:opacity-70"
                     }`}
                   >
                     <HealthFeatureCard
@@ -213,7 +243,7 @@ const HealthProductCarousel = ({
       </div>
 
       {canLoop && (
-        <div className="mt-2 flex items-center justify-center gap-2 sm:mt-4">
+        <div className="mt-2 hidden items-center justify-center gap-2 sm:mt-4 sm:flex">
           {products.map((_, index) => (
             <button
               key={index}
