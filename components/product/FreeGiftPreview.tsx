@@ -3,7 +3,11 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useMemo } from "react";
-import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
+import {
+  ProductVariation,
+  SimpleProduct,
+  VariableProduct,
+} from "@/graphql/types/graphql";
 import { findBogoEnabledVariation, resolveBogoConfig } from "@/lib/bogo";
 import { getPreferredVariation } from "@/lib/getPreferredVariation";
 import { useStore } from "@/store/store";
@@ -61,14 +65,17 @@ export default function FreeGiftPreview({
   // Pre-selection (initial load) falls back to the preferred (in-stock, lowest
   // price) variation — same default ProductDetails uses.
   const activeVariationId = useStore((s) => s.product.activeVariationId);
-  const variationNodes = (product as VariableProduct)?.variations?.nodes;
-  const activeVariation = useMemo(() => {
-    if (!variationNodes?.length) return undefined;
+  const variationNodes = useMemo(
+    () =>
+      ((product as VariableProduct).variations?.nodes as ProductVariation[]) ??
+      [],
+    [product],
+  );
+  const activeVariation = useMemo((): ProductVariation | undefined => {
+    if (!variationNodes.length) return undefined;
     if (activeVariationId != null) {
       const match = variationNodes.find(
-        (v) =>
-          (v as { databaseId?: number } | null | undefined)?.databaseId ===
-          activeVariationId
+        (v) => v.databaseId === activeVariationId,
       );
       if (match) return match;
     }
@@ -83,8 +90,7 @@ export default function FreeGiftPreview({
     [product, activeVariation]
   );
 
-  const activeVariationDbId = (activeVariation as { databaseId?: number } | null | undefined)
-    ?.databaseId;
+  const activeVariationDbId = activeVariation?.databaseId;
   const bogoSourceId = useMemo(() => {
     if (
       activeVariationDbId &&
