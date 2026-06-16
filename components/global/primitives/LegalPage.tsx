@@ -6,16 +6,8 @@ type LegalPageProps = {
   content: string;
 };
 
-const legalMarkdownClassName = [
-  "text-neutral-800 dark:text-neutral-200",
-  "text-base leading-8",
-  "[&>p]:mb-5",
-  "[&>h2]:text-lg [&>h2]:font-bold [&>h2]:text-neutral-900 [&>h2]:dark:text-neutral-100",
-  "[&>h2]:mt-10 [&>h2]:mb-4 [&>h2:first-child]:mt-0",
-  "[&>ul]:list-disc [&>ul]:pl-6 [&>ul]:mb-5 [&>ul]:space-y-2",
-  "[&>ol]:list-decimal [&>ol]:pl-6 [&>ol]:mb-5 [&>ol]:space-y-2",
-  "[&_strong]:font-semibold [&_strong]:text-neutral-900 [&_strong]:dark:text-neutral-100",
-].join(" ");
+const legalMarkdownClassName =
+  "prose prose-neutral max-w-none leading-8 dark:prose-invert";
 
 export function LegalPage({ title, content }: LegalPageProps) {
   return (
@@ -32,7 +24,7 @@ export function LegalPage({ title, content }: LegalPageProps) {
                 a: ({ node: _node, ...props }) => (
                   <a
                     {...props}
-                    className="text-primary-600 underline hover:text-primary-700 dark:text-primary-400"
+                    className="font-medium text-header-green underline hover:opacity-80"
                     target={
                       props.href?.startsWith("http") ? "_blank" : undefined
                     }
