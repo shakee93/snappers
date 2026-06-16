@@ -72,6 +72,8 @@ export const siteConfig = {
       // Soft-peach action icons + Basket pill on the cream bar.
       peach: "253 230 214",
       accent: "243 168 130",
+      /** Primary CTA fill — Add to cart, checkout, confirm order (#ACDA5A). */
+      action: "172 218 90",
     },
     /** Deal section — countdown, carousel controls, product-card accent. */
     deal: {

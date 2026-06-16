@@ -14,7 +14,7 @@ function scaleToCssVars(prefix: "primary" | "secondary", scale: ColorScale): str
 /** CSS custom properties for :root — injected once in the root layout. */
 export function getSiteThemeCss(): string {
   const { primary, secondary } = siteConfig.theme.colors;
-  const { cream, green, peach, accent } = siteConfig.theme.header;
+  const { cream, green, peach, accent, action } = siteConfig.theme.header;
   const { brown: dealBrown, accent: dealAccent } = siteConfig.theme.deal;
 
   return `:root {
@@ -24,6 +24,7 @@ ${scaleToCssVars("secondary", secondary)}
   --c-header-green: ${green};
   --c-header-peach: ${peach};
   --c-header-accent: ${accent};
+  --c-header-action: ${action};
   --c-deal-brown: ${dealBrown};
   --c-deal-accent: ${dealAccent};
 }`;

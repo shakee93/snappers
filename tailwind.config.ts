@@ -61,6 +61,7 @@ const config: Config = {
 					green: tokenColor("--c-header-green"),
 					peach: tokenColor("--c-header-peach"),
 					accent: tokenColor("--c-header-accent"),
+					action: tokenColor("--c-header-action"),
 				},
 				deal: {
 					brown: tokenColor("--c-deal-brown"),

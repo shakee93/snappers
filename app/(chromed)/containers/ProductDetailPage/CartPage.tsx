@@ -3,13 +3,11 @@ import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
 import CartItemProduct from "@/app/(chromed)/containers/ProductDetailPage/CartItem";
 import BackdropSpinner from "@/components/global/ui/BackdropSpinner";
-
-const CHECKOUT_BTN_CLASS =
-  "relative w-full items-center justify-center rounded-full transition-opacity text-sm sm:text-base font-bold py-3 px-4 sm:py-3 sm:px-6 bg-[#ACDA5A] text-[#38461F] hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50";
+import ButtonBrand, { BRAND_CTA_BUTTON_CLASS } from "shared/Button/ButtonBrand";
 
 const CartPage = () => {
   const { cart, loading } = useCart();
-  const empty = cart?.contents?.itemCount === 0;
+  const checkoutDisabled = loading || (cart?.contents?.itemCount ?? 0) === 0;
 
   return (
     <div className="nc-CartPage">
@@ -67,11 +65,19 @@ const CartPage = () => {
                   </span>
                 </div>
               </div>
-              <Link href="/checkout" className="mt-8 block w-full">
-                <button type="button" disabled={empty} className={CHECKOUT_BTN_CLASS}>
+              {checkoutDisabled ? (
+                <button
+                  type="button"
+                  disabled
+                  className={`mt-8 w-full ${BRAND_CTA_BUTTON_CLASS}`}
+                >
                   Checkout
                 </button>
-              </Link>
+              ) : (
+                <ButtonBrand href="/checkout" className="mt-8 w-full">
+                  Checkout
+                </ButtonBrand>
+              )}
               <div className="mt-5 flex items-center justify-center text-sm text-slate-500 dark:text-slate-400">
                 <p className="relative block pl-5">
                   <svg
