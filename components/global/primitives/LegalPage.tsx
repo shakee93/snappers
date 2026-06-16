@@ -6,6 +6,8 @@ type LegalPageProps = {
   content: string;
 };
 
+// Tailwind prose covers the full GFM subset (headings, nested lists, tables, etc.).
+// Link color is overridden below — prose defaults to primary blue, not header-green.
 const legalMarkdownClassName =
   "prose prose-neutral max-w-none leading-8 dark:prose-invert";
 
