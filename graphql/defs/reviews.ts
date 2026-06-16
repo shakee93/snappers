@@ -20,3 +20,11 @@ export const GET_GOOGLE_REVIEWS = gql`
     }
   }
 `;
+
+export const WRITE_PRODUCT_REVIEW = gql`
+  mutation WriteProductReview($input: WriteReviewInput!) {
+    writeReview(input: $input) {
+      rating
+    }
+  }
+`;

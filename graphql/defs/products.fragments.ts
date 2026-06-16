@@ -326,6 +326,7 @@ export const ProductContentFull = gql`
     description
     shortDescription(format: RAW)
     reviewCount
+    averageRating
     image {
       id
       sourceUrl
@@ -385,6 +386,18 @@ export const ProductContentFull = gql`
         options
       }
     }
+    reviews(first: 20, where: { status: "approve" }) {
+      nodes {
+        databaseId
+        content
+        date
+        author {
+          node {
+            name
+          }
+        }
+      }
+    }
     # Upsells render through ProductCard3 (via SectionSliderProductCard), identical
     # to listing cards — reuse ProductContentCard to avoid duplicating the full
     # variable-product + taxonomy tree per upsell.
@@ -395,6 +408,9 @@ export const ProductContentFull = gql`
     }
     ... on SimpleProduct {
       happiestCustomersGallery
+      singleProductFields {
+        videoLink
+      }
       onSale
       stockStatus
       price
@@ -426,6 +442,9 @@ export const ProductContentFull = gql`
     }
     ... on VariableProduct {
       happiestCustomersGallery
+      singleProductFields {
+        videoLink
+      }
       onSale
       price
       rawPrice: price(format: RAW)

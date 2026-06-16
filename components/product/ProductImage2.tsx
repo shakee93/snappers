@@ -3,6 +3,8 @@
 import { useImage } from "@/context/ImageChangeGrabber";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import { getPreferredVariation } from "@/lib/getPreferredVariation";
+import { getProductVideoUrl, type ProductVideoSource } from "@/lib/productVideo";
+import { siteConfig } from "@/site.config";
 import {
   CoreVariationThumb,
   Thumb,
@@ -22,7 +24,7 @@ import "styles/product_embla.scss";
 
 type PropType = {
   options?: EmblaOptionsType;
-  product: SimpleProduct & VariableProduct & { productVideoUrl?: string };
+  product: SimpleProduct & VariableProduct & ProductVideoSource;
 };
 type selectedVariationType = {
   sourceUrl: string;
@@ -33,9 +35,8 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [emblaMainRef, emblaMainApi] = useEmblaCarousel({});
   const [emblaThumbsRef, emblaThumbsApi] = useEmblaCarousel({
-    containScroll: 'keepSnaps',
-    dragFree: true,
-    align: "center"
+    containScroll: "trimSnaps",
+    align: "start",
   });
   const { variationId, activeVariation } = useImage();
   const [variationImageEnabled, setVariationImageEnabled] = useState(false);
@@ -103,20 +104,17 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
       if (videoId) {
         // Add parameters for better experience
         const params = new URLSearchParams({
-          controls: '1',          // Show native controls
-          showinfo: '0',          // No title/uploader info
-          rel: '0',               // No related videos at end
-          modestbranding: '1',    // Minimal YouTube branding
-          iv_load_policy: '3',    // No annotations
-          mute: '1',              // Muted by default
-          loop: '1',              // Loop video (prevents end screen)
-          playlist: videoId,      // Required for loop to work
-          playsinline: '1',       // Play inline on mobile
+          controls: "1",
+          showinfo: "0",
+          rel: "0",
+          modestbranding: "1",
+          iv_load_policy: "3",
+          mute: "1",
+          loop: "1",
+          playlist: videoId,
+          playsinline: "1",
+          origin: siteConfig.url.base,
         });
-
-        if (typeof window !== 'undefined') {
-          params.append('origin', window.location.origin);
-        }
 
         return `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
       }
@@ -146,9 +144,10 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
     }
   };
 
-  const hasValidVideo = isValidVideoUrl(product.productVideoUrl);
+  const productVideoUrl = getProductVideoUrl(product);
+  const hasValidVideo = isValidVideoUrl(productVideoUrl);
   const videoItem = hasValidVideo ? {
-    sourceUrl: product.productVideoUrl,
+    sourceUrl: productVideoUrl,
     databaseId: 'video',
     altText: 'Product Video',
     isVideo: true
@@ -286,9 +285,12 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   }, [emblaMainApi, onSelect]);
 
   return (
-    <div className="embla min-h-[272px] md:min-h-[576px]" id='product-image'>
+    <div className="embla w-full" id='product-image'>
       <div className="relative">
-        <div className="embla__viewport  rounded-2xl" ref={emblaMainRef}>
+        <div
+          className="embla__viewport rounded-2xl border border-[#0000001A] bg-white"
+          ref={emblaMainRef}
+        >
           <div className="embla__container ">
             {galleryImages?.map((variation: any, index: number) => (
               <div
@@ -299,11 +301,11 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
                   setLightboxOpen(true);
                 }}
               >
-                <div className="flex justify-center items-center p-2 py-4">
+                <div className="relative aspect-square w-full overflow-hidden">
                   <Image
                     fetchPriority={index === 0 ? "high" : undefined}
                     loading={index === 0 ? "eager" : "lazy"}
-                    className="max-h-[330px] object-contain md:max-h-[410px] image transform transition-transform duration-300"
+                    className="image h-full w-full object-cover transition-transform duration-300"
                     alt=""
                     width={1000}
                     height={1000}
@@ -319,7 +321,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
             setLightboxIndex(selectedIndex);
             setLightboxOpen(true);
           }}
-          className="absolute top-3 right-3 z-10 bg-white/80 hover:bg-white rounded-lg p-2 shadow-md transition-colors"
+          className="absolute top-3 left-3 z-10 bg-white/80 hover:bg-white rounded-lg p-2 shadow-md transition-colors"
           aria-label="View fullscreen"
         >
           <Expand className="w-5 h-5 text-gray-700" />
@@ -362,34 +364,34 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
       </div>
 
       {/* Product Video Section - Below Thumbnails */}
-      {hasValidVideo && product.productVideoUrl && (
-        <div className="hidden md:block mt-6 md:mt-8">
-          {isTikTokUrl(product.productVideoUrl) ? (
-            <div className="relative w-full rounded-2xl overflow-hidden bg-black flex items-center justify-center">
+      {hasValidVideo && productVideoUrl && (
+        <div className="mt-4 border-t border-[#E8E8E8] pt-4 md:mt-8 md:pt-8">
+          {isTikTokUrl(productVideoUrl) ? (
+            <div className="relative h-0 w-full overflow-hidden rounded-2xl bg-black pb-[56.25%]">
               <iframe
-                src={getTikTokEmbedUrl(product.productVideoUrl) || product.productVideoUrl}
-                className="w-full h-[330px] md:h-[410px] rounded-xl"
+                src={getTikTokEmbedUrl(productVideoUrl) || productVideoUrl}
+                className="absolute inset-0 h-full w-full border-0"
                 allowFullScreen
                 scrolling="no"
                 allow="encrypted-media;"
                 title="TikTok video"
               />
             </div>
-          ) : isYouTubeUrl(product.productVideoUrl) ? (
-            <div className="relative w-full rounded-2xl overflow-hidden bg-black flex items-center justify-center">
+          ) : isYouTubeUrl(productVideoUrl) ? (
+            <div className="relative h-0 w-full overflow-hidden rounded-2xl bg-black pb-[56.25%]">
               <iframe
-                src={getYouTubeEmbedUrl(product.productVideoUrl)! || product.productVideoUrl}
-                className="w-full h-[330px] md:h-[410px] rounded-xl"
+                src={getYouTubeEmbedUrl(productVideoUrl) ?? productVideoUrl}
+                className="absolute inset-0 h-full w-full border-0"
                 allowFullScreen
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                 title="YouTube video player"
               />
             </div>
           ) : (
-            <div className="relative w-full rounded-2xl overflow-hidden bg-black flex items-center justify-center">
+            <div className="relative h-0 w-full overflow-hidden rounded-2xl bg-black pb-[56.25%]">
               <video
                 ref={videoRef}
-                className="w-full max-h-[330px] md:max-h-[410px] object-contain rounded-xl"
+                className="absolute inset-0 h-full w-full object-cover"
                 controls={isVideoPlaying}
                 poster={originalGalleryImages?.[0]?.sourceUrl || product.image?.sourceUrl || undefined}
                 preload="metadata"
@@ -397,12 +399,12 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
                 onPause={() => setIsVideoPlaying(false)}
                 onEnded={() => setIsVideoPlaying(false)}
               >
-                <source src={product.productVideoUrl} type="video/mp4" />
+                <source src={productVideoUrl} type="video/mp4" />
                 <p>Your browser does not support the video tag.</p>
               </video>
               {!isVideoPlaying && (
                 <div
-                  className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-30 cursor-pointer group hover:bg-opacity-40 transition-all duration-300"
+                  className="absolute inset-0 flex cursor-pointer items-center justify-center bg-black/30 transition-all duration-300 hover:bg-black/40"
                   onClick={() => {
                     if (videoRef.current) {
                       videoRef.current.play();
@@ -410,8 +412,8 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
                     }
                   }}
                 >
-                  <div className="bg-white bg-opacity-90 rounded-[2rem] p-4 md:p-6 shadow-2xl group-hover:bg-opacity-100 group-hover:scale-110 transition-all duration-300">
-                    <PlayIcon className="w-12 h-12 md:w-16 md:h-16 text-primary-500 ml-1" />
+                  <div className="rounded-[2rem] bg-white/90 p-4 shadow-2xl transition-all duration-300 group-hover:scale-110 md:p-6">
+                    <PlayIcon className="ml-1 h-12 w-12 text-primary-500 md:h-16 md:w-16" />
                   </div>
                 </div>
               )}

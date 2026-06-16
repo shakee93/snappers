@@ -1,44 +1,52 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 import Link from "next/link";
 import ProductAddToCart from "./ProductAddToCart";
 import {
-  Attribute,
   Brand,
   ProductAttribute,
+  ProductCategory,
   ProductVariation,
   SimpleProduct,
+  StockStatusEnum,
   VariableProduct,
   VariationAttribute,
 } from "@/graphql/types/graphql";
-import React, { Fragment, useCallback, useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useStore } from "@/store/store";
 import { twMerge } from "tailwind-merge";
 import { useImage } from "@/context/ImageChangeGrabber";
-import brandColors from "@/data/brandColors";
-import AttributeIcon from "@/components/global/primitives/AttributeIcon";
-import ProductDescription from "./ProductDescription";
+import { getCategoryPath, getProductPath } from "@/lib/productUrl";
+import ProductStarRating from "@/components/product/ProductStarRating";
+import ProductTrustBadges from "@/components/product/ProductTrustBadges";
+import ProductPaymentOptions from "@/components/product/ProductPaymentOptions";
+import ProductPurchaseAccordions from "@/components/product/ProductPurchaseAccordions";
+import BrandLogo from "@/components/product/BrandLogo";
+import ProductReviewsSection from "@/components/product/ProductReviewsSection";
+import { type ProductReviewItem } from "@/lib/productReviews";
 import { useUnresolvedFreeGifts } from "@/hooks/useUnresolvedFreeGifts";
 import { usePriceFluctuationNotice } from "@/hooks/usePriceFluctuationNotice";
 import { useFreeGiftProducts } from "@/hooks/useFreeGiftProducts";
-import koko from "@/public/koko.png";
-import Image from "next/image";
-import { BanknotesIcon } from "@heroicons/react/24/outline";
+import { useProductStock } from "@/hooks/useProductStock";
 import { Flame, Truck } from "lucide-react";
-import BrandLogo from "./BrandLogo";
-import ShareButtons from "./ShareButtons";
-import { getCategoryPath, getProductPath } from "@/lib/productUrl";
 import { AnimatePresence, motion } from "framer-motion";
-import { Listbox, Transition } from "@headlessui/react";
-import { CheckIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import { resolveBogoConfig } from "@/lib/bogo";
-import { getPreferredVariation } from "@/lib/getPreferredVariation";
 import {
   isSimpleProductFreeShipping,
   isVariationFreeShipping,
 } from "@/lib/freeShipping";
 import { siteConfig } from "@/site.config";
-import { toDisplayCurrency, currencySymbol } from "@/lib/formatPrice";
+import { toDisplayCurrency } from "@/lib/formatPrice";
+import {
+  findVariationByOption,
+  isVariationOptionSelected,
+  normalizeAttrName,
+  variationsForOption,
+} from "@/lib/productVariationMatch";
+import {
+  getPreferredVariation,
+  getVariationNumericPrice,
+} from "@/lib/getPreferredVariation";
+
 const ProductDetails = ({
   product,
   brand,
@@ -54,40 +62,53 @@ const ProductDetails = ({
   } = useStore();
 
   const preferredVariation = getPreferredVariation(product?.variations?.nodes);
+  const productVariations =
+    ((product as VariableProduct).variations?.nodes as ProductVariation[]) ?? [];
+  const productAttributeNodes =
+    (product.attributes?.nodes ?? []) as ProductAttribute[];
+  const defaultVariation = preferredVariation ?? null;
 
-  const [activeVariation, setActiveVariation] = useState<any>(
-    preferredVariation
+  const sortedAttributeOptions = useMemo(() => {
+    return productAttributeNodes.map((attr) => {
+      const options = (attr.options ?? []).filter(
+        (option): option is string => !!option,
+      );
+
+      const sorted = [...options].sort((a, b) => {
+        const priceForOption = (option: string) => {
+          const matches = variationsForOption(
+            productVariations,
+            option,
+            attr,
+            productAttributeNodes,
+          );
+          if (!matches.length) return Number.POSITIVE_INFINITY;
+          return Math.min(...matches.map(getVariationNumericPrice));
+        };
+
+        return priceForOption(a) - priceForOption(b);
+      });
+
+      return { attr, options: sorted };
+    });
+  }, [productAttributeNodes, productVariations]);
+
+  const [activeVariation, setActiveVariation] = useState<ProductVariation | null>(
+    defaultVariation,
   );
-
-  const [lastClickedAttribute, setLastClickedAttribute] = useState<string | null>(null);
 
   const { setVariationId } = useImage();
 
   useEffect(() => {
     clearAttributes();
 
-    if (product.type === "VARIABLE") {
-      const defAttributes = product?.defaultAttributes?.nodes;
-      product?.attributes?.nodes.map((attr: ProductAttribute) => {
-        setAttribute(attr, (attr?.options && attr?.options[0]) || "");
-      });
-      defAttributes?.forEach((defAttr: VariationAttribute) => {
-        setAttribute(defAttr, defAttr.value || "");
-      });
+    if (product.type !== "VARIABLE" || !defaultVariation) return;
 
-      // Apply preferred in-stock variation attributes so dropdowns match
-      if (preferredVariation?.attributes?.nodes) {
-        preferredVariation.attributes.nodes.forEach((attr: Attribute) => {
-          setAttribute(attr, attr.value || "");
-        });
-      }
-    }
+    defaultVariation.attributes?.nodes?.forEach((attr: VariationAttribute) => {
+      setAttribute(attr, attr.value || "");
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- mount-only init
   }, []);
-
-  useEffect(() => {
-    setVariationId(activeVariation?.image?.databaseId);
-    setActiveVariation(activeVariation);
-  }, [activeVariation]);
 
   // Sync the active variation's ID to the store on a primitive dep so the
   // write fires only when the ID actually changes — keeps subscribers
@@ -98,83 +119,71 @@ const ProductDetails = ({
     setActiveVariationId(activeVariationDbId);
   }, [activeVariationDbId, setActiveVariationId]);
 
+  useEffect(() => {
+    if (activeVariation?.image?.databaseId) {
+      setVariationId(String(activeVariation.image.databaseId));
+    }
+  }, [activeVariation?.image?.databaseId, setVariationId]);
+
   const activeAttr = useCallback(
     (attr: ProductAttribute) => {
-      return attribute.find((a) => a.name === attr.name);
+      return attribute.find(
+        (a) =>
+          a.name === attr.name ||
+          normalizeAttrName(a.name) === normalizeAttrName(attr.name) ||
+          normalizeAttrName(a.label) === normalizeAttrName(attr.label),
+      );
     },
-    [attribute]
+    [attribute],
   );
 
-  useEffect(() => {
-    if (
-      product.type === "VARIABLE" &&
-      product?.variations?.nodes?.length !== undefined &&
-      product.variations.nodes.length > 0
-    ) {
-      setActiveVariation(preferredVariation);
-    } else if (product.type === "SIMPLE") {
-      // Handle simple product case
-      setActiveVariation(product);
-    }
-  }, [product]);
+  const { simpleStockStatus, getVariationStockStatus } = useProductStock(product.slug);
 
-  useEffect(() => {
-    if (product.type === "VARIABLE" && activeVariation) {
-      setVariationId(activeVariation?.image?.databaseId);
-      setActiveVariation(activeVariation);
-    }
-  }, [activeVariation]);
+  const resolveVariationStockStatus = useCallback(
+    (variation: ProductVariation | null | undefined) => {
+      if (!variation) return undefined;
+      return (
+        getVariationStockStatus(variation.databaseId) ?? variation.stockStatus
+      );
+    },
+    [getVariationStockStatus],
+  );
 
-  useEffect(() => {
-    if (preferredVariation?.image) {
-      setActiveVariation(preferredVariation);
-      setVariationId(preferredVariation.image.databaseId.toString());
-    } else {
-      const firstVariation = product?.variations?.nodes[0];
-      if (firstVariation) {
-        setActiveVariation(firstVariation);
-        setVariationId(firstVariation?.image?.databaseId?.toString());
+  const displayVariation = useMemo((): ProductVariation | null => {
+    const base = activeVariation ?? defaultVariation;
+    if (!base) return null;
+    const freshStatus = getVariationStockStatus(base.databaseId);
+    if (!freshStatus) return base;
+    return {
+      ...base,
+      stockStatus: freshStatus as StockStatusEnum,
+    };
+  }, [activeVariation, defaultVariation, getVariationStockStatus]);
+
+  const selectVariation = useCallback(
+    (attr: ProductAttribute, option: string) => {
+      const matched = findVariationByOption(
+        productVariations,
+        option,
+        attr,
+        productAttributeNodes,
+      );
+
+      if (!matched) return;
+
+      setActiveVariation(matched);
+
+      if (matched.image?.databaseId) {
+        setVariationId(String(matched.image.databaseId));
       }
-    }
-  }, []);
 
-  useEffect(() => {
-    if (product.type === "VARIABLE") {
-      let variation = (product as VariableProduct).variations
-        ?.nodes as unknown as ProductVariation[];
-
-      let vProduct = variation.find((v) => {
-        let nodes = v.attributes?.nodes as unknown as VariationAttribute[];
-        let attrKey = attribute
-          .sort((a, b) => a.name.localeCompare(b.name))
-          .map((a) => `${a.name}:${a.val}`)
-          .join("+");
-        let variationKey = (nodes || [])
-          .sort((a, b) => a?.name?.localeCompare(b?.name || "") || 0)
-          ?.map((a) => `${a.name}:${a.value}`)
-          .join("+");
-
-        return attrKey === variationKey;
+      matched.attributes?.nodes?.forEach((node) => {
+        const variationAttr = node as VariationAttribute;
+        setAttribute(variationAttr, variationAttr.value || "");
       });
-
-      // Debounce update of activeVariation
-      let timeoutId: NodeJS.Timeout;
-      if (vProduct) {
-        setActiveVariation(vProduct);
-      } else {
-        // Debounce setting activeVariation to null to prevent flickering
-        timeoutId = setTimeout(() => {
-          setActiveVariation(null);
-        }, 150); // Small delay before setting to null
-      }
-
-      // Clean up timeout on unmount or re-render
-      return () => clearTimeout(timeoutId);
-    }
-  }, [attribute, product]);
-
-
-  useEffect(() => { }, [attribute]);
+    },
+    [productAttributeNodes, productVariations, setAttribute, setVariationId],
+  );
 
   const { isPriceFluctuation } = usePriceFluctuationNotice();
   // Variation meta wins, parent is the fallback — mirrors the WP plugin's
@@ -297,35 +306,12 @@ const ProductDetails = ({
       </>
     ) : null;
 
-  const [highestPrice, setHighestPrice] = useState<string>('');
-
-  useEffect(() => {
-    if (product.type === "VARIABLE") {
-      const variations = (product as VariableProduct).variations?.nodes as unknown as ProductVariation[];
-
-      if (variations && variations.length > 0) {
-        // Convert price strings to numbers by removing currency symbol and parsing
-        const prices = variations.map(v =>
-          parseFloat(v.price?.replace(/[^0-9.]/g, '') || "0")
-        );
-
-        const maxPrice = Math.max(...prices);
-        const variationWithMaxPrice = variations.find(v =>
-          v.price && parseFloat(v.price.replace(/[^0-9.]/g, '')) === maxPrice
-        );
-
-        if (variationWithMaxPrice) {
-          setHighestPrice(variationWithMaxPrice.price || "");
-        }
-      }
-    }
-  }, [product]); // Log the variations to inspect their structure
-
   // Compute availability message for unavailable combinations
   const availabilityMessage = useMemo(() => {
     if (
       product.type !== "VARIABLE" ||
-      (activeVariation && activeVariation?.stockStatus === "IN_STOCK") ||
+      (displayVariation &&
+        resolveVariationStockStatus(displayVariation) === "IN_STOCK") ||
       !product.attributes?.nodes ||
       product.attributes.nodes.length <= 1
     ) {
@@ -340,21 +326,29 @@ const ProductDetails = ({
       if (!selectedValue) return;
 
       // Get all variations that match the other attributes but have different values for this attribute
-      const otherAttributes = attribute.filter((a) => a.name !== attr.name);
+      const otherAttributes = attribute.filter(
+        (a) => normalizeAttrName(a.name) !== normalizeAttrName(attr.name),
+      );
       const availableValues = new Set<string>();
 
       (product as VariableProduct).variations?.nodes.forEach((v: ProductVariation) => {
         // Check if this variation matches all other selected attributes
         const matchesOtherAttributes = otherAttributes.every((selectedAttr) => {
           return v.attributes?.nodes.some(
-            (node: any) => node.name === selectedAttr.name && node.value === selectedAttr.val
+            (node: VariationAttribute) =>
+              normalizeAttrName(node.name) === normalizeAttrName(selectedAttr.name) &&
+              node.value === selectedAttr.val,
           );
         });
 
         // If it matches other attributes and is in stock, get the value for this attribute
-        if (matchesOtherAttributes && v.stockStatus === "IN_STOCK") {
-          const attrValue = (v.attributes?.nodes as unknown as VariationAttribute[])?.find(
-            (node: VariationAttribute) => node.name === attr.name
+        if (
+          matchesOtherAttributes &&
+          resolveVariationStockStatus(v) === "IN_STOCK"
+        ) {
+          const attrValue = v.attributes?.nodes?.find(
+            (node: VariationAttribute) =>
+              normalizeAttrName(node.name) === normalizeAttrName(attr.name),
           )?.value;
           if (attrValue && attrValue !== selectedValue) {
             // Custom (non-taxonomy) attributes: the value is the display label.
@@ -378,530 +372,277 @@ const ProductDetails = ({
     }
 
     return null;
-  }, [product, activeVariation, attribute, activeAttr]);
+  }, [product, displayVariation, attribute, activeAttr, resolveVariationStockStatus]);
+
+  const displayPriceHtml = useMemo(() => {
+    if (product.type === "VARIABLE") {
+      if (displayVariation?.price) {
+        return toDisplayCurrency(displayVariation.price);
+      }
+      return "";
+    }
+    if (product.price) {
+      return toDisplayCurrency(product.price);
+    }
+    return "";
+  }, [product, displayVariation]);
+
+  const displayRegularPriceHtml = useMemo(() => {
+    if (product.type === "VARIABLE") {
+      if (displayVariation?.regularPrice) {
+        return toDisplayCurrency(displayVariation.regularPrice);
+      }
+      return "";
+    }
+    if (product.regularPrice) {
+      return toDisplayCurrency(product.regularPrice);
+    }
+    return "";
+  }, [product, displayVariation]);
+
+  const displayNumericPrice = useMemo(() => {
+    const raw =
+      product.type === "VARIABLE" && displayVariation
+        ? displayVariation.salePrice &&
+          displayVariation.salePrice !== displayVariation.regularPrice
+          ? displayVariation.salePrice
+          : displayVariation.price
+        : product.price;
+    return parseFloat((raw || "0").toString().replace(/[^\d.]/g, "")) || 0;
+  }, [product, displayVariation]);
+
+  const isOnSale = useMemo(() => {
+    if (product.type === "VARIABLE" && displayVariation) {
+      return (
+        !!displayVariation.salePrice &&
+        displayVariation.salePrice !== displayVariation.regularPrice
+      );
+    }
+    return !!product.salePrice && product.salePrice !== product.regularPrice;
+  }, [product, displayVariation]);
+
+  const isInStock = useMemo(() => {
+    if (product.type === "VARIABLE") {
+      if (!displayVariation) return false;
+      return resolveVariationStockStatus(displayVariation) === "IN_STOCK";
+    }
+    return (simpleStockStatus ?? product.stockStatus) === "IN_STOCK";
+  }, [product, displayVariation, resolveVariationStockStatus, simpleStockStatus]);
 
   return (
-    <>
+    <div className="flex flex-col gap-5 pb-24 lg:gap-0 lg:pb-0">
       {isPriceFluctuation && (
-        <div className="p-4 mb-2 bg-red-400 text-white text-base rounded-md">
-          Prices are being updated. For current pricing, please contact us on WhatsApp {siteConfig.contact.primaryPhone} / {siteConfig.contact.secondaryPhone}.
-          Updated prices will be on the site soon!
-        </div>
-      )}
-      {/* <div className="flex gap-1 text-sm text-gray-500">
-        <Link
-          href={`/${brand?.slug}`}
-          target="_blank"
-          className="bg-primary-500 rounded-xl px-2.5 py-1 text-white"
-        >
-          {brand?.name}
-        </Link>
-      </div> */}
-
-      {/* <div className="text-2xl font-medium md:text-3xl">{product.name}</div> */}
-      {product.price && (
-        <div className="flex items-center gap-2 mt-2">
-          <div className="text-sm text-primary-500 flex items-center gap-1">
-            <BanknotesIcon className="w-4 h-4" />
-            <span className="text-gray-500 font-medium">Cash Price</span>
-          </div>
-          {product?.productTags?.nodes?.some(
-            (tag: any) => tag.slug === 'clearance'
-          ) && (
-            <span className="inline-flex items-center gap-1 bg-orange-500 text-white text-xs font-semibold px-2.5 py-0.5 rounded-full">
-              <Flame className="w-3 h-3" />
-              Clearance
-            </span>
-          )}
-          {isFreeShippingProduct && (
-            <span className="inline-flex items-center gap-1 bg-blue-600 text-white text-xs font-semibold px-2.5 py-0.5 rounded-full">
-              <Truck className="w-3 h-3" />
-              Free Shipping
-            </span>
-          )}
-        </div>
-      )}
-      {/* Commented */}
-      {product.type === "VARIABLE" && activeVariation ? (
-        <div>
-          <div className="flex flex-wrap items-center gap-4 text-base font-bold text-black-600 md:text-2xl">
-            <span
-              dangerouslySetInnerHTML={{ __html: toDisplayCurrency(activeVariation.price) }}
-            />
-            {!!activeVariation.salePrice &&
-              activeVariation.salePrice !== activeVariation.regularPrice && (
-                <span className="text-red-400 line-through md:text-xl">
-                  <span
-                    dangerouslySetInnerHTML={{
-                      __html: toDisplayCurrency(activeVariation.regularPrice),
-                    }}
-                  />
-                </span>
-              )}
-
-            {/* {activeVariation?.stockStatus == "IN_STOCK" && activeVariation?.stockQuantity &&
-              activeVariation?.stockQuantity <= 2 && (
-                <div className="mb-1 w-max rounded-full bg-yellow-200 px-3 py-1.5 text-center text-xs font-medium text-gray-800">
-                  Low Stock
-                </div>
-              )} */}
-
-            {product.type === "VARIABLE" && activeVariation &&
-              activeVariation?.stockStatus !== "IN_STOCK" && (
-                <div className="mb-1 w-max rounded-full bg-red-200 px-4 py-1.5 text-center text-xs font-medium text-gray-800">
-                  Sold Out
-                </div>
-              )}
-
-            {product.type === "VARIABLE" && !activeVariation && (
-              <div className="mb-1 w-max rounded-full bg-gray-600 px-4 py-1.5 text-center text-xs font-medium text-white">
-                Not Available
-              </div>
-            )}
-
-            <div className="flex flex-wrap items-center text-xs text-gray-400">
-              <span>or pay in 3 x {currencySymbol}</span>
-              <span className="font-semibold mx-1">
-                {(
-                  parseFloat(
-                    ((activeVariation.salePrice === "₨&nbsp;0.00" || activeVariation.salePrice === null) && (activeVariation.regularPrice === "₨&nbsp;0.00" || activeVariation.regularPrice === null)
-                      ? highestPrice
-                      : (activeVariation.salePrice || activeVariation.regularPrice) || "0")
-                      .toString()
-                      .replace(/[^\d.]/g, "")
-                  ) / 88 * 100 / 3
-                ).toFixed(2)}
-              </span>
-              <span>with</span>
-              <span className="ml-1 inline-block">
-                <Image src={koko} alt="KOKO" className="inline-block w-12 h-auto" />
-              </span>
-            </div>
-
-          </div>
-        </div>
-      ) : product.price ? (
-        <div className="flex flex-wrap items-center gap-2 text-base font-bold text-gray-600 md:text-2xl">
-
-          <div className="flex flex-col gap-2">
-            <span dangerouslySetInnerHTML={{ __html: toDisplayCurrency(product.price) }} />
-          </div>
-
-          {product.salePrice &&
-            product.salePrice !== product.regularPrice && (
-              <div>
-                <span className="text-red-400 line-through md:text-xl">
-                  <span
-                    dangerouslySetInnerHTML={{
-                      __html: toDisplayCurrency(product.regularPrice),
-                    }}
-                  />
-                </span>
-
-              </div>
-            )}
-
-
-          {/* {product.stockStatus == "IN_STOCK" &&
-            product?.stockQuantity &&
-            product?.stockQuantity <= 2 && (
-              <div className="mb-1 w-max rounded-full bg-yellow-200 px-4 py-1 text-center text-xs text-gray-800 md:text-sm">
-                Low Stock
-              </div>
-            )} */}
-
-          {product.type === "SIMPLE" && product.stockStatus !== "IN_STOCK" && (
-            <div className="w-max rounded-full bg-red-200 px-4 py-1.5 text-center text-xs font-medium text-gray-800">
-              Sold Out
-            </div>
-          )}
-
-          <div className="flex flex-wrap items-center text-xs text-gray-400">
-            <span>or pay in 3 x {currencySymbol}</span>
-            <span className="font-semibold mx-1">
-              {(
-                parseFloat(
-                  (product.price || "0")
-                    .toString()
-                    .replace(/[^\d.]/g, "")
-                ) / 88 * 100 / 3
-              ).toFixed(2)}
-            </span>
-            <span>with</span>
-            <span className="ml-1 inline-block">
-              <Image src={koko} alt="KOKO" className="inline-block w-12 h-auto" />
-            </span>
-          </div>
-
-        </div>
-      ) : (
-        <div className="w-max rounded-full bg-gray-600 px-4 py-1.5 text-center text-xs font-medium text-white">
-          Currently Unavailable
+        <div className="rounded-xl bg-red-500 p-4 text-sm text-white">
+          Prices are being updated. For current pricing, please contact us on WhatsApp{" "}
+          {siteConfig.contact.primaryPhone} / {siteConfig.contact.secondaryPhone}.
         </div>
       )}
 
-      {/* Commented */}
+      <div className="flex flex-col gap-2 pb-4">
+        <BrandLogo
+          brand={brand}
+          imageClassName="h-10 w-auto max-w-[220px] object-contain object-left"
+        />
 
-      <h1 className="text-2xl text-primary-500 font-bold md:text-3xl">{product.name}</h1>
-      {bogo.isBogoEnabled && freeGiftDetailLine !== null && (
-        <div className="mt-2 flex flex-wrap items-center gap-2 text-xs md:text-sm">
-          <span className="inline-flex items-center rounded-full bg-green-600 px-2.5 py-1 font-semibold text-white">
+        <h1 className="text-[26px] font-bold leading-snug text-[#38461F] sm:text-[28px]">
+          {product.name}
+        </h1>
+
+        <ProductStarRating
+          averageRating={
+            (product as SimpleProduct & { averageRating?: number | null })
+              .averageRating
+          }
+          reviewCount={product.reviewCount}
+          labelMode="rated"
+          showWhenEmpty
+        />
+      </div>
+
+      <div className="flex flex-wrap items-center gap-2">
+        {product?.productTags?.nodes?.some(
+          (tag) => tag && "slug" in tag && tag.slug === "clearance",
+        ) && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-orange-500 px-2.5 py-0.5 text-xs font-semibold text-white">
+            <Flame className="h-3 w-3" />
+            Clearance
+          </span>
+        )}
+        {isFreeShippingProduct && (
+          <span className="inline-flex items-center gap-1 rounded-full bg-[#38461F] px-2.5 py-0.5 text-xs font-semibold text-white">
+            <Truck className="h-3 w-3" />
+            Free Shipping
+          </span>
+        )}
+        {bogo.isBogoEnabled && freeGiftDetailLine !== null && (
+          <span className="inline-flex items-center rounded-full bg-green-600 px-2.5 py-1 text-xs font-semibold text-white">
             {isFreeGiftProduct ? "Free Gift" : bogo.label}
           </span>
-          <span className="text-gray-600">{freeGiftDetailLine}</span>
-        </div>
-      )}
-      <div className="flex items-center gap-1 mt-2">
-        <BrandLogo brand={brand} />
-      </div>
-
-      <ShareButtons
-        url={`${siteConfig.url.base}${getProductPath(product)}`}
-        title={product.name || "Product"}
-        className="mt-3"
-      />
-
-      <div className="flex items-center gap-2">
-        {/* Commented */}
-        {/* {product.type === "VARIABLE" && activeVariation ? (
-          <div>
-            <div className="flex flex-wrap items-center gap-4 py-2 text-base font-medium text-gray-600 md:text-xl">
-              <span
-                dangerouslySetInnerHTML={{ __html: activeVariation.price }}
-              />
-
-              {!!activeVariation.salePrice &&
-                activeVariation.salePrice !== activeVariation.regularPrice && (
-                  <span className="text-red-400 line-through md:text-sm">
-                    <span
-                      dangerouslySetInnerHTML={{
-                        __html: activeVariation.regularPrice,
-                      }}
-                    />
-                  </span>
-                )}
-            </div>
-          </div>
-        ) : (
-          <div className="flex flex-wrap items-center gap-2 py-2 text-base font-medium text-gray-600 md:text-xl">
-            {!!product.price ? (
-              <span dangerouslySetInnerHTML={{ __html: product.price || "" }} />
-            ) : (
-              <span>Can not be purchased now</span>
-            )}
-            {product.salePrice &&
-              product.salePrice !== product.price &&
-              activeVariation === null && (
-                <span className="text-red-400 line-through md:text-sm">
-                  <span
-                    dangerouslySetInnerHTML={{
-                      __html: product.regularPrice || "",
-                    }}
-                  />
-                </span>
-              )}
-          </div>
-        )} */}
-
-        {/* Commented */}
-
-        {/* Sold Out Badge */}
-
-        <div>
-
-          {/* Commented */}
-          {/* {product.type === "SIMPLE" && product.stockStatus !== "IN_STOCK" && (
-            <div className="w-max rounded-full bg-red-200 px-4 py-1.5 text-center text-xs font-medium text-gray-800">
-              Sold Out
-            </div>
-          )}
-
-          {product.type === "VARIABLE" && activeVariation &&
-            activeVariation?.stockStatus !== "IN_STOCK" && (
-              <div className="mb-1 w-max rounded-full bg-red-200 px-4 py-1.5 text-center text-xs font-medium text-gray-800">
-                Sold Out
-              </div>
-            )}
-
-          {product.type === "VARIABLE" && !activeVariation && (
-            <div className="mb-1 w-max rounded-full bg-gray-600 px-4 py-1.5 text-center text-xs font-medium text-white">
-              Not Available
-            </div>
-          )} */}
-          {/* Commented */}
-
-          {/* In Stock Badge */}
-          {/* Removed low stock and INSTOCK badge October 14 */}
-
-          {/* {product.type === "VARIABLE" &&
-            activeVariation?.stockStatus == "IN_STOCK" &&
-            ((activeVariation?.stockQuantity &&
-              activeVariation?.stockQuantity >= 3) ||
-              (!activeVariation.stockQuantity &&
-                activeVariation?.stockStatus === "IN_STOCK")) && (
-              <div className="w-max rounded-full bg-green-200 px-4 py-1.5 text-center text-xs font-medium text-gray-800">
-                In Stock
-              </div>
-            )}
-
-          {product.type === "SIMPLE" &&
-            product.stockStatus === "IN_STOCK" &&
-            ((product?.stockQuantity && product?.stockQuantity >= 3) ||
-              (!product.stockQuantity &&
-                product.stockStatus === "IN_STOCK")) && (
-              <div className="w-max rounded-full bg-green-200 px-4 py-1.5 text-center text-xs font-medium text-gray-800">
-                In Stock
-              </div>
-            )} */}
-
-          {/* Removed low stock and INSTOCK badge October 14 */}
-          {/* Low Stock Badge */}
-          {/* {product.type === "VARIABLE" &&
-            activeVariation?.stockStatus == "IN_STOCK" &&
-            activeVariation?.stockQuantity &&
-            activeVariation?.stockQuantity <= 2 && (
-              <div className="mb-1 w-max rounded-full bg-yellow-200 px-3 py-1.5 text-center text-xs font-medium text-gray-800">
-                Low Stock
-              </div>
-            )}
-
-          {product.type === "SIMPLE" &&
-            product.stockStatus == "IN_STOCK" &&
-            product?.stockQuantity &&
-            product?.stockQuantity <= 2 && (
-              <div className="mb-1 w-max rounded-full bg-yellow-200 px-4 py-1 text-center text-xs text-gray-800 md:text-sm">
-                Low Stock
-              </div>
-            )} */}
-        </div>
-      </div>
-
-      {/* <div className="">
-        {warrantyType && warrantyPeriod && (
-          <div className="items-left flex w-full flex-col flex-wrap gap-2 py-2 text-xs text-gray-500 md:text-sm">
-            <div className="">
-              <span className="font-medium">Warranty Type :</span>{" "}
-              {warrantyType}
-            </div>
-            <div className="">
-              <span className="font-medium">Warranty period :</span>{" "}
-              {warrantyPeriod} Months
-            </div>
-          </div>
         )}
-      </div> */}
+      </div>
 
-      {/* {product.shortDescription && <ProductDescription product={product} />} */}
+      {bogo.isBogoEnabled && freeGiftDetailLine !== null && (
+        <p className="text-sm text-[#6B7280]">{freeGiftDetailLine}</p>
+      )}
 
       {product.type === "VARIABLE" && (
-        <div id="product-attributes" className="grid grid-cols-1 md:grid-cols-2 gap-4 items-start">
-          {product.attributes?.nodes.map(
-            (attr: ProductAttribute, index: number) => (
-              <div key={index} className="flex flex-col w-full text-gray-500">
-                <div className="flex items-center gap-1 mb-2 text-sm h-6">
-                  <span className="text-primary-500 flex items-center gap-1">
-                    <AttributeIcon name={attr?.name || ""} className="w-4 h-4 flex-shrink-0" />
-                    <span className="whitespace-nowrap">{attr.label}:</span>
-                  </span>
-                </div>
+        <div
+          id="product-attributes"
+          className="space-y-4 border-t border-b border-[#E8E8E8] py-4"
+        >
+          {sortedAttributeOptions.map(({ attr, options }, index) => (
+            <div key={index}>
+              <p className="mb-3 text-sm font-bold text-[#38461F]">
+                {options.length} {attr.label || attr.name}(s):
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {options.map((option) => {
+                  const isSelected = isVariationOptionSelected(
+                    displayVariation,
+                    option,
+                    attr,
+                    productAttributeNodes,
+                  );
+                  const matching = variationsForOption(
+                    productVariations,
+                    option,
+                    attr,
+                    productAttributeNodes,
+                  );
+                  const outOfStock =
+                    matching.length > 0 &&
+                    matching.every(
+                      (v) => resolveVariationStockStatus(v) !== "IN_STOCK",
+                    );
 
-                <Listbox
-                  value={activeAttr(attr)?.val || ""}
-                  onChange={(value) => {
-                    setAttribute(attr, value || "");
-                    setLastClickedAttribute(attr.name || null);
-                  }}
-                >
-                  <div className="relative">
-                    <Listbox.Button className="relative w-full cursor-default rounded-2xl border border-gray-300 bg-white h-11 pl-4 pr-10 text-left text-sm focus:border-primary-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-opacity-50 flex items-center">
-                      <span className="block truncate">
-                        {(() => {
-                          const selectedOption = activeAttr(attr)?.val;
-                          if (!selectedOption) {
-                            return `Select ${attr.label}`;
-                          }
-                          return selectedOption;
-                        })()}
-                      </span>
-                      <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3">
-                        <ChevronDownIcon
-                          className="h-5 w-5 text-gray-400"
-                          aria-hidden="true"
-                        />
-                      </span>
-                    </Listbox.Button>
-                    <Transition
-                      as={Fragment}
-                      leave="transition ease-in duration-100"
-                      leaveFrom="opacity-100"
-                      leaveTo="opacity-0"
+                  return (
+                    <button
+                      key={option}
+                      type="button"
+                      disabled={outOfStock}
+                      onClick={() => selectVariation(attr, option || "")}
+                      className={twMerge(
+                        "rounded-[10px] border border-[#38461F1A] bg-white px-4 py-2 text-sm font-semibold text-[#38461F] transition-colors",
+                        isSelected
+                          ? "border-[#38461F] bg-[#38461F]/20"
+                          : "border-[#0000001A] hover:border-[#38461F]/50",
+                        outOfStock && "cursor-not-allowed opacity-40",
+                      )}
                     >
-                      <Listbox.Options className="absolute z-20 mt-2 max-h-60 w-full overflow-auto rounded-2xl bg-white py-1 text-sm shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                        {(() => {
-                          const variations = (product as VariableProduct).variations?.nodes || [];
-                          const isOptionOutOfStock = (option: string | null) => {
-                            const matching = variations.filter((v: ProductVariation) =>
-                              v.attributes?.nodes.some(
-                                (node: any) => node.name === attr.name && node.value === option
-                              )
-                            );
-                            return matching.length > 0 && matching.every((v) => v.stockStatus !== "IN_STOCK");
-                          };
-                          return attr.options?.slice().sort((a, b) => {
-                            // In-stock options first, out-of-stock after
-                            const aOut = isOptionOutOfStock(a) ? 1 : 0;
-                            const bOut = isOptionOutOfStock(b) ? 1 : 0;
-                            if (aOut !== bOut) return aOut - bOut;
-                            // Extract first number from each option (e.g., "12gb-256gb" -> 12)
-                            const numA = a ? parseInt(a.match(/\d+/)?.[0] || "0", 10) : 0;
-                            const numB = b ? parseInt(b.match(/\d+/)?.[0] || "0", 10) : 0;
-                            return numA - numB; // Ascending order: 12, 16, 24
-                          });
-                        })()
-                          ?.map((option, optionIndex) => {
-                            const matchingVariations = (
-                              product as VariableProduct
-                            ).variations?.nodes.filter((v: ProductVariation) => {
-                              return v.attributes?.nodes.some(
-                                (node: any) =>
-                                  node.name === attr.name && node.value === option
-                              );
-                            });
-
-                            const allOutOfStock = matchingVariations?.every(
-                              (v) => v.stockStatus !== "IN_STOCK"
-                            );
-
-                            const isSelected = activeAttr(attr)?.val === option;
-
-                            // Check if current combination is unavailable
-                            const currentCombinationUnavailable = !activeVariation || activeVariation.stockStatus !== "IN_STOCK";
-
-                            // Check if this option would be available when combined with other selected attributes
-                            // Don't show "available" on the last clicked attribute
-                            let isAvailable = false;
-                            if (currentCombinationUnavailable && !isSelected && lastClickedAttribute !== (attr.name || null)) {
-                              // Get all other selected attributes
-                              const otherAttributes = attribute.filter((a) => a.name !== attr.name);
-
-                              // Check if there's a variation that matches this option + other selected attributes and is in stock
-                              const availableVariation = (product as VariableProduct).variations?.nodes.find((v: ProductVariation) => {
-                                // Check if this variation has this option for current attribute
-                                const hasThisOption = v.attributes?.nodes.some(
-                                  (node: any) => node.name === attr.name && node.value === option
-                                );
-
-                                // Check if this variation matches all other selected attributes
-                                const matchesOtherAttributes = otherAttributes.every((selectedAttr) => {
-                                  return v.attributes?.nodes.some(
-                                    (node: any) => node.name === selectedAttr.name && node.value === selectedAttr.val
-                                  );
-                                });
-
-                                return hasThisOption && matchesOtherAttributes && v.stockStatus === "IN_STOCK";
-                              });
-
-                              isAvailable = !!availableVariation;
-                            }
-
-                            let optionText = option || "OPTION";
-                            if (allOutOfStock) {
-                              optionText += " (Out of Stock)";
-                            } else if (isAvailable) {
-                              optionText += " (In Stock)";
-                            } else if (isSelected && currentCombinationUnavailable) {
-                              optionText += " (Out of Stock)";
-                            }
-
-                            return (
-                              <Listbox.Option
-                                key={optionIndex}
-                                value={option || ""}
-                                className={({ active }) =>
-                                  twMerge(
-                                    "relative cursor-pointer select-none py-2 pl-10 pr-4",
-                                    active && "bg-primary-500/10 text-primary-500",
-                                    isSelected && "font-medium"
-                                  )
-                                }
-                              >
-                                {({ selected, active }) => (
-                                  <>
-                                    <span
-                                      className={twMerge(
-                                        "block truncate",
-                                        selected ? "font-medium" : "font-normal",
-                                        allOutOfStock && "text-gray-400"
-                                      )}
-                                    >
-                                      {optionText}
-                                    </span>
-                                    {selected ? (
-                                      <span className="absolute inset-y-0 left-0 flex items-center pl-3 text-primary-500">
-                                        <CheckIcon className="h-5 w-5" aria-hidden="true" />
-                                      </span>
-                                    ) : null}
-                                  </>
-                                )}
-                              </Listbox.Option>
-                            );
-                          })}
-                      </Listbox.Options>
-                    </Transition>
-                  </div>
-                </Listbox>
+                      {option}
+                    </button>
+                  );
+                })}
               </div>
-            )
-          )}
+            </div>
+          ))}
         </div>
       )}
+
       <AnimatePresence>
         {availabilityMessage && (
           <motion.div
-            initial={{ opacity: 0, y: -10, height: 0, paddingTop: 0, paddingBottom: 0 }}
-            animate={{ opacity: 1, y: 0, height: '2rem', paddingTop: '.65rem', paddingBottom: '.65rem' }}
-            exit={{ opacity: 0, y: -10, height: 0, paddingTop: 0, paddingBottom: 0 }}
+            initial={{ opacity: 0, y: -10, height: 0 }}
+            animate={{ opacity: 1, y: 0, height: "auto" }}
+            exit={{ opacity: 0, y: -10, height: 0 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            style={{ overflow: 'hidden' }}
-            className="text-sm text-gray-600"
+            className="overflow-hidden text-sm text-[#6B7280]"
           >
-            <span className="font-medium">
-              Unavailable.
-            </span>{" "}
-            <span className="">
-              In-stock
-              <span className="ml-1 font-medium">{availabilityMessage.attr.label?.toLowerCase()}:
-                <span className="ml-1 text-primary-500 font-medium">
-                  {availabilityMessage.availableValues.join(", ")}
-                </span>
-
-
-              </span>
+            <span className="font-medium">Unavailable.</span> In-stock{" "}
+            {availabilityMessage.attr.label?.toLowerCase()}:{" "}
+            <span className="font-medium text-[#38461F]">
+              {availabilityMessage.availableValues.join(", ")}
             </span>
-          </motion.div >
+          </motion.div>
         )}
-      </AnimatePresence >
+      </AnimatePresence>
 
-      <ProductAddToCart product={product} variation={activeVariation} />
+      {displayPriceHtml ? (
+        <div className="space-y-1 py-4">
+          <div className="flex flex-wrap items-baseline gap-3">
+            <span
+              className="text-2xl font-bold text-[#38461F] sm:text-3xl"
+              dangerouslySetInnerHTML={{ __html: displayPriceHtml }}
+            />
+            {isOnSale && displayRegularPriceHtml && (
+              <span
+                className="text-lg text-[#9CA3AF] line-through"
+                dangerouslySetInnerHTML={{ __html: displayRegularPriceHtml }}
+              />
+            )}
+          </div>
+          {isInStock ? (
+            <p className="flex items-center gap-2 text-sm font-medium text-[#2DC014]">
+              <span
+                className="h-2 w-2 shrink-0 rounded-full bg-[#2DC014] animate-pulse"
+                aria-hidden
+              />
+              In Stock
+            </p>
+          ) : (
+            <p className="flex items-center gap-2 text-sm font-medium text-[#DC2626]">
+              <span
+                className="h-2 w-2 shrink-0 rounded-full bg-[#DC2626]"
+                aria-hidden
+              />
+              Out of stock
+            </p>
+          )}
+        </div>
+      ) : (
+        <p className="text-sm font-medium text-[#6B7280]">Currently unavailable</p>
+      )}
 
-      <ProductDescription product={product} />
+      <ProductAddToCart
+        product={product}
+        variation={
+          (displayVariation ?? defaultVariation) as ProductVariation & {
+            rawPrice: string;
+          }
+        }
+      />
 
-      <div className="flex w-full flex-wrap items-center gap-1 pt-2 text-sm text-gray-500 md:text-base">
-        <div className="py-2 text-sm">Category :</div>
-        {product.productCategories?.edges.map(
-          (category: any, index: number) => (
+      <ProductTrustBadges />
+
+      {displayNumericPrice > 0 && (
+        <ProductPaymentOptions
+          priceHtml={displayPriceHtml}
+          numericPrice={displayNumericPrice}
+        />
+      )}
+
+      <ProductPurchaseAccordions product={product} />
+
+      <ProductReviewsSection
+        productDatabaseId={product.databaseId}
+        reviews={
+          (product as { reviews?: { nodes?: ProductReviewItem[] | null } | null })
+            .reviews?.nodes
+        }
+        averageRating={
+          (product as SimpleProduct & { averageRating?: number | null }).averageRating
+        }
+        reviewCount={product.reviewCount}
+      />
+
+      {product.productCategories?.edges && product.productCategories.edges.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2 border-t border-[#E8E8E8] pt-4 text-sm text-[#6B7280]">
+          <span>Category:</span>
+          {product.productCategories.edges.map((category, index) => {
+            const node = category.node as ProductCategory | null | undefined;
+            return (
             <Link
-              href={getCategoryPath(category.node.slug ?? "")}
+              href={getCategoryPath(node?.slug ?? "")}
               key={index}
-              className="border border-primary-500 inline-block min-w-max
-              rounded-md text-black px-3 py-1 text-xs md:text-sm bg-white"
+              className="rounded-full border border-[#D1D5DB] px-3 py-1 text-xs font-medium text-[#374151] hover:border-[#38461F]"
             >
-              {category.node.name}
+              {node?.name}
             </Link>
-          )
-        )}
-      </div>
-    </>
+            );
+          })}
+        </div>
+      )}
+    </div>
   );
 };
 
