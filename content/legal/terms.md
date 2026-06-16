@@ -1,89 +1,57 @@
-## Warranty & Return Policy
+The customer is responsible for preserving the confidentiality of the password and user name and is responsible for all activities that are carried out under them. Catlitter.lk is unable to check the identities of the registered customers and will not be held responsible for losses suffered by the customer where his/her password or user name is used by someone else unless this occurs due to our negligence or a lapse in security.
 
-### Return & Exchange Policy
+The content of the Catlitter.lk website is provided for personal shopping purposes and shall not be used for any other purpose without prior permission from Catlitter.lk.
 
-Goods once sold cannot be returned or exchanged under any circumstances.
+## Products, Pricing, Promotion Codes and Payments
 
-### Warranty Terms
+At Catlitter.lk we only trade genuine products directly sourced from manufacturers and authorized distributors.
 
-- **Repairs only** — No replacements will be provided.
-- The product must be presented with the **original box, cables, and all accessories** to claim warranty.
-- AppleCare or manufacturer warranty claims may take a **minimum of 45 days** to process.
-- Warranty processing time depends on the **availability of spare parts and shipping schedules**.
+The prices of the products listed on the website are displayed in Sri Lankan Rupees (LKR) inclusive of VAT.
 
-### Warranty Does Not Cover
+The product images on the website are for illustration purposes only. The actual product may vary slightly due to manufacturer changes.
 
-The following conditions and damages are **not covered** under warranty:
+The stocks and prices of each product are subject to change without notice.
 
-- Liquid or water damage
-- Display or display line issues
-- Touch panel faults
-- Charging port damage
-- Burn marks
-- Drops or physical damage
-- Power fluctuations
-- No-power issues
-- Improper usage or misuse
-- Products used outside normal domestic conditions
+All orders are subject to availability and acceptance. Catlitter.lk reserves the right to refuse or cancel any order at any time.
 
-### Display Warranty
+If any item ordered is out of stock after an order has been placed, the customer will be notified and the amount for that item will be deducted from the payment or refunded. Catlitter.lk will not be responsible for any disappointment suffered by the customer as a result.
 
-Display warranty covers **7 days** to check the device for any manufacturing defects.
+Only one promotion code or gift voucher code can be redeemed per order.
 
-For complete warranty information, visit our [Warranty Terms](/warranty-terms) page.
+Special offer prices are only valid during the time of the offer. No refunds will be given for items purchased at a higher price when not on special offer.
 
-## Shipping & Delivery
+All orders are subject to extra security checks including authentication of credit/debit card details and address information. Catlitter.lk reserves the right to request alternative payment methods or cancel orders where information cannot be authenticated. For cash payments and bank transfers, a 24-hour processing period may apply after funds are received.
 
-At this time, GQ Mobiles ships within Sri Lanka.
+## Delivery
 
-## PickMe & Uber Flash Delivery
+Catlitter.lk reserves the right to contact customers directly in respect of orders.
 
-When a customer chooses to receive their order through a third-party on-demand delivery service such as **PickMe Flash** or **Uber Flash**, the customer acknowledges and agrees to the terms below.
+Some orders may only be delivered to the Billing Address. Customers will be notified by email if this applies.
 
-GQ Mobiles only acts as the sender handing the package over to the rider arranged by the customer. Once the package is handed over to the rider, the order leaves our possession and our delivery responsibility ends.
+If an order is returned because it was not collected, the customer will be eligible for a refund but postal charges will not be refunded.
 
-By selecting PickMe Flash, Uber Flash, or any similar third-party courier service, the **customer takes full responsibility** for the package, including:
+Non-receipt of orders must be notified in writing or by email within 45 working days of dispatch. No claims will be accepted after this period.
 
-- Loss, theft, or misplacement after handover
-- Damage to the device or packaging during transit
-- Delivery delays, incorrect addresses, or failed deliveries caused by third-party services
-- Disputes about package condition on arrival
+Catlitter.lk is not liable for any delays in delivery, failure to deliver, or any damage or defect to goods occurring during the delivery process.
 
-We strongly recommend customers inspect the package and device in the rider's presence at delivery. GQ Mobiles will not be liable for claims related to loss, theft, or damage after rider handover.
+## Cancellation, Return and Refund
 
-Payment for third-party delivery services is settled directly between the customer and the provider and is not part of the order total paid to GQ Mobiles.
+Customers are advised to check all order details carefully before submitting an order as changes cannot be made once an order has been placed. No compensation will be granted for any inconvenience or loss suffered.
 
-## Welcome
+Please refer to our [FAQ](/faq) for a comprehensive guide on our return policy, or see our [Return Policy](/return-policy) page.
 
-These terms and conditions outline the rules and regulations for the use of GQ Mobiles's website, located at [https://gqmobiles.lk](https://gqmobiles.lk).
+## Complaints
 
-By accessing this website, we assume you accept these terms and conditions. Do not continue to use GQ Mobiles if you do not agree to all terms stated on this page.
+If you are unhappy with any aspect of our service, we encourage you to contact us.
 
-## Cookies
+All complaints will be acknowledged within seven working days and you will be kept informed of the status of your complaint.
 
-We employ the use of cookies. By accessing GQ Mobiles, you agree to use cookies in agreement with the [Privacy Policy](/privacy).
+## Changes to Terms and Conditions
 
-## License
+Catlitter.lk reserves the right to amend these terms and conditions at any time for legal, regulatory or security reasons.
 
-Unless otherwise stated, GQ Mobiles and/or its licensors own the intellectual property rights for all material on GQ Mobiles. All rights are reserved.
+Where major changes are made, we will notify customers via the website or by email. However, it is the customer's responsibility to check for updates.
 
-You must not:
+## Further Inquiries
 
-- Republish material from GQ Mobiles
-- Sell, rent, or sub-license material from GQ Mobiles
-- Reproduce, duplicate, or copy material from GQ Mobiles
-- Redistribute content from GQ Mobiles
-
-## Hyperlinking to Our Content
-
-Certain organizations may link to our website without prior written approval (for example, government agencies, search engines, and news organizations). Additional link requests may be considered case by case.
-
-## Your Privacy
-
-Please read our [Privacy Policy](/privacy).
-
-## Disclaimer
-
-To the maximum extent permitted by applicable law, we exclude all representations, warranties, and conditions relating to our website and its use.
-
-As long as the website and the information and services on the website are provided free of charge, we will not be liable for any loss or damage of any nature.
+For any further inquiries relating to these terms and conditions, please [contact us](/contact).
