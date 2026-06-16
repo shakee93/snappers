@@ -1,39 +1,24 @@
-# Delivery Details
+## Deliveries
 
-We deliver pet food, litter, and accessories island-wide across Sri Lanka. Please read the details below so you know what to expect when you order from Catlitter.lk.
+Delivery charges for your order will be calculated and displayed at checkout.
 
-## Delivery Coverage
+Deliveries will be processed between Monday – Saturday (9AM – 6PM), excluding any mercantile & public holidays. Orders received on Sunday will be processed on the following Monday.
 
-- **Island-wide delivery** throughout Sri Lanka.
-- Orders are dispatched from our stores in **Dehiwala–Mount Lavinia** and **Wellampitiya**.
+Delivery delays can occasionally occur due to unavoidable circumstances.
 
-## Delivery Time
+## Standard Delivery
 
-- **Colombo & suburbs:** 1–2 business days.
-- **Other areas:** 2–4 business days.
-- Orders placed **before 2:00 PM** on a business day are processed the same day. Orders placed afterwards are processed the next business day.
+Standard delivery is both reliable and cost effective.
 
-Delivery times are estimates and may vary during sale periods, Poya days, and public holidays.
+- **Colombo / Suburbs:** 2 – 3 Days
+- **Out of Colombo:** 3 – 5 Days
 
-## Delivery Charges
+## Store pick-up
 
-- Delivery charges are calculated automatically at checkout based on your **order weight and destination**.
-- **Free delivery** is available on qualifying orders — the threshold is shown in your cart at checkout.
+Customers preferring to collect orders directly can choose the store pick-up option at the checkout.
 
-## Cash on Delivery
+Notifications for order collection will be sent via E-mail/SMS, and orders can be collected within 7 working days at **#107, Kirula Road, Narahenpita, Colombo 5**, from **Monday to Saturday (9 AM – 9.30 PM / Sunday 9.30 AM – 6 PM)**.
 
-**Cash on Delivery (COD)** is available island-wide. Please keep the exact amount ready for the delivery rider.
+Unattended store pick-up orders after 7 working days will be canceled, with customers notified via SMS/E-mail.
 
-## Order Tracking
-
-Once your order is dispatched, we will share tracking or courier details by SMS or email so you can follow your delivery.
-
-## Receiving Your Order
-
-- Please **inspect your order** at the time of delivery.
-- For pet food and treats, check the **packaging and expiry dates** before accepting.
-- If anything is damaged, incorrect, or missing, contact us right away — see our [Return Policy](/return-policy).
-
-## Need Help?
-
-For any delivery-related questions, please [contact us](/contact) and our team will be happy to assist.
+**For more information on delivery options and times available, please contact on 071 606 0123.**

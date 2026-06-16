@@ -4,13 +4,13 @@ import { LegalPage } from "@/components/global/primitives/LegalPage";
 import { readLegalMarkdown } from "@/lib/legalContent";
 
 export const metadata: Metadata = {
-  title: "Terms and Conditions",
+  title: "Delivery Details",
 };
 
 export const revalidate = 86400;
 
-export default async function PageTerm() {
-  const content = await readLegalMarkdown("terms.md");
+export default async function PageDeliveryDetails() {
+  const content = await readLegalMarkdown("delivery.md");
 
-  return <LegalPage title="Terms and Conditions" content={content} />;
+  return <LegalPage title="Delivery Terms" content={content} />;
 }
