@@ -68,7 +68,8 @@ const ReviewCard = ({
   const images = (item.reviewImages?.nodes ?? []).filter(
     (img): img is ReviewImageNode => !!img?.sourceUrl
   );
-  const stars = Math.min(Math.max(item.stars ?? 5, 0), 5);
+  const rating = Math.min(Math.max(item.stars ?? 5, 0), 5);
+  const starCount = Math.round(rating);
   const fullText = reviewPlainText(item.review ?? "");
   const previewText = truncateAtWord(fullText, REVIEW_PREVIEW_CHARS);
   const isTruncated = previewText.length < fullText.length;
@@ -102,9 +103,13 @@ const ReviewCard = ({
           <span className="truncate text-sm font-bold text-[#092412]">
             {item.reviewer}
           </span>
-          <span className="flex shrink-0 items-center gap-1.5 text-sm text-neutral-800">
-            <StarIcon />
-            Rated {stars} {stars === 1 ? "star" : "stars"} on Google
+          <span
+            className="flex shrink-0 items-center gap-0 text-sm text-neutral-800"
+            aria-label={`${starCount} out of 5 stars`}
+          >
+            {Array.from({ length: starCount }).map((_, index) => (
+              <StarIcon key={index} />
+            ))}
           </span>
         </figcaption>
       </div>
@@ -166,7 +171,7 @@ const SectionGoogleReviews = ({
             alt="Google Rated 4.9"
             width={516}
             height={147}
-            className="h-44 w-auto"
+            className="h-28 md:h-44 w-auto"
           />
           <h2 className="block font-albra text-3xl font-semibold text-[#092412] md:text-6xl pt-5 text-center">
             Real stories from{" "}

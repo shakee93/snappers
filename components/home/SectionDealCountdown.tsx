@@ -5,8 +5,10 @@ import Image from "next/image";
 
 export interface SectionDealCountdownProps {
   className?: string;
-  /** Banner artwork (includes the cat & dog). */
+  /** Desktop banner artwork. */
   backgroundImage?: string;
+  /** Mobile banner artwork (puppy on the right). */
+  backgroundImageMobile?: string;
   /** Deal end time as an ISO string. */
   endsAt?: string;
 }
@@ -37,6 +39,7 @@ const getTimeLeft = (target: number): TimeLeft => {
 const SectionDealCountdown = ({
   className = "",
   backgroundImage = "/homepage/deal-bg.png",
+  backgroundImageMobile = "/homepage/deal-m-bg.png",
   endsAt,
 }: SectionDealCountdownProps) => {
   // Countdown values depend on Date.now() — only compute after mount so SSR
@@ -63,20 +66,107 @@ const SectionDealCountdown = ({
       ]
     : null;
 
+  const countdownBody = (
+    <div
+      className="flex min-h-[2.25rem] w-full items-center justify-evenly md:min-h-[4.25rem] md:w-auto md:justify-center"
+      aria-busy={!units}
+    >
+      {units ? (
+        units.map((unit, index) => (
+          <div key={unit.label} className="flex items-center">
+            {index > 0 && (
+              <span
+                className="mx-2 h-8 w-px bg-[#E7D9C7] md:mx-4 md:h-10"
+                aria-hidden
+              />
+            )}
+            <div className="flex flex-col items-center">
+              <span className="text-2xl font-bold tabular-nums text-deal-brown md:text-4xl">
+                {pad(unit.value)}
+              </span>
+              <span className="text-[9px] leading-none py-1 md:py-2 font-semibold uppercase tracking-wider text-[#EE9E7D] md:text-xs">
+                {unit.label}
+              </span>
+            </div>
+          </div>
+        ))
+      ) : (
+        <div className="flex w-full items-center justify-center gap-2 md:gap-4">
+          {[0, 1, 2].map((index) => (
+            <div key={index} className="flex items-center">
+              {index > 0 && (
+                <span
+                  className="mx-2 h-8 w-px bg-[#E7D9C7] md:mx-4 md:h-10"
+                  aria-hidden
+                />
+              )}
+              <div className="flex flex-col items-center gap-1.5">
+                <span className="h-7 w-9 animate-pulse rounded-md bg-[#E7D9C7]/80 md:h-9 md:w-12" />
+                <span className="h-2 w-7 animate-pulse rounded bg-[#EE9E7D]/40 md:h-2.5 md:w-8" />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+
   return (
-    <section className={`mx-auto w-full max-w-[1368px] px-3 lg:px-0 mt-[-50px] ${className}`}>
-      <div className="relative w-full overflow-hidden rounded-[28px]">
+    <section className={`mx-auto w-full max-w-[1368px] px-3 lg:px-0 md:mt-[-50px] mt-[-20px] ${className}`}>
+      <div className="relative w-full overflow-visible rounded-[20px] md:overflow-hidden md:rounded-[28px]">
+        <Image
+          src={backgroundImageMobile}
+          alt=""
+          width={371}
+          height={170}
+          aria-hidden
+          className="h-auto w-full rounded-[20px] object-cover md:hidden"
+        />
         <Image
           src={backgroundImage}
           alt=""
           width={1368}
           height={386}
           aria-hidden
-          className="h-auto w-full object-cover"
+          className="hidden h-auto w-full object-cover md:block"
         />
 
-        {/* Centered title + countdown overlay */}
-        <div className="absolute inset-0 flex flex-col items-center justify-end gap-5 px-4 pb-8 sm:pb-12">
+        {/* Mobile: left-aligned title + countdown over puppy bg */}
+        <div className="absolute inset-0 flex flex-col items-start justify-center pl-5 pr-[30%] md:hidden ">
+          <div className="inline-block pt-10">
+            <div className="relative">
+              <Image
+                src="/homepage/lines.png"
+                alt=""
+                width={28}
+                height={28}
+                aria-hidden
+                className="absolute -left-5 -top-3 h-4 w-4 hidden md:block"
+              />
+              <h2 className="mb-2 text-[25px] font-albra font-bold leading-tight text-deal-brown">
+                Deals for your <span className="text-[#E79A72]">pet</span>
+              </h2>
+              <Image
+                src="/homepage/bone.png"
+                alt=""
+                width={40}
+                height={34}
+                aria-hidden
+                className="absolute -right-6 -top-2 h-5 w-6 hidden md:block"
+              />
+            </div>
+
+            <div className="relative mt-2.5 w-full rounded-xl border border-[#E7D9C7] bg-white px-2 pb-1.5 pt-2.5">
+              <span className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-deal-brown px-1.5 py-1 text-[8px] font-bold uppercase leading-none tracking-wide !text-[#EE9E7D]">
+                Hurry! Deals ends in:
+              </span>
+              {countdownBody}
+            </div>
+          </div>
+        </div>
+
+        {/* Desktop: centered title + countdown overlay */}
+        <div className="absolute inset-0 hidden flex-col items-center justify-end gap-5 px-4 pb-12 md:flex">
           <div className="relative">
             <Image
               src="/homepage/lines.png"
@@ -84,9 +174,9 @@ const SectionDealCountdown = ({
               width={28}
               height={28}
               aria-hidden
-              className="absolute -left-7 -top-5 h-5 w-5 sm:-left-4 sm:h-7 sm:w-7"
+              className="absolute -left-4 -top-5 h-7 w-7"
             />
-            <h2 className="text-3xl font-albra font-bold text-[#092412] md:text-6xl">
+            <h2 className="text-6xl font-albra font-bold text-[#092412]">
               Deals for your <span className="text-[#E79A72]">pet</span>
             </h2>
             <Image
@@ -95,57 +185,15 @@ const SectionDealCountdown = ({
               width={40}
               height={34}
               aria-hidden
-              className="absolute -right-9 -top-4 h-6 w-7 sm:-right-11 sm:h-8 sm:w-10"
+              className="absolute -right-11 -top-4 h-8 w-10"
             />
           </div>
 
-          <div className="relative rounded-2xl border border-[#E7D9C7] bg-white/70 px-5 pb-3 pt-5 backdrop-blur-sm sm:px-7">
-            <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-[#3E251B] px-3 py-0 text-[10px] font-bold uppercase tracking-wider text-[#EE9E7D]">
+          <div className="relative rounded-2xl border border-[#E7D9C7] bg-white/70 px-7 py-0 md:pb-3 md:pt-5 backdrop-blur-sm">
+            <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-deal-brown px-3 py-2 text-[10px] font-bold uppercase leading-none tracking-wider !text-[#EE9E7D]">
               Hurry! Deals ends in:
             </span>
-
-            <div
-              className="flex min-h-[3.75rem] items-center sm:min-h-[4.25rem]"
-              aria-busy={!units}
-            >
-              {units ? (
-                units.map((unit, index) => (
-                  <div key={unit.label} className="flex items-center">
-                    {index > 0 && (
-                      <span
-                        className="mx-3 h-10 w-px bg-[#E7D9C7] sm:mx-4"
-                        aria-hidden
-                      />
-                    )}
-                    <div className="flex flex-col items-center">
-                      <span className="text-3xl font-bold tabular-nums text-[#3E251B] sm:text-4xl">
-                        {pad(unit.value)}
-                      </span>
-                      <span className="text-[10px] font-semibold uppercase tracking-wider text-[#EE9E7D] sm:text-xs">
-                        {unit.label}
-                      </span>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="flex w-full items-center justify-center gap-3 sm:gap-4">
-                  {[0, 1, 2].map((index) => (
-                    <div key={index} className="flex items-center">
-                      {index > 0 && (
-                        <span
-                          className="mx-3 h-10 w-px bg-[#E7D9C7] sm:mx-4"
-                          aria-hidden
-                        />
-                      )}
-                      <div className="flex flex-col items-center gap-1.5">
-                        <span className="h-8 w-10 animate-pulse rounded-md bg-[#E7D9C7]/80 sm:h-9 sm:w-12" />
-                        <span className="h-2.5 w-8 animate-pulse rounded bg-[#EE9E7D]/40" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            {countdownBody}
           </div>
         </div>
       </div>

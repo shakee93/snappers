@@ -30,7 +30,7 @@ export default function NewsletterSignup() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex w-full max-w-md items-center gap-2"
+      className="flex w-full max-w-md flex-wrap items-center gap-2 sm:flex-nowrap"
     >
       <input
         type="email"
@@ -39,11 +39,11 @@ export default function NewsletterSignup() {
         onChange={(event) => setEmail(event.target.value)}
         placeholder={placeholder}
         aria-label="Email address"
-        className="flex-1 rounded-md bg-white px-4 py-2.5 text-sm text-gray-700 outline-none placeholder:text-gray-400"
+        className="w-full rounded-md bg-white px-4 py-2.5 text-sm text-gray-700 outline-none placeholder:text-gray-400 sm:flex-1"
       />
       <button
         type="submit"
-        className="flex items-center gap-1.5 rounded-md bg-[#ACDA5A] px-5 py-2.5 text-base font-semibold text-black transition-colors hover:bg-[#b4d653]"
+        className="flex w-full items-center justify-center gap-1.5 rounded-md bg-header-action px-5 py-2.5 text-base font-semibold text-black transition-opacity hover:opacity-90 sm:w-auto"
       >
         {buttonLabel}
         <ArrowRight size={16} />

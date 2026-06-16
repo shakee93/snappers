@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Loader } from "lucide-react";
@@ -39,6 +39,127 @@ const toPlainText = (html?: string | null): string =>
     .replace(/\s+/g, " ")
     .trim();
 
+const packshotBoxClassName =
+  "relative overflow-hidden rounded-xl border border-[#E8E8E8] bg-white";
+
+const SM_MEDIA_QUERY = "(min-width: 640px)";
+
+function useIsSmUp(): boolean {
+  return useSyncExternalStore(
+    (onStoreChange) => {
+      const mediaQueryList = window.matchMedia(SM_MEDIA_QUERY);
+      mediaQueryList.addEventListener("change", onStoreChange);
+      return () => mediaQueryList.removeEventListener("change", onStoreChange);
+    },
+    () => window.matchMedia(SM_MEDIA_QUERY).matches,
+    () => false,
+  );
+}
+
+type HealthFeatureDetailsProps = {
+  name?: string | null;
+  description: string;
+  link: string;
+  packshotImageUrl: string;
+  priceRow: ReactNode;
+  addToCartButton: ReactNode;
+  footerLayout?: "mobile" | "desktop";
+};
+
+const HealthFeatureDetails = ({
+  name,
+  description,
+  link,
+  packshotImageUrl,
+  priceRow,
+  addToCartButton,
+  footerLayout = "mobile",
+}: HealthFeatureDetailsProps) => {
+  const isDesktop = footerLayout === "desktop";
+
+  return (
+  <>
+    <Link href={link || "#"} className="block shrink-0">
+      <h3 className="font-albra text-xl font-bold leading-tight text-[#0A0A0A] sm:text-[1.65rem] sm:leading-[1.25] lg:text-[1.85rem]">
+        {name}
+      </h3>
+    </Link>
+
+    {description ? (
+      <p
+        className={`shrink-0 text-sm leading-relaxed text-[#1A1A1A] sm:mt-3 sm:leading-[1.65] ${
+          isDesktop ? "line-clamp-4" : "line-clamp-[7]"
+        }`}
+      >
+        {description}
+      </p>
+    ) : (
+      <div aria-hidden />
+    )}
+
+    <Link
+      href={link || "#"}
+      className={
+        isDesktop
+          ? "flex h-full w-full items-center justify-start overflow-hidden"
+          : "flex h-full min-h-[140px] w-full flex-col justify-center"
+      }
+      aria-label={name ?? "Product"}
+    >
+      {packshotImageUrl ? (
+        isDesktop ? (
+          <div
+            className={`${packshotBoxClassName} aspect-square h-full w-auto max-h-full shrink-0`}
+          >
+            <Image
+              src={packshotImageUrl}
+              alt={name ? `${name} product` : "Product"}
+              width={800}
+              height={800}
+              sizes="22vw"
+              className="h-full w-full object-cover"
+            />
+          </div>
+        ) : (
+          <div
+            className={`${packshotBoxClassName} mx-auto aspect-square w-[56%] max-w-[170px] shrink-0`}
+          >
+            <Image
+              src={packshotImageUrl}
+              alt={name ? `${name} product` : "Product"}
+              width={800}
+              height={800}
+              sizes="90vw"
+              className="h-full w-full object-contain p-4"
+            />
+          </div>
+        )
+      ) : (
+        <div
+          className={`${packshotBoxClassName} ${
+            isDesktop
+              ? "aspect-square h-full w-auto max-h-full shrink-0"
+              : "aspect-square w-full shrink-0"
+          }`}
+          aria-hidden
+        />
+      )}
+    </Link>
+    {footerLayout === "mobile" ? (
+      <div className="flex shrink-0 flex-col gap-2">
+        <div className="min-w-0 overflow-hidden">{priceRow ?? <span />}</div>
+        <div className="flex justify-end">{addToCartButton}</div>
+      </div>
+    ) : (
+      <div className="flex shrink-0 flex-col gap-4">
+        {priceRow}
+        <div className="flex justify-end">{addToCartButton}</div>
+      </div>
+    )}
+  </>
+  );
+};
+
 const HealthFeatureCard = ({
   product,
   price,
@@ -46,6 +167,7 @@ const HealthFeatureCard = ({
   isActive = false,
 }: HealthFeatureCardProps) => {
   const [loading, setLoading] = useState(false);
+  const isSmUp = useIsSmUp();
   const { addToCart } = useCart();
   const link = useProductLink(product);
   const router = useRouter();
@@ -59,6 +181,7 @@ const HealthFeatureCard = ({
   );
 
   const heroImageUrl = featureImage || productImageUrl;
+  const packshotImageUrl = productImageUrl || featureImage || "";
 
   const description = useMemo(() => {
     const short = toPlainText(product.shortDescription);
@@ -107,98 +230,80 @@ const HealthFeatureCard = ({
         ? "Adding…"
         : "Add to basket";
 
+  const priceRow =
+    numericPrice > 0 ? (
+      <div className="flex items-center gap-x-1 whitespace-nowrap sm:flex-wrap sm:gap-y-1 sm:whitespace-normal">
+        <span className="text-[13px] font-bold text-[#0A0A0A] sm:text-lg">
+          LKR {formatLkr(numericPrice)}
+        </span>
+        <span className="text-[13px] font-bold text-[#0A0A0A] sm:text-sm">
+          × 3 with
+        </span>
+        <Image src={koko} alt="KOKO" className="inline-block h-auto w-8 sm:w-10" />
+      </div>
+    ) : null;
+
+  const addToCartButton = (
+    <button
+      type="button"
+      disabled={loading || isOutOfStock}
+      onClick={handleAddToCart}
+      className="inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-[10px] bg-[#C5E066] px-3.5 py-2 text-[13px] font-bold leading-none text-[#0A0A0A] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:min-w-[160px] sm:rounded-full sm:px-6 sm:py-3 sm:text-sm sm:leading-normal"
+    >
+      {loading && <Loader className="h-4 w-4 animate-spin" />}
+      <span>{buttonLabel}</span>
+    </button>
+  );
+
+  const detailsProps = {
+    name,
+    description,
+    link: link || "#",
+    packshotImageUrl,
+    priceRow,
+    addToCartButton,
+  };
+
   return (
     <article
-      className={`aspect-[4/3] w-full overflow-hidden rounded-[24px] border border-[#E8E8E8] transition-colors duration-300 max-sm:aspect-auto ${
-        isActive ? "bg-[#F6F6F6]" : "bg-white"
+      className={`w-full overflow-hidden rounded-2xl border border-[#E8E8E8] bg-[#F6F6F6] transition-colors duration-300 max-sm:min-h-[440px] sm:aspect-[4/3] ${
+        isActive ? "sm:bg-[#F6F6F6]" : "sm:bg-white"
       }`}
     >
-      <div className="flex h-full flex-col sm:flex-row">
-        {/* Left feature image with inset padding and rounded corners */}
-        <Link
-          href={link || "#"}
-          className="block w-full p-4 sm:flex sm:h-full sm:w-1/2 sm:shrink-0 sm:p-5 lg:p-6"
-          aria-label={name ?? "Product"}
-        >
-          {heroImageUrl ? (
-            <div className="relative h-full w-full overflow-hidden rounded-[20px] border border-[#E8E8E8] max-sm:aspect-[4/3]">
-              <Image
-                src={heroImageUrl}
-                alt={name ?? "Product"}
-                fill
-                sizes="(max-width: 640px) 90vw, 22vw"
-                className="object-cover object-center"
-              />
-            </div>
-          ) : (
-            <div
-              className="h-full w-full rounded-[20px] border border-[#E8E8E8] bg-neutral-100 max-sm:aspect-[4/3]"
-              aria-hidden
-            />
-          )}
-        </Link>
-
-        {/* Right product details — grid gives the thumbnail row an explicit height */}
-        <div className="flex flex-col px-5 pb-5 pt-1 sm:grid sm:h-full sm:w-1/2 sm:min-h-0 sm:grid-rows-[auto_auto_minmax(0,1fr)_auto] sm:px-7 sm:py-6 lg:px-8 lg:py-7">
-          <Link href={link || "#"} className="block">
-            <h3 className="font-albra text-[1.4rem] font-bold leading-[1.25] text-[#0A0A0A] max-sm:line-clamp-2 max-sm:text-[1.25rem] sm:text-[1.65rem] lg:text-[1.85rem]">
-              {name}
-            </h3>
-          </Link>
-
-          {description ? (
-            <p className="mt-2 line-clamp-3 text-[13px] leading-[1.55] text-[#1A1A1A] max-sm:hidden sm:mt-3 sm:line-clamp-4 sm:text-sm sm:leading-[1.65]">
-              {description}
-            </p>
-          ) : (
-            <div aria-hidden />
-          )}
-
-          {productImageUrl ? (
-            <div className="mt-3 flex min-h-0 items-start sm:mt-4">
-              <div className="relative h-full min-h-[64px] w-auto max-w-full shrink-0 overflow-hidden rounded-xl border border-[#E8E8E8] [aspect-ratio:1/1] max-sm:size-[72px]">
+      {isSmUp ? (
+        <div className="grid h-full grid-cols-2">
+          <Link
+            href={link || "#"}
+            className="flex h-full min-h-0 p-5 lg:p-6"
+            aria-label={name ?? "Product"}
+          >
+            {heroImageUrl ? (
+              <div className="relative h-full min-h-[240px] w-full overflow-hidden rounded-[20px] border border-[#E8E8E8]">
                 <Image
-                  src={productImageUrl}
-                  alt={name ? `${name} product` : "Product"}
+                  src={heroImageUrl}
+                  alt={name ?? "Product"}
                   fill
-                  sizes="(max-width: 640px) 72px, 160px"
-                  className="object-cover object-left"
+                  sizes="22vw"
+                  className="object-cover object-center"
                 />
               </div>
-            </div>
-          ) : (
-            <div aria-hidden />
-          )}
+            ) : (
+              <div
+                className="h-full min-h-[240px] w-full rounded-[20px] border border-[#E8E8E8] bg-neutral-100"
+                aria-hidden
+              />
+            )}
+          </Link>
 
-          <div className="pt-3 max-sm:mt-3 sm:pt-8">
-            <div className="flex flex-col gap-3 sm:gap-4">
-              {numericPrice > 0 && (
-                <div className="flex max-sm:flex-col max-sm:gap-1.5 flex-wrap items-center gap-x-1.5 gap-y-1">
-                  <span className="text-base font-bold text-[#0A0A0A] sm:text-lg">
-                    LKR {formatLkr(numericPrice)}
-                  </span>
-                  <span className="text-sm font-bold text-[#0A0A0A]">× 3 with</span>
-                  <Image
-                    src={koko}
-                    alt="KOKO"
-                    className="inline-block h-auto w-9 sm:w-10"
-                  />
-                </div>
-              )}
-
-              <button
-                type="button"
-                disabled={loading || isOutOfStock}
-                onClick={handleAddToCart}
-                className="inline-flex max-sm:w-full shrink-0 items-center justify-center gap-2 self-end rounded-full bg-[#C5E066] px-6 py-3 text-sm font-bold text-[#0A0A0A] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:min-w-[160px]"
-              >
-                {loading && <Loader className="h-4 w-4 animate-spin" />}
-                <span>{buttonLabel}</span>
-              </button>
-            </div>
+          <div className="grid h-full min-h-0 grid-rows-[auto_auto_minmax(0,1fr)_auto] gap-3 px-7 py-6 lg:px-8 lg:py-7">
+            <HealthFeatureDetails {...detailsProps} footerLayout="desktop" />
           </div>
         </div>
-      </div>
+      ) : (
+        <div className="grid h-full min-h-[440px] grid-rows-[auto_auto_minmax(0,1fr)_auto] gap-3 p-5">
+          <HealthFeatureDetails {...detailsProps} footerLayout="mobile" />
+        </div>
+      )}
     </article>
   );
 };
