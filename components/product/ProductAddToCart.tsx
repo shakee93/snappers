@@ -19,7 +19,7 @@ import PreOrderNotice from "@/components/global/ui/PreOrderNotice";
 
 interface ProductAddToCartProps {
   product: SimpleProduct & VariableProduct;
-  variation: ProductVariation & { rawPrice: string };
+  variation?: (ProductVariation & { rawPrice?: string | null }) | null;
 }
 
 const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation }) => {
@@ -119,7 +119,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   };
 
   const getVariationId = () => {
-    return product.type === "SIMPLE" ? undefined : variation.databaseId;
+    return product.type === "SIMPLE" ? undefined : variation?.databaseId;
   };
 
   const isProductOutOfStock = () => {
@@ -128,6 +128,11 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
     }
     return product?.stockStatus !== "IN_STOCK";
   };
+
+  const rawPrice =
+    product.type === "SIMPLE"
+      ? (product as SimpleProduct & { rawPrice?: string | null }).rawPrice
+      : variation?.rawPrice;
 
   const isDesiredQuantityAvailable = () => {
     const cartItems = cart?.contents?.nodes ?? [];
@@ -302,8 +307,9 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
 
   const isAddToCartDisabled =
     loading ||
-    variation?.rawPrice === "0.00" ||
-    variation?.rawPrice == null ||
+    rawPrice === "0.00" ||
+    rawPrice == null ||
+    rawPrice === "" ||
     isProductOutOfStock();
 
   const cardControlClass =
@@ -311,7 +317,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
 
   const isInStock =
     (product.type === "SIMPLE" && product.stockStatus === "IN_STOCK") ||
-    (product.type === "VARIABLE" && !isProductOutOfStock());
+    (product.type === "VARIABLE" && !!variation && !isProductOutOfStock());
 
   return (
     <div className="w-full">

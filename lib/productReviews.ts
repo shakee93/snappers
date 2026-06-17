@@ -8,9 +8,74 @@ export type ProductReviewItem = {
   databaseId: number;
   content?: string | null;
   date?: string | null;
+  rating?: number | null;
   author?: { node?: { name?: string | null } | null } | null;
-  reviewImages?: (ReviewImage | null)[] | null;
+  reviewImages?:
+    | (ReviewImage | null)[]
+    | { nodes?: (ReviewImage | null)[] | null }
+    | null;
 };
+
+export type ReviewDisplayImage = {
+  sourceUrl: string;
+  thumbnailUrl: string;
+  altText: string;
+};
+
+export function getReviewDisplayImages(
+  review: ProductReviewItem,
+  authorName = "Customer",
+): ReviewDisplayImage[] {
+  const raw = review.reviewImages;
+  const list: ReviewImage[] = Array.isArray(raw)
+    ? raw.filter((image): image is ReviewImage => !!image)
+    : raw &&
+        typeof raw === "object" &&
+        "nodes" in raw &&
+        Array.isArray((raw as { nodes?: unknown }).nodes)
+      ? ((raw as { nodes: (ReviewImage | null)[] }).nodes ?? []).filter(
+          (image): image is ReviewImage => !!image,
+        )
+      : [];
+
+  return list
+    .filter(
+      (image) => !image.isVideo && !!(image.thumbnailUrl ?? image.sourceUrl),
+    )
+    .map((image, index) => ({
+      sourceUrl: image.sourceUrl ?? image.thumbnailUrl ?? "",
+      thumbnailUrl: image.thumbnailUrl ?? image.sourceUrl ?? "",
+      altText: `Photo ${index + 1} from ${authorName}'s review`,
+    }));
+}
+
+type ProductReviewConnection = {
+  edges?: Array<{
+    rating?: number | null;
+    node?: ProductReviewItem | null;
+  } | null> | null;
+  nodes?: Array<ProductReviewItem | null> | null;
+} | null;
+
+/** Flatten a product reviews connection; prefers edges (includes per-review rating). */
+export function flattenProductReviews(
+  connection?: ProductReviewConnection,
+): ProductReviewItem[] {
+  const fromEdges = (connection?.edges ?? [])
+    .filter((edge): edge is NonNullable<typeof edge> => !!edge?.node?.databaseId)
+    .map((edge) => ({
+      ...edge.node!,
+      rating: edge.rating ?? edge.node?.rating ?? null,
+    }));
+
+  if (fromEdges.length > 0) {
+    return fromEdges;
+  }
+
+  return (connection?.nodes ?? []).filter(
+    (review): review is ProductReviewItem => !!review?.databaseId,
+  );
+}
 
 /** REST origin of the WordPress backend, derived from the GraphQL endpoint. */
 const WP_REST_BASE = new URL(
@@ -56,6 +121,54 @@ export async function uploadReviewImage(
 
 export function stripReviewHtml(html: string): string {
   return html.replace(/<[^>]*>/g, " ").replace(/\s+/g, " ").trim();
+}
+
+function parseReviewTimestamp(date?: string | null): number {
+  if (!date) return 0;
+  const normalized = date.includes("T") ? date : date.replace(" ", "T");
+  const timestamp = Date.parse(normalized);
+  return Number.isNaN(timestamp) ? 0 : timestamp;
+}
+
+/** Newest-first; undated reviews keep their original relative order at the end. */
+export function sortReviewsByDateDesc(reviews: ProductReviewItem[]): ProductReviewItem[] {
+  return [...reviews]
+    .map((review, index) => ({ review, index }))
+    .sort((a, b) => {
+      const dateDiff = parseReviewTimestamp(b.review.date) - parseReviewTimestamp(a.review.date);
+      return dateDiff !== 0 ? dateDiff : a.index - b.index;
+    })
+    .map(({ review }) => review);
+}
+
+export function reviewHasImages(review: ProductReviewItem): boolean {
+  return getReviewDisplayImages(review).length > 0;
+}
+
+/** Reviews with photos first, then newest within each group. */
+export function sortReviewsImageFirst(reviews: ProductReviewItem[]): ProductReviewItem[] {
+  return [...reviews]
+    .map((review, index) => ({ review, index }))
+    .sort((a, b) => {
+      const imageDiff =
+        Number(reviewHasImages(b.review)) - Number(reviewHasImages(a.review));
+      if (imageDiff !== 0) return imageDiff;
+
+      const dateDiff =
+        parseReviewTimestamp(b.review.date) - parseReviewTimestamp(a.review.date);
+      return dateDiff !== 0 ? dateDiff : a.index - b.index;
+    })
+    .map(({ review }) => review);
+}
+
+/** First review with visible text, preferring the newest. */
+export function getFeaturedReview(reviews: ProductReviewItem[]): ProductReviewItem | null {
+  const sorted = sortReviewsByDateDesc(reviews);
+  return (
+    sorted.find((review) => !!review.content && stripReviewHtml(review.content)) ??
+    sorted[0] ??
+    null
+  );
 }
 
 export function formatReviewDate(date: string): string {
