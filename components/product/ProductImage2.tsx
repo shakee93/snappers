@@ -4,7 +4,7 @@ import { useImage } from "@/context/ImageChangeGrabber";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import { getPreferredVariation } from "@/lib/getPreferredVariation";
 import { getProductVideoUrl, type ProductVideoSource } from "@/lib/productVideo";
-import { flattenProductReviews, sortReviewsImageFirst } from "@/lib/productReviews";
+import { flattenProductReviews } from "@/lib/productReviews";
 import ProductReviewTabs from "@/components/product/ProductReviewTabs";
 import { siteConfig } from "@/site.config";
 import {
@@ -151,10 +151,8 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
 
   const productReviews = useMemo(
     () =>
-      sortReviewsImageFirst(
-        flattenProductReviews(
-          (product as { reviews?: Parameters<typeof flattenProductReviews>[0] }).reviews,
-        ),
+      flattenProductReviews(
+        (product as { reviews?: Parameters<typeof flattenProductReviews>[0] }).reviews,
       ),
     [product],
   );

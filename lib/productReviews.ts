@@ -10,10 +10,7 @@ export type ProductReviewItem = {
   date?: string | null;
   rating?: number | null;
   author?: { node?: { name?: string | null } | null } | null;
-  reviewImages?:
-    | (ReviewImage | null)[]
-    | { nodes?: (ReviewImage | null)[] | null }
-    | null;
+  reviewImages?: (ReviewImage | null)[] | null;
 };
 
 export type ReviewDisplayImage = {
@@ -26,17 +23,9 @@ export function getReviewDisplayImages(
   review: ProductReviewItem,
   authorName = "Customer",
 ): ReviewDisplayImage[] {
-  const raw = review.reviewImages;
-  const list: ReviewImage[] = Array.isArray(raw)
-    ? raw.filter((image): image is ReviewImage => !!image)
-    : raw &&
-        typeof raw === "object" &&
-        "nodes" in raw &&
-        Array.isArray((raw as { nodes?: unknown }).nodes)
-      ? ((raw as { nodes: (ReviewImage | null)[] }).nodes ?? []).filter(
-          (image): image is ReviewImage => !!image,
-        )
-      : [];
+  const list = (review.reviewImages ?? []).filter(
+    (image): image is ReviewImage => !!image,
+  );
 
   return list
     .filter(
@@ -130,17 +119,6 @@ function parseReviewTimestamp(date?: string | null): number {
   return Number.isNaN(timestamp) ? 0 : timestamp;
 }
 
-/** Newest-first; undated reviews keep their original relative order at the end. */
-export function sortReviewsByDateDesc(reviews: ProductReviewItem[]): ProductReviewItem[] {
-  return [...reviews]
-    .map((review, index) => ({ review, index }))
-    .sort((a, b) => {
-      const dateDiff = parseReviewTimestamp(b.review.date) - parseReviewTimestamp(a.review.date);
-      return dateDiff !== 0 ? dateDiff : a.index - b.index;
-    })
-    .map(({ review }) => review);
-}
-
 export function reviewHasImages(review: ProductReviewItem): boolean {
   return getReviewDisplayImages(review).length > 0;
 }
@@ -159,16 +137,6 @@ export function sortReviewsImageFirst(reviews: ProductReviewItem[]): ProductRevi
       return dateDiff !== 0 ? dateDiff : a.index - b.index;
     })
     .map(({ review }) => review);
-}
-
-/** First review with visible text, preferring the newest. */
-export function getFeaturedReview(reviews: ProductReviewItem[]): ProductReviewItem | null {
-  const sorted = sortReviewsByDateDesc(reviews);
-  return (
-    sorted.find((review) => !!review.content && stripReviewHtml(review.content)) ??
-    sorted[0] ??
-    null
-  );
 }
 
 export function formatReviewDate(date: string): string {

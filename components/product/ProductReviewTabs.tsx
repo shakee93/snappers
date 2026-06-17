@@ -80,12 +80,7 @@ const ProductReviewTabs = ({
   }, [activeTab]);
 
   const approvedReviews = useMemo(
-    () =>
-      sortReviewsImageFirst(
-        (reviews ?? []).filter(
-          (review): review is ProductReviewItem => !!review?.databaseId,
-        ),
-      ),
+    () => sortReviewsImageFirst(reviews ?? []),
     [reviews],
   );
 
