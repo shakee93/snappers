@@ -12,6 +12,12 @@ import { useParams } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import { Transition } from "@headlessui/react";
 import { UiState } from "instantsearch.js";
+import {
+  filterLinkClassName,
+  filterPanelClassName,
+  filterPanelToggleClassName,
+  filterCheckboxLabelClassName,
+} from "@/components/global/primitives/Filters/filterStyles";
 
 interface BrandFilterProps {
   brands: Brand[];
@@ -176,12 +182,12 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
   }, [facetedBrands]);
 
   return (
-    <div className="overflow-hidden rounded-xl w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
+    <div className={filterPanelClassName}>
       <div className="relative flex flex-col w-full px-4 py-3 space-y-3">
 
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="font-medium flex gap-2 items-center justify-between w-full text-left hover:opacity-80 transition-opacity text-sm"
+          className={filterPanelToggleClassName}
         >
           <span>Brands</span>
           <ChevronDown
@@ -202,6 +208,7 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
             <Checkbox
               name="All Brands"
               label={`All Brands (${totalCount})`}
+              labelClassName={filterCheckboxLabelClassName}
               defaultChecked={brandsState.length === 0}
               onChange={(checked) => handleChange(checked, 0)}
             />
@@ -217,6 +224,7 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
                         name={item.slug || ""}
                         //label={`${item.name} (${item.count})`}
                         label={`${item.name} (${firstFacets.find(f => item.databaseId === Number(f.value))?.count || 0})`}
+                        labelClassName={filterCheckboxLabelClassName}
                         defaultChecked={brandsState.includes(item.databaseId)}
                         onChange={(checked) =>
                           handleChange(checked, item.databaseId)
@@ -229,13 +237,13 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
                 {facetedBrands.length > 10 && !showAllBrands && (
                   <>
                     {/* Gradient overlay */}
-                    <div className="absolute bottom-8 left-0 right-0 h-6 bg-gradient-to-t from-white dark:from-neutral-900 to-transparent pointer-events-none z-10" />
+                    <div className="absolute bottom-8 left-0 right-0 h-6 bg-gradient-to-t from-header-cream/30 to-transparent pointer-events-none z-10" />
 
                     {/* Show More button */}
                     <div className="mt-2 text-center relative z-20">
                       <button
                         onClick={() => setShowAllBrands(true)}
-                        className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+                        className={filterLinkClassName}
                       >
                         Show More ({facetedBrands.length - 10} more)
                       </button>
@@ -247,7 +255,7 @@ const BrandFilter = ({ brands }: BrandFilterProps) => {
                   <div className="mt-2 text-center">
                     <button
                       onClick={() => setShowAllBrands(false)}
-                      className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+                      className={filterLinkClassName}
                     >
                       Show Less
                     </button>

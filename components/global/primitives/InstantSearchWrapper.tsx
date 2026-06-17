@@ -155,6 +155,7 @@ const InstantSearchWrapperInner = ({
   // pagination.
   const defaultSort = defaultNewest ? SORT_NEWEST_ID : "";
   const resetSearchQuery = search || bindToStore;
+  const useHorizontalArchiveFilters = filters && !search;
   const [differedSidebar] = useDebounce(sidebar, 800);
   const [hitsPerPage, setHitsPerPage] = useState<number>(12);
   // useSearchParams here triggers BAILOUT_TO_CLIENT_SIDE_RENDERING for the
@@ -614,7 +615,6 @@ const InstantSearchWrapperInner = ({
                   categories={categories}
                   subCategories={subCategories}
                   brands={brands}
-                  sort={sort}
                   dealsType={dealsType}
                   inStockOnly={inStockOnly}
                   defaultSort={defaultSort}

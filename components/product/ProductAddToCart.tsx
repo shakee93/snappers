@@ -444,6 +444,11 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
                   )}
                 </button>
 
+                <WishlistButton
+                  productId={product.databaseId}
+                  className={`${cardControlClass} w-11 shrink-0`}
+                />
+
                 <div className="flex h-11 shrink-0 items-stretch overflow-hidden rounded-lg border border-[#E8E8E8] bg-white p-1">
                     <div className="flex min-w-[108px] flex-1 items-center justify-evenly rounded-md bg-[#F3F4F6] px-2">
                       <a
@@ -492,21 +497,22 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
                       )}
                     </button>
                   </div>
-
-                  <WishlistButton
-                    productId={product.databaseId}
-                    className={`${cardControlClass} w-11 shrink-0`}
-                  />
                 </div>
             ) : (
-              <button
-                type="button"
-                disabled={isNotifyClicked}
-                onClick={handleNotifyClick}
-                className={`${cardControlClass} h-12 w-full px-4 text-sm font-bold text-[#38461F] disabled:cursor-not-allowed disabled:opacity-50`}
-              >
-                Notify Me
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  disabled={isNotifyClicked}
+                  onClick={handleNotifyClick}
+                  className={`${cardControlClass} h-12 min-w-0 flex-1 px-4 text-sm font-bold text-[#38461F] disabled:cursor-not-allowed disabled:opacity-50`}
+                >
+                  Notify Me
+                </button>
+                <WishlistButton
+                  productId={product.databaseId}
+                  className={`${cardControlClass} h-12 w-11 shrink-0`}
+                />
+              </div>
             )}
           </div>
         )}

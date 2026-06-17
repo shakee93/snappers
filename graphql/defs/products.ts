@@ -526,6 +526,35 @@ export const GET_PRODUCTS_NODES = gql`
   ${ProductContentCard}
 `;
 
+export const GET_ARCHIVE_PRODUCTS = gql`
+  query GetArchiveProducts(
+    $first: Int = 45
+    $categoryIdIn: [Int]
+    $stockStatus: [StockStatusEnum]
+    $onSale: Boolean
+    $minPrice: Float
+    $maxPrice: Float
+    $orderby: ProductsOrderByInput = { field: DATE, order: DESC }
+  ) {
+    products(
+      first: $first
+      where: {
+        categoryIdIn: $categoryIdIn
+        stockStatus: $stockStatus
+        onSale: $onSale
+        minPrice: $minPrice
+        maxPrice: $maxPrice
+        orderby: $orderby
+      }
+    ) {
+      nodes {
+        ...ProductContentCard
+      }
+    }
+  }
+  ${ProductContentCard}
+`;
+
 /** Homepage browse grid — matches category archive (includes out-of-stock). */
 export const GET_BROWSE_SECTION_PRODUCTS = gql`
   query GetBrowseSectionProducts(

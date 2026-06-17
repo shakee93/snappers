@@ -13,6 +13,12 @@ import { useParams } from "next/navigation";
 import { ChevronDown } from "lucide-react";
 import { InstantSearchNextProps } from "react-instantsearch-nextjs";
 import { UiState } from "instantsearch.js";
+import {
+  filterLinkClassName,
+  filterPanelClassName,
+  filterPanelToggleClassName,
+  filterCheckboxLabelClassName,
+} from "@/components/global/primitives/Filters/filterStyles";
 
 interface CategoryFilterProps {
     categories: ProductCategory[]
@@ -123,11 +129,11 @@ const CategoryFilter = ({ categories }: CategoryFilterProps) => {
     }, [firstCategoryFacets]);
 
     return (
-        <div className="overflow-hidden relative w-full z-10 rounded-xl bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700">
+        <div className={filterPanelClassName}>
             <div className="relative flex flex-col px-4 py-3 w-full space-y-3">
                 <button
                     onClick={() => setIsCollapsed(!isCollapsed)}
-                    className="font-medium flex gap-2 items-center justify-between w-full text-left hover:opacity-80 transition-opacity text-sm"
+                    className={filterPanelToggleClassName}
                 >
                     <span>Categories</span>
                     <ChevronDown
@@ -148,6 +154,7 @@ const CategoryFilter = ({ categories }: CategoryFilterProps) => {
                         <Checkbox
                             name="All Categories"
                             label={`All Categories (${totalCount})`}
+                            labelClassName={filterCheckboxLabelClassName}
                             defaultChecked={catState.length === 0}
                             onChange={(checked) =>
                                 handleChangeCategories(checked, 0)
@@ -164,6 +171,7 @@ const CategoryFilter = ({ categories }: CategoryFilterProps) => {
                                             <Checkbox
                                                 name={item.slug || ''}
                                                 label={`${item.name} (${firstCategoryFacets.find(f => item.databaseId === Number(f.value))?.count || 0})`}
+                                                labelClassName={filterCheckboxLabelClassName}
                                                 defaultChecked={catState.includes(item.databaseId)}
                                                 onChange={(checked) =>
                                                     handleChangeCategories(checked, item.databaseId)
@@ -176,13 +184,13 @@ const CategoryFilter = ({ categories }: CategoryFilterProps) => {
                                 {facetedCategories.length > 10 && !showAllCategories && (
                                     <>
                                         {/* Gradient overlay */}
-                                        <div className="absolute bottom-8 left-0 right-0 h-6 bg-gradient-to-t from-white dark:from-neutral-900 to-transparent pointer-events-none z-10" />
+                                        <div className="absolute bottom-8 left-0 right-0 h-6 bg-gradient-to-t from-header-cream/30 to-transparent pointer-events-none z-10" />
 
                                         {/* Show More button */}
                                         <div className="mt-2 text-center relative z-20">
                                             <button
                                                 onClick={() => setShowAllCategories(true)}
-                                                className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+                                                className={filterLinkClassName}
                                             >
                                                 Show More ({facetedCategories.length - 10} more)
                                             </button>
@@ -194,7 +202,7 @@ const CategoryFilter = ({ categories }: CategoryFilterProps) => {
                                     <div className="mt-2 text-center">
                                         <button
                                             onClick={() => setShowAllCategories(false)}
-                                            className="text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium"
+                                            className={filterLinkClassName}
                                         >
                                             Show Less
                                         </button>

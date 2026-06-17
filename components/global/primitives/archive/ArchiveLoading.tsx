@@ -29,7 +29,7 @@ const ArchiveLoading = () => {
                         <div className="h-10 bg-gray-300 rounded-full w-32 animate-pulse"></div>
                     </div>
                 </div>
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-x-2 gap-y-2 lg:gap-x-8 lg:gap-y-10">
+                <div className="grid grid-cols-2 lg:grid-cols-3 gap-x-2 gap-y-2 lg:gap-x-8 lg:gap-y-10">
 
                     {Array(grid).fill(null).map((x, index) =>
                         <ProductCardLoading key={index}/>
