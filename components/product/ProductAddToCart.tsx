@@ -1,8 +1,8 @@
 "use client";
-import { Check, Heart, Loader, Minus, Plus } from "lucide-react";
+import { Check, Loader, Minus, Plus } from "lucide-react";
 import Image from "next/image";
-import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
+import WishlistButton from "@/components/product/WishlistButton";
 import {
   ProductVariation,
   SimpleProduct,
@@ -493,13 +493,10 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
                     </button>
                   </div>
 
-                  <Link
-                    href="/account/save-lists"
+                  <WishlistButton
+                    productId={variation?.databaseId ?? product.databaseId}
                     className={`${cardControlClass} w-11 shrink-0`}
-                    aria-label="Save to wishlist"
-                  >
-                    <Heart className="h-5 w-5 text-[#374151]" />
-                  </Link>
+                  />
                 </div>
             ) : (
               <button

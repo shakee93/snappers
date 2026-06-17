@@ -6,6 +6,7 @@ import localFont from "next/font/local";
 import ApolloWrapper from "@/graphql/apollo-client";
 import { SessionProvider } from "@/context/SessionProvider";
 import { CartProvider } from "@/context/CartProvider";
+import { WishlistProvider } from "@/context/WishlistProvider";
 import { Toaster } from "sonner";
 import { Suspense } from "react";
 import { NavigationEvents } from "@/components/global/layout/NavigationEvents";
@@ -125,16 +126,18 @@ export default async function RootLayout({
         <ApolloWrapper>
           <CartProvider>
             <SessionProvider>
-              <Suspense fallback={null}>
-                <NavigationEvents />
-              </Suspense>
-              <Suspense fallback={null}>
-                <GoogleAnalytics />
-              </Suspense>
+              <WishlistProvider>
+                <Suspense fallback={null}>
+                  <NavigationEvents />
+                </Suspense>
+                <Suspense fallback={null}>
+                  <GoogleAnalytics />
+                </Suspense>
 
-              <ContentWrapper>{children}</ContentWrapper>
-              <WhatsappLogoComponent />
-              <Toaster />
+                <ContentWrapper>{children}</ContentWrapper>
+                <WhatsappLogoComponent />
+                <Toaster />
+              </WishlistProvider>
             </SessionProvider>
           </CartProvider>
         </ApolloWrapper>

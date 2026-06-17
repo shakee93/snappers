@@ -122,6 +122,21 @@ export const GET_PRODUCTS_BY_DATABASE_IDS = gql`
   }
 `;
 
+// Full listing-card data for the account wishlist page. Reuses ProductContentCard
+// (the same fragment the homepage/archive cards render) so ProductCard works
+// as-is. WooGraphQL doesn't preserve `include` order, so the page re-sorts the
+// nodes to match the wishlist's newest-first id order.
+export const GET_WISHLIST_PRODUCTS = gql`
+  ${ProductContentCard}
+  query GetWishlistProducts($ids: [Int]) {
+    products(first: 100, where: { include: $ids }) {
+      nodes {
+        ...ProductContentCard
+      }
+    }
+  }
+`;
+
 export const GET_PRODUCT_BY_DATABASE_ID = gql`
   query GetProductByDatabaseId($id: ID!) {
     product(id: $id, idType: DATABASE_ID) {

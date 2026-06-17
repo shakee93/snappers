@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import koko from "@/public/koko.png";
 import { useCart } from "@/context/CartProvider";
 import useProductLink from "@/hooks/useProductLink";
+import WishlistButton from "@/components/product/WishlistButton";
 import { getDatabaseIdFromProductLike } from "@/lib/bogo";
 import { resolveProductImageUrl } from "@/lib/productImage";
 import { parsePriceString, resolveProductSale } from "@/lib/productSale";
@@ -174,8 +175,15 @@ const ProductCard = ({
 
   return (
     <div
-      className={`flex h-full flex-col overflow-hidden rounded-xl border border-neutral-200 bg-white ${className}`}
+      className={`relative flex h-full flex-col overflow-hidden rounded-xl border border-neutral-200 bg-white ${className}`}
     >
+      {/* Kept outside the image Link — a button must not nest inside an anchor. */}
+      <WishlistButton
+        productId={productDbId}
+        size={18}
+        className="absolute right-2 top-2 z-20 h-8 w-8 rounded-full bg-white/90 shadow-sm hover:bg-white"
+      />
+
       <Link
         href={link || "#"}
         className="relative block aspect-square bg-[#FAFAFA]"
