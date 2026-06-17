@@ -126,6 +126,8 @@ export const GET_PRODUCTS_BY_DATABASE_IDS = gql`
 // (the same fragment the homepage/archive cards render) so ProductCard works
 // as-is. WooGraphQL doesn't preserve `include` order, so the page re-sorts the
 // nodes to match the wishlist's newest-first id order.
+// `first: 100` caps the page at 100 saved products — fine for launch; revisit
+// with pagination if wishlists are expected to grow larger.
 export const GET_WISHLIST_PRODUCTS = gql`
   ${ProductContentCard}
   query GetWishlistProducts($ids: [Int]) {

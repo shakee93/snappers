@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo } from "react";
-import Link from "next/link";
 import { useLazyQuery } from "@apollo/client";
 import { useSession } from "@/context/SessionProvider";
 import { useWishlist } from "@/context/WishlistProvider";
@@ -58,7 +57,21 @@ const AccountSavelists = () => {
       );
     }
 
-    if (ids.length === 0 && ready) {
+    const skeleton = (
+      <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        {Array.from({ length: Math.min(ids.length || 3, 6) }).map((_, i) => (
+          <div
+            key={i}
+            className="aspect-[3/4] animate-pulse rounded-xl bg-neutral-200/60"
+          />
+        ))}
+      </div>
+    );
+
+    // Wishlist membership not resolved yet.
+    if (!ready) return skeleton;
+
+    if (ids.length === 0) {
       return (
         <div className="flex flex-col items-center gap-6 py-10 text-center">
           <p className="text-slate-500">
@@ -69,16 +82,18 @@ const AccountSavelists = () => {
       );
     }
 
-    const showSkeleton = (!ready || loading) && products.length === 0;
-    if (showSkeleton) {
+    // Have ids, product details still loading.
+    if (products.length === 0 && (loading || !data)) return skeleton;
+
+    // Have ids but nothing resolves — every saved product is unavailable
+    // (deleted/unpublished). Show a message rather than a blank grid.
+    if (products.length === 0) {
       return (
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: Math.min(ids.length || 3, 6) }).map((_, i) => (
-            <div
-              key={i}
-              className="aspect-[3/4] animate-pulse rounded-xl bg-neutral-200/60"
-            />
-          ))}
+        <div className="flex flex-col items-center gap-6 py-10 text-center">
+          <p className="text-slate-500">
+            None of your saved products are available right now.
+          </p>
+          <ButtonPrimary href="/">Browse products</ButtonPrimary>
         </div>
       );
     }

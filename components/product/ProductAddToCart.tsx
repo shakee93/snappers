@@ -494,7 +494,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
                   </div>
 
                   <WishlistButton
-                    productId={variation?.databaseId ?? product.databaseId}
+                    productId={product.databaseId}
                     className={`${cardControlClass} w-11 shrink-0`}
                   />
                 </div>
