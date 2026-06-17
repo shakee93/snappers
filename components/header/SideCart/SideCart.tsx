@@ -1,12 +1,13 @@
 "use client";
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/global/ui/sheet";
-import { ShoppingCart } from "lucide-react";
+import Image from "next/image";
 import { useMemo } from "react";
 import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
 import CartDropdownItem from "@/components/header/CartDropdownItem";
 import { BRAND_CTA_BUTTON_CLASS } from "@/shared/Button/ButtonBrand";
+import basketIcon from "@/public/global/basket.svg";
 
 const SIDE_CART_CHECKOUT_CLASS =
     `relative w-full h-auto flex flex-1 items-center justify-center rounded-full text-sm sm:text-base font-bold py-3 px-4 sm:py-3 sm:px-6 ${BRAND_CTA_BUTTON_CLASS}`;
@@ -26,9 +27,20 @@ export default function SideCart() {
                     aria-label="Open basket"
                     className="group relative inline-flex items-center gap-2 rounded-xl bg-header-accent px-4 py-2.5 text-neutral-900 transition-[filter] hover:brightness-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-header-accent focus-visible:ring-offset-1"
                 >
-                    <ShoppingCart className="w-[18px]" />
+                    <Image
+                        src={basketIcon}
+                        alt=""
+                        width={18}
+                        height={18}
+                        className="h-[18px] w-[18px] object-contain"
+                        aria-hidden
+                    />
                     <span className="text-sm font-semibold">Basket</span>
-                    <span className="ml-1 text-sm font-bold tabular-nums">
+                    <span
+                      className="h-4 w-px shrink-0 bg-neutral-900/25"
+                      aria-hidden
+                    />
+                    <span className="text-sm font-bold tabular-nums">
                         {cart?.contents?.itemCount ?? 0}
                     </span>
 

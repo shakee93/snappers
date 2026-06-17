@@ -25,9 +25,11 @@ const HeaderAnnouncementBar = () => {
 
   if (!message) return null;
 
+  const isKokoIcon = message.icon.includes("koko");
+
   return (
     <div className="bg-header-green text-white">
-      <div className="relative mx-auto h-9 max-w-[100vw] overflow-hidden px-4 sm:h-10">
+      <div className="relative mx-auto h-9 max-w-[100vw] overflow-hidden px-4 sm:h-10 lg:px-6">
         <AnimatePresence initial={false}>
           <motion.div
             key={activeIndex}
@@ -35,17 +37,21 @@ const HeaderAnnouncementBar = () => {
             animate={{ y: 0 }}
             exit={{ y: "-100%" }}
             transition={SLIDE_TRANSITION}
-            className="absolute inset-0 flex items-center justify-center gap-2 text-center"
+            className="absolute inset-0 flex items-center justify-center gap-2 px-4 text-center"
           >
             <Image
               src={message.icon}
               alt=""
-              width={18}
-              height={18}
+              width={isKokoIcon ? 52 : 18}
+              height={isKokoIcon ? 20 : 18}
               aria-hidden
-              className="h-[18px] w-[18px] shrink-0 object-contain"
+              className={
+                isKokoIcon
+                  ? "h-6 w-auto max-w-[72px] shrink-0 object-contain sm:h-7"
+                  : "h-[18px] w-[18px] shrink-0 object-contain"
+              }
             />
-            <span className="text-[11px] font-medium leading-tight text-white/95 sm:text-xs">
+            <span className="text-[10px] font-medium leading-tight text-white/95 lg:text-xs">
               {message.text}
             </span>
           </motion.div>

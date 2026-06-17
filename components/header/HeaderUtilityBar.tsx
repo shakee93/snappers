@@ -14,14 +14,22 @@ function isUtilityLinkActive(pathname: string, href: string): boolean {
 }
 
 /**
- * Desktop dark-green utility bar: search (left) · quick links (right).
- * Announcement messages live in `HeaderAnnouncementBar` above the cream bar.
+ * Green utility bar: mobile search · desktop search + quick links.
+ * Announcement messages live in `HeaderAnnouncementBar` above.
  */
 const HeaderUtilityBar = () => {
   const pathname = usePathname();
 
   return (
-    <div className="hidden lg:block bg-header-green">
+    <>
+      <div className="bg-header-green px-4 pb-3 lg:hidden">
+        <SearchBar
+          variant="utility"
+          placeholder="Search for brand, products or categories..."
+        />
+      </div>
+
+      <div className="hidden bg-header-green lg:block">
       <div className="flex h-[72px] w-full items-center px-6 max-w-[1368px] mx-auto">
         {/* Left: pill search */}
         <div className="min-w-0 w-full max-w-3xl">
@@ -59,6 +67,7 @@ const HeaderUtilityBar = () => {
         </nav>
       </div>
     </div>
+    </>
   );
 };
 

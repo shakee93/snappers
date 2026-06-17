@@ -1,15 +1,20 @@
 "use client";
 
-import { BadgePercent, Menu, ShoppingBasket, User } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartProvider";
 import { useSession } from "@/context/SessionProvider";
 import { siteConfig } from "@/site.config";
+import basketIcon from "@/public/global/boxicons_basket-filled.svg";
+import dealIcon from "@/public/global/deal.svg";
+import menuIcon from "@/public/global/charm_menu-hamburger.svg";
+import profileIcon from "@/public/global/profile-m.svg";
 
 const navItemClass =
     "flex flex-1 flex-col items-center justify-center gap-1 pt-2 text-white cursor-pointer";
+
+const mobileNavIconClass = "h-[22px] w-[22px] object-contain";
 
 const MobileBottomNav = () => {
     const { cart, setIsCartOpen } = useCart();
@@ -49,23 +54,51 @@ const MobileBottomNav = () => {
                             <span className="mt-[1px]">{cart.contents.itemCount}</span>
                         </div>
                     )}
-                    <ShoppingBasket strokeWidth={1.75} />
+                    <Image
+                        src={basketIcon}
+                        alt=""
+                        width={22}
+                        height={22}
+                        className={mobileNavIconClass}
+                        aria-hidden
+                    />
                 </div>
                 <span className="text-[11px]">Basket</span>
             </button>
 
             <Link href="/deals" className={navItemClass}>
-                <BadgePercent strokeWidth={1.75} />
+                <Image
+                    src={dealIcon}
+                    alt=""
+                    width={22}
+                    height={22}
+                    className={mobileNavIconClass}
+                    aria-hidden
+                />
                 <span className="text-[11px]">Deals</span>
             </Link>
 
             <button type="button" onClick={handleAccountClick} className={navItemClass}>
-                <User strokeWidth={1.75} />
+                <Image
+                    src={profileIcon}
+                    alt=""
+                    width={22}
+                    height={22}
+                    className={mobileNavIconClass}
+                    aria-hidden
+                />
                 <span className="text-[11px]">Account</span>
             </button>
 
             <Link href="/c" className={navItemClass}>
-                <Menu strokeWidth={1.75} />
+                <Image
+                    src={menuIcon}
+                    alt=""
+                    width={22}
+                    height={22}
+                    className={mobileNavIconClass}
+                    aria-hidden
+                />
                 <span className="text-[11px]">Categories</span>
             </Link>
         </div>

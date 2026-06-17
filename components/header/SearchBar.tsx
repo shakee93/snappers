@@ -166,7 +166,7 @@ const SearchBar = ({ onSearchExpand, placeholder = "Quick Search", variant = "de
                     </button>
                 )}
 
-                <div className={cn("flex-1 bg-transparent", isUtility ? "" : "text-primary-700 p-1 lg:p-0 w-1/2 lg:bg-transparent")}>
+                <div className={cn("flex-1 bg-transparent", isUtility ? "" : "p-1 text-neutral-700 lg:p-0 w-1/2 lg:bg-transparent")}>
                     <div className={cn(
                         "flex items-center rounded-full",
                         isUtility
@@ -183,18 +183,25 @@ const SearchBar = ({ onSearchExpand, placeholder = "Quick Search", variant = "de
                             placeholder={placeholder}
                             className={cn(
                                 "border-none focus:border-none focus:outline-none focus:ring-0 bg-transparent w-full text-sm",
-                                isUtility ? "text-neutral-700 placeholder:text-neutral-400" : "text-primaryColor/80 text-base"
+                                isUtility
+                                    ? "text-neutral-700 placeholder:text-neutral-400"
+                                    : "text-neutral-700 placeholder:text-neutral-400 text-base"
                             )}
                             suppressHydrationWarning
                         />
                         {(search_status === 'stalled' || search_status === 'loading') ? (
-                            <Loader className={cn("animate-spin w-5 h-5 lg:w-auto lg:h-auto", isUtility ? "text-neutral-400" : "text-primaryColor")} />
+                            <Loader className="h-5 w-5 shrink-0 animate-spin text-neutral-400 lg:h-auto lg:w-auto" />
                         ) : search.length > 0 ? (
                             <button onClick={handleSearchClear} className={mounted ? '' : 'opacity-0'}>
-                                <XIcon className={cn("w-5 h-5 lg:w-auto lg:h-auto", isUtility ? "text-neutral-500" : "text-primaryColor")} />
+                                <XIcon className="h-5 w-5 shrink-0 text-neutral-500 lg:h-auto lg:w-auto" />
                             </button>
                         ) : (
-                            <Search className={cn("w-5 h-5 lg:w-auto lg:h-auto", isUtility ? "text-neutral-400" : "text-primaryColor/80 mr-4")} />
+                            <Search
+                                className={cn(
+                                    "h-5 w-5 shrink-0 lg:h-auto lg:w-auto",
+                                    isUtility ? "text-neutral-400" : "text-neutral-900 lg:mr-4",
+                                )}
+                            />
                         )}
                     </div>
                 </div>
