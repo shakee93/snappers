@@ -2,13 +2,12 @@ import Image from "next/image";
 import type { StaticImageData } from "next/image";
 import koko from "@/public/koko.png";
 import amex from "@/public/product/amex.png";
-import bankTransfer from "@/public/product/bank-trasnfer 1.png";
-import cashPrice from "@/public/product/cash-price-2 1.png";
-import visaMastercard from "@/public/product/visa-mastercard-1 1.png";
+import bankTransfer from "@/public/product/bank-transfer.png";
+import cashPrice from "@/public/product/cash-price.png";
+import visaMastercard from "@/public/product/visa-mastercard.png";
 import { formatPrice } from "@/lib/formatPrice";
 
 interface ProductPaymentOptionsProps {
-  priceHtml: string;
   numericPrice: number;
 }
 
@@ -46,6 +45,7 @@ const ProductPaymentOptions = ({
 }: ProductPaymentOptionsProps) => {
   const kokoInstallment =
     numericPrice > 0 ? ((numericPrice / 88) * 100) / 3 : 0;
+  const mintpayInstallment = numericPrice > 0 ? numericPrice / 3 : 0;
   const formattedPrice = numericPrice > 0 ? formatPrice(numericPrice) : "—";
 
   return (
@@ -99,7 +99,7 @@ const ProductPaymentOptions = ({
               <div className="min-w-0 flex-1">
                 <p className="text-xs text-[#9CA3AF]">Buy Now Pay Later</p>
                 <p className="text-sm font-bold text-[#38461F]">
-                  {formatPrice(numericPrice)}
+                  3 x {formatPrice(mintpayInstallment)}
                 </p>
               </div>
             </div>

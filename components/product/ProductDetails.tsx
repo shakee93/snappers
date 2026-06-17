@@ -479,7 +479,7 @@ const ProductDetails = ({
                   return (
                     <Link
                       href={getCategoryPath(node?.slug ?? "")}
-                      key={index}
+                      key={node?.slug ?? index}
                       className="rounded-full border border-[#D1D5DB] px-3 py-1 text-xs font-medium text-[#374151] hover:border-[#38461F]"
                     >
                       {node?.name}
@@ -637,10 +637,7 @@ const ProductDetails = ({
       <ProductTrustBadges />
 
       {displayNumericPrice > 0 && (
-        <ProductPaymentOptions
-          priceHtml={displayPriceHtml}
-          numericPrice={displayNumericPrice}
-        />
+        <ProductPaymentOptions numericPrice={displayNumericPrice} />
       )}
 
       <ProductPurchaseAccordions product={product} />

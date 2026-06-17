@@ -9,7 +9,7 @@ import {
   VariableProduct,
   ProductTag,
 } from "@/graphql/types/graphql";
-import React, { useCallback, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
 import { useRouter } from "next/navigation";
@@ -35,6 +35,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   const { customer } = useSession();
   const [isNotifyClicked, setIsNotifyClicked] = useState(false);
   const [linkCopied, setLinkCopied] = useState(false);
+  const copyResetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [userEmail, setUserEmail] = useState(customer?.email || ""); // Track user's email
   const [isThankYouModal, setIsThankYouModal] = useState(false); // Track thank you modal visibility
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -373,8 +374,24 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
 
     setLinkCopied(true);
     toast.success("Link copied!");
-    setTimeout(() => setLinkCopied(false), 2000);
+
+    if (copyResetTimeoutRef.current) {
+      clearTimeout(copyResetTimeoutRef.current);
+    }
+
+    copyResetTimeoutRef.current = setTimeout(() => {
+      setLinkCopied(false);
+      copyResetTimeoutRef.current = null;
+    }, 2000);
   }, [productUrl, writeToClipboard]);
+
+  useEffect(() => {
+    return () => {
+      if (copyResetTimeoutRef.current) {
+        clearTimeout(copyResetTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="w-full">
