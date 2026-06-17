@@ -158,7 +158,7 @@ const ProductReviewsSection = ({
         throw new Error("Failed to submit review.");
       }
 
-      const commentId = data?.writeReview?.comment?.databaseId;
+      const commentId = data?.writeReview?.review?.databaseId;
       if (commentId && uploaded.length) {
         await attachReviewMedia(commentId, uploaded);
       }
