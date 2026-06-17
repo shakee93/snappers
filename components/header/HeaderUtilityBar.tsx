@@ -24,7 +24,6 @@ const HeaderUtilityBar = () => {
     <>
       <div className="bg-header-green px-4 pb-3 lg:hidden">
         <SearchBar
-          variant="utility"
           placeholder="Search for brand, products or categories..."
         />
       </div>
@@ -34,7 +33,6 @@ const HeaderUtilityBar = () => {
         {/* Left: pill search */}
         <div className="min-w-0 w-full max-w-3xl">
           <SearchBar
-            variant="utility"
             placeholder="Search for brand, products or categories..."
           />
         </div>

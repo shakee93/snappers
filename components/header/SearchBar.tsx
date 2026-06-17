@@ -1,26 +1,21 @@
 'use client'
-import { ChevronLeft, Loader, Search, XIcon } from "lucide-react";
-import HeaderSearchResults from "@/components/header/HeaderSearchResults";
-import { Brand, ProductCategory } from "@/graphql/types/graphql";
+import { Loader, Search, XIcon } from "lucide-react";
 import { useStore } from "@/store/store";
 import { useRouter } from "next/navigation";
-import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { cn } from "@/lib/utils";
 import { PRICE_RANGE } from "@/components/global/primitives/Filters/PriceFilter";
 
 interface SearchBarProps {
     onSearchExpand?: (expanded: boolean) => void;
     placeholder?: string;
-    /** "utility" renders the solid-white pill used in the green header bar. */
-    variant?: "default" | "utility";
 }
 
-const SearchBar = ({ onSearchExpand, placeholder = "Quick Search", variant = "default" }: SearchBarProps) => {
-    const isUtility = variant === "utility";
-    const { search, setSearch, search_status, syncCategories, syncBrands, synPriceRange, syncOnSale, setInStock, setSort, clearVariations, searchMounted } = useStore();
+const SearchBar = ({
+    onSearchExpand,
+    placeholder = "Search for brand, products or categories...",
+}: SearchBarProps) => {
+    const { search, setSearch, search_status, syncCategories, syncBrands, synPriceRange, syncOnSale, setInStock, setSort, clearVariations } = useStore();
     const router = useRouter();
-    const path = usePathname();
     const [searchValue, setSearchValue] = useState('');
     // Tracks the last value the user typed locally. Used to ignore the
     // store→input mirror effect while typing — otherwise rapid deletion races
@@ -30,36 +25,10 @@ const SearchBar = ({ onSearchExpand, placeholder = "Quick Search", variant = "de
     const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
     const [mounted, setMounted] = useState(false);
-    const [isFocused, setIsFocused] = useState(false);
-    const [scrollHeight, setScrollHeight] = useState(0);
 
-    useEffect(() => {
-        const handleScroll = () => {
-            setScrollHeight(window.scrollY);
-        };
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
-
-    // Handle hydration
     useEffect(() => {
         setMounted(true);
     }, []);
-
-    // Handle initial load and subsequent URL changes
-    // useEffect(() => {
-    //     if (!mounted) return; // Don't run until component is mounted
-
-    //     const query = searchParams.get('q');
-
-    //     if ((query && !isInitialized) || isInitialized) {
-    //         // setSearch(query ? decodeURIComponent(query) : '');
-    //     }
-
-    //     if (!isInitialized) {
-    //         setIsInitialized(true);
-    //     }
-    // }, [searchParams, setSearch, isInitialized, mounted]);
 
     const handleSearchClear = () => {
         // Cancel any pending typed-debounce so it can't overwrite the clear.
@@ -145,34 +114,18 @@ const SearchBar = ({ onSearchExpand, placeholder = "Quick Search", variant = "de
     }, [search]);
 
     const handleFocus = () => {
-        setIsFocused(true);
         onSearchExpand?.(true);
     };
 
     const handleBlur = () => {
-        setIsFocused(false);
         onSearchExpand?.(false);
     };
 
     return (
-        <div className={cn("w-full", !isUtility && "pt-2 px-3 md:p-0")}>
-            <div className={cn("flex-1 transition-all duration-200 flex items-center gap-1 mx-auto", isUtility ? "w-full" : (isFocused || scrollHeight < 100) ? "w-full" : "md:w-full w-1/2")}>
-                {path !== '/' && (
-                    <button
-                        onClick={() => router.back()}
-                        className=" hidden w-10 h-10  items-center justify-center"
-                    >
-                        <ChevronLeft className="text-white w-8" />
-                    </button>
-                )}
-
-                <div className={cn("flex-1 bg-transparent", isUtility ? "" : "p-1 text-neutral-700 lg:p-0 w-1/2 lg:bg-transparent")}>
-                    <div className={cn(
-                        "flex items-center rounded-full",
-                        isUtility
-                            ? "bg-white h-11 w-full px-5 shadow-sm"
-                            : "bg-white/60 backdrop-blur-sm border lg:border border-primaryColor/20 py-1 md:py-1 space-x-0 lg:space-x-1.5 px-2 pr-3 xl:px-5 lg:rounded-[25px] h-10 lg:h-full"
-                    )}>
+        <div className="w-full">
+            <div className="mx-auto flex w-full flex-1 items-center gap-1">
+                <div className="flex-1 bg-transparent">
+                    <div className="flex h-11 w-full items-center rounded-full bg-white px-5 shadow-sm">
                         <input
                             value={mounted ? searchValue : ''}
                             onChange={handleSearchChange}
@@ -181,33 +134,22 @@ const SearchBar = ({ onSearchExpand, placeholder = "Quick Search", variant = "de
                             onBlur={handleBlur}
                             type="text"
                             placeholder={placeholder}
-                            className={cn(
-                                "border-none focus:border-none focus:outline-none focus:ring-0 bg-transparent w-full text-sm",
-                                isUtility
-                                    ? "text-neutral-700 placeholder:text-neutral-400"
-                                    : "text-neutral-700 placeholder:text-neutral-400 text-base"
-                            )}
+                            className="w-full border-none bg-transparent text-sm text-neutral-700 placeholder:text-neutral-400 focus:border-none focus:outline-none focus:ring-0"
                             suppressHydrationWarning
                         />
                         {(search_status === 'stalled' || search_status === 'loading') ? (
-                            <Loader className="h-5 w-5 shrink-0 animate-spin text-neutral-400 lg:h-auto lg:w-auto" />
+                            <Loader className="h-5 w-5 shrink-0 animate-spin text-neutral-400" />
                         ) : search.length > 0 ? (
-                            <button onClick={handleSearchClear} className={mounted ? '' : 'opacity-0'}>
-                                <XIcon className="h-5 w-5 shrink-0 text-neutral-500 lg:h-auto lg:w-auto" />
+                            <button type="button" onClick={handleSearchClear} className={mounted ? '' : 'opacity-0'} aria-label="Clear search">
+                                <XIcon className="h-5 w-5 shrink-0 text-neutral-500" />
                             </button>
                         ) : (
-                            <Search
-                                className={cn(
-                                    "h-5 w-5 shrink-0 lg:h-auto lg:w-auto",
-                                    isUtility ? "text-neutral-400" : "text-neutral-900 lg:mr-4",
-                                )}
-                            />
+                            <Search className="h-5 w-5 shrink-0 text-neutral-400" aria-hidden />
                         )}
                     </div>
                 </div>
             </div>
         </div>
-
     );
 };
 

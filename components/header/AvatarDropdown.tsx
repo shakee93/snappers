@@ -60,7 +60,8 @@ export default function AvatarDropdown() {
         {({ open, close }) => (
           <>
             <Popover.Button
-              className={``}
+              className=""
+              aria-label="Account"
               onClick={() => {
                 fetchCustomer();
                 setIsOpen(!isOpen);
