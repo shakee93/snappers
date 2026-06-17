@@ -14,8 +14,13 @@ const AccountSavelists = () => {
   const { ids, ready } = useWishlist();
   const isLoggedIn = !!customer && customer.id !== "guest";
 
+  // no-cache (not cache-and-network): the browser InMemoryCache has no
+  // possibleTypes map, so normalizing drops the `... on SimpleProduct` /
+  // `... on VariableProduct` fields from ProductContentCard, leaving cards with
+  // no price/stock. no-cache returns the raw response with all fields intact —
+  // same reason the SSR client pins no-cache.
   const [fetchProducts, { data, loading }] = useLazyQuery(GET_WISHLIST_PRODUCTS, {
-    fetchPolicy: "cache-and-network",
+    fetchPolicy: "no-cache",
   });
 
   // Re-fetch product details whenever the set of wishlist ids changes.
