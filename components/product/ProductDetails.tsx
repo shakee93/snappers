@@ -21,8 +21,9 @@ import ProductTrustBadges from "@/components/product/ProductTrustBadges";
 import ProductPaymentOptions from "@/components/product/ProductPaymentOptions";
 import ProductPurchaseAccordions from "@/components/product/ProductPurchaseAccordions";
 import BrandLogo from "@/components/product/BrandLogo";
-import ProductReviewsSection from "@/components/product/ProductReviewsSection";
-import { type ProductReviewItem } from "@/lib/productReviews";
+import {
+  stripReviewHtml,
+} from "@/lib/productReviews";
 import { useUnresolvedFreeGifts } from "@/hooks/useUnresolvedFreeGifts";
 import { usePriceFluctuationNotice } from "@/hooks/usePriceFluctuationNotice";
 import { useFreeGiftProducts } from "@/hooks/useFreeGiftProducts";
@@ -429,6 +430,12 @@ const ProductDetails = ({
     return (simpleStockStatus ?? product.stockStatus) === "IN_STOCK";
   }, [product, displayVariation, resolveVariationStockStatus, simpleStockStatus]);
 
+  const shortDescriptionText = useMemo(() => {
+    if (!product.shortDescription) return "";
+    const text = stripReviewHtml(product.shortDescription);
+    return text.trim();
+  }, [product.shortDescription]);
+
   return (
     <div className="flex flex-col gap-5 pb-24 lg:gap-0 lg:pb-0">
       {isPriceFluctuation && (
@@ -447,6 +454,10 @@ const ProductDetails = ({
         <h1 className="text-[26px] font-bold leading-snug text-[#38461F] sm:text-[28px]">
           {product.name}
         </h1>
+
+        {shortDescriptionText && (
+          <p className="text-sm leading-relaxed text-[#1A1A1A]">{shortDescriptionText}</p>
+        )}
 
         <ProductStarRating
           averageRating={
@@ -612,18 +623,6 @@ const ProductDetails = ({
       )}
 
       <ProductPurchaseAccordions product={product} />
-
-      <ProductReviewsSection
-        productDatabaseId={product.databaseId}
-        reviews={
-          (product as { reviews?: { nodes?: ProductReviewItem[] | null } | null })
-            .reviews?.nodes
-        }
-        averageRating={
-          (product as SimpleProduct & { averageRating?: number | null }).averageRating
-        }
-        reviewCount={product.reviewCount}
-      />
 
       {product.productCategories?.edges && product.productCategories.edges.length > 0 && (
         <div className="flex flex-wrap items-center gap-2 border-t border-[#E8E8E8] pt-4 text-sm text-[#6B7280]">

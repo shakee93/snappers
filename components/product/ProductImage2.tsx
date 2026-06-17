@@ -4,6 +4,8 @@ import { useImage } from "@/context/ImageChangeGrabber";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import { getPreferredVariation } from "@/lib/getPreferredVariation";
 import { getProductVideoUrl, type ProductVideoSource } from "@/lib/productVideo";
+import { flattenProductReviews } from "@/lib/productReviews";
+import ProductReviewTabs from "@/components/product/ProductReviewTabs";
 import { siteConfig } from "@/site.config";
 import {
   CoreVariationThumb,
@@ -13,7 +15,7 @@ import { EmblaOptionsType } from "embla-carousel";
 import useEmblaCarousel from "embla-carousel-react";
 import { ChevronLeft, ChevronRight, Expand, PlayIcon } from "lucide-react";
 import Image from "next/image";
-import React, { useCallback, useEffect, useState, useRef } from "react";
+import React, { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import dynamic from "next/dynamic";
 
 const ProductLightbox = dynamic(() => import("./ProductLightbox"), {
@@ -146,6 +148,14 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
 
   const productVideoUrl = getProductVideoUrl(product);
   const hasValidVideo = isValidVideoUrl(productVideoUrl);
+
+  const productReviews = useMemo(
+    () =>
+      flattenProductReviews(
+        (product as { reviews?: Parameters<typeof flattenProductReviews>[0] }).reviews,
+      ),
+    [product],
+  );
   const videoItem = hasValidVideo ? {
     sourceUrl: productVideoUrl,
     databaseId: 'video',
@@ -426,6 +436,16 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
           )}
         </div>
       )}
+
+      <ProductReviewTabs
+        productDatabaseId={product.databaseId}
+        reviews={productReviews}
+        averageRating={
+          (product as SimpleProduct & { averageRating?: number | null }).averageRating
+        }
+        reviewCount={product.reviewCount}
+        className={hasValidVideo ? "mt-4 md:mt-6" : "mt-4 border-t border-[#E8E8E8] pt-4 md:mt-8 md:pt-8"}
+      />
 
       {lightboxOpen && galleryImages && (
         <ProductLightbox

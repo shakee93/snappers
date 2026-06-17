@@ -387,19 +387,22 @@ export const ProductContentFull = gql`
       }
     }
     reviews(first: 20, where: { status: "approve" }) {
-      nodes {
-        databaseId
-        content
-        date
-        author {
-          node {
-            name
+      edges {
+        rating
+        node {
+          databaseId
+          content
+          date
+          author {
+            node {
+              name
+            }
           }
-        }
-        reviewImages {
-          sourceUrl
-          thumbnailUrl
-          isVideo
+          reviewImages {
+            sourceUrl
+            thumbnailUrl
+            isVideo
+          }
         }
       }
     }
