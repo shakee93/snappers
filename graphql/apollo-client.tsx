@@ -57,18 +57,33 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
       return await refreshAuthToken(refreshToken || undefined);
     }
 
+    // Unauthenticated entry points: these establish a session and must NOT
+    // carry a (possibly stale/expired) Bearer token. The backend now reads the
+    // Authorization header (mod_php auth-header bridge), so an invalid token on
+    // these makes login/register/refresh fail with "Internal server error".
+    const AUTH_FREE_OPERATIONS = new Set([
+      "Login",
+      "LoginCustomer",
+      "RegisterCustomer",
+      "RefreshAuthToken",
+      "SendPasswordResetEmail",
+      "ResetUserPassword",
+    ]);
+
     const authLink = new ApolloLink((operation, forward) => {
       const sessionToken = localStorage.getItem(SESSION_TOKEN_KEY);
       const authToken = localStorage.getItem(AUTH_TOKEN_KEY);
+      const skipAuth = AUTH_FREE_OPERATIONS.has(operation.operationName);
 
       operation.setContext({
         headers: {
           ...(sessionToken && {
             "woocommerce-session": `Session ${sessionToken}`,
           }),
-          ...(authToken && {
-            Authorization: `Bearer ${authToken}`,
-          }),
+          ...(authToken &&
+            !skipAuth && {
+              Authorization: `Bearer ${authToken}`,
+            }),
         },
       });
 
