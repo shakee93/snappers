@@ -396,6 +396,11 @@ export const ProductContentFull = gql`
             name
           }
         }
+        reviewImages {
+          sourceUrl
+          thumbnailUrl
+          isVideo
+        }
       }
     }
     # Upsells render through ProductCard3 (via SectionSliderProductCard), identical

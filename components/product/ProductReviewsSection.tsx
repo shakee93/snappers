@@ -1,16 +1,20 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation } from "@apollo/client";
 import { ApolloError } from "@apollo/client";
-import { Loader, Star } from "lucide-react";
+import Image from "next/image";
+import { ImagePlus, Loader, Star, X } from "lucide-react";
 import { toast } from "sonner";
 import { WRITE_PRODUCT_REVIEW } from "@/graphql/defs/reviews";
 import ProductStarRating from "@/components/product/ProductStarRating";
 import { useSession } from "@/context/SessionProvider";
 import {
   formatReviewDate,
+  REVIEW_IMAGE_MAX_BYTES,
+  REVIEW_IMAGE_MAX_FILES,
   stripReviewHtml,
+  uploadReviewImage,
   type ProductReviewItem,
 } from "@/lib/productReviews";
 import { twMerge } from "tailwind-merge";
@@ -36,9 +40,46 @@ const ProductReviewsSection = ({
   const [authorName, setAuthorName] = useState("");
   const [authorEmail, setAuthorEmail] = useState("");
   const [content, setContent] = useState("");
+  const [files, setFiles] = useState<File[]>([]);
   const [submitting, setSubmitting] = useState(false);
 
   const [writeReview] = useMutation(WRITE_PRODUCT_REVIEW);
+
+  const previews = useMemo(
+    () => files.map((file) => ({ name: file.name, url: URL.createObjectURL(file) })),
+    [files],
+  );
+
+  // Release the object URLs when the selection changes or the component unmounts.
+  useEffect(
+    () => () => previews.forEach((preview) => URL.revokeObjectURL(preview.url)),
+    [previews],
+  );
+
+  const handleFilesSelected = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = Array.from(event.target.files ?? []);
+    event.target.value = "";
+    if (!selected.length) return;
+
+    const accepted = selected.filter((file) => {
+      if (file.size > REVIEW_IMAGE_MAX_BYTES) {
+        toast.error(`${file.name} is too large (max 5 MB).`);
+        return false;
+      }
+      return true;
+    });
+
+    setFiles((prev) => {
+      if (prev.length + accepted.length > REVIEW_IMAGE_MAX_FILES) {
+        toast.error(`You can attach up to ${REVIEW_IMAGE_MAX_FILES} images.`);
+      }
+      return [...prev, ...accepted].slice(0, REVIEW_IMAGE_MAX_FILES);
+    });
+  };
+
+  const removeFile = (index: number) => {
+    setFiles((prev) => prev.filter((_, fileIndex) => fileIndex !== index));
+  };
 
   const approvedReviews = useMemo(
     () => (reviews ?? []).filter((review): review is ProductReviewItem => !!review?.databaseId),
@@ -93,6 +134,14 @@ const ProductReviewsSection = ({
     setSubmitting(true);
 
     try {
+      // Upload images first (fail fast on a bad file). The backend links them to
+      // the review on creation, keyed by the submitter's email + product id.
+      if (files.length && email) {
+        await Promise.all(
+          files.map((file) => uploadReviewImage(file, email, productDatabaseId)),
+        );
+      }
+
       const { data } = await writeReview({
         variables: {
           input: {
@@ -111,6 +160,7 @@ const ProductReviewsSection = ({
 
       setRating(0);
       setContent("");
+      setFiles([]);
       if (isGuest) {
         setAuthorName("");
         setAuthorEmail("");
@@ -147,6 +197,10 @@ const ProductReviewsSection = ({
           {approvedReviews.map((review) => {
             const body = review.content ? stripReviewHtml(review.content) : "";
             const authorName = review.author?.node?.name?.trim() || "Customer";
+            const images = (review.reviewImages ?? []).filter(
+              (image): image is NonNullable<typeof image> =>
+                !!image && !image.isVideo && !!(image.thumbnailUrl ?? image.sourceUrl),
+            );
 
             return (
               <li
@@ -166,6 +220,29 @@ const ProductReviewsSection = ({
                 </div>
                 {body && (
                   <p className="mt-2 text-sm leading-relaxed text-[#4B5563]">{body}</p>
+                )}
+                {images.length > 0 && (
+                  <ul className="mt-3 flex flex-wrap gap-2">
+                    {images.map((image, index) => (
+                      <li key={`${review.databaseId}-${index}`}>
+                        <a
+                          href={image.sourceUrl ?? "#"}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block overflow-hidden rounded-lg border border-[#E8E8E8]"
+                        >
+                          <Image
+                            src={image.thumbnailUrl ?? image.sourceUrl ?? ""}
+                            alt={`Photo from ${authorName}'s review`}
+                            width={64}
+                            height={64}
+                            loading="lazy"
+                            className="h-16 w-16 object-cover"
+                          />
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
                 )}
               </li>
             );
@@ -248,6 +325,52 @@ const ProductReviewsSection = ({
             placeholder="Share your experience with this product"
           />
         </label>
+
+        <div>
+          <p className="mb-2 text-sm font-medium text-[#374151]">
+            Add photos{" "}
+            <span className="font-normal text-[#6B7280]">
+              (optional, up to {REVIEW_IMAGE_MAX_FILES})
+            </span>
+          </p>
+          {previews.length > 0 && (
+            <ul className="mb-2 flex flex-wrap gap-2">
+              {previews.map((preview, index) => (
+                <li key={preview.url} className="relative">
+                  <Image
+                    src={preview.url}
+                    alt={preview.name}
+                    width={64}
+                    height={64}
+                    unoptimized
+                    className="h-16 w-16 rounded-lg border border-[#E8E8E8] object-cover"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => removeFile(index)}
+                    aria-label={`Remove ${preview.name}`}
+                    className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-[#1A1A1A] text-white"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+          {previews.length < REVIEW_IMAGE_MAX_FILES && (
+            <label className="inline-flex h-11 cursor-pointer items-center gap-2 rounded-full border border-dashed border-[#D1D5DB] px-4 text-sm font-medium text-[#374151] hover:border-[#38461F]">
+              <ImagePlus className="h-4 w-4" />
+              Choose images
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/gif,image/webp"
+                multiple
+                onChange={handleFilesSelected}
+                className="sr-only"
+              />
+            </label>
+          )}
+        </div>
 
         <button
           type="submit"
