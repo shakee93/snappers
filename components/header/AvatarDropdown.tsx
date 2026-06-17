@@ -1,12 +1,18 @@
 "use client";
 import { Popover, Transition } from "@headlessui/react";
-import { CircleUserRound, User, LogIn } from "lucide-react";
-import { Fragment, useEffect, useState, useRef } from "react";
+import Image from "next/image";
+import { Loader2, LogIn, User } from "lucide-react";
+import { Fragment, useEffect, useMemo, useState, useRef } from "react";
 import Link from "next/link";
 import LogoutButton from "@/components/header/LogoutButton";
 import { useSession } from "@/context/SessionProvider";
-import { LoggedInAvatar } from "@/components/global/forms/HelperComps";
-import AvatarSkeleton from "@/components/global/primitives/Skeletons/AvatarSkeleton";
+import profileIcon from "@/public/global/profile.svg";
+
+const headerAvatarButtonClass =
+  "flex h-10 w-10 items-center justify-center rounded-xl bg-header-peach text-neutral-900 transition-[filter] hover:brightness-95 focus:outline-none";
+
+const headerAvatarLoaderClass =
+  "h-[18px] w-[18px] animate-spin text-neutral-900";
 
 // Skeleton for loading
 export default function AvatarDropdown() {
@@ -15,6 +21,11 @@ export default function AvatarDropdown() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const { customer, fetchCustomer } = useSession();
+
+  const customerInitial = useMemo(() => {
+    const name = customer?.displayName?.trim();
+    return name ? name.charAt(0).toUpperCase() : "?";
+  }, [customer?.displayName]);
 
   const fetchData = async () => {
     setIsLoading(true); // Set loading state to true
@@ -49,21 +60,32 @@ export default function AvatarDropdown() {
         {({ open, close }) => (
           <>
             <Popover.Button
-              className={``}
+              className=""
+              aria-label="Account"
               onClick={() => {
                 fetchCustomer();
                 setIsOpen(!isOpen);
               }}
             >
-              <div
-                className={`text-neutral-900 w-10 h-10 rounded-xl bg-header-peach transition-[filter] hover:brightness-95 dark:text-slate-300 focus:outline-none flex items-center justify-center`}
-              >
+              <div className={headerAvatarButtonClass}>
                 {isLoading ? (
-                  <AvatarSkeleton /> // Show skeleton when loading
+                  <Loader2
+                    className={headerAvatarLoaderClass}
+                    aria-hidden
+                  />
                 ) : !customer || customer?.id === "guest" ? (
-                  <CircleUserRound />
+                  <Image
+                    src={profileIcon}
+                    alt=""
+                    width={18}
+                    height={18}
+                    className="h-[18px] w-[18px] object-contain"
+                    aria-hidden
+                  />
                 ) : (
-                  <LoggedInAvatar name={customer?.displayName?.toString()} />
+                  <span className="text-lg font-bold leading-none text-neutral-900">
+                    {customerInitial}
+                  </span>
                 )}
               </div>
             </Popover.Button>
@@ -81,7 +103,11 @@ export default function AvatarDropdown() {
                 <div className="overflow-hidden rounded-3xl shadow-lg ring-1 ring-black ring-opacity-5">
                   <div className="relative grid grid-cols-1 gap-6 bg-white dark:bg-neutral-800 py-7 px-6">
                     {isLoading ? (
-                      <AvatarSkeleton /> // Show skeleton for the menu while loading
+                      <div className="space-y-3 animate-pulse" aria-hidden>
+                        <div className="h-4 w-2/3 rounded bg-neutral-200 dark:bg-neutral-700" />
+                        <div className="h-4 w-full rounded bg-neutral-200 dark:bg-neutral-700" />
+                        <div className="h-4 w-4/5 rounded bg-neutral-200 dark:bg-neutral-700" />
+                      </div>
                     ) : !customer || customer.id === "guest" ? (
                       <>
                         <Link

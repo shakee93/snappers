@@ -1,12 +1,13 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
-import { Heart, Truck } from "lucide-react";
 import { ProductCategory } from "@/graphql/types/graphql";
+import heartIcon from "@/public/global/heart.svg";
+import truckIcon from "@/public/global/truck.svg";
 import AvatarDropdown from "./AvatarDropdown";
 import Logo from "./Logo";
 import NavLinks from "./NavLinks";
-import SearchBar from "./SearchBar";
 import SideCart from "./SideCart/SideCart";
 
 interface HeaderContentProps {
@@ -16,16 +17,11 @@ interface HeaderContentProps {
 const iconButtonClass =
   "flex h-10 w-10 items-center justify-center rounded-xl bg-header-peach text-neutral-900 transition-[filter] hover:brightness-95";
 
+const headerIconClass = "h-[18px] w-[18px] object-contain";
+
 const HeaderContent = ({ navCategories }: HeaderContentProps) => {
   return (
-    <>
-      {/* Mobile: search only — desktop nav/search live in the bars below */}
-      <div className="lg:hidden gap-2 flex-1 justify-center items-center">
-        <SearchBar />
-      </div>
-
-      {/* Desktop cream top bar: logo · nav · account + basket */}
-      <div className="hidden lg:block bg-header-cream">
+    <div className="hidden lg:block bg-header-cream">
         <div className="grid h-[86px] w-full grid-cols-[1fr_auto_1fr] items-center gap-6 px-6 max-w-[1368px] mx-auto">
           {/* Left: Logo */}
           <div className="flex min-w-0 items-center justify-start">
@@ -44,21 +40,34 @@ const HeaderContent = ({ navCategories }: HeaderContentProps) => {
               aria-label="Saved items"
               className={iconButtonClass}
             >
-              <Heart className="w-[18px]" />
+              <Image
+                src={heartIcon}
+                alt=""
+                width={18}
+                height={18}
+                className={headerIconClass}
+                aria-hidden
+              />
             </Link>
             <Link
               href="/account/my-orders"
               aria-label="My orders"
               className={iconButtonClass}
             >
-              <Truck className="w-[18px]" />
+              <Image
+                src={truckIcon}
+                alt=""
+                width={18}
+                height={18}
+                className={headerIconClass}
+                aria-hidden
+              />
             </Link>
             <AvatarDropdown />
             <SideCart />
           </div>
         </div>
       </div>
-    </>
   );
 };
 

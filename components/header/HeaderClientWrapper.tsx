@@ -25,21 +25,9 @@ const HeaderClientWrapper = ({
   brands,
   navCategories
 }: HeaderClientWrapperProps) => {
-  const [isDesktop, setIsDesktop] = useState(false);
   const [isHeaderSticky, setIsHeaderSticky] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const stickyOffsetRef = useRef(0);
-
-  // Check if device is desktop (lg and above)
-  useEffect(() => {
-    const checkScreenSize = () => {
-      setIsDesktop(window.innerWidth >= 1024); // lg breakpoint
-    };
-
-    checkScreenSize();
-    window.addEventListener('resize', checkScreenSize);
-    return () => window.removeEventListener('resize', checkScreenSize);
-  }, []);
 
   // Handle scroll behavior
   useEffect(() => {
@@ -68,12 +56,9 @@ const HeaderClientWrapper = ({
     <>
       <header
         ref={headerRef}
-        style={{
-          backgroundColor: !isDesktop ? 'transparent' : 'white'
-        }}
         className={`
-          ${isHeaderSticky ? 'fixed top-0 left-0 right-0' : 'relative'}
-          flex flex-col justify-between bg-transparent z-[100] transition-all duration-100
+          ${isHeaderSticky ? "fixed top-0 left-0 right-0" : "relative"}
+          z-[100] flex flex-col justify-between bg-header-green transition-all duration-100 lg:bg-white
         `}
       >
         {/* Checkout-paused notice - always visible (does not hide on scroll) */}
