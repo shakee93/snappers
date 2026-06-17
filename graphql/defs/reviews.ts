@@ -25,9 +25,6 @@ export const WRITE_PRODUCT_REVIEW = gql`
   mutation WriteProductReview($input: WriteReviewInput!) {
     writeReview(input: $input) {
       rating
-      review {
-        databaseId
-      }
     }
   }
 `;

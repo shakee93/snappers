@@ -10,14 +10,12 @@ import { WRITE_PRODUCT_REVIEW } from "@/graphql/defs/reviews";
 import ProductStarRating from "@/components/product/ProductStarRating";
 import { useSession } from "@/context/SessionProvider";
 import {
-  attachReviewMedia,
   formatReviewDate,
   REVIEW_IMAGE_MAX_BYTES,
   REVIEW_IMAGE_MAX_FILES,
   stripReviewHtml,
   uploadReviewImage,
   type ProductReviewItem,
-  type UploadedReviewMedia,
 } from "@/lib/productReviews";
 import { twMerge } from "tailwind-merge";
 
@@ -136,10 +134,12 @@ const ProductReviewsSection = ({
     setSubmitting(true);
 
     try {
-      // Upload images first so a bad file fails before the review is created.
-      let uploaded: UploadedReviewMedia[] = [];
-      if (files.length) {
-        uploaded = await Promise.all(files.map(uploadReviewImage));
+      // Upload images first (fail fast on a bad file). The backend links them to
+      // the review on creation, keyed by the submitter's email + product id.
+      if (files.length && email) {
+        await Promise.all(
+          files.map((file) => uploadReviewImage(file, email, productDatabaseId)),
+        );
       }
 
       const { data } = await writeReview({
@@ -156,11 +156,6 @@ const ProductReviewsSection = ({
       const submittedRating = data?.writeReview?.rating;
       if (submittedRating == null || submittedRating < 1) {
         throw new Error("Failed to submit review.");
-      }
-
-      const commentId = data?.writeReview?.review?.databaseId;
-      if (commentId && uploaded.length) {
-        await attachReviewMedia(commentId, uploaded);
       }
 
       setRating(0);
