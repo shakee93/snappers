@@ -1,5 +1,6 @@
 "use client";
-import { Heart, Loader, Minus, Plus } from "lucide-react";
+import { Check, Heart, Loader, Minus, Plus } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
 import {
@@ -8,14 +9,18 @@ import {
   VariableProduct,
   ProductTag,
 } from "@/graphql/types/graphql";
-import React, { useState } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { twMerge } from "tailwind-merge";
 import { useRouter } from "next/navigation";
 import { useSession } from "@/context/SessionProvider";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
-import Input from "shared/Input/Input";
 import PreOrderNotice from "@/components/global/ui/PreOrderNotice";
+import { getProductPath } from "@/lib/productUrl";
+import { siteConfig } from "@/site.config";
+import copyIcon from "@/public/product/copy.png";
+import facebookIcon from "@/public/product/logos_facebook.png";
+import { FaWhatsapp } from "react-icons/fa";
 
 interface ProductAddToCartProps {
   product: SimpleProduct & VariableProduct;
@@ -27,8 +32,10 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   const [loading, setLoading] = useState<boolean>(false);
   const { addToCart, cart } = useCart();
   const router = useRouter();
-  const { customer, fetchCustomer } = useSession();
+  const { customer } = useSession();
   const [isNotifyClicked, setIsNotifyClicked] = useState(false);
+  const [linkCopied, setLinkCopied] = useState(false);
+  const copyResetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [userEmail, setUserEmail] = useState(customer?.email || ""); // Track user's email
   const [isThankYouModal, setIsThankYouModal] = useState(false); // Track thank you modal visibility
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
@@ -315,9 +322,76 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   const cardControlClass =
     "flex h-11 items-center justify-center rounded-lg border border-[#E8E8E8] bg-white";
 
+  const shareIconClass = "h-6 w-6 object-contain";
+
   const isInStock =
     (product.type === "SIMPLE" && product.stockStatus === "IN_STOCK") ||
     (product.type === "VARIABLE" && !!variation && !isProductOutOfStock());
+
+  const productUrl = useMemo(
+    () => `${siteConfig.url.base}${getProductPath(product)}`,
+    [product],
+  );
+
+  const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(productUrl)}`;
+
+  const shareText = useMemo(
+    () => `Check out ${product.name ?? "this product"} at ${siteConfig.brand.name}: ${productUrl}`,
+    [product.name, productUrl],
+  );
+  const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+
+  const writeToClipboard = useCallback(async (text: string): Promise<boolean> => {
+    try {
+      await navigator.clipboard.writeText(text);
+      return true;
+    } catch {
+      try {
+        const textArea = document.createElement("textarea");
+        textArea.value = text;
+        textArea.style.position = "fixed";
+        textArea.style.left = "-9999px";
+        textArea.setAttribute("readonly", "");
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        const copied = document.execCommand("copy");
+        document.body.removeChild(textArea);
+        return copied;
+      } catch {
+        return false;
+      }
+    }
+  }, []);
+
+  const copyProductLink = useCallback(async () => {
+    const copied = await writeToClipboard(productUrl);
+
+    if (!copied) {
+      toast.error(`Unable to copy link. Copy manually: ${productUrl}`);
+      return;
+    }
+
+    setLinkCopied(true);
+    toast.success("Link copied!");
+
+    if (copyResetTimeoutRef.current) {
+      clearTimeout(copyResetTimeoutRef.current);
+    }
+
+    copyResetTimeoutRef.current = setTimeout(() => {
+      setLinkCopied(false);
+      copyResetTimeoutRef.current = null;
+    }, 2000);
+  }, [productUrl, writeToClipboard]);
+
+  useEffect(() => {
+    return () => {
+      if (copyResetTimeoutRef.current) {
+        clearTimeout(copyResetTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div className="w-full">
@@ -325,11 +399,11 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
 
       <div className="fixed bottom-[82px] left-0 z-40 w-full border-t border-[#E8E8E8] bg-white p-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] lg:static lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none">
         {!(product.type === "VARIABLE" && !variation) && (
-          <div className="flex items-center gap-2 pb-4 ">
+          <div className="pb-4">
             {isInStock ? (
-              <>
+              <div className="flex items-center gap-2">
                 <div
-                  className={`${cardControlClass} shrink-0 gap-3 px-3 justify-between min-w-[150px]`}
+                  className={`${cardControlClass} shrink-0 justify-between gap-3 px-3 min-w-[120px]`}
                 >
                   <button
                     type="button"
@@ -356,9 +430,9 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
                 <button
                   type="button"
                   disabled={isAddToCartDisabled}
-                  onClick={() => addItemToCart(false)}
+                  onClick={() => addItemToCart(true)}
                   className={twMerge(
-                    `${cardControlClass} min-w-0 flex-1 px-4 text-sm font-bold text-[#38461F] bg-[#ACDA5A] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50`,
+                    "flex h-11 min-w-0 flex-1 items-center justify-center rounded-lg bg-[#ACDA5A] px-4 text-sm font-bold text-[#38461F] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50",
                   )}
                 >
                   {loading ? (
@@ -366,24 +440,73 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
                   ) : isPreOrderProduct() ? (
                     "Pre-order"
                   ) : (
-                    "Add to Basket"
+                    "Buy now"
                   )}
                 </button>
 
-                <Link
-                  href="/account/save-lists"
-                  className={`${cardControlClass} w-11 shrink-0`}
-                  aria-label="Save to wishlist"
-                >
-                  <Heart className="h-5 w-5 text-[#374151]" />
-                </Link>
-              </>
+                <div className="flex h-11 shrink-0 items-stretch overflow-hidden rounded-lg border border-[#E8E8E8] bg-white p-1">
+                    <div className="flex min-w-[108px] flex-1 items-center justify-evenly rounded-md bg-[#F3F4F6] px-2">
+                      <a
+                        href={whatsappShareUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex h-7 w-7 items-center justify-center transition-opacity hover:opacity-70"
+                        aria-label="Share on WhatsApp"
+                      >
+                        <FaWhatsapp className="h-5 w-5 text-[#25D366]" />
+                      </a>
+                      <a
+                        href={facebookShareUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex h-7 w-7 items-center justify-center transition-opacity hover:opacity-70"
+                        aria-label="Share on Facebook"
+                      >
+                        <Image
+                          src={facebookIcon}
+                          alt=""
+                          width={16}
+                          height={16}
+                          className={shareIconClass}
+                          aria-hidden
+                        />
+                      </a>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={copyProductLink}
+                      className="flex w-10 shrink-0 items-center justify-center transition-opacity hover:opacity-70"
+                      aria-label={linkCopied ? "Link copied!" : "Copy link"}
+                    >
+                      {linkCopied ? (
+                        <Check className="h-4 w-4 text-green-600" />
+                      ) : (
+                        <Image
+                          src={copyIcon}
+                          alt=""
+                          width={16}
+                          height={16}
+                          className={shareIconClass}
+                          aria-hidden
+                        />
+                      )}
+                    </button>
+                  </div>
+
+                  <Link
+                    href="/account/save-lists"
+                    className={`${cardControlClass} w-11 shrink-0`}
+                    aria-label="Save to wishlist"
+                  >
+                    <Heart className="h-5 w-5 text-[#374151]" />
+                  </Link>
+                </div>
             ) : (
               <button
                 type="button"
                 disabled={isNotifyClicked}
                 onClick={handleNotifyClick}
-                className={`${cardControlClass} w-full px-4 text-sm font-bold text-[#38461F] disabled:cursor-not-allowed disabled:opacity-50`}
+                className={`${cardControlClass} h-12 w-full px-4 text-sm font-bold text-[#38461F] disabled:cursor-not-allowed disabled:opacity-50`}
               >
                 Notify Me
               </button>
