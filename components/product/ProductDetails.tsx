@@ -459,15 +459,36 @@ const ProductDetails = ({
           <p className="text-sm leading-relaxed text-[#1A1A1A]">{shortDescriptionText}</p>
         )}
 
-        <ProductStarRating
-          averageRating={
-            (product as SimpleProduct & { averageRating?: number | null })
-              .averageRating
-          }
-          reviewCount={product.reviewCount}
-          labelMode="rated"
-          showWhenEmpty
-        />
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+          <ProductStarRating
+            averageRating={
+              (product as SimpleProduct & { averageRating?: number | null })
+                .averageRating
+            }
+            reviewCount={product.reviewCount}
+            labelMode="rated"
+            showWhenEmpty
+          />
+
+          {product.productCategories?.edges &&
+            product.productCategories.edges.length > 0 && (
+              <div className="flex flex-wrap items-center gap-2 text-sm text-[#6B7280]">
+                <span>Category:</span>
+                {product.productCategories.edges.map((category, index) => {
+                  const node = category.node as ProductCategory | null | undefined;
+                  return (
+                    <Link
+                      href={getCategoryPath(node?.slug ?? "")}
+                      key={index}
+                      className="rounded-full border border-[#D1D5DB] px-3 py-1 text-xs font-medium text-[#374151] hover:border-[#38461F]"
+                    >
+                      {node?.name}
+                    </Link>
+                  );
+                })}
+              </div>
+            )}
+        </div>
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
@@ -623,24 +644,6 @@ const ProductDetails = ({
       )}
 
       <ProductPurchaseAccordions product={product} />
-
-      {product.productCategories?.edges && product.productCategories.edges.length > 0 && (
-        <div className="flex flex-wrap items-center gap-2 border-t border-[#E8E8E8] pt-4 text-sm text-[#6B7280]">
-          <span>Category:</span>
-          {product.productCategories.edges.map((category, index) => {
-            const node = category.node as ProductCategory | null | undefined;
-            return (
-            <Link
-              href={getCategoryPath(node?.slug ?? "")}
-              key={index}
-              className="rounded-full border border-[#D1D5DB] px-3 py-1 text-xs font-medium text-[#374151] hover:border-[#38461F]"
-            >
-              {node?.name}
-            </Link>
-            );
-          })}
-        </div>
-      )}
     </div>
   );
 };
