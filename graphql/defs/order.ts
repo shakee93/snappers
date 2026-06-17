@@ -161,8 +161,23 @@ export const GET_MY_ORDERS = gql`
           databaseId
           orderNumber
           total
+          subtotal
           status
           paymentMethod
+          paymentMethodTitle
+          shippingTotal
+          billing {
+            ...CustomerAddressFragment
+          }
+          shipping {
+            ...CustomerAddressFragment
+          }
+          shippingLines {
+            nodes {
+              methodTitle
+              total
+            }
+          }
           metaData {
             id
             key
@@ -203,6 +218,7 @@ export const GET_MY_ORDERS = gql`
       }
     }
   }
+  ${CustomerAddressFragment}
 `;
 
 export const GET_ADDRESSES = gql`

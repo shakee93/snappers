@@ -4,6 +4,7 @@ import { useEffect } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { useStore } from "@/store/store";
 import NextTopLoader from "nextjs-toploader";
+import { getHeaderCreamHex } from "@/lib/siteTheme";
 import { PRICE_RANGE } from "@/components/global/primitives/Filters/PriceFilter";
 import { toast } from 'sonner';
 
@@ -96,6 +97,6 @@ export function NavigationEvents() {
     }, [pathname, searchParams])
 
     return <div>
-        <NextTopLoader height={3} color="#1b41b0" showSpinner={false} />
+        <NextTopLoader height={3} color={getHeaderCreamHex()} showSpinner={false} />
     </div>
 }

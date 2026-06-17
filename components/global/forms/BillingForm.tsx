@@ -9,28 +9,29 @@ import { useAddresses } from "@/hooks/useAddresses";
 import { siteConfig } from "@/site.config";
 
 // Component Imports
-import Input from "@/shared/Input/Input";
-import Label from "@/components/global/primitives/Label/Label";
-import Select from "@/shared/Select/Select";
-import ButtonPrimary from "@/shared/Button/ButtonPrimary";
-
-// Context and Utility Imports
 import { useSession } from "@/context/SessionProvider";
 import { toast } from "sonner";
 
 // Types and Interfaces
 import { Customer } from "@/graphql/types/graphql";
-import { InputField, SRI_LANKAN_STATES, SelectField } from "./HelperComps";
+import { SRI_LANKAN_STATES } from "./HelperComps";
 import Checkbox from "@/shared/Checkbox/Checkbox";
+import AccountSubmitButton from "@/components/account/AccountSubmitButton";
+import {
+  AccountInputField,
+  AccountSelectField,
+} from "@/components/account/AccountFormFields";
+import { accountSubheadingClassName } from "@/components/account/accountStyles";
 
 // Constants
 
 
 type BillingFormProps = {
   onSaved?: () => void | Promise<void>;
+  embedded?: boolean;
 };
 
-const BillingForm: FC<BillingFormProps> = ({ onSaved }) => {
+const BillingForm: FC<BillingFormProps> = ({ onSaved, embedded = false }) => {
   const { customer, fetchCustomer, updateCustomer } = useSession();
   const { getAddresses, data, error, updateAddress } = useAddresses();
   const [saveBothAddresses, setSaveBothAddresses] = useState(false);
@@ -122,21 +123,31 @@ const BillingForm: FC<BillingFormProps> = ({ onSaved }) => {
   }
 
   return (
-    <div className="nc-AddressPage" data-nc-id="AccountPage">
-      <div className="space-y-10 sm:space-y-12">
-        <h2 className="text-xl sm:text-2xl font-semibold">Billing Details</h2>
-        <form onSubmit={handleSubmit} className="gap-2">
-          <div className="flex flex-col gap-2 md:flex-row">
-            <div className="flex-grow mt-10 md:mt-0 max-w-3xl space-y-6">
-              <div className="flex gap-2">
-                <InputField
+    <div className={embedded ? undefined : "nc-AddressPage"} data-nc-id="AccountPage">
+      <div className={embedded ? undefined : "space-y-10 sm:space-y-12"}>
+        {!embedded ? (
+          <h2 className={accountSubheadingClassName}>Billing Details</h2>
+        ) : null}
+        <form onSubmit={handleSubmit} className={embedded ? "space-y-2.5" : "gap-2"}>
+          <div className={embedded ? undefined : "flex flex-col gap-2 md:flex-row"}>
+            <div
+              className={
+                embedded
+                  ? "space-y-2.5"
+                  : "mt-10 max-w-3xl flex-grow space-y-6 md:mt-0"
+              }
+            >
+              <div className={embedded ? "grid grid-cols-2 gap-2" : "flex gap-2"}>
+                <AccountInputField
+                  compact={embedded}
                   label="First Name"
                   name="firstName"
                   placeholder="First Name"
                   value={formData.firstName}
                   onChange={handleChange}
                 />
-                <InputField
+                <AccountInputField
+                  compact={embedded}
                   label="Last Name"
                   name="lastName"
                   placeholder="Last Name"
@@ -144,48 +155,99 @@ const BillingForm: FC<BillingFormProps> = ({ onSaved }) => {
                   onChange={handleChange}
                 />
               </div>
-              <div className="flex gap-2">
-                <InputField
+              {embedded ? (
+                <AccountInputField
+                  compact={embedded}
                   label="Street Address"
                   name="address1"
                   placeholder="Street Address"
                   value={formData.address1}
                   onChange={handleChange}
                 />
-                <InputField
-                  label="Apt, Suite, etc."
-                  name="address2"
-                  placeholder="Apt, Suite, etc."
-                  value={formData.address2}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="flex gap-2">
-                <InputField
-                  label="Town/City"
-                  name="city"
-                  placeholder="Town/City"
-                  value={formData.city}
-                  onChange={handleChange}
-                />
-                <SelectField
-                  label="Country"
-                  name="country"
-                  value={formData.country}
-                  options={[{ value: siteConfig.locale.countryCode, label: siteConfig.locale.countryName }]}
-                  onChange={handleChange}
-                  disabled={true}
-                />
-              </div>
-              <div className="flex gap-2">
-                <InputField
+              ) : (
+                <div className="flex gap-2">
+                  <AccountInputField
+                  compact={embedded}
+                    label="Street Address"
+                    name="address1"
+                    placeholder="Street Address"
+                    value={formData.address1}
+                    onChange={handleChange}
+                  />
+                  <AccountInputField
+                  compact={embedded}
+                    label="Apt, Suite, etc."
+                    name="address2"
+                    placeholder="Apt, Suite, etc."
+                    value={formData.address2}
+                    onChange={handleChange}
+                  />
+                </div>
+              )}
+              {embedded ? (
+                <div className="grid grid-cols-2 gap-2">
+                  <AccountInputField
+                  compact={embedded}
+                    label="Apt, Suite, etc."
+                    name="address2"
+                    placeholder="Apt, Suite, etc."
+                    value={formData.address2}
+                    onChange={handleChange}
+                  />
+                  <AccountInputField
+                  compact={embedded}
+                    label="Town/City"
+                    name="city"
+                    placeholder="Town/City"
+                    value={formData.city}
+                    onChange={handleChange}
+                  />
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  <AccountInputField
+                  compact={embedded}
+                    label="Town/City"
+                    name="city"
+                    placeholder="Town/City"
+                    value={formData.city}
+                    onChange={handleChange}
+                  />
+                  <AccountSelectField
+                  compact={embedded}
+                    label="Country"
+                    name="country"
+                    value={formData.country}
+                    options={[{ value: siteConfig.locale.countryCode, label: siteConfig.locale.countryName }]}
+                    onChange={handleChange}
+                    disabled={true}
+                  />
+                </div>
+              )}
+              {embedded ? (
+                <div className="hidden sm:block">
+                  <AccountSelectField
+                    compact={embedded}
+                    label="Country"
+                    name="country"
+                    value={formData.country}
+                    options={[{ value: siteConfig.locale.countryCode, label: siteConfig.locale.countryName }]}
+                    onChange={handleChange}
+                    disabled={true}
+                  />
+                </div>
+              ) : null}
+              <div className={embedded ? "grid grid-cols-2 gap-2" : "flex gap-2"}>
+                <AccountInputField
+                  compact={embedded}
                   label="Postcode/ZIP"
                   name="postcode"
                   placeholder="Postcode/ZIP"
                   value={formData.postcode}
                   onChange={handleChange}
                 />
-                <SelectField
+                <AccountSelectField
+                  compact={embedded}
                   label="State"
                   name="state"
                   value={formData.state}
@@ -197,7 +259,8 @@ const BillingForm: FC<BillingFormProps> = ({ onSaved }) => {
                 />
               </div>
               <div>
-                <InputField
+                <AccountInputField
+                  compact={embedded}
                   label="Phone"
                   name="phone"
                   placeholder="Phone"
@@ -213,9 +276,9 @@ const BillingForm: FC<BillingFormProps> = ({ onSaved }) => {
               />
             </div>
           </div>
-          <ButtonPrimary type="submit" className="mt-4">
+          <AccountSubmitButton type="submit" className={embedded ? "w-full" : "mt-4"}>
             Save Billing Address
-          </ButtonPrimary>
+          </AccountSubmitButton>
         </form>
       </div>
     </div>

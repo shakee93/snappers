@@ -1,15 +1,16 @@
-import ButtonPrimary from "shared/Button/ButtonPrimary";
+import AccountSubmitButton from "@/components/account/AccountSubmitButton";
+import {
+  accountLinkClassName,
+  accountPageTitleClassName,
+} from "@/components/account/accountStyles";
 
 const AccountBilling = () => {
   return (
     <div>
       <div className="space-y-10 sm:space-y-12">
-        {/* HEADING */}
-        <h2 className="text-2xl sm:text-3xl font-semibold">
-          Payments & payouts
-        </h2>
-        <div className="max-w-2xl prose prose-slate dark:prose-invert">
-          <span className="">
+        <h2 className={accountPageTitleClassName}>Payments & payouts</h2>
+        <div className="prose prose-slate max-w-2xl dark:prose-invert">
+          <span>
             When you receive a payment for a order, we call that payment to you
             a &ldquo;payout.&ldquo; Our secure payment system supports several
             payout methods, which can be set up below. Go to FAQ.
@@ -17,14 +18,14 @@ const AccountBilling = () => {
             <br />
             To get paid, you need to set up a payout method releases payouts
             about 24 hours after a guest’s scheduled time. The time it takes for
-            the funds to appear in your account depends on your payout method.
-            {` `}
-            <a href="##">Learn more</a>
+            the funds to appear in your account depends on your payout method.{" "}
+            <a className={accountLinkClassName} href="##">
+              Learn more
+            </a>
           </span>
           <div className="pt-10">
-            <ButtonPrimary>Add payout mothod</ButtonPrimary>
+            <AccountSubmitButton>Add payout method</AccountSubmitButton>
           </div>
-          w
         </div>
       </div>
     </div>

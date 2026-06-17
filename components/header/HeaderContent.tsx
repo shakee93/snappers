@@ -9,6 +9,7 @@ import AvatarDropdown from "./AvatarDropdown";
 import Logo from "./Logo";
 import NavLinks from "./NavLinks";
 import SideCart from "./SideCart/SideCart";
+import { accountTabHref } from "@/components/account/accountTabs";
 
 interface HeaderContentProps {
   navCategories: ProductCategory[];
@@ -36,7 +37,7 @@ const HeaderContent = ({ navCategories }: HeaderContentProps) => {
           {/* Right: saved list · orders · account · basket */}
           <div className="flex min-w-0 items-center justify-end gap-2.5">
             <Link
-              href="/account/save-lists"
+              href={accountTabHref("wishlist")}
               aria-label="Saved items"
               className={iconButtonClass}
             >
@@ -50,7 +51,7 @@ const HeaderContent = ({ navCategories }: HeaderContentProps) => {
               />
             </Link>
             <Link
-              href="/account/my-orders"
+              href={accountTabHref("orders")}
               aria-label="My orders"
               className={iconButtonClass}
             >
