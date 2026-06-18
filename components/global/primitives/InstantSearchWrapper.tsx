@@ -614,7 +614,6 @@ const InstantSearchWrapperInner = ({
                   categories={categories}
                   subCategories={subCategories}
                   brands={brands}
-                  sort={sort}
                   dealsType={dealsType}
                   inStockOnly={inStockOnly}
                   defaultSort={defaultSort}

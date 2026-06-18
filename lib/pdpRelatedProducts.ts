@@ -1,5 +1,5 @@
 import { getClient } from "@/graphql/apollo-ssr";
-import { GET_CATEGORY_ARCHIVE_IN_STOCK } from "@/graphql/defs/products";
+import { GET_CATEGORY_ARCHIVE_RELATED } from "@/graphql/defs/products";
 import type { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import { isProductInStock } from "@/lib/isProductInStock";
 
@@ -15,60 +15,97 @@ type ProductWithRelations = ProductNode & {
   } | null;
 };
 
-/** Products for the PDP slider: Woo upsells, then WC related, then same-category fallback. */
-export async function getPdpRelatedProducts(
-  product: ProductWithRelations,
-  cacheTag: string
-): Promise<ProductNode[]> {
-  const excludeId = product.databaseId;
+const MAX_RELATED = 12;
 
-  const isEligible = (p: ProductNode) =>
-    p.databaseId !== excludeId && isProductInStock(p);
+const dedupeProducts = (
+  products: ProductNode[],
+  excludeId: number,
+  seen: Set<number>,
+): ProductNode[] => {
+  const result: ProductNode[] = [];
 
-  const upsellNodes = (product.upsell?.nodes ?? []) as ProductNode[];
-  const fromUpsell = upsellNodes.filter(isEligible);
-  if (fromUpsell.length > 0) {
-    return fromUpsell;
+  for (const product of products) {
+    if (product.databaseId === excludeId || seen.has(product.databaseId)) {
+      continue;
+    }
+
+    seen.add(product.databaseId);
+    result.push(product);
   }
 
-  const relatedNodes = (product.related?.nodes ?? []) as ProductNode[];
-  const fromRelated = relatedNodes.filter(isEligible);
-  if (fromRelated.length > 0) {
-    return fromRelated;
-  }
+  return result;
+};
 
-  const categoryIds =
-    product.productCategories?.edges
-      ?.map((edge) => {
-        const node = edge?.node as { databaseId?: number } | null | undefined;
-        return node?.databaseId;
-      })
-      .filter((id): id is number => typeof id === "number") ?? [];
-
-  if (categoryIds.length === 0) {
-    return [];
-  }
-
-  // Exclude the current product server-side and over-fetch a buffer so the
-  // client-side stock refinement below can't shrink the slider under 12.
-  const { data } = await getClient().query({
-    query: GET_CATEGORY_ARCHIVE_IN_STOCK,
-    variables: { categoryIdIn: categoryIds, first: 18, exclude: [excludeId] },
-    context: {
-      fetchOptions: {
-        cache: "force-cache",
-        next: { tags: [cacheTag] },
-      },
-    },
+const preferInStock = (products: ProductNode[]): ProductNode[] =>
+  [...products].sort((a, b) => {
+    const aRank = isProductInStock(a) ? 0 : 1;
+    const bRank = isProductInStock(b) ? 0 : 1;
+    return aRank - bRank;
   });
 
-  type CategoryEdge = { node?: ProductNode | null };
-  const edges = (data?.products?.edges ?? []) as CategoryEdge[];
+const getCategoryDatabaseIds = (product: ProductWithRelations): number[] => {
+  const edges = product.productCategories?.edges ?? [];
   return edges
-    .map((edge) => edge?.node)
-    .filter(
-      (p): p is ProductNode =>
-        p != null && typeof p.databaseId === "number" && isProductInStock(p)
-    )
-    .slice(0, 12);
+    .map((edge) => {
+      const node = edge?.node as { databaseId?: number } | null | undefined;
+      return node?.databaseId;
+    })
+    .filter((id): id is number => typeof id === "number");
+};
+
+/** PDP related row: upsells + WC related, then same-category fallback to fill the grid. */
+export async function getPdpRelatedProducts(
+  product: ProductWithRelations,
+  cacheTag: string,
+): Promise<ProductNode[]> {
+  const excludeId = product.databaseId;
+  const seen = new Set<number>();
+  const upsellNodes = (product.upsell?.nodes ?? []) as ProductNode[];
+  const relatedNodes = (product.related?.nodes ?? []) as ProductNode[];
+
+  let combined = dedupeProducts(
+    [...upsellNodes, ...relatedNodes],
+    excludeId,
+    seen,
+  );
+
+  if (combined.length < MAX_RELATED) {
+    const categoryIds = getCategoryDatabaseIds(product);
+
+    if (categoryIds.length > 0) {
+      const isDev = process.env.NODE_ENV === "development";
+      const { data } = await getClient().query({
+        query: GET_CATEGORY_ARCHIVE_RELATED,
+        variables: {
+          categoryIdIn: categoryIds,
+          first: 18,
+          exclude: [excludeId],
+        },
+        context: {
+          fetchOptions: isDev
+            ? { cache: "no-store" }
+            : {
+                cache: "force-cache",
+                next: { tags: [cacheTag] },
+              },
+        },
+      });
+
+      type CategoryEdge = { node?: ProductNode | null };
+      const edges = (data?.products?.edges ?? []) as CategoryEdge[];
+      const fromCategory = edges
+        .map((edge) => edge?.node)
+        .filter(
+          (node): node is ProductNode =>
+            node != null && typeof node.databaseId === "number",
+        );
+
+      combined = [
+        ...combined,
+        ...dedupeProducts(fromCategory, excludeId, seen),
+      ];
+    }
+  }
+
+  return preferInStock(combined).slice(0, MAX_RELATED);
 }

@@ -15,7 +15,9 @@ import Pagination from "@/shared/Pagination/Pagination";
 import Image from "next/image";
 import NotFound from "@/public/not_found.svg";
 import ProductCardLoading from "@/components/global/primitives/Loading/ProductCardLoading";
+import FilterSelect from "@/components/global/primitives/Filters/FilterSelect";
 import { filterHiddenProducts } from "@/lib/hidden-products";
+import { getDatabaseIdFromProductLike } from "@/lib/bogo";
 import { resolveProductSale, type SaleResolvableProduct } from "@/lib/productSale";
 
 interface ProductGridProps {
@@ -25,6 +27,18 @@ interface ProductGridProps {
   pages?: number;
   hitsPerPage?: number;
   setHitsPerPage?: (hitsPerPage: number) => void;
+}
+
+function getProductHitKey(item: unknown, index: number): string {
+  const hit = item as { objectID?: string; slug?: string | null };
+  if (hit.objectID) return hit.objectID;
+
+  const databaseId = getDatabaseIdFromProductLike(item);
+  if (databaseId) return `product-${databaseId}`;
+
+  if (hit.slug) return `${hit.slug}-${index}`;
+
+  return `product-hit-${index}`;
 }
 
 const ProductGridInstant = ({
@@ -114,17 +128,17 @@ const ProductGridInstant = ({
   // 'loading'/'stalled' on cache reads and widget churn even without a real
   // network round-trip; unmounting the grid for those transitions causes a
   // visible flicker. Only show the skeleton on the very first load.
-  const desktopGridClass = "lg:grid-cols-4";
+  const desktopGridClass = "lg:grid-cols-3";
   const showSkeleton = visibleHits.length === 0 && (statusState === 'stalled' || statusState === 'loading');
 
   return (
     <>
       <div className='h-[185px] md:h-60 bottom-3 right-3 hidden'></div>
       {visibleHits.length > 0 && (
-        <div className={`flex-1 grid grid-cols-2 md:grid-cols-4 ${desktopGridClass} gap-x-2 gap-y-2 lg:gap-x-3 lg:gap-y-4`}>
-          {visibleHits.map((item) => (
+        <div className={`flex-1 grid grid-cols-2 md:grid-cols-3 ${desktopGridClass} gap-x-2 gap-y-2 lg:gap-x-3 lg:gap-y-4`}>
+          {visibleHits.map((item, index) => (
             <ProductCard
-              key={item?.slug as unknown as string}
+              key={getProductHitKey(item, index)}
               product={item as unknown as ProductCardItem}
               listingImageByProductId={listingImageByProductId}
             />
@@ -161,19 +175,20 @@ const ProductGridInstant = ({
             <div className="flex items-center gap-2">
               {results && results.nbPages > 1 && results.nbHits > 0 && (
                 <div className="text-right py-6 text-sm rounded-xl border-none focus:outline-none select-none">
-                  <label htmlFor="hitsPerPage" className="mr-2 text-slate-900 dark:text-slate-100">Results per page:</label>
-                  <select
+                  <label htmlFor="hitsPerPage" className="mr-2 text-header-green">Results per page:</label>
+                  <FilterSelect
                     id="hitsPerPage"
-                    value={hitsPerPage}
-                    onChange={(e) => setHitsPerPage ? setHitsPerPage(Number(e.target.value)) : null}
-                    className="border p-2 w-20 text-sm rounded-md border-neutral-300 dark:border-neutral-700
-                    cursor-pointer bg-transparent"
-                  >
-                    <option className="text-sm p-2" value={12}>12</option>
-                    <option className="text-sm p-2" value={24}>24</option>
-                    <option className="text-sm p-2" value={48}>48</option>
-                    <option className="text-sm p-2" value={96}>96</option>
-                  </select>
+                    aria-label="Results per page"
+                    value={String(hitsPerPage)}
+                    buttonClassName="min-w-[4.5rem]"
+                    options={[
+                      { id: "12", label: "12" },
+                      { id: "24", label: "24" },
+                      { id: "48", label: "48" },
+                      { id: "96", label: "96" },
+                    ]}
+                    onChange={(value) => setHitsPerPage?.(Number(value))}
+                  />
                 </div>
               )}
             </div>

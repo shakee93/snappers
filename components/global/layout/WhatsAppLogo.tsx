@@ -4,26 +4,29 @@ import Image from "next/image";
 import whatsappLogo from "@/public/images/whatsapplogo.webp";
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { useStore } from "@/store/store";
-import { useParams, usePathname, useRouter } from "next/navigation";
+import { useParams, usePathname } from "next/navigation";
 import { twMerge } from "tailwind-merge";
 
 const WhatsappLogoComponent = () => {
   const [isHovered, setIsHovered] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const { navigation } = useStore()
 
-  const params = useParams()
-  const pathname = usePathname()
+  const params = useParams();
+  const pathname = usePathname();
 
-  const isProduct = useMemo(() => {
-
-    if (!params) {
+  const isSlugPage = useMemo(() => {
+    if (!params?.slug) {
       return false;
     }
 
-    return ['brand', 'slug'].join('') === Object.keys(params).join('');
-  }, [params])
+    const keys = Object.keys(params);
+
+    if (keys.length === 1 && keys[0] === "slug") {
+      return true;
+    }
+
+    return keys.sort().join("") === "brandslug";
+  }, [params]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -45,10 +48,14 @@ const WhatsappLogoComponent = () => {
   }
 
   return (
-    <div className={twMerge(
-      "transition-transform fixed z-[1000] md:bottom-12 md:right-10 bottom-[120px] right-7 h-8 w-12 md:mb-5",
-      isProduct && 'bottom-44'
-    )}>
+    <div
+      className={twMerge(
+        "fixed z-[1000] h-8 w-12 transition-transform",
+        "max-md:bottom-[120px] max-md:right-7",
+        isSlugPage && "max-md:bottom-[200px]",
+        "md:bottom-12 md:right-10 md:mb-5 md:left-auto",
+      )}
+    >
       <Link href={"https://wa.me/94722299944"} target="_blank">
         <div className="relative flex flex-col items-center">
           <Image

@@ -7,6 +7,11 @@ import { useInstantSearch, useRefinementList } from "react-instantsearch";
 import { UiState } from "instantsearch.js";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import { ProductCategory } from "@/graphql/types/graphql";
+import {
+  filterPanelClassName,
+  filterPanelToggleClassName,
+  filterCheckboxLabelClassName,
+} from "@/components/global/primitives/Filters/filterStyles";
 import { useStore } from "@/store/store";
 
 interface SubCategoryFilterProps {
@@ -76,12 +81,12 @@ const SubCategoryFilter = ({ subCategories }: SubCategoryFilterProps) => {
   }
 
   return (
-    <div className="relative z-10 w-full overflow-hidden rounded-xl border border-neutral-200 bg-white dark:border-neutral-700 dark:bg-neutral-900">
+    <div className={filterPanelClassName}>
       <div className="relative flex w-full flex-col space-y-3 px-4 py-3">
         <button
           type="button"
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="flex w-full items-center justify-between gap-2 text-left text-sm font-medium transition-opacity hover:opacity-80"
+          className={filterPanelToggleClassName}
         >
           <span>Subcategories</span>
           <ChevronDown
@@ -104,6 +109,7 @@ const SubCategoryFilter = ({ subCategories }: SubCategoryFilterProps) => {
                 key={item.databaseId}
                 name={item.slug || String(item.databaseId)}
                 label={`${item.name} (${facetSnapshot.find((f) => Number(f.value) === item.databaseId)?.count || 0})`}
+                labelClassName={filterCheckboxLabelClassName}
                 defaultChecked={selectedCategories.includes(item.databaseId)}
                 onChange={(checked) => handleChange(checked, item.databaseId)}
               />

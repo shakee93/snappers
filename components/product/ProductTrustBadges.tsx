@@ -38,7 +38,7 @@ const TRUST_ITEMS: ReadonlyArray<{
 ];
 
 const ProductTrustBadges = () => (
-  <div className="grid grid-cols-2 gap-3 pb-4">
+  <div className="grid grid-cols-1 gap-3 pb-2 sm:grid-cols-2 sm:pb-4">
     {TRUST_ITEMS.map(({ src, alt, title, subtitle }) => (
       <div
         key={title}

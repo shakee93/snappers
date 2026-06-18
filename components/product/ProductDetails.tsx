@@ -307,6 +307,22 @@ const ProductDetails = ({
       </>
     ) : null;
 
+  const showPromoTags = useMemo(() => {
+    const hasClearance = product?.productTags?.nodes?.some(
+      (tag) => tag && "slug" in tag && tag.slug === "clearance",
+    );
+    return (
+      hasClearance ||
+      isFreeShippingProduct ||
+      (bogo.isBogoEnabled && freeGiftDetailLine !== null)
+    );
+  }, [
+    product?.productTags?.nodes,
+    isFreeShippingProduct,
+    bogo.isBogoEnabled,
+    freeGiftDetailLine,
+  ]);
+
   // Compute availability message for unavailable combinations
   const availabilityMessage = useMemo(() => {
     if (
@@ -437,7 +453,7 @@ const ProductDetails = ({
   }, [product.shortDescription]);
 
   return (
-    <div className="flex flex-col gap-5 pb-24 lg:gap-0 lg:pb-0">
+    <div className="flex flex-col gap-3 lg:gap-0">
       {isPriceFluctuation && (
         <div className="rounded-xl bg-red-500 p-4 text-sm text-white">
           Prices are being updated. For current pricing, please contact us on WhatsApp{" "}
@@ -445,7 +461,7 @@ const ProductDetails = ({
         </div>
       )}
 
-      <div className="flex flex-col gap-2 pb-4">
+      <div className="flex flex-col gap-2 pb-2 lg:pb-4">
         <BrandLogo
           brand={brand}
           imageClassName="h-10 w-auto max-w-[220px] object-contain object-left"
@@ -491,30 +507,34 @@ const ProductDetails = ({
         </div>
       </div>
 
-      <div className="flex flex-wrap items-center gap-2">
-        {product?.productTags?.nodes?.some(
-          (tag) => tag && "slug" in tag && tag.slug === "clearance",
-        ) && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-orange-500 px-2.5 py-0.5 text-xs font-semibold text-white">
-            <Flame className="h-3 w-3" />
-            Clearance
-          </span>
-        )}
-        {isFreeShippingProduct && (
-          <span className="inline-flex items-center gap-1 rounded-full bg-[#38461F] px-2.5 py-0.5 text-xs font-semibold text-white">
-            <Truck className="h-3 w-3" />
-            Free Shipping
-          </span>
-        )}
-        {bogo.isBogoEnabled && freeGiftDetailLine !== null && (
-          <span className="inline-flex items-center rounded-full bg-green-600 px-2.5 py-1 text-xs font-semibold text-white">
-            {isFreeGiftProduct ? "Free Gift" : bogo.label}
-          </span>
-        )}
-      </div>
+      {showPromoTags && (
+        <>
+          <div className="flex flex-wrap items-center gap-2">
+            {product?.productTags?.nodes?.some(
+              (tag) => tag && "slug" in tag && tag.slug === "clearance",
+            ) && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-orange-500 px-2.5 py-0.5 text-xs font-semibold text-white">
+                <Flame className="h-3 w-3" />
+                Clearance
+              </span>
+            )}
+            {isFreeShippingProduct && (
+              <span className="inline-flex items-center gap-1 rounded-full bg-[#38461F] px-2.5 py-0.5 text-xs font-semibold text-white">
+                <Truck className="h-3 w-3" />
+                Free Shipping
+              </span>
+            )}
+            {bogo.isBogoEnabled && freeGiftDetailLine !== null && (
+              <span className="inline-flex items-center rounded-full bg-green-600 px-2.5 py-1 text-xs font-semibold text-white">
+                {isFreeGiftProduct ? "Free Gift" : bogo.label}
+              </span>
+            )}
+          </div>
 
-      {bogo.isBogoEnabled && freeGiftDetailLine !== null && (
-        <p className="text-sm text-[#6B7280]">{freeGiftDetailLine}</p>
+          {bogo.isBogoEnabled && freeGiftDetailLine !== null && (
+            <p className="text-sm text-[#6B7280]">{freeGiftDetailLine}</p>
+          )}
+        </>
       )}
 
       {product.type === "VARIABLE" && (
@@ -571,8 +591,8 @@ const ProductDetails = ({
         </div>
       )}
 
-      <AnimatePresence>
-        {availabilityMessage && (
+      {availabilityMessage && (
+        <AnimatePresence>
           <motion.div
             initial={{ opacity: 0, y: -10, height: 0 }}
             animate={{ opacity: 1, y: 0, height: "auto" }}
@@ -586,11 +606,11 @@ const ProductDetails = ({
               {availabilityMessage.availableValues.join(", ")}
             </span>
           </motion.div>
-        )}
-      </AnimatePresence>
+        </AnimatePresence>
+      )}
 
       {displayPriceHtml ? (
-        <div className="space-y-1 py-4">
+        <div className="space-y-1 pt-1 lg:py-4">
           <div className="flex flex-wrap items-baseline gap-3">
             <span
               className="text-2xl font-bold text-[#38461F] sm:text-3xl"
@@ -625,15 +645,6 @@ const ProductDetails = ({
         <p className="text-sm font-medium text-[#6B7280]">Currently unavailable</p>
       )}
 
-      <ProductAddToCart
-        product={product}
-        variation={
-          (displayVariation ?? defaultVariation) as ProductVariation & {
-            rawPrice: string;
-          }
-        }
-      />
-
       <ProductTrustBadges />
 
       {displayNumericPrice > 0 && (
@@ -641,6 +652,17 @@ const ProductDetails = ({
       )}
 
       <ProductPurchaseAccordions product={product} />
+
+      <div className="max-lg:h-0 max-lg:overflow-visible">
+        <ProductAddToCart
+          product={product}
+          variation={
+            (displayVariation ?? defaultVariation) as ProductVariation & {
+              rawPrice: string;
+            }
+          }
+        />
+      </div>
     </div>
   );
 };

@@ -1,7 +1,11 @@
+import { Suspense } from "react";
 import { getClient } from "@/graphql/apollo-ssr";
 import { GET_ALL_PRODUCTS } from "@/graphql/defs/products";
 import { GET_NESTED_CATEGORIES } from "@/graphql/defs/nav";
 import InstantSearchWrapper from "@/components/global/primitives/InstantSearchWrapper";
+import ArchiveFilters from "@/components/global/primitives/archive/ArchiveFilters";
+import TypesenseArchiveFilters from "@/components/global/primitives/archive/TypesenseArchiveFilters";
+import ArchiveProductGrid from "@/components/global/primitives/archive/ArchiveProductGrid";
 import ProductGridGraphQL from "@/components/global/primitives/archive/ProductGridGraphQL";
 import { Brand } from "@/graphql/types/graphql";
 import Link from "next/link";
@@ -137,19 +141,33 @@ const ArchiveLayout = async ({
           </div>
         ) : null}
 
+        {filters ? (
+          <Suspense>
+            {graphqlArchive ? <ArchiveFilters /> : <TypesenseArchiveFilters />}
+          </Suspense>
+        ) : null}
+
         <hr className="border-slate-200 dark:border-slate-700 " />
 
         <main>
           <div className="flex flex-col lg:flex-row">
             <div className="flex-1 ">
-              {/* {JSON.stringify(search, null, 2)}
-              {JSON.stringify(productCategories, null, 2)}
-              {JSON.stringify(brand, null, 2)} */}
               {graphqlArchive ? (
-                <ProductGridGraphQL
-                  categoryIds={categoryScopeIds}
-                  first={45}
-                />
+                filters ? (
+                  <Suspense>
+                    <ArchiveProductGrid
+                      categoryIds={
+                        categoryScopeIds.length > 0 ? categoryScopeIds : undefined
+                      }
+                      first={45}
+                    />
+                  </Suspense>
+                ) : (
+                  <ProductGridGraphQL
+                    categoryIds={categoryScopeIds}
+                    first={45}
+                  />
+                )
               ) : (
                 <InstantSearchWrapper
                   categories={productCategories}

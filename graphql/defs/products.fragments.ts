@@ -433,6 +433,7 @@ export const ProductContentFull = gql`
         edges {
           node {
             id
+            databaseId
             name
             slug
             parentDatabaseId

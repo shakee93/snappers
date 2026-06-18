@@ -177,13 +177,6 @@ const ProductCard = ({
     <div
       className={`relative flex h-full flex-col overflow-hidden rounded-xl border border-neutral-200 bg-white ${className}`}
     >
-      {/* Kept outside the image Link — a button must not nest inside an anchor. */}
-      <WishlistButton
-        productId={productDbId}
-        size={18}
-        className="absolute right-2 top-2 z-20 h-8 w-8 rounded-full bg-white/90 shadow-sm hover:bg-white"
-      />
-
       <Link
         href={link || "#"}
         className="relative block aspect-square bg-[#FAFAFA]"
@@ -239,22 +232,29 @@ const ProductCard = ({
           </div>
         )}
 
-        <button
-          type="button"
-          style={{ backgroundColor: accentColor }}
-          disabled={loading || isOutOfStock}
-          onClick={handleAddToCart}
-          className="mt-3 flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-left text-[13px] font-bold text-black transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:mt-4 sm:px-4 sm:py-3 sm:text-sm"
-        >
-          <span>{loading ? "Adding…" : buttonLabel}</span>
-          <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-black">
-            {loading ? (
-              <Loader className="h-3.5 w-3.5 animate-spin text-white" />
-            ) : (
-              <Plus className="h-3.5 w-3.5 text-white" strokeWidth={2.5} />
-            )}
-          </span>
-        </button>
+        <div className="mt-3 flex items-stretch gap-2 sm:mt-4">
+          <button
+            type="button"
+            style={{ backgroundColor: accentColor }}
+            disabled={loading || isOutOfStock}
+            onClick={handleAddToCart}
+            className="flex min-w-0 flex-1 items-center justify-between rounded-lg px-3 py-2.5 text-left text-[13px] font-bold text-black transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:py-3 sm:text-sm"
+          >
+            <span>{loading ? "Adding…" : buttonLabel}</span>
+            <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-black">
+              {loading ? (
+                <Loader className="h-3.5 w-3.5 animate-spin text-white" />
+              ) : (
+                <Plus className="h-3.5 w-3.5 text-white" strokeWidth={2.5} />
+              )}
+            </span>
+          </button>
+          <WishlistButton
+            productId={productDbId}
+            size={18}
+            className="flex w-11 shrink-0 items-center justify-center rounded-lg border border-neutral-200 bg-white hover:bg-neutral-50"
+          />
+        </div>
       </div>
     </div>
   );

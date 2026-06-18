@@ -11,6 +11,17 @@ import { twMerge } from "tailwind-merge";
 import { SearchResults } from "algoliasearch-helper";
 import { ChevronLast, ChevronLeft, ChevronRight } from "lucide-react";
 
+const paginationNavButtonClassName = (twFocusClass: string) =>
+  `inline-flex items-center justify-center rounded-full border border-[#E8E8E8] bg-white px-2.5 text-header-green transition-colors hover:border-header-green/40 hover:bg-header-cream/30 disabled:cursor-not-allowed disabled:opacity-50 ${twFocusClass}`;
+
+const paginationPageButtonClassName = (twFocusClass: string, active: boolean) =>
+  active
+    ? `inline-flex h-11 w-11 items-center justify-center rounded-full bg-header-action font-semibold text-header-green ${twFocusClass}`
+    : `inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#E8E8E8] bg-white text-header-green transition-colors hover:border-header-green/40 hover:bg-header-cream/30 ${twFocusClass}`;
+
+const paginationFirstButtonClassName = (twFocusClass: string) =>
+  `inline-flex items-center justify-center rounded-full border border-[#E8E8E8] bg-white px-4 text-header-green transition-colors hover:border-header-green/40 hover:bg-header-cream/30 disabled:cursor-not-allowed disabled:opacity-50 ${twFocusClass}`;
+
 
 export interface PaginationProps {
   className?: string;
@@ -75,9 +86,7 @@ const Paginationx: FC<PaginationProps> = ({ className = "", onPageChange }) => {
                   event.preventDefault();
                   refine(firstPageIndex);
                 }}
-                className={twMerge(
-                  `inline-flex px-4 items-center justify-center rounded-full bg-white hover:bg-neutral-100 border border-neutral-200 text-neutral-6000 dark:text-neutral-400 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:border-neutral-700 ${twFocusClass()}`
-                )}
+                className={paginationFirstButtonClassName(twFocusClass())}
               >
                 First
               </button>
@@ -90,9 +99,7 @@ const Paginationx: FC<PaginationProps> = ({ className = "", onPageChange }) => {
                   event.preventDefault();
                   refine(previousPageIndex);
                 }}
-                className={twMerge(
-                  `inline-flex px-2.5 items-center justify-center rounded-full bg-white hover:bg-neutral-100 border border-neutral-200 text-neutral-6000 dark:text-neutral-400 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:border-neutral-700 ${twFocusClass()}`
-                )}
+                className={paginationNavButtonClassName(twFocusClass())}
               >
                 <ChevronLeft />
               </button>
@@ -106,10 +113,9 @@ const Paginationx: FC<PaginationProps> = ({ className = "", onPageChange }) => {
                     event.preventDefault();
                     refine(page);
                   }}
-                  className={twMerge(
-                    currentRefinement === page
-                      ? `inline-flex w-11 h-11 items-center justify-center rounded-full bg-primary-500 text-white ${twFocusClass()}`
-                      : `inline-flex w-11 h-11 items-center justify-center rounded-full bg-white hover:bg-neutral-100 border border-neutral-200 text-neutral-6000 dark:text-neutral-400 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:border-neutral-700 ${twFocusClass()}`
+                  className={paginationPageButtonClassName(
+                    twFocusClass(),
+                    currentRefinement === page,
                   )}
                 >
                   {page + 1}
@@ -123,10 +129,9 @@ const Paginationx: FC<PaginationProps> = ({ className = "", onPageChange }) => {
                     event.preventDefault();
                     refine(page);
                   }}
-                  className={twMerge(
-                    currentRefinement === page
-                      ? `inline-flex w-11 h-11 items-center justify-center rounded-full bg-primary-500 text-white ${twFocusClass()}`
-                      : `inline-flex w-11 h-11 items-center justify-center rounded-full bg-white hover:bg-neutral-100 border border-neutral-200 text-neutral-6000 dark:text-neutral-400 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:border-neutral-700 ${twFocusClass()}`
+                  className={paginationPageButtonClassName(
+                    twFocusClass(),
+                    currentRefinement === page,
                   )}
                 >
                   {page + 1}
@@ -140,9 +145,7 @@ const Paginationx: FC<PaginationProps> = ({ className = "", onPageChange }) => {
                 event.preventDefault();
                 refine(nextPageIndex);
               }}
-              className={twMerge(
-                `inline-flex px-2.5 items-center justify-center rounded-full bg-white hover:bg-neutral-100 border border-neutral-200 text-neutral-6000 dark:text-neutral-400 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:border-neutral-700 ${twFocusClass()}`
-              )}
+              className={paginationNavButtonClassName(twFocusClass())}
             >
               <ChevronRight />
             </button>
@@ -153,9 +156,7 @@ const Paginationx: FC<PaginationProps> = ({ className = "", onPageChange }) => {
                 event.preventDefault();
                 refine(lastPageIndex);
               }}
-              className={twMerge(
-                `inline-flex px-2.5 items-center justify-center rounded-full bg-white hover:bg-neutral-100 border border-neutral-200 text-neutral-6000 dark:text-neutral-400 dark:bg-neutral-900 dark:hover:bg-neutral-800 dark:border-neutral-700 ${twFocusClass()}`
-              )}
+              className={paginationNavButtonClassName(twFocusClass())}
             >
               <ChevronLast />
             </button>

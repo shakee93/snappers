@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { filterResetClassName } from "@/components/global/primitives/Filters/filterStyles";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useInstantSearch } from "react-instantsearch";
 import { UiState } from "instantsearch.js";
@@ -102,7 +103,7 @@ const FilterResetButton = ({
     <button
       type="button"
       onClick={handleReset}
-      className={`text-sm font-medium text-primary-600 hover:text-primary-700 underline-offset-2 hover:underline ${className}`}
+      className={`${filterResetClassName} ${className}`}
     >
       Reset
     </button>
