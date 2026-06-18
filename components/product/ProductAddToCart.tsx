@@ -2,6 +2,7 @@
 import { Loader, Minus, Plus } from "lucide-react";
 import { useCart } from "@/context/CartProvider";
 import WishlistButton from "@/components/product/WishlistButton";
+import ProductShareControls from "@/components/product/ProductShareControls";
 import {
   ProductVariation,
   SimpleProduct,
@@ -318,62 +319,83 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
     (product.type === "SIMPLE" && product.stockStatus === "IN_STOCK") ||
     (product.type === "VARIABLE" && !!variation && !isProductOutOfStock());
 
+  const renderQuantityControl = () => (
+    <div
+      className={`${cardControlClass} min-w-[108px] shrink-0 justify-between gap-3 px-3`}
+    >
+      <button
+        type="button"
+        onClick={() => setQuantity((current) => Math.max(1, current - 1))}
+        disabled={quantity <= 1}
+        className="text-[#374151] disabled:cursor-not-allowed disabled:opacity-40"
+        aria-label="Decrease quantity"
+      >
+        <Minus className="h-4 w-4" />
+      </button>
+      <span className="min-w-5 text-center text-sm font-medium text-[#1A1A1A]">
+        {quantity}
+      </span>
+      <button
+        type="button"
+        onClick={() => setQuantity((current) => current + 1)}
+        className="text-[#374151]"
+        aria-label="Increase quantity"
+      >
+        <Plus className="h-4 w-4" />
+      </button>
+    </div>
+  );
+
+  const renderBuyNowButton = () => (
+    <button
+      type="button"
+      disabled={isAddToCartDisabled}
+      onClick={() => addItemToCart(true)}
+      className={twMerge(
+        "flex h-11 min-w-0 flex-1 items-center justify-center rounded-lg bg-[#ACDA5A] px-4 text-sm font-bold text-[#38461F] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50",
+      )}
+    >
+      {loading ? (
+        <Loader className="h-4 w-4 animate-spin" />
+      ) : isPreOrderProduct() ? (
+        "Pre-order"
+      ) : (
+        "Buy now"
+      )}
+    </button>
+  );
+
+  const renderWishlistControl = () => (
+    <WishlistButton
+      productId={product.databaseId}
+      className={`${cardControlClass} w-11 shrink-0`}
+    />
+  );
+
   return (
     <div className="w-full">
       {isPreOrderProduct() && <PreOrderNotice className="mb-4" />}
 
       <div className="fixed bottom-[82px] left-0 z-40 w-full border-t border-[#E8E8E8] bg-white p-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] lg:static lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none">
         {!(product.type === "VARIABLE" && !variation) && (
-          <div className="pb-4">
+          <div className="lg:pb-4">
             {isInStock ? (
-              <div className="flex items-center gap-2">
-                <div
-                  className={`${cardControlClass} shrink-0 justify-between gap-3 px-3 min-w-[120px]`}
-                >
-                  <button
-                    type="button"
-                    onClick={() => setQuantity((current) => Math.max(1, current - 1))}
-                    disabled={quantity <= 1}
-                    className="text-[#374151] disabled:cursor-not-allowed disabled:opacity-40"
-                    aria-label="Decrease quantity"
-                  >
-                    <Minus className="h-4 w-4" />
-                  </button>
-                  <span className="min-w-5 text-center text-sm font-medium text-[#1A1A1A]">
-                    {quantity}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setQuantity((current) => current + 1)}
-                    className="text-[#374151]"
-                    aria-label="Increase quantity"
-                  >
-                    <Plus className="h-4 w-4" />
-                  </button>
+              <>
+                {/* Mobile: qty · buy now · wishlist */}
+                <div className="flex items-center gap-2 lg:hidden">
+                  {renderQuantityControl()}
+                  {renderBuyNowButton()}
+                  {renderWishlistControl()}
                 </div>
 
-                <button
-                  type="button"
-                  disabled={isAddToCartDisabled}
-                  onClick={() => addItemToCart(true)}
-                  className={twMerge(
-                    "flex h-11 min-w-0 flex-1 items-center justify-center rounded-lg bg-[#ACDA5A] px-4 text-sm font-bold text-[#38461F] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50",
-                  )}
-                >
-                  {loading ? (
-                    <Loader className="h-4 w-4 animate-spin" />
-                  ) : isPreOrderProduct() ? (
-                    "Pre-order"
-                  ) : (
-                    "Buy now"
-                  )}
-                </button>
-
-                <WishlistButton
-                  productId={product.databaseId}
-                  className={`${cardControlClass} w-11 shrink-0`}
-                />
-              </div>
+                {/* Desktop: qty · buy now · wishlist · share */}
+                <div className="hidden items-center gap-2 lg:flex">
+                  {renderQuantityControl()}
+                  {renderBuyNowButton()}
+                  {renderWishlistControl()}
+                  <ProductShareControls product={product} className="w-auto shrink-0" />
+                </div>
+              </>
             ) : (
               <div className="flex items-center gap-2">
                 <button

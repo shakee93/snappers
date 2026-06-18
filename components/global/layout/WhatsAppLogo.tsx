@@ -52,7 +52,7 @@ const WhatsappLogoComponent = () => {
       className={twMerge(
         "fixed z-[1000] h-8 w-12 transition-transform",
         "max-md:bottom-[120px] max-md:right-7",
-        isSlugPage && "max-md:bottom-[200px]",
+        isSlugPage && "max-md:bottom-[180px]",
         "md:bottom-12 md:right-10 md:mb-5 md:left-auto",
       )}
     >
