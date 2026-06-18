@@ -151,7 +151,7 @@ const AboutPageContent = ({ googleReviews }: AboutPageContentProps) => {
         </div>
       </section>
 
-      <SectionGoogleReviews data={googleReviews} className="mt-0" />
+      <SectionGoogleReviews data={googleReviews} disableTopOffset />
 
       {/* Closing */}
       <section className="bg-[#EDF2EE] px-4 pb-14 pt-4 text-center md:px-6 md:pb-20">

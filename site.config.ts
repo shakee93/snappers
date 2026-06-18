@@ -190,18 +190,13 @@ export const siteConfig = {
     },
     support: {
       heading: "Our experts are available 24/7",
-      phones: [
-        // { display: "071 606 0123", tel: "0716060123" },
-        { display: "011 250 0177", tel: "0112500177" },
-      ],
+      phones: [{ display: "011 250 0177", tel: "0112500177" }],
     },
   },
   social: {
     facebook: "catlitter.lk",
     instagram: "catlittersrilanka",
     tiktok: "@catlitter.lk",
-    x: "catlitter",
-    linkedin: "catlitter",
     googleReviewUrl:
       "https://www.google.com/search?hl=en-LK&gl=lk&q=ground+floor,+GQ+-The+Mobile+Store,+250,+54+R.+A.+De+Mel+Mawatha,+Colombo+00300&ludocid=1458190955880003094&lsig=AB86z5VvNAV33q2slj2rSzJqGGyh#lrd=0x3ae25975d215fa97:0x143c88f2d3ea3616,3",
   },
