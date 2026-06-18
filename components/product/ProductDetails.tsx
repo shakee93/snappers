@@ -20,6 +20,7 @@ import ProductStarRating from "@/components/product/ProductStarRating";
 import ProductTrustBadges from "@/components/product/ProductTrustBadges";
 import ProductPaymentOptions from "@/components/product/ProductPaymentOptions";
 import ProductPurchaseAccordions from "@/components/product/ProductPurchaseAccordions";
+import ProductShareControls from "@/components/product/ProductShareControls";
 import BrandLogo from "@/components/product/BrandLogo";
 import {
   stripReviewHtml,
@@ -645,14 +646,6 @@ const ProductDetails = ({
         <p className="text-sm font-medium text-[#6B7280]">Currently unavailable</p>
       )}
 
-      <ProductTrustBadges />
-
-      {displayNumericPrice > 0 && (
-        <ProductPaymentOptions numericPrice={displayNumericPrice} />
-      )}
-
-      <ProductPurchaseAccordions product={product} />
-
       <div className="max-lg:h-0 max-lg:overflow-visible">
         <ProductAddToCart
           product={product}
@@ -663,6 +656,16 @@ const ProductDetails = ({
           }
         />
       </div>
+
+      <ProductShareControls product={product} className="lg:hidden" />
+
+      <ProductTrustBadges />
+
+      {displayNumericPrice > 0 && (
+        <ProductPaymentOptions numericPrice={displayNumericPrice} />
+      )}
+
+      <ProductPurchaseAccordions product={product} />
     </div>
   );
 };

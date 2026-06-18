@@ -45,7 +45,7 @@ const UpsellProducts = ({
   const { description } = upsellContent as { description: string };
 
   return (
-    <section className="w-full bg-[#F5F5F5] px-3 py-12 md:py-16 lg:px-6">
+    <section className="w-full bg-white px-3 py-12 md:py-16 lg:px-6">
       <div className="mx-auto w-full max-w-[1368px]">
         <div className="mx-auto max-w-3xl text-center">
           <h2 className="font-albra text-3xl font-bold leading-tight text-[#092412] sm:text-4xl md:text-5xl lg:text-6xl">

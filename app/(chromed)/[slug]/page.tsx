@@ -178,7 +178,7 @@ const Page = async (props: Props) => {
     ) as string[];
 
     return (
-      <div className="bg-white pb-28 lg:pb-12">
+      <div className="bg-white pb-[160px] lg:pb-12">
         <main className="mx-auto flex max-w-[1368px] flex-col px-3 sm:px-4 lg:px-6">
           <script
             type="application/ld+json"
