@@ -18,6 +18,7 @@ import SectionShopByCategory, {
 } from "@/components/home/SectionShopByCategory";
 import SectionDealCountdown from "@/components/home/SectionDealCountdown";
 import SectionDealProducts from "@/components/home/SectionDealProducts";
+import SectionHowToOrder from "@/components/home/SectionHowToOrder";
 import SectionHealthProducts from "@/components/home/SectionHealthProducts";
 import SectionBrowseProducts, {
   type BrowseInitialCache,
@@ -197,6 +198,8 @@ export default async function Home() {
         <div className="mt-8 md:mt-10">
           <SectionDealProducts products={dealProducts} />
         </div>
+
+        <SectionHowToOrder className="mt-16 md:mt-24" />
 
         <div className="mt-16 md:mt-24">
           <SectionHealthProducts

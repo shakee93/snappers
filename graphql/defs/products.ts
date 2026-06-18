@@ -508,6 +508,27 @@ export const GET_CATEGORY_ARCHIVE_IN_STOCK = gql`
   ${ProductContentCard}
 `;
 
+/** Same-category PDP fallback — includes out-of-stock so the row can still render. */
+export const GET_CATEGORY_ARCHIVE_RELATED = gql`
+  query GetCategoryArchiveRelated(
+    $categoryIdIn: [Int] = null
+    $first: Int = 10
+    $exclude: [Int] = null
+  ) {
+    products(
+      first: $first
+      where: { categoryIdIn: $categoryIdIn, exclude: $exclude }
+    ) {
+      edges {
+        node {
+          ...ProductContentCard
+        }
+      }
+    }
+  }
+  ${ProductContentCard}
+`;
+
 export const GET_PRODUCTS_NODES = gql`
   query getProductsNode($categoryIdIn: [Int] = null, $first: Int = 10) {
     products(

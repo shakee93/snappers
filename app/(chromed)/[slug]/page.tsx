@@ -1,10 +1,6 @@
-import ProductDetails from "@/components/product/ProductDetails";
-import ProductImage from "@/components/product/ProductImage2";
-import FreeGiftPreview from "@/components/product/FreeGiftPreview";
-import HappiestCustomersGallery from "@/components/product/HappiestCustomersGallery";
+import ProductPdpLayout from "@/components/product/ProductPdpLayout";
 import { Suspense } from "react";
 import { Metadata, ResolvingMetadata } from "next";
-import { ImageProvider } from "@/context/ImageChangeGrabber";
 import UpsellProducts from "@/components/product/UpsellProducts";
 import ArchiveLayout from "@/components/global/primitives/archive/ArchiveLayout";
 import { getProductSchema } from "@/lib/jsonld/productSchema";
@@ -182,7 +178,7 @@ const Page = async (props: Props) => {
     ) as string[];
 
     return (
-      <div className="bg-white pb-6 lg:pb-12">
+      <div className="bg-white pb-28 lg:pb-12">
         <main className="mx-auto flex max-w-[1368px] flex-col px-3 sm:px-4 lg:px-6">
           <script
             type="application/ld+json"
@@ -207,32 +203,16 @@ const Page = async (props: Props) => {
             <span className="text-[#1A1A1A]">{product.name}</span>
           </nav>
 
-        <div className="grid grid-cols-1 gap-6 rounded-3xl bg-[#FAFAF8] p-4 sm:p-6 lg:grid-cols-7 lg:gap-10 lg:p-8">
-            <ImageProvider>
-              <div className="flex flex-col gap-4 lg:col-span-3 lg:gap-6">
-                <Suspense
-                  fallback={
-                    <div className="flex min-h-[280px] items-center justify-center rounded-2xl bg-[#F6F6F6] text-sm text-[#6B7280]">
-                      Loading images…
-                    </div>
-                  }
-                >
-                  <ProductImage product={product} />
-                </Suspense>
-                <FreeGiftPreview product={product} />
-                <HappiestCustomersGallery images={happiestCustomersImages} />
-              </div>
-
-              <div className="flex flex-col lg:col-span-4">
-                <ProductDetails brand={brand} product={product} />
-              </div>
-            </ImageProvider>
-          </div>
-
-          <div className="mt-8 lg:mt-12">
-            <UpsellProducts newArrivals={upsellProducts} />
+        <div className="rounded-3xl bg-[#FAFAF8] p-4 sm:p-6 lg:p-8">
+            <ProductPdpLayout
+              product={product}
+              brand={brand}
+              happiestCustomersImages={happiestCustomersImages}
+            />
           </div>
         </main>
+
+        <UpsellProducts relatedProducts={upsellProducts} />
       </div>
     );
   }

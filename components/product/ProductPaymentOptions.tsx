@@ -12,7 +12,7 @@ interface ProductPaymentOptionsProps {
 }
 
 const optionCardClass =
-  "flex min-h-[72px] items-center justify-between gap-2 rounded-2xl border border-[#E8E8E8] bg-white p-3";
+  "flex min-h-[72px] items-center justify-between gap-3 rounded-2xl border border-[#E8E8E8] bg-white p-3 sm:gap-2";
 
 const splitPayCardClass =
   "flex min-h-[72px] items-center gap-3 rounded-2xl border border-[#E8E8E8] bg-white p-3";
@@ -22,16 +22,16 @@ const paymentOptions: Array<{
   alt: string;
   imageClassName?: string;
 }> = [
-  { image: cashPrice, alt: "Cash Price", imageClassName: "h-8 w-auto max-w-[55%] object-contain" },
+  { image: cashPrice, alt: "Cash Price", imageClassName: "h-8 w-auto max-w-[50%] object-contain sm:max-w-[55%]" },
   {
     image: bankTransfer,
     alt: "Bank Transfer",
-    imageClassName: "h-8 w-auto max-w-[55%] object-contain",
+    imageClassName: "h-8 w-auto max-w-[50%] object-contain sm:max-w-[55%]",
   },
   {
     image: visaMastercard,
     alt: "Visa and Mastercard",
-    imageClassName: "h-7 w-auto max-w-[55%] object-contain",
+    imageClassName: "h-7 w-auto max-w-[50%] object-contain sm:max-w-[55%]",
   },
   {
     image: amex,
@@ -53,7 +53,7 @@ const ProductPaymentOptions = ({
       <div className="space-y-3">
         <p className="text-sm font-bold text-[#1A1A1A]">Payment Options</p>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {paymentOptions.map((option) => (
             <div key={option.alt} className={optionCardClass}>
               <Image
@@ -61,7 +61,7 @@ const ProductPaymentOptions = ({
                 alt={option.alt}
                 className={option.imageClassName ?? "h-8 w-auto object-contain"}
               />
-              <div className="shrink-0 text-right">
+              <div className="shrink-0 whitespace-nowrap text-right">
                 <p className="text-xs text-[#9CA3AF]">Price</p>
                 <p className="text-sm font-bold text-[#1A1A1A]">{formattedPrice}</p>
               </div>
