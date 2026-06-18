@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useMyOrders } from "@/hooks/useMyOrders";
@@ -15,7 +15,11 @@ import {
 } from "@/components/account/accountOrderUtils";
 import { parseWooMoneyAmount } from "@/lib/cartLinePricing";
 import { formatPrice } from "@/lib/formatPrice";
-import { LineItem, Order, Product } from "@/graphql/types/graphql";
+import type {
+  MyOrder,
+  MyOrderLineItem,
+  MyOrderProduct,
+} from "@/graphql/defs/order";
 import {
   accountLinkClassName,
   accountOrderCardClassName,
@@ -26,7 +30,7 @@ const OrderProductThumb = ({
   product,
   extraCount,
 }: {
-  product?: Product | null;
+  product?: MyOrderProduct | null;
   extraCount: number;
 }) => {
   const imageUrl = product?.featuredImage?.node?.sourceUrl;
@@ -56,24 +60,32 @@ const OrderProductThumb = ({
   );
 };
 
-const OrderCard = ({
+const OrderCard = memo(function OrderCard({
   order,
   onSelect,
 }: {
-  order: Order;
-  onSelect: (order: Order) => void;
-}) => {
-  const lineItems = (order.lineItems?.nodes ?? []).filter(
-    (item): item is LineItem => !!item?.product?.node
+  order: MyOrder;
+  onSelect: (order: MyOrder) => void;
+}) {
+  const lineItems = useMemo(
+    () =>
+      (order.lineItems?.nodes ?? []).filter(
+        (item): item is MyOrderLineItem => !!item?.product?.node,
+      ),
+    [order.lineItems?.nodes],
   );
+
   const firstItem = lineItems[0];
   const firstProduct = firstItem?.product?.node;
   const extraItemCount = Math.max(0, lineItems.length - 1);
 
-  const productTitle =
-    lineItems.length === 1
-      ? firstProduct?.name ?? "Product"
-      : `${firstProduct?.name ?? "Product"} + ${extraItemCount} more`;
+  const productTitle = useMemo(
+    () =>
+      lineItems.length === 1
+        ? firstProduct?.name ?? "Product"
+        : `${firstProduct?.name ?? "Product"} + ${extraItemCount} more`,
+    [extraItemCount, firstProduct?.name, lineItems.length],
+  );
 
   return (
     <article
@@ -127,18 +139,26 @@ const OrderCard = ({
       </div>
     </article>
   );
-};
+});
 
 const AccountOrdersPanel = () => {
   const { loading, error, data, refetch } = useMyOrders();
   const { customer } = useSession();
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<MyOrder | null>(null);
 
   useEffect(() => {
     if (customer?.id === "guest") {
       window.location.href = "/";
     }
   }, [customer]);
+
+  const orders = useMemo(
+    () =>
+      (data?.customer?.orders?.nodes ?? []).filter(
+        (order): order is MyOrder => !!order,
+      ),
+    [data?.customer?.orders?.nodes],
+  );
 
   if (loading) {
     return <LoadingSkeleton />;
@@ -147,10 +167,6 @@ const AccountOrdersPanel = () => {
   if (error) {
     return <p className="text-sm text-red-600">Error: {error.message}</p>;
   }
-
-  const orders = (data?.customer?.orders?.nodes ?? []).filter(
-    (order): order is Order => !!order
-  );
 
   return (
     <div className="space-y-6 sm:space-y-8">

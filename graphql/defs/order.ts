@@ -204,10 +204,23 @@ export const GET_MY_ORDERS = gql`
                   name
                   slug
                   productId
+                  type
                   brands {
                     nodes {
                       name
                       slug
+                    }
+                  }
+                }
+              }
+              variation {
+                node {
+                  name
+                  attributes {
+                    nodes {
+                      label
+                      name
+                      value
                     }
                   }
                 }
@@ -220,6 +233,87 @@ export const GET_MY_ORDERS = gql`
   }
   ${CustomerAddressFragment}
 `;
+
+export type MyOrderAddress = {
+  firstName?: string | null;
+  lastName?: string | null;
+  address1?: string | null;
+  address2?: string | null;
+  city?: string | null;
+  country?: string | null;
+  state?: string | null;
+  postcode?: string | null;
+  phone?: string | null;
+  email?: string | null;
+};
+
+export type MyOrderProduct = {
+  databaseId?: number | null;
+  id?: string | null;
+  name?: string | null;
+  slug?: string | null;
+  type?: string | null;
+  featuredImage?: { node?: { sourceUrl?: string | null } | null } | null;
+};
+
+export type MyOrderLineItem = {
+  databaseId?: number | null;
+  id: string;
+  orderId?: number | null;
+  productId?: number | null;
+  quantity?: number | null;
+  subtotal?: string | null;
+  total?: string | null;
+  product?: { node?: MyOrderProduct | null } | null;
+  variation?: {
+    node?: {
+      name?: string | null;
+      attributes?: {
+        nodes?: Array<{
+          label?: string | null;
+          name?: string | null;
+          value?: string | null;
+        } | null> | null;
+      } | null;
+    } | null;
+  } | null;
+};
+
+export type MyOrder = {
+  date?: string | null;
+  id: string;
+  databaseId?: number | null;
+  orderNumber?: string | null;
+  total?: string | null;
+  subtotal?: string | null;
+  status?: string | null;
+  paymentMethod?: string | null;
+  paymentMethodTitle?: string | null;
+  shippingTotal?: string | null;
+  billing?: MyOrderAddress | null;
+  shipping?: MyOrderAddress | null;
+  shippingLines?: {
+    nodes?: Array<{
+      methodTitle?: string | null;
+      total?: string | null;
+    } | null> | null;
+  } | null;
+  metaData?: Array<{
+    id?: string | null;
+    key?: string | null;
+    value?: string | null;
+  } | null> | null;
+  lineItems?: { nodes?: Array<MyOrderLineItem | null> | null } | null;
+};
+
+export type GetMyOrdersQuery = {
+  customer?: {
+    id?: string | null;
+    databaseId?: number | null;
+    orderCount?: number | null;
+    orders?: { nodes?: Array<MyOrder | null> | null } | null;
+  } | null;
+};
 
 export const GET_ADDRESSES = gql`
   query getShippingDetails {

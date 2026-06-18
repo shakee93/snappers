@@ -185,24 +185,40 @@ const BillingForm: FC<BillingFormProps> = ({ onSaved, embedded = false }) => {
                 </div>
               )}
               {embedded ? (
-                <div className="grid grid-cols-2 gap-2">
-                  <AccountInputField
-                  compact={embedded}
-                    label="Apt, Suite, etc."
-                    name="address2"
-                    placeholder="Apt, Suite, etc."
-                    value={formData.address2}
+                <>
+                  <div className="grid grid-cols-2 gap-2">
+                    <AccountInputField
+                      compact={embedded}
+                      label="Apt, Suite, etc."
+                      name="address2"
+                      placeholder="Apt, Suite, etc."
+                      value={formData.address2}
+                      onChange={handleChange}
+                    />
+                    <AccountInputField
+                      compact={embedded}
+                      label="Town/City"
+                      name="city"
+                      placeholder="Town/City"
+                      value={formData.city}
+                      onChange={handleChange}
+                    />
+                  </div>
+                  <AccountSelectField
+                    compact={embedded}
+                    label="Country"
+                    name="country"
+                    value={formData.country}
+                    options={[
+                      {
+                        value: siteConfig.locale.countryCode,
+                        label: siteConfig.locale.countryName,
+                      },
+                    ]}
                     onChange={handleChange}
+                    disabled={true}
                   />
-                  <AccountInputField
-                  compact={embedded}
-                    label="Town/City"
-                    name="city"
-                    placeholder="Town/City"
-                    value={formData.city}
-                    onChange={handleChange}
-                  />
-                </div>
+                </>
               ) : (
                 <div className="flex gap-2">
                   <AccountInputField
@@ -224,19 +240,6 @@ const BillingForm: FC<BillingFormProps> = ({ onSaved, embedded = false }) => {
                   />
                 </div>
               )}
-              {embedded ? (
-                <div className="hidden sm:block">
-                  <AccountSelectField
-                    compact={embedded}
-                    label="Country"
-                    name="country"
-                    value={formData.country}
-                    options={[{ value: siteConfig.locale.countryCode, label: siteConfig.locale.countryName }]}
-                    onChange={handleChange}
-                    disabled={true}
-                  />
-                </div>
-              ) : null}
               <div className={embedded ? "grid grid-cols-2 gap-2" : "flex gap-2"}>
                 <AccountInputField
                   compact={embedded}

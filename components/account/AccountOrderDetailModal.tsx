@@ -6,8 +6,9 @@ import { Fragment } from "react";
 import { Mail, Phone } from "lucide-react";
 import ButtonClose from "@/shared/ButtonClose/ButtonClose";
 import OrderBankReceiptUpload from "@/components/global/ui/OrderBankReceiptUpload";
-import useProductLink from "@/hooks/useProductLink";
+import { getProductPath } from "@/lib/productUrl";
 import {
+  formatLineItemVariation,
   formatOrderMoney,
   formatOrderSummaryDate,
   formatPaymentMethod,
@@ -18,7 +19,7 @@ import { decodeHtmlEntities } from "@/lib/decodeHtmlEntities";
 import {
   hasSavedAddress,
 } from "@/lib/formatCustomerAddress";
-import { CustomerAddress, LineItem, Order } from "@/graphql/types/graphql";
+import type { MyOrder, MyOrderLineItem } from "@/graphql/defs/order";
 
 const DetailRow = ({
   label,
@@ -41,10 +42,11 @@ const DetailRow = ({
   </tr>
 );
 
-const ProductRow = ({ item }: { item: LineItem }) => {
+const ProductRow = ({ item }: { item: MyOrderLineItem }) => {
   const product = item.product?.node;
-  const link = useProductLink(product);
+  const link = product?.slug ? getProductPath({ slug: product.slug }) : "";
   const name = decodeHtmlEntities(product?.name ?? "Product");
+  const variationLabel = formatLineItemVariation(item);
   const quantity = item.quantity ?? 1;
   const isFree = isLineItemFree(item.total, item.subtotal);
   const priceLabel = isFree
@@ -62,6 +64,9 @@ const ProductRow = ({ item }: { item: LineItem }) => {
         >
           {name} × {quantity}
         </Link>
+        {variationLabel ? (
+          <p className="mt-1 text-xs text-neutral-500">{variationLabel}</p>
+        ) : null}
       </td>
       <td
         className={`px-4 py-3 text-right align-top text-sm ${
@@ -74,7 +79,11 @@ const ProductRow = ({ item }: { item: LineItem }) => {
   );
 };
 
-const BillingAddressBlock = ({ billing }: { billing: CustomerAddress }) => {
+const BillingAddressBlock = ({
+  billing,
+}: {
+  billing: NonNullable<MyOrder["billing"]>;
+}) => {
   const name = [billing.firstName, billing.lastName].filter(Boolean).join(" ");
   const locality = [billing.city, billing.state, billing.postcode]
     .filter(Boolean)
@@ -113,7 +122,7 @@ const BillingAddressBlock = ({ billing }: { billing: CustomerAddress }) => {
 };
 
 interface AccountOrderDetailModalProps {
-  order: Order | null;
+  order: MyOrder | null;
   show: boolean;
   onClose: () => void;
   onUploadSuccess: () => void;
@@ -148,7 +157,7 @@ const AccountOrderDetailModal = ({
   const orderDatabaseId =
     order.databaseId?.toString() || order.orderNumber || "";
   const lineItems = (order.lineItems?.nodes ?? []).filter(
-    (item): item is LineItem => !!item?.product?.node
+    (item): item is MyOrderLineItem => !!item?.product?.node,
   );
   const billing = order.billing;
   const hasBilling = hasSavedAddress(billing);

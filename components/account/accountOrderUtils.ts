@@ -1,6 +1,7 @@
 import { parseWooMoneyAmount } from "@/lib/cartLinePricing";
 import { decodeHtmlEntities } from "@/lib/decodeHtmlEntities";
 import { formatPrice } from "@/lib/formatPrice";
+import type { MyOrderLineItem } from "@/graphql/defs/order";
 
 export const PAYMENT_LABELS: Record<string, string> = {
   cod: "Cash on Delivery",
@@ -45,7 +46,32 @@ export function formatPaymentMethod(
 
 export function formatStatus(status: string | null | undefined) {
   if (!status) return "Unknown";
-  return status.charAt(0) + status.slice(1).toLowerCase();
+  return status
+    .toLowerCase()
+    .replace(/_/g, " ")
+    .replace(/^\w/, (char) => char.toUpperCase());
+}
+
+/** Human-readable variation summary for an order line item. */
+export function formatLineItemVariation(item: MyOrderLineItem): string | null {
+  const attributes = (item.variation?.node?.attributes?.nodes ?? []).filter(
+    (attr): attr is NonNullable<typeof attr> =>
+      !!attr?.label?.trim() && !!attr?.value?.trim(),
+  );
+
+  if (attributes.length > 0) {
+    return attributes
+      .map((attr) => `${attr.label}: ${attr.value}`)
+      .join(" · ");
+  }
+
+  const variationName = item.variation?.node?.name?.trim();
+  const productName = item.product?.node?.name?.trim();
+  if (variationName && variationName !== productName) {
+    return variationName;
+  }
+
+  return null;
 }
 
 export function statusBadgeClass(status: string | null | undefined) {

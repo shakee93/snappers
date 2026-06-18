@@ -24,7 +24,6 @@ const AccountInfoPanel: FC = () => {
     address: "",
     gender: "",
     phoneNumber: "",
-    about: "",
   });
 
   const router = useRouter();
@@ -49,8 +48,6 @@ const AccountInfoPanel: FC = () => {
         gender:
           customer.metaData?.find((md) => md?.key === "gender")?.value || "",
         phoneNumber: customer.shipping?.phone || "",
-        about:
-          customer.metaData?.find((md) => md?.key === "about")?.value || "",
       });
     }
   }, [customer]);
@@ -75,15 +72,8 @@ const AccountInfoPanel: FC = () => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const {
-      displayName,
-      email,
-      dateOfBirth,
-      address,
-      gender,
-      phoneNumber,
-      about,
-    } = formData;
+    const { displayName, email, dateOfBirth, address, gender, phoneNumber } =
+      formData;
 
     const input = {
       shipping: { address1: address, phone: phoneNumber },
@@ -92,7 +82,6 @@ const AccountInfoPanel: FC = () => {
       metaData: [
         { key: "dob", value: dateOfBirth },
         { key: "gender", value: gender },
-        { key: "about", value: about },
       ],
     };
 
@@ -102,9 +91,7 @@ const AccountInfoPanel: FC = () => {
     } catch {
       toast.error("Something Went Wrong!");
     } finally {
-      setTimeout(() => {
-        setIsSubmitting(false);
-      }, 3000);
+      setIsSubmitting(false);
     }
   };
 
