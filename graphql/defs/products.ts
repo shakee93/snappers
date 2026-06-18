@@ -550,15 +550,17 @@ export const GET_PRODUCTS_NODES = gql`
 export const GET_ARCHIVE_PRODUCTS = gql`
   query GetArchiveProducts(
     $first: Int = 45
+    $after: String
     $categoryIdIn: [Int]
     $stockStatus: [StockStatusEnum]
     $onSale: Boolean
     $minPrice: Float
     $maxPrice: Float
-    $orderby: ProductsOrderByInput = { field: DATE, order: DESC }
+    $orderby: [ProductsOrderbyInput] = [{ field: DATE, order: DESC }]
   ) {
     products(
       first: $first
+      after: $after
       where: {
         categoryIdIn: $categoryIdIn
         stockStatus: $stockStatus
@@ -568,6 +570,10 @@ export const GET_ARCHIVE_PRODUCTS = gql`
         orderby: $orderby
       }
     ) {
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
       nodes {
         ...ProductContentCard
       }

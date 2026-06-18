@@ -9,6 +9,7 @@ import {
   ARCHIVE_SORT_OPTIONS,
   ArchiveFilterState,
   normalizePriceRange,
+  parseArchivePriceInput,
 } from "@/lib/archiveFilters";
 import {
   filterCheckboxLabelClassName,
@@ -77,7 +78,10 @@ const ArchivePriceRangeInputs = ({
   const [maxPrice, setMaxPrice] = useState(String(committedMax));
 
   const commitPriceRange = () => {
-    const next = normalizePriceRange(Number(minPrice), Number(maxPrice));
+    const next = normalizePriceRange(
+      parseArchivePriceInput(minPrice, "min"),
+      parseArchivePriceInput(maxPrice, "max"),
+    );
     onChange(next);
   };
 

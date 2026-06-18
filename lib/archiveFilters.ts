@@ -71,7 +71,7 @@ export interface ArchiveFilterState {
 
 export const DEFAULT_ARCHIVE_FILTERS: ArchiveFilterState = {
   onSale: false,
-  inStock: true,
+  inStock: false,
   minPrice: ARCHIVE_PRICE_MIN,
   maxPrice: ARCHIVE_PRICE_MAX,
   sort: DEFAULT_ARCHIVE_SORT,
@@ -103,7 +103,7 @@ export function parseArchiveFilters(
 
   return {
     onSale: parseBooleanParam(searchParams.get("on_sale"), false),
-    inStock: parseBooleanParam(searchParams.get("in_stock"), true),
+    inStock: parseBooleanParam(searchParams.get("in_stock"), false),
     minPrice: parsePriceParam(
       searchParams.get("min_price"),
       ARCHIVE_PRICE_MIN,
@@ -125,8 +125,8 @@ export function buildArchiveFilterSearchParams(
     params.set("on_sale", "true");
   }
 
-  if (!filters.inStock) {
-    params.set("in_stock", "false");
+  if (filters.inStock) {
+    params.set("in_stock", "true");
   }
 
   if (filters.minPrice > ARCHIVE_PRICE_MIN) {
@@ -146,12 +146,13 @@ export function buildArchiveFilterSearchParams(
 
 export interface ArchiveProductsQueryVariables {
   first: number;
+  after?: string | null;
   categoryIdIn?: number[];
   stockStatus?: StockStatusEnum[];
   onSale?: boolean;
   minPrice?: number;
   maxPrice?: number;
-  orderby: { field: ProductsOrderByEnum; order: OrderEnum };
+  orderby: Array<{ field: ProductsOrderByEnum; order: OrderEnum }>;
 }
 
 export function toArchiveProductsVariables(
@@ -165,7 +166,7 @@ export function toArchiveProductsVariables(
 
   const variables: ArchiveProductsQueryVariables = {
     first,
-    orderby: { field: sortOption.field, order: sortOption.order },
+    orderby: [{ field: sortOption.field, order: sortOption.order }],
   };
 
   if (categoryIds && categoryIds.length > 0) {
@@ -189,6 +190,21 @@ export function toArchiveProductsVariables(
   }
 
   return variables;
+}
+
+/** Parse a price input; empty string restores the bound to its default. */
+export function parseArchivePriceInput(
+  value: string,
+  bound: "min" | "max",
+): number {
+  if (value.trim() === "") {
+    return bound === "min" ? ARCHIVE_PRICE_MIN : ARCHIVE_PRICE_MAX;
+  }
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) {
+    return bound === "min" ? ARCHIVE_PRICE_MIN : ARCHIVE_PRICE_MAX;
+  }
+  return Math.min(Math.max(parsed, ARCHIVE_PRICE_MIN), ARCHIVE_PRICE_MAX);
 }
 
 export function normalizePriceRange(

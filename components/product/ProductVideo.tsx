@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { PlayIcon } from "lucide-react";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import { getProductVideoUrl, type ProductVideoSource } from "@/lib/productVideo";
+import { getYoutubeVideoId } from "@/lib/youtube";
 import { siteConfig } from "@/site.config";
 
 type ProductVideoProps = {
@@ -46,38 +47,23 @@ const getTikTokEmbedUrl = (url: string): string | null => {
 };
 
 const getYouTubeEmbedUrl = (url: string): string | null => {
-  try {
-    let videoId: string | null = null;
+  const videoId = getYoutubeVideoId(url);
+  if (!videoId) return null;
 
-    if (url.includes("youtu.be/")) {
-      const match = url.match(/youtu\.be\/([^?&]+)/);
-      videoId = match ? match[1] : null;
-    } else if (url.includes("youtube.com/watch")) {
-      videoId = new URL(url).searchParams.get("v");
-    } else if (url.includes("youtube.com/embed/")) {
-      const match = url.match(/embed\/([^?&]+)/);
-      videoId = match ? match[1] : null;
-    }
+  const params = new URLSearchParams({
+    controls: "1",
+    showinfo: "0",
+    rel: "0",
+    modestbranding: "1",
+    iv_load_policy: "3",
+    mute: "1",
+    loop: "1",
+    playlist: videoId,
+    playsinline: "1",
+    origin: siteConfig.url.base,
+  });
 
-    if (!videoId) return null;
-
-    const params = new URLSearchParams({
-      controls: "1",
-      showinfo: "0",
-      rel: "0",
-      modestbranding: "1",
-      iv_load_policy: "3",
-      mute: "1",
-      loop: "1",
-      playlist: videoId,
-      playsinline: "1",
-      origin: siteConfig.url.base,
-    });
-
-    return `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
-  } catch {
-    return null;
-  }
+  return `https://www.youtube.com/embed/${videoId}?${params.toString()}`;
 };
 
 const isTikTokUrl = (url?: string): boolean => {
