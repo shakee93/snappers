@@ -177,40 +177,48 @@ const ProductCard = ({
     <div
       className={`relative flex h-full flex-col overflow-hidden rounded-xl border border-neutral-200 bg-white ${className}`}
     >
-      <Link
-        href={link || "#"}
-        className="relative block aspect-square bg-[#FAFAFA]"
-      >
-        {isOutOfStock ? (
-          <span className="absolute left-2.5 top-2.5 z-10 rounded-md bg-neutral-700 px-2.5 py-1 text-[11px] font-bold leading-none text-white sm:px-3 sm:text-xs">
-            Out of Stock
-          </span>
-        ) : (
-          badge && (
-            <span
-              style={{ backgroundColor: accentColor }}
-              className="absolute left-2.5 top-2.5 z-10 rounded-md px-2.5 py-1 text-[11px] font-bold leading-none text-black sm:px-3 sm:text-xs"
-            >
-              {badge}
+      <div className="relative">
+        <Link
+          href={link || "#"}
+          className="relative block aspect-square bg-[#FAFAFA]"
+        >
+          {isOutOfStock ? (
+            <span className="absolute left-2.5 top-2.5 z-10 rounded-md bg-neutral-700 px-2.5 py-1 text-[11px] font-bold leading-none text-white sm:px-3 sm:text-xs">
+              Out of Stock
             </span>
-          )
-        )}
+          ) : (
+            badge && (
+              <span
+                style={{ backgroundColor: accentColor }}
+                className="absolute left-2.5 top-2.5 z-10 rounded-md px-2.5 py-1 text-[11px] font-bold leading-none text-black sm:px-3 sm:text-xs"
+              >
+                {badge}
+              </span>
+            )
+          )}
 
-        {imageUrl ? (
-          <Image
-            src={imageUrl}
-            alt={name ?? "Product"}
-            width={400}
-            height={400}
-            sizes="(max-width: 640px) 45vw, 20vw"
-            className={`aspect-square w-full object-cover ${
-              isOutOfStock ? "opacity-50" : ""
-            }`}
-          />
-        ) : (
-          <div className="aspect-square w-full bg-neutral-200/60" aria-hidden />
-        )}
-      </Link>
+          {imageUrl ? (
+            <Image
+              src={imageUrl}
+              alt={name ?? "Product"}
+              width={400}
+              height={400}
+              sizes="(max-width: 640px) 45vw, 20vw"
+              className={`aspect-square w-full object-cover ${
+                isOutOfStock ? "opacity-50" : ""
+              }`}
+            />
+          ) : (
+            <div className="aspect-square w-full bg-neutral-200/60" aria-hidden />
+          )}
+        </Link>
+
+        <WishlistButton
+          productId={productDbId}
+          size={18}
+          className="absolute bottom-2.5 right-2.5 z-10 flex h-9 w-9 items-center justify-center rounded-lg border border-neutral-200 bg-[#fafaf8] shadow-sm hover:bg-neutral-50 sm:bottom-3 sm:right-3"
+        />
+      </div>
 
       <div className="flex flex-1 flex-col border-t border-neutral-200 px-3 pb-3 pt-2.5 sm:px-4 sm:pb-4 sm:pt-3">
         <Link href={link || "#"} className="flex-1">
@@ -232,13 +240,13 @@ const ProductCard = ({
           </div>
         )}
 
-        <div className="mt-3 flex items-stretch gap-2 sm:mt-4">
+        <div className="mt-3 sm:mt-4">
           <button
             type="button"
             style={{ backgroundColor: accentColor }}
             disabled={loading || isOutOfStock}
             onClick={handleAddToCart}
-            className="flex min-w-0 flex-1 items-center justify-between rounded-lg px-3 py-2.5 text-left text-[13px] font-bold text-black transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:py-3 sm:text-sm"
+            className="flex w-full min-w-0 items-center justify-between rounded-lg px-3 py-2.5 text-left text-[13px] font-bold text-black transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:py-3 sm:text-sm"
           >
             <span>{loading ? "Adding…" : buttonLabel}</span>
             <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-black">
@@ -249,11 +257,6 @@ const ProductCard = ({
               )}
             </span>
           </button>
-          <WishlistButton
-            productId={productDbId}
-            size={18}
-            className="flex w-11 shrink-0 items-center justify-center rounded-lg border border-neutral-200 bg-white hover:bg-neutral-50"
-          />
         </div>
       </div>
     </div>
