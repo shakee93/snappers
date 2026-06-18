@@ -22,15 +22,21 @@ const paginationFirstButtonClassName = (twFocusClass: string) =>
 
 const MOBILE_MEDIA_QUERY = "(max-width: 767px)";
 
+const subscribeIsMobile = (onStoreChange: () => void) => {
+  const mediaQueryList = window.matchMedia(MOBILE_MEDIA_QUERY);
+  mediaQueryList.addEventListener("change", onStoreChange);
+  return () => mediaQueryList.removeEventListener("change", onStoreChange);
+};
+
+const getIsMobileSnapshot = () => window.matchMedia(MOBILE_MEDIA_QUERY).matches;
+
+const getIsMobileServerSnapshot = () => false;
+
 function useIsMobile(): boolean {
   return useSyncExternalStore(
-    (onStoreChange) => {
-      const mediaQueryList = window.matchMedia(MOBILE_MEDIA_QUERY);
-      mediaQueryList.addEventListener("change", onStoreChange);
-      return () => mediaQueryList.removeEventListener("change", onStoreChange);
-    },
-    () => window.matchMedia(MOBILE_MEDIA_QUERY).matches,
-    () => false,
+    subscribeIsMobile,
+    getIsMobileSnapshot,
+    getIsMobileServerSnapshot,
   );
 }
 
