@@ -1,14 +1,24 @@
 {
+  "email": "catlitter.lk@gmail.com",
   "locations": [
     {
-      "name": "Pet & Co",
-      "addressLine1": "No 122 Galle Rd,",
+      "name": "Catlitter.lk (Main)",
+      "addressLine1": "No. 107, Kirula Road, Narahenpita,",
+      "addressLine2": "Colombo 05, Sri Lanka",
+      "phones": [
+        { "display": "071 606 0123", "tel": "0716060123" },
+        { "display": "011 250 0177", "tel": "0112500177" }
+      ]
+    },
+    {
+      "name": "Pet & Co.",
+      "addressLine1": "No. 122, Galle Road,",
       "addressLine2": "Dehiwala-Mount Lavinia",
       "phones": [{ "display": "077 713 8138", "tel": "0777138138" }]
     },
     {
       "name": "Pet Love.lk",
-      "addressLine1": "No 680 Avissawella Rd,",
+      "addressLine1": "No. 680, Avissawella Road,",
       "addressLine2": "Wellampitiya",
       "phones": [{ "display": "077 627 7866", "tel": "0776277866" }]
     }

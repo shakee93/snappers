@@ -111,12 +111,15 @@ export const siteConfig = {
     ogLocale: "en_US",
   },
   contact: {
-    primaryPhone: "0777555665",
-    secondaryPhone: "0777988665",
-    whatsapp: "94722299944",
-    email: "inquiries@gqmobiles.lk",
+    primaryPhone: "0716060123",
+    secondaryPhone: "0112500177",
+    whatsapp: "94716060123",
+    email: "catlitter.lk@gmail.com",
     storeAddress:
-      "No. 250 | 53–54 Ground Floor, Liberty Plaza, Colombo 03",
+      "No. 107, Kirula Road, Narahenpita, Colombo 05, Sri Lanka",
+    /** Formspree form ID — set `NEXT_PUBLIC_FORMSPREE_CONTACT_ID` in env. */
+    formspreeContactFormId:
+      process.env.NEXT_PUBLIC_FORMSPREE_CONTACT_ID ?? "",
   },
   businessHours: {
     heading: "Business Hours",
@@ -187,14 +190,16 @@ export const siteConfig = {
     },
     support: {
       heading: "Our experts are available 24/7",
-      phoneDisplay: "071 606 0123",
-      phoneTel: "0716060123",
+      phones: [
+        // { display: "071 606 0123", tel: "0716060123" },
+        { display: "011 250 0177", tel: "0112500177" },
+      ],
     },
   },
   social: {
-    facebook: "gqmobilestore",
-    instagram: "gqthemobilestoreunlimited",
-    tiktok: "@gqmobiles",
+    facebook: "catlitter.lk",
+    instagram: "catlittersrilanka",
+    tiktok: "@catlitter.lk",
     x: "catlitter",
     linkedin: "catlitter",
     googleReviewUrl:

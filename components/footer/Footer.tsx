@@ -2,17 +2,15 @@ import Link from "next/link";
 import Image from "next/image";
 import { Phone } from "lucide-react";
 import {
-  FaXTwitter,
   FaInstagram,
   FaFacebookF,
-  FaLinkedinIn,
+  FaTiktok,
 } from "react-icons/fa6";
 import NewsletterSignup from "@/components/footer/NewsletterSignup";
 import { siteConfig } from "@/site.config";
 import contactContent from "@/content/contact.json";
 
 const socialLinks = [
-  { Icon: FaXTwitter, href: `https://x.com/${siteConfig.social.x}`, label: "X" },
   {
     Icon: FaInstagram,
     href: `https://www.instagram.com/${siteConfig.social.instagram}`,
@@ -24,9 +22,9 @@ const socialLinks = [
     label: "Facebook",
   },
   {
-    Icon: FaLinkedinIn,
-    href: `https://www.linkedin.com/company/${siteConfig.social.linkedin}`,
-    label: "LinkedIn",
+    Icon: FaTiktok,
+    href: `https://www.tiktok.com/${siteConfig.social.tiktok}`,
+    label: "TikTok",
   },
 ];
 
@@ -164,13 +162,18 @@ const Footer = () => {
               <p className="text-sm font-semibold uppercase text-white">
                 {footer.support.heading}
               </p>
-              <Link
-                href={`tel:${footer.support.phoneTel}`}
-                className="mt-1 flex items-center gap-2 text-2xl font-bold md:justify-end"
-              >
-                <Phone size={20} className="text-[#a3c83f]" />
-                {footer.support.phoneDisplay}
-              </Link>
+              <div className="mt-1 flex flex-col items-start gap-1 md:items-end">
+                {footer.support.phones.map((phone) => (
+                  <Link
+                    key={phone.tel}
+                    href={`tel:${phone.tel}`}
+                    className="flex items-center gap-2 text-2xl font-bold"
+                  >
+                    <Phone size={20} className="text-[#a3c83f]" />
+                    {phone.display}
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
 
