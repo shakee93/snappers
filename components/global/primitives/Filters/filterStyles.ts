@@ -28,7 +28,7 @@ export const filterSelectOptionClassName = (active: boolean, selected: boolean) 
     .join(" ");
 
 export const filterPanelClassName =
-  "overflow-hidden relative w-full rounded-xl border border-[#E8E8E8] bg-header-cream/30";
+  "overflow-hidden relative w-full rounded-xl border border-[#E8E8E8] bg-white";
 
 export const filterPanelTitleClassName =
   "text-sm font-semibold text-header-green";

@@ -1,6 +1,4 @@
-import { CustomLink } from "@/data/types";
-import React, { FC, useEffect } from "react";
-import Link from "next/link";
+import React, { FC, useEffect, useMemo, useSyncExternalStore } from "react";
 import twFocusClass from "@/utils/twFocusClass";
 import {
   Pagination,
@@ -22,6 +20,25 @@ const paginationPageButtonClassName = (twFocusClass: string, active: boolean) =>
 const paginationFirstButtonClassName = (twFocusClass: string) =>
   `inline-flex items-center justify-center rounded-full border border-[#E8E8E8] bg-white px-4 text-header-green transition-colors hover:border-header-green/40 hover:bg-header-cream/30 disabled:cursor-not-allowed disabled:opacity-50 ${twFocusClass}`;
 
+const MOBILE_MEDIA_QUERY = "(max-width: 767px)";
+
+const subscribeIsMobile = (onStoreChange: () => void) => {
+  const mediaQueryList = window.matchMedia(MOBILE_MEDIA_QUERY);
+  mediaQueryList.addEventListener("change", onStoreChange);
+  return () => mediaQueryList.removeEventListener("change", onStoreChange);
+};
+
+const getIsMobileSnapshot = () => window.matchMedia(MOBILE_MEDIA_QUERY).matches;
+
+const getIsMobileServerSnapshot = () => false;
+
+function useIsMobile(): boolean {
+  return useSyncExternalStore(
+    subscribeIsMobile,
+    getIsMobileSnapshot,
+    getIsMobileServerSnapshot,
+  );
+}
 
 export interface PaginationProps {
   className?: string;
@@ -35,20 +52,20 @@ const Paginationx: FC<PaginationProps> = ({ className = "", onPageChange }) => {
       padding: 2
     });
 
+  const isMobile = useIsMobile();
+
   const firstPageIndex = 0;
   const previousPageIndex = currentRefinement - 1;
   const nextPageIndex = currentRefinement + 1;
   const lastPageIndex = nbPages - 1;
 
-  const getVisiblePages = () => {
-    if (typeof window !== 'undefined' && window.innerWidth < 768) {
-      // console.log(currentRefinement)
-      const start = Math.max(0, currentRefinement - 1);
-      const end = Math.min(nbPages - 1, currentRefinement + 1);
-      return pages.slice(start, end + 1);
-    }
-    return pages;
-  };
+  const visiblePages = useMemo(() => {
+    if (!isMobile) return pages;
+
+    const start = Math.max(0, currentRefinement - 1);
+    const end = Math.min(nbPages - 1, currentRefinement + 1);
+    return pages.slice(start, end + 1);
+  }, [isMobile, pages, currentRefinement, nbPages]);
 
 
   useEffect(() => {
@@ -105,39 +122,21 @@ const Paginationx: FC<PaginationProps> = ({ className = "", onPageChange }) => {
               </button>
             )}
 
-            {typeof window !== 'undefined' && window.innerWidth < 768 ? (
-              getVisiblePages().map((page) => (
-                <button
-                  key={page}
-                  onClick={(event) => {
-                    event.preventDefault();
-                    refine(page);
-                  }}
-                  className={paginationPageButtonClassName(
-                    twFocusClass(),
-                    currentRefinement === page,
-                  )}
-                >
-                  {page + 1}
-                </button>
-              ))
-            ) : (
-              pages.map((page) => (
-                <button
-                  key={page}
-                  onClick={(event) => {
-                    event.preventDefault();
-                    refine(page);
-                  }}
-                  className={paginationPageButtonClassName(
-                    twFocusClass(),
-                    currentRefinement === page,
-                  )}
-                >
-                  {page + 1}
-                </button>
-              ))
-            )}
+            {visiblePages.map((page) => (
+              <button
+                key={page}
+                onClick={(event) => {
+                  event.preventDefault();
+                  refine(page);
+                }}
+                className={paginationPageButtonClassName(
+                  twFocusClass(),
+                  currentRefinement === page,
+                )}
+              >
+                {page + 1}
+              </button>
+            ))}
 
             <button
               disabled={isLastPage}
