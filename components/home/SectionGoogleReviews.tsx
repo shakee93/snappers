@@ -2,6 +2,7 @@ import Image from "next/image";
 import ReviewImageSlider, {
   type ReviewImage as ReviewImageNode,
 } from "@/components/home/ReviewImageSlider";
+import { cn } from "@/lib/utils";
 
 interface GoogleReviewItem {
   review?: string | null;
@@ -17,6 +18,8 @@ export interface GoogleReviewsFields {
 export interface SectionGoogleReviewsProps {
   className?: string;
   data?: GoogleReviewsFields | null;
+  /** Homepage uses a negative top margin so the wave banner bridges sections. */
+  disableTopOffset?: boolean;
 }
 
 const StarIcon = () => (
@@ -128,6 +131,7 @@ const MIN_CARDS_PER_HALF = 6;
 const SectionGoogleReviews = ({
   className = "",
   data,
+  disableTopOffset = false,
 }: SectionGoogleReviewsProps) => {
   const reviews = (data?.reviews ?? []).filter(
     (r): r is GoogleReviewItem => !!r?.review || !!r?.reviewer
@@ -153,7 +157,13 @@ const SectionGoogleReviews = ({
     });
 
   return (
-    <section className={`w-full -mt-16 md:-mt-24 ${className}`}>
+    <section
+      className={cn(
+        "w-full",
+        !disableTopOffset && "-mt-16 md:-mt-24",
+        className
+      )}
+    >
       {/* Full-width banner artwork (transparent WebP, wave edge baked in) */}
       <Image
         src="/homepage/real-story-top.webp"

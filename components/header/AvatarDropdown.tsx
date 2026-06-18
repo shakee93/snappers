@@ -2,7 +2,7 @@
 import { Popover, Transition } from "@headlessui/react";
 import Image from "next/image";
 import { Loader2, LogIn, User } from "lucide-react";
-import { Fragment, useEffect, useMemo, useState, useRef } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import LogoutButton from "@/components/header/LogoutButton";
 import { useSession } from "@/context/SessionProvider";
@@ -17,10 +17,7 @@ const headerAvatarLoaderClass =
 
 // Skeleton for loading
 export default function AvatarDropdown() {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isLoading, setIsLoading] = useState(true); // Add loading state
-  const dropdownRef = useRef<HTMLDivElement>(null);
-
+  const [isLoading, setIsLoading] = useState(true);
   const { customer, fetchCustomer } = useSession();
 
   const customerInitial = useMemo(() => {
@@ -42,21 +39,8 @@ export default function AvatarDropdown() {
     }
   }, [customer]);
 
-  const handleClickOutside = (event: any) => {
-    if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-      setIsOpen(false);
-    }
-  };
-
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, []);
-
   return (
-    <div className="AvatarDropdown" ref={dropdownRef}>
+    <div className="AvatarDropdown">
       <Popover className="relative">
         {({ open, close }) => (
           <>
@@ -65,7 +49,6 @@ export default function AvatarDropdown() {
               aria-label="Account"
               onClick={() => {
                 fetchCustomer();
-                setIsOpen(!isOpen);
               }}
             >
               <div className={headerAvatarButtonClass}>
@@ -92,7 +75,7 @@ export default function AvatarDropdown() {
             </Popover.Button>
             <Transition
               as={Fragment}
-              show={isOpen}
+              show={open}
               enter="transition ease-out duration-200"
               enterFrom="opacity-0 translate-y-1"
               enterTo="opacity-100 translate-y-0"
@@ -235,7 +218,7 @@ export default function AvatarDropdown() {
                           </div>
                         </Link>
 
-                        <LogoutButton />
+                        <LogoutButton onClose={close} />
                       </>
                     )}
                   </div>

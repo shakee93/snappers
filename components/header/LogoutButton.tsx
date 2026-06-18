@@ -2,10 +2,15 @@
 import { useRouter } from "next/navigation";
 import { useSession } from "@/context/SessionProvider";
 
-const LogoutButton = () => {
+interface LogoutButtonProps {
+  onClose?: () => void;
+}
+
+const LogoutButton = ({ onClose }: LogoutButtonProps) => {
   let { logout } = useSession();
   const router = useRouter();
   const handleLogout = async () => {
+    onClose?.();
     logout();
     router.push("/login");
   };
