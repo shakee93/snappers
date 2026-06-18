@@ -1,45 +1,41 @@
 "use client";
+
 import { useSession } from "@/context/SessionProvider";
-import { useRouter } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import AvatarSkeleton from "@/components/global/primitives/Skeletons/AvatarSkeleton";
+import { accountLayoutTitleClassName } from "@/components/account/accountStyles";
 
 const UserDetails = () => {
   const { customer, fetchCustomer } = useSession();
-  const router = useRouter();
-
-  // Define state variables for displayName, email, and loading state
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
-  const [isLoading, setIsLoading] = useState(true); // Add loading state
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Fetch customer data
     const fetchData = async () => {
       await fetchCustomer();
-      setIsLoading(false); // Set loading to false after fetching
+      setIsLoading(false);
     };
     fetchData();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    // Update state variables with customer data
     setDisplayName(customer?.displayName || "");
     setEmail(customer?.email || "");
   }, [customer]);
 
   return (
     <div className="max-w-2xl">
-      <h2 className="text-3xl xl:text-4xl font-semibold">Account</h2>
-      {isLoading ? ( // Show skeleton while loading
+      <h1 className={accountLayoutTitleClassName}>Account</h1>
+      {isLoading ? (
         <AvatarSkeleton />
       ) : (
-        <span className="block mt-4 text-neutral-500 dark:text-neutral-400 text-base sm:text-lg">
-          <span className="text-slate-900 dark:text-slate-200 font-semibold">
+        <span className="mt-4 block text-base text-neutral-500 dark:text-neutral-400 sm:text-lg">
+          <span className="font-semibold text-header-green dark:text-neutral-200">
             {displayName} ·
           </span>{" "}
-          {email}  
+          {email}
         </span>
       )}
     </div>

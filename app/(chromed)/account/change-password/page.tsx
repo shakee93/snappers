@@ -1,30 +1,32 @@
+import AccountInput from "@/components/account/AccountInput";
+import AccountSubmitButton from "@/components/account/AccountSubmitButton";
 import Label from "@/components/global/primitives/Label/Label";
-import ButtonPrimary from "shared/Button/ButtonPrimary";
-import Input from "shared/Input/Input";
+import {
+  accountFormClassName,
+  accountLabelClassName,
+  accountPageTitleClassName,
+} from "@/components/account/accountStyles";
 
 const AccountPass = () => {
   return (
     <div>
       <div className="space-y-10 sm:space-y-12">
-        {/* HEADING */}
-        <h2 className="text-2xl sm:text-3xl font-semibold">
-          Update your password
-        </h2>
-        <div className=" max-w-xl space-y-6">
+        <h2 className={accountPageTitleClassName}>Update your password</h2>
+        <div className={accountFormClassName}>
           <div>
-            <Label>Current password</Label>
-            <Input type="password" className="mt-1.5" />
+            <Label className={accountLabelClassName}>Current password</Label>
+            <AccountInput type="password" />
           </div>
           <div>
-            <Label>New password</Label>
-            <Input type="password" className="mt-1.5" />
+            <Label className={accountLabelClassName}>New password</Label>
+            <AccountInput type="password" />
           </div>
           <div>
-            <Label>Confirm password</Label>
-            <Input type="password" className="mt-1.5" />
+            <Label className={accountLabelClassName}>Confirm password</Label>
+            <AccountInput type="password" />
           </div>
           <div className="pt-2">
-            <ButtonPrimary>Update password</ButtonPrimary>
+            <AccountSubmitButton>Update password</AccountSubmitButton>
           </div>
         </div>
       </div>

@@ -6,6 +6,7 @@ import { Fragment, useEffect, useMemo, useState, useRef } from "react";
 import Link from "next/link";
 import LogoutButton from "@/components/header/LogoutButton";
 import { useSession } from "@/context/SessionProvider";
+import { accountTabHref } from "@/components/account/accountTabs";
 import profileIcon from "@/public/global/profile.svg";
 
 const headerAvatarButtonClass =
@@ -184,7 +185,7 @@ export default function AvatarDropdown() {
                         </Link>
 
                         <Link
-                          href={"/account/my-orders"}
+                          href={accountTabHref("orders")}
                           className="flex items-center p-2 -m-3 transition duration-150 ease-in-out rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50"
                           onClick={() => close()}
                         >

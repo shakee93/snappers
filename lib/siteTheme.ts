@@ -38,3 +38,14 @@ export function getBrandPrimaryRgb(): string {
 export function getBrandPrimaryHex(): string {
   return siteConfig.theme.brandHex.primary;
 }
+
+function channelsToHex(channels: string): string {
+  return `#${channels
+    .split(" ")
+    .map((c) => Number(c).toString(16).padStart(2, "0"))
+    .join("")}`;
+}
+
+export function getHeaderCreamHex(): string {
+  return channelsToHex(siteConfig.theme.header.cream);
+}

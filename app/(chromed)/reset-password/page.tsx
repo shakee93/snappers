@@ -5,9 +5,16 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Loader } from "lucide-react";
-import Input from "@/shared/Input/Input";
-import ButtonPrimary from "@/shared/Button/ButtonPrimary";
+import Button from "@/shared/Button/Button";
+import AuthInput from "@/components/auth/AuthInput";
 import { useResetPassword } from "@/hooks/useResetPassword";
+import {
+  authLabelClassName,
+  authLinkClassName,
+  authPageTitleClassName,
+  authPageWrapperClassName,
+  authSubmitButtonClassName,
+} from "@/components/auth/authStyles";
 
 const ResetPasswordContent = () => {
   const searchParams = useSearchParams();
@@ -59,11 +66,9 @@ const ResetPasswordContent = () => {
   return (
     <div className="nc-PageResetPassword" data-nc-id="PageResetPassword">
       <div className="container mb-24 lg:mb-32">
-        <h2 className="my-20 flex items-center justify-center text-3xl font-semibold leading-[115%] text-neutral-900 dark:text-neutral-100 md:text-5xl md:leading-[115%]">
-          Reset Password
-        </h2>
+        <h1 className={authPageTitleClassName}>Reset Password</h1>
 
-        <div className="mx-auto max-w-md space-y-6">
+        <div className={authPageWrapperClassName}>
           {!hasValidResetParams ? (
             <p className="text-sm text-red-500">
               This reset link is invalid. Please request a new password reset email.
@@ -72,11 +77,10 @@ const ResetPasswordContent = () => {
 
           <form className="grid grid-cols-1 gap-6" onSubmit={handleSubmit}>
             <label className="block">
-              <span className="text-neutral-800 dark:text-neutral-200">New password</span>
-              <Input
+              <span className={authLabelClassName}>New password</span>
+              <AuthInput
                 type="password"
                 required={true}
-                className="mt-1"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 disabled={!hasValidResetParams || isSuccess}
@@ -84,31 +88,38 @@ const ResetPasswordContent = () => {
             </label>
 
             <label className="block">
-              <span className="text-neutral-800 dark:text-neutral-200">Confirm new password</span>
-              <Input
+              <span className={authLabelClassName}>Confirm new password</span>
+              <AuthInput
                 type="password"
                 required={true}
-                className="mt-1"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 disabled={!hasValidResetParams || isSuccess}
               />
             </label>
 
-            <ButtonPrimary
+            <Button
               type="submit"
               disabled={!hasValidResetParams || isLoading || isSuccess}
+              className={authSubmitButtonClassName}
+              fontSize="text-base font-bold"
             >
-              {isLoading ? <Loader className="animate-spin text-gray-100" /> : "Reset password"}
-            </ButtonPrimary>
+              {isLoading ? (
+                <Loader className="h-5 w-5 animate-spin text-header-green" />
+              ) : (
+                "Reset password"
+              )}
+            </Button>
           </form>
 
           {isSuccess ? (
-            <p className="text-sm text-green-600">Your password has been updated successfully.</p>
+            <p className="text-sm text-header-green">
+              Your password has been updated successfully.
+            </p>
           ) : null}
 
           <p className="text-center text-sm text-neutral-700 dark:text-neutral-300">
-            <Link href="/login" className="text-green-600">
+            <Link href="/login" className={authLinkClassName}>
               Back to login
             </Link>
           </p>

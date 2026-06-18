@@ -1,5 +1,6 @@
 import Button, { ButtonProps } from "@/shared/Button/Button";
 import React from "react";
+import { cn } from "@/lib/utils";
 
 export interface ButtonPrimaryProps extends ButtonProps {}
 
@@ -9,7 +10,10 @@ const ButtonPrimary: React.FC<ButtonPrimaryProps> = ({
 }) => {
   return (
     <Button
-      className={`ttnc-ButtonPrimary disabled:bg-opacity-90 bg-primary-500 hover:bg-slate-800 text-slate-50 dark:text-slate-800 shadow-xl ${className}`}
+      className={cn(
+        "ttnc-ButtonPrimary bg-primary-500 text-slate-50 shadow-xl hover:bg-slate-800 disabled:bg-opacity-90 dark:text-slate-800",
+        className
+      )}
       {...args}
     />
   );
