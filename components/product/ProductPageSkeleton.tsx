@@ -83,7 +83,7 @@ const ProductPageSkeleton = () => (
               </div>
             </div>
 
-            <div className="order-4 space-y-3 lg:mt-6">
+            <div className="order-4 space-y-3 lg:mt-0">
               <SkeletonBlock className="h-11 w-full rounded-xl" />
               <SkeletonBlock className="h-28 w-full rounded-xl" />
             </div>

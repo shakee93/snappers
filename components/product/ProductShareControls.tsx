@@ -28,14 +28,22 @@ const ProductShareControls = ({ product, className = "" }: ProductShareControlsP
     [product],
   );
 
-  const facebookShareUrl = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(productUrl)}`;
+  const facebookShareUrl = useMemo(
+    () =>
+      `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(productUrl)}`,
+    [productUrl],
+  );
 
   const shareText = useMemo(
     () =>
       `Check out ${product.name ?? "this product"} at ${siteConfig.brand.name}: ${productUrl}`,
     [product.name, productUrl],
   );
-  const whatsappShareUrl = `https://wa.me/?text=${encodeURIComponent(shareText)}`;
+
+  const whatsappShareUrl = useMemo(
+    () => `https://wa.me/?text=${encodeURIComponent(shareText)}`,
+    [shareText],
+  );
 
   const writeToClipboard = useCallback(async (text: string): Promise<boolean> => {
     try {
@@ -116,8 +124,8 @@ const ProductShareControls = ({ product, className = "" }: ProductShareControlsP
           <Image
             src={facebookIcon}
             alt=""
-            width={16}
-            height={16}
+            width={24}
+            height={24}
             className={shareIconClass}
             aria-hidden
           />
@@ -135,8 +143,8 @@ const ProductShareControls = ({ product, className = "" }: ProductShareControlsP
           <Image
             src={copyIcon}
             alt=""
-            width={16}
-            height={16}
+            width={24}
+            height={24}
             className={shareIconClass}
             aria-hidden
           />
