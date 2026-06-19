@@ -6,13 +6,19 @@ import Link from "next/link";
 import parseHtml from "html-react-parser";
 import { Product } from "@/graphql/types/graphql";
 import ProductSpecifications from "@/components/product/ProductSpecifications";
+import ProductReviewFeedback from "@/components/product/ProductReviewFeedback";
+import { pdpRadius } from "@/components/product/pdpStyles";
+import { stripEmojis } from "@/lib/stripEmojis";
 
 interface ProductPurchaseAccordionsProps {
   product: Product;
 }
 
 const panelClass =
-  "px-4 pb-4 pt-1 text-sm leading-relaxed text-[#4B5563]";
+  "px-4 pb-5 pt-2 text-sm leading-relaxed text-[#4B5563]";
+
+const productInfoProseClass =
+  "prose prose-sm max-w-none prose-p:mb-4 prose-p:last:mb-0 prose-headings:mb-3 prose-headings:mt-6 prose-headings:first:mt-0 prose-ul:my-4 prose-ul:space-y-2 prose-li:my-1 prose-strong:text-[#1A1A1A]";
 
 const ProductPurchaseAccordions = ({ product }: ProductPurchaseAccordionsProps) => {
   const manualMeta = product?.metaData;
@@ -25,19 +31,21 @@ const ProductPurchaseAccordions = ({ product }: ProductPurchaseAccordionsProps) 
   const manualTechSpecs = parsedMetaData ? Object.entries(parsedMetaData) : [];
 
   const styleListItems = (htmlContent: string) =>
-    htmlContent?.replace(/<ul/g, '<ul class="list-disc pl-5 space-y-1"');
+    htmlContent?.replace(/<ul/g, '<ul class="list-disc pl-5 space-y-2.5 my-4"');
 
-  const descriptionHtml = product.shortDescription
-    ? styleListItems(product.shortDescription)
-    : product.description
-      ? styleListItems(product.description.slice(0, 1200))
-      : "";
+  const descriptionHtml = stripEmojis(
+    product.shortDescription
+      ? styleListItems(product.shortDescription)
+      : product.description
+        ? styleListItems(product.description.slice(0, 1200))
+        : "",
+  );
 
   const sections = [
     {
       name: "Product Information",
       content: descriptionHtml ? (
-        <div className="prose prose-sm max-w-none">{parseHtml(descriptionHtml)}</div>
+        <div className={productInfoProseClass}>{parseHtml(descriptionHtml)}</div>
       ) : (
         <p>No additional product information available.</p>
       ),
@@ -45,7 +53,7 @@ const ProductPurchaseAccordions = ({ product }: ProductPurchaseAccordionsProps) 
     {
       name: "Delivery & Returns",
       content: (
-        <div className="space-y-3">
+        <div className="space-y-4">
           <p>
             Island-wide delivery available. Orders are typically dispatched within
             1–2 business days.
@@ -79,11 +87,11 @@ const ProductPurchaseAccordions = ({ product }: ProductPurchaseAccordionsProps) 
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
       {sections.map((section) => (
         <Disclosure key={section.name} defaultOpen={section.name === "Product Information"}>
           {({ open }) => (
-            <div className="overflow-hidden rounded-xl border border-[#E8E8E8] bg-white">
+            <div className={`overflow-hidden border border-[#E8E8E8] bg-white ${pdpRadius}`}>
               <Disclosure.Button className="flex w-full items-center justify-between px-4 py-3.5 text-left text-sm font-semibold text-[#1A1A1A]">
                 {section.name}
                 <ChevronDown
@@ -97,6 +105,14 @@ const ProductPurchaseAccordions = ({ product }: ProductPurchaseAccordionsProps) 
           )}
         </Disclosure>
       ))}
+
+      <ProductReviewFeedback
+        productDatabaseId={product.databaseId}
+        averageRating={
+          (product as Product & { averageRating?: number | null }).averageRating
+        }
+        reviewCount={product.reviewCount}
+      />
     </div>
   );
 };

@@ -9,6 +9,7 @@ import {
   stripReviewHtml,
   type ProductReviewItem,
 } from "@/lib/productReviews";
+import { pdpRadius } from "@/components/product/pdpStyles";
 
 const ProductLightbox = dynamic(() => import("@/components/product/ProductLightbox"), {
   ssr: false,
@@ -41,7 +42,7 @@ const ProductFeaturedReview = ({ review, className = "" }: ProductFeaturedReview
   return (
     <>
       <figure
-        className={`rounded-2xl border border-[#E8E8E8] bg-white p-4 ${className}`}
+        className={`border border-[#E8E8E8] bg-white p-4 ${pdpRadius} ${className}`}
       >
         <figcaption className="flex items-center justify-between gap-3 border-b border-[#E8E8E8] pb-3">
           <span className="text-sm font-semibold text-[#1A1A1A]">{authorName}</span>
@@ -73,7 +74,7 @@ const ProductFeaturedReview = ({ review, className = "" }: ProductFeaturedReview
                 <button
                   type="button"
                   onClick={() => openLightbox(index)}
-                  className="absolute inset-0 block h-full w-full overflow-hidden rounded-lg border border-[#E8E8E8] bg-[#FAFAFA]"
+                  className={`absolute inset-0 block h-full w-full overflow-hidden border border-[#E8E8E8] bg-[#FAFAFA] ${pdpRadius}`}
                   aria-label={`Preview photo ${index + 1} of ${images.length}`}
                 >
                   <Image

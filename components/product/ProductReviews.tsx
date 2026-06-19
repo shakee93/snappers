@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import ProductReviewTabs from "@/components/product/ProductReviewTabs";
+import ProductReviewExplore from "@/components/product/ProductReviewExplore";
 import { flattenProductReviews } from "@/lib/productReviews";
 import type { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 
@@ -26,14 +26,8 @@ const ProductReviews = ({
   );
 
   return (
-    <ProductReviewTabs
-      productDatabaseId={product.databaseId}
+    <ProductReviewExplore
       reviews={productReviews}
-      averageRating={
-        (product as SimpleProduct & { averageRating?: number | null })
-          .averageRating
-      }
-      reviewCount={product.reviewCount}
       className={
         hasVideoAbove
           ? className

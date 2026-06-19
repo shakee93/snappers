@@ -4,7 +4,6 @@ import ProductAddToCart from "./ProductAddToCart";
 import {
   Brand,
   ProductAttribute,
-  ProductCategory,
   ProductVariation,
   SimpleProduct,
   StockStatusEnum,
@@ -15,9 +14,8 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useStore } from "@/store/store";
 import { twMerge } from "tailwind-merge";
 import { useImage } from "@/context/ImageChangeGrabber";
-import { getCategoryPath, getProductPath } from "@/lib/productUrl";
+import { getProductPath } from "@/lib/productUrl";
 import ProductStarRating from "@/components/product/ProductStarRating";
-import ProductTrustBadges from "@/components/product/ProductTrustBadges";
 import ProductPaymentOptions from "@/components/product/ProductPaymentOptions";
 import ProductPurchaseAccordions from "@/components/product/ProductPurchaseAccordions";
 import ProductShareControls from "@/components/product/ProductShareControls";
@@ -25,6 +23,7 @@ import BrandLogo from "@/components/product/BrandLogo";
 import {
   stripReviewHtml,
 } from "@/lib/productReviews";
+import { stripEmojis } from "@/lib/stripEmojis";
 import { useUnresolvedFreeGifts } from "@/hooks/useUnresolvedFreeGifts";
 import { usePriceFluctuationNotice } from "@/hooks/usePriceFluctuationNotice";
 import { useFreeGiftProducts } from "@/hooks/useFreeGiftProducts";
@@ -38,6 +37,7 @@ import {
 } from "@/lib/freeShipping";
 import { siteConfig } from "@/site.config";
 import { toDisplayCurrency } from "@/lib/formatPrice";
+import { pdpRadius } from "@/components/product/pdpStyles";
 import {
   findVariationByOption,
   isVariationOptionSelected,
@@ -449,24 +449,27 @@ const ProductDetails = ({
 
   const shortDescriptionText = useMemo(() => {
     if (!product.shortDescription) return "";
-    const text = stripReviewHtml(product.shortDescription);
+    const text = stripEmojis(stripReviewHtml(product.shortDescription));
     return text.trim();
   }, [product.shortDescription]);
 
   return (
     <div className="flex flex-col gap-3 lg:gap-0">
       {isPriceFluctuation && (
-        <div className="rounded-xl bg-red-500 p-4 text-sm text-white">
+        <div className={`bg-red-500 p-4 text-sm text-white ${pdpRadius}`}>
           Prices are being updated. For current pricing, please contact us on WhatsApp{" "}
           {siteConfig.contact.primaryPhone} / {siteConfig.contact.secondaryPhone}.
         </div>
       )}
 
       <div className="flex flex-col gap-2 pb-2 lg:pb-4">
-        <BrandLogo
-          brand={brand}
-          imageClassName="h-10 w-auto max-w-[220px] object-contain object-left"
-        />
+        <div className="flex items-center justify-between gap-3">
+          <BrandLogo
+            brand={brand}
+            imageClassName="h-10 w-auto max-w-[220px] object-contain object-left"
+          />
+          <ProductShareControls product={product} className="w-auto shrink-0" />
+        </div>
 
         <h1 className="text-[26px] font-bold leading-snug text-[#38461F] sm:text-[28px]">
           {product.name}
@@ -476,36 +479,15 @@ const ProductDetails = ({
           <p className="text-sm leading-relaxed text-[#1A1A1A]">{shortDescriptionText}</p>
         )}
 
-        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-          <ProductStarRating
-            averageRating={
-              (product as SimpleProduct & { averageRating?: number | null })
-                .averageRating
-            }
-            reviewCount={product.reviewCount}
-            labelMode="rated"
-            showWhenEmpty
-          />
-
-          {product.productCategories?.edges &&
-            product.productCategories.edges.length > 0 && (
-              <div className="flex flex-wrap items-center gap-2 text-sm text-[#6B7280]">
-                <span>Category:</span>
-                {product.productCategories.edges.map((category, index) => {
-                  const node = category.node as ProductCategory | null | undefined;
-                  return (
-                    <Link
-                      href={getCategoryPath(node?.slug ?? "")}
-                      key={node?.slug ?? index}
-                      className="rounded-full border border-[#D1D5DB] px-3 py-1 text-xs font-medium text-[#374151] hover:border-[#38461F]"
-                    >
-                      {node?.name}
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
-        </div>
+        <ProductStarRating
+          averageRating={
+            (product as SimpleProduct & { averageRating?: number | null })
+              .averageRating
+          }
+          reviewCount={product.reviewCount}
+          labelMode="rated"
+          showWhenEmpty
+        />
       </div>
 
       {showPromoTags && (
@@ -514,19 +496,19 @@ const ProductDetails = ({
             {product?.productTags?.nodes?.some(
               (tag) => tag && "slug" in tag && tag.slug === "clearance",
             ) && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-orange-500 px-2.5 py-0.5 text-xs font-semibold text-white">
+              <span className={`inline-flex items-center gap-1 bg-orange-500 px-2.5 py-0.5 text-xs font-semibold text-white ${pdpRadius}`}>
                 <Flame className="h-3 w-3" />
                 Clearance
               </span>
             )}
             {isFreeShippingProduct && (
-              <span className="inline-flex items-center gap-1 rounded-full bg-[#38461F] px-2.5 py-0.5 text-xs font-semibold text-white">
+              <span className={`inline-flex items-center gap-1 bg-[#38461F] px-2.5 py-0.5 text-xs font-semibold text-white ${pdpRadius}`}>
                 <Truck className="h-3 w-3" />
                 Free Shipping
               </span>
             )}
             {bogo.isBogoEnabled && freeGiftDetailLine !== null && (
-              <span className="inline-flex items-center rounded-full bg-green-600 px-2.5 py-1 text-xs font-semibold text-white">
+              <span className={`inline-flex items-center bg-green-600 px-2.5 py-1 text-xs font-semibold text-white ${pdpRadius}`}>
                 {isFreeGiftProduct ? "Free Gift" : bogo.label}
               </span>
             )}
@@ -575,7 +557,7 @@ const ProductDetails = ({
                       disabled={outOfStock}
                       onClick={() => selectVariation(attr, option || "")}
                       className={twMerge(
-                        "rounded-[10px] border border-[#38461F1A] bg-white px-4 py-2 text-sm font-semibold text-[#38461F] transition-colors",
+                        `${pdpRadius} border border-[#38461F1A] bg-white px-4 py-2 text-sm font-semibold text-[#38461F] transition-colors`,
                         isSelected
                           ? "border-[#38461F] bg-[#38461F]/20"
                           : "border-[#0000001A] hover:border-[#38461F]/50",
@@ -611,7 +593,7 @@ const ProductDetails = ({
       )}
 
       {displayPriceHtml ? (
-        <div className="space-y-1 pt-1 lg:py-4">
+        <div className="space-y-1 pt-1 pb-5 lg:py-4 lg:pb-8">
           <div className="flex flex-wrap items-baseline gap-3">
             <span
               className="text-2xl font-bold text-[#38461F] sm:text-3xl"
@@ -646,7 +628,7 @@ const ProductDetails = ({
         <p className="text-sm font-medium text-[#6B7280]">Currently unavailable</p>
       )}
 
-      <div className="max-lg:h-0 max-lg:overflow-visible">
+      <div className="max-lg:h-0 max-lg:overflow-visible mb-4 md:mb-8">
         <ProductAddToCart
           product={product}
           variation={
@@ -656,10 +638,6 @@ const ProductDetails = ({
           }
         />
       </div>
-
-      <ProductShareControls product={product} className="lg:hidden" />
-
-      <ProductTrustBadges />
 
       {displayNumericPrice > 0 && (
         <ProductPaymentOptions numericPrice={displayNumericPrice} />

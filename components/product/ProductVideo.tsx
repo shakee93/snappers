@@ -6,6 +6,7 @@ import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import { getProductVideoUrl, type ProductVideoSource } from "@/lib/productVideo";
 import { getYoutubeVideoId } from "@/lib/youtube";
 import { siteConfig } from "@/site.config";
+import { pdpRadius } from "@/components/product/pdpStyles";
 
 type ProductVideoProps = {
   product: SimpleProduct & VariableProduct & ProductVideoSource;
@@ -107,7 +108,7 @@ const ProductVideo = ({ product, className = "" }: ProductVideoProps) => {
   return (
     <div className={className}>
       {isTikTokUrl(productVideoUrl) ? (
-        <div className="relative h-0 w-full overflow-hidden rounded-2xl bg-black pb-[56.25%]">
+        <div className={`relative h-0 w-full overflow-hidden bg-black pb-[56.25%] ${pdpRadius}`}>
           <iframe
             src={getTikTokEmbedUrl(productVideoUrl) || productVideoUrl}
             className="absolute inset-0 h-full w-full border-0"
@@ -118,7 +119,7 @@ const ProductVideo = ({ product, className = "" }: ProductVideoProps) => {
           />
         </div>
       ) : isYouTubeUrl(productVideoUrl) ? (
-        <div className="relative h-0 w-full overflow-hidden rounded-2xl bg-black pb-[56.25%]">
+        <div className={`relative h-0 w-full overflow-hidden bg-black pb-[56.25%] ${pdpRadius}`}>
           <iframe
             src={getYouTubeEmbedUrl(productVideoUrl) ?? productVideoUrl}
             className="absolute inset-0 h-full w-full border-0"
@@ -128,7 +129,7 @@ const ProductVideo = ({ product, className = "" }: ProductVideoProps) => {
           />
         </div>
       ) : (
-        <div className="relative h-0 w-full overflow-hidden rounded-2xl bg-black pb-[56.25%]">
+        <div className={`relative h-0 w-full overflow-hidden bg-black pb-[56.25%] ${pdpRadius}`}>
           <video
             ref={videoRef}
             className="absolute inset-0 h-full w-full object-cover"
