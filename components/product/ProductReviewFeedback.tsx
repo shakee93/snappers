@@ -17,7 +17,7 @@ import {
 import { pdpRadius } from "@/components/product/pdpStyles";
 import { twMerge } from "tailwind-merge";
 import { Customer } from "@/graphql/types/graphql";
-import { USER_DATA_KEY } from "@/utils/storage-keys";
+import { AUTH_TOKEN_KEY, USER_DATA_KEY } from "@/utils/storage-keys";
 
 interface ProductReviewFeedbackProps {
   productDatabaseId: number;
@@ -68,9 +68,10 @@ const ProductReviewFeedback = ({
   }, [customer]);
 
   useEffect(() => {
-    if (!resolvedCustomer) {
-      void fetchCustomer();
-    }
+    if (resolvedCustomer) return;
+    if (!localStorage.getItem(AUTH_TOKEN_KEY)) return;
+
+    void fetchCustomer();
   }, [resolvedCustomer, fetchCustomer]);
 
   const reviewAuthorName = useMemo(() => {

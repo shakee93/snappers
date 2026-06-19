@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, ReactNode, useContext, useEffect, useState } from 'react';
+import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { ApolloError, FetchResult, useLazyQuery, useMutation } from '@apollo/client';
 import {
     GET_ACCOUNT_DETAILS,
@@ -93,80 +93,7 @@ export function SessionProvider({ children }: {
         await getCart();
     }
 
-    const signUp = async (email: string, password: string) => {
-        try {
-            const response: FetchResult<RegisterCustomerMutation> = await registerCustomer({
-                variables: {
-                    input: {
-                        email,
-                        password,
-                    },
-                },
-            });
-
-            await saveResponseToLocalStorage(response);
-            await fetchCustomer();
-
-            return { data: "registered", error: null };
-        } catch (error) {
-            let errorMessage = "An error occurred while signing up.";
-            if (error instanceof ApolloError) {
-                if (error.message.includes("An account is already registered with your email address")) {
-                    errorMessage = "An account with this email address already exists. Please log in.";
-                } else {
-                    console.error("Signup ApolloError:", error);
-                    errorMessage = error.message || errorMessage;
-                }
-            } else {
-                console.error("Signup error:", error);
-            }
-            return { data: null, error: errorMessage };
-        }
-    };
-
-    const login = async (email: string, password: string): Promise<LoginResponse> => {
-        try {
-            const response: FetchResult<LoginCustomerMutation> = await loginCustomer({
-                variables: {
-                    input: {
-                        username: email,
-                        password,
-                    },
-                },
-            })
-
-            await saveResponseToLocalStorage(response, "login");
-            await fetchCustomer();
-            return { data: "logged_in", error: null };
-        } catch (error) {
-            let errorMessage = "An error occurred while login.";
-            if (error instanceof ApolloError) {
-                if (error.message.includes("invalid_email")) {
-                    errorMessage = "No user found with this email address.";
-                } else if (error.message.includes("incorrect_password")) {
-                    errorMessage = "Incorrect password.";
-                } else {
-                    console.error("An ApolloError occurred:", error);
-                }
-            } else {
-                errorMessage = typeof error === "string" ? error : "";
-                console.error("An error occurred:", error);
-            }
-            return { data: null, error: errorMessage };
-        }
-    };
-
-    const logout = () => {
-        localStorage.removeItem(AUTH_TOKEN_KEY);
-        localStorage.removeItem(REFRESH_TOKEN_KEY);
-        localStorage.removeItem(SESSION_TOKEN_KEY);
-        localStorage.removeItem(USER_DATA_KEY);
-
-        setSessionToken(null)
-        setCustomer(null)
-    };
-
-    const fetchCustomer = async () => {
+    const fetchCustomer = useCallback(async () => {
         const cached = localStorage.getItem(USER_DATA_KEY);
         const hasAuthToken = !!localStorage.getItem(AUTH_TOKEN_KEY);
 
@@ -200,11 +127,84 @@ export function SessionProvider({ children }: {
             setCustomer(null);
             return null;
         }
-    }
+    }, [customer, getUser, setCustomer]);
+
+    const signUp = useCallback(async (email: string, password: string) => {
+        try {
+            const response: FetchResult<RegisterCustomerMutation> = await registerCustomer({
+                variables: {
+                    input: {
+                        email,
+                        password,
+                    },
+                },
+            });
+
+            await saveResponseToLocalStorage(response);
+            await fetchCustomer();
+
+            return { data: "registered", error: null };
+        } catch (error) {
+            let errorMessage = "An error occurred while signing up.";
+            if (error instanceof ApolloError) {
+                if (error.message.includes("An account is already registered with your email address")) {
+                    errorMessage = "An account with this email address already exists. Please log in.";
+                } else {
+                    console.error("Signup ApolloError:", error);
+                    errorMessage = error.message || errorMessage;
+                }
+            } else {
+                console.error("Signup error:", error);
+            }
+            return { data: null, error: errorMessage };
+        }
+    }, [fetchCustomer, registerCustomer]);
+
+    const login = useCallback(async (email: string, password: string): Promise<LoginResponse> => {
+        try {
+            const response: FetchResult<LoginCustomerMutation> = await loginCustomer({
+                variables: {
+                    input: {
+                        username: email,
+                        password,
+                    },
+                },
+            })
+
+            await saveResponseToLocalStorage(response, "login");
+            await fetchCustomer();
+            return { data: "logged_in", error: null };
+        } catch (error) {
+            let errorMessage = "An error occurred while login.";
+            if (error instanceof ApolloError) {
+                if (error.message.includes("invalid_email")) {
+                    errorMessage = "No user found with this email address.";
+                } else if (error.message.includes("incorrect_password")) {
+                    errorMessage = "Incorrect password.";
+                } else {
+                    console.error("An ApolloError occurred:", error);
+                }
+            } else {
+                errorMessage = typeof error === "string" ? error : "";
+                console.error("An error occurred:", error);
+            }
+            return { data: null, error: errorMessage };
+        }
+    }, [fetchCustomer, loginCustomer]);
+
+    const logout = useCallback(() => {
+        localStorage.removeItem(AUTH_TOKEN_KEY);
+        localStorage.removeItem(REFRESH_TOKEN_KEY);
+        localStorage.removeItem(SESSION_TOKEN_KEY);
+        localStorage.removeItem(USER_DATA_KEY);
+
+        setSessionToken(null)
+        setCustomer(null)
+    }, [setCustomer]);
 
     const [updateCustomerMutation] = useMutation(UPDATE_ACCOUNT_INFORMATION);
 
-    const updateCustomer = async (input: any) => {
+    const updateCustomer = useCallback(async (input: any) => {
         try {
             const response = await updateCustomerMutation({
                 variables: { input },
@@ -222,7 +222,7 @@ export function SessionProvider({ children }: {
             console.error("An error occurred while updating customer:", error);
             return { data: null, error: "An error occurred while updating customer." };
         }
-    };
+    }, [updateCustomerMutation, setCustomer]);
 
     useEffect(() => {
         const handleAuthInvalidated = () => {
@@ -233,8 +233,21 @@ export function SessionProvider({ children }: {
         return () => window.removeEventListener(AUTH_INVALIDATED_EVENT, handleAuthInvalidated);
     }, []);
 
+    const sessionValue = useMemo(
+        () => ({
+            sessionToken,
+            signUp,
+            login,
+            logout,
+            fetchCustomer,
+            customer,
+            updateCustomer,
+        }),
+        [sessionToken, signUp, login, logout, fetchCustomer, customer, updateCustomer],
+    );
+
     return (
-        <SessionContext.Provider value={{ sessionToken, signUp, login, logout, fetchCustomer, customer, updateCustomer }}>
+        <SessionContext.Provider value={sessionValue}>
             {children}
         </SessionContext.Provider>
     );
