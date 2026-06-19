@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { X } from "lucide-react";
+import { pdpRadius } from "@/components/product/pdpStyles";
 
 type HappiestCustomersGalleryProps = {
   images?: string[];
@@ -37,7 +38,7 @@ const HappiestCustomersGallery = ({ images = [] }: HappiestCustomersGalleryProps
   };
 
   return (
-    <section className="mt-6 rounded-3xl bg-white p-4 md:p-6">
+    <section className={`mt-6 bg-white p-4 md:p-6 ${pdpRadius}`}>
       <h2 className="text-xl md:text-2xl font-semibold text-primary-500 text-center">
         Happiest Customers
       </h2>
@@ -48,7 +49,7 @@ const HappiestCustomersGallery = ({ images = [] }: HappiestCustomersGalleryProps
             key={`${url}-${index}`}
             type="button"
             onClick={() => openDialogAt(index)}
-            className="relative w-[calc(50%-0.375rem)] sm:w-[calc(33.333%-0.5rem)] md:w-[calc(25%-0.5625rem)] lg:w-[calc(16.666%-0.625rem)] aspect-square overflow-hidden rounded-xl border border-gray-200 bg-gray-50"
+            className={`relative w-[calc(50%-0.375rem)] sm:w-[calc(33.333%-0.5rem)] md:w-[calc(25%-0.5625rem)] lg:w-[calc(16.666%-0.625rem)] aspect-square overflow-hidden border border-gray-200 bg-gray-50 ${pdpRadius}`}
           >
             <img
               src={url}
@@ -103,7 +104,7 @@ const HappiestCustomersGallery = ({ images = [] }: HappiestCustomersGalleryProps
                   key={`${url}-thumb-${index}`}
                   type="button"
                   onClick={() => setActiveImageIndex(index)}
-                  className={`relative shrink-0 w-16 h-16 md:w-20 md:h-20 overflow-hidden rounded-lg border-2 ${
+                  className={`relative shrink-0 w-16 h-16 md:w-20 md:h-20 overflow-hidden border-2 ${pdpRadius} ${
                     index === activeImageIndex
                       ? "border-white"
                       : "border-transparent opacity-80 hover:opacity-100"

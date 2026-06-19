@@ -13,6 +13,7 @@ import { ChevronLeft, ChevronRight, Expand } from "lucide-react";
 import Image from "next/image";
 import React, { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
+import { pdpRadius } from "@/components/product/pdpStyles";
 
 const ProductLightbox = dynamic(() => import("./ProductLightbox"), {
   ssr: false,
@@ -170,7 +171,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
     <div className="embla w-full" id="product-image">
       <div className="relative">
         <div
-          className="embla__viewport rounded-2xl border border-[#0000001A] bg-white"
+          className={`embla__viewport border border-[#0000001A] bg-white ${pdpRadius}`}
           ref={emblaMainRef}
         >
           <div className="embla__container ">
@@ -203,7 +204,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
             setLightboxIndex(selectedIndex);
             setLightboxOpen(true);
           }}
-          className="absolute top-3 left-3 z-10 bg-white/80 hover:bg-white rounded-lg p-2 shadow-md transition-colors"
+          className={`absolute top-3 left-3 z-10 bg-white/80 hover:bg-white p-2 shadow-md transition-colors ${pdpRadius}`}
           aria-label="View fullscreen"
         >
           <Expand className="w-5 h-5 text-gray-700" />

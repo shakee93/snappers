@@ -2,7 +2,6 @@
 import { Loader, Minus, Plus } from "lucide-react";
 import { useCart } from "@/context/CartProvider";
 import WishlistButton from "@/components/product/WishlistButton";
-import ProductShareControls from "@/components/product/ProductShareControls";
 import {
   ProductVariation,
   SimpleProduct,
@@ -16,6 +15,7 @@ import { useRouter } from "next/navigation";
 import { useSession } from "@/context/SessionProvider";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
 import PreOrderNotice from "@/components/global/ui/PreOrderNotice";
+import { pdpRadius } from "@/components/product/pdpStyles";
 
 interface ProductAddToCartProps {
   product: SimpleProduct & VariableProduct;
@@ -313,7 +313,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
     isProductOutOfStock();
 
   const cardControlClass =
-    "flex h-11 items-center justify-center rounded-lg border border-[#E8E8E8] bg-white";
+    `flex h-12 items-center justify-center border border-[#E8E8E8] bg-white ${pdpRadius}`;
 
   const isInStock =
     (product.type === "SIMPLE" && product.stockStatus === "IN_STOCK") ||
@@ -321,27 +321,27 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
 
   const renderQuantityControl = () => (
     <div
-      className={`${cardControlClass} min-w-[108px] shrink-0 justify-between gap-3 px-3`}
+      className={`${cardControlClass} min-w-[136px] shrink-0 justify-between gap-4 px-4`}
     >
       <button
         type="button"
         onClick={() => setQuantity((current) => Math.max(1, current - 1))}
         disabled={quantity <= 1}
-        className="text-[#374151] disabled:cursor-not-allowed disabled:opacity-40"
+        className="flex h-8 w-8 items-center justify-center text-[#374151] disabled:cursor-not-allowed disabled:opacity-40"
         aria-label="Decrease quantity"
       >
-        <Minus className="h-4 w-4" />
+        <Minus className="h-5 w-5" />
       </button>
-      <span className="min-w-5 text-center text-sm font-medium text-[#1A1A1A]">
+      <span className="min-w-6 text-center text-base font-semibold text-[#1A1A1A]">
         {quantity}
       </span>
       <button
         type="button"
         onClick={() => setQuantity((current) => current + 1)}
-        className="text-[#374151]"
+        className="flex h-8 w-8 items-center justify-center text-[#374151]"
         aria-label="Increase quantity"
       >
-        <Plus className="h-4 w-4" />
+        <Plus className="h-5 w-5" />
       </button>
     </div>
   );
@@ -352,7 +352,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
       disabled={isAddToCartDisabled}
       onClick={() => addItemToCart(true)}
       className={twMerge(
-        "flex h-11 min-w-0 flex-1 items-center justify-center rounded-lg bg-[#ACDA5A] px-4 text-sm font-bold text-[#38461F] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50",
+        `flex h-12 min-w-0 flex-1 items-center justify-center bg-[#ACDA5A] px-4 text-base font-bold text-[#38461F] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 ${pdpRadius}`,
       )}
     >
       {loading ? (
@@ -368,7 +368,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   const renderWishlistControl = () => (
     <WishlistButton
       productId={product.databaseId}
-      className={`${cardControlClass} w-11 shrink-0`}
+      className={`${cardControlClass} w-12 shrink-0`}
     />
   );
 
@@ -388,12 +388,11 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
                   {renderWishlistControl()}
                 </div>
 
-                {/* Desktop: qty · buy now · wishlist · share */}
+                {/* Desktop: qty · buy now · wishlist */}
                 <div className="hidden items-center gap-2 lg:flex">
                   {renderQuantityControl()}
                   {renderBuyNowButton()}
                   {renderWishlistControl()}
-                  <ProductShareControls product={product} className="w-auto shrink-0" />
                 </div>
               </>
             ) : (
@@ -408,7 +407,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
                 </button>
                 <WishlistButton
                   productId={product.databaseId}
-                  className={`${cardControlClass} h-12 w-11 shrink-0`}
+                  className={`${cardControlClass} w-12 shrink-0`}
                 />
               </div>
             )}

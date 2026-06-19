@@ -203,7 +203,7 @@ const Page = async (props: Props) => {
             <span className="text-[#1A1A1A]">{product.name}</span>
           </nav>
 
-        <div className="rounded-3xl bg-[#FAFAF8] p-4 sm:p-6 lg:p-8">
+        <div className="rounded-2xl bg-[#FAFAF8] p-4 sm:p-6 lg:p-8">
             <ProductPdpLayout
               product={product}
               brand={brand}

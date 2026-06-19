@@ -9,6 +9,7 @@ import { twMerge } from "tailwind-merge";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import { getProductPath } from "@/lib/productUrl";
 import { siteConfig } from "@/site.config";
+import { pdpRadius } from "@/components/product/pdpStyles";
 import copyIcon from "@/public/product/copy.png";
 import facebookIcon from "@/public/product/logos_facebook.png";
 
@@ -100,11 +101,11 @@ const ProductShareControls = ({ product, className = "" }: ProductShareControlsP
   return (
     <div
       className={twMerge(
-        "flex h-11 w-full shrink-0 items-stretch overflow-hidden rounded-lg border border-[#E8E8E8] bg-white p-1",
+        `flex h-11 w-full shrink-0 items-stretch overflow-hidden border border-[#E8E8E8] bg-white p-1 ${pdpRadius}`,
         className,
       )}
     >
-      <div className="flex min-w-0 flex-1 items-center justify-evenly rounded-md bg-[#F3F4F6] px-2">
+      <div className={`flex min-w-0 flex-1 items-center justify-evenly bg-[#F3F4F6] px-2 ${pdpRadius}`}>
         <a
           href={whatsappShareUrl}
           target="_blank"

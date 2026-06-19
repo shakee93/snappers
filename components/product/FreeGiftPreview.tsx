@@ -14,6 +14,7 @@ import { useStore } from "@/store/store";
 import { useUnresolvedFreeGifts } from "@/hooks/useUnresolvedFreeGifts";
 import { useFreeGiftProducts } from "@/hooks/useFreeGiftProducts";
 import { getProductPath } from "@/lib/productUrl";
+import { pdpRadius } from "@/components/product/pdpStyles";
 
 type GiftCardItem = {
   id: number | string;
@@ -24,8 +25,8 @@ type GiftCardItem = {
 
 function GiftCard({ gift }: { gift: GiftCardItem }) {
   const inner = (
-    <div className="flex items-center gap-3 rounded-xl border border-emerald-100 bg-white p-2.5">
-      <div className="relative h-14 w-14 flex-shrink-0 overflow-hidden rounded-lg bg-slate-100">
+    <div className={`flex items-center gap-3 border border-emerald-100 bg-white p-2.5 ${pdpRadius}`}>
+      <div className={`relative h-14 w-14 flex-shrink-0 overflow-hidden bg-slate-100 ${pdpRadius}`}>
         {gift.imageUrl ? (
           <Image
             src={gift.imageUrl}
@@ -188,7 +189,7 @@ export default function FreeGiftPreview({
   if (!bogo.isBogoEnabled) return null;
   if (freeGiftLoading || unresolvedLoading) {
     return (
-      <div className="mt-4 rounded-2xl border border-emerald-100 bg-emerald-50/50 p-3 text-sm text-emerald-700">
+      <div className={`mt-4 border border-emerald-100 bg-emerald-50/50 p-3 text-sm text-emerald-700 ${pdpRadius}`}>
         Loading free gift...
       </div>
     );
@@ -196,7 +197,7 @@ export default function FreeGiftPreview({
   if (allGiftCards.length === 0) return null;
 
   return (
-    <div className="mt-4 rounded-2xl border border-emerald-200 bg-emerald-50/40 p-3">
+    <div className={`mt-4 border border-emerald-200 bg-emerald-50/40 p-3 ${pdpRadius}`}>
       <div className="mb-2 text-xs font-bold uppercase tracking-wide text-emerald-700">
         + Free
       </div>
