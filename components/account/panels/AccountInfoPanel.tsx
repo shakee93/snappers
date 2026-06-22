@@ -6,7 +6,6 @@ import Label from "@/components/global/primitives/Label/Label";
 import AccountSelect from "@/components/account/AccountSelect";
 import AccountSubmitButton from "@/components/account/AccountSubmitButton";
 import { useSession } from "@/context/SessionProvider";
-import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
   accountFormClassName,
@@ -25,17 +24,6 @@ const AccountInfoPanel: FC = () => {
     gender: "",
     phoneNumber: "",
   });
-
-  const router = useRouter();
-
-  useEffect(() => {
-    if (customer?.id === "guest") {
-      const timeoutId = setTimeout(() => {
-        router.push("/login");
-      }, 1000);
-      return () => clearTimeout(timeoutId);
-    }
-  }, [customer, router]);
 
   useEffect(() => {
     if (customer) {

@@ -15,8 +15,14 @@ import AccountInfoPanel from "@/components/account/panels/AccountInfoPanel";
 import AccountOrdersPanel from "@/components/account/panels/AccountOrdersPanel";
 import AccountWishlistPanel from "@/components/account/panels/AccountWishlistPanel";
 import AccountAddressPanel from "@/components/account/panels/AccountAddressPanel";
-import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, type ComponentType } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useState, type ComponentType } from "react";
+import { useSession } from "@/context/SessionProvider";
+
+function accountLoginRedirect(pathname: string, search: string): string {
+  const returnUrl = search ? `${pathname}?${search}` : pathname;
+  return `/login?redirect=${encodeURIComponent(returnUrl)}`;
+}
 
 const TAB_PANELS: Record<AccountTabId, ComponentType> = {
   info: AccountInfoPanel,
@@ -58,8 +64,34 @@ const AccountNav = ({
 
 const AccountPageClient = () => {
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
+  const { fetchCustomer } = useSession();
+  const [authChecked, setAuthChecked] = useState(false);
   const activeTab = parseAccountTab(searchParams.get("tab"));
+
+  useEffect(() => {
+    let cancelled = false;
+
+    void (async () => {
+      const data = await fetchCustomer();
+      if (cancelled) return;
+
+      const customerId = data?.customer?.id;
+      if (!customerId || customerId === "guest") {
+        router.replace(accountLoginRedirect(pathname, searchParams.toString()));
+        return;
+      }
+
+      setAuthChecked(true);
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+    // Validate once on mount — fetchCustomer identity changes when customer updates.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleTabChange = useCallback(
     (tab: AccountTabId) => {
@@ -69,6 +101,14 @@ const AccountPageClient = () => {
   );
 
   const ActivePanel = TAB_PANELS[activeTab];
+
+  if (!authChecked) {
+    return (
+      <div className="container my-20 text-center text-neutral-500">
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <div className="nc-CommonLayoutProps container">

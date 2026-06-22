@@ -5,7 +5,7 @@ import Button from "@/shared/Button/Button";
 import AuthInput from "@/components/auth/AuthInput";
 import { LoginResponse } from "@/utils/type";
 import { useSession } from "@/context/SessionProvider";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Loader } from "lucide-react";
 import { getRandomWelcomeMessage } from "@/components/global/forms/HelperComps";
@@ -16,6 +16,13 @@ import {
   authSubmitButtonClassName,
 } from "@/components/auth/authStyles";
 
+function getSafeRedirectPath(redirect: string | null): string {
+  if (!redirect?.startsWith("/") || redirect.startsWith("//")) {
+    return "/";
+  }
+  return redirect;
+}
+
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,6 +30,8 @@ const LoginForm = () => {
 
   const { fetchCustomer, login } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectTo = getSafeRedirectPath(searchParams.get("redirect"));
 
   const handleFormSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -41,7 +50,7 @@ const LoginForm = () => {
       toast(randomMessage);
 
       await fetchCustomer();
-      router.push("/");
+      router.push(redirectTo);
       localStorage.removeItem("last_order");
     } catch (error: unknown) {
       console.error("Error:", error);
