@@ -255,6 +255,10 @@ export const siteConfig = {
   analytics: {
     googleAnalyticsId: "G-LS3EVR93ZH",
   },
+  /** Set `indexable: true` when the site goes live. */
+  seo: {
+    indexable: false,
+  },
   product: {
     // Default warranty used in product JSON-LD when a product has none set.
     defaultWarranty: {
