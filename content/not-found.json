@@ -14,14 +14,5 @@
         "label": "Back to home"
       }
     }
-  },
-  "suggestions": {
-    "title": "Try one of these instead",
-    "links": [
-      { "href": "/shop", "label": "Shop all" },
-      { "href": "/new-arrivals", "label": "New arrivals" },
-      { "href": "/deals", "label": "Flash deals" },
-      { "href": "/contact", "label": "Contact us" }
-    ]
   }
 }

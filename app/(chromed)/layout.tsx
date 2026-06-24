@@ -1,6 +1,7 @@
 import Header from "@/components/header/Header";
 import Footer from "@/components/footer/Footer";
 import HeaderGate from "@/components/header/HeaderGate";
+import { ChromeGate } from "@/context/ChromeVisibilityProvider";
 
 export default function ChromedLayout({
   children,
@@ -9,13 +10,17 @@ export default function ChromedLayout({
 }) {
   return (
     <>
-      <HeaderGate>
-        <Header />
-      </HeaderGate>
+      <ChromeGate>
+        <HeaderGate>
+          <Header />
+        </HeaderGate>
+      </ChromeGate>
       {children}
-      <HeaderGate>
-        <Footer />
-      </HeaderGate>
+      <ChromeGate>
+        <HeaderGate>
+          <Footer />
+        </HeaderGate>
+      </ChromeGate>
     </>
   );
 }

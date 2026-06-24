@@ -15,6 +15,7 @@ import WhatsappLogoComponent from "@/components/global/layout/WhatsAppLogo";
 import Script from "next/script";
 import GoogleAnalytics from "@/components/global/layout/GoogleAnalytics";
 import ContentWrapper from "@/components/global/layout/ContentWrapper";
+import { ChromeGate, ChromeVisibilityProvider } from "@/context/ChromeVisibilityProvider";
 import { siteConfig } from "@/site.config";
 import { getSiteMetadataIcons, getSiteTwitterImage } from "@/lib/siteAssets";
 import SiteThemeStyles from "@/components/global/theme/SiteThemeStyles";
@@ -139,16 +140,20 @@ export default async function RootLayout({
           <CartProvider>
             <SessionProvider>
               <WishlistProvider>
-                <Suspense fallback={null}>
-                  <NavigationEvents />
-                </Suspense>
-                <Suspense fallback={null}>
-                  <GoogleAnalytics />
-                </Suspense>
+                <ChromeVisibilityProvider>
+                  <Suspense fallback={null}>
+                    <NavigationEvents />
+                  </Suspense>
+                  <Suspense fallback={null}>
+                    <GoogleAnalytics />
+                  </Suspense>
 
-                <ContentWrapper>{children}</ContentWrapper>
-                <WhatsappLogoComponent />
-                <Toaster />
+                  <ContentWrapper>{children}</ContentWrapper>
+                  <ChromeGate>
+                    <WhatsappLogoComponent />
+                  </ChromeGate>
+                  <Toaster />
+                </ChromeVisibilityProvider>
               </WishlistProvider>
             </SessionProvider>
           </CartProvider>
