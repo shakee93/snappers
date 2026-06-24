@@ -154,16 +154,21 @@ const ProductTable = ({
         <h2 className={SECTION_TITLE_CLASS}>Order Details</h2>
         <div className={`mt-4 ${TABLE_WRAPPER_CLASS}`}>
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-[#E8E8E8]">
+            <table className="w-full table-fixed divide-y divide-[#E8E8E8]">
+              <colgroup>
+                <col />
+                <col className="w-12 sm:w-16" />
+                <col className="w-28 sm:w-32" />
+              </colgroup>
               <thead className="bg-header-cream text-sm font-semibold text-header-green">
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-left font-semibold">
+                  <th scope="col" className="px-3 py-3 text-left font-semibold sm:px-6 sm:py-3">
                     Product
                   </th>
-                  <th scope="col" className="px-6 py-3 text-center font-semibold">
-                    Quantity
+                  <th scope="col" className="px-2 py-3 text-center font-semibold sm:px-4">
+                    Qty
                   </th>
-                  <th scope="col" className="px-6 py-3 text-right font-semibold">
+                  <th scope="col" className="px-3 py-3 text-right font-semibold sm:px-6">
                     Total
                   </th>
                 </tr>
@@ -171,13 +176,13 @@ const ProductTable = ({
               <tbody className="divide-y divide-[#E8E8E8] text-slate-800">
                 {lineItems.map((item, index) => (
                   <tr key={index}>
-                    <td className="px-6 py-4 text-left font-medium">
+                    <td className="px-3 py-3 text-left align-top text-sm font-medium leading-snug sm:px-6 sm:py-4 sm:text-base">
                       {item?.product.node.name}
                     </td>
-                    <td className="px-6 py-4 text-center whitespace-nowrap">
+                    <td className="px-2 py-3 text-center align-top text-sm whitespace-nowrap sm:px-4 sm:py-4 sm:text-base">
                       {item?.quantity}
                     </td>
-                    <td className="px-6 py-4 text-right whitespace-nowrap font-medium">
+                    <td className="px-3 py-3 text-right align-top text-sm whitespace-nowrap font-medium sm:px-6 sm:py-4 sm:text-base">
                       {isLineItemFree(item?.total, item?.subtotal) ? (
                         <span className="font-semibold text-header-green">Free</span>
                       ) : (
@@ -189,9 +194,9 @@ const ProductTable = ({
                   </tr>
                 ))}
                 <tr>
-                  <td className="px-6 py-4 font-medium">Shipping</td>
+                  <td className="px-3 py-3 font-medium sm:px-6 sm:py-4">Shipping</td>
                   <td />
-                  <td className="px-6 py-4 text-right font-medium">
+                  <td className="px-3 py-3 text-right text-sm whitespace-nowrap font-medium [&_*]:inline sm:px-6 sm:py-4 sm:text-base">
                     <span
                       dangerouslySetInnerHTML={{
                         __html:
@@ -204,18 +209,18 @@ const ProductTable = ({
 
                 {bankCharge > 0 && (
                   <tr>
-                    <td className="px-6 py-4 font-medium">3% Bank Charge</td>
+                    <td className="px-3 py-3 font-medium sm:px-6 sm:py-4">3% Bank Charge</td>
                     <td />
-                    <td className="px-6 py-4 text-right font-medium">
+                    <td className="px-3 py-3 text-right whitespace-nowrap font-medium sm:px-6 sm:py-4">
                       {formatPrice(bankCharge)}
                     </td>
                   </tr>
                 )}
 
                 <tr className="bg-[#FAFAF8]/60">
-                  <td className="px-6 py-4 font-semibold text-[#092412]">Total</td>
+                  <td className="px-3 py-3 font-semibold text-[#092412] sm:px-6 sm:py-4">Total</td>
                   <td />
-                  <td className="px-6 py-4 text-right font-semibold text-[#092412]">
+                  <td className="px-3 py-3 text-right text-sm font-semibold whitespace-nowrap text-[#092412] [&_*]:inline sm:px-6 sm:py-4 sm:text-base">
                     <span
                       dangerouslySetInnerHTML={{
                         __html: formatMoneyValue(orderData?.order?.total),
