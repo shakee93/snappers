@@ -1,5 +1,6 @@
 import React, { FC } from "react";
 import { Maybe } from "@/graphql/types/graphql";
+import { toDisplayCurrency } from "@/lib/formatPrice";
 import { twMerge } from "tailwind-merge";
 
 export interface PricesProps {
@@ -27,7 +28,7 @@ const Prices: FC<PricesProps> = ({
           className={`flex items-center rounded-lg ${contentClass}`}
         >
           <span className="text-slate-950 text-sm font-bold !leading-none">
-            <span dangerouslySetInnerHTML={{ __html: price || "" }} />
+            <span dangerouslySetInnerHTML={{ __html: toDisplayCurrency(String(price)) }} />
           </span>
         </div>
       ) : null}
@@ -37,7 +38,7 @@ const Prices: FC<PricesProps> = ({
         >
           <span
             className="text-slate-400 dark:text-slate-500 font-normal line-through text-sm break-words lg:whitespace-nowrap max-w-full lg:max-w-none"
-            dangerouslySetInnerHTML={{ __html: salePrice || "" }}
+            dangerouslySetInnerHTML={{ __html: toDisplayCurrency(String(salePrice)) }}
           />
         </div>
       ) : null}

@@ -1,181 +1,241 @@
-import { isLineItemFree, stripHtmlMoney } from "@/lib/cartLinePricing";
-import { currencySymbol, toDisplayCurrency } from "@/lib/formatPrice";
+import { isLineItemFree, parseWooMoneyAmount } from "@/lib/cartLinePricing";
+import { currencySymbol, formatPrice, toDisplayCurrency } from "@/lib/formatPrice";
+
+type PaymentAddressDetails = {
+  first_name?: string | null;
+  last_name?: string | null;
+  billingAddress1?: string | null;
+  billingAddress2?: string | null;
+  billingaddress1?: string | null;
+  billingaddress2?: string | null;
+  city?: string | null;
+  country?: string | null;
+};
+
+const SECTION_TITLE_CLASS =
+  "font-albra text-xl font-semibold uppercase text-header-green sm:text-2xl";
+
+const SUMMARY_CARD_CLASS =
+  "rounded-2xl border border-[#E8E8E8] bg-white p-5";
+
+const TABLE_WRAPPER_CLASS =
+  "overflow-hidden rounded-2xl border border-[#E8E8E8] bg-white";
+
+function isPlaceholderAddressPart(value: string | undefined | null): boolean {
+  if (!value) return true;
+  const normalized = value.trim().toLowerCase();
+  return normalized === "" || normalized.startsWith("no_") || normalized === "n/a";
+}
+
+function formatPaymentAddress(
+  details?: PaymentAddressDetails | null,
+): string {
+  if (!details) return "—";
+
+  const billingLine1 = details.billingAddress1 ?? details.billingaddress1;
+  const billingLine2 = details.billingAddress2 ?? details.billingaddress2;
+
+  const lines = [
+    [details.first_name, details.last_name]
+      .filter((part) => part && !isPlaceholderAddressPart(part))
+      .join(" ")
+      .trim(),
+    billingLine1,
+    billingLine2,
+    details.city,
+    details.country,
+  ].filter((part) => part && !isPlaceholderAddressPart(part));
+
+  return lines.length > 0 ? lines.join("\n") : "—";
+}
+
+function formatMoneyValue(value: string | number | null | undefined): string {
+  if (value == null || value === "") return `${currencySymbol} 0.00`;
+  if (typeof value === "number") return formatPrice(value);
+  return toDisplayCurrency(value) || `${currencySymbol} 0.00`;
+}
 
 interface OrderDetailsProps {
-  orderData: any;
+  orderData?: {
+    order: {
+      date?: string | null;
+      orderNumber?: string | number | null;
+      databaseId?: number | null;
+      id?: string | null;
+      total?: string | null;
+      subtotal?: string | null;
+      shippingTotal?: string | null;
+    };
+  } | null;
 }
 
 export const OrderDetails = ({ orderData }: OrderDetailsProps) => {
   if (!orderData) return null;
-  const date = orderData.order.date ? new Date(orderData.order.date).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  }) : "-";
 
-  
+  const date = orderData.order.date
+    ? new Date(orderData.order.date).toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      })
+    : "—";
+
+  const orderNumber =
+    orderData.order.orderNumber ??
+    orderData.order.databaseId ??
+    orderData.order.id ??
+    "—";
 
   const rows = [
-    { label: "Order Id", value: orderData.order.orderNumber ?? orderData.order.databaseId ?? orderData.order.id ?? "Not found" },
+    { label: "Order Id", value: String(orderNumber), isOrderId: true },
     { label: "Date", value: date },
-    { label: "Order Total", value: orderData.order.total },
-    {
-      label: "Discount",
-      value: orderData.order.total - orderData.order.subtotal,
-      condition: orderData.order.total - orderData.order.subtotal > 0,
-    },
-    { label: "Delivery Fee", value: orderData.order.shippingTotal },
-    { label: "Sub Total", value: orderData.order.subtotal },
+    { label: "Order Total", value: formatMoneyValue(orderData.order.total) },
+    { label: "Delivery Fee", value: formatMoneyValue(orderData.order.shippingTotal) },
+    { label: "Sub Total", value: formatMoneyValue(orderData.order.subtotal) },
   ];
 
   return (
-    <div className="my-4">
-      <div className="grid grid-cols-1 lg:grid-cols-1 py-4">
+    <div>
+      <p className="text-sm font-semibold text-header-green">Order confirmed</p>
+      <h1 className="mt-2 font-albra text-2xl font-semibold uppercase leading-tight text-[#092412] sm:text-3xl">
+        We&apos;ve got your order. Thank you for choosing us. 📦
+      </h1>
 
-        <div className="flex flex-col justify-center items-start">
-          <h1 className="text-3xl font-regural ">We{"'"}ve got your order.Thank you for choosing us.  📦</h1>
-        </div>
-
-        <div className="flex flex-col items-center gap-3 text-center justify-between w-full py-8 md:flex-row">
-
-          {rows.map((row, index) =>
-            row.condition !== false ? (
-              <div key={index} className="flex flex-col items-center md:items-start ">
-                <p className="font-semibold	">{row.label}</p>
-                {row.label == "Order Id" ? <p className="	text-4xl font-bold"><span dangerouslySetInnerHTML={{ __html: row.value || '' }} /></p> : <p className="mt-1"><span dangerouslySetInnerHTML={{ __html: row.value || '' }} /> </p>}
-              </div>
-            ) : null
-          )}
-
-        </div>
-
+      <div className={`mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 ${SUMMARY_CARD_CLASS}`}>
+        {rows.map((row) => (
+          <div key={row.label} className="min-w-0 text-left">
+            <p className="text-sm font-semibold text-slate-600">{row.label}</p>
+            {row.isOrderId ? (
+              <p className="mt-1 text-3xl font-bold text-[#092412]">{row.value}</p>
+            ) : (
+              <p
+                className="mt-1 text-sm font-medium text-[#092412] sm:text-base [&_*]:inline"
+                dangerouslySetInnerHTML={{ __html: row.value }}
+              />
+            )}
+          </div>
+        ))}
       </div>
     </div>
   );
 };
 
-type ProductTableProps = {
-  lineItems?: any[];
-  orderData?: any;
-  paymentDetails?: any;
+type LineItem = {
+  product: { node: { name?: string | null } };
+  quantity?: number | null;
+  total?: string | null;
+  subtotal?: string | null;
 };
 
-const ProductTable = ({ lineItems, orderData, paymentDetails }: ProductTableProps) => {
+type ProductTableProps = {
+  lineItems?: LineItem[];
+  orderData?: OrderDetailsProps["orderData"];
+  paymentDetails?: PaymentAddressDetails | null;
+};
+
+const ProductTable = ({
+  lineItems,
+  orderData,
+  paymentDetails,
+}: ProductTableProps) => {
   if (!lineItems) return null;
 
+  const subtotalNumeric = parseWooMoneyAmount(orderData?.order?.subtotal);
+  const totalNumeric = parseWooMoneyAmount(orderData?.order?.total);
+  const shippingNumeric = parseWooMoneyAmount(orderData?.order?.shippingTotal);
+  const bankCharge =
+    (Number.isFinite(totalNumeric) ? totalNumeric : 0) -
+    (Number.isFinite(subtotalNumeric) ? subtotalNumeric : 0) -
+    (Number.isFinite(shippingNumeric) ? shippingNumeric : 0);
 
   return (
-    <>
+    <div className="mt-10 space-y-8">
       <div>
-        <p className="text-2xl text-left pb-4">Order Details</p>
-      </div>
-      <div className="w-full">
-        <div className="flex flex-col overflow-hidden">
+        <h2 className={SECTION_TITLE_CLASS}>Order Details</h2>
+        <div className={`mt-4 ${TABLE_WRAPPER_CLASS}`}>
           <div className="overflow-x-auto">
-
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700 ">
-              <thead className="text-lg bg-gray-200 py-2 text-primary-500 ">
+            <table className="min-w-full divide-y divide-[#E8E8E8]">
+              <thead className="bg-header-cream text-sm font-semibold text-header-green">
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-center font-medium">
+                  <th scope="col" className="px-6 py-3 text-left font-semibold">
                     Product
                   </th>
-                  <th scope="col" className="px-6 py-3 text-center font-medium">
+                  <th scope="col" className="px-6 py-3 text-center font-semibold">
                     Quantity
                   </th>
-                  <th scope="col" className="px-6 py-3 text-center font-medium">
+                  <th scope="col" className="px-6 py-3 text-right font-semibold">
                     Total
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
+              <tbody className="divide-y divide-[#E8E8E8] text-slate-800">
                 {lineItems.map((item, index) => (
                   <tr key={index}>
-                    <td className="px-6 text-left py-4 font-medium text-gray-800 dark:text-gray-200">
+                    <td className="px-6 py-4 text-left font-medium">
                       {item?.product.node.name}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-gray-800 dark:text-gray-200">
+                    <td className="px-6 py-4 text-center whitespace-nowrap">
                       {item?.quantity}
                     </td>
-                    <td className="px-6 py-4 text-right whitespace-nowrap text-gray-800 dark:text-gray-200">
+                    <td className="px-6 py-4 text-right whitespace-nowrap font-medium">
                       {isLineItemFree(item?.total, item?.subtotal) ? (
-                        <span className="font-semibold text-green-600">
-                          Free
-                        </span>
+                        <span className="font-semibold text-header-green">Free</span>
                       ) : (
-                        <>{currencySymbol} {stripHtmlMoney(item?.total ?? item?.subtotal)}</>
+                        formatPrice(
+                          parseWooMoneyAmount(item?.total ?? item?.subtotal) || 0,
+                        )
                       )}
                     </td>
                   </tr>
                 ))}
                 <tr>
-                  <td className="px-6 text-left py-4  font-medium text-gray-800 dark:text-gray-200">
-                    Shipping
-                  </td>
-                  <td></td>
-                  <td className="px-6 text-right py-4  font-medium text-gray-800 dark:text-gray-200">
-                    <span dangerouslySetInnerHTML={{ __html: toDisplayCurrency(orderData?.order?.shippingTotal) || `${currencySymbol} 0.00` }} />
+                  <td className="px-6 py-4 font-medium">Shipping</td>
+                  <td />
+                  <td className="px-6 py-4 text-right font-medium">
+                    <span
+                      dangerouslySetInnerHTML={{
+                        __html:
+                          formatMoneyValue(orderData?.order?.shippingTotal) ||
+                          `${currencySymbol} 0.00`,
+                      }}
+                    />
                   </td>
                 </tr>
 
-                {(() => {
-                  const cleanString = (str: any) => str?.replace(/[^0-9.]+/g, "");
-                  
-                  const subtotal = orderData?.order?.subtotal;
-                  const total = orderData?.order?.total;
-                  const shippingTotal = orderData?.order?.shippingTotal;
-                  
-                  const subtotalNumeric = parseFloat(cleanString(subtotal));
-                  const totalNumeric = parseFloat(cleanString(total));
-                  const shippingNumeric = parseFloat(cleanString(shippingTotal));
-                  
-                  // Calculate if there are additional charges beyond shipping (like bank charges)
-                  const expectedTotal = subtotalNumeric + shippingNumeric;
-                  const bankCharge = totalNumeric - expectedTotal;
-                  
-                  // Only show bank charge row if there's actually a charge beyond subtotal + shipping
-                  if (bankCharge > 0) {
-                    return (
-                      <tr>
-                        <td className="px-6 text-left py-4 font-medium text-gray-800 dark:text-gray-200">
-                          3% Bank Charge
-                        </td>
-                        <td></td>
-                        <td className="px-6 text-right py-4 font-medium text-gray-800 dark:text-gray-200">
-                          {currencySymbol} {bankCharge.toFixed(2)}
-                        </td>
-                      </tr>
-                    );
-                  }
-                  return null;
-                })()}
+                {bankCharge > 0 && (
+                  <tr>
+                    <td className="px-6 py-4 font-medium">3% Bank Charge</td>
+                    <td />
+                    <td className="px-6 py-4 text-right font-medium">
+                      {formatPrice(bankCharge)}
+                    </td>
+                  </tr>
+                )}
 
-                <tr>
-                  <td className="px-6 text-left py-4  font-medium text-gray-800 dark:text-gray-200">
-                    Total
-                  </td>
-                  <td></td>
-                  <td className="px-6 text-right py-4 font-medium text-gray-800 dark:text-gray-200">
-                    <span dangerouslySetInnerHTML={{ __html: toDisplayCurrency(orderData.order?.total) }} />
+                <tr className="bg-[#FAFAF8]/60">
+                  <td className="px-6 py-4 font-semibold text-[#092412]">Total</td>
+                  <td />
+                  <td className="px-6 py-4 text-right font-semibold text-[#092412]">
+                    <span
+                      dangerouslySetInnerHTML={{
+                        __html: formatMoneyValue(orderData?.order?.total),
+                      }}
+                    />
                   </td>
                 </tr>
               </tbody>
             </table>
-
           </div>
         </div>
       </div>
 
-      <div className="pt-8">
-        <p className="text-2xl text-left">Billing Address</p>
-        <div className="mt-8 border rounded" >
-          <div className="text-left p-4 ">
-            {`${paymentDetails.billingAddress1}  ${paymentDetails.billingAddress2}`}
-          </div>
+      <div>
+        <h2 className={SECTION_TITLE_CLASS}>Billing Address</h2>
+        <div className={`mt-4 whitespace-pre-line ${SUMMARY_CARD_CLASS} text-slate-700`}>
+          {formatPaymentAddress(paymentDetails)}
         </div>
       </div>
-
-
-    </>
+    </div>
   );
 };
 

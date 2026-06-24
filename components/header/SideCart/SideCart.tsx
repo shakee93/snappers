@@ -7,6 +7,7 @@ import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
 import CartDropdownItem from "@/components/header/CartDropdownItem";
 import { BRAND_CTA_BUTTON_CLASS } from "@/shared/Button/ButtonBrand";
+import { currencySymbol, toDisplayCurrency } from "@/lib/formatPrice";
 import basketIcon from "@/public/global/basket.svg";
 
 const SIDE_CART_CHECKOUT_CLASS =
@@ -16,9 +17,10 @@ export default function SideCart() {
     const { cart, isCartOpen, setIsCartOpen } = useCart();
     const checkoutDisabled = (cart?.contents?.itemCount ?? 0) === 0;
 
-    const subTotal = useMemo(() => {
-        return cart?.subtotal;
-    }, [cart]);
+    const subTotal = useMemo(
+        () => toDisplayCurrency(cart?.subtotal) || `${currencySymbol} 0.00`,
+        [cart?.subtotal],
+    );
 
     return (
         <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
@@ -50,11 +52,11 @@ export default function SideCart() {
 
             <SheetContent
                 side="right"
-                className="fixed inset-y-0 right-0 h-full w-10/12 border-l bg-header-cream
+                className="fixed inset-y-0 right-0 h-full w-11/12 border-l bg-[#FAFAF8]
                     data-[state=closed]:duration-300 data-[state=open]:duration-200
                     data-[state=open]:animate-in data-[state=closed]:animate-out
                     data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right
-                    sm:max-w-sm z-[1000] px-4"
+                    sm:max-w-lg z-[1000] px-4"
             >
                 <SheetHeader className="space-y-4 pb-6">
                     <Link href={"/cart"} className="text-sm text-slate-500 dark:text-slate-400">
@@ -68,7 +70,7 @@ export default function SideCart() {
                             {cart?.contents?.nodes?.map((item, index) => (
                                 <div
                                     key={index}
-                                    className="overflow-hidden rounded-xl border border-[#E8E8E8] bg-header-peach"
+                                    className="overflow-hidden rounded-xl border border-[#E8E8E8] bg-white"
                                 >
                                     <CartDropdownItem
                                         item={item}
@@ -81,15 +83,16 @@ export default function SideCart() {
                     </div>
 
                     <div className="border-t border-slate-200 dark:border-slate-700 pt-6 mt-auto">
-                        <div className="flex justify-between font-semibold text-slate-900 dark:text-slate-100">
-                            <span>
-                                <span>Subtotal</span>
-                                <span className="block text-sm text-slate-500 dark:text-slate-400 font-normal">
-                                    Shipping and taxes calculated at checkout.
-                                </span>
-                            </span>
-                            <span dangerouslySetInnerHTML={{ __html: subTotal || '' }} />
+                        <div className="flex items-baseline justify-between gap-4 font-semibold text-slate-900 dark:text-slate-100">
+                            <span>Subtotal</span>
+                            <span
+                                className="whitespace-nowrap [&_*]:inline"
+                                dangerouslySetInnerHTML={{ __html: subTotal || "" }}
+                            />
                         </div>
+                        <p className="mt-1 text-sm font-normal text-slate-500 dark:text-slate-400">
+                            Shipping and taxes calculated at checkout.
+                        </p>
                         <div className="mt-5">
                             {checkoutDisabled ? (
                                 <button

@@ -10,9 +10,26 @@ import { useEffect, useMemo, useRef, useState, use } from "react";
 import ProductTable, { OrderDetails } from "./Comps";
 import { toast } from "sonner";
 import Link from "next/link";
-import ButtonPrimary from "shared/Button/ButtonPrimary";
+import ButtonBrand from "shared/Button/ButtonBrand";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCart } from "@/context/CartProvider";
+
+const ORDER_PAGE_SHELL = "min-h-screen bg-[#FAFAF8]";
+const ORDER_PAGE_CONTAINER =
+  "container mx-auto max-w-4xl px-4 py-10 text-left lg:py-16";
+
+function OrderConfirmationFooter() {
+  return (
+    <div className="mt-16 text-center">
+      <p className="text-lg font-semibold text-[#092412]">
+        To Explore Our Product Range Further!
+      </p>
+      <ButtonBrand href="/" className="mt-5">
+        Shop More
+      </ButtonBrand>
+    </div>
+  );
+}
 
 export default function OrderPaymentPage(props: OrderPaymentPageProps) {
   const params = use(props.params);
@@ -329,28 +346,17 @@ export default function OrderPaymentPage(props: OrderPaymentPageProps) {
 
   if (ordermethod === "guest") {
     return (
-      <>
-        <div className="container mx-auto rounded-3xl text-center lg:p-20">
-          <div className="my-4">
-            <OrderDetails orderData={guestOrderData} />
-            <div className="">
-              <div className="">
-                <ProductTable
-                  lineItems={guestOrderData?.order?.lineItems?.nodes}
-                  orderData={guestOrderData}
-                  paymentDetails={guestPaymentDetails}
-                />
-              </div>
-            </div>
-          </div>
-          <h1 className="pb-4 pt-20 text-center text-2xl font-bold">
-            To Explore Our Product Range Further!
-          </h1>
-          <Link href={`/`}>
-            <ButtonPrimary>Shop More</ButtonPrimary>
-          </Link>
+      <div className={ORDER_PAGE_SHELL}>
+        <div className={ORDER_PAGE_CONTAINER}>
+          <OrderDetails orderData={guestOrderData} />
+          <ProductTable
+            lineItems={guestOrderData?.order?.lineItems?.nodes}
+            orderData={guestOrderData}
+            paymentDetails={guestPaymentDetails}
+          />
+          <OrderConfirmationFooter />
         </div>
-      </>
+      </div>
     );
   }
 
@@ -436,7 +442,7 @@ export default function OrderPaymentPage(props: OrderPaymentPageProps) {
     return (
       <div className="container mx-auto grid items-center justify-center py-20">
         <div className="text-center">
-          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-blue-500 border-t-transparent"></div>
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-header-green border-t-transparent"></div>
           <p className="mt-4 text-lg">Loading order details...</p>
         </div>
       </div>
@@ -462,25 +468,16 @@ export default function OrderPaymentPage(props: OrderPaymentPageProps) {
   }
 
   return (
-    <div className="container mx-auto rounded-3xl text-center lg:p-20">
-      <div className="my-4">
+    <div className={ORDER_PAGE_SHELL}>
+      <div className={ORDER_PAGE_CONTAINER}>
         <OrderDetails orderData={displayOrderData} />
-        <div className="">
-          <div className="">
-            <ProductTable
-              lineItems={displayOrderData?.order?.lineItems?.nodes}
-              orderData={displayOrderData}
-              paymentDetails={displayPaymentDetails}
-            />
-          </div>
-        </div>
+        <ProductTable
+          lineItems={displayOrderData?.order?.lineItems?.nodes}
+          orderData={displayOrderData}
+          paymentDetails={displayPaymentDetails}
+        />
+        <OrderConfirmationFooter />
       </div>
-      <h1 className="pb-4 pt-20 text-center text-2xl font-bold">
-        To Explore Our Product Range Further!
-      </h1>
-      <Link href={`/`}>
-        <ButtonPrimary>Shop More</ButtonPrimary>
-      </Link>
     </div>
   );
 }
