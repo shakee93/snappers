@@ -177,7 +177,7 @@ const ProductTable = ({
               <tbody className="divide-y divide-[#E8E8E8] text-slate-800">
                 {lineItems.map((item, index) => (
                   <tr key={index}>
-                    <td className="px-3 py-3 text-left align-top text-sm font-medium leading-snug sm:px-6 sm:py-4 sm:text-base">
+                    <td className="px-3 py-3 text-left align-top break-words text-sm font-medium leading-snug sm:px-6 sm:py-4 sm:text-base">
                       {item?.product.node.name}
                     </td>
                     <td className="px-2 py-3 text-center align-top text-sm whitespace-nowrap sm:px-4 sm:py-4 sm:text-base">
