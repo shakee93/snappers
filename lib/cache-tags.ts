@@ -1,4 +1,6 @@
 export const DEALS_CACHE_TAG = 'deals';
+// Site-wide ACF options (deal countdown end date, etc.).
+export const SITE_SETTINGS_CACHE_TAG = 'site-settings';
 // Homepage hero/bento sliders + slide CPT. Busted by the WP `acf/save_post`
 // hook on Hero Section options page saves, and by save_post on the slide CPT.
 export const HERO_SECTION_CACHE_TAG = 'hero-section';

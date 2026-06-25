@@ -17,18 +17,21 @@ interface TimeLeft {
   days: number;
   hours: number;
   minutes: number;
+  seconds: number;
 }
 
 const pad = (n: number) => n.toString().padStart(2, "0");
 
+const DEFAULT_COUNTDOWN_MS = 1000 * 60 * 60 * 24 * 2;
 
 const getTimeLeft = (target: number): TimeLeft => {
   const diff = Math.max(0, target - Date.now());
-  const totalMinutes = Math.floor(diff / 60000);
+  const totalSeconds = Math.floor(diff / 1000);
   return {
-    days: Math.floor(totalMinutes / (60 * 24)),
-    hours: Math.floor((totalMinutes % (60 * 24)) / 60),
-    minutes: totalMinutes % 60,
+    days: Math.floor(totalSeconds / 86400),
+    hours: Math.floor((totalSeconds % 86400) / 3600),
+    minutes: Math.floor((totalSeconds % 3600) / 60),
+    seconds: totalSeconds % 60,
   };
 };
 
@@ -47,9 +50,10 @@ const SectionDealCountdown = ({
   const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
 
   useEffect(() => {
-    const target = endsAt
-      ? new Date(endsAt).getTime()
-      : Date.now() + 1000 * 60 * 60 * 24 * 2;
+    const parsed = endsAt ? new Date(endsAt).getTime() : NaN;
+    const target = Number.isFinite(parsed)
+      ? parsed
+      : Date.now() + DEFAULT_COUNTDOWN_MS;
 
     const tick = () => setTimeLeft(getTimeLeft(target));
     tick();
@@ -63,6 +67,7 @@ const SectionDealCountdown = ({
         { label: "Days", value: timeLeft.days },
         { label: "Hrs", value: timeLeft.hours },
         { label: "Mins", value: timeLeft.minutes },
+        { label: "Secs", value: timeLeft.seconds },
       ]
     : null;
 
@@ -76,12 +81,12 @@ const SectionDealCountdown = ({
           <div key={unit.label} className="flex items-center">
             {index > 0 && (
               <span
-                className="mx-2 h-8 w-px bg-[#E7D9C7] md:mx-4 md:h-10"
+                className="mx-1.5 h-8 w-px bg-[#E7D9C7] md:mx-3 md:h-10"
                 aria-hidden
               />
             )}
             <div className="flex flex-col items-center">
-              <span className="text-2xl font-bold tabular-nums text-deal-brown md:text-4xl">
+              <span className="text-xl font-bold tabular-nums text-deal-brown md:text-4xl">
                 {pad(unit.value)}
               </span>
               <span className="text-[9px] leading-none py-1 md:py-2 font-semibold uppercase tracking-wider text-[#EE9E7D] md:text-xs">
@@ -91,17 +96,17 @@ const SectionDealCountdown = ({
           </div>
         ))
       ) : (
-        <div className="flex w-full items-center justify-center gap-2 md:gap-4">
-          {[0, 1, 2].map((index) => (
+        <div className="flex w-full items-center justify-center gap-1 md:gap-4">
+          {[0, 1, 2, 3].map((index) => (
             <div key={index} className="flex items-center">
               {index > 0 && (
                 <span
-                  className="mx-2 h-8 w-px bg-[#E7D9C7] md:mx-4 md:h-10"
+                  className="mx-1.5 h-8 w-px bg-[#E7D9C7] md:mx-3 md:h-10"
                   aria-hidden
                 />
               )}
               <div className="flex flex-col items-center gap-1.5">
-                <span className="h-7 w-9 animate-pulse rounded-md bg-[#E7D9C7]/80 md:h-9 md:w-12" />
+                <span className="h-7 w-8 animate-pulse rounded-md bg-[#E7D9C7]/80 md:h-9 md:w-12" />
                 <span className="h-2 w-7 animate-pulse rounded bg-[#EE9E7D]/40 md:h-2.5 md:w-8" />
               </div>
             </div>
