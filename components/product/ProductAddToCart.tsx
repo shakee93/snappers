@@ -170,7 +170,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
     return true;
   };
 
-  const addItemToCart = async (redirectToCheckout = false) => {
+  const addItemToCart = async () => {
     if (isProductOutOfStock()) {
       return;
     }
@@ -193,9 +193,6 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
       const success = !error && !data?.error;
       if (success) {
         handleCartCompletion();
-        if (redirectToCheckout) {
-          router.push("/checkout");
-        }
       } else {
         handleAddToCartResponse(data, error);
       }
@@ -346,11 +343,11 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
     </div>
   );
 
-  const renderBuyNowButton = () => (
+  const renderAddToCartButton = () => (
     <button
       type="button"
       disabled={isAddToCartDisabled}
-      onClick={() => addItemToCart(true)}
+      onClick={() => addItemToCart()}
       className={twMerge(
         `flex h-12 min-w-0 flex-1 items-center justify-center bg-[#ACDA5A] px-4 text-base font-bold text-[#38461F] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 ${pdpRadius}`,
       )}
@@ -360,7 +357,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
       ) : isPreOrderProduct() ? (
         "Pre-order"
       ) : (
-        "Buy now"
+        "Add to cart"
       )}
     </button>
   );
@@ -381,17 +378,17 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
           <div className="lg:pb-4">
             {isInStock ? (
               <>
-                {/* Mobile: qty · buy now · wishlist */}
+                {/* Mobile: qty · add to cart · wishlist */}
                 <div className="flex items-center gap-2 lg:hidden">
                   {renderQuantityControl()}
-                  {renderBuyNowButton()}
+                  {renderAddToCartButton()}
                   {renderWishlistControl()}
                 </div>
 
-                {/* Desktop: qty · buy now · wishlist */}
+                {/* Desktop: qty · add to cart · wishlist */}
                 <div className="hidden items-center gap-2 lg:flex">
                   {renderQuantityControl()}
-                  {renderBuyNowButton()}
+                  {renderAddToCartButton()}
                   {renderWishlistControl()}
                 </div>
               </>

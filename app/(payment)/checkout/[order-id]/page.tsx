@@ -6,17 +6,31 @@ import {
   GET_CHECKOUT_USER_DETAILS,
   GET_SINGLE_ORDER,
 } from "@/graphql/defs/order";
-import { useEffect, useMemo, useRef, useState, use } from "react";
+import { useEffect, useMemo, useRef, useState, use, type ReactNode } from "react";
 import ProductTable, { OrderDetails } from "./Comps";
 import { toast } from "sonner";
 import Link from "next/link";
 import ButtonBrand from "shared/Button/ButtonBrand";
+import Logo from "@/components/header/Logo";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCart } from "@/context/CartProvider";
 
 const ORDER_PAGE_SHELL = "min-h-screen bg-[#FAFAF8]";
 const ORDER_PAGE_CONTAINER =
   "container mx-auto max-w-4xl px-4 py-10 text-left lg:py-16";
+
+function OrderConfirmationLayout({ children }: { children: ReactNode }) {
+  return (
+    <div className={ORDER_PAGE_SHELL}>
+      <div className={ORDER_PAGE_CONTAINER}>
+        <div className="mb-8">
+          <Logo imageClass="h-9 sm:h-[31px] hover:scale-100" />
+        </div>
+        {children}
+      </div>
+    </div>
+  );
+}
 
 function OrderConfirmationFooter() {
   return (
@@ -346,17 +360,15 @@ export default function OrderPaymentPage(props: OrderPaymentPageProps) {
 
   if (ordermethod === "guest") {
     return (
-      <div className={ORDER_PAGE_SHELL}>
-        <div className={ORDER_PAGE_CONTAINER}>
-          <OrderDetails orderData={guestOrderData} />
-          <ProductTable
-            lineItems={guestOrderData?.order?.lineItems?.nodes}
-            orderData={guestOrderData}
-            paymentDetails={guestPaymentDetails}
-          />
-          <OrderConfirmationFooter />
-        </div>
-      </div>
+      <OrderConfirmationLayout>
+        <OrderDetails orderData={guestOrderData} />
+        <ProductTable
+          lineItems={guestOrderData?.order?.lineItems?.nodes}
+          orderData={guestOrderData}
+          paymentDetails={guestPaymentDetails}
+        />
+        <OrderConfirmationFooter />
+      </OrderConfirmationLayout>
     );
   }
 
@@ -468,16 +480,14 @@ export default function OrderPaymentPage(props: OrderPaymentPageProps) {
   }
 
   return (
-    <div className={ORDER_PAGE_SHELL}>
-      <div className={ORDER_PAGE_CONTAINER}>
-        <OrderDetails orderData={displayOrderData} />
-        <ProductTable
-          lineItems={displayOrderData?.order?.lineItems?.nodes}
-          orderData={displayOrderData}
-          paymentDetails={displayPaymentDetails}
-        />
-        <OrderConfirmationFooter />
-      </div>
-    </div>
+    <OrderConfirmationLayout>
+      <OrderDetails orderData={displayOrderData} />
+      <ProductTable
+        lineItems={displayOrderData?.order?.lineItems?.nodes}
+        orderData={displayOrderData}
+        paymentDetails={displayPaymentDetails}
+      />
+      <OrderConfirmationFooter />
+    </OrderConfirmationLayout>
   );
 }
