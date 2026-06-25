@@ -22,6 +22,8 @@ interface TimeLeft {
 
 const pad = (n: number) => n.toString().padStart(2, "0");
 
+const DEFAULT_COUNTDOWN_MS = 1000 * 60 * 60 * 24 * 2;
+
 const getTimeLeft = (target: number): TimeLeft => {
   const diff = Math.max(0, target - Date.now());
   const totalSeconds = Math.floor(diff / 1000);
@@ -48,9 +50,10 @@ const SectionDealCountdown = ({
   const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
 
   useEffect(() => {
-    const target = endsAt
-      ? new Date(endsAt).getTime()
-      : Date.now() + 1000 * 60 * 60 * 24 * 2;
+    const parsed = endsAt ? new Date(endsAt).getTime() : NaN;
+    const target = Number.isFinite(parsed)
+      ? parsed
+      : Date.now() + DEFAULT_COUNTDOWN_MS;
 
     const tick = () => setTimeLeft(getTimeLeft(target));
     tick();
