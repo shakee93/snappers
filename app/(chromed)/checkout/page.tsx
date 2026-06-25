@@ -914,7 +914,7 @@ const CheckoutPage = () => {
     ? formatPrice(numericOrderTotal + threePercentFromTotal)
     : isKokoPayment
     ? formatPrice(kokoOrderTotal)
-    : formatPrice(Number.isFinite(numericOrderTotal) ? numericOrderTotal : 0);
+    : formatPrice(numericOrderTotal);
 
   useEffect(() => {
     setTotalWithTax(taxWithTotal);
@@ -1507,7 +1507,7 @@ const CheckoutPage = () => {
                     <span className="inline-block w-32 h-7 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
                   ) : (
                     <span className="text-xl font-bold">
-                      {formatPrice(Number.isFinite(numericOrderTotal) ? numericOrderTotal : 0)}
+                      {formatPrice(numericOrderTotal)}
                     </span>
                   )}
                 </div>
