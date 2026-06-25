@@ -8,6 +8,10 @@ import {
 } from "@/graphql/defs/products";
 import { GET_HERO_SETTINGS } from "@/graphql/defs/slides";
 import { GET_GOOGLE_REVIEWS } from "@/graphql/defs/reviews";
+import {
+  GET_SITE_SETTINGS,
+  type SiteSettingFields,
+} from "@/graphql/defs/site-settings";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import SectionHeroPets, {
   type HeroSettingsFields,
@@ -37,7 +41,7 @@ import SectionBrandMarquee, {
 import SectionOurStores from "@/components/home/SectionOurStores";
 import { type CategoryTreeNode } from "@/lib/categoryScope";
 import { unstable_cache } from "next/cache";
-import { HERO_SECTION_CACHE_TAG } from "@/lib/cache-tags";
+import { HERO_SECTION_CACHE_TAG, SITE_SETTINGS_CACHE_TAG } from "@/lib/cache-tags";
 
 // ISR safety net: the WP → /api/revalidate webhook is the primary cache buster,
 // but this ensures the homepage (slides, reviews, etc.) self-heals if a webhook
@@ -57,6 +61,10 @@ const HERO_QUERY_CONTEXT = {
   fetchOptions: { next: { tags: [HERO_SECTION_CACHE_TAG] } },
 };
 
+const SITE_SETTINGS_QUERY_CONTEXT = {
+  fetchOptions: { next: { tags: [SITE_SETTINGS_CACHE_TAG] } },
+};
+
 const getHeroSettingsCached = unstable_cache(
   () =>
     getClient()
@@ -67,9 +75,23 @@ const getHeroSettingsCached = unstable_cache(
   { tags: [HERO_SECTION_CACHE_TAG], revalidate: 86400 }
 );
 
+const getSiteSettingsCached = unstable_cache(
+  () =>
+    getClient()
+      .query({
+        query: GET_SITE_SETTINGS,
+        context: SITE_SETTINGS_QUERY_CONTEXT,
+      })
+      .then((res) => res.data?.siteSettings?.siteSettingFields ?? null)
+      .catch(() => null),
+  ["homepage-site-settings-v1"],
+  { tags: [SITE_SETTINGS_CACHE_TAG], revalidate: 1800 }
+);
+
 const getData = async () => {
   const [
     heroSettings,
+    siteSettings,
     categories,
     dealProducts,
     browseAllTab,
@@ -78,6 +100,7 @@ const getData = async () => {
     brands,
   ] = await Promise.all([
     getHeroSettingsCached(),
+    getSiteSettingsCached(),
     getClient()
       .query({ query: GET_SHOP_BY_CATEGORIES, variables: { first: 12 } })
       .then((res) => res.data?.productCategories?.nodes || [])
@@ -155,6 +178,7 @@ const getData = async () => {
 
   return {
     heroSettings: heroSettings as HeroSettingsFields | null,
+    siteSettings: siteSettings as SiteSettingFields | null,
     categories: categories as SectionShopByCategoryProps["categories"],
     dealProducts: dealProducts as (SimpleProduct & VariableProduct)[],
     browseAllTab: browseAllTab as BrowseInitialCache,
@@ -169,6 +193,7 @@ const getData = async () => {
 export default async function Home() {
   const {
     heroSettings,
+    siteSettings,
     categories,
     dealProducts,
     browseAllTab,
@@ -192,7 +217,7 @@ export default async function Home() {
         </div>
 
         <div className="mt-16 md:mt-24">
-          <SectionDealCountdown />
+          <SectionDealCountdown endsAt={siteSettings?.dealEnds ?? undefined} />
         </div>
 
         <div className="mt-8 md:mt-10">
