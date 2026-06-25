@@ -153,22 +153,23 @@ const ProductTable = ({
       <div>
         <h2 className={SECTION_TITLE_CLASS}>Order Details</h2>
         <div className={`mt-4 ${TABLE_WRAPPER_CLASS}`}>
-          <div className="overflow-x-auto">
-            <table className="w-full table-fixed divide-y divide-[#E8E8E8]">
-              <colgroup>
+          <div className="max-sm:overflow-x-auto">
+            <table className="w-full divide-y divide-[#E8E8E8] max-sm:table-fixed">
+              <colgroup className="sm:hidden">
                 <col />
-                <col className="w-12 sm:w-16" />
-                <col className="w-28 sm:w-32" />
+                <col className="w-12" />
+                <col className="w-28" />
               </colgroup>
-              <thead className="bg-header-cream text-sm font-semibold text-header-green">
+              <thead className="bg-header-cream text-sm font-semibold text-header-green sm:text-base">
                 <tr>
                   <th scope="col" className="px-3 py-3 text-left font-semibold sm:px-6 sm:py-3">
                     Product
                   </th>
-                  <th scope="col" className="px-2 py-3 text-center font-semibold sm:px-4">
-                    Qty
+                  <th scope="col" className="w-16 px-2 py-3 text-center font-semibold sm:w-28 sm:px-4">
+                    <span className="sm:hidden">Qty</span>
+                    <span className="hidden sm:inline">Quantity</span>
                   </th>
-                  <th scope="col" className="px-3 py-3 text-right font-semibold sm:px-6">
+                  <th scope="col" className="w-32 px-3 py-3 text-right font-semibold sm:w-40 sm:px-6">
                     Total
                   </th>
                 </tr>
