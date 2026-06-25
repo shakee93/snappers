@@ -371,9 +371,20 @@ export const CHECKOUT = gql`
         total
         subtotal
         shippingTotal
+        customerNote
         date
         id
         databaseId
+        shippingLines {
+          nodes {
+            methodTitle
+            total
+            shippingMethod {
+              id
+              title
+            }
+          }
+        }
         lineItems {
           nodes {
             databaseId
@@ -426,6 +437,20 @@ export const GET_SINGLE_ORDER = gql`
       discountTax
       shippingTax
       shippingTotal
+      shippingLines {
+        nodes {
+          methodTitle
+          total
+          shippingMethod {
+            id
+            title
+          }
+        }
+      }
+      metaData(keysIn: ["delivery_type"]) {
+        key
+        value
+      }
       orderNumber
       customerNote
       date

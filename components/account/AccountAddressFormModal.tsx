@@ -33,7 +33,7 @@ const AccountAddressFormModal = ({
 
   return (
     <Transition appear show={show} as={Fragment}>
-      <Dialog as="div" className="fixed inset-0 z-50" onClose={onClose}>
+      <Dialog as="div" className="fixed inset-0 z-[1100] overflow-y-auto" onClose={onClose}>
         <div className="flex min-h-full items-center justify-center p-4">
           <Transition.Child
             as={Fragment}
@@ -56,15 +56,15 @@ const AccountAddressFormModal = ({
             leaveFrom="opacity-100 scale-100"
             leaveTo="opacity-0 scale-95"
           >
-            <Dialog.Panel className="relative flex max-h-[90vh] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white text-left shadow-xl">
-              <div className="flex items-center justify-between border-b border-[#E8E8E8] px-5 py-4 sm:px-6">
+            <Dialog.Panel className="relative flex max-h-[calc(100dvh-2rem)] w-full max-w-2xl flex-col overflow-hidden rounded-2xl bg-white text-left shadow-xl">
+              <div className="flex shrink-0 items-center justify-between border-b border-[#E8E8E8] px-5 py-4 sm:px-6">
                 <Dialog.Title className="text-lg font-bold text-header-green">
                   {formType ? titles[formType] : ""}
                 </Dialog.Title>
                 <ButtonClose onClick={onClose} />
               </div>
 
-              <div className="hiddenScrollbar flex-1 overflow-y-auto px-4 py-3 sm:px-5 sm:py-4">
+              <div className="hiddenScrollbar min-h-0 flex-1 overflow-y-auto overscroll-contain px-4 py-3 sm:px-5 sm:py-4">
                 {formType === "delivery" ? (
                   <DeliveryForm embedded onSaved={handleSaved} />
                 ) : null}

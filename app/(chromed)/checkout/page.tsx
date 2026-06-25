@@ -40,6 +40,7 @@ import { siteConfig } from "@/site.config";
 import { formatPrice, currencySymbol } from "@/lib/formatPrice";
 import { CARD_SURCHARGE_RATE } from "@/lib/checkoutMath";
 import { apiUrl } from "@/lib/api";
+import { enrichCheckoutOrderStorage } from "@/components/account/accountOrderUtils";
 interface FormData {
   contactInfo: Record<string, any>;
   deliveryAddress: any;
@@ -421,9 +422,9 @@ const CheckoutPage = () => {
 
       const shippingMethod = getShippingMethod(shippingTotal, orderDeliveryType);
       const storePickupAddressOverride = {
-        address1: "Store Pickup",
+        address1: "",
         address2: "",
-        city: "Store Pickup",
+        city: "",
         state: "",
         postcode: "",
         country: "LK",
@@ -478,6 +479,9 @@ const CheckoutPage = () => {
               key: "payhere_order_id",
               value: payherPaymentID ?? "",
             },
+            ...(orderDeliveryType
+              ? [{ key: "delivery_type", value: orderDeliveryType }]
+              : []),
           ],
         },
       };
@@ -500,8 +504,29 @@ const CheckoutPage = () => {
         return null;
       }
 
+      const storedCheckoutData = enrichCheckoutOrderStorage(
+        mutationData,
+        orderDeliveryType,
+        shippingMethod.methodTitle,
+      );
+
       // Store order data in localStorage for both guest and logged-in users
-      localStorage.setItem("last_order", JSON.stringify(mutationData));
+      localStorage.setItem("last_order", JSON.stringify(storedCheckoutData));
+
+      const orderDbId =
+        storedCheckoutData.checkout?.order?.databaseId?.toString();
+      if (orderDbId && typeof window !== "undefined") {
+        sessionStorage.setItem(
+          `order_shipping_label_${orderDbId}`,
+          shippingMethod.methodTitle,
+        );
+        if (orderDeliveryType) {
+          sessionStorage.setItem(
+            `order_delivery_type_${orderDbId}`,
+            orderDeliveryType,
+          );
+        }
+      }
 
       if (gatewayId === "darazbnpl") {
         const orderData = {
@@ -521,8 +546,9 @@ const CheckoutPage = () => {
         const shippingAddress = isStorePickupOrder
           ? {
               ...transformAddress(data.deliveryAddress),
-              address1: "Store Pickup",
-              city: "Store Pickup",
+              address1: "",
+              address2: "",
+              city: "",
             }
           : transformAddress(data.deliveryAddress);
 
@@ -552,7 +578,7 @@ const CheckoutPage = () => {
           ship_to_address_country: shippingAddress.country || "LK",
         };
 
-        localStorage.setItem("last_order", JSON.stringify(mutationData));
+        localStorage.setItem("last_order", JSON.stringify(storedCheckoutData));
         handleNdbPay(orderData);
         return null;
       }
@@ -568,7 +594,7 @@ const CheckoutPage = () => {
         }
         localStorage.setItem(
           "payhere_last_order",
-          JSON.stringify(mutationData)
+          JSON.stringify(storedCheckoutData)
         );
         router.push(`/checkout/payhere/guest_order`);
         return null;
@@ -596,7 +622,7 @@ const CheckoutPage = () => {
       }
 
       if (mutationData) {
-        const checkoutDetails = savePaymentDetails(mutationData);
+        const checkoutDetails = savePaymentDetails(storedCheckoutData);
         setPaymentData(checkoutDetails);
 
         if (isBankTransfer) {
@@ -888,7 +914,7 @@ const CheckoutPage = () => {
     ? formatPrice(numericOrderTotal + threePercentFromTotal)
     : isKokoPayment
     ? formatPrice(kokoOrderTotal)
-    : (orderTotal || "");
+    : formatPrice(Number.isFinite(numericOrderTotal) ? numericOrderTotal : 0);
 
   useEffect(() => {
     setTotalWithTax(taxWithTotal);
@@ -1480,10 +1506,9 @@ const CheckoutPage = () => {
                   {shippingUpdating ? (
                     <span className="inline-block w-32 h-7 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
                   ) : (
-                    <span
-                      className="text-xl font-bold"
-                      dangerouslySetInnerHTML={{ __html: orderTotal || "0.00" }}
-                    />
+                    <span className="text-xl font-bold">
+                      {formatPrice(Number.isFinite(numericOrderTotal) ? numericOrderTotal : 0)}
+                    </span>
                   )}
                 </div>
               )}

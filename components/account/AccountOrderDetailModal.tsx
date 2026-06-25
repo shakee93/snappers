@@ -171,7 +171,7 @@ const AccountOrderDetailModal = ({
 
   return (
     <Transition appear show={show} as={Fragment}>
-      <Dialog as="div" className="fixed inset-0 z-50" onClose={onClose}>
+      <Dialog as="div" className="fixed inset-0 z-[1100]" onClose={onClose}>
         <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center">
           <Transition.Child
             as={Fragment}

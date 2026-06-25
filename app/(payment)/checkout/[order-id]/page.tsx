@@ -7,7 +7,11 @@ import {
   GET_SINGLE_ORDER,
 } from "@/graphql/defs/order";
 import { useEffect, useMemo, useRef, useState, use, type ReactNode } from "react";
+import { mergeThankYouOrderData } from "@/components/account/accountOrderUtils";
 import ProductTable, { OrderDetails } from "./Comps";
+import type { ComponentProps } from "react";
+
+type ThankYouOrderData = ComponentProps<typeof OrderDetails>["orderData"];
 import { toast } from "sonner";
 import Link from "next/link";
 import ButtonBrand from "shared/Button/ButtonBrand";
@@ -80,6 +84,8 @@ export default function OrderPaymentPage(props: OrderPaymentPageProps) {
   const lineItems = lineItemsParam && lineItemsParam !== "undefined"
     ? JSON.parse(lineItemsParam)
     : { nodes: [] };
+  const shippingMethodLabel = searchParamsObj.get("shippingMethodLabel");
+  const deliveryType = searchParamsObj.get("deliveryType");
   const ordermethod = searchParamsObj.get('ordermethod');
 
   //Koko Payment
@@ -161,6 +167,7 @@ export default function OrderPaymentPage(props: OrderPaymentPageProps) {
   const { data: orderData, error: orderError } = useQuery(GET_SINGLE_ORDER, {
     variables: { orderID: orderId },
     skip: !orderId || orderId === "guest_checkout" || orderId === "ItemNo12345" || orderId === "12345" || ordermethod === "guest",
+    fetchPolicy: "cache-and-network",
   });
 
   // Clear cart for guest checkout with ordermethod=guest
@@ -266,6 +273,11 @@ export default function OrderPaymentPage(props: OrderPaymentPageProps) {
       total: amount,
       subtotal: subtotal,
       shippingTotal: shippingTotal,
+      deliveryType,
+      shippingMethodLabel,
+      shippingLines: shippingMethodLabel
+        ? { nodes: [{ methodTitle: shippingMethodLabel }] }
+        : undefined,
       lineItems: {
         nodes: lineItems.nodes,
       },
@@ -353,6 +365,16 @@ export default function OrderPaymentPage(props: OrderPaymentPageProps) {
     [localStorageOrderData, regularPaymentDetails],
   );
 
+  const displayOrderData = useMemo(
+    () =>
+      mergeThankYouOrderData(
+        orderData,
+        localStorageOrderData,
+        orderId,
+      ) as ThankYouOrderData,
+    [orderData, localStorageOrderData, orderId],
+  );
+
   // Empty effect for potential future use
   useEffect(() => {
     // window.location.reload()
@@ -430,9 +452,6 @@ export default function OrderPaymentPage(props: OrderPaymentPageProps) {
     );
   }
 
-  // Prefer query data (complete) over localStorage (may be incomplete); fall back to localStorage for guest orders
-  const finalOrderData = orderData || localStorageOrderData?.checkout;
-
   // If query failed and we have no localStorage data, show error
   if (orderError && !localStorageOrderData && !isCheckingLocalStorage) {
     return (
@@ -461,7 +480,6 @@ export default function OrderPaymentPage(props: OrderPaymentPageProps) {
     );
   }
 
-  const displayOrderData = orderData || localStorageOrderData?.checkout;
   const displayPaymentDetails = localStorageOrderData && !orderData ? localStoragePaymentDetails : regularPaymentDetails;
 
   if (!displayOrderData) {
@@ -483,7 +501,7 @@ export default function OrderPaymentPage(props: OrderPaymentPageProps) {
     <OrderConfirmationLayout>
       <OrderDetails orderData={displayOrderData} />
       <ProductTable
-        lineItems={displayOrderData?.order?.lineItems?.nodes}
+        lineItems={displayOrderData?.order?.lineItems?.nodes ?? undefined}
         orderData={displayOrderData}
         paymentDetails={displayPaymentDetails}
       />

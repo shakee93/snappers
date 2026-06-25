@@ -102,6 +102,12 @@ const savePaymentDetails = (
 ): PaymentDetailsWithoutUrls => {
   let orderDetails: CheckoutPayload = checkoutDetails?.checkout;
   let { order, customer } = orderDetails;
+  const shippingMethodLabel =
+    (orderDetails as { shippingMethodLabel?: string }).shippingMethodLabel ??
+    order?.shippingLines?.nodes?.[0]?.methodTitle ??
+    "";
+  const deliveryType =
+    (orderDetails as { deliveryType?: string }).deliveryType ?? "";
 
   let saved_data = {
     amount: order?.total ?? "no_amount",
@@ -121,6 +127,8 @@ const savePaymentDetails = (
     shippingaddress1: customer?.shipping?.address1 || "no_address",
     shippingaddress2: customer?.shipping?.address2 || "no_address",
     city: customer?.billing?.city || "no_city",
+    shippingMethodLabel,
+    deliveryType,
   };
 
   // console.log("saved_data: for payment", saved_data);

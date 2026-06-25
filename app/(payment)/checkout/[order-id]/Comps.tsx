@@ -1,3 +1,4 @@
+import { getOrderShippingRowLabel } from "@/components/account/accountOrderUtils";
 import { isLineItemFree, parseWooMoneyAmount } from "@/lib/cartLinePricing";
 import { currencySymbol, formatPrice, toDisplayCurrency } from "@/lib/formatPrice";
 
@@ -65,9 +66,29 @@ interface OrderDetailsProps {
       total?: string | null;
       subtotal?: string | null;
       shippingTotal?: string | null;
+      customerNote?: string | null;
+      deliveryType?: string | null;
+      shippingMethodLabel?: string | null;
+      metaData?: Array<{ key?: string | null; value?: string | null } | null> | null;
+      shippingLines?: {
+        nodes?: Array<{
+          methodTitle?: string | null;
+          shippingMethod?: { id?: string | null; title?: string | null } | null;
+        } | null> | null;
+      } | null;
+      lineItems?: {
+        nodes?: LineItem[] | null;
+      } | null;
     };
   } | null;
 }
+
+type LineItem = {
+  product: { node: { name?: string | null } };
+  quantity?: number | null;
+  total?: string | null;
+  subtotal?: string | null;
+};
 
 export const OrderDetails = ({ orderData }: OrderDetailsProps) => {
   if (!orderData) return null;
@@ -120,13 +141,6 @@ export const OrderDetails = ({ orderData }: OrderDetailsProps) => {
   );
 };
 
-type LineItem = {
-  product: { node: { name?: string | null } };
-  quantity?: number | null;
-  total?: string | null;
-  subtotal?: string | null;
-};
-
 type ProductTableProps = {
   lineItems?: LineItem[];
   orderData?: OrderDetailsProps["orderData"];
@@ -147,6 +161,9 @@ const ProductTable = ({
     (Number.isFinite(totalNumeric) ? totalNumeric : 0) -
     (Number.isFinite(subtotalNumeric) ? subtotalNumeric : 0) -
     (Number.isFinite(shippingNumeric) ? shippingNumeric : 0);
+  const shippingRowLabel = orderData?.order
+    ? getOrderShippingRowLabel(orderData.order)
+    : "Shipping";
 
   return (
     <div className="mt-10 space-y-8">
@@ -195,7 +212,9 @@ const ProductTable = ({
                   </tr>
                 ))}
                 <tr>
-                  <td className="px-3 py-3 font-medium sm:px-6 sm:py-4">Shipping</td>
+                  <td className="px-3 py-3 font-medium sm:px-6 sm:py-4">
+                    {shippingRowLabel}
+                  </td>
                   <td />
                   <td className="px-3 py-3 text-right text-sm whitespace-nowrap font-medium [&_*]:inline sm:px-6 sm:py-4 sm:text-base">
                     <span
