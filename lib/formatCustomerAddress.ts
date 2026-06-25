@@ -14,7 +14,9 @@ export function hasSavedAddress(
   address?: CustomerAddressLike | null
 ): boolean {
   return Boolean(
-    address?.address1?.trim() ||
+    address?.firstName?.trim() ||
+      address?.lastName?.trim() ||
+      address?.address1?.trim() ||
       address?.city?.trim() ||
       address?.phone?.trim()
   );
