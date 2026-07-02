@@ -44,6 +44,10 @@ export function getSiteMetadataIcons(): NonNullable<Metadata["icons"]> {
   };
 }
 
+export function getSiteOgImage(): string {
+  return getPublicAssetUrl(siteConfig.url.defaultOgImage);
+}
+
 export function getSiteTwitterImage(): string {
-  return getLogoSources().light;
+  return getSiteOgImage();
 }

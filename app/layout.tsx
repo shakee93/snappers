@@ -17,7 +17,11 @@ import GoogleAnalytics from "@/components/global/layout/GoogleAnalytics";
 import ContentWrapper from "@/components/global/layout/ContentWrapper";
 import { ChromeGate, ChromeVisibilityProvider } from "@/context/ChromeVisibilityProvider";
 import { siteConfig } from "@/site.config";
-import { getSiteMetadataIcons, getSiteTwitterImage } from "@/lib/siteAssets";
+import {
+  getSiteMetadataIcons,
+  getSiteOgImage,
+  getSiteTwitterImage,
+} from "@/lib/siteAssets";
 import SiteThemeStyles from "@/components/global/theme/SiteThemeStyles";
 
 const inter = Inter({
@@ -62,10 +66,10 @@ export const metadata: Metadata = {
     siteName: siteConfig.brand.name,
     images: [
       {
-        url: siteConfig.url.defaultOgImage,
+        url: getSiteOgImage(),
         width: 1200,
         height: 630,
-        alt: `${siteConfig.brand.name} Logo`,
+        alt: `${siteConfig.brand.name} — ${siteConfig.brand.tagline}`,
       },
     ],
     locale: siteConfig.locale.ogLocale,
