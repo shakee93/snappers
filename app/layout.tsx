@@ -36,6 +36,7 @@ const albraSans = localFont({
 const defaultTitle = `${siteConfig.brand.name} - ${siteConfig.brand.tagline}`;
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.url.base),
   title: {
     template: `%s - ${siteConfig.brand.name}`,
     default: defaultTitle,

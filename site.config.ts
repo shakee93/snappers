@@ -96,11 +96,10 @@ export const siteConfig = {
     // appleTouchIcon: "/global/apple-touch-icon.png",
   },
   url: {
-    base: "https://gqmobiles.lk",
+    base: "https://catlitter-xi.vercel.app/",
     api: "https://catlitter-api.freshpixl.com",
     cdn: "https://cdn.gqmobiles.lk",
-    defaultOgImage:
-      "https://cdn.gqmobiles.lk/wp-content/uploads/2025/10/gq.png",
+    defaultOgImage: "/global/OG-image.png",
   },
   locale: {
     countryCode: "LK",
