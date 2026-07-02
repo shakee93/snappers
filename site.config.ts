@@ -99,7 +99,7 @@ export const siteConfig = {
     base: "https://catlitter-xi.vercel.app",
     api: "https://catlitter-api.freshpixl.com",
     cdn: "https://cdn.gqmobiles.lk",
-    defaultOgImage: "/global/OG-image.png",
+    defaultOgImage: "/global/catlitter-og.jpg",
   },
   locale: {
     countryCode: "LK",
