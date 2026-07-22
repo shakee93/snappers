@@ -32,9 +32,9 @@ export type MegaMenuConfig = {
     { child: string[]; under: string[] }[]
   >;
   /** Swap two column indexes after layout (e.g. Cat middle ↔ right). */
-  columnSwap: Record<string, [number, number]>;
+  columnSwap?: Record<string, number[]>;
   /** Leaf categories to hide from mega-menu lists (slug/name aliases). */
-  excludeLeaves: string[][];
+  excludeLeaves?: string[][];
   featuredLinks: Record<string, { href: string; label: string }[]>;
 };
 
@@ -141,7 +141,7 @@ export function distributeMegaMenuColumns(
   }
 
   const swap = navSlug ? config.columnSwap?.[navSlug] : undefined;
-  if (swap) {
+  if (swap && swap.length >= 2) {
     const [a, b] = swap;
     if (columns[a] && columns[b]) {
       const tmp = columns[a];
