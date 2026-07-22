@@ -13,6 +13,7 @@ import { GET_TAG_DETAILS_BY_SLUG } from "@/graphql/defs/products";
 import { DealFilterType } from "@/lib/dealFilters";
 import { isGraphqlArchive } from "@/lib/archiveSource";
 import { siteConfig } from "@/site.config";
+import { getCategoryScopeExtraIds } from "@/lib/browseCategories";
 
 async function getData(parentId?: number, tagSlug?: string) {
   const { data } = await getClient().query({
@@ -57,12 +58,15 @@ async function getData(parentId?: number, tagSlug?: string) {
 }
 
 function buildCategoryScopeIds(
-  category: { databaseId: number } | undefined,
+  category: { databaseId: number; slug?: string | null } | undefined,
   nestedCategories: { databaseId: number }[],
 ): number[] {
   if (!category) return [];
   const childIds = nestedCategories.map((item) => item.databaseId);
-  return [category.databaseId, ...childIds];
+  const extras = getCategoryScopeExtraIds(category.slug);
+  return Array.from(
+    new Set([category.databaseId, ...childIds, ...extras]),
+  );
 }
 
 

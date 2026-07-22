@@ -2,7 +2,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { getCategoryPath } from "@/lib/productUrl";
-import { sortByMainNavCategoryOrder } from "@/lib/browseCategories";
+import {
+  NAV_SHARED_CATEGORY_SLUGS,
+  sortByMainNavCategoryOrder,
+} from "@/lib/browseCategories";
 
 interface CategoryNode {
   id: string;
@@ -20,6 +23,10 @@ export interface SectionShopByCategoryProps {
 // Rotating pill colors so each card's label bar picks up a soft accent.
 const PILL_COLORS = ["#F0E7D6", "#FBEAC9", "#E7EAD9", "#F8DECB", "#DCEAF2"];
 
+const SHARED_ONLY_SLUGS = new Set(
+  Object.values(NAV_SHARED_CATEGORY_SLUGS).flat(),
+);
+
 /**
  * "Shop by categories" grid of pet categories, each rendered with its category
  * image and a label/CTA pill. Backed by `GET_SHOP_BY_CATEGORIES`.
@@ -30,7 +37,10 @@ const SectionShopByCategory = ({
 }: SectionShopByCategoryProps) => {
   const items = sortByMainNavCategoryOrder(
     (categories ?? []).filter(
-      (c): c is CategoryNode => !!c?.image?.sourceUrl && !!c?.slug,
+      (c): c is CategoryNode =>
+        !!c?.image?.sourceUrl &&
+        !!c?.slug &&
+        !SHARED_ONLY_SLUGS.has(c.slug),
     ),
   );
 

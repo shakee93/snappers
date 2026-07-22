@@ -19,6 +19,26 @@ const BROWSE_TAB_SLUG_ALIASES: Record<string, string[]> = {
 };
 
 /**
+ * Shared WP roots whose products should also appear under these nav tabs.
+ * Keeps "Cat & Dog" items visible under Cat and Dog instead of a separate tab.
+ */
+export const NAV_SHARED_CATEGORY_SLUGS: Record<string, readonly string[]> = {
+  cat: ["cat-dog"],
+  dog: ["cat-dog"],
+};
+
+/**
+ * Extra category databaseIds merged into a nav tab's product scope.
+ * Fallback when the shared root isn't available in the current category list.
+ *
+ * IDs: cat-dog (34) + Accessories (41) + its children + Health (49) + Medicine (50).
+ */
+export const CATEGORY_SCOPE_EXTRA_IDS: Record<string, readonly number[]> = {
+  cat: [34, 41, 70, 54, 42, 49, 50],
+  dog: [34, 41, 70, 54, 42, 49, 50],
+};
+
+/**
  * Explicit category scopes when WP has duplicate roots or nested `children`
  * are missing from the browse tabs query. Keys are canonical nav slugs.
  */
@@ -94,24 +114,72 @@ export type BrowseCategoryLike = {
   children?: CategoryTreeNode["children"];
 };
 
+const uniqueIds = (ids: number[]): number[] => Array.from(new Set(ids));
+
+/** Extra scope IDs for a nav/category slug (shared cat-dog under cat/dog, etc.). */
+export const getCategoryScopeExtraIds = (
+  slug: string | null | undefined,
+): number[] => {
+  if (!slug) return [];
+  const navSlug = getBrowseNavSlugForCategory(slug) ?? slug;
+  return [...(CATEGORY_SCOPE_EXTRA_IDS[navSlug] ?? [])];
+};
+
+/**
+ * Merge shared-root trees from `allRoots` into a base scope when the tab
+ * declares `NAV_SHARED_CATEGORY_SLUGS` (preferred over hardcoded extras when
+ * the full category list is available).
+ */
+const appendSharedRootScopes = (
+  baseIds: number[],
+  categorySlug: string | null | undefined,
+  allRoots?: BrowseCategoryLike[],
+): number[] => {
+  if (!categorySlug || !allRoots?.length) {
+    return uniqueIds([...baseIds, ...getCategoryScopeExtraIds(categorySlug)]);
+  }
+
+  const navSlug = getBrowseNavSlugForCategory(categorySlug) ?? categorySlug;
+  const sharedSlugs = NAV_SHARED_CATEGORY_SLUGS[navSlug] ?? [];
+  if (sharedSlugs.length === 0) {
+    return uniqueIds([...baseIds, ...getCategoryScopeExtraIds(categorySlug)]);
+  }
+
+  const sharedIds = sharedSlugs.flatMap((sharedSlug) => {
+    const shared = allRoots.find((item) => item.slug === sharedSlug);
+    if (typeof shared?.databaseId !== "number") return [];
+    return buildCategoryScopeIds(shared.databaseId, shared.children?.nodes);
+  });
+
+  if (sharedIds.length === 0) {
+    return uniqueIds([...baseIds, ...getCategoryScopeExtraIds(categorySlug)]);
+  }
+
+  return uniqueIds([...baseIds, ...sharedIds]);
+};
+
 /** Product query scope: parent + subcategories (override or nested tree). */
 export const resolveBrowseCategoryScopeIds = (
   category: BrowseCategoryLike,
+  allRoots?: BrowseCategoryLike[],
 ): number[] => {
+  let baseIds: number[] = [];
+
   if (category.slug && BROWSE_CATEGORY_SCOPE_OVERRIDES[category.slug]) {
-    return BROWSE_CATEGORY_SCOPE_OVERRIDES[category.slug];
+    baseIds = BROWSE_CATEGORY_SCOPE_OVERRIDES[category.slug];
+  } else if (typeof category.databaseId === "number") {
+    baseIds = buildCategoryScopeIds(
+      category.databaseId,
+      category.children?.nodes,
+    );
   }
 
-  if (typeof category.databaseId !== "number") return [];
-
-  return buildCategoryScopeIds(
-    category.databaseId,
-    category.children?.nodes,
-  );
+  return appendSharedRootScopes(baseIds, category.slug, allRoots);
 };
 
 export const buildBrowseCategoryScopeMap = (
   categories: BrowseCategoryLike[],
+  allRoots?: BrowseCategoryLike[],
 ): Record<number, number[]> =>
   Object.fromEntries(
     categories
@@ -121,7 +189,7 @@ export const buildBrowseCategoryScopeMap = (
       )
       .map((category) => [
         category.databaseId,
-        resolveBrowseCategoryScopeIds(category),
+        resolveBrowseCategoryScopeIds(category, allRoots ?? categories),
       ]),
   );
 

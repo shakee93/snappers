@@ -22,8 +22,8 @@ const headerIconClass = "h-[18px] w-[18px] object-contain";
 
 const HeaderContent = ({ navCategories }: HeaderContentProps) => {
   return (
-    <div className="hidden lg:block bg-header-cream">
-        <div className="grid h-[86px] w-full grid-cols-[1fr_auto_1fr] items-center gap-6 px-6 max-w-[1368px] mx-auto">
+    <div className="relative hidden overflow-visible bg-header-cream lg:block">
+        <div className="mx-auto grid h-[86px] w-full max-w-[1368px] grid-cols-[1fr_auto_1fr] items-center gap-6 px-6">
           {/* Left: Logo */}
           <div className="flex min-w-0 items-center justify-start">
             <Logo />

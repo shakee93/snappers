@@ -1,4 +1,5 @@
 "use client";
+
 import Link from "next/link";
 import { ProductCategory } from "@/graphql/types/graphql";
 import { ArrowRight } from "lucide-react";
@@ -6,76 +7,33 @@ import Image from "next/image";
 import { useMemo } from "react";
 import { orderCollectionNavRoots } from "@/lib/collectionNavOrder";
 import { getCategoryPath } from "@/lib/productUrl";
+import {
+  buildCategoryTree,
+  type CategoryTreeNode,
+} from "@/lib/categoryTree";
 
 type NavCategoriesProps = {
   onClose: () => void;
   categories: ProductCategory[];
 };
 
-type CategoryWithChildren = Omit<ProductCategory, 'children'> & {
-  children?: ProductCategory[];
-};
-
-export default function NavCategories({ onClose, categories }: NavCategoriesProps) {
-  const flatCategories: ProductCategory[] = categories ?? [];
-
-  // Build parent-child tree structure from flat categories
-  const buildCategoryTree = (
-    categories: ProductCategory[]
-  ): CategoryWithChildren[] => {
-    // Create a map for quick lookup
-    const categoryMap = new Map<number, CategoryWithChildren>();
-    const rootCategories: CategoryWithChildren[] = [];
-
-    // First pass: create all category objects
-    categories.forEach((category) => {
-      if (category.databaseId != null) {
-        categoryMap.set(category.databaseId, {
-          ...category,
-          children: [] as ProductCategory[],
-        });
-      }
-    });
-
-    // Second pass: build parent-child relationships
-    categories.forEach((category) => {
-      if (category.databaseId == null) return;
-
-      const categoryWithChildren = categoryMap.get(category.databaseId);
-      if (!categoryWithChildren) return;
-
-      const parentId = category.parentDatabaseId;
-      const isRoot = parentId == null || parentId === 0;
-
-      // If category has a parent (WP uses 0 for top-level; treat as root)
-      if (!isRoot) {
-        const parent = categoryMap.get(parentId);
-        if (parent && parent.children) {
-          // Push the category without the children override to avoid type issues
-          const { children: _, ...categoryWithoutChildren } = categoryWithChildren;
-          parent.children.push(categoryWithoutChildren as ProductCategory);
-        }
-      } else {
-        // Root category (no parent)
-        rootCategories.push(categoryWithChildren);
-      }
-    });
-
-    return rootCategories;
-  };
-
+/** All-categories mega panel (3-column overview). Prefer CategoryMegaPanel for per-nav roots. */
+export default function NavCategories({
+  onClose,
+  categories,
+}: NavCategoriesProps) {
   const categoryTree = useMemo(
-    () => buildCategoryTree(flatCategories),
-    [flatCategories]
+    () => buildCategoryTree(categories ?? []),
+    [categories],
   );
 
   /** 3 columns, round-robin: 1→col1, 2→col2, 3→col3, 4→col1, … */
   const categoryColumns = useMemo(() => {
     const items = orderCollectionNavRoots(categoryTree);
     const columnCount = 3;
-    const columns: CategoryWithChildren[][] = Array.from(
+    const columns: CategoryTreeNode[][] = Array.from(
       { length: columnCount },
-      () => []
+      () => [],
     );
     items.forEach((item, index) => {
       columns[index % columnCount].push(item);
@@ -85,76 +43,78 @@ export default function NavCategories({ onClose, categories }: NavCategoriesProp
 
   return (
     <div
-      className="w-full bg-white md:w-[800px] lg:w-[800px] xl:w-[1200px] overflow-y-auto"
+      className="w-full overflow-y-auto bg-white md:w-[800px] lg:w-[800px] xl:w-[1200px]"
       style={{ maxHeight: "calc(100vh - 200px)" }}
     >
-      <div className="text-sm p-3 text-muted-foreground mb-2 w-full border-b pb-2">
+      <div className="mb-2 w-full border-b pb-2 p-3 text-sm text-muted-foreground">
         <Link
           href="/c"
-          className="flex items-center hover:underline hover:text-blue-800 transition-colors duration-200"
+          className="flex items-center transition-colors duration-200 hover:text-blue-800 hover:underline"
         >
           <span>Browse all categories</span>
           <ArrowRight className="ml-1 h-4 w-4 group-hover:text-blue-500" />
         </Link>
       </div>
 
-      <div className="flex flex-col md:flex-row gap-6 md:gap-8 p-3 pt-1 w-full">
+      <div className="flex w-full flex-col gap-6 p-3 pt-1 md:flex-row md:gap-8">
         {categoryColumns.map((columnItems, colIndex) => (
-            <div
-              key={`nav-col-${colIndex}`}
-              className="flex-1 flex flex-col gap-y-2 min-w-0"
-            >
-              {columnItems.map((category) => (
-                <div
-                  key={`category-${category.slug}`}
-                  className="category-group mb-2 p-2 hover:bg-zinc-100 rounded-md min-w-0"
+          <div
+            key={`nav-col-${colIndex}`}
+            className="flex min-w-0 flex-1 flex-col gap-y-2"
+          >
+            {columnItems.map((category) => (
+              <div
+                key={`category-${category.slug}`}
+                className="category-group mb-2 min-w-0 rounded-md p-2 hover:bg-zinc-100"
+              >
+                <h3
+                  className={`text-sm font-semibold ${
+                    category.children.length > 0 ? "mb-2" : ""
+                  }`}
                 >
-                  <h3
-                    className={`text-sm font-semibold ${category.children && category.children.length > 0
-                      ? "mb-2"
-                      : ""
-                      }`}
+                  <Link
+                    href={getCategoryPath(category.slug ?? "")}
+                    className="flex items-center text-blue-950 hover:underline"
+                    onClick={onClose}
                   >
-                    <Link
-                      href={getCategoryPath(category.slug ?? "")}
-                      className="text-blue-950 hover:underline flex items-center"
-                      onClick={onClose}
-                    >
-                      {category.image?.sourceUrl ? (
-                        <Image
-                          src={category.image.sourceUrl}
-                          alt={category.name ?? ""}
-                          width={24}
-                          height={24}
-                          className="rounded-full w-6 h-6 mr-1.5 object-contain"
-                        />
-                      ) : (
-                        <span className="inline-block bg-zinc-200 rounded-full w-6 h-6 mr-1.5"></span>
-                      )}
-                      <span className="truncate max-w-[200px]">
-                        {category.name}
-                      </span>
-                    </Link>
-                  </h3>
-                  {category.children && category.children.length > 0 && (
-                    <ul className="space-y-1">
-                      {category.children.map((child: ProductCategory) => (
-                        <li key={`child-${child.slug}`} className="ml-2.5">
-                          <Link
-                            href={getCategoryPath(child.slug ?? "")}
-                            className="text-sm text-muted-foreground hover:text-primary"
-                            onClick={onClose}
-                          >
-                            {child.name}
-                          </Link>
-                        </li>
-                      ))}
-                    </ul>
-                  )}
-                </div>
-              ))}
-            </div>
-          ))}
+                    {category.image?.sourceUrl ? (
+                      <Image
+                        src={category.image.sourceUrl}
+                        alt={category.name ?? ""}
+                        width={24}
+                        height={24}
+                        className="mr-1.5 h-6 w-6 rounded-full object-contain"
+                      />
+                    ) : (
+                      <span className="mr-1.5 inline-block h-6 w-6 rounded-full bg-zinc-200" />
+                    )}
+                    <span className="max-w-[200px] truncate">
+                      {category.name}
+                    </span>
+                  </Link>
+                </h3>
+                {category.children.length > 0 ? (
+                  <ul className="space-y-1">
+                    {category.children.map((child) => (
+                      <li
+                        key={`child-${child.slug}`}
+                        className="ml-2.5"
+                      >
+                        <Link
+                          href={getCategoryPath(child.slug ?? "")}
+                          className="text-sm text-muted-foreground hover:text-primary"
+                          onClick={onClose}
+                        >
+                          {child.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+            ))}
+          </div>
+        ))}
       </div>
     </div>
   );

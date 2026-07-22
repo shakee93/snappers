@@ -133,7 +133,6 @@ export const siteConfig = {
     main: [
       { href: "/cat", name: "Cat" },
       { href: "/dog", name: "Dog" },
-      { href: "/cat-dog", name: "Cat & dogs" },
       { href: "/bird", name: "Birds" },
       { href: "/aquarium", name: "Aquarium" },
       { href: "/rabbit-hamsters", name: "Rabbit & Hamsters" },

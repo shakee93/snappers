@@ -1,0 +1,53 @@
+{
+  "columns": 3,
+  "showFeatureImage": true,
+  "shopAllLabel": "Shop all {name}",
+  "slugAliases": {
+    "rabbit-hamsters": ["rabbit-hamsters", "rabbit-hamster"]
+  },
+  "includeSharedFrom": {
+    "cat": ["cat-dog"],
+    "dog": ["cat-dog"]
+  },
+  "sharedCategoryMerge": {
+    "accessories": ["accessories-cat", "accessories-dog"],
+    "health-wellness": ["cat-health-wellness", "dog-health-wellness"],
+    "medicine-supplement": [
+      "cat-medicine-supplement",
+      "dog-medicine-supplement"
+    ]
+  },
+  "childOrder": {
+    "cat": [
+      ["cat-food", "food"],
+      ["cat-litter", "litter"],
+      ["accessories-cat", "accessories"],
+      ["cat-medicine-supplement", "medicine-supplement"],
+      ["cat-health-wellness", "health-wellness"],
+      ["cat-toys", "toys"]
+    ],
+    "dog": [
+      ["dog-food", "food"],
+      ["dog-litter", "litter"],
+      ["accessories-dog", "accessories"],
+      ["dog-health-wellness", "health-wellness"],
+      ["dog-medicine-supplement", "medicine-supplement"],
+      ["dog-toys", "toys"]
+    ]
+  },
+  "stackUnder": {
+    "cat": [
+      { "child": ["cat-toys", "toys"], "under": ["cat-health-wellness", "health-wellness"] }
+    ],
+    "dog": [
+      { "child": ["dog-toys", "toys"], "under": ["dog-health-wellness", "health-wellness"] }
+    ]
+  },
+  "columnSwap": {
+    "cat": [1, 2]
+  },
+  "excludeLeaves": [
+    ["cat-food-water-bowl-or-feeder", "cat food water bowl or feeder"]
+  ],
+  "featuredLinks": {}
+}

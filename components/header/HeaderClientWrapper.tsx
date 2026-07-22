@@ -84,7 +84,7 @@ const HeaderClientWrapper = ({
         ></div>
       )}
 
-      <MobileNavLinks />
+      <MobileNavLinks navCategories={navCategories} />
 
       <HeaderSearchResults
         productCategories={productCategories}

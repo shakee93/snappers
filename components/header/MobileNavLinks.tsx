@@ -1,131 +1,209 @@
 "use client";
-import {
-  Home,
-  Search,
-  ShoppingBag,
-  LayoutGrid,
-  UserCircle,
-} from "lucide-react";
-import Logo from "./Logo";
-import { Menu, XIcon, Facebook, Instagram, PhoneCall } from "lucide-react";
-import { FaTiktok } from "react-icons/fa";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+
+import { useMemo, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { ChevronDown, Facebook, Instagram, PhoneCall } from "lucide-react";
+import { FaTiktok } from "react-icons/fa";
+import { ProductCategory } from "@/graphql/types/graphql";
 import { useStore } from "@/store/store";
 import { useSession } from "@/context/SessionProvider";
 import { siteConfig } from "@/site.config";
+import { getMegaMenuPanelData, navHrefToSlug } from "@/lib/megaMenu";
+import { getMegaMenuCategoryIcon } from "@/lib/megaMenuIcons";
+import { getCategoryPath } from "@/lib/productUrl";
+import type { CategoryTreeNode } from "@/lib/categoryTree";
+import { cn } from "@/lib/utils";
 
-const MobileNavLinks = () => {
+type MobileNavLinksProps = {
+  navCategories?: ProductCategory[];
+};
+
+const MobileNavLinks = ({ navCategories = [] }: MobileNavLinksProps) => {
   const iconSize = 18;
-  const navLinks = [
-    {
-      id: 2,
-      href: "/shop",
-      name: "Shop",
-    },
-    {
-      id: 3,
-      href: "/deals",
-      name: "Deals",
-    },
-    {
-      id: 4,
-      href: "/tag/pre-order",
-      name: "Pre Order",
-    },
-    {
-      id: 5,
-      href: "/about",
-      name: "About Us",
-    },
+  const navLinks = siteConfig.navigation.main;
+  const [openSlug, setOpenSlug] = useState<string | null>(null);
 
-    {
-      id: 6,
-      href: "/contact",
-      name: "Contact Us",
-    },
-
-  ];
-
-
-  const { mobileMenu, toggleMobileMenu } = useStore()
-  const { customer, fetchCustomer, updateCustomer } = useSession();
-
-  let { logout } = useSession();
+  const { mobileMenu, toggleMobileMenu } = useStore();
+  const { customer, logout } = useSession();
   const router = useRouter();
+
+  const panelsByHref = useMemo(() => {
+    const map = new Map<
+      string,
+      NonNullable<ReturnType<typeof getMegaMenuPanelData>>
+    >();
+    for (const item of navLinks) {
+      const panel = getMegaMenuPanelData(navCategories, item.href);
+      if (panel) map.set(item.href, panel);
+    }
+    return map;
+  }, [navCategories, navLinks]);
+
   const handleLogout = async () => {
     logout();
     router.push("/login");
   };
 
-  return (
-    <div className='w-full'>
-      <div
-        className={`${mobileMenu ?
-          "bottom-[95px] translate-y-0 opacity-1 scale-100" :
-          "translate-y-full opacity-0 bottom-0 scale-50"
-          } fixed left-0  shadow-xl rounded-3xl left-1/2 -translate-x-1/2 w-11/12 border border-gray-30
-        0 h-fit pt-4 pb-8 bg-white ease-in-out duration-150 transform origin-center z-[1001]`}
-      >
-        <div className="bg-gray-300 m-auto py-0.5 w-1/5 rounded-xl"></div>
+  const closeMenu = () => {
+    toggleMobileMenu();
+    setOpenSlug(null);
+  };
 
-        <div className="flex flex-col gap-5 mt-3">
-          <ul className="gap-1 text-base text-center items-center font-medium  text-primaryColor ">
-            {navLinks.map((item) => (
-              <li
-                key={item.id}
-                className="rounded-3xl px-1 xl:px-3 py-1 "
-              >
-                <Link
-                  onClick={e => toggleMobileMenu()}
-                  href={item.href}>{item.name}
-                </Link>
-              </li>
-            ))}
-            <li className="rounded-3xl px-1 xl:px-3 py-1 ">
+  return (
+    <div className="w-full">
+      <div
+        className={`${
+          mobileMenu
+            ? "bottom-[95px] translate-y-0 opacity-100 scale-100"
+            : "bottom-0 translate-y-full opacity-0 scale-50"
+        } fixed left-1/2 z-[1001] h-fit w-11/12 origin-center -translate-x-1/2 transform rounded-3xl border border-gray-300 bg-white pt-4 pb-8 shadow-xl duration-150 ease-in-out`}
+      >
+        <div className="m-auto w-1/5 rounded-xl bg-gray-300 py-0.5" />
+
+        <div className="mt-3 flex max-h-[60vh] flex-col gap-4 overflow-y-auto">
+          <ul className="items-center gap-1 px-2 text-center text-base font-medium text-primaryColor">
+            {navLinks.map((item) => {
+              const panel = panelsByHref.get(item.href);
+              const slug = navHrefToSlug(item.href);
+              const isOpen = openSlug === slug;
+
+              if (!panel) {
+                return (
+                  <li key={item.href} className="rounded-3xl px-1 py-1 xl:px-3">
+                    <Link href={item.href} onClick={closeMenu}>
+                      {item.name}
+                    </Link>
+                  </li>
+                );
+              }
+
+              return (
+                <li key={item.href} className="rounded-2xl px-1 py-1 text-left">
+                  <div className="flex items-center gap-1">
+                    <Link
+                      href={panel.shopAllHref}
+                      onClick={closeMenu}
+                      className="flex-1 rounded-xl px-3 py-2"
+                    >
+                      {item.name}
+                    </Link>
+                    <button
+                      type="button"
+                      aria-expanded={isOpen}
+                      aria-label={`${isOpen ? "Hide" : "Show"} ${item.name} subcategories`}
+                      onClick={() => setOpenSlug(isOpen ? null : slug)}
+                      className="flex h-9 w-9 items-center justify-center rounded-full text-primaryColor"
+                    >
+                      <ChevronDown
+                        className={cn(
+                          "h-4 w-4 transition-transform",
+                          isOpen && "rotate-180",
+                        )}
+                      />
+                    </button>
+                  </div>
+                  {isOpen ? (
+                    <div className="mb-2 space-y-3 rounded-2xl bg-neutral-50 px-3 py-3">
+                      {panel.root.children.map((child: CategoryTreeNode) => {
+                        const Icon = getMegaMenuCategoryIcon(child);
+                        return (
+                        <div key={child.slug ?? child.databaseId}>
+                          <Link
+                            href={getCategoryPath(child.slug ?? "")}
+                            onClick={closeMenu}
+                            className="inline-flex items-center gap-1.5 text-sm font-semibold text-header-green"
+                          >
+                            <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-header-cream text-header-green">
+                              <Icon className="h-3.5 w-3.5" aria-hidden />
+                            </span>
+                            {child.name}
+                          </Link>
+                          {child.children.length > 0 ? (
+                            <ul className="mt-1.5 space-y-1 pl-1">
+                              {child.children.map((grand) => (
+                                <li
+                                  key={grand.slug ?? grand.databaseId}
+                                  className="flex gap-2"
+                                >
+                                  <span
+                                    className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-header-green/35"
+                                    aria-hidden
+                                  />
+                                  <Link
+                                    href={getCategoryPath(grand.slug ?? "")}
+                                    onClick={closeMenu}
+                                    className="py-0.5 text-sm text-neutral-600 hover:text-header-green"
+                                  >
+                                    {grand.name}
+                                  </Link>
+                                </li>
+                              ))}
+                            </ul>
+                          ) : null}
+                        </div>
+                        );
+                      })}
+                      <Link
+                        href={panel.shopAllHref}
+                        onClick={closeMenu}
+                        className="inline-block pt-1 text-sm font-semibold text-primary-600"
+                      >
+                        {panel.shopAllLabel}
+                      </Link>
+                    </div>
+                  ) : null}
+                </li>
+              );
+            })}
+            <li className="rounded-3xl px-1 py-1 xl:px-3">
               <Link
-                onClick={e => toggleMobileMenu()}
-                href={!customer || customer?.id === "guest" ? "/login" : "/account"}
+                onClick={closeMenu}
+                href={
+                  !customer || customer?.id === "guest" ? "/login" : "/account"
+                }
               >
                 {!customer || customer?.id === "guest" ? "Login" : "Account"}
               </Link>
             </li>
           </ul>
 
-          {customer && customer?.id !== "guest" && (
-            <div
-              className="gap-1 text-base cursor-pointer text-center items-center font-medium  text-primaryColor "
+          {customer && customer?.id !== "guest" ? (
+            <button
+              type="button"
+              className="cursor-pointer text-center text-base font-medium text-primaryColor"
               onClick={handleLogout}
             >
               Log Out
-            </div>
-          )}
+            </button>
+          ) : null}
 
-
-          <div className="flex  justify-center text-primaryColor text-base gap-2 items-center">
-
+          <div className="flex items-center justify-center gap-2 text-base text-primaryColor">
             <Link
               href={`tel:${siteConfig.contact.primaryPhone}`}
-              className="flex  gap-2 items-center justify-center"
+              className="flex items-center justify-center gap-2"
             >
               <PhoneCall size={iconSize} /> {siteConfig.contact.primaryPhone}
             </Link>
             <div>|</div>
             <Link
               href={`tel:${siteConfig.contact.secondaryPhone}`}
-              className="flex gap-2 items-center justify-center"
+              className="flex items-center justify-center gap-2"
             >
               <PhoneCall size={iconSize} />
               {siteConfig.contact.secondaryPhone}
             </Link>
           </div>
 
-          <div className="flex gap-2 justify-center text-primaryColor">
-            <Link href={`https://www.facebook.com/${siteConfig.social.facebook}`}>
+          <div className="flex justify-center gap-2 text-primaryColor">
+            <Link
+              href={`https://www.facebook.com/${siteConfig.social.facebook}`}
+            >
               <Facebook size={24} />
             </Link>
-            <Link href={`https://www.instagram.com/${siteConfig.social.instagram}`}>
+            <Link
+              href={`https://www.instagram.com/${siteConfig.social.instagram}`}
+            >
               <Instagram size={24} />
             </Link>
             <Link href={`https://www.tiktok.com/${siteConfig.social.tiktok}`}>

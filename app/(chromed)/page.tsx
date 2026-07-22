@@ -138,7 +138,10 @@ const getData = async () => {
   const browseCategoryTabs = filterBrowseCategoryTabs(
     browseCategories as BrowseCategoryTab[]
   );
-  const browseCategoryScopes = buildBrowseCategoryScopeMap(browseCategoryTabs);
+  const browseCategoryScopes = buildBrowseCategoryScopeMap(
+    browseCategoryTabs,
+    browseCategories as BrowseCategoryTab[],
+  );
 
   const browseCategoryTabCacheEntries = await Promise.all(
     browseCategoryTabs
