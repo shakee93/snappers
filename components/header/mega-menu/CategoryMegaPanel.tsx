@@ -38,14 +38,12 @@ function CategoryIcon({ category }: { category: CategoryTreeNode }) {
 function CategoryGroup({
   category,
   onClose,
-  stacked,
 }: {
   category: CategoryTreeNode;
   onClose: () => void;
-  stacked?: boolean;
 }) {
   return (
-    <div className={stacked ? "w-full min-w-[180px]" : "w-[168px]"}>
+    <div className="min-w-0 w-full">
       <Link
         href={getCategoryPath(category.slug ?? "")}
         onClick={onClose}
@@ -94,10 +92,25 @@ export default function CategoryMegaPanel({
     columns.length === 1 &&
     root.children.every((category) => category.children.length === 0);
 
+  // Cat & Dog have the densest trees — same wide equal-column panel.
+  const isWidePanel = data.navSlug === "cat" || data.navSlug === "dog";
+
   return (
-    <div className="mega-menu-panel w-max max-w-[min(920px,calc(100vw-2rem))] rounded-[14px] bg-[#FFFCFA]">
-      <div className="flex items-end gap-6 px-5 py-4">
-        <div className="min-w-0">
+    <div
+      className={
+        isWidePanel
+          ? "mega-menu-panel w-[min(1020px,calc(100vw-2rem))] rounded-[14px] bg-[#FFFCFA]"
+          : "mega-menu-panel w-max max-w-[min(920px,calc(100vw-2rem))] rounded-[14px] bg-[#FFFCFA]"
+      }
+    >
+      <div
+        className={
+          isWidePanel
+            ? "flex w-full items-end gap-6 px-5 py-4"
+            : "flex items-end gap-6 px-5 py-4"
+        }
+      >
+        <div className={isWidePanel ? "min-w-0 flex-1" : "min-w-0"}>
           <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-header-green/10 pb-2.5">
             <Link
               href={shopAllHref}
@@ -123,14 +136,23 @@ export default function CategoryMegaPanel({
             className={
               isFlatList
                 ? "flex flex-col gap-3"
-                : "flex items-start gap-8"
+                : "grid w-full gap-x-8 gap-y-5"
+            }
+            style={
+              isFlatList
+                ? undefined
+                : {
+                    gridTemplateColumns: `repeat(${Math.max(columns.length, 1)}, minmax(0, 1fr))`,
+                  }
             }
           >
             {columns.map((columnItems, colIndex) => (
               <div
                 key={`mega-col-${colIndex}`}
                 className={
-                  isFlatList ? "flex flex-col gap-3" : "flex flex-col gap-5"
+                  isFlatList
+                    ? "flex flex-col gap-3"
+                    : "flex min-w-0 flex-col gap-5"
                 }
               >
                 {columnItems.map((category) => (
@@ -138,7 +160,6 @@ export default function CategoryMegaPanel({
                     key={category.slug ?? category.databaseId}
                     category={category}
                     onClose={onClose}
-                    stacked={isFlatList}
                   />
                 ))}
               </div>

@@ -594,6 +594,7 @@ export const GET_BROWSE_SECTION_PRODUCTS = gql`
       after: $after
       where: {
         categoryIdIn: $categoryIdIn
+        stockStatus: IN_STOCK
         orderby: { field: DATE, order: DESC }
       }
     ) {

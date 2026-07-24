@@ -9,6 +9,8 @@ interface StoreLocation {
   location: string;
   details: string;
   href: string;
+  image?: string;
+  imageAlt?: string;
 }
 
 export interface SectionOurStoresProps {
@@ -48,6 +50,8 @@ const SectionOurStores = ({ className = "" }: SectionOurStoresProps) => {
         <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:mt-14 xl:grid-cols-4 xl:gap-6">
           {stores.map((store) => {
             const external = isExternalHref(store.href);
+            const imageSrc = store.image || coverImage;
+            const imageAlt = store.imageAlt || `${store.name} — ${store.location}`;
 
             return (
               <article
@@ -56,9 +60,8 @@ const SectionOurStores = ({ className = "" }: SectionOurStoresProps) => {
               >
                 <div className="relative aspect-[4/3] w-full overflow-hidden rounded-xl">
                   <Image
-                    src={coverImage}
-                    alt=""
-                    aria-hidden
+                    src={imageSrc}
+                    alt={imageAlt}
                     fill
                     sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw"
                     className="object-cover"

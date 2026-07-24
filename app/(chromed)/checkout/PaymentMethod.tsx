@@ -166,7 +166,7 @@ const PaymentMethod: FC<Props> = ({
               htmlFor={gateway.id}
               className="flex items-center space-x-4 sm:space-x-6"
             >
-              <p className="font-medium">{gateway.id === "payhere" ? "Pay Online" : gateway.title}</p>
+              <p className="font-medium">{gateway.id === "payhere" || gateway.id === "webxpay" ? "Pay online" : gateway.title}</p>
             </label>
             <div className={`mt-6 mb-4 ${active ? "block" : "hidden"}`}>
               {/* {gateway.icon ? (

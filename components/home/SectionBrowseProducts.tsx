@@ -17,6 +17,7 @@ import {
   resolveBrowseCategoryScopeIds,
 } from "@/lib/browseCategories";
 import { getCategoryPath } from "@/lib/productUrl";
+import { getCompactPageItems } from "@/lib/compactPagination";
 
 const PAGE_SIZE = 6;
 const ALL_TAB_KEY = "all";
@@ -447,26 +448,39 @@ const SectionBrowseProducts = ({
 
       {(pageCount > 1 || activeCache.hasNextPage) && (
         <div className="mt-6 flex flex-wrap items-center justify-center gap-1.5 sm:mt-8 md:mt-10">
-          {Array.from({ length: pageCount }, (_, index) => {
-            const pageNumber = index + 1;
-            const isActive = pageNumber === page;
-            return (
-              <button
-                key={pageNumber}
-                type="button"
-                onClick={() => setPage(pageNumber)}
-                aria-label={`Go to page ${pageNumber}`}
-                aria-current={isActive ? "page" : undefined}
-                className={`flex h-8 w-8 items-center justify-center rounded-lg text-xs font-bold transition-colors sm:h-9 sm:w-9 sm:text-sm ${
-                  isActive
-                    ? "bg-[#092412] text-white"
-                    : "text-neutral-700 hover:bg-neutral-100"
-                }`}
-              >
-                {pageNumber}
-              </button>
-            );
-          })}
+          {getCompactPageItems(page, Math.max(pageCount, page)).map(
+            (item, index) => {
+              if (item === "ellipsis") {
+                return (
+                  <span
+                    key={`ellipsis-${index}`}
+                    className="flex h-8 w-8 items-center justify-center text-xs font-bold text-neutral-400 sm:h-9 sm:w-9 sm:text-sm"
+                    aria-hidden
+                  >
+                    …
+                  </span>
+                );
+              }
+
+              const isActive = item === page;
+              return (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => setPage(item)}
+                  aria-label={`Go to page ${item}`}
+                  aria-current={isActive ? "page" : undefined}
+                  className={`flex h-8 w-8 items-center justify-center rounded-lg text-xs font-bold transition-colors sm:h-9 sm:w-9 sm:text-sm ${
+                    isActive
+                      ? "bg-[#092412] text-white"
+                      : "text-neutral-700 hover:bg-neutral-100"
+                  }`}
+                >
+                  {item}
+                </button>
+              );
+            },
+          )}
 
           {(page < pageCount || activeCache.hasNextPage) && (
             <button

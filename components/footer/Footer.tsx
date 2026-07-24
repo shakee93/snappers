@@ -155,9 +155,9 @@ const Footer = () => {
               <Image
                 src="/global/payments.png"
                 alt="Accepted payment methods"
-                width={243}
-                height={23}
-                className="mt-3 h-8 w-auto"
+                width={1024}
+                height={115}
+                className="mt-3 h-8 w-auto max-w-full"
               />
             </div>
             <div className="md:text-right">

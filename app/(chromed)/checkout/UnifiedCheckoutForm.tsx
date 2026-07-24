@@ -602,9 +602,10 @@ const UnifiedCheckoutForm = ({
         const g = visiblePaymentGateways.find((gw) => !gatewayDisabledReason(gw.id));
         if (!g) return;
         setMethodActive(g.id);
-        setSelectedGateway({ id: g.id, title: g.title });
+        const meta = getGatewayMeta(g);
+        setSelectedGateway({ id: g.id, title: meta.title });
         setIsKokoPayment(g.id === "darazbnpl");
-        setIsCardPayment(g.id === "payhere");
+        setIsCardPayment(g.id === "payhere" || g.id === "webxpay");
         // eslint-disable-next-line react-hooks/exhaustive-deps -- gatewayDisabledReason depends on deliveryType which is already in deps
     }, [visiblePaymentGateways, selectedGateway.id, deliveryType, setIsCardPayment, setIsKokoPayment]);
 
@@ -680,8 +681,10 @@ const UnifiedCheckoutForm = ({
         switch (gateway.id) {
             case "payhere":
                 return {
-                    title: "Pay Online",
-                    subtitle: "Secure online card payment",
+                    title: checkoutCopy.webxpay?.title || "Pay online",
+                    subtitle:
+                        checkoutCopy.webxpay?.subtitle ||
+                        "Secure online card payment",
                     icon: <CreditCard className="w-5 h-5" strokeWidth={1.75} />,
                     trailing: (
                         <div className="flex items-center gap-1.5">
@@ -748,20 +751,47 @@ const UnifiedCheckoutForm = ({
                         </div>
                     ),
                 };
-            default:
+            case "webxpay":
                 return {
-                    title: gateway.title || "Other",
-                    subtitle: "",
+                    title: checkoutCopy.webxpay.title,
+                    subtitle: checkoutCopy.webxpay.subtitle,
                     icon: <CreditCard className="w-5 h-5" strokeWidth={1.75} />,
-                    trailing: null,
+                    trailing: (
+                        <div className="flex items-center gap-1.5">
+                            <BrandBadge src="/logos/visa.png" alt="Visa" />
+                            <BrandBadge src="/logos/mastercard.png" alt="Mastercard" />
+                        </div>
+                    ),
                 };
+            default: {
+                // WP gateway titles can be a long card/wallet list — show a clean label.
+                const rawTitle = gateway.title || "";
+                const looksLikeCardList =
+                    rawTitle.includes("Visa") && rawTitle.includes("/");
+                return {
+                    title: looksLikeCardList
+                        ? checkoutCopy.webxpay.title
+                        : rawTitle || "Other",
+                    subtitle: looksLikeCardList
+                        ? checkoutCopy.webxpay.subtitle
+                        : "",
+                    icon: <CreditCard className="w-5 h-5" strokeWidth={1.75} />,
+                    trailing: looksLikeCardList ? (
+                        <div className="flex items-center gap-1.5">
+                            <BrandBadge src="/logos/visa.png" alt="Visa" />
+                            <BrandBadge src="/logos/mastercard.png" alt="Mastercard" />
+                        </div>
+                    ) : null,
+                };
+            }
         }
     };
 
     const selectGateway = (gateway: PaymentGateway) => {
         if (gatewayDisabledReason(gateway.id)) return;
         setMethodActive(gateway.id);
-        setSelectedGateway({ id: gateway.id, title: gateway.title });
+        const meta = getGatewayMeta(gateway);
+        setSelectedGateway({ id: gateway.id, title: meta.title });
 
         if (gateway.id !== "bacs") {
             setBankSlipFile(null);

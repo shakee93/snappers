@@ -6,6 +6,9 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useParams, usePathname } from "next/navigation";
 import { twMerge } from "tailwind-merge";
+import { siteConfig } from "@/site.config";
+
+const WHATSAPP_HREF = `https://wa.me/${siteConfig.contact.whatsapp}`;
 
 const WhatsappLogoComponent = () => {
   const [isHovered, setIsHovered] = useState(false);
@@ -33,14 +36,14 @@ const WhatsappLogoComponent = () => {
       setIsScrolled(window.scrollY > 200);
     };
 
-    window.addEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
     return () => {
-      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener("scroll", handleScroll);
     };
   }, []);
 
   const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   if (pathname?.startsWith("/checkout")) {
@@ -56,7 +59,7 @@ const WhatsappLogoComponent = () => {
         "md:bottom-12 md:right-10 md:mb-5 md:left-auto",
       )}
     >
-      <Link href={"https://wa.me/94722299944"} target="_blank">
+      <Link href={WHATSAPP_HREF} target="_blank" rel="noopener noreferrer">
         <div className="relative flex flex-col items-center">
           <Image
             src={whatsappLogo}
@@ -66,7 +69,7 @@ const WhatsappLogoComponent = () => {
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
           />
-          <div className="min-w-max text-xs font-medium text-[#25d366]" >
+          <div className="min-w-max text-xs font-medium text-[#25d366]">
             Chat with us
           </div>
         </div>
@@ -75,14 +78,24 @@ const WhatsappLogoComponent = () => {
       {isScrolled && (
         <button
           onClick={scrollToTop}
-          className="hidden md:block p-2 bg-white text-white rounded border border-black absolute right-0 bottom-12 mr-1"
+          className="hidden md:block absolute bottom-12 right-0 mr-1 rounded border border-black bg-white p-2 text-white"
         >
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="black" className="size-6">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18" />
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="black"
+            className="size-6"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M4.5 10.5 12 3m0 0 7.5 7.5M12 3v18"
+            />
           </svg>
         </button>
       )}
-
     </div>
   );
 };

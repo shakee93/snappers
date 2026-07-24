@@ -1,35 +1,43 @@
 {
   "title": "Our store",
   "subtitle": "Premium pet care, trusted by pet parents across Sri Lanka.",
-  "coverImage": "/homepage/stores/petshop-cover.webp",
+  "coverImage": "/homepage/stores/pet-co-dehiwala.jpg",
   "stores": [
     {
-      "id": "meo",
-      "name": "Me-O",
-      "location": "Avissawella store",
-      "details": "RQ8 Private Bus Stand, Ratnapura Road, Avissawella 10700. Open 8:00 AM · Closes 8 PM.",
-      "href": "/contact"
+      "id": "pet-love-wellampitiya",
+      "name": "Pet Love.lk",
+      "location": "Wellampitiya store",
+      "details": "No. 680, Avissawella Road, Wellampitiya. Open 8:00 AM · Closes 8 PM.",
+      "href": "/contact",
+      "image": "/homepage/stores/pet-love-wellampitiya.jpg",
+      "imageAlt": "Pet Love.lk Wellampitiya storefront"
     },
     {
       "id": "scooby-doo",
       "name": "Scoody Doodle Pet Shop",
       "location": "Nugegoda store",
       "details": "#526 Dutugemunu Mawatha, Nugegoda. Open 8:00 AM · Closes 8 PM.",
-      "href": "https://scoodydoodlepetshop.com"
+      "href": "https://scoodydoodlepetshop.com",
+      "image": "/homepage/stores/petshop-cover.webp",
+      "imageAlt": "Scoody Doodle Pet Shop"
     },
     {
-      "id": "pet-store",
-      "name": "Pet Store",
-      "location": "Mount Lavinia store",
-      "details": "No 148 Galle Rd, Mount Lavinia. Open 8:00 AM · Closes 8 PM.",
-      "href": "/contact"
+      "id": "pet-co-dehiwala",
+      "name": "Pet & Co.",
+      "location": "Dehiwala store",
+      "details": "No. 122A, Galle Road, Dehiwala. Open 8:00 AM · Closes 8 PM.",
+      "href": "/contact",
+      "image": "/homepage/stores/pet-co-dehiwala.jpg",
+      "imageAlt": "Pet & Co Dehiwala storefront"
     },
     {
       "id": "wow-pet",
       "name": "Wow Pet",
       "location": "Maharagama store",
       "details": "Maharagama, Sri Lanka. Open 8:00 AM · Closes 8 PM.",
-      "href": "https://wowpet.lk"
+      "href": "https://wowpet.lk",
+      "image": "/homepage/stores/petshop-cover.webp",
+      "imageAlt": "Wow Pet store"
     }
   ]
 }

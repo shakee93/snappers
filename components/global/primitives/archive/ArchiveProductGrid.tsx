@@ -12,6 +12,7 @@ import {
   parseArchiveFilters,
   toArchiveProductsVariables,
 } from "@/lib/archiveFilters";
+import { getCompactPageItems } from "@/lib/compactPagination";
 
 export interface ArchiveProductGridProps {
   categoryIds?: number[];
@@ -222,26 +223,39 @@ const ArchiveProductGrid = ({
             </button>
           ) : null}
 
-          {Array.from({ length: pageCount }, (_, index) => {
-            const pageNumber = index + 1;
-            const isActive = pageNumber === page;
-            return (
-              <button
-                key={pageNumber}
-                type="button"
-                onClick={() => goToPage(pageNumber)}
-                aria-label={`Go to page ${pageNumber}`}
-                aria-current={isActive ? "page" : undefined}
-                className={`inline-flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold transition-colors ${
-                  isActive
-                    ? "bg-header-action text-header-green"
-                    : "border border-[#E8E8E8] bg-white text-header-green hover:border-header-green/40 hover:bg-header-cream/30"
-                }`}
-              >
-                {pageNumber}
-              </button>
-            );
-          })}
+          {getCompactPageItems(page, Math.max(pageCount, page)).map(
+            (item, index) => {
+              if (item === "ellipsis") {
+                return (
+                  <span
+                    key={`ellipsis-${index}`}
+                    className="inline-flex h-9 w-9 items-center justify-center text-sm font-semibold text-header-green/40"
+                    aria-hidden
+                  >
+                    …
+                  </span>
+                );
+              }
+
+              const isActive = item === page;
+              return (
+                <button
+                  key={item}
+                  type="button"
+                  onClick={() => goToPage(item)}
+                  aria-label={`Go to page ${item}`}
+                  aria-current={isActive ? "page" : undefined}
+                  className={`inline-flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold transition-colors ${
+                    isActive
+                      ? "bg-header-action text-header-green"
+                      : "border border-[#E8E8E8] bg-white text-header-green hover:border-header-green/40 hover:bg-header-cream/30"
+                  }`}
+                >
+                  {item}
+                </button>
+              );
+            },
+          )}
 
           {page < pageCount || cache.hasNextPage ? (
             <button
