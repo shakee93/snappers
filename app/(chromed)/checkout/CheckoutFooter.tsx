@@ -5,7 +5,6 @@ import { siteConfig } from "@/site.config";
 const policyLinks = [
   { href: "/privacy", label: "Privacy" },
   { href: "/terms-and-conditions", label: "Terms" },
-  { href: "/warranty-terms", label: "Warranty" },
   { href: "/contact", label: "Contact" },
 ];
 

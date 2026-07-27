@@ -27,8 +27,6 @@ const NoOrderMessage = () => {
           <p>
             <span className="font-semibold">Phone:</span>{" "}
             <a href={`tel:${siteConfig.contact.primaryPhone}`} className="text-blue-600 hover:underline">{siteConfig.contact.primaryPhone}</a>
-            {" / "}
-            <a href={`tel:${siteConfig.contact.secondaryPhone}`} className="text-blue-600 hover:underline">{siteConfig.contact.secondaryPhone}</a>
           </p>
           <p>
             <span className="font-semibold">Email:</span>{" "}

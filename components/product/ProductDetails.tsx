@@ -458,7 +458,7 @@ const ProductDetails = ({
       {isPriceFluctuation && (
         <div className={`bg-red-500 p-4 text-sm text-white ${pdpRadius}`}>
           Prices are being updated. For current pricing, please contact us on WhatsApp{" "}
-          {siteConfig.contact.primaryPhone} / {siteConfig.contact.secondaryPhone}.
+          {siteConfig.contact.primaryPhone}.
         </div>
       )}
 

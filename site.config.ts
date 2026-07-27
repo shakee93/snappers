@@ -111,7 +111,7 @@ export const siteConfig = {
   },
   contact: {
     primaryPhone: "0716060123",
-    secondaryPhone: "0112500177",
+    primaryPhoneDisplay: "071 6060 123",
     whatsapp: "94716060123",
     email: "catlitter.lk@gmail.com",
     storeAddress:
@@ -169,9 +169,8 @@ export const siteConfig = {
     openTime: {
       heading: "Open Time",
       schedule: [
-        { label: "Monday - Friday", hours: "09:00 AM - 10.00 PM" },
-        { label: "Saturday", hours: "09:00 AM - 10.00 PM" },
-        { label: "Sunday & Poya", hours: "09:00 AM - 6.00 PM" },
+        { label: "Monday - Saturday", hours: "09:00 AM - 09.00 PM" },
+        { label: "Sunday & Poya", hours: "09:30 AM - 6.00 PM" },
       ],
     },
     visitUsHeading: "Visit Us",
@@ -188,7 +187,7 @@ export const siteConfig = {
     },
     support: {
       heading: "Our experts are available 24/7",
-      phones: [{ display: "011 250 0177", tel: "0112500177" }],
+      phones: [{ display: "071 6060 123", tel: "0716060123" }],
     },
   },
   social: {

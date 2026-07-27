@@ -2,7 +2,7 @@
 
 Delivery charges for your order will be calculated and displayed at checkout.
 
-Deliveries will be processed between Monday – Saturday (9AM – 6PM), excluding any mercantile & public holidays. Orders received on Sunday will be processed on the following Monday.
+Deliveries will be processed between Monday – Saturday (9AM – 9PM), excluding any mercantile & public holidays. Orders received on Sunday will be processed on the following Monday.
 
 Delivery delays can occasionally occur due to unavoidable circumstances.
 

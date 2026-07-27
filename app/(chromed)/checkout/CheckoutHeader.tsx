@@ -4,8 +4,8 @@ import { PiWhatsappLogoDuotone } from "react-icons/pi";
 import { siteConfig } from "@/site.config";
 import SiteLogoImage from "@/components/global/brand/SiteLogoImage";
 
-const SUPPORT_PHONE_DISPLAY = siteConfig.contact.secondaryPhone;
-const SUPPORT_PHONE_TEL = `tel:${siteConfig.contact.secondaryPhone}`;
+const SUPPORT_PHONE_DISPLAY = siteConfig.contact.primaryPhoneDisplay;
+const SUPPORT_PHONE_TEL = `tel:${siteConfig.contact.primaryPhone}`;
 const SUPPORT_WHATSAPP = `https://wa.me/${siteConfig.contact.whatsapp}`;
 
 const CheckoutHeader = () => {

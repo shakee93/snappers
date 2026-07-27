@@ -47,7 +47,7 @@ const SectionOurStores = ({ className = "" }: SectionOurStoresProps) => {
           </p>
         </div>
 
-        <div className="mt-10 grid grid-cols-1 gap-5 sm:grid-cols-2 xl:mt-14 xl:grid-cols-4 xl:gap-6">
+        <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3 xl:mt-14 xl:gap-6">
           {stores.map((store) => {
             const external = isExternalHref(store.href);
             const imageSrc = store.image || coverImage;
@@ -63,7 +63,7 @@ const SectionOurStores = ({ className = "" }: SectionOurStoresProps) => {
                     src={imageSrc}
                     alt={imageAlt}
                     fill
-                    sizes="(min-width: 1280px) 25vw, (min-width: 640px) 50vw, 100vw"
+                    sizes="(min-width: 768px) 33vw, 100vw"
                     className="object-cover"
                   />
                 </div>

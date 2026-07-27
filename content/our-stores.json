@@ -18,8 +18,8 @@
       "location": "Nugegoda store",
       "details": "#526 Dutugemunu Mawatha, Nugegoda. Open 8:00 AM · Closes 8 PM.",
       "href": "https://scoodydoodlepetshop.com",
-      "image": "/homepage/stores/petshop-cover.webp",
-      "imageAlt": "Scoody Doodle Pet Shop"
+      "image": "/homepage/stores/scoody-doodle-nugegoda.jpg",
+      "imageAlt": "Scoody Doodle Pet Shop Nugegoda storefront"
     },
     {
       "id": "pet-co-dehiwala",
@@ -29,15 +29,6 @@
       "href": "/contact",
       "image": "/homepage/stores/pet-co-dehiwala.jpg",
       "imageAlt": "Pet & Co Dehiwala storefront"
-    },
-    {
-      "id": "wow-pet",
-      "name": "Wow Pet",
-      "location": "Maharagama store",
-      "details": "Maharagama, Sri Lanka. Open 8:00 AM · Closes 8 PM.",
-      "href": "https://wowpet.lk",
-      "image": "/homepage/stores/petshop-cover.webp",
-      "imageAlt": "Wow Pet store"
     }
   ]
 }

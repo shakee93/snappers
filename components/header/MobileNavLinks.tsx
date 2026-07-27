@@ -185,14 +185,6 @@ const MobileNavLinks = ({ navCategories = [] }: MobileNavLinksProps) => {
             >
               <PhoneCall size={iconSize} /> {siteConfig.contact.primaryPhone}
             </Link>
-            <div>|</div>
-            <Link
-              href={`tel:${siteConfig.contact.secondaryPhone}`}
-              className="flex items-center justify-center gap-2"
-            >
-              <PhoneCall size={iconSize} />
-              {siteConfig.contact.secondaryPhone}
-            </Link>
           </div>
 
           <div className="flex justify-center gap-2 text-primaryColor">
