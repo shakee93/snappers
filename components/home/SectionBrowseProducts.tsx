@@ -386,7 +386,7 @@ const SectionBrowseProducts = ({
           className="aspect-[16/10] sm:aspect-[5/3] lg:hidden"
         />
 
-        <div className="hidden lg:grid lg:grid-cols-4 lg:items-stretch lg:gap-6">
+        <div className="hidden lg:grid lg:grid-cols-4 lg:items-start lg:gap-6">
           <BrowseFeatureBanner
             src={activeFeatureImage}
             alt={activeFeatureAlt}

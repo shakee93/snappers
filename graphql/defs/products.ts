@@ -591,7 +591,7 @@ export const GET_ARCHIVE_PRODUCTS = gql`
   ${ProductContentCard}
 `;
 
-/** Homepage browse grid — matches category archive (includes out-of-stock). */
+/** Homepage browse grid — discovery section; includes out-of-stock so sparse categories still render. */
 export const GET_BROWSE_SECTION_PRODUCTS = gql`
   query GetBrowseSectionProducts(
     $categoryIdIn: [Int] = null
@@ -603,7 +603,6 @@ export const GET_BROWSE_SECTION_PRODUCTS = gql`
       after: $after
       where: {
         categoryIdIn: $categoryIdIn
-        stockStatus: IN_STOCK
         orderby: { field: DATE, order: DESC }
       }
     ) {
