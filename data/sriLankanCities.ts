@@ -1,9 +1,9 @@
 ﻿export type SriLankanCity = {
   name: string;
-  postcode: string;
+  postcode: string | null;
 };
 
-export const SRI_LANKAN_CITIES: SriLankanCity[] = [
+const RAW_SRI_LANKAN_CITIES: Array<{ name: string; postcode: string }> = [
   { name: 'Aandankulam', postcode: 'NULL' },
   { name: 'Adampan', postcode: 'NULL' },
   { name: 'Addalaichenai', postcode: '32350' },
@@ -2205,3 +2205,13 @@ export const SRI_LANKAN_CITIES: SriLankanCity[] = [
   { name: 'Welikada', postcode: 'NULL' },
   { name: 'Wickramasinghapura', postcode: 'NULL' },
 ];
+
+export const SRI_LANKAN_CITIES: SriLankanCity[] = Array.from(
+  RAW_SRI_LANKAN_CITIES.reduce((cities, city) => {
+    cities.set(city.name.trim().toLowerCase(), {
+      name: city.name.trim(),
+      postcode: city.postcode === "NULL" ? null : city.postcode,
+    });
+    return cities;
+  }, new Map<string, SriLankanCity>()).values(),
+).sort((a, b) => a.name.localeCompare(b.name));

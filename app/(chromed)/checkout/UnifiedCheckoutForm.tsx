@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, memo, useCallback, useEffect, useMemo, useState } from "react";
-import { Popover, Transition } from "@headlessui/react";
+import { Combobox, Transition } from "@headlessui/react";
 import Image from "next/image";
 import Input from "shared/Input/Input";
 import CountryPhoneInput from "./components/CountryPhoneInput";
@@ -175,106 +175,143 @@ interface AddressFieldsProps {
 interface CitySelectFieldProps {
     id: string;
     value: string;
+    postalValue: string;
     onChange: (patch: Partial<AddressFieldValues>) => void;
 }
 
-const CitySelectField = ({ id, value, onChange }: CitySelectFieldProps) => {
+const MAX_VISIBLE_CITY_OPTIONS = 60;
+
+const CitySelectField = ({ id, value, postalValue, onChange }: CitySelectFieldProps) => {
     const [query, setQuery] = useState("");
-    const searchableCities = useMemo(
-        () => {
-            const seen = new Set<string>();
-            return [...SRI_LANKAN_CITIES]
-                .filter((city) => {
-                    const key = city.name.trim().toLowerCase();
-                    if (seen.has(key)) {
-                        return false;
-                    }
-                    seen.add(key);
-                    return true;
-                })
-                .sort((a, b) => a.name.localeCompare(b.name));
-        },
-        [],
-    );
+    const normalizedQuery = query.trim().toLowerCase();
 
     const filteredCities = useMemo(() => {
-        const normalized = query.trim().toLowerCase();
-        if (!normalized) {
-            return searchableCities;
+        if (!normalizedQuery) {
+            return SRI_LANKAN_CITIES.slice(0, MAX_VISIBLE_CITY_OPTIONS);
         }
 
-        return searchableCities.filter((city) =>
-            city.name.toLowerCase().includes(normalized),
+        return SRI_LANKAN_CITIES.filter((city) =>
+            city.name.toLowerCase().includes(normalizedQuery) ||
+            city.postcode?.includes(normalizedQuery),
         );
-    }, [query, searchableCities]);
+    }, [normalizedQuery]);
+
+    const hasExactMatch = useMemo(
+        () =>
+            !!normalizedQuery &&
+            SRI_LANKAN_CITIES.some((city) => city.name.toLowerCase() === normalizedQuery),
+        [normalizedQuery],
+    );
 
     return (
-        <Popover className="relative">
-            {({ close }) => (
-                <>
-                    <Popover.Button
-                        id={id}
-                        className={`flex h-11 w-full items-center justify-between rounded-2xl bg-white px-4 text-left text-sm ${FIELD_CLASS}`}
-                    >
-                        <span className={value ? "text-slate-900" : "text-slate-400"}>
-                            {value || "Select a City"}
-                        </span>
-                        <ChevronsUpDown className="h-4 w-4 text-slate-500" />
-                    </Popover.Button>
-                    <Transition
-                        as={Fragment}
-                        enter="transition ease-out duration-100"
-                        enterFrom="opacity-0 translate-y-1"
-                        enterTo="opacity-100 translate-y-0"
-                        leave="transition ease-in duration-75"
-                        leaveFrom="opacity-100 translate-y-0"
-                        leaveTo="opacity-0 translate-y-1"
-                    >
-                        <Popover.Panel className="absolute z-30 mt-2 w-full rounded-2xl border border-slate-200 bg-white p-3 shadow-xl">
-                            <div className="flex items-center rounded-xl border border-slate-300 px-3">
-                                <Search className="h-4 w-4 text-slate-400" />
-                                <input
-                                    autoFocus
-                                    className="h-10 w-full border-0 bg-transparent px-2 text-sm outline-none focus:ring-0"
-                                    placeholder="Search City..."
-                                    value={query}
-                                    onChange={(e) => setQuery(e.target.value)}
-                                />
-                            </div>
-                            <div className="mt-2 max-h-64 overflow-y-auto">
-                                {filteredCities.length ? (
-                                    filteredCities.map((city) => (
-                                        <button
-                                            key={`${city.name}-${city.postcode}`}
-                                            type="button"
-                                            className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm hover:bg-slate-100 ${
-                                                city.name === value ? "bg-slate-100 font-medium" : ""
-                                            }`}
-                                            onClick={() => {
-                                                onChange({
-                                                    city: city.name,
-                                                    ...(city.postcode && city.postcode !== "NULL"
-                                                        ? { postal: city.postcode }
-                                                        : {}),
-                                                });
-                                                setQuery("");
-                                                close();
-                                            }}
-                                        >
-                                            <span>{city.name}</span>
-                                        </button>
-                                    ))
-                                ) : (
-                                    <div className="px-3 py-2 text-sm text-slate-500">
-                                        No cities found.
+        <Combobox
+            as="div"
+            className="relative"
+            value={value}
+            onChange={(nextCity: string) => {
+                const selectedCity = SRI_LANKAN_CITIES.find(
+                    (city) => city.name.toLowerCase() === nextCity.trim().toLowerCase(),
+                );
+
+                onChange({
+                    city: nextCity,
+                    ...(!postalValue && selectedCity?.postcode
+                        ? { postal: selectedCity.postcode }
+                        : {}),
+                });
+                setQuery("");
+            }}
+        >
+            <div className="relative">
+                <Search className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <Combobox.Input
+                    as={Input}
+                    id={id}
+                    className={`normal-case pl-9 pr-10 ${FIELD_CLASS}`}
+                    placeholder="Search or enter city"
+                    autoComplete="address-level2"
+                    displayValue={(city: string) => query || city}
+                    onChange={(e) => {
+                        const nextValue = e.target.value;
+                        setQuery(nextValue);
+                        onChange({ city: nextValue });
+                    }}
+                    onBlur={() => setQuery("")}
+                    onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                            e.preventDefault();
+                        }
+                    }}
+                    required={true}
+                />
+                <Combobox.Button
+                    className="absolute inset-y-0 right-0 flex items-center px-3 text-slate-500"
+                    aria-label="Toggle city suggestions"
+                >
+                    <ChevronsUpDown className="h-4 w-4" />
+                </Combobox.Button>
+            </div>
+            <Transition
+                as={Fragment}
+                enter="transition ease-out duration-100"
+                enterFrom="opacity-0 translate-y-1"
+                enterTo="opacity-100 translate-y-0"
+                leave="transition ease-in duration-75"
+                leaveFrom="opacity-100 translate-y-0"
+                leaveTo="opacity-0 translate-y-1"
+                afterLeave={() => setQuery("")}
+            >
+                <Combobox.Options className="absolute z-30 mt-2 max-h-64 w-full overflow-y-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-xl empty:invisible">
+                    {!hasExactMatch && normalizedQuery ? (
+                        <Combobox.Option
+                            value={query.trim()}
+                            className={({ active }) =>
+                                `cursor-pointer rounded-lg px-3 py-2 text-sm ${
+                                    active ? "bg-slate-100" : ""
+                                }`
+                            }
+                        >
+                            Use &quot;{query.trim()}&quot;
+                        </Combobox.Option>
+                    ) : null}
+                    {filteredCities.length ? (
+                        <>
+                            {filteredCities.map((city) => (
+                                <Combobox.Option
+                                    key={`${city.name}-${city.postcode ?? "custom"}`}
+                                    value={city.name}
+                                    className={({ active, selected }) =>
+                                        `cursor-pointer rounded-lg px-3 py-2 text-sm ${
+                                            active || selected ? "bg-slate-100" : ""
+                                        } ${selected ? "font-medium" : ""}`
+                                    }
+                                >
+                                    <div className="flex items-center justify-between gap-3">
+                                        <span>{city.name}</span>
+                                        {city.postcode ? (
+                                            <span className="text-xs text-slate-500">{city.postcode}</span>
+                                        ) : null}
                                     </div>
-                                )}
-                            </div>
-                        </Popover.Panel>
-                    </Transition>
-                </>
-            )}
-        </Popover>
+                                </Combobox.Option>
+                            ))}
+                            {!normalizedQuery ? (
+                                <div className="px-3 py-2 text-xs text-slate-500">
+                                    Keep typing to narrow the city list.
+                                </div>
+                            ) : null}
+                        </>
+                    ) : normalizedQuery ? (
+                        <div className="px-3 py-2 text-sm text-slate-500">
+                            No matches found. You can keep your typed city.
+                        </div>
+                    ) : (
+                        <div className="px-3 py-2 text-sm text-slate-500">
+                            Keep typing to narrow the city list.
+                        </div>
+                    )}
+                </Combobox.Options>
+            </Transition>
+        </Combobox>
     );
 };
 
@@ -354,6 +391,7 @@ const AddressFields = memo(({ idPrefix, values, onChange, nameOnly = false }: Ad
                 <CitySelectField
                     id={`${idPrefix}-city`}
                     value={values.city}
+                    postalValue={values.postal}
                     onChange={onChange}
                 />
             </div>
@@ -747,6 +785,14 @@ const UnifiedCheckoutForm = ({
         }
 
         if (
+            deliveryType !== "store_pickup" &&
+            !isAddressComplete(billingAddress)
+        ) {
+            toast.error("Please complete the billing address.");
+            return;
+        }
+
+        if (
             shippingDifferent &&
             deliveryType !== "store_pickup" &&
             !isAddressComplete(shippingAddress)
@@ -1093,7 +1139,7 @@ const UnifiedCheckoutForm = ({
             <CheckoutStepper currentStep={currentStep} />
 
             {/* Contact Information Section */}
-            <div className="overflow-visible">
+            <div>
                 <div className="p-0">
                     <h3 className="text-lg font-semibold mb-4">Contact Information</h3>
 
@@ -1136,7 +1182,7 @@ const UnifiedCheckoutForm = ({
             </div>
 
             {/* Delivery Method Section */}
-            <div className="overflow-visible">
+            <div>
                 <div className="p-0">
                     <h3 className="text-lg font-semibold mb-4">Delivery Method</h3>
 
