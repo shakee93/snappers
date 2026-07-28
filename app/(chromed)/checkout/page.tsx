@@ -9,6 +9,7 @@ import { BRAND_CTA_BUTTON_CLASS } from "shared/Button/ButtonBrand";
 import { useCart } from "@/context/CartProvider";
 import { useCoupon } from "@/hooks/useCoupon";
 import { useShipping } from "@/hooks/useShipping";
+import { useCheckoutAddressSync } from "@/hooks/useCheckoutAddressSync";
 import { useCheckout } from "@/hooks/useCheckout";
 import {
   CheckoutPayload,
@@ -269,6 +270,22 @@ const CheckoutPage = () => {
       console.error("An error occurred while updating shipping total:", error);
     }
   };
+
+  // The address the customer types is what WooCommerce quotes the rate
+  // against, so once it lands server-side both the shipping line and the cart
+  // totals on this page are stale. Re-run the rate lookup first, then pull the
+  // cart so subtotal/discount reflect any address-conditional rules.
+  const handleAddressSynced = async () => {
+    await updateShippingTotal();
+    await refreshCart();
+  };
+
+  const { syncCheckoutAddress, addressSyncing } =
+    useCheckoutAddressSync(handleAddressSynced);
+
+  // Totals are mid-flight while either the address push or the rate lookup is
+  // running — the summary skeletons and the Confirm button both key off this.
+  const totalsRecalculating = shippingUpdating || addressSyncing;
 
   useEffect(() => {
     // Skip until the cart has actually loaded. Firing the WBS mutation
@@ -1187,13 +1204,14 @@ const CheckoutPage = () => {
               setIsKokoPayment={setIsKokoPayment}
               isKokoPayment={isKokoPayment}
               onCheckoutSubmit={submitCheckout}
+              onAddressChange={syncCheckoutAddress}
               isTOC={isTOC}
               onTOCChange={handleTOC}
               tocError={tocError}
-              // Disable the Confirm button while either the checkout
-              // mutation OR the shipping recalculation is in flight, so
+              // Disable the Confirm button while the checkout mutation, the
+              // address push OR the shipping recalculation is in flight, so
               // the user can't submit at a stale total.
-              loading={loading || shippingUpdating}
+              loading={loading || totalsRecalculating}
               orderTotalLabel={orderTotalLabel}
             />
           </div>
@@ -1422,12 +1440,12 @@ const CheckoutPage = () => {
                 )}
 
                 {!noShipping && (
-                  <div className="flex justify-between" aria-busy={shippingUpdating}>
+                  <div className="flex justify-between" aria-busy={totalsRecalculating}>
                     <span className="text-slate-600 dark:text-slate-400">
                       {freeShipping ? `Free Shipping` : `Shipping estimate`}
                     </span>
                     <span className="font-medium text-slate-900 dark:text-slate-200">
-                      {shippingUpdating ? (
+                      {totalsRecalculating ? (
                         <span className="inline-block w-20 h-5 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
                       ) : freeShipping ? (
                         <span dangerouslySetInnerHTML={{ __html: "0.00" }} />
@@ -1469,9 +1487,9 @@ const CheckoutPage = () => {
               )}
 
               {isCardPayment && (
-                <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100" aria-busy={shippingUpdating}>
+                <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100" aria-busy={totalsRecalculating}>
                   <span className="text-base font-semibold">Order total</span>
-                  {shippingUpdating ? (
+                  {totalsRecalculating ? (
                     <span className="inline-block w-32 h-7 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
                   ) : (
                     <span
@@ -1485,9 +1503,9 @@ const CheckoutPage = () => {
               )}
 
               {isKokoPayment && (
-                <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100" aria-busy={shippingUpdating}>
+                <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100" aria-busy={totalsRecalculating}>
                   <span className="text-base font-semibold">Order total</span>
-                  {shippingUpdating ? (
+                  {totalsRecalculating ? (
                     <span className="inline-block w-32 h-7 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
                   ) : (
                     <span
@@ -1501,9 +1519,9 @@ const CheckoutPage = () => {
               )}
 
               {!isCardPayment && !isKokoPayment && (
-                <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100" aria-busy={shippingUpdating}>
+                <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100" aria-busy={totalsRecalculating}>
                   <span className="text-base font-semibold">Order total</span>
-                  {shippingUpdating ? (
+                  {totalsRecalculating ? (
                     <span className="inline-block w-32 h-7 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
                   ) : (
                     <span className="text-xl font-bold">

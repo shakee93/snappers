@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import UnifiedCheckoutForm, { CheckoutSubmitPayload, DeliveryType } from "./UnifiedCheckoutForm";
 import { QueryResult } from "@apollo/client";
 import { useCheckoutUserDetails } from "@/hooks/useCheckoutUserDetails";
+import { CheckoutAddressSnapshot } from "@/hooks/useCheckoutAddressSync";
 import { usePriceFluctuationNotice } from "@/hooks/usePriceFluctuationNotice";
 import { Customer, CustomerAddress } from "@/graphql/types/graphql";
 import { contactInformation } from "@/data/types";
@@ -20,6 +21,7 @@ interface CheckoutLeftProps {
   setIsKokoPayment: (v: boolean) => void;
   isKokoPayment: boolean;
   onCheckoutSubmit: (payload: CheckoutSubmitPayload) => Promise<void> | void;
+  onAddressChange: (snapshot: CheckoutAddressSnapshot | null) => void;
   isTOC: boolean;
   onTOCChange: () => void;
   tocError: boolean;
@@ -38,6 +40,7 @@ const CheckoutDetails = ({
   setIsKokoPayment,
   isKokoPayment,
   onCheckoutSubmit,
+  onAddressChange,
   isTOC,
   onTOCChange,
   tocError,
@@ -86,6 +89,7 @@ const CheckoutDetails = ({
         isKokoPayment={isKokoPayment}
         isPriceFluctuation={isPriceFluctuation}
         onCheckoutSubmit={onCheckoutSubmit}
+        onAddressChange={onAddressChange}
         isTOC={isTOC}
         onTOCChange={onTOCChange}
         tocError={tocError}
