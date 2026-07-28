@@ -62,6 +62,13 @@ const SectionDealCountdown = ({
     return () => window.clearInterval(id);
   }, [endsAt]);
 
+  const isExpired =
+    timeLeft !== null &&
+    timeLeft.days === 0 &&
+    timeLeft.hours === 0 &&
+    timeLeft.minutes === 0 &&
+    timeLeft.seconds === 0;
+
   const units = timeLeft
     ? [
         { label: "Days", value: timeLeft.days },
@@ -161,7 +168,10 @@ const SectionDealCountdown = ({
               />
             </div>
 
-            <div className="relative mt-2.5 w-full rounded-xl border border-[#E7D9C7] bg-white px-2 pb-1.5 pt-2.5">
+            <div
+              className={`relative mt-2.5 w-full rounded-xl border border-[#E7D9C7] bg-white px-2 pb-1.5 pt-2.5 ${isExpired ? "invisible" : ""}`}
+              aria-hidden={isExpired}
+            >
               <span className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-deal-brown px-1.5 py-1 text-[8px] font-bold uppercase leading-none tracking-wide !text-[#EE9E7D]">
                 Hurry! Deals ends in:
               </span>
@@ -194,7 +204,10 @@ const SectionDealCountdown = ({
             />
           </div>
 
-          <div className="relative rounded-2xl border border-[#E7D9C7] bg-white/70 px-7 py-0 md:pb-3 md:pt-5 backdrop-blur-sm">
+          <div
+            className={`relative rounded-2xl border border-[#E7D9C7] bg-white/70 px-7 py-0 md:pb-3 md:pt-5 backdrop-blur-sm ${isExpired ? "invisible" : ""}`}
+            aria-hidden={isExpired}
+          >
             <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-deal-brown px-3 py-2 text-[10px] font-bold uppercase leading-none tracking-wider !text-[#EE9E7D]">
               Hurry! Deals ends in:
             </span>
