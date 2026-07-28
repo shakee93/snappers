@@ -10,7 +10,8 @@ import { CustomerAddress, PaymentGateway } from "@/graphql/types/graphql";
 import { contactInformation } from "@/data/types";
 import Select from "shared/Select/Select";
 import { toast } from "sonner";
-import { SRI_LANKAN_STATES } from "@/components/global/forms/HelperComps";
+import { SRI_LANKAN_STATES, transformAddress } from "@/components/global/forms/HelperComps";
+import { CheckoutAddressSnapshot } from "@/hooks/useCheckoutAddressSync";
 import { useCart } from "@/context/CartProvider";
 import checkoutCopy from "@/content/checkout-copy.json";
 import { formatPrice } from "@/lib/formatPrice";
@@ -388,6 +389,7 @@ interface Props {
     isKokoPayment: boolean;
     isPriceFluctuation: any;
     onCheckoutSubmit: (payload: CheckoutSubmitPayload) => Promise<void> | void;
+    onAddressChange: (snapshot: CheckoutAddressSnapshot | null) => void;
     isTOC: boolean;
     onTOCChange: () => void;
     tocError: boolean;
@@ -409,6 +411,7 @@ const UnifiedCheckoutForm = ({
     isKokoPayment,
     isPriceFluctuation,
     onCheckoutSubmit,
+    onAddressChange,
     isTOC,
     onTOCChange,
     tocError,
@@ -495,6 +498,25 @@ const UnifiedCheckoutForm = ({
         }
     }, [initialShippingData]);
 
+    // WooCommerce quotes shipping against the customer's stored address, so
+    // the totals on this page are only correct once the address the customer
+    // typed has been pushed to it. Report every address edit upward; the page
+    // debounces and ignores changes that can't move the rate. Store pickup has
+    // no destination, so there is nothing to quote.
+    const addressSnapshot = useMemo<CheckoutAddressSnapshot | null>(() => {
+        if (!deliveryType || deliveryType === "store_pickup") return null;
+
+        const billing = transformAddress({ ...billingAddress, country: "LK" });
+        const shipping = shippingDifferent
+            ? transformAddress({ ...shippingAddress, country: "LK" })
+            : billing;
+
+        return { billing, shipping };
+    }, [deliveryType, shippingDifferent, billingAddress, shippingAddress]);
+
+    useEffect(() => {
+        onAddressChange(addressSnapshot);
+    }, [addressSnapshot, onAddressChange]);
 
     const handlePickupTypeChange = (type: DeliveryType) => {
         setDeliveryType(type);
