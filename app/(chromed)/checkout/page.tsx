@@ -161,13 +161,18 @@ const CheckoutPage = () => {
       router.push("/");
     }
 
-    if (cart?.total !== null && cart?.total !== undefined) {
+    if (cart?.subtotal != null && (noShipping || freeShipping)) {
+      setOrderTotal(cart.subtotal);
+      if (noShipping) {
+        setShippingTotal("0");
+      }
+    } else if (cart?.total !== null && cart?.total !== undefined) {
       setOrderTotal(cart?.total);
     }
-    if (cart?.shippingTotal != null) {
+    if (!noShipping && cart?.shippingTotal != null) {
       setShippingTotal(cart.shippingTotal);
     }
-  }, [cart, hasSeenCartWithItems, isCouponSyncingCart, applyingCoupon, removingCoupon]);
+  }, [cart, hasSeenCartWithItems, isCouponSyncingCart, applyingCoupon, removingCoupon, noShipping, freeShipping]);
 
   useEffect(() => {
     fetchCustomer();
@@ -272,11 +277,10 @@ const CheckoutPage = () => {
       }
 
       const total: any = rateSource?.total;
-      setOrderTotal(freeShipping ? rateSource?.subtotal : total);
+      const subtotal: any = rateSource?.subtotal;
+      setOrderTotal(noShipping || freeShipping ? subtotal : total);
 
       if (customer?.id === "guest") {
-        const subtotal: any = rateSource?.subtotal;
-
         if (noShipping || freeShipping) {
           setOrderTotal(subtotal);
         } else {
@@ -304,9 +308,9 @@ const CheckoutPage = () => {
         // refresh effect lands (which is what made the estimate look stuck).
         applyCart(updatedCart);
         const { total, shippingTotal, subtotal } = updatedCart;
-        if (freeShipping) {
+        if (freeShipping || noShipping) {
           setOrderTotal(subtotal);
-          setShippingTotal(shippingTotal);
+          setShippingTotal(noShipping ? "0" : shippingTotal);
         } else {
           setOrderTotal(total);
           setShippingTotal(shippingTotal);
@@ -981,6 +985,11 @@ const CheckoutPage = () => {
 
   const numericOrderTotal = replaceStringinInt(orderTotal);
   const cartSubtotal = replaceStringinInt(cart?.subtotal);
+  // Store pickup and flash delivery have no courier charge. The cart can
+  // still carry the previous courier shipping line until updateShippingMethod
+  // lands, so never bill shipping on those methods.
+  const chargeableOrderTotal =
+    noShipping || freeShipping ? cartSubtotal : numericOrderTotal;
   const numericDiscountTotal = replaceStringinInt(cart?.discountTotal);
   const hasDiscount = Number.isFinite(numericDiscountTotal) && numericDiscountTotal > 0;
 
@@ -992,9 +1001,9 @@ const CheckoutPage = () => {
     if (!Number.isFinite(sale) || !Number.isFinite(regular) || regular <= sale) return sum;
     return sum + (regular - sale) * (item?.quantity || 0);
   }, 0);
-  const threePercentFromTotal = numericOrderTotal * CARD_SURCHARGE_RATE;
-  const TotalWithKoko = (cartSubtotal / 88) * 100;
-  const taxWithTotal = (numericOrderTotal + threePercentFromTotal).toFixed(2);
+  const threePercentFromTotal = chargeableOrderTotal * CARD_SURCHARGE_RATE;
+  const TotalWithKoko = (chargeableOrderTotal / 88) * 100;
+  const taxWithTotal = (chargeableOrderTotal + threePercentFromTotal).toFixed(2);
 
   // Real shipping amount for Koko's installment math. Was hardcoded at 500
   // LKR which silently disagreed with the actual courier rate the rest of
@@ -1017,12 +1026,16 @@ const CheckoutPage = () => {
     return 500;
   })();
   const kokoOrderTotal = TotalWithKoko + kokoShippingAmount;
+  const kokoFinancingFee = isKokoPayment
+    ? Math.max(0, kokoOrderTotal - chargeableOrderTotal)
+    : 0;
+  const cardSurchargeAmount = isCardPayment ? threePercentFromTotal : 0;
 
   const orderTotalLabel = isCardPayment
-    ? formatPrice(numericOrderTotal + threePercentFromTotal)
+    ? formatPrice(chargeableOrderTotal + threePercentFromTotal)
     : isKokoPayment
     ? formatPrice(kokoOrderTotal)
-    : formatPrice(numericOrderTotal);
+    : formatPrice(chargeableOrderTotal);
 
   // The courier's name changes with the destination — WC quotes "Local
   // Delivery" inside the Colombo distance zone and "Standard Shipping"
@@ -1300,7 +1313,7 @@ const CheckoutPage = () => {
               deliveryType={deliveryType}
               setIsCardPayment={setIsCardPayment}
               isCardPayment={isCardPayment}
-              totalPayment={numericOrderTotal}
+              totalPayment={chargeableOrderTotal}
               kokoTotal={kokoOrderTotal}
               setIsKokoPayment={setIsKokoPayment}
               isKokoPayment={isKokoPayment}
@@ -1555,10 +1568,32 @@ const CheckoutPage = () => {
                     </span>
                   </div>
                 )}
+
+                {isKokoPayment && kokoFinancingFee > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600 dark:text-slate-400">
+                      Koko financing fee
+                    </span>
+                    <span className="font-medium text-slate-900 dark:text-slate-200">
+                      +{formatPrice(kokoFinancingFee)}
+                    </span>
+                  </div>
+                )}
+
+                {isCardPayment && cardSurchargeAmount > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600 dark:text-slate-400">
+                      Card processing fee
+                    </span>
+                    <span className="font-medium text-slate-900 dark:text-slate-200">
+                      +{formatPrice(cardSurchargeAmount)}
+                    </span>
+                  </div>
+                )}
               </div>
-              {(isCardPayment || isKokoPayment) && (
+              {hasDiscount && (isCardPayment || isKokoPayment) && (
                 <div className="flex justify-between py-2.5">
-                  <span className="text-red-500 font-medium">Sorry you missed the discount</span>
+                  <span className="text-red-500 font-medium">Coupon discounts cannot be used with this payment method</span>
                 </div>
               )}
               {isKokoPayment && (
@@ -1587,7 +1622,7 @@ const CheckoutPage = () => {
                     <span
                       className="text-xl font-bold"
                       dangerouslySetInnerHTML={{
-                        __html: formatPrice(numericOrderTotal + threePercentFromTotal),
+                        __html: formatPrice(chargeableOrderTotal + threePercentFromTotal),
                       }}
                     />
                   )}
@@ -1617,7 +1652,7 @@ const CheckoutPage = () => {
                     <span className="inline-block w-32 h-7 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
                   ) : (
                     <span className="text-xl font-bold">
-                      {formatPrice(numericOrderTotal)}
+                      {formatPrice(chargeableOrderTotal)}
                     </span>
                   )}
                 </div>
