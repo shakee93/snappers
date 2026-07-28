@@ -49,10 +49,14 @@ const snapshotKey = (snapshot: CheckoutAddressSnapshot) =>
 
 // Pushing a half-typed address makes WC quote against a zone the customer
 // isn't in, so wait until every rate-affecting field is actually filled.
+// `address1` is in this list because the store's distance-based method prices
+// off the geocoded street line — quoting without it returns the store's own
+// location as the destination, i.e. the cheapest possible rate.
 const isQuotable = (address: CustomerAddressInput) =>
   !!String(address.country ?? "").trim() &&
   !!String(address.state ?? "").trim() &&
   !!String(address.city ?? "").trim() &&
+  !!String(address.address1 ?? "").trim() &&
   CHECKOUT_POSTCODE_PATTERN.test(String(address.postcode ?? "").trim());
 
 /**

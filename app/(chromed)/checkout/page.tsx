@@ -12,6 +12,7 @@ import { useShipping } from "@/hooks/useShipping";
 import { useCheckoutAddressSync } from "@/hooks/useCheckoutAddressSync";
 import { useCheckout } from "@/hooks/useCheckout";
 import {
+  Cart,
   CheckoutPayload,
   CustomerAddressInput,
   PaymentGateway,
@@ -42,6 +43,37 @@ import { formatPrice, currencySymbol } from "@/lib/formatPrice";
 import { CARD_SURCHARGE_RATE } from "@/lib/checkoutMath";
 import { apiUrl } from "@/lib/api";
 import { enrichCheckoutOrderStorage } from "@/components/account/accountOrderUtils";
+
+// Methods that represent "customer collects", never a courier rate.
+const PICKUP_METHOD_IDS = new Set(["pickup_location", "local_pickup"]);
+
+/**
+ * The courier rate is not a constant on this store. Its id *and* its label
+ * change with the destination — the distance/weight method quotes
+ * `dwbs:1:distance` "Local Delivery" inside the Colombo zone and
+ * `dwbs:1:weight` "Standard Shipping" outstation — so a hard-coded id is
+ * rejected outright ("… is not an available shipping method for shipping
+ * package …") and the cart silently keeps the rate quoted for the previous
+ * address. Read it off the rates WooCommerce returned for the address it
+ * currently holds instead.
+ */
+const resolveCourierRate = (cart: Cart | null | undefined, preferFree: boolean) => {
+  const rates = cart?.availableShippingMethods?.[0]?.rates ?? [];
+  const courierRates = rates.filter(
+    (rate): rate is NonNullable<typeof rate> =>
+      !!rate?.id && !PICKUP_METHOD_IDS.has(rate.methodId ?? ""),
+  );
+
+  if (preferFree) {
+    const free = courierRates.find(
+      (rate) => rate.methodId === "free_shipping" || Number(rate.cost) === 0,
+    );
+    if (free) return free;
+  }
+
+  return courierRates[0] ?? null;
+};
+
 interface FormData {
   contactInfo: Record<string, any>;
   deliveryAddress: any;
@@ -195,8 +227,14 @@ const CheckoutPage = () => {
   // stale response that does come back.
   const shippingAbortRef = useRef<AbortController | null>(null);
 
-  const updateShippingTotal = async () => {
-    const hasFreeShipping: any = cart?.appliedCoupons?.some(
+  // `quotedCart` is the cart as the server just returned it. After an address
+  // push the provider's `cart` is a render behind, and the rate ids we have to
+  // choose from live on that response — so callers that just refetched pass it
+  // in rather than letting us read a stale set.
+  const updateShippingTotal = async (quotedCart?: Cart | null) => {
+    const rateSource = quotedCart ?? cart;
+
+    const hasFreeShipping: any = rateSource?.appliedCoupons?.some(
       (coupon) => coupon?.code === "free-shipping"
     );
     if (hasFreeShipping) {
@@ -211,21 +249,27 @@ const CheckoutPage = () => {
       // Mirror the mapping in getShippingMethod: store_pickup uses the
       // block-based pickup_location, flash_delivery uses the zone-bound
       // flat_rate:4 (free, configured backend-side as "Flash Delivery
-      // (Uber/PickMe)").
+      // (Uber/PickMe)"). Courier falls through to whichever rate the store
+      // quoted for the current address — see resolveCourierRate.
       const shippingMethods =
         deliveryType === "flash_delivery"
           ? "flat_rate:4"
           : deliveryType === "store_pickup"
             ? "pickup_location:0"
-            : freeShipping
-              ? siteConfig.shipping.freeShippingMethodId
-              : siteConfig.shipping.weightBasedShippingMethodId;
+            : resolveCourierRate(rateSource, hasFreeShipping || freeShipping)?.id;
 
-      const total: any = cart?.total;
-      setOrderTotal(freeShipping ? cart?.subtotal : total);
+      // No courier rate means the address doesn't resolve to a serviceable
+      // zone yet. Selecting nothing is correct — the cart keeps whatever WC
+      // last quoted, and the summary is already showing that.
+      if (!shippingMethods) {
+        return;
+      }
+
+      const total: any = rateSource?.total;
+      setOrderTotal(freeShipping ? rateSource?.subtotal : total);
 
       if (customer?.id === "guest") {
-        const subtotal: any = cart?.subtotal;
+        const subtotal: any = rateSource?.subtotal;
 
         if (noShipping || freeShipping) {
           setOrderTotal(subtotal);
@@ -273,11 +317,14 @@ const CheckoutPage = () => {
 
   // The address the customer types is what WooCommerce quotes the rate
   // against, so once it lands server-side both the shipping line and the cart
-  // totals on this page are stale. Re-run the rate lookup first, then pull the
-  // cart so subtotal/discount reflect any address-conditional rules.
+  // totals on this page are stale. Pull the cart first: its
+  // `availableShippingMethods` are re-quoted for the new address, and the
+  // courier rate id we then select comes from that response. Reading it the
+  // other way round selects against the previous address's rates, which is how
+  // the total ended up one edit behind.
   const handleAddressSynced = async () => {
-    await updateShippingTotal();
-    await refreshCart();
+    const refreshed = await refreshCart();
+    await updateShippingTotal(refreshed?.data?.cart ?? null);
   };
 
   const { syncCheckoutAddress, addressSyncing } =
@@ -684,26 +731,33 @@ const CheckoutPage = () => {
     // both resolve to a free shipping line — and flat_rate keeps the
     // title verbatim so order admin shows "Flash Delivery (Uber/PickMe)"
     // instead of the pickup_location plugin's "<title> (<location>)" template.
+    // Courier: same dynamic rate as the cart-side lookup. Falling back to the
+    // configured constant keeps the order writable if the cart somehow has no
+    // rates to read, but the resolved id is what the store actually quoted.
+    const courierRate = resolveCourierRate(cart, freeShipping);
+
     const methodId =
       orderDeliveryType === "flash_delivery"
         ? "flat_rate:4"
         : orderDeliveryType === "store_pickup"
           ? "pickup_location:0"
-          : freeShipping
-            ? siteConfig.shipping.freeShippingMethodId
-            : siteConfig.shipping.weightBasedShippingMethodId;
+          : courierRate?.id ??
+            (freeShipping
+              ? siteConfig.shipping.freeShippingMethodId
+              : siteConfig.shipping.weightBasedShippingMethodId);
 
     // methodTitle is the display string for the order summary; for
     // flat_rate WC writes the zone-config title, for pickup_location WC
     // writes its own templated title — either way this string is
-    // cosmetic on the cart side.
+    // cosmetic on the cart side. The courier label is zone-dependent
+    // ("Local Delivery" vs "Standard Shipping"), so prefer the quoted one
+    // over a generic stand-in.
     const methodTitle = orderDeliveryType === "store_pickup"
       ? "Store Pickup"
       : orderDeliveryType === "flash_delivery"
         ? "Flash Delivery (Uber/PickMe)"
-        : freeShipping
-          ? "Free Shipping"
-          : "Weight Based Shipping";
+        : courierRate?.label ??
+          (freeShipping ? "Free Shipping" : "Weight Based Shipping");
 
     const total = noCharge ? "0" : shippingTotal;
 
