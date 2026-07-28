@@ -1,4 +1,4 @@
-﻿export type SriLankanCity = {
+export type SriLankanCity = {
   name: string;
   postcode: string | null;
 };
@@ -2206,6 +2206,8 @@ const RAW_SRI_LANKAN_CITIES: Array<{ name: string; postcode: string }> = [
   { name: 'Wickramasinghapura', postcode: 'NULL' },
 ];
 
+// Last-wins: later Colombo-suburb aliases intentionally override earlier
+// duplicate names so checkout prefers the more specific suburb postcodes.
 export const SRI_LANKAN_CITIES: SriLankanCity[] = Array.from(
   RAW_SRI_LANKAN_CITIES.reduce((cities, city) => {
     cities.set(city.name.trim().toLowerCase(), {

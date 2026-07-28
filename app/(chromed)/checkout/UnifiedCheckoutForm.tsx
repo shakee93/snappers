@@ -190,9 +190,11 @@ const MAX_VISIBLE_CITY_OPTIONS = 60;
 
 const CitySelectField = memo(({ id, value, postalValue, onChange }: CitySelectFieldProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
+    const listRef = useRef<HTMLUListElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const [inputValue, setInputValue] = useState(value);
     const [isOpen, setIsOpen] = useState(false);
+    const [activeIndex, setActiveIndex] = useState(-1);
     const deferredQuery = useDeferredValue(inputValue.trim().toLowerCase());
 
     useEffect(() => {
@@ -223,6 +225,17 @@ const CitySelectField = memo(({ id, value, postalValue, onChange }: CitySelectFi
         return matches;
     }, [deferredQuery]);
 
+    useEffect(() => {
+        if (!isOpen || activeIndex < 0) {
+            return;
+        }
+
+        const activeOption = listRef.current?.querySelector<HTMLElement>(
+            `[data-city-option-index="${activeIndex}"]`,
+        );
+        activeOption?.scrollIntoView({ block: "nearest" });
+    }, [activeIndex, isOpen]);
+
     const commitCity = useCallback(
         (cityName: string, postcode?: string | null) => {
             onChange({
@@ -245,6 +258,7 @@ const CitySelectField = memo(({ id, value, postalValue, onChange }: CitySelectFi
         const handlePointerDown = (event: MouseEvent) => {
             if (!containerRef.current?.contains(event.target as Node)) {
                 setIsOpen(false);
+                setActiveIndex(-1);
             }
         };
 
@@ -254,7 +268,9 @@ const CitySelectField = memo(({ id, value, postalValue, onChange }: CitySelectFi
 
     const handleInputChange = (nextValue: string) => {
         setInputValue(nextValue);
+        setActiveIndex(-1);
         debouncedCommitCity(nextValue);
+        setIsOpen(true);
     };
 
     const handleSelectCity = (city: SriLankanCity) => {
@@ -262,13 +278,18 @@ const CitySelectField = memo(({ id, value, postalValue, onChange }: CitySelectFi
         debouncedCommitCity.cancel();
         commitCity(city.name, city.postcode);
         setIsOpen(false);
+        setActiveIndex(-1);
     };
 
     const handleInputBlur = () => {
         debouncedCommitCity.flush();
         commitCity(inputValue);
         setIsOpen(false);
+        setActiveIndex(-1);
     };
+
+    const activeOptionId =
+        isOpen && activeIndex >= 0 ? `${id}-city-option-${activeIndex}` : undefined;
 
     return (
         <div ref={containerRef} className="relative">
@@ -280,18 +301,45 @@ const CitySelectField = memo(({ id, value, postalValue, onChange }: CitySelectFi
                 placeholder="Search or enter city"
                 autoComplete="address-level2"
                 value={inputValue}
-                onChange={(e) => {
-                    handleInputChange(e.target.value);
-                    setIsOpen(true);
-                }}
+                onChange={(e) => handleInputChange(e.target.value)}
                 onFocus={() => setIsOpen(true)}
                 onBlur={handleInputBlur}
                 onKeyDown={(e) => {
+                    if (e.key === "ArrowDown") {
+                        e.preventDefault();
+                        if (!filteredCities.length) {
+                            return;
+                        }
+                        setIsOpen(true);
+                        setActiveIndex((prev) =>
+                            prev < filteredCities.length - 1 ? prev + 1 : 0,
+                        );
+                        return;
+                    }
+
+                    if (e.key === "ArrowUp") {
+                        e.preventDefault();
+                        if (!filteredCities.length) {
+                            return;
+                        }
+                        setIsOpen(true);
+                        setActiveIndex((prev) =>
+                            prev > 0 ? prev - 1 : filteredCities.length - 1,
+                        );
+                        return;
+                    }
+
                     if (e.key === "Enter") {
                         e.preventDefault();
+                        if (isOpen && activeIndex >= 0 && filteredCities[activeIndex]) {
+                            handleSelectCity(filteredCities[activeIndex]);
+                        }
+                        return;
                     }
+
                     if (e.key === "Escape") {
                         setIsOpen(false);
+                        setActiveIndex(-1);
                     }
                 }}
                 required={true}
@@ -299,40 +347,52 @@ const CitySelectField = memo(({ id, value, postalValue, onChange }: CitySelectFi
                 aria-expanded={isOpen}
                 aria-controls={`${id}-city-listbox`}
                 aria-autocomplete="list"
+                aria-activedescendant={activeOptionId}
             />
             <button
                 type="button"
                 className="absolute inset-y-0 right-0 flex items-center px-3 text-slate-500"
                 aria-label="Toggle city suggestions"
                 onMouseDown={(e) => e.preventDefault()}
-                onClick={() => setIsOpen((open) => !open)}
+                onClick={() => {
+                    setIsOpen((open) => !open);
+                    setActiveIndex(-1);
+                }}
             >
                 <ChevronsUpDown className="h-4 w-4" />
             </button>
             {isOpen ? (
                 <ul
+                    ref={listRef}
                     id={`${id}-city-listbox`}
                     role="listbox"
                     className="absolute z-30 mt-2 max-h-64 w-full overflow-y-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-xl [scrollbar-width:thin] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5"
                 >
                     {filteredCities.length ? (
                         <>
-                            {filteredCities.map((city) => (
-                                <li key={`${city.name}-${city.postcode ?? "custom"}`} role="presentation">
-                                    <button
-                                        type="button"
-                                        role="option"
-                                        aria-selected={city.name === inputValue}
-                                        className={`flex w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-slate-100 ${
-                                            city.name === inputValue ? "bg-slate-100 font-medium" : ""
-                                        }`}
-                                        onMouseDown={(e) => e.preventDefault()}
-                                        onClick={() => handleSelectCity(city)}
-                                    >
-                                        {city.name}
-                                    </button>
-                                </li>
-                            ))}
+                            {filteredCities.map((city, index) => {
+                                const isActive = index === activeIndex;
+                                const isSelected = city.name === inputValue;
+                                return (
+                                    <li key={`${city.name}-${city.postcode ?? "custom"}`} role="presentation">
+                                        <button
+                                            type="button"
+                                            id={`${id}-city-option-${index}`}
+                                            data-city-option-index={index}
+                                            role="option"
+                                            aria-selected={isActive || isSelected}
+                                            className={`flex w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-slate-100 ${
+                                                isActive || isSelected ? "bg-slate-100 font-medium" : ""
+                                            }`}
+                                            onMouseDown={(e) => e.preventDefault()}
+                                            onMouseEnter={() => setActiveIndex(index)}
+                                            onClick={() => handleSelectCity(city)}
+                                        >
+                                            {city.name}
+                                        </button>
+                                    </li>
+                                );
+                            })}
                             {!deferredQuery ? (
                                 <li className="px-3 py-2 text-xs text-slate-500" role="presentation">
                                     Keep typing to narrow the city list.
