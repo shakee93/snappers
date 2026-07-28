@@ -261,7 +261,7 @@ const CitySelectField = ({ id, value, postalValue, onChange }: CitySelectFieldPr
                 leaveTo="opacity-0 translate-y-1"
                 afterLeave={() => setQuery("")}
             >
-                <Combobox.Options className="absolute z-30 mt-2 max-h-64 w-full overflow-y-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-xl empty:invisible">
+                <Combobox.Options className="absolute z-30 mt-2 max-h-64 w-full overflow-y-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-xl [scrollbar-width:thin] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5 empty:invisible">
                     {!hasExactMatch && normalizedQuery ? (
                         <Combobox.Option
                             value={query.trim()}
@@ -286,12 +286,7 @@ const CitySelectField = ({ id, value, postalValue, onChange }: CitySelectFieldPr
                                         } ${selected ? "font-medium" : ""}`
                                     }
                                 >
-                                    <div className="flex items-center justify-between gap-3">
-                                        <span>{city.name}</span>
-                                        {city.postcode ? (
-                                            <span className="text-xs text-slate-500">{city.postcode}</span>
-                                        ) : null}
-                                    </div>
+                                    <span>{city.name}</span>
                                 </Combobox.Option>
                             ))}
                             {!normalizedQuery ? (
