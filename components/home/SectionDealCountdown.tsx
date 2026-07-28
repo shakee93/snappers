@@ -55,10 +55,21 @@ const SectionDealCountdown = ({
       ? parsed
       : Date.now() + DEFAULT_COUNTDOWN_MS;
 
-    const tick = () => setTimeLeft(getTimeLeft(target));
-    tick();
+    const isZero = (t: TimeLeft) =>
+      t.days + t.hours + t.minutes + t.seconds === 0;
 
-    const id = window.setInterval(tick, 1000);
+    const tick = () => {
+      const next = getTimeLeft(target);
+      setTimeLeft(next);
+      return isZero(next);
+    };
+
+    // Already expired — no interval needed.
+    if (tick()) return;
+
+    const id = window.setInterval(() => {
+      if (tick()) window.clearInterval(id);
+    }, 1000);
     return () => window.clearInterval(id);
   }, [endsAt]);
 
@@ -68,6 +79,11 @@ const SectionDealCountdown = ({
     timeLeft.hours === 0 &&
     timeLeft.minutes === 0 &&
     timeLeft.seconds === 0;
+
+  // Hide while mounting (avoids a one-frame expired flash) and after expiry.
+  // `invisible` keeps the box in layout so the title does not shift.
+  const hideTimer = timeLeft === null || isExpired;
+  const timerVisibilityClass = hideTimer ? "invisible" : "";
 
   const units = timeLeft
     ? [
@@ -79,10 +95,7 @@ const SectionDealCountdown = ({
     : null;
 
   const countdownBody = (
-    <div
-      className="flex min-h-[2.25rem] w-full items-center justify-evenly md:min-h-[4.25rem] md:w-auto md:justify-center"
-      aria-busy={!units}
-    >
+    <div className="flex min-h-[2.25rem] w-full items-center justify-evenly md:min-h-[4.25rem] md:w-auto md:justify-center">
       {units ? (
         units.map((unit, index) => (
           <div key={unit.label} className="flex items-center">
@@ -169,8 +182,7 @@ const SectionDealCountdown = ({
             </div>
 
             <div
-              className={`relative mt-2.5 w-full rounded-xl border border-[#E7D9C7] bg-white px-2 pb-1.5 pt-2.5 ${isExpired ? "invisible" : ""}`}
-              aria-hidden={isExpired}
+              className={`relative mt-2.5 w-full rounded-xl border border-[#E7D9C7] bg-white px-2 pb-1.5 pt-2.5 ${timerVisibilityClass}`}
             >
               <span className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-deal-brown px-1.5 py-1 text-[8px] font-bold uppercase leading-none tracking-wide !text-[#EE9E7D]">
                 Hurry! Deals ends in:
@@ -205,8 +217,7 @@ const SectionDealCountdown = ({
           </div>
 
           <div
-            className={`relative rounded-2xl border border-[#E7D9C7] bg-white/70 px-7 py-0 md:pb-3 md:pt-5 backdrop-blur-sm ${isExpired ? "invisible" : ""}`}
-            aria-hidden={isExpired}
+            className={`relative rounded-2xl border border-[#E7D9C7] bg-white/70 px-7 py-0 md:pb-3 md:pt-5 backdrop-blur-sm ${timerVisibilityClass}`}
           >
             <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-deal-brown px-3 py-2 text-[10px] font-bold uppercase leading-none tracking-wider !text-[#EE9E7D]">
               Hurry! Deals ends in:
