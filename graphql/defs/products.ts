@@ -75,6 +75,8 @@ export const GET_PRODUCT = gql`
       ...ProductContentFull
       # woo-price-tiers plugin — reference prices per payment option.
       # PDP-only: listings don't render payment options.
+      # Requires the plugin on every GraphQL backend this app targets; if
+      # priceTiers is absent from the schema, GetProduct fails and PDPs 404.
       priceTiers {
         name
         price

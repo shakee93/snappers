@@ -25,6 +25,9 @@ export type ProductPageData = {
  * to skip the related-products fetch, which `<title>`/OG tags never use. The
  * `GET_PRODUCT` query itself is `force-cache`d, so the page-body call that does
  * need related products reuses the same cached response.
+ *
+ * GET_PRODUCT includes woo-price-tiers `priceTiers` — deploy the plugin (or
+ * remove the field) before pointing this frontend at a WP instance without it.
  */
 export async function getProductPageData(
   slug: string,

@@ -7,14 +7,16 @@ import visaMastercard from "@/public/product/visa-mastercard.png";
 import { formatPrice } from "@/lib/formatPrice";
 import { pdpRadius } from "@/components/product/pdpStyles";
 import {
+  isCodTier,
   isKokoTier,
-  type ProductPriceTier,
+  kokoInstallmentAmount,
+  type ResolvedPriceTier,
 } from "@/lib/priceTiers";
 
 interface ProductPaymentOptionsProps {
   /** Selected variation / simple product price — used when a tier's price is null (e.g. variable parents). */
   numericPrice: number;
-  priceTiers?: ProductPriceTier[] | null;
+  priceTiers?: ResolvedPriceTier[];
 }
 
 const optionCardClass =
@@ -42,34 +44,52 @@ const fallbackByName: Array<{
   { match: /koko/i, image: koko },
 ];
 
-function isCodTier(name: string | null | undefined): boolean {
-  return /cash\s*on\s*delivery|^cod$/i.test(name ?? "");
-}
+type TierVisual =
+  | { kind: "image"; src: string | StaticImageData; alt: string; koko?: boolean }
+  | { kind: "label"; name: string };
 
-function resolveTierImage(
-  tier: ProductPriceTier,
-): string | StaticImageData {
-  const fallback = fallbackByName.find((entry) =>
-    entry.match.test(tier.name ?? ""),
-  );
+function resolveTierVisual(tier: ResolvedPriceTier): TierVisual {
+  const name = tier.name.trim();
+  const fallback = fallbackByName.find((entry) => entry.match.test(name));
 
   // Prefer local assets for known payment methods — backend thumbs are often
   // cropped squares that clip wordmarks (COD) or look tiny (KOKO).
-  if (fallback && (isKokoTier(tier.name) || isCodTier(tier.name))) {
-    return fallback.image;
+  if (fallback && (isKokoTier(name) || isCodTier(name))) {
+    return {
+      kind: "image",
+      src: fallback.image,
+      alt: name,
+      koko: isKokoTier(name),
+    };
   }
 
   if (tier.imageUrl) {
-    return tier.imageUrl;
+    return {
+      kind: "image",
+      src: tier.imageUrl,
+      alt: name,
+      koko: isKokoTier(name),
+    };
   }
 
-  return fallback?.image ?? bankTransfer;
+  if (fallback) {
+    return {
+      kind: "image",
+      src: fallback.image,
+      alt: name,
+      koko: isKokoTier(name),
+    };
+  }
+
+  return { kind: "label", name };
 }
 
 function resolveTierPrice(
-  tier: ProductPriceTier,
+  tier: ResolvedPriceTier,
   fallbackPrice: number,
 ): number {
+  // Treat price <= 0 as missing — variable parents return null tier prices;
+  // a genuinely zero-priced tier would also fall back to numericPrice.
   if (
     typeof tier.price === "number" &&
     Number.isFinite(tier.price) &&
@@ -89,21 +109,31 @@ function TierLogo({
   alt: string;
   koko?: boolean;
 }) {
-  // Fixed-height fill box + object-contain: scales the full wordmark into the
-  // available width instead of clipping when the price column squeezes the row.
   return (
-    <div
-      className={`relative min-w-0 flex-1 ${koko ? "h-11" : "h-10"}`}
-    >
+    <div className={`relative min-w-0 flex-1 ${koko ? "h-11" : "h-10"}`}>
       <Image
         src={src}
         alt={alt}
         fill
-        sizes="(max-width: 640px) 45vw, 180px"
         className="object-contain object-left"
-        unoptimized={typeof src === "string"}
       />
     </div>
+  );
+}
+
+function TierLeading({ visual }: { visual: TierVisual }) {
+  if (visual.kind === "label") {
+    return (
+      <div className="flex min-w-0 flex-1 items-center">
+        <span className="text-sm font-semibold leading-tight text-[#1A1A1A]">
+          {visual.name}
+        </span>
+      </div>
+    );
+  }
+
+  return (
+    <TierLogo src={visual.src} alt={visual.alt} koko={visual.koko} />
   );
 }
 
@@ -111,13 +141,14 @@ const ProductPaymentOptions = ({
   numericPrice,
   priceTiers,
 }: ProductPaymentOptionsProps) => {
-  const tiers = (priceTiers ?? []).filter((tier) => !!tier.name);
+  const tiers = priceTiers ?? [];
 
   if (tiers.length === 0 && numericPrice <= 0) {
     return null;
   }
 
   if (tiers.length === 0) {
+    // Legacy path — no woo-price-tiers data; gross-up base price for Koko fee estimate.
     const kokoInstallment = ((numericPrice / 88) * 100) / 3;
     const formattedPrice = formatPrice(numericPrice);
 
@@ -153,23 +184,22 @@ const ProductPaymentOptions = ({
       <p className="text-sm font-bold text-[#1A1A1A]">Payment Options</p>
 
       <div className={optionsGridClass}>
-        {tiers.map((tier) => {
-          const name = tier.name!.trim();
+        {tiers.map((tier, index) => {
+          const name = tier.name.trim();
           const amount = resolveTierPrice(tier, numericPrice);
-          const src = resolveTierImage(tier);
+          const visual = resolveTierVisual(tier);
           const koko = isKokoTier(name);
-          const kokoInstallment =
-            koko && amount > 0 ? ((amount / 88) * 100) / 3 : 0;
+          const installment = kokoInstallmentAmount(amount);
 
           return (
-            <div key={name} className={optionCardClass}>
-              <TierLogo src={src} alt={name} koko={koko} />
+            <div key={`${name}-${index}`} className={optionCardClass}>
+              <TierLeading visual={visual} />
               <div className="shrink-0 whitespace-nowrap text-right">
                 {koko && amount > 0 ? (
                   <>
                     <p className="text-xs text-[#9CA3AF]">Buy Now Pay Later</p>
                     <p className="text-sm font-bold text-[#38461F]">
-                      3 x {formatPrice(kokoInstallment)}
+                      3 x {formatPrice(installment)}
                     </p>
                   </>
                 ) : (

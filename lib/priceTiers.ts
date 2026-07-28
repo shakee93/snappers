@@ -8,16 +8,29 @@ export type ProductPriceTier = {
   imageUrl?: string | null;
 };
 
+export type ResolvedPriceTier = ProductPriceTier & { name: string };
+
 export type ProductWithPriceTiers = {
   priceTiers?: ProductPriceTier[] | null;
 };
 
 export function getProductPriceTiers(
   product: ProductWithPriceTiers | null | undefined,
-): ProductPriceTier[] {
-  return product?.priceTiers?.filter((tier) => !!tier?.name) ?? [];
+): ResolvedPriceTier[] {
+  return (product?.priceTiers ?? []).filter(
+    (tier): tier is ResolvedPriceTier => !!tier?.name,
+  );
 }
 
 export function isKokoTier(name: string | null | undefined): boolean {
-  return (name ?? "").trim().toLowerCase() === "koko";
+  return /koko/i.test(name ?? "");
+}
+
+export function isCodTier(name: string | null | undefined): boolean {
+  return /cash\s*on\s*delivery|^cod$/i.test(name ?? "");
+}
+
+/** Backend KOKO tier price is the final payable total — split into 3 installments. */
+export function kokoInstallmentAmount(totalPrice: number): number {
+  return totalPrice > 0 ? totalPrice / 3 : 0;
 }
