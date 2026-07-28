@@ -326,24 +326,30 @@ const CheckoutPage = () => {
   // other way round selects against the previous address's rates, which is how
   // the total ended up one edit behind.
   const handleAddressSynced = async () => {
-    const refreshed = await refreshCart();
-    let quotedCart: Cart | null = refreshed?.data?.cart ?? null;
-
-    // refreshCart swallows some errors and resolves undefined. Letting that
-    // fall through to the provider's `cart` would price the new address
-    // against the previous one's rates — and across a zone change the rate id
-    // it picks no longer exists, so the mutation errors, the total never
-    // updates, and the summary only corrects itself on a reload. Read the
-    // cart explicitly instead.
-    if (!quotedCart) {
+    // Goes straight to the client rather than through refreshCart() so the
+    // rate ids are guaranteed to be the ones WooCommerce just quoted for the
+    // new address: refreshCart() is a useLazyQuery execute that swallows some
+    // errors and resolves undefined, and falling back to the provider's cart
+    // would price against the previous destination.
+    let quotedCart: Cart | null = null;
+    try {
       const { data } = await apolloClient.query({
         query: GET_CART,
         fetchPolicy: "no-cache",
       });
       quotedCart = data?.cart ?? null;
+    } catch (error) {
+      // Fall through with a null cart: updateShippingTotal drops back to the
+      // provider's copy, which is worth trying but may price against the
+      // previous address.
+      console.error("Failed to re-read the cart after address sync:", error);
     }
 
     await updateShippingTotal(quotedCart);
+
+    // Bring the provider's cart up to date for the rest of the summary
+    // (subtotal, coupons, line items).
+    await refreshCart();
   };
 
   const { syncCheckoutAddress, addressSyncing } =
@@ -1509,14 +1515,19 @@ const CheckoutPage = () => {
                       ) : freeShipping ? (
                         formatPrice(0)
                       ) : (
-                        // shippingTotal here is local state set from the
-                        // updateShippingMethod mutation response (line 245);
-                        // cart?.shippingTotal from CartProvider is stale until
-                        // the next cart refetch. Both arrive as WooCommerce's
-                        // own "Rs450.00" string, so re-format rather than
-                        // render it — the rest of this summary is LKR.
+                        // The refreshed cart wins over the local state. Both
+                        // hold a shipping figure, but only the cart's is
+                        // re-read after every address sync — the local copy is
+                        // whatever the last updateShippingMethod returned and
+                        // never expires, so `shippingTotal || cart` let a
+                        // superseded rate shadow the live one indefinitely.
+                        // That is why the row disagreed with the order total
+                        // (which tracks cart.total) until a reload cleared the
+                        // state. Both arrive as WooCommerce's own "Rs450.00"
+                        // string, so re-format — the rest of this summary is
+                        // LKR.
                         formatPrice(
-                          replaceStringinInt(shippingTotal || cart?.shippingTotal),
+                          replaceStringinInt(cart?.shippingTotal || shippingTotal),
                         )
                       )}
                     </span>
