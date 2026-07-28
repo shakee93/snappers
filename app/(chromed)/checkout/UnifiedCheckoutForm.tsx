@@ -1,6 +1,7 @@
 "use client";
 
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import { useDebouncedCallback } from "use-debounce";
 import Image from "next/image";
 import Input from "shared/Input/Input";
 import CountryPhoneInput from "./components/CountryPhoneInput";
@@ -22,6 +23,7 @@ import { PAYHERE_HIDE_THRESHOLD } from "@/lib/checkoutMath";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonBrand from "shared/Button/ButtonBrand";
 import PreOrderNotice from "@/components/global/ui/PreOrderNotice";
+import { SRI_LANKAN_CITIES, type SriLankanCity } from "@/data/sriLankanCities";
 import {
     Store,
     Truck,
@@ -30,8 +32,10 @@ import {
     Landmark,
     Check,
     ChevronRight,
+    ChevronsUpDown,
     ArrowLeft,
     Loader,
+    Search,
 } from "lucide-react";
 
 // Account shown inline in the BACS panel — sourced from site.config so the
@@ -175,6 +179,287 @@ interface AddressFieldsProps {
     nameOnly?: boolean;
 }
 
+interface CitySelectFieldProps {
+    id: string;
+    value: string;
+    postalValue: string;
+    onChange: (patch: Partial<AddressFieldValues>) => void;
+}
+
+const MAX_VISIBLE_CITY_OPTIONS = 60;
+
+/** max-h-64 (256px) plus the 8px gap, used to decide whether the panel drops up. */
+const CITY_PANEL_HEIGHT = 264;
+
+const CitySelectField = memo(({ id, value, postalValue, onChange }: CitySelectFieldProps) => {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const listRef = useRef<HTMLUListElement>(null);
+    const [inputValue, setInputValue] = useState(value);
+    const [syncedValue, setSyncedValue] = useState(value);
+    const [committedValue, setCommittedValue] = useState(value);
+    const [isOpen, setIsOpen] = useState(false);
+    const [activeIndex, setActiveIndex] = useState(-1);
+    const [dropUp, setDropUp] = useState(false);
+    const deferredQuery = useDeferredValue(inputValue.trim().toLowerCase());
+
+    // Adjust during render rather than in an effect: the field mirrors the
+    // parent's city, but must not clobber what is being typed when the parent
+    // is only echoing back this field's own debounced commit.
+    if (value !== syncedValue) {
+        setSyncedValue(value);
+        if (value !== committedValue) {
+            setInputValue(value);
+        }
+    }
+
+    const filteredCities = useMemo(() => {
+        if (!deferredQuery) {
+            return SRI_LANKAN_CITIES.slice(0, MAX_VISIBLE_CITY_OPTIONS);
+        }
+
+        const matches: SriLankanCity[] = [];
+        for (const city of SRI_LANKAN_CITIES) {
+            if (matches.length >= MAX_VISIBLE_CITY_OPTIONS) {
+                break;
+            }
+
+            if (
+                city.name.toLowerCase().includes(deferredQuery) ||
+                city.postcode?.includes(deferredQuery)
+            ) {
+                matches.push(city);
+            }
+        }
+
+        return matches;
+    }, [deferredQuery]);
+
+    // The deferred query can shrink the list under a stale index, so clamp on
+    // render rather than let aria-activedescendant point at a missing option.
+    const activeOptionIndex = activeIndex < filteredCities.length ? activeIndex : -1;
+
+    useEffect(() => {
+        if (!isOpen || activeIndex < 0) {
+            return;
+        }
+
+        const activeOption = listRef.current?.querySelector<HTMLElement>(
+            `[data-city-option-index="${activeIndex}"]`,
+        );
+        activeOption?.scrollIntoView({ block: "nearest" });
+    }, [activeIndex, isOpen]);
+
+    const commitCity = useCallback(
+        (cityName: string, postcode?: string | null) => {
+            setCommittedValue(cityName);
+            onChange({
+                city: cityName,
+                ...(!postalValue && postcode ? { postal: postcode } : {}),
+            });
+        },
+        [onChange, postalValue],
+    );
+
+    const debouncedCommitCity = useDebouncedCallback((cityName: string) => {
+        commitCity(cityName);
+    }, 300);
+
+    useEffect(() => {
+        if (!isOpen) {
+            return;
+        }
+
+        const handlePointerDown = (event: MouseEvent) => {
+            if (!containerRef.current?.contains(event.target as Node)) {
+                setIsOpen(false);
+                setActiveIndex(-1);
+            }
+        };
+
+        document.addEventListener("mousedown", handlePointerDown);
+        return () => document.removeEventListener("mousedown", handlePointerDown);
+    }, [isOpen]);
+
+    // Flip the panel above the field when it would otherwise run off the viewport.
+    useEffect(() => {
+        if (!isOpen) {
+            return;
+        }
+
+        const updatePlacement = () => {
+            const rect = containerRef.current?.getBoundingClientRect();
+            if (!rect) {
+                return;
+            }
+
+            const spaceBelow = window.innerHeight - rect.bottom;
+            setDropUp(spaceBelow < CITY_PANEL_HEIGHT && rect.top > spaceBelow);
+        };
+
+        updatePlacement();
+        window.addEventListener("resize", updatePlacement, { passive: true });
+        window.addEventListener("scroll", updatePlacement, { capture: true, passive: true });
+        return () => {
+            window.removeEventListener("resize", updatePlacement);
+            window.removeEventListener("scroll", updatePlacement, { capture: true });
+        };
+    }, [isOpen]);
+
+    const handleInputChange = (nextValue: string) => {
+        setInputValue(nextValue);
+        setActiveIndex(-1);
+        debouncedCommitCity(nextValue);
+        setIsOpen(true);
+    };
+
+    const handleSelectCity = (city: SriLankanCity) => {
+        setInputValue(city.name);
+        debouncedCommitCity.cancel();
+        commitCity(city.name, city.postcode);
+        setIsOpen(false);
+        setActiveIndex(-1);
+    };
+
+    const handleInputBlur = () => {
+        debouncedCommitCity.flush();
+        commitCity(inputValue);
+        setIsOpen(false);
+        setActiveIndex(-1);
+    };
+
+    const activeOptionId =
+        isOpen && activeOptionIndex >= 0 ? `${id}-city-option-${activeOptionIndex}` : undefined;
+
+    return (
+        <div ref={containerRef} className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Input
+                id={id}
+                className={`normal-case pl-9 pr-10 ${FIELD_CLASS}`}
+                placeholder="Search or enter city"
+                autoComplete="address-level2"
+                value={inputValue}
+                onChange={(e) => handleInputChange(e.target.value)}
+                onFocus={() => setIsOpen(true)}
+                onBlur={handleInputBlur}
+                onKeyDown={(e) => {
+                    if (e.key === "ArrowDown") {
+                        e.preventDefault();
+                        if (!filteredCities.length) {
+                            return;
+                        }
+                        setIsOpen(true);
+                        setActiveIndex((prev) =>
+                            prev < filteredCities.length - 1 ? prev + 1 : 0,
+                        );
+                        return;
+                    }
+
+                    if (e.key === "ArrowUp") {
+                        e.preventDefault();
+                        if (!filteredCities.length) {
+                            return;
+                        }
+                        setIsOpen(true);
+                        setActiveIndex((prev) =>
+                            prev > 0 ? prev - 1 : filteredCities.length - 1,
+                        );
+                        return;
+                    }
+
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                        if (isOpen && activeOptionIndex >= 0) {
+                            handleSelectCity(filteredCities[activeOptionIndex]);
+                        }
+                        return;
+                    }
+
+                    if (e.key === "Escape") {
+                        setIsOpen(false);
+                        setActiveIndex(-1);
+                    }
+                }}
+                required={true}
+                role="combobox"
+                aria-expanded={isOpen}
+                aria-controls={`${id}-city-listbox`}
+                aria-autocomplete="list"
+                aria-activedescendant={activeOptionId}
+            />
+            <button
+                type="button"
+                className="absolute inset-y-0 right-0 flex items-center px-3 text-slate-500"
+                aria-label="Toggle city suggestions"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => {
+                    setIsOpen((open) => !open);
+                    setActiveIndex(-1);
+                }}
+            >
+                <ChevronsUpDown className="h-4 w-4" />
+            </button>
+            {isOpen ? (
+                <ul
+                    ref={listRef}
+                    id={`${id}-city-listbox`}
+                    role="listbox"
+                    className={`absolute z-30 max-h-64 w-full overflow-y-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-xl [scrollbar-width:thin] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5 ${
+                        dropUp ? "bottom-full mb-2" : "top-full mt-2"
+                    }`}
+                >
+                    {filteredCities.length ? (
+                        <>
+                            {filteredCities.map((city, index) => {
+                                const isActive = index === activeOptionIndex;
+                                const isCurrent = city.name === value;
+                                return (
+                                    <li key={`${city.name}-${city.postcode ?? "custom"}`} role="presentation">
+                                        <button
+                                            type="button"
+                                            id={`${id}-city-option-${index}`}
+                                            data-city-option-index={index}
+                                            role="option"
+                                            // Single-select listbox: only the active option is
+                                            // selected. Focus stays on the input, which owns
+                                            // keyboard navigation via aria-activedescendant.
+                                            aria-selected={isActive}
+                                            tabIndex={-1}
+                                            className={`flex w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-slate-100 ${
+                                                isActive ? "bg-slate-100" : ""
+                                            } ${isCurrent ? "font-medium" : ""}`}
+                                            onMouseDown={(e) => e.preventDefault()}
+                                            onMouseEnter={() => setActiveIndex(index)}
+                                            onClick={() => handleSelectCity(city)}
+                                        >
+                                            {city.name}
+                                        </button>
+                                    </li>
+                                );
+                            })}
+                            {!deferredQuery ? (
+                                <li className="px-3 py-2 text-xs text-slate-500" role="presentation">
+                                    Keep typing to narrow the city list.
+                                </li>
+                            ) : null}
+                        </>
+                    ) : deferredQuery ? (
+                        <li className="px-3 py-2 text-sm text-slate-500" role="presentation">
+                            No matches found. You can keep your typed city.
+                        </li>
+                    ) : (
+                        <li className="px-3 py-2 text-sm text-slate-500" role="presentation">
+                            Keep typing to narrow the city list.
+                        </li>
+                    )}
+                </ul>
+            ) : null}
+        </div>
+    );
+});
+
+CitySelectField.displayName = "CitySelectField";
+
 const AddressFields = memo(({ idPrefix, values, onChange, nameOnly = false }: AddressFieldsProps) => (
     <>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
@@ -243,19 +528,16 @@ const AddressFields = memo(({ idPrefix, values, onChange, nameOnly = false }: Ad
             </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)] sm:gap-3">
             <div>
                 <label htmlFor={`${idPrefix}-city`} className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
                     City
                 </label>
-                <Input
+                <CitySelectField
                     id={`${idPrefix}-city`}
-                    className={`normal-case ${FIELD_CLASS}`}
-                    placeholder="e.g. Colombo"
                     value={values.city}
-                    autoComplete="address-level2"
-                    onChange={(e) => onChange({ city: e.target.value })}
-                    required={true}
+                    postalValue={values.postal}
+                    onChange={onChange}
                 />
             </div>
             <div>
@@ -669,6 +951,14 @@ const UnifiedCheckoutForm = ({
         }
 
         if (
+            deliveryType !== "store_pickup" &&
+            !isAddressComplete(billingAddress)
+        ) {
+            toast.error("Please complete the billing address.");
+            return;
+        }
+
+        if (
             shippingDifferent &&
             deliveryType !== "store_pickup" &&
             !isAddressComplete(shippingAddress)
@@ -1015,7 +1305,7 @@ const UnifiedCheckoutForm = ({
             <CheckoutStepper currentStep={currentStep} />
 
             {/* Contact Information Section */}
-            <div className=" overflow-hidden">
+            <div>
                 <div className="p-0">
                     <h3 className="text-lg font-semibold mb-4">Contact Information</h3>
 
@@ -1058,7 +1348,7 @@ const UnifiedCheckoutForm = ({
             </div>
 
             {/* Delivery Method Section */}
-            <div className="overflow-hidden">
+            <div>
                 <div className="p-0">
                     <h3 className="text-lg font-semibold mb-4">Delivery Method</h3>
 
