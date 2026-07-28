@@ -1,6 +1,7 @@
 "use client";
 
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { Fragment, memo, useCallback, useEffect, useMemo, useState } from "react";
+import { Popover, Transition } from "@headlessui/react";
 import Image from "next/image";
 import Input from "shared/Input/Input";
 import CountryPhoneInput from "./components/CountryPhoneInput";
@@ -18,6 +19,7 @@ import { PAYHERE_HIDE_THRESHOLD } from "@/lib/checkoutMath";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonBrand from "shared/Button/ButtonBrand";
 import PreOrderNotice from "@/components/global/ui/PreOrderNotice";
+import { SRI_LANKAN_CITIES } from "@/data/sriLankanCities";
 import {
     Store,
     Truck,
@@ -26,8 +28,10 @@ import {
     Landmark,
     Check,
     ChevronRight,
+    ChevronsUpDown,
     ArrowLeft,
     Loader,
+    Search,
 } from "lucide-react";
 
 // Account shown inline in the BACS panel — sourced from site.config so the
@@ -168,6 +172,112 @@ interface AddressFieldsProps {
     nameOnly?: boolean;
 }
 
+interface CitySelectFieldProps {
+    id: string;
+    value: string;
+    onChange: (patch: Partial<AddressFieldValues>) => void;
+}
+
+const CitySelectField = ({ id, value, onChange }: CitySelectFieldProps) => {
+    const [query, setQuery] = useState("");
+    const searchableCities = useMemo(
+        () => {
+            const seen = new Set<string>();
+            return [...SRI_LANKAN_CITIES]
+                .filter((city) => {
+                    const key = city.name.trim().toLowerCase();
+                    if (seen.has(key)) {
+                        return false;
+                    }
+                    seen.add(key);
+                    return true;
+                })
+                .sort((a, b) => a.name.localeCompare(b.name));
+        },
+        [],
+    );
+
+    const filteredCities = useMemo(() => {
+        const normalized = query.trim().toLowerCase();
+        if (!normalized) {
+            return searchableCities;
+        }
+
+        return searchableCities.filter((city) =>
+            city.name.toLowerCase().includes(normalized),
+        );
+    }, [query, searchableCities]);
+
+    return (
+        <Popover className="relative">
+            {({ close }) => (
+                <>
+                    <Popover.Button
+                        id={id}
+                        className={`flex h-11 w-full items-center justify-between rounded-2xl bg-white px-4 text-left text-sm ${FIELD_CLASS}`}
+                    >
+                        <span className={value ? "text-slate-900" : "text-slate-400"}>
+                            {value || "Select a City"}
+                        </span>
+                        <ChevronsUpDown className="h-4 w-4 text-slate-500" />
+                    </Popover.Button>
+                    <Transition
+                        as={Fragment}
+                        enter="transition ease-out duration-100"
+                        enterFrom="opacity-0 translate-y-1"
+                        enterTo="opacity-100 translate-y-0"
+                        leave="transition ease-in duration-75"
+                        leaveFrom="opacity-100 translate-y-0"
+                        leaveTo="opacity-0 translate-y-1"
+                    >
+                        <Popover.Panel className="absolute z-30 mt-2 w-full rounded-2xl border border-slate-200 bg-white p-3 shadow-xl">
+                            <div className="flex items-center rounded-xl border border-slate-300 px-3">
+                                <Search className="h-4 w-4 text-slate-400" />
+                                <input
+                                    autoFocus
+                                    className="h-10 w-full border-0 bg-transparent px-2 text-sm outline-none focus:ring-0"
+                                    placeholder="Search City..."
+                                    value={query}
+                                    onChange={(e) => setQuery(e.target.value)}
+                                />
+                            </div>
+                            <div className="mt-2 max-h-64 overflow-y-auto">
+                                {filteredCities.length ? (
+                                    filteredCities.map((city) => (
+                                        <button
+                                            key={`${city.name}-${city.postcode}`}
+                                            type="button"
+                                            className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-left text-sm hover:bg-slate-100 ${
+                                                city.name === value ? "bg-slate-100 font-medium" : ""
+                                            }`}
+                                            onClick={() => {
+                                                onChange({
+                                                    city: city.name,
+                                                    ...(city.postcode && city.postcode !== "NULL"
+                                                        ? { postal: city.postcode }
+                                                        : {}),
+                                                });
+                                                setQuery("");
+                                                close();
+                                            }}
+                                        >
+                                            <span>{city.name}</span>
+                                        </button>
+                                    ))
+                                ) : (
+                                    <div className="px-3 py-2 text-sm text-slate-500">
+                                        No cities found.
+                                    </div>
+                                )}
+                            </div>
+                        </Popover.Panel>
+                    </Transition>
+                </>
+            )}
+        </Popover>
+    );
+};
+
 const AddressFields = memo(({ idPrefix, values, onChange, nameOnly = false }: AddressFieldsProps) => (
     <>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
@@ -236,19 +346,15 @@ const AddressFields = memo(({ idPrefix, values, onChange, nameOnly = false }: Ad
             </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-3">
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)_minmax(0,1fr)] sm:gap-3">
             <div>
                 <label htmlFor={`${idPrefix}-city`} className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
                     City
                 </label>
-                <Input
+                <CitySelectField
                     id={`${idPrefix}-city`}
-                    className={`normal-case ${FIELD_CLASS}`}
-                    placeholder="e.g. Colombo"
                     value={values.city}
-                    autoComplete="address-level2"
-                    onChange={(e) => onChange({ city: e.target.value })}
-                    required={true}
+                    onChange={onChange}
                 />
             </div>
             <div>
@@ -987,7 +1093,7 @@ const UnifiedCheckoutForm = ({
             <CheckoutStepper currentStep={currentStep} />
 
             {/* Contact Information Section */}
-            <div className=" overflow-hidden">
+            <div className="overflow-visible">
                 <div className="p-0">
                     <h3 className="text-lg font-semibold mb-4">Contact Information</h3>
 
@@ -1030,7 +1136,7 @@ const UnifiedCheckoutForm = ({
             </div>
 
             {/* Delivery Method Section */}
-            <div className="overflow-hidden">
+            <div className="overflow-visible">
                 <div className="p-0">
                     <h3 className="text-lg font-semibold mb-4">Delivery Method</h3>
 
