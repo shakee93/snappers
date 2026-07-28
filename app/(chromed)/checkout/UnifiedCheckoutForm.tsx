@@ -1,7 +1,7 @@
 "use client";
 
-import { Fragment, memo, useCallback, useEffect, useMemo, useState } from "react";
-import { Combobox, Transition } from "@headlessui/react";
+import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
+import { useDebouncedCallback } from "use-debounce";
 import Image from "next/image";
 import Input from "shared/Input/Input";
 import CountryPhoneInput from "./components/CountryPhoneInput";
@@ -19,7 +19,7 @@ import { PAYHERE_HIDE_THRESHOLD } from "@/lib/checkoutMath";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonBrand from "shared/Button/ButtonBrand";
 import PreOrderNotice from "@/components/global/ui/PreOrderNotice";
-import { SRI_LANKAN_CITIES } from "@/data/sriLankanCities";
+import { SRI_LANKAN_CITIES, type SriLankanCity } from "@/data/sriLankanCities";
 import {
     Store,
     Truck,
@@ -181,134 +181,173 @@ interface CitySelectFieldProps {
 
 const MAX_VISIBLE_CITY_OPTIONS = 60;
 
-const CitySelectField = ({ id, value, postalValue, onChange }: CitySelectFieldProps) => {
-    const [query, setQuery] = useState("");
-    const normalizedQuery = query.trim().toLowerCase();
+const CitySelectField = memo(({ id, value, postalValue, onChange }: CitySelectFieldProps) => {
+    const containerRef = useRef<HTMLDivElement>(null);
+    const inputRef = useRef<HTMLInputElement>(null);
+    const [inputValue, setInputValue] = useState(value);
+    const [isOpen, setIsOpen] = useState(false);
+    const deferredQuery = useDeferredValue(inputValue.trim().toLowerCase());
+
+    useEffect(() => {
+        if (document.activeElement !== inputRef.current) {
+            setInputValue(value);
+        }
+    }, [value]);
 
     const filteredCities = useMemo(() => {
-        if (!normalizedQuery) {
+        if (!deferredQuery) {
             return SRI_LANKAN_CITIES.slice(0, MAX_VISIBLE_CITY_OPTIONS);
         }
 
-        return SRI_LANKAN_CITIES.filter((city) =>
-            city.name.toLowerCase().includes(normalizedQuery) ||
-            city.postcode?.includes(normalizedQuery),
-        );
-    }, [normalizedQuery]);
+        const matches: SriLankanCity[] = [];
+        for (const city of SRI_LANKAN_CITIES) {
+            if (matches.length >= MAX_VISIBLE_CITY_OPTIONS) {
+                break;
+            }
 
-    const hasExactMatch = useMemo(
-        () =>
-            !!normalizedQuery &&
-            SRI_LANKAN_CITIES.some((city) => city.name.toLowerCase() === normalizedQuery),
-        [normalizedQuery],
+            if (
+                city.name.toLowerCase().includes(deferredQuery) ||
+                city.postcode?.includes(deferredQuery)
+            ) {
+                matches.push(city);
+            }
+        }
+
+        return matches;
+    }, [deferredQuery]);
+
+    const commitCity = useCallback(
+        (cityName: string, postcode?: string | null) => {
+            onChange({
+                city: cityName,
+                ...(!postalValue && postcode ? { postal: postcode } : {}),
+            });
+        },
+        [onChange, postalValue],
     );
 
-    return (
-        <Combobox
-            as="div"
-            className="relative"
-            value={value}
-            onChange={(nextCity: string) => {
-                const selectedCity = SRI_LANKAN_CITIES.find(
-                    (city) => city.name.toLowerCase() === nextCity.trim().toLowerCase(),
-                );
+    const debouncedCommitCity = useDebouncedCallback((cityName: string) => {
+        commitCity(cityName);
+    }, 300);
 
-                onChange({
-                    city: nextCity,
-                    ...(!postalValue && selectedCity?.postcode
-                        ? { postal: selectedCity.postcode }
-                        : {}),
-                });
-                setQuery("");
-            }}
-        >
-            <div className="relative">
-                <Search className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-slate-400" />
-                <Combobox.Input
-                    as={Input}
-                    id={id}
-                    className={`normal-case pl-9 pr-10 ${FIELD_CLASS}`}
-                    placeholder="Search or enter city"
-                    autoComplete="address-level2"
-                    displayValue={(city: string) => query || city}
-                    onChange={(e) => {
-                        const nextValue = e.target.value;
-                        setQuery(nextValue);
-                        onChange({ city: nextValue });
-                    }}
-                    onBlur={() => setQuery("")}
-                    onKeyDown={(e) => {
-                        if (e.key === "Enter") {
-                            e.preventDefault();
-                        }
-                    }}
-                    required={true}
-                />
-                <Combobox.Button
-                    className="absolute inset-y-0 right-0 flex items-center px-3 text-slate-500"
-                    aria-label="Toggle city suggestions"
-                >
-                    <ChevronsUpDown className="h-4 w-4" />
-                </Combobox.Button>
-            </div>
-            <Transition
-                as={Fragment}
-                enter="transition ease-out duration-100"
-                enterFrom="opacity-0 translate-y-1"
-                enterTo="opacity-100 translate-y-0"
-                leave="transition ease-in duration-75"
-                leaveFrom="opacity-100 translate-y-0"
-                leaveTo="opacity-0 translate-y-1"
-                afterLeave={() => setQuery("")}
+    useEffect(() => {
+        if (!isOpen) {
+            return;
+        }
+
+        const handlePointerDown = (event: MouseEvent) => {
+            if (!containerRef.current?.contains(event.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handlePointerDown);
+        return () => document.removeEventListener("mousedown", handlePointerDown);
+    }, [isOpen]);
+
+    const handleInputChange = (nextValue: string) => {
+        setInputValue(nextValue);
+        debouncedCommitCity(nextValue);
+    };
+
+    const handleSelectCity = (city: SriLankanCity) => {
+        setInputValue(city.name);
+        debouncedCommitCity.cancel();
+        commitCity(city.name, city.postcode);
+        setIsOpen(false);
+    };
+
+    const handleInputBlur = () => {
+        debouncedCommitCity.flush();
+        commitCity(inputValue);
+        setIsOpen(false);
+    };
+
+    return (
+        <div ref={containerRef} className="relative">
+            <Search className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-slate-400" />
+            <Input
+                ref={inputRef}
+                id={id}
+                className={`normal-case pl-9 pr-10 ${FIELD_CLASS}`}
+                placeholder="Search or enter city"
+                autoComplete="address-level2"
+                value={inputValue}
+                onChange={(e) => {
+                    handleInputChange(e.target.value);
+                    setIsOpen(true);
+                }}
+                onFocus={() => setIsOpen(true)}
+                onBlur={handleInputBlur}
+                onKeyDown={(e) => {
+                    if (e.key === "Enter") {
+                        e.preventDefault();
+                    }
+                    if (e.key === "Escape") {
+                        setIsOpen(false);
+                    }
+                }}
+                required={true}
+                role="combobox"
+                aria-expanded={isOpen}
+                aria-controls={`${id}-city-listbox`}
+                aria-autocomplete="list"
+            />
+            <button
+                type="button"
+                className="absolute inset-y-0 right-0 flex items-center px-3 text-slate-500"
+                aria-label="Toggle city suggestions"
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={() => setIsOpen((open) => !open)}
             >
-                <Combobox.Options className="absolute z-30 mt-2 max-h-64 w-full overflow-y-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-xl [scrollbar-width:thin] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5 empty:invisible">
-                    {!hasExactMatch && normalizedQuery ? (
-                        <Combobox.Option
-                            value={query.trim()}
-                            className={({ active }) =>
-                                `cursor-pointer rounded-lg px-3 py-2 text-sm ${
-                                    active ? "bg-slate-100" : ""
-                                }`
-                            }
-                        >
-                            Use &quot;{query.trim()}&quot;
-                        </Combobox.Option>
-                    ) : null}
+                <ChevronsUpDown className="h-4 w-4" />
+            </button>
+            {isOpen ? (
+                <ul
+                    id={`${id}-city-listbox`}
+                    role="listbox"
+                    className="absolute z-30 mt-2 max-h-64 w-full overflow-y-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-xl [scrollbar-width:thin] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5"
+                >
                     {filteredCities.length ? (
                         <>
                             {filteredCities.map((city) => (
-                                <Combobox.Option
-                                    key={`${city.name}-${city.postcode ?? "custom"}`}
-                                    value={city.name}
-                                    className={({ active, selected }) =>
-                                        `cursor-pointer rounded-lg px-3 py-2 text-sm ${
-                                            active || selected ? "bg-slate-100" : ""
-                                        } ${selected ? "font-medium" : ""}`
-                                    }
-                                >
-                                    <span>{city.name}</span>
-                                </Combobox.Option>
+                                <li key={`${city.name}-${city.postcode ?? "custom"}`} role="presentation">
+                                    <button
+                                        type="button"
+                                        role="option"
+                                        aria-selected={city.name === inputValue}
+                                        className={`flex w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-slate-100 ${
+                                            city.name === inputValue ? "bg-slate-100 font-medium" : ""
+                                        }`}
+                                        onMouseDown={(e) => e.preventDefault()}
+                                        onClick={() => handleSelectCity(city)}
+                                    >
+                                        {city.name}
+                                    </button>
+                                </li>
                             ))}
-                            {!normalizedQuery ? (
-                                <div className="px-3 py-2 text-xs text-slate-500">
+                            {!deferredQuery ? (
+                                <li className="px-3 py-2 text-xs text-slate-500" role="presentation">
                                     Keep typing to narrow the city list.
-                                </div>
+                                </li>
                             ) : null}
                         </>
-                    ) : normalizedQuery ? (
-                        <div className="px-3 py-2 text-sm text-slate-500">
+                    ) : deferredQuery ? (
+                        <li className="px-3 py-2 text-sm text-slate-500" role="presentation">
                             No matches found. You can keep your typed city.
-                        </div>
+                        </li>
                     ) : (
-                        <div className="px-3 py-2 text-sm text-slate-500">
+                        <li className="px-3 py-2 text-sm text-slate-500" role="presentation">
                             Keep typing to narrow the city list.
-                        </div>
+                        </li>
                     )}
-                </Combobox.Options>
-            </Transition>
-        </Combobox>
+                </ul>
+            ) : null}
+        </div>
     );
-};
+});
+
+CitySelectField.displayName = "CitySelectField";
 
 const AddressFields = memo(({ idPrefix, values, onChange, nameOnly = false }: AddressFieldsProps) => (
     <>
