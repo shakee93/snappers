@@ -681,7 +681,10 @@ interface Props {
     isKokoPayment: boolean;
     isPriceFluctuation: any;
     onCheckoutSubmit: (payload: CheckoutSubmitPayload) => Promise<void> | void;
-    onAddressChange: (snapshot: CheckoutAddressSnapshot | null) => void;
+    onAddressChange: (
+        snapshot: CheckoutAddressSnapshot | null,
+        options?: { immediate?: boolean },
+    ) => void;
     isTOC: boolean;
     onTOCChange: () => void;
     tocError: boolean;
@@ -718,11 +721,20 @@ const UnifiedCheckoutForm = ({
     const [billingAddress, setBillingAddress] = useState<AddressFieldValues>(EMPTY_ADDRESS);
     const [shippingAddress, setShippingAddress] = useState<AddressFieldValues>(EMPTY_ADDRESS);
     const [shippingDifferent, setShippingDifferent] = useState(false);
+    // City list picks set city+postcode together — flag the next snapshot so
+    // the parent skips the typing debounce and quotes immediately.
+    const immediateAddressSyncRef = useRef(false);
 
     const handleBillingChange = useCallback((patch: Partial<AddressFieldValues>) => {
+        if (patch.city !== undefined && patch.postal !== undefined) {
+            immediateAddressSyncRef.current = true;
+        }
         setBillingAddress((prev) => ({ ...prev, ...patch }));
     }, []);
     const handleShippingChange = useCallback((patch: Partial<AddressFieldValues>) => {
+        if (patch.city !== undefined && patch.postal !== undefined) {
+            immediateAddressSyncRef.current = true;
+        }
         setShippingAddress((prev) => ({ ...prev, ...patch }));
     }, []);
 
@@ -803,11 +815,13 @@ const UnifiedCheckoutForm = ({
             ? transformAddress({ ...shippingAddress, country: "LK" })
             : billing;
 
-        return { billing, shipping };
+        return { billing, shipping, shippingSameAsBilling: !shippingDifferent };
     }, [deliveryType, shippingDifferent, billingAddress, shippingAddress]);
 
     useEffect(() => {
-        onAddressChange(addressSnapshot);
+        const immediate = immediateAddressSyncRef.current;
+        immediateAddressSyncRef.current = false;
+        onAddressChange(addressSnapshot, immediate ? { immediate: true } : undefined);
     }, [addressSnapshot, onAddressChange]);
 
     const handlePickupTypeChange = (type: DeliveryType) => {
@@ -901,11 +915,16 @@ const UnifiedCheckoutForm = ({
     }, [paymentGateways, isPreOrderCart, isPriceFluctuation, totalPayment, cart]);
 
     // Gateways that should appear but be greyed-out for the current delivery
-    // method. Cash on Delivery is incompatible with Flash Delivery — the
-    // courier driver doesn't collect cash on our behalf.
+    // method. Cash on Delivery needs a delivery to collect the cash at: the
+    // Flash Delivery driver doesn't collect on our behalf, and Store Pickup has
+    // no delivery leg at all.
     const gatewayDisabledReason = (gatewayId: string): string | null => {
-        if (deliveryType === "flash_delivery" && gatewayId === "cod") {
+        if (gatewayId !== "cod") return null;
+        if (deliveryType === "flash_delivery") {
             return "Not available with Flash Delivery — pay online instead";
+        }
+        if (deliveryType === "store_pickup") {
+            return "Not available with Store Pickup — pay online instead";
         }
         return null;
     };

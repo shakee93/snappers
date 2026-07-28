@@ -21,8 +21,8 @@ export const ADD_TO_CART = gql`
 `;
 
 export const GET_CART = gql`
-    query GetCart($customerId: Int) {
-        cart {
+    query GetCart($customerId: Int, $recalculateTotals: Boolean) {
+        cart(recalculateTotals: $recalculateTotals) {
             ...CartContent
         }
         customer(customerId: $customerId) {

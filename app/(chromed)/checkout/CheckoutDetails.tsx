@@ -21,7 +21,10 @@ interface CheckoutLeftProps {
   setIsKokoPayment: (v: boolean) => void;
   isKokoPayment: boolean;
   onCheckoutSubmit: (payload: CheckoutSubmitPayload) => Promise<void> | void;
-  onAddressChange: (snapshot: CheckoutAddressSnapshot | null) => void;
+  onAddressChange: (
+    snapshot: CheckoutAddressSnapshot | null,
+    options?: { immediate?: boolean },
+  ) => void;
   isTOC: boolean;
   onTOCChange: () => void;
   tocError: boolean;

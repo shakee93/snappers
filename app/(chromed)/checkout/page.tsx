@@ -89,7 +89,7 @@ interface FormData {
 }
 
 const CheckoutPage = () => {
-  const { cart, removeFromCart, updateCart, clearCart, refreshCart, loading: cartLoading } = useCart();
+  const { cart, removeFromCart, updateCart, clearCart, refreshCart, applyCart, loading: cartLoading } = useCart();
   const apolloClient = useApolloClient();
   const [finalOrderTotal, setFinalOrderTotal] = useState(null);
   const { customer, fetchCustomer } = useSession();
@@ -115,7 +115,7 @@ const CheckoutPage = () => {
   const [isCardPayment, setIsCardPayment] = useState(false);
   const [isKokoPayment, setIsKokoPayment] = useState(false);
 
-  const [shippingTotal, setShippingTotal] = useState();
+  const [shippingTotal, setShippingTotal] = useState<string | null | undefined>();
   const [orderTotal, setOrderTotal] = useState<string | null>(null);
   const [paymentData, setPaymentData] =
     useState<PaymentDetailsWithoutUrls | null>(null);
@@ -163,6 +163,9 @@ const CheckoutPage = () => {
 
     if (cart?.total !== null && cart?.total !== undefined) {
       setOrderTotal(cart?.total);
+    }
+    if (cart?.shippingTotal != null) {
+      setShippingTotal(cart.shippingTotal);
     }
   }, [cart, hasSeenCartWithItems, isCouponSyncingCart, applyingCoupon, removingCoupon]);
 
@@ -295,8 +298,12 @@ const CheckoutPage = () => {
       }
 
       if (data?.updateShippingMethod?.cart) {
-        const { total, shippingTotal, subtotal } =
-          data.updateShippingMethod.cart;
+        const updatedCart = data.updateShippingMethod.cart;
+        // Push into the provider now — the summary prefers cart.shippingTotal,
+        // and without this it keeps reading the pre-address cart until a later
+        // refresh effect lands (which is what made the estimate look stuck).
+        applyCart(updatedCart);
+        const { total, shippingTotal, subtotal } = updatedCart;
         if (freeShipping) {
           setOrderTotal(subtotal);
           setShippingTotal(shippingTotal);
@@ -335,6 +342,7 @@ const CheckoutPage = () => {
     try {
       const { data } = await apolloClient.query({
         query: GET_CART,
+        variables: { recalculateTotals: true },
         fetchPolicy: "no-cache",
       });
       quotedCart = data?.cart ?? null;
@@ -345,11 +353,15 @@ const CheckoutPage = () => {
       console.error("Failed to re-read the cart after address sync:", error);
     }
 
-    await updateShippingTotal(quotedCart);
+    // Surface the re-quoted cart immediately — the totals effect above picks
+    // the new figures up from it. Waiting for updateShippingMethod before
+    // touching the provider left the estimate row on the previous rate for the
+    // whole mutation round-trip.
+    if (quotedCart) {
+      applyCart(quotedCart);
+    }
 
-    // Bring the provider's cart up to date for the rest of the summary
-    // (subtotal, coupons, line items).
-    await refreshCart();
+    await updateShippingTotal(quotedCart);
   };
 
   const { syncCheckoutAddress, addressSyncing } =
@@ -1012,6 +1024,16 @@ const CheckoutPage = () => {
     ? formatPrice(kokoOrderTotal)
     : formatPrice(numericOrderTotal);
 
+  // The courier's name changes with the destination — WC quotes "Local
+  // Delivery" inside the Colombo distance zone and "Standard Shipping"
+  // outstation — so name the service the customer is paying for instead of a
+  // generic estimate line. Falls back to the generic wording while the cart
+  // has no quote yet.
+  const shippingRateLabel = useMemo(() => {
+    if (freeShipping) return "Free Shipping";
+    return resolveCourierRate(cart, freeShipping)?.label || "Shipping estimate";
+  }, [cart, freeShipping]);
+
   useEffect(() => {
     setTotalWithTax(taxWithTotal);
   }, [taxWithTotal]);
@@ -1507,7 +1529,7 @@ const CheckoutPage = () => {
                 {!noShipping && (
                   <div className="flex justify-between" aria-busy={totalsRecalculating}>
                     <span className="text-slate-600 dark:text-slate-400">
-                      {freeShipping ? `Free Shipping` : `Shipping estimate`}
+                      {shippingRateLabel}
                     </span>
                     <span className="font-medium text-slate-900 dark:text-slate-200">
                       {totalsRecalculating ? (

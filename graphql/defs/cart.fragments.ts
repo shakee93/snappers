@@ -117,6 +117,14 @@ export const CartContentSlim = gql`
 // consumers — subtotalTax / shippingTax / totalTax / feeTax / feeTotal /
 // discountTax / needsShippingAddress / appliedCoupons.discountTax all had
 // zero readers in the codebase.
+//
+// availableShippingMethods does cost a WC shipping-zone evaluation, which is
+// why AddToCart uses CartContentSlim instead. Checkout cannot go without it:
+// the courier rate id changes with the destination, so selecting a method
+// means reading the rates WC quoted for the address it currently holds. Only
+// the four fields below are read (resolveCourierRate, courierShippingLabel,
+// kokoShippingAmount) — packageDetails / supportsShippingCalculator /
+// instanceId have no consumers.
 export const CartContent = gql`
   fragment CartContent on Cart {
     contents(first: 100) {
@@ -128,6 +136,14 @@ export const CartContent = gql`
     appliedCoupons {
       code
       discountAmount
+    }
+    availableShippingMethods {
+      rates {
+        id
+        methodId
+        label
+        cost
+      }
     }
     subtotal
     shippingTotal

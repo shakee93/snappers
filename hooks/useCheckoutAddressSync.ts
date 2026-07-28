@@ -12,6 +12,8 @@ import { CustomerAddressInput } from "@/graphql/types/graphql";
 export interface CheckoutAddressSnapshot {
   billing: CustomerAddressInput;
   shipping: CustomerAddressInput;
+  /** When true, WC uses billing as the shipping destination for rate quotes. */
+  shippingSameAsBilling: boolean;
 }
 
 /**
@@ -22,9 +24,9 @@ export interface CheckoutAddressSnapshot {
 export const CHECKOUT_POSTCODE_PATTERN = /^\d{4,6}$/;
 
 // Long enough that typing a city or postcode doesn't fire a mutation per
-// keystroke, short enough that the rate lands before the user reaches the
-// payment section.
-const SYNC_DEBOUNCE_MS = 700;
+// keystroke, short enough that a picked city shows its rate before the user
+// scrolls to payment. City picks already debounce their own commit at 300ms.
+const SYNC_DEBOUNCE_MS = 300;
 
 // Every address field is worth pushing, not just the ones core WC matches
 // zones on: shipping plugins and per-address rules can key on the street
@@ -46,6 +48,22 @@ const addressKey = (address: CustomerAddressInput) =>
 
 const snapshotKey = (snapshot: CheckoutAddressSnapshot) =>
   `${addressKey(snapshot.billing)}>>${addressKey(snapshot.shipping)}`;
+
+/**
+ * WooGraphQL persists the customer address one mutation behind: a single
+ * `updateCustomer` does not take effect for the requests that follow it, and
+ * its own payload echoes the *previous* address. Verified against this
+ * backend — pushing Wellampitiya once left WC with no destination at all, so
+ * it quoted the weight fallback ("Standard Shipping", 400) instead of the real
+ * rate for that address ("Local Delivery", 450). A silent undercharge, not
+ * just a stale label. A second identical push flushes the first one, after
+ * which the cart quotes correctly; this held for every address tried.
+ *
+ * The push is idempotent, so this stays harmless if the backend is fixed to
+ * persist on the first write. That fix belongs in gq-backend-plugins — this is
+ * a workaround for a backend defect, not a frontend design.
+ */
+const ADDRESS_PUSHES = 2;
 
 // Pushing a half-typed address makes WC quote against a zone the customer
 // isn't in, so wait until every rate-affecting field is actually filled.
@@ -92,7 +110,10 @@ export function useCheckoutAddressSync(onSynced: () => Promise<void> | void) {
   }, []);
 
   const syncCheckoutAddress = useCallback(
-    (snapshot: CheckoutAddressSnapshot | null) => {
+    (
+      snapshot: CheckoutAddressSnapshot | null,
+      options?: { immediate?: boolean },
+    ) => {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
         timerRef.current = null;
@@ -116,21 +137,25 @@ export function useCheckoutAddressSync(onSynced: () => Promise<void> | void) {
       // known-stale, and Confirm must not be live during it.
       setAddressSyncing(true);
 
-      timerRef.current = setTimeout(async () => {
+      const runSync = async () => {
         timerRef.current = null;
 
         try {
-          // Omitted fields (email, phone) are merged, not cleared — WC only
-          // wipes them when `overwrite` is set — so this is safe to run
-          // against a logged-in customer's saved address.
-          await updateAddress({
-            variables: {
-              input: {
-                billing: snapshot.billing,
-                shipping: snapshot.shipping,
+          for (let push = 0; push < ADDRESS_PUSHES; push += 1) {
+            // Omitted fields (email, phone) are merged, not cleared — WC only
+            // wipes them when `overwrite` is set — so this is safe to run
+            // against a logged-in customer's saved address.
+            await updateAddress({
+              variables: {
+                input: {
+                  billing: snapshot.billing,
+                  shipping: snapshot.shipping,
+                  shippingSameAsBilling: snapshot.shippingSameAsBilling,
+                },
               },
-            },
-          });
+            });
+          }
+
           lastSyncedKeyRef.current = key;
         } catch (error) {
           // A failed push only means WC keeps quoting against the previous
@@ -157,6 +182,17 @@ export function useCheckoutAddressSync(onSynced: () => Promise<void> | void) {
         } finally {
           setAddressSyncing(false);
         }
+      };
+
+      // City list picks commit city+postcode as a finished destination — no
+      // need to wait out the typing debounce before quoting.
+      if (options?.immediate) {
+        void runSync();
+        return;
+      }
+
+      timerRef.current = setTimeout(() => {
+        void runSync();
       }, SYNC_DEBOUNCE_MS);
     },
     [updateAddress]
