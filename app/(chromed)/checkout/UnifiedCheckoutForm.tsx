@@ -182,7 +182,6 @@ interface AddressFieldsProps {
 interface CitySelectFieldProps {
     id: string;
     value: string;
-    postalValue: string;
     onChange: (patch: Partial<AddressFieldValues>) => void;
 }
 
@@ -191,7 +190,7 @@ const MAX_VISIBLE_CITY_OPTIONS = 60;
 /** max-h-64 (256px) plus the 8px gap, used to decide whether the panel drops up. */
 const CITY_PANEL_HEIGHT = 264;
 
-const CitySelectField = memo(({ id, value, postalValue, onChange }: CitySelectFieldProps) => {
+const CitySelectField = memo(({ id, value, onChange }: CitySelectFieldProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const listRef = useRef<HTMLUListElement>(null);
     const [inputValue, setInputValue] = useState(value);
@@ -249,15 +248,21 @@ const CitySelectField = memo(({ id, value, postalValue, onChange }: CitySelectFi
         activeOption?.scrollIntoView({ block: "nearest" });
     }, [activeIndex, isOpen]);
 
+    // A postcode only reaches here when the customer picked a city off the
+    // list, and then it is authoritative: the courier quotes city and postcode
+    // as a pair, so keeping the previously-picked city's code (which is what
+    // "only fill when empty" did from the second pick onwards) sends a
+    // mismatched destination — Angoda gets quoted against Kolonnawa's 10600.
+    // Typing a city commits without a postcode and never touches the field.
     const commitCity = useCallback(
         (cityName: string, postcode?: string | null) => {
             setCommittedValue(cityName);
             onChange({
                 city: cityName,
-                ...(!postalValue && postcode ? { postal: postcode } : {}),
+                ...(postcode ? { postal: postcode } : {}),
             });
         },
-        [onChange, postalValue],
+        [onChange],
     );
 
     const debouncedCommitCity = useDebouncedCallback((cityName: string) => {
@@ -536,7 +541,6 @@ const AddressFields = memo(({ idPrefix, values, onChange, nameOnly = false }: Ad
                 <CitySelectField
                     id={`${idPrefix}-city`}
                     value={values.city}
-                    postalValue={values.postal}
                     onChange={onChange}
                 />
             </div>
