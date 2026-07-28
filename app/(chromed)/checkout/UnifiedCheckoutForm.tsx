@@ -501,8 +501,8 @@ const UnifiedCheckoutForm = ({
     // WooCommerce quotes shipping against the customer's stored address, so
     // the totals on this page are only correct once the address the customer
     // typed has been pushed to it. Report every address edit upward; the page
-    // debounces and ignores changes that can't move the rate. Store pickup has
-    // no destination, so there is nothing to quote.
+    // debounces and dedupes. Store pickup has no destination, so there is
+    // nothing to quote.
     const addressSnapshot = useMemo<CheckoutAddressSnapshot | null>(() => {
         if (!deliveryType || deliveryType === "store_pickup") return null;
 

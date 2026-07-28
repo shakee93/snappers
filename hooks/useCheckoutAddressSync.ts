@@ -19,12 +19,26 @@ export interface CheckoutAddressSnapshot {
 // payment section.
 const SYNC_DEBOUNCE_MS = 700;
 
-// WooCommerce matches shipping zones on country/state/city/postcode only —
-// street lines and names never move the rate, so they don't warrant a sync.
-const rateKey = (address: CustomerAddressInput) =>
-  [address.country, address.state, address.city, address.postcode]
+// Every address field is worth pushing, not just the ones core WC matches
+// zones on: shipping plugins and per-address rules can key on the street
+// lines, and the customer expects the total to respond to whatever they just
+// edited. Deduping still skips renders where nothing in the address moved.
+const addressKey = (address: CustomerAddressInput) =>
+  [
+    address.country,
+    address.state,
+    address.city,
+    address.postcode,
+    address.address1,
+    address.address2,
+    address.firstName,
+    address.lastName,
+  ]
     .map((part) => String(part ?? "").trim().toLowerCase())
     .join("|");
+
+const snapshotKey = (snapshot: CheckoutAddressSnapshot) =>
+  `${addressKey(snapshot.billing)}>>${addressKey(snapshot.shipping)}`;
 
 // Pushing a half-typed address makes WC quote against a zone the customer
 // isn't in, so wait until every rate-affecting field is actually filled.
@@ -40,8 +54,8 @@ const isQuotable = (address: CustomerAddressInput) =>
  * `onSynced` to pull the refreshed rate and cart.
  *
  * Returns a stable `syncCheckoutAddress` — call it with the current address
- * on every change; it debounces and skips snapshots whose rate-affecting
- * fields are unchanged or incomplete.
+ * on every change; it debounces and skips snapshots that are unchanged or
+ * not yet complete enough to quote against.
  */
 export function useCheckoutAddressSync(onSynced: () => Promise<void> | void) {
   const [updateAddress, { loading: addressSyncing }] = useMutation(UPDATE_ADDRESS);
@@ -69,7 +83,7 @@ export function useCheckoutAddressSync(onSynced: () => Promise<void> | void) {
 
       if (!snapshot || !isQuotable(snapshot.shipping)) return;
 
-      const key = rateKey(snapshot.shipping);
+      const key = snapshotKey(snapshot);
       if (key === lastSyncedKeyRef.current) return;
 
       timerRef.current = setTimeout(async () => {
