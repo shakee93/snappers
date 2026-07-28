@@ -10,7 +10,11 @@ import { CustomerAddress, PaymentGateway } from "@/graphql/types/graphql";
 import { contactInformation } from "@/data/types";
 import Select from "shared/Select/Select";
 import { toast } from "sonner";
-import { SRI_LANKAN_STATES } from "@/components/global/forms/HelperComps";
+import { SRI_LANKAN_STATES, transformAddress } from "@/components/global/forms/HelperComps";
+import {
+    CHECKOUT_POSTCODE_PATTERN,
+    CheckoutAddressSnapshot,
+} from "@/hooks/useCheckoutAddressSync";
 import { useCart } from "@/context/CartProvider";
 import checkoutCopy from "@/content/checkout-copy.json";
 import { formatPrice } from "@/lib/formatPrice";
@@ -153,13 +157,16 @@ const EMPTY_ADDRESS: AddressFieldValues = {
     postal: "",
 };
 
+// Postal is validated against the same pattern the address sync quotes on,
+// so the stepper can't report "details done" for an address WooCommerce was
+// never able to price. Matches the `pattern` on the postal input.
 const isAddressComplete = (addr: AddressFieldValues) =>
     !!addr.firstName &&
     !!addr.lastName &&
     !!addr.address &&
     !!addr.city &&
     !!addr.state &&
-    !!addr.postal;
+    CHECKOUT_POSTCODE_PATTERN.test(addr.postal.trim());
 
 interface AddressFieldsProps {
     idPrefix: string;
@@ -388,6 +395,7 @@ interface Props {
     isKokoPayment: boolean;
     isPriceFluctuation: any;
     onCheckoutSubmit: (payload: CheckoutSubmitPayload) => Promise<void> | void;
+    onAddressChange: (snapshot: CheckoutAddressSnapshot | null) => void;
     isTOC: boolean;
     onTOCChange: () => void;
     tocError: boolean;
@@ -409,6 +417,7 @@ const UnifiedCheckoutForm = ({
     isKokoPayment,
     isPriceFluctuation,
     onCheckoutSubmit,
+    onAddressChange,
     isTOC,
     onTOCChange,
     tocError,
@@ -495,6 +504,25 @@ const UnifiedCheckoutForm = ({
         }
     }, [initialShippingData]);
 
+    // WooCommerce quotes shipping against the customer's stored address, so
+    // the totals on this page are only correct once the address the customer
+    // typed has been pushed to it. Report every address edit upward; the page
+    // debounces and dedupes. Store pickup has no destination, so there is
+    // nothing to quote.
+    const addressSnapshot = useMemo<CheckoutAddressSnapshot | null>(() => {
+        if (!deliveryType || deliveryType === "store_pickup") return null;
+
+        const billing = transformAddress({ ...billingAddress, country: "LK" });
+        const shipping = shippingDifferent
+            ? transformAddress({ ...shippingAddress, country: "LK" })
+            : billing;
+
+        return { billing, shipping };
+    }, [deliveryType, shippingDifferent, billingAddress, shippingAddress]);
+
+    useEffect(() => {
+        onAddressChange(addressSnapshot);
+    }, [addressSnapshot, onAddressChange]);
 
     const handlePickupTypeChange = (type: DeliveryType) => {
         setDeliveryType(type);
