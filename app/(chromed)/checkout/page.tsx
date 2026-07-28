@@ -1002,33 +1002,9 @@ const CheckoutPage = () => {
     return sum + (regular - sale) * (item?.quantity || 0);
   }, 0);
   const threePercentFromTotal = chargeableOrderTotal * CARD_SURCHARGE_RATE;
-  const TotalWithKoko = (chargeableOrderTotal / 88) * 100;
   const taxWithTotal = (chargeableOrderTotal + threePercentFromTotal).toFixed(2);
 
-  // Real shipping amount for Koko's installment math. Was hardcoded at 500
-  // LKR which silently disagreed with the actual courier rate the rest of
-  // the page renders. Source the same value the cart shows; fall back to
-  // 500 only if the cart hasn't loaded yet.
-  // Note: 0 is a valid loaded value when the cart contains a free-shipping
-  // product (plugin zeros the rate) or has the free-shipping coupon applied,
-  // so we cannot reject it with `> 0` — that would overcharge Koko by 500.
-  const kokoShippingAmount = (() => {
-    if (noShipping) return 0;
-    if (cart?.shippingTotal != null) {
-      const fromCart = replaceStringinInt(cart.shippingTotal);
-      if (Number.isFinite(fromCart)) return fromCart;
-    }
-    const rateCost = cart?.availableShippingMethods?.[0]?.rates?.[0]?.cost;
-    if (rateCost != null) {
-      const fromRate = typeof rateCost === "string" ? parseFloat(rateCost) : Number(rateCost);
-      if (Number.isFinite(fromRate)) return fromRate;
-    }
-    return 500;
-  })();
-  const kokoOrderTotal = TotalWithKoko + kokoShippingAmount;
-  const kokoFinancingFee = isKokoPayment
-    ? Math.max(0, kokoOrderTotal - chargeableOrderTotal)
-    : 0;
+  const kokoOrderTotal = chargeableOrderTotal;
   const cardSurchargeAmount = isCardPayment ? threePercentFromTotal : 0;
 
   const orderTotalLabel = isCardPayment
@@ -1565,17 +1541,6 @@ const CheckoutPage = () => {
                           replaceStringinInt(cart?.shippingTotal || shippingTotal),
                         )
                       )}
-                    </span>
-                  </div>
-                )}
-
-                {isKokoPayment && kokoFinancingFee > 0 && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-600 dark:text-slate-400">
-                      Koko financing fee
-                    </span>
-                    <span className="font-medium text-slate-900 dark:text-slate-200">
-                      +{formatPrice(kokoFinancingFee)}
                     </span>
                   </div>
                 )}

@@ -109,7 +109,7 @@ const ProductCard = ({
 
   const kokoInstallment = useMemo(() => {
     if (!numericPrice) return 0;
-    return ((numericPrice / 88) * 100) / 3;
+    return numericPrice / 3;
   }, [numericPrice]);
 
   // Search hits often omit variation media; patch from the GraphQL backfill.

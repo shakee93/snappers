@@ -123,7 +123,6 @@ export const CartContentSlim = gql`
 // the courier rate id changes with the destination, so selecting a method
 // means reading the rates WC quoted for the address it currently holds. Only
 // the four fields below are read (resolveCourierRate, courierShippingLabel,
-// kokoShippingAmount) — packageDetails / supportsShippingCalculator /
 // instanceId have no consumers.
 export const CartContent = gql`
   fragment CartContent on Cart {

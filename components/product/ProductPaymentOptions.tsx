@@ -40,7 +40,7 @@ const ProductPaymentOptions = ({
   numericPrice,
 }: ProductPaymentOptionsProps) => {
   const kokoInstallment =
-    numericPrice > 0 ? ((numericPrice / 88) * 100) / 3 : 0;
+    numericPrice > 0 ? numericPrice / 3 : 0;
   const formattedPrice = numericPrice > 0 ? formatPrice(numericPrice) : "—";
 
   return (
