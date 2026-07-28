@@ -11,7 +11,10 @@ import { contactInformation } from "@/data/types";
 import Select from "shared/Select/Select";
 import { toast } from "sonner";
 import { SRI_LANKAN_STATES, transformAddress } from "@/components/global/forms/HelperComps";
-import { CheckoutAddressSnapshot } from "@/hooks/useCheckoutAddressSync";
+import {
+    CHECKOUT_POSTCODE_PATTERN,
+    CheckoutAddressSnapshot,
+} from "@/hooks/useCheckoutAddressSync";
 import { useCart } from "@/context/CartProvider";
 import checkoutCopy from "@/content/checkout-copy.json";
 import { formatPrice } from "@/lib/formatPrice";
@@ -154,13 +157,16 @@ const EMPTY_ADDRESS: AddressFieldValues = {
     postal: "",
 };
 
+// Postal is validated against the same pattern the address sync quotes on,
+// so the stepper can't report "details done" for an address WooCommerce was
+// never able to price. Matches the `pattern` on the postal input.
 const isAddressComplete = (addr: AddressFieldValues) =>
     !!addr.firstName &&
     !!addr.lastName &&
     !!addr.address &&
     !!addr.city &&
     !!addr.state &&
-    !!addr.postal;
+    CHECKOUT_POSTCODE_PATTERN.test(addr.postal.trim());
 
 interface AddressFieldsProps {
     idPrefix: string;
