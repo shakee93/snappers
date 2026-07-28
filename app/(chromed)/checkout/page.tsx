@@ -1409,11 +1409,7 @@ const CheckoutPage = () => {
                           </span>
                           {applied.discountAmount && (
                             <span className="ml-2">
-                              (<span
-                                dangerouslySetInnerHTML={{
-                                  __html: applied.discountAmount,
-                                }}
-                              />{" "}
+                              ({formatPrice(replaceStringinInt(applied.discountAmount))}{" "}
                               off)
                             </span>
                           )}
@@ -1460,13 +1456,7 @@ const CheckoutPage = () => {
                   <span className="font-medium text-slate-900 dark:text-slate-200">
                     {catalogSavings > 0
                       ? formatPrice(cartSubtotal + catalogSavings)
-                      : (
-                        <span
-                          dangerouslySetInnerHTML={{
-                            __html: cart?.subtotal || "0.00",
-                          }}
-                        />
-                      )}
+                      : formatPrice(cartSubtotal)}
                   </span>
                 </div>
 
@@ -1484,11 +1474,7 @@ const CheckoutPage = () => {
                     <span className="text-slate-600 dark:text-slate-400">Coupon</span>
                     <span className="inline-flex items-center rounded-md bg-red-500 px-2 py-0.5 text-xs font-semibold text-white">
                       −{" "}
-                      <span
-                        dangerouslySetInnerHTML={{
-                          __html: cart?.discountTotal || "0.00",
-                        }}
-                      />
+                      {formatPrice(numericDiscountTotal)}
                     </span>
                   </div>
                 )}
@@ -1502,17 +1488,17 @@ const CheckoutPage = () => {
                       {totalsRecalculating ? (
                         <span className="inline-block w-20 h-5 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
                       ) : freeShipping ? (
-                        <span dangerouslySetInnerHTML={{ __html: "0.00" }} />
+                        formatPrice(0)
                       ) : (
                         // shippingTotal here is local state set from the
                         // updateShippingMethod mutation response (line 245);
                         // cart?.shippingTotal from CartProvider is stale until
-                        // the next cart refetch.
-                        <span
-                          dangerouslySetInnerHTML={{
-                            __html: shippingTotal || cart?.shippingTotal || "0.00",
-                          }}
-                        />
+                        // the next cart refetch. Both arrive as WooCommerce's
+                        // own "Rs450.00" string, so re-format rather than
+                        // render it — the rest of this summary is LKR.
+                        formatPrice(
+                          replaceStringinInt(shippingTotal || cart?.shippingTotal),
+                        )
                       )}
                     </span>
                   </div>
