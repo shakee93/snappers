@@ -6,7 +6,9 @@ import Input from "shared/Input/Input";
 import Label from "@/components/global/primitives/Label/Label";
 import Link from "next/link";
 import { BRAND_CTA_BUTTON_CLASS } from "shared/Button/ButtonBrand";
+import { useApolloClient } from "@apollo/client";
 import { useCart } from "@/context/CartProvider";
+import { GET_CART } from "@/graphql/defs/cart";
 import { useCoupon } from "@/hooks/useCoupon";
 import { useShipping } from "@/hooks/useShipping";
 import { useCheckoutAddressSync } from "@/hooks/useCheckoutAddressSync";
@@ -88,6 +90,7 @@ interface FormData {
 
 const CheckoutPage = () => {
   const { cart, removeFromCart, updateCart, clearCart, refreshCart, loading: cartLoading } = useCart();
+  const apolloClient = useApolloClient();
   const [finalOrderTotal, setFinalOrderTotal] = useState(null);
   const { customer, fetchCustomer } = useSession();
 
@@ -324,7 +327,23 @@ const CheckoutPage = () => {
   // the total ended up one edit behind.
   const handleAddressSynced = async () => {
     const refreshed = await refreshCart();
-    await updateShippingTotal(refreshed?.data?.cart ?? null);
+    let quotedCart: Cart | null = refreshed?.data?.cart ?? null;
+
+    // refreshCart swallows some errors and resolves undefined. Letting that
+    // fall through to the provider's `cart` would price the new address
+    // against the previous one's rates — and across a zone change the rate id
+    // it picks no longer exists, so the mutation errors, the total never
+    // updates, and the summary only corrects itself on a reload. Read the
+    // cart explicitly instead.
+    if (!quotedCart) {
+      const { data } = await apolloClient.query({
+        query: GET_CART,
+        fetchPolicy: "no-cache",
+      });
+      quotedCart = data?.cart ?? null;
+    }
+
+    await updateShippingTotal(quotedCart);
   };
 
   const { syncCheckoutAddress, addressSyncing } =
