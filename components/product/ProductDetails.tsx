@@ -48,12 +48,16 @@ import {
   getPreferredVariation,
   getVariationNumericPrice,
 } from "@/lib/getPreferredVariation";
+import {
+  getProductPriceTiers,
+  type ProductWithPriceTiers,
+} from "@/lib/priceTiers";
 
 const ProductDetails = ({
   product,
   brand,
 }: {
-  product: VariableProduct & SimpleProduct;
+  product: VariableProduct & SimpleProduct & ProductWithPriceTiers;
   brand: Brand;
 }) => {
   const {
@@ -429,6 +433,8 @@ const ProductDetails = ({
     return parseFloat((raw || "0").toString().replace(/[^\d.]/g, "")) || 0;
   }, [product, displayVariation]);
 
+  const priceTiers = useMemo(() => getProductPriceTiers(product), [product]);
+
   const isOnSale = useMemo(() => {
     if (product.type === "VARIABLE" && displayVariation) {
       return (
@@ -639,8 +645,11 @@ const ProductDetails = ({
         />
       </div>
 
-      {displayNumericPrice > 0 && (
-        <ProductPaymentOptions numericPrice={displayNumericPrice} />
+      {(displayNumericPrice > 0 || priceTiers.length > 0) && (
+        <ProductPaymentOptions
+          numericPrice={displayNumericPrice}
+          priceTiers={priceTiers}
+        />
       )}
 
       <ProductPurchaseAccordions product={product} />

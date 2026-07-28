@@ -73,6 +73,13 @@ export const GET_PRODUCT = gql`
   query GetProduct($productId: ID!) {
     product(id: $productId, idType: SLUG) {
       ...ProductContentFull
+      # woo-price-tiers plugin — reference prices per payment option.
+      # PDP-only: listings don't render payment options.
+      priceTiers {
+        name
+        price
+        imageUrl
+      }
       # Related products feed the PDP "you may also like" slider. PDP-only —
       # kept out of ProductContentFull so brand / category / homepage archives
       # that share that fragment don't each pull 12 extra product cards.

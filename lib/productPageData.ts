@@ -8,9 +8,10 @@ import {
   getPrimaryCategorySlug,
   getProductCategories,
 } from "@/lib/productUrl";
+import type { ProductWithPriceTiers } from "@/lib/priceTiers";
 
 export type ProductPageData = {
-  product: SimpleProduct & VariableProduct;
+  product: SimpleProduct & VariableProduct & ProductWithPriceTiers;
   brand: Brand;
   upsellProducts: Awaited<ReturnType<typeof getPdpRelatedProducts>>;
   primaryCategorySlug: string;
@@ -66,7 +67,9 @@ export async function getProductPageData(
       categories[0];
 
     return {
-      product: data.product as SimpleProduct & VariableProduct,
+      product: data.product as SimpleProduct &
+        VariableProduct &
+        ProductWithPriceTiers,
       brand: productBrand as Brand,
       upsellProducts,
       primaryCategorySlug,
