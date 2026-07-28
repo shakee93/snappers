@@ -2206,14 +2206,32 @@ const RAW_SRI_LANKAN_CITIES: Array<{ name: string; postcode: string }> = [
   { name: 'Wickramasinghapura', postcode: 'NULL' },
 ];
 
-// Last-wins: later Colombo-suburb aliases intentionally override earlier
-// duplicate names so checkout prefers the more specific suburb postcodes.
+/**
+ * Normalized once at module scope: `'NULL'` (a data-export artifact) becomes
+ * `null`, names are trimmed, duplicates are merged, and the list is sorted.
+ *
+ * Ten names appear twice, because the Colombo suburb rows appended to the end
+ * of the export repeat entries from the main body. Seven of those pairs are
+ * identical. The three that differ resolve FIRST-wins, because it is the
+ * earlier row that carries the granular postcode while the appended one
+ * carries the generic "Colombo 10" code: Maligawatta 01070 over 01000, and
+ * Panchikawatte 01078 over 01000. A later row only fills in a postcode the
+ * earlier one is missing, which is what keeps Oruwala on 10201 instead of
+ * dropping it to null.
+ */
 export const SRI_LANKAN_CITIES: SriLankanCity[] = Array.from(
   RAW_SRI_LANKAN_CITIES.reduce((cities, city) => {
-    cities.set(city.name.trim().toLowerCase(), {
-      name: city.name.trim(),
-      postcode: city.postcode === "NULL" ? null : city.postcode,
-    });
+    const name = city.name.trim();
+    const key = name.toLowerCase();
+    const postcode = city.postcode === "NULL" ? null : city.postcode;
+    const existing = cities.get(key);
+
+    if (!existing) {
+      cities.set(key, { name, postcode });
+    } else if (!existing.postcode && postcode) {
+      existing.postcode = postcode;
+    }
+
     return cities;
   }, new Map<string, SriLankanCity>()).values(),
 ).sort((a, b) => a.name.localeCompare(b.name));

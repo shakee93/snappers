@@ -188,20 +188,29 @@ interface CitySelectFieldProps {
 
 const MAX_VISIBLE_CITY_OPTIONS = 60;
 
+/** max-h-64 (256px) plus the 8px gap, used to decide whether the panel drops up. */
+const CITY_PANEL_HEIGHT = 264;
+
 const CitySelectField = memo(({ id, value, postalValue, onChange }: CitySelectFieldProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const listRef = useRef<HTMLUListElement>(null);
-    const inputRef = useRef<HTMLInputElement>(null);
     const [inputValue, setInputValue] = useState(value);
+    const [syncedValue, setSyncedValue] = useState(value);
+    const [committedValue, setCommittedValue] = useState(value);
     const [isOpen, setIsOpen] = useState(false);
     const [activeIndex, setActiveIndex] = useState(-1);
+    const [dropUp, setDropUp] = useState(false);
     const deferredQuery = useDeferredValue(inputValue.trim().toLowerCase());
 
-    useEffect(() => {
-        if (document.activeElement !== inputRef.current) {
+    // Adjust during render rather than in an effect: the field mirrors the
+    // parent's city, but must not clobber what is being typed when the parent
+    // is only echoing back this field's own debounced commit.
+    if (value !== syncedValue) {
+        setSyncedValue(value);
+        if (value !== committedValue) {
             setInputValue(value);
         }
-    }, [value]);
+    }
 
     const filteredCities = useMemo(() => {
         if (!deferredQuery) {
@@ -225,6 +234,10 @@ const CitySelectField = memo(({ id, value, postalValue, onChange }: CitySelectFi
         return matches;
     }, [deferredQuery]);
 
+    // The deferred query can shrink the list under a stale index, so clamp on
+    // render rather than let aria-activedescendant point at a missing option.
+    const activeOptionIndex = activeIndex < filteredCities.length ? activeIndex : -1;
+
     useEffect(() => {
         if (!isOpen || activeIndex < 0) {
             return;
@@ -238,6 +251,7 @@ const CitySelectField = memo(({ id, value, postalValue, onChange }: CitySelectFi
 
     const commitCity = useCallback(
         (cityName: string, postcode?: string | null) => {
+            setCommittedValue(cityName);
             onChange({
                 city: cityName,
                 ...(!postalValue && postcode ? { postal: postcode } : {}),
@@ -266,6 +280,31 @@ const CitySelectField = memo(({ id, value, postalValue, onChange }: CitySelectFi
         return () => document.removeEventListener("mousedown", handlePointerDown);
     }, [isOpen]);
 
+    // Flip the panel above the field when it would otherwise run off the viewport.
+    useEffect(() => {
+        if (!isOpen) {
+            return;
+        }
+
+        const updatePlacement = () => {
+            const rect = containerRef.current?.getBoundingClientRect();
+            if (!rect) {
+                return;
+            }
+
+            const spaceBelow = window.innerHeight - rect.bottom;
+            setDropUp(spaceBelow < CITY_PANEL_HEIGHT && rect.top > spaceBelow);
+        };
+
+        updatePlacement();
+        window.addEventListener("resize", updatePlacement, { passive: true });
+        window.addEventListener("scroll", updatePlacement, { capture: true, passive: true });
+        return () => {
+            window.removeEventListener("resize", updatePlacement);
+            window.removeEventListener("scroll", updatePlacement, { capture: true });
+        };
+    }, [isOpen]);
+
     const handleInputChange = (nextValue: string) => {
         setInputValue(nextValue);
         setActiveIndex(-1);
@@ -289,13 +328,12 @@ const CitySelectField = memo(({ id, value, postalValue, onChange }: CitySelectFi
     };
 
     const activeOptionId =
-        isOpen && activeIndex >= 0 ? `${id}-city-option-${activeIndex}` : undefined;
+        isOpen && activeOptionIndex >= 0 ? `${id}-city-option-${activeOptionIndex}` : undefined;
 
     return (
         <div ref={containerRef} className="relative">
             <Search className="pointer-events-none absolute left-3 top-1/2 z-10 h-4 w-4 -translate-y-1/2 text-slate-400" />
             <Input
-                ref={inputRef}
                 id={id}
                 className={`normal-case pl-9 pr-10 ${FIELD_CLASS}`}
                 placeholder="Search or enter city"
@@ -331,8 +369,8 @@ const CitySelectField = memo(({ id, value, postalValue, onChange }: CitySelectFi
 
                     if (e.key === "Enter") {
                         e.preventDefault();
-                        if (isOpen && activeIndex >= 0 && filteredCities[activeIndex]) {
-                            handleSelectCity(filteredCities[activeIndex]);
+                        if (isOpen && activeOptionIndex >= 0) {
+                            handleSelectCity(filteredCities[activeOptionIndex]);
                         }
                         return;
                     }
@@ -366,13 +404,15 @@ const CitySelectField = memo(({ id, value, postalValue, onChange }: CitySelectFi
                     ref={listRef}
                     id={`${id}-city-listbox`}
                     role="listbox"
-                    className="absolute z-30 mt-2 max-h-64 w-full overflow-y-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-xl [scrollbar-width:thin] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5"
+                    className={`absolute z-30 max-h-64 w-full overflow-y-auto rounded-2xl border border-slate-200 bg-white p-2 shadow-xl [scrollbar-width:thin] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-slate-300 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5 ${
+                        dropUp ? "bottom-full mb-2" : "top-full mt-2"
+                    }`}
                 >
                     {filteredCities.length ? (
                         <>
                             {filteredCities.map((city, index) => {
-                                const isActive = index === activeIndex;
-                                const isSelected = city.name === inputValue;
+                                const isActive = index === activeOptionIndex;
+                                const isCurrent = city.name === value;
                                 return (
                                     <li key={`${city.name}-${city.postcode ?? "custom"}`} role="presentation">
                                         <button
@@ -380,10 +420,14 @@ const CitySelectField = memo(({ id, value, postalValue, onChange }: CitySelectFi
                                             id={`${id}-city-option-${index}`}
                                             data-city-option-index={index}
                                             role="option"
-                                            aria-selected={isActive || isSelected}
+                                            // Single-select listbox: only the active option is
+                                            // selected. Focus stays on the input, which owns
+                                            // keyboard navigation via aria-activedescendant.
+                                            aria-selected={isActive}
+                                            tabIndex={-1}
                                             className={`flex w-full rounded-lg px-3 py-2 text-left text-sm hover:bg-slate-100 ${
-                                                isActive || isSelected ? "bg-slate-100 font-medium" : ""
-                                            }`}
+                                                isActive ? "bg-slate-100" : ""
+                                            } ${isCurrent ? "font-medium" : ""}`}
                                             onMouseDown={(e) => e.preventDefault()}
                                             onMouseEnter={() => setActiveIndex(index)}
                                             onClick={() => handleSelectCity(city)}
