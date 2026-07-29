@@ -87,10 +87,11 @@ const CheckoutCouponField = ({
       });
 
       if (data?.applyCoupon?.applied?.code) {
-        const successText = "Coupon applied successfully.";
-        toast.success(successText);
-        setCouponStatus("success");
-        setCouponMessage(successText);
+        toast.success("Coupon applied successfully.");
+        // Inline success is redundant once the applied chip is on screen —
+        // toast covers the confirmation; clear the input for a next code.
+        clearStatus();
+        setCouponCode("");
         setShowCouponField(true);
         await refreshCart();
       } else {
