@@ -726,11 +726,18 @@ const UnifiedCheckoutForm = ({
     const immediateAddressSyncRef = useRef(false);
 
     const handleBillingChange = useCallback((patch: Partial<AddressFieldValues>) => {
-        if (patch.city !== undefined && patch.postal !== undefined) {
+        // Immediate sync only when billing is the shipping destination —
+        // a billing city pick can't move the courier quote when shipping
+        // uses a separate address.
+        if (
+            !shippingDifferent &&
+            patch.city !== undefined &&
+            patch.postal !== undefined
+        ) {
             immediateAddressSyncRef.current = true;
         }
         setBillingAddress((prev) => ({ ...prev, ...patch }));
-    }, []);
+    }, [shippingDifferent]);
     const handleShippingChange = useCallback((patch: Partial<AddressFieldValues>) => {
         if (patch.city !== undefined && patch.postal !== undefined) {
             immediateAddressSyncRef.current = true;

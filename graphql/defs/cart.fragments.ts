@@ -113,17 +113,16 @@ export const CartContentSlim = gql`
   ${CartItemContent}
 `;
 
-// Full cart fragment for /cart and /checkout. Trimmed to fields with actual
+// Full cart fragment for /cart, quantity/coupon mutations, and sidecart
+// surfaces that need totals but not rate ids. Trimmed to fields with actual
 // consumers — subtotalTax / shippingTax / totalTax / feeTax / feeTotal /
 // discountTax / needsShippingAddress / appliedCoupons.discountTax all had
 // zero readers in the codebase.
 //
-// availableShippingMethods does cost a WC shipping-zone evaluation, which is
-// why AddToCart uses CartContentSlim instead. Checkout cannot go without it:
-// the courier rate id changes with the destination, so selecting a method
-// means reading the rates WC quoted for the address it currently holds. Only
-// the four fields below are read (resolveCourierRate, courierShippingLabel,
-// instanceId have no consumers.
+// Deliberately omits availableShippingMethods: that field forces a WC
+// shipping-zone evaluation (distance/geocode on this store), and quantity /
+// coupon mutations must not pay that cost on every mini-cart bump. Checkout
+// rate selection uses CartContentWithRates instead.
 export const CartContent = gql`
   fragment CartContent on Cart {
     contents(first: 100) {
@@ -136,6 +135,25 @@ export const CartContent = gql`
       code
       discountAmount
     }
+    subtotal
+    shippingTotal
+    total
+    discountTotal
+  }
+  ${CartItemContent}
+`;
+
+// Checkout-only cart fragment. availableShippingMethods costs a WC
+// shipping-zone evaluation, so it lives here — not on CartContent — and is
+// spread only by GET_CART and UPDATE_SHIPPING_TOTAL.
+//
+// Only id / methodId / label / cost are read (resolveCourierRate +
+// shippingRateLabel). Assumes WC quotes a single package with a single
+// courier rate; if a zone ever offers multiple courier options the customer
+// silently gets whichever WC ordered first (rates[0]).
+export const CartContentWithRates = gql`
+  fragment CartContentWithRates on Cart {
+    ...CartContent
     availableShippingMethods {
       rates {
         id
@@ -144,10 +162,6 @@ export const CartContent = gql`
         cost
       }
     }
-    subtotal
-    shippingTotal
-    total
-    discountTotal
   }
-  ${CartItemContent}
+  ${CartContent}
 `;

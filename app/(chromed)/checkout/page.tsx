@@ -58,7 +58,18 @@ const PICKUP_METHOD_IDS = new Set(["pickup_location", "local_pickup"]);
  * package …") and the cart silently keeps the rate quoted for the previous
  * address. Read it off the rates WooCommerce returned for the address it
  * currently holds instead.
+ *
+ * Assumes WC quotes a single package (`availableShippingMethods[0]`) with a
+ * single courier rate among the non-pickup options; if a zone ever offers
+ * multiple courier choices the customer silently gets `courierRates[0]`
+ * (whatever WC ordered first) and never sees a picker.
  */
+const parseRateCost = (cost: string | number | null | undefined): number => {
+  if (typeof cost === "number") return cost;
+  if (typeof cost !== "string") return NaN;
+  return parseFloat(cost.replace(/₨|&nbsp;|,|[^0-9.]/g, ""));
+};
+
 const resolveCourierRate = (cart: Cart | null | undefined, preferFree: boolean) => {
   const rates = cart?.availableShippingMethods?.[0]?.rates ?? [];
   const courierRates = rates.filter(
@@ -68,7 +79,7 @@ const resolveCourierRate = (cart: Cart | null | undefined, preferFree: boolean) 
 
   if (preferFree) {
     const free = courierRates.find(
-      (rate) => rate.methodId === "free_shipping" || Number(rate.cost) === 0,
+      (rate) => rate.methodId === "free_shipping" || parseRateCost(rate.cost) === 0,
     );
     if (free) return free;
   }
@@ -91,7 +102,6 @@ interface FormData {
 const CheckoutPage = () => {
   const { cart, removeFromCart, updateCart, clearCart, refreshCart, applyCart, loading: cartLoading } = useCart();
   const apolloClient = useApolloClient();
-  const [finalOrderTotal, setFinalOrderTotal] = useState(null);
   const { customer, fetchCustomer } = useSession();
 
   const { paymentGateways } = usePaymentGateways();
@@ -120,7 +130,6 @@ const CheckoutPage = () => {
   const [paymentData, setPaymentData] =
     useState<PaymentDetailsWithoutUrls | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [totalWithTax, setTotalWithTax] = useState<string | null>();
   const [isTOC, setTOC] = useState<boolean>(false);
   const [freeShipping, setFreeShipping] = useState<boolean>(false);
   const [tocError, setTocError] = useState(false);
@@ -161,13 +170,11 @@ const CheckoutPage = () => {
       router.push("/");
     }
 
-    if (cart?.subtotal != null && (noShipping || freeShipping)) {
-      setOrderTotal(cart.subtotal);
+    if (cart?.total != null) {
+      setOrderTotal(cart.total);
       if (noShipping) {
         setShippingTotal("0");
       }
-    } else if (cart?.total !== null && cart?.total !== undefined) {
-      setOrderTotal(cart?.total);
     }
     if (!noShipping && cart?.shippingTotal != null) {
       setShippingTotal(cart.shippingTotal);
@@ -245,10 +252,11 @@ const CheckoutPage = () => {
   const updateShippingTotal = async (quotedCart?: Cart | null) => {
     const rateSource = quotedCart ?? cart;
 
-    const hasFreeShipping: any = rateSource?.appliedCoupons?.some(
+    const cartHasFreeShippingCoupon = !!rateSource?.appliedCoupons?.some(
       (coupon) => coupon?.code === "free-shipping"
     );
-    if (hasFreeShipping) {
+    const preferFreeShipping = freeShipping || cartHasFreeShippingCoupon;
+    if (cartHasFreeShippingCoupon) {
       setFreeShipping(true);
     }
 
@@ -267,7 +275,7 @@ const CheckoutPage = () => {
           ? "flat_rate:4"
           : deliveryType === "store_pickup"
             ? "pickup_location:0"
-            : resolveCourierRate(rateSource, hasFreeShipping || freeShipping)?.id;
+            : resolveCourierRate(rateSource, preferFreeShipping)?.id;
 
       // No courier rate means the address doesn't resolve to a serviceable
       // zone yet. Selecting nothing is correct — the cart keeps whatever WC
@@ -278,14 +286,12 @@ const CheckoutPage = () => {
 
       const total: any = rateSource?.total;
       const subtotal: any = rateSource?.subtotal;
-      setOrderTotal(noShipping || freeShipping ? subtotal : total);
+      // Prefer cart.total even for pickup/free-shipping so coupons stay in
+      // the figure; chargeableOrderTotal strips a stale shipping line later.
+      setOrderTotal(total ?? subtotal);
 
       if (customer?.id === "guest") {
-        if (noShipping || freeShipping) {
-          setOrderTotal(subtotal);
-        } else {
-          setOrderTotal(total);
-        }
+        setOrderTotal(total ?? subtotal);
       }
 
       const { data, errors } = await updateCartShippingTotalMutation({
@@ -307,14 +313,9 @@ const CheckoutPage = () => {
         // and without this it keeps reading the pre-address cart until a later
         // refresh effect lands (which is what made the estimate look stuck).
         applyCart(updatedCart);
-        const { total, shippingTotal, subtotal } = updatedCart;
-        if (freeShipping || noShipping) {
-          setOrderTotal(subtotal);
-          setShippingTotal(noShipping ? "0" : shippingTotal);
-        } else {
-          setOrderTotal(total);
-          setShippingTotal(shippingTotal);
-        }
+        const { total, shippingTotal } = updatedCart;
+        setOrderTotal(total);
+        setShippingTotal(noShipping ? "0" : shippingTotal);
       } else {
         console.error(
           "Failed to update cart shipping total. No valid data returned."
@@ -765,6 +766,11 @@ const CheckoutPage = () => {
       orderDeliveryType === "store_pickup" ||
       orderDeliveryType === "flash_delivery";
 
+    const cartHasFreeShippingCoupon = !!cart?.appliedCoupons?.some(
+      (coupon) => coupon?.code === "free-shipping",
+    );
+    const preferFreeShipping = freeShipping || cartHasFreeShippingCoupon;
+
     // store_pickup → block-based pickup_location method (instance 0).
     // flash_delivery → zone-bound flat_rate instance 4 ("Flash Delivery
     // (Uber/PickMe)" at cost 0). Configured via WooCommerce > Settings >
@@ -775,7 +781,7 @@ const CheckoutPage = () => {
     // Courier: same dynamic rate as the cart-side lookup. Falling back to the
     // configured constant keeps the order writable if the cart somehow has no
     // rates to read, but the resolved id is what the store actually quoted.
-    const courierRate = resolveCourierRate(cart, freeShipping);
+    const courierRate = resolveCourierRate(cart, preferFreeShipping);
 
     const methodId =
       orderDeliveryType === "flash_delivery"
@@ -783,7 +789,7 @@ const CheckoutPage = () => {
         : orderDeliveryType === "store_pickup"
           ? "pickup_location:0"
           : courierRate?.id ??
-            (freeShipping
+            (preferFreeShipping
               ? siteConfig.shipping.freeShippingMethodId
               : siteConfig.shipping.weightBasedShippingMethodId);
 
@@ -798,7 +804,7 @@ const CheckoutPage = () => {
       : orderDeliveryType === "flash_delivery"
         ? "Flash Delivery (Uber/PickMe)"
         : courierRate?.label ??
-          (freeShipping ? "Free Shipping" : "Weight Based Shipping");
+          (preferFreeShipping ? "Free Shipping" : "Weight Based Shipping");
 
     const total = noCharge ? "0" : shippingTotal;
 
@@ -983,13 +989,26 @@ const CheckoutPage = () => {
     return orderTotalNumber;
   };
 
-  const numericOrderTotal = replaceStringinInt(orderTotal);
-  const cartSubtotal = replaceStringinInt(cart?.subtotal);
-  // Store pickup and flash delivery have no courier charge. The cart can
-  // still carry the previous courier shipping line until updateShippingMethod
-  // lands, so never bill shipping on those methods.
+  const cartHasFreeShippingCoupon = !!cart?.appliedCoupons?.some(
+    (coupon) => coupon?.code === "free-shipping",
+  );
+  const preferFreeShipping = freeShipping || cartHasFreeShippingCoupon;
+
+  // Prefer the live cart total over local orderTotal state — local state can
+  // lag a tick behind applyCart. For pickup / flash / free shipping, strip
+  // only the (possibly stale) shipping line so coupons and fees stay in the
+  // quoted total. Using cart.subtotal here would drop percentage coupons.
+  const serverOrderTotal = replaceStringinInt(cart?.total ?? orderTotal);
+  const serverShippingTotal = replaceStringinInt(cart?.shippingTotal ?? "0");
   const chargeableOrderTotal =
-    noShipping || freeShipping ? cartSubtotal : numericOrderTotal;
+    noShipping || preferFreeShipping
+      ? Math.max(
+          0,
+          (Number.isFinite(serverOrderTotal) ? serverOrderTotal : 0) -
+            (Number.isFinite(serverShippingTotal) ? serverShippingTotal : 0),
+        )
+      : serverOrderTotal;
+  const cartSubtotal = replaceStringinInt(cart?.subtotal);
   const numericDiscountTotal = replaceStringinInt(cart?.discountTotal);
   const hasDiscount = Number.isFinite(numericDiscountTotal) && numericDiscountTotal > 0;
 
@@ -1002,15 +1021,14 @@ const CheckoutPage = () => {
     return sum + (regular - sale) * (item?.quantity || 0);
   }, 0);
   const threePercentFromTotal = chargeableOrderTotal * CARD_SURCHARGE_RATE;
-  const taxWithTotal = (chargeableOrderTotal + threePercentFromTotal).toFixed(2);
-
+  // Koko installment seam — currently identical to chargeableOrderTotal after
+  // the financing markup was removed; kept named so a gateway fee can return
+  // without rewiring the summary / prop plumbing.
   const kokoOrderTotal = chargeableOrderTotal;
   const cardSurchargeAmount = isCardPayment ? threePercentFromTotal : 0;
 
   const orderTotalLabel = isCardPayment
     ? formatPrice(chargeableOrderTotal + threePercentFromTotal)
-    : isKokoPayment
-    ? formatPrice(kokoOrderTotal)
     : formatPrice(chargeableOrderTotal);
 
   // The courier's name changes with the destination — WC quotes "Local
@@ -1019,13 +1037,9 @@ const CheckoutPage = () => {
   // generic estimate line. Falls back to the generic wording while the cart
   // has no quote yet.
   const shippingRateLabel = useMemo(() => {
-    if (freeShipping) return "Free Shipping";
-    return resolveCourierRate(cart, freeShipping)?.label || "Shipping estimate";
-  }, [cart, freeShipping]);
-
-  useEffect(() => {
-    setTotalWithTax(taxWithTotal);
-  }, [taxWithTotal]);
+    if (preferFreeShipping) return "Free Shipping";
+    return resolveCourierRate(cart, preferFreeShipping)?.label || "Shipping estimate";
+  }, [cart, preferFreeShipping]);
 
   const isPreOrderProduct = (product: any) => {
     const tags = product?.productTags?.nodes || [];
@@ -1584,12 +1598,9 @@ const CheckoutPage = () => {
                   {totalsRecalculating ? (
                     <span className="inline-block w-32 h-7 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
                   ) : (
-                    <span
-                      className="text-xl font-bold"
-                      dangerouslySetInnerHTML={{
-                        __html: formatPrice(chargeableOrderTotal + threePercentFromTotal),
-                      }}
-                    />
+                    <span className="text-xl font-bold">
+                      {formatPrice(chargeableOrderTotal + threePercentFromTotal)}
+                    </span>
                   )}
                 </div>
               )}
@@ -1600,12 +1611,9 @@ const CheckoutPage = () => {
                   {totalsRecalculating ? (
                     <span className="inline-block w-32 h-7 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
                   ) : (
-                    <span
-                      className="text-xl font-bold"
-                      dangerouslySetInnerHTML={{
-                        __html: formatPrice(kokoOrderTotal),
-                      }}
-                    />
+                    <span className="text-xl font-bold">
+                      {formatPrice(kokoOrderTotal)}
+                    </span>
                   )}
                 </div>
               )}
