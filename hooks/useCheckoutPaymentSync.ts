@@ -59,10 +59,24 @@ export function useCheckoutPaymentSync(onSynced: () => Promise<void> | void) {
                 },
               },
             });
-            if (!isCurrent()) return;
-            await onSyncedRef.current?.();
           } catch {
             // best-effort — totals will resync when a gateway is re-selected
+          }
+
+          if (!isCurrent()) return;
+
+          try {
+            await onSyncedRef.current?.();
+          } catch (error) {
+            console.error(
+              "Failed to refresh totals after clearing payment method sync:",
+              error,
+            );
+            if (isCurrent()) {
+              toast.error(
+                "Could not refresh order totals. Reload the page if amounts look incorrect.",
+              );
+            }
           } finally {
             if (isCurrent()) {
               lastSyncedGatewayRef.current = null;

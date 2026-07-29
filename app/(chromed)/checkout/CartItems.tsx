@@ -110,19 +110,22 @@ const CartItems = ({
     // quote we can safely show the tier-derived unit caption; if not, the tier
     // plugin is display-only for this gateway and we fall back to Woo's own
     // unit figure so the row stays internally consistent.
-    const totalAmount = parseWooMoneyAmount(total);
     const subtotalAmount = parseWooMoneyAmount(subtotal);
-    const wooLineTotal = Number.isNaN(totalAmount) ? subtotalAmount : totalAmount;
+    const wooLineSubtotal = subtotalAmount;
     const wooUnitPrice =
-      Number.isFinite(wooLineTotal) && wooLineTotal > 0 && qty > 0
-        ? wooLineTotal / qty
+      Number.isFinite(wooLineSubtotal) && wooLineSubtotal > 0 && qty > 0
+        ? wooLineSubtotal / qty
         : NaN;
+    const wooMatchesCatalog =
+      Number.isFinite(wooUnitPrice) &&
+      Number.isFinite(catalogUnitPrice) &&
+      Math.abs(wooUnitPrice - catalogUnitPrice) < 0.01;
     const tierMatchesWoo =
       !!tierPrice &&
       Number.isFinite(wooUnitPrice) &&
       Math.abs(wooUnitPrice - tierPrice.unitPrice) < 0.01;
     // Unit price shown in the caption. Only trust the tier number when Woo's
-    // own line total corroborates it.
+    // own visible line subtotal corroborates it.
     const displayUnitPrice = tierMatchesWoo
       ? tierPrice.unitPrice
       : Number.isFinite(wooUnitPrice) && wooUnitPrice > 0
@@ -131,7 +134,7 @@ const CartItems = ({
     // Strike-through target: tier → catalog; catalog → regular (on sale products).
     const compareAtPrice = tierMatchesWoo
       ? tierPrice.catalogUnitPrice
-      : !tierPrice
+      : !tierPrice && wooMatchesCatalog
         ? regularUnitPrice
         : NaN;
     const hasUnitPrice = Number.isFinite(displayUnitPrice) && displayUnitPrice > 0;
@@ -152,8 +155,11 @@ const CartItems = ({
           ? formatPrice(unitSaving * qty)
           : null,
       // Always WooCommerce's own number — never a client-side recalculation.
-      lineTotalLabel: formatPrice(wooLineTotal),
-      showTierCaption: !!tierPrice && tierMatchesWoo,
+      lineTotalLabel: formatPrice(wooLineSubtotal),
+      // The visible line figure is Woo's pre-coupon subtotal, so the caption
+      // only claims a tier price when that subtotal corroborates it too.
+      showTierCaption: tierMatchesWoo,
+      wooMatchesCatalog,
     };
   }, [
     price,
@@ -335,11 +341,12 @@ const CartItems = ({
               <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                 {linePricing.lineTotalLabel}
               </span>
-              {linePricing.savingLabel && (
+              {linePricing.savingLabel &&
+                (linePricing.showTierCaption || linePricing.wooMatchesCatalog) && (
                 <span className="mt-1 block rounded bg-slate-100 px-1.5 py-0.5 text-[11px] font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                   Save {linePricing.savingLabel}
                 </span>
-              )}
+                )}
             </>
           )}
         </div>

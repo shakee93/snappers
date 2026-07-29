@@ -200,9 +200,12 @@ export const siteConfig = {
   payment: {
     gatewayOrder: ["payhere", "ndb-pay", "cod", "darazbnpl", "bacs"],
     kokoGatewayId: "darazbnpl",
-    // Gateways that charge a card (Visa/Mastercard) — used for woo-price-tiers
-    // tier matching and the "Coupon discounts cannot be used" warning.
+    // Gateways that quote the shared Visa/Mastercard tier in woo-price-tiers.
     cardGatewayIds: ["payhere", "webxpay", "ndb-pay", "geniebiz"] as const,
+    // Gateways that genuinely cannot be combined with coupon discounts.
+    // Keep this separate from `cardGatewayIds`: not every card processor has
+    // the same coupon rule.
+    couponRestrictedGatewayIds: ["payhere"] as const,
     payhere: {
       hideAboveAmount: 100000,
     },

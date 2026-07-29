@@ -145,6 +145,11 @@ const CheckoutPage = () => {
   // Selected gateway id — the summary lines price their woo-price-tiers unit
   // price off it while WooCommerce keeps owning the totals.
   const [selectedPaymentGatewayId, setSelectedPaymentGatewayId] = useState("");
+  const couponRestrictedPaymentGatewayIds =
+    siteConfig.payment.couponRestrictedGatewayIds as readonly string[];
+  const isCouponRestrictedPayment = couponRestrictedPaymentGatewayIds.includes(
+    selectedPaymentGatewayId,
+  );
 
   const [shippingTotal, setShippingTotal] = useState<string | null | undefined>();
   const [paymentData, setPaymentData] =
@@ -1596,7 +1601,7 @@ const CheckoutPage = () => {
                 ))}
 
               </div>
-              {hasDiscount && (isCardPayment || isKokoPayment) && (
+              {hasDiscount && (isCouponRestrictedPayment || isKokoPayment) && (
                 <div className="flex justify-between py-2.5">
                   <span className="text-red-500 font-medium">Coupon discounts cannot be used with this payment method</span>
                 </div>
