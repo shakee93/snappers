@@ -1,7 +1,5 @@
-import {
-  SelectField,
-  SRI_LANKAN_STATES,
-} from "@/components/global/forms/HelperComps";
+import { SelectField } from "@/components/global/forms/HelperComps";
+import { SRI_LANKAN_PROVINCES } from "@/data/sriLankanProvinces";
 import { CustomerAddress } from "@/graphql/types/graphql";
 import { FC, useEffect, useState } from "react";
 import { siteConfig } from "@/site.config";
@@ -274,7 +272,7 @@ const DeliveryAddress: FC<Props> = ({
                   className="mt-0 sm:mt-1.5"
                   name="state"
                   value={state}
-                  options={SRI_LANKAN_STATES.map((state) => ({
+                  options={SRI_LANKAN_PROVINCES.map((state) => ({
                     value: state,
                     label: state,
                   }))}

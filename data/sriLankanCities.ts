@@ -1,16 +1,6 @@
-export const SRI_LANKAN_PROVINCES = [
-  "Western",
-  "Central",
-  "Southern",
-  "Northern",
-  "Eastern",
-  "North Western",
-  "North Central",
-  "Uva",
-  "Sabaragamuwa",
-] as const;
+import type { SriLankanProvince } from "@/data/sriLankanProvinces";
 
-export type SriLankanProvince = (typeof SRI_LANKAN_PROVINCES)[number];
+export type { SriLankanProvince } from "@/data/sriLankanProvinces";
 
 export type SriLankanCity = {
   name: string;
@@ -18,6 +8,13 @@ export type SriLankanCity = {
   province: SriLankanProvince;
 };
 
+/**
+ * Raw export rows. About 108 have `postcode: 'NULL'` (no Sri Lanka Post code
+ * to derive a province from). Those were name-inferred; where a place could
+ * not be pinned to a district with confidence, **Northern is the accepted
+ * default** — not an oversight. Wrong province at worst misroutes the shipping
+ * zone; the province select stays editable so the customer can correct it.
+ */
 const RAW_SRI_LANKAN_CITIES: Array<{
   name: string;
   postcode: string;

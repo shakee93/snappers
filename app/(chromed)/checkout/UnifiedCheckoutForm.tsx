@@ -11,7 +11,7 @@ import { CustomerAddress, PaymentGateway } from "@/graphql/types/graphql";
 import { contactInformation } from "@/data/types";
 import Select from "shared/Select/Select";
 import { toast } from "sonner";
-import { SRI_LANKAN_STATES, transformAddress } from "@/components/global/forms/HelperComps";
+import { transformAddress } from "@/components/global/forms/HelperComps";
 import {
     CHECKOUT_POSTCODE_PATTERN,
     CheckoutAddressSnapshot,
@@ -23,7 +23,8 @@ import { PAYHERE_HIDE_THRESHOLD } from "@/lib/checkoutMath";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonBrand from "shared/Button/ButtonBrand";
 import PreOrderNotice from "@/components/global/ui/PreOrderNotice";
-import { SRI_LANKAN_CITIES, type SriLankanCity, type SriLankanProvince } from "@/data/sriLankanCities";
+import { SRI_LANKAN_CITIES, type SriLankanCity } from "@/data/sriLankanCities";
+import { SRI_LANKAN_PROVINCES, type SriLankanProvince } from "@/data/sriLankanProvinces";
 import {
     Store,
     Truck,
@@ -558,7 +559,7 @@ const AddressFields = memo(({ idPrefix, values, onChange, nameOnly = false }: Ad
                     onChange={(e) => onChange({ state: e.target.value })}
                     required={true}
                 >
-                    {SRI_LANKAN_STATES.map((s) => (
+                    {SRI_LANKAN_PROVINCES.map((s) => (
                         <option key={s} value={s}>
                             {s}
                         </option>
