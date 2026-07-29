@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { cn } from "@/lib/utils";
 
 export interface SectionDealCountdownProps {
   className?: string;
@@ -35,6 +36,9 @@ const getTimeLeft = (target: number): TimeLeft => {
   };
 };
 
+const isExpiredTime = (t: TimeLeft) =>
+  t.days === 0 && t.hours === 0 && t.minutes === 0 && t.seconds === 0;
+
 /**
  * Promo banner with a live "deal ends in" countdown overlaid on a provided
  * background image (the cat & dog artwork).
@@ -55,12 +59,26 @@ const SectionDealCountdown = ({
       ? parsed
       : Date.now() + DEFAULT_COUNTDOWN_MS;
 
-    const tick = () => setTimeLeft(getTimeLeft(target));
-    tick();
+    const tick = () => {
+      const next = getTimeLeft(target);
+      setTimeLeft(next);
+      return isExpiredTime(next);
+    };
 
-    const id = window.setInterval(tick, 1000);
+    // Already expired — no interval needed.
+    if (tick()) return;
+
+    const id = window.setInterval(() => {
+      if (tick()) window.clearInterval(id);
+    }, 1000);
     return () => window.clearInterval(id);
   }, [endsAt]);
+
+  const isExpired = timeLeft !== null && isExpiredTime(timeLeft);
+
+  // Hide only after expiry — `invisible` keeps the box in layout so the title
+  // does not shift. Loading skeleton stays visible until the first tick.
+  const timerVisibilityClass = isExpired ? "invisible" : "";
 
   const units = timeLeft
     ? [
@@ -161,7 +179,12 @@ const SectionDealCountdown = ({
               />
             </div>
 
-            <div className="relative mt-2.5 w-full rounded-xl border border-[#E7D9C7] bg-white px-2 pb-1.5 pt-2.5">
+            <div
+              className={cn(
+                "relative mt-2.5 w-full rounded-xl border border-[#E7D9C7] bg-white px-2 pb-1.5 pt-2.5",
+                timerVisibilityClass,
+              )}
+            >
               <span className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-deal-brown px-1.5 py-1 text-[8px] font-bold uppercase leading-none tracking-wide !text-[#EE9E7D]">
                 Hurry! Deals ends in:
               </span>
@@ -194,7 +217,12 @@ const SectionDealCountdown = ({
             />
           </div>
 
-          <div className="relative rounded-2xl border border-[#E7D9C7] bg-white/70 px-7 py-0 md:pb-3 md:pt-5 backdrop-blur-sm">
+          <div
+            className={cn(
+              "relative rounded-2xl border border-[#E7D9C7] bg-white/70 px-7 py-0 md:pb-3 md:pt-5 backdrop-blur-sm",
+              timerVisibilityClass,
+            )}
+          >
             <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-deal-brown px-3 py-2 text-[10px] font-bold uppercase leading-none tracking-wider !text-[#EE9E7D]">
               Hurry! Deals ends in:
             </span>

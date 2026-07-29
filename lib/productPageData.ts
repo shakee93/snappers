@@ -8,9 +8,10 @@ import {
   getPrimaryCategorySlug,
   getProductCategories,
 } from "@/lib/productUrl";
+import type { ProductWithPriceTiers } from "@/lib/priceTiers";
 
 export type ProductPageData = {
-  product: SimpleProduct & VariableProduct;
+  product: SimpleProduct & VariableProduct & ProductWithPriceTiers;
   brand: Brand;
   upsellProducts: Awaited<ReturnType<typeof getPdpRelatedProducts>>;
   primaryCategorySlug: string;
@@ -24,6 +25,9 @@ export type ProductPageData = {
  * to skip the related-products fetch, which `<title>`/OG tags never use. The
  * `GET_PRODUCT` query itself is `force-cache`d, so the page-body call that does
  * need related products reuses the same cached response.
+ *
+ * GET_PRODUCT includes woo-price-tiers `priceTiers` — deploy the plugin (or
+ * remove the field) before pointing this frontend at a WP instance without it.
  */
 export async function getProductPageData(
   slug: string,
@@ -66,7 +70,9 @@ export async function getProductPageData(
       categories[0];
 
     return {
-      product: data.product as SimpleProduct & VariableProduct,
+      product: data.product as SimpleProduct &
+        VariableProduct &
+        ProductWithPriceTiers,
       brand: productBrand as Brand,
       upsellProducts,
       primaryCategorySlug,
