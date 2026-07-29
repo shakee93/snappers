@@ -2,14 +2,10 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import Input from "shared/Input/Input";
-import Label from "@/components/global/primitives/Label/Label";
 import Link from "next/link";
-import { BRAND_CTA_BUTTON_CLASS } from "shared/Button/ButtonBrand";
 import { useApolloClient } from "@apollo/client";
 import { useCart } from "@/context/CartProvider";
 import { GET_CART } from "@/graphql/defs/cart";
-import { useCoupon } from "@/hooks/useCoupon";
 import { useShipping } from "@/hooks/useShipping";
 import { useCheckoutAddressSync } from "@/hooks/useCheckoutAddressSync";
 import { useCheckoutPaymentSync } from "@/hooks/useCheckoutPaymentSync";
@@ -24,6 +20,7 @@ import koko from "@/public/koko.png";
 import CheckoutDetails from "./CheckoutDetails";
 import { CheckoutSubmitPayload, DeliveryType } from "./UnifiedCheckoutForm";
 import CartItems, { CartItem } from "./CartItems";
+import CheckoutCouponField from "./CheckoutCouponField";
 import { OrderSummarySkeleton } from "./CheckoutSkeletons";
 import { toast } from "sonner";
 import { PayhereStatus, PaymentDetailsWithoutUrls } from "@/data/types";
@@ -146,15 +143,8 @@ const CheckoutPage = () => {
   const [guestCheckoutData, setGuestCheckoutData] = useState<any>();
   const [isConfirmingOrder, setIsConfirmingOrder] = useState(false);
   const [htmlFormResponse, setHtmlFormResponse] = useState<string | null>(null);
-  const [couponCode, setCouponCode] = useState("");
-  const [couponStatus, setCouponStatus] = useState<"idle" | "success" | "error">("idle");
-  const [couponMessage, setCouponMessage] = useState<string | null>(null);
   const [isCouponSyncingCart, setIsCouponSyncingCart] = useState(false);
-  /** User chose to reveal the coupon input (sticky until they hide it). */
-  const [showCouponField, setShowCouponField] = useState(false);
   const [hasSeenCartWithItems, setHasSeenCartWithItems] = useState(false);
-
-  const { applyCouponMutation, removeCouponsMutation, applyingCoupon, removingCoupon } = useCoupon();
 
   const handleTOC = () => {
     const updatedTOC = !isTOC;
@@ -174,8 +164,6 @@ const CheckoutPage = () => {
     if (
       !hasSeenCartWithItems &&
       !isCouponSyncingCart &&
-      !applyingCoupon &&
-      !removingCoupon &&
       cart &&
       cart?.contents?.nodes?.length === 0
     ) {
@@ -187,7 +175,7 @@ const CheckoutPage = () => {
     } else if (cart?.shippingTotal != null) {
       setShippingTotal(cart.shippingTotal);
     }
-  }, [cart, hasSeenCartWithItems, isCouponSyncingCart, applyingCoupon, removingCoupon, noShipping]);
+  }, [cart, hasSeenCartWithItems, isCouponSyncingCart, noShipping]);
 
   useEffect(() => {
     fetchCustomer();
@@ -1021,10 +1009,6 @@ const CheckoutPage = () => {
   const cartSubtotal = replaceStringinInt(cart?.subtotal);
   const numericDiscountTotal = replaceStringinInt(cart?.discountTotal);
   const hasDiscount = Number.isFinite(numericDiscountTotal) && numericDiscountTotal > 0;
-  const hasAppliedCoupons = (cart?.appliedCoupons?.length ?? 0) > 0;
-  // Open when the user asked, or when a coupon is already on the cart — no
-  // useEffect for derived open state (see CLAUDE.md).
-  const couponFieldOpen = showCouponField || hasAppliedCoupons;
 
   // Card pricing now comes from WooCommerce alone: either a fee it attaches
   // once chosen_payment_method is synced, or the woo-price-tiers card price.
@@ -1360,186 +1344,11 @@ const CheckoutPage = () => {
             </div>
 
             <div className="mt-6 border-t border-slate-200/70 pt-5 text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400 ">
-              {!couponFieldOpen ? (
-                <button
-                  type="button"
-                  onClick={() => setShowCouponField(true)}
-                  className="text-sm font-medium text-primary-500 hover:underline"
-                  aria-expanded={false}
-                  aria-controls="checkout-coupon-field"
-                >
-                  Have a coupon?
-                </button>
-              ) : (
-                <div id="checkout-coupon-field">
-                  <div className="flex items-center justify-between gap-3">
-                    <Label className="text-sm">Discount code</Label>
-                    {!hasAppliedCoupons && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setShowCouponField(false);
-                          setCouponStatus("idle");
-                          setCouponMessage(null);
-                        }}
-                        className="text-xs font-medium text-slate-500 hover:text-slate-700 hover:underline dark:text-slate-400 dark:hover:text-slate-200"
-                        aria-expanded={true}
-                        aria-controls="checkout-coupon-field"
-                      >
-                        Hide
-                      </button>
-                    )}
-                  </div>
-                  <div className="mt-1.5 flex gap-2">
-                    <Input
-                      sizeClass="h-10 px-4 py-3 !rounded-full"
-                      className={`flex-1 ${
-                        couponStatus === "error"
-                          ? "border-red-500 focus:border-red-500 focus:ring-red-200"
-                          : couponStatus === "success"
-                          ? "border-emerald-500 focus:border-emerald-500 focus:ring-emerald-200"
-                          : ""
-                      }`}
-                      value={couponCode}
-                      onChange={(e) => {
-                        setCouponCode(e.target.value);
-                        if (couponStatus !== "idle") {
-                          setCouponStatus("idle");
-                          setCouponMessage(null);
-                        }
-                      }}
-                      placeholder="Enter coupon code"
-                    />
-                    <button
-                      type="button"
-                      onClick={async () => {
-                        const code = couponCode.trim();
-                        if (!code) {
-                          toast.error("Please enter a coupon code.");
-                          setCouponStatus("error");
-                          setCouponMessage("Please enter a coupon code.");
-                          return;
-                        }
-                        try {
-                          setIsCouponSyncingCart(true);
-                          setCouponStatus("idle");
-                          setCouponMessage(null);
-
-                          const { data } = await applyCouponMutation({
-                            variables: { code },
-                          });
-
-                          if (data?.applyCoupon?.applied?.code) {
-                            const successText = "Coupon applied successfully.";
-                            toast.success(successText);
-                            setCouponStatus("success");
-                            setCouponMessage(successText);
-                            setShowCouponField(true);
-                            await refreshCart();
-                          } else {
-                            const failText = "Coupon could not be applied.";
-                            toast.error(failText);
-                            setCouponStatus("error");
-                            setCouponMessage(failText);
-                          }
-                        } catch (error: any) {
-                          const rawMessage =
-                            error?.graphQLErrors?.[0]?.message ||
-                            error?.message ||
-                            "Failed to apply coupon.";
-                          const cleanedMessage = rawMessage.replace(/&quot;/g, '"');
-                          toast.error(cleanedMessage);
-                          setCouponStatus("error");
-                          setCouponMessage(cleanedMessage);
-                        } finally {
-                          setIsCouponSyncingCart(false);
-                        }
-                      }}
-                      disabled={applyingCoupon}
-                      className={`inline-flex items-center justify-center rounded-full px-4 py-2 text-sm font-bold hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed ${BRAND_CTA_BUTTON_CLASS}`}
-                    >
-                      {applyingCoupon ? (
-                        <Loader className="w-4 h-4 animate-spin text-header-green" />
-                      ) : (
-                        "Apply coupon"
-                      )}
-                    </button>
-                  </div>
-
-                  {couponMessage && (
-                    <div
-                      className={`mt-1 flex items-center text-xs ${
-                        couponStatus === "error"
-                          ? "text-red-600"
-                          : couponStatus === "success"
-                          ? "text-emerald-600"
-                          : "text-slate-500"
-                      }`}
-                    >
-                      <span className="mr-1 text-sm">
-                        {couponStatus === "error" ? "⚠" : "✓"}
-                      </span>
-                      <span>{couponMessage}</span>
-                    </div>
-                  )}
-
-                  {cart?.appliedCoupons && cart.appliedCoupons.length > 0 && (
-                    <div className="mt-3 space-y-1">
-                      <span className="text-xs font-medium text-emerald-600">
-                        Coupon{cart.appliedCoupons.length > 1 ? "s" : ""} applied:
-                      </span>
-                      <div className="flex flex-wrap gap-2">
-                        {cart.appliedCoupons.map((applied: any) => (
-                          <div
-                            key={applied.code}
-                            className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-100"
-                          >
-                            <span className="font-semibold uppercase">
-                              {applied.code}
-                            </span>
-                            {applied.discountAmount && (
-                              <span className="ml-2">
-                                ({formatPrice(replaceStringinInt(applied.discountAmount))}{" "}
-                                off)
-                              </span>
-                            )}
-                            <button
-                              type="button"
-                              onClick={async () => {
-                                try {
-                                  setIsCouponSyncingCart(true);
-                                  const { data } = await removeCouponsMutation({
-                                    variables: { codes: [applied.code] },
-                                  });
-
-                                  if (data?.removeCoupons?.cart) {
-                                    toast.success("Coupon removed.");
-                                    await refreshCart();
-                                  } else {
-                                    toast.error("Coupon could not be removed.");
-                                  }
-                                } catch (error: any) {
-                                  const message =
-                                    error?.graphQLErrors?.[0]?.message ||
-                                    error?.message ||
-                                    "Failed to remove coupon.";
-                                  toast.error(message);
-                                } finally {
-                                  setIsCouponSyncingCart(false);
-                                }
-                              }}
-                              disabled={removingCoupon}
-                              className="ml-2 text-[10px] font-semibold text-emerald-800 hover:text-emerald-950 dark:text-emerald-200 disabled:opacity-60"
-                            >
-                              ×
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
-              )}
+              <CheckoutCouponField
+                appliedCoupons={cart?.appliedCoupons}
+                refreshCart={refreshCart}
+                onSyncingChange={setIsCouponSyncingCart}
+              />
 
               <div className="mt-5 space-y-2 text-sm" aria-busy={totalsRecalculating}>
                 {/* Subtotal is the sum of the line prices as shown above it.
