@@ -23,7 +23,7 @@ import { PAYHERE_HIDE_THRESHOLD } from "@/lib/checkoutMath";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonBrand from "shared/Button/ButtonBrand";
 import PreOrderNotice from "@/components/global/ui/PreOrderNotice";
-import { SRI_LANKAN_CITIES, type SriLankanCity } from "@/data/sriLankanCities";
+import { SRI_LANKAN_CITIES, type SriLankanCity, type SriLankanProvince } from "@/data/sriLankanCities";
 import {
     Store,
     Truck,
@@ -256,7 +256,7 @@ const CitySelectField = memo(({ id, value, onChange }: CitySelectFieldProps) => 
     // 10600. Typing a city commits without a postcode/province and never
     // touches those fields.
     const commitCity = useCallback(
-        (cityName: string, postcode?: string | null, province?: string) => {
+        (cityName: string, postcode?: string | null, province?: SriLankanProvince) => {
             setCommittedValue(cityName);
             onChange({
                 city: cityName,

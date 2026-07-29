@@ -1,10 +1,28 @@
+export const SRI_LANKAN_PROVINCES = [
+  "Western",
+  "Central",
+  "Southern",
+  "Northern",
+  "Eastern",
+  "North Western",
+  "North Central",
+  "Uva",
+  "Sabaragamuwa",
+] as const;
+
+export type SriLankanProvince = (typeof SRI_LANKAN_PROVINCES)[number];
+
 export type SriLankanCity = {
   name: string;
   postcode: string | null;
-  province: string;
+  province: SriLankanProvince;
 };
 
-const RAW_SRI_LANKAN_CITIES: Array<{ name: string; postcode: string; province: string }> = [
+const RAW_SRI_LANKAN_CITIES: Array<{
+  name: string;
+  postcode: string;
+  province: SriLankanProvince;
+}> = [
   { name: 'Aandankulam', postcode: 'NULL', province: 'Northern' },
   { name: 'Adampan', postcode: 'NULL', province: 'Northern' },
   { name: 'Addalaichenai', postcode: '32350', province: 'Eastern' },
@@ -2219,6 +2237,11 @@ const RAW_SRI_LANKAN_CITIES: Array<{ name: string; postcode: string; province: s
  * Panchikawatte 01078 over 01000. A later row only fills in a postcode the
  * earlier one is missing, which is what keeps Oruwala on 10201 instead of
  * dropping it to null.
+ *
+ * Province is also first-wins on duplicates. Today's ten duplicate pairs all
+ * agree on the same province (Western), so the merge is unambiguous; a later
+ * row never overwrites an earlier province, and only fills a postcode when
+ * the earlier row is missing one.
  */
 export const SRI_LANKAN_CITIES: SriLankanCity[] = Array.from(
   RAW_SRI_LANKAN_CITIES.reduce((cities, city) => {
@@ -2230,6 +2253,7 @@ export const SRI_LANKAN_CITIES: SriLankanCity[] = Array.from(
     if (!existing) {
       cities.set(key, { name, postcode, province: city.province });
     } else if (!existing.postcode && postcode) {
+      // First-wins province stays; only fill a missing postcode.
       existing.postcode = postcode;
     }
 

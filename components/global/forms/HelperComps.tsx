@@ -7,18 +7,10 @@ import { PaymentDetailsWithoutUrls } from "@/data/types";
 import { siteConfig } from "@/site.config";
 import { apiUrl } from "@/lib/api";
 import WelcomeMessages from "@/content/welcome-messages.json";
+import { SRI_LANKAN_PROVINCES } from "@/data/sriLankanCities";
 
-const SRI_LANKAN_STATES = [
-  "Western",
-  "Central",
-  "Southern",
-  "Northern",
-  "Eastern",
-  "North Western",
-  "North Central",
-  "Uva",
-  "Sabaragamuwa",
-];
+/** Province select options — single source with the city list's typed provinces. */
+const SRI_LANKAN_STATES = SRI_LANKAN_PROVINCES;
 // Smaller Components
 const InputField = React.memo(function InputField({
   label,

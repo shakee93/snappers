@@ -16,19 +16,7 @@ import {
   AccountSelectField,
 } from "@/components/account/AccountFormFields";
 import { accountSubheadingClassName } from "@/components/account/accountStyles";
-
-// Constants
-const SRI_LANKAN_STATES = [
-  "Western",
-  "Central",
-  "Southern",
-  "Northern",
-  "Eastern",
-  "North Western",
-  "North Central",
-  "Uva",
-  "Sabaragamuwa",
-];
+import { SRI_LANKAN_STATES } from "./HelperComps";
 
 type DeliveryFormProps = {
   onSaved?: () => void | Promise<void>;
