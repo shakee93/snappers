@@ -20,7 +20,6 @@ import { useCart } from "@/context/CartProvider";
 import checkoutCopy from "@/content/checkout-copy.json";
 import { formatPrice } from "@/lib/formatPrice";
 import { PAYHERE_HIDE_THRESHOLD } from "@/lib/checkoutMath";
-import { isCardPaymentGateway } from "@/lib/priceTiers";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonBrand from "shared/Button/ButtonBrand";
 import PreOrderNotice from "@/components/global/ui/PreOrderNotice";
@@ -674,8 +673,6 @@ interface Props {
     paymentGateways: PaymentGateway[];
     setDeliveryType: (v: DeliveryType | null) => void;
     deliveryType: DeliveryType | null;
-    setIsCardPayment: (v: boolean) => void;
-    isCardPayment: boolean;
     totalPayment: number;
     kokoTotal: number;
     setIsKokoPayment: (v: boolean) => void;
@@ -700,8 +697,6 @@ const UnifiedCheckoutForm = ({
     paymentGateways,
     setDeliveryType,
     deliveryType,
-    setIsCardPayment,
-    isCardPayment,
     totalPayment,
     kokoTotal,
     setIsKokoPayment,
@@ -948,10 +943,9 @@ const UnifiedCheckoutForm = ({
         const meta = getGatewayMeta(g);
         setSelectedGateway({ id: g.id, title: meta.title });
         setIsKokoPayment(g.id === "darazbnpl");
-        setIsCardPayment(isCardPaymentGateway(g.id));
         onPaymentMethodChange(g.id);
         // eslint-disable-next-line react-hooks/exhaustive-deps -- gatewayDisabledReason depends on deliveryType which is already in deps
-    }, [visiblePaymentGateways, selectedGateway.id, deliveryType, setIsCardPayment, setIsKokoPayment, onPaymentMethodChange]);
+    }, [visiblePaymentGateways, selectedGateway.id, deliveryType, setIsKokoPayment, onPaymentMethodChange]);
 
     // If the currently-selected gateway becomes disabled (e.g. user picks COD
     // then switches to Flash Delivery), clear it so the form can't submit
@@ -962,7 +956,6 @@ const UnifiedCheckoutForm = ({
         setSelectedGateway({ id: "", title: null });
         setMethodActive("");
         setIsKokoPayment(false);
-        setIsCardPayment(false);
         onPaymentMethodChange("");
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [deliveryType, selectedGateway.id, onPaymentMethodChange]);
@@ -1155,7 +1148,6 @@ const UnifiedCheckoutForm = ({
         }
 
         setIsKokoPayment(gateway.id === "darazbnpl");
-        setIsCardPayment(isCardPaymentGateway(gateway.id));
         onPaymentMethodChange(gateway.id);
     };
 

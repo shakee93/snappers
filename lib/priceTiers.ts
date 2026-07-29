@@ -37,7 +37,7 @@ export function isBankTransferTier(name: string | null | undefined): boolean {
 }
 
 export function isCardTier(name: string | null | undefined): boolean {
-  return /visa|mastercard|card/i.test(name ?? "");
+  return /\b(visa|master\s*card|mastercard|card)\b/i.test(name ?? "");
 }
 
 /** Backend KOKO tier price is the final payable total — split into 3 installments. */

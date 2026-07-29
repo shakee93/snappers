@@ -48,6 +48,8 @@ import { enrichCheckoutOrderStorage } from "@/components/account/accountOrderUti
 
 // Methods that represent "customer collects", never a courier rate.
 const PICKUP_METHOD_IDS = new Set(["pickup_location", "local_pickup"]);
+const COUPON_RESTRICTED_GATEWAY_IDS =
+  siteConfig.payment.couponRestrictedGatewayIds as readonly string[];
 
 /**
  * Placeholder for a summary figure while WooCommerce re-quotes the cart. Every
@@ -140,14 +142,11 @@ const CheckoutPage = () => {
 
   const [deliveryType, setDeliveryType] = useState<DeliveryType | null>(null);
   const noShipping = deliveryType === "store_pickup" || deliveryType === "flash_delivery";
-  const [isCardPayment, setIsCardPayment] = useState(false);
   const [isKokoPayment, setIsKokoPayment] = useState(false);
   // Selected gateway id — the summary lines price their woo-price-tiers unit
   // price off it while WooCommerce keeps owning the totals.
   const [selectedPaymentGatewayId, setSelectedPaymentGatewayId] = useState("");
-  const couponRestrictedPaymentGatewayIds =
-    siteConfig.payment.couponRestrictedGatewayIds as readonly string[];
-  const isCouponRestrictedPayment = couponRestrictedPaymentGatewayIds.includes(
+  const isCouponRestrictedPayment = COUPON_RESTRICTED_GATEWAY_IDS.includes(
     selectedPaymentGatewayId,
   );
 
@@ -1319,8 +1318,6 @@ const CheckoutPage = () => {
               }
               setDeliveryType={setDeliveryType}
               deliveryType={deliveryType}
-              setIsCardPayment={setIsCardPayment}
-              isCardPayment={isCardPayment}
               totalPayment={chargeableOrderTotal}
               kokoTotal={kokoOrderTotal}
               setIsKokoPayment={setIsKokoPayment}

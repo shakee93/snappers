@@ -14,8 +14,6 @@ interface CheckoutLeftProps {
   paymentGateways: any[];
   setDeliveryType: (v: DeliveryType | null) => void;
   deliveryType: DeliveryType | null;
-  isCardPayment: boolean;
-  setIsCardPayment: (v: boolean) => void;
   totalPayment: any;
   kokoTotal: number;
   setIsKokoPayment: (v: boolean) => void;
@@ -37,8 +35,6 @@ const CheckoutDetails = ({
   paymentGateways,
   setDeliveryType,
   deliveryType,
-  isCardPayment,
-  setIsCardPayment,
   totalPayment,
   kokoTotal,
   setIsKokoPayment,
@@ -86,8 +82,6 @@ const CheckoutDetails = ({
         paymentGateways={paymentGateways}
         setDeliveryType={setDeliveryType}
         deliveryType={deliveryType}
-        setIsCardPayment={setIsCardPayment}
-        isCardPayment={isCardPayment}
         totalPayment={totalPayment}
         kokoTotal={kokoTotal}
         setIsKokoPayment={setIsKokoPayment}

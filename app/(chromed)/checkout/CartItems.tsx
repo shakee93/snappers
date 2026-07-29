@@ -92,10 +92,11 @@ const CartItems = ({
     () => resolveCartLineTierPrice(item, paymentGatewayId),
     [item, paymentGatewayId]
   );
-  // Line total always comes from WooCommerce so BOGO, product-scoped coupons
-  // and any backend-side repricing are respected without needing to model them
-  // client-side. The tier price is only used for the unit-price caption and the
-  // compare-at/save display — it never affects the charged amount shown here.
+  // Verified against the live catlitter GraphQL flow:
+  // addToCart -> updateSession(chosen_payment_method) -> GET_CART(recalculateTotals)
+  // moves the cart line subtotal itself (e.g. 3800 -> 3895 for webxpay on the
+  // wooden bowl stand). So woo-price-tiers reprices the cart item, and the
+  // tier caption can trust the backend's own subtotal flow.
   const linePricing = useMemo(() => {
     const qty = quantity || 1;
     const isVariable = type === "VARIABLE";
@@ -106,37 +107,14 @@ const CartItems = ({
       isVariable ? variation?.node?.regularPrice : regularPrice
     );
 
-    // Woo's own line figure is the source of truth. If it agrees with the tier
-    // quote we can safely show the tier-derived unit caption; if not, the tier
-    // plugin is display-only for this gateway and we fall back to Woo's own
-    // unit figure so the row stays internally consistent.
-    const subtotalAmount = parseWooMoneyAmount(subtotal);
-    const wooLineSubtotal = subtotalAmount;
-    const wooUnitPrice =
-      Number.isFinite(wooLineSubtotal) && wooLineSubtotal > 0 && qty > 0
-        ? wooLineSubtotal / qty
-        : NaN;
-    const wooMatchesCatalog =
-      Number.isFinite(wooUnitPrice) &&
-      Number.isFinite(catalogUnitPrice) &&
-      Math.abs(wooUnitPrice - catalogUnitPrice) < 0.01;
-    const tierMatchesWoo =
-      !!tierPrice &&
-      Number.isFinite(wooUnitPrice) &&
-      Math.abs(wooUnitPrice - tierPrice.unitPrice) < 0.01;
-    // Unit price shown in the caption. Only trust the tier number when Woo's
-    // own visible line subtotal corroborates it.
-    const displayUnitPrice = tierMatchesWoo
-      ? tierPrice.unitPrice
-      : Number.isFinite(wooUnitPrice) && wooUnitPrice > 0
-        ? wooUnitPrice
-        : catalogUnitPrice;
-    // Strike-through target: tier → catalog; catalog → regular (on sale products).
-    const compareAtPrice = tierMatchesWoo
+    const wooLineSubtotal = parseWooMoneyAmount(subtotal);
+    // Unit price shown in the caption: matched payment tier when present,
+    // otherwise the catalog unit price.
+    const displayUnitPrice = tierPrice ? tierPrice.unitPrice : catalogUnitPrice;
+    // Strike-through target: tier -> catalog; catalog -> regular (sale products).
+    const compareAtPrice = tierPrice
       ? tierPrice.catalogUnitPrice
-      : !tierPrice && wooMatchesCatalog
-        ? regularUnitPrice
-        : NaN;
+      : regularUnitPrice;
     const hasUnitPrice = Number.isFinite(displayUnitPrice) && displayUnitPrice > 0;
     // Only show a saving when the payment option is genuinely cheaper; a
     // gateway that costs more gets no strike-through.
@@ -156,10 +134,6 @@ const CartItems = ({
           : null,
       // Always WooCommerce's own number — never a client-side recalculation.
       lineTotalLabel: formatPrice(wooLineSubtotal),
-      // The visible line figure is Woo's pre-coupon subtotal, so the caption
-      // only claims a tier price when that subtotal corroborates it too.
-      showTierCaption: tierMatchesWoo,
-      wooMatchesCatalog,
     };
   }, [
     price,
@@ -167,7 +141,6 @@ const CartItems = ({
     regularPrice,
     subtotal,
     tierPrice,
-    total,
     type,
     variation?.node?.price,
     variation?.node?.regularPrice,
@@ -250,7 +223,7 @@ const CartItems = ({
               <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                 {linePricing.unitPriceLabel}
               </span>
-              {linePricing.showTierCaption && tierPrice && (
+              {tierPrice && (
                 <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
                   {tierPrice.tierName} price
                 </span>
@@ -341,12 +314,11 @@ const CartItems = ({
               <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                 {linePricing.lineTotalLabel}
               </span>
-              {linePricing.savingLabel &&
-                (linePricing.showTierCaption || linePricing.wooMatchesCatalog) && (
+              {linePricing.savingLabel && (
                 <span className="mt-1 block rounded bg-slate-100 px-1.5 py-0.5 text-[11px] font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
                   Save {linePricing.savingLabel}
                 </span>
-                )}
+              )}
             </>
           )}
         </div>
