@@ -20,6 +20,7 @@ import {
   isSimpleProductFreeShipping,
   isVariationFreeShipping,
 } from "@/lib/freeShipping";
+import { RecalculatingAmount } from "@/components/global/ui/RecalculatingAmount";
 import { getProductPath } from "@/lib/productUrl";
 
 export interface CartItem {
@@ -61,6 +62,8 @@ interface CartItemsProps {
   index: number;
   /** Selected WooCommerce gateway id — drives the woo-price-tiers line price. */
   paymentGatewayId: string;
+  /** True while payment/shipping/coupon sync is re-quoting cart line totals. */
+  pricesRecalculating?: boolean;
   onQuantityChange: (key: string, quantity: number) => Promise<unknown> | unknown;
   onRemove: (keys: string[]) => Promise<unknown> | unknown;
 }
@@ -69,6 +72,7 @@ const CartItems = ({
   item,
   index,
   paymentGatewayId,
+  pricesRecalculating = false,
   onQuantityChange,
   onRemove,
 }: CartItemsProps) => {
@@ -108,9 +112,12 @@ const CartItems = ({
     );
 
     const wooLineSubtotal = parseWooMoneyAmount(subtotal);
-    // Unit price shown in the caption: matched payment tier when present,
-    // otherwise the catalog unit price.
-    const displayUnitPrice = tierPrice ? tierPrice.unitPrice : catalogUnitPrice;
+    // Single source for both unit caption and line total — always Woo's line
+    // subtotal so gateway changes never show tier math beside a stale total.
+    const displayUnitPrice =
+      Number.isFinite(wooLineSubtotal) && wooLineSubtotal > 0 && qty > 0
+        ? wooLineSubtotal / qty
+        : catalogUnitPrice;
     // Strike-through target: tier -> catalog; catalog -> regular (sale products).
     const compareAtPrice = tierPrice
       ? tierPrice.catalogUnitPrice
@@ -213,17 +220,21 @@ const CartItems = ({
             <Link href={productHref}>{name}</Link>
           </h3>
 
-          {!lineIsFree && linePricing.unitPriceLabel && (
+          {!lineIsFree && (linePricing.unitPriceLabel || pricesRecalculating) && (
             <div className="mt-1 flex flex-wrap items-center gap-2">
-              {linePricing.compareAtPriceLabel && (
+              {!pricesRecalculating && linePricing.compareAtPriceLabel && (
                 <span className="text-xs text-slate-400 line-through dark:text-slate-500">
                   {linePricing.compareAtPriceLabel}
                 </span>
               )}
-              <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                {linePricing.unitPriceLabel}
-              </span>
-              {tierPrice && (
+              {pricesRecalculating ? (
+                <RecalculatingAmount className="h-4 w-16" />
+              ) : (
+                <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                  {linePricing.unitPriceLabel}
+                </span>
+              )}
+              {!pricesRecalculating && tierPrice && (
                 <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
                   {tierPrice.tierName} price
                 </span>
@@ -309,6 +320,8 @@ const CartItems = ({
         >
           {lineIsFree ? (
             <span className="text-sm font-bold text-green-600">Free</span>
+          ) : pricesRecalculating ? (
+            <RecalculatingAmount className="h-4 w-16" />
           ) : (
             <>
               <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
