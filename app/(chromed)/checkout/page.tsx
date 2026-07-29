@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Input from "shared/Input/Input";
 import Label from "@/components/global/primitives/Label/Label";
 import Link from "next/link";
@@ -86,6 +86,9 @@ const resolveCourierRate = (cart: Cart | null | undefined, preferFree: boolean) 
 
   return courierRates[0] ?? null;
 };
+
+const cartHasFreeShippingCoupon = (source: Cart | null | undefined) =>
+  !!source?.appliedCoupons?.some((coupon) => coupon?.code === "free-shipping");
 
 interface FormData {
   contactInfo: Record<string, any>;
@@ -200,15 +203,9 @@ const CheckoutPage = () => {
   const router = useRouter();
   const initiatePayment = usePayhere();
 
-  const cartHasFreeShippingCoupon = useCallback(
-    (source: Cart | null | undefined) =>
-      !!source?.appliedCoupons?.some((coupon) => coupon?.code === "free-shipping"),
-    [],
-  );
-
   const preferFreeShipping = useMemo(
     () => cartHasFreeShippingCoupon(cart),
-    [cart, cartHasFreeShippingCoupon],
+    [cart],
   );
 
   const updateFormData = (section: string, data: any) => {

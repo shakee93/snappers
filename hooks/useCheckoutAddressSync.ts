@@ -28,39 +28,53 @@ export const CHECKOUT_POSTCODE_PATTERN = /^\d{4,6}$/;
 // scrolls to payment. City picks already debounce their own commit at 300ms.
 const SYNC_DEBOUNCE_MS = 300;
 
-/** Fields that decide the shipping zone / distance quote — not the full address. */
-type AddressKeyFields = Pick<
-  CustomerAddressInput,
-  "country" | "state" | "city" | "postcode" | "address1"
->;
-
-type AddressKeySource = {
-  [K in keyof AddressKeyFields]?: string | null;
+type AddressFieldSource = {
+  country?: string | null;
+  state?: string | null;
+  city?: string | null;
+  postcode?: string | null;
+  address1?: string | null;
+  address2?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
 } | null | undefined;
 
-// Rate-affecting fields only. Omitting address2 / name avoids permanent
-// mismatch when WC merges a saved apartment line the form never sent.
-const addressKey = (address: AddressKeySource) =>
-  [
-    address?.country,
-    address?.state,
-    address?.city,
-    address?.postcode,
-    address?.address1,
-  ]
-    .map((part) => String(part ?? "").trim().toLowerCase())
-    .join("|");
+// Full address for dedupe — every field the customer edits is worth pushing.
+// Shipping plugins / per-address rules can key on street lines and names, and
+// the customer expects the total to respond to whatever they just changed.
+// (Echo comparison uses RATE_KEY_FIELDS below, which is intentionally narrower.)
+const FULL_KEY_FIELDS = [
+  "country",
+  "state",
+  "city",
+  "postcode",
+  "address1",
+  "address2",
+  "firstName",
+  "lastName",
+] as const;
 
-const snapshotKey = (snapshot: CheckoutAddressSnapshot) =>
-  `${addressKey(snapshot.billing)}>>${addressKey(snapshot.shipping)}`;
-
-const ADDRESS_KEY_FIELDS = [
+// Rate-affecting fields only for the updateCustomer echo check. Omitting
+// address2 / name avoids permanent mismatch when WC merges a saved apartment
+// line the form never sent — which would force a second push every time.
+const RATE_KEY_FIELDS = [
   "country",
   "state",
   "city",
   "postcode",
   "address1",
 ] as const;
+
+const fieldKey = (
+  address: AddressFieldSource,
+  fields: readonly (keyof NonNullable<AddressFieldSource>)[],
+) =>
+  fields
+    .map((field) => String(address?.[field] ?? "").trim().toLowerCase())
+    .join("|");
+
+const snapshotKey = (snapshot: CheckoutAddressSnapshot) =>
+  `${fieldKey(snapshot.billing, FULL_KEY_FIELDS)}>>${fieldKey(snapshot.shipping, FULL_KEY_FIELDS)}`;
 
 /**
  * WooGraphQL can persist the customer address one mutation behind: a single
@@ -72,29 +86,26 @@ const ADDRESS_KEY_FIELDS = [
  * just a stale label.
  *
  * Push once, then push again only when the echoed shipping address still
- * mismatches what we sent. Healthy backends pay one round trip; the laggy
- * case still gets the second flush. Remove the retry once the backend defect
- * is fixed — track under gq-backend-plugins (WooGraphQL updateCustomer address
- * lag). Watch the network tab: a healthy push should fire one
- * `updateCustomerAddress`; a warn below means the echo comparison still
- * forced a retry.
+ * mismatches what we sent on rate-affecting fields. Healthy backends pay one
+ * round trip; the laggy case still gets the second flush.
+ *
+ * Remove the retry *and* the console.warn below together once the backend
+ * defect is fixed — track under gq-backend-plugins (WooGraphQL updateCustomer
+ * address lag). Watch the network tab: a healthy push should fire one
+ * `updateCustomerAddress`; a warn means the echo comparison forced a retry
+ * (state normalisation is the field most likely to trip this).
  */
-const mismatchedAddressFields = (
+const mismatchedRateFields = (
   sent: CustomerAddressInput,
-  echoed: AddressKeySource,
+  echoed: AddressFieldSource,
 ): string[] => {
-  if (!echoed) return [...ADDRESS_KEY_FIELDS];
-  return ADDRESS_KEY_FIELDS.filter((field) => {
+  if (!echoed) return [...RATE_KEY_FIELDS];
+  return RATE_KEY_FIELDS.filter((field) => {
     const a = String(sent[field] ?? "").trim().toLowerCase();
     const b = String(echoed[field] ?? "").trim().toLowerCase();
     return a !== b;
   });
 };
-
-const addressesMatch = (
-  sent: CustomerAddressInput,
-  echoed: AddressKeySource,
-) => mismatchedAddressFields(sent, echoed).length === 0;
 
 // Pushing a half-typed address makes WC quote against a zone the customer
 // isn't in, so wait until every rate-affecting field is actually filled.
@@ -194,9 +205,6 @@ export function useCheckoutAddressSync(onSynced: () => Promise<void> | void) {
       const runSync = async () => {
         timerRef.current = null;
         if (!isCurrent()) return;
-        // Belt-and-suspenders with the clear above: once runSync actually
-        // starts, the prior key must not be treated as synced.
-        lastSyncedKeyRef.current = null;
 
         try {
           const pushInput = {
@@ -214,11 +222,12 @@ export function useCheckoutAddressSync(onSynced: () => Promise<void> | void) {
           if (!isCurrent()) return;
 
           const echoedShipping = firstPush?.updateCustomer?.customer?.shipping;
-          const mismatched = mismatchedAddressFields(
+          const mismatched = mismatchedRateFields(
             snapshot.shipping,
             echoedShipping,
           );
           if (mismatched.length > 0) {
+            // Remove with the retry once backend address lag is fixed.
             console.warn(
               "[checkout] updateCustomer echo mismatched; retrying push. Fields:",
               mismatched.join(", "),
