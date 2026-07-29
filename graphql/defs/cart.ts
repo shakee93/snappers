@@ -1,5 +1,10 @@
 import { gql } from '@apollo/client';
-import { CartContent, CartContentSlim, CartItemContent } from "@/graphql/defs/cart.fragments";
+import {
+  CartContent,
+  CartContentSlim,
+  CartContentWithRates,
+  CartItemContent,
+} from "@/graphql/defs/cart.fragments";
 import {CustomerFragment} from "@/graphql/defs/auth.fragments";
 
 
@@ -21,15 +26,15 @@ export const ADD_TO_CART = gql`
 `;
 
 export const GET_CART = gql`
-    query GetCart($customerId: Int) {
-        cart {
-            ...CartContent
+    query GetCart($customerId: Int, $recalculateTotals: Boolean) {
+        cart(recalculateTotals: $recalculateTotals) {
+            ...CartContentWithRates
         }
         customer(customerId: $customerId) {
             ...CustomerFragment
         }
     }
-    ${CartContent}
+    ${CartContentWithRates}
     ${CustomerFragment}
 `;
 
@@ -81,12 +86,12 @@ export const UPDATE_SHIPPING_TOTAL = gql`
 mutation updateShippingMethod($input: UpdateShippingMethodInput!){  
     updateShippingMethod(input: $input){    
         cart {
-                  ...CartContent    
+                  ...CartContentWithRates    
                 }
                 clientMutationId  
             }
         }
-        ${CartContent}`
+        ${CartContentWithRates}`
 
 
 export const APPLY_COUPON = gql`

@@ -6,12 +6,15 @@ import Input from "shared/Input/Input";
 import Label from "@/components/global/primitives/Label/Label";
 import Link from "next/link";
 import { BRAND_CTA_BUTTON_CLASS } from "shared/Button/ButtonBrand";
+import { useApolloClient } from "@apollo/client";
 import { useCart } from "@/context/CartProvider";
+import { GET_CART } from "@/graphql/defs/cart";
 import { useCoupon } from "@/hooks/useCoupon";
 import { useShipping } from "@/hooks/useShipping";
 import { useCheckoutAddressSync } from "@/hooks/useCheckoutAddressSync";
 import { useCheckout } from "@/hooks/useCheckout";
 import {
+  Cart,
   CheckoutPayload,
   CustomerAddressInput,
   PaymentGateway,
@@ -42,6 +45,51 @@ import { formatPrice, currencySymbol } from "@/lib/formatPrice";
 import { CARD_SURCHARGE_RATE } from "@/lib/checkoutMath";
 import { apiUrl } from "@/lib/api";
 import { enrichCheckoutOrderStorage } from "@/components/account/accountOrderUtils";
+
+// Methods that represent "customer collects", never a courier rate.
+const PICKUP_METHOD_IDS = new Set(["pickup_location", "local_pickup"]);
+
+/**
+ * The courier rate is not a constant on this store. Its id *and* its label
+ * change with the destination — the distance/weight method quotes
+ * `dwbs:1:distance` "Local Delivery" inside the Colombo zone and
+ * `dwbs:1:weight` "Standard Shipping" outstation — so a hard-coded id is
+ * rejected outright ("… is not an available shipping method for shipping
+ * package …") and the cart silently keeps the rate quoted for the previous
+ * address. Read it off the rates WooCommerce returned for the address it
+ * currently holds instead.
+ *
+ * Assumes WC quotes a single package (`availableShippingMethods[0]`) with a
+ * single courier rate among the non-pickup options; if a zone ever offers
+ * multiple courier choices the customer silently gets `courierRates[0]`
+ * (whatever WC ordered first) and never sees a picker.
+ */
+const parseRateCost = (cost: string | number | null | undefined): number => {
+  if (typeof cost === "number") return cost;
+  if (typeof cost !== "string") return NaN;
+  return parseFloat(cost.replace(/₨|&nbsp;|,|[^0-9.]/g, ""));
+};
+
+const resolveCourierRate = (cart: Cart | null | undefined, preferFree: boolean) => {
+  const rates = cart?.availableShippingMethods?.[0]?.rates ?? [];
+  const courierRates = rates.filter(
+    (rate): rate is NonNullable<typeof rate> =>
+      !!rate?.id && !PICKUP_METHOD_IDS.has(rate.methodId ?? ""),
+  );
+
+  if (preferFree) {
+    const free = courierRates.find(
+      (rate) => rate.methodId === "free_shipping" || parseRateCost(rate.cost) === 0,
+    );
+    if (free) return free;
+  }
+
+  return courierRates[0] ?? null;
+};
+
+const cartHasFreeShippingCoupon = (source: Cart | null | undefined) =>
+  !!source?.appliedCoupons?.some((coupon) => coupon?.code === "free-shipping");
+
 interface FormData {
   contactInfo: Record<string, any>;
   deliveryAddress: any;
@@ -55,8 +103,8 @@ interface FormData {
 }
 
 const CheckoutPage = () => {
-  const { cart, removeFromCart, updateCart, clearCart, refreshCart, loading: cartLoading } = useCart();
-  const [finalOrderTotal, setFinalOrderTotal] = useState(null);
+  const { cart, removeFromCart, updateCart, clearCart, refreshCart, applyCart, loading: cartLoading } = useCart();
+  const apolloClient = useApolloClient();
   const { customer, fetchCustomer } = useSession();
 
   const { paymentGateways } = usePaymentGateways();
@@ -80,14 +128,11 @@ const CheckoutPage = () => {
   const [isCardPayment, setIsCardPayment] = useState(false);
   const [isKokoPayment, setIsKokoPayment] = useState(false);
 
-  const [shippingTotal, setShippingTotal] = useState();
-  const [orderTotal, setOrderTotal] = useState<string | null>(null);
+  const [shippingTotal, setShippingTotal] = useState<string | null | undefined>();
   const [paymentData, setPaymentData] =
     useState<PaymentDetailsWithoutUrls | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
-  const [totalWithTax, setTotalWithTax] = useState<string | null>();
   const [isTOC, setTOC] = useState<boolean>(false);
-  const [freeShipping, setFreeShipping] = useState<boolean>(false);
   const [tocError, setTocError] = useState(false);
   const [guestCheckoutData, setGuestCheckoutData] = useState<any>();
   const [isConfirmingOrder, setIsConfirmingOrder] = useState(false);
@@ -126,10 +171,12 @@ const CheckoutPage = () => {
       router.push("/");
     }
 
-    if (cart?.total !== null && cart?.total !== undefined) {
-      setOrderTotal(cart?.total);
+    if (noShipping) {
+      setShippingTotal("0");
+    } else if (cart?.shippingTotal != null) {
+      setShippingTotal(cart.shippingTotal);
     }
-  }, [cart, hasSeenCartWithItems, isCouponSyncingCart, applyingCoupon, removingCoupon]);
+  }, [cart, hasSeenCartWithItems, isCouponSyncingCart, applyingCoupon, removingCoupon, noShipping]);
 
   useEffect(() => {
     fetchCustomer();
@@ -156,15 +203,10 @@ const CheckoutPage = () => {
   const router = useRouter();
   const initiatePayment = usePayhere();
 
-
-  useEffect(() => {
-    const hasFreeShipping: any = cart?.appliedCoupons?.some(
-      (coupon) => coupon?.code === "free-shipping"
-    );
-    if (hasFreeShipping) {
-      setFreeShipping(true);
-    }
-  }, [cart]);
+  const preferFreeShipping = useMemo(
+    () => cartHasFreeShippingCoupon(cart),
+    [cart],
+  );
 
   const updateFormData = (section: string, data: any) => {
     // Form data changing here!.
@@ -195,13 +237,15 @@ const CheckoutPage = () => {
   // stale response that does come back.
   const shippingAbortRef = useRef<AbortController | null>(null);
 
-  const updateShippingTotal = async () => {
-    const hasFreeShipping: any = cart?.appliedCoupons?.some(
-      (coupon) => coupon?.code === "free-shipping"
-    );
-    if (hasFreeShipping) {
-      setFreeShipping(true);
-    }
+  // `quotedCart` is the cart as the server just returned it. After an address
+  // push the provider's `cart` is a render behind, and the rate ids we have to
+  // choose from live on that response — so callers that just refetched pass it
+  // in rather than letting us read a stale set.
+  const updateShippingTotal = async (quotedCart?: Cart | null) => {
+    const rateSource = quotedCart ?? cart;
+    // Prefer the quoted cart's coupon set when one was just refetched —
+    // the provider cart can lag a render behind.
+    const preferFree = cartHasFreeShippingCoupon(rateSource);
 
     shippingAbortRef.current?.abort();
     const controller = new AbortController();
@@ -211,27 +255,20 @@ const CheckoutPage = () => {
       // Mirror the mapping in getShippingMethod: store_pickup uses the
       // block-based pickup_location, flash_delivery uses the zone-bound
       // flat_rate:4 (free, configured backend-side as "Flash Delivery
-      // (Uber/PickMe)").
+      // (Uber/PickMe)"). Courier falls through to whichever rate the store
+      // quoted for the current address — see resolveCourierRate.
       const shippingMethods =
         deliveryType === "flash_delivery"
           ? "flat_rate:4"
           : deliveryType === "store_pickup"
             ? "pickup_location:0"
-            : freeShipping
-              ? siteConfig.shipping.freeShippingMethodId
-              : siteConfig.shipping.weightBasedShippingMethodId;
+            : resolveCourierRate(rateSource, preferFree)?.id;
 
-      const total: any = cart?.total;
-      setOrderTotal(freeShipping ? cart?.subtotal : total);
-
-      if (customer?.id === "guest") {
-        const subtotal: any = cart?.subtotal;
-
-        if (noShipping || freeShipping) {
-          setOrderTotal(subtotal);
-        } else {
-          setOrderTotal(total);
-        }
+      // No courier rate means the address doesn't resolve to a serviceable
+      // zone yet. Selecting nothing is correct — the cart keeps whatever WC
+      // last quoted, and the summary is already showing that.
+      if (!shippingMethods) {
+        return;
       }
 
       const { data, errors } = await updateCartShippingTotalMutation({
@@ -248,15 +285,12 @@ const CheckoutPage = () => {
       }
 
       if (data?.updateShippingMethod?.cart) {
-        const { total, shippingTotal, subtotal } =
-          data.updateShippingMethod.cart;
-        if (freeShipping) {
-          setOrderTotal(subtotal);
-          setShippingTotal(shippingTotal);
-        } else {
-          setOrderTotal(total);
-          setShippingTotal(shippingTotal);
-        }
+        const updatedCart = data.updateShippingMethod.cart;
+        // Push into the provider now — the summary prefers cart.shippingTotal,
+        // and without this it keeps reading the pre-address cart until a later
+        // refresh effect lands (which is what made the estimate look stuck).
+        applyCart(updatedCart);
+        setShippingTotal(noShipping ? "0" : updatedCart.shippingTotal);
       } else {
         console.error(
           "Failed to update cart shipping total. No valid data returned."
@@ -273,11 +307,41 @@ const CheckoutPage = () => {
 
   // The address the customer types is what WooCommerce quotes the rate
   // against, so once it lands server-side both the shipping line and the cart
-  // totals on this page are stale. Re-run the rate lookup first, then pull the
-  // cart so subtotal/discount reflect any address-conditional rules.
+  // totals on this page are stale. Pull the cart first: its
+  // `availableShippingMethods` are re-quoted for the new address, and the
+  // courier rate id we then select comes from that response. Reading it the
+  // other way round selects against the previous address's rates, which is how
+  // the total ended up one edit behind.
   const handleAddressSynced = async () => {
-    await updateShippingTotal();
-    await refreshCart();
+    // Goes straight to the client rather than through refreshCart() so the
+    // rate ids are guaranteed to be the ones WooCommerce just quoted for the
+    // new address: refreshCart() is a useLazyQuery execute that swallows some
+    // errors and resolves undefined, and falling back to the provider's cart
+    // would price against the previous destination.
+    let quotedCart: Cart | null = null;
+    try {
+      const { data } = await apolloClient.query({
+        query: GET_CART,
+        variables: { recalculateTotals: true },
+        fetchPolicy: "no-cache",
+      });
+      quotedCart = data?.cart ?? null;
+    } catch (error) {
+      // Fall through with a null cart: updateShippingTotal drops back to the
+      // provider's copy, which is worth trying but may price against the
+      // previous address.
+      console.error("Failed to re-read the cart after address sync:", error);
+    }
+
+    // Surface the re-quoted cart immediately — the totals effect above picks
+    // the new figures up from it. Waiting for updateShippingMethod before
+    // touching the provider left the estimate row on the previous rate for the
+    // whole mutation round-trip.
+    if (quotedCart) {
+      applyCart(quotedCart);
+    }
+
+    await updateShippingTotal(quotedCart);
   };
 
   const { syncCheckoutAddress, addressSyncing } =
@@ -294,7 +358,7 @@ const CheckoutPage = () => {
     if (!cart?.contents?.itemCount) return;
     updateShippingTotal().then((r) => r);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally omit the unstable mutation fn ref
-  }, [deliveryType, freeShipping, cart?.contents?.itemCount]);
+  }, [deliveryType, preferFreeShipping, cart?.contents?.itemCount]);
 
   // Abort any pending shipping-update on unmount so we don't write to
   // unmounted-component state.
@@ -684,26 +748,33 @@ const CheckoutPage = () => {
     // both resolve to a free shipping line — and flat_rate keeps the
     // title verbatim so order admin shows "Flash Delivery (Uber/PickMe)"
     // instead of the pickup_location plugin's "<title> (<location>)" template.
+    // Courier: same dynamic rate as the cart-side lookup. Falling back to the
+    // configured constant keeps the order writable if the cart somehow has no
+    // rates to read, but the resolved id is what the store actually quoted.
+    const courierRate = resolveCourierRate(cart, preferFreeShipping);
+
     const methodId =
       orderDeliveryType === "flash_delivery"
         ? "flat_rate:4"
         : orderDeliveryType === "store_pickup"
           ? "pickup_location:0"
-          : freeShipping
-            ? siteConfig.shipping.freeShippingMethodId
-            : siteConfig.shipping.weightBasedShippingMethodId;
+          : courierRate?.id ??
+            (preferFreeShipping
+              ? siteConfig.shipping.freeShippingMethodId
+              : siteConfig.shipping.weightBasedShippingMethodId);
 
     // methodTitle is the display string for the order summary; for
     // flat_rate WC writes the zone-config title, for pickup_location WC
     // writes its own templated title — either way this string is
-    // cosmetic on the cart side.
+    // cosmetic on the cart side. The courier label is zone-dependent
+    // ("Local Delivery" vs "Standard Shipping"), so prefer the quoted one
+    // over a generic stand-in.
     const methodTitle = orderDeliveryType === "store_pickup"
       ? "Store Pickup"
       : orderDeliveryType === "flash_delivery"
         ? "Flash Delivery (Uber/PickMe)"
-        : freeShipping
-          ? "Free Shipping"
-          : "Weight Based Shipping";
+        : courierRate?.label ??
+          (preferFreeShipping ? "Free Shipping" : "Weight Based Shipping");
 
     const total = noCharge ? "0" : shippingTotal;
 
@@ -888,7 +959,22 @@ const CheckoutPage = () => {
     return orderTotalNumber;
   };
 
-  const numericOrderTotal = replaceStringinInt(orderTotal);
+  // For pickup / flash / free shipping, strip only the (possibly stale)
+  // shipping line from cart.total so coupons and fees stay in the quoted
+  // total. Using cart.subtotal would drop percentage coupons. Assumes
+  // shippingTax is 0 on this store (tax fields were trimmed from the cart
+  // fragment as unused) — if shipping tax is ever configured, pickup totals
+  // would still include it until that line is subtracted too.
+  const serverOrderTotal = replaceStringinInt(cart?.total);
+  const serverShippingTotal = replaceStringinInt(cart?.shippingTotal ?? "0");
+  const chargeableOrderTotal =
+    noShipping || preferFreeShipping
+      ? Math.max(
+          0,
+          (Number.isFinite(serverOrderTotal) ? serverOrderTotal : 0) -
+            (Number.isFinite(serverShippingTotal) ? serverShippingTotal : 0),
+        )
+      : serverOrderTotal;
   const cartSubtotal = replaceStringinInt(cart?.subtotal);
   const numericDiscountTotal = replaceStringinInt(cart?.discountTotal);
   const hasDiscount = Number.isFinite(numericDiscountTotal) && numericDiscountTotal > 0;
@@ -901,41 +987,26 @@ const CheckoutPage = () => {
     if (!Number.isFinite(sale) || !Number.isFinite(regular) || regular <= sale) return sum;
     return sum + (regular - sale) * (item?.quantity || 0);
   }, 0);
-  const threePercentFromTotal = numericOrderTotal * CARD_SURCHARGE_RATE;
-  const TotalWithKoko = (cartSubtotal / 88) * 100;
-  const taxWithTotal = (numericOrderTotal + threePercentFromTotal).toFixed(2);
-
-  // Real shipping amount for Koko's installment math. Was hardcoded at 500
-  // LKR which silently disagreed with the actual courier rate the rest of
-  // the page renders. Source the same value the cart shows; fall back to
-  // 500 only if the cart hasn't loaded yet.
-  // Note: 0 is a valid loaded value when the cart contains a free-shipping
-  // product (plugin zeros the rate) or has the free-shipping coupon applied,
-  // so we cannot reject it with `> 0` — that would overcharge Koko by 500.
-  const kokoShippingAmount = (() => {
-    if (noShipping) return 0;
-    if (cart?.shippingTotal != null) {
-      const fromCart = replaceStringinInt(cart.shippingTotal);
-      if (Number.isFinite(fromCart)) return fromCart;
-    }
-    const rateCost = cart?.availableShippingMethods?.[0]?.rates?.[0]?.cost;
-    if (rateCost != null) {
-      const fromRate = typeof rateCost === "string" ? parseFloat(rateCost) : Number(rateCost);
-      if (Number.isFinite(fromRate)) return fromRate;
-    }
-    return 500;
-  })();
-  const kokoOrderTotal = TotalWithKoko + kokoShippingAmount;
+  const threePercentFromTotal = chargeableOrderTotal * CARD_SURCHARGE_RATE;
+  // Koko installment seam — currently identical to chargeableOrderTotal after
+  // the financing markup was removed; kept named so a gateway fee can return
+  // without rewiring the summary / prop plumbing.
+  const kokoOrderTotal = chargeableOrderTotal;
+  const cardSurchargeAmount = isCardPayment ? threePercentFromTotal : 0;
 
   const orderTotalLabel = isCardPayment
-    ? formatPrice(numericOrderTotal + threePercentFromTotal)
-    : isKokoPayment
-    ? formatPrice(kokoOrderTotal)
-    : formatPrice(numericOrderTotal);
+    ? formatPrice(chargeableOrderTotal + threePercentFromTotal)
+    : formatPrice(chargeableOrderTotal);
 
-  useEffect(() => {
-    setTotalWithTax(taxWithTotal);
-  }, [taxWithTotal]);
+  // The courier's name changes with the destination — WC quotes "Local
+  // Delivery" inside the Colombo distance zone and "Standard Shipping"
+  // outstation — so name the service the customer is paying for instead of a
+  // generic estimate line. Falls back to the generic wording while the cart
+  // has no quote yet.
+  const shippingRateLabel = useMemo(() => {
+    if (preferFreeShipping) return "Free Shipping";
+    return resolveCourierRate(cart, preferFreeShipping)?.label || "Shipping estimate";
+  }, [cart, preferFreeShipping]);
 
   const isPreOrderProduct = (product: any) => {
     const tags = product?.productTags?.nodes || [];
@@ -1199,7 +1270,7 @@ const CheckoutPage = () => {
               deliveryType={deliveryType}
               setIsCardPayment={setIsCardPayment}
               isCardPayment={isCardPayment}
-              totalPayment={numericOrderTotal}
+              totalPayment={chargeableOrderTotal}
               kokoTotal={kokoOrderTotal}
               setIsKokoPayment={setIsKokoPayment}
               isKokoPayment={isKokoPayment}
@@ -1355,11 +1426,7 @@ const CheckoutPage = () => {
                           </span>
                           {applied.discountAmount && (
                             <span className="ml-2">
-                              (<span
-                                dangerouslySetInnerHTML={{
-                                  __html: applied.discountAmount,
-                                }}
-                              />{" "}
+                              ({formatPrice(replaceStringinInt(applied.discountAmount))}{" "}
                               off)
                             </span>
                           )}
@@ -1406,13 +1473,7 @@ const CheckoutPage = () => {
                   <span className="font-medium text-slate-900 dark:text-slate-200">
                     {catalogSavings > 0
                       ? formatPrice(cartSubtotal + catalogSavings)
-                      : (
-                        <span
-                          dangerouslySetInnerHTML={{
-                            __html: cart?.subtotal || "0.00",
-                          }}
-                        />
-                      )}
+                      : formatPrice(cartSubtotal)}
                   </span>
                 </div>
 
@@ -1430,11 +1491,7 @@ const CheckoutPage = () => {
                     <span className="text-slate-600 dark:text-slate-400">Coupon</span>
                     <span className="inline-flex items-center rounded-md bg-red-500 px-2 py-0.5 text-xs font-semibold text-white">
                       −{" "}
-                      <span
-                        dangerouslySetInnerHTML={{
-                          __html: cart?.discountTotal || "0.00",
-                        }}
-                      />
+                      {formatPrice(numericDiscountTotal)}
                     </span>
                   </div>
                 )}
@@ -1442,31 +1499,47 @@ const CheckoutPage = () => {
                 {!noShipping && (
                   <div className="flex justify-between" aria-busy={totalsRecalculating}>
                     <span className="text-slate-600 dark:text-slate-400">
-                      {freeShipping ? `Free Shipping` : `Shipping estimate`}
+                      {shippingRateLabel}
                     </span>
                     <span className="font-medium text-slate-900 dark:text-slate-200">
                       {totalsRecalculating ? (
                         <span className="inline-block w-20 h-5 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
-                      ) : freeShipping ? (
-                        <span dangerouslySetInnerHTML={{ __html: "0.00" }} />
+                      ) : preferFreeShipping ? (
+                        formatPrice(0)
                       ) : (
-                        // shippingTotal here is local state set from the
-                        // updateShippingMethod mutation response (line 245);
-                        // cart?.shippingTotal from CartProvider is stale until
-                        // the next cart refetch.
-                        <span
-                          dangerouslySetInnerHTML={{
-                            __html: shippingTotal || cart?.shippingTotal || "0.00",
-                          }}
-                        />
+                        // The refreshed cart wins over the local state. Both
+                        // hold a shipping figure, but only the cart's is
+                        // re-read after every address sync — the local copy is
+                        // whatever the last updateShippingMethod returned and
+                        // never expires, so `shippingTotal || cart` let a
+                        // superseded rate shadow the live one indefinitely.
+                        // That is why the row disagreed with the order total
+                        // (which tracks cart.total) until a reload cleared the
+                        // state. Both arrive as WooCommerce's own "Rs450.00"
+                        // string, so re-format — the rest of this summary is
+                        // LKR.
+                        formatPrice(
+                          replaceStringinInt(cart?.shippingTotal || shippingTotal),
+                        )
                       )}
                     </span>
                   </div>
                 )}
+
+                {isCardPayment && cardSurchargeAmount > 0 && (
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-600 dark:text-slate-400">
+                      Card processing fee
+                    </span>
+                    <span className="font-medium text-slate-900 dark:text-slate-200">
+                      +{formatPrice(cardSurchargeAmount)}
+                    </span>
+                  </div>
+                )}
               </div>
-              {(isCardPayment || isKokoPayment) && (
+              {hasDiscount && (isCardPayment || isKokoPayment) && (
                 <div className="flex justify-between py-2.5">
-                  <span className="text-red-500 font-medium">Sorry you missed the discount</span>
+                  <span className="text-red-500 font-medium">Coupon discounts cannot be used with this payment method</span>
                 </div>
               )}
               {isKokoPayment && (
@@ -1492,12 +1565,9 @@ const CheckoutPage = () => {
                   {totalsRecalculating ? (
                     <span className="inline-block w-32 h-7 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
                   ) : (
-                    <span
-                      className="text-xl font-bold"
-                      dangerouslySetInnerHTML={{
-                        __html: formatPrice(numericOrderTotal + threePercentFromTotal),
-                      }}
-                    />
+                    <span className="text-xl font-bold">
+                      {formatPrice(chargeableOrderTotal + threePercentFromTotal)}
+                    </span>
                   )}
                 </div>
               )}
@@ -1508,12 +1578,9 @@ const CheckoutPage = () => {
                   {totalsRecalculating ? (
                     <span className="inline-block w-32 h-7 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
                   ) : (
-                    <span
-                      className="text-xl font-bold"
-                      dangerouslySetInnerHTML={{
-                        __html: formatPrice(kokoOrderTotal),
-                      }}
-                    />
+                    <span className="text-xl font-bold">
+                      {formatPrice(kokoOrderTotal)}
+                    </span>
                   )}
                 </div>
               )}
@@ -1525,7 +1592,7 @@ const CheckoutPage = () => {
                     <span className="inline-block w-32 h-7 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
                   ) : (
                     <span className="text-xl font-bold">
-                      {formatPrice(numericOrderTotal)}
+                      {formatPrice(chargeableOrderTotal)}
                     </span>
                   )}
                 </div>

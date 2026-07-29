@@ -182,7 +182,6 @@ interface AddressFieldsProps {
 interface CitySelectFieldProps {
     id: string;
     value: string;
-    postalValue: string;
     onChange: (patch: Partial<AddressFieldValues>) => void;
 }
 
@@ -191,7 +190,7 @@ const MAX_VISIBLE_CITY_OPTIONS = 60;
 /** max-h-64 (256px) plus the 8px gap, used to decide whether the panel drops up. */
 const CITY_PANEL_HEIGHT = 264;
 
-const CitySelectField = memo(({ id, value, postalValue, onChange }: CitySelectFieldProps) => {
+const CitySelectField = memo(({ id, value, onChange }: CitySelectFieldProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const listRef = useRef<HTMLUListElement>(null);
     const [inputValue, setInputValue] = useState(value);
@@ -249,15 +248,21 @@ const CitySelectField = memo(({ id, value, postalValue, onChange }: CitySelectFi
         activeOption?.scrollIntoView({ block: "nearest" });
     }, [activeIndex, isOpen]);
 
+    // A postcode only reaches here when the customer picked a city off the
+    // list, and then it is authoritative: the courier quotes city and postcode
+    // as a pair, so keeping the previously-picked city's code (which is what
+    // "only fill when empty" did from the second pick onwards) sends a
+    // mismatched destination — Angoda gets quoted against Kolonnawa's 10600.
+    // Typing a city commits without a postcode and never touches the field.
     const commitCity = useCallback(
         (cityName: string, postcode?: string | null) => {
             setCommittedValue(cityName);
             onChange({
                 city: cityName,
-                ...(!postalValue && postcode ? { postal: postcode } : {}),
+                ...(postcode ? { postal: postcode } : {}),
             });
         },
-        [onChange, postalValue],
+        [onChange],
     );
 
     const debouncedCommitCity = useDebouncedCallback((cityName: string) => {
@@ -536,7 +541,6 @@ const AddressFields = memo(({ idPrefix, values, onChange, nameOnly = false }: Ad
                 <CitySelectField
                     id={`${idPrefix}-city`}
                     value={values.city}
-                    postalValue={values.postal}
                     onChange={onChange}
                 />
             </div>
@@ -677,7 +681,10 @@ interface Props {
     isKokoPayment: boolean;
     isPriceFluctuation: any;
     onCheckoutSubmit: (payload: CheckoutSubmitPayload) => Promise<void> | void;
-    onAddressChange: (snapshot: CheckoutAddressSnapshot | null) => void;
+    onAddressChange: (
+        snapshot: CheckoutAddressSnapshot | null,
+        options?: { immediate?: boolean },
+    ) => void;
     isTOC: boolean;
     onTOCChange: () => void;
     tocError: boolean;
@@ -714,11 +721,27 @@ const UnifiedCheckoutForm = ({
     const [billingAddress, setBillingAddress] = useState<AddressFieldValues>(EMPTY_ADDRESS);
     const [shippingAddress, setShippingAddress] = useState<AddressFieldValues>(EMPTY_ADDRESS);
     const [shippingDifferent, setShippingDifferent] = useState(false);
+    // City list picks set city+postcode together — flag the next snapshot so
+    // the parent skips the typing debounce and quotes immediately.
+    const immediateAddressSyncRef = useRef(false);
 
     const handleBillingChange = useCallback((patch: Partial<AddressFieldValues>) => {
+        // Immediate sync only when billing is the shipping destination —
+        // a billing city pick can't move the courier quote when shipping
+        // uses a separate address.
+        if (
+            !shippingDifferent &&
+            patch.city !== undefined &&
+            patch.postal !== undefined
+        ) {
+            immediateAddressSyncRef.current = true;
+        }
         setBillingAddress((prev) => ({ ...prev, ...patch }));
-    }, []);
+    }, [shippingDifferent]);
     const handleShippingChange = useCallback((patch: Partial<AddressFieldValues>) => {
+        if (patch.city !== undefined && patch.postal !== undefined) {
+            immediateAddressSyncRef.current = true;
+        }
         setShippingAddress((prev) => ({ ...prev, ...patch }));
     }, []);
 
@@ -799,11 +822,13 @@ const UnifiedCheckoutForm = ({
             ? transformAddress({ ...shippingAddress, country: "LK" })
             : billing;
 
-        return { billing, shipping };
+        return { billing, shipping, shippingSameAsBilling: !shippingDifferent };
     }, [deliveryType, shippingDifferent, billingAddress, shippingAddress]);
 
     useEffect(() => {
-        onAddressChange(addressSnapshot);
+        const immediate = immediateAddressSyncRef.current;
+        immediateAddressSyncRef.current = false;
+        onAddressChange(addressSnapshot, immediate ? { immediate: true } : undefined);
     }, [addressSnapshot, onAddressChange]);
 
     const handlePickupTypeChange = (type: DeliveryType) => {
@@ -897,11 +922,16 @@ const UnifiedCheckoutForm = ({
     }, [paymentGateways, isPreOrderCart, isPriceFluctuation, totalPayment, cart]);
 
     // Gateways that should appear but be greyed-out for the current delivery
-    // method. Cash on Delivery is incompatible with Flash Delivery — the
-    // courier driver doesn't collect cash on our behalf.
+    // method. Cash on Delivery needs a delivery to collect the cash at: the
+    // Flash Delivery driver doesn't collect on our behalf, and Store Pickup has
+    // no delivery leg at all.
     const gatewayDisabledReason = (gatewayId: string): string | null => {
-        if (deliveryType === "flash_delivery" && gatewayId === "cod") {
+        if (gatewayId !== "cod") return null;
+        if (deliveryType === "flash_delivery") {
             return "Not available with Flash Delivery — pay online instead";
+        }
+        if (deliveryType === "store_pickup") {
+            return "Not available with Store Pickup — pay online instead";
         }
         return null;
     };

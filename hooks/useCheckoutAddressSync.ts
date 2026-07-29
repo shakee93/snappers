@@ -12,6 +12,8 @@ import { CustomerAddressInput } from "@/graphql/types/graphql";
 export interface CheckoutAddressSnapshot {
   billing: CustomerAddressInput;
   shipping: CustomerAddressInput;
+  /** When true, WC uses billing as the shipping destination for rate quotes. */
+  shippingSameAsBilling: boolean;
 }
 
 /**
@@ -22,37 +24,99 @@ export interface CheckoutAddressSnapshot {
 export const CHECKOUT_POSTCODE_PATTERN = /^\d{4,6}$/;
 
 // Long enough that typing a city or postcode doesn't fire a mutation per
-// keystroke, short enough that the rate lands before the user reaches the
-// payment section.
-const SYNC_DEBOUNCE_MS = 700;
+// keystroke, short enough that a picked city shows its rate before the user
+// scrolls to payment. City picks already debounce their own commit at 300ms.
+const SYNC_DEBOUNCE_MS = 300;
 
-// Every address field is worth pushing, not just the ones core WC matches
-// zones on: shipping plugins and per-address rules can key on the street
-// lines, and the customer expects the total to respond to whatever they just
-// edited. Deduping still skips renders where nothing in the address moved.
-const addressKey = (address: CustomerAddressInput) =>
-  [
-    address.country,
-    address.state,
-    address.city,
-    address.postcode,
-    address.address1,
-    address.address2,
-    address.firstName,
-    address.lastName,
-  ]
-    .map((part) => String(part ?? "").trim().toLowerCase())
+type AddressFieldSource = {
+  country?: string | null;
+  state?: string | null;
+  city?: string | null;
+  postcode?: string | null;
+  address1?: string | null;
+  address2?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+} | null | undefined;
+
+// Full address for dedupe — every field the customer edits is worth pushing.
+// Shipping plugins / per-address rules can key on street lines and names, and
+// the customer expects the total to respond to whatever they just changed.
+// (Echo comparison uses RATE_KEY_FIELDS below, which is intentionally narrower.)
+const FULL_KEY_FIELDS = [
+  "country",
+  "state",
+  "city",
+  "postcode",
+  "address1",
+  "address2",
+  "firstName",
+  "lastName",
+] as const;
+
+// Rate-affecting fields only for the updateCustomer echo check. Omitting
+// address2 / name avoids permanent mismatch when WC merges a saved apartment
+// line the form never sent — which would force a second push every time.
+const RATE_KEY_FIELDS = [
+  "country",
+  "state",
+  "city",
+  "postcode",
+  "address1",
+] as const;
+
+const fieldKey = (
+  address: AddressFieldSource,
+  fields: readonly (keyof NonNullable<AddressFieldSource>)[],
+) =>
+  fields
+    .map((field) => String(address?.[field] ?? "").trim().toLowerCase())
     .join("|");
 
 const snapshotKey = (snapshot: CheckoutAddressSnapshot) =>
-  `${addressKey(snapshot.billing)}>>${addressKey(snapshot.shipping)}`;
+  `${fieldKey(snapshot.billing, FULL_KEY_FIELDS)}>>${fieldKey(snapshot.shipping, FULL_KEY_FIELDS)}`;
+
+/**
+ * WooGraphQL can persist the customer address one mutation behind: a single
+ * `updateCustomer` sometimes does not take effect for the requests that follow
+ * it, and its own payload echoes the *previous* address. Verified against this
+ * backend — pushing Wellampitiya once left WC with no destination at all, so
+ * it quoted the weight fallback ("Standard Shipping", 400) instead of the real
+ * rate for that address ("Local Delivery", 450). A silent undercharge, not
+ * just a stale label.
+ *
+ * Push once, then push again only when the echoed shipping address still
+ * mismatches what we sent on rate-affecting fields. Healthy backends pay one
+ * round trip; the laggy case still gets the second flush.
+ *
+ * Remove the retry *and* the console.warn below together once the backend
+ * defect is fixed — track under gq-backend-plugins (WooGraphQL updateCustomer
+ * address lag). Watch the network tab: a healthy push should fire one
+ * `updateCustomerAddress`; a warn means the echo comparison forced a retry
+ * (state normalisation is the field most likely to trip this).
+ */
+const mismatchedRateFields = (
+  sent: CustomerAddressInput,
+  echoed: AddressFieldSource,
+): string[] => {
+  if (!echoed) return [...RATE_KEY_FIELDS];
+  return RATE_KEY_FIELDS.filter((field) => {
+    const a = String(sent[field] ?? "").trim().toLowerCase();
+    const b = String(echoed[field] ?? "").trim().toLowerCase();
+    return a !== b;
+  });
+};
 
 // Pushing a half-typed address makes WC quote against a zone the customer
 // isn't in, so wait until every rate-affecting field is actually filled.
+// `address1` is in this list because the store's distance-based method prices
+// off the geocoded street line — quoting without it returns the store's own
+// location as the destination, i.e. the cheapest possible rate.
 const isQuotable = (address: CustomerAddressInput) =>
   !!String(address.country ?? "").trim() &&
   !!String(address.state ?? "").trim() &&
   !!String(address.city ?? "").trim() &&
+  !!String(address.address1 ?? "").trim() &&
   CHECKOUT_POSTCODE_PATTERN.test(String(address.postcode ?? "").trim());
 
 /**
@@ -65,6 +129,11 @@ const isQuotable = (address: CustomerAddressInput) =>
  * not yet complete enough to quote against. `addressSyncing` covers the whole
  * chain, debounce window included, so callers can block submission for as
  * long as the totals on screen might not match the address on screen.
+ *
+ * Concurrent calls are generation-guarded: only the latest sync may clear
+ * `addressSyncing`, write `lastSyncedKeyRef`, or invoke `onSynced`. The
+ * generation bump runs on early-return paths too so a superseded in-flight
+ * chain cannot clear Confirm while a newer destination is pending.
  */
 export function useCheckoutAddressSync(onSynced: () => Promise<void> | void) {
   const [updateAddress] = useMutation(UPDATE_ADDRESS);
@@ -74,6 +143,7 @@ export function useCheckoutAddressSync(onSynced: () => Promise<void> | void) {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const onSyncedRef = useRef(onSynced);
   const isMountedRef = useRef(true);
+  const syncGenerationRef = useRef(0);
 
   useEffect(() => {
     onSyncedRef.current = onSynced;
@@ -84,26 +154,41 @@ export function useCheckoutAddressSync(onSynced: () => Promise<void> | void) {
     return () => {
       isMountedRef.current = false;
       if (timerRef.current) clearTimeout(timerRef.current);
+      // Invalidate any in-flight chain so it cannot write after unmount.
+      syncGenerationRef.current += 1;
     };
   }, []);
 
   const syncCheckoutAddress = useCallback(
-    (snapshot: CheckoutAddressSnapshot | null) => {
+    (
+      snapshot: CheckoutAddressSnapshot | null,
+      options?: { immediate?: boolean },
+    ) => {
       if (timerRef.current) {
         clearTimeout(timerRef.current);
         timerRef.current = null;
       }
 
-      // Nothing to quote, or the server already has this exact address —
-      // either way there is no pending work left to block submission on.
+      // Bump generation on every call — including "nothing to do" paths — so
+      // an older in-flight runSync cannot clear addressSyncing or applyCart
+      // after a newer destination has already been requested. That also makes
+      // the A→B→A race reachable: reverting to A while B is in flight must not
+      // trust lastSyncedKeyRef from the earlier A push (WC may already be on B).
+      const generation = ++syncGenerationRef.current;
+      const isCurrent = () =>
+        isMountedRef.current && syncGenerationRef.current === generation;
+
+      // Nothing to quote — no pending work left to block submission on.
+      // Deliberately do NOT clear lastSyncedKeyRef here: an incomplete edit
+      // shouldn't force a re-push of the last good address on the next tick.
       if (!snapshot || !isQuotable(snapshot.shipping)) {
-        setAddressSyncing(false);
+        if (isCurrent()) setAddressSyncing(false);
         return;
       }
 
       const key = snapshotKey(snapshot);
       if (key === lastSyncedKeyRef.current) {
-        setAddressSyncing(false);
+        if (isCurrent()) setAddressSyncing(false);
         return;
       }
 
@@ -111,22 +196,48 @@ export function useCheckoutAddressSync(onSynced: () => Promise<void> | void) {
       // and its refreshed total there is a moment where the displayed total is
       // known-stale, and Confirm must not be live during it.
       setAddressSyncing(true);
+      // From here the server's address is in flux (this push, or a superseded
+      // one still landing). No key is known-good until this generation's
+      // pushes complete — otherwise reverting to a prior address short-circuits
+      // on a stale lastSyncedKeyRef while WC still quotes the abandoned one.
+      lastSyncedKeyRef.current = null;
 
-      timerRef.current = setTimeout(async () => {
+      const runSync = async () => {
         timerRef.current = null;
+        if (!isCurrent()) return;
 
         try {
+          const pushInput = {
+            billing: snapshot.billing,
+            shipping: snapshot.shipping,
+            shippingSameAsBilling: snapshot.shippingSameAsBilling,
+          };
+
           // Omitted fields (email, phone) are merged, not cleared — WC only
           // wipes them when `overwrite` is set — so this is safe to run
           // against a logged-in customer's saved address.
-          await updateAddress({
-            variables: {
-              input: {
-                billing: snapshot.billing,
-                shipping: snapshot.shipping,
-              },
-            },
+          const { data: firstPush } = await updateAddress({
+            variables: { input: pushInput },
           });
+          if (!isCurrent()) return;
+
+          const echoedShipping = firstPush?.updateCustomer?.customer?.shipping;
+          const mismatched = mismatchedRateFields(
+            snapshot.shipping,
+            echoedShipping,
+          );
+          if (mismatched.length > 0) {
+            // Remove with the retry once backend address lag is fixed.
+            console.warn(
+              "[checkout] updateCustomer echo mismatched; retrying push. Fields:",
+              mismatched.join(", "),
+            );
+            await updateAddress({
+              variables: { input: pushInput },
+            });
+            if (!isCurrent()) return;
+          }
+
           lastSyncedKeyRef.current = key;
         } catch (error) {
           // A failed push only means WC keeps quoting against the previous
@@ -134,13 +245,13 @@ export function useCheckoutAddressSync(onSynced: () => Promise<void> | void) {
           // the order itself is unaffected. Leave lastSyncedKeyRef unset so
           // the next edit retries.
           console.error("Failed to sync checkout address for shipping:", error);
-          setAddressSyncing(false);
+          if (isCurrent()) setAddressSyncing(false);
           return;
         }
 
-        // Unmounted mid-flight: the address landed, which is what mattered.
-        // Don't drive state on a page that is gone.
-        if (!isMountedRef.current) return;
+        // Unmounted mid-flight / superseded: the address may have landed,
+        // but don't drive state or refresh totals for a stale generation.
+        if (!isCurrent()) return;
 
         try {
           await onSyncedRef.current?.();
@@ -149,10 +260,21 @@ export function useCheckoutAddressSync(onSynced: () => Promise<void> | void) {
           // key so the next snapshot — including a revert to this same
           // address — runs the chain again instead of trusting stale totals.
           console.error("Failed to refresh totals after address sync:", error);
-          lastSyncedKeyRef.current = null;
+          if (isCurrent()) lastSyncedKeyRef.current = null;
         } finally {
-          setAddressSyncing(false);
+          if (isCurrent()) setAddressSyncing(false);
         }
+      };
+
+      // City list picks commit city+postcode as a finished destination — no
+      // need to wait out the typing debounce before quoting.
+      if (options?.immediate) {
+        void runSync();
+        return;
+      }
+
+      timerRef.current = setTimeout(() => {
+        void runSync();
       }, SYNC_DEBOUNCE_MS);
     },
     [updateAddress]

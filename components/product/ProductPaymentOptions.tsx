@@ -148,8 +148,9 @@ const ProductPaymentOptions = ({
   }
 
   if (tiers.length === 0) {
-    // Legacy path — no woo-price-tiers data; gross-up base price for Koko fee estimate.
-    const kokoInstallment = ((numericPrice / 88) * 100) / 3;
+    // Legacy path — no woo-price-tiers data. Koko installment is base / 3
+    // (financing markup removed sitewide; see checkout Koko totals).
+    const kokoInstallment = kokoInstallmentAmount(numericPrice);
     const formattedPrice = formatPrice(numericPrice);
 
     return (

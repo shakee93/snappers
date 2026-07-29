@@ -19,6 +19,8 @@ type CartSession = {
     setCustomer: React.Dispatch<React.SetStateAction<Customer | null>>
     clearCart: () => void
     refreshCart: () => Promise<any>
+    /** Push a cart returned by a mutation/query straight into state — don't wait for a refetch effect. */
+    applyCart: (next: Cart | null) => void
     isCartOpen: boolean
     setIsCartOpen: React.Dispatch<React.SetStateAction<boolean>>
 }
@@ -35,6 +37,7 @@ const CartContext = createContext<CartSession>({
     setCustomer: () => { },
     clearCart: () => { },
     refreshCart: () => Promise.resolve(),
+    applyCart: () => { },
     isCartOpen: false,
     setIsCartOpen: () => { }
 });
@@ -190,9 +193,27 @@ export function CartProvider({ children }: {
         }
     }, [cart, removeFromCart])
 
+    // Checkout (and other callers) need the provider's cart to match a mutation
+    // response on the same tick — waiting for the lazy-query `data` effect leaves
+    // one paint where the summary still reads the previous shipping total.
+    const applyCart = useCallback((next: Cart | null) => {
+        setCart(next)
+    }, [])
+
     const refreshCart = useCallback(async () => {
         try {
-            return await getCart();
+            const result = await getCart();
+            // Apply immediately. The `data` useEffect would eventually do the
+            // same, but only after paint — and the shipping-estimate row keys
+            // off this state, so a deferred write shows the old rate for a beat
+            // (or longer if another render interrupts the effect).
+            if (result?.data?.cart !== undefined) {
+                setCart(result.data.cart)
+            }
+            if (result?.data?.customer !== undefined) {
+                setCustomer(result.data.customer)
+            }
+            return result
         } catch (error: any) {
             // If we get a 500 error, don't retry - session might be invalid
             if (error?.networkError?.statusCode === 500 || 
@@ -348,6 +369,7 @@ export function CartProvider({ children }: {
             setCustomer,
             clearCart,
             refreshCart,
+            applyCart,
             isCartOpen,
             setIsCartOpen
         }}>
