@@ -151,26 +151,28 @@ const CheckoutCouponField = ({
 
   return (
     <div>
-      <button
-        type="button"
-        onClick={toggleField}
-        className={`text-sm font-medium ${
-          hasAppliedCoupons
-            ? "text-slate-500 cursor-default dark:text-slate-400"
-            : "text-primary-500 hover:underline"
-        }`}
-        aria-expanded={couponFieldOpen}
-        aria-controls={COUPON_FIELD_ID}
-        disabled={hasAppliedCoupons}
-      >
-        {couponFieldOpen
-          ? hasAppliedCoupons
-            ? "Discount code"
-            : "Hide"
-          : "Have a coupon?"}
-      </button>
+      {/* Applied coupons force the panel open — no disclosure trigger then,
+          so we don't stack a disabled "Discount code" above the field label. */}
+      {!hasAppliedCoupons && (
+        <button
+          type="button"
+          onClick={toggleField}
+          className="text-sm font-medium text-primary-500 hover:underline"
+          aria-expanded={couponFieldOpen}
+          aria-controls={COUPON_FIELD_ID}
+        >
+          {couponFieldOpen ? "Hide" : "Have a coupon?"}
+        </button>
+      )}
 
-      <div id={COUPON_FIELD_ID} hidden={!couponFieldOpen} className="mt-2">
+      {/* Prefer the `hidden` attribute over a display utility — Tailwind
+          preflight's `[hidden] { display: none }` loses to any `flex`/`block`
+          class on the same element. */}
+      <div
+        id={COUPON_FIELD_ID}
+        hidden={!couponFieldOpen}
+        className={hasAppliedCoupons ? undefined : "mt-2"}
+      >
         <Label className="text-sm">Discount code</Label>
         <div className="mt-1.5 flex gap-2">
           <Input
