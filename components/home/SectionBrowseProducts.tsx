@@ -391,9 +391,7 @@ const SectionBrowseProducts = ({
             src={activeFeatureImage}
             alt={activeFeatureAlt}
             priority={activeCategoryId === null}
-            // min-h keeps the tile product-card-tall when the row has no
-            // products (otherwise h-full collapses to the empty-state height).
-            className="col-span-2 h-full min-h-[clamp(280px,32vw,440px)]"
+            className="col-span-2 h-full"
           />
           {isLoadingTab
             ? [0, 1].map((index) => productSkeleton(`row1-${index}`))
@@ -401,7 +399,9 @@ const SectionBrowseProducts = ({
                 <ProductCard key={product.id} product={product} />
               ))}
           {!isLoadingTab && !rowOneProducts.length && (
-            <p className="col-span-2 flex items-center justify-center py-8 text-center text-sm font-medium text-neutral-500">
+            // Floor only on the empty state so Cat/Dog still size from cards;
+            // the banner's h-full fills the row this paragraph defines.
+            <p className="col-span-2 flex min-h-[clamp(280px,32vw,440px)] items-center justify-center py-8 text-sm font-medium text-neutral-500">
               No products found in this category.
             </p>
           )}

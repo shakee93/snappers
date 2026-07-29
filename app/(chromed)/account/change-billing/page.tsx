@@ -16,7 +16,7 @@ const AccountBilling = () => {
             payout methods, which can be set up below.
             <br />
             <br />
-            To get paid, you need to set up a payout method releases payouts
+            To get paid, you need to set up a payout method. Payouts release
             about 24 hours after a guest’s scheduled time. The time it takes for
             the funds to appear in your account depends on your payout method.{" "}
             <a className={accountLinkClassName} href="##">
