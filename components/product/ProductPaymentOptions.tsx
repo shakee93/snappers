@@ -10,6 +10,7 @@ import {
   isCodTier,
   isKokoTier,
   kokoInstallmentAmount,
+  resolveTierUnitPrice,
   type ResolvedPriceTier,
 } from "@/lib/priceTiers";
 
@@ -82,22 +83,6 @@ function resolveTierVisual(tier: ResolvedPriceTier): TierVisual {
   }
 
   return { kind: "label", name };
-}
-
-function resolveTierPrice(
-  tier: ResolvedPriceTier,
-  fallbackPrice: number,
-): number {
-  // Treat price <= 0 as missing — variable parents return null tier prices;
-  // a genuinely zero-priced tier would also fall back to numericPrice.
-  if (
-    typeof tier.price === "number" &&
-    Number.isFinite(tier.price) &&
-    tier.price > 0
-  ) {
-    return tier.price;
-  }
-  return fallbackPrice;
 }
 
 function TierLogo({
@@ -187,7 +172,7 @@ const ProductPaymentOptions = ({
       <div className={optionsGridClass}>
         {tiers.map((tier, index) => {
           const name = tier.name.trim();
-          const amount = resolveTierPrice(tier, numericPrice);
+          const amount = resolveTierUnitPrice(tier, numericPrice);
           const visual = resolveTierVisual(tier);
           const koko = isKokoTier(name);
           const installment = kokoInstallmentAmount(amount);

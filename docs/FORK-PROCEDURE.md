@@ -25,7 +25,7 @@ Every brand-tunable value lives here now. Edit each section for the new tenant:
 - `locale` — countryCode/Name, currencyCode/Symbol, phoneCountryCode, ogLocale
 - `contact` — phones, whatsapp, email, storeAddress
 - `social` — facebook, instagram, tiktok, googleReviewUrl
-- `payment` — gatewayOrder, kokoGatewayId, payhere thresholds/surcharge
+- `payment` — gatewayOrder, kokoGatewayId, payhere thresholds, bankAccounts
 - `shipping` — free + weight-based method IDs (match the new WC shipping zones)
 - `analytics` — googleAnalyticsId
 - `product` — defaultWarranty

@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import LineOrCartPriceLabel from "@/components/global/ui/LineOrCartPriceLabel";
 import { Fragment, useMemo, useState } from "react";
 import AttributeIcon from "@/components/global/primitives/AttributeIcon";
 import type { VariationAttribute } from "@/graphql/types/graphql";
@@ -13,8 +12,10 @@ import { Loader, Truck } from "lucide-react";
 // VariationAttribute type — augment it here rather than reaching for `any`.
 type CartLineAttribute = VariationAttribute & { displayValue?: string | null };
 import { toast } from "sonner";
-import { isLineItemFree } from "@/lib/cartLinePricing";
+import { isLineItemFree, parseWooMoneyAmount } from "@/lib/cartLinePricing";
 import { getCartLineStockCap } from "@/lib/cartLineStockCap";
+import { resolveCartLineTierPrice } from "@/lib/checkoutPriceTiers";
+import { formatPrice } from "@/lib/formatPrice";
 import {
   isSimpleProductFreeShipping,
   isVariationFreeShipping,
@@ -52,11 +53,14 @@ export interface CartItemProductNode {
     nodes: any;
   };
   freeShippingMeta?: Array<{ key?: string | null; value?: string | null }>;
+  priceTiers?: Array<{ name?: string | null; price?: number | null }> | null;
 }
 
 interface CartItemsProps {
   item: CartItem;
   index: number;
+  /** Selected WooCommerce gateway id — drives the woo-price-tiers line price. */
+  paymentGatewayId: string;
   onQuantityChange: (key: string, quantity: number) => Promise<unknown> | unknown;
   onRemove: (keys: string[]) => Promise<unknown> | unknown;
 }
@@ -64,6 +68,7 @@ interface CartItemsProps {
 const CartItems = ({
   item,
   index,
+  paymentGatewayId,
   onQuantityChange,
   onRemove,
 }: CartItemsProps) => {
@@ -80,6 +85,62 @@ const CartItems = ({
     return isSimpleProductFreeShipping(node);
   }, [type, variation?.node, node]);
   const productHref = node ? getProductPath(node) : "#";
+
+  // Payment tiers only reprice the line's unit price for display — the summary
+  // totals stay on WooCommerce's own figures.
+  const tierPrice = useMemo(
+    () => resolveCartLineTierPrice(item, paymentGatewayId),
+    [item, paymentGatewayId]
+  );
+  // Unit price, the price it's compared against, the line total and the saving
+  // all come off the same figure so the row can never disagree with itself.
+  // Formatted here because Woo's own strings carry the store symbol, not LKR.
+  const linePricing = useMemo(() => {
+    const qty = quantity || 1;
+    const isVariable = type === "VARIABLE";
+    const catalogUnitPrice = parseWooMoneyAmount(
+      isVariable ? variation?.node?.price : price
+    );
+    const regularUnitPrice = parseWooMoneyAmount(
+      isVariable ? variation?.node?.regularPrice : regularPrice
+    );
+
+    const unitPrice = tierPrice ? tierPrice.unitPrice : catalogUnitPrice;
+    // A payment tier replaces the catalog price, so that becomes what the
+    // saving is measured against; otherwise it's the product's regular price.
+    const compareAtPrice = tierPrice
+      ? tierPrice.catalogUnitPrice
+      : regularUnitPrice;
+    const hasUnitPrice = Number.isFinite(unitPrice) && unitPrice > 0;
+    // Only ever positive: a gateway that costs more than the catalog price
+    // shows its price plainly, with no strike-through and no saving.
+    const unitSaving =
+      hasUnitPrice &&
+      Number.isFinite(compareAtPrice) &&
+      compareAtPrice > unitPrice
+        ? compareAtPrice - unitPrice
+        : 0;
+
+    return {
+      unitPriceLabel: hasUnitPrice ? formatPrice(unitPrice) : null,
+      compareAtPriceLabel: unitSaving > 0 ? formatPrice(compareAtPrice) : null,
+      savingLabel: unitSaving > 0 ? formatPrice(unitSaving * qty) : null,
+      // Line total tracks the unit price shown above it; coupons stay on their
+      // own summary row, the way WooCommerce itemises them.
+      lineTotalLabel: formatPrice(
+        hasUnitPrice ? unitPrice * qty : parseWooMoneyAmount(subtotal)
+      ),
+    };
+  }, [
+    price,
+    quantity,
+    regularPrice,
+    subtotal,
+    tierPrice,
+    type,
+    variation?.node?.price,
+    variation?.node?.regularPrice,
+  ]);
 
   const { maxQty, atMax } = getCartLineStockCap(item);
   const atMaxStock = atMax(quantity);
@@ -147,6 +208,24 @@ const CartItems = ({
           <h3 className="text-sm font-semibold leading-snug text-slate-900 dark:text-slate-100 line-clamp-2">
             <Link href={productHref}>{name}</Link>
           </h3>
+
+          {!lineIsFree && linePricing.unitPriceLabel && (
+            <div className="mt-1 flex flex-wrap items-center gap-2">
+              {linePricing.compareAtPriceLabel && (
+                <span className="text-xs text-slate-400 line-through dark:text-slate-500">
+                  {linePricing.compareAtPriceLabel}
+                </span>
+              )}
+              <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                {linePricing.unitPriceLabel}
+              </span>
+              {tierPrice && (
+                <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                  {tierPrice.tierName} price
+                </span>
+              )}
+            </div>
+          )}
 
           {type === "VARIABLE" && (
             <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
@@ -224,16 +303,20 @@ const CartItems = ({
           }`}
           aria-busy={isBusy}
         >
-          <LineOrCartPriceLabel
-            lineTotal={total}
-            lineSubtotal={subtotal}
-            showOriginalPrice={true}
-            catalogPrice={type === "VARIABLE" ? variation?.node.price : price}
-            catalogSalePrice={
-              type === "VARIABLE" ? variation?.node.regularPrice : regularPrice
-            }
-            className="!flex-col !items-end !gap-0 text-sm font-semibold text-slate-900 dark:text-slate-100"
-          />
+          {lineIsFree ? (
+            <span className="text-sm font-bold text-green-600">Free</span>
+          ) : (
+            <>
+              <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                {linePricing.lineTotalLabel}
+              </span>
+              {linePricing.savingLabel && (
+                <span className="mt-1 block rounded bg-slate-100 px-1.5 py-0.5 text-[11px] font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                  Save {linePricing.savingLabel}
+                </span>
+              )}
+            </>
+          )}
         </div>
       </div>
     </div>

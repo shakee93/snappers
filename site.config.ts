@@ -202,7 +202,6 @@ export const siteConfig = {
     kokoGatewayId: "darazbnpl",
     payhere: {
       hideAboveAmount: 100000,
-      cardSurchargeRate: 0.03,
     },
     // Bank accounts shown for the BACS / bank-transfer gateway. The full list
     // renders on the bank-details view; the one flagged `featuredAtCheckout`
