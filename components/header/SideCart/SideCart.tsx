@@ -2,7 +2,7 @@
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/global/ui/sheet";
 import Image from "next/image";
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
 import CartDropdownItem from "@/components/header/CartDropdownItem";
@@ -13,6 +13,20 @@ import basketIcon from "@/public/global/basket.svg";
 const SIDE_CART_CHECKOUT_CLASS =
     `relative w-full h-auto flex flex-1 items-center justify-center rounded-full text-sm sm:text-base font-bold py-3 px-4 sm:py-3 sm:px-6 ${BRAND_CTA_BUTTON_CLASS}`;
 
+/**
+ * Radix Sheet uses react-remove-scroll, which locks the body via
+ * `data-scroll-locked`. Checkout hides the header (HeaderGate), so the sheet
+ * can unmount mid-close and leave that attribute behind — checkout then
+ * cannot scroll until a full reload.
+ */
+function clearBodyScrollLock() {
+    document.body.removeAttribute("data-scroll-locked");
+    document.body.style.removeProperty("overflow");
+    document.body.style.removeProperty("padding-right");
+    document.body.style.removeProperty("margin-right");
+    document.documentElement.style.removeProperty("overflow");
+}
+
 export default function SideCart() {
     const { cart, isCartOpen, setIsCartOpen } = useCart();
     const checkoutDisabled = (cart?.contents?.itemCount ?? 0) === 0;
@@ -22,8 +36,30 @@ export default function SideCart() {
         [cart?.subtotal],
     );
 
+    const closeCart = useCallback(() => {
+        setIsCartOpen(false);
+        clearBodyScrollLock();
+    }, [setIsCartOpen]);
+
+    const handleOpenChange = useCallback(
+        (open: boolean) => {
+            setIsCartOpen(open);
+            if (!open) {
+                clearBodyScrollLock();
+            }
+        },
+        [setIsCartOpen],
+    );
+
+    // Safety net when HeaderGate unmounts this tree on /checkout.
+    useEffect(() => {
+        return () => {
+            clearBodyScrollLock();
+        };
+    }, []);
+
     return (
-        <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
+        <Sheet open={isCartOpen} onOpenChange={handleOpenChange}>
             <SheetTrigger asChild>
                 <button
                     aria-label="Open basket"
@@ -74,7 +110,7 @@ export default function SideCart() {
                                 >
                                     <CartDropdownItem
                                         item={item}
-                                        close={() => setIsCartOpen(false)}
+                                        close={closeCart}
                                         wrapperClassName="flex px-3 py-4 relative border-0 bg-transparent"
                                     />
                                 </div>
@@ -105,7 +141,7 @@ export default function SideCart() {
                             ) : (
                                 <Link
                                     href="/checkout"
-                                    onClick={() => setIsCartOpen(false)}
+                                    onClick={closeCart}
                                     className={SIDE_CART_CHECKOUT_CLASS}
                                 >
                                     Checkout
