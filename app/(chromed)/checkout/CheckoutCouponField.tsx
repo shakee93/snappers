@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import Input from "shared/Input/Input";
 import Label from "@/components/global/primitives/Label/Label";
 import { BRAND_CTA_BUTTON_CLASS } from "shared/Button/ButtonBrand";
@@ -36,6 +36,7 @@ const CheckoutCouponField = ({
   const [couponMessage, setCouponMessage] = useState<string | null>(null);
   /** User chose to reveal the input (sticky until they hide it). */
   const [showCouponField, setShowCouponField] = useState(false);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   const {
     applyCouponMutation,
@@ -52,6 +53,8 @@ const CheckoutCouponField = ({
     [appliedCoupons],
   );
   const hasAppliedCoupons = activeCoupons.length > 0;
+  // Applied coupons force the panel open — no disclosure trigger then.
+  const showTrigger = !hasAppliedCoupons;
   // Open when the user asked, or when a coupon is already on the cart — no
   // useEffect for derived open state (see CLAUDE.md).
   const couponFieldOpen = showCouponField || hasAppliedCoupons;
@@ -62,8 +65,6 @@ const CheckoutCouponField = ({
   };
 
   const toggleField = () => {
-    // Applied coupons force the panel open; Hide must not fight that.
-    if (hasAppliedCoupons) return;
     setShowCouponField((open) => {
       if (open) clearStatus();
       return !open;
@@ -119,6 +120,7 @@ const CheckoutCouponField = ({
   };
 
   const handleRemove = async (code: string) => {
+    const removingLast = activeCoupons.length === 1;
     try {
       onSyncingChange(true);
       const { data } = await removeCouponsMutation({
@@ -132,6 +134,16 @@ const CheckoutCouponField = ({
         // already applied, when showCouponField was still false).
         setShowCouponField(true);
         await refreshCart();
+        // Last chip unmounts and the disclosure remounts — restore focus so it
+        // doesn't fall to <body>. Double rAF waits for the commit that mounts
+        // the trigger after appliedCoupons clears.
+        if (removingLast) {
+          requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+              triggerRef.current?.focus();
+            });
+          });
+        }
       } else {
         toast.error("Coupon could not be removed.");
       }
@@ -154,8 +166,9 @@ const CheckoutCouponField = ({
     <div>
       {/* Applied coupons force the panel open — no disclosure trigger then,
           so we don't stack a disabled "Discount code" above the field label. */}
-      {!hasAppliedCoupons && (
+      {showTrigger && (
         <button
+          ref={triggerRef}
           type="button"
           onClick={toggleField}
           className="text-sm font-medium text-primary-500 hover:underline"
@@ -172,7 +185,7 @@ const CheckoutCouponField = ({
       <div
         id={COUPON_FIELD_ID}
         hidden={!couponFieldOpen}
-        className={hasAppliedCoupons ? undefined : "mt-2"}
+        className={showTrigger ? "mt-2" : undefined}
       >
         <Label className="text-sm">Discount code</Label>
         <div className="mt-1.5 flex gap-2">
