@@ -13,7 +13,7 @@ const AccountBilling = () => {
           <span>
             When you receive a payment for a order, we call that payment to you
             a &ldquo;payout.&ldquo; Our secure payment system supports several
-            payout methods, which can be set up below. Go to FAQ.
+            payout methods, which can be set up below.
             <br />
             <br />
             To get paid, you need to set up a payout method releases payouts

@@ -56,9 +56,8 @@ export const BROWSE_CATEGORY_FEATURE_IMAGES: Record<string, string> = {
   aquarium: "/homepage/categories/fish.webp",
 };
 
-/** "All" tab banner — same artwork as the Dog category. */
-export const BROWSE_ALL_TAB_FEATURE_IMAGE =
-  BROWSE_CATEGORY_FEATURE_IMAGES.dog;
+/** "All" tab banner — dedicated all-pets artwork. */
+export const BROWSE_ALL_TAB_FEATURE_IMAGE = "/homepage/categories/all.png";
 
 /** Feature banner for a nav tab slug (`cat`, `dog`, …). */
 export const getBrowseFeatureImageForNavSlug = (
