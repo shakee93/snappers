@@ -150,7 +150,6 @@ const CheckoutPage = () => {
   const [couponStatus, setCouponStatus] = useState<"idle" | "success" | "error">("idle");
   const [couponMessage, setCouponMessage] = useState<string | null>(null);
   const [isCouponSyncingCart, setIsCouponSyncingCart] = useState(false);
-  const [showCouponField, setShowCouponField] = useState(false);
   const [hasSeenCartWithItems, setHasSeenCartWithItems] = useState(false);
 
   const { applyCouponMutation, removeCouponsMutation, applyingCoupon, removingCoupon } = useCoupon();
@@ -168,12 +167,6 @@ const CheckoutPage = () => {
       setHasSeenCartWithItems(true);
     }
   }, [cart]);
-
-  useEffect(() => {
-    if ((cart?.appliedCoupons?.length ?? 0) > 0) {
-      setShowCouponField(true);
-    }
-  }, [cart?.appliedCoupons?.length]);
 
   useEffect(() => {
     if (
@@ -1026,7 +1019,6 @@ const CheckoutPage = () => {
   const cartSubtotal = replaceStringinInt(cart?.subtotal);
   const numericDiscountTotal = replaceStringinInt(cart?.discountTotal);
   const hasDiscount = Number.isFinite(numericDiscountTotal) && numericDiscountTotal > 0;
-  const hasAppliedCoupons = (cart?.appliedCoupons?.length ?? 0) > 0;
 
   // Card pricing now comes from WooCommerce alone: either a fee it attaches
   // once chosen_payment_method is synced, or the woo-price-tiers card price.
@@ -1354,7 +1346,7 @@ const CheckoutPage = () => {
                   key={item?.key ?? index}
                   item={item as unknown as CartItem}
                   paymentGatewayId={selectedPaymentGatewayId}
-                  pricesRecalculating={totalsRecalculating}
+                  pricesRecalculating={paymentSyncing}
                   onQuantityChange={updateCart}
                   onRemove={removeFromCart}
                 />
@@ -1362,32 +1354,8 @@ const CheckoutPage = () => {
             </div>
 
             <div className="mt-6 border-t border-slate-200/70 pt-5 text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400 ">
-              {!showCouponField ? (
-                <button
-                  type="button"
-                  onClick={() => setShowCouponField(true)}
-                  className="text-sm font-medium text-primary-500 hover:underline"
-                >
-                  Have a coupon?
-                </button>
-              ) : (
               <div>
-                <div className="flex items-center justify-between gap-3">
-                  <Label className="text-sm">Discount code</Label>
-                  {!hasAppliedCoupons && (
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setShowCouponField(false);
-                        setCouponStatus("idle");
-                        setCouponMessage(null);
-                      }}
-                      className="text-xs font-medium text-slate-500 hover:text-slate-700 hover:underline dark:text-slate-400 dark:hover:text-slate-200"
-                    >
-                      Hide
-                    </button>
-                  )}
-                </div>
+                <Label className="text-sm">Discount code</Label>
                 <div className="mt-1.5 flex gap-2">
                   <Input
                     sizeClass="h-10 px-4 py-3 !rounded-full"
@@ -1536,7 +1504,6 @@ const CheckoutPage = () => {
                   </div>
                 )}
               </div>
-              )}
 
               <div className="mt-5 space-y-2 text-sm" aria-busy={totalsRecalculating}>
                 {/* Subtotal is the sum of the line prices as shown above it.

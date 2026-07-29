@@ -33,9 +33,13 @@ export function getLineUnitPrice(item: CheckoutCartLine): number {
 }
 
 export type CartLineTierPrice = {
-  /** Unit price the selected gateway is quoted at. */
+  /**
+   * Tier quote used only to decide whether a caption is worth showing
+   * (`unitPrice === catalogUnitPrice` → suppress). Visible unit amounts come
+   * from Woo's line subtotal, not this field.
+   */
   unitPrice: number;
-  /** Catalog unit price the tier replaces — rendered struck through. */
+  /** Catalog unit price the tier replaces — rendered struck through when cheaper. */
   catalogUnitPrice: number;
   /** Tier name as configured in woo-price-tiers, e.g. "Visa / Master Card". */
   tierName: string;

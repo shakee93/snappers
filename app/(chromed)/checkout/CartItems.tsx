@@ -62,7 +62,7 @@ interface CartItemsProps {
   index: number;
   /** Selected WooCommerce gateway id — drives the woo-price-tiers line price. */
   paymentGatewayId: string;
-  /** True while payment/shipping/coupon sync is re-quoting cart line totals. */
+  /** True while payment-method sync is re-quoting cart line subtotals. */
   pricesRecalculating?: boolean;
   onQuantityChange: (key: string, quantity: number) => Promise<unknown> | unknown;
   onRemove: (keys: string[]) => Promise<unknown> | unknown;
@@ -221,7 +221,10 @@ const CartItems = ({
           </h3>
 
           {!lineIsFree && (linePricing.unitPriceLabel || pricesRecalculating) && (
-            <div className="mt-1 flex flex-wrap items-center gap-2">
+            <div
+              className="mt-1 flex flex-wrap items-center gap-2"
+              aria-busy={pricesRecalculating}
+            >
               {!pricesRecalculating && linePricing.compareAtPriceLabel && (
                 <span className="text-xs text-slate-400 line-through dark:text-slate-500">
                   {linePricing.compareAtPriceLabel}
@@ -316,7 +319,7 @@ const CartItems = ({
           className={`text-right shrink-0 transition-opacity ${
             isBusy ? "opacity-50" : "opacity-100"
           }`}
-          aria-busy={isBusy}
+          aria-busy={isBusy || pricesRecalculating}
         >
           {lineIsFree ? (
             <span className="text-sm font-bold text-green-600">Free</span>
