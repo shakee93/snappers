@@ -45,6 +45,11 @@ export function useCheckoutPaymentSync(onSynced: () => Promise<void> | void) {
       // gateway became disabled). Clear chosen_payment_method in the WC session
       // so price-tier plugins don't keep applying the old method's pricing.
       if (!gatewayId) {
+        setPaymentSyncing(true);
+        // Match the happy path: clear the last synced ref synchronously so a
+        // rapid A -> "" -> A sequence cannot short-circuit the re-select while
+        // the session is still being cleared in the background.
+        lastSyncedGatewayRef.current = null;
         const runClear = async () => {
           try {
             await updateSession({
@@ -54,6 +59,8 @@ export function useCheckoutPaymentSync(onSynced: () => Promise<void> | void) {
                 },
               },
             });
+            if (!isCurrent()) return;
+            await onSyncedRef.current?.();
           } catch {
             // best-effort — totals will resync when a gateway is re-selected
           } finally {

@@ -202,7 +202,7 @@ export const siteConfig = {
     kokoGatewayId: "darazbnpl",
     // Gateways that charge a card (Visa/Mastercard) — used for woo-price-tiers
     // tier matching and the "Coupon discounts cannot be used" warning.
-    cardGatewayIds: ["payhere", "webxpay", "ndb-pay"] as string[],
+    cardGatewayIds: ["payhere", "webxpay", "ndb-pay", "geniebiz"] as const,
     payhere: {
       hideAboveAmount: 100000,
     },

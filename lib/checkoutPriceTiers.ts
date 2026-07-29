@@ -4,7 +4,7 @@ import {
   resolveTierUnitPrice,
   type ProductWithPriceTiers,
 } from "@/lib/priceTiers";
-import { parsePriceString } from "@/lib/productSale";
+import { parseWooMoneyAmount } from "@/lib/cartLinePricing";
 
 export type CheckoutCartLine = {
   quantity?: number | null;
@@ -24,10 +24,10 @@ export type CheckoutCartLine = {
 export function getLineUnitPrice(item: CheckoutCartLine): number {
   const node = item.product?.node;
   const priceStr = node?.type === "VARIABLE" ? item.variation?.node?.price : node?.price;
-  const parsed = parsePriceString(priceStr);
+  const parsed = parseWooMoneyAmount(priceStr);
   if (parsed > 0) return parsed;
 
-  const lineSubtotal = parsePriceString(item.subtotal);
+  const lineSubtotal = parseWooMoneyAmount(item.subtotal);
   const qty = item.quantity || 0;
   return lineSubtotal > 0 && qty > 0 ? lineSubtotal / qty : 0;
 }

@@ -97,6 +97,7 @@ const CartItems = ({
   // client-side. The tier price is only used for the unit-price caption and the
   // compare-at/save display — it never affects the charged amount shown here.
   const linePricing = useMemo(() => {
+    const qty = quantity || 1;
     const isVariable = type === "VARIABLE";
     const catalogUnitPrice = parseWooMoneyAmount(
       isVariable ? variation?.node?.price : price
@@ -105,13 +106,34 @@ const CartItems = ({
       isVariable ? variation?.node?.regularPrice : regularPrice
     );
 
-    // Unit price shown in the caption: tier price when a gateway matches, else
-    // catalog price. We deliberately do NOT use this to compute the line total.
-    const displayUnitPrice = tierPrice ? tierPrice.unitPrice : catalogUnitPrice;
+    // Woo's own line figure is the source of truth. If it agrees with the tier
+    // quote we can safely show the tier-derived unit caption; if not, the tier
+    // plugin is display-only for this gateway and we fall back to Woo's own
+    // unit figure so the row stays internally consistent.
+    const totalAmount = parseWooMoneyAmount(total);
+    const subtotalAmount = parseWooMoneyAmount(subtotal);
+    const wooLineTotal = Number.isNaN(totalAmount) ? subtotalAmount : totalAmount;
+    const wooUnitPrice =
+      Number.isFinite(wooLineTotal) && wooLineTotal > 0 && qty > 0
+        ? wooLineTotal / qty
+        : NaN;
+    const tierMatchesWoo =
+      !!tierPrice &&
+      Number.isFinite(wooUnitPrice) &&
+      Math.abs(wooUnitPrice - tierPrice.unitPrice) < 0.01;
+    // Unit price shown in the caption. Only trust the tier number when Woo's
+    // own line total corroborates it.
+    const displayUnitPrice = tierMatchesWoo
+      ? tierPrice.unitPrice
+      : Number.isFinite(wooUnitPrice) && wooUnitPrice > 0
+        ? wooUnitPrice
+        : catalogUnitPrice;
     // Strike-through target: tier → catalog; catalog → regular (on sale products).
-    const compareAtPrice = tierPrice
+    const compareAtPrice = tierMatchesWoo
       ? tierPrice.catalogUnitPrice
-      : regularUnitPrice;
+      : !tierPrice
+        ? regularUnitPrice
+        : NaN;
     const hasUnitPrice = Number.isFinite(displayUnitPrice) && displayUnitPrice > 0;
     // Only show a saving when the payment option is genuinely cheaper; a
     // gateway that costs more gets no strike-through.
@@ -122,24 +144,16 @@ const CartItems = ({
         ? compareAtPrice - displayUnitPrice
         : 0;
 
-    // `subtotal` is the pre-discount WooCommerce line total — what a per-line
-    // BOGO or product coupon would already be baked into. Use `total` when it
-    // is available and non-zero (it reflects line-level discounts like 100%
-    // BOGO), falling back to subtotal otherwise.
-    const wooLineTotal =
-      parseWooMoneyAmount(total) > 0
-        ? parseWooMoneyAmount(total)
-        : parseWooMoneyAmount(subtotal);
-
     return {
       unitPriceLabel: hasUnitPrice ? formatPrice(displayUnitPrice) : null,
       compareAtPriceLabel: unitSaving > 0 ? formatPrice(compareAtPrice) : null,
       savingLabel:
         unitSaving > 0
-          ? formatPrice(unitSaving * (quantity || 1))
+          ? formatPrice(unitSaving * qty)
           : null,
       // Always WooCommerce's own number — never a client-side recalculation.
       lineTotalLabel: formatPrice(wooLineTotal),
+      showTierCaption: !!tierPrice && tierMatchesWoo,
     };
   }, [
     price,
@@ -230,7 +244,7 @@ const CartItems = ({
               <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                 {linePricing.unitPriceLabel}
               </span>
-              {tierPrice && (
+              {linePricing.showTierCaption && tierPrice && (
                 <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
                   {tierPrice.tierName} price
                 </span>

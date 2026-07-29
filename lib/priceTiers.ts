@@ -47,7 +47,9 @@ export function kokoInstallmentAmount(totalPrice: number): number {
 
 /** Card gateways all quote the single Visa/Mastercard tier on the backend. */
 export function isCardPaymentGateway(gatewayId: string): boolean {
-  return siteConfig.payment.cardGatewayIds.includes(gatewayId);
+  return (siteConfig.payment.cardGatewayIds as readonly string[]).includes(
+    gatewayId,
+  );
 }
 
 /** Map a WooCommerce gateway id onto the tier the plugin names it after. */
