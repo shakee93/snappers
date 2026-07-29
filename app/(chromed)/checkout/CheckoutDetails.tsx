@@ -25,6 +25,7 @@ interface CheckoutLeftProps {
     snapshot: CheckoutAddressSnapshot | null,
     options?: { immediate?: boolean },
   ) => void;
+  onPaymentMethodChange: (gatewayId: string) => void;
   isTOC: boolean;
   onTOCChange: () => void;
   tocError: boolean;
@@ -44,6 +45,7 @@ const CheckoutDetails = ({
   isKokoPayment,
   onCheckoutSubmit,
   onAddressChange,
+  onPaymentMethodChange,
   isTOC,
   onTOCChange,
   tocError,
@@ -93,6 +95,7 @@ const CheckoutDetails = ({
         isPriceFluctuation={isPriceFluctuation}
         onCheckoutSubmit={onCheckoutSubmit}
         onAddressChange={onAddressChange}
+        onPaymentMethodChange={onPaymentMethodChange}
         isTOC={isTOC}
         onTOCChange={onTOCChange}
         tocError={tocError}

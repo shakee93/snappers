@@ -162,6 +162,14 @@ export const CartContentWithRates = gql`
         cost
       }
     }
+    # Payment-method fees (card surcharge etc.) after chosen_payment_method
+    # is set on the session and the cart is recalculated.
+    feeTotal
+    fees {
+      id
+      name
+      amount
+    }
   }
   ${CartContent}
 `;

@@ -12,6 +12,7 @@ import { GET_CART } from "@/graphql/defs/cart";
 import { useCoupon } from "@/hooks/useCoupon";
 import { useShipping } from "@/hooks/useShipping";
 import { useCheckoutAddressSync } from "@/hooks/useCheckoutAddressSync";
+import { useCheckoutPaymentSync } from "@/hooks/useCheckoutPaymentSync";
 import { useCheckout } from "@/hooks/useCheckout";
 import {
   Cart,
@@ -347,9 +348,31 @@ const CheckoutPage = () => {
   const { syncCheckoutAddress, addressSyncing } =
     useCheckoutAddressSync(handleAddressSynced);
 
-  // Totals are mid-flight while either the address push or the rate lookup is
-  // running — the summary skeletons and the Confirm button both key off this.
-  const totalsRecalculating = shippingUpdating || addressSyncing;
+  // Same pattern as address sync: after chosen_payment_method lands in the WC
+  // session, plugins that reprice by gateway (fees / price tiers) need a
+  // recalculated cart before the summary can show the correct total.
+  const handlePaymentSynced = async () => {
+    try {
+      const { data } = await apolloClient.query({
+        query: GET_CART,
+        variables: { recalculateTotals: true },
+        fetchPolicy: "no-cache",
+      });
+      if (data?.cart) {
+        applyCart(data.cart);
+      }
+    } catch (error) {
+      console.error("Failed to re-read the cart after payment method sync:", error);
+    }
+  };
+
+  const { syncCheckoutPaymentMethod, paymentSyncing } =
+    useCheckoutPaymentSync(handlePaymentSynced);
+
+  // Totals are mid-flight while address, payment, or shipping recalculation
+  // is running — the summary skeletons and the Confirm button both key off this.
+  const totalsRecalculating =
+    shippingUpdating || addressSyncing || paymentSyncing;
 
   useEffect(() => {
     // Skip until the cart has actually loaded. Firing the WBS mutation
@@ -988,15 +1011,30 @@ const CheckoutPage = () => {
     return sum + (regular - sale) * (item?.quantity || 0);
   }, 0);
   const threePercentFromTotal = chargeableOrderTotal * CARD_SURCHARGE_RATE;
+  // Prefer fees the backend attached after chosen_payment_method synced.
+  // Fall back to the site-config card surcharge only when WC returned none
+  // (plugin not applying a fee for this gateway yet).
+  const backendFeeTotal = replaceStringinInt(cart?.feeTotal ?? "0");
+  const backendFees = (cart?.fees ?? []).filter(
+    (fee): fee is NonNullable<typeof fee> =>
+      !!fee && Number.isFinite(fee.amount) && (fee.amount ?? 0) !== 0,
+  );
+  const hasBackendFees =
+    backendFees.length > 0 ||
+    (Number.isFinite(backendFeeTotal) && backendFeeTotal !== 0);
   // Koko installment seam — currently identical to chargeableOrderTotal after
   // the financing markup was removed; kept named so a gateway fee can return
   // without rewiring the summary / prop plumbing.
   const kokoOrderTotal = chargeableOrderTotal;
-  const cardSurchargeAmount = isCardPayment ? threePercentFromTotal : 0;
+  const cardSurchargeAmount =
+    isCardPayment && !hasBackendFees ? threePercentFromTotal : 0;
+  const displayedOrderTotal = hasBackendFees
+    ? chargeableOrderTotal
+    : isCardPayment
+      ? chargeableOrderTotal + threePercentFromTotal
+      : chargeableOrderTotal;
 
-  const orderTotalLabel = isCardPayment
-    ? formatPrice(chargeableOrderTotal + threePercentFromTotal)
-    : formatPrice(chargeableOrderTotal);
+  const orderTotalLabel = formatPrice(displayedOrderTotal);
 
   // The courier's name changes with the destination — WC quotes "Local
   // Delivery" inside the Colombo distance zone and "Standard Shipping"
@@ -1276,6 +1314,7 @@ const CheckoutPage = () => {
               isKokoPayment={isKokoPayment}
               onCheckoutSubmit={submitCheckout}
               onAddressChange={syncCheckoutAddress}
+              onPaymentMethodChange={syncCheckoutPaymentMethod}
               isTOC={isTOC}
               onTOCChange={handleTOC}
               tocError={tocError}
@@ -1526,6 +1565,21 @@ const CheckoutPage = () => {
                   </div>
                 )}
 
+                {backendFees.map((fee) => (
+                  <div
+                    key={fee.id ?? fee.name}
+                    className="flex justify-between items-center"
+                  >
+                    <span className="text-slate-600 dark:text-slate-400">
+                      {fee.name}
+                    </span>
+                    <span className="font-medium text-slate-900 dark:text-slate-200">
+                      {(fee.amount ?? 0) > 0 ? "+" : "−"}
+                      {formatPrice(Math.abs(fee.amount ?? 0))}
+                    </span>
+                  </div>
+                ))}
+
                 {isCardPayment && cardSurchargeAmount > 0 && (
                   <div className="flex justify-between items-center">
                     <span className="text-slate-600 dark:text-slate-400">
@@ -1559,44 +1613,16 @@ const CheckoutPage = () => {
                 </div>
               )}
 
-              {isCardPayment && (
-                <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100" aria-busy={totalsRecalculating}>
-                  <span className="text-base font-semibold">Order total</span>
-                  {totalsRecalculating ? (
-                    <span className="inline-block w-32 h-7 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
-                  ) : (
-                    <span className="text-xl font-bold">
-                      {formatPrice(chargeableOrderTotal + threePercentFromTotal)}
-                    </span>
-                  )}
-                </div>
-              )}
-
-              {isKokoPayment && (
-                <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100" aria-busy={totalsRecalculating}>
-                  <span className="text-base font-semibold">Order total</span>
-                  {totalsRecalculating ? (
-                    <span className="inline-block w-32 h-7 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
-                  ) : (
-                    <span className="text-xl font-bold">
-                      {formatPrice(kokoOrderTotal)}
-                    </span>
-                  )}
-                </div>
-              )}
-
-              {!isCardPayment && !isKokoPayment && (
-                <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100" aria-busy={totalsRecalculating}>
-                  <span className="text-base font-semibold">Order total</span>
-                  {totalsRecalculating ? (
-                    <span className="inline-block w-32 h-7 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
-                  ) : (
-                    <span className="text-xl font-bold">
-                      {formatPrice(chargeableOrderTotal)}
-                    </span>
-                  )}
-                </div>
-              )}
+              <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100" aria-busy={totalsRecalculating}>
+                <span className="text-base font-semibold">Order total</span>
+                {totalsRecalculating ? (
+                  <span className="inline-block w-32 h-7 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
+                ) : (
+                  <span className="text-xl font-bold">
+                    {formatPrice(displayedOrderTotal)}
+                  </span>
+                )}
+              </div>
 
             </div>
             </>

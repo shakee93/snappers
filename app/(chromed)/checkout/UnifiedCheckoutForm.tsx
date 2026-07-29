@@ -685,6 +685,7 @@ interface Props {
         snapshot: CheckoutAddressSnapshot | null,
         options?: { immediate?: boolean },
     ) => void;
+    onPaymentMethodChange: (gatewayId: string) => void;
     isTOC: boolean;
     onTOCChange: () => void;
     tocError: boolean;
@@ -707,6 +708,7 @@ const UnifiedCheckoutForm = ({
     isPriceFluctuation,
     onCheckoutSubmit,
     onAddressChange,
+    onPaymentMethodChange,
     isTOC,
     onTOCChange,
     tocError,
@@ -945,9 +947,10 @@ const UnifiedCheckoutForm = ({
         const meta = getGatewayMeta(g);
         setSelectedGateway({ id: g.id, title: meta.title });
         setIsKokoPayment(g.id === "darazbnpl");
-        setIsCardPayment(g.id === "payhere" || g.id === "webxpay");
+        setIsCardPayment(g.id === "payhere" || g.id === "webxpay" || g.id === "ndb-pay");
+        onPaymentMethodChange(g.id);
         // eslint-disable-next-line react-hooks/exhaustive-deps -- gatewayDisabledReason depends on deliveryType which is already in deps
-    }, [visiblePaymentGateways, selectedGateway.id, deliveryType, setIsCardPayment, setIsKokoPayment]);
+    }, [visiblePaymentGateways, selectedGateway.id, deliveryType, setIsCardPayment, setIsKokoPayment, onPaymentMethodChange]);
 
     // If the currently-selected gateway becomes disabled (e.g. user picks COD
     // then switches to Flash Delivery), clear it so the form can't submit
@@ -959,8 +962,9 @@ const UnifiedCheckoutForm = ({
         setMethodActive("");
         setIsKokoPayment(false);
         setIsCardPayment(false);
+        onPaymentMethodChange("");
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [deliveryType, selectedGateway.id]);
+    }, [deliveryType, selectedGateway.id, onPaymentMethodChange]);
 
     const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -1150,7 +1154,12 @@ const UnifiedCheckoutForm = ({
         }
 
         setIsKokoPayment(gateway.id === "darazbnpl");
-        setIsCardPayment(gateway.id === "payhere");
+        setIsCardPayment(
+          gateway.id === "payhere" ||
+            gateway.id === "webxpay" ||
+            gateway.id === "ndb-pay",
+        );
+        onPaymentMethodChange(gateway.id);
     };
 
     const PaymentMethodCard = ({ gateway }: { gateway: PaymentGateway }) => {
