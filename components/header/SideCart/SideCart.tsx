@@ -14,17 +14,20 @@ const SIDE_CART_CHECKOUT_CLASS =
     `relative w-full h-auto flex flex-1 items-center justify-center rounded-full text-sm sm:text-base font-bold py-3 px-4 sm:py-3 sm:px-6 ${BRAND_CTA_BUTTON_CLASS}`;
 
 /**
- * Radix Sheet uses react-remove-scroll, which locks the body via
- * `data-scroll-locked`. Checkout hides the header (HeaderGate), so the sheet
- * can unmount mid-close and leave that attribute behind — checkout then
- * cannot scroll until a full reload.
+ * Radix Sheet locks the page via react-remove-scroll-bar's `data-scroll-locked`
+ * attribute (a reference count + injected stylesheet — not inline overflow
+ * styles). Checkout hides the header (HeaderGate), so the sheet can unmount
+ * mid-close and leave that attribute behind.
+ *
+ * Safe today because SideCart is the only Radix dialog consumer; a second
+ * concurrent dialog would need the count decremented rather than wiped.
+ *
+ * Also clears DismissableLayer's inline `pointer-events: none` in case that
+ * teardown is skipped on the same hard unmount.
  */
 function clearBodyScrollLock() {
     document.body.removeAttribute("data-scroll-locked");
-    document.body.style.removeProperty("overflow");
-    document.body.style.removeProperty("padding-right");
-    document.body.style.removeProperty("margin-right");
-    document.documentElement.style.removeProperty("overflow");
+    document.body.style.removeProperty("pointer-events");
 }
 
 export default function SideCart() {
@@ -38,28 +41,26 @@ export default function SideCart() {
 
     const closeCart = useCallback(() => {
         setIsCartOpen(false);
+    }, [setIsCartOpen]);
+
+    // Eager lock clear only on the /checkout hop — HeaderGate unmounts this
+    // tree there. Other close paths stay mounted long enough for Radix cleanup.
+    const leaveForCheckout = useCallback(() => {
+        setIsCartOpen(false);
         clearBodyScrollLock();
     }, [setIsCartOpen]);
 
-    const handleOpenChange = useCallback(
-        (open: boolean) => {
-            setIsCartOpen(open);
-            if (!open) {
-                clearBodyScrollLock();
-            }
-        },
-        [setIsCartOpen],
-    );
-
-    // Safety net when HeaderGate unmounts this tree on /checkout.
+    // Reset provider state + DOM lock when HeaderGate unmounts this tree
+    // (e.g. /checkout via back/forward or /cart's own Checkout button).
     useEffect(() => {
         return () => {
+            setIsCartOpen(false);
             clearBodyScrollLock();
         };
-    }, []);
+    }, [setIsCartOpen]);
 
     return (
-        <Sheet open={isCartOpen} onOpenChange={handleOpenChange}>
+        <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
             <SheetTrigger asChild>
                 <button
                     aria-label="Open basket"
@@ -95,7 +96,11 @@ export default function SideCart() {
                     sm:max-w-lg z-[1000] px-4"
             >
                 <SheetHeader className="space-y-4 pb-6">
-                    <Link href={"/cart"} className="text-sm text-slate-500 dark:text-slate-400">
+                    <Link
+                        href={"/cart"}
+                        onClick={closeCart}
+                        className="text-sm text-slate-500 dark:text-slate-400"
+                    >
                         <SheetTitle className="text-xl font-semibold">Shopping Cart</SheetTitle>
                     </Link>
                 </SheetHeader>
@@ -141,7 +146,7 @@ export default function SideCart() {
                             ) : (
                                 <Link
                                     href="/checkout"
-                                    onClick={closeCart}
+                                    onClick={leaveForCheckout}
                                     className={SIDE_CART_CHECKOUT_CLASS}
                                 >
                                     Checkout
