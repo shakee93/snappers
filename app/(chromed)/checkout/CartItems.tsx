@@ -41,8 +41,8 @@ export interface CartItemProduct {
 export interface CartItemProductNode {
   id: number;
   name: string;
-  price: number;
-  regularPrice?: string;
+  price?: string | null;
+  regularPrice?: string | null;
   slug: string;
   type: string;
   image: {
@@ -92,11 +92,11 @@ const CartItems = ({
     () => resolveCartLineTierPrice(item, paymentGatewayId),
     [item, paymentGatewayId]
   );
-  // Unit price, the price it's compared against, the line total and the saving
-  // all come off the same figure so the row can never disagree with itself.
-  // Formatted here because Woo's own strings carry the store symbol, not LKR.
+  // Line total always comes from WooCommerce so BOGO, product-scoped coupons
+  // and any backend-side repricing are respected without needing to model them
+  // client-side. The tier price is only used for the unit-price caption and the
+  // compare-at/save display — it never affects the charged amount shown here.
   const linePricing = useMemo(() => {
-    const qty = quantity || 1;
     const isVariable = type === "VARIABLE";
     const catalogUnitPrice = parseWooMoneyAmount(
       isVariable ? variation?.node?.price : price
@@ -105,31 +105,41 @@ const CartItems = ({
       isVariable ? variation?.node?.regularPrice : regularPrice
     );
 
-    const unitPrice = tierPrice ? tierPrice.unitPrice : catalogUnitPrice;
-    // A payment tier replaces the catalog price, so that becomes what the
-    // saving is measured against; otherwise it's the product's regular price.
+    // Unit price shown in the caption: tier price when a gateway matches, else
+    // catalog price. We deliberately do NOT use this to compute the line total.
+    const displayUnitPrice = tierPrice ? tierPrice.unitPrice : catalogUnitPrice;
+    // Strike-through target: tier → catalog; catalog → regular (on sale products).
     const compareAtPrice = tierPrice
       ? tierPrice.catalogUnitPrice
       : regularUnitPrice;
-    const hasUnitPrice = Number.isFinite(unitPrice) && unitPrice > 0;
-    // Only ever positive: a gateway that costs more than the catalog price
-    // shows its price plainly, with no strike-through and no saving.
+    const hasUnitPrice = Number.isFinite(displayUnitPrice) && displayUnitPrice > 0;
+    // Only show a saving when the payment option is genuinely cheaper; a
+    // gateway that costs more gets no strike-through.
     const unitSaving =
       hasUnitPrice &&
       Number.isFinite(compareAtPrice) &&
-      compareAtPrice > unitPrice
-        ? compareAtPrice - unitPrice
+      compareAtPrice > displayUnitPrice
+        ? compareAtPrice - displayUnitPrice
         : 0;
 
+    // `subtotal` is the pre-discount WooCommerce line total — what a per-line
+    // BOGO or product coupon would already be baked into. Use `total` when it
+    // is available and non-zero (it reflects line-level discounts like 100%
+    // BOGO), falling back to subtotal otherwise.
+    const wooLineTotal =
+      parseWooMoneyAmount(total) > 0
+        ? parseWooMoneyAmount(total)
+        : parseWooMoneyAmount(subtotal);
+
     return {
-      unitPriceLabel: hasUnitPrice ? formatPrice(unitPrice) : null,
+      unitPriceLabel: hasUnitPrice ? formatPrice(displayUnitPrice) : null,
       compareAtPriceLabel: unitSaving > 0 ? formatPrice(compareAtPrice) : null,
-      savingLabel: unitSaving > 0 ? formatPrice(unitSaving * qty) : null,
-      // Line total tracks the unit price shown above it; coupons stay on their
-      // own summary row, the way WooCommerce itemises them.
-      lineTotalLabel: formatPrice(
-        hasUnitPrice ? unitPrice * qty : parseWooMoneyAmount(subtotal)
-      ),
+      savingLabel:
+        unitSaving > 0
+          ? formatPrice(unitSaving * (quantity || 1))
+          : null,
+      // Always WooCommerce's own number — never a client-side recalculation.
+      lineTotalLabel: formatPrice(wooLineTotal),
     };
   }, [
     price,
@@ -137,6 +147,7 @@ const CartItems = ({
     regularPrice,
     subtotal,
     tierPrice,
+    total,
     type,
     variation?.node?.price,
     variation?.node?.regularPrice,

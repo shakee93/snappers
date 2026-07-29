@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useMutation } from "@apollo/client";
 import { UPDATE_SESSION } from "@/graphql/defs/cart";
+import { toast } from "sonner";
 
 /**
  * Pushes the selected payment gateway into the WooCommerce session
@@ -40,8 +41,29 @@ export function useCheckoutPaymentSync(onSynced: () => Promise<void> | void) {
       const isCurrent = () =>
         isMountedRef.current && syncGenerationRef.current === generation;
 
+      // An empty gateway id means the selection was cleared (e.g. the chosen
+      // gateway became disabled). Clear chosen_payment_method in the WC session
+      // so price-tier plugins don't keep applying the old method's pricing.
       if (!gatewayId) {
-        if (isCurrent()) setPaymentSyncing(false);
+        const runClear = async () => {
+          try {
+            await updateSession({
+              variables: {
+                input: {
+                  sessionData: [{ key: "chosen_payment_method", value: "" }],
+                },
+              },
+            });
+          } catch {
+            // best-effort — totals will resync when a gateway is re-selected
+          } finally {
+            if (isCurrent()) {
+              lastSyncedGatewayRef.current = null;
+              setPaymentSyncing(false);
+            }
+          }
+        };
+        void runClear();
         return;
       }
 
@@ -77,7 +99,12 @@ export function useCheckoutPaymentSync(onSynced: () => Promise<void> | void) {
             "Failed to sync checkout payment method for totals:",
             error,
           );
-          if (isCurrent()) setPaymentSyncing(false);
+          if (isCurrent()) {
+            setPaymentSyncing(false);
+            toast.error(
+              "Could not update payment method totals. Please try again.",
+            );
+          }
           return;
         }
 
@@ -90,7 +117,12 @@ export function useCheckoutPaymentSync(onSynced: () => Promise<void> | void) {
             "Failed to refresh totals after payment method sync:",
             error,
           );
-          if (isCurrent()) lastSyncedGatewayRef.current = null;
+          if (isCurrent()) {
+            lastSyncedGatewayRef.current = null;
+            toast.error(
+              "Could not refresh order totals. Reload the page if amounts look incorrect.",
+            );
+          }
         } finally {
           if (isCurrent()) setPaymentSyncing(false);
         }

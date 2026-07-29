@@ -145,7 +145,6 @@ export const siteConfig = {
     gatewayOrder: ["payhere", "ndb-pay", "cod", "darazbnpl", "bacs"],
     payhere: {
       hideAboveAmount: 100000,
-      cardSurchargeRate: 0.03,
     },
   },
   shipping: {
@@ -216,7 +215,7 @@ From the CONTENT bucket (32 findings):
 The 8 LIB findings, plus a few helpers that should exist:
 
 - `lib/formatPrice.ts` — `formatPrice(amount: number)` reads `siteConfig.locale.currencySymbol` + `currencyCode`. Replaces inline `Rs ${new Intl.NumberFormat...}` at `app/(chromed)/checkout/page.tsx:888-889` and `UnifiedCheckoutForm.tsx:283`. Also kills `LKR`/`Rs.` literals in `PriceFilter.tsx`, `MobileFilterSheet.tsx`, `OrderItem.tsx`.
-- `lib/checkoutMath.ts` — exports `CARD_SURCHARGE_RATE` (currently `0.03` at `checkout/page.tsx:862`), `PAYHERE_HIDE_THRESHOLD` (currently `100000` at `checkout/page.tsx:413`, `PaymentMethod.tsx:128`, `UnifiedCheckoutForm.tsx:413`). Both read from `siteConfig.payment.payhere.*`.
+- `lib/checkoutMath.ts` — exports `PAYHERE_HIDE_THRESHOLD` (currently `100000`). Reads from `siteConfig.payment.payhere.hideAboveAmount`. (`CARD_SURCHARGE_RATE` was removed — the site no longer applies a frontend surcharge; pricing comes from WooCommerce fees / woo-price-tiers.)
 - `lib/api.ts` — `apiUrl(path: string)` helper that joins `siteConfig.url.api` + path. Replaces hardcoded `https://api.gqmobiles.lk/wp-json/...` URLs in `OrderBankReceiptUpload.tsx:44`, `Payment/BankTransfer.tsx:114`, `checkout/page.tsx:1089`, `app/(chromed)/contact/page.tsx:56`.
 - `lib/jsonld/productSchema.ts:39,46,15-18` — `priceCurrency`, seller `name`, `DEFAULT_WARRANTY` from `siteConfig`.
 - `lib/collectionNavOrder.ts:5-16` — split: data array → `content/nav-category-priority.json`; ordering helpers stay in `lib/`.

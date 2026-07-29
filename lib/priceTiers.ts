@@ -1,3 +1,5 @@
+import { siteConfig } from "@/site.config";
+
 /**
  * Shape returned by the woo-price-tiers WPGraphQL field on Product.
  * Not yet in generated types (API introspection is often disabled).
@@ -44,15 +46,8 @@ export function kokoInstallmentAmount(totalPrice: number): number {
 }
 
 /** Card gateways all quote the single Visa/Mastercard tier on the backend. */
-const CARD_PAYMENT_GATEWAY_IDS = [
-  "payhere",
-  "webxpay",
-  "ndb-pay",
-  "geniebiz",
-] as const;
-
 export function isCardPaymentGateway(gatewayId: string): boolean {
-  return (CARD_PAYMENT_GATEWAY_IDS as readonly string[]).includes(gatewayId);
+  return siteConfig.payment.cardGatewayIds.includes(gatewayId);
 }
 
 /** Map a WooCommerce gateway id onto the tier the plugin names it after. */

@@ -1576,7 +1576,7 @@ const CheckoutPage = () => {
 
                 {backendFees.map((fee) => (
                   <div
-                    key={fee.id ?? fee.name}
+                    key={fee.id}
                     className="flex justify-between items-center"
                   >
                     <span className="text-slate-600 dark:text-slate-400">

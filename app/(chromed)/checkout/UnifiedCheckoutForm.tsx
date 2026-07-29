@@ -20,6 +20,7 @@ import { useCart } from "@/context/CartProvider";
 import checkoutCopy from "@/content/checkout-copy.json";
 import { formatPrice } from "@/lib/formatPrice";
 import { PAYHERE_HIDE_THRESHOLD } from "@/lib/checkoutMath";
+import { isCardPaymentGateway } from "@/lib/priceTiers";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonBrand from "shared/Button/ButtonBrand";
 import PreOrderNotice from "@/components/global/ui/PreOrderNotice";
@@ -947,7 +948,7 @@ const UnifiedCheckoutForm = ({
         const meta = getGatewayMeta(g);
         setSelectedGateway({ id: g.id, title: meta.title });
         setIsKokoPayment(g.id === "darazbnpl");
-        setIsCardPayment(g.id === "payhere" || g.id === "webxpay" || g.id === "ndb-pay");
+        setIsCardPayment(isCardPaymentGateway(g.id));
         onPaymentMethodChange(g.id);
         // eslint-disable-next-line react-hooks/exhaustive-deps -- gatewayDisabledReason depends on deliveryType which is already in deps
     }, [visiblePaymentGateways, selectedGateway.id, deliveryType, setIsCardPayment, setIsKokoPayment, onPaymentMethodChange]);
@@ -1154,11 +1155,7 @@ const UnifiedCheckoutForm = ({
         }
 
         setIsKokoPayment(gateway.id === "darazbnpl");
-        setIsCardPayment(
-          gateway.id === "payhere" ||
-            gateway.id === "webxpay" ||
-            gateway.id === "ndb-pay",
-        );
+        setIsCardPayment(isCardPaymentGateway(gateway.id));
         onPaymentMethodChange(gateway.id);
     };
 
