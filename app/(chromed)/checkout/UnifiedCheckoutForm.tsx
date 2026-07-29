@@ -248,18 +248,20 @@ const CitySelectField = memo(({ id, value, onChange }: CitySelectFieldProps) => 
         activeOption?.scrollIntoView({ block: "nearest" });
     }, [activeIndex, isOpen]);
 
-    // A postcode only reaches here when the customer picked a city off the
-    // list, and then it is authoritative: the courier quotes city and postcode
-    // as a pair, so keeping the previously-picked city's code (which is what
-    // "only fill when empty" did from the second pick onwards) sends a
-    // mismatched destination — Angoda gets quoted against Kolonnawa's 10600.
-    // Typing a city commits without a postcode and never touches the field.
+    // A postcode and province only reach here when the customer picked a city
+    // off the list, and then they are authoritative: the courier quotes city
+    // and postcode as a pair, so keeping the previously-picked city's code
+    // (which is what "only fill when empty" did from the second pick onwards)
+    // sends a mismatched destination — Angoda gets quoted against Kolonnawa's
+    // 10600. Typing a city commits without a postcode/province and never
+    // touches those fields.
     const commitCity = useCallback(
-        (cityName: string, postcode?: string | null) => {
+        (cityName: string, postcode?: string | null, province?: string) => {
             setCommittedValue(cityName);
             onChange({
                 city: cityName,
                 ...(postcode ? { postal: postcode } : {}),
+                ...(province ? { state: province } : {}),
             });
         },
         [onChange],
@@ -320,7 +322,7 @@ const CitySelectField = memo(({ id, value, onChange }: CitySelectFieldProps) => 
     const handleSelectCity = (city: SriLankanCity) => {
         setInputValue(city.name);
         debouncedCommitCity.cancel();
-        commitCity(city.name, city.postcode);
+        commitCity(city.name, city.postcode, city.province);
         setIsOpen(false);
         setActiveIndex(-1);
     };
