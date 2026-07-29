@@ -200,9 +200,14 @@ export const siteConfig = {
   payment: {
     gatewayOrder: ["payhere", "ndb-pay", "cod", "darazbnpl", "bacs"],
     kokoGatewayId: "darazbnpl",
+    // Gateways that quote the shared Visa/Mastercard tier in woo-price-tiers.
+    cardGatewayIds: ["payhere", "webxpay", "ndb-pay", "geniebiz"] as const,
+    // Gateways that genuinely cannot be combined with coupon discounts.
+    // Keep this separate from `cardGatewayIds`: not every card processor has
+    // the same coupon rule.
+    couponRestrictedGatewayIds: ["payhere"] as const,
     payhere: {
       hideAboveAmount: 100000,
-      cardSurchargeRate: 0.03,
     },
     // Bank accounts shown for the BACS / bank-transfer gateway. The full list
     // renders on the bank-details view; the one flagged `featuredAtCheckout`

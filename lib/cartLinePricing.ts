@@ -1,7 +1,9 @@
 /**
  * Parse WooCommerce / WPGraphQL money strings (may include HTML) to a number.
  */
-export function parseWooMoneyAmount(value: string | null | undefined): number {
+export function parseWooMoneyAmount(
+  value: string | number | null | undefined,
+): number {
   if (value == null || value === "") return NaN;
   const stripped = String(value)
     .replace(/<[^>]*>/g, "")

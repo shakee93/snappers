@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Input from "shared/Input/Input";
 import Label from "@/components/global/primitives/Label/Label";
 import Link from "next/link";
@@ -12,6 +12,7 @@ import { GET_CART } from "@/graphql/defs/cart";
 import { useCoupon } from "@/hooks/useCoupon";
 import { useShipping } from "@/hooks/useShipping";
 import { useCheckoutAddressSync } from "@/hooks/useCheckoutAddressSync";
+import { useCheckoutPaymentSync } from "@/hooks/useCheckoutPaymentSync";
 import { useCheckout } from "@/hooks/useCheckout";
 import {
   Cart,
@@ -42,12 +43,15 @@ import { Metadata } from "next/types";
 import Image from "next/image";
 import { siteConfig } from "@/site.config";
 import { formatPrice, currencySymbol } from "@/lib/formatPrice";
-import { CARD_SURCHARGE_RATE } from "@/lib/checkoutMath";
 import { apiUrl } from "@/lib/api";
 import { enrichCheckoutOrderStorage } from "@/components/account/accountOrderUtils";
 
 // Methods that represent "customer collects", never a courier rate.
 const PICKUP_METHOD_IDS = new Set(["pickup_location", "local_pickup"]);
+const COUPON_RESTRICTED_GATEWAY_IDS =
+  siteConfig.payment.couponRestrictedGatewayIds as readonly string[];
+
+import { RecalculatingAmount } from "@/components/global/ui/RecalculatingAmount";
 
 /**
  * The courier rate is not a constant on this store. Its id *and* its label
@@ -125,8 +129,13 @@ const CheckoutPage = () => {
 
   const [deliveryType, setDeliveryType] = useState<DeliveryType | null>(null);
   const noShipping = deliveryType === "store_pickup" || deliveryType === "flash_delivery";
-  const [isCardPayment, setIsCardPayment] = useState(false);
   const [isKokoPayment, setIsKokoPayment] = useState(false);
+  // Selected gateway id — the summary lines price their woo-price-tiers unit
+  // price off it while WooCommerce keeps owning the totals.
+  const [selectedPaymentGatewayId, setSelectedPaymentGatewayId] = useState("");
+  const isCouponRestrictedPayment = COUPON_RESTRICTED_GATEWAY_IDS.includes(
+    selectedPaymentGatewayId,
+  );
 
   const [shippingTotal, setShippingTotal] = useState<string | null | undefined>();
   const [paymentData, setPaymentData] =
@@ -347,9 +356,41 @@ const CheckoutPage = () => {
   const { syncCheckoutAddress, addressSyncing } =
     useCheckoutAddressSync(handleAddressSynced);
 
-  // Totals are mid-flight while either the address push or the rate lookup is
-  // running — the summary skeletons and the Confirm button both key off this.
-  const totalsRecalculating = shippingUpdating || addressSyncing;
+  // Same pattern as address sync: after chosen_payment_method lands in the WC
+  // session, plugins that reprice by gateway (fees / price tiers) need a
+  // recalculated cart before the summary can show the correct total.
+  const handlePaymentSynced = async () => {
+    try {
+      const { data } = await apolloClient.query({
+        query: GET_CART,
+        variables: { recalculateTotals: true },
+        fetchPolicy: "no-cache",
+      });
+      if (data?.cart) {
+        applyCart(data.cart);
+      }
+    } catch (error) {
+      console.error("Failed to re-read the cart after payment method sync:", error);
+    }
+  };
+
+  const { syncCheckoutPaymentMethod, paymentSyncing } =
+    useCheckoutPaymentSync(handlePaymentSynced);
+
+  // The form calls this from effects, so it has to stay referentially stable.
+  const handlePaymentMethodChange = useCallback(
+    (gatewayId: string) => {
+      setSelectedPaymentGatewayId(gatewayId);
+      syncCheckoutPaymentMethod(gatewayId);
+    },
+    [syncCheckoutPaymentMethod],
+  );
+
+  // Totals are mid-flight while address, payment, shipping or coupon
+  // recalculation is running — the summary rows and the Confirm button both key
+  // off this, so no figure can be read while a superseded one is on screen.
+  const totalsRecalculating =
+    shippingUpdating || addressSyncing || paymentSyncing || isCouponSyncingCart;
 
   useEffect(() => {
     // Skip until the cart has actually loaded. Firing the WBS mutation
@@ -979,24 +1020,20 @@ const CheckoutPage = () => {
   const numericDiscountTotal = replaceStringinInt(cart?.discountTotal);
   const hasDiscount = Number.isFinite(numericDiscountTotal) && numericDiscountTotal > 0;
 
-  const catalogSavings = (cart?.contents?.nodes || []).reduce((sum: number, item: any) => {
-    const node = item?.product?.node;
-    const isVariable = node?.type === "VARIABLE";
-    const sale = replaceStringinInt(isVariable ? item?.variation?.node?.price : node?.price);
-    const regular = replaceStringinInt(isVariable ? item?.variation?.node?.regularPrice : node?.regularPrice);
-    if (!Number.isFinite(sale) || !Number.isFinite(regular) || regular <= sale) return sum;
-    return sum + (regular - sale) * (item?.quantity || 0);
-  }, 0);
-  const threePercentFromTotal = chargeableOrderTotal * CARD_SURCHARGE_RATE;
+  // Card pricing now comes from WooCommerce alone: either a fee it attaches
+  // once chosen_payment_method is synced, or the woo-price-tiers card price.
+  // No site-side surcharge is added on top — one was never billed, so it only
+  // ever quoted a total higher than the amount handed to the gateway.
+  const backendFees = (cart?.fees ?? []).filter(
+    (fee): fee is NonNullable<typeof fee> =>
+      !!fee && Number.isFinite(fee.amount) && (fee.amount ?? 0) !== 0,
+  );
   // Koko installment seam — currently identical to chargeableOrderTotal after
   // the financing markup was removed; kept named so a gateway fee can return
   // without rewiring the summary / prop plumbing.
   const kokoOrderTotal = chargeableOrderTotal;
-  const cardSurchargeAmount = isCardPayment ? threePercentFromTotal : 0;
 
-  const orderTotalLabel = isCardPayment
-    ? formatPrice(chargeableOrderTotal + threePercentFromTotal)
-    : formatPrice(chargeableOrderTotal);
+  const orderTotalLabel = formatPrice(chargeableOrderTotal);
 
   // The courier's name changes with the destination — WC quotes "Local
   // Delivery" inside the Colombo distance zone and "Standard Shipping"
@@ -1268,14 +1305,13 @@ const CheckoutPage = () => {
               }
               setDeliveryType={setDeliveryType}
               deliveryType={deliveryType}
-              setIsCardPayment={setIsCardPayment}
-              isCardPayment={isCardPayment}
               totalPayment={chargeableOrderTotal}
               kokoTotal={kokoOrderTotal}
               setIsKokoPayment={setIsKokoPayment}
               isKokoPayment={isKokoPayment}
               onCheckoutSubmit={submitCheckout}
               onAddressChange={syncCheckoutAddress}
+              onPaymentMethodChange={handlePaymentMethodChange}
               isTOC={isTOC}
               onTOCChange={handleTOC}
               tocError={tocError}
@@ -1309,6 +1345,8 @@ const CheckoutPage = () => {
                   index={index}
                   key={item?.key ?? index}
                   item={item as unknown as CartItem}
+                  paymentGatewayId={selectedPaymentGatewayId}
+                  pricesRecalculating={paymentSyncing}
                   onQuantityChange={updateCart}
                   onRemove={removeFromCart}
                 />
@@ -1467,43 +1505,43 @@ const CheckoutPage = () => {
                 )}
               </div>
 
-              <div className="mt-5 space-y-2 text-sm">
+              <div className="mt-5 space-y-2 text-sm" aria-busy={totalsRecalculating}>
+                {/* Subtotal is the sum of the line prices as shown above it.
+                    Catalog savings are itemised per product line ("Save X"),
+                    not grossed up here and discounted back off. */}
                 <div className="flex justify-between">
                   <span className="text-slate-600 dark:text-slate-400">Subtotal</span>
                   <span className="font-medium text-slate-900 dark:text-slate-200">
-                    {catalogSavings > 0
-                      ? formatPrice(cartSubtotal + catalogSavings)
-                      : formatPrice(cartSubtotal)}
+                    {totalsRecalculating ? (
+                      <RecalculatingAmount />
+                    ) : (
+                      formatPrice(cartSubtotal)
+                    )}
                   </span>
                 </div>
-
-                {catalogSavings > 0 && (
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-600 dark:text-slate-400">Promotion <span className="text-xs font-semibold text-success ">(You saved)</span></span>
-                    <span className="inline-flex items-center rounded-md bg-red-500 px-2 py-0.5 text-xs font-semibold text-white">
-                      -{formatPrice(catalogSavings)}
-                    </span>
-                  </div>
-                )}
 
                 {hasDiscount && (
                   <div className="flex justify-between items-center">
                     <span className="text-slate-600 dark:text-slate-400">Coupon</span>
-                    <span className="inline-flex items-center rounded-md bg-red-500 px-2 py-0.5 text-xs font-semibold text-white">
-                      −{" "}
-                      {formatPrice(numericDiscountTotal)}
-                    </span>
+                    {totalsRecalculating ? (
+                      <RecalculatingAmount className="h-5 w-16" />
+                    ) : (
+                      <span className="inline-flex items-center rounded-md bg-red-500 px-2 py-0.5 text-xs font-semibold text-white">
+                        −{" "}
+                        {formatPrice(numericDiscountTotal)}
+                      </span>
+                    )}
                   </div>
                 )}
 
                 {!noShipping && (
-                  <div className="flex justify-between" aria-busy={totalsRecalculating}>
+                  <div className="flex justify-between">
                     <span className="text-slate-600 dark:text-slate-400">
                       {shippingRateLabel}
                     </span>
                     <span className="font-medium text-slate-900 dark:text-slate-200">
                       {totalsRecalculating ? (
-                        <span className="inline-block w-20 h-5 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
+                        <RecalculatingAmount />
                       ) : preferFreeShipping ? (
                         formatPrice(0)
                       ) : (
@@ -1526,27 +1564,45 @@ const CheckoutPage = () => {
                   </div>
                 )}
 
-                {isCardPayment && cardSurchargeAmount > 0 && (
-                  <div className="flex justify-between items-center">
+                {backendFees.map((fee) => (
+                  <div
+                    key={fee.id}
+                    className="flex justify-between items-center"
+                  >
                     <span className="text-slate-600 dark:text-slate-400">
-                      Card processing fee
+                      {fee.name}
                     </span>
                     <span className="font-medium text-slate-900 dark:text-slate-200">
-                      +{formatPrice(cardSurchargeAmount)}
+                      {totalsRecalculating ? (
+                        <RecalculatingAmount />
+                      ) : (
+                        <>
+                          {(fee.amount ?? 0) > 0 ? "+" : "−"}
+                          {formatPrice(Math.abs(fee.amount ?? 0))}
+                        </>
+                      )}
                     </span>
                   </div>
-                )}
+                ))}
+
               </div>
-              {hasDiscount && (isCardPayment || isKokoPayment) && (
+              {hasDiscount && (isCouponRestrictedPayment || isKokoPayment) && (
                 <div className="flex justify-between py-2.5">
                   <span className="text-red-500 font-medium">Coupon discounts cannot be used with this payment method</span>
                 </div>
               )}
               {isKokoPayment && (
-                <div className="flex flex-wrap items-center text-xs text-gray-500 mt-1">
+                <div
+                  className="flex flex-wrap items-center text-xs text-gray-500 mt-1"
+                  aria-busy={totalsRecalculating}
+                >
                   <span>pay in 3 x {currencySymbol}</span>
                   <span className="font-semibold mx-1">
-                    {(kokoOrderTotal / 3).toFixed(2)}
+                    {totalsRecalculating ? (
+                      <RecalculatingAmount className="h-4 w-14" />
+                    ) : (
+                      (kokoOrderTotal / 3).toFixed(2)
+                    )}
                   </span>
                   <span>with</span>
                   <span className="ml-1 inline-block">
@@ -1559,44 +1615,14 @@ const CheckoutPage = () => {
                 </div>
               )}
 
-              {isCardPayment && (
-                <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100" aria-busy={totalsRecalculating}>
-                  <span className="text-base font-semibold">Order total</span>
-                  {totalsRecalculating ? (
-                    <span className="inline-block w-32 h-7 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
-                  ) : (
-                    <span className="text-xl font-bold">
-                      {formatPrice(chargeableOrderTotal + threePercentFromTotal)}
-                    </span>
-                  )}
-                </div>
-              )}
-
-              {isKokoPayment && (
-                <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100" aria-busy={totalsRecalculating}>
-                  <span className="text-base font-semibold">Order total</span>
-                  {totalsRecalculating ? (
-                    <span className="inline-block w-32 h-7 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
-                  ) : (
-                    <span className="text-xl font-bold">
-                      {formatPrice(kokoOrderTotal)}
-                    </span>
-                  )}
-                </div>
-              )}
-
-              {!isCardPayment && !isKokoPayment && (
-                <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100" aria-busy={totalsRecalculating}>
-                  <span className="text-base font-semibold">Order total</span>
-                  {totalsRecalculating ? (
-                    <span className="inline-block w-32 h-7 rounded bg-slate-200 dark:bg-slate-700 animate-pulse align-middle" />
-                  ) : (
-                    <span className="text-xl font-bold">
-                      {formatPrice(chargeableOrderTotal)}
-                    </span>
-                  )}
-                </div>
-              )}
+              <div className="mt-4 pt-4 border-t border-slate-200/70 dark:border-slate-700 flex items-baseline justify-between text-slate-900 dark:text-slate-100" aria-busy={totalsRecalculating}>
+                <span className="text-base font-semibold">Order total</span>
+                {totalsRecalculating ? (
+                  <RecalculatingAmount className="h-7 w-32" />
+                ) : (
+                  <span className="text-xl font-bold">{orderTotalLabel}</span>
+                )}
+              </div>
 
             </div>
             </>

@@ -120,3 +120,15 @@ mutation RemoveCoupons($codes: [String]) {
 }
 ${CartContent}`
 
+/** Persist session keys (e.g. chosen_payment_method) for cart recalculation. */
+export const UPDATE_SESSION = gql`
+  mutation UpdateSession($input: UpdateSessionInput!) {
+    updateSession(input: $input) {
+      session {
+        key
+        value
+      }
+    }
+  }
+`;
+

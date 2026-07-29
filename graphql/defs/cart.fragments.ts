@@ -50,6 +50,14 @@ export const CartItemProductSlim = gql`
             key
             value
         }
+        # woo-price-tiers plugin — per-payment-method unit price shown on the
+        # checkout summary line once a gateway is selected. Lives here rather
+        # than on a checkout-only fragment because every cart mutation response
+        # re-renders that same summary.
+        priceTiers {
+            name
+            price
+        }
         ... on SimpleProduct {
             price
             regularPrice
@@ -161,6 +169,15 @@ export const CartContentWithRates = gql`
         label
         cost
       }
+    }
+    # Payment-method fees (card processing etc.) WooCommerce attaches after
+    # chosen_payment_method is set on the session and the cart is recalculated.
+    # feeTotal is not fetched: cart.total already includes it, and the summary
+    # itemises the individual fee rows.
+    fees {
+      id
+      name
+      amount
     }
   }
   ${CartContent}

@@ -2,7 +2,6 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import LineOrCartPriceLabel from "@/components/global/ui/LineOrCartPriceLabel";
 import { Fragment, useMemo, useState } from "react";
 import AttributeIcon from "@/components/global/primitives/AttributeIcon";
 import type { VariationAttribute } from "@/graphql/types/graphql";
@@ -13,12 +12,15 @@ import { Loader, Truck } from "lucide-react";
 // VariationAttribute type — augment it here rather than reaching for `any`.
 type CartLineAttribute = VariationAttribute & { displayValue?: string | null };
 import { toast } from "sonner";
-import { isLineItemFree } from "@/lib/cartLinePricing";
+import { isLineItemFree, parseWooMoneyAmount } from "@/lib/cartLinePricing";
 import { getCartLineStockCap } from "@/lib/cartLineStockCap";
+import { resolveCartLineTierPrice } from "@/lib/checkoutPriceTiers";
+import { formatPrice } from "@/lib/formatPrice";
 import {
   isSimpleProductFreeShipping,
   isVariationFreeShipping,
 } from "@/lib/freeShipping";
+import { RecalculatingAmount } from "@/components/global/ui/RecalculatingAmount";
 import { getProductPath } from "@/lib/productUrl";
 
 export interface CartItem {
@@ -40,8 +42,8 @@ export interface CartItemProduct {
 export interface CartItemProductNode {
   id: number;
   name: string;
-  price: number;
-  regularPrice?: string;
+  price?: string | null;
+  regularPrice?: string | null;
   slug: string;
   type: string;
   image: {
@@ -52,11 +54,16 @@ export interface CartItemProductNode {
     nodes: any;
   };
   freeShippingMeta?: Array<{ key?: string | null; value?: string | null }>;
+  priceTiers?: Array<{ name?: string | null; price?: number | null }> | null;
 }
 
 interface CartItemsProps {
   item: CartItem;
   index: number;
+  /** Selected WooCommerce gateway id — drives the woo-price-tiers line price. */
+  paymentGatewayId: string;
+  /** True while payment-method sync is re-quoting cart line subtotals. */
+  pricesRecalculating?: boolean;
   onQuantityChange: (key: string, quantity: number) => Promise<unknown> | unknown;
   onRemove: (keys: string[]) => Promise<unknown> | unknown;
 }
@@ -64,6 +71,8 @@ interface CartItemsProps {
 const CartItems = ({
   item,
   index,
+  paymentGatewayId,
+  pricesRecalculating = false,
   onQuantityChange,
   onRemove,
 }: CartItemsProps) => {
@@ -80,6 +89,69 @@ const CartItems = ({
     return isSimpleProductFreeShipping(node);
   }, [type, variation?.node, node]);
   const productHref = node ? getProductPath(node) : "#";
+
+  // Payment tiers only reprice the line's unit price for display — the summary
+  // totals stay on WooCommerce's own figures.
+  const tierPrice = useMemo(
+    () => resolveCartLineTierPrice(item, paymentGatewayId),
+    [item, paymentGatewayId]
+  );
+  // Verified against the live catlitter GraphQL flow:
+  // addToCart -> updateSession(chosen_payment_method) -> GET_CART(recalculateTotals)
+  // moves the cart line subtotal itself (e.g. 3800 -> 3895 for webxpay on the
+  // wooden bowl stand). So woo-price-tiers reprices the cart item, and the
+  // tier caption can trust the backend's own subtotal flow.
+  const linePricing = useMemo(() => {
+    const qty = quantity || 1;
+    const isVariable = type === "VARIABLE";
+    const catalogUnitPrice = parseWooMoneyAmount(
+      isVariable ? variation?.node?.price : price
+    );
+    const regularUnitPrice = parseWooMoneyAmount(
+      isVariable ? variation?.node?.regularPrice : regularPrice
+    );
+
+    const wooLineSubtotal = parseWooMoneyAmount(subtotal);
+    // Single source for both unit caption and line total — always Woo's line
+    // subtotal so gateway changes never show tier math beside a stale total.
+    const displayUnitPrice =
+      Number.isFinite(wooLineSubtotal) && wooLineSubtotal > 0 && qty > 0
+        ? wooLineSubtotal / qty
+        : catalogUnitPrice;
+    // Strike-through target: tier -> catalog; catalog -> regular (sale products).
+    const compareAtPrice = tierPrice
+      ? tierPrice.catalogUnitPrice
+      : regularUnitPrice;
+    const hasUnitPrice = Number.isFinite(displayUnitPrice) && displayUnitPrice > 0;
+    // Only show a saving when the payment option is genuinely cheaper; a
+    // gateway that costs more gets no strike-through.
+    const unitSaving =
+      hasUnitPrice &&
+      Number.isFinite(compareAtPrice) &&
+      compareAtPrice > displayUnitPrice
+        ? compareAtPrice - displayUnitPrice
+        : 0;
+
+    return {
+      unitPriceLabel: hasUnitPrice ? formatPrice(displayUnitPrice) : null,
+      compareAtPriceLabel: unitSaving > 0 ? formatPrice(compareAtPrice) : null,
+      savingLabel:
+        unitSaving > 0
+          ? formatPrice(unitSaving * qty)
+          : null,
+      // Always WooCommerce's own number — never a client-side recalculation.
+      lineTotalLabel: formatPrice(wooLineSubtotal),
+    };
+  }, [
+    price,
+    quantity,
+    regularPrice,
+    subtotal,
+    tierPrice,
+    type,
+    variation?.node?.price,
+    variation?.node?.regularPrice,
+  ]);
 
   const { maxQty, atMax } = getCartLineStockCap(item);
   const atMaxStock = atMax(quantity);
@@ -147,6 +219,31 @@ const CartItems = ({
           <h3 className="text-sm font-semibold leading-snug text-slate-900 dark:text-slate-100 line-clamp-2">
             <Link href={productHref}>{name}</Link>
           </h3>
+
+          {!lineIsFree && (linePricing.unitPriceLabel || pricesRecalculating) && (
+            <div
+              className="mt-1 flex flex-wrap items-center gap-2"
+              aria-busy={pricesRecalculating}
+            >
+              {!pricesRecalculating && linePricing.compareAtPriceLabel && (
+                <span className="text-xs text-slate-400 line-through dark:text-slate-500">
+                  {linePricing.compareAtPriceLabel}
+                </span>
+              )}
+              {pricesRecalculating ? (
+                <RecalculatingAmount className="h-4 w-16" />
+              ) : (
+                <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                  {linePricing.unitPriceLabel}
+                </span>
+              )}
+              {!pricesRecalculating && tierPrice && (
+                <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                  {tierPrice.tierName} price
+                </span>
+              )}
+            </div>
+          )}
 
           {type === "VARIABLE" && (
             <div className="mt-1 text-xs text-slate-500 dark:text-slate-400">
@@ -222,18 +319,24 @@ const CartItems = ({
           className={`text-right shrink-0 transition-opacity ${
             isBusy ? "opacity-50" : "opacity-100"
           }`}
-          aria-busy={isBusy}
+          aria-busy={isBusy || pricesRecalculating}
         >
-          <LineOrCartPriceLabel
-            lineTotal={total}
-            lineSubtotal={subtotal}
-            showOriginalPrice={true}
-            catalogPrice={type === "VARIABLE" ? variation?.node.price : price}
-            catalogSalePrice={
-              type === "VARIABLE" ? variation?.node.regularPrice : regularPrice
-            }
-            className="!flex-col !items-end !gap-0 text-sm font-semibold text-slate-900 dark:text-slate-100"
-          />
+          {lineIsFree ? (
+            <span className="text-sm font-bold text-green-600">Free</span>
+          ) : pricesRecalculating ? (
+            <RecalculatingAmount className="h-4 w-16" />
+          ) : (
+            <>
+              <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+                {linePricing.lineTotalLabel}
+              </span>
+              {linePricing.savingLabel && (
+                <span className="mt-1 block rounded bg-slate-100 px-1.5 py-0.5 text-[11px] font-medium text-slate-600 dark:bg-slate-800 dark:text-slate-300">
+                  Save {linePricing.savingLabel}
+                </span>
+              )}
+            </>
+          )}
         </div>
       </div>
     </div>

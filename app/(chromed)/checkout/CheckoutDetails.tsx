@@ -14,8 +14,6 @@ interface CheckoutLeftProps {
   paymentGateways: any[];
   setDeliveryType: (v: DeliveryType | null) => void;
   deliveryType: DeliveryType | null;
-  isCardPayment: boolean;
-  setIsCardPayment: (v: boolean) => void;
   totalPayment: any;
   kokoTotal: number;
   setIsKokoPayment: (v: boolean) => void;
@@ -25,6 +23,7 @@ interface CheckoutLeftProps {
     snapshot: CheckoutAddressSnapshot | null,
     options?: { immediate?: boolean },
   ) => void;
+  onPaymentMethodChange: (gatewayId: string) => void;
   isTOC: boolean;
   onTOCChange: () => void;
   tocError: boolean;
@@ -36,14 +35,13 @@ const CheckoutDetails = ({
   paymentGateways,
   setDeliveryType,
   deliveryType,
-  isCardPayment,
-  setIsCardPayment,
   totalPayment,
   kokoTotal,
   setIsKokoPayment,
   isKokoPayment,
   onCheckoutSubmit,
   onAddressChange,
+  onPaymentMethodChange,
   isTOC,
   onTOCChange,
   tocError,
@@ -84,8 +82,6 @@ const CheckoutDetails = ({
         paymentGateways={paymentGateways}
         setDeliveryType={setDeliveryType}
         deliveryType={deliveryType}
-        setIsCardPayment={setIsCardPayment}
-        isCardPayment={isCardPayment}
         totalPayment={totalPayment}
         kokoTotal={kokoTotal}
         setIsKokoPayment={setIsKokoPayment}
@@ -93,6 +89,7 @@ const CheckoutDetails = ({
         isPriceFluctuation={isPriceFluctuation}
         onCheckoutSubmit={onCheckoutSubmit}
         onAddressChange={onAddressChange}
+        onPaymentMethodChange={onPaymentMethodChange}
         isTOC={isTOC}
         onTOCChange={onTOCChange}
         tocError={tocError}
