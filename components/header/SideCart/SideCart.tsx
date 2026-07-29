@@ -2,7 +2,7 @@
 
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/global/ui/sheet";
 import Image from "next/image";
-import { useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
 import CartDropdownItem from "@/components/header/CartDropdownItem";
@@ -13,6 +13,23 @@ import basketIcon from "@/public/global/basket.svg";
 const SIDE_CART_CHECKOUT_CLASS =
     `relative w-full h-auto flex flex-1 items-center justify-center rounded-full text-sm sm:text-base font-bold py-3 px-4 sm:py-3 sm:px-6 ${BRAND_CTA_BUTTON_CLASS}`;
 
+/**
+ * Radix Sheet locks the page via react-remove-scroll-bar's `data-scroll-locked`
+ * attribute (a reference count + injected stylesheet — not inline overflow
+ * styles). Checkout hides the header (HeaderGate), so the sheet can unmount
+ * mid-close and leave that attribute behind.
+ *
+ * Safe today because SideCart is the only Radix dialog consumer; a second
+ * concurrent dialog would need the count decremented rather than wiped.
+ *
+ * Also clears DismissableLayer's inline `pointer-events: none` in case that
+ * teardown is skipped on the same hard unmount.
+ */
+function clearBodyScrollLock() {
+    document.body.removeAttribute("data-scroll-locked");
+    document.body.style.removeProperty("pointer-events");
+}
+
 export default function SideCart() {
     const { cart, isCartOpen, setIsCartOpen } = useCart();
     const checkoutDisabled = (cart?.contents?.itemCount ?? 0) === 0;
@@ -21,6 +38,26 @@ export default function SideCart() {
         () => toDisplayCurrency(cart?.subtotal) || `${currencySymbol} 0.00`,
         [cart?.subtotal],
     );
+
+    const closeCart = useCallback(() => {
+        setIsCartOpen(false);
+    }, [setIsCartOpen]);
+
+    // Eager lock clear only on the /checkout hop — HeaderGate unmounts this
+    // tree there. Other close paths stay mounted long enough for Radix cleanup.
+    const leaveForCheckout = useCallback(() => {
+        setIsCartOpen(false);
+        clearBodyScrollLock();
+    }, [setIsCartOpen]);
+
+    // Reset provider state + DOM lock when HeaderGate unmounts this tree
+    // (e.g. /checkout via back/forward or /cart's own Checkout button).
+    useEffect(() => {
+        return () => {
+            setIsCartOpen(false);
+            clearBodyScrollLock();
+        };
+    }, [setIsCartOpen]);
 
     return (
         <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
@@ -59,7 +96,11 @@ export default function SideCart() {
                     sm:max-w-lg z-[1000] px-4"
             >
                 <SheetHeader className="space-y-4 pb-6">
-                    <Link href={"/cart"} className="text-sm text-slate-500 dark:text-slate-400">
+                    <Link
+                        href={"/cart"}
+                        onClick={closeCart}
+                        className="text-sm text-slate-500 dark:text-slate-400"
+                    >
                         <SheetTitle className="text-xl font-semibold">Shopping Cart</SheetTitle>
                     </Link>
                 </SheetHeader>
@@ -74,7 +115,7 @@ export default function SideCart() {
                                 >
                                     <CartDropdownItem
                                         item={item}
-                                        close={() => setIsCartOpen(false)}
+                                        close={closeCart}
                                         wrapperClassName="flex px-3 py-4 relative border-0 bg-transparent"
                                     />
                                 </div>
@@ -105,7 +146,7 @@ export default function SideCart() {
                             ) : (
                                 <Link
                                     href="/checkout"
-                                    onClick={() => setIsCartOpen(false)}
+                                    onClick={leaveForCheckout}
                                     className={SIDE_CART_CHECKOUT_CLASS}
                                 >
                                     Checkout
