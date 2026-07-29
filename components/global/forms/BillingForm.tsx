@@ -14,7 +14,7 @@ import { toast } from "sonner";
 
 // Types and Interfaces
 import { Customer } from "@/graphql/types/graphql";
-import { SRI_LANKAN_STATES } from "./HelperComps";
+import { SRI_LANKAN_PROVINCES } from "@/data/sriLankanProvinces";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import AccountSubmitButton from "@/components/account/AccountSubmitButton";
 import {
@@ -254,7 +254,7 @@ const BillingForm: FC<BillingFormProps> = ({ onSaved, embedded = false }) => {
                   label="State"
                   name="state"
                   value={formData.state}
-                  options={SRI_LANKAN_STATES.map((state) => ({
+                  options={SRI_LANKAN_PROVINCES.map((state) => ({
                     value: state,
                     label: state,
                   }))}

@@ -16,19 +16,7 @@ import {
   AccountSelectField,
 } from "@/components/account/AccountFormFields";
 import { accountSubheadingClassName } from "@/components/account/accountStyles";
-
-// Constants
-const SRI_LANKAN_STATES = [
-  "Western",
-  "Central",
-  "Southern",
-  "Northern",
-  "Eastern",
-  "North Western",
-  "North Central",
-  "Uva",
-  "Sabaragamuwa",
-];
+import { SRI_LANKAN_PROVINCES } from "@/data/sriLankanProvinces";
 
 type DeliveryFormProps = {
   onSaved?: () => void | Promise<void>;
@@ -246,7 +234,7 @@ const DeliveryForm: FC<DeliveryFormProps> = ({ onSaved, embedded = false }) => {
                   label="State"
                   name="state"
                   value={formData.state}
-                  options={SRI_LANKAN_STATES.map((state) => ({
+                  options={SRI_LANKAN_PROVINCES.map((state) => ({
                     value: state,
                     label: state,
                   }))}

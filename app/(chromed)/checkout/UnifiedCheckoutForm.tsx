@@ -11,7 +11,7 @@ import { CustomerAddress, PaymentGateway } from "@/graphql/types/graphql";
 import { contactInformation } from "@/data/types";
 import Select from "shared/Select/Select";
 import { toast } from "sonner";
-import { SRI_LANKAN_STATES, transformAddress } from "@/components/global/forms/HelperComps";
+import { transformAddress } from "@/components/global/forms/HelperComps";
 import {
     CHECKOUT_POSTCODE_PATTERN,
     CheckoutAddressSnapshot,
@@ -24,6 +24,7 @@ import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonBrand from "shared/Button/ButtonBrand";
 import PreOrderNotice from "@/components/global/ui/PreOrderNotice";
 import { SRI_LANKAN_CITIES, type SriLankanCity } from "@/data/sriLankanCities";
+import { SRI_LANKAN_PROVINCES, type SriLankanProvince } from "@/data/sriLankanProvinces";
 import {
     Store,
     Truck,
@@ -248,18 +249,20 @@ const CitySelectField = memo(({ id, value, onChange }: CitySelectFieldProps) => 
         activeOption?.scrollIntoView({ block: "nearest" });
     }, [activeIndex, isOpen]);
 
-    // A postcode only reaches here when the customer picked a city off the
-    // list, and then it is authoritative: the courier quotes city and postcode
-    // as a pair, so keeping the previously-picked city's code (which is what
-    // "only fill when empty" did from the second pick onwards) sends a
-    // mismatched destination — Angoda gets quoted against Kolonnawa's 10600.
-    // Typing a city commits without a postcode and never touches the field.
+    // A postcode and province only reach here when the customer picked a city
+    // off the list, and then they are authoritative: the courier quotes city
+    // and postcode as a pair, so keeping the previously-picked city's code
+    // (which is what "only fill when empty" did from the second pick onwards)
+    // sends a mismatched destination — Angoda gets quoted against Kolonnawa's
+    // 10600. Typing a city commits without a postcode/province and never
+    // touches those fields.
     const commitCity = useCallback(
-        (cityName: string, postcode?: string | null) => {
+        (cityName: string, postcode?: string | null, province?: SriLankanProvince) => {
             setCommittedValue(cityName);
             onChange({
                 city: cityName,
                 ...(postcode ? { postal: postcode } : {}),
+                ...(province ? { state: province } : {}),
             });
         },
         [onChange],
@@ -320,7 +323,7 @@ const CitySelectField = memo(({ id, value, onChange }: CitySelectFieldProps) => 
     const handleSelectCity = (city: SriLankanCity) => {
         setInputValue(city.name);
         debouncedCommitCity.cancel();
-        commitCity(city.name, city.postcode);
+        commitCity(city.name, city.postcode, city.province);
         setIsOpen(false);
         setActiveIndex(-1);
     };
@@ -556,7 +559,7 @@ const AddressFields = memo(({ idPrefix, values, onChange, nameOnly = false }: Ad
                     onChange={(e) => onChange({ state: e.target.value })}
                     required={true}
                 >
-                    {SRI_LANKAN_STATES.map((s) => (
+                    {SRI_LANKAN_PROVINCES.map((s) => (
                         <option key={s} value={s}>
                             {s}
                         </option>

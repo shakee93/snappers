@@ -1,7 +1,5 @@
-import {
-  SRI_LANKAN_STATES,
-  SelectField,
-} from "@/components/global/forms/HelperComps";
+import { SelectField } from "@/components/global/forms/HelperComps";
+import { SRI_LANKAN_PROVINCES } from "@/data/sriLankanProvinces";
 import { CustomerAddress } from "@/graphql/types/graphql";
 import Label from "@/components/global/primitives/Label/Label";
 import { siteConfig } from "@/site.config";
@@ -193,7 +191,7 @@ const BillingAddress: FC<Props> = ({
                 // label="State"
                 name="state"
                 value={state}
-                options={SRI_LANKAN_STATES.map((state) => ({
+                options={SRI_LANKAN_PROVINCES.map((state) => ({
                   value: state,
                   label: state,
                 }))}

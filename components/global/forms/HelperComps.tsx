@@ -8,17 +8,6 @@ import { siteConfig } from "@/site.config";
 import { apiUrl } from "@/lib/api";
 import WelcomeMessages from "@/content/welcome-messages.json";
 
-const SRI_LANKAN_STATES = [
-  "Western",
-  "Central",
-  "Southern",
-  "Northern",
-  "Eastern",
-  "North Western",
-  "North Central",
-  "Uva",
-  "Sabaragamuwa",
-];
 // Smaller Components
 const InputField = React.memo(function InputField({
   label,
@@ -284,7 +273,6 @@ function stripHtmlTags(html: string): string {
 export {
   InputField,
   SelectField,
-  SRI_LANKAN_STATES,
   extractRawAmount,
   LoggedInAvatar,
   transformAddress,
