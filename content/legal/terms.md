@@ -38,7 +38,7 @@ Catlitter.lk is not liable for any delays in delivery, failure to deliver, or an
 
 Customers are advised to check all order details carefully before submitting an order as changes cannot be made once an order has been placed. No compensation will be granted for any inconvenience or loss suffered.
 
-Please refer to our [FAQ](/faq) for a comprehensive guide on our return policy, or see our [Return Policy](/return-policy) page.
+Please refer to our [Return Policy](/return-policy) page for a comprehensive guide on returns.
 
 ## Complaints
 

@@ -120,14 +120,6 @@ export const siteConfig = {
     formspreeContactFormId:
       process.env.NEXT_PUBLIC_FORMSPREE_CONTACT_ID ?? "",
   },
-  businessHours: {
-    heading: "Business Hours",
-    schedule: [
-      { label: "Monday - Saturday", hours: "5AM - 8PM" },
-      { label: "Poya Day", hours: "10AM - 6PM" },
-      { label: "Sunday", hours: "Closed" },
-    ],
-  },
   /** Header + footer navigation (see `NavLinks`, `footer`). */
   navigation: {
     main: [
