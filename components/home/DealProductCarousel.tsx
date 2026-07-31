@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import Autoplay from "embla-carousel-autoplay";
 import ProductCard, {
   type ProductCardItem,
 } from "@/components/home/ProductCard";
@@ -10,7 +11,6 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-  type CarouselApi,
 } from "@/components/global/ui/carousel";
 import { siteConfig } from "@/site.config";
 
@@ -29,9 +29,14 @@ const slideClassName =
 /** Horizontal deal-product carousel shown beneath the countdown banner. */
 const DealProductCarousel = ({ products }: DealProductCarouselProps) => {
   const [mounted, setMounted] = useState(false);
-  const [api, setApi] = useState<CarouselApi>();
-  const [isPaused, setIsPaused] = useState(false);
   const canLoop = products.length > 1;
+  const autoplay = useRef(
+    Autoplay({
+      delay: AUTO_SLIDE_MS,
+      stopOnInteraction: false,
+      stopOnMouseEnter: true,
+    }),
+  );
 
   const carouselSlides = useMemo(() => {
     if (!canLoop) {
@@ -60,13 +65,6 @@ const DealProductCarousel = ({ products }: DealProductCarouselProps) => {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (!api || !mounted || isPaused) return;
-
-    const interval = setInterval(() => api.scrollNext(), AUTO_SLIDE_MS);
-    return () => clearInterval(interval);
-  }, [api, mounted, isPaused]);
-
   if (!products.length) return null;
 
   if (!mounted) {
@@ -86,24 +84,14 @@ const DealProductCarousel = ({ products }: DealProductCarouselProps) => {
   }
 
   return (
-    <div
-      className="relative"
-      onMouseEnter={() => setIsPaused(true)}
-      onMouseLeave={() => setIsPaused(false)}
-      onFocusCapture={() => setIsPaused(true)}
-      onBlurCapture={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
-          setIsPaused(false);
-        }
-      }}
-    >
+    <div className="relative">
       <Carousel
         opts={{
           align: "start",
           loop: canLoop,
           slidesToScroll: 1,
         }}
-        setApi={setApi}
+        plugins={canLoop ? [autoplay.current] : []}
         className="w-full"
       >
         <CarouselContent className="-ml-3">
