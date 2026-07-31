@@ -51,7 +51,7 @@ export default function SiteLogoImage({
         width={width}
         height={height}
         draggable={draggable}
-        className={twMerge(className, "select-none dark:hidden")}
+        className={twMerge(className, "dark:hidden")}
         {...imageProps}
       />
       <Image
@@ -60,7 +60,7 @@ export default function SiteLogoImage({
         width={width}
         height={height}
         draggable={draggable}
-        className={twMerge(className, "hidden select-none dark:block")}
+        className={twMerge(className, "hidden dark:block")}
         {...imageProps}
       />
     </span>
