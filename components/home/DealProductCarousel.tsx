@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import ProductCard, {
   type ProductCardItem,
 } from "@/components/home/ProductCard";
@@ -30,7 +30,7 @@ const slideClassName =
 const DealProductCarousel = ({ products }: DealProductCarouselProps) => {
   const [mounted, setMounted] = useState(false);
   const [api, setApi] = useState<CarouselApi>();
-  const carouselRef = useRef<HTMLDivElement>(null);
+  const [isPaused, setIsPaused] = useState(false);
   const canLoop = products.length > 1;
 
   const carouselSlides = useMemo(() => {
@@ -61,36 +61,11 @@ const DealProductCarousel = ({ products }: DealProductCarouselProps) => {
   }, []);
 
   useEffect(() => {
-    if (!api || !mounted) return;
+    if (!api || !mounted || isPaused) return;
 
-    let interval: ReturnType<typeof setInterval>;
-
-    const startAutoSlide = () => {
-      interval = setInterval(() => api.scrollNext(), AUTO_SLIDE_MS);
-    };
-
-    const stopAutoSlide = () => {
-      if (interval) clearInterval(interval);
-    };
-
-    startAutoSlide();
-
-    const carouselElement = carouselRef.current;
-    carouselElement?.addEventListener("mouseenter", stopAutoSlide);
-    carouselElement?.addEventListener("mouseleave", startAutoSlide);
-    carouselElement?.addEventListener("pointerdown", stopAutoSlide);
-    carouselElement?.addEventListener("pointerup", startAutoSlide);
-    carouselElement?.addEventListener("pointercancel", startAutoSlide);
-
-    return () => {
-      stopAutoSlide();
-      carouselElement?.removeEventListener("mouseenter", stopAutoSlide);
-      carouselElement?.removeEventListener("mouseleave", startAutoSlide);
-      carouselElement?.removeEventListener("pointerdown", stopAutoSlide);
-      carouselElement?.removeEventListener("pointerup", startAutoSlide);
-      carouselElement?.removeEventListener("pointercancel", startAutoSlide);
-    };
-  }, [api, mounted]);
+    const interval = setInterval(() => api.scrollNext(), AUTO_SLIDE_MS);
+    return () => clearInterval(interval);
+  }, [api, mounted, isPaused]);
 
   if (!products.length) return null;
 
@@ -111,7 +86,17 @@ const DealProductCarousel = ({ products }: DealProductCarouselProps) => {
   }
 
   return (
-    <div ref={carouselRef} className="relative">
+    <div
+      className="relative"
+      onMouseEnter={() => setIsPaused(true)}
+      onMouseLeave={() => setIsPaused(false)}
+      onFocusCapture={() => setIsPaused(true)}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) {
+          setIsPaused(false);
+        }
+      }}
+    >
       <Carousel
         opts={{
           align: "start",

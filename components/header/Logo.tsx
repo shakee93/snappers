@@ -14,13 +14,18 @@ const Logo = ({
 }) => {
   const clearSearch = useClearSearch();
   return (
-    <Link href={"/"} className={className} onClick={clearSearch}>
+    <Link
+      href={"/"}
+      className={twMerge("select-none", className)}
+      onClick={clearSearch}
+    >
       <SiteLogoImage
         priority
         className={twMerge(
-          "relative h-[31px] w-auto max-w-[320px] transition-all hover:scale-110",
+          "relative h-[31px] w-auto max-w-[320px] select-none transition-all hover:scale-110",
           imageClass
         )}
+        draggable={false}
       />
     </Link>
   );

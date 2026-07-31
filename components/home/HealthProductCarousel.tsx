@@ -62,6 +62,7 @@ const HealthProductCarousel = ({
     Autoplay({
       delay: SLIDE_INTERVAL,
       stopOnInteraction: false,
+      stopOnMouseEnter: true,
       playOnInit: false,
     }),
   );
