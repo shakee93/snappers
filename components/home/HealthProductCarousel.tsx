@@ -62,6 +62,7 @@ const HealthProductCarousel = ({
     Autoplay({
       delay: SLIDE_INTERVAL,
       stopOnInteraction: false,
+      stopOnMouseEnter: true,
       playOnInit: false,
     }),
   );
@@ -127,8 +128,13 @@ const HealthProductCarousel = ({
 
     const onInit = () => {
       syncActiveFromViewport(emblaApi);
-      if (canLoop && emblaApi.internalEngine().options.loop) {
+      // Plugin is only attached when canLoop — don't destroy() an un-inited plugin.
+      // When attached but Embla declined loop, destroy so mouseLeave can't startAutoplay().
+      if (!canLoop) return;
+      if (emblaApi.internalEngine().options.loop) {
         autoplay.current.play();
+      } else {
+        autoplay.current.destroy();
       }
     };
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import Autoplay from "embla-carousel-autoplay";
 import ProductCard, {
   type ProductCardItem,
 } from "@/components/home/ProductCard";
@@ -10,7 +11,6 @@ import {
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-  type CarouselApi,
 } from "@/components/global/ui/carousel";
 import { siteConfig } from "@/site.config";
 
@@ -29,9 +29,14 @@ const slideClassName =
 /** Horizontal deal-product carousel shown beneath the countdown banner. */
 const DealProductCarousel = ({ products }: DealProductCarouselProps) => {
   const [mounted, setMounted] = useState(false);
-  const [api, setApi] = useState<CarouselApi>();
-  const carouselRef = useRef<HTMLDivElement>(null);
   const canLoop = products.length > 1;
+  const autoplay = useRef(
+    Autoplay({
+      delay: AUTO_SLIDE_MS,
+      stopOnInteraction: false,
+      stopOnMouseEnter: true,
+    }),
+  );
 
   const carouselSlides = useMemo(() => {
     if (!canLoop) {
@@ -60,38 +65,6 @@ const DealProductCarousel = ({ products }: DealProductCarouselProps) => {
     setMounted(true);
   }, []);
 
-  useEffect(() => {
-    if (!api || !mounted) return;
-
-    let interval: ReturnType<typeof setInterval>;
-
-    const startAutoSlide = () => {
-      interval = setInterval(() => api.scrollNext(), AUTO_SLIDE_MS);
-    };
-
-    const stopAutoSlide = () => {
-      if (interval) clearInterval(interval);
-    };
-
-    startAutoSlide();
-
-    const carouselElement = carouselRef.current;
-    carouselElement?.addEventListener("mouseenter", stopAutoSlide);
-    carouselElement?.addEventListener("mouseleave", startAutoSlide);
-    carouselElement?.addEventListener("pointerdown", stopAutoSlide);
-    carouselElement?.addEventListener("pointerup", startAutoSlide);
-    carouselElement?.addEventListener("pointercancel", startAutoSlide);
-
-    return () => {
-      stopAutoSlide();
-      carouselElement?.removeEventListener("mouseenter", stopAutoSlide);
-      carouselElement?.removeEventListener("mouseleave", startAutoSlide);
-      carouselElement?.removeEventListener("pointerdown", stopAutoSlide);
-      carouselElement?.removeEventListener("pointerup", startAutoSlide);
-      carouselElement?.removeEventListener("pointercancel", startAutoSlide);
-    };
-  }, [api, mounted]);
-
   if (!products.length) return null;
 
   if (!mounted) {
@@ -111,14 +84,14 @@ const DealProductCarousel = ({ products }: DealProductCarouselProps) => {
   }
 
   return (
-    <div ref={carouselRef} className="relative">
+    <div className="relative">
       <Carousel
         opts={{
           align: "start",
           loop: canLoop,
           slidesToScroll: 1,
         }}
-        setApi={setApi}
+        plugins={canLoop ? [autoplay.current] : []}
         className="w-full"
       >
         <CarouselContent className="-ml-3">

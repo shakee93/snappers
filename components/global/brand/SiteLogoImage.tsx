@@ -18,6 +18,7 @@ export default function SiteLogoImage({
   lightOnly = false,
   width: widthProp,
   height: heightProp,
+  draggable = false,
   ...imageProps
 }: SiteLogoImageProps) {
   const { light, dark } = getLogoSources();
@@ -35,19 +36,21 @@ export default function SiteLogoImage({
         alt={alt}
         width={width}
         height={height}
-        className={className}
+        draggable={draggable}
+        className={twMerge("select-none", className)}
         {...imageProps}
       />
     );
   }
 
   return (
-    <span className="inline-block">
+    <span className="inline-block select-none">
       <Image
         src={light}
         alt={alt}
         width={width}
         height={height}
+        draggable={draggable}
         className={twMerge(className, "dark:hidden")}
         {...imageProps}
       />
@@ -56,6 +59,7 @@ export default function SiteLogoImage({
         alt={alt}
         width={width}
         height={height}
+        draggable={draggable}
         className={twMerge(className, "hidden dark:block")}
         {...imageProps}
       />
