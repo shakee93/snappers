@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMutation } from "@apollo/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
@@ -8,6 +8,7 @@ import { Loader } from "lucide-react";
 import Button from "@/shared/Button/Button";
 import AuthInput from "@/components/auth/AuthInput";
 import OtpCodeInput from "@/components/auth/OtpCodeInput";
+import CountryCallingCodeSelect from "@/components/auth/CountryCallingCodeSelect";
 import {
   authLabelClassName,
   authLinkClassName,
@@ -57,12 +58,14 @@ const PhoneOtpForm = () => {
   const [code, setCode] = useState("");
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [otpStatus, setOtpStatus] = useState<"idle" | "success" | "error">("idle");
   const [isBusy, setIsBusy] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
   const [now, setNow] = useState(() => Date.now());
+  const verifyingRef = useRef(false);
 
-  const { applyAuthSession, updateCustomer } = useSession();
+  const { applyAuthSession, updateCustomer, fetchCustomer } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = getSafeRedirectPath(searchParams.get("redirect"));
@@ -109,6 +112,7 @@ const PhoneOtpForm = () => {
         });
         setNow(issuedAt);
         setCode("");
+        setOtpStatus("idle");
         setStep("code");
         return true;
       } catch (caught) {
@@ -156,25 +160,44 @@ const PhoneOtpForm = () => {
     router.push(redirectTo);
   }, [redirectTo, router]);
 
-  const handleCodeSubmit = useCallback(
-    async (event: React.FormEvent) => {
-      event.preventDefault();
-      if (!challenge) return;
+  // My Account phone lives on shipping.phone; billing.phone is used at checkout.
+  const syncVerifiedPhone = useCallback(async () => {
+    await updateCustomer({
+      billing: { phone },
+      shipping: { phone },
+    });
+    await fetchCustomer();
+  }, [fetchCustomer, phone, updateCustomer]);
 
+  const verifyCode = useCallback(
+    async (otp: string) => {
+      if (!challenge || verifyingRef.current) return;
+      if (otp.length !== CODE_LENGTH) return;
+
+      verifyingRef.current = true;
       setError(null);
+      setOtpStatus("idle");
       setIsBusy(true);
       try {
         const { data } = await verifyOtp({
-          variables: { challengeId: challenge.challengeId, code },
+          variables: { challengeId: challenge.challengeId, code: otp },
         });
         const verified = data?.verifyOtp;
 
         if (!verified?.session?.authToken) {
+          setOtpStatus("error");
           setError("We could not complete sign-in. Please request a new code.");
+          setCode("");
           return;
         }
 
+        setOtpStatus("success");
         await applyAuthSession(verified.session);
+        // Phone OTP does not write WooCommerce address fields — sync them here
+        // so Account → Phone number reflects the verified number immediately.
+        await syncVerifiedPhone();
+        // Brief pause so the green ring is visible before navigation.
+        await new Promise((resolve) => setTimeout(resolve, 400));
 
         if (verified.isNewUser) {
           setStep("profile");
@@ -184,34 +207,66 @@ const PhoneOtpForm = () => {
         finishSignIn();
       } catch (caught) {
         const parsed = parseAuthError(caught);
+        setOtpStatus("error");
         setError(parsed.message);
+        setCode("");
         if (isChallengeDead(parsed.code)) {
           setChallenge(null);
-          setCode("");
+          setOtpStatus("idle");
           setStep("phone");
         }
       } finally {
+        verifyingRef.current = false;
         setIsBusy(false);
       }
     },
-    [applyAuthSession, challenge, code, finishSignIn, verifyOtp]
+    [applyAuthSession, challenge, finishSignIn, syncVerifiedPhone, verifyOtp]
   );
 
-  // The verified number is the only detail an OTP signup arrives with, and the
-  // auth plugin does not write it to the WooCommerce billing record.
+  const handleCodeChange = useCallback(
+    (next: string) => {
+      setCode(next);
+      if (otpStatus !== "idle") setOtpStatus("idle");
+      if (error) setError(null);
+
+      if (next.length === CODE_LENGTH && expiresIn > 0) {
+        void verifyCode(next);
+      }
+    },
+    [error, expiresIn, otpStatus, verifyCode]
+  );
+
+  const handleCodeSubmit = useCallback(
+    async (event: React.FormEvent) => {
+      event.preventDefault();
+      await verifyCode(code);
+    },
+    [code, verifyCode]
+  );
+
+  // Name becomes displayName (header avatar initial + account username).
+  // Email + phone go on the customer + shipping/billing records My Account reads.
   const saveProfile = useCallback(
     async (withDetails: boolean) => {
       setIsBusy(true);
       setError(null);
       try {
+        const name = firstName.trim();
+        const trimmedEmail = email.trim();
         const result = await updateCustomer(
           withDetails
             ? {
-                firstName,
-                email,
-                billing: { firstName, email, phone },
+                firstName: name,
+                displayName: name,
+                nickname: name,
+                email: trimmedEmail,
+                billing: { firstName: name, email: trimmedEmail, phone },
+                shipping: { phone },
               }
-            : { billing: { phone } }
+            : {
+                billing: { phone },
+                shipping: { phone },
+              }
         );
 
         // Skip always navigates; a failed name/email write must stay on the
@@ -221,12 +276,13 @@ const PhoneOtpForm = () => {
           return;
         }
 
+        await fetchCustomer();
         finishSignIn();
       } finally {
         setIsBusy(false);
       }
     },
-    [email, finishSignIn, firstName, phone, updateCustomer]
+    [email, fetchCustomer, finishSignIn, firstName, phone, updateCustomer]
   );
 
   const handleProfileSubmit = useCallback(
@@ -245,6 +301,7 @@ const PhoneOtpForm = () => {
     setStep("phone");
     setChallenge(null);
     setCode("");
+    setOtpStatus("idle");
     setError(null);
   }, []);
 
@@ -328,8 +385,9 @@ const PhoneOtpForm = () => {
           <OtpCodeInput
             length={CODE_LENGTH}
             value={code}
-            onChange={setCode}
+            onChange={handleCodeChange}
             disabled={isBusy || expiresIn === 0}
+            status={otpStatus}
             autoFocus
           />
           <span className="mt-1.5 block text-xs text-neutral-500 dark:text-neutral-400">
@@ -371,18 +429,11 @@ const PhoneOtpForm = () => {
       <div>
         <span className={authLabelClassName}>Phone number</span>
         <div className="mt-1.5 flex gap-2">
-          <select
-            aria-label="Country calling code"
-            className="h-11 w-28 rounded-lg border-0 bg-header-cream px-2 text-sm text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-header-action/40 dark:bg-neutral-800 dark:text-neutral-100"
+          <CountryCallingCodeSelect
             value={countryCode}
-            onChange={(event) => setCountryCode(event.target.value)}
-          >
-            {countries.map((country) => (
-              <option key={country.code} value={country.code}>
-                {country.flag} {country.callingCode}
-              </option>
-            ))}
-          </select>
+            onChange={setCountryCode}
+            disabled={isBusy}
+          />
           <AuthInput
             type="tel"
             inputMode="tel"
