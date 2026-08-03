@@ -16,6 +16,8 @@ import { getSafeRedirectPath } from "@/utils/redirect";
 const GSI_SRC = "https://accounts.google.com/gsi/client";
 /** GSI's documented max button width. */
 const GSI_MAX_WIDTH = 400;
+/** GSI `size: "large"` renders at 40px — match the placeholder to it. */
+const GSI_BUTTON_HEIGHT_CLASS = "h-10 py-0";
 
 type GoogleCredentialResponse = {
   credential?: string;
@@ -80,11 +82,15 @@ type GoogleSignInButtonProps = {
 };
 
 const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const hostRef = useRef<HTMLDivElement>(null);
   const nonceRef = useRef<string | null>(null);
   const nonceExpiresAtRef = useRef(0);
+  const expiryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastWidthRef = useRef(0);
   const initializingRef = useRef(false);
   const mountedRef = useRef(true);
+  const ensureButtonRef = useRef<() => Promise<boolean>>(async () => false);
   // Keep the credential handler stable so unrelated SessionProvider /
   // CartProvider updates do not tear down and remint the GSI button.
   const credentialRef = useRef<(response: GoogleCredentialResponse) => void>(
@@ -143,14 +149,17 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
     [applyAuthSession, redirectTo, router, signInWithGoogle]
   );
 
-  credentialRef.current = (response) => {
-    void handleCredential(response);
-  };
+  useEffect(() => {
+    credentialRef.current = (response) => {
+      void handleCredential(response);
+    };
+  }, [handleCredential]);
 
   useEffect(() => {
     mountedRef.current = true;
     return () => {
       mountedRef.current = false;
+      if (expiryTimerRef.current) clearTimeout(expiryTimerRef.current);
       window.google?.accounts.id.cancel();
     };
   }, []);
@@ -159,7 +168,9 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
     if (nonceAttempt === 0) return;
     nonceRef.current = null;
     nonceExpiresAtRef.current = 0;
+    lastWidthRef.current = 0;
     initializingRef.current = false;
+    if (expiryTimerRef.current) clearTimeout(expiryTimerRef.current);
     setIsButtonReady(false);
     if (hostRef.current) hostRef.current.innerHTML = "";
   }, [nonceAttempt]);
@@ -170,6 +181,11 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
     if (!identity || !host || !nonceRef.current) return;
 
     const nextWidth = Math.min(Math.max(Math.floor(width), 200), GSI_MAX_WIDTH);
+    if (Math.abs(nextWidth - lastWidthRef.current) < 2 && host.childElementCount > 0) {
+      return;
+    }
+    lastWidthRef.current = nextWidth;
+
     host.innerHTML = "";
     identity.renderButton(host, {
       theme: "outline",
@@ -182,11 +198,27 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
     setIsButtonReady(true);
   }, []);
 
+  const scheduleExpiryRemint = useCallback((expiresInSeconds: number) => {
+    if (expiryTimerRef.current) clearTimeout(expiryTimerRef.current);
+    // Remint before the nonce TTL so an idle tab does not fail the first click.
+    const remintInMs = Math.max((expiresInSeconds - 30) * 1000, 5_000);
+    expiryTimerRef.current = setTimeout(() => {
+      if (!mountedRef.current) return;
+      nonceRef.current = null;
+      nonceExpiresAtRef.current = 0;
+      lastWidthRef.current = 0;
+      // Remint in the background while the button stays mounted — do not tear
+      // it down under the cursor.
+      void ensureButtonRef.current();
+    }, remintInMs);
+  }, []);
+
   const ensureButton = useCallback(async () => {
     if (!isScriptReady || !mountedRef.current) return false;
 
     const identity = window.google?.accounts.id;
     const host = hostRef.current;
+    const wrapper = wrapperRef.current;
     if (!identity || !host) return false;
 
     const nonceStillValid =
@@ -216,7 +248,11 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
         cancel_on_tap_outside: true,
       });
 
-      paintButton(host.clientWidth || host.parentElement?.clientWidth || GSI_MAX_WIDTH);
+      // Measure the visible wrapper — the host may still be `invisible`.
+      const width =
+        wrapper?.clientWidth || host.clientWidth || host.parentElement?.clientWidth || GSI_MAX_WIDTH;
+      paintButton(width);
+      scheduleExpiryRemint(payload.expiresIn);
       return true;
     } catch (caught) {
       if (mountedRef.current) setError(parseAuthError(caught).message);
@@ -225,7 +261,53 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
       initializingRef.current = false;
       if (mountedRef.current) setIsPreparing(false);
     }
-  }, [clientId, createAuthNonce, isScriptReady, paintButton]);
+  }, [clientId, createAuthNonce, isScriptReady, paintButton, scheduleExpiryRemint]);
+
+  ensureButtonRef.current = ensureButton;
+
+  // Arm once on first user interaction anywhere in the panel (or when the
+  // browser is idle), so bounced visitors never mint a nonce and anyone who
+  // reaches for the button finds it already live — including on touch.
+  useEffect(() => {
+    if (!isScriptReady) return;
+
+    let armed = false;
+
+    const teardown = () => {
+      window.removeEventListener("pointerdown", arm, true);
+      window.removeEventListener("keydown", arm, true);
+      window.removeEventListener("touchstart", arm, true);
+      window.removeEventListener("scroll", arm, true);
+    };
+
+    const arm = () => {
+      if (armed) return;
+      armed = true;
+      teardown();
+      void ensureButton();
+    };
+
+    window.addEventListener("pointerdown", arm, true);
+    window.addEventListener("keydown", arm, true);
+    window.addEventListener("touchstart", arm, true);
+    window.addEventListener("scroll", arm, true);
+
+    let idleHandle: number | ReturnType<typeof setTimeout> | undefined;
+    if (typeof window.requestIdleCallback === "function") {
+      idleHandle = window.requestIdleCallback(arm, { timeout: 2500 });
+    } else {
+      idleHandle = setTimeout(arm, 1200);
+    }
+
+    return () => {
+      teardown();
+      if (typeof idleHandle === "number" && typeof window.cancelIdleCallback === "function") {
+        window.cancelIdleCallback(idleHandle);
+      } else if (idleHandle !== undefined) {
+        clearTimeout(idleHandle);
+      }
+    };
+  }, [ensureButton, isScriptReady, nonceAttempt]);
 
   useEffect(() => {
     if (!isScriptReady || !isButtonReady) return;
@@ -242,42 +324,38 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
     return () => resizeObserver.disconnect();
   }, [isButtonReady, isScriptReady, paintButton]);
 
-  const armGoogle = () => {
-    void ensureButton();
-  };
-
   return (
-    <div className="w-full space-y-2">
+    <div ref={wrapperRef} className="w-full space-y-2">
       <Script src={GSI_SRC} strategy="afterInteractive" onReady={() => setIsScriptReady(true)} />
       <div
         className={`relative w-full ${isSigningIn ? "pointer-events-none opacity-60" : ""}`}
       >
         {!isButtonReady ? (
-          <div onPointerEnter={armGoogle} onFocus={armGoogle}>
-            <Button
-              type="button"
-              disabled={!isScriptReady || isPreparing || isSigningIn}
-              onClick={() => {
-                void ensureButton();
-              }}
-              className="w-full border border-neutral-200 bg-white text-header-green shadow-md hover:bg-header-cream disabled:opacity-60 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:hover:bg-neutral-800"
-              fontSize="text-base font-bold"
-            >
-              {isPreparing ? (
-                <Loader className="h-5 w-5 animate-spin text-header-green" />
-              ) : (
-                <span className="inline-flex items-center gap-3">
-                  <GoogleMark />
-                  Continue with Google
-                </span>
-              )}
-            </Button>
-          </div>
+          <Button
+            type="button"
+            disabled={!isScriptReady || isPreparing || isSigningIn}
+            onClick={() => {
+              void ensureButton();
+            }}
+            className="w-full border border-neutral-200 bg-white text-header-green shadow-md hover:bg-header-cream disabled:opacity-60 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:hover:bg-neutral-800"
+            sizeClass={GSI_BUTTON_HEIGHT_CLASS}
+            fontSize="text-sm font-bold"
+          >
+            {isPreparing ? (
+              <Loader className="h-5 w-5 animate-spin text-header-green" />
+            ) : (
+              <span className="inline-flex items-center gap-3">
+                <GoogleMark />
+                Continue with Google
+              </span>
+            )}
+          </Button>
         ) : null}
 
+        {/* `invisible` keeps layout width measurable before the first paint. */}
         <div
           ref={hostRef}
-          className={`flex w-full justify-center ${isButtonReady ? "" : "hidden"}`}
+          className={`flex w-full justify-center ${isButtonReady ? "" : "invisible absolute inset-x-0 top-0"}`}
           aria-busy={isSigningIn}
         />
 

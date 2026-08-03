@@ -1,7 +1,7 @@
 export const authPageTitleClassName =
   "my-12 text-center text-3xl font-bold text-header-green dark:text-neutral-100";
 
-export const authPageWrapperClassName = "mx-auto max-w-md space-y-6";
+export const authPageWrapperClassName = "mx-auto max-w-[400px] space-y-6";
 
 export const authLabelClassName =
   "text-sm font-medium text-neutral-800 dark:text-neutral-200";
