@@ -282,30 +282,30 @@ const PhoneOtpForm = () => {
   // Email + phone go on the customer + shipping/billing records My Account reads.
   const saveProfile = useCallback(
     async (withDetails: boolean) => {
+      // Phone was already written in syncVerifiedPhone after OTP verify —
+      // Skip is a no-op mutation otherwise, so just continue.
+      if (!withDetails) {
+        finishSignIn();
+        return;
+      }
+
       setIsBusy(true);
       setError(null);
       try {
         const name = firstName.trim();
         const trimmedEmail = email.trim();
-        const result = await updateCustomer(
-          withDetails
-            ? {
-                firstName: name,
-                displayName: name,
-                nickname: name,
-                email: trimmedEmail,
-                billing: { firstName: name, email: trimmedEmail, phone },
-                shipping: { phone },
-              }
-            : {
-                billing: { phone },
-                shipping: { phone },
-              }
-        );
+        const result = await updateCustomer({
+          firstName: name,
+          displayName: name,
+          nickname: name,
+          email: trimmedEmail,
+          billing: { firstName: name, email: trimmedEmail, phone },
+          shipping: { phone },
+        });
 
-        // Skip always navigates; a failed name/email write must stay on the
-        // profile step so the user can fix it (e.g. email already taken).
-        if (withDetails && result?.error) {
+        // A failed name/email write must stay on the profile step so the user
+        // can fix it (e.g. email already taken).
+        if (result?.error) {
           setError(result.error);
           return;
         }
