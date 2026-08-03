@@ -1,20 +1,21 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useMutation } from "@apollo/client";
 import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Loader } from "lucide-react";
 import Button from "@/shared/Button/Button";
 import AuthInput from "@/components/auth/AuthInput";
-import OtpCodeInput from "@/components/auth/OtpCodeInput";
+import OtpCodeInput, { type OtpStatus } from "@/components/auth/OtpCodeInput";
+import CountryCallingCodeSelect from "@/components/auth/CountryCallingCodeSelect";
 import {
   authLabelClassName,
   authLinkClassName,
   authSubmitButtonClassName,
 } from "@/components/auth/authStyles";
 import { countries } from "@/data/countries";
-import { REQUEST_OTP, VERIFY_OTP } from "@/graphql/defs/auth-otp";
+import { REQUEST_OTP, VERIFY_OTP, type VerifyOtpMutation } from "@/graphql/defs/auth-otp";
 import { isChallengeDead, parseAuthError } from "@/utils/auth-errors";
 import { useSession } from "@/context/SessionProvider";
 import { getRandomWelcomeMessage } from "@/components/global/forms/HelperComps";
@@ -31,6 +32,11 @@ type Challenge = {
   challengeId: string;
   expiresAt: number;
   resendAt: number;
+};
+
+type AuthedOtp = {
+  session: NonNullable<NonNullable<VerifyOtpMutation["verifyOtp"]>["session"]>;
+  isNewUser: boolean;
 };
 
 function nationalDigits(localNumber: string): string {
@@ -57,10 +63,13 @@ const PhoneOtpForm = () => {
   const [code, setCode] = useState("");
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [otpStatus, setOtpStatus] = useState<OtpStatus>("idle");
   const [isBusy, setIsBusy] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
   const [now, setNow] = useState(() => Date.now());
+  const verifyingRef = useRef(false);
+  const finishingRef = useRef(false);
 
   const { applyAuthSession, updateCustomer } = useSession();
   const router = useRouter();
@@ -109,6 +118,7 @@ const PhoneOtpForm = () => {
         });
         setNow(issuedAt);
         setCode("");
+        setOtpStatus("idle");
         setStep("code");
         return true;
       } catch (caught) {
@@ -151,76 +161,163 @@ const PhoneOtpForm = () => {
   );
 
   const finishSignIn = useCallback(() => {
+    // Skip / Save / verify can all race a second call before navigation —
+    // one toast and one push only.
+    if (finishingRef.current) return;
+    finishingRef.current = true;
     toast(getRandomWelcomeMessage());
     localStorage.removeItem("last_order");
     router.push(redirectTo);
   }, [redirectTo, router]);
 
-  const handleCodeSubmit = useCallback(
-    async (event: React.FormEvent) => {
-      event.preventDefault();
-      if (!challenge) return;
+  // My Account phone lives on shipping.phone; billing.phone is used at checkout.
+  // UPDATE_ACCOUNT_INFORMATION now returns id + billing/shipping phone, so the
+  // mutation itself updates the session cache — no follow-up getUser.
+  // Always write after verify (including new users): abandoning the profile
+  // step must not leave an account with no phone for order/delivery contact.
+  const syncVerifiedPhone = useCallback(async () => {
+    const result = await updateCustomer({
+      billing: { phone },
+      shipping: { phone },
+    });
+    if (result?.error) {
+      console.error("Failed to sync verified phone to account:", result.error);
+    }
+  }, [phone, updateCustomer]);
 
+  const verifyCode = useCallback(
+    async (otp: string) => {
+      if (!challenge || verifyingRef.current) return;
+      if (otp.length !== CODE_LENGTH) return;
+
+      verifyingRef.current = true;
       setError(null);
+      setOtpStatus("idle");
       setIsBusy(true);
+
+      let authed: AuthedOtp | null = null;
+
       try {
         const { data } = await verifyOtp({
-          variables: { challengeId: challenge.challengeId, code },
+          variables: { challengeId: challenge.challengeId, code: otp },
         });
-        const verified = data?.verifyOtp;
+        const verified = data?.verifyOtp ?? null;
 
         if (!verified?.session?.authToken) {
+          setOtpStatus("error");
           setError("We could not complete sign-in. Please request a new code.");
+          setCode("");
           return;
         }
 
-        await applyAuthSession(verified.session);
+        setOtpStatus("success");
+        authed = {
+          session: verified.session,
+          isNewUser: verified.isNewUser,
+        };
+      } catch (caught) {
+        const parsed = parseAuthError(caught);
+        setOtpStatus("error");
+        setError(parsed.message);
+        setCode("");
+        if (isChallengeDead(parsed.code)) {
+          setChallenge(null);
+          setOtpStatus("idle");
+          setStep("phone");
+        }
+        return;
+      } finally {
+        // Keep isBusy true through post-auth work so the UI doesn't flash.
+        if (!authed) {
+          verifyingRef.current = false;
+          setIsBusy(false);
+        }
+      }
 
-        if (verified.isNewUser) {
+      if (!authed) return;
+
+      // Auth succeeded — failures below must not look like a bad OTP.
+      try {
+        await applyAuthSession(authed.session);
+        await syncVerifiedPhone();
+
+        if (authed.isNewUser) {
           setStep("profile");
           return;
         }
 
         finishSignIn();
       } catch (caught) {
-        const parsed = parseAuthError(caught);
-        setError(parsed.message);
-        if (isChallengeDead(parsed.code)) {
-          setChallenge(null);
-          setCode("");
-          setStep("phone");
+        console.error("Post-authentication setup failed after OTP verify:", caught);
+        if (authed.isNewUser) {
+          setStep("profile");
+        } else {
+          finishSignIn();
         }
       } finally {
+        verifyingRef.current = false;
         setIsBusy(false);
       }
     },
-    [applyAuthSession, challenge, code, finishSignIn, verifyOtp]
+    [applyAuthSession, challenge, finishSignIn, syncVerifiedPhone, verifyOtp]
   );
 
-  // The verified number is the only detail an OTP signup arrives with, and the
-  // auth plugin does not write it to the WooCommerce billing record.
+  const handleCodeChange = useCallback(
+    (next: string) => {
+      setCode(next);
+      if (otpStatus !== "idle") setOtpStatus("idle");
+      if (error) setError(null);
+
+      if (next.length === CODE_LENGTH && expiresIn > 0) {
+        void verifyCode(next);
+      }
+    },
+    [error, expiresIn, otpStatus, verifyCode]
+  );
+
+  const handleCodeSubmit = useCallback(
+    async (event: React.FormEvent) => {
+      event.preventDefault();
+      await verifyCode(code);
+    },
+    [code, verifyCode]
+  );
+
+  // Name becomes displayName (header avatar initial + account username).
+  // Email + phone go on the customer + shipping/billing records My Account reads.
   const saveProfile = useCallback(
     async (withDetails: boolean) => {
+      // Phone was already written in syncVerifiedPhone after OTP verify —
+      // Skip is a no-op mutation otherwise, so just continue.
+      if (!withDetails) {
+        setIsBusy(true);
+        finishSignIn();
+        return;
+      }
+
       setIsBusy(true);
       setError(null);
       try {
-        const result = await updateCustomer(
-          withDetails
-            ? {
-                firstName,
-                email,
-                billing: { firstName, email, phone },
-              }
-            : { billing: { phone } }
-        );
+        const name = firstName.trim();
+        const trimmedEmail = email.trim();
+        const result = await updateCustomer({
+          firstName: name,
+          displayName: name,
+          nickname: name,
+          email: trimmedEmail,
+          billing: { firstName: name, email: trimmedEmail, phone },
+          shipping: { phone },
+        });
 
-        // Skip always navigates; a failed name/email write must stay on the
-        // profile step so the user can fix it (e.g. email already taken).
-        if (withDetails && result?.error) {
+        // A failed name/email write must stay on the profile step so the user
+        // can fix it (e.g. email already taken).
+        if (result?.error) {
           setError(result.error);
           return;
         }
 
+        // Mutation selection set now includes id / billing / shipping — no
+        // follow-up getUser needed to keep USER_DATA_KEY cacheable.
         finishSignIn();
       } finally {
         setIsBusy(false);
@@ -245,6 +342,7 @@ const PhoneOtpForm = () => {
     setStep("phone");
     setChallenge(null);
     setCode("");
+    setOtpStatus("idle");
     setError(null);
   }, []);
 
@@ -328,8 +426,9 @@ const PhoneOtpForm = () => {
           <OtpCodeInput
             length={CODE_LENGTH}
             value={code}
-            onChange={setCode}
+            onChange={handleCodeChange}
             disabled={isBusy || expiresIn === 0}
+            status={otpStatus}
             autoFocus
           />
           <span className="mt-1.5 block text-xs text-neutral-500 dark:text-neutral-400">
@@ -371,18 +470,11 @@ const PhoneOtpForm = () => {
       <div>
         <span className={authLabelClassName}>Phone number</span>
         <div className="mt-1.5 flex gap-2">
-          <select
-            aria-label="Country calling code"
-            className="h-11 w-28 rounded-lg border-0 bg-header-cream px-2 text-sm text-neutral-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-header-action/40 dark:bg-neutral-800 dark:text-neutral-100"
+          <CountryCallingCodeSelect
             value={countryCode}
-            onChange={(event) => setCountryCode(event.target.value)}
-          >
-            {countries.map((country) => (
-              <option key={country.code} value={country.code}>
-                {country.flag} {country.callingCode}
-              </option>
-            ))}
-          </select>
+            onChange={setCountryCode}
+            disabled={isBusy}
+          />
           <AuthInput
             type="tel"
             inputMode="tel"

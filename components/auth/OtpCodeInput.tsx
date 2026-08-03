@@ -9,12 +9,15 @@ import {
 import { cn } from "@/lib/utils";
 import { authInputClassName } from "@/components/auth/authStyles";
 
+export type OtpStatus = "idle" | "success" | "error";
+
 type OtpCodeInputProps = {
   length: number;
   value: string;
   onChange: (value: string) => void;
   disabled?: boolean;
   autoFocus?: boolean;
+  status?: OtpStatus;
   "aria-label"?: string;
 };
 
@@ -24,6 +27,7 @@ const OtpCodeInput = ({
   onChange,
   disabled = false,
   autoFocus = false,
+  status = "idle",
   "aria-label": ariaLabel = "Verification code",
 }: OtpCodeInputProps) => {
   const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
@@ -36,6 +40,13 @@ const OtpCodeInput = ({
     if (!autoFocus) return;
     inputsRef.current[0]?.focus();
   }, [autoFocus]);
+
+  // After a failed verify the parent clears the value while the inputs are
+  // still disabled; refocus once they become editable again.
+  useEffect(() => {
+    if (disabled || digits.length > 0) return;
+    inputsRef.current[0]?.focus();
+  }, [disabled, digits.length]);
 
   const focusAt = (index: number) => {
     const clamped = Math.max(0, Math.min(length - 1, index));
@@ -148,7 +159,11 @@ const OtpCodeInput = ({
           onFocus={(event) => event.target.select()}
           className={cn(
             authInputClassName,
-            "mt-0 h-12 w-11 flex-1 px-0 text-center text-lg font-semibold tabular-nums sm:w-12"
+            "mt-0 h-12 w-11 flex-1 px-0 text-center text-lg font-semibold tabular-nums sm:w-12",
+            status === "success" &&
+              "ring-2 ring-green-500 focus:ring-green-500 dark:ring-green-400 dark:focus:ring-green-400",
+            status === "error" &&
+              "ring-2 ring-red-500 focus:ring-red-500 dark:ring-red-400 dark:focus:ring-red-400"
           )}
         />
       ))}
