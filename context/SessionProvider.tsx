@@ -8,6 +8,7 @@ import {
     REGISTER_CUSTOMER_MUTATION,
     UPDATE_ACCOUNT_INFORMATION
 } from '@/graphql/defs/auth';
+import type { AuthSessionTokens } from '@/graphql/defs/auth-otp';
 import { LoginResponse, Session } from "@/utils/type";
 import {
     Customer,
@@ -33,6 +34,7 @@ const SessionContext = createContext<Session>({
     login: async (email: string, password: string) => {
         return { data: null, error: null };
     },
+    applyAuthSession: async () => { },
     logout: () => { },
     fetchCustomer: () => Promise.resolve(),
     customer: undefined,
@@ -44,6 +46,40 @@ export function useSession() {
 }
 
 type AuthType = "registerCustomer" | "login";
+
+type PersistableTokens = {
+    authToken: string | null | undefined;
+    refreshToken: string | null | undefined;
+    sessionToken?: string | null;
+};
+
+/**
+ * Writes the auth/refresh tokens and resolves which WooCommerce session token
+ * to keep, returning it.
+ *
+ * Prefer the existing guest session token if one is set: keeping it means the
+ * next cart request carries `woocommerce-session: Session <guest>` + the new
+ * `Authorization: Bearer <auth>` header, which is what triggers WooCommerce to
+ * link the guest cart to the authenticated user. The sessionAfterware then
+ * rotates SESSION_TOKEN_KEY to the user-owned token via the woocommerce-session
+ * response header. Overwriting with the sign-in payload's sessionToken here
+ * orphans the guest cart — as does clearing it, which is why the OTP flow (whose
+ * payload carries no sessionToken at all) goes through this same path.
+ */
+function persistAuthTokens({ authToken, refreshToken, sessionToken }: PersistableTokens): string | null {
+    const existingGuestToken = localStorage.getItem(SESSION_TOKEN_KEY);
+    const tokenToStore = existingGuestToken || sessionToken || null;
+
+    localStorage.setItem(AUTH_TOKEN_KEY, authToken || '');
+    localStorage.setItem(REFRESH_TOKEN_KEY, refreshToken || '');
+    if (tokenToStore) {
+        localStorage.setItem(SESSION_TOKEN_KEY, tokenToStore);
+    } else {
+        localStorage.removeItem(SESSION_TOKEN_KEY);
+    }
+
+    return tokenToStore;
+}
 
 export function SessionProvider({ children }: {
     children: ReactNode
@@ -65,27 +101,13 @@ export function SessionProvider({ children }: {
         const data: LoginPayload & RegisterCustomerPayload = response?.data?.[type]
         if (!data) return;
 
-        const sessionTokenFromPayload = data?.sessionToken ?? data?.customer?.sessionToken ?? '';
-        const normalizedSessionToken = sessionTokenFromPayload || null;
-
-        // Prefer the existing guest session token if one is set: keeping it means
-        // the next cart request carries `woocommerce-session: Session <guest>` +
-        // the new `Authorization: Bearer <auth>` header, which is what triggers
-        // WooCommerce to link the guest cart to the authenticated user. The
-        // sessionAfterware then rotates SESSION_TOKEN_KEY to the user-owned
-        // token via the woocommerce-session response header. Overwriting with
-        // the login payload's sessionToken here orphans the guest cart.
-        const existingGuestToken = localStorage.getItem(SESSION_TOKEN_KEY);
-        const tokenToStore = existingGuestToken || normalizedSessionToken;
+        const tokenToStore = persistAuthTokens({
+            authToken: data?.authToken,
+            refreshToken: data?.refreshToken,
+            sessionToken: data?.sessionToken ?? data?.customer?.sessionToken,
+        });
 
         localStorage.setItem(USER_DATA_KEY, JSON.stringify(data?.customer));
-        localStorage.setItem(AUTH_TOKEN_KEY, data?.authToken || '');
-        if (tokenToStore) {
-            localStorage.setItem(SESSION_TOKEN_KEY, tokenToStore);
-        } else {
-            localStorage.removeItem(SESSION_TOKEN_KEY);
-        }
-        localStorage.setItem(REFRESH_TOKEN_KEY, data?.refreshToken || '');
 
         setSessionToken(tokenToStore);
         setCustomer(data?.customer as Customer);
@@ -192,6 +214,26 @@ export function SessionProvider({ children }: {
         }
     }, [fetchCustomer, loginCustomer]);
 
+    /**
+     * Completes a phone or provider sign-in. Those mutations return only
+     * WordPress tokens, so the WooCommerce customer is resolved by re-reading
+     * the cart and customer with the new Bearer token attached.
+     */
+    const applyAuthSession = useCallback(async (session: AuthSessionTokens) => {
+        // No customer payload accompanies these sessions, so any cached user
+        // belongs to a previous sign-in — drop it before fetchCustomer paints it.
+        localStorage.removeItem(USER_DATA_KEY);
+
+        const tokenToStore = persistAuthTokens({
+            authToken: session.authToken,
+            refreshToken: session.refreshToken,
+        });
+        setSessionToken(tokenToStore);
+
+        await getCart();
+        await fetchCustomer();
+    }, [fetchCustomer, getCart]);
+
     const logout = useCallback(() => {
         localStorage.removeItem(AUTH_TOKEN_KEY);
         localStorage.removeItem(REFRESH_TOKEN_KEY);
@@ -238,12 +280,13 @@ export function SessionProvider({ children }: {
             sessionToken,
             signUp,
             login,
+            applyAuthSession,
             logout,
             fetchCustomer,
             customer,
             updateCustomer,
         }),
-        [sessionToken, signUp, login, logout, fetchCustomer, customer, updateCustomer],
+        [sessionToken, signUp, login, applyAuthSession, logout, fetchCustomer, customer, updateCustomer],
     );
 
     return (

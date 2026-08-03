@@ -15,13 +15,7 @@ import {
   authLinkClassName,
   authSubmitButtonClassName,
 } from "@/components/auth/authStyles";
-
-function getSafeRedirectPath(redirect: string | null): string {
-  if (!redirect?.startsWith("/") || redirect.startsWith("//")) {
-    return "/";
-  }
-  return redirect;
-}
+import { getSafeRedirectPath } from "@/utils/redirect";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
