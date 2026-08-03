@@ -12,12 +12,12 @@ import { AUTH_PROVIDERS } from "@/graphql/defs/auth-otp";
 type Mode = "phone" | "email";
 
 const LoginPanel = () => {
-  const { data, loading, error } = useQuery(AUTH_PROVIDERS);
+  const { data, error } = useQuery(AUTH_PROVIDERS);
   const [chosenMode, setChosenMode] = useState<Mode | null>(null);
 
   // A provider can be switched off, or on but unconfigured. Asking the server
-  // avoids offering a sign-in method that would always fail. On error or while
-  // loading, fall through to email so the form is usable immediately.
+  // avoids offering a sign-in method that would always fail. On error, fall
+  // through to email.
   const phoneEnabled = useMemo(
     () =>
       !error &&
@@ -37,9 +37,13 @@ const LoginPanel = () => {
     [data, error]
   );
 
-  // Until providers resolve, show email so cold loads aren't blocked.
+  // Phone is the intended primary path — optimistically render it while
+  // authProviders loads so a cold load does not paint email and then swap.
+  // Once the query resolves with phone disabled (or errors), drop to email.
+  const providersResolved = data !== undefined || !!error;
   const mode: Mode =
-    chosenMode ?? (loading || error ? "email" : phoneEnabled ? "phone" : "email");
+    chosenMode ??
+    (error ? "email" : !providersResolved || phoneEnabled ? "phone" : "email");
 
   return (
     <div className="space-y-6">

@@ -4,7 +4,7 @@ export type Country = {
   flag: string;
   callingCode: string;
 };
-export const countries = [
+export const countries: readonly Country[] = [
   { code: "AF", name: "Afghanistan", flag: "🇦🇫", callingCode: "+93" },
   { code: "AL", name: "Albania", flag: "🇦🇱", callingCode: "+355" },
   { code: "DZ", name: "Algeria", flag: "🇩🇿", callingCode: "+213" },

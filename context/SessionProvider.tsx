@@ -265,7 +265,11 @@ export function SessionProvider({ children }: {
             return { data: "updated", error: null };
         } catch (error) {
             console.error("An error occurred while updating customer:", error);
-            return { data: null, error: "An error occurred while updating customer." };
+            const message =
+                error instanceof ApolloError && error.message
+                    ? error.message
+                    : "An error occurred while updating customer.";
+            return { data: null, error: message };
         }
     }, [updateCustomerMutation, setCustomer]);
 

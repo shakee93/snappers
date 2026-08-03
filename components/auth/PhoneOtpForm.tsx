@@ -115,16 +115,13 @@ const PhoneOtpForm = () => {
         const parsed = parseAuthError(caught);
         setError(parsed.message);
         // Server cooldown may disagree with the client timer — honour it.
-        if (
-          parsed.code === "RESEND_TOO_SOON" &&
-          parsed.retryAfterSeconds != null &&
-          parsed.retryAfterSeconds > 0
-        ) {
+        const retryAfter = parsed.retryAfterSeconds;
+        if (parsed.code === "RESEND_TOO_SOON" && retryAfter != null && retryAfter > 0) {
           setChallenge((current) =>
             current
               ? {
                   ...current,
-                  resendAt: Date.now() + parsed.retryAfterSeconds! * 1000,
+                  resendAt: Date.now() + retryAfter * 1000,
                 }
               : current
           );
