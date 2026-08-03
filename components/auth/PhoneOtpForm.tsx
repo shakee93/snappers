@@ -13,7 +13,7 @@ import {
   authLinkClassName,
   authSubmitButtonClassName,
 } from "@/components/auth/authStyles";
-import { countries } from "@/app/(chromed)/checkout/components/CountryPhoneInput";
+import { countries } from "@/data/countries";
 import { REQUEST_OTP, VERIFY_OTP } from "@/graphql/defs/auth-otp";
 import { isChallengeDead, parseAuthError } from "@/utils/auth-errors";
 import { useSession } from "@/context/SessionProvider";
@@ -22,6 +22,8 @@ import { getSafeRedirectPath } from "@/utils/redirect";
 
 const DEFAULT_COUNTRY = "LK";
 const CODE_LENGTH = 6;
+const MIN_NATIONAL_DIGITS = 9;
+const MAX_NATIONAL_DIGITS = 12;
 
 type Step = "phone" | "code" | "profile";
 
@@ -31,11 +33,14 @@ type Challenge = {
   resendAt: number;
 };
 
+function nationalDigits(localNumber: string): string {
+  return localNumber.replace(/\D/g, "").replace(/^0+/, "");
+}
+
 function toE164(countryCode: string, localNumber: string): string {
   const dialCode =
     countries.find((country) => country.code === countryCode)?.callingCode ?? "+94";
-  const nationalDigits = localNumber.replace(/\D/g, "").replace(/^0+/, "");
-  return `+${dialCode.replace(/\D/g, "")}${nationalDigits}`;
+  return `+${dialCode.replace(/\D/g, "")}${nationalDigits(localNumber)}`;
 }
 
 function formatCountdown(totalSeconds: number): string {
@@ -109,6 +114,22 @@ const PhoneOtpForm = () => {
       } catch (caught) {
         const parsed = parseAuthError(caught);
         setError(parsed.message);
+        // Server cooldown may disagree with the client timer — honour it.
+        if (
+          parsed.code === "RESEND_TOO_SOON" &&
+          parsed.retryAfterSeconds != null &&
+          parsed.retryAfterSeconds > 0
+        ) {
+          setChallenge((current) =>
+            current
+              ? {
+                  ...current,
+                  resendAt: Date.now() + parsed.retryAfterSeconds! * 1000,
+                }
+              : current
+          );
+          setNow(Date.now());
+        }
         return false;
       } finally {
         setIsBusy(false);
@@ -120,6 +141,11 @@ const PhoneOtpForm = () => {
   const handlePhoneSubmit = useCallback(
     async (event: React.FormEvent) => {
       event.preventDefault();
+      const digits = nationalDigits(localNumber);
+      if (digits.length < MIN_NATIONAL_DIGITS || digits.length > MAX_NATIONAL_DIGITS) {
+        setError(`Enter a phone number with ${MIN_NATIONAL_DIGITS} to ${MAX_NATIONAL_DIGITS} digits.`);
+        return;
+      }
       const e164 = toE164(countryCode, localNumber);
       setPhone(e164);
       await sendCode(e164);
@@ -179,8 +205,9 @@ const PhoneOtpForm = () => {
   const saveProfile = useCallback(
     async (withDetails: boolean) => {
       setIsBusy(true);
+      setError(null);
       try {
-        await updateCustomer(
+        const result = await updateCustomer(
           withDetails
             ? {
                 firstName,
@@ -189,9 +216,17 @@ const PhoneOtpForm = () => {
               }
             : { billing: { phone } }
         );
+
+        // Skip always navigates; a failed name/email write must stay on the
+        // profile step so the user can fix it (e.g. email already taken).
+        if (withDetails && result?.error) {
+          setError(result.error);
+          return;
+        }
+
+        finishSignIn();
       } finally {
         setIsBusy(false);
-        finishSignIn();
       }
     },
     [email, finishSignIn, firstName, phone, updateCustomer]
@@ -249,6 +284,11 @@ const PhoneOtpForm = () => {
             onChange={(event) => setEmail(event.target.value)}
           />
         </label>
+        {error ? (
+          <p role="alert" className="text-sm text-red-600 dark:text-red-400">
+            {error}
+          </p>
+        ) : null}
         <Button
           type="submit"
           disabled={isBusy}
@@ -348,12 +388,10 @@ const PhoneOtpForm = () => {
           </select>
           <AuthInput
             type="tel"
-            inputMode="numeric"
+            inputMode="tel"
             autoComplete="tel-national"
             placeholder="77 123 4567"
             className="mt-0 flex-1"
-            pattern="^0?[0-9]{9,12}$"
-            title="Enter a phone number with 9 to 12 digits"
             required
             value={localNumber}
             onChange={(event) => setLocalNumber(event.target.value)}

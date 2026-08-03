@@ -18,10 +18,6 @@ type OtpCodeInputProps = {
   "aria-label"?: string;
 };
 
-function digitAt(value: string, index: number): string {
-  return value[index] ?? "";
-}
-
 const OtpCodeInput = ({
   length,
   value,
@@ -31,6 +27,10 @@ const OtpCodeInput = ({
   "aria-label": ariaLabel = "Verification code",
 }: OtpCodeInputProps) => {
   const inputsRef = useRef<Array<HTMLInputElement | null>>([]);
+  // value is always a contiguous digit string (no gaps). Digits only fill
+  // boxes 0..value.length; typing into a later box is ignored so a mis-click
+  // cannot land a digit in the wrong place.
+  const digits = value.replace(/\D/g, "").slice(0, length);
 
   useEffect(() => {
     if (!autoFocus) return;
@@ -43,52 +43,63 @@ const OtpCodeInput = ({
     inputsRef.current[clamped]?.select();
   };
 
-  const writeDigits = (digits: string, startIndex: number) => {
-    const cleaned = digits.replace(/\D/g, "");
+  const writeFrom = (startIndex: number, incoming: string) => {
+    const cleaned = incoming.replace(/\D/g, "");
     if (!cleaned) return;
 
-    const next = value.padEnd(length, " ").split("");
-    for (let offset = 0; offset < cleaned.length && startIndex + offset < length; offset += 1) {
-      next[startIndex + offset] = cleaned[offset];
+    // Full-code paste/autofill always replaces from the start.
+    if (cleaned.length >= length || startIndex === 0) {
+      const next = cleaned.slice(0, length);
+      onChange(next);
+      focusAt(Math.min(next.length, length - 1));
+      return;
     }
 
-    const joined = next.join("").replace(/ /g, "").slice(0, length);
-    onChange(joined);
+    // Only accept input at the next empty box or an already-filled box.
+    if (startIndex > digits.length) {
+      focusAt(digits.length);
+      return;
+    }
+
+    const next = (digits.slice(0, startIndex) + cleaned).slice(0, length);
+    onChange(next);
     focusAt(Math.min(startIndex + cleaned.length, length - 1));
   };
 
   const handleChange = (index: number, raw: string) => {
-    // Mobile OTP autofill and some keyboards may dump the whole code into one
-    // field — treat multi-character input the same as a paste.
     if (raw.length > 1) {
-      writeDigits(raw, index);
+      writeFrom(index, raw);
       return;
     }
 
     const digit = raw.replace(/\D/g, "").slice(-1);
-    const next = value.padEnd(length, " ").split("");
-    next[index] = digit || " ";
-    const joined = next.join("").replace(/ /g, "").slice(0, length);
-    onChange(joined);
-
-    if (digit && index < length - 1) {
-      focusAt(index + 1);
+    if (!digit) {
+      onChange(digits.slice(0, index) + digits.slice(index + 1));
+      return;
     }
+
+    if (index > digits.length) {
+      focusAt(digits.length);
+      return;
+    }
+
+    const next = (digits.slice(0, index) + digit + digits.slice(index + 1)).slice(
+      0,
+      length
+    );
+    onChange(next);
+    if (index < length - 1) focusAt(index + 1);
   };
 
   const handleKeyDown = (index: number, event: KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Backspace") {
       event.preventDefault();
-      if (digitAt(value, index)) {
-        const next = value.padEnd(length, " ").split("");
-        next[index] = " ";
-        onChange(next.join("").replace(/ /g, "").slice(0, length));
+      if (digits[index]) {
+        onChange(digits.slice(0, index) + digits.slice(index + 1));
         return;
       }
       if (index > 0) {
-        const next = value.padEnd(length, " ").split("");
-        next[index - 1] = " ";
-        onChange(next.join("").replace(/ /g, "").slice(0, length));
+        onChange(digits.slice(0, index - 1) + digits.slice(index));
         focusAt(index - 1);
       }
       return;
@@ -108,7 +119,7 @@ const OtpCodeInput = ({
 
   const handlePaste = (index: number, event: ClipboardEvent<HTMLInputElement>) => {
     event.preventDefault();
-    writeDigits(event.clipboardData.getData("text"), index);
+    writeFrom(index, event.clipboardData.getData("text"));
   };
 
   return (
@@ -130,7 +141,7 @@ const OtpCodeInput = ({
           aria-label={`Digit ${index + 1} of ${length}`}
           maxLength={length}
           disabled={disabled}
-          value={digitAt(value, index)}
+          value={digits[index] ?? ""}
           onChange={(event) => handleChange(index, event.target.value)}
           onKeyDown={(event) => handleKeyDown(index, event)}
           onPaste={(event) => handlePaste(index, event)}

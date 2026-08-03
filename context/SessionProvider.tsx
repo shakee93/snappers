@@ -230,6 +230,9 @@ export function SessionProvider({ children }: {
         });
         setSessionToken(tokenToStore);
 
+        // Sequential on purpose: getCart is what carries the guest
+        // woocommerce-session + new Bearer together and rotates the session
+        // token via sessionAfterware before fetchCustomer reads the account.
         await getCart();
         await fetchCustomer();
     }, [fetchCustomer, getCart]);

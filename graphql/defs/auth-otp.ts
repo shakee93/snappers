@@ -6,6 +6,7 @@ import type { TypedDocumentNode } from "@graphql-typed-document-node/core";
 // Extended User Signup half of the schema. Every field below was validated
 // against the live endpoint. Once introspection is enabled, regenerate and
 // import the typed documents from `graphql/types/gql` like the rest of the app.
+// Excluded from the codegen documents glob in codegen.ts for the same reason.
 
 export type AuthProviderName = "PHONE" | "GOOGLE" | "APPLE";
 
@@ -20,7 +21,7 @@ export type AuthProvidersQuery = {
   authProviders: AuthProviderStatus[] | null;
 };
 
-export const AUTH_PROVIDERS: TypedDocumentNode<AuthProvidersQuery, Record<string, never>> = gql`
+export const AUTH_PROVIDERS = gql`
   query AuthProviders {
     authProviders {
       provider
@@ -46,7 +47,7 @@ export type RequestOtpVariables = {
   phone: string;
 };
 
-export const REQUEST_OTP: TypedDocumentNode<RequestOtpMutation, RequestOtpVariables> = gql`
+export const REQUEST_OTP = gql`
   mutation RequestOtp($phone: String!) {
     requestOtp(input: { phone: $phone, purpose: AUTH }) {
       challenge {
@@ -83,7 +84,7 @@ export type VerifyOtpVariables = {
   code: string;
 };
 
-export const VERIFY_OTP: TypedDocumentNode<VerifyOtpMutation, VerifyOtpVariables> = gql`
+export const VERIFY_OTP = gql`
   mutation VerifyOtp($challengeId: String!, $code: String!) {
     verifyOtp(input: { challengeId: $challengeId, code: $code }) {
       isNewUser
@@ -110,10 +111,7 @@ export type CreateAuthNonceMutation = {
   } | null;
 };
 
-export const CREATE_AUTH_NONCE: TypedDocumentNode<
-  CreateAuthNonceMutation,
-  Record<string, never>
-> = gql`
+export const CREATE_AUTH_NONCE = gql`
   mutation CreateAuthNonce {
     createAuthNonce(input: {}) {
       nonce
@@ -135,10 +133,7 @@ export type SignInWithGoogleVariables = {
   nonce: string;
 };
 
-export const SIGN_IN_WITH_GOOGLE: TypedDocumentNode<
-  SignInWithGoogleMutation,
-  SignInWithGoogleVariables
-> = gql`
+export const SIGN_IN_WITH_GOOGLE = gql`
   mutation SignInWithGoogle($idToken: String!, $nonce: String!) {
     signInWithGoogle(input: { idToken: $idToken, nonce: $nonce }) {
       isNewUser

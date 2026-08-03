@@ -12,38 +12,34 @@ import { AUTH_PROVIDERS } from "@/graphql/defs/auth-otp";
 type Mode = "phone" | "email";
 
 const LoginPanel = () => {
-  const { data, loading } = useQuery(AUTH_PROVIDERS);
+  const { data, loading, error } = useQuery(AUTH_PROVIDERS);
   const [chosenMode, setChosenMode] = useState<Mode | null>(null);
 
   // A provider can be switched off, or on but unconfigured. Asking the server
-  // avoids offering a sign-in method that would always fail.
+  // avoids offering a sign-in method that would always fail. On error or while
+  // loading, fall through to email so the form is usable immediately.
   const phoneEnabled = useMemo(
     () =>
-      data?.authProviders?.some(
+      !error &&
+      (data?.authProviders?.some(
         (provider) => provider.provider === "PHONE" && provider.enabled
-      ) ?? false,
-    [data]
+      ) ?? false),
+    [data, error]
   );
 
-  // A provider can be enabled but unconfigured, in which case there is no
-  // client ID for its SDK and the button would always fail.
   const googleClientId = useMemo(
     () =>
-      data?.authProviders?.find(
-        (provider) => provider.provider === "GOOGLE" && provider.enabled
-      )?.clientId ?? null,
-    [data]
+      error
+        ? null
+        : data?.authProviders?.find(
+            (provider) => provider.provider === "GOOGLE" && provider.enabled
+          )?.clientId ?? null,
+    [data, error]
   );
 
-  const mode: Mode = chosenMode ?? (phoneEnabled ? "phone" : "email");
-
-  if (loading) {
-    return (
-      <div className="py-8 text-center text-sm text-neutral-500 dark:text-neutral-400">
-        Loading sign-in options...
-      </div>
-    );
-  }
+  // Until providers resolve, show email so cold loads aren't blocked.
+  const mode: Mode =
+    chosenMode ?? (loading || error ? "email" : phoneEnabled ? "phone" : "email");
 
   return (
     <div className="space-y-6">
