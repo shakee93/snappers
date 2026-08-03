@@ -69,6 +69,7 @@ const PhoneOtpForm = () => {
   const [email, setEmail] = useState("");
   const [now, setNow] = useState(() => Date.now());
   const verifyingRef = useRef(false);
+  const finishingRef = useRef(false);
 
   const { applyAuthSession, updateCustomer } = useSession();
   const router = useRouter();
@@ -160,6 +161,10 @@ const PhoneOtpForm = () => {
   );
 
   const finishSignIn = useCallback(() => {
+    // Skip / Save / verify can all race a second call before navigation —
+    // one toast and one push only.
+    if (finishingRef.current) return;
+    finishingRef.current = true;
     toast(getRandomWelcomeMessage());
     localStorage.removeItem("last_order");
     router.push(redirectTo);
@@ -285,6 +290,7 @@ const PhoneOtpForm = () => {
       // Phone was already written in syncVerifiedPhone after OTP verify —
       // Skip is a no-op mutation otherwise, so just continue.
       if (!withDetails) {
+        setIsBusy(true);
         finishSignIn();
         return;
       }
