@@ -87,6 +87,7 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
   const nonceRef = useRef<string | null>(null);
   const nonceExpiresAtRef = useRef(0);
   const expiryTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const pendingRemintRef = useRef(false);
   const lastWidthRef = useRef(0);
   const initializingRef = useRef(false);
   const mountedRef = useRef(true);
@@ -157,9 +158,25 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
 
   useEffect(() => {
     mountedRef.current = true;
+
+    const onVisibility = () => {
+      if (document.hidden || !pendingRemintRef.current || !mountedRef.current) return;
+      pendingRemintRef.current = false;
+      nonceRef.current = null;
+      nonceExpiresAtRef.current = 0;
+      // Force paintButton to rebuild: GSI captures the nonce at renderButton
+      // time, so a bare initialize() would leave the iframe signing with a
+      // dead nonce. Replacing the iframe is deliberate.
+      lastWidthRef.current = 0;
+      void ensureButtonRef.current();
+    };
+
+    document.addEventListener("visibilitychange", onVisibility);
     return () => {
       mountedRef.current = false;
+      pendingRemintRef.current = false;
       if (expiryTimerRef.current) clearTimeout(expiryTimerRef.current);
+      document.removeEventListener("visibilitychange", onVisibility);
       window.google?.accounts.id.cancel();
     };
   }, []);
@@ -170,6 +187,7 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
     nonceExpiresAtRef.current = 0;
     lastWidthRef.current = 0;
     initializingRef.current = false;
+    pendingRemintRef.current = false;
     if (expiryTimerRef.current) clearTimeout(expiryTimerRef.current);
     setIsButtonReady(false);
     if (hostRef.current) hostRef.current.innerHTML = "";
@@ -200,15 +218,24 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
 
   const scheduleExpiryRemint = useCallback((expiresInSeconds: number) => {
     if (expiryTimerRef.current) clearTimeout(expiryTimerRef.current);
-    // Remint before the nonce TTL so an idle tab does not fail the first click.
+    // Remint before the nonce TTL so a visible idle tab does not fail the
+    // first click with a stale nonce.
     const remintInMs = Math.max((expiresInSeconds - 30) * 1000, 5_000);
     expiryTimerRef.current = setTimeout(() => {
       if (!mountedRef.current) return;
+
+      // Abandoned background tabs must not mint forever — wait until visible.
+      if (document.hidden) {
+        pendingRemintRef.current = true;
+        return;
+      }
+
       nonceRef.current = null;
       nonceExpiresAtRef.current = 0;
+      // Force paintButton to rebuild: GSI captures the nonce at renderButton
+      // time, so a bare initialize() would leave the iframe signing with a
+      // dead nonce. Replacing the iframe is deliberate.
       lastWidthRef.current = 0;
-      // Remint in the background while the button stays mounted — do not tear
-      // it down under the cursor.
       void ensureButtonRef.current();
     }, remintInMs);
   }, []);
@@ -263,22 +290,18 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
     }
   }, [clientId, createAuthNonce, isScriptReady, paintButton, scheduleExpiryRemint]);
 
-  ensureButtonRef.current = ensureButton;
+  useEffect(() => {
+    ensureButtonRef.current = ensureButton;
+  }, [ensureButton]);
 
-  // Arm once on first user interaction anywhere in the panel (or when the
-  // browser is idle), so bounced visitors never mint a nonce and anyone who
-  // reaches for the button finds it already live — including on touch.
+  // Arm once on first user interaction (or when idle), so bounced visitors
+  // often skip the nonce mint and anyone who reaches for the button finds it
+  // already live — including on touch.
   useEffect(() => {
     if (!isScriptReady) return;
 
     let armed = false;
-
-    const teardown = () => {
-      window.removeEventListener("pointerdown", arm, true);
-      window.removeEventListener("keydown", arm, true);
-      window.removeEventListener("touchstart", arm, true);
-      window.removeEventListener("scroll", arm, true);
-    };
+    const opts = { capture: true, passive: true } as const;
 
     const arm = () => {
       if (armed) return;
@@ -287,10 +310,17 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
       void ensureButton();
     };
 
-    window.addEventListener("pointerdown", arm, true);
-    window.addEventListener("keydown", arm, true);
-    window.addEventListener("touchstart", arm, true);
-    window.addEventListener("scroll", arm, true);
+    const teardown = () => {
+      window.removeEventListener("pointerdown", arm, opts);
+      window.removeEventListener("keydown", arm, opts);
+      window.removeEventListener("touchstart", arm, opts);
+      window.removeEventListener("scroll", arm, opts);
+    };
+
+    window.addEventListener("pointerdown", arm, opts);
+    window.addEventListener("keydown", arm, opts);
+    window.addEventListener("touchstart", arm, opts);
+    window.addEventListener("scroll", arm, opts);
 
     let idleHandle: number | ReturnType<typeof setTimeout> | undefined;
     if (typeof window.requestIdleCallback === "function") {
