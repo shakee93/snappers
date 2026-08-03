@@ -71,8 +71,13 @@ export const UPDATE_ACCOUNT_INFORMATION = gql`
     updateCustomer(input: $input) {
       clientMutationId
       customer {
+        id
         displayName
+        firstName
         email
+        billing {
+          phone
+        }
         shipping {
           address1
           phone

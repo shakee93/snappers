@@ -1,13 +1,6 @@
 "use client";
 
-import {
-  useCallback,
-  useDeferredValue,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ChevronsUpDown } from "lucide-react";
 import { countries, type Country } from "@/data/countries";
 import { authInputClassName } from "@/components/auth/authStyles";
@@ -22,6 +15,16 @@ type CountryCallingCodeSelectProps = {
 
 const MAX_VISIBLE_OPTIONS = 60;
 const PANEL_HEIGHT = 264;
+
+type CountrySearchEntry = Country & { haystack: string };
+
+/** Precomputed once — avoids rebuilding lowercased strings per keystroke. */
+const COUNTRY_SEARCH_INDEX: readonly CountrySearchEntry[] = countries.map(
+  (country) => ({
+    ...country,
+    haystack: `${country.name} ${country.code} ${country.callingCode}`.toLowerCase(),
+  }),
+);
 
 /** Windows does not render emoji flags — use PNGs instead. */
 function flagSrc(countryCode: string): string {
@@ -53,58 +56,78 @@ function CountryFlag({
   );
 }
 
+function resolveSelected(value: string): Country {
+  return (
+    countries.find((country) => country.code === value) ??
+    countries.find((country) => country.code === "LK") ??
+    countries[0]
+  );
+}
+
+/**
+ * Empty query: selected country first, then the rest of the alphabet up to the
+ * cap — so opening the list always shows where you are. With a query: filter
+ * by precomputed haystack and cap the same way.
+ */
+function filterCountries(
+  query: string,
+  selectedCode: string,
+): { matches: Country[]; truncated: boolean } {
+  if (!query) {
+    const selected = resolveSelected(selectedCode);
+    const rest = countries
+      .filter((country) => country.code !== selected.code)
+      .slice(0, MAX_VISIBLE_OPTIONS - 1);
+    return {
+      matches: [selected, ...rest],
+      truncated: countries.length > MAX_VISIBLE_OPTIONS,
+    };
+  }
+
+  const matches: Country[] = [];
+  let hitCap = false;
+  for (const country of COUNTRY_SEARCH_INDEX) {
+    if (!country.haystack.includes(query)) continue;
+    if (matches.length >= MAX_VISIBLE_OPTIONS) {
+      hitCap = true;
+      break;
+    }
+    matches.push(country);
+  }
+  return { matches, truncated: hitCap };
+}
+
 const CountryCallingCodeSelect = ({
   id = "auth-country-code",
   value,
   onChange,
   disabled = false,
 }: CountryCallingCodeSelectProps) => {
-  const selected =
-    countries.find((country) => country.code === value) ??
-    countries.find((country) => country.code === "LK") ??
-    countries[0];
+  const selected = useMemo(() => resolveSelected(value), [value]);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
-  const [inputValue, setInputValue] = useState(selected.callingCode);
+  const [inputValue, setInputValue] = useState("");
   const [isOpen, setIsOpen] = useState(false);
-  const [activeIndex, setActiveIndex] = useState(-1);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [dropUp, setDropUp] = useState(false);
-  const deferredQuery = useDeferredValue(inputValue.trim().toLowerCase());
+  const query = inputValue.trim().toLowerCase();
 
-  // Keep the closed display in sync when the parent changes the selection
-  // (e.g. reset), without clobbering an in-progress search.
-  useEffect(() => {
-    if (isOpen) return;
-    setInputValue(selected.callingCode);
-  }, [isOpen, selected]);
-
-  const filteredCountries = useMemo(() => {
-    if (!deferredQuery) {
-      return countries.slice(0, MAX_VISIBLE_OPTIONS);
-    }
-
-    const matches: Country[] = [];
-    for (const country of countries) {
-      if (matches.length >= MAX_VISIBLE_OPTIONS) break;
-
-      const haystack =
-        `${country.name} ${country.code} ${country.callingCode}`.toLowerCase();
-      if (haystack.includes(deferredQuery)) {
-        matches.push(country);
-      }
-    }
-    return matches;
-  }, [deferredQuery]);
+  const { matches: filteredCountries, truncated } = useMemo(
+    () => filterCountries(isOpen ? query : "", value),
+    [isOpen, query, value],
+  );
 
   const activeOptionIndex =
-    activeIndex < filteredCountries.length ? activeIndex : -1;
+    activeIndex >= 0 && activeIndex < filteredCountries.length
+      ? activeIndex
+      : -1;
 
   useEffect(() => {
     if (!isOpen || activeIndex < 0) return;
 
     const activeOption = listRef.current?.querySelector<HTMLElement>(
-      `[data-country-option-index="${activeIndex}"]`
+      `[data-country-option-index="${activeIndex}"]`,
     );
     activeOption?.scrollIntoView({ block: "nearest" });
   }, [activeIndex, isOpen]);
@@ -115,14 +138,14 @@ const CountryCallingCodeSelect = ({
     const handlePointerDown = (event: MouseEvent) => {
       if (!containerRef.current?.contains(event.target as Node)) {
         setIsOpen(false);
-        setActiveIndex(-1);
-        setInputValue(selected.callingCode);
+        setActiveIndex(0);
+        setInputValue("");
       }
     };
 
     document.addEventListener("mousedown", handlePointerDown);
     return () => document.removeEventListener("mousedown", handlePointerDown);
-  }, [isOpen, selected]);
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -147,28 +170,39 @@ const CountryCallingCodeSelect = ({
     };
   }, [isOpen]);
 
+  const openList = useCallback(() => {
+    setIsOpen(true);
+    setInputValue("");
+    // Selected is first in the empty-query list.
+    setActiveIndex(0);
+  }, []);
+
+  const closeList = useCallback(() => {
+    setIsOpen(false);
+    setActiveIndex(0);
+    setInputValue("");
+  }, []);
+
   const commitCountry = useCallback(
     (country: Country) => {
-      setInputValue(country.callingCode);
       onChange(country.code);
-      setIsOpen(false);
-      setActiveIndex(-1);
+      closeList();
     },
-    [onChange]
+    [closeList, onChange],
   );
 
   const handleInputChange = (nextValue: string) => {
     setInputValue(nextValue);
-    setActiveIndex(-1);
+    setActiveIndex(0);
     setIsOpen(true);
   };
 
   const handleInputBlur = () => {
     // Calling codes must come from the list — free text would break E.164.
-    setInputValue(selected.callingCode);
-    setIsOpen(false);
-    setActiveIndex(-1);
+    closeList();
   };
+
+  const displayValue = isOpen ? inputValue : selected.callingCode;
 
   const activeOptionId =
     isOpen && activeOptionIndex >= 0
@@ -199,15 +233,11 @@ const CountryCallingCodeSelect = ({
         className={cn(
           authInputClassName,
           "mt-0 truncate pr-8 text-sm",
-          isOpen ? "pl-4" : "pl-10"
+          isOpen ? "pl-4" : "pl-10",
         )}
-        value={inputValue}
+        value={displayValue}
         onChange={(event) => handleInputChange(event.target.value)}
-        onFocus={() => {
-          setIsOpen(true);
-          setInputValue("");
-          setActiveIndex(-1);
-        }}
+        onFocus={openList}
         onBlur={handleInputBlur}
         onKeyDown={(event) => {
           if (event.key === "ArrowDown") {
@@ -215,7 +245,7 @@ const CountryCallingCodeSelect = ({
             if (!filteredCountries.length) return;
             setIsOpen(true);
             setActiveIndex((prev) =>
-              prev < filteredCountries.length - 1 ? prev + 1 : 0
+              prev < filteredCountries.length - 1 ? prev + 1 : 0,
             );
             return;
           }
@@ -225,12 +255,13 @@ const CountryCallingCodeSelect = ({
             if (!filteredCountries.length) return;
             setIsOpen(true);
             setActiveIndex((prev) =>
-              prev > 0 ? prev - 1 : filteredCountries.length - 1
+              prev > 0 ? prev - 1 : filteredCountries.length - 1,
             );
             return;
           }
 
           if (event.key === "Enter") {
+            // Dropdown owns Enter while focused — never submit the phone form.
             event.preventDefault();
             if (isOpen && activeOptionIndex >= 0) {
               commitCountry(filteredCountries[activeOptionIndex]);
@@ -239,9 +270,9 @@ const CountryCallingCodeSelect = ({
           }
 
           if (event.key === "Escape") {
-            setIsOpen(false);
-            setActiveIndex(-1);
-            setInputValue(selected.callingCode);
+            event.preventDefault();
+            event.stopPropagation();
+            closeList();
           }
         }}
       />
@@ -252,15 +283,11 @@ const CountryCallingCodeSelect = ({
         aria-label="Toggle country suggestions"
         onMouseDown={(event) => event.preventDefault()}
         onClick={() => {
-          setIsOpen((open) => {
-            if (open) {
-              setInputValue(selected.callingCode);
-              return false;
-            }
-            setInputValue("");
-            return true;
-          });
-          setActiveIndex(-1);
+          if (isOpen) {
+            closeList();
+          } else {
+            openList();
+          }
         }}
       >
         <ChevronsUpDown className="h-4 w-4" />
@@ -271,9 +298,9 @@ const CountryCallingCodeSelect = ({
           id={`${id}-country-listbox`}
           role="listbox"
           className={cn(
-            "absolute z-30 max-h-64 min-w-full overflow-y-auto rounded-lg border border-neutral-200 bg-white p-2 shadow-xl [scrollbar-width:thin] dark:border-neutral-700 dark:bg-neutral-900",
+            "absolute z-30 max-h-64 w-64 overflow-y-auto rounded-lg border border-neutral-200 bg-white p-2 shadow-xl [scrollbar-width:thin] dark:border-neutral-700 dark:bg-neutral-900",
             "[&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-neutral-300 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5",
-            dropUp ? "bottom-full mb-2" : "top-full mt-2"
+            dropUp ? "bottom-full mb-2" : "top-full mt-2",
           )}
         >
           {filteredCountries.length ? (
@@ -282,32 +309,30 @@ const CountryCallingCodeSelect = ({
                 const isActive = index === activeOptionIndex;
                 const isCurrent = country.code === value;
                 return (
-                  <li key={country.code} role="presentation">
-                    <button
-                      type="button"
-                      id={`${id}-country-option-${index}`}
-                      data-country-option-index={index}
-                      role="option"
-                      aria-selected={isActive}
-                      tabIndex={-1}
-                      className={cn(
-                        "flex w-full items-center gap-2 rounded-md px-3 py-2 text-left text-sm hover:bg-header-cream dark:hover:bg-neutral-800",
-                        isActive ? "bg-header-cream dark:bg-neutral-800" : "",
-                        isCurrent ? "font-semibold" : ""
-                      )}
-                      onMouseDown={(event) => event.preventDefault()}
-                      onMouseEnter={() => setActiveIndex(index)}
-                      onClick={() => commitCountry(country)}
-                    >
-                      <CountryFlag code={country.code} name={country.name} />
-                      <span className="text-neutral-600 dark:text-neutral-300">
-                        {country.callingCode}
-                      </span>
-                    </button>
+                  <li
+                    key={country.code}
+                    id={`${id}-country-option-${index}`}
+                    data-country-option-index={index}
+                    role="option"
+                    aria-selected={isCurrent}
+                    className={cn(
+                      "flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-left text-sm hover:bg-header-cream dark:hover:bg-neutral-800",
+                      isActive ? "bg-header-cream dark:bg-neutral-800" : "",
+                      isCurrent ? "font-semibold" : "",
+                    )}
+                    onMouseDown={(event) => event.preventDefault()}
+                    onMouseEnter={() => setActiveIndex(index)}
+                    onClick={() => commitCountry(country)}
+                  >
+                    <CountryFlag code={country.code} name={country.name} />
+                    <span className="min-w-0 flex-1 truncate">{country.name}</span>
+                    <span className="ml-auto shrink-0 text-neutral-600 dark:text-neutral-300">
+                      {country.callingCode}
+                    </span>
                   </li>
                 );
               })}
-              {!deferredQuery ? (
+              {truncated ? (
                 <li
                   className="px-3 py-2 text-xs text-neutral-500 dark:text-neutral-400"
                   role="presentation"

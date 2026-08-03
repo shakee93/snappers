@@ -7,7 +7,7 @@ import { toast } from "sonner";
 import { Loader } from "lucide-react";
 import Button from "@/shared/Button/Button";
 import AuthInput from "@/components/auth/AuthInput";
-import OtpCodeInput from "@/components/auth/OtpCodeInput";
+import OtpCodeInput, { type OtpStatus } from "@/components/auth/OtpCodeInput";
 import CountryCallingCodeSelect from "@/components/auth/CountryCallingCodeSelect";
 import {
   authLabelClassName,
@@ -15,7 +15,7 @@ import {
   authSubmitButtonClassName,
 } from "@/components/auth/authStyles";
 import { countries } from "@/data/countries";
-import { REQUEST_OTP, VERIFY_OTP } from "@/graphql/defs/auth-otp";
+import { REQUEST_OTP, VERIFY_OTP, type AuthSessionTokens } from "@/graphql/defs/auth-otp";
 import { isChallengeDead, parseAuthError } from "@/utils/auth-errors";
 import { useSession } from "@/context/SessionProvider";
 import { getRandomWelcomeMessage } from "@/components/global/forms/HelperComps";
@@ -58,14 +58,14 @@ const PhoneOtpForm = () => {
   const [code, setCode] = useState("");
   const [challenge, setChallenge] = useState<Challenge | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [otpStatus, setOtpStatus] = useState<"idle" | "success" | "error">("idle");
+  const [otpStatus, setOtpStatus] = useState<OtpStatus>("idle");
   const [isBusy, setIsBusy] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
   const [now, setNow] = useState(() => Date.now());
   const verifyingRef = useRef(false);
 
-  const { applyAuthSession, updateCustomer, fetchCustomer } = useSession();
+  const { applyAuthSession, updateCustomer } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = getSafeRedirectPath(searchParams.get("redirect"));
@@ -161,13 +161,17 @@ const PhoneOtpForm = () => {
   }, [redirectTo, router]);
 
   // My Account phone lives on shipping.phone; billing.phone is used at checkout.
+  // UPDATE_ACCOUNT_INFORMATION now returns id + billing/shipping phone, so the
+  // mutation itself updates the session cache — no follow-up getUser.
   const syncVerifiedPhone = useCallback(async () => {
-    await updateCustomer({
+    const result = await updateCustomer({
       billing: { phone },
       shipping: { phone },
     });
-    await fetchCustomer();
-  }, [fetchCustomer, phone, updateCustomer]);
+    if (result?.error) {
+      console.error("Failed to sync verified phone to account:", result.error);
+    }
+  }, [phone, updateCustomer]);
 
   const verifyCode = useCallback(
     async (otp: string) => {
@@ -178,11 +182,17 @@ const PhoneOtpForm = () => {
       setError(null);
       setOtpStatus("idle");
       setIsBusy(true);
+
+      let verified: {
+        isNewUser?: boolean | null;
+        session: AuthSessionTokens | null;
+      } | null = null;
+
       try {
         const { data } = await verifyOtp({
           variables: { challengeId: challenge.challengeId, code: otp },
         });
-        const verified = data?.verifyOtp;
+        verified = data?.verifyOtp ?? null;
 
         if (!verified?.session?.authToken) {
           setOtpStatus("error");
@@ -192,19 +202,6 @@ const PhoneOtpForm = () => {
         }
 
         setOtpStatus("success");
-        await applyAuthSession(verified.session);
-        // Phone OTP does not write WooCommerce address fields — sync them here
-        // so Account → Phone number reflects the verified number immediately.
-        await syncVerifiedPhone();
-        // Brief pause so the green ring is visible before navigation.
-        await new Promise((resolve) => setTimeout(resolve, 400));
-
-        if (verified.isNewUser) {
-          setStep("profile");
-          return;
-        }
-
-        finishSignIn();
       } catch (caught) {
         const parsed = parseAuthError(caught);
         setOtpStatus("error");
@@ -214,6 +211,38 @@ const PhoneOtpForm = () => {
           setChallenge(null);
           setOtpStatus("idle");
           setStep("phone");
+        }
+        return;
+      } finally {
+        // Keep isBusy true through post-auth work so the UI doesn't flash.
+        if (!verified?.session?.authToken) {
+          verifyingRef.current = false;
+          setIsBusy(false);
+        }
+      }
+
+      const session = verified!.session!;
+
+      // Auth succeeded — failures below must not look like a bad OTP.
+      try {
+        await applyAuthSession(session);
+        // New users hit the profile step, which writes phone again — skip here.
+        if (!verified!.isNewUser) {
+          await syncVerifiedPhone();
+        }
+
+        if (verified!.isNewUser) {
+          setStep("profile");
+          return;
+        }
+
+        finishSignIn();
+      } catch (caught) {
+        console.error("Post-authentication setup failed after OTP verify:", caught);
+        if (verified!.isNewUser) {
+          setStep("profile");
+        } else {
+          finishSignIn();
         }
       } finally {
         verifyingRef.current = false;
@@ -276,13 +305,14 @@ const PhoneOtpForm = () => {
           return;
         }
 
-        await fetchCustomer();
+        // Mutation selection set now includes id / billing / shipping — no
+        // follow-up getUser needed to keep USER_DATA_KEY cacheable.
         finishSignIn();
       } finally {
         setIsBusy(false);
       }
     },
-    [email, fetchCustomer, finishSignIn, firstName, phone, updateCustomer]
+    [email, finishSignIn, firstName, phone, updateCustomer]
   );
 
   const handleProfileSubmit = useCallback(

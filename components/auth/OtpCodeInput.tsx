@@ -9,7 +9,7 @@ import {
 import { cn } from "@/lib/utils";
 import { authInputClassName } from "@/components/auth/authStyles";
 
-type OtpStatus = "idle" | "success" | "error";
+export type OtpStatus = "idle" | "success" | "error";
 
 type OtpCodeInputProps = {
   length: number;
