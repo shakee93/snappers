@@ -100,12 +100,13 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
 
   const [isScriptReady, setIsScriptReady] = useState(false);
   const [isButtonReady, setIsButtonReady] = useState(false);
-  const [showPlaceholder, setShowPlaceholder] = useState(true);
   const [isPreparing, setIsPreparing] = useState(false);
   const [isSigningIn, setIsSigningIn] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  // Kept separate from armError so a successful remint after a failed
+  // signInWithGoogle cannot erase the failure message the user needs to see.
+  const [signInError, setSignInError] = useState<string | null>(null);
+  const [armError, setArmError] = useState<string | null>(null);
   const [nonceAttempt, setNonceAttempt] = useState(0);
-  const placeholderRef = useRef<HTMLDivElement>(null);
 
   const { applyAuthSession } = useSession();
   const router = useRouter();
@@ -121,19 +122,19 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
       const nonce = nonceRef.current;
 
       if (!idToken || !nonce) {
-        setError("Google sign-in did not complete. Please try again.");
+        setSignInError("Google sign-in did not complete. Please try again.");
         setNonceAttempt((attempt) => attempt + 1);
         return;
       }
 
-      setError(null);
+      setSignInError(null);
       setIsSigningIn(true);
       try {
         const { data } = await signInWithGoogle({ variables: { idToken, nonce } });
         const session = data?.signInWithGoogle?.session;
 
         if (!session?.authToken) {
-          setError("Google sign-in did not complete. Please try again.");
+          setSignInError("Google sign-in did not complete. Please try again.");
           setNonceAttempt((attempt) => attempt + 1);
           return;
         }
@@ -143,7 +144,7 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
         localStorage.removeItem("last_order");
         router.push(redirectTo);
       } catch (caught) {
-        setError(parseAuthError(caught).message);
+        setSignInError(parseAuthError(caught).message);
         setNonceAttempt((attempt) => attempt + 1);
       } finally {
         if (mountedRef.current) setIsSigningIn(false);
@@ -192,7 +193,6 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
     pendingRemintRef.current = false;
     if (expiryTimerRef.current) clearTimeout(expiryTimerRef.current);
     setIsButtonReady(false);
-    setShowPlaceholder(true);
     if (hostRef.current) hostRef.current.innerHTML = "";
   }, [nonceAttempt]);
 
@@ -246,8 +246,6 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
   const ensureButton = useCallback(async () => {
     if (!isScriptReady || !mountedRef.current) return false;
 
-    setError(null);
-
     const identity = window.google?.accounts.id;
     const host = hostRef.current;
     const wrapper = wrapperRef.current;
@@ -258,6 +256,7 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
 
     if (nonceStillValid && host.childElementCount > 0) {
       setIsButtonReady(true);
+      setArmError(null);
       return true;
     }
 
@@ -285,9 +284,10 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
         wrapper?.clientWidth || host.clientWidth || host.parentElement?.clientWidth || GSI_MAX_WIDTH;
       paintButton(width);
       scheduleExpiryRemint(payload.expiresIn);
+      setArmError(null);
       return true;
     } catch (caught) {
-      if (mountedRef.current) setError(parseAuthError(caught).message);
+      if (mountedRef.current) setArmError(parseAuthError(caught).message);
       return false;
     } finally {
       initializingRef.current = false;
@@ -359,24 +359,7 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
     return () => resizeObserver.disconnect();
   }, [isButtonReady, isScriptReady, paintButton]);
 
-  // Hold the placeholder while it still has keyboard focus so Tab → arm does
-  // not yank focus back to the body when the swap happens mid-focus.
-  useEffect(() => {
-    if (!isButtonReady) {
-      setShowPlaceholder(true);
-      return;
-    }
-
-    const placeholder = placeholderRef.current;
-    const active = document.activeElement;
-    if (placeholder && active instanceof Node && placeholder.contains(active)) {
-      const onFocusOut = () => setShowPlaceholder(false);
-      placeholder.addEventListener("focusout", onFocusOut);
-      return () => placeholder.removeEventListener("focusout", onFocusOut);
-    }
-
-    setShowPlaceholder(false);
-  }, [isButtonReady]);
+  const visibleError = signInError ?? armError;
 
   return (
     <div ref={wrapperRef} className="w-full space-y-2">
@@ -384,34 +367,33 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
       <div
         className={`relative w-full ${isSigningIn ? "pointer-events-none opacity-60" : ""}`}
       >
-        {showPlaceholder ? (
-          <div ref={placeholderRef}>
-            <Button
-              type="button"
-              disabled={!isScriptReady || isPreparing || isSigningIn || isButtonReady}
-              onClick={() => {
-                void ensureButton();
-              }}
-              className="w-full border border-neutral-200 bg-white text-header-green shadow-md hover:bg-header-cream disabled:opacity-60 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:hover:bg-neutral-800"
-              sizeClass={GSI_BUTTON_HEIGHT_CLASS}
-              fontSize="text-sm font-bold"
-            >
-              {isPreparing ? (
-                <Loader className="h-5 w-5 animate-spin text-header-green" />
-              ) : (
-                <span className="inline-flex items-center gap-3">
-                  <GoogleMark />
-                  Continue with Google
-                </span>
-              )}
-            </Button>
-          </div>
+        {!isButtonReady ? (
+          <Button
+            type="button"
+            disabled={!isScriptReady || isPreparing || isSigningIn}
+            onClick={() => {
+              setArmError(null);
+              void ensureButton();
+            }}
+            className="w-full border border-neutral-200 bg-white text-header-green shadow-md hover:bg-header-cream disabled:opacity-60 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100 dark:hover:bg-neutral-800"
+            sizeClass={GSI_BUTTON_HEIGHT_CLASS}
+            fontSize="text-sm font-bold"
+          >
+            {isPreparing ? (
+              <Loader className="h-5 w-5 animate-spin text-header-green" />
+            ) : (
+              <span className="inline-flex items-center gap-3">
+                <GoogleMark />
+                Continue with Google
+              </span>
+            )}
+          </Button>
         ) : null}
 
         {/* `invisible` keeps layout width measurable before the first paint. */}
         <div
           ref={hostRef}
-          className={`flex w-full justify-center ${showPlaceholder ? "invisible absolute inset-x-0 top-0" : ""}`}
+          className={`flex w-full justify-center ${isButtonReady ? "" : "invisible absolute inset-x-0 top-0"}`}
           aria-busy={isSigningIn}
         />
 
@@ -421,9 +403,9 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
           </div>
         ) : null}
       </div>
-      {error ? (
+      {visibleError ? (
         <p role="alert" className="text-center text-sm text-red-600 dark:text-red-400">
-          {error}
+          {visibleError}
         </p>
       ) : null}
     </div>
