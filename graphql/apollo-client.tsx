@@ -68,6 +68,11 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
       "RefreshAuthToken",
       "SendPasswordResetEmail",
       "ResetUserPassword",
+      "AuthProviders",
+      "RequestOtp",
+      "VerifyOtp",
+      "CreateAuthNonce",
+      "SignInWithGoogle",
     ]);
 
     const authLink = new ApolloLink((operation, forward) => {

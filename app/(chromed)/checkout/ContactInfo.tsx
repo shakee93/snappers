@@ -4,7 +4,7 @@ import Link from "next/link";
 import { FC, useEffect, useState } from "react";
 import ButtonPrimary from "shared/Button/ButtonPrimary";
 import Input from "shared/Input/Input";
-import CountryPhoneInput, { countries } from "./components/CountryPhoneInput";
+import CountryPhoneInput from "./components/CountryPhoneInput";
 
 interface Props {
   isActive: boolean;
