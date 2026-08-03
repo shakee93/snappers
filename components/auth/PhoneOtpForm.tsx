@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { Loader } from "lucide-react";
 import Button from "@/shared/Button/Button";
 import AuthInput from "@/components/auth/AuthInput";
+import OtpCodeInput from "@/components/auth/OtpCodeInput";
 import {
   authLabelClassName,
   authLinkClassName,
@@ -285,26 +286,21 @@ const PhoneOtpForm = () => {
           </button>
         </div>
 
-        <label className="block">
+        <div>
           <span className={authLabelClassName}>Verification code</span>
-          <AuthInput
-            type="text"
-            inputMode="numeric"
-            autoComplete="one-time-code"
-            autoFocus
-            placeholder="123456"
-            maxLength={CODE_LENGTH}
-            className="tracking-[0.5em]"
-            required
+          <OtpCodeInput
+            length={CODE_LENGTH}
             value={code}
-            onChange={(event) => setCode(event.target.value.replace(/\D/g, ""))}
+            onChange={setCode}
+            disabled={isBusy || expiresIn === 0}
+            autoFocus
           />
           <span className="mt-1.5 block text-xs text-neutral-500 dark:text-neutral-400">
             {expiresIn > 0
               ? `Code expires in ${formatCountdown(expiresIn)}`
               : "This code has expired. Request a new one."}
           </span>
-        </label>
+        </div>
 
         {error ? (
           <p role="alert" className="text-sm text-red-600 dark:text-red-400">
