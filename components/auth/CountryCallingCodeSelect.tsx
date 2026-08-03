@@ -22,8 +22,8 @@ type CountrySearchEntry = Country & { haystack: string };
 const COUNTRY_SEARCH_INDEX: readonly CountrySearchEntry[] = countries.map(
   (country) => ({
     ...country,
-    haystack: `${country.name} ${country.code} ${country.callingCode}`.toLowerCase(),
-  }),
+    haystack: `${country.name} ${country.code} ${country.callingCode}`.toLowerCase()
+  })
 );
 
 /** Windows does not render emoji flags — use PNGs instead. */
@@ -34,7 +34,7 @@ function flagSrc(countryCode: string): string {
 function CountryFlag({
   code,
   name,
-  className,
+  className
 }: {
   code: string;
   name: string;
@@ -71,7 +71,7 @@ function resolveSelected(value: string): Country {
  */
 function filterCountries(
   query: string,
-  selectedCode: string,
+  selectedCode: string
 ): { matches: Country[]; truncated: boolean } {
   if (!query) {
     const selected = resolveSelected(selectedCode);
@@ -80,7 +80,7 @@ function filterCountries(
       .slice(0, MAX_VISIBLE_OPTIONS - 1);
     return {
       matches: [selected, ...rest],
-      truncated: countries.length > MAX_VISIBLE_OPTIONS,
+      truncated: countries.length > MAX_VISIBLE_OPTIONS
     };
   }
 
@@ -101,7 +101,7 @@ const CountryCallingCodeSelect = ({
   id = "auth-country-code",
   value,
   onChange,
-  disabled = false,
+  disabled = false
 }: CountryCallingCodeSelectProps) => {
   const selected = useMemo(() => resolveSelected(value), [value]);
 
@@ -115,7 +115,7 @@ const CountryCallingCodeSelect = ({
 
   const { matches: filteredCountries, truncated } = useMemo(
     () => filterCountries(isOpen ? query : "", value),
-    [isOpen, query, value],
+    [isOpen, query, value]
   );
 
   const activeOptionIndex =
@@ -127,7 +127,7 @@ const CountryCallingCodeSelect = ({
     if (!isOpen || activeIndex < 0) return;
 
     const activeOption = listRef.current?.querySelector<HTMLElement>(
-      `[data-country-option-index="${activeIndex}"]`,
+      `[data-country-option-index="${activeIndex}"]`
     );
     activeOption?.scrollIntoView({ block: "nearest" });
   }, [activeIndex, isOpen]);
@@ -162,7 +162,7 @@ const CountryCallingCodeSelect = ({
     window.addEventListener("resize", updatePlacement, { passive: true });
     window.addEventListener("scroll", updatePlacement, {
       capture: true,
-      passive: true,
+      passive: true
     });
     return () => {
       window.removeEventListener("resize", updatePlacement);
@@ -188,7 +188,7 @@ const CountryCallingCodeSelect = ({
       onChange(country.code);
       closeList();
     },
-    [closeList, onChange],
+    [closeList, onChange]
   );
 
   const handleInputChange = (nextValue: string) => {
@@ -233,7 +233,7 @@ const CountryCallingCodeSelect = ({
         className={cn(
           authInputClassName,
           "mt-0 truncate pr-8 text-sm",
-          isOpen ? "pl-4" : "pl-10",
+          isOpen ? "pl-4" : "pl-10"
         )}
         value={displayValue}
         onChange={(event) => handleInputChange(event.target.value)}
@@ -245,7 +245,7 @@ const CountryCallingCodeSelect = ({
             if (!filteredCountries.length) return;
             setIsOpen(true);
             setActiveIndex((prev) =>
-              prev < filteredCountries.length - 1 ? prev + 1 : 0,
+              prev < filteredCountries.length - 1 ? prev + 1 : 0
             );
             return;
           }
@@ -255,7 +255,7 @@ const CountryCallingCodeSelect = ({
             if (!filteredCountries.length) return;
             setIsOpen(true);
             setActiveIndex((prev) =>
-              prev > 0 ? prev - 1 : filteredCountries.length - 1,
+              prev > 0 ? prev - 1 : filteredCountries.length - 1
             );
             return;
           }
@@ -300,7 +300,7 @@ const CountryCallingCodeSelect = ({
           className={cn(
             "absolute z-30 max-h-64 w-64 overflow-y-auto rounded-lg border border-neutral-200 bg-white p-2 shadow-xl [scrollbar-width:thin] dark:border-neutral-700 dark:bg-neutral-900",
             "[&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-neutral-300 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar]:w-1.5",
-            dropUp ? "bottom-full mb-2" : "top-full mt-2",
+            dropUp ? "bottom-full mb-2" : "top-full mt-2"
           )}
         >
           {filteredCountries.length ? (
@@ -318,7 +318,7 @@ const CountryCallingCodeSelect = ({
                     className={cn(
                       "flex cursor-pointer items-center gap-2 rounded-md px-3 py-2 text-left text-sm hover:bg-header-cream dark:hover:bg-neutral-800",
                       isActive ? "bg-header-cream dark:bg-neutral-800" : "",
-                      isCurrent ? "font-semibold" : "",
+                      isCurrent ? "font-semibold" : ""
                     )}
                     onMouseDown={(event) => event.preventDefault()}
                     onMouseEnter={() => setActiveIndex(index)}

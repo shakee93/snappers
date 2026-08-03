@@ -15,7 +15,7 @@ import {
   authSubmitButtonClassName,
 } from "@/components/auth/authStyles";
 import { countries } from "@/data/countries";
-import { REQUEST_OTP, VERIFY_OTP, type AuthSessionTokens } from "@/graphql/defs/auth-otp";
+import { REQUEST_OTP, VERIFY_OTP, type VerifyOtpMutation } from "@/graphql/defs/auth-otp";
 import { isChallengeDead, parseAuthError } from "@/utils/auth-errors";
 import { useSession } from "@/context/SessionProvider";
 import { getRandomWelcomeMessage } from "@/components/global/forms/HelperComps";
@@ -32,6 +32,11 @@ type Challenge = {
   challengeId: string;
   expiresAt: number;
   resendAt: number;
+};
+
+type AuthedOtp = {
+  session: NonNullable<NonNullable<VerifyOtpMutation["verifyOtp"]>["session"]>;
+  isNewUser: boolean;
 };
 
 function nationalDigits(localNumber: string): string {
@@ -163,6 +168,8 @@ const PhoneOtpForm = () => {
   // My Account phone lives on shipping.phone; billing.phone is used at checkout.
   // UPDATE_ACCOUNT_INFORMATION now returns id + billing/shipping phone, so the
   // mutation itself updates the session cache — no follow-up getUser.
+  // Always write after verify (including new users): abandoning the profile
+  // step must not leave an account with no phone for order/delivery contact.
   const syncVerifiedPhone = useCallback(async () => {
     const result = await updateCustomer({
       billing: { phone },
@@ -183,16 +190,13 @@ const PhoneOtpForm = () => {
       setOtpStatus("idle");
       setIsBusy(true);
 
-      let verified: {
-        isNewUser?: boolean | null;
-        session: AuthSessionTokens | null;
-      } | null = null;
+      let authed: AuthedOtp | null = null;
 
       try {
         const { data } = await verifyOtp({
           variables: { challengeId: challenge.challengeId, code: otp },
         });
-        verified = data?.verifyOtp ?? null;
+        const verified = data?.verifyOtp ?? null;
 
         if (!verified?.session?.authToken) {
           setOtpStatus("error");
@@ -202,6 +206,10 @@ const PhoneOtpForm = () => {
         }
 
         setOtpStatus("success");
+        authed = {
+          session: verified.session,
+          isNewUser: verified.isNewUser,
+        };
       } catch (caught) {
         const parsed = parseAuthError(caught);
         setOtpStatus("error");
@@ -215,23 +223,20 @@ const PhoneOtpForm = () => {
         return;
       } finally {
         // Keep isBusy true through post-auth work so the UI doesn't flash.
-        if (!verified?.session?.authToken) {
+        if (!authed) {
           verifyingRef.current = false;
           setIsBusy(false);
         }
       }
 
-      const session = verified!.session!;
+      if (!authed) return;
 
       // Auth succeeded — failures below must not look like a bad OTP.
       try {
-        await applyAuthSession(session);
-        // New users hit the profile step, which writes phone again — skip here.
-        if (!verified!.isNewUser) {
-          await syncVerifiedPhone();
-        }
+        await applyAuthSession(authed.session);
+        await syncVerifiedPhone();
 
-        if (verified!.isNewUser) {
+        if (authed.isNewUser) {
           setStep("profile");
           return;
         }
@@ -239,7 +244,7 @@ const PhoneOtpForm = () => {
         finishSignIn();
       } catch (caught) {
         console.error("Post-authentication setup failed after OTP verify:", caught);
-        if (verified!.isNewUser) {
+        if (authed.isNewUser) {
           setStep("profile");
         } else {
           finishSignIn();
