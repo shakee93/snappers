@@ -13,13 +13,13 @@
       "imageAlt": "Pet Love.lk Wellampitiya storefront"
     },
     {
-      "id": "scooby-doo",
-      "name": "Scoody Doodle Pet Shop",
-      "location": "Nugegoda store",
-      "details": "#526 Dutugemunu Mawatha, Nugegoda. Open 8:00 AM · Closes 8 PM.",
-      "href": "https://scoodydoodlepetshop.com",
+      "id": "catlitter-narahenpita",
+      "name": "Catlitter",
+      "location": "Narahenpita store",
+      "details": "107, Kirula Road, Narahenpita, Colombo 05, Colombo, Sri Lanka. Open 8:00 AM · Closes 8 PM.",
+      "href": "/contact",
       "image": "/homepage/stores/scoody-doodle-nugegoda.jpg",
-      "imageAlt": "Scoody Doodle Pet Shop Nugegoda storefront"
+      "imageAlt": "Catlitter Narahenpita storefront"
     },
     {
       "id": "pet-co-dehiwala",
