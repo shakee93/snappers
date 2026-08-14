@@ -722,15 +722,20 @@ const CheckoutPage = () => {
         return null;
       }
 
-      // Genie Payment Redirect
-      if (gatewayId === "geniebiz" && mutationData?.checkout?.redirect) {
-        if (mutationData?.checkout?.result === "success") {
-          handleGeniePayment(mutationData);
-          return;
-        } else {
-          toast.error("Checkout failed. Please try again.");
-          return;
-        }
+      // Offsite gateways (Genie, WebXPay, etc.) return WooCommerce's pay URL
+      // in `checkout.redirect`. Follow it unless this method has its own flow.
+      const checkoutRedirect = mutationData?.checkout?.redirect;
+      const checkoutSucceeded = mutationData?.checkout?.result === "success";
+      const usesDedicatedPaymentFlow =
+        isPayhere ||
+        isBankTransfer ||
+        gatewayId === "cod" ||
+        gatewayId === "darazbnpl" ||
+        gatewayId === "ndb-pay";
+
+      if (checkoutRedirect && checkoutSucceeded && !usesDedicatedPaymentFlow) {
+        handleOffsitePaymentRedirect(checkoutRedirect);
+        return null;
       }
 
       if (mutationData) {
@@ -1179,30 +1184,9 @@ const CheckoutPage = () => {
     }
   };
 
-  const handleGeniePayment = (checkoutData: any) => {
-    try {
-      const redirectUrl = checkoutData?.checkout?.redirect;
-
-      if (!redirectUrl) {
-        toast.error("Payment gateway URL not received. Please try again.");
-        return;
-      }
-
-      // Store order data for reference
-      localStorage.setItem("genie_last_order", JSON.stringify(checkoutData));
-
-      // Show success message before redirect
-      toast.success("Redirecting to payment gateway...");
-
-      // Small delay to ensure toast is shown
-      setTimeout(() => {
-        window.location.href = redirectUrl;
-      }, 1000);
-
-    } catch (error) {
-      console.error("Genie payment redirect error:", error);
-      toast.error("Payment redirect failed. Please try again.");
-    }
+  const handleOffsitePaymentRedirect = (redirectUrl: string) => {
+    toast.success("Redirecting to payment gateway...");
+    window.location.assign(redirectUrl);
   };
 
   const uploadBankSlip = async (file: File, checkoutDetails: PaymentDetailsWithoutUrls) => {
