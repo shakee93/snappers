@@ -47,9 +47,6 @@ import { enrichCheckoutOrderStorage } from "@/components/account/accountOrderUti
 const PICKUP_METHOD_IDS = new Set(["pickup_location", "local_pickup"]);
 const COUPON_RESTRICTED_GATEWAY_IDS =
   siteConfig.payment.couponRestrictedGatewayIds as readonly string[];
-// Gateways whose WooCommerce `process_payment` returns a URL we should follow
-// (Genie hosted checkout, WebXPay pay URL). Unknown methods stay in-app.
-const OFFSITE_REDIRECT_GATEWAY_IDS = new Set(["geniebiz", "webxpay"]);
 
 import { RecalculatingAmount } from "@/components/global/ui/RecalculatingAmount";
 
@@ -141,6 +138,8 @@ const CheckoutPage = () => {
   const [paymentData, setPaymentData] =
     useState<PaymentDetailsWithoutUrls | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [redirecting, setRedirecting] = useState(false);
+  const redirectingRef = useRef(false);
   const [isTOC, setTOC] = useState<boolean>(false);
   const [tocError, setTocError] = useState(false);
   const [guestCheckoutData, setGuestCheckoutData] = useState<any>();
@@ -725,16 +724,29 @@ const CheckoutPage = () => {
         return null;
       }
 
-      // Only known offsite gateways follow `checkout.redirect`. Anything else
-      // (including unknown WP-admin methods) keeps the in-app success path.
-      if (OFFSITE_REDIRECT_GATEWAY_IDS.has(gatewayId)) {
-        const checkoutRedirect = mutationData?.checkout?.redirect;
-        const checkoutSucceeded = mutationData?.checkout?.result === "success";
-        if (!checkoutSucceeded || !checkoutRedirect) {
-          toast.error("Checkout failed. Please try again.");
+      // PayHere, Koko, and NDB already returned above. COD and bank transfer
+      // finish in-app below. Card gateways that remain follow `checkout.redirect`
+      // when WooCommerce returns one (Genie hosted checkout, WebXPay pay URL).
+      const checkoutRedirect = mutationData?.checkout?.redirect;
+      const checkoutSucceeded = mutationData?.checkout?.result === "success";
+      const usesInAppCompletion = isBankTransfer || gatewayId === "cod";
+      const cardGatewayIds = siteConfig.payment.cardGatewayIds as readonly string[];
+      const expectsOffsitePayment =
+        !usesInAppCompletion &&
+        (Boolean(checkoutRedirect) ||
+          (cardGatewayIds.includes(gatewayId) &&
+            gatewayId !== "payhere" &&
+            gatewayId !== "ndb-pay"));
+
+      if (expectsOffsitePayment) {
+        if (checkoutSucceeded && checkoutRedirect) {
+          await handleOffsitePaymentRedirect(checkoutRedirect);
           return null;
         }
-        handleOffsitePaymentRedirect(checkoutRedirect);
+
+        await handleOffsitePaymentStartFailure(
+          mutationData?.checkout?.order?.databaseId,
+        );
         return null;
       }
 
@@ -765,7 +777,9 @@ const CheckoutPage = () => {
     } catch (error) {
       await handleCheckoutError(error);
     } finally {
-      setLoading(false);
+      if (!redirectingRef.current) {
+        setLoading(false);
+      }
     }
   };
 
@@ -1184,7 +1198,46 @@ const CheckoutPage = () => {
     }
   };
 
-  const handleOffsitePaymentRedirect = (redirectUrl: string) => {
+  const clearCartSafely = async () => {
+    try {
+      await clearCart();
+    } catch (error: unknown) {
+      if (
+        error instanceof Error &&
+        !error.message.includes("No items in cart to remove")
+      ) {
+        console.error("Error clearing cart:", error);
+      }
+    }
+  };
+
+  const markRedirectPending = () => {
+    redirectingRef.current = true;
+    setRedirecting(true);
+  };
+
+  const handleOffsitePaymentStartFailure = async (
+    orderDbId?: number | null,
+  ) => {
+    markRedirectPending();
+    await clearCartSafely();
+
+    if (orderDbId) {
+      toast.error(
+        "Your order was created, but payment could not be started. View your order to complete payment — do not place the order again.",
+      );
+      router.push(`/checkout/${orderDbId}`);
+      return;
+    }
+
+    toast.error(
+      "Payment could not be started. Please contact support if you were charged.",
+    );
+  };
+
+  const handleOffsitePaymentRedirect = async (redirectUrl: string) => {
+    markRedirectPending();
+    await clearCartSafely();
     toast.success("Redirecting to payment gateway...");
     // Delay so the toast can paint before the document unloads.
     setTimeout(() => {
@@ -1295,7 +1348,7 @@ const CheckoutPage = () => {
               // Disable the Confirm button while the checkout mutation, the
               // address push OR the shipping recalculation is in flight, so
               // the user can't submit at a stale total.
-              loading={loading || totalsRecalculating}
+              loading={loading || totalsRecalculating || redirecting}
               orderTotalLabel={orderTotalLabel}
             />
           </div>
