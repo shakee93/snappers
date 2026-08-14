@@ -47,6 +47,9 @@ import { enrichCheckoutOrderStorage } from "@/components/account/accountOrderUti
 const PICKUP_METHOD_IDS = new Set(["pickup_location", "local_pickup"]);
 const COUPON_RESTRICTED_GATEWAY_IDS =
   siteConfig.payment.couponRestrictedGatewayIds as readonly string[];
+// Gateways whose WooCommerce `process_payment` returns a URL we should follow
+// (Genie hosted checkout, WebXPay pay URL). Unknown methods stay in-app.
+const OFFSITE_REDIRECT_GATEWAY_IDS = new Set(["geniebiz", "webxpay"]);
 
 import { RecalculatingAmount } from "@/components/global/ui/RecalculatingAmount";
 
@@ -722,18 +725,15 @@ const CheckoutPage = () => {
         return null;
       }
 
-      // Offsite gateways (Genie, WebXPay, etc.) return WooCommerce's pay URL
-      // in `checkout.redirect`. Follow it unless this method has its own flow.
-      const checkoutRedirect = mutationData?.checkout?.redirect;
-      const checkoutSucceeded = mutationData?.checkout?.result === "success";
-      const usesDedicatedPaymentFlow =
-        isPayhere ||
-        isBankTransfer ||
-        gatewayId === "cod" ||
-        gatewayId === "darazbnpl" ||
-        gatewayId === "ndb-pay";
-
-      if (checkoutRedirect && checkoutSucceeded && !usesDedicatedPaymentFlow) {
+      // Only known offsite gateways follow `checkout.redirect`. Anything else
+      // (including unknown WP-admin methods) keeps the in-app success path.
+      if (OFFSITE_REDIRECT_GATEWAY_IDS.has(gatewayId)) {
+        const checkoutRedirect = mutationData?.checkout?.redirect;
+        const checkoutSucceeded = mutationData?.checkout?.result === "success";
+        if (!checkoutSucceeded || !checkoutRedirect) {
+          toast.error("Checkout failed. Please try again.");
+          return null;
+        }
         handleOffsitePaymentRedirect(checkoutRedirect);
         return null;
       }
@@ -1186,7 +1186,10 @@ const CheckoutPage = () => {
 
   const handleOffsitePaymentRedirect = (redirectUrl: string) => {
     toast.success("Redirecting to payment gateway...");
-    window.location.assign(redirectUrl);
+    // Delay so the toast can paint before the document unloads.
+    setTimeout(() => {
+      window.location.assign(redirectUrl);
+    }, 1000);
   };
 
   const uploadBankSlip = async (file: File, checkoutDetails: PaymentDetailsWithoutUrls) => {

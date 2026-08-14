@@ -46,19 +46,6 @@ const GenieThankYouContent = () => {
     setCallbackData(allParams);
     addLog("All callback data extracted: " + JSON.stringify(allParams, null, 2));
 
-    // Check for stored order data
-    try {
-      const storedOrder = localStorage.getItem("genie_last_order");
-      if (storedOrder) {
-        addLog("Found stored order data in localStorage");
-        addLog("Stored order: " + storedOrder);
-      } else {
-        addLog("No stored order data found in localStorage");
-      }
-    } catch (error) {
-      addLog("Error accessing localStorage: " + error);
-    }
-
     // Determine payment status based on callback data
     const status = allParams.status?.toLowerCase();
     if (status === 'success' || status === 'completed') {
@@ -243,7 +230,6 @@ const GenieThankYouContent = () => {
             <li>• This page captures all URL parameters from the Genie payment callback</li>
             <li>• All callback data is logged for debugging purposes</li>
             <li>• Payment status is determined based on the &apos;status&apos; parameter</li>
-            <li>• Stored order data from localStorage is also logged</li>
             <li>• Use the debug panel to monitor all callback activities</li>
           </ul>
         </div>
