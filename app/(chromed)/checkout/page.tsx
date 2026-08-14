@@ -725,18 +725,14 @@ const CheckoutPage = () => {
       }
 
       // PayHere, Koko, and NDB already returned above. COD and bank transfer
-      // finish in-app below. Card gateways that remain follow `checkout.redirect`
-      // when WooCommerce returns one (Genie hosted checkout, WebXPay pay URL).
+      // finish in-app below. Only configured offsite gateways follow
+      // `checkout.redirect` (Genie hosted checkout, WebXPay pay URL).
       const checkoutRedirect = mutationData?.checkout?.redirect;
       const checkoutSucceeded = mutationData?.checkout?.result === "success";
-      const usesInAppCompletion = isBankTransfer || gatewayId === "cod";
-      const cardGatewayIds = siteConfig.payment.cardGatewayIds as readonly string[];
+      const offsiteRedirectGatewayIds =
+        siteConfig.payment.offsiteRedirectGatewayIds as readonly string[];
       const expectsOffsitePayment =
-        !usesInAppCompletion &&
-        (Boolean(checkoutRedirect) ||
-          (cardGatewayIds.includes(gatewayId) &&
-            gatewayId !== "payhere" &&
-            gatewayId !== "ndb-pay"));
+        offsiteRedirectGatewayIds.includes(gatewayId);
 
       if (expectsOffsitePayment) {
         if (checkoutSucceeded && checkoutRedirect) {
@@ -1219,25 +1215,19 @@ const CheckoutPage = () => {
   const handleOffsitePaymentStartFailure = async (
     orderDbId?: number | null,
   ) => {
-    markRedirectPending();
-    await clearCartSafely();
-
     if (orderDbId) {
+      await clearCartSafely();
       toast.error(
-        "Your order was created, but payment could not be started. View your order to complete payment — do not place the order again.",
+        "Your order was created, but payment could not be started. Please contact support — do not place the order again.",
       );
-      router.push(`/checkout/${orderDbId}`);
       return;
     }
 
-    toast.error(
-      "Payment could not be started. Please contact support if you were charged.",
-    );
+    toast.error("Checkout failed. Please try again.");
   };
 
   const handleOffsitePaymentRedirect = async (redirectUrl: string) => {
     markRedirectPending();
-    await clearCartSafely();
     toast.success("Redirecting to payment gateway...");
     // Delay so the toast can paint before the document unloads.
     setTimeout(() => {
