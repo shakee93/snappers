@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { Metadata, ResolvingMetadata } from "next";
 import UpsellProducts from "@/components/product/UpsellProducts";
 import ArchiveLayout from "@/components/global/primitives/archive/ArchiveLayout";
+import ArchiveLoading from "@/components/global/primitives/archive/ArchiveLoading";
 import { getProductSchema } from "@/lib/jsonld/productSchema";
 import {
   getCategoryPath,
@@ -220,7 +221,7 @@ const Page = async (props: Props) => {
   if (resolved.type === "category") {
     const { productCategory } = resolved.data;
     return (
-      <Suspense>
+      <Suspense fallback={<ArchiveLoading />}>
         <ArchiveLayout
           title={productCategory.name ?? ""}
           description={productCategory.description ?? undefined}
@@ -233,7 +234,7 @@ const Page = async (props: Props) => {
 
   const { brand } = resolved.data;
   return (
-    <Suspense>
+    <Suspense fallback={<ArchiveLoading />}>
       <ArchiveLayout
         title={brand.name ?? ""}
         description={brand.description ?? undefined}

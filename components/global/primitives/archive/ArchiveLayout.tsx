@@ -7,6 +7,12 @@ import ArchiveFilters from "@/components/global/primitives/archive/ArchiveFilter
 import TypesenseArchiveFilters from "@/components/global/primitives/archive/TypesenseArchiveFilters";
 import ArchiveProductGrid from "@/components/global/primitives/archive/ArchiveProductGrid";
 import ProductGridGraphQL from "@/components/global/primitives/archive/ProductGridGraphQL";
+import { ArchiveFilterBarSkeleton } from "@/components/global/primitives/archive/ArchiveLoading";
+import {
+  ARCHIVE_PRODUCT_GRID_CLASS_NAME,
+  INSTANT_SEARCH_PRODUCT_GRID_CLASS_NAME,
+  ProductCardsSkeleton,
+} from "@/components/global/primitives/Loading/ProductCardLoading";
 import { Brand } from "@/graphql/types/graphql";
 import Link from "next/link";
 import { GET_TAG_DETAILS_BY_SLUG } from "@/graphql/defs/products";
@@ -146,7 +152,7 @@ const ArchiveLayout = async ({
         ) : null}
 
         {filters ? (
-          <Suspense>
+          <Suspense fallback={<ArchiveFilterBarSkeleton />}>
             {graphqlArchive ? <ArchiveFilters /> : <TypesenseArchiveFilters />}
           </Suspense>
         ) : null}
@@ -158,7 +164,13 @@ const ArchiveLayout = async ({
             <div className="flex-1 ">
               {graphqlArchive ? (
                 filters ? (
-                  <Suspense>
+                  <Suspense
+                    fallback={
+                      <ProductCardsSkeleton
+                        className={ARCHIVE_PRODUCT_GRID_CLASS_NAME}
+                      />
+                    }
+                  >
                     <ArchiveProductGrid
                       categoryIds={
                         categoryScopeIds.length > 0 ? categoryScopeIds : undefined
@@ -167,29 +179,46 @@ const ArchiveLayout = async ({
                     />
                   </Suspense>
                 ) : (
-                  <ProductGridGraphQL
-                    categoryIds={categoryScopeIds}
-                    first={45}
-                  />
+                  <Suspense
+                    fallback={
+                      <ProductCardsSkeleton
+                        className={ARCHIVE_PRODUCT_GRID_CLASS_NAME}
+                      />
+                    }
+                  >
+                    <ProductGridGraphQL
+                      categoryIds={categoryScopeIds}
+                      first={45}
+                    />
+                  </Suspense>
                 )
               ) : (
-                <InstantSearchWrapper
-                  categories={productCategories}
-                  brands={brands}
-                  brand={brand}
-                  category={category}
-                  categoryScopeIds={categoryScopeIds}
-                  subCategories={nestedCategories}
-                  filters={filters}
-                  search={search}
-                  sort={sort}
-                  tag={tag}
-                  routing={true}
-                  dealsType={dealsType}
-                  dealTags={dealTags}
-                  inStockOnly={inStockOnly}
-                  defaultNewest={defaultNewest}
-                />
+                <Suspense
+                  fallback={
+                    <ProductCardsSkeleton
+                      count={12}
+                      className={INSTANT_SEARCH_PRODUCT_GRID_CLASS_NAME}
+                    />
+                  }
+                >
+                  <InstantSearchWrapper
+                    categories={productCategories}
+                    brands={brands}
+                    brand={brand}
+                    category={category}
+                    categoryScopeIds={categoryScopeIds}
+                    subCategories={nestedCategories}
+                    filters={filters}
+                    search={search}
+                    sort={sort}
+                    tag={tag}
+                    routing={true}
+                    dealsType={dealsType}
+                    dealTags={dealTags}
+                    inStockOnly={inStockOnly}
+                    defaultNewest={defaultNewest}
+                  />
+                </Suspense>
               )}
             </div>
           </div>

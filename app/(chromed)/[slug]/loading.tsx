@@ -1,5 +1,5 @@
-import ProductPageSkeleton from "@/components/product/ProductPageSkeleton";
+import SlugRouteSkeleton from "@/components/global/primitives/SlugRouteSkeleton";
 
-const LoadingProduct = () => <ProductPageSkeleton />;
+const LoadingSlug = () => <SlugRouteSkeleton />;
 
-export default LoadingProduct;
+export default LoadingSlug;

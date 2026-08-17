@@ -6,6 +6,7 @@ import { useSession } from "@/context/SessionProvider";
 import { useWishlist } from "@/context/WishlistProvider";
 import { GET_WISHLIST_PRODUCTS } from "@/graphql/defs/products";
 import ProductCard, { ProductCardItem } from "@/components/home/ProductCard";
+import ProductCardLoading from "@/components/global/primitives/Loading/ProductCardLoading";
 import AccountSubmitButton from "@/components/account/AccountSubmitButton";
 import { accountPageTitleClassName } from "@/components/account/accountStyles";
 
@@ -52,10 +53,7 @@ const AccountWishlistPanel = () => {
     const skeleton = (
       <div className="grid grid-cols-2 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: Math.min(ids.length || 3, 6) }).map((_, i) => (
-          <div
-            key={i}
-            className="aspect-[3/4] animate-pulse rounded-xl bg-neutral-200/60"
-          />
+          <ProductCardLoading key={i} />
         ))}
       </div>
     );

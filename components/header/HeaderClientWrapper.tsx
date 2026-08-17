@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useMemo, useState, useRef } from "react";
 import { Brand, ProductCategory } from "@/graphql/types/graphql";
 import HeaderContent from "./HeaderContent";
 import HeaderAnnouncementBar from "./HeaderAnnouncementBar";
@@ -12,6 +12,7 @@ import {
   ADD_TO_CART_DISABLED,
   CHECKOUT_PAUSED_NOTICE,
 } from "@/lib/addToCartDisabled";
+import { registerArchiveSlugs } from "@/lib/archiveSlugRegistry";
 
 interface HeaderClientWrapperProps {
   productCategories: ProductCategory[];
@@ -28,6 +29,19 @@ const HeaderClientWrapper = ({
   const [isHeaderSticky, setIsHeaderSticky] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const stickyOffsetRef = useRef(0);
+
+  const archiveSlugsFromNav = useMemo(
+    () => [
+      ...productCategories.map((category) => category.slug),
+      ...navCategories.map((category) => category.slug),
+      ...brands.map((brand) => brand.slug),
+    ],
+    [productCategories, brands, navCategories],
+  );
+
+  useEffect(() => {
+    registerArchiveSlugs(archiveSlugsFromNav);
+  }, [archiveSlugsFromNav]);
 
   // Handle scroll behavior
   useEffect(() => {

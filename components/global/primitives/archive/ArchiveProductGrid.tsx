@@ -5,6 +5,10 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useLazyQuery } from "@apollo/client";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import ProductCard from "@/components/home/ProductCard";
+import {
+  ARCHIVE_PRODUCT_GRID_CLASS_NAME,
+  ProductCardsSkeleton,
+} from "@/components/global/primitives/Loading/ProductCardLoading";
 import { GET_ARCHIVE_PRODUCTS } from "@/graphql/defs/products";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import {
@@ -176,14 +180,7 @@ const ArchiveProductGrid = ({
   return (
     <>
       {showSkeleton ? (
-        <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-3 lg:gap-6">
-          {Array.from({ length: 8 }).map((_, index) => (
-            <div
-              key={index}
-              className="aspect-[3/4] animate-pulse rounded-2xl bg-neutral-100"
-            />
-          ))}
-        </div>
+        <ProductCardsSkeleton className={ARCHIVE_PRODUCT_GRID_CLASS_NAME} />
       ) : null}
 
       {error ? (
@@ -200,7 +197,7 @@ const ArchiveProductGrid = ({
 
       {visibleProducts.length > 0 ? (
         <div
-          className={`grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-3 lg:gap-6 ${
+          className={`${ARCHIVE_PRODUCT_GRID_CLASS_NAME} ${
             loadingMore ? "opacity-60" : ""
           }`}
         >

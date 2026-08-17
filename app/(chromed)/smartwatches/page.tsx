@@ -1,4 +1,5 @@
 import ArchiveLayout from "@/components/global/primitives/archive/ArchiveLayout";
+import ArchiveLoading from "@/components/global/primitives/archive/ArchiveLoading";
 import { Metadata, ResolvingMetadata } from "next";
 import { Suspense } from "react";
 
@@ -18,7 +19,7 @@ const Page = () => {
     };
 
     return (
-        <Suspense>
+        <Suspense fallback={<ArchiveLoading />}>
             <ArchiveLayout title="Smart Watches" filters category={smartwatchescategory}/>
         </Suspense>
     );
