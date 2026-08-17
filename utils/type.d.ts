@@ -10,15 +10,3 @@ export type Session = {
     updateCustomer: any,
 }
 
-export type SignUpResponse = {
-    data: string | null;
-    error: string | null;
-}
-
-export type LoginResponse = {
-    data: string | null;
-    error: string | null;
-}
-
-
-

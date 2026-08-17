@@ -8,7 +8,7 @@ import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 import { AUTH_PROVIDERS } from "@/graphql/defs/auth-otp";
 
 const LoginPanel = () => {
-  const { data, error, loading } = useQuery(AUTH_PROVIDERS);
+  const { data, error } = useQuery(AUTH_PROVIDERS);
 
   const providersResolved = data !== undefined || !!error;
 
@@ -33,7 +33,7 @@ const LoginPanel = () => {
     [data, error]
   );
 
-  if (loading || !providersResolved) {
+  if (!providersResolved) {
     return (
       <div className="flex justify-center py-12" aria-busy="true" aria-label="Loading sign-in options">
         <Loader className="h-6 w-6 animate-spin text-header-green" />

@@ -175,14 +175,16 @@ const PhoneOtpForm = () => {
   // mutation itself updates the session cache — no follow-up getUser.
   // Always write after verify (including new users): abandoning the profile
   // step must not leave an account with no phone for order/delivery contact.
-  const syncVerifiedPhone = useCallback(async () => {
+  const syncVerifiedPhone = useCallback(async (): Promise<boolean> => {
     const result = await updateCustomer({
       billing: { phone },
       shipping: { phone },
     });
     if (result?.error) {
-      throw new Error(result.error);
+      console.error("Failed to sync verified phone to account:", result.error);
+      return false;
     }
+    return true;
   }, [phone, updateCustomer]);
 
   const verifyCode = useCallback(
@@ -239,7 +241,11 @@ const PhoneOtpForm = () => {
       // Auth succeeded — failures below must not look like a bad OTP.
       try {
         await applyAuthSession(authed.session);
-        await syncVerifiedPhone();
+
+        const phoneSynced = await syncVerifiedPhone();
+        if (!phoneSynced) {
+          console.warn("Signed in but phone sync failed after OTP verify");
+        }
 
         if (authed.isNewUser) {
           setStep("profile");
@@ -248,11 +254,8 @@ const PhoneOtpForm = () => {
 
         finishSignIn();
       } catch (caught) {
-        console.error("Post-authentication setup failed after OTP verify:", caught);
-        setError("We signed you in, but could not save your phone number. Please try again.");
-        if (authed.isNewUser) {
-          setStep("profile");
-        }
+        console.error("Post-authentication session setup failed after OTP verify:", caught);
+        setError("We could not complete sign-in. Please try again.");
       } finally {
         verifyingRef.current = false;
         setIsBusy(false);
@@ -366,7 +369,7 @@ const PhoneOtpForm = () => {
         </label>
         <label className="block">
           <span className={authLabelClassName}>Mobile number</span>
-          <AuthInput type="tel" value={phone} readOnly aria-readonly="true" />
+          <AuthInput type="tel" value={phone} readOnly />
         </label>
         {error ? (
           <p role="alert" className="text-sm text-red-600 dark:text-red-400">
