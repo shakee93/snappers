@@ -103,13 +103,7 @@ export default function CategoryMegaPanel({
           : "mega-menu-panel w-max max-w-[min(920px,calc(100vw-2rem))] rounded-[14px] bg-[#FFFCFA]"
       }
     >
-      <div
-        className={
-          isWidePanel
-            ? "flex w-full items-start gap-6 px-5 py-4"
-            : "flex items-start gap-6 px-5 py-4"
-        }
-      >
+      <div className="flex items-start gap-6 px-5 py-4">
         <div className={isWidePanel ? "min-w-0 flex-1" : "min-w-0"}>
           <div className="mb-3 flex flex-wrap items-center gap-x-4 gap-y-2 border-b border-header-green/10 pb-2.5">
             <Link
