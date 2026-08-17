@@ -91,6 +91,35 @@ const resolveCourierRate = (cart: Cart | null | undefined, preferFree: boolean) 
 const cartHasFreeShippingCoupon = (source: Cart | null | undefined) =>
   !!source?.appliedCoupons?.some((coupon) => coupon?.code === "free-shipping");
 
+const buildCustomerNote = ({
+  email,
+  phone,
+  isStorePickup,
+  isFlashDelivery,
+  isKokoPay,
+  customerNote,
+}: {
+  email: string;
+  phone: string;
+  isStorePickup: boolean;
+  isFlashDelivery: boolean;
+  isKokoPay: boolean;
+  customerNote: string;
+}) => {
+  const lines = [
+    `Customer Email: ${email}`,
+    `Phone Number: ${phone}`,
+    ...(isStorePickup ? ["Pickup Location: Store"] : []),
+    ...(isFlashDelivery
+      ? ["Delivery Method: Flash Delivery — customer arranges Uber/PickMe pickup"]
+      : []),
+    ...(isKokoPay ? ["Payment Method: Koko Pay"] : []),
+    ...(customerNote ? ["", `Customer Note: ${customerNote}`] : []),
+  ];
+
+  return lines.join("\n");
+};
+
 interface FormData {
   contactInfo: Record<string, any>;
   deliveryAddress: any;
@@ -564,22 +593,15 @@ const CheckoutPage = () => {
           phone: contactPhone,
         };
 
-      const customerNoteHTML = `
-            <p><strong>Customer Email:</strong> ${contactEmail}</p>
-            <p><strong>Phone Number:</strong> ${contactPhone}</p>
-            ${isStorePickupOrder
-          ? "<p><strong>Pickup Location:</strong> Store</p>"
-          : ""
-        }
-            ${isFlashDeliveryOrder
-          ? "<p><strong>Delivery Method:</strong> Flash Delivery — customer arranges Uber/PickMe pickup</p>"
-          : ""
-        }
-            ${gatewayId === "darazbnpl"
-          ? "<p><strong>Payment Method:</strong> Koko Pay</p>"
-          : ""
-        }
-        `;
+      const trimmedCustomerNote = data.customerNote?.trim() ?? "";
+      const customerNote = buildCustomerNote({
+        email: contactEmail,
+        phone: contactPhone,
+        isStorePickup: isStorePickupOrder,
+        isFlashDelivery: isFlashDeliveryOrder,
+        isKokoPay: gatewayId === "darazbnpl",
+        customerNote: trimmedCustomerNote,
+      });
 
       const variables = {
         input: {
@@ -587,7 +609,7 @@ const CheckoutPage = () => {
           shippingMethod,
           shipping: shippingDetails,
           billing: billingDetails,
-          customerNote: customerNoteHTML,
+          customerNote,
           metaData: [
             {
               key: "payhere_order_id",

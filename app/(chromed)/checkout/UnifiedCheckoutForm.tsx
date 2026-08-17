@@ -76,6 +76,7 @@ export interface CheckoutSubmitPayload {
         bankSlipFile: File | null;
     };
     deliveryType: DeliveryType;
+    customerNote: string;
 }
 
 type StepKey = "details" | "payment" | "review";
@@ -755,6 +756,7 @@ const UnifiedCheckoutForm = ({
 
     const [bankSlipFile, setBankSlipFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [customerNote, setCustomerNote] = useState("");
 
     const { cart } = useCart();
 
@@ -1021,6 +1023,7 @@ const UnifiedCheckoutForm = ({
                 bankSlipFile: selectedGateway.id === "bacs" ? bankSlipFile : null,
             },
             deliveryType,
+            customerNote: customerNote.trim(),
         };
 
         await onCheckoutSubmit(payload);
@@ -1485,6 +1488,34 @@ const UnifiedCheckoutForm = ({
                     )}
                 </div>
             </div>
+
+            {/* Customer Note Section */}
+            {deliveryType && (
+                <div>
+                    <h3 className="text-lg font-semibold mb-4">Order Notes</h3>
+                    <div>
+                        <label
+                            htmlFor="checkout-customer-note"
+                            className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5"
+                        >
+                            Customer note{" "}
+                            <span className="font-normal text-slate-500 dark:text-slate-400">
+                                (optional)
+                            </span>
+                        </label>
+                        <textarea
+                            id="checkout-customer-note"
+                            name="customerNote"
+                            rows={3}
+                            maxLength={500}
+                            placeholder="Special instructions for your order, delivery preferences, etc."
+                            value={customerNote}
+                            onChange={(e) => setCustomerNote(e.target.value)}
+                            className={`block w-full rounded-xl px-4 py-3 text-sm font-normal resize-none mt-0 bg-white dark:bg-neutral-900 ${FIELD_CLASS}`}
+                        />
+                    </div>
+                </div>
+            )}
 
             {/* Payment Method Section */}
             {deliveryType && (
