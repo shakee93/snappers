@@ -3,7 +3,7 @@
 import { useMemo, useState, useSyncExternalStore, type ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Loader } from "lucide-react";
+import { Loader, ArrowRight, ShoppingCart } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import koko from "@/public/koko.png";
@@ -224,11 +224,11 @@ const HealthFeatureCard = ({
 
   const buttonLabel = isOutOfStock
     ? "Out of Stock"
-    : isVariableInStock
-      ? "Choose options"
-      : loading
-        ? "Adding…"
-        : "Add to basket";
+    : loading
+      ? "Adding…"
+      : "Buy Now";
+
+  const ButtonIcon = isVariableInStock ? ArrowRight : ShoppingCart;
 
   const priceRow =
     numericPrice > 0 ? (
@@ -250,7 +250,11 @@ const HealthFeatureCard = ({
       onClick={handleAddToCart}
       className="inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-[10px] bg-[#C5E066] px-3.5 py-2 text-[13px] font-bold leading-none text-[#0A0A0A] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:min-w-[160px] sm:rounded-full sm:px-6 sm:py-3 sm:text-sm sm:leading-normal"
     >
-      {loading && <Loader className="h-4 w-4 animate-spin" />}
+      {loading ? (
+        <Loader className="h-4 w-4 animate-spin" />
+      ) : !isOutOfStock ? (
+        <ButtonIcon className="h-4 w-4" strokeWidth={2.25} />
+      ) : null}
       <span>{buttonLabel}</span>
     </button>
   );

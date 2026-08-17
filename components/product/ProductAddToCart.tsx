@@ -357,7 +357,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
       ) : isPreOrderProduct() ? (
         "Pre-order"
       ) : (
-        "Add to cart"
+        "Buy Now"
       )}
     </button>
   );

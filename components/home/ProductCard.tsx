@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Loader, Plus } from "lucide-react";
+import { Loader, ArrowRight, ShoppingCart } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import koko from "@/public/koko.png";
@@ -167,11 +167,11 @@ const ProductCard = ({
 
   const buttonLabel = isOutOfStock
     ? "Out of Stock"
-    : isVariableInStock
-      ? "Choose Options"
-      : isPreOrder
-        ? "Pre-order Now"
-        : "Add to Basket";
+    : isPreOrder
+      ? "Pre-order Now"
+      : "Buy Now";
+
+  const ButtonIcon = isVariableInStock ? ArrowRight : ShoppingCart;
 
   return (
     <div
@@ -246,16 +246,14 @@ const ProductCard = ({
             style={{ backgroundColor: accentColor }}
             disabled={loading || isOutOfStock}
             onClick={handleAddToCart}
-            className="flex w-full min-w-0 items-center justify-between rounded-lg px-3 py-2.5 text-left text-[13px] font-bold text-black transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:py-3 sm:text-sm"
+            className="flex w-full min-w-0 items-center justify-center gap-2 rounded-lg px-3 py-2.5 text-[13px] font-bold text-black transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:py-3 sm:text-sm"
           >
+            {loading ? (
+              <Loader className="h-4 w-4 animate-spin" />
+            ) : !isOutOfStock ? (
+              <ButtonIcon className="h-4 w-4" strokeWidth={2.25} />
+            ) : null}
             <span>{loading ? "Adding…" : buttonLabel}</span>
-            <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-black">
-              {loading ? (
-                <Loader className="h-3.5 w-3.5 animate-spin text-white" />
-              ) : (
-                <Plus className="h-3.5 w-3.5 text-white" strokeWidth={2.5} />
-              )}
-            </span>
           </button>
         </div>
       </div>
