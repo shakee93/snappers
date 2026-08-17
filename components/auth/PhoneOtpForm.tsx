@@ -175,14 +175,16 @@ const PhoneOtpForm = () => {
   // mutation itself updates the session cache — no follow-up getUser.
   // Always write after verify (including new users): abandoning the profile
   // step must not leave an account with no phone for order/delivery contact.
-  const syncVerifiedPhone = useCallback(async () => {
+  const syncVerifiedPhone = useCallback(async (): Promise<boolean> => {
     const result = await updateCustomer({
       billing: { phone },
       shipping: { phone },
     });
     if (result?.error) {
       console.error("Failed to sync verified phone to account:", result.error);
+      return false;
     }
+    return true;
   }, [phone, updateCustomer]);
 
   const verifyCode = useCallback(
@@ -239,7 +241,11 @@ const PhoneOtpForm = () => {
       // Auth succeeded — failures below must not look like a bad OTP.
       try {
         await applyAuthSession(authed.session);
-        await syncVerifiedPhone();
+
+        const phoneSynced = await syncVerifiedPhone();
+        if (!phoneSynced) {
+          console.warn("Signed in but phone sync failed after OTP verify");
+        }
 
         if (authed.isNewUser) {
           setStep("profile");
@@ -248,12 +254,8 @@ const PhoneOtpForm = () => {
 
         finishSignIn();
       } catch (caught) {
-        console.error("Post-authentication setup failed after OTP verify:", caught);
-        if (authed.isNewUser) {
-          setStep("profile");
-        } else {
-          finishSignIn();
-        }
+        console.error("Post-authentication session setup failed after OTP verify:", caught);
+        setError("We could not complete sign-in. Please try again.");
       } finally {
         verifyingRef.current = false;
         setIsBusy(false);
@@ -284,17 +286,9 @@ const PhoneOtpForm = () => {
   );
 
   // Name becomes displayName (header avatar initial + account username).
-  // Email + phone go on the customer + shipping/billing records My Account reads.
+  // Email goes on the customer record for order confirmations.
   const saveProfile = useCallback(
-    async (withDetails: boolean) => {
-      // Phone was already written in syncVerifiedPhone after OTP verify —
-      // Skip is a no-op mutation otherwise, so just continue.
-      if (!withDetails) {
-        setIsBusy(true);
-        finishSignIn();
-        return;
-      }
-
+    async () => {
       setIsBusy(true);
       setError(null);
       try {
@@ -316,8 +310,6 @@ const PhoneOtpForm = () => {
           return;
         }
 
-        // Mutation selection set now includes id / billing / shipping — no
-        // follow-up getUser needed to keep USER_DATA_KEY cacheable.
         finishSignIn();
       } finally {
         setIsBusy(false);
@@ -329,14 +321,10 @@ const PhoneOtpForm = () => {
   const handleProfileSubmit = useCallback(
     async (event: React.FormEvent) => {
       event.preventDefault();
-      await saveProfile(true);
+      await saveProfile();
     },
     [saveProfile]
   );
-
-  const handleSkipProfile = useCallback(() => {
-    void saveProfile(false);
-  }, [saveProfile]);
 
   const handleChangeNumber = useCallback(() => {
     setStep("phone");
@@ -354,8 +342,8 @@ const PhoneOtpForm = () => {
     return (
       <form className="grid grid-cols-1 gap-6" onSubmit={handleProfileSubmit}>
         <p className="text-sm text-neutral-600 dark:text-neutral-300">
-          Welcome! Tell us who you are so we can address you properly and send your
-          order confirmations.
+          Welcome! Your mobile number is saved. Add your name and email so we can
+          address you properly and send order confirmations.
         </p>
         <label className="block">
           <span className={authLabelClassName}>Your name</span>
@@ -379,6 +367,10 @@ const PhoneOtpForm = () => {
             onChange={(event) => setEmail(event.target.value)}
           />
         </label>
+        <label className="block">
+          <span className={authLabelClassName}>Mobile number</span>
+          <AuthInput type="tel" value={phone} readOnly />
+        </label>
         {error ? (
           <p role="alert" className="text-sm text-red-600 dark:text-red-400">
             {error}
@@ -392,14 +384,6 @@ const PhoneOtpForm = () => {
         >
           {isBusy ? <Loader className="h-5 w-5 animate-spin text-header-green" /> : "Save and continue"}
         </Button>
-        <button
-          type="button"
-          onClick={handleSkipProfile}
-          disabled={isBusy}
-          className="text-sm text-neutral-500 hover:underline disabled:opacity-60 dark:text-neutral-400"
-        >
-          Skip for now
-        </button>
       </form>
     );
   }

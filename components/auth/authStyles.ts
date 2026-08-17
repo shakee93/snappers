@@ -7,7 +7,7 @@ export const authLabelClassName =
   "text-sm font-medium text-neutral-800 dark:text-neutral-200";
 
 export const authInputClassName =
-  "mt-1.5 block h-11 w-full rounded-lg border-0 bg-header-cream px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-header-action/40 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-neutral-800 dark:text-neutral-100 dark:focus:bg-neutral-900";
+  "mt-1.5 block h-11 w-full rounded-lg border-0 bg-header-cream px-4 py-3 text-sm text-neutral-900 placeholder:text-neutral-400 focus:bg-white focus:outline-none focus:ring-2 focus:ring-header-action/40 read-only:cursor-default read-only:text-neutral-500 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-neutral-800 dark:text-neutral-100 dark:read-only:text-neutral-400 dark:focus:bg-neutral-900";
 
 export const authLinkClassName =
   "font-semibold text-header-green hover:underline";

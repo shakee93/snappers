@@ -62,9 +62,6 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
     // Authorization header (mod_php auth-header bridge), so an invalid token on
     // these makes login/register/refresh fail with "Internal server error".
     const AUTH_FREE_OPERATIONS = new Set([
-      "Login",
-      "LoginCustomer",
-      "RegisterCustomer",
       "RefreshAuthToken",
       "SendPasswordResetEmail",
       "ResetUserPassword",

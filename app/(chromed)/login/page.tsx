@@ -9,7 +9,7 @@ const PageLogin = () => {
   return (
     <div className="nc-PageLogin" data-nc-id="PageLogin">
       <div className="container mb-24 lg:mb-32">
-        <h1 className={authPageTitleClassName}>Login</h1>
+        <h1 className={authPageTitleClassName}>Sign in</h1>
         <div className={authPageWrapperClassName}>
           <Suspense fallback={<div className="py-8 text-center text-sm text-neutral-500">Loading...</div>}>
             <LoginPanel />
