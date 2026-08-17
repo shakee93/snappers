@@ -629,8 +629,16 @@ const AddressFields = memo(({ idPrefix, values, onChange, nameOnly = false }: Ad
     // resolved there is no new pair to protect, so the typed one stands.
     const handleApplyPin = useCallback(
         (resolved: ResolvedPinAddress, coordinates: PinCoordinates) => {
+            // A pin that lands in a different city invalidates the street line
+            // as surely as it does the postcode: keeping "229, Wennawatta"
+            // after pinning a Kandy suburb reads as a real address and isn't
+            // one. Within the same city the typed street is a refinement
+            // Google can't improve on, so it stands.
+            const movedCity = !!resolved.city && resolved.city !== values.city;
+            const fallbackAddress = movedCity ? "" : values.address;
+
             onChange({
-                address: resolved.address || values.address,
+                address: resolved.address || fallbackAddress,
                 city: resolved.city || values.city,
                 state: resolved.state || values.state,
                 postal: resolved.city ? resolved.postal : values.postal,

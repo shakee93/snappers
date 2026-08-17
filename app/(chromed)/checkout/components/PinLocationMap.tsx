@@ -40,13 +40,12 @@ interface PinLocationMapProps {
 /** Long enough that a dragged pin doesn't bill a geocode per frame. */
 const REVERSE_GEOCODE_DEBOUNCE_MS = 500;
 /**
- * Opening the tab only needs a rough fix to put the map in the right town —
- * the customer drags the pin from there — so it uses the fast network-based
- * lookup. A high-accuracy GPS fix can take the full timeout on a desktop,
- * and the map is blocked behind it.
+ * Geolocation runs only when the customer presses "Use my current location".
+ * Opening the tab must not raise a browser permission prompt on a payment
+ * page — an unprompted request there reads as the site grabbing at something,
+ * and a denial is sticky. Without a pin or a typed address the map simply
+ * opens on the default centre and waits to be searched or dragged.
  */
-const INITIAL_GEOLOCATION = { enableHighAccuracy: false, timeout: 6000 };
-/** The explicit button is worth waiting on: the customer asked for precision. */
 const REQUESTED_GEOLOCATION = { enableHighAccuracy: true, timeout: 10000 };
 /** ~10cm — below this the pin has not meaningfully moved. */
 const COORDINATE_EPSILON = 1e-6;
@@ -203,9 +202,8 @@ const PinLocationMap = ({
 
             geocoderRef.current = new maps.Geocoder();
 
-            // Placement order: an existing pin, then the typed address, then a
-            // GPS fix. Geolocation is only ever asked for here — on a tab the
-            // customer deliberately opened — never on checkout load.
+            // Placement order: an existing pin, then the typed address, then
+            // the default centre. No GPS here — see REQUESTED_GEOLOCATION.
             let position: PinCoordinates = DEFAULT_MAP_CENTER;
             let zoom = DEFAULT_MAP_ZOOM;
 
@@ -226,15 +224,8 @@ const PinLocationMap = ({
                             zoom = LOCATED_MAP_ZOOM;
                         }
                     } catch {
-                        // Unresolvable typed address — fall through to GPS.
-                    }
-                }
-
-                if (zoom === DEFAULT_MAP_ZOOM) {
-                    const fix = await geolocate(INITIAL_GEOLOCATION);
-                    if (fix) {
-                        position = fix;
-                        zoom = LOCATED_MAP_ZOOM;
+                        // Unresolvable typed address — open on the default centre
+                        // and let the customer search or drag from there.
                     }
                 }
             }

@@ -27,12 +27,29 @@ export interface ResolvedPinAddress {
 
 let cityIndex: Map<string, SriLankanCity> | null = null;
 
+/**
+ * Normalises a city name for lookup.
+ *
+ * Google zero-pads Colombo's numbered suburbs ("Colombo 05") while the rate
+ * dataset does not ("Colombo 5"), so an exact match misses every one of
+ * Colombo 1–9 — the densest delivery area we serve. Verified against live
+ * Geocoding responses: a pin on Narahenpita returns "Colombo 05", and a pin
+ * on Colombo Fort returns "Colombo 01" with no postcode at all, which would
+ * otherwise land the customer on an unsnapped city and a cleared postal.
+ */
+const normaliseCityKey = (name: string): string =>
+  name
+    .trim()
+    .toLowerCase()
+    .replace(/\s+/g, " ")
+    .replace(/\b0+(\d)/g, "$1");
+
 /** Built on first pin, not at module scope — the map tab may never open. */
 const getCityIndex = (): Map<string, SriLankanCity> => {
   if (!cityIndex) {
     cityIndex = new Map<string, SriLankanCity>();
     for (const city of SRI_LANKAN_CITIES) {
-      const key = city.name.trim().toLowerCase();
+      const key = normaliseCityKey(city.name);
       // First row wins: the dataset lists its canonical spelling first.
       if (!cityIndex.has(key)) {
         cityIndex.set(key, city);
@@ -79,8 +96,10 @@ const resolveCity = (
 
   const index = getCityIndex();
   for (const candidate of candidates) {
-    const match = index.get(candidate.trim().toLowerCase());
+    const match = index.get(normaliseCityKey(candidate));
     if (match) {
+      // The dataset's spelling wins, not Google's — the shipping zone is
+      // configured against these names.
       return { city: match.name, match };
     }
   }

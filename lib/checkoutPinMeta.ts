@@ -20,6 +20,9 @@ export interface OrderMetaEntry {
 /** Six decimals is ~10cm — more precision than a delivery ever needs. */
 const formatCoordinate = (value: number): string => value.toFixed(6);
 
+const mapUrl = (lat: string, lng: string): string =>
+  `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`;
+
 const hasPin = (
   address: PinnedAddress | null | undefined,
 ): address is PinnedAddress & { latitude: number; longitude: number } =>
@@ -47,10 +50,7 @@ export const buildPinMetaData = ({
     meta.push(
       { key: "shipping_lat", value: lat },
       { key: "shipping_lng", value: lng },
-      {
-        key: "shipping_map_url",
-        value: `https://www.google.com/maps/search/?api=1&query=${lat},${lng}`,
-      },
+      { key: "shipping_map_url", value: mapUrl(lat, lng) },
     );
   }
 
@@ -62,9 +62,12 @@ export const buildPinMetaData = ({
       billing.latitude !== shipping.latitude ||
       billing.longitude !== shipping.longitude)
   ) {
+    const lat = formatCoordinate(billing.latitude);
+    const lng = formatCoordinate(billing.longitude);
     meta.push(
-      { key: "billing_lat", value: formatCoordinate(billing.latitude) },
-      { key: "billing_lng", value: formatCoordinate(billing.longitude) },
+      { key: "billing_lat", value: lat },
+      { key: "billing_lng", value: lng },
+      { key: "billing_map_url", value: mapUrl(lat, lng) },
     );
   }
 
