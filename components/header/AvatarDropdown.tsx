@@ -1,7 +1,7 @@
 "use client";
 import { Popover, Transition } from "@headlessui/react";
 import Image from "next/image";
-import { Loader2, LogIn, User } from "lucide-react";
+import { Loader2, LogIn } from "lucide-react";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import LogoutButton from "@/components/header/LogoutButton";
@@ -93,32 +93,18 @@ export default function AvatarDropdown() {
                         <div className="h-4 w-4/5 rounded bg-neutral-200 dark:bg-neutral-700" />
                       </div>
                     ) : !customer || customer.id === "guest" ? (
-                      <>
-                        <Link
-                          href={"/login"}
-                          className="flex items-center p-2 -m-3 transition duration-150 ease-in-out rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50"
-                          onClick={() => close()}
-                        >
-                          <div className="flex items-center justify-center flex-shrink-0 text-neutral-500 dark:text-neutral-300">
-                            <LogIn />
-                          </div>
-                          <div className="ml-4">
-                            <p className="text-sm font-medium ">{"Login"}</p>
-                          </div>
-                        </Link>
-                        <Link
-                          href={"/signup"}
-                          className="flex items-center p-2 -m-3 transition duration-150 ease-in-out rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50"
-                          onClick={() => close()}
-                        >
-                          <div className="flex items-center justify-center flex-shrink-0 text-neutral-500 dark:text-neutral-300">
-                            <User />
-                          </div>
-                          <div className="ml-4">
-                            <p className="text-sm font-medium ">{"Register"}</p>
-                          </div>
-                        </Link>
-                      </>
+                      <Link
+                        href="/login"
+                        className="flex items-center p-2 -m-3 transition duration-150 ease-in-out rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50"
+                        onClick={() => close()}
+                      >
+                        <div className="flex items-center justify-center flex-shrink-0 text-neutral-500 dark:text-neutral-300">
+                          <LogIn />
+                        </div>
+                        <div className="ml-4">
+                          <p className="text-sm font-medium">Sign in</p>
+                        </div>
+                      </Link>
                     ) : (
                       <>
                         <div className="flex items-center space-x-3">

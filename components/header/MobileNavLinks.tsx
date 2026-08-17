@@ -163,7 +163,7 @@ const MobileNavLinks = ({ navCategories = [] }: MobileNavLinksProps) => {
                   !customer || customer?.id === "guest" ? "/login" : "/account"
                 }
               >
-                {!customer || customer?.id === "guest" ? "Login" : "Account"}
+                {!customer || customer?.id === "guest" ? "Sign in" : "Account"}
               </Link>
             </li>
           </ul>

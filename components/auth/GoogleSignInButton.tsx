@@ -7,6 +7,7 @@ import Script from "next/script";
 import { toast } from "sonner";
 import { Loader } from "lucide-react";
 import Button from "@/shared/Button/Button";
+import PhoneOtpForm from "@/components/auth/PhoneOtpForm";
 import { CREATE_AUTH_NONCE, SIGN_IN_WITH_GOOGLE } from "@/graphql/defs/auth-otp";
 import { parseAuthError } from "@/utils/auth-errors";
 import { useSession } from "@/context/SessionProvider";
@@ -102,13 +103,14 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
   const [isButtonReady, setIsButtonReady] = useState(false);
   const [isPreparing, setIsPreparing] = useState(false);
   const [isSigningIn, setIsSigningIn] = useState(false);
+  const [needsPhone, setNeedsPhone] = useState(false);
   // Kept separate from armError so a successful remint after a failed
   // signInWithGoogle cannot erase the failure message the user needs to see.
   const [signInError, setSignInError] = useState<string | null>(null);
   const [armError, setArmError] = useState<string | null>(null);
   const [nonceAttempt, setNonceAttempt] = useState(0);
 
-  const { applyAuthSession } = useSession();
+  const { applyAuthSession, fetchCustomer } = useSession();
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectTo = getSafeRedirectPath(searchParams.get("redirect"));
@@ -140,6 +142,14 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
         }
 
         await applyAuthSession(session);
+        const account = await fetchCustomer();
+        const hasPhone = Boolean(account?.customer?.shipping?.phone?.trim());
+
+        if (!hasPhone) {
+          setNeedsPhone(true);
+          return;
+        }
+
         toast(getRandomWelcomeMessage());
         localStorage.removeItem("last_order");
         router.push(redirectTo);
@@ -150,7 +160,7 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
         if (mountedRef.current) setIsSigningIn(false);
       }
     },
-    [applyAuthSession, redirectTo, router, signInWithGoogle]
+    [applyAuthSession, fetchCustomer, redirectTo, router, signInWithGoogle]
   );
 
   useEffect(() => {
@@ -360,6 +370,18 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
   }, [isButtonReady, isScriptReady, paintButton]);
 
   const visibleError = signInError ?? armError;
+
+  if (needsPhone) {
+    return (
+      <div className="space-y-4">
+        <p className="text-sm text-neutral-600 dark:text-neutral-300">
+          A mobile number is required for order updates and delivery contact. Verify
+          your number to finish signing in.
+        </p>
+        <PhoneOtpForm authenticatedCapture />
+      </div>
+    );
+  }
 
   return (
     <div ref={wrapperRef} className="w-full space-y-2">
