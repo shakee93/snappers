@@ -55,12 +55,7 @@ function formatCountdown(totalSeconds: number): string {
   return `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
-type PhoneOtpFormProps = {
-  /** User is already signed in (e.g. Google) — verify and attach a phone only. */
-  authenticatedCapture?: boolean;
-};
-
-const PhoneOtpForm = ({ authenticatedCapture = false }: PhoneOtpFormProps) => {
+const PhoneOtpForm = () => {
   const [step, setStep] = useState<Step>("phone");
   const [countryCode, setCountryCode] = useState(DEFAULT_COUNTRY);
   const [localNumber, setLocalNumber] = useState("");
@@ -186,7 +181,7 @@ const PhoneOtpForm = ({ authenticatedCapture = false }: PhoneOtpFormProps) => {
       shipping: { phone },
     });
     if (result?.error) {
-      console.error("Failed to sync verified phone to account:", result.error);
+      throw new Error(result.error);
     }
   }, [phone, updateCustomer]);
 
@@ -246,11 +241,6 @@ const PhoneOtpForm = ({ authenticatedCapture = false }: PhoneOtpFormProps) => {
         await applyAuthSession(authed.session);
         await syncVerifiedPhone();
 
-        if (authenticatedCapture) {
-          finishSignIn();
-          return;
-        }
-
         if (authed.isNewUser) {
           setStep("profile");
           return;
@@ -259,21 +249,16 @@ const PhoneOtpForm = ({ authenticatedCapture = false }: PhoneOtpFormProps) => {
         finishSignIn();
       } catch (caught) {
         console.error("Post-authentication setup failed after OTP verify:", caught);
-        if (authenticatedCapture) {
-          finishSignIn();
-          return;
-        }
+        setError("We signed you in, but could not save your phone number. Please try again.");
         if (authed.isNewUser) {
           setStep("profile");
-        } else {
-          finishSignIn();
         }
       } finally {
         verifyingRef.current = false;
         setIsBusy(false);
       }
     },
-    [applyAuthSession, authenticatedCapture, challenge, finishSignIn, syncVerifiedPhone, verifyOtp]
+    [applyAuthSession, challenge, finishSignIn, syncVerifiedPhone, verifyOtp]
   );
 
   const handleCodeChange = useCallback(
@@ -381,7 +366,7 @@ const PhoneOtpForm = ({ authenticatedCapture = false }: PhoneOtpFormProps) => {
         </label>
         <label className="block">
           <span className={authLabelClassName}>Mobile number</span>
-          <AuthInput type="tel" value={phone} readOnly disabled className="mt-1.5" />
+          <AuthInput type="tel" value={phone} readOnly aria-readonly="true" />
         </label>
         {error ? (
           <p role="alert" className="text-sm text-red-600 dark:text-red-400">

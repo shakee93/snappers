@@ -2,12 +2,15 @@
 
 import { useMemo } from "react";
 import { useQuery } from "@apollo/client";
+import { Loader } from "lucide-react";
 import PhoneOtpForm from "@/components/auth/PhoneOtpForm";
 import GoogleSignInButton from "@/components/auth/GoogleSignInButton";
 import { AUTH_PROVIDERS } from "@/graphql/defs/auth-otp";
 
 const LoginPanel = () => {
-  const { data, error } = useQuery(AUTH_PROVIDERS);
+  const { data, error, loading } = useQuery(AUTH_PROVIDERS);
+
+  const providersResolved = data !== undefined || !!error;
 
   // A provider can be switched off, or on but unconfigured. Asking the server
   // avoids offering a sign-in method that would always fail.
@@ -29,6 +32,14 @@ const LoginPanel = () => {
           )?.clientId ?? null,
     [data, error]
   );
+
+  if (loading || !providersResolved) {
+    return (
+      <div className="flex justify-center py-12" aria-busy="true" aria-label="Loading sign-in options">
+        <Loader className="h-6 w-6 animate-spin text-header-green" />
+      </div>
+    );
+  }
 
   if (!phoneEnabled && !googleClientId) {
     return (

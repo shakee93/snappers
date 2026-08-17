@@ -1,22 +1,14 @@
 'use client';
 
 import React, { createContext, ReactNode, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { ApolloError, FetchResult, useLazyQuery, useMutation } from '@apollo/client';
+import { ApolloError, useLazyQuery, useMutation } from '@apollo/client';
 import {
     GET_ACCOUNT_DETAILS,
-    LOGIN_CUSTOMER_MUTATION,
-    REGISTER_CUSTOMER_MUTATION,
     UPDATE_ACCOUNT_INFORMATION
 } from '@/graphql/defs/auth';
 import type { AuthSessionTokens } from '@/graphql/defs/auth-otp';
-import { LoginResponse, Session } from "@/utils/type";
-import {
-    Customer,
-    LoginCustomerMutation,
-    LoginPayload,
-    RegisterCustomerMutation,
-    RegisterCustomerPayload
-} from "@/graphql/types/graphql";
+import { Session } from "@/utils/type";
+import { Customer, GetAccountDetailsQuery } from "@/graphql/types/graphql";
 import { useCart } from "@/context/CartProvider";
 import {
     AUTH_TOKEN_KEY,
@@ -28,15 +20,9 @@ import {
 
 const SessionContext = createContext<Session>({
     sessionToken: null,
-    signUp: async (email: string, password: string) => {
-        return { data: null, error: null };
-    },
-    login: async (email: string, password: string) => {
-        return { data: null, error: null };
-    },
     applyAuthSession: async () => { },
     logout: () => { },
-    fetchCustomer: () => Promise.resolve(),
+    fetchCustomer: () => Promise.resolve(null as GetAccountDetailsQuery | null),
     customer: undefined,
     updateCustomer: undefined
 });
@@ -44,8 +30,6 @@ const SessionContext = createContext<Session>({
 export function useSession() {
     return useContext(SessionContext);
 }
-
-type AuthType = "registerCustomer" | "login";
 
 type PersistableTokens = {
     authToken: string | null | undefined;
@@ -93,28 +77,6 @@ export function SessionProvider({ children }: {
         fetchPolicy: 'no-cache'
     })
 
-    const [registerCustomer] = useMutation(REGISTER_CUSTOMER_MUTATION);
-    const [loginCustomer] = useMutation(LOGIN_CUSTOMER_MUTATION);
-
-    async function saveResponseToLocalStorage(response: any, type: AuthType = "registerCustomer") {
-
-        const data: LoginPayload & RegisterCustomerPayload = response?.data?.[type]
-        if (!data) return;
-
-        const tokenToStore = persistAuthTokens({
-            authToken: data?.authToken,
-            refreshToken: data?.refreshToken,
-            sessionToken: data?.sessionToken ?? data?.customer?.sessionToken,
-        });
-
-        localStorage.setItem(USER_DATA_KEY, JSON.stringify(data?.customer));
-
-        setSessionToken(tokenToStore);
-        setCustomer(data?.customer as Customer);
-
-        await getCart();
-    }
-
     const fetchCustomer = useCallback(async () => {
         const cached = localStorage.getItem(USER_DATA_KEY);
         const hasAuthToken = !!localStorage.getItem(AUTH_TOKEN_KEY);
@@ -150,69 +112,6 @@ export function SessionProvider({ children }: {
             return null;
         }
     }, [customer, getUser, setCustomer]);
-
-    const signUp = useCallback(async (email: string, password: string) => {
-        try {
-            const response: FetchResult<RegisterCustomerMutation> = await registerCustomer({
-                variables: {
-                    input: {
-                        email,
-                        password,
-                    },
-                },
-            });
-
-            await saveResponseToLocalStorage(response);
-            await fetchCustomer();
-
-            return { data: "registered", error: null };
-        } catch (error) {
-            let errorMessage = "An error occurred while signing up.";
-            if (error instanceof ApolloError) {
-                if (error.message.includes("An account is already registered with your email address")) {
-                    errorMessage = "An account with this email address already exists. Please log in.";
-                } else {
-                    console.error("Signup ApolloError:", error);
-                    errorMessage = error.message || errorMessage;
-                }
-            } else {
-                console.error("Signup error:", error);
-            }
-            return { data: null, error: errorMessage };
-        }
-    }, [fetchCustomer, registerCustomer]);
-
-    const login = useCallback(async (email: string, password: string): Promise<LoginResponse> => {
-        try {
-            const response: FetchResult<LoginCustomerMutation> = await loginCustomer({
-                variables: {
-                    input: {
-                        username: email,
-                        password,
-                    },
-                },
-            })
-
-            await saveResponseToLocalStorage(response, "login");
-            await fetchCustomer();
-            return { data: "logged_in", error: null };
-        } catch (error) {
-            let errorMessage = "An error occurred while login.";
-            if (error instanceof ApolloError) {
-                if (error.message.includes("invalid_email")) {
-                    errorMessage = "No user found with this email address.";
-                } else if (error.message.includes("incorrect_password")) {
-                    errorMessage = "Incorrect password.";
-                } else {
-                    console.error("An ApolloError occurred:", error);
-                }
-            } else {
-                errorMessage = typeof error === "string" ? error : "";
-                console.error("An error occurred:", error);
-            }
-            return { data: null, error: errorMessage };
-        }
-    }, [fetchCustomer, loginCustomer]);
 
     /**
      * Completes a phone or provider sign-in. Those mutations return only
@@ -285,15 +184,13 @@ export function SessionProvider({ children }: {
     const sessionValue = useMemo(
         () => ({
             sessionToken,
-            signUp,
-            login,
             applyAuthSession,
             logout,
             fetchCustomer,
             customer,
             updateCustomer,
         }),
-        [sessionToken, signUp, login, applyAuthSession, logout, fetchCustomer, customer, updateCustomer],
+        [sessionToken, applyAuthSession, logout, fetchCustomer, customer, updateCustomer],
     );
 
     return (
