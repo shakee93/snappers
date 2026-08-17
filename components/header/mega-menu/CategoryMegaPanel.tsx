@@ -106,8 +106,8 @@ export default function CategoryMegaPanel({
       <div
         className={
           isWidePanel
-            ? "flex w-full items-end gap-6 px-5 py-4"
-            : "flex items-end gap-6 px-5 py-4"
+            ? "flex w-full items-start gap-6 px-5 py-4"
+            : "flex items-start gap-6 px-5 py-4"
         }
       >
         <div className={isWidePanel ? "min-w-0 flex-1" : "min-w-0"}>
