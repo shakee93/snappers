@@ -2,6 +2,7 @@
 
 import { memo, useCallback, useDeferredValue, useEffect, useMemo, useRef, useState } from "react";
 import { useDebouncedCallback } from "use-debounce";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import Input from "shared/Input/Input";
 import CountryPhoneInput from "./components/CountryPhoneInput";
@@ -38,7 +39,21 @@ import {
     ArrowLeft,
     Loader,
     Search,
+    MapPin,
+    PenLine,
 } from "lucide-react";
+import type { PinCoordinates } from "./components/PinLocationMap";
+import type { ResolvedPinAddress } from "@/lib/checkoutGeocode";
+
+// Google Maps is a heavy, browser-only dependency that most checkouts never
+// need: it is fetched the first time someone opens the "Pin location" tab,
+// and never during the initial checkout render.
+const PinLocationMap = dynamic(() => import("./components/PinLocationMap"), {
+    ssr: false,
+    loading: () => (
+        <div className="h-72 w-full animate-pulse rounded-xl bg-slate-100 dark:bg-slate-800 sm:h-80" />
+    ),
+});
 
 // Account shown inline in the BACS panel — sourced from site.config so the
 // full bank list (rendered on the bank-details view) stays the single source.
@@ -48,30 +63,25 @@ const FEATURED_BANK_ACCOUNT =
 
 export type DeliveryType = "courier" | "store_pickup" | "flash_delivery";
 
+export interface CheckoutAddressPayload {
+    firstName: string;
+    lastName: string;
+    address: string;
+    apartment: string;
+    city: string;
+    state: string;
+    postal: string;
+    country: string;
+    addressType: string;
+    /** Map pin, or null when the customer never opened the pin tab. */
+    latitude: number | null;
+    longitude: number | null;
+}
+
 export interface CheckoutSubmitPayload {
     contactInfo: { phone: string; email: string; country: string };
-    deliveryAddress: {
-        firstName: string;
-        lastName: string;
-        address: string;
-        apartment: string;
-        city: string;
-        state: string;
-        postal: string;
-        country: string;
-        addressType: string;
-    };
-    billingAddress: {
-        firstName: string;
-        lastName: string;
-        address: string;
-        apartment: string;
-        city: string;
-        state: string;
-        postal: string;
-        country: string;
-        addressType: string;
-    };
+    deliveryAddress: CheckoutAddressPayload;
+    billingAddress: CheckoutAddressPayload;
     paymentMethod: {
         selectedGateway: { id: string; title: string | null };
         bankSlipFile: File | null;
@@ -152,6 +162,15 @@ type AddressFieldValues = {
     city: string;
     state: string;
     postal: string;
+    /**
+     * Map pin, set only when the customer picked one. Null keeps the
+     * coordinates out of the order meta entirely rather than sending zeroes.
+     * Deliberately absent from `transformAddress`: coordinates must not
+     * widen the address sync's dedupe key, since WooCommerce quotes the
+     * rate off the address fields, not the pin.
+     */
+    latitude: number | null;
+    longitude: number | null;
 };
 
 const EMPTY_ADDRESS: AddressFieldValues = {
@@ -162,6 +181,45 @@ const EMPTY_ADDRESS: AddressFieldValues = {
     city: "",
     state: "Western",
     postal: "",
+    latitude: null,
+    longitude: null,
+};
+
+/** Fields that describe *where* the parcel goes, as opposed to who receives it. */
+const LOCATION_FIELDS = ["address", "city", "state", "postal"] as const;
+
+/**
+ * Merges an address patch, dropping any map pin the edit has invalidated.
+ *
+ * Once the customer types a different street, city, province or postcode, the
+ * coordinates they pinned earlier describe somewhere else — handing the driver
+ * a pin that disagrees with the address is worse than handing them none. So a
+ * real change to any location field clears the pin, which also means reopening
+ * the Pin tab re-finds the newly typed address instead of restoring the old
+ * position.
+ *
+ * Two things deliberately do not clear it: a patch that carries coordinates
+ * (that *is* the pin being applied, along with the address it resolved to),
+ * and a patch that re-sends a field's existing value — the city combobox
+ * commits on every blur, and a mere focus-and-leave must not drop the pin.
+ */
+const mergeAddressPatch = (
+    prev: AddressFieldValues,
+    patch: Partial<AddressFieldValues>,
+): AddressFieldValues => {
+    const next = { ...prev, ...patch };
+
+    const isPinApply = patch.latitude !== undefined;
+    const changesLocation = LOCATION_FIELDS.some(
+        (field) => patch[field] !== undefined && patch[field] !== prev[field],
+    );
+
+    if (!isPinApply && changesLocation) {
+        next.latitude = null;
+        next.longitude = null;
+    }
+
+    return next;
 };
 
 // Postal is validated against the same pattern the address sync quotes on,
@@ -470,7 +528,130 @@ const CitySelectField = memo(({ id, value, onChange }: CitySelectFieldProps) => 
 
 CitySelectField.displayName = "CitySelectField";
 
-const AddressFields = memo(({ idPrefix, values, onChange, nameOnly = false }: AddressFieldsProps) => (
+type AddressTab = "address" | "pin";
+
+const ADDRESS_TABS = [
+    { key: "address" as const, label: "Address", Icon: PenLine },
+    { key: "pin" as const, label: "Pin location", Icon: MapPin },
+];
+
+interface AddressTabBarProps {
+    idPrefix: string;
+    value: AddressTab;
+    onChange: (tab: AddressTab) => void;
+    hasPin: boolean;
+}
+
+const AddressTabBar = memo(({ idPrefix, value, onChange, hasPin }: AddressTabBarProps) => {
+    // Roving tabindex: only the selected tab is in the tab order, and the
+    // arrow keys move both the selection and the focus with it.
+    const selectTab = (tab: AddressTab) => {
+        onChange(tab);
+        document.getElementById(`${idPrefix}-tab-${tab}`)?.focus();
+    };
+
+    return (
+        <div
+            role="tablist"
+            aria-label="Address entry method"
+            className="inline-flex rounded-xl bg-slate-100 p-1 dark:bg-slate-800"
+        >
+            {ADDRESS_TABS.map(({ key, label, Icon }) => {
+                const selected = key === value;
+                return (
+                    <button
+                        key={key}
+                        id={`${idPrefix}-tab-${key}`}
+                        type="button"
+                        role="tab"
+                        aria-selected={selected}
+                        aria-controls={`${idPrefix}-panel-${key}`}
+                        tabIndex={selected ? 0 : -1}
+                        onClick={() => onChange(key)}
+                        onKeyDown={(e) => {
+                            if (e.key !== "ArrowLeft" && e.key !== "ArrowRight") return;
+                            e.preventDefault();
+                            const next = ADDRESS_TABS.find((tab) => tab.key !== key);
+                            if (next) selectTab(next.key);
+                        }}
+                        className={`inline-flex items-center gap-2 rounded-lg px-3 py-2 text-sm font-semibold transition-colors ${
+                            selected
+                                ? "bg-white text-slate-900 shadow-sm dark:bg-slate-900 dark:text-slate-100"
+                                : "text-slate-600 hover:text-slate-900 dark:text-slate-400 dark:hover:text-slate-200"
+                        }`}
+                    >
+                        <Icon className="h-4 w-4" strokeWidth={2} />
+                        {label}
+                        {key === "pin" && hasPin && (
+                            <>
+                                <span
+                                    aria-hidden="true"
+                                    className="h-1.5 w-1.5 rounded-full bg-header-green"
+                                />
+                                <span className="sr-only">(pin set)</span>
+                            </>
+                        )}
+                    </button>
+                );
+            })}
+        </div>
+    );
+});
+AddressTabBar.displayName = "AddressTabBar";
+
+const AddressFields = memo(({ idPrefix, values, onChange, nameOnly = false }: AddressFieldsProps) => {
+    const [activeTab, setActiveTab] = useState<AddressTab>("address");
+
+    const pin = useMemo<PinCoordinates | null>(
+        () =>
+            values.latitude !== null && values.longitude !== null
+                ? { lat: values.latitude, lng: values.longitude }
+                : null,
+        [values.latitude, values.longitude],
+    );
+
+    // Only used to place the pin the first time the tab opens, so a partial
+    // address is still worth sending — Google will land in the right suburb.
+    const addressQuery = useMemo(() => {
+        const parts = [values.address, values.city, values.state, values.postal]
+            .map((part) => part.trim())
+            .filter(Boolean);
+        return parts.length ? `${parts.join(", ")}, Sri Lanka` : "";
+    }, [values.address, values.city, values.state, values.postal]);
+
+    // One patch, not four: a single state update means a single address
+    // snapshot, so applying a pin costs exactly one shipping recalculation.
+    //
+    // Every field falls back to what was already typed when Google has nothing
+    // for it — except the postal code, which is replaced *whenever a city was
+    // resolved*, empty or not. A stale postcode left paired with a new city is
+    // what silently misprices delivery, so an empty one (which the required
+    // field then makes the customer fill) is the safer failure. With no city
+    // resolved there is no new pair to protect, so the typed one stands.
+    const handleApplyPin = useCallback(
+        (resolved: ResolvedPinAddress, coordinates: PinCoordinates) => {
+            // A pin that lands in a different city invalidates the street line
+            // as surely as it does the postcode: keeping "229, Wennawatta"
+            // after pinning a Kandy suburb reads as a real address and isn't
+            // one. Within the same city the typed street is a refinement
+            // Google can't improve on, so it stands.
+            const movedCity = !!resolved.city && resolved.city !== values.city;
+            const fallbackAddress = movedCity ? "" : values.address;
+
+            onChange({
+                address: resolved.address || fallbackAddress,
+                city: resolved.city || values.city,
+                state: resolved.state || values.state,
+                postal: resolved.city ? resolved.postal : values.postal,
+                latitude: coordinates.lat,
+                longitude: coordinates.lng,
+            });
+            setActiveTab("address");
+        },
+        [onChange, values.address, values.city, values.state, values.postal],
+    );
+
+    return (
     <>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-3">
             <div>
@@ -505,6 +686,36 @@ const AddressFields = memo(({ idPrefix, values, onChange, nameOnly = false }: Ad
 
         {nameOnly ? null : (
         <>
+        <AddressTabBar
+            idPrefix={idPrefix}
+            value={activeTab}
+            onChange={setActiveTab}
+            hasPin={!!pin}
+        />
+
+        {activeTab === "pin" ? (
+        <div
+            role="tabpanel"
+            id={`${idPrefix}-panel-pin`}
+            aria-labelledby={`${idPrefix}-tab-pin`}
+        >
+            <PinLocationMap
+                idPrefix={idPrefix}
+                addressQuery={addressQuery}
+                pin={pin}
+                onApply={handleApplyPin}
+            />
+        </div>
+        ) : (
+        // Unmounted rather than hidden: `display:none` on a required input
+        // makes Chrome refuse the whole submit with an unfocusable-control
+        // error. The values live in the parent, so nothing is lost.
+        <div
+            role="tabpanel"
+            id={`${idPrefix}-panel-address`}
+            aria-labelledby={`${idPrefix}-tab-address`}
+            className="space-y-4"
+        >
         <div className="sm:flex sm:space-x-3 sm:space-y-0 space-y-4">
             <div className="flex-1">
                 <label htmlFor={`${idPrefix}-address1`} className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5">
@@ -585,10 +796,13 @@ const AddressFields = memo(({ idPrefix, values, onChange, nameOnly = false }: Ad
                 />
             </div>
         </div>
+        </div>
+        )}
         </>
         )}
     </>
-));
+    );
+});
 AddressFields.displayName = "AddressFields";
 
 interface DeliveryOptionProps {
@@ -724,7 +938,8 @@ const UnifiedCheckoutForm = ({
     const [billingAddress, setBillingAddress] = useState<AddressFieldValues>(EMPTY_ADDRESS);
     const [shippingAddress, setShippingAddress] = useState<AddressFieldValues>(EMPTY_ADDRESS);
     const [shippingDifferent, setShippingDifferent] = useState(false);
-    // City list picks set city+postcode together — flag the next snapshot so
+    // City list picks and applied map pins both set city+postcode together —
+    // a finished destination, not a half-typed one. Flag the next snapshot so
     // the parent skips the typing debounce and quotes immediately.
     const immediateAddressSyncRef = useRef(false);
 
@@ -739,13 +954,13 @@ const UnifiedCheckoutForm = ({
         ) {
             immediateAddressSyncRef.current = true;
         }
-        setBillingAddress((prev) => ({ ...prev, ...patch }));
+        setBillingAddress((prev) => mergeAddressPatch(prev, patch));
     }, [shippingDifferent]);
     const handleShippingChange = useCallback((patch: Partial<AddressFieldValues>) => {
         if (patch.city !== undefined && patch.postal !== undefined) {
             immediateAddressSyncRef.current = true;
         }
-        setShippingAddress((prev) => ({ ...prev, ...patch }));
+        setShippingAddress((prev) => mergeAddressPatch(prev, patch));
     }, []);
 
     // Payment Method State
@@ -809,6 +1024,9 @@ const UnifiedCheckoutForm = ({
                 city: initialShippingData.city || "",
                 state: initialShippingData.state || "Western",
                 postal: initialShippingData.postcode || "",
+                // A saved WooCommerce address carries no pin.
+                latitude: null,
+                longitude: null,
             });
         }
     }, [initialShippingData]);

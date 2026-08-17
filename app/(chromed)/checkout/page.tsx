@@ -8,6 +8,7 @@ import { useCart } from "@/context/CartProvider";
 import { GET_CART } from "@/graphql/defs/cart";
 import { useShipping } from "@/hooks/useShipping";
 import { useCheckoutAddressSync } from "@/hooks/useCheckoutAddressSync";
+import { buildPinMetaData } from "@/lib/checkoutPinMeta";
 import { useCheckoutPaymentSync } from "@/hooks/useCheckoutPaymentSync";
 import { useCheckout } from "@/hooks/useCheckout";
 import {
@@ -618,6 +619,11 @@ const CheckoutPage = () => {
             ...(orderDeliveryType
               ? [{ key: "delivery_type", value: orderDeliveryType }]
               : []),
+            ...buildPinMetaData({
+              shipping: data.deliveryAddress,
+              billing: data.billingAddress,
+              isStorePickup: isStorePickupOrder,
+            }),
           ],
         },
       };
