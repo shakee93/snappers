@@ -51,7 +51,10 @@ const CartDropdownItem = ({ item, close, wrapperClassName }: CartDropdownItemPro
 
   const imageUrl =
     product?.node?.type === "VARIABLE"
-      ? variation?.node?.image?.sourceUrl ?? null
+      ? variation?.node?.image?.sourceUrl ??
+        product?.node?.image?.sourceUrl ??
+        product?.node?.image?.mediaItemUrl ??
+        null
       : product?.node?.image?.sourceUrl ??
         product?.node?.image?.mediaItemUrl ??
         null;

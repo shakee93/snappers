@@ -251,7 +251,6 @@ export function CartProvider({ children }: {
         return (
             err?.networkError?.statusCode === 500 ||
             err?.message?.includes("Internal server error") ||
-            err?.message?.includes("500") ||
             err?.graphQLErrors?.some((graphQLError) =>
                 graphQLError?.extensions?.code === "INTERNAL_SERVER_ERROR" ||
                 graphQLError?.message?.includes("Internal server error") ||
@@ -263,15 +262,14 @@ export function CartProvider({ children }: {
 
     const clearStoredSessionState = (preserveAuth: boolean) => {
         localStorage.removeItem(SESSION_TOKEN_KEY);
-        localStorage.removeItem(USER_DATA_KEY);
 
         if (!preserveAuth) {
+            localStorage.removeItem(USER_DATA_KEY);
             localStorage.removeItem(AUTH_TOKEN_KEY);
             localStorage.removeItem(REFRESH_TOKEN_KEY);
             window.dispatchEvent(new Event(AUTH_INVALIDATED_EVENT));
+            setCustomer(null);
         }
-
-        setCustomer(null);
     };
 
     // Helper function to check if cart has pre-order products
@@ -328,7 +326,7 @@ export function CartProvider({ children }: {
                 const hasAuthToken = !!localStorage.getItem(AUTH_TOKEN_KEY);
 
                 if (hasSessionToken || hasAuthToken) {
-                    const preserveAuth = !!customer && customer.id !== "guest" && hasAuthToken;
+                    const preserveAuth = hasAuthToken && customer?.id !== "guest";
                     console.warn(
                         `Add to cart failed with a stale ${preserveAuth ? "session" : "session/auth"} token. Retrying once.`
                     );

@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Loader, LogIn, ShoppingCart } from "lucide-react";
+import { Loader, ArrowRight, ShoppingCart } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import koko from "@/public/koko.png";
@@ -167,13 +167,11 @@ const ProductCard = ({
 
   const buttonLabel = isOutOfStock
     ? "Out of Stock"
-    : isVariableInStock
-      ? "Buy Now"
-      : isPreOrder
-        ? "Pre-order Now"
-        : "Buy Now";
+    : isPreOrder
+      ? "Pre-order Now"
+      : "Buy Now";
 
-  const ButtonIcon = isVariableInStock ? LogIn : ShoppingCart;
+  const ButtonIcon = isVariableInStock ? ArrowRight : ShoppingCart;
 
   return (
     <div
@@ -252,9 +250,9 @@ const ProductCard = ({
           >
             {loading ? (
               <Loader className="h-4 w-4 animate-spin" />
-            ) : (
+            ) : !isOutOfStock ? (
               <ButtonIcon className="h-4 w-4" strokeWidth={2.25} />
-            )}
+            ) : null}
             <span>{loading ? "Adding…" : buttonLabel}</span>
           </button>
         </div>
