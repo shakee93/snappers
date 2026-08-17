@@ -194,6 +194,8 @@ export const siteConfig = {
     kokoGatewayId: "darazbnpl",
     // Gateways that quote the shared Visa/Mastercard tier in woo-price-tiers.
     cardGatewayIds: ["payhere", "webxpay", "ndb-pay", "geniebiz"] as const,
+    // Gateways whose checkout mutation returns a pay URL we should follow.
+    offsiteRedirectGatewayIds: ["geniebiz", "webxpay"] as const,
     // Gateways that genuinely cannot be combined with coupon discounts.
     // Keep this separate from `cardGatewayIds`: not every card processor has
     // the same coupon rule.

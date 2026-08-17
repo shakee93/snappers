@@ -138,6 +138,8 @@ const CheckoutPage = () => {
   const [paymentData, setPaymentData] =
     useState<PaymentDetailsWithoutUrls | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
+  const [redirecting, setRedirecting] = useState(false);
+  const redirectingRef = useRef(false);
   const [isTOC, setTOC] = useState<boolean>(false);
   const [tocError, setTocError] = useState(false);
   const [guestCheckoutData, setGuestCheckoutData] = useState<any>();
@@ -722,15 +724,26 @@ const CheckoutPage = () => {
         return null;
       }
 
-      // Genie Payment Redirect
-      if (gatewayId === "geniebiz" && mutationData?.checkout?.redirect) {
-        if (mutationData?.checkout?.result === "success") {
-          handleGeniePayment(mutationData);
-          return;
-        } else {
-          toast.error("Checkout failed. Please try again.");
-          return;
+      // PayHere, Koko, and NDB already returned above. COD and bank transfer
+      // finish in-app below. Only configured offsite gateways follow
+      // `checkout.redirect` (Genie hosted checkout, WebXPay pay URL).
+      const checkoutRedirect = mutationData?.checkout?.redirect;
+      const checkoutSucceeded = mutationData?.checkout?.result === "success";
+      const offsiteRedirectGatewayIds =
+        siteConfig.payment.offsiteRedirectGatewayIds as readonly string[];
+      const expectsOffsitePayment =
+        offsiteRedirectGatewayIds.includes(gatewayId);
+
+      if (expectsOffsitePayment) {
+        if (checkoutSucceeded && checkoutRedirect) {
+          await handleOffsitePaymentRedirect(checkoutRedirect);
+          return null;
         }
+
+        await handleOffsitePaymentStartFailure(
+          mutationData?.checkout?.order?.databaseId,
+        );
+        return null;
       }
 
       if (mutationData) {
@@ -760,7 +773,9 @@ const CheckoutPage = () => {
     } catch (error) {
       await handleCheckoutError(error);
     } finally {
-      setLoading(false);
+      if (!redirectingRef.current) {
+        setLoading(false);
+      }
     }
   };
 
@@ -1179,30 +1194,45 @@ const CheckoutPage = () => {
     }
   };
 
-  const handleGeniePayment = (checkoutData: any) => {
+  const clearCartSafely = async () => {
     try {
-      const redirectUrl = checkoutData?.checkout?.redirect;
-
-      if (!redirectUrl) {
-        toast.error("Payment gateway URL not received. Please try again.");
-        return;
+      await clearCart();
+    } catch (error: unknown) {
+      if (
+        error instanceof Error &&
+        !error.message.includes("No items in cart to remove")
+      ) {
+        console.error("Error clearing cart:", error);
       }
-
-      // Store order data for reference
-      localStorage.setItem("genie_last_order", JSON.stringify(checkoutData));
-
-      // Show success message before redirect
-      toast.success("Redirecting to payment gateway...");
-
-      // Small delay to ensure toast is shown
-      setTimeout(() => {
-        window.location.href = redirectUrl;
-      }, 1000);
-
-    } catch (error) {
-      console.error("Genie payment redirect error:", error);
-      toast.error("Payment redirect failed. Please try again.");
     }
+  };
+
+  const markRedirectPending = () => {
+    redirectingRef.current = true;
+    setRedirecting(true);
+  };
+
+  const handleOffsitePaymentStartFailure = async (
+    orderDbId?: number | null,
+  ) => {
+    if (orderDbId) {
+      await clearCartSafely();
+      toast.error(
+        "Your order was created, but payment could not be started. Please contact support — do not place the order again.",
+      );
+      return;
+    }
+
+    toast.error("Checkout failed. Please try again.");
+  };
+
+  const handleOffsitePaymentRedirect = async (redirectUrl: string) => {
+    markRedirectPending();
+    toast.success("Redirecting to payment gateway...");
+    // Delay so the toast can paint before the document unloads.
+    setTimeout(() => {
+      window.location.assign(redirectUrl);
+    }, 1000);
   };
 
   const uploadBankSlip = async (file: File, checkoutDetails: PaymentDetailsWithoutUrls) => {
@@ -1308,7 +1338,7 @@ const CheckoutPage = () => {
               // Disable the Confirm button while the checkout mutation, the
               // address push OR the shipping recalculation is in flight, so
               // the user can't submit at a stale total.
-              loading={loading || totalsRecalculating}
+              loading={loading || totalsRecalculating || redirecting}
               orderTotalLabel={orderTotalLabel}
             />
           </div>
