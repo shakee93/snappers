@@ -30,6 +30,7 @@ import {
     Truck,
     Zap,
     CreditCard,
+    Banknote,
     Landmark,
     Check,
     ChevronRight,
@@ -1047,13 +1048,12 @@ const UnifiedCheckoutForm = ({
                 };
             case "cod":
                 return {
-                    title: gateway.title || "Cash on delivery: Powered by Citypak",
-                    subtitle: "Powered by Citypak",
-                    icon: (
-                        <div className="w-8 h-5 flex items-center justify-center">
-                            <Image src="/citypak.png" alt="citypak" width={40} height={20} />
-                        </div>
-                    ),
+                    title:
+                        gateway.title
+                            ?.replace(/[\s:()–—-]*powered by citypak\)?\.?/i, "")
+                            .trim() || "Cash on delivery",
+                    subtitle: "",
+                    icon: <Banknote className="w-5 h-5" strokeWidth={1.75} />,
                     trailing: null,
                 };
             case "darazbnpl": {
