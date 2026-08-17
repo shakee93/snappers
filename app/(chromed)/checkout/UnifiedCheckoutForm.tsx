@@ -691,6 +691,7 @@ const AddressFields = memo(({ idPrefix, values, onChange, nameOnly = false }: Ad
             aria-labelledby={`${idPrefix}-tab-pin`}
         >
             <PinLocationMap
+                idPrefix={idPrefix}
                 addressQuery={addressQuery}
                 pin={pin}
                 onApply={handleApplyPin}

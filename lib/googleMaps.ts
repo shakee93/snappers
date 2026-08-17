@@ -64,8 +64,9 @@ export function loadGoogleMaps(): Promise<MapsNamespace> {
       key: GOOGLE_MAPS_API_KEY,
       callback: CALLBACK_NAME,
       loading: "async",
-      // `marker` supplies AdvancedMarkerElement, the draggable pin.
-      libraries: "marker",
+      // `marker` supplies AdvancedMarkerElement (the draggable pin);
+      // `places` supplies the address search box's autocomplete.
+      libraries: "marker,places",
       // Bias geocoding to Sri Lanka so ambiguous place names resolve locally.
       region: "LK",
       language: "en",

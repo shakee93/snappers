@@ -16,6 +16,7 @@ import {
     resolvePinAddress,
     type ResolvedPinAddress,
 } from "@/lib/checkoutGeocode";
+import PlaceSearchField from "./PlaceSearchField";
 
 export interface PinCoordinates {
     lat: number;
@@ -23,6 +24,8 @@ export interface PinCoordinates {
 }
 
 interface PinLocationMapProps {
+    /** Namespaces element ids, so billing and shipping maps never collide. */
+    idPrefix: string;
     /**
      * The address as typed on the sibling tab, used once to place the pin.
      * Empty when nothing usable has been entered yet.
@@ -94,7 +97,12 @@ const isSameCoordinate = (a: PinCoordinates | null, b: PinCoordinates) =>
     Math.abs(a.lat - b.lat) < COORDINATE_EPSILON &&
     Math.abs(a.lng - b.lng) < COORDINATE_EPSILON;
 
-const PinLocationMap = ({ addressQuery, pin, onApply }: PinLocationMapProps) => {
+const PinLocationMap = ({
+    idPrefix,
+    addressQuery,
+    pin,
+    onApply,
+}: PinLocationMapProps) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const mapRef = useRef<google.maps.Map | null>(null);
     const markerRef = useRef<google.maps.marker.AdvancedMarkerElement | null>(null);
@@ -317,6 +325,21 @@ const PinLocationMap = ({ addressQuery, pin, onApply }: PinLocationMapProps) => 
         movePin(fix);
     }, [movePin]);
 
+    /** Stable across map moves, so panning never re-renders the search field. */
+    const getLocationBias = useCallback(
+        () => mapRef.current?.getBounds() ?? null,
+        [],
+    );
+
+    const handleSearchSelect = useCallback(
+        (coordinates: PinCoordinates) => {
+            mapRef.current?.panTo(coordinates);
+            mapRef.current?.setZoom(LOCATED_MAP_ZOOM);
+            movePin(coordinates);
+        },
+        [movePin],
+    );
+
     const handleApply = useCallback(() => {
         if (!resolved || !positionRef.current) return;
         onApply(resolved, positionRef.current);
@@ -342,6 +365,16 @@ const PinLocationMap = ({ addressQuery, pin, onApply }: PinLocationMapProps) => 
                     <div className="absolute inset-0 flex items-center justify-center gap-2 bg-slate-100 text-sm text-slate-500 dark:bg-slate-800 dark:text-slate-400">
                         <Loader className="h-4 w-4 animate-spin" strokeWidth={2} />
                         Loading map…
+                    </div>
+                )}
+
+                {status === "ready" && (
+                    <div className="absolute inset-x-3 top-3">
+                        <PlaceSearchField
+                            id={`${idPrefix}-place-search`}
+                            getLocationBias={getLocationBias}
+                            onSelect={handleSearchSelect}
+                        />
                     </div>
                 )}
 
