@@ -184,6 +184,43 @@ const EMPTY_ADDRESS: AddressFieldValues = {
     longitude: null,
 };
 
+/** Fields that describe *where* the parcel goes, as opposed to who receives it. */
+const LOCATION_FIELDS = ["address", "city", "state", "postal"] as const;
+
+/**
+ * Merges an address patch, dropping any map pin the edit has invalidated.
+ *
+ * Once the customer types a different street, city, province or postcode, the
+ * coordinates they pinned earlier describe somewhere else — handing the driver
+ * a pin that disagrees with the address is worse than handing them none. So a
+ * real change to any location field clears the pin, which also means reopening
+ * the Pin tab re-finds the newly typed address instead of restoring the old
+ * position.
+ *
+ * Two things deliberately do not clear it: a patch that carries coordinates
+ * (that *is* the pin being applied, along with the address it resolved to),
+ * and a patch that re-sends a field's existing value — the city combobox
+ * commits on every blur, and a mere focus-and-leave must not drop the pin.
+ */
+const mergeAddressPatch = (
+    prev: AddressFieldValues,
+    patch: Partial<AddressFieldValues>,
+): AddressFieldValues => {
+    const next = { ...prev, ...patch };
+
+    const isPinApply = patch.latitude !== undefined;
+    const changesLocation = LOCATION_FIELDS.some(
+        (field) => patch[field] !== undefined && patch[field] !== prev[field],
+    );
+
+    if (!isPinApply && changesLocation) {
+        next.latitude = null;
+        next.longitude = null;
+    }
+
+    return next;
+};
+
 // Postal is validated against the same pattern the address sync quotes on,
 // so the stepper can't report "details done" for an address WooCommerce was
 // never able to price. Matches the `pattern` on the postal input.
@@ -907,13 +944,13 @@ const UnifiedCheckoutForm = ({
         ) {
             immediateAddressSyncRef.current = true;
         }
-        setBillingAddress((prev) => ({ ...prev, ...patch }));
+        setBillingAddress((prev) => mergeAddressPatch(prev, patch));
     }, [shippingDifferent]);
     const handleShippingChange = useCallback((patch: Partial<AddressFieldValues>) => {
         if (patch.city !== undefined && patch.postal !== undefined) {
             immediateAddressSyncRef.current = true;
         }
-        setShippingAddress((prev) => ({ ...prev, ...patch }));
+        setShippingAddress((prev) => mergeAddressPatch(prev, patch));
     }, []);
 
     // Payment Method State
