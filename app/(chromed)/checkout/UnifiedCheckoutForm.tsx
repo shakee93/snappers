@@ -1049,9 +1049,10 @@ const UnifiedCheckoutForm = ({
             case "cod":
                 return {
                     title:
-                        gateway.title?.replace(/:\s*Powered by Citypak/i, "").trim() ||
-                        "Cash on delivery",
-                    subtitle: "Pay with cash upon delivery",
+                        gateway.title
+                            ?.replace(/[\s:()–—-]*powered by citypak\)?\.?/i, "")
+                            .trim() || "Cash on delivery",
+                    subtitle: "",
                     icon: <Banknote className="w-5 h-5" strokeWidth={1.75} />,
                     trailing: null,
                 };
