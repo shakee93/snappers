@@ -44,11 +44,17 @@ const CartDropdownItem = ({ item, close, wrapperClassName }: CartDropdownItemPro
   // @ts-ignore
   const {
     name,
-    image,
     price,
     type,
     regularPrice,
   }: SimpleProduct & VariableProduct = product?.node;
+
+  const imageUrl =
+    product?.node?.type === "VARIABLE"
+      ? variation?.node?.image?.sourceUrl ?? null
+      : product?.node?.image?.sourceUrl ??
+        product?.node?.image?.mediaItemUrl ??
+        null;
 
   const { maxQty } = getCartLineStockCap(item);
   const maxQtyProp = maxQty ?? undefined;
@@ -102,16 +108,15 @@ const CartDropdownItem = ({ item, close, wrapperClassName }: CartDropdownItemPro
       )}
 
       <div className="relative h-24 w-20 flex-shrink-0 overflow-hidden rounded-xl bg-slate-100">
-        <Image
-          fill
-          style={{ objectFit: "cover" }}
-          layout="fill"
-          src={product.node.type === "VARIABLE"
-            ? variation?.node.image?.sourceUrl || ""
-            : product.node.image?.sourceUrl || product.node.image?.mediaItemUrl || ""}
-          alt={name || ""}
-          className="h-full w-full object-contain object-center"
-        />
+        {imageUrl ? (
+          <Image
+            fill
+            style={{ objectFit: "cover" }}
+            src={imageUrl}
+            alt={name || "Product"}
+            className="h-full w-full object-contain object-center"
+          />
+        ) : null}
         <Link onClick={close} className="absolute inset-0" href={link} />
       </div>
 

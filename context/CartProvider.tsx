@@ -5,6 +5,13 @@ import { ApolloError, useLazyQuery, useMutation } from '@apollo/client';
 import { ADD_TO_CART, GET_CART, REMOVE_ITEMS_FROM_CART, UPDATE_CART_ITEM_QUANTITY } from "@/graphql/defs/cart";
 import { Cart, Customer } from "@/graphql/types/graphql";
 import { toast } from "sonner";
+import {
+    AUTH_INVALIDATED_EVENT,
+    AUTH_TOKEN_KEY,
+    REFRESH_TOKEN_KEY,
+    SESSION_TOKEN_KEY,
+    USER_DATA_KEY,
+} from "@/utils/storage-keys";
 
 
 type CartSession = {
@@ -234,6 +241,39 @@ export function CartProvider({ children }: {
         ) || false;
     };
 
+    const isInternalServerError = (error: unknown) => {
+        const err = error as {
+            message?: string;
+            networkError?: { statusCode?: number };
+            graphQLErrors?: Array<{ message?: string; extensions?: { code?: string; message?: string } }>;
+        };
+
+        return (
+            err?.networkError?.statusCode === 500 ||
+            err?.message?.includes("Internal server error") ||
+            err?.message?.includes("500") ||
+            err?.graphQLErrors?.some((graphQLError) =>
+                graphQLError?.extensions?.code === "INTERNAL_SERVER_ERROR" ||
+                graphQLError?.message?.includes("Internal server error") ||
+                graphQLError?.extensions?.message?.includes("Internal server error")
+            ) ||
+            false
+        );
+    };
+
+    const clearStoredSessionState = (preserveAuth: boolean) => {
+        localStorage.removeItem(SESSION_TOKEN_KEY);
+        localStorage.removeItem(USER_DATA_KEY);
+
+        if (!preserveAuth) {
+            localStorage.removeItem(AUTH_TOKEN_KEY);
+            localStorage.removeItem(REFRESH_TOKEN_KEY);
+            window.dispatchEvent(new Event(AUTH_INVALIDATED_EVENT));
+        }
+
+        setCustomer(null);
+    };
+
     // Helper function to check if cart has pre-order products
     const cartHasPreOrderProducts = () => {
         if (!cart?.contents?.nodes) return false;
@@ -282,6 +322,38 @@ export function CartProvider({ children }: {
             return data
         } catch (error: any) {
             console.error('Add to cart error:', error);
+
+            if (isInternalServerError(error) && typeof window !== "undefined") {
+                const hasSessionToken = !!localStorage.getItem(SESSION_TOKEN_KEY);
+                const hasAuthToken = !!localStorage.getItem(AUTH_TOKEN_KEY);
+
+                if (hasSessionToken || hasAuthToken) {
+                    const preserveAuth = !!customer && customer.id !== "guest" && hasAuthToken;
+                    console.warn(
+                        `Add to cart failed with a stale ${preserveAuth ? "session" : "session/auth"} token. Retrying once.`
+                    );
+
+                    clearStoredSessionState(preserveAuth);
+
+                    try {
+                        const retry = await _addToCart({
+                            variables: {
+                                productId: id,
+                                quantity: quantity,
+                                variationId: variation
+                            },
+                        });
+
+                        if (retry?.data?.addToCart?.cartItem) {
+                            setIsCartOpen(true)
+                        }
+
+                        return retry;
+                    } catch (retryError) {
+                        console.error("Add to cart retry failed:", retryError);
+                    }
+                }
+            }
 
             // Handle GraphQL errors
             if (error.graphQLErrors && error.graphQLErrors.length > 0) {
