@@ -9,6 +9,7 @@ import { GET_BROWSE_SECTION_PRODUCTS } from "@/graphql/defs/products";
 import ProductCard, {
   type ProductCardItem,
 } from "@/components/home/ProductCard";
+import ProductCardLoading from "@/components/global/primitives/Loading/ProductCardLoading";
 import {
   BROWSE_ALL_TAB_FEATURE_IMAGE,
   BROWSE_CATEGORY_TAB_FETCH_BATCH,
@@ -82,13 +83,7 @@ const buildInitialTabCaches = (
   return caches;
 };
 
-const productSkeleton = (key: string) => (
-  <div
-    key={key}
-    aria-hidden
-    className="aspect-[3/4] animate-pulse rounded-xl bg-neutral-100"
-  />
-);
+const productSkeleton = (key: string) => <ProductCardLoading key={key} />;
 
 interface BrowseFeatureBannerProps {
   src: string;

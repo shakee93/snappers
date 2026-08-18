@@ -1,4 +1,5 @@
 import ArchiveLayout from "@/components/global/primitives/archive/ArchiveLayout";
+import ArchiveLoading from "@/components/global/primitives/archive/ArchiveLoading";
 import { getClient } from "@/graphql/apollo-ssr";
 import { GET_TAG_DETAILS_BY_SLUG } from "@/graphql/defs/products";
 import { Metadata, ResolvingMetadata } from "next";
@@ -41,7 +42,7 @@ export default async function Page(props: { params: Promise<{ tag: string }> }) 
   const fallbackTitle = tag ? humanizeSlug(tag) : "Custom Collection";
 
   return (
-    <Suspense>
+    <Suspense fallback={<ArchiveLoading />}>
       <ArchiveLayout
         title={fallbackTitle}
         filters

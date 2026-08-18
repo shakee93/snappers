@@ -1,3 +1,4 @@
+import { ARCHIVE_PRODUCT_GRID_CLASS_NAME } from "@/components/global/primitives/Loading/ProductCardLoading";
 import ProductCard from "@/components/home/ProductCard";
 import { getClient } from "@/graphql/apollo-ssr";
 import {
@@ -42,7 +43,7 @@ const ProductGridGraphQL = async ({
   }
 
   return (
-    <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-3 lg:gap-6">
+    <div className={ARCHIVE_PRODUCT_GRID_CLASS_NAME}>
       {products.map((product) => (
         <ProductCard key={product.id} product={product} />
       ))}

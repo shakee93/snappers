@@ -4,6 +4,7 @@ import { Brand, ProductCategory } from "@/graphql/types/graphql";
 import { useStore } from "@/store/store";
 import { Suspense, useEffect, useState } from "react";
 import { twMerge } from "tailwind-merge";
+import { ProductCardsSkeleton, INSTANT_SEARCH_PRODUCT_GRID_CLASS_NAME } from "@/components/global/primitives/Loading/ProductCardLoading";
 import AttributeMappingsInitializer from "@/components/global/primitives/AttributeMappingsInitializer";
 
 interface SearchBarProps {
@@ -43,7 +44,7 @@ const HeaderSearchResults = ({ brands, productCategories }: SearchBarProps) => {
         search.length > 0 ? 'fixed' : 'hidden'
     )}>
         <div className='container mx-auto'>
-            <Suspense fallback={'loading...'}>
+            <Suspense fallback={<ProductCardsSkeleton count={8} className={INSTANT_SEARCH_PRODUCT_GRID_CLASS_NAME} />}>
                 <AttributeMappingsInitializer />
                 <InstantSearchWrapper
                     filters

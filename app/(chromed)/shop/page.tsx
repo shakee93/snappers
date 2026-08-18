@@ -1,4 +1,5 @@
 import ArchiveLayout from "@/components/global/primitives/archive/ArchiveLayout";
+import ArchiveLoading from "@/components/global/primitives/archive/ArchiveLoading";
 import { Metadata } from "next";
 import { Suspense } from "react";
 import { siteConfig } from "@/site.config";
@@ -12,7 +13,7 @@ export const metadata: Metadata = {
 
 const Page = () => {
   return (
-    <Suspense>
+    <Suspense fallback={<ArchiveLoading />}>
       <ArchiveLayout title="All Products" filters />
     </Suspense>
   );

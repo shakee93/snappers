@@ -14,7 +14,10 @@ import { useHits, useInstantSearch } from "react-instantsearch";
 import Pagination from "@/shared/Pagination/Pagination";
 import Image from "next/image";
 import NotFound from "@/public/not_found.svg";
-import ProductCardLoading from "@/components/global/primitives/Loading/ProductCardLoading";
+import {
+  INSTANT_SEARCH_PRODUCT_GRID_CLASS_NAME,
+  ProductCardsSkeleton,
+} from "@/components/global/primitives/Loading/ProductCardLoading";
 import FilterSelect from "@/components/global/primitives/Filters/FilterSelect";
 import { filterHiddenProducts } from "@/lib/hidden-products";
 import { getDatabaseIdFromProductLike } from "@/lib/bogo";
@@ -100,8 +103,6 @@ const ProductGridInstant = ({
     return filtered.filter((hit) => resolveProductSale(hit as SaleResolvableProduct) !== null);
   }, [hits, sidebar.on_sale]);
 
-  const grid = 8;
-
   // useEffect(() => {
   //     setSearchStatus(statusState)
   // }, [statusState])
@@ -128,14 +129,12 @@ const ProductGridInstant = ({
   // 'loading'/'stalled' on cache reads and widget churn even without a real
   // network round-trip; unmounting the grid for those transitions causes a
   // visible flicker. Only show the skeleton on the very first load.
-  const desktopGridClass = "lg:grid-cols-3";
   const showSkeleton = visibleHits.length === 0 && (statusState === 'stalled' || statusState === 'loading');
 
   return (
     <>
-      <div className='h-[185px] md:h-60 bottom-3 right-3 hidden'></div>
       {visibleHits.length > 0 && (
-        <div className={`flex-1 grid grid-cols-2 md:grid-cols-3 ${desktopGridClass} gap-x-2 gap-y-2 lg:gap-x-3 lg:gap-y-4`}>
+        <div className={INSTANT_SEARCH_PRODUCT_GRID_CLASS_NAME}>
           {visibleHits.map((item, index) => (
             <ProductCard
               key={getProductHitKey(item, index)}
@@ -147,11 +146,10 @@ const ProductGridInstant = ({
       )}
 
       {showSkeleton && (
-        <div className={`flex-1 grid grid-cols-2 ${desktopGridClass} gap-x-2 gap-y-2 lg:gap-x-8 lg:gap-y-10`}>
-          {Array(grid).fill(null).map((x, index) =>
-            <ProductCardLoading key={index} />
-          )}
-        </div>
+        <ProductCardsSkeleton
+          count={12}
+          className={INSTANT_SEARCH_PRODUCT_GRID_CLASS_NAME}
+        />
       )}
 
       {(visibleHits.length === 0 && statusState === 'idle') && (
