@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Loader, ArrowRight, ShoppingCart } from "lucide-react";
+import { ImageIcon, Loader, ArrowRight, ShoppingCart } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import koko from "@/public/koko.png";
@@ -45,7 +45,14 @@ const formatLkr = (value: number) =>
     maximumFractionDigits: 2,
   });
 
-export const resolveDisplayPrice = (product: ProductCardItem): string | null => {
+interface ResolvedDisplayPricing {
+  price: string | null;
+  regularPrice: string | null;
+}
+
+export const resolveDisplayPricing = (
+  product: ProductCardItem,
+): ResolvedDisplayPricing => {
   const { type, price, regularPrice, variations } = product;
 
   if (type === "VARIABLE" && variations?.nodes?.length) {
@@ -61,14 +68,26 @@ export const resolveDisplayPrice = (product: ProductCardItem): string | null => 
       const lowest = priced.reduce((prev, curr) =>
         parsePriceString(curr.price) < parsePriceString(prev.price) ? curr : prev,
       );
-      return lowest.price ?? null;
+      return {
+        price: lowest.price ?? null,
+        regularPrice: lowest.regularPrice ?? null,
+      };
     }
 
-    return price ?? regularPrice ?? null;
+    return {
+      price: price ?? regularPrice ?? null,
+      regularPrice: regularPrice ?? null,
+    };
   }
 
-  return price ?? regularPrice ?? null;
+  return {
+    price: price ?? regularPrice ?? null,
+    regularPrice: regularPrice ?? null,
+  };
 };
+
+export const resolveDisplayPrice = (product: ProductCardItem): string | null =>
+  resolveDisplayPricing(product).price;
 
 const ProductCard = ({
   product,
@@ -85,12 +104,18 @@ const ProductCard = ({
   const { name, image, stockStatus, type, rawPrice, purchasable } = product;
   const productDbId = getDatabaseIdFromProductLike(product) ?? product.databaseId;
 
+  const sale = useMemo(() => resolveProductSale(product), [product]);
+
   // Explicit label wins (Deals/Health); otherwise show the on-sale discount.
   const badge = useMemo(() => {
     if (badgeLabel) return badgeLabel;
-    const sale = resolveProductSale(product);
     return sale ? `${sale.roundedPercent}% OFF!` : null;
-  }, [badgeLabel, product]);
+  }, [badgeLabel, sale]);
+
+  const saleBadge = useMemo(() => {
+    if (!badgeLabel || !sale) return null;
+    return `${sale.roundedPercent}% OFF!`;
+  }, [badgeLabel, sale]);
 
   const isPreOrder = useMemo(
     () =>
@@ -100,11 +125,17 @@ const ProductCard = ({
     [product.productTags?.nodes],
   );
 
-  const displayPrice = useMemo(() => resolveDisplayPrice(product), [product]);
+  const displayPricing = useMemo(() => resolveDisplayPricing(product), [product]);
+  const displayPrice = displayPricing.price;
 
   const numericPrice = useMemo(
     () => parsePriceString(displayPrice),
     [displayPrice],
+  );
+
+  const regularNumericPrice = useMemo(
+    () => parsePriceString(displayPricing.regularPrice),
+    [displayPricing.regularPrice],
   );
 
   const kokoInstallment = useMemo(() => {
@@ -177,10 +208,10 @@ const ProductCard = ({
     <div
       className={`relative flex h-full flex-col overflow-hidden rounded-xl border border-neutral-200 bg-white ${className}`}
     >
-      <div className="relative">
+      <div className="relative w-full shrink-0">
         <Link
           href={link || "#"}
-          className="relative block aspect-square bg-[#FAFAFA]"
+          className="relative block w-full bg-[#FAFAFA] pt-[100%]"
         >
           {isOutOfStock ? (
             <span className="absolute left-2.5 top-2.5 z-10 rounded-md bg-neutral-700 px-2.5 py-1 text-[11px] font-bold leading-none text-white sm:px-3 sm:text-xs">
@@ -188,12 +219,21 @@ const ProductCard = ({
             </span>
           ) : (
             badge && (
-              <span
-                style={{ backgroundColor: accentColor }}
-                className="absolute left-2.5 top-2.5 z-10 rounded-md px-2.5 py-1 text-[11px] font-bold leading-none text-black sm:px-3 sm:text-xs"
-              >
-                {badge}
-              </span>
+              <div className="absolute left-2.5 top-2.5 z-10 flex flex-col gap-1">
+                <span
+                  style={{ backgroundColor: accentColor }}
+                  className="rounded-md px-2.5 py-1 text-[11px] font-bold leading-none text-center text-black sm:px-3 sm:text-sm"
+                >
+                  {badge}
+                </span>
+                {saleBadge && (
+                  <span
+                    className="self-stretch rounded-md bg-[#F5B289] px-2.5 py-1 text-center text-xs font-bold leading-none text-neutral-900 sm:px-3 sm:text-sm"
+                  >
+                    {saleBadge}
+                  </span>
+                )}
+              </div>
             )
           )}
 
@@ -201,15 +241,25 @@ const ProductCard = ({
             <Image
               src={imageUrl}
               alt={name ?? "Product"}
-              width={400}
-              height={400}
+              fill
               sizes="(max-width: 640px) 45vw, 20vw"
-              className={`aspect-square w-full object-cover ${
+              className={`object-cover ${
                 isOutOfStock ? "opacity-50" : ""
               }`}
             />
           ) : (
-            <div className="aspect-square w-full bg-neutral-200/60" aria-hidden />
+            <div
+              className={`absolute inset-0 flex items-center justify-center bg-neutral-100 ${
+                isOutOfStock ? "opacity-50" : ""
+              }`}
+              aria-label={name ? `${name} — no image available` : "No product image available"}
+            >
+              <ImageIcon
+                className="h-16 w-16 text-neutral-400 sm:h-20 sm:w-20"
+                strokeWidth={1.25}
+                aria-hidden
+              />
+            </div>
           )}
         </Link>
 
@@ -228,9 +278,16 @@ const ProductCard = ({
         </Link>
 
         {numericPrice > 0 && (
-          <p className="mt-2 text-left text-lg font-bold leading-none text-neutral-900 sm:text-xl">
-            LKR {formatLkr(numericPrice)}
-          </p>
+          <div className="mt-2 flex flex-wrap items-end gap-2 text-left">
+            <p className="text-lg font-bold leading-none text-neutral-900 sm:text-xl">
+              LKR {formatLkr(numericPrice)}
+            </p>
+            {regularNumericPrice > numericPrice && (
+              <p className="text-sm font-medium leading-none text-neutral-400 line-through sm:text-base">
+                LKR {formatLkr(regularNumericPrice)}
+              </p>
+            )}
+          </div>
         )}
 
         {numericPrice > 0 && (
