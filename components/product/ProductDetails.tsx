@@ -38,6 +38,7 @@ import {
 import { siteConfig } from "@/site.config";
 import { toDisplayCurrency } from "@/lib/formatPrice";
 import { pdpRadius } from "@/components/product/pdpStyles";
+import { parsePriceString, resolveProductSale } from "@/lib/productSale";
 import {
   findVariationByOption,
   isVariationOptionSelected,
@@ -445,6 +446,24 @@ const ProductDetails = ({
     return !!product.salePrice && product.salePrice !== product.regularPrice;
   }, [product, displayVariation]);
 
+  const saleBadge = useMemo(() => {
+    if (product.type === "VARIABLE" && displayVariation) {
+      const regular = parsePriceString(displayVariation.regularPrice);
+      const sale = parsePriceString(
+        displayVariation.salePrice ?? displayVariation.price,
+      );
+      if (regular > 0 && sale > 0 && sale < regular) {
+        const roundedPercent =
+          Math.round((((regular - sale) / regular) * 100) / 5) * 5;
+        return roundedPercent > 0 ? `${roundedPercent}% OFF!` : null;
+      }
+      return null;
+    }
+
+    const resolvedSale = resolveProductSale(product);
+    return resolvedSale ? `${resolvedSale.roundedPercent}% OFF!` : null;
+  }, [product, displayVariation]);
+
   const isInStock = useMemo(() => {
     if (product.type === "VARIABLE") {
       if (!displayVariation) return false;
@@ -452,6 +471,13 @@ const ProductDetails = ({
     }
     return (simpleStockStatus ?? product.stockStatus) === "IN_STOCK";
   }, [product, displayVariation, resolveVariationStockStatus, simpleStockStatus]);
+
+  const stockCount = useMemo(() => {
+    if (product.type === "VARIABLE") {
+      return displayVariation?.stockQuantity ?? null;
+    }
+    return product.stockQuantity ?? null;
+  }, [product, displayVariation]);
 
   const shortDescriptionText = useMemo(() => {
     if (!product.shortDescription) return "";
@@ -474,7 +500,16 @@ const ProductDetails = ({
             brand={brand}
             imageClassName="h-10 w-auto max-w-[220px] object-contain object-left"
           />
-          <ProductShareControls product={product} className="w-auto shrink-0" />
+          <div className="flex items-center gap-2">
+            {saleBadge && (
+              <span
+                className={`rounded-md bg-[#F5B289] px-3 py-1.5 text-sm font-bold leading-none text-neutral-900 ${pdpRadius}`}
+              >
+                {saleBadge}
+              </span>
+            )}
+            <ProductShareControls product={product} className="w-auto shrink-0" />
+          </div>
         </div>
 
         <h1 className="text-[26px] font-bold leading-snug text-[#38461F] sm:text-[28px]">
@@ -618,7 +653,14 @@ const ProductDetails = ({
                 className="h-2 w-2 shrink-0 rounded-full bg-[#2DC014] animate-pulse"
                 aria-hidden
               />
-              In Stock
+              {stockCount != null && stockCount > 0 ? (
+                <>
+                  <span>In Stock </span>
+                  <span className="text-[#38461F]">({stockCount})</span>
+                </>
+              ) : (
+                "In Stock"
+              )}
             </p>
           ) : (
             <p className="flex items-center gap-2 text-sm font-medium text-[#DC2626]">
