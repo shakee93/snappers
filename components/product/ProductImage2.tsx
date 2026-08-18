@@ -9,7 +9,7 @@ import {
 } from "@/components/product/SingleProductBlock/ProductCarouselThumb";
 import { EmblaOptionsType } from "embla-carousel";
 import useEmblaCarousel from "embla-carousel-react";
-import { ChevronLeft, ChevronRight, Expand } from "lucide-react";
+import { ChevronLeft, ChevronRight, Expand, ImageIcon } from "lucide-react";
 import Image from "next/image";
 import React, { useCallback, useEffect, useState } from "react";
 import dynamic from "next/dynamic";
@@ -28,6 +28,20 @@ type PropType = {
 type selectedVariationType = {
   sourceUrl: string;
   databaseId: any;
+};
+
+type GalleryImage = {
+  sourceUrl?: string | null;
+  databaseId?: number | null;
+};
+
+const hasRenderableGalleryImages = (images: unknown): boolean => {
+  if (!Array.isArray(images)) return false;
+
+  return images.some((image) => {
+    if (!image || typeof image !== "object") return false;
+    return Boolean((image as GalleryImage).sourceUrl);
+  });
 };
 
 const EmblaCarousel: React.FC<PropType> = ({ product }) => {
@@ -167,49 +181,79 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
     };
   }, [emblaMainApi, onSelect]);
 
+  const showGallery = hasRenderableGalleryImages(galleryImages);
+
   return (
     <div className="embla w-full" id="product-image">
       <div className="relative">
         <div
           className={`embla__viewport border border-[#0000001A] bg-white ${pdpRadius}`}
-          ref={emblaMainRef}
+          ref={showGallery ? emblaMainRef : undefined}
         >
-          <div className="embla__container ">
-            {galleryImages?.map((variation: any, index: number) => (
+          <div className="embla__container">
+            {showGallery ? (
+              galleryImages?.map((variation, index: number) => {
+                const sourceUrl = (variation as GalleryImage | null)?.sourceUrl;
+                if (!sourceUrl) return null;
+
+                return (
+                  <div
+                    className="embla__slide"
+                    key={index}
+                    onClick={() => {
+                      setLightboxIndex(index);
+                      setLightboxOpen(true);
+                    }}
+                  >
+                    <div className="relative aspect-square w-full overflow-hidden">
+                      <Image
+                        fetchPriority={index === 0 ? "high" : undefined}
+                        loading={index === 0 ? "eager" : "lazy"}
+                        className="image h-full w-full object-cover transition-transform duration-300"
+                        alt={product.name ?? "Product"}
+                        width={1000}
+                        height={1000}
+                        src={sourceUrl}
+                      />
+                    </div>
+                  </div>
+                );
+              })
+            ) : (
               <div
                 className="embla__slide"
-                key={index}
-                onClick={() => {
-                  setLightboxIndex(index);
-                  setLightboxOpen(true);
-                }}
+                aria-label={
+                  product.name
+                    ? `${product.name} — no image available`
+                    : "No product image available"
+                }
               >
-                <div className="relative aspect-square w-full overflow-hidden">
-                  <Image
-                    fetchPriority={index === 0 ? "high" : undefined}
-                    loading={index === 0 ? "eager" : "lazy"}
-                    className="image h-full w-full object-cover transition-transform duration-300"
-                    alt=""
-                    width={1000}
-                    height={1000}
-                    src={variation?.sourceUrl || ""}
-                  />
+                <div className="relative w-full pt-[100%]">
+                  <div className="absolute inset-0 flex items-center justify-center bg-neutral-100">
+                    <ImageIcon
+                      className="h-20 w-20 text-neutral-400 sm:h-24 sm:w-24"
+                      strokeWidth={1.25}
+                      aria-hidden
+                    />
+                  </div>
                 </div>
               </div>
-            ))}
+            )}
           </div>
         </div>
-        <button
-          onClick={() => {
-            setLightboxIndex(selectedIndex);
-            setLightboxOpen(true);
-          }}
-          className={`absolute top-3 left-3 z-10 bg-white/80 hover:bg-white p-2 shadow-md transition-colors ${pdpRadius}`}
-          aria-label="View fullscreen"
-        >
-          <Expand className="w-5 h-5 text-gray-700" />
-        </button>
-        {canScrollPrev && (
+        {showGallery && (
+          <button
+            onClick={() => {
+              setLightboxIndex(selectedIndex);
+              setLightboxOpen(true);
+            }}
+            className={`absolute top-3 left-3 z-10 bg-white/80 hover:bg-white p-2 shadow-md transition-colors ${pdpRadius}`}
+            aria-label="View fullscreen"
+          >
+            <Expand className="w-5 h-5 text-gray-700" />
+          </button>
+        )}
+        {showGallery && canScrollPrev && (
           <button
             onClick={() => emblaMainApi?.scrollPrev()}
             className="absolute left-2 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white rounded-full p-2 shadow-md transition-colors"
@@ -218,7 +262,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
             <ChevronLeft className="w-5 h-5 text-gray-700" />
           </button>
         )}
-        {canScrollNext && (
+        {showGallery && canScrollNext && (
           <button
             onClick={() => emblaMainApi?.scrollNext()}
             className="absolute right-2 top-1/2 -translate-y-1/2 z-10 bg-white/80 hover:bg-white rounded-full p-2 shadow-md transition-colors"
@@ -229,23 +273,30 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
         )}
       </div>
 
-      <div className="embla-thumbs">
-        <div className="embla-thumbs__viewport " ref={emblaThumbsRef}>
-          <div className="embla-thumbs__container" >
-            {galleryImages?.map((variation: any, index: number) => (
-              <Thumb
-                onClick={() => onThumbClickCalculated(index)}
-                selected={index === selectedIndex}
-                index={index}
-                imgSrc={variation?.sourceUrl || ""}
-                key={index}
-              />
-            ))}
+      {showGallery && (
+        <div className="embla-thumbs">
+          <div className="embla-thumbs__viewport " ref={emblaThumbsRef}>
+            <div className="embla-thumbs__container" >
+              {galleryImages?.map((variation, index: number) => {
+                const sourceUrl = (variation as GalleryImage | null)?.sourceUrl;
+                if (!sourceUrl) return null;
+
+                return (
+                  <Thumb
+                    onClick={() => onThumbClickCalculated(index)}
+                    selected={index === selectedIndex}
+                    index={index}
+                    imgSrc={sourceUrl}
+                    key={index}
+                  />
+                );
+              })}
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
-      {lightboxOpen && galleryImages && (
+      {showGallery && lightboxOpen && galleryImages && (
         <ProductLightbox
           images={galleryImages}
           initialIndex={lightboxIndex}
