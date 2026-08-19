@@ -28,6 +28,7 @@ interface CheckoutLeftProps {
   onTOCChange: () => void;
   tocError: boolean;
   loading: boolean;
+  ratesRecalculating: boolean;
   orderTotalLabel: string;
 }
 
@@ -46,6 +47,7 @@ const CheckoutDetails = ({
   onTOCChange,
   tocError,
   loading,
+  ratesRecalculating,
   orderTotalLabel,
 }: CheckoutLeftProps) => {
 
@@ -94,6 +96,7 @@ const CheckoutDetails = ({
         onTOCChange={onTOCChange}
         tocError={tocError}
         loading={loading}
+        ratesRecalculating={ratesRecalculating}
         orderTotalLabel={orderTotalLabel}
       />
     </div>

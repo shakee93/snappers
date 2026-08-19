@@ -35,9 +35,16 @@ export function formatOrderDate(date: string) {
   });
 }
 
+/**
+ * Our own delivery fleet. WooCommerce quotes it per address (distance-based),
+ * so this is only the fallback title for when no quoted label is available.
+ */
+export const CATLITTER_DELIVERY_TITLE = "CatLitter Delivery";
+
 export const DELIVERY_TYPE_LABELS: Record<string, string> = {
   store_pickup: "Store Pickup",
   flash_delivery: "Flash Delivery (Uber/PickMe)",
+  catlitter_delivery: CATLITTER_DELIVERY_TITLE,
 };
 
 type ShippingLineLabelSource = {

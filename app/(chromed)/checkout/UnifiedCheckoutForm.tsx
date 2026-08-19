@@ -21,12 +21,17 @@ import { useCart } from "@/context/CartProvider";
 import checkoutCopy from "@/content/checkout-copy.json";
 import { formatPrice } from "@/lib/formatPrice";
 import { PAYHERE_HIDE_THRESHOLD } from "@/lib/checkoutMath";
+import {
+    resolveCatlitterDeliveryRate,
+    type DeliveryType,
+} from "@/lib/checkoutShipping";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonBrand from "shared/Button/ButtonBrand";
 import PreOrderNotice from "@/components/global/ui/PreOrderNotice";
 import { SRI_LANKAN_CITIES, type SriLankanCity } from "@/data/sriLankanCities";
 import { SRI_LANKAN_PROVINCES, type SriLankanProvince } from "@/data/sriLankanProvinces";
 import {
+    Bike,
     Store,
     Truck,
     Zap,
@@ -61,7 +66,12 @@ const FEATURED_BANK_ACCOUNT =
     siteConfig.payment.bankAccounts.find((a) => a.featuredAtCheckout) ??
     siteConfig.payment.bankAccounts[0];
 
-export type DeliveryType = "courier" | "store_pickup" | "flash_delivery";
+const PAY_ON_DELIVERY_GATEWAY_IDS =
+    siteConfig.payment.payOnDeliveryGatewayIds as readonly string[];
+const OWN_FLEET_ONLY_GATEWAY_IDS =
+    siteConfig.payment.ownFleetOnlyGatewayIds as readonly string[];
+
+export type { DeliveryType };
 
 export interface CheckoutAddressPayload {
     firstName: string;
@@ -237,7 +247,6 @@ interface AddressFieldsProps {
     idPrefix: string;
     values: AddressFieldValues;
     onChange: (patch: Partial<AddressFieldValues>) => void;
-    nameOnly?: boolean;
 }
 
 interface CitySelectFieldProps {
@@ -599,7 +608,7 @@ const AddressTabBar = memo(({ idPrefix, value, onChange, hasPin }: AddressTabBar
 });
 AddressTabBar.displayName = "AddressTabBar";
 
-const AddressFields = memo(({ idPrefix, values, onChange, nameOnly = false }: AddressFieldsProps) => {
+const AddressFields = memo(({ idPrefix, values, onChange }: AddressFieldsProps) => {
     const [activeTab, setActiveTab] = useState<AddressTab>("address");
 
     const pin = useMemo<PinCoordinates | null>(
@@ -684,8 +693,6 @@ const AddressFields = memo(({ idPrefix, values, onChange, nameOnly = false }: Ad
             </div>
         </div>
 
-        {nameOnly ? null : (
-        <>
         <AddressTabBar
             idPrefix={idPrefix}
             value={activeTab}
@@ -798,8 +805,6 @@ const AddressFields = memo(({ idPrefix, values, onChange, nameOnly = false }: Ad
         </div>
         </div>
         )}
-        </>
-        )}
     </>
     );
 });
@@ -814,6 +819,11 @@ interface DeliveryOptionProps {
     subtitle: string;
     chip?: { label: string; tone: "emerald" | "blue" };
     trailing?: React.ReactNode;
+    /**
+     * Held while the cart re-quotes — for any reason, not only an address
+     * change — because switching mid-flight races the in-flight totals.
+     */
+    disabled?: boolean;
 }
 
 const CHIP_TONES = {
@@ -830,12 +840,20 @@ const DeliveryOption = ({
     subtitle,
     chip,
     trailing,
+    disabled = false,
 }: DeliveryOptionProps) => (
     <label
-        className={`group flex items-center gap-4 w-full p-4 rounded-xl border-2 cursor-pointer transition-colors ${
+        aria-disabled={disabled || undefined}
+        className={`group flex items-center gap-4 w-full p-4 rounded-xl border-2 transition-colors ${
+            disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"
+        } ${
             selected
                 ? "border-primary-500 bg-primary-50/60 dark:bg-primary-900/20"
-                : "border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/40 hover:border-slate-300 hover:bg-slate-100 dark:hover:border-slate-600"
+                : `border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/40 ${
+                      disabled
+                          ? ""
+                          : "hover:border-slate-300 hover:bg-slate-100 dark:hover:border-slate-600"
+                  }`
         }`}
     >
         <input
@@ -843,6 +861,7 @@ const DeliveryOption = ({
             name="pickup"
             value={value}
             checked={selected}
+            disabled={disabled}
             onChange={() => onSelect(value)}
             className="sr-only"
         />
@@ -907,6 +926,7 @@ interface Props {
     onTOCChange: () => void;
     tocError: boolean;
     loading: boolean;
+    ratesRecalculating: boolean;
     orderTotalLabel: string;
 }
 
@@ -928,6 +948,7 @@ const UnifiedCheckoutForm = ({
     onTOCChange,
     tocError,
     loading,
+    ratesRecalculating,
     orderTotalLabel,
 }: Props) => {
     // Contact Info State
@@ -976,16 +997,52 @@ const UnifiedCheckoutForm = ({
 
     const { cart } = useCart();
 
-    const courierShippingLabel = useMemo(() => {
-        const rates = cart?.availableShippingMethods?.[0]?.rates;
-        const flat = rates?.find(
-            (r) => r?.methodId === "flat_rate" || /flat rate|courier/i.test(r?.label || "")
-        );
-        const cost = flat?.cost ?? rates?.[0]?.cost;
-        const numeric = typeof cost === "string" ? parseFloat(cost) : Number(cost);
-        if (!Number.isFinite(numeric) || numeric <= 0) return null;
-        return formatPrice(numeric, { decimals: 0 });
-    }, [cart]);
+    // Courier and CatLitter Delivery are two answers to the same question, and
+    // WooCommerce has already decided it for the address the customer entered:
+    // inside our radius it quotes (and forces) the distance rate, outside it
+    // quotes only the island-wide courier one. Offering both would invite a
+    // choice the store overrides and reprices behind the customer's back, so
+    // show whichever is actually quoted and hide the other.
+    //
+    // Neither shows an amount — the order summary is the one place the
+    // shipping charge is quoted. This resolves to null while the option is
+    // unconfigured, which is what keeps it hidden on a store without it.
+    const catlitterRate = useMemo(
+        () => resolveCatlitterDeliveryRate(cart),
+        [cart],
+    );
+    const showCatlitterDelivery = !!catlitterRate;
+    const showCourierDelivery = !catlitterRate;
+
+    // Editing the address can pull the selected option out from under the
+    // customer — a Colombo address swaps Courier for CatLitter Delivery and
+    // vice versa. Move the selection onto the option that survived so the
+    // section is never left with nothing selected, and say why, since the
+    // shipping total changes with it.
+    const [overrideNotice, setOverrideNotice] = useState<DeliveryType | null>(null);
+
+    // Never mid-quote: until the address push lands the cart still holds the
+    // previous address's rates, and switching on those would announce a change
+    // we'd have to undo a moment later.
+    const strandedOn = ratesRecalculating
+        ? null
+        : (deliveryType === "courier" && !showCourierDelivery && "catlitter_delivery") ||
+          (deliveryType === "catlitter_delivery" && !showCatlitterDelivery && "courier") ||
+          null;
+
+    useEffect(() => {
+        if (!strandedOn) return;
+        setDeliveryType(strandedOn);
+        setOverrideNotice(strandedOn);
+    }, [strandedOn, setDeliveryType]);
+
+    // The customer picking an option themselves is an acknowledgement — drop a
+    // stale notice rather than leaving it to describe a choice they've moved on
+    // from. Store Pickup and Flash Delivery clear it too.
+    const handlePickupTypeChange = (type: DeliveryType) => {
+        setOverrideNotice(null);
+        setDeliveryType(type);
+    };
 
     const handleBankSlipChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const fileList = event.target.files;
@@ -1034,28 +1091,26 @@ const UnifiedCheckoutForm = ({
     // WooCommerce quotes shipping against the customer's stored address, so
     // the totals on this page are only correct once the address the customer
     // typed has been pushed to it. Report every address edit upward; the page
-    // debounces and dedupes. Store pickup has no destination, so there is
-    // nothing to quote.
+    // debounces and dedupes.
+    //
+    // This no longer waits on a delivery selection: the address is collected
+    // first now, and which delivery options exist at all is decided by the
+    // rates WooCommerce quotes for it. Gating the push on deliveryType would
+    // mean the options could never appear.
     const addressSnapshot = useMemo<CheckoutAddressSnapshot | null>(() => {
-        if (!deliveryType || deliveryType === "store_pickup") return null;
-
         const billing = transformAddress({ ...billingAddress, country: "LK" });
         const shipping = shippingDifferent
             ? transformAddress({ ...shippingAddress, country: "LK" })
             : billing;
 
         return { billing, shipping, shippingSameAsBilling: !shippingDifferent };
-    }, [deliveryType, shippingDifferent, billingAddress, shippingAddress]);
+    }, [shippingDifferent, billingAddress, shippingAddress]);
 
     useEffect(() => {
         const immediate = immediateAddressSyncRef.current;
         immediateAddressSyncRef.current = false;
         onAddressChange(addressSnapshot, immediate ? { immediate: true } : undefined);
     }, [addressSnapshot, onAddressChange]);
-
-    const handlePickupTypeChange = (type: DeliveryType) => {
-        setDeliveryType(type);
-    };
 
     const removePayhereOnMobileAndTab = () => {
         try {
@@ -1139,16 +1194,34 @@ const UnifiedCheckoutForm = ({
             ) {
                 return false;
             }
+            if (
+                OWN_FLEET_ONLY_GATEWAY_IDS.includes(gateway.id ?? "") &&
+                deliveryType !== "catlitter_delivery"
+            ) {
+                return false;
+            }
             return true;
         });
-    }, [paymentGateways, isPreOrderCart, isPriceFluctuation, totalPayment, cart]);
+    }, [
+        paymentGateways,
+        isPreOrderCart,
+        isPriceFluctuation,
+        totalPayment,
+        cart,
+        deliveryType,
+    ]);
 
     // Gateways that should appear but be greyed-out for the current delivery
-    // method. Cash on Delivery needs a delivery to collect the cash at: the
-    // Flash Delivery driver doesn't collect on our behalf, and Store Pickup has
-    // no delivery leg at all.
+    // method. Cash on Delivery needs a delivery to collect at: the Flash
+    // Delivery driver doesn't collect on our behalf, and Store Pickup has no
+    // delivery leg at all. Greying out rather than hiding is deliberate here —
+    // the reason doubles as the instruction ("pay online instead").
+    //
+    // Card on Delivery is not handled here: it is filtered out of
+    // visiblePaymentGateways entirely, because "switch delivery method" is not
+    // an instruction that belongs on a payment row.
     const gatewayDisabledReason = (gatewayId: string): string | null => {
-        if (gatewayId !== "cod") return null;
+        if (!PAY_ON_DELIVERY_GATEWAY_IDS.includes(gatewayId)) return null;
         if (deliveryType === "flash_delivery") {
             return "Not available with Flash Delivery — pay online instead";
         }
@@ -1171,18 +1244,31 @@ const UnifiedCheckoutForm = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps -- gatewayDisabledReason depends on deliveryType which is already in deps
     }, [visiblePaymentGateways, selectedGateway.id, deliveryType, setIsKokoPayment, onPaymentMethodChange]);
 
-    // If the currently-selected gateway becomes disabled (e.g. user picks COD
-    // then switches to Flash Delivery), clear it so the form can't submit
-    // through an option the user can no longer see as available.
+    // Clear a selection the customer can no longer act on, so the form can't
+    // submit through a gateway that is off the page.
+    //
+    // Keyed on whether the row is still selectable, not on
+    // gatewayDisabledReason: a gateway can leave in two ways, and that function
+    // only reports one of them. Card on Delivery is *hidden* off our own fleet
+    // rather than greyed out, so checking the reason alone missed it — picking
+    // it under CatLitter Delivery and then editing the address out of range
+    // auto-switched delivery to Courier, dropped the row, and left `cheque`
+    // selected and submittable on a courier shipment no rider can take a card
+    // for. Membership of visiblePaymentGateways covers hidden and disabled both.
+    const selectableGatewayIds = visiblePaymentGateways
+        .filter((gw) => !gatewayDisabledReason(gw.id ?? ""))
+        .map((gw) => gw.id)
+        .join(",");
+
     useEffect(() => {
         if (!selectedGateway.id) return;
-        if (!gatewayDisabledReason(selectedGateway.id)) return;
+        if (selectableGatewayIds.split(",").includes(selectedGateway.id)) return;
         setSelectedGateway({ id: "", title: null });
         setMethodActive("");
         setIsKokoPayment(false);
         onPaymentMethodChange("");
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [deliveryType, selectedGateway.id, onPaymentMethodChange]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- setters are stable
+    }, [selectableGatewayIds, selectedGateway.id, onPaymentMethodChange]);
 
     const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -1202,19 +1288,12 @@ const UnifiedCheckoutForm = ({
             return;
         }
 
-        if (
-            deliveryType !== "store_pickup" &&
-            !isAddressComplete(billingAddress)
-        ) {
+        if (!isAddressComplete(billingAddress)) {
             toast.error("Please complete the billing address.");
             return;
         }
 
-        if (
-            shippingDifferent &&
-            deliveryType !== "store_pickup" &&
-            !isAddressComplete(shippingAddress)
-        ) {
+        if (shippingDifferent && !isAddressComplete(shippingAddress)) {
             toast.error("Please complete the shipping address.");
             return;
         }
@@ -1533,14 +1612,11 @@ const UnifiedCheckoutForm = ({
 
     const contactDone = /^[0-9]{9,12}$/.test(phone) && /.+@.+\..+/.test(email);
     const nameDone = !!billingAddress.firstName && !!billingAddress.lastName;
-    const useSeparateShipping =
-        shippingDifferent && deliveryType !== "store_pickup";
     const deliveryDone =
         deliveryType !== null &&
         nameDone &&
-        (deliveryType === "store_pickup" ||
-            (isAddressComplete(billingAddress) &&
-                (!useSeparateShipping || isAddressComplete(shippingAddress))));
+        isAddressComplete(billingAddress) &&
+        (!shippingDifferent || isAddressComplete(shippingAddress));
     const detailsDone = contactDone && deliveryDone;
     const paymentDone =
         !!selectedGateway.id &&
@@ -1599,29 +1675,86 @@ const UnifiedCheckoutForm = ({
                 </div>
             </div>
 
+            {/* Address Section — billing, plus a separate shipping address when
+                the customer asks for one. Sits ahead of the delivery method:
+                which methods exist at all depends on what WooCommerce quotes
+                for this address. */}
+            <div>
+                <div className="p-0">
+                    <h3 className="text-lg font-semibold mb-4">Billing address</h3>
+
+                    <div className="space-y-4">
+                        <AddressFields
+                            idPrefix="checkout"
+                            values={billingAddress}
+                            onChange={handleBillingChange}
+                        />
+
+                        <Checkbox
+                            name="shipping-different"
+                            label="Shipping address different from billing address"
+                            checked={shippingDifferent}
+                            onChange={setShippingDifferent}
+                        />
+
+                        {shippingDifferent && (
+                            <div className="pt-4 space-y-4 border-t border-slate-200 dark:border-slate-700">
+                                <h4 className="text-base font-semibold text-slate-900 dark:text-slate-100">
+                                    Shipping address
+                                </h4>
+                                <AddressFields
+                                    idPrefix="ship"
+                                    values={shippingAddress}
+                                    onChange={handleShippingChange}
+                                />
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+
             {/* Delivery Method Section */}
             <div>
                 <div className="p-0">
-                    <h3 className="text-lg font-semibold mb-4">Delivery Method</h3>
+                    <h3 className="text-lg font-semibold mb-4 flex flex-wrap items-center gap-x-2 gap-y-1">
+                        Delivery Method
+                        {ratesRecalculating && (
+                            <span className="inline-flex items-center gap-1.5 text-xs font-normal text-slate-500 dark:text-slate-400">
+                                <Loader className="w-3.5 h-3.5 animate-spin" aria-hidden="true" />
+                                Updating…
+                            </span>
+                        )}
+                    </h3>
 
-                    <div className="space-y-3">
-                        <DeliveryOption
-                            value="courier"
-                            selected={deliveryType === "courier"}
-                            onSelect={handlePickupTypeChange}
-                            icon={<Truck className="w-5 h-5" strokeWidth={1.75} />}
-                            title="Courier delivery"
-                            subtitle="Island-wide delivery in 2–3 business working days"
-                            trailing={courierShippingLabel ? (
-                                <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
-                                    {courierShippingLabel}
-                                </span>
-                            ) : null}
-                        />
+                    <div className="space-y-3" aria-busy={ratesRecalculating}>
+                        {showCatlitterDelivery && (
+                            <DeliveryOption
+                                value="catlitter_delivery"
+                                selected={deliveryType === "catlitter_delivery"}
+                                onSelect={handlePickupTypeChange}
+                                disabled={ratesRecalculating}
+                                icon={<Bike className="w-5 h-5" strokeWidth={1.75} />}
+                                title="CatLitter Delivery"
+                                subtitle={checkoutCopy.catlitterDeliverySubtitle}
+                                chip={{ label: checkoutCopy.catlitterDeliveryChipLabel, tone: "emerald" }}
+                            />
+                        )}
+                        {showCourierDelivery && (
+                            <DeliveryOption
+                                value="courier"
+                                selected={deliveryType === "courier"}
+                                onSelect={handlePickupTypeChange}
+                                disabled={ratesRecalculating}
+                                icon={<Truck className="w-5 h-5" strokeWidth={1.75} />}
+                                title="Courier delivery"
+                                subtitle="Island-wide delivery in 2–3 business working days"
+                            />
+                        )}
                         <DeliveryOption
                             value="store_pickup"
                             selected={deliveryType === "store_pickup"}
                             onSelect={handlePickupTypeChange}
+                            disabled={ratesRecalculating}
                             icon={<Store className="w-5 h-5" strokeWidth={1.75} />}
                             title="Store Pickup"
                             subtitle="Ready during working hours"
@@ -1636,6 +1769,7 @@ const UnifiedCheckoutForm = ({
                             value="flash_delivery"
                             selected={deliveryType === "flash_delivery"}
                             onSelect={handlePickupTypeChange}
+                            disabled={ratesRecalculating}
                             icon={<Zap className="w-5 h-5" strokeWidth={1.75} />}
                             title="Flash Delivery"
                             subtitle="You arrange Uber / PickMe pickup"
@@ -1656,53 +1790,21 @@ const UnifiedCheckoutForm = ({
                         </div>
                     )}
 
-                    {deliveryType && (
-                    <div className="mt-6 space-y-4">
-                        {deliveryType === "store_pickup" ? (
-                            <>
-                                <AddressFields
-                                    idPrefix="checkout"
-                                    values={billingAddress}
-                                    onChange={handleBillingChange}
-                                    nameOnly
-                                />
-                                <p className="text-sm text-slate-600 dark:text-slate-400">
-                                    {checkoutCopy.storePickupNote}
-                                </p>
-                            </>
-                        ) : (
-                            <>
-                                <h4 className="text-base font-semibold text-slate-900 dark:text-slate-100">
-                                    Billing address
-                                </h4>
-                                <AddressFields
-                                    idPrefix="checkout"
-                                    values={billingAddress}
-                                    onChange={handleBillingChange}
-                                />
+                    {overrideNotice && (
+                        <p
+                            role="alert"
+                            className="mt-3 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200"
+                        >
+                            {overrideNotice === "catlitter_delivery"
+                                ? checkoutCopy.switchedToCatlitterDeliveryNote
+                                : checkoutCopy.switchedToCourierDeliveryNote}
+                        </p>
+                    )}
 
-                                <Checkbox
-                                    name="shipping-different"
-                                    label="Shipping address different from billing address"
-                                    checked={shippingDifferent}
-                                    onChange={setShippingDifferent}
-                                />
-
-                                {shippingDifferent && (
-                                    <div className="pt-4 space-y-4 border-t border-slate-200 dark:border-slate-700">
-                                        <h4 className="text-base font-semibold text-slate-900 dark:text-slate-100">
-                                            Shipping address
-                                        </h4>
-                                        <AddressFields
-                                            idPrefix="ship"
-                                            values={shippingAddress}
-                                            onChange={handleShippingChange}
-                                        />
-                                    </div>
-                                )}
-                            </>
-                        )}
-                    </div>
+                    {deliveryType === "store_pickup" && (
+                        <p className="mt-4 text-sm text-slate-600 dark:text-slate-400">
+                            {checkoutCopy.storePickupNote}
+                        </p>
                     )}
                 </div>
             </div>
