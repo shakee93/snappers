@@ -2,6 +2,9 @@
   "pickupChipLabel": "Instant Pickup · Colombo",
   "flashDeliveryChipLabel": "~1hr Instant Delivery",
   "storePickupNote": "Visit Catlitter to collect your order.",
+  "catlitterDeliveryChipLabel": "Our own riders",
+  "catlitterDeliverySubtitle": "Delivered by our team · within 15km range",
+  "catlitterDeliveryUnavailableNote": "CatLitter Delivery doesn't reach this address yet. Choose Courier delivery or Store Pickup instead.",
   "webxpay": {
     "title": "Pay online",
     "subtitle": "Visa, Mastercard & digital wallets"

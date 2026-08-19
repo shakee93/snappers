@@ -9,6 +9,10 @@ import { GET_CART } from "@/graphql/defs/cart";
 import { useShipping } from "@/hooks/useShipping";
 import { useCheckoutAddressSync } from "@/hooks/useCheckoutAddressSync";
 import { buildPinMetaData } from "@/lib/checkoutPinMeta";
+import {
+  resolveCatlitterDeliveryRate,
+  resolveCourierRate,
+} from "@/lib/checkoutShipping";
 import { useCheckoutPaymentSync } from "@/hooks/useCheckoutPaymentSync";
 import { useCheckout } from "@/hooks/useCheckout";
 import {
@@ -42,52 +46,17 @@ import Image from "next/image";
 import { siteConfig } from "@/site.config";
 import { formatPrice, currencySymbol } from "@/lib/formatPrice";
 import { apiUrl } from "@/lib/api";
-import { enrichCheckoutOrderStorage } from "@/components/account/accountOrderUtils";
+import {
+  CATLITTER_DELIVERY_TITLE,
+  enrichCheckoutOrderStorage,
+} from "@/components/account/accountOrderUtils";
 
-// Methods that represent "customer collects", never a courier rate.
-const PICKUP_METHOD_IDS = new Set(["pickup_location", "local_pickup"]);
 const COUPON_RESTRICTED_GATEWAY_IDS =
   siteConfig.payment.couponRestrictedGatewayIds as readonly string[];
+const PAY_ON_DELIVERY_GATEWAY_IDS =
+  siteConfig.payment.payOnDeliveryGatewayIds as readonly string[];
 
 import { RecalculatingAmount } from "@/components/global/ui/RecalculatingAmount";
-
-/**
- * The courier rate is not a constant on this store. Its id *and* its label
- * change with the destination — the distance/weight method quotes
- * `dwbs:1:distance` "Local Delivery" inside the Colombo zone and
- * `dwbs:1:weight` "Standard Shipping" outstation — so a hard-coded id is
- * rejected outright ("… is not an available shipping method for shipping
- * package …") and the cart silently keeps the rate quoted for the previous
- * address. Read it off the rates WooCommerce returned for the address it
- * currently holds instead.
- *
- * Assumes WC quotes a single package (`availableShippingMethods[0]`) with a
- * single courier rate among the non-pickup options; if a zone ever offers
- * multiple courier choices the customer silently gets `courierRates[0]`
- * (whatever WC ordered first) and never sees a picker.
- */
-const parseRateCost = (cost: string | number | null | undefined): number => {
-  if (typeof cost === "number") return cost;
-  if (typeof cost !== "string") return NaN;
-  return parseFloat(cost.replace(/₨|&nbsp;|,|[^0-9.]/g, ""));
-};
-
-const resolveCourierRate = (cart: Cart | null | undefined, preferFree: boolean) => {
-  const rates = cart?.availableShippingMethods?.[0]?.rates ?? [];
-  const courierRates = rates.filter(
-    (rate): rate is NonNullable<typeof rate> =>
-      !!rate?.id && !PICKUP_METHOD_IDS.has(rate.methodId ?? ""),
-  );
-
-  if (preferFree) {
-    const free = courierRates.find(
-      (rate) => rate.methodId === "free_shipping" || parseRateCost(rate.cost) === 0,
-    );
-    if (free) return free;
-  }
-
-  return courierRates[0] ?? null;
-};
 
 const cartHasFreeShippingCoupon = (source: Cart | null | undefined) =>
   !!source?.appliedCoupons?.some((coupon) => coupon?.code === "free-shipping");
@@ -286,18 +255,23 @@ const CheckoutPage = () => {
       // Mirror the mapping in getShippingMethod: store_pickup uses the
       // block-based pickup_location, flash_delivery uses the zone-bound
       // flat_rate:4 (free, configured backend-side as "Flash Delivery
-      // (Uber/PickMe)"). Courier falls through to whichever rate the store
-      // quoted for the current address — see resolveCourierRate.
+      // (Uber/PickMe)"). CatLitter Delivery and courier both fall through to
+      // whichever rate the store quoted for the current address — see
+      // resolveCatlitterDeliveryRate / resolveCourierRate.
       const shippingMethods =
         deliveryType === "flash_delivery"
           ? "flat_rate:4"
           : deliveryType === "store_pickup"
             ? "pickup_location:0"
-            : resolveCourierRate(rateSource, preferFree)?.id;
+            : deliveryType === "catlitter_delivery"
+              ? resolveCatlitterDeliveryRate(rateSource)?.id
+              : resolveCourierRate(rateSource, preferFree)?.id;
 
-      // No courier rate means the address doesn't resolve to a serviceable
-      // zone yet. Selecting nothing is correct — the cart keeps whatever WC
-      // last quoted, and the summary is already showing that.
+      // No rate means the address doesn't resolve to a serviceable zone yet
+      // (or, for CatLitter Delivery, falls outside our own delivery reach).
+      // Selecting nothing is correct — the cart keeps whatever WC last quoted,
+      // and the summary is already showing that. The form blocks submission
+      // separately so the customer can't order through an unquoted method.
       if (!shippingMethods) {
         return;
       }
@@ -440,9 +414,13 @@ const CheckoutPage = () => {
       return;
     }
 
-    const isCashOnDelivery =
-      formData?.paymentMethod?.selectedGateway?.id == "cod";
-    // const isKokoPayment = formData?.paymentMethod?.selectedGateway?.id == "darazbnpl";
+    // Every pay-on-delivery gateway lands here, not just Cash on Delivery.
+    // Gating this on `cod` alone left Card on Delivery (`cheque`) creating the
+    // order and clearing the cart but never navigating — the customer sat on
+    // the checkout form with no confirmation.
+    const isPayOnDelivery = PAY_ON_DELIVERY_GATEWAY_IDS.includes(
+      formData?.paymentMethod?.selectedGateway?.id ?? "",
+    );
 
     let checkoutDetails = paymentDetails;
 
@@ -472,7 +450,7 @@ const CheckoutPage = () => {
       city: city,
     };
 
-    if (isCashOnDelivery) {
+    if (isPayOnDelivery) {
       if (
         customer?.id === "guest" ||
         checkoutDetails.order_id == "guest_checkout"
@@ -822,20 +800,24 @@ const CheckoutPage = () => {
     // both resolve to a free shipping line — and flat_rate keeps the
     // title verbatim so order admin shows "Flash Delivery (Uber/PickMe)"
     // instead of the pickup_location plugin's "<title> (<location>)" template.
-    // Courier: same dynamic rate as the cart-side lookup. Falling back to the
-    // configured constant keeps the order writable if the cart somehow has no
-    // rates to read, but the resolved id is what the store actually quoted.
+    // CatLitter Delivery / courier: same dynamic rates as the cart-side
+    // lookup. Falling back to the configured constant keeps the order writable
+    // if the cart somehow has no rates to read, but the resolved id is what
+    // the store actually quoted.
     const courierRate = resolveCourierRate(cart, preferFreeShipping);
+    const catlitterRate = resolveCatlitterDeliveryRate(cart);
 
     const methodId =
       orderDeliveryType === "flash_delivery"
         ? "flat_rate:4"
         : orderDeliveryType === "store_pickup"
           ? "pickup_location:0"
-          : courierRate?.id ??
-            (preferFreeShipping
-              ? siteConfig.shipping.freeShippingMethodId
-              : siteConfig.shipping.weightBasedShippingMethodId);
+          : orderDeliveryType === "catlitter_delivery"
+            ? catlitterRate?.id ?? siteConfig.shipping.catlitterDeliveryMethodId
+            : courierRate?.id ??
+              (preferFreeShipping
+                ? siteConfig.shipping.freeShippingMethodId
+                : siteConfig.shipping.weightBasedShippingMethodId);
 
     // methodTitle is the display string for the order summary; for
     // flat_rate WC writes the zone-config title, for pickup_location WC
@@ -847,8 +829,10 @@ const CheckoutPage = () => {
       ? "Store Pickup"
       : orderDeliveryType === "flash_delivery"
         ? "Flash Delivery (Uber/PickMe)"
-        : courierRate?.label ??
-          (preferFreeShipping ? "Free Shipping" : "Weight Based Shipping");
+        : orderDeliveryType === "catlitter_delivery"
+          ? catlitterRate?.label ?? CATLITTER_DELIVERY_TITLE
+          : courierRate?.label ??
+            (preferFreeShipping ? "Free Shipping" : "Weight Based Shipping");
 
     const total = noCharge ? "0" : shippingTotal;
 
@@ -1071,12 +1055,16 @@ const CheckoutPage = () => {
   // The courier's name changes with the destination — WC quotes "Local
   // Delivery" inside the Colombo distance zone and "Standard Shipping"
   // outstation — so name the service the customer is paying for instead of a
-  // generic estimate line. Falls back to the generic wording while the cart
-  // has no quote yet.
+  // generic estimate line. CatLitter Delivery is quoted per address too, so it
+  // reads its own rate rather than the courier one. Falls back to the generic
+  // wording while the cart has no quote yet.
   const shippingRateLabel = useMemo(() => {
     if (preferFreeShipping) return "Free Shipping";
+    if (deliveryType === "catlitter_delivery") {
+      return resolveCatlitterDeliveryRate(cart)?.label || CATLITTER_DELIVERY_TITLE;
+    }
     return resolveCourierRate(cart, preferFreeShipping)?.label || "Shipping estimate";
-  }, [cart, preferFreeShipping]);
+  }, [cart, deliveryType, preferFreeShipping]);
 
   const isPreOrderProduct = (product: any) => {
     const tags = product?.productTags?.nodes || [];
@@ -1367,6 +1355,10 @@ const CheckoutPage = () => {
               // address push OR the shipping recalculation is in flight, so
               // the user can't submit at a stale total.
               loading={loading || totalsRecalculating || redirecting}
+              // Separate from `loading`: the delivery options must not call a
+              // rate unavailable while the address push that would quote it is
+              // still in flight.
+              ratesRecalculating={totalsRecalculating}
               orderTotalLabel={orderTotalLabel}
             />
           </div>

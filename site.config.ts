@@ -190,8 +190,15 @@ export const siteConfig = {
       "https://www.google.com/search?q=catlitter.lk&newwindow=1&sca_esv=47fdd52eba661d26&rlz=1C5CHFA_enLK1163LK1163&biw=1710&bih=985&sxsrf=APpeQnt9vKUXvlC8bmdZEbb-YhBaKGCIKw%3A1782983829933&ei=lSxGasnAOM6wwcsPpsKluQI&ved=0ahUKEwiJ38qu1LOVAxVOWHADHSZhKScQ4dUDCBI&uact=5&oq=catlitter.lk&gs_lp=Egxnd3Mtd2l6LXNlcnAiDGNhdGxpdHRlci5sazIEECMYJzILEC4YrwEYxwEYgAQyBRAAGIAEMgUQABiABDIEEAAYHjIEEAAYHjICECZI4AdQyARY0AVwAXgBkAEAmAGRAaAB6wGqAQMxLjG4AQPIAQD4AQGYAgKgAmnCAgoQABhHGNYEGLADmAMAiAYBkAYIkgcDMS4xoAffE7IHAzAuMbgHZcIHBzAuMS4wLjHIBwuACAE&sclient=gws-wiz-serp#",
   },
   payment: {
-    gatewayOrder: ["payhere", "ndb-pay", "cod", "darazbnpl", "bacs"],
+    gatewayOrder: ["payhere", "ndb-pay", "cod", "cheque", "darazbnpl", "bacs"],
     kokoGatewayId: "darazbnpl",
+    // Gateways the customer settles on delivery rather than online. They take
+    // no payment step during checkout, so the order is confirmed in-app and
+    // the customer goes straight to the thank-you page — and they all need a
+    // delivery leg to collect at, so Store Pickup / Flash Delivery disable them.
+    // "cheque" is WooCommerce's built-in cheque gateway, retitled "Card on
+    // Delivery" in wp-admin; the id stays `cheque`.
+    payOnDeliveryGatewayIds: ["cod", "cheque"] as const,
     // Gateways that quote the shared Visa/Mastercard tier in woo-price-tiers.
     cardGatewayIds: ["payhere", "webxpay", "ndb-pay", "geniebiz"] as const,
     // Gateways whose checkout mutation returns a pay URL we should follow.
@@ -247,6 +254,20 @@ export const siteConfig = {
   shipping: {
     freeShippingMethodId: "wbs:5c9bd062_free_shipping",
     weightBasedShippingMethodId: "wbs:0dd3bc79_weight_based_shipping",
+    /**
+     * CatLitter Delivery — our own fleet, priced by distance server-side.
+     *
+     * Set this to the rate id of the instance configured under WooCommerce >
+     * Settings > Shipping > Sri Lanka. A `<methodId>:<instanceId>` prefix is
+     * enough for the distance/weight plugin, which quotes one instance under
+     * two sub-modes (`dwbs:2:distance` / `dwbs:2:weight`); a fixed method such
+     * as `flat_rate:5` is matched exactly.
+     *
+     * Empty string keeps the delivery option hidden. Leave it empty until the
+     * WooCommerce method exists — offering a rate the store cannot quote makes
+     * `updateShippingMethod` fail and leaves the cart on a stale rate.
+     */
+    catlitterDeliveryMethodId: "",
   },
   analytics: {
     googleAnalyticsId: "G-LS3EVR93ZH",

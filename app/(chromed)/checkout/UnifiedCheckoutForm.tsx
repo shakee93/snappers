@@ -21,12 +21,19 @@ import { useCart } from "@/context/CartProvider";
 import checkoutCopy from "@/content/checkout-copy.json";
 import { formatPrice } from "@/lib/formatPrice";
 import { PAYHERE_HIDE_THRESHOLD } from "@/lib/checkoutMath";
+import {
+    CATLITTER_DELIVERY_ENABLED,
+    parseRateCost,
+    resolveCatlitterDeliveryRate,
+    resolveCourierRate,
+} from "@/lib/checkoutShipping";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonBrand from "shared/Button/ButtonBrand";
 import PreOrderNotice from "@/components/global/ui/PreOrderNotice";
 import { SRI_LANKAN_CITIES, type SriLankanCity } from "@/data/sriLankanCities";
 import { SRI_LANKAN_PROVINCES, type SriLankanProvince } from "@/data/sriLankanProvinces";
 import {
+    Bike,
     Store,
     Truck,
     Zap,
@@ -61,7 +68,14 @@ const FEATURED_BANK_ACCOUNT =
     siteConfig.payment.bankAccounts.find((a) => a.featuredAtCheckout) ??
     siteConfig.payment.bankAccounts[0];
 
-export type DeliveryType = "courier" | "store_pickup" | "flash_delivery";
+const PAY_ON_DELIVERY_GATEWAY_IDS =
+    siteConfig.payment.payOnDeliveryGatewayIds as readonly string[];
+
+export type DeliveryType =
+    | "courier"
+    | "catlitter_delivery"
+    | "store_pickup"
+    | "flash_delivery";
 
 export interface CheckoutAddressPayload {
     firstName: string;
@@ -220,6 +234,14 @@ const mergeAddressPatch = (
     }
 
     return next;
+};
+
+// Rate costs arrive from WooCommerce as bare numeric strings ("350"). A rate
+// that is missing, unparseable, or free carries no chip.
+const formatRateChip = (cost: string | number | null | undefined) => {
+    const numeric = parseRateCost(cost);
+    if (!Number.isFinite(numeric) || numeric <= 0) return null;
+    return formatPrice(numeric, { decimals: 0 });
 };
 
 // Postal is validated against the same pattern the address sync quotes on,
@@ -907,6 +929,7 @@ interface Props {
     onTOCChange: () => void;
     tocError: boolean;
     loading: boolean;
+    ratesRecalculating: boolean;
     orderTotalLabel: string;
 }
 
@@ -928,6 +951,7 @@ const UnifiedCheckoutForm = ({
     onTOCChange,
     tocError,
     loading,
+    ratesRecalculating,
     orderTotalLabel,
 }: Props) => {
     // Contact Info State
@@ -976,16 +1000,37 @@ const UnifiedCheckoutForm = ({
 
     const { cart } = useCart();
 
-    const courierShippingLabel = useMemo(() => {
-        const rates = cart?.availableShippingMethods?.[0]?.rates;
-        const flat = rates?.find(
-            (r) => r?.methodId === "flat_rate" || /flat rate|courier/i.test(r?.label || "")
-        );
-        const cost = flat?.cost ?? rates?.[0]?.cost;
-        const numeric = typeof cost === "string" ? parseFloat(cost) : Number(cost);
-        if (!Number.isFinite(numeric) || numeric <= 0) return null;
-        return formatPrice(numeric, { decimals: 0 });
-    }, [cart]);
+    // Price chips on the delivery options. These read the same resolvers the
+    // order summary and the shipping mutation use, so the figure shown on an
+    // option is the figure the customer is charged.
+    const courierShippingLabel = useMemo(
+        () => formatRateChip(resolveCourierRate(cart, false)?.cost),
+        [cart],
+    );
+
+    // Null both before any address has been quoted and when the destination
+    // falls outside our fleet's reach. `catlitterUnavailable` below separates
+    // the two so the form only warns once WooCommerce has had a complete
+    // address to price against.
+    const catlitterRate = useMemo(
+        () => (CATLITTER_DELIVERY_ENABLED ? resolveCatlitterDeliveryRate(cart) : null),
+        [cart],
+    );
+    const catlitterShippingLabel = useMemo(
+        () => formatRateChip(catlitterRate?.cost),
+        [catlitterRate],
+    );
+
+    // Our fleet covers a limited radius, so a perfectly valid address can still
+    // fall outside it — WooCommerce then quotes the courier rate but not ours.
+    // Only call it unavailable once the destination is complete and no address
+    // push or recalculation is in flight; before that an absent rate only means
+    // WooCommerce has not been asked yet.
+    const catlitterUnavailable =
+        deliveryType === "catlitter_delivery" &&
+        !catlitterRate &&
+        !ratesRecalculating &&
+        isAddressComplete(shippingDifferent ? shippingAddress : billingAddress);
 
     const handleBankSlipChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const fileList = event.target.files;
@@ -1144,11 +1189,13 @@ const UnifiedCheckoutForm = ({
     }, [paymentGateways, isPreOrderCart, isPriceFluctuation, totalPayment, cart]);
 
     // Gateways that should appear but be greyed-out for the current delivery
-    // method. Cash on Delivery needs a delivery to collect the cash at: the
-    // Flash Delivery driver doesn't collect on our behalf, and Store Pickup has
-    // no delivery leg at all.
+    // method. Pay-on-delivery gateways (Cash on Delivery, Card on Delivery)
+    // need a delivery to collect at: the Flash Delivery driver doesn't collect
+    // on our behalf, and Store Pickup has no delivery leg at all. Courier and
+    // CatLitter Delivery are both our own collection points, so every gateway
+    // stays enabled for them.
     const gatewayDisabledReason = (gatewayId: string): string | null => {
-        if (gatewayId !== "cod") return null;
+        if (!PAY_ON_DELIVERY_GATEWAY_IDS.includes(gatewayId)) return null;
         if (deliveryType === "flash_delivery") {
             return "Not available with Flash Delivery — pay online instead";
         }
@@ -1216,6 +1263,17 @@ const UnifiedCheckoutForm = ({
             !isAddressComplete(shippingAddress)
         ) {
             toast.error("Please complete the shipping address.");
+            return;
+        }
+
+        // Submitting here would send an order with no shipping method applied
+        // — updateShippingMethod has nothing to select, so the cart keeps
+        // whatever rate it last held and the customer is billed for a delivery
+        // we cannot make.
+        if (catlitterUnavailable) {
+            toast.error(
+                "CatLitter Delivery doesn't reach this address. Please choose another delivery method.",
+            );
             return;
         }
 
@@ -1605,6 +1663,22 @@ const UnifiedCheckoutForm = ({
                     <h3 className="text-lg font-semibold mb-4">Delivery Method</h3>
 
                     <div className="space-y-3">
+                        {CATLITTER_DELIVERY_ENABLED && (
+                            <DeliveryOption
+                                value="catlitter_delivery"
+                                selected={deliveryType === "catlitter_delivery"}
+                                onSelect={handlePickupTypeChange}
+                                icon={<Bike className="w-5 h-5" strokeWidth={1.75} />}
+                                title="CatLitter Delivery"
+                                subtitle={checkoutCopy.catlitterDeliverySubtitle}
+                                chip={{ label: checkoutCopy.catlitterDeliveryChipLabel, tone: "emerald" }}
+                                trailing={catlitterShippingLabel ? (
+                                    <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
+                                        {catlitterShippingLabel}
+                                    </span>
+                                ) : null}
+                            />
+                        )}
                         <DeliveryOption
                             value="courier"
                             selected={deliveryType === "courier"}
@@ -1654,6 +1728,15 @@ const UnifiedCheckoutForm = ({
                             <span className="inline-block w-1 h-1 rounded-full bg-primary-500 animate-pulse" />
                             Select a delivery method to continue
                         </div>
+                    )}
+
+                    {catlitterUnavailable && (
+                        <p
+                            role="alert"
+                            className="mt-3 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200"
+                        >
+                            {checkoutCopy.catlitterDeliveryUnavailableNote}
+                        </p>
                     )}
 
                     {deliveryType && (
