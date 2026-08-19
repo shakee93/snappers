@@ -4,7 +4,8 @@
   "storePickupNote": "Visit Catlitter to collect your order.",
   "catlitterDeliveryChipLabel": "Our own riders",
   "catlitterDeliverySubtitle": "Delivered by our team · within 15km range",
-  "catlitterDeliveryUnavailableNote": "CatLitter Delivery doesn't reach this address yet. Choose Courier delivery or Store Pickup instead.",
+  "switchedToCourierDeliveryNote": "This address is outside our 15km CatLitter Delivery range, so we've switched you to Courier delivery. Your shipping total has been updated to match.",
+  "switchedToCatlitterDeliveryNote": "This address is inside our 15km range, so we deliver it ourselves — we've switched you to CatLitter Delivery. Your shipping total has been updated to match.",
   "webxpay": {
     "title": "Pay online",
     "subtitle": "Visa, Mastercard & digital wallets"

@@ -267,11 +267,11 @@ const CheckoutPage = () => {
               ? resolveCatlitterDeliveryRate(rateSource)?.id
               : resolveCourierRate(rateSource, preferFree)?.id;
 
-      // No rate means the address doesn't resolve to a serviceable zone yet
-      // (or, for CatLitter Delivery, falls outside our own delivery reach).
+      // No rate means the address doesn't resolve to a serviceable zone yet.
       // Selecting nothing is correct — the cart keeps whatever WC last quoted,
-      // and the summary is already showing that. The form blocks submission
-      // separately so the customer can't order through an unquoted method.
+      // and the summary is already showing that. The form only ever offers a
+      // delivery option WooCommerce quoted, so this is the unserviceable-zone
+      // case rather than a mismatched selection.
       if (!shippingMethods) {
         return;
       }

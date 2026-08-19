@@ -4,23 +4,30 @@ import type { Cart, ShippingRate } from "@/graphql/types/graphql";
 /** Methods that represent "customer collects", never a delivery rate. */
 const PICKUP_METHOD_IDS = new Set(["pickup_location", "local_pickup"]);
 
+/** The delivery options offered at checkout. */
+export type DeliveryType =
+  | "courier"
+  | "catlitter_delivery"
+  | "store_pickup"
+  | "flash_delivery";
+
 /**
- * Rate id (or `<methodId>:<instanceId>` prefix) of the CatLitter Delivery
- * method. Empty until the instance is configured in WooCommerce, which keeps
- * the option hidden rather than offering a rate the store cannot quote.
+ * Rate id of the CatLitter Delivery method. Empty until it is configured in
+ * WooCommerce, which keeps the option hidden rather than offering a rate the
+ * store cannot quote.
  */
 const CATLITTER_DELIVERY_METHOD_ID: string =
   siteConfig.shipping.catlitterDeliveryMethodId;
 
 /** Whether CatLitter Delivery is wired up to a WooCommerce method at all. */
-export const CATLITTER_DELIVERY_ENABLED = CATLITTER_DELIVERY_METHOD_ID.length > 0;
+const CATLITTER_DELIVERY_ENABLED = CATLITTER_DELIVERY_METHOD_ID.length > 0;
 
 /**
  * WooCommerce hands costs back as bare numeric strings ("350") on rates and as
  * formatted money ("Rs350.00") elsewhere. Strip everything that isn't part of
  * the number so both parse.
  */
-export const parseRateCost = (cost: string | number | null | undefined): number => {
+const parseRateCost = (cost: string | number | null | undefined): number => {
   if (typeof cost === "number") return cost;
   if (typeof cost !== "string") return NaN;
   return parseFloat(cost.replace(/₨|&nbsp;|,|[^0-9.]/g, ""));
@@ -36,11 +43,14 @@ const quotedRates = (cart: Cart | null | undefined): ShippingRate[] =>
   );
 
 /**
- * The distance/weight plugin quotes one zone instance under two sub-modes —
- * `dwbs:1:distance` inside the local radius, `dwbs:1:weight` outstation — so
- * the configured value is matched as a prefix as well as exactly. That lets
- * `dwbs:2` cover both of its sub-modes while an exact id like `flat_rate:5`
- * still matches on its own.
+ * Matched exactly, with a prefix match as a fallback for a method whose rate
+ * ids carry a suffix we don't want to enumerate.
+ *
+ * On this store the configured value must be the full sub-mode id
+ * (`dwbs:2:distance`), NOT the instance prefix `dwbs:2`: that instance quotes
+ * `:distance` and `:weight` together, they are our two separate delivery
+ * options, and a prefix would claim both and leave the courier option with no
+ * rate at all.
  */
 const isCatlitterDeliveryRate = (rate: ShippingRate): boolean =>
   CATLITTER_DELIVERY_ENABLED &&
@@ -60,8 +70,8 @@ export const resolveCatlitterDeliveryRate = (
 /**
  * The courier rate is not a constant on this store. Its id *and* its label
  * change with the destination — the distance/weight method quotes
- * `dwbs:1:distance` "Local Delivery" inside the Colombo zone and
- * `dwbs:1:weight` "Standard Shipping" outstation — so a hard-coded id is
+ * `dwbs:2:distance` "Local Delivery" inside the Colombo zone and
+ * `dwbs:2:weight` "Standard Shipping" outstation — so a hard-coded id is
  * rejected outright ("… is not an available shipping method for shipping
  * package …") and the cart silently keeps the rate quoted for the previous
  * address. Read it off the rates WooCommerce returned for the address it

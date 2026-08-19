@@ -199,6 +199,10 @@ export const siteConfig = {
     // "cheque" is WooCommerce's built-in cheque gateway, retitled "Card on
     // Delivery" in wp-admin; the id stays `cheque`.
     payOnDeliveryGatewayIds: ["cod", "cheque"] as const,
+    // Pay-on-delivery gateways that additionally need one of our own riders at
+    // the door: they carry the card terminal, third-party couriers don't. Only
+    // CatLitter Delivery puts our own rider on the doorstep.
+    ownFleetOnlyGatewayIds: ["cheque"] as const,
     // Gateways that quote the shared Visa/Mastercard tier in woo-price-tiers.
     cardGatewayIds: ["payhere", "webxpay", "ndb-pay", "geniebiz"] as const,
     // Gateways whose checkout mutation returns a pay URL we should follow.
@@ -257,17 +261,22 @@ export const siteConfig = {
     /**
      * CatLitter Delivery — our own fleet, priced by distance server-side.
      *
-     * Set this to the rate id of the instance configured under WooCommerce >
-     * Settings > Shipping > Sri Lanka. A `<methodId>:<instanceId>` prefix is
-     * enough for the distance/weight plugin, which quotes one instance under
-     * two sub-modes (`dwbs:2:distance` / `dwbs:2:weight`); a fixed method such
-     * as `flat_rate:5` is matched exactly.
+     * The dwbs instance in WooCommerce > Settings > Shipping > Sri Lanka
+     * quotes BOTH of its sub-modes at once inside the delivery radius:
+     * `dwbs:2:distance` "Local Delivery" is our fleet, `dwbs:2:weight`
+     * "Standard Shipping" is the island-wide courier. Outside the radius only
+     * the weight rate is quoted, and the checkout offers Courier delivery in
+     * place of CatLitter Delivery.
      *
-     * Empty string keeps the delivery option hidden. Leave it empty until the
-     * WooCommerce method exists — offering a rate the store cannot quote makes
+     * So this must name the sub-mode, not just the instance — a bare `dwbs:2`
+     * prefix would claim both rates and leave the courier option with none.
+     * A single-rate method such as `flat_rate:5` is matched exactly.
+     *
+     * Empty string keeps the delivery option hidden. Keep it empty until the
+     * WooCommerce rate exists — offering a rate the store cannot quote makes
      * `updateShippingMethod` fail and leaves the cart on a stale rate.
      */
-    catlitterDeliveryMethodId: "",
+    catlitterDeliveryMethodId: "dwbs:2:distance",
   },
   analytics: {
     googleAnalyticsId: "G-LS3EVR93ZH",
