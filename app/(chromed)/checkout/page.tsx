@@ -12,6 +12,7 @@ import { buildPinMetaData } from "@/lib/checkoutPinMeta";
 import {
   resolveCatlitterDeliveryRate,
   resolveCourierRate,
+  resolveFreeShippingRate,
 } from "@/lib/checkoutShipping";
 import { useCheckoutPaymentSync } from "@/hooks/useCheckoutPaymentSync";
 import { useCheckout } from "@/hooks/useCheckout";
@@ -258,14 +259,18 @@ const CheckoutPage = () => {
       // (Uber/PickMe)"). CatLitter Delivery and courier both fall through to
       // whichever rate the store quoted for the current address — see
       // resolveCatlitterDeliveryRate / resolveCourierRate.
+      // A free rate outranks both delivery options — see
+      // resolveFreeShippingRate. Pickup and Flash keep their fixed ids.
+      const freeRate = preferFree ? resolveFreeShippingRate(rateSource) : null;
       const shippingMethods =
         deliveryType === "flash_delivery"
           ? "flat_rate:4"
           : deliveryType === "store_pickup"
             ? "pickup_location:0"
-            : deliveryType === "catlitter_delivery"
-              ? resolveCatlitterDeliveryRate(rateSource)?.id
-              : resolveCourierRate(rateSource, preferFree)?.id;
+            : freeRate?.id ??
+              (deliveryType === "catlitter_delivery"
+                ? resolveCatlitterDeliveryRate(rateSource)?.id
+                : resolveCourierRate(rateSource, preferFree)?.id);
 
       // No rate means the address doesn't resolve to a serviceable zone yet.
       // Selecting nothing is correct — the cart keeps whatever WC last quoted,
@@ -806,18 +811,22 @@ const CheckoutPage = () => {
     // the store actually quoted.
     const courierRate = resolveCourierRate(cart, preferFreeShipping);
     const catlitterRate = resolveCatlitterDeliveryRate(cart);
+    // Mirrors updateShippingTotal: a free rate outranks either delivery option,
+    // so the order is written with the same line the cart was priced at.
+    const freeRate = preferFreeShipping ? resolveFreeShippingRate(cart) : null;
 
     const methodId =
       orderDeliveryType === "flash_delivery"
         ? "flat_rate:4"
         : orderDeliveryType === "store_pickup"
           ? "pickup_location:0"
-          : orderDeliveryType === "catlitter_delivery"
-            ? catlitterRate?.id ?? siteConfig.shipping.catlitterDeliveryMethodId
-            : courierRate?.id ??
-              (preferFreeShipping
-                ? siteConfig.shipping.freeShippingMethodId
-                : siteConfig.shipping.weightBasedShippingMethodId);
+          : freeRate?.id ??
+            (orderDeliveryType === "catlitter_delivery"
+              ? catlitterRate?.id ?? siteConfig.shipping.catlitterDeliveryMethodId
+              : courierRate?.id ??
+                (preferFreeShipping
+                  ? siteConfig.shipping.freeShippingMethodId
+                  : siteConfig.shipping.weightBasedShippingMethodId));
 
     // methodTitle is the display string for the order summary; for
     // flat_rate WC writes the zone-config title, for pickup_location WC
@@ -829,10 +838,12 @@ const CheckoutPage = () => {
       ? "Store Pickup"
       : orderDeliveryType === "flash_delivery"
         ? "Flash Delivery (Uber/PickMe)"
-        : orderDeliveryType === "catlitter_delivery"
-          ? catlitterRate?.label ?? CATLITTER_DELIVERY_TITLE
-          : courierRate?.label ??
-            (preferFreeShipping ? "Free Shipping" : "Weight Based Shipping");
+        : freeRate
+          ? freeRate.label ?? "Free Shipping"
+          : orderDeliveryType === "catlitter_delivery"
+            ? catlitterRate?.label ?? CATLITTER_DELIVERY_TITLE
+            : courierRate?.label ??
+              (preferFreeShipping ? "Free Shipping" : "Weight Based Shipping");
 
     const total = noCharge ? "0" : shippingTotal;
 

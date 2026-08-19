@@ -68,6 +68,27 @@ export const resolveCatlitterDeliveryRate = (
   quotedRates(cart).find(isCatlitterDeliveryRate) ?? null;
 
 /**
+ * A zero-cost rate WooCommerce quoted for the current address — the
+ * free-shipping coupon's rate, or a method configured at no charge.
+ *
+ * Free shipping is a property of the cart, not of the delivery option, so this
+ * is resolved independently of which option is selected. Courier and CatLitter
+ * Delivery are mutually exclusive in the UI, and without this the free rate
+ * would be unreachable whenever the hidden one is the option carrying it.
+ *
+ * Pickup rates are excluded: they are free by nature, and returning one here
+ * would silently turn a delivery into a collection.
+ */
+export const resolveFreeShippingRate = (
+  cart: Cart | null | undefined,
+): ShippingRate | null =>
+  quotedRates(cart).find(
+    (rate) =>
+      !PICKUP_METHOD_IDS.has(rate.methodId ?? "") &&
+      (rate.methodId === "free_shipping" || parseRateCost(rate.cost) === 0),
+  ) ?? null;
+
+/**
  * The courier rate is not a constant on this store. Its id *and* its label
  * change with the destination — the distance/weight method quotes
  * `dwbs:2:distance` "Local Delivery" inside the Colombo zone and

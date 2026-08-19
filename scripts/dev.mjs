@@ -36,6 +36,16 @@ const child = spawn(
   { stdio: "inherit", shell: process.platform === "win32" },
 );
 
+// Without this, a missing `next` binary surfaces as a raw ENOENT stack trace.
+// Only reachable before `npm install`, but `next dev` used to fail there with a
+// readable "command not found".
+child.on("error", (error) => {
+  console.error(
+    `Could not start Next: ${error.message}\nIs "next" installed? Try \`npm install\`.`,
+  );
+  process.exit(1);
+});
+
 child.on("exit", (code, signal) => {
   // Re-raise the signal rather than exiting 0, so Ctrl-C is reported honestly
   // to whatever launched this.

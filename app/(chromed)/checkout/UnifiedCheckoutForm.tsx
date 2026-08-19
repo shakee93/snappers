@@ -819,7 +819,10 @@ interface DeliveryOptionProps {
     subtitle: string;
     chip?: { label: string; tone: "emerald" | "blue" };
     trailing?: React.ReactNode;
-    /** Held while the cart re-quotes — switching mid-flight races the totals. */
+    /**
+     * Held while the cart re-quotes — for any reason, not only an address
+     * change — because switching mid-flight races the in-flight totals.
+     */
     disabled?: boolean;
 }
 
@@ -1241,18 +1244,31 @@ const UnifiedCheckoutForm = ({
         // eslint-disable-next-line react-hooks/exhaustive-deps -- gatewayDisabledReason depends on deliveryType which is already in deps
     }, [visiblePaymentGateways, selectedGateway.id, deliveryType, setIsKokoPayment, onPaymentMethodChange]);
 
-    // If the currently-selected gateway becomes disabled (e.g. user picks COD
-    // then switches to Flash Delivery), clear it so the form can't submit
-    // through an option the user can no longer see as available.
+    // Clear a selection the customer can no longer act on, so the form can't
+    // submit through a gateway that is off the page.
+    //
+    // Keyed on whether the row is still selectable, not on
+    // gatewayDisabledReason: a gateway can leave in two ways, and that function
+    // only reports one of them. Card on Delivery is *hidden* off our own fleet
+    // rather than greyed out, so checking the reason alone missed it — picking
+    // it under CatLitter Delivery and then editing the address out of range
+    // auto-switched delivery to Courier, dropped the row, and left `cheque`
+    // selected and submittable on a courier shipment no rider can take a card
+    // for. Membership of visiblePaymentGateways covers hidden and disabled both.
+    const selectableGatewayIds = visiblePaymentGateways
+        .filter((gw) => !gatewayDisabledReason(gw.id ?? ""))
+        .map((gw) => gw.id)
+        .join(",");
+
     useEffect(() => {
         if (!selectedGateway.id) return;
-        if (!gatewayDisabledReason(selectedGateway.id)) return;
+        if (selectableGatewayIds.split(",").includes(selectedGateway.id)) return;
         setSelectedGateway({ id: "", title: null });
         setMethodActive("");
         setIsKokoPayment(false);
         onPaymentMethodChange("");
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [deliveryType, selectedGateway.id, onPaymentMethodChange]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- setters are stable
+    }, [selectableGatewayIds, selectedGateway.id, onPaymentMethodChange]);
 
     const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -1705,7 +1721,7 @@ const UnifiedCheckoutForm = ({
                         {ratesRecalculating && (
                             <span className="inline-flex items-center gap-1.5 text-xs font-normal text-slate-500 dark:text-slate-400">
                                 <Loader className="w-3.5 h-3.5 animate-spin" aria-hidden="true" />
-                                Updating for your address…
+                                Updating…
                             </span>
                         )}
                     </h3>
