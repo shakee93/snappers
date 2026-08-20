@@ -22,6 +22,8 @@ interface ArchiveFilterBarProps {
   filters: ArchiveFilterState;
   onChange: (next: Partial<ArchiveFilterState>) => void;
   className?: string;
+  /** Locked filters are hidden — the page always applies them server-side. */
+  lockedFilters?: Partial<ArchiveFilterState>;
 }
 
 const priceInputWrapperClassName =
@@ -116,7 +118,11 @@ const ArchiveFilterBar = ({
   filters,
   onChange,
   className,
+  lockedFilters,
 }: ArchiveFilterBarProps) => {
+  const showOnSale = lockedFilters?.onSale === undefined;
+  const showInStock = lockedFilters?.inStock === undefined;
+
   return (
     <div
       className={cn(
@@ -126,26 +132,34 @@ const ArchiveFilterBar = ({
     >
       <div className="flex flex-col gap-4 lg:grid lg:grid-cols-3 lg:items-center lg:gap-4">
         <div className="flex w-full items-center gap-2 border-b border-[#E8E8E8] pb-4 sm:gap-3 lg:gap-4 lg:border-0 lg:pb-0">
-          <Checkbox
-            name="archive-on-sale"
-            label="On sale"
-            labelPosition="after"
-            className="shrink-0"
-            checked={filters.onSale}
-            onChange={(checked) => onChange({ onSale: checked })}
-            labelClassName={filterCheckboxLabelClassName}
-          />
-          <span className={filterRowDividerClassName} aria-hidden />
-          <Checkbox
-            name="archive-in-stock"
-            label="In stock"
-            labelPosition="after"
-            className="shrink-0"
-            checked={filters.inStock}
-            onChange={(checked) => onChange({ inStock: checked })}
-            labelClassName={filterCheckboxLabelClassName}
-          />
-          <span className={filterRowDividerClassName} aria-hidden />
+          {showOnSale ? (
+            <Checkbox
+              name="archive-on-sale"
+              label="On sale"
+              labelPosition="after"
+              className="shrink-0"
+              checked={filters.onSale}
+              onChange={(checked) => onChange({ onSale: checked })}
+              labelClassName={filterCheckboxLabelClassName}
+            />
+          ) : null}
+          {showOnSale && showInStock ? (
+            <span className={filterRowDividerClassName} aria-hidden />
+          ) : null}
+          {showInStock ? (
+            <Checkbox
+              name="archive-in-stock"
+              label="In stock"
+              labelPosition="after"
+              className="shrink-0"
+              checked={filters.inStock}
+              onChange={(checked) => onChange({ inStock: checked })}
+              labelClassName={filterCheckboxLabelClassName}
+            />
+          ) : null}
+          {(showOnSale || showInStock) ? (
+            <span className={filterRowDividerClassName} aria-hidden />
+          ) : null}
           <div className="flex min-w-0 flex-1 items-center gap-1.5 lg:hidden">
             <label
               htmlFor="archive-sort-mobile"

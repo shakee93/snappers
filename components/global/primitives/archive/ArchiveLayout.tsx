@@ -5,7 +5,9 @@ import { GET_NESTED_CATEGORIES } from "@/graphql/defs/nav";
 import InstantSearchWrapper from "@/components/global/primitives/InstantSearchWrapper";
 import ArchiveFilters from "@/components/global/primitives/archive/ArchiveFilters";
 import TypesenseArchiveFilters from "@/components/global/primitives/archive/TypesenseArchiveFilters";
-import ArchiveProductGrid from "@/components/global/primitives/archive/ArchiveProductGrid";
+import ArchiveProductGrid, {
+  type ArchiveProductGridProps,
+} from "@/components/global/primitives/archive/ArchiveProductGrid";
 import ProductGridGraphQL from "@/components/global/primitives/archive/ProductGridGraphQL";
 import { ArchiveFilterBarSkeleton } from "@/components/global/primitives/archive/ArchiveLoading";
 import {
@@ -16,6 +18,7 @@ import {
 import { Brand } from "@/graphql/types/graphql";
 import Link from "next/link";
 import { GET_TAG_DETAILS_BY_SLUG } from "@/graphql/defs/products";
+import { ArchiveFilterState } from "@/lib/archiveFilters";
 import { DealFilterType } from "@/lib/dealFilters";
 import { isGraphqlArchive } from "@/lib/archiveSource";
 import { siteConfig } from "@/site.config";
@@ -92,6 +95,13 @@ interface ArchiveLayoutProps {
   dealTags?: string[];
   inStockOnly?: boolean;
   defaultNewest?: boolean;
+  /** GraphQL archive default filters when the URL omits them (e.g. /deals → in-stock). */
+  filterDefaults?: Partial<ArchiveFilterState>;
+  /** Always applied — URL cannot override (e.g. /deals locks on-sale). */
+  lockedFilters?: Partial<ArchiveFilterState>;
+  /** Deal archive — on-sale query + hide products without a real discount. */
+  dealsOnly?: boolean;
+  productCardProps?: ArchiveProductGridProps["productCardProps"];
 }
 
 const ArchiveLayout = async ({
@@ -110,6 +120,10 @@ const ArchiveLayout = async ({
   dealTags,
   inStockOnly,
   defaultNewest,
+  filterDefaults,
+  lockedFilters,
+  dealsOnly,
+  productCardProps,
 }: ArchiveLayoutProps) => {
   const graphqlArchive = isGraphqlArchive();
   const { productCategories, brands, nestedCategories, tagDetails } = await getData(category?.databaseId ?? '', tag);
@@ -153,7 +167,15 @@ const ArchiveLayout = async ({
 
         {filters ? (
           <Suspense fallback={<ArchiveFilterBarSkeleton />}>
-            {graphqlArchive ? <ArchiveFilters /> : <TypesenseArchiveFilters />}
+            {graphqlArchive ? (
+              <ArchiveFilters
+                filterDefaults={filterDefaults}
+                lockedFilters={lockedFilters}
+                dealsOnly={dealsOnly}
+              />
+            ) : (
+              <TypesenseArchiveFilters />
+            )}
           </Suspense>
         ) : null}
 
@@ -176,6 +198,10 @@ const ArchiveLayout = async ({
                         categoryScopeIds.length > 0 ? categoryScopeIds : undefined
                       }
                       first={45}
+                      filterDefaults={filterDefaults}
+                      lockedFilters={lockedFilters}
+                      dealsOnly={dealsOnly}
+                      productCardProps={productCardProps}
                     />
                   </Suspense>
                 ) : (

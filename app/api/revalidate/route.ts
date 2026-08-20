@@ -21,6 +21,12 @@ function logRevalidate(fields: Record<string, unknown>) {
         .join(' '))
 }
 
+function bustDealSurfaces() {
+    revalidateTag(DEALS_CACHE_TAG, 'max')
+    revalidatePath('/', 'page')
+    revalidatePath('/deals')
+}
+
 // NOTE: IF you want to revalidate all routes, use `/api/revalidate?path=all`;
 // just use `/api/revalidate`.
 export async function GET(request: NextRequest) {
@@ -29,6 +35,10 @@ export async function GET(request: NextRequest) {
     if (tag) {
         try {
             revalidateTag(tag, 'max')
+            if (tag === DEALS_CACHE_TAG) {
+                revalidatePath('/', 'page')
+                revalidatePath('/deals')
+            }
             logRevalidate({ kind: 'tag', tag, ms: Date.now() - startedAt })
         } catch (e) {
             logRevalidate({ kind: 'tag', tag, threw: String(e), ms: Date.now() - startedAt })
@@ -43,7 +53,7 @@ export async function GET(request: NextRequest) {
 
         if (path === 'all') {
             revalidatePath('/', 'layout');
-            revalidateTag(DEALS_CACHE_TAG, 'max');
+            bustDealSurfaces();
             logRevalidate({ kind: 'all', ms: Date.now() - startedAt })
             return Response.json({ revalidated: 'all', now: Date.now() })
         }
@@ -54,6 +64,7 @@ export async function GET(request: NextRequest) {
             revalidatePath('/back-in-stock');
             revalidatePath('/smartwatches');
             revalidatePath('/explore-speakers');
+            bustDealSurfaces();
             logRevalidate({ kind: 'homepage', ms: Date.now() - startedAt })
             return Response.json({ revalidated: 'homepage', now: Date.now() })
         }
@@ -65,9 +76,13 @@ export async function GET(request: NextRequest) {
             } else {
                 revalidatePath(path);
             }
-            if (path.startsWith('/product') || path.startsWith('/tag')) {
-                // Tag/collection pages — bust deals sliders.
-                revalidateTag(DEALS_CACHE_TAG, 'max');
+            if (
+                path.startsWith('/product') ||
+                path.startsWith('/tag') ||
+                path.startsWith('/shop')
+            ) {
+                // Product/tag saves must also refresh homepage deals.
+                bustDealSurfaces();
             } else {
                 // PDP paths follow /<category>/<slug>. Bust the per-product tag
                 // attached to GET_PRODUCT's SSR fetch so a regen actually
@@ -76,6 +91,7 @@ export async function GET(request: NextRequest) {
                 const productSlug = path.match(/^\/[^/]+\/([^/]+)$/)?.[1]
                 if (productSlug) {
                     revalidateTag(productTag(productSlug), 'max');
+                    bustDealSurfaces();
                 }
             }
             logRevalidate({ kind: 'path', path, type: type ?? '', ms: Date.now() - startedAt })

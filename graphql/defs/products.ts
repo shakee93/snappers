@@ -675,7 +675,7 @@ export const GET_PRODUCTS_NODES_HOMEPAGE = gql`
 
 /** Homepage deals grid — in-stock products currently on sale. */
 export const GET_HOMEPAGE_DEAL_PRODUCTS = gql`
-  query GetHomepageDealProducts($first: Int = 4) {
+  query GetHomepageDealProducts($first: Int = 50) {
     products(
       first: $first
       where: {

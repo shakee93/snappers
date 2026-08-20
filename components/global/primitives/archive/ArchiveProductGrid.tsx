@@ -4,7 +4,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useLazyQuery } from "@apollo/client";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import ProductCard from "@/components/home/ProductCard";
+import ProductCard, {
+  type ProductCardProps,
+} from "@/components/home/ProductCard";
 import {
   ARCHIVE_PRODUCT_GRID_CLASS_NAME,
   ProductCardsSkeleton,
@@ -12,15 +14,26 @@ import {
 import { GET_ARCHIVE_PRODUCTS } from "@/graphql/defs/products";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import {
+  ArchiveFilterState,
   buildArchiveFilterSearchParams,
+  DEALS_FILTER_DEFAULTS,
+  DEALS_LOCKED_FILTERS,
   parseArchiveFilters,
   toArchiveProductsVariables,
 } from "@/lib/archiveFilters";
 import { getCompactPageItems } from "@/lib/compactPagination";
+import { resolveProductSale, type SaleResolvableProduct } from "@/lib/productSale";
 
 export interface ArchiveProductGridProps {
   categoryIds?: number[];
   first?: number;
+  /** Applied when the URL omits a filter param (e.g. /deals defaults to in-stock). */
+  filterDefaults?: Partial<ArchiveFilterState>;
+  /** Always applied — URL cannot override (e.g. /deals locks on-sale). */
+  lockedFilters?: Partial<ArchiveFilterState>;
+  /** Deal archive — always query on-sale and hide products with no real discount. */
+  dealsOnly?: boolean;
+  productCardProps?: Pick<ProductCardProps, "badgeLabel" | "accentColor">;
 }
 
 type ArchiveProduct = SimpleProduct & VariableProduct;
@@ -42,14 +55,30 @@ const EMPTY_CACHE: ProductCache = {
 const ArchiveProductGrid = ({
   categoryIds,
   first = 45,
+  filterDefaults,
+  lockedFilters,
+  dealsOnly = false,
+  productCardProps,
 }: ArchiveProductGridProps) => {
+  const resolvedLockedFilters = dealsOnly
+    ? DEALS_LOCKED_FILTERS
+    : lockedFilters;
+  const resolvedFilterDefaults = dealsOnly
+    ? { ...DEALS_FILTER_DEFAULTS, ...filterDefaults }
+    : filterDefaults;
+
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const filters = useMemo(
-    () => parseArchiveFilters(searchParams),
-    [searchParams],
+    () =>
+      parseArchiveFilters(
+        searchParams,
+        resolvedFilterDefaults,
+        resolvedLockedFilters,
+      ),
+    [resolvedFilterDefaults, resolvedLockedFilters, searchParams],
   );
 
   const page = Math.max(
@@ -58,8 +87,14 @@ const ArchiveProductGrid = ({
   );
 
   const filterKey = useMemo(
-    () => JSON.stringify({ filters, categoryIds, first }),
-    [filters, categoryIds, first],
+    () =>
+      JSON.stringify({
+        filters,
+        categoryIds,
+        first,
+        dealsOnly,
+      }),
+    [filters, categoryIds, first, dealsOnly],
   );
 
   const [cache, setCache] = useState<ProductCache>(EMPTY_CACHE);
@@ -76,7 +111,12 @@ const ArchiveProductGrid = ({
     async (after?: string | null): Promise<ProductCache> => {
       const { data, error: queryError } = await fetchArchiveProducts({
         variables: {
-          ...toArchiveProductsVariables(filters, categoryIds, first),
+          ...toArchiveProductsVariables(
+            filters,
+            categoryIds,
+            first,
+            resolvedLockedFilters,
+          ),
           after: after ?? undefined,
         },
       });
@@ -85,7 +125,15 @@ const ArchiveProductGrid = ({
         throw queryError;
       }
 
-      const nodes = (data?.products?.nodes ?? []) as ArchiveProduct[];
+      let nodes = (data?.products?.nodes ?? []) as ArchiveProduct[];
+
+      // WooCommerce `onSale` can stay true after the discount ends — keep only
+      // products that would actually render a discount (same rule as Typesense).
+      if (dealsOnly) {
+        nodes = nodes.filter(
+          (product) => resolveProductSale(product as SaleResolvableProduct) !== null,
+        );
+      }
       const pageInfo = data?.products?.pageInfo;
 
       return {
@@ -95,7 +143,7 @@ const ArchiveProductGrid = ({
         loaded: true,
       };
     },
-    [categoryIds, fetchArchiveProducts, filters, first],
+    [categoryIds, dealsOnly, fetchArchiveProducts, filters, first, resolvedLockedFilters],
   );
 
   useEffect(() => {
@@ -155,7 +203,9 @@ const ArchiveProductGrid = ({
 
   const goToPage = useCallback(
     (nextPage: number) => {
-      const params = new URLSearchParams(buildArchiveFilterSearchParams(filters));
+      const params = new URLSearchParams(
+        buildArchiveFilterSearchParams(filters, resolvedLockedFilters),
+      );
       if (nextPage > 1) {
         params.set("page", String(nextPage));
       }
@@ -163,7 +213,7 @@ const ArchiveProductGrid = ({
       router.push(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
       window.scrollTo({ top: 0, behavior: "smooth" });
     },
-    [filters, pathname, router],
+    [filters, pathname, resolvedLockedFilters, router],
   );
 
   useEffect(() => {
@@ -202,7 +252,11 @@ const ArchiveProductGrid = ({
           }`}
         >
           {visibleProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
+            <ProductCard
+              key={product.id}
+              product={product}
+              {...productCardProps}
+            />
           ))}
         </div>
       ) : null}

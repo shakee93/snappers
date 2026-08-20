@@ -1,10 +1,8 @@
-import SectionSliderProductCard from "@/components/global/ui/SectionSliderProductCard";
-import { getClient } from "@/graphql/apollo-ssr";
-import { GET_PRODUCTS_BY_BOGO_TAG } from "@/graphql/defs/products";
-import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
-import { DEALS_CACHE_TAG } from "@/lib/cache-tags";
+import ArchiveFilters from "@/components/global/primitives/archive/ArchiveFilters";
+import { ArchiveFilterBarSkeleton } from "@/components/global/primitives/archive/ArchiveLoading";
+import DealsProductGrid from "@/components/global/primitives/archive/DealsProductGrid";
+import { getDealProductsCached } from "@/lib/dealProducts.server";
 import { Metadata } from "next";
-import { unstable_cache } from "next/cache";
 import { Suspense } from "react";
 import { siteConfig } from "@/site.config";
 
@@ -13,67 +11,40 @@ export const metadata: Metadata = {
   description: `Up to 75% off, Buy One Get One, and Free Gift deals at ${siteConfig.brand.name}.`,
 };
 
-// Safety-net ISR — primary invalidation is via revalidateTag(DEALS_CACHE_TAG) from /api/revalidate.
 export const revalidate = 300;
 
-type DealProduct = SimpleProduct | VariableProduct;
-
-const fetchByTag = (tagIn: string[]): Promise<DealProduct[]> =>
-  getClient()
-    .query({ query: GET_PRODUCTS_BY_BOGO_TAG, variables: { first: 20, tagIn } })
-    .then((res) => (res.data?.products?.nodes ?? []) as DealProduct[])
-    .catch((e) => {
-      console.error("[deals] fetch failed", e);
-      return [];
-    });
-
-const getDealsData = unstable_cache(
-  async () => {
-    const [clearance, bogo, freeGift, freeShipping] = await Promise.all([
-      fetchByTag(["clearance"]),
-      fetchByTag(["bogo-offer"]),
-      fetchByTag(["free-gift"]),
-      fetchByTag(["free-shipping"]),
-    ]);
-    return { clearance, bogo, freeGift, freeShipping };
-  },
-  ["deals-sliders"],
-  { tags: [DEALS_CACHE_TAG], revalidate: 300 }
-);
-
-async function DealsSliders() {
-  const { clearance, bogo, freeGift, freeShipping } = await getDealsData();
-
-  if (!clearance.length && !bogo.length && !freeGift.length && !freeShipping.length) {
-    return (
-      <p className="text-neutral-500 dark:text-neutral-400 text-sm">
-        No active deals right now — check back soon.
-      </p>
-    );
-  }
+async function DealsContent() {
+  const products = await getDealProductsCached();
 
   return (
     <>
-      <SectionSliderProductCard
-        products={clearance}
-        heading="Up to 75% off"
-        link="/tag/clearance"
-      />
-      <SectionSliderProductCard
-        products={bogo}
-        heading="Buy One Get One"
-        link="/tag/bogo-offer"
-      />
-      <SectionSliderProductCard
-        products={freeGift}
-        heading="Free Gift"
-        link="/tag/free-gift"
-      />
-      <SectionSliderProductCard
-        products={freeShipping}
-        heading="Free Shipping"
-        link="/tag/free-shipping"
-      />
+      <div className="lg:hidden">
+        <Suspense fallback={<ArchiveFilterBarSkeleton />}>
+          <ArchiveFilters dealsOnly />
+        </Suspense>
+      </div>
+
+      <hr className="border-slate-200 dark:border-slate-700 lg:hidden" />
+
+      <div className="grid grid-cols-12 gap-4">
+        <aside className="hidden lg:col-span-3 lg:block">
+          <Suspense fallback={<ArchiveFilterBarSkeleton />}>
+            <ArchiveFilters dealsOnly variant="sidebar" />
+          </Suspense>
+        </aside>
+
+        <div className="col-span-12 lg:col-span-9">
+          <Suspense fallback={null}>
+            <DealsProductGrid
+              products={products}
+              productCardProps={{
+                badgeLabel: "Deals",
+                accentColor: siteConfig.theme.brandHex.dealAccent,
+              }}
+            />
+          </Suspense>
+        </div>
+      </div>
     </>
   );
 }
@@ -81,19 +52,27 @@ async function DealsSliders() {
 export default function DealsPage() {
   return (
     <main>
-      <div className="nc-PageHome relative flex flex-col overflow-hidden">
-        <div className="flex flex-col px-3 gap-8 lg:gap-10 sm:container sm:max-w-screen-2xl py-8 lg:py-12">
-          <div className="max-w-screen-md">
-            <h1 className="block capitalize text-2xl sm:text-3xl lg:text-4xl font-semibold">
+      <div className="container space-y-16 py-8 sm:space-y-20 lg:space-y-28 lg:py-12">
+        <div className="space-y-4 lg:space-y-6">
+          <div className="max-w-screen-sm">
+            <h1 className="block text-2xl font-semibold capitalize sm:text-3xl lg:text-4xl">
               Deals
             </h1>
-            <span className="block mt-2 lg:mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
-              Explore the best savings, BOGO offers, and free gift promotions in one place.
+            <span className="mt-2 block text-sm text-neutral-500 dark:text-neutral-400 sm:text-base lg:mt-4">
+              Explore the best savings, BOGO offers, and free gift promotions in
+              one place.
             </span>
           </div>
 
-          <Suspense>
-            <DealsSliders />
+          <Suspense
+            fallback={
+              <div className="space-y-4">
+                <ArchiveFilterBarSkeleton />
+                <div className="animate-pulse rounded-xl bg-neutral-200 py-32" />
+              </div>
+            }
+          >
+            <DealsContent />
           </Suspense>
         </div>
       </div>
