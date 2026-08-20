@@ -205,7 +205,7 @@ const ArchiveFilterBar = ({
             options={sortOptions.map((option) => ({
               id: option.id,
               label: option.label,
-              }))}
+            }))}
             onChange={(sort) => onChange({ sort })}
           />
         </div>

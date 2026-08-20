@@ -133,9 +133,10 @@ export function parseArchiveFilters(
   searchParams: URLSearchParams,
   defaults: Partial<ArchiveFilterState> = {},
   locked: Partial<ArchiveFilterState> = {},
+  sortOptions: ArchiveSortOption[] = ARCHIVE_SORT_OPTIONS,
 ): ArchiveFilterState {
   const sort = searchParams.get("sort");
-  const validSort = ARCHIVE_SORT_OPTIONS.some((option) => option.id === sort);
+  const validSort = sortOptions.some((option) => option.id === sort);
 
   const parsed: ArchiveFilterState = {
     onSale: parseBooleanParam(

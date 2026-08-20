@@ -3,6 +3,7 @@ import ProductCard, {
 } from "@/components/home/ProductCard";
 import { ARCHIVE_PRODUCT_GRID_CLASS_NAME } from "@/components/global/primitives/Loading/ProductCardLoading";
 import {
+  DEALS_ARCHIVE_SORT_OPTIONS,
   DEALS_FILTER_DEFAULTS,
   DEALS_LOCKED_FILTERS,
   parseArchiveFilters,
@@ -25,6 +26,7 @@ const DealsProductGrid = ({
     searchParams,
     DEALS_FILTER_DEFAULTS,
     DEALS_LOCKED_FILTERS,
+    DEALS_ARCHIVE_SORT_OPTIONS,
   );
   const visibleProducts = filterDealProducts(products, filters);
 

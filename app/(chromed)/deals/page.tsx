@@ -23,7 +23,7 @@ async function DealsContent({
 }: {
   searchParams: URLSearchParams;
 }) {
-  const products = await getDealProductsCached();
+  const products = await getDealProductsCached().catch(() => []);
 
   return (
     <>

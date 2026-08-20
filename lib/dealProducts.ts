@@ -3,15 +3,15 @@ import {
   DEALS_ARCHIVE_SORT_OPTIONS,
   type ArchiveFilterState,
 } from "@/lib/archiveFilters";
-
-export const HOMEPAGE_DEAL_CAROUSEL_LIMIT = 12;
-export const DEALS_PAGE_FETCH_FIRST = 50;
 import { filterHiddenProducts } from "@/lib/hidden-products";
 import {
   parsePriceString,
   resolveProductSale,
   type SaleResolvableProduct,
 } from "@/lib/productSale";
+
+export const HOMEPAGE_DEAL_CAROUSEL_LIMIT = 12;
+export const DEALS_PAGE_FETCH_FIRST = 50;
 
 export type DealProduct = SimpleProduct | VariableProduct;
 

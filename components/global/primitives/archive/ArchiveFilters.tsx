@@ -58,8 +58,9 @@ const ArchiveFilters = ({
         searchParams,
         resolvedFilterDefaults,
         resolvedLockedFilters,
+        sortOptions,
       ),
-    [resolvedFilterDefaults, resolvedLockedFilters, searchParams],
+    [resolvedFilterDefaults, resolvedLockedFilters, searchParams, sortOptions],
   );
 
   const updateFilters = useCallback(

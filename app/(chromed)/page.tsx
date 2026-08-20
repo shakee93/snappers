@@ -109,7 +109,7 @@ const getData = async () => {
       .query({ query: GET_SHOP_BY_CATEGORIES, variables: { first: 12 } })
       .then((res) => res.data?.productCategories?.nodes || [])
       .catch(() => []),
-    getDealProductsCached(),
+    getDealProductsCached().catch(() => []),
     getClient()
       .query({ query: GET_BROWSE_SECTION_PRODUCTS, variables: { first: 100 } })
       .then((res) => ({
