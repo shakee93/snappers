@@ -675,7 +675,7 @@ export const GET_PRODUCTS_NODES_HOMEPAGE = gql`
 
 /** Homepage deals grid — in-stock products currently on sale. */
 export const GET_HOMEPAGE_DEAL_PRODUCTS = gql`
-  query GetHomepageDealProducts($first: Int = 4) {
+  query GetHomepageDealProducts($first: Int = 50) {
     products(
       first: $first
       where: {
@@ -683,22 +683,6 @@ export const GET_HOMEPAGE_DEAL_PRODUCTS = gql`
         stockStatus: IN_STOCK
         orderby: { field: DATE, order: DESC }
       }
-    ) {
-      nodes {
-        ...ProductContentCard
-      }
-    }
-  }
-  ${ProductContentCard}
-`;
-
-/** Homepage health grid — in-stock products in the health category. */
-/** Products tagged for BOGO / free offers (WP plugin syncs tag slug `bogo-offer`). */
-export const GET_PRODUCTS_BY_BOGO_TAG = gql`
-  query GetProductsByBogoTag($first: Int = 50, $tagIn: [String] = ["bogo-offer"]) {
-    products(
-      first: $first
-      where: { tagIn: $tagIn, stockStatus: IN_STOCK, orderby: { field: DATE, order: DESC } }
     ) {
       nodes {
         ...ProductContentCard

@@ -3,7 +3,6 @@ import {
   GET_ALL_BRANDS,
   GET_BROWSE_CATEGORY_TABS,
   GET_BROWSE_SECTION_PRODUCTS,
-  GET_HOMEPAGE_DEAL_PRODUCTS,
   GET_SHOP_BY_CATEGORIES,
 } from "@/graphql/defs/products";
 import { GET_HERO_SETTINGS } from "@/graphql/defs/slides";
@@ -32,6 +31,8 @@ import {
   BROWSE_CATEGORY_TAB_SSR_FIRST,
   filterBrowseCategoryTabs,
 } from "@/lib/browseCategories";
+import { getDealProductsCached } from "@/lib/dealProducts.server";
+import { HOMEPAGE_DEAL_CAROUSEL_LIMIT } from "@/lib/dealProducts";
 import SectionGoogleReviews, {
   type GoogleReviewsFields,
 } from "@/components/home/SectionGoogleReviews";
@@ -41,7 +42,10 @@ import SectionBrandMarquee, {
 import SectionOurStores from "@/components/home/SectionOurStores";
 import { type CategoryTreeNode } from "@/lib/categoryScope";
 import { unstable_cache } from "next/cache";
-import { HERO_SECTION_CACHE_TAG, SITE_SETTINGS_CACHE_TAG } from "@/lib/cache-tags";
+import {
+  HERO_SECTION_CACHE_TAG,
+  SITE_SETTINGS_CACHE_TAG,
+} from "@/lib/cache-tags";
 
 // ISR safety net: the WP → /api/revalidate webhook is the primary cache buster,
 // but this ensures the homepage (slides, reviews, etc.) self-heals if a webhook
@@ -105,10 +109,7 @@ const getData = async () => {
       .query({ query: GET_SHOP_BY_CATEGORIES, variables: { first: 12 } })
       .then((res) => res.data?.productCategories?.nodes || [])
       .catch(() => []),
-    getClient()
-      .query({ query: GET_HOMEPAGE_DEAL_PRODUCTS, variables: { first: 12 } })
-      .then((res) => res.data?.products?.nodes || [])
-      .catch(() => []),
+    getDealProductsCached().catch(() => []),
     getClient()
       .query({ query: GET_BROWSE_SECTION_PRODUCTS, variables: { first: 100 } })
       .then((res) => ({
@@ -224,7 +225,9 @@ export default async function Home() {
         </div>
 
         <div className="mt-8 md:mt-10">
-          <SectionDealProducts products={dealProducts} />
+          <SectionDealProducts
+            products={dealProducts.slice(0, HOMEPAGE_DEAL_CAROUSEL_LIMIT)}
+          />
         </div>
 
         <SectionHowToOrder className="mt-16 md:mt-24" />

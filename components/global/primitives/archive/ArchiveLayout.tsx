@@ -153,7 +153,11 @@ const ArchiveLayout = async ({
 
         {filters ? (
           <Suspense fallback={<ArchiveFilterBarSkeleton />}>
-            {graphqlArchive ? <ArchiveFilters /> : <TypesenseArchiveFilters />}
+            {graphqlArchive ? (
+              <ArchiveFilters />
+            ) : (
+              <TypesenseArchiveFilters />
+            )}
           </Suspense>
         ) : null}
 

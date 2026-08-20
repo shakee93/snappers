@@ -58,7 +58,12 @@ const ArchiveProductGrid = ({
   );
 
   const filterKey = useMemo(
-    () => JSON.stringify({ filters, categoryIds, first }),
+    () =>
+      JSON.stringify({
+        filters,
+        categoryIds,
+        first,
+      }),
     [filters, categoryIds, first],
   );
 

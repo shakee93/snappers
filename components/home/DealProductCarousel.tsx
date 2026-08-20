@@ -16,7 +16,9 @@ import { siteConfig } from "@/site.config";
 
 const dealAccentHex = siteConfig.theme.brandHex.dealAccent;
 const AUTO_SLIDE_MS = 4000;
-/** Embla needs enough slides to engage loop when only a few products are on sale. */
+/** Matches the largest desktop page size (`lg` shows 4 cards). */
+const DESKTOP_VISIBLE_SLIDES = 4;
+/** Embla needs enough slides to engage loop once products overflow one page. */
 const MIN_SLIDES_FOR_LOOP = 16;
 
 export interface DealProductCarouselProps {
@@ -26,10 +28,19 @@ export interface DealProductCarouselProps {
 const slideClassName =
   "pl-3 basis-[calc(50%-0.375rem)] sm:basis-[calc(33.333%-0.5rem)] lg:basis-[calc(25%-0.75rem)]";
 
+const slideKeyFor = (product: ProductCardItem, repeatIndex?: number) => {
+  const base =
+    product.id ??
+    (product.databaseId != null ? `deal-${product.databaseId}` : product.slug);
+  return repeatIndex == null ? String(base) : `${base}-r${repeatIndex}`;
+};
+
 /** Horizontal deal-product carousel shown beneath the countdown banner. */
 const DealProductCarousel = ({ products }: DealProductCarouselProps) => {
   const [mounted, setMounted] = useState(false);
-  const canLoop = products.length > 1;
+  // Only loop once there are more unique products than one desktop page.
+  // Padding a short list with duplicates makes it look like deals are missing.
+  const canLoop = products.length > DESKTOP_VISIBLE_SLIDES;
   const autoplay = useRef(
     Autoplay({
       delay: AUTO_SLIDE_MS,
@@ -41,7 +52,7 @@ const DealProductCarousel = ({ products }: DealProductCarouselProps) => {
   const carouselSlides = useMemo(() => {
     if (!canLoop) {
       return products.map((product) => ({
-        key: product.id,
+        key: slideKeyFor(product),
         product,
         ariaHidden: false,
       }));
@@ -54,7 +65,7 @@ const DealProductCarousel = ({ products }: DealProductCarouselProps) => {
 
     return Array.from({ length: repeatCount }, (_, repeatIndex) =>
       products.map((product) => ({
-        key: `${product.id}-r${repeatIndex}`,
+        key: slideKeyFor(product, repeatIndex),
         product,
         ariaHidden: repeatIndex > 0,
       })),

@@ -20,6 +20,34 @@ export interface ArchiveSortOption {
   order: OrderEnum;
 }
 
+/** Sort options exposed on /deals — popular/rating are no-ops client-side. */
+export const DEALS_ARCHIVE_SORT_OPTIONS: ArchiveSortOption[] = [
+  {
+    id: "newest",
+    label: "Newest",
+    field: ProductsOrderByEnum.Date,
+    order: OrderEnum.Desc,
+  },
+  {
+    id: "price-asc",
+    label: "Price: Low to High",
+    field: ProductsOrderByEnum.Price,
+    order: OrderEnum.Asc,
+  },
+  {
+    id: "price-desc",
+    label: "Price: High to Low",
+    field: ProductsOrderByEnum.Price,
+    order: OrderEnum.Desc,
+  },
+  {
+    id: "name",
+    label: "Name",
+    field: ProductsOrderByEnum.Name,
+    order: OrderEnum.Asc,
+  },
+];
+
 export const ARCHIVE_SORT_OPTIONS: ArchiveSortOption[] = [
   {
     id: "newest",
@@ -77,6 +105,12 @@ export const DEFAULT_ARCHIVE_FILTERS: ArchiveFilterState = {
   sort: DEFAULT_ARCHIVE_SORT,
 };
 
+/** /deals — always query on-sale; default to in-stock unless URL overrides. */
+export const DEALS_LOCKED_FILTERS: Partial<ArchiveFilterState> = { onSale: true };
+export const DEALS_FILTER_DEFAULTS: Partial<ArchiveFilterState> = {
+  inStock: true,
+};
+
 function parseBooleanParam(
   value: string | null,
   defaultValue: boolean,
@@ -97,51 +131,88 @@ function parsePriceParam(
 
 export function parseArchiveFilters(
   searchParams: URLSearchParams,
+  defaults: Partial<ArchiveFilterState> = {},
+  locked: Partial<ArchiveFilterState> = {},
+  sortOptions: ArchiveSortOption[] = ARCHIVE_SORT_OPTIONS,
 ): ArchiveFilterState {
   const sort = searchParams.get("sort");
-  const validSort = ARCHIVE_SORT_OPTIONS.some((option) => option.id === sort);
+  const validSort = sortOptions.some((option) => option.id === sort);
 
-  return {
-    onSale: parseBooleanParam(searchParams.get("on_sale"), false),
-    inStock: parseBooleanParam(searchParams.get("in_stock"), false),
+  const parsed: ArchiveFilterState = {
+    onSale: parseBooleanParam(
+      searchParams.get("on_sale"),
+      defaults.onSale ?? false,
+    ),
+    inStock: parseBooleanParam(
+      searchParams.get("in_stock"),
+      defaults.inStock ?? false,
+    ),
     minPrice: parsePriceParam(
       searchParams.get("min_price"),
-      ARCHIVE_PRICE_MIN,
+      defaults.minPrice ?? ARCHIVE_PRICE_MIN,
     ),
     maxPrice: parsePriceParam(
       searchParams.get("max_price"),
-      ARCHIVE_PRICE_MAX,
+      defaults.maxPrice ?? ARCHIVE_PRICE_MAX,
     ),
-    sort: validSort && sort ? sort : DEFAULT_ARCHIVE_SORT,
+    sort: validSort && sort ? sort : (defaults.sort ?? DEFAULT_ARCHIVE_SORT),
   };
+
+  return { ...parsed, ...locked };
 }
 
 export function buildArchiveFilterSearchParams(
   filters: ArchiveFilterState,
+  locked: Partial<ArchiveFilterState> = {},
+  defaults: Partial<ArchiveFilterState> = {},
 ): string {
   const params = new URLSearchParams();
+  const base: ArchiveFilterState = {
+    ...DEFAULT_ARCHIVE_FILTERS,
+    ...defaults,
+    ...locked,
+  };
 
-  if (filters.onSale) {
-    params.set("on_sale", "true");
+  if (filters.onSale !== base.onSale && locked.onSale === undefined) {
+    params.set("on_sale", filters.onSale ? "true" : "false");
   }
 
-  if (filters.inStock) {
-    params.set("in_stock", "true");
+  if (filters.inStock !== base.inStock && locked.inStock === undefined) {
+    params.set("in_stock", filters.inStock ? "true" : "false");
   }
 
-  if (filters.minPrice > ARCHIVE_PRICE_MIN) {
+  if (filters.minPrice !== base.minPrice) {
     params.set("min_price", String(filters.minPrice));
   }
 
-  if (filters.maxPrice < ARCHIVE_PRICE_MAX) {
+  if (filters.maxPrice !== base.maxPrice) {
     params.set("max_price", String(filters.maxPrice));
   }
 
-  if (filters.sort !== DEFAULT_ARCHIVE_SORT) {
+  if (filters.sort !== base.sort) {
     params.set("sort", filters.sort);
   }
 
   return params.toString();
+}
+
+export function recordToURLSearchParams(
+  record: Record<string, string | string[] | undefined>,
+): URLSearchParams {
+  const params = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(record)) {
+    if (value === undefined) continue;
+    if (Array.isArray(value)) {
+      for (const entry of value) {
+        params.append(key, entry);
+      }
+    } else {
+      params.set(key, value);
+    }
+  }
+
+  return params;
 }
 
 export interface ArchiveProductsQueryVariables {
@@ -159,9 +230,12 @@ export function toArchiveProductsVariables(
   filters: ArchiveFilterState,
   categoryIds: number[] | undefined,
   first: number,
+  locked: Partial<ArchiveFilterState> = {},
 ): ArchiveProductsQueryVariables {
+  const effective: ArchiveFilterState = { ...filters, ...locked };
+
   const sortOption =
-    ARCHIVE_SORT_OPTIONS.find((option) => option.id === filters.sort) ??
+    ARCHIVE_SORT_OPTIONS.find((option) => option.id === effective.sort) ??
     ARCHIVE_SORT_OPTIONS[0];
 
   const variables: ArchiveProductsQueryVariables = {
@@ -173,20 +247,20 @@ export function toArchiveProductsVariables(
     variables.categoryIdIn = categoryIds;
   }
 
-  if (filters.inStock) {
+  if (effective.inStock) {
     variables.stockStatus = [StockStatusEnum.InStock];
   }
 
-  if (filters.onSale) {
+  if (effective.onSale) {
     variables.onSale = true;
   }
 
-  if (filters.minPrice > ARCHIVE_PRICE_MIN) {
-    variables.minPrice = filters.minPrice;
+  if (effective.minPrice > ARCHIVE_PRICE_MIN) {
+    variables.minPrice = effective.minPrice;
   }
 
-  if (filters.maxPrice < ARCHIVE_PRICE_MAX) {
-    variables.maxPrice = filters.maxPrice;
+  if (effective.maxPrice < ARCHIVE_PRICE_MAX) {
+    variables.maxPrice = effective.maxPrice;
   }
 
   return variables;
