@@ -10,6 +10,7 @@ import {
   ARCHIVE_SORT_OPTIONS,
   DEFAULT_ARCHIVE_FILTERS,
   ArchiveFilterState,
+  ArchiveSortOption,
   buildArchiveFilterSearchParams,
   normalizePriceRange,
   parseArchivePriceInput,
@@ -26,6 +27,8 @@ interface ArchiveSidebarPanelProps {
   filters: ArchiveFilterState;
   onChange: (next: Partial<ArchiveFilterState>) => void;
   lockedFilters?: Partial<ArchiveFilterState>;
+  filterDefaults?: Partial<ArchiveFilterState>;
+  sortOptions?: ArchiveSortOption[];
 }
 
 const priceInputWrapperClassName =
@@ -34,33 +37,96 @@ const priceInputWrapperClassName =
 const priceInputClassName =
   "h-full min-w-0 flex-1 border-0 bg-transparent p-0 text-sm leading-9 text-neutral-900 focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none";
 
+const ArchiveSidebarPriceInputs = ({
+  minPrice,
+  maxPrice,
+  onChange,
+}: {
+  minPrice: number;
+  maxPrice: number;
+  onChange: (next: Partial<ArchiveFilterState>) => void;
+}) => {
+  const [minPriceInput, setMinPriceInput] = useState(String(minPrice));
+  const [maxPriceInput, setMaxPriceInput] = useState(String(maxPrice));
+
+  const commitPriceRange = () => {
+    const next = normalizePriceRange(
+      parseArchivePriceInput(minPriceInput, "min"),
+      parseArchivePriceInput(maxPriceInput, "max"),
+    );
+    onChange(next);
+  };
+
+  return (
+    <div className="flex items-center gap-1.5">
+      <div className={priceInputWrapperClassName}>
+        <span className="flex h-full shrink-0 items-center text-xs font-medium leading-none text-header-green">
+          {currencyCode}
+        </span>
+        <input
+          id="archive-sidebar-min-price"
+          type="number"
+          min={ARCHIVE_PRICE_MIN}
+          max={ARCHIVE_PRICE_MAX}
+          inputMode="numeric"
+          aria-label="Minimum price"
+          className={priceInputClassName}
+          value={minPriceInput}
+          onChange={(event) => setMinPriceInput(event.target.value)}
+          onBlur={commitPriceRange}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") commitPriceRange();
+          }}
+        />
+      </div>
+      <span className="text-sm text-neutral-400">–</span>
+      <div className={priceInputWrapperClassName}>
+        <span className="flex h-full shrink-0 items-center text-xs font-medium leading-none text-header-green">
+          {currencyCode}
+        </span>
+        <input
+          id="archive-sidebar-max-price"
+          type="number"
+          min={ARCHIVE_PRICE_MIN}
+          max={ARCHIVE_PRICE_MAX}
+          inputMode="numeric"
+          aria-label="Maximum price"
+          className={priceInputClassName}
+          value={maxPriceInput}
+          onChange={(event) => setMaxPriceInput(event.target.value)}
+          onBlur={commitPriceRange}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") commitPriceRange();
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
 const ArchiveSidebarPanel = ({
   filters,
   onChange,
   lockedFilters,
+  filterDefaults,
+  sortOptions = ARCHIVE_SORT_OPTIONS,
 }: ArchiveSidebarPanelProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const showOnSale = lockedFilters?.onSale === undefined;
   const showInStock = lockedFilters?.inStock === undefined;
 
-  const [minPrice, setMinPrice] = useState(String(filters.minPrice));
-  const [maxPrice, setMaxPrice] = useState(String(filters.maxPrice));
-
-  const commitPriceRange = () => {
-    const next = normalizePriceRange(
-      parseArchivePriceInput(minPrice, "min"),
-      parseArchivePriceInput(maxPrice, "max"),
-    );
-    onChange(next);
-  };
-
   const handleReset = () => {
     const resetState: ArchiveFilterState = {
       ...DEFAULT_ARCHIVE_FILTERS,
+      ...filterDefaults,
       ...lockedFilters,
     };
-    const query = buildArchiveFilterSearchParams(resetState, lockedFilters);
+    const query = buildArchiveFilterSearchParams(
+      resetState,
+      lockedFilters,
+      filterDefaults,
+    );
     router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
   };
 
@@ -83,7 +149,7 @@ const ArchiveSidebarPanel = ({
           className="w-full"
           buttonClassName="h-9 w-full px-2"
           value={filters.sort}
-          options={ARCHIVE_SORT_OPTIONS.map((option) => ({
+          options={sortOptions.map((option) => ({
             id: option.id,
             label: option.label,
           }))}
@@ -118,49 +184,12 @@ const ArchiveSidebarPanel = ({
 
       <div className="space-y-2 rounded-xl border border-[#E8E8E8] bg-white px-4 py-3">
         <span className={filterFieldLabelClassName}>Price</span>
-        <div className="flex items-center gap-1.5">
-          <div className={priceInputWrapperClassName}>
-            <span className="flex h-full shrink-0 items-center text-xs font-medium leading-none text-header-green">
-              {currencyCode}
-            </span>
-            <input
-              id="archive-sidebar-min-price"
-              type="number"
-              min={ARCHIVE_PRICE_MIN}
-              max={ARCHIVE_PRICE_MAX}
-              inputMode="numeric"
-              aria-label="Minimum price"
-              className={priceInputClassName}
-              value={minPrice}
-              onChange={(event) => setMinPrice(event.target.value)}
-              onBlur={commitPriceRange}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") commitPriceRange();
-              }}
-            />
-          </div>
-          <span className="text-sm text-neutral-400">–</span>
-          <div className={priceInputWrapperClassName}>
-            <span className="flex h-full shrink-0 items-center text-xs font-medium leading-none text-header-green">
-              {currencyCode}
-            </span>
-            <input
-              id="archive-sidebar-max-price"
-              type="number"
-              min={ARCHIVE_PRICE_MIN}
-              max={ARCHIVE_PRICE_MAX}
-              inputMode="numeric"
-              aria-label="Maximum price"
-              className={priceInputClassName}
-              value={maxPrice}
-              onChange={(event) => setMaxPrice(event.target.value)}
-              onBlur={commitPriceRange}
-              onKeyDown={(event) => {
-                if (event.key === "Enter") commitPriceRange();
-              }}
-            />
-          </div>
-        </div>
+        <ArchiveSidebarPriceInputs
+          key={`${filters.minPrice}-${filters.maxPrice}`}
+          minPrice={filters.minPrice}
+          maxPrice={filters.maxPrice}
+          onChange={onChange}
+        />
       </div>
     </div>
   );

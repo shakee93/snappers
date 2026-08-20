@@ -1,8 +1,11 @@
 import { SimpleProduct, VariableProduct, ProductVariation } from "@/graphql/types/graphql";
 import {
-  ARCHIVE_SORT_OPTIONS,
+  DEALS_ARCHIVE_SORT_OPTIONS,
   type ArchiveFilterState,
 } from "@/lib/archiveFilters";
+
+export const HOMEPAGE_DEAL_CAROUSEL_LIMIT = 12;
+export const DEALS_PAGE_FETCH_FIRST = 50;
 import { filterHiddenProducts } from "@/lib/hidden-products";
 import {
   parsePriceString,
@@ -51,8 +54,8 @@ export const filterDealProducts = (
   });
 
   const sortOption =
-    ARCHIVE_SORT_OPTIONS.find((option) => option.id === filters.sort) ??
-    ARCHIVE_SORT_OPTIONS[0];
+    DEALS_ARCHIVE_SORT_OPTIONS.find((option) => option.id === filters.sort) ??
+    DEALS_ARCHIVE_SORT_OPTIONS[0];
 
   const sorted = [...result];
 
@@ -65,9 +68,6 @@ export const filterDealProducts = (
       break;
     case "name":
       sorted.sort((a, b) => (a.name ?? "").localeCompare(b.name ?? ""));
-      break;
-    case "rating":
-      sorted.sort((a, b) => (b.reviewCount ?? 0) - (a.reviewCount ?? 0));
       break;
     case "newest":
     default:

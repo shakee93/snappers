@@ -1,7 +1,3 @@
-"use client";
-
-import { useMemo } from "react";
-import { useSearchParams } from "next/navigation";
 import ProductCard, {
   type ProductCardProps,
 } from "@/components/home/ProductCard";
@@ -15,30 +11,22 @@ import { filterDealProducts, type DealProduct } from "@/lib/dealProducts";
 
 export interface DealsProductGridProps {
   products: DealProduct[];
+  searchParams: URLSearchParams;
   productCardProps?: Pick<ProductCardProps, "badgeLabel" | "accentColor">;
 }
 
-/** Deal-only grid — filters/sorts SSR deal products client-side. */
+/** Deal-only grid — filters/sorts SSR deal products from URL params. */
 const DealsProductGrid = ({
   products,
+  searchParams,
   productCardProps,
 }: DealsProductGridProps) => {
-  const searchParams = useSearchParams();
-
-  const filters = useMemo(
-    () =>
-      parseArchiveFilters(
-        searchParams,
-        DEALS_FILTER_DEFAULTS,
-        DEALS_LOCKED_FILTERS,
-      ),
-    [searchParams],
+  const filters = parseArchiveFilters(
+    searchParams,
+    DEALS_FILTER_DEFAULTS,
+    DEALS_LOCKED_FILTERS,
   );
-
-  const visibleProducts = useMemo(
-    () => filterDealProducts(products, filters),
-    [filters, products],
-  );
+  const visibleProducts = filterDealProducts(products, filters);
 
   if (!visibleProducts.length) {
     return (

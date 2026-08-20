@@ -7,9 +7,13 @@ import ArchiveSidebarPanel from "@/components/global/primitives/archive/ArchiveS
 import {
   ArchiveFilterState,
   buildArchiveFilterSearchParams,
+  DEALS_ARCHIVE_SORT_OPTIONS,
   DEALS_FILTER_DEFAULTS,
   DEALS_LOCKED_FILTERS,
+  DEFAULT_ARCHIVE_FILTERS,
   parseArchiveFilters,
+  ARCHIVE_SORT_OPTIONS,
+  type ArchiveSortOption,
 } from "@/lib/archiveFilters";
 
 interface ArchiveFiltersProps {
@@ -25,12 +29,24 @@ const ArchiveFilters = ({
   dealsOnly = false,
   variant = "bar",
 }: ArchiveFiltersProps) => {
-  const resolvedLockedFilters = dealsOnly
-    ? DEALS_LOCKED_FILTERS
-    : lockedFilters;
-  const resolvedFilterDefaults = dealsOnly
-    ? { ...DEALS_FILTER_DEFAULTS, ...filterDefaults }
-    : filterDefaults;
+  const resolvedLockedFilters = useMemo(
+    () => (dealsOnly ? DEALS_LOCKED_FILTERS : lockedFilters),
+    [dealsOnly, lockedFilters],
+  );
+  const resolvedFilterDefaults = useMemo(
+    () =>
+      dealsOnly
+        ? { ...DEALS_FILTER_DEFAULTS, ...filterDefaults }
+        : filterDefaults,
+    [dealsOnly, filterDefaults],
+  );
+  const resolvedBuildDefaults = useMemo(
+    () => ({ ...DEFAULT_ARCHIVE_FILTERS, ...resolvedFilterDefaults }),
+    [resolvedFilterDefaults],
+  );
+  const sortOptions: ArchiveSortOption[] = dealsOnly
+    ? DEALS_ARCHIVE_SORT_OPTIONS
+    : ARCHIVE_SORT_OPTIONS;
 
   const router = useRouter();
   const pathname = usePathname();
@@ -53,12 +69,16 @@ const ArchiveFilters = ({
         ...partial,
         ...resolvedLockedFilters,
       };
-      const query = buildArchiveFilterSearchParams(next, resolvedLockedFilters);
+      const query = buildArchiveFilterSearchParams(
+        next,
+        resolvedLockedFilters,
+        resolvedBuildDefaults,
+      );
       router.replace(query ? `${pathname}?${query}` : pathname, {
         scroll: false,
       });
     },
-    [filters, pathname, resolvedLockedFilters, router],
+    [filters, pathname, resolvedBuildDefaults, resolvedLockedFilters, router],
   );
 
   if (variant === "sidebar") {
@@ -67,6 +87,8 @@ const ArchiveFilters = ({
         filters={filters}
         onChange={updateFilters}
         lockedFilters={resolvedLockedFilters}
+        filterDefaults={resolvedBuildDefaults}
+        sortOptions={sortOptions}
       />
     );
   }
@@ -76,6 +98,7 @@ const ArchiveFilters = ({
       filters={filters}
       onChange={updateFilters}
       lockedFilters={resolvedLockedFilters}
+      sortOptions={sortOptions}
     />
   );
 };

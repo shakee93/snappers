@@ -1,6 +1,7 @@
 import ArchiveFilters from "@/components/global/primitives/archive/ArchiveFilters";
 import { ArchiveFilterBarSkeleton } from "@/components/global/primitives/archive/ArchiveLoading";
 import DealsProductGrid from "@/components/global/primitives/archive/DealsProductGrid";
+import { recordToURLSearchParams } from "@/lib/archiveFilters";
 import { getDealProductsCached } from "@/lib/dealProducts.server";
 import { Metadata } from "next";
 import { Suspense } from "react";
@@ -13,7 +14,15 @@ export const metadata: Metadata = {
 
 export const revalidate = 300;
 
-async function DealsContent() {
+interface DealsPageProps {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}
+
+async function DealsContent({
+  searchParams,
+}: {
+  searchParams: URLSearchParams;
+}) {
   const products = await getDealProductsCached();
 
   return (
@@ -34,22 +43,23 @@ async function DealsContent() {
         </aside>
 
         <div className="col-span-12 lg:col-span-9">
-          <Suspense fallback={null}>
-            <DealsProductGrid
-              products={products}
-              productCardProps={{
-                badgeLabel: "Deals",
-                accentColor: siteConfig.theme.brandHex.dealAccent,
-              }}
-            />
-          </Suspense>
+          <DealsProductGrid
+            products={products}
+            searchParams={searchParams}
+            productCardProps={{
+              badgeLabel: "Deals",
+              accentColor: siteConfig.theme.brandHex.dealAccent,
+            }}
+          />
         </div>
       </div>
     </>
   );
 }
 
-export default function DealsPage() {
+export default async function DealsPage({ searchParams }: DealsPageProps) {
+  const resolvedSearchParams = recordToURLSearchParams(await searchParams);
+
   return (
     <main>
       <div className="container space-y-16 py-8 sm:space-y-20 lg:space-y-28 lg:py-12">
@@ -72,7 +82,7 @@ export default function DealsPage() {
               </div>
             }
           >
-            <DealsContent />
+            <DealsContent searchParams={resolvedSearchParams} />
           </Suspense>
         </div>
       </div>

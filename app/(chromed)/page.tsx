@@ -32,6 +32,7 @@ import {
   filterBrowseCategoryTabs,
 } from "@/lib/browseCategories";
 import { getDealProductsCached } from "@/lib/dealProducts.server";
+import { HOMEPAGE_DEAL_CAROUSEL_LIMIT } from "@/lib/dealProducts";
 import SectionGoogleReviews, {
   type GoogleReviewsFields,
 } from "@/components/home/SectionGoogleReviews";
@@ -224,7 +225,9 @@ export default async function Home() {
         </div>
 
         <div className="mt-8 md:mt-10">
-          <SectionDealProducts products={dealProducts} />
+          <SectionDealProducts
+            products={dealProducts.slice(0, HOMEPAGE_DEAL_CAROUSEL_LIMIT)}
+          />
         </div>
 
         <SectionHowToOrder className="mt-16 md:mt-24" />

@@ -8,6 +8,7 @@ import {
   ARCHIVE_PRICE_MIN,
   ARCHIVE_SORT_OPTIONS,
   ArchiveFilterState,
+  ArchiveSortOption,
   normalizePriceRange,
   parseArchivePriceInput,
 } from "@/lib/archiveFilters";
@@ -24,6 +25,7 @@ interface ArchiveFilterBarProps {
   className?: string;
   /** Locked filters are hidden — the page always applies them server-side. */
   lockedFilters?: Partial<ArchiveFilterState>;
+  sortOptions?: ArchiveSortOption[];
 }
 
 const priceInputWrapperClassName =
@@ -119,6 +121,7 @@ const ArchiveFilterBar = ({
   onChange,
   className,
   lockedFilters,
+  sortOptions = ARCHIVE_SORT_OPTIONS,
 }: ArchiveFilterBarProps) => {
   const showOnSale = lockedFilters?.onSale === undefined;
   const showInStock = lockedFilters?.inStock === undefined;
@@ -173,7 +176,7 @@ const ArchiveFilterBar = ({
               className="min-w-0 flex-1"
               buttonClassName="h-9 w-full min-w-0 px-2"
               value={filters.sort}
-              options={ARCHIVE_SORT_OPTIONS.map((option) => ({
+              options={sortOptions.map((option) => ({
                 id: option.id,
                 label: option.label,
               }))}
@@ -199,10 +202,10 @@ const ArchiveFilterBar = ({
             id="archive-sort"
             aria-label="Sort products"
             value={filters.sort}
-            options={ARCHIVE_SORT_OPTIONS.map((option) => ({
+            options={sortOptions.map((option) => ({
               id: option.id,
               label: option.label,
-            }))}
+              }))}
             onChange={(sort) => onChange({ sort })}
           />
         </div>

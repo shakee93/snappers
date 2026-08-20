@@ -20,6 +20,34 @@ export interface ArchiveSortOption {
   order: OrderEnum;
 }
 
+/** Sort options exposed on /deals — popular/rating are no-ops client-side. */
+export const DEALS_ARCHIVE_SORT_OPTIONS: ArchiveSortOption[] = [
+  {
+    id: "newest",
+    label: "Newest",
+    field: ProductsOrderByEnum.Date,
+    order: OrderEnum.Desc,
+  },
+  {
+    id: "price-asc",
+    label: "Price: Low to High",
+    field: ProductsOrderByEnum.Price,
+    order: OrderEnum.Asc,
+  },
+  {
+    id: "price-desc",
+    label: "Price: High to Low",
+    field: ProductsOrderByEnum.Price,
+    order: OrderEnum.Desc,
+  },
+  {
+    id: "name",
+    label: "Name",
+    field: ProductsOrderByEnum.Name,
+    order: OrderEnum.Asc,
+  },
+];
+
 export const ARCHIVE_SORT_OPTIONS: ArchiveSortOption[] = [
   {
     id: "newest",
@@ -135,30 +163,55 @@ export function parseArchiveFilters(
 export function buildArchiveFilterSearchParams(
   filters: ArchiveFilterState,
   locked: Partial<ArchiveFilterState> = {},
+  defaults: Partial<ArchiveFilterState> = {},
 ): string {
   const params = new URLSearchParams();
+  const base: ArchiveFilterState = {
+    ...DEFAULT_ARCHIVE_FILTERS,
+    ...defaults,
+    ...locked,
+  };
 
-  if (filters.onSale && locked.onSale === undefined) {
-    params.set("on_sale", "true");
+  if (filters.onSale !== base.onSale && locked.onSale === undefined) {
+    params.set("on_sale", filters.onSale ? "true" : "false");
   }
 
-  if (filters.inStock && locked.inStock === undefined) {
-    params.set("in_stock", "true");
+  if (filters.inStock !== base.inStock && locked.inStock === undefined) {
+    params.set("in_stock", filters.inStock ? "true" : "false");
   }
 
-  if (filters.minPrice > ARCHIVE_PRICE_MIN) {
+  if (filters.minPrice !== base.minPrice) {
     params.set("min_price", String(filters.minPrice));
   }
 
-  if (filters.maxPrice < ARCHIVE_PRICE_MAX) {
+  if (filters.maxPrice !== base.maxPrice) {
     params.set("max_price", String(filters.maxPrice));
   }
 
-  if (filters.sort !== DEFAULT_ARCHIVE_SORT) {
+  if (filters.sort !== base.sort) {
     params.set("sort", filters.sort);
   }
 
   return params.toString();
+}
+
+export function recordToURLSearchParams(
+  record: Record<string, string | string[] | undefined>,
+): URLSearchParams {
+  const params = new URLSearchParams();
+
+  for (const [key, value] of Object.entries(record)) {
+    if (value === undefined) continue;
+    if (Array.isArray(value)) {
+      for (const entry of value) {
+        params.append(key, entry);
+      }
+    } else {
+      params.set(key, value);
+    }
+  }
+
+  return params;
 }
 
 export interface ArchiveProductsQueryVariables {
