@@ -7,19 +7,32 @@
       "addressLine2": "Colombo 05, Sri Lanka",
       "phones": [
         { "display": "071 6060 123", "tel": "0716060123" }
+      ],
+      "hours": [
+        "Mon – Sat: 9:00 AM – 9:00 PM",
+        "Sun & Poya: 9:30 AM – 6:00 PM"
       ]
     },
     {
       "name": "Pet & Co.",
       "addressLine1": "No. 122, Galle Road,",
       "addressLine2": "Dehiwala-Mount Lavinia",
-      "phones": [{ "display": "077 713 8138", "tel": "0777138138" }]
+      "phones": [{ "display": "077 713 8138", "tel": "0777138138" }],
+      "hours": [
+        "Mon – Sat: 9:30 AM – 7:00 PM",
+        "Poya: 9:30 AM – 6:00 PM",
+        "Sunday: Closed"
+      ]
     },
     {
       "name": "Pet Love.lk",
       "addressLine1": "No. 680, Avissawella Road,",
       "addressLine2": "Wellampitiya",
-      "phones": [{ "display": "077 627 7866", "tel": "0776277866" }]
+      "phones": [{ "display": "077 627 7866", "tel": "0776277866" }],
+      "hours": [
+        "Mon – Sat: 9:00 AM – 9:00 PM",
+        "Sun & Poya: 9:30 AM – 6:00 PM"
+      ]
     }
   ]
 }

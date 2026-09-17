@@ -7,7 +7,8 @@ interface StoreLocation {
   id: string;
   name: string;
   location: string;
-  details: string;
+  address: string;
+  hours: string[];
   href: string;
   image?: string;
   imageAlt?: string;
@@ -74,9 +75,21 @@ const SectionOurStores = ({ className = "" }: SectionOurStoresProps) => {
                 <p className="mt-1 text-sm font-medium text-neutral-700">
                   {store.location}
                 </p>
-                <p className="mt-3 flex-1 text-sm leading-relaxed text-neutral-600">
-                  {store.details}
+                <p className="mt-3 text-sm leading-relaxed text-neutral-600">
+                  {store.address}
                 </p>
+                {store.hours.length > 0 ? (
+                  <div className="mt-3 flex-1">
+                    <p className="text-sm font-semibold text-[#092412]">
+                      Open hours
+                    </p>
+                    <ul className="mt-1.5 space-y-0.5 text-sm leading-relaxed text-neutral-600">
+                      {store.hours.map((line) => (
+                        <li key={line}>{line}</li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
 
                 <Link
                   href={store.href}

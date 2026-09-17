@@ -65,6 +65,13 @@ const ContactPageContent = ({ formspreeId }: ContactPageContentProps) => {
                           </Link>
                         ))}
                       </div>
+                      {"hours" in location && location.hours?.length ? (
+                        <ul className="mt-2 space-y-0.5 text-sm text-neutral-600">
+                          {location.hours.map((line) => (
+                            <li key={line}>{line}</li>
+                          ))}
+                        </ul>
+                      ) : null}
                     </div>
                   </article>
                 ))}

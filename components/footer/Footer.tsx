@@ -72,14 +72,21 @@ const Footer = () => {
         <div className="mx-auto grid max-w-[1088px] grid-cols-1 gap-x-8 gap-y-8 px-4 py-8 sm:grid-cols-2 lg:grid-cols-12">
           <div className="min-w-0 lg:col-span-4">
             <h3 className={headingClass}>{footer.openTime.heading}</h3>
-            <ul className="mt-3 space-y-2">
-              {footer.openTime.schedule.map((entry) => (
-                <li
-                  key={entry.label}
-                  className="flex flex-wrap gap-x-2 text-sm text-white/70"
-                >
-                  <span className="font-medium text-white/90">{entry.label}</span>
-                  <span>{entry.hours}</span>
+            <ul className="mt-3 space-y-4">
+              {footer.openTime.groups.map((group) => (
+                <li key={group.name}>
+                  <p className="text-sm font-medium text-white/90">{group.name}</p>
+                  <ul className="mt-1.5 space-y-1">
+                    {group.lines.map((line) => (
+                      <li
+                        key={`${group.name}-${line.label}`}
+                        className="flex flex-wrap gap-x-2 text-sm text-white/70"
+                      >
+                        <span className="font-medium text-white/80">{line.label}</span>
+                        <span>{line.hours}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </li>
               ))}
             </ul>
