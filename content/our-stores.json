@@ -7,7 +7,11 @@
       "id": "pet-love-wellampitiya",
       "name": "Pet Love.lk",
       "location": "Wellampitiya store",
-      "details": "No. 680, Avissawella Road, Wellampitiya. Open 8:00 AM · Closes 8 PM.",
+      "address": "No. 680, Avissawella Road, Wellampitiya.",
+      "hours": [
+        "Mon – Sat: 9:00 AM – 9:00 PM",
+        "Sun & Poya: 9:30 AM – 6:00 PM"
+      ],
       "href": "/contact",
       "image": "/homepage/stores/pet-love-wellampitiya.jpg",
       "imageAlt": "Pet Love.lk Wellampitiya storefront"
@@ -16,7 +20,11 @@
       "id": "catlitter-narahenpita",
       "name": "Catlitter",
       "location": "Narahenpita store",
-      "details": "107, Kirula Road, Narahenpita, Colombo 05, Colombo, Sri Lanka. Open 8:00 AM · Closes 8 PM.",
+      "address": "107, Kirula Road, Narahenpita, Colombo 05, Colombo, Sri Lanka.",
+      "hours": [
+        "Mon – Sat: 9:00 AM – 9:00 PM",
+        "Sun & Poya: 9:30 AM – 6:00 PM"
+      ],
       "href": "/contact",
       "image": "/homepage/stores/scoody-doodle-nugegoda.jpg",
       "imageAlt": "Catlitter Narahenpita storefront"
@@ -25,7 +33,12 @@
       "id": "pet-co-dehiwala",
       "name": "Pet & Co.",
       "location": "Dehiwala store",
-      "details": "No. 122A, Galle Road, Dehiwala. Open 8:00 AM · Closes 8 PM.",
+      "address": "No. 122A, Galle Road, Dehiwala.",
+      "hours": [
+        "Mon – Sat: 9:30 AM – 7:00 PM",
+        "Poya: 9:30 AM – 6:00 PM",
+        "Sunday: Closed"
+      ],
       "href": "/contact",
       "image": "/homepage/stores/pet-co-dehiwala.jpg",
       "imageAlt": "Pet & Co Dehiwala storefront"

@@ -160,9 +160,22 @@ export const siteConfig = {
     },
     openTime: {
       heading: "Open Time",
-      schedule: [
-        { label: "Monday - Saturday", hours: "09:00 AM - 09.00 PM" },
-        { label: "Sunday & Poya", hours: "09:30 AM - 6.00 PM" },
+      groups: [
+        {
+          name: "Catlitter & Petlove",
+          lines: [
+            { label: "Mon – Sat", hours: "9:00 AM – 9:00 PM" },
+            { label: "Sun & Poya", hours: "9:30 AM – 6:00 PM" },
+          ],
+        },
+        {
+          name: "Pet & Co",
+          lines: [
+            { label: "Mon – Sat", hours: "9:30 AM – 7:00 PM" },
+            { label: "Poya", hours: "9:30 AM – 6:00 PM" },
+            { label: "Sunday", hours: "Closed" },
+          ],
+        },
       ],
     },
     visitUsHeading: "Visit Us",
