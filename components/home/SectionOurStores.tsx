@@ -3,16 +3,30 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import ourStoresContent from "@/content/our-stores.json";
 
-interface StoreLocation {
+type StoreLocationRaw = {
   id: string;
   name: string;
   location: string;
-  address: string;
-  hours: string[];
   href: string;
   image?: string;
   imageAlt?: string;
-}
+  /** Current shape */
+  address?: string;
+  hours?: string[];
+  /** Legacy single-line copy before address/hours split */
+  details?: string;
+};
+
+type StoreLocation = StoreLocationRaw & {
+  address: string;
+  hours: string[];
+};
+
+const normalizeStore = (store: StoreLocationRaw): StoreLocation => ({
+  ...store,
+  address: store.address ?? store.details ?? "",
+  hours: store.hours ?? [],
+});
 
 export interface SectionOurStoresProps {
   className?: string;
@@ -29,7 +43,7 @@ const SectionOurStores = ({ className = "" }: SectionOurStoresProps) => {
     title: string;
     subtitle: string;
     coverImage: string;
-    stores: StoreLocation[];
+    stores: StoreLocationRaw[];
   };
 
   if (stores.length === 0) return null;
@@ -49,10 +63,12 @@ const SectionOurStores = ({ className = "" }: SectionOurStoresProps) => {
         </div>
 
         <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3 xl:mt-14 xl:gap-6">
-          {stores.map((store) => {
+          {stores.map((raw) => {
+            const store = normalizeStore(raw);
             const external = isExternalHref(store.href);
             const imageSrc = store.image || coverImage;
             const imageAlt = store.imageAlt || `${store.name} — ${store.location}`;
+            const hasHours = store.hours.length > 0;
 
             return (
               <article
@@ -78,7 +94,7 @@ const SectionOurStores = ({ className = "" }: SectionOurStoresProps) => {
                 <p className="mt-3 text-sm leading-relaxed text-neutral-600">
                   {store.address}
                 </p>
-                {store.hours.length > 0 ? (
+                {hasHours ? (
                   <div className="mt-3 flex-1">
                     <p className="text-sm font-semibold text-[#092412]">
                       Open hours
