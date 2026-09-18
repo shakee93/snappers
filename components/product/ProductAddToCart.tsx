@@ -186,7 +186,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
     const variationId = getVariationId();
 
     try {
-      const { data, error } = await addToCart(
+      const result = await addToCart(
         product?.databaseId,
         quantity,
         variationId,
@@ -194,28 +194,23 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
         { openCart: !redirectToCheckout },
       );
 
-      const success = !error && !data?.error;
-      if (success) {
-        handleCartCompletion();
-        if (redirectToCheckout) {
-          router.push("/checkout");
-        }
-      } else {
-        handleAddToCartResponse(data, error);
+      if (!result || ("error" in result && result.error)) {
+        setLoadingAction(null);
+        return;
       }
+
+      handleCartCompletion();
+      if (redirectToCheckout) {
+        router.push("/checkout");
+        // Keep the Buy Now spinner until the route swap so a second click
+        // cannot queue another add while checkout is still loading.
+        return;
+      }
+
+      setLoadingAction(null);
     } catch (error: unknown) {
       handleAddToCartError(error);
-    } finally {
       setLoadingAction(null);
-    }
-  };
-
-  const handleAddToCartResponse = (
-    data: { error?: unknown } | null | undefined,
-    error: unknown,
-  ) => {
-    if (!error && !data?.error) {
-      handleCartCompletion();
     }
   };
 
@@ -355,8 +350,9 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
       type="button"
       disabled={isAddToCartDisabled}
       onClick={() => addItemToCart(false)}
+      aria-label={isPreOrderProduct() ? "Pre-order" : "Add to Cart"}
       className={twMerge(
-        `${cardControlClass} min-w-0 flex-1 px-3 text-sm font-bold text-[#38461F] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:text-base`,
+        `${cardControlClass} min-w-0 flex-1 px-2 text-xs font-bold leading-tight text-[#38461F] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:text-sm lg:text-base`,
       )}
     >
       {loadingAction === "cart" ? (
@@ -364,7 +360,10 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
       ) : isPreOrderProduct() ? (
         "Pre-order"
       ) : (
-        "Add to Cart"
+        <>
+          <span className="sm:hidden">Add</span>
+          <span className="hidden sm:inline">Add to Cart</span>
+        </>
       )}
     </button>
   );
@@ -375,7 +374,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
       disabled={isAddToCartDisabled}
       onClick={() => addItemToCart(true)}
       className={twMerge(
-        `flex h-12 min-w-0 flex-1 items-center justify-center bg-[#ACDA5A] px-3 text-sm font-bold text-[#38461F] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:text-base ${pdpRadius}`,
+        `flex h-12 min-w-0 flex-1 items-center justify-center bg-[#ACDA5A] px-2 text-xs font-bold leading-tight text-[#38461F] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:text-sm lg:text-base ${pdpRadius}`,
       )}
     >
       {loadingAction === "buy" ? (
@@ -401,23 +400,12 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
         {!(product.type === "VARIABLE" && !variation) && (
           <div className="lg:pb-4">
             {isInStock ? (
-              <>
-                {/* Mobile: qty · add to cart · buy now · wishlist */}
-                <div className="flex items-center gap-2 lg:hidden">
-                  {renderQuantityControl()}
-                  {renderAddToCartButton()}
-                  {renderBuyNowButton()}
-                  {renderWishlistControl()}
-                </div>
-
-                {/* Desktop: qty · add to cart · buy now · wishlist */}
-                <div className="hidden items-center gap-2 lg:flex">
-                  {renderQuantityControl()}
-                  {renderAddToCartButton()}
-                  {renderBuyNowButton()}
-                  {renderWishlistControl()}
-                </div>
-              </>
+              <div className="flex items-center gap-2">
+                {renderQuantityControl()}
+                {renderAddToCartButton()}
+                {renderBuyNowButton()}
+                {renderWishlistControl()}
+              </div>
             ) : (
               <div className="flex items-center gap-2">
                 <button

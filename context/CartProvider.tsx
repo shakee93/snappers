@@ -13,6 +13,18 @@ import {
     USER_DATA_KEY,
 } from "@/utils/storage-keys";
 
+/** Result of `addToCart` — Apollo mutation payload or a bail-out with `error`. */
+export type AddToCartResult =
+    | {
+          data?: {
+              addToCart?: {
+                  cartItem?: unknown
+                  cart?: Cart | null
+              } | null
+          } | null
+          errors?: readonly unknown[]
+      }
+    | { error: string }
 
 type CartSession = {
     cart: Cart | null
@@ -28,7 +40,7 @@ type CartSession = {
         variation?: number,
         productData?: unknown,
         options?: { openCart?: boolean },
-    ) => void | Promise<unknown>
+    ) => Promise<AddToCartResult | undefined>
     setCustomer: React.Dispatch<React.SetStateAction<Customer | null>>
     clearCart: () => void
     refreshCart: () => Promise<any>
@@ -44,7 +56,7 @@ const CartContext = createContext<CartSession>({
     customer: null,
     loading: null,
     removeFromCart: (keys) => { },
-    addToCart: (id, quantity, variation, productData, options) => { },
+    addToCart: async () => undefined,
     updateCart: (key, q) => { },
     getCart: () => { },
     setCustomer: () => { },
@@ -302,7 +314,7 @@ export function CartProvider({ children }: {
         variation?: number,
         productData?: unknown,
         options?: { openCart?: boolean },
-    ) => {
+    ): Promise<AddToCartResult | undefined> => {
         const openCart = options?.openCart !== false;
 
         try {
@@ -363,6 +375,8 @@ export function CartProvider({ children }: {
                         return retry;
                     } catch (retryError) {
                         console.error("Add to cart retry failed:", retryError);
+                        toast.error("Unable to add item to cart. Please try again.");
+                        return { error: "Add to cart failed" };
                     }
                 }
             }
