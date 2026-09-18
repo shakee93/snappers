@@ -24,7 +24,9 @@ interface ProductAddToCartProps {
 
 const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation }) => {
   const [quantity, setQuantity] = useState<number>(1);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loadingAction, setLoadingAction] = useState<"cart" | "buy" | null>(
+    null,
+  );
   const { addToCart, cart } = useCart();
   const router = useRouter();
   const { customer } = useSession();
@@ -32,6 +34,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   const [userEmail, setUserEmail] = useState(customer?.email || ""); // Track user's email
   const [isThankYouModal, setIsThankYouModal] = useState(false); // Track thank you modal visibility
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const loading = loadingAction !== null;
 
   const sendNotificationRequest = async () => {
     try {
@@ -170,7 +173,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
     return true;
   };
 
-  const addItemToCart = async () => {
+  const addItemToCart = async (redirectToCheckout = false) => {
     if (isProductOutOfStock()) {
       return;
     }
@@ -179,36 +182,35 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
       return;
     }
 
-    setLoading(true);
+    setLoadingAction(redirectToCheckout ? "buy" : "cart");
     const variationId = getVariationId();
 
     try {
-      const { data, error } = await addToCart(
+      const result = await addToCart(
         product?.databaseId,
         quantity,
         variationId,
-        product
+        product,
+        { openCart: !redirectToCheckout },
       );
 
-      const success = !error && !data?.error;
-      if (success) {
-        handleCartCompletion();
-      } else {
-        handleAddToCartResponse(data, error);
+      if (!result || ("error" in result && result.error)) {
+        setLoadingAction(null);
+        return;
       }
+
+      handleCartCompletion();
+      if (redirectToCheckout) {
+        router.push("/checkout");
+        // Keep the Buy Now spinner until the route swap so a second click
+        // cannot queue another add while checkout is still loading.
+        return;
+      }
+
+      setLoadingAction(null);
     } catch (error: unknown) {
       handleAddToCartError(error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleAddToCartResponse = (
-    data: { error?: unknown } | null | undefined,
-    error: unknown,
-  ) => {
-    if (!error && !data?.error) {
-      handleCartCompletion();
+      setLoadingAction(null);
     }
   };
 
@@ -318,7 +320,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
 
   const renderQuantityControl = () => (
     <div
-      className={`${cardControlClass} min-w-[136px] shrink-0 justify-between gap-4 px-4`}
+      className={`${cardControlClass} min-w-[112px] shrink-0 justify-between gap-2 px-2 sm:min-w-[136px] sm:gap-4 sm:px-4`}
     >
       <button
         type="button"
@@ -347,15 +349,36 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
     <button
       type="button"
       disabled={isAddToCartDisabled}
-      onClick={() => addItemToCart()}
+      onClick={() => addItemToCart(false)}
+      aria-label={isPreOrderProduct() ? "Pre-order" : "Add to Cart"}
       className={twMerge(
-        `flex h-12 min-w-0 flex-1 items-center justify-center bg-[#ACDA5A] px-4 text-base font-bold text-[#38461F] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 ${pdpRadius}`,
+        `${cardControlClass} min-w-0 flex-1 px-2 text-xs font-bold leading-tight text-[#38461F] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:text-sm lg:text-base`,
       )}
     >
-      {loading ? (
+      {loadingAction === "cart" ? (
         <Loader className="h-4 w-4 animate-spin" />
       ) : isPreOrderProduct() ? (
         "Pre-order"
+      ) : (
+        <>
+          <span className="sm:hidden">Add</span>
+          <span className="hidden sm:inline">Add to Cart</span>
+        </>
+      )}
+    </button>
+  );
+
+  const renderBuyNowButton = () => (
+    <button
+      type="button"
+      disabled={isAddToCartDisabled}
+      onClick={() => addItemToCart(true)}
+      className={twMerge(
+        `flex h-12 min-w-0 flex-1 items-center justify-center bg-[#ACDA5A] px-2 text-xs font-bold leading-tight text-[#38461F] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:text-sm lg:text-base ${pdpRadius}`,
+      )}
+    >
+      {loadingAction === "buy" ? (
+        <Loader className="h-4 w-4 animate-spin" />
       ) : (
         "Buy Now"
       )}
@@ -377,21 +400,12 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
         {!(product.type === "VARIABLE" && !variation) && (
           <div className="lg:pb-4">
             {isInStock ? (
-              <>
-                {/* Mobile: qty · add to cart · wishlist */}
-                <div className="flex items-center gap-2 lg:hidden">
-                  {renderQuantityControl()}
-                  {renderAddToCartButton()}
-                  {renderWishlistControl()}
-                </div>
-
-                {/* Desktop: qty · add to cart · wishlist */}
-                <div className="hidden items-center gap-2 lg:flex">
-                  {renderQuantityControl()}
-                  {renderAddToCartButton()}
-                  {renderWishlistControl()}
-                </div>
-              </>
+              <div className="flex items-center gap-2">
+                {renderQuantityControl()}
+                {renderAddToCartButton()}
+                {renderBuyNowButton()}
+                {renderWishlistControl()}
+              </div>
             ) : (
               <div className="flex items-center gap-2">
                 <button

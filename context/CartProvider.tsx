@@ -13,6 +13,18 @@ import {
     USER_DATA_KEY,
 } from "@/utils/storage-keys";
 
+/** Result of `addToCart` — Apollo mutation payload or a bail-out with `error`. */
+export type AddToCartResult =
+    | {
+          data?: {
+              addToCart?: {
+                  cartItem?: unknown
+                  cart?: Cart | null
+              } | null
+          } | null
+          errors?: readonly unknown[]
+      }
+    | { error: string }
 
 type CartSession = {
     cart: Cart | null
@@ -22,7 +34,13 @@ type CartSession = {
     updateCart: (key: string, quantity: number) => void
     removeFromCart: (keys: string[]) => void
     getCart: () => void
-    addToCart: (id: number, quantity?: number, variation?: number, productData?: any) => void | Promise<any>
+    addToCart: (
+        id: number,
+        quantity?: number,
+        variation?: number,
+        productData?: unknown,
+        options?: { openCart?: boolean },
+    ) => Promise<AddToCartResult | undefined>
     setCustomer: React.Dispatch<React.SetStateAction<Customer | null>>
     clearCart: () => void
     refreshCart: () => Promise<any>
@@ -38,7 +56,7 @@ const CartContext = createContext<CartSession>({
     customer: null,
     loading: null,
     removeFromCart: (keys) => { },
-    addToCart: (id, quantity, variation, productData) => { },
+    addToCart: async () => undefined,
     updateCart: (key, q) => { },
     getCart: () => { },
     setCustomer: () => { },
@@ -290,7 +308,15 @@ export function CartProvider({ children }: {
         );
     };
 
-    const addToCart = async (id: number, quantity?: number, variation?: number, productData?: any) => {
+    const addToCart = async (
+        id: number,
+        quantity?: number,
+        variation?: number,
+        productData?: unknown,
+        options?: { openCart?: boolean },
+    ): Promise<AddToCartResult | undefined> => {
+        const openCart = options?.openCart !== false;
+
         try {
             // Check pre-order restrictions before adding to cart
             const isProductPreOrder = productData ? isPreOrderProduct(productData) : false;
@@ -313,7 +339,7 @@ export function CartProvider({ children }: {
                 },
             })
 
-            if (data?.data?.addToCart?.cartItem) {
+            if (openCart && data?.data?.addToCart?.cartItem) {
                 setIsCartOpen(true)
             }
 
@@ -342,13 +368,15 @@ export function CartProvider({ children }: {
                             },
                         });
 
-                        if (retry?.data?.addToCart?.cartItem) {
+                        if (openCart && retry?.data?.addToCart?.cartItem) {
                             setIsCartOpen(true)
                         }
 
                         return retry;
                     } catch (retryError) {
                         console.error("Add to cart retry failed:", retryError);
+                        toast.error("Unable to add item to cart. Please try again.");
+                        return { error: "Add to cart failed" };
                     }
                 }
             }

@@ -22,7 +22,8 @@ const StarRowSkeleton = () => (
 
 const AddToCartRowSkeleton = () => (
   <div className="flex items-center gap-2">
-    <SkeletonBlock className="h-12 w-[136px] shrink-0" />
+    <SkeletonBlock className="h-12 w-[112px] shrink-0 sm:w-[136px]" />
+    <SkeletonBlock className="h-12 min-w-0 flex-1" />
     <SkeletonBlock className="h-12 min-w-0 flex-1" />
     <SkeletonBlock className="h-12 w-12 shrink-0" />
   </div>
