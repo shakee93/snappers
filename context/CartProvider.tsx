@@ -22,7 +22,13 @@ type CartSession = {
     updateCart: (key: string, quantity: number) => void
     removeFromCart: (keys: string[]) => void
     getCart: () => void
-    addToCart: (id: number, quantity?: number, variation?: number, productData?: any) => void | Promise<any>
+    addToCart: (
+        id: number,
+        quantity?: number,
+        variation?: number,
+        productData?: unknown,
+        options?: { openCart?: boolean },
+    ) => void | Promise<unknown>
     setCustomer: React.Dispatch<React.SetStateAction<Customer | null>>
     clearCart: () => void
     refreshCart: () => Promise<any>
@@ -38,7 +44,7 @@ const CartContext = createContext<CartSession>({
     customer: null,
     loading: null,
     removeFromCart: (keys) => { },
-    addToCart: (id, quantity, variation, productData) => { },
+    addToCart: (id, quantity, variation, productData, options) => { },
     updateCart: (key, q) => { },
     getCart: () => { },
     setCustomer: () => { },
@@ -290,7 +296,15 @@ export function CartProvider({ children }: {
         );
     };
 
-    const addToCart = async (id: number, quantity?: number, variation?: number, productData?: any) => {
+    const addToCart = async (
+        id: number,
+        quantity?: number,
+        variation?: number,
+        productData?: unknown,
+        options?: { openCart?: boolean },
+    ) => {
+        const openCart = options?.openCart !== false;
+
         try {
             // Check pre-order restrictions before adding to cart
             const isProductPreOrder = productData ? isPreOrderProduct(productData) : false;
@@ -313,7 +327,7 @@ export function CartProvider({ children }: {
                 },
             })
 
-            if (data?.data?.addToCart?.cartItem) {
+            if (openCart && data?.data?.addToCart?.cartItem) {
                 setIsCartOpen(true)
             }
 
@@ -342,7 +356,7 @@ export function CartProvider({ children }: {
                             },
                         });
 
-                        if (retry?.data?.addToCart?.cartItem) {
+                        if (openCart && retry?.data?.addToCart?.cartItem) {
                             setIsCartOpen(true)
                         }
 

@@ -24,7 +24,9 @@ interface ProductAddToCartProps {
 
 const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation }) => {
   const [quantity, setQuantity] = useState<number>(1);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loadingAction, setLoadingAction] = useState<"cart" | "buy" | null>(
+    null,
+  );
   const { addToCart, cart } = useCart();
   const router = useRouter();
   const { customer } = useSession();
@@ -32,6 +34,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
   const [userEmail, setUserEmail] = useState(customer?.email || ""); // Track user's email
   const [isThankYouModal, setIsThankYouModal] = useState(false); // Track thank you modal visibility
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const loading = loadingAction !== null;
 
   const sendNotificationRequest = async () => {
     try {
@@ -170,7 +173,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
     return true;
   };
 
-  const addItemToCart = async () => {
+  const addItemToCart = async (redirectToCheckout = false) => {
     if (isProductOutOfStock()) {
       return;
     }
@@ -179,7 +182,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
       return;
     }
 
-    setLoading(true);
+    setLoadingAction(redirectToCheckout ? "buy" : "cart");
     const variationId = getVariationId();
 
     try {
@@ -187,19 +190,23 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
         product?.databaseId,
         quantity,
         variationId,
-        product
+        product,
+        { openCart: !redirectToCheckout },
       );
 
       const success = !error && !data?.error;
       if (success) {
         handleCartCompletion();
+        if (redirectToCheckout) {
+          router.push("/checkout");
+        }
       } else {
         handleAddToCartResponse(data, error);
       }
     } catch (error: unknown) {
       handleAddToCartError(error);
     } finally {
-      setLoading(false);
+      setLoadingAction(null);
     }
   };
 
@@ -318,7 +325,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
 
   const renderQuantityControl = () => (
     <div
-      className={`${cardControlClass} min-w-[136px] shrink-0 justify-between gap-4 px-4`}
+      className={`${cardControlClass} min-w-[112px] shrink-0 justify-between gap-2 px-2 sm:min-w-[136px] sm:gap-4 sm:px-4`}
     >
       <button
         type="button"
@@ -347,15 +354,32 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
     <button
       type="button"
       disabled={isAddToCartDisabled}
-      onClick={() => addItemToCart()}
+      onClick={() => addItemToCart(false)}
       className={twMerge(
-        `flex h-12 min-w-0 flex-1 items-center justify-center bg-[#ACDA5A] px-4 text-base font-bold text-[#38461F] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 ${pdpRadius}`,
+        `${cardControlClass} min-w-0 flex-1 px-3 text-sm font-bold text-[#38461F] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:text-base`,
       )}
     >
-      {loading ? (
+      {loadingAction === "cart" ? (
         <Loader className="h-4 w-4 animate-spin" />
       ) : isPreOrderProduct() ? (
         "Pre-order"
+      ) : (
+        "Add to Cart"
+      )}
+    </button>
+  );
+
+  const renderBuyNowButton = () => (
+    <button
+      type="button"
+      disabled={isAddToCartDisabled}
+      onClick={() => addItemToCart(true)}
+      className={twMerge(
+        `flex h-12 min-w-0 flex-1 items-center justify-center bg-[#ACDA5A] px-3 text-sm font-bold text-[#38461F] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:text-base ${pdpRadius}`,
+      )}
+    >
+      {loadingAction === "buy" ? (
+        <Loader className="h-4 w-4 animate-spin" />
       ) : (
         "Buy Now"
       )}
@@ -378,17 +402,19 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
           <div className="lg:pb-4">
             {isInStock ? (
               <>
-                {/* Mobile: qty · add to cart · wishlist */}
+                {/* Mobile: qty · add to cart · buy now · wishlist */}
                 <div className="flex items-center gap-2 lg:hidden">
                   {renderQuantityControl()}
                   {renderAddToCartButton()}
+                  {renderBuyNowButton()}
                   {renderWishlistControl()}
                 </div>
 
-                {/* Desktop: qty · add to cart · wishlist */}
+                {/* Desktop: qty · add to cart · buy now · wishlist */}
                 <div className="hidden items-center gap-2 lg:flex">
                   {renderQuantityControl()}
                   {renderAddToCartButton()}
+                  {renderBuyNowButton()}
                   {renderWishlistControl()}
                 </div>
               </>
