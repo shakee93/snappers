@@ -138,31 +138,6 @@ export default function OrderPaymentPage(props: OrderPaymentPageProps) {
     }
   }, [trnId, status, orderIdUrl, router]);
 
-  useEffect(() => {
-    const sendKokoVerification = async () => {
-      if (orderIdUrl && status) {
-        try {
-          const response = await fetch('/api/koko-verify', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-              orderId: orderIdUrl,
-              status: status,
-            }),
-          });
-
-          const data = await response.json();
-        } catch (error) {
-          console.error('Error sending Koko verification:', error);
-        }
-      }
-    };
-
-    sendKokoVerification();
-  }, [orderId, status, orderIdUrl]); // Dependencies to trigger the effect
-
   // Query for order data (will be skipped for guest checkouts)
   const { data: orderData, error: orderError } = useQuery(GET_SINGLE_ORDER, {
     variables: { orderID: orderId },
