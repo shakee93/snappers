@@ -18,6 +18,7 @@ import ButtonBrand from "shared/Button/ButtonBrand";
 import Logo from "@/components/header/Logo";
 import { useSearchParams } from "next/navigation";
 import { useCart } from "@/context/CartProvider";
+import { siteConfig } from "@/site.config";
 
 const ORDER_PAGE_SHELL = "min-h-screen bg-[#FAFAF8]";
 const ORDER_PAGE_CONTAINER =
@@ -45,6 +46,38 @@ function OrderConfirmationFooter() {
       <ButtonBrand href="/" className="mt-5">
         Shop More
       </ButtonBrand>
+    </div>
+  );
+}
+
+// Shown when the order can't be loaded (e.g. a guest returning from payment in a
+// different browser, so there's no matching `last_order`). The order itself is
+// still placed, so point the customer at support instead of a dead end.
+function OrderUnavailable({ title }: { title: string }) {
+  return (
+    <div className="container mx-auto grid items-center justify-center px-4 py-20 text-center">
+      <h1 className="text-2xl font-bold">{title}</h1>
+      <p className="mt-4 text-gray-600">
+        If you just completed a payment, your order has been received. For
+        order details, please contact us:
+      </p>
+      <div className="mt-4 space-y-1">
+        <p>
+          <span className="font-semibold">Phone:</span>{" "}
+          <a href={`tel:${siteConfig.contact.primaryPhone}`} className="text-blue-600 hover:underline">
+            {siteConfig.contact.primaryPhoneDisplay}
+          </a>
+        </p>
+        <p>
+          <span className="font-semibold">Email:</span>{" "}
+          <a href={`mailto:${siteConfig.contact.email}`} className="text-blue-600 hover:underline">
+            {siteConfig.contact.email}
+          </a>
+        </p>
+      </div>
+      <Link href="/" className="mt-8 font-bold text-blue-500 underline hover:text-blue-800">
+        Back to Home
+      </Link>
     </div>
   );
 }
@@ -87,7 +120,8 @@ export default function OrderPaymentPage(props: OrderPaymentPageProps) {
   const deliveryType = searchParamsObj.get("deliveryType");
   const ordermethod = searchParamsObj.get('ordermethod');
 
-  // Payment return status (Koko appends ?status=SUCCESS|FAILURE)
+  // Payment return status (Koko appends ?status=SUCCESS|FAILURE). Display only:
+  // anyone can set it, so never use it as the source of truth for order state.
   const status = searchParamsObj.get('status');
 
   const hasClearedGuestRef = useRef(false);
@@ -412,18 +446,7 @@ export default function OrderPaymentPage(props: OrderPaymentPageProps) {
 
   // If query failed and we have no localStorage data, show error
   if (orderError && !localStorageOrderData && !isCheckingLocalStorage) {
-    return (
-      <div className="container mx-auto grid items-center justify-center">
-        <h1 className="py-20 text-center text-2xl font-bold">
-          Not authorized to view this order
-        </h1>
-        <Link href={`/`}>
-          <div className="self-center text-center font-bold text-blue-500 underline hover:cursor-pointer hover:text-blue-800">
-            Back to Home
-          </div>
-        </Link>
-      </div>
-    );
+    return <OrderUnavailable title="Not authorized to view this order" />;
   }
 
   // Show loading while checking localStorage
@@ -441,18 +464,7 @@ export default function OrderPaymentPage(props: OrderPaymentPageProps) {
   const displayPaymentDetails = localStorageOrderData && !orderData ? localStoragePaymentDetails : regularPaymentDetails;
 
   if (!displayOrderData) {
-    return (
-      <div className="container mx-auto grid items-center justify-center">
-        <h1 className="py-20 text-center text-2xl font-bold">
-          Order not found
-        </h1>
-        <Link href={`/`}>
-          <div className="self-center text-center font-bold text-blue-500 underline hover:cursor-pointer hover:text-blue-800">
-            Back to Home
-          </div>
-        </Link>
-      </div>
-    );
+    return <OrderUnavailable title="Order not found" />;
   }
 
   return (
