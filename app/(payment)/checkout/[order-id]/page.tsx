@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import Link from "next/link";
 import ButtonBrand from "shared/Button/ButtonBrand";
 import Logo from "@/components/header/Logo";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useCart } from "@/context/CartProvider";
 
 const ORDER_PAGE_SHELL = "min-h-screen bg-[#FAFAF8]";
@@ -51,7 +51,6 @@ function OrderConfirmationFooter() {
 
 export default function OrderPaymentPage(props: OrderPaymentPageProps) {
   const params = use(props.params);
-  const router = useRouter();
   const orderId = params["order-id"];
 
   // Call useSearchParams once and reuse it
@@ -88,15 +87,8 @@ export default function OrderPaymentPage(props: OrderPaymentPageProps) {
   const deliveryType = searchParamsObj.get("deliveryType");
   const ordermethod = searchParamsObj.get('ordermethod');
 
-  //Koko Payment
-  const trnId = searchParamsObj.get('trnId');
-  const orderIdParam = searchParamsObj.get('orderId') || (typeof window !== 'undefined' ? window.location.pathname.split('/')[2] || '' : '');
-  const orderIdUrl = typeof window !== 'undefined' ? window.location.pathname.split('/')[2] : '';
+  // Payment return status (Koko appends ?status=SUCCESS|FAILURE)
   const status = searchParamsObj.get('status');
-  const desc = searchParamsObj.get('desc');
-  const key = searchParamsObj.get('key');
-  const wcApi = searchParamsObj.get('wc-api');
-
 
   const hasClearedGuestRef = useRef(false);
   const hasClearedSimpleRef = useRef(false);
@@ -128,15 +120,6 @@ export default function OrderPaymentPage(props: OrderPaymentPageProps) {
       setIsCheckingLocalStorage(false);
     }
   }, [orderId]);
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const lastOrder = localStorage.getItem('last_order');
-      if (lastOrder && trnId && status !== "FAILURE") {
-        router.push(`/checkout/koko/guest_order?orderId=${orderIdUrl}&status=${status}`);
-      }
-    }
-  }, [trnId, status, orderIdUrl, router]);
 
   // Query for order data (will be skipped for guest checkouts)
   const { data: orderData, error: orderError } = useQuery(GET_SINGLE_ORDER, {
