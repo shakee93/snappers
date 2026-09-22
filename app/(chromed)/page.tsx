@@ -208,6 +208,9 @@ export default async function Home() {
     brands,
   } = await getData();
 
+  const homepageDeals = dealProducts.slice(0, HOMEPAGE_DEAL_CAROUSEL_LIMIT);
+  const hasHomepageDeals = homepageDeals.length > 0;
+
   return (
     <main className="overflow-x-hidden">
       <div className="nc-PageHome relative flex flex-col overflow-x-hidden bg-white">
@@ -220,15 +223,19 @@ export default async function Home() {
           <SectionShopByCategory categories={categories} />
         </div>
 
-        <div className="mt-16 md:mt-24">
-          <SectionDealCountdown endsAt={siteSettings?.dealEnds ?? undefined} />
-        </div>
+        {hasHomepageDeals ? (
+          <>
+            <div className="mt-16 md:mt-24">
+              <SectionDealCountdown
+                endsAt={siteSettings?.dealEnds ?? undefined}
+              />
+            </div>
 
-        <div className="mt-8 md:mt-10">
-          <SectionDealProducts
-            products={dealProducts.slice(0, HOMEPAGE_DEAL_CAROUSEL_LIMIT)}
-          />
-        </div>
+            <div className="mt-8 md:mt-10">
+              <SectionDealProducts products={homepageDeals} />
+            </div>
+          </>
+        ) : null}
 
         <SectionHowToOrder className="mt-16 md:mt-24" />
 
