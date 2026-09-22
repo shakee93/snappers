@@ -74,9 +74,6 @@ export const resolveDisplayPricing = (
       const saleAmounts = priced
         .map((v) => parsePriceString(v.price))
         .filter((p) => p > 0);
-      const regularAmounts = priced
-        .map((v) => parsePriceString(v.regularPrice))
-        .filter((p) => p > 0);
 
       const lowest = priced.reduce((prev, curr) =>
         parsePriceString(curr.price) < parsePriceString(prev.price) ? curr : prev,
@@ -84,12 +81,32 @@ export const resolveDisplayPricing = (
 
       const priceMin = saleAmounts.length ? Math.min(...saleAmounts) : null;
       const priceMax = saleAmounts.length ? Math.max(...saleAmounts) : null;
-      const regularMin = regularAmounts.length
-        ? Math.min(...regularAmounts)
-        : null;
-      const regularMax = regularAmounts.length
-        ? Math.max(...regularAmounts)
-        : null;
+
+      const onSale = priced.filter((v) => {
+        const sale = parsePriceString(v.price);
+        const regular = parsePriceString(v.regularPrice);
+        return regular > sale;
+      });
+      const allVariationsOnSale =
+        onSale.length > 0 && onSale.length === priced.length;
+
+      let regularMin: number | null = null;
+      let regularMax: number | null = null;
+
+      if (allVariationsOnSale) {
+        const regularAmounts = onSale
+          .map((v) => parsePriceString(v.regularPrice))
+          .filter((p) => p > 0);
+        regularMin = regularAmounts.length ? Math.min(...regularAmounts) : null;
+        regularMax = regularAmounts.length ? Math.max(...regularAmounts) : null;
+      } else {
+        const lowestRegular = parsePriceString(lowest.regularPrice);
+        const lowestSale = parsePriceString(lowest.price);
+        if (lowestRegular > lowestSale) {
+          regularMin = lowestRegular;
+          regularMax = lowestRegular;
+        }
+      }
 
       return {
         price: lowest.price ?? null,
@@ -102,26 +119,29 @@ export const resolveDisplayPricing = (
     }
 
     const fallback = parsePriceString(price ?? regularPrice);
+    const fallbackRegular = parsePriceString(regularPrice);
+    const fallbackOnSale = fallbackRegular > fallback && fallback > 0;
     return {
       price: price ?? regularPrice ?? null,
       regularPrice: regularPrice ?? null,
       priceMin: fallback > 0 ? fallback : null,
       priceMax: fallback > 0 ? fallback : null,
-      regularMin: parsePriceString(regularPrice) || null,
-      regularMax: parsePriceString(regularPrice) || null,
+      regularMin: fallbackOnSale ? fallbackRegular : null,
+      regularMax: fallbackOnSale ? fallbackRegular : null,
     };
   }
 
   const single = parsePriceString(price ?? regularPrice);
   const singleRegular = parsePriceString(regularPrice);
+  const simpleOnSale = singleRegular > single && single > 0;
 
   return {
     price: price ?? regularPrice ?? null,
     regularPrice: regularPrice ?? null,
     priceMin: single > 0 ? single : null,
     priceMax: single > 0 ? single : null,
-    regularMin: singleRegular > 0 ? singleRegular : null,
-    regularMax: singleRegular > 0 ? singleRegular : null,
+    regularMin: simpleOnSale ? singleRegular : null,
+    regularMax: simpleOnSale ? singleRegular : null,
   };
 };
 
