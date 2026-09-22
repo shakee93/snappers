@@ -1,8 +1,9 @@
 'use client';
 
 import React, { createContext, ReactNode, useContext, useEffect, useState, useRef, useCallback } from 'react';
-import { ApolloError, useLazyQuery, useMutation } from '@apollo/client';
+import { ApolloError, useApolloClient, useLazyQuery, useMutation } from '@apollo/client';
 import { ADD_TO_CART, GET_CART, REMOVE_ITEMS_FROM_CART, UPDATE_CART_ITEM_QUANTITY } from "@/graphql/defs/cart";
+import { GET_AUTH_TOKEN } from "@/graphql/defs/auth";
 import { Cart, Customer } from "@/graphql/types/graphql";
 import { toast } from "sonner";
 import {
@@ -74,6 +75,7 @@ export function useCart() {
 export function CartProvider({ children }: {
     children: ReactNode
 }) {
+    const apolloClient = useApolloClient();
     const [cart, setCart] = useState<Cart | null>(null)
     const [customer, setCustomer] = useState<Customer | null>(null)
     const [isCartOpen, setIsCartOpen] = useState(false)
@@ -259,22 +261,44 @@ export function CartProvider({ children }: {
         ) || false;
     };
 
-    const isInternalServerError = (error: unknown) => {
+    /** GraphQL-level ISE only — not HTTP/network 500s (those can be transient outages). */
+    const isGraphQlInternalServerError = (error: unknown) => {
+        const err = error as {
+            graphQLErrors?: Array<{ message?: string; extensions?: { message?: string } }>;
+        };
+        return (
+            err?.graphQLErrors?.some((graphQLError) => {
+                const message =
+                    graphQLError?.message || graphQLError?.extensions?.message || "";
+                return message.toLowerCase().includes("internal server error");
+            }) ?? false
+        );
+    };
+
+    const isAuthRefreshFailure = (error: unknown) => {
         const err = error as {
             message?: string;
-            networkError?: { statusCode?: number };
-            graphQLErrors?: Array<{ message?: string; extensions?: { code?: string; message?: string } }>;
+            graphQLErrors?: Array<{ message?: string; extensions?: { debugMessage?: string } }>;
         };
+        const messages = [
+            err?.message,
+            ...(err?.graphQLErrors?.map(
+                (graphQLError) =>
+                    graphQLError?.extensions?.debugMessage || graphQLError?.message,
+            ) ?? []),
+        ]
+            .filter(Boolean)
+            .map((message) => String(message).toLowerCase());
 
-        return (
-            err?.networkError?.statusCode === 500 ||
-            err?.message?.includes("Internal server error") ||
-            err?.graphQLErrors?.some((graphQLError) =>
-                graphQLError?.extensions?.code === "INTERNAL_SERVER_ERROR" ||
-                graphQLError?.message?.includes("Internal server error") ||
-                graphQLError?.extensions?.message?.includes("Internal server error")
-            ) ||
-            false
+        return messages.some(
+            (message) =>
+                message.includes("expired token") ||
+                message.includes("invalid-secret-key") ||
+                message.includes("wrong number of segments") ||
+                message.includes("signature verification failed") ||
+                message.includes("iss do not match") ||
+                message.includes("refresh") ||
+                message.includes("jwt"),
         );
     };
 
@@ -287,6 +311,50 @@ export function CartProvider({ children }: {
             localStorage.removeItem(REFRESH_TOKEN_KEY);
             window.dispatchEvent(new Event(AUTH_INVALIDATED_EVENT));
             setCustomer(null);
+        }
+    };
+
+    /**
+     * AddToCart-only recovery for bare WP "Internal server error" caused by a
+     * bad JWT. Kept out of the Apollo errorLink so checkout is never auto-replayed.
+     * Clears the Woo session before refresh so a stale session cannot fail refresh.
+     * Wipes auth only when refresh fails with an auth-shaped error.
+     */
+    const recoverSessionForAddToCart = async (): Promise<void> => {
+        localStorage.removeItem(SESSION_TOKEN_KEY);
+
+        const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+        const hasAuthToken = !!localStorage.getItem(AUTH_TOKEN_KEY);
+
+        if (!hasAuthToken) {
+            return;
+        }
+
+        if (!refreshToken) {
+            // Broken auth with nothing to refresh — fall back to guest cart.
+            clearStoredSessionState(false);
+            return;
+        }
+
+        try {
+            const result = await apolloClient.mutate<{
+                refreshJwtAuthToken?: { authToken?: string | null } | null;
+            }>({
+                mutation: GET_AUTH_TOKEN,
+                variables: { refreshToken },
+            });
+            const nextAuth = result.data?.refreshJwtAuthToken?.authToken;
+            if (nextAuth) {
+                localStorage.setItem(AUTH_TOKEN_KEY, nextAuth);
+                return;
+            }
+            // Empty refresh payload — treat as auth failure.
+            clearStoredSessionState(false);
+        } catch (refreshError) {
+            if (isAuthRefreshFailure(refreshError)) {
+                clearStoredSessionState(false);
+            }
+            // Transient refresh/outage: keep auth, retry with a fresh Woo session.
         }
     };
 
@@ -364,17 +432,19 @@ export function CartProvider({ children }: {
                 console.error("Add to cart error:", caughtMessage || error);
             }
 
-            if (isInternalServerError(error) && typeof window !== "undefined") {
+            // AddToCart-only: bare GraphQL ISE is often a bad JWT (WP does not
+            // return "Expired token"). Do not use the Apollo errorLink for this —
+            // auto-replaying checkout would be unsafe.
+            if (isGraphQlInternalServerError(error) && typeof window !== "undefined") {
                 const hasSessionToken = !!localStorage.getItem(SESSION_TOKEN_KEY);
                 const hasAuthToken = !!localStorage.getItem(AUTH_TOKEN_KEY);
 
                 if (hasSessionToken || hasAuthToken) {
-                    const preserveAuth = hasAuthToken && customer?.id !== "guest";
                     console.warn(
-                        `Add to cart failed with a stale ${preserveAuth ? "session" : "session/auth"} token. Retrying once.`
+                        "Add to cart failed with a possible stale session/auth token. Recovering and retrying once.",
                     );
 
-                    clearStoredSessionState(preserveAuth);
+                    await recoverSessionForAddToCart();
 
                     try {
                         const retry = await _addToCart({

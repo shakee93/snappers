@@ -136,7 +136,6 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
           return targetErrors.includes(errorMessage) || errorMessage.includes("invalid-secret-key");
         });
 
-
         if (
           isTargetError
         ) {
