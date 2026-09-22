@@ -1,6 +1,7 @@
 "use client";
 
 import { Dialog, Transition } from "@headlessui/react";
+import Image from "next/image";
 import Link from "next/link";
 import { Fragment } from "react";
 import { Mail, Phone } from "lucide-react";
@@ -13,6 +14,8 @@ import {
   formatOrderSummaryDate,
   formatPaymentMethod,
   formatStatus,
+  getOrderLineItemImageUrl,
+  getOrderLineItemName,
 } from "@/components/account/accountOrderUtils";
 import { isLineItemFree, parseWooMoneyAmount } from "@/lib/cartLinePricing";
 import { decodeHtmlEntities } from "@/lib/decodeHtmlEntities";
@@ -20,6 +23,7 @@ import {
   hasSavedAddress,
 } from "@/lib/formatCustomerAddress";
 import type { MyOrder, MyOrderLineItem } from "@/graphql/defs/order";
+import ReorderButton from "@/components/account/ReorderButton";
 
 const DetailRow = ({
   label,
@@ -45,7 +49,8 @@ const DetailRow = ({
 const ProductRow = ({ item }: { item: MyOrderLineItem }) => {
   const product = item.product?.node;
   const link = product?.slug ? getProductPath({ slug: product.slug }) : "";
-  const name = decodeHtmlEntities(product?.name ?? "Product");
+  const name = getOrderLineItemName(item);
+  const imageUrl = getOrderLineItemImageUrl(item);
   const variationLabel = formatLineItemVariation(item);
   const quantity = item.quantity ?? 1;
   const isFree = isLineItemFree(item.total, item.subtotal);
@@ -53,20 +58,49 @@ const ProductRow = ({ item }: { item: MyOrderLineItem }) => {
     ? "Free"
     : formatOrderMoney(item.total ?? item.subtotal);
 
-  if (!product) return null;
+  const nameBlock = (
+    <>
+      <span className="font-medium text-neutral-900">
+        {name} × {quantity}
+      </span>
+      {variationLabel ? (
+        <p className="mt-0.5 text-xs font-normal text-neutral-500">
+          {variationLabel}
+        </p>
+      ) : null}
+    </>
+  );
 
   return (
     <tr className="border-t border-[#E8E8E8]">
       <td className="px-4 py-3 pr-4 align-top text-sm">
-        <Link
-          href={link}
-          className="text-neutral-900 underline decoration-neutral-300 underline-offset-2 hover:text-header-green"
-        >
-          {name} × {quantity}
-        </Link>
-        {variationLabel ? (
-          <p className="mt-1 text-xs text-neutral-500">{variationLabel}</p>
-        ) : null}
+        <div className="flex items-start gap-3">
+          <div className="relative h-14 w-14 shrink-0 overflow-hidden rounded-lg border border-[#E8E8E8] bg-neutral-50">
+            {imageUrl ? (
+              <Image
+                src={imageUrl}
+                alt={name}
+                fill
+                sizes="56px"
+                className="object-cover"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center text-[10px] leading-tight text-neutral-400">
+                No image
+              </div>
+            )}
+          </div>
+          {link ? (
+            <Link
+              href={link}
+              className="min-w-0 underline decoration-neutral-300 underline-offset-2 hover:text-header-green"
+            >
+              {nameBlock}
+            </Link>
+          ) : (
+            <div className="min-w-0">{nameBlock}</div>
+          )}
+        </div>
       </td>
       <td
         className={`px-4 py-3 text-right align-top text-sm ${
@@ -126,6 +160,8 @@ interface AccountOrderDetailModalProps {
   show: boolean;
   onClose: () => void;
   onUploadSuccess: () => void;
+  onReorder: (order: MyOrder) => void;
+  reordering?: boolean;
 }
 
 const AccountOrderDetailModal = ({
@@ -133,6 +169,8 @@ const AccountOrderDetailModal = ({
   show,
   onClose,
   onUploadSuccess,
+  onReorder,
+  reordering = false,
 }: AccountOrderDetailModalProps) => {
   if (!order) return null;
 
@@ -157,7 +195,7 @@ const AccountOrderDetailModal = ({
   const orderDatabaseId =
     order.databaseId?.toString() || order.orderNumber || "";
   const lineItems = (order.lineItems?.nodes ?? []).filter(
-    (item): item is MyOrderLineItem => !!item?.product?.node,
+    (item): item is MyOrderLineItem => !!item,
   );
   const billing = order.billing;
   const hasBilling = hasSavedAddress(billing);
@@ -286,8 +324,8 @@ const AccountOrderDetailModal = ({
                 ) : null}
               </div>
 
-              {order.paymentMethod === "payhere" ? (
-                <div className="border-t border-[#E8E8E8] bg-neutral-50 px-5 py-4 sm:px-6">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#E8E8E8] bg-neutral-50 px-5 py-4 sm:px-6">
+                {order.paymentMethod === "payhere" ? (
                   <Link
                     href={`/checkout/payhere/${order.orderNumber}`}
                     className="text-sm font-medium text-header-green hover:underline"
@@ -295,8 +333,14 @@ const AccountOrderDetailModal = ({
                   >
                     View payment details →
                   </Link>
-                </div>
-              ) : null}
+                ) : (
+                  <span />
+                )}
+                <ReorderButton
+                  loading={reordering}
+                  onClick={() => onReorder(order)}
+                />
+              </div>
             </Dialog.Panel>
           </Transition.Child>
         </div>

@@ -1,7 +1,106 @@
 import { parseWooMoneyAmount } from "@/lib/cartLinePricing";
 import { decodeHtmlEntities } from "@/lib/decodeHtmlEntities";
 import { formatPrice } from "@/lib/formatPrice";
-import type { MyOrderLineItem } from "@/graphql/defs/order";
+import { normalizeProductImageUrl } from "@/lib/productImage";
+import type { MyOrder, MyOrderLineItem, MyOrderProduct } from "@/graphql/defs/order";
+
+export type OrderCatalogProduct = {
+  databaseId?: number | null;
+  name?: string | null;
+  slug?: string | null;
+  image?: { sourceUrl?: string | null } | null;
+  featuredImage?: { node?: { sourceUrl?: string | null } | null } | null;
+};
+
+export function collectOrderProductIds(
+  orders?: Array<MyOrder | null> | null,
+): number[] {
+  const ids = new Set<number>();
+  for (const order of orders ?? []) {
+    for (const item of order?.lineItems?.nodes ?? []) {
+      const id = item?.product?.node?.databaseId ?? item?.productId;
+      if (id) ids.add(id);
+    }
+  }
+  return Array.from(ids);
+}
+
+export function mergeCatalogProduct(
+  product: MyOrderProduct | null | undefined,
+  catalog: OrderCatalogProduct | undefined,
+): MyOrderProduct | null {
+  if (!product && !catalog) return product ?? null;
+
+  const imageUrl =
+    normalizeProductImageUrl(catalog?.image?.sourceUrl) ??
+    normalizeProductImageUrl(catalog?.featuredImage?.node?.sourceUrl);
+
+  return {
+    ...(product ?? {}),
+    databaseId: product?.databaseId ?? catalog?.databaseId,
+    name: product?.name || catalog?.name,
+    slug: product?.slug || catalog?.slug,
+    image: product?.image?.sourceUrl
+      ? product.image
+      : imageUrl
+        ? { sourceUrl: imageUrl }
+        : product?.image,
+    featuredImage: product?.featuredImage?.node?.sourceUrl
+      ? product.featuredImage
+      : catalog?.featuredImage ?? product?.featuredImage,
+  };
+}
+
+export function enrichOrdersWithCatalog<T extends { customer?: GetMyOrdersCustomer | null }>(
+  data: T | undefined,
+  catalogNodes?: Array<OrderCatalogProduct | null> | null,
+): T | undefined {
+  if (!data?.customer?.orders?.nodes?.length) return data;
+
+  const catalogById = new Map<number, OrderCatalogProduct>();
+  for (const node of catalogNodes ?? []) {
+    if (node?.databaseId != null) catalogById.set(node.databaseId, node);
+  }
+  if (catalogById.size === 0) return data;
+
+  return {
+    ...data,
+    customer: {
+      ...data.customer,
+      orders: {
+        ...data.customer.orders,
+        nodes: data.customer.orders.nodes.map((order) => {
+          if (!order?.lineItems?.nodes) return order;
+          return {
+            ...order,
+            lineItems: {
+              ...order.lineItems,
+              nodes: order.lineItems.nodes.map((item) => {
+                if (!item) return item;
+                const productId = item.product?.node?.databaseId ?? item.productId;
+                const catalog = productId != null ? catalogById.get(productId) : undefined;
+                if (!catalog && item.product?.node) return item;
+                return {
+                  ...item,
+                  product: {
+                    ...item.product,
+                    node: mergeCatalogProduct(item.product?.node, catalog),
+                  },
+                };
+              }),
+            },
+          };
+        }),
+      },
+    },
+  };
+}
+
+type GetMyOrdersCustomer = {
+  orders?: {
+    nodes?: Array<MyOrder | null> | null;
+  } | null;
+};
 
 export const PAYMENT_LABELS: Record<string, string> = {
   cod: "Cash on Delivery",
@@ -247,6 +346,26 @@ export function formatStatus(status: string | null | undefined) {
     .toLowerCase()
     .replace(/_/g, " ")
     .replace(/^\w/, (char) => char.toUpperCase());
+}
+
+export function getOrderLineItemName(item: MyOrderLineItem): string {
+  const productName = item.product?.node?.name?.trim();
+  if (productName) return decodeHtmlEntities(productName);
+
+  const variationName = item.variation?.node?.name?.trim();
+  if (variationName) return decodeHtmlEntities(variationName);
+
+  return "Product";
+}
+
+export function getOrderLineItemImageUrl(item: MyOrderLineItem): string | null {
+  const product = item.product?.node;
+  const variation = item.variation?.node;
+  return (
+    normalizeProductImageUrl(product?.image?.sourceUrl) ??
+    normalizeProductImageUrl(product?.featuredImage?.node?.sourceUrl) ??
+    normalizeProductImageUrl(variation?.image?.sourceUrl)
+  );
 }
 
 /** Human-readable variation summary for an order line item. */

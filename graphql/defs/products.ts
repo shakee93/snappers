@@ -108,7 +108,7 @@ export const GET_PRODUCT = gql`
 
 export const GET_PRODUCTS_BY_DATABASE_IDS = gql`
   query GetProductsByDatabaseIds($ids: [Int]) {
-    products(first: 25, where: { include: $ids }) {
+    products(first: 100, where: { include: $ids }) {
       nodes {
         databaseId
         name
