@@ -46,15 +46,31 @@ const formatLkr = (value: number) =>
   });
 
 interface ResolvedDisplayPricing {
-  /** Lowest effective price (sale or list) — used for badges, Koko, etc. */
+  /** Lowest variation / parent formatted price — used by `resolveDisplayPrice`. */
   price: string | null;
-  regularPrice: string | null;
-  /** When set and min !== max, listing cards show a price range. */
+  /** When min !== max, listing cards show a sale price range. */
   priceMin: number | null;
   priceMax: number | null;
   regularMin: number | null;
   regularMax: number | null;
 }
+
+const resolveParentLevelPricing = (
+  priceStr: string | null | undefined,
+  regularStr: string | null | undefined,
+): ResolvedDisplayPricing => {
+  const sale = parsePriceString(priceStr ?? regularStr);
+  const regular = parsePriceString(regularStr);
+  const onSale = regular > sale && sale > 0;
+
+  return {
+    price: priceStr ?? regularStr ?? null,
+    priceMin: sale > 0 ? sale : null,
+    priceMax: sale > 0 ? sale : null,
+    regularMin: onSale ? regular : null,
+    regularMax: onSale ? regular : null,
+  };
+};
 
 export const resolveDisplayPricing = (
   product: ProductCardItem,
@@ -71,16 +87,14 @@ export const resolveDisplayPricing = (
     const priced = pool.filter((v) => parsePriceString(v.price) > 0);
 
     if (priced.length) {
-      const saleAmounts = priced
-        .map((v) => parsePriceString(v.price))
-        .filter((p) => p > 0);
+      const saleAmounts = priced.map((v) => parsePriceString(v.price));
 
       const lowest = priced.reduce((prev, curr) =>
         parsePriceString(curr.price) < parsePriceString(prev.price) ? curr : prev,
       );
 
-      const priceMin = saleAmounts.length ? Math.min(...saleAmounts) : null;
-      const priceMax = saleAmounts.length ? Math.max(...saleAmounts) : null;
+      const priceMin = Math.min(...saleAmounts);
+      const priceMax = Math.max(...saleAmounts);
 
       const onSale = priced.filter((v) => {
         const sale = parsePriceString(v.price);
@@ -110,7 +124,6 @@ export const resolveDisplayPricing = (
 
       return {
         price: lowest.price ?? null,
-        regularPrice: lowest.regularPrice ?? null,
         priceMin,
         priceMax,
         regularMin,
@@ -118,31 +131,10 @@ export const resolveDisplayPricing = (
       };
     }
 
-    const fallback = parsePriceString(price ?? regularPrice);
-    const fallbackRegular = parsePriceString(regularPrice);
-    const fallbackOnSale = fallbackRegular > fallback && fallback > 0;
-    return {
-      price: price ?? regularPrice ?? null,
-      regularPrice: regularPrice ?? null,
-      priceMin: fallback > 0 ? fallback : null,
-      priceMax: fallback > 0 ? fallback : null,
-      regularMin: fallbackOnSale ? fallbackRegular : null,
-      regularMax: fallbackOnSale ? fallbackRegular : null,
-    };
+    return resolveParentLevelPricing(price, regularPrice);
   }
 
-  const single = parsePriceString(price ?? regularPrice);
-  const singleRegular = parsePriceString(regularPrice);
-  const simpleOnSale = singleRegular > single && single > 0;
-
-  return {
-    price: price ?? regularPrice ?? null,
-    regularPrice: regularPrice ?? null,
-    priceMin: single > 0 ? single : null,
-    priceMax: single > 0 ? single : null,
-    regularMin: simpleOnSale ? singleRegular : null,
-    regularMax: simpleOnSale ? singleRegular : null,
-  };
+  return resolveParentLevelPricing(price, regularPrice);
 };
 
 export const resolveDisplayPrice = (product: ProductCardItem): string | null =>
@@ -206,11 +198,8 @@ const ProductCard = ({
   }, [displayPricing]);
 
   const showRegularRange = useMemo(() => {
-    const { regularMin, regularMax, priceMin } = displayPricing;
-    if (regularMin == null || priceMin == null || regularMin <= priceMin) {
-      return false;
-    }
-    return regularMax != null && regularMax > regularMin;
+    const { regularMin, regularMax } = displayPricing;
+    return regularMin != null && regularMax != null && regularMax > regularMin;
   }, [displayPricing]);
 
   const showRegularStrike = useMemo(() => {
