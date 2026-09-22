@@ -189,6 +189,7 @@ export const GET_MY_ORDERS = gql`
               id
               orderId
               productId
+              variationId
               quantity
               subtotal
               total
@@ -199,6 +200,10 @@ export const GET_MY_ORDERS = gql`
                     node {
                       sourceUrl
                     }
+                  }
+                  image {
+                    sourceUrl
+                    altText
                   }
                   id
                   name
@@ -215,7 +220,12 @@ export const GET_MY_ORDERS = gql`
               }
               variation {
                 node {
+                  databaseId
                   name
+                  image {
+                    sourceUrl
+                    altText
+                  }
                   attributes {
                     nodes {
                       label
@@ -247,13 +257,37 @@ export type MyOrderAddress = {
   email?: string | null;
 };
 
+export type MyOrderProductTag = {
+  slug?: string | null;
+};
+
 export type MyOrderProduct = {
   databaseId?: number | null;
   id?: string | null;
   name?: string | null;
   slug?: string | null;
   type?: string | null;
+  purchasable?: boolean | null;
+  stockStatus?: string | null;
+  stockQuantity?: number | null;
+  productTags?: { nodes?: Array<MyOrderProductTag | null> | null } | null;
   featuredImage?: { node?: { sourceUrl?: string | null } | null } | null;
+  image?: { sourceUrl?: string | null; altText?: string | null } | null;
+};
+
+export type MyOrderVariation = {
+  databaseId?: number | null;
+  name?: string | null;
+  stockStatus?: string | null;
+  stockQuantity?: number | null;
+  image?: { sourceUrl?: string | null; altText?: string | null } | null;
+  attributes?: {
+    nodes?: Array<{
+      label?: string | null;
+      name?: string | null;
+      value?: string | null;
+    } | null> | null;
+  } | null;
 };
 
 export type MyOrderLineItem = {
@@ -261,22 +295,12 @@ export type MyOrderLineItem = {
   id: string;
   orderId?: number | null;
   productId?: number | null;
+  variationId?: number | null;
   quantity?: number | null;
   subtotal?: string | null;
   total?: string | null;
   product?: { node?: MyOrderProduct | null } | null;
-  variation?: {
-    node?: {
-      name?: string | null;
-      attributes?: {
-        nodes?: Array<{
-          label?: string | null;
-          name?: string | null;
-          value?: string | null;
-        } | null> | null;
-      } | null;
-    } | null;
-  } | null;
+  variation?: { node?: MyOrderVariation | null } | null;
 };
 
 export type MyOrder = {
@@ -314,6 +338,60 @@ export type GetMyOrdersQuery = {
     orders?: { nodes?: Array<MyOrder | null> | null } | null;
   } | null;
 };
+
+export type ReorderProductStockVariation = {
+  databaseId?: number | null;
+  stockStatus?: string | null;
+  stockQuantity?: number | null;
+};
+
+export type ReorderProductStock = {
+  databaseId?: number | null;
+  name?: string | null;
+  type?: string | null;
+  purchasable?: boolean | null;
+  stockStatus?: string | null;
+  stockQuantity?: number | null;
+  productTags?: { nodes?: Array<{ slug?: string | null } | null> | null } | null;
+  variations?: { nodes?: Array<ReorderProductStockVariation | null> | null } | null;
+};
+
+export type GetReorderProductStockQuery = {
+  products?: { nodes?: Array<ReorderProductStock | null> | null } | null;
+};
+
+export const GET_REORDER_PRODUCT_STOCK = gql`
+  query GetReorderProductStock($ids: [Int]) {
+    products(first: 100, where: { include: $ids }) {
+      nodes {
+        databaseId
+        name
+        type
+        purchasable
+        productTags(first: 20) {
+          nodes {
+            slug
+          }
+        }
+        ... on SimpleProduct {
+          stockStatus
+          stockQuantity
+        }
+        ... on VariableProduct {
+          stockStatus
+          stockQuantity
+          variations(first: 50) {
+            nodes {
+              databaseId
+              stockStatus
+              stockQuantity
+            }
+          }
+        }
+      }
+    }
+  }
+`;
 
 export const GET_ADDRESSES = gql`
   query getShippingDetails {

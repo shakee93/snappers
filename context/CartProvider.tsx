@@ -39,7 +39,7 @@ type CartSession = {
         quantity?: number,
         variation?: number,
         productData?: unknown,
-        options?: { openCart?: boolean },
+        options?: { openCart?: boolean; suppressErrorToast?: boolean },
     ) => Promise<AddToCartResult | undefined>
     setCustomer: React.Dispatch<React.SetStateAction<Customer | null>>
     clearCart: () => void
@@ -313,21 +313,26 @@ export function CartProvider({ children }: {
         quantity?: number,
         variation?: number,
         productData?: unknown,
-        options?: { openCart?: boolean },
+        options?: { openCart?: boolean; suppressErrorToast?: boolean },
     ): Promise<AddToCartResult | undefined> => {
         const openCart = options?.openCart !== false;
+        const notifyError = (message: string) => {
+            if (!options?.suppressErrorToast) {
+                toast.error(message);
+            }
+        };
 
         try {
             // Check pre-order restrictions before adding to cart
             const isProductPreOrder = productData ? isPreOrderProduct(productData) : false;
 
             if (isProductPreOrder && cartHasNonPreOrderProducts()) {
-                toast.error("You can't add pre-order products with regular products in your cart.");
+                notifyError("You can't add pre-order products with regular products in your cart.");
                 return { error: "Pre-order restriction" };
             }
 
             if (!isProductPreOrder && cartHasPreOrderProducts()) {
-                toast.error("You can't add regular products with pre-order products in your cart.");
+                notifyError("You can't add regular products with pre-order products in your cart.");
                 return { error: "Pre-order restriction" };
             }
 
@@ -345,7 +350,19 @@ export function CartProvider({ children }: {
 
             return data
         } catch (error: any) {
-            console.error('Add to cart error:', error);
+            const caughtMessage =
+                error?.graphQLErrors?.[0]?.message ||
+                error?.message ||
+                "";
+            const isExpectedStockError =
+                caughtMessage.toLowerCase().includes("out of stock") ||
+                caughtMessage.toLowerCase().includes("not in stock") ||
+                caughtMessage.toLowerCase().includes("not have enough") ||
+                caughtMessage.toLowerCase().includes("can no longer be purchased");
+
+            if (!isExpectedStockError) {
+                console.error("Add to cart error:", caughtMessage || error);
+            }
 
             if (isInternalServerError(error) && typeof window !== "undefined") {
                 const hasSessionToken = !!localStorage.getItem(SESSION_TOKEN_KEY);
@@ -375,7 +392,7 @@ export function CartProvider({ children }: {
                         return retry;
                     } catch (retryError) {
                         console.error("Add to cart retry failed:", retryError);
-                        toast.error("Unable to add item to cart. Please try again.");
+                        notifyError("Unable to add item to cart. Please try again.");
                         return { error: "Add to cart failed" };
                     }
                 }
@@ -387,7 +404,7 @@ export function CartProvider({ children }: {
                 const errorMessage = graphQLError.message || graphQLError.extensions?.message;
 
                 if (errorMessage?.toLowerCase().includes("not have enough")) {
-                    toast.error("There isn't enough stock for that quantity. Please try a smaller amount.");
+                    notifyError("There isn't enough stock for that quantity. Please try a smaller amount.");
                     return { error: "Insufficient stock" };
                 }
 
@@ -396,43 +413,43 @@ export function CartProvider({ children }: {
                     errorMessage?.toLowerCase().includes("not in stock") ||
                     errorMessage?.toLowerCase().includes("stock")
                 ) {
-                    toast.error("This product is currently out of stock.");
+                    notifyError("This product is currently out of stock.");
                     return { error: "Out of stock" };
                 }
 
                 if (errorMessage?.includes("cart") || errorMessage?.includes("add")) {
-                    toast.error("Unable to add item to cart. Please login and try again.");
+                    notifyError("Unable to add item to cart. Please login and try again.");
                     return { error: "Add to cart failed" };
                 }
 
-                toast.error("Unable to add item to cart. Please login and try again.");
+                notifyError("Unable to add item to cart. Please login and try again.");
                 return { error: "Add to cart failed" };
             }
 
             // Handle network errors
             if (error.networkError) {
-                toast.error("Unable to connect to the server. Please check your internet connection and try again.");
+                notifyError("Unable to connect to the server. Please check your internet connection and try again.");
                 return { error: "Network error" };
             }
 
             // Handle generic errors
             if (error.message?.includes("fetch") || error.message?.includes("network")) {
-                toast.error("Unable to connect to the server. Please check your internet connection and try again.");
+                notifyError("Unable to connect to the server. Please check your internet connection and try again.");
                 return { error: "Network error" };
             }
 
             if (error.message?.includes("timeout")) {
-                toast.error("Request timed out. Please try again.");
+                notifyError("Request timed out. Please try again.");
                 return { error: "Timeout error" };
             }
 
             if (error.message?.includes("500") || error.message?.includes("Internal Server Error")) {
-                toast.error("Server error occurred. Please try again in a few moments.");
+                notifyError("Server error occurred. Please try again in a few moments.");
                 return { error: "Server error" };
             }
 
             // Fallback
-            toast.error("An unexpected error occurred. Please try again.");
+            notifyError("An unexpected error occurred. Please try again.");
             return { error: "Unknown error" };
         }
     }

@@ -7,19 +7,19 @@ import { useMyOrders } from "@/hooks/useMyOrders";
 import LoadingSkeleton from "@/components/global/primitives/OrderPageSkeleton";
 import { useSession } from "@/context/SessionProvider";
 import AccountOrderDetailModal from "@/components/account/AccountOrderDetailModal";
+import ReorderButton from "@/components/account/ReorderButton";
+import { useReorderOrder } from "@/hooks/useReorderOrder";
 import {
   formatOrderDate,
   formatPaymentMethod,
   formatStatus,
+  getOrderLineItemImageUrl,
+  getOrderLineItemName,
   statusBadgeClass,
 } from "@/components/account/accountOrderUtils";
 import { parseWooMoneyAmount } from "@/lib/cartLinePricing";
 import { formatPrice } from "@/lib/formatPrice";
-import type {
-  MyOrder,
-  MyOrderLineItem,
-  MyOrderProduct,
-} from "@/graphql/defs/order";
+import type { MyOrder, MyOrderLineItem } from "@/graphql/defs/order";
 import {
   accountLinkClassName,
   accountOrderCardClassName,
@@ -27,14 +27,14 @@ import {
 } from "@/components/account/accountStyles";
 
 const OrderProductThumb = ({
-  product,
+  item,
   extraCount,
 }: {
-  product?: MyOrderProduct | null;
+  item?: MyOrderLineItem | null;
   extraCount: number;
 }) => {
-  const imageUrl = product?.featuredImage?.node?.sourceUrl;
-  const name = product?.name ?? "Product";
+  const imageUrl = item ? getOrderLineItemImageUrl(item) : null;
+  const name = item ? getOrderLineItemName(item) : "Product";
 
   return (
     <div className="relative h-16 w-16 shrink-0 overflow-hidden rounded-lg border border-[#E8E8E8] bg-neutral-50 sm:h-[72px] sm:w-[72px]">
@@ -63,29 +63,32 @@ const OrderProductThumb = ({
 const OrderCard = memo(function OrderCard({
   order,
   onSelect,
+  onReorder,
+  reordering,
 }: {
   order: MyOrder;
   onSelect: (order: MyOrder) => void;
+  onReorder: (order: MyOrder) => void;
+  reordering: boolean;
 }) {
   const lineItems = useMemo(
     () =>
       (order.lineItems?.nodes ?? []).filter(
-        (item): item is MyOrderLineItem => !!item?.product?.node,
+        (item): item is MyOrderLineItem => !!item,
       ),
     [order.lineItems?.nodes],
   );
 
   const firstItem = lineItems[0];
-  const firstProduct = firstItem?.product?.node;
   const extraItemCount = Math.max(0, lineItems.length - 1);
 
-  const productTitle = useMemo(
-    () =>
-      lineItems.length === 1
-        ? firstProduct?.name ?? "Product"
-        : `${firstProduct?.name ?? "Product"} + ${extraItemCount} more`,
-    [extraItemCount, firstProduct?.name, lineItems.length],
-  );
+  const productTitle = useMemo(() => {
+    if (!firstItem) return "Product";
+    const name = getOrderLineItemName(firstItem);
+    return lineItems.length === 1
+      ? name
+      : `${name} + ${extraItemCount} more`;
+  }, [extraItemCount, firstItem, lineItems.length]);
 
   return (
     <article
@@ -101,7 +104,7 @@ const OrderCard = memo(function OrderCard({
       className={`${accountOrderCardClassName} cursor-pointer transition-colors hover:bg-neutral-50/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-header-action/40`}
     >
       <div className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:gap-5 sm:p-5">
-        <OrderProductThumb product={firstProduct} extraCount={extraItemCount} />
+        <OrderProductThumb item={firstItem} extraCount={extraItemCount} />
 
         <div className="min-w-0 flex-1 text-left">
           <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
@@ -128,13 +131,20 @@ const OrderCard = memo(function OrderCard({
           </p>
         </div>
 
-        <div className="flex shrink-0 items-center justify-between gap-4 sm:flex-col sm:items-end sm:justify-center sm:text-right">
+        <div className="flex shrink-0 items-center justify-between gap-3 sm:flex-col sm:items-end sm:justify-center sm:text-right">
           <p className="text-base font-bold text-neutral-900">
             {formatPrice(parseWooMoneyAmount(order.total))}
           </p>
-          <span className="text-xs font-medium text-header-green">
-            View details →
-          </span>
+          <div className="flex items-center gap-3">
+            <ReorderButton
+              size="compact"
+              loading={reordering}
+              onClick={() => onReorder(order)}
+            />
+            <span className="text-xs font-medium text-header-green">
+              View details →
+            </span>
+          </div>
         </div>
       </div>
     </article>
@@ -144,6 +154,7 @@ const OrderCard = memo(function OrderCard({
 const AccountOrdersPanel = () => {
   const { loading, error, data, refetch } = useMyOrders();
   const { customer } = useSession();
+  const { reorder, reorderingId } = useReorderOrder();
   const [selectedOrder, setSelectedOrder] = useState<MyOrder | null>(null);
 
   useEffect(() => {
@@ -160,11 +171,11 @@ const AccountOrdersPanel = () => {
     [data?.customer?.orders?.nodes],
   );
 
-  if (loading) {
+  if (loading && !data) {
     return <LoadingSkeleton />;
   }
 
-  if (error) {
+  if (error && !data) {
     return <p className="text-sm text-red-600">Error: {error.message}</p>;
   }
 
@@ -179,6 +190,8 @@ const AccountOrdersPanel = () => {
               key={order.id}
               order={order}
               onSelect={setSelectedOrder}
+              onReorder={reorder}
+              reordering={reorderingId === order.id}
             />
           ))}
         </div>
@@ -203,6 +216,13 @@ const AccountOrdersPanel = () => {
         onUploadSuccess={() => {
           void refetch();
         }}
+        onReorder={async (order) => {
+          const added = await reorder(order);
+          if (added) setSelectedOrder(null);
+        }}
+        reordering={
+          selectedOrder != null && reorderingId === selectedOrder.id
+        }
       />
     </div>
   );
