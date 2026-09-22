@@ -46,8 +46,14 @@ const formatLkr = (value: number) =>
   });
 
 interface ResolvedDisplayPricing {
+  /** Lowest effective price (sale or list) — used for badges, Koko, etc. */
   price: string | null;
   regularPrice: string | null;
+  /** When set and min !== max, listing cards show a price range. */
+  priceMin: number | null;
+  priceMax: number | null;
+  regularMin: number | null;
+  regularMax: number | null;
 }
 
 export const resolveDisplayPricing = (
@@ -65,24 +71,57 @@ export const resolveDisplayPricing = (
     const priced = pool.filter((v) => parsePriceString(v.price) > 0);
 
     if (priced.length) {
+      const saleAmounts = priced
+        .map((v) => parsePriceString(v.price))
+        .filter((p) => p > 0);
+      const regularAmounts = priced
+        .map((v) => parsePriceString(v.regularPrice))
+        .filter((p) => p > 0);
+
       const lowest = priced.reduce((prev, curr) =>
         parsePriceString(curr.price) < parsePriceString(prev.price) ? curr : prev,
       );
+
+      const priceMin = saleAmounts.length ? Math.min(...saleAmounts) : null;
+      const priceMax = saleAmounts.length ? Math.max(...saleAmounts) : null;
+      const regularMin = regularAmounts.length
+        ? Math.min(...regularAmounts)
+        : null;
+      const regularMax = regularAmounts.length
+        ? Math.max(...regularAmounts)
+        : null;
+
       return {
         price: lowest.price ?? null,
         regularPrice: lowest.regularPrice ?? null,
+        priceMin,
+        priceMax,
+        regularMin,
+        regularMax,
       };
     }
 
+    const fallback = parsePriceString(price ?? regularPrice);
     return {
       price: price ?? regularPrice ?? null,
       regularPrice: regularPrice ?? null,
+      priceMin: fallback > 0 ? fallback : null,
+      priceMax: fallback > 0 ? fallback : null,
+      regularMin: parsePriceString(regularPrice) || null,
+      regularMax: parsePriceString(regularPrice) || null,
     };
   }
+
+  const single = parsePriceString(price ?? regularPrice);
+  const singleRegular = parsePriceString(regularPrice);
 
   return {
     price: price ?? regularPrice ?? null,
     regularPrice: regularPrice ?? null,
+    priceMin: single > 0 ? single : null,
+    priceMax: single > 0 ? single : null,
+    regularMin: singleRegular > 0 ? singleRegular : null,
+    regularMax: singleRegular > 0 ? singleRegular : null,
   };
 };
 
@@ -129,14 +168,35 @@ const ProductCard = ({
   const displayPrice = displayPricing.price;
 
   const numericPrice = useMemo(
-    () => parsePriceString(displayPrice),
-    [displayPrice],
+    () =>
+      displayPricing.priceMin != null && displayPricing.priceMin > 0
+        ? displayPricing.priceMin
+        : parsePriceString(displayPrice),
+    [displayPrice, displayPricing.priceMin],
   );
 
-  const regularNumericPrice = useMemo(
-    () => parsePriceString(displayPricing.regularPrice),
-    [displayPricing.regularPrice],
-  );
+  const showPriceRange = useMemo(() => {
+    const { priceMin, priceMax } = displayPricing;
+    return (
+      priceMin != null &&
+      priceMax != null &&
+      priceMin > 0 &&
+      priceMax > priceMin
+    );
+  }, [displayPricing]);
+
+  const showRegularRange = useMemo(() => {
+    const { regularMin, regularMax, priceMin } = displayPricing;
+    if (regularMin == null || priceMin == null || regularMin <= priceMin) {
+      return false;
+    }
+    return regularMax != null && regularMax > regularMin;
+  }, [displayPricing]);
+
+  const showRegularStrike = useMemo(() => {
+    const { regularMin, priceMin } = displayPricing;
+    return regularMin != null && priceMin != null && regularMin > priceMin;
+  }, [displayPricing]);
 
   const kokoInstallment = useMemo(() => {
     if (!numericPrice) return 0;
@@ -279,12 +339,29 @@ const ProductCard = ({
 
         {numericPrice > 0 && (
           <div className="mt-2 flex flex-wrap items-end gap-2 text-left">
-            <p className="text-lg font-bold leading-none text-neutral-900 sm:text-xl">
-              LKR {formatLkr(numericPrice)}
+            <p className="text-sm font-bold leading-snug text-neutral-900 sm:text-base">
+              {showPriceRange &&
+              displayPricing.priceMin != null &&
+              displayPricing.priceMax != null ? (
+                <>
+                  LKR {formatLkr(displayPricing.priceMin)} – LKR{" "}
+                  {formatLkr(displayPricing.priceMax)}
+                </>
+              ) : (
+                <>LKR {formatLkr(numericPrice)}</>
+              )}
             </p>
-            {regularNumericPrice > numericPrice && (
-              <p className="text-sm font-medium leading-none text-neutral-400 line-through sm:text-base">
-                LKR {formatLkr(regularNumericPrice)}
+            {showRegularStrike && displayPricing.regularMin != null && (
+              <p className="text-xs font-medium leading-snug text-neutral-400 line-through sm:text-sm">
+                {showRegularRange &&
+                displayPricing.regularMax != null ? (
+                  <>
+                    LKR {formatLkr(displayPricing.regularMin)} – LKR{" "}
+                    {formatLkr(displayPricing.regularMax)}
+                  </>
+                ) : (
+                  <>LKR {formatLkr(displayPricing.regularMin)}</>
+                )}
               </p>
             )}
           </div>
