@@ -62,6 +62,22 @@ import { RecalculatingAmount } from "@/components/global/ui/RecalculatingAmount"
 const cartHasFreeShippingCoupon = (source: Cart | null | undefined) =>
   !!source?.appliedCoupons?.some((coupon) => coupon?.code === "free-shipping");
 
+// WebXPay's `checkout.redirect` is the backend order-pay URL, but WebXPay
+// rejects form posts from that host, so pay from our own page instead.
+const webxpayPaymentPath = (
+  orderPayUrl: string,
+  orderId: number | null | undefined,
+): string | null => {
+  try {
+    const key = new URL(orderPayUrl).searchParams.get("key");
+    return orderId && key
+      ? `/checkout/webxpay/${orderId}?key=${encodeURIComponent(key)}`
+      : null;
+  } catch {
+    return null;
+  }
+};
+
 const buildCustomerNote = ({
   email,
   phone,
@@ -746,8 +762,16 @@ const CheckoutPage = () => {
         offsiteRedirectGatewayIds.includes(gatewayId);
 
       if (expectsOffsitePayment) {
-        if (checkoutSucceeded && checkoutRedirect) {
-          await handleOffsitePaymentRedirect(checkoutRedirect);
+        const offsiteRedirect =
+          gatewayId === "webxpay" && checkoutRedirect
+            ? webxpayPaymentPath(
+                checkoutRedirect,
+                mutationData?.checkout?.order?.databaseId,
+              )
+            : checkoutRedirect;
+
+        if (checkoutSucceeded && offsiteRedirect) {
+          await handleOffsitePaymentRedirect(offsiteRedirect);
           return null;
         }
 
