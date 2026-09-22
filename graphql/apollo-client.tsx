@@ -136,6 +136,24 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
           return targetErrors.includes(errorMessage) || errorMessage.includes("invalid-secret-key");
         });
 
+        // Invalid JWTs often surface as a bare ISE from WP. Only treat that as
+        // an auth-recovery signal when we actually sent a Bearer token.
+        if (
+          !isTargetError &&
+          graphQLErrors?.some(
+            (err: { message?: string }) => err?.message === "Internal server error",
+          )
+        ) {
+          const headers = operation.getContext().headers as
+            | Record<string, string | undefined>
+            | undefined;
+          const sentAuth = Boolean(
+            headers?.Authorization || headers?.authorization,
+          );
+          if (sentAuth) {
+            isTargetError = true;
+          }
+        }
 
         if (
           isTargetError

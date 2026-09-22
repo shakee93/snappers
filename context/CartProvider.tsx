@@ -1,8 +1,9 @@
 'use client';
 
 import React, { createContext, ReactNode, useContext, useEffect, useState, useRef, useCallback } from 'react';
-import { ApolloError, useLazyQuery, useMutation } from '@apollo/client';
+import { ApolloError, useApolloClient, useLazyQuery, useMutation } from '@apollo/client';
 import { ADD_TO_CART, GET_CART, REMOVE_ITEMS_FROM_CART, UPDATE_CART_ITEM_QUANTITY } from "@/graphql/defs/cart";
+import { GET_AUTH_TOKEN } from "@/graphql/defs/auth";
 import { Cart, Customer } from "@/graphql/types/graphql";
 import { toast } from "sonner";
 import {
@@ -74,6 +75,7 @@ export function useCart() {
 export function CartProvider({ children }: {
     children: ReactNode
 }) {
+    const apolloClient = useApolloClient();
     const [cart, setCart] = useState<Cart | null>(null)
     const [customer, setCustomer] = useState<Customer | null>(null)
     const [isCartOpen, setIsCartOpen] = useState(false)
@@ -290,6 +292,35 @@ export function CartProvider({ children }: {
         }
     };
 
+    /**
+     * Invalid JWTs often surface as a bare "Internal server error" from WP —
+     * not "Expired token" — so the Apollo errorLink never refreshes. Try
+     * refresh once; if that fails, wipe auth so the next attempt is anonymous.
+     */
+    const recoverFromStaleAuth = async (): Promise<void> => {
+        const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
+        if (refreshToken) {
+            try {
+                const result = await apolloClient.mutate<{
+                    refreshJwtAuthToken?: { authToken?: string | null } | null;
+                }>({
+                    mutation: GET_AUTH_TOKEN,
+                    variables: { refreshToken },
+                });
+                const nextAuth = result.data?.refreshJwtAuthToken?.authToken;
+                if (nextAuth) {
+                    localStorage.setItem(AUTH_TOKEN_KEY, nextAuth);
+                    localStorage.removeItem(SESSION_TOKEN_KEY);
+                    return;
+                }
+            } catch {
+                // Fall through to full clear.
+            }
+        }
+
+        clearStoredSessionState(false);
+    };
+
     // Helper function to check if cart has pre-order products
     const cartHasPreOrderProducts = () => {
         if (!cart?.contents?.nodes) return false;
@@ -369,12 +400,17 @@ export function CartProvider({ children }: {
                 const hasAuthToken = !!localStorage.getItem(AUTH_TOKEN_KEY);
 
                 if (hasSessionToken || hasAuthToken) {
-                    const preserveAuth = hasAuthToken && customer?.id !== "guest";
                     console.warn(
-                        `Add to cart failed with a stale ${preserveAuth ? "session" : "session/auth"} token. Retrying once.`
+                        "Add to cart failed with a stale session/auth token. Recovering and retrying once.",
                     );
 
-                    clearStoredSessionState(preserveAuth);
+                    // Do NOT preserve auth here — a bad JWT is what triggers the
+                    // backend "Internal server error" on addToCart.
+                    if (hasAuthToken) {
+                        await recoverFromStaleAuth();
+                    } else {
+                        clearStoredSessionState(false);
+                    }
 
                     try {
                         const retry = await _addToCart({
@@ -395,6 +431,30 @@ export function CartProvider({ children }: {
                         notifyError("Unable to add item to cart. Please try again.");
                         return { error: "Add to cart failed" };
                     }
+                }
+            }
+
+            // Stale Woo session JWT (not ISE) — clear and retry once.
+            if (
+                typeof window !== "undefined" &&
+                caughtMessage.includes("Wrong number of segments")
+            ) {
+                clearStoredSessionState(!!localStorage.getItem(AUTH_TOKEN_KEY));
+                try {
+                    const retry = await _addToCart({
+                        variables: {
+                            productId: id,
+                            quantity: quantity,
+                            variationId: variation,
+                        },
+                    });
+                    if (openCart && retry?.data?.addToCart?.cartItem) {
+                        setIsCartOpen(true);
+                    }
+                    return retry;
+                } catch {
+                    notifyError("Unable to add item to cart. Please try again.");
+                    return { error: "Add to cart failed" };
                 }
             }
 
