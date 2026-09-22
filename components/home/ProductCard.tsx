@@ -46,9 +46,31 @@ const formatLkr = (value: number) =>
   });
 
 interface ResolvedDisplayPricing {
+  /** Lowest variation / parent formatted price — used by `resolveDisplayPrice`. */
   price: string | null;
-  regularPrice: string | null;
+  /** When min !== max, listing cards show a sale price range. */
+  priceMin: number | null;
+  priceMax: number | null;
+  regularMin: number | null;
+  regularMax: number | null;
 }
+
+const resolveParentLevelPricing = (
+  priceStr: string | null | undefined,
+  regularStr: string | null | undefined,
+): ResolvedDisplayPricing => {
+  const sale = parsePriceString(priceStr ?? regularStr);
+  const regular = parsePriceString(regularStr);
+  const onSale = regular > sale && sale > 0;
+
+  return {
+    price: priceStr ?? regularStr ?? null,
+    priceMin: sale > 0 ? sale : null,
+    priceMax: sale > 0 ? sale : null,
+    regularMin: onSale ? regular : null,
+    regularMax: onSale ? regular : null,
+  };
+};
 
 export const resolveDisplayPricing = (
   product: ProductCardItem,
@@ -65,25 +87,54 @@ export const resolveDisplayPricing = (
     const priced = pool.filter((v) => parsePriceString(v.price) > 0);
 
     if (priced.length) {
+      const saleAmounts = priced.map((v) => parsePriceString(v.price));
+
       const lowest = priced.reduce((prev, curr) =>
         parsePriceString(curr.price) < parsePriceString(prev.price) ? curr : prev,
       );
+
+      const priceMin = Math.min(...saleAmounts);
+      const priceMax = Math.max(...saleAmounts);
+
+      const onSale = priced.filter((v) => {
+        const sale = parsePriceString(v.price);
+        const regular = parsePriceString(v.regularPrice);
+        return regular > sale;
+      });
+      const allVariationsOnSale =
+        onSale.length > 0 && onSale.length === priced.length;
+
+      let regularMin: number | null = null;
+      let regularMax: number | null = null;
+
+      if (allVariationsOnSale) {
+        const regularAmounts = onSale
+          .map((v) => parsePriceString(v.regularPrice))
+          .filter((p) => p > 0);
+        regularMin = regularAmounts.length ? Math.min(...regularAmounts) : null;
+        regularMax = regularAmounts.length ? Math.max(...regularAmounts) : null;
+      } else {
+        const lowestRegular = parsePriceString(lowest.regularPrice);
+        const lowestSale = parsePriceString(lowest.price);
+        if (lowestRegular > lowestSale) {
+          regularMin = lowestRegular;
+          regularMax = lowestRegular;
+        }
+      }
+
       return {
         price: lowest.price ?? null,
-        regularPrice: lowest.regularPrice ?? null,
+        priceMin,
+        priceMax,
+        regularMin,
+        regularMax,
       };
     }
 
-    return {
-      price: price ?? regularPrice ?? null,
-      regularPrice: regularPrice ?? null,
-    };
+    return resolveParentLevelPricing(price, regularPrice);
   }
 
-  return {
-    price: price ?? regularPrice ?? null,
-    regularPrice: regularPrice ?? null,
-  };
+  return resolveParentLevelPricing(price, regularPrice);
 };
 
 export const resolveDisplayPrice = (product: ProductCardItem): string | null =>
@@ -129,14 +180,32 @@ const ProductCard = ({
   const displayPrice = displayPricing.price;
 
   const numericPrice = useMemo(
-    () => parsePriceString(displayPrice),
-    [displayPrice],
+    () =>
+      displayPricing.priceMin != null && displayPricing.priceMin > 0
+        ? displayPricing.priceMin
+        : parsePriceString(displayPrice),
+    [displayPrice, displayPricing.priceMin],
   );
 
-  const regularNumericPrice = useMemo(
-    () => parsePriceString(displayPricing.regularPrice),
-    [displayPricing.regularPrice],
-  );
+  const showPriceRange = useMemo(() => {
+    const { priceMin, priceMax } = displayPricing;
+    return (
+      priceMin != null &&
+      priceMax != null &&
+      priceMin > 0 &&
+      priceMax > priceMin
+    );
+  }, [displayPricing]);
+
+  const showRegularRange = useMemo(() => {
+    const { regularMin, regularMax } = displayPricing;
+    return regularMin != null && regularMax != null && regularMax > regularMin;
+  }, [displayPricing]);
+
+  const showRegularStrike = useMemo(() => {
+    const { regularMin, priceMin } = displayPricing;
+    return regularMin != null && priceMin != null && regularMin > priceMin;
+  }, [displayPricing]);
 
   const kokoInstallment = useMemo(() => {
     if (!numericPrice) return 0;
@@ -279,12 +348,29 @@ const ProductCard = ({
 
         {numericPrice > 0 && (
           <div className="mt-2 flex flex-wrap items-end gap-2 text-left">
-            <p className="text-lg font-bold leading-none text-neutral-900 sm:text-xl">
-              LKR {formatLkr(numericPrice)}
+            <p className="text-sm font-bold leading-snug text-neutral-900 sm:text-base">
+              {showPriceRange &&
+              displayPricing.priceMin != null &&
+              displayPricing.priceMax != null ? (
+                <>
+                  LKR {formatLkr(displayPricing.priceMin)} – LKR{" "}
+                  {formatLkr(displayPricing.priceMax)}
+                </>
+              ) : (
+                <>LKR {formatLkr(numericPrice)}</>
+              )}
             </p>
-            {regularNumericPrice > numericPrice && (
-              <p className="text-sm font-medium leading-none text-neutral-400 line-through sm:text-base">
-                LKR {formatLkr(regularNumericPrice)}
+            {showRegularStrike && displayPricing.regularMin != null && (
+              <p className="text-xs font-medium leading-snug text-neutral-400 line-through sm:text-sm">
+                {showRegularRange &&
+                displayPricing.regularMax != null ? (
+                  <>
+                    LKR {formatLkr(displayPricing.regularMin)} – LKR{" "}
+                    {formatLkr(displayPricing.regularMax)}
+                  </>
+                ) : (
+                  <>LKR {formatLkr(displayPricing.regularMin)}</>
+                )}
               </p>
             )}
           </div>
