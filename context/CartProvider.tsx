@@ -261,22 +261,44 @@ export function CartProvider({ children }: {
         ) || false;
     };
 
-    const isInternalServerError = (error: unknown) => {
+    /** GraphQL-level ISE only — not HTTP/network 500s (those can be transient outages). */
+    const isGraphQlInternalServerError = (error: unknown) => {
+        const err = error as {
+            graphQLErrors?: Array<{ message?: string; extensions?: { message?: string } }>;
+        };
+        return (
+            err?.graphQLErrors?.some((graphQLError) => {
+                const message =
+                    graphQLError?.message || graphQLError?.extensions?.message || "";
+                return message.toLowerCase().includes("internal server error");
+            }) ?? false
+        );
+    };
+
+    const isAuthRefreshFailure = (error: unknown) => {
         const err = error as {
             message?: string;
-            networkError?: { statusCode?: number };
-            graphQLErrors?: Array<{ message?: string; extensions?: { code?: string; message?: string } }>;
+            graphQLErrors?: Array<{ message?: string; extensions?: { debugMessage?: string } }>;
         };
+        const messages = [
+            err?.message,
+            ...(err?.graphQLErrors?.map(
+                (graphQLError) =>
+                    graphQLError?.extensions?.debugMessage || graphQLError?.message,
+            ) ?? []),
+        ]
+            .filter(Boolean)
+            .map((message) => String(message).toLowerCase());
 
-        return (
-            err?.networkError?.statusCode === 500 ||
-            err?.message?.includes("Internal server error") ||
-            err?.graphQLErrors?.some((graphQLError) =>
-                graphQLError?.extensions?.code === "INTERNAL_SERVER_ERROR" ||
-                graphQLError?.message?.includes("Internal server error") ||
-                graphQLError?.extensions?.message?.includes("Internal server error")
-            ) ||
-            false
+        return messages.some(
+            (message) =>
+                message.includes("expired token") ||
+                message.includes("invalid-secret-key") ||
+                message.includes("wrong number of segments") ||
+                message.includes("signature verification failed") ||
+                message.includes("iss do not match") ||
+                message.includes("refresh") ||
+                message.includes("jwt"),
         );
     };
 
@@ -293,32 +315,47 @@ export function CartProvider({ children }: {
     };
 
     /**
-     * Invalid JWTs often surface as a bare "Internal server error" from WP —
-     * not "Expired token" — so the Apollo errorLink never refreshes. Try
-     * refresh once; if that fails, wipe auth so the next attempt is anonymous.
+     * AddToCart-only recovery for bare WP "Internal server error" caused by a
+     * bad JWT. Kept out of the Apollo errorLink so checkout is never auto-replayed.
+     * Clears the Woo session before refresh so a stale session cannot fail refresh.
+     * Wipes auth only when refresh fails with an auth-shaped error.
      */
-    const recoverFromStaleAuth = async (): Promise<void> => {
+    const recoverSessionForAddToCart = async (): Promise<void> => {
+        localStorage.removeItem(SESSION_TOKEN_KEY);
+
         const refreshToken = localStorage.getItem(REFRESH_TOKEN_KEY);
-        if (refreshToken) {
-            try {
-                const result = await apolloClient.mutate<{
-                    refreshJwtAuthToken?: { authToken?: string | null } | null;
-                }>({
-                    mutation: GET_AUTH_TOKEN,
-                    variables: { refreshToken },
-                });
-                const nextAuth = result.data?.refreshJwtAuthToken?.authToken;
-                if (nextAuth) {
-                    localStorage.setItem(AUTH_TOKEN_KEY, nextAuth);
-                    localStorage.removeItem(SESSION_TOKEN_KEY);
-                    return;
-                }
-            } catch {
-                // Fall through to full clear.
-            }
+        const hasAuthToken = !!localStorage.getItem(AUTH_TOKEN_KEY);
+
+        if (!hasAuthToken) {
+            return;
         }
 
-        clearStoredSessionState(false);
+        if (!refreshToken) {
+            // Broken auth with nothing to refresh — fall back to guest cart.
+            clearStoredSessionState(false);
+            return;
+        }
+
+        try {
+            const result = await apolloClient.mutate<{
+                refreshJwtAuthToken?: { authToken?: string | null } | null;
+            }>({
+                mutation: GET_AUTH_TOKEN,
+                variables: { refreshToken },
+            });
+            const nextAuth = result.data?.refreshJwtAuthToken?.authToken;
+            if (nextAuth) {
+                localStorage.setItem(AUTH_TOKEN_KEY, nextAuth);
+                return;
+            }
+            // Empty refresh payload — treat as auth failure.
+            clearStoredSessionState(false);
+        } catch (refreshError) {
+            if (isAuthRefreshFailure(refreshError)) {
+                clearStoredSessionState(false);
+            }
+            // Transient refresh/outage: keep auth, retry with a fresh Woo session.
+        }
     };
 
     // Helper function to check if cart has pre-order products
@@ -395,22 +432,19 @@ export function CartProvider({ children }: {
                 console.error("Add to cart error:", caughtMessage || error);
             }
 
-            if (isInternalServerError(error) && typeof window !== "undefined") {
+            // AddToCart-only: bare GraphQL ISE is often a bad JWT (WP does not
+            // return "Expired token"). Do not use the Apollo errorLink for this —
+            // auto-replaying checkout would be unsafe.
+            if (isGraphQlInternalServerError(error) && typeof window !== "undefined") {
                 const hasSessionToken = !!localStorage.getItem(SESSION_TOKEN_KEY);
                 const hasAuthToken = !!localStorage.getItem(AUTH_TOKEN_KEY);
 
                 if (hasSessionToken || hasAuthToken) {
                     console.warn(
-                        "Add to cart failed with a stale session/auth token. Recovering and retrying once.",
+                        "Add to cart failed with a possible stale session/auth token. Recovering and retrying once.",
                     );
 
-                    // Do NOT preserve auth here — a bad JWT is what triggers the
-                    // backend "Internal server error" on addToCart.
-                    if (hasAuthToken) {
-                        await recoverFromStaleAuth();
-                    } else {
-                        clearStoredSessionState(false);
-                    }
+                    await recoverSessionForAddToCart();
 
                     try {
                         const retry = await _addToCart({
@@ -431,30 +465,6 @@ export function CartProvider({ children }: {
                         notifyError("Unable to add item to cart. Please try again.");
                         return { error: "Add to cart failed" };
                     }
-                }
-            }
-
-            // Stale Woo session JWT (not ISE) — clear and retry once.
-            if (
-                typeof window !== "undefined" &&
-                caughtMessage.includes("Wrong number of segments")
-            ) {
-                clearStoredSessionState(!!localStorage.getItem(AUTH_TOKEN_KEY));
-                try {
-                    const retry = await _addToCart({
-                        variables: {
-                            productId: id,
-                            quantity: quantity,
-                            variationId: variation,
-                        },
-                    });
-                    if (openCart && retry?.data?.addToCart?.cartItem) {
-                        setIsCartOpen(true);
-                    }
-                    return retry;
-                } catch {
-                    notifyError("Unable to add item to cart. Please try again.");
-                    return { error: "Add to cart failed" };
                 }
             }
 
