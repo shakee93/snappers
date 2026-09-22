@@ -96,7 +96,7 @@ export const siteConfig = {
     // appleTouchIcon: "/global/apple-touch-icon.png",
   },
   url: {
-    base: "https://catlitter-xi.vercel.app",
+    base: "https://www.catlitter.lk",
     api: "https://catlitter-api.freshpixl.com",
     cdn: "https://cdn.gqmobiles.lk",
     defaultOgImage: "/global/catlitter-og.jpg",
