@@ -70,7 +70,7 @@ export function collectReorderProductIds(
     const id = item?.productId ?? item?.product?.node?.databaseId;
     if (id) ids.add(id);
   }
-  return [...ids];
+  return Array.from(ids);
 }
 
 function stockMapFromNodes(
@@ -83,7 +83,11 @@ function stockMapFromNodes(
   return map;
 }
 
-/** Paid, in-stock order lines that can be added back to the cart. */
+function isPurchasableStockStatus(status: string | null | undefined): boolean {
+  return status === "IN_STOCK" || status === "ON_BACKORDER";
+}
+
+/** Paid, in-stock (or backorder) order lines that can be added back to the cart. */
 export function getReorderCandidates(
   items: Array<MyOrderLineItem | null | undefined>,
   cartLines: ReorderCartLine[] = [],
@@ -157,13 +161,14 @@ export function getReorderCandidates(
     const stockQuantity = isVariable
       ? (variationStock?.stockQuantity ?? item.variation?.node?.stockQuantity)
       : (live?.stockQuantity ?? product?.stockQuantity);
+    const onBackorder = stockStatus === "ON_BACKORDER";
 
     if (stockChecked) {
-      if (stockStatus !== "IN_STOCK") {
+      if (!isPurchasableStockStatus(stockStatus)) {
         skipped.push({ name: displayName, reason: "out_of_stock" });
         continue;
       }
-    } else if (stockStatus && stockStatus !== "IN_STOCK") {
+    } else if (stockStatus && !isPurchasableStockStatus(stockStatus)) {
       skipped.push({ name: displayName, reason: "out_of_stock" });
       continue;
     }
@@ -175,7 +180,8 @@ export function getReorderCandidates(
       (pendingQty.get(key) ?? 0);
 
     let quantity = requested;
-    if (stockQuantity != null) {
+    // Backordered items often report stockQuantity 0/negative but Woo still sells them.
+    if (!onBackorder && stockQuantity != null) {
       const available = stockQuantity - reserved;
       if (available <= 0) {
         skipped.push({ name: displayName, reason: "out_of_stock" });

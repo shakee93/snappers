@@ -22,7 +22,7 @@ export function collectOrderProductIds(
       if (id) ids.add(id);
     }
   }
-  return [...ids];
+  return Array.from(ids);
 }
 
 export function mergeCatalogProduct(

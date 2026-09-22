@@ -380,7 +380,7 @@ export const GET_REORDER_PRODUCT_STOCK = gql`
         ... on VariableProduct {
           stockStatus
           stockQuantity
-          variations(first: 50) {
+          variations(first: 100) {
             nodes {
               databaseId
               stockStatus

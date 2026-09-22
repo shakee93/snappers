@@ -60,7 +60,10 @@ export function useReorderOrder() {
               errorPolicy: "all",
             });
 
-            if (stockResult.error && !stockResult.data?.products) {
+            if (
+              (stockResult.errors?.length ?? 0) > 0 &&
+              !stockResult.data?.products
+            ) {
               toast.error(
                 "Unable to check stock for this order. Please try again.",
               );
