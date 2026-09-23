@@ -6,9 +6,14 @@ import { getYoutubeVideoId } from "@/lib/youtube";
 
 export interface SectionHowToOrderProps {
   className?: string;
+  /** WP Homepage ACF `videoUrlOfHowToOrderSection` (full URL or video id). */
+  youtubeVideoUrl?: string | null;
 }
 
-const SectionHowToOrder = ({ className = "" }: SectionHowToOrderProps) => {
+const SectionHowToOrder = ({
+  className = "",
+  youtubeVideoUrl,
+}: SectionHowToOrderProps) => {
   const { eyebrow, title, description, ctaLabel, ctaHref, youtubeVideoId } =
     howToOrderContent as {
       eyebrow: string;
@@ -19,7 +24,9 @@ const SectionHowToOrder = ({ className = "" }: SectionHowToOrderProps) => {
       youtubeVideoId: string;
     };
 
-  const videoId = getYoutubeVideoId(youtubeVideoId);
+  const videoId = getYoutubeVideoId(
+    youtubeVideoUrl?.trim() || youtubeVideoId,
+  );
 
   return (
     <section

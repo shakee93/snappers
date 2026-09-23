@@ -6,6 +6,7 @@ export const GET_SITE_SETTINGS = gql`
     siteSettings {
       siteSettingFields {
         dealEnds
+        videoUrlOfHowToOrderSection
       }
     }
   }
@@ -13,4 +14,5 @@ export const GET_SITE_SETTINGS = gql`
 
 export type SiteSettingFields = {
   dealEnds?: string | null;
+  videoUrlOfHowToOrderSection?: string | null;
 };
