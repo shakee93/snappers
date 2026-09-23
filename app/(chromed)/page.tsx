@@ -88,7 +88,7 @@ const getSiteSettingsCached = unstable_cache(
       })
       .then((res) => res.data?.siteSettings?.siteSettingFields ?? null)
       .catch(() => null),
-  ["homepage-site-settings-v1"],
+  ["homepage-site-settings-v2"],
   { tags: [SITE_SETTINGS_CACHE_TAG], revalidate: 1800 }
 );
 
@@ -237,7 +237,10 @@ export default async function Home() {
           </>
         ) : null}
 
-        <SectionHowToOrder className="mt-16 md:mt-24" />
+        <SectionHowToOrder
+          className="mt-16 md:mt-24"
+          youtubeVideoUrl={siteSettings?.videoUrlOfHowToOrderSection}
+        />
 
         <div className="mt-16 md:mt-24">
           <SectionHealthProducts
