@@ -290,6 +290,14 @@ export const siteConfig = {
      * `updateShippingMethod` fail and leaves the cart on a stale rate.
      */
     catlitterDeliveryMethodId: "dwbs:2:distance",
+    /**
+     * Flash Delivery — the customer books an Uber / PickMe to collect. A
+     * zero-cost flat rate in WooCommerce > Settings > Shipping titled
+     * "Flash Delivery (Uber/PickMe)". Checkout refuses a Flash order when the
+     * store doesn't quote this rate: WooCommerce silently swaps an unknown
+     * method for the first rate it has, which bills a delivery charge.
+     */
+    flashDeliveryMethodId: "flat_rate:4",
   },
   analytics: {
     googleAnalyticsId: "G-LS3EVR93ZH",
