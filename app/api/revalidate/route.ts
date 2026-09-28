@@ -1,6 +1,6 @@
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { NextRequest } from 'next/server'
-import { DEALS_CACHE_TAG, productTag } from '@/lib/cache-tags'
+import { BROWSE_PRODUCTS_CACHE_TAG, DEALS_CACHE_TAG, productTag } from '@/lib/cache-tags'
 
 // Accepted values for the optional ?type= query param. Forwarded as the
 // second arg to revalidatePath. For App Router dynamic routes like
@@ -21,9 +21,14 @@ function logRevalidate(fields: Record<string, unknown>) {
         .join(' '))
 }
 
+// Homepage is a concrete path, so bust it WITHOUT a type: revalidatePath('/')
+// emits the `_N_T_/` implicit tag the page is stored under. revalidatePath('/',
+// 'page') emits `_N_T_/page`, which only matches an app/page.tsx outside a
+// route group — ours lives at app/(chromed)/page.tsx, so it silently no-op'd.
 function bustDealSurfaces() {
     revalidateTag(DEALS_CACHE_TAG, 'max')
-    revalidatePath('/', 'page')
+    revalidateTag(BROWSE_PRODUCTS_CACHE_TAG, 'max')
+    revalidatePath('/')
     revalidatePath('/deals')
 }
 
@@ -36,7 +41,7 @@ export async function GET(request: NextRequest) {
         try {
             revalidateTag(tag, 'max')
             if (tag === DEALS_CACHE_TAG) {
-                revalidatePath('/', 'page')
+                revalidatePath('/')
                 revalidatePath('/deals')
             }
             logRevalidate({ kind: 'tag', tag, ms: Date.now() - startedAt })
@@ -59,7 +64,7 @@ export async function GET(request: NextRequest) {
         }
 
         if (path === 'homepage') {
-            revalidatePath('/', 'page');
+            revalidatePath('/');
             revalidatePath('/new-arrivals');
             revalidatePath('/back-in-stock');
             revalidatePath('/smartwatches');

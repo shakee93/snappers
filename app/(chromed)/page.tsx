@@ -43,6 +43,7 @@ import SectionOurStores from "@/components/home/SectionOurStores";
 import { type CategoryTreeNode } from "@/lib/categoryScope";
 import { unstable_cache } from "next/cache";
 import {
+  BROWSE_PRODUCTS_CACHE_TAG,
   HERO_SECTION_CACHE_TAG,
   SITE_SETTINGS_CACHE_TAG,
 } from "@/lib/cache-tags";
@@ -67,6 +68,10 @@ const HERO_QUERY_CONTEXT = {
 
 const SITE_SETTINGS_QUERY_CONTEXT = {
   fetchOptions: { next: { tags: [SITE_SETTINGS_CACHE_TAG] } },
+};
+
+const BROWSE_PRODUCTS_QUERY_CONTEXT = {
+  fetchOptions: { next: { tags: [BROWSE_PRODUCTS_CACHE_TAG] } },
 };
 
 const getHeroSettingsCached = unstable_cache(
@@ -111,7 +116,11 @@ const getData = async () => {
       .catch(() => []),
     getDealProductsCached().catch(() => []),
     getClient()
-      .query({ query: GET_BROWSE_SECTION_PRODUCTS, variables: { first: 100 } })
+      .query({
+        query: GET_BROWSE_SECTION_PRODUCTS,
+        variables: { first: 100 },
+        context: BROWSE_PRODUCTS_QUERY_CONTEXT,
+      })
       .then((res) => ({
         products: res.data?.products?.nodes || [],
         hasNextPage: res.data?.products?.pageInfo?.hasNextPage ?? false,
@@ -163,6 +172,7 @@ const getData = async () => {
               categoryIdIn,
               first: BROWSE_CATEGORY_TAB_SSR_FIRST,
             },
+            context: BROWSE_PRODUCTS_QUERY_CONTEXT,
           })
           .catch(() => null);
 
