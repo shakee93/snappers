@@ -12,6 +12,7 @@ import { buildPinMetaData } from "@/lib/checkoutPinMeta";
 import {
   resolveCatlitterDeliveryRate,
   resolveCourierRate,
+  resolveFlashDeliveryRate,
   resolveFreeShippingRate,
 } from "@/lib/checkoutShipping";
 import { useCheckoutPaymentSync } from "@/hooks/useCheckoutPaymentSync";
@@ -270,17 +271,17 @@ const CheckoutPage = () => {
 
     try {
       // Mirror the mapping in getShippingMethod: store_pickup uses the
-      // block-based pickup_location, flash_delivery uses the zone-bound
-      // flat_rate:4 (free, configured backend-side as "Flash Delivery
-      // (Uber/PickMe)"). CatLitter Delivery and courier both fall through to
-      // whichever rate the store quoted for the current address — see
-      // resolveCatlitterDeliveryRate / resolveCourierRate.
+      // block-based pickup_location, flash_delivery uses the zero-cost flat
+      // rate "Flash Delivery (Uber/PickMe)" — only when the store actually
+      // quotes it, see resolveFlashDeliveryRate. CatLitter Delivery and
+      // courier both fall through to whichever rate the store quoted for the
+      // current address — see resolveCatlitterDeliveryRate / resolveCourierRate.
       // A free rate outranks both delivery options — see
-      // resolveFreeShippingRate. Pickup and Flash keep their fixed ids.
+      // resolveFreeShippingRate. Pickup keeps its fixed id.
       const freeRate = preferFree ? resolveFreeShippingRate(rateSource) : null;
       const shippingMethods =
         deliveryType === "flash_delivery"
-          ? "flat_rate:4"
+          ? resolveFlashDeliveryRate(rateSource)?.id
           : deliveryType === "store_pickup"
             ? "pickup_location:0"
             : freeRate?.id ??
@@ -563,6 +564,14 @@ const CheckoutPage = () => {
         return null;
       }
 
+      // WooCommerce swaps an unquoted shipping method for the first rate it
+      // has, so submitting Flash without its rate bills a delivery charge the
+      // summary never showed. Refuse instead.
+      if (isFlashDeliveryOrder && !resolveFlashDeliveryRate(cart)) {
+        toast.error("Flash Delivery isn't available right now. Please choose another delivery option.");
+        return null;
+      }
+
       const shippingMethod = getShippingMethod(shippingTotal, orderDeliveryType);
       const storePickupAddressOverride = {
         address1: "",
@@ -823,9 +832,10 @@ const CheckoutPage = () => {
       orderDeliveryType === "flash_delivery";
 
     // store_pickup → block-based pickup_location method (instance 0).
-    // flash_delivery → zone-bound flat_rate instance 4 ("Flash Delivery
-    // (Uber/PickMe)" at cost 0). Configured via WooCommerce > Settings >
-    // Shipping > Sri Lanka. Different mechanism from store pickup, but
+    // flash_delivery → zone-bound flat rate ("Flash Delivery (Uber/PickMe)"
+    // at cost 0, id in siteConfig.shipping.flashDeliveryMethodId —
+    // handleCheckout has already confirmed the store quotes it). Configured
+    // via WooCommerce > Settings > Shipping > Everywhere. Different mechanism from store pickup, but
     // both resolve to a free shipping line — and flat_rate keeps the
     // title verbatim so order admin shows "Flash Delivery (Uber/PickMe)"
     // instead of the pickup_location plugin's "<title> (<location>)" template.
@@ -841,7 +851,7 @@ const CheckoutPage = () => {
 
     const methodId =
       orderDeliveryType === "flash_delivery"
-        ? "flat_rate:4"
+        ? siteConfig.shipping.flashDeliveryMethodId
         : orderDeliveryType === "store_pickup"
           ? "pickup_location:0"
           : freeRate?.id ??

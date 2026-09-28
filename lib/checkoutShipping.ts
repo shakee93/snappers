@@ -22,6 +22,9 @@ const CATLITTER_DELIVERY_METHOD_ID: string =
 /** Whether CatLitter Delivery is wired up to a WooCommerce method at all. */
 const CATLITTER_DELIVERY_ENABLED = CATLITTER_DELIVERY_METHOD_ID.length > 0;
 
+/** Rate id of the Flash Delivery method (customer-arranged Uber / PickMe). */
+const FLASH_DELIVERY_METHOD_ID: string = siteConfig.shipping.flashDeliveryMethodId;
+
 /**
  * WooCommerce hands costs back as bare numeric strings ("350") on rates and as
  * formatted money ("Rs350.00") elsewhere. Strip everything that isn't part of
@@ -57,6 +60,10 @@ const isCatlitterDeliveryRate = (rate: ShippingRate): boolean =>
   (rate.id === CATLITTER_DELIVERY_METHOD_ID ||
     rate.id.startsWith(`${CATLITTER_DELIVERY_METHOD_ID}:`));
 
+/** Matched exactly — a flat rate quotes a single, unsuffixed id. */
+const isFlashDeliveryRate = (rate: ShippingRate): boolean =>
+  rate.id === FLASH_DELIVERY_METHOD_ID;
+
 /**
  * The CatLitter Delivery rate WooCommerce quoted for the current address, or
  * null when the address falls outside the method's configured reach. Its cost
@@ -68,6 +75,16 @@ export const resolveCatlitterDeliveryRate = (
   quotedRates(cart).find(isCatlitterDeliveryRate) ?? null;
 
 /**
+ * The Flash Delivery rate WooCommerce quoted, or null when the store has no
+ * such method for the current address. Confirm it is quoted before
+ * submitting a Flash order: WooCommerce replaces an unquoted method with the
+ * first rate it has, so the order would be billed for a delivery nobody makes.
+ */
+export const resolveFlashDeliveryRate = (
+  cart: Cart | null | undefined,
+): ShippingRate | null => quotedRates(cart).find(isFlashDeliveryRate) ?? null;
+
+/**
  * A zero-cost rate WooCommerce quoted for the current address — the
  * free-shipping coupon's rate, or a method configured at no charge.
  *
@@ -76,8 +93,8 @@ export const resolveCatlitterDeliveryRate = (
  * Delivery are mutually exclusive in the UI, and without this the free rate
  * would be unreachable whenever the hidden one is the option carrying it.
  *
- * Pickup rates are excluded: they are free by nature, and returning one here
- * would silently turn a delivery into a collection.
+ * Pickup and Flash Delivery rates are excluded: they are free by nature, and
+ * returning one here would silently turn a delivery into a collection.
  */
 export const resolveFreeShippingRate = (
   cart: Cart | null | undefined,
@@ -85,6 +102,7 @@ export const resolveFreeShippingRate = (
   quotedRates(cart).find(
     (rate) =>
       !PICKUP_METHOD_IDS.has(rate.methodId ?? "") &&
+      !isFlashDeliveryRate(rate) &&
       (rate.methodId === "free_shipping" || parseRateCost(rate.cost) === 0),
   ) ?? null;
 
@@ -98,8 +116,8 @@ export const resolveFreeShippingRate = (
  * address. Read it off the rates WooCommerce returned for the address it
  * currently holds instead.
  *
- * Pickup and CatLitter Delivery rates are excluded: both are offered as their
- * own delivery option, so leaving them in would let the courier option resolve
+ * Pickup, Flash Delivery and CatLitter Delivery rates are excluded: each is
+ * offered as its own delivery option, so leaving them in would let the courier option resolve
  * to a rate the customer did not choose.
  *
  * Assumes a single courier rate among what remains; if a zone ever offers
@@ -112,7 +130,9 @@ export const resolveCourierRate = (
 ): ShippingRate | null => {
   const courierRates = quotedRates(cart).filter(
     (rate) =>
-      !PICKUP_METHOD_IDS.has(rate.methodId ?? "") && !isCatlitterDeliveryRate(rate),
+      !PICKUP_METHOD_IDS.has(rate.methodId ?? "") &&
+      !isFlashDeliveryRate(rate) &&
+      !isCatlitterDeliveryRate(rate),
   );
 
   if (preferFree) {
