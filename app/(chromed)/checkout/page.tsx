@@ -1452,7 +1452,7 @@ const CheckoutPage = () => {
 
                 {hasDiscount && (
                   <div className="flex justify-between items-center">
-                    <span className="text-slate-600 dark:text-slate-400">Coupon</span>
+                    <span className="text-slate-600 dark:text-slate-400">You saved</span>
                     {totalsRecalculating ? (
                       <RecalculatingAmount className="h-5 w-16" />
                     ) : (
