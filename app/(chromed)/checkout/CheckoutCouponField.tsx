@@ -1,12 +1,10 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useMemo, useState } from "react";
 import Input from "shared/Input/Input";
 import Label from "@/components/global/primitives/Label/Label";
 import { BRAND_CTA_BUTTON_CLASS } from "shared/Button/ButtonBrand";
 import { useCoupon } from "@/hooks/useCoupon";
-import { parseWooMoneyAmount } from "@/lib/cartLinePricing";
-import { formatPrice } from "@/lib/formatPrice";
 import type { AppliedCoupon } from "@/graphql/types/graphql";
 import { Loader } from "lucide-react";
 import { toast } from "sonner";
@@ -36,14 +34,8 @@ const CheckoutCouponField = ({
   const [couponMessage, setCouponMessage] = useState<string | null>(null);
   /** User chose to reveal the input (sticky until they hide it). */
   const [showCouponField, setShowCouponField] = useState(false);
-  const triggerRef = useRef<HTMLButtonElement>(null);
 
-  const {
-    applyCouponMutation,
-    removeCouponsMutation,
-    applyingCoupon,
-    removingCoupon,
-  } = useCoupon();
+  const { applyCouponMutation, applyingCoupon } = useCoupon();
 
   const activeCoupons = useMemo(
     () =>
@@ -89,8 +81,8 @@ const CheckoutCouponField = ({
 
       if (data?.applyCoupon?.applied?.code) {
         toast.success("Coupon applied successfully.");
-        // Inline success is redundant once the applied chip is on screen —
-        // toast covers the confirmation; clear the input for a next code.
+        // Toast covers the confirmation and the "You saved" row shows the
+        // discount; clear the input for a next code.
         clearStatus();
         setCouponCode("");
         setShowCouponField(true);
@@ -119,56 +111,12 @@ const CheckoutCouponField = ({
     }
   };
 
-  const handleRemove = async (code: string) => {
-    const removingLast = activeCoupons.length === 1;
-    try {
-      onSyncingChange(true);
-      const { data } = await removeCouponsMutation({
-        variables: { codes: [code] },
-      });
-
-      if (data?.removeCoupons?.cart) {
-        toast.success("Coupon removed.");
-        // Keep the field open so the customer can enter another code without
-        // hunting for the disclosure again (including coupons that arrived
-        // already applied, when showCouponField was still false).
-        setShowCouponField(true);
-        await refreshCart();
-        // Last chip unmounts and the disclosure remounts — restore focus so it
-        // doesn't fall to <body>. Double rAF waits for the commit that mounts
-        // the trigger after appliedCoupons clears.
-        if (removingLast) {
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              triggerRef.current?.focus();
-            });
-          });
-        }
-      } else {
-        toast.error("Coupon could not be removed.");
-      }
-    } catch (error: unknown) {
-      const apolloError = error as {
-        graphQLErrors?: Array<{ message?: string }>;
-        message?: string;
-      };
-      const message =
-        apolloError?.graphQLErrors?.[0]?.message ||
-        apolloError?.message ||
-        "Failed to remove coupon.";
-      toast.error(message);
-    } finally {
-      onSyncingChange(false);
-    }
-  };
-
   return (
     <div>
       {/* Applied coupons force the panel open — no disclosure trigger then,
           so we don't stack a disabled "Discount code" above the field label. */}
       {showTrigger && (
         <button
-          ref={triggerRef}
           type="button"
           onClick={toggleField}
           className="text-sm font-medium text-primary-500 hover:underline"
@@ -236,37 +184,6 @@ const CheckoutCouponField = ({
           </div>
         )}
 
-        {hasAppliedCoupons && (
-          <div className="mt-3 space-y-1">
-            <span className="text-xs font-medium text-emerald-600">
-              Coupon{activeCoupons.length > 1 ? "s" : ""} applied:
-            </span>
-            <div className="flex flex-wrap gap-2">
-              {activeCoupons.map((applied) => {
-                const discount = parseWooMoneyAmount(applied.discountAmount);
-                return (
-                  <div
-                    key={applied.code}
-                    className="inline-flex items-center rounded-full bg-emerald-50 px-3 py-1 text-xs text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-100"
-                  >
-                    <span className="font-semibold uppercase">{applied.code}</span>
-                    {Number.isFinite(discount) && discount > 0 && (
-                      <span className="ml-2">({formatPrice(discount)} off)</span>
-                    )}
-                    <button
-                      type="button"
-                      onClick={() => void handleRemove(applied.code)}
-                      disabled={removingCoupon}
-                      className="ml-2 text-[10px] font-semibold text-emerald-800 hover:text-emerald-950 dark:text-emerald-200 disabled:opacity-60"
-                    >
-                      ×
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
