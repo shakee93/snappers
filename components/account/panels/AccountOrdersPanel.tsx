@@ -8,8 +8,12 @@ import LoadingSkeleton from "@/components/global/primitives/OrderPageSkeleton";
 import { useSession } from "@/context/SessionProvider";
 import AccountOrderDetailModal from "@/components/account/AccountOrderDetailModal";
 import ReorderButton from "@/components/account/ReorderButton";
+import CancelOrderButton from "@/components/account/CancelOrderButton";
+import CancelOrderConfirmDialog from "@/components/account/CancelOrderConfirmDialog";
 import { useReorderOrder } from "@/hooks/useReorderOrder";
+import { useCancelOrder } from "@/hooks/useCancelOrder";
 import {
+  canCancelOrder,
   formatOrderDate,
   formatPaymentMethod,
   formatStatus,
@@ -65,11 +69,17 @@ const OrderCard = memo(function OrderCard({
   onSelect,
   onReorder,
   reordering,
+  onCancel,
+  cancelling,
+  canCancel,
 }: {
   order: MyOrder;
   onSelect: (order: MyOrder) => void;
   onReorder: (order: MyOrder) => void;
   reordering: boolean;
+  onCancel: (order: MyOrder) => void;
+  cancelling: boolean;
+  canCancel: boolean;
 }) {
   const lineItems = useMemo(
     () =>
@@ -135,7 +145,14 @@ const OrderCard = memo(function OrderCard({
           <p className="text-base font-bold text-neutral-900">
             {formatPrice(parseWooMoneyAmount(order.total))}
           </p>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3">
+            {canCancel ? (
+              <CancelOrderButton
+                size="compact"
+                loading={cancelling}
+                onClick={() => onCancel(order)}
+              />
+            ) : null}
             <ReorderButton
               size="compact"
               loading={reordering}
@@ -155,7 +172,20 @@ const AccountOrdersPanel = () => {
   const { loading, error, data, refetch } = useMyOrders();
   const { customer } = useSession();
   const { reorder, reorderingId } = useReorderOrder();
+  const { cancelOrder, cancellingId } = useCancelOrder();
   const [selectedOrder, setSelectedOrder] = useState<MyOrder | null>(null);
+  const [orderToCancel, setOrderToCancel] = useState<MyOrder | null>(null);
+
+  const requestCancel = (order: MyOrder) => setOrderToCancel(order);
+
+  const confirmCancel = async () => {
+    if (!orderToCancel) return;
+    const success = await cancelOrder(orderToCancel);
+    setOrderToCancel(null);
+    if (success) {
+      void refetch();
+    }
+  };
 
   useEffect(() => {
     if (customer?.id === "guest") {
@@ -192,6 +222,9 @@ const AccountOrdersPanel = () => {
               onSelect={setSelectedOrder}
               onReorder={reorder}
               reordering={reorderingId === order.id}
+              onCancel={requestCancel}
+              cancelling={cancellingId === order.id}
+              canCancel={canCancelOrder(order.status)}
             />
           ))}
         </div>
@@ -223,6 +256,20 @@ const AccountOrdersPanel = () => {
         reordering={
           selectedOrder != null && reorderingId === selectedOrder.id
         }
+        onCancel={requestCancel}
+        cancelling={
+          selectedOrder != null && cancellingId === selectedOrder.id
+        }
+      />
+
+      <CancelOrderConfirmDialog
+        order={orderToCancel}
+        show={!!orderToCancel}
+        loading={
+          orderToCancel != null && cancellingId === orderToCancel.id
+        }
+        onCancel={() => setOrderToCancel(null)}
+        onConfirm={confirmCancel}
       />
     </div>
   );
