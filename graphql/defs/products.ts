@@ -293,6 +293,21 @@ export const GET_ALL_PRODUCTS = gql`
   }
 `;
 
+export const GET_ALL_CATEGORIES_WITH_HIERARCHY = gql`
+  query GetAllCategoriesWithHierarchy {
+    productCategories(first: 200, where: { hideEmpty: true, orderby: NAME }) {
+      nodes {
+        id
+        databaseId
+        parentDatabaseId
+        name
+        slug
+        count
+      }
+    }
+  }
+`;
+
 export const GET_CATEGORY_SLUGS = gql`
   query productCategories {
     productCategories(first: 100) {
