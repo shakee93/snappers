@@ -57,6 +57,8 @@ export function useCancelOrder() {
         });
 
         const finalStatus = data?.customerCancelOrder?.status;
+        // The mu-plugin returns WooCommerce's status slug ("cancelled"), not
+        // the uppercase GraphQL enum ("CANCELLED"). Compare against the slug.
         if (errors?.length || finalStatus !== "cancelled") {
           const message = errors?.[0]?.message?.trim();
           console.error("[cancelOrder] Mutation rejected:", errors, data);

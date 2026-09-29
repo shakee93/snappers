@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useMyOrders } from "@/hooks/useMyOrders";
@@ -176,15 +176,21 @@ const AccountOrdersPanel = () => {
   const [selectedOrder, setSelectedOrder] = useState<MyOrder | null>(null);
   const [orderToCancel, setOrderToCancel] = useState<MyOrder | null>(null);
 
-  const requestCancel = (order: MyOrder) => setOrderToCancel(order);
+  // Close the detail modal before opening the confirm dialog so the two
+  // Headless UI dialogs don't sit as siblings — otherwise their outside-click
+  // and Escape handlers compete and the detail modal keeps rendering the
+  // pre-cancel `selectedOrder` snapshot after refetch.
+  const openCancelDialog = useCallback((order: MyOrder) => {
+    setSelectedOrder(null);
+    setOrderToCancel(order);
+  }, []);
 
+  // The hook already awaits `client.refetchQueries({ include: [GET_MY_ORDERS] })`
+  // before returning, so no extra refetch is needed here.
   const confirmCancel = async () => {
     if (!orderToCancel) return;
-    const success = await cancelOrder(orderToCancel);
+    await cancelOrder(orderToCancel);
     setOrderToCancel(null);
-    if (success) {
-      void refetch();
-    }
   };
 
   useEffect(() => {
@@ -222,7 +228,7 @@ const AccountOrdersPanel = () => {
               onSelect={setSelectedOrder}
               onReorder={reorder}
               reordering={reorderingId === order.id}
-              onCancel={requestCancel}
+              onCancel={openCancelDialog}
               cancelling={cancellingId === order.id}
               canCancel={canCancelOrder(order.status)}
             />
@@ -256,7 +262,7 @@ const AccountOrdersPanel = () => {
         reordering={
           selectedOrder != null && reorderingId === selectedOrder.id
         }
-        onCancel={requestCancel}
+        onCancel={openCancelDialog}
         cancelling={
           selectedOrder != null && cancellingId === selectedOrder.id
         }
