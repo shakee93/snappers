@@ -401,3 +401,7 @@ export function statusBadgeClass(status: string | null | undefined) {
       return "bg-header-action/25 text-header-green";
   }
 }
+
+export function canCancelOrder(status: string | null | undefined): boolean {
+  return status === "PENDING" || status === "ON_HOLD" || status === "PROCESSING";
+}

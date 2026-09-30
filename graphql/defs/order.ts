@@ -728,3 +728,16 @@ export const COMPLETE_ORDER_PAYMENT = gql`
     }
   }
 `;
+
+// Custom mutation registered by the `headless-customer-cancel-order` mu-plugin
+// on the catlitter WordPress backend. Runs as the JWT-authenticated customer
+// (Apollo's authLink attaches the Bearer token) and performs ownership +
+// allowed-status checks server-side, so the frontend doesn't need to.
+export const CUSTOMER_CANCEL_ORDER = gql`
+  mutation customerCancelOrder($orderId: Int!) {
+    customerCancelOrder(input: { orderId: $orderId }) {
+      orderId
+      status
+    }
+  }
+`;

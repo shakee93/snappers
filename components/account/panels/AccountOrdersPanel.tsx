@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useMyOrders } from "@/hooks/useMyOrders";
@@ -8,8 +8,12 @@ import LoadingSkeleton from "@/components/global/primitives/OrderPageSkeleton";
 import { useSession } from "@/context/SessionProvider";
 import AccountOrderDetailModal from "@/components/account/AccountOrderDetailModal";
 import ReorderButton from "@/components/account/ReorderButton";
+import CancelOrderButton from "@/components/account/CancelOrderButton";
+import CancelOrderConfirmDialog from "@/components/account/CancelOrderConfirmDialog";
 import { useReorderOrder } from "@/hooks/useReorderOrder";
+import { useCancelOrder } from "@/hooks/useCancelOrder";
 import {
+  canCancelOrder,
   formatOrderDate,
   formatPaymentMethod,
   formatStatus,
@@ -65,11 +69,17 @@ const OrderCard = memo(function OrderCard({
   onSelect,
   onReorder,
   reordering,
+  onCancel,
+  cancelling,
+  canCancel,
 }: {
   order: MyOrder;
   onSelect: (order: MyOrder) => void;
   onReorder: (order: MyOrder) => void;
   reordering: boolean;
+  onCancel: (order: MyOrder) => void;
+  cancelling: boolean;
+  canCancel: boolean;
 }) {
   const lineItems = useMemo(
     () =>
@@ -135,7 +145,14 @@ const OrderCard = memo(function OrderCard({
           <p className="text-base font-bold text-neutral-900">
             {formatPrice(parseWooMoneyAmount(order.total))}
           </p>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3">
+            {canCancel ? (
+              <CancelOrderButton
+                size="compact"
+                loading={cancelling}
+                onClick={() => onCancel(order)}
+              />
+            ) : null}
             <ReorderButton
               size="compact"
               loading={reordering}
@@ -155,7 +172,26 @@ const AccountOrdersPanel = () => {
   const { loading, error, data, refetch } = useMyOrders();
   const { customer } = useSession();
   const { reorder, reorderingId } = useReorderOrder();
+  const { cancelOrder, cancellingId } = useCancelOrder();
   const [selectedOrder, setSelectedOrder] = useState<MyOrder | null>(null);
+  const [orderToCancel, setOrderToCancel] = useState<MyOrder | null>(null);
+
+  // Close the detail modal before opening the confirm dialog so the two
+  // Headless UI dialogs don't sit as siblings — otherwise their outside-click
+  // and Escape handlers compete and the detail modal keeps rendering the
+  // pre-cancel `selectedOrder` snapshot after refetch.
+  const openCancelDialog = useCallback((order: MyOrder) => {
+    setSelectedOrder(null);
+    setOrderToCancel(order);
+  }, []);
+
+  // The hook already awaits `client.refetchQueries({ include: [GET_MY_ORDERS] })`
+  // before returning, so no extra refetch is needed here.
+  const confirmCancel = async () => {
+    if (!orderToCancel) return;
+    await cancelOrder(orderToCancel);
+    setOrderToCancel(null);
+  };
 
   useEffect(() => {
     if (customer?.id === "guest") {
@@ -192,6 +228,9 @@ const AccountOrdersPanel = () => {
               onSelect={setSelectedOrder}
               onReorder={reorder}
               reordering={reorderingId === order.id}
+              onCancel={openCancelDialog}
+              cancelling={cancellingId === order.id}
+              canCancel={canCancelOrder(order.status)}
             />
           ))}
         </div>
@@ -223,6 +262,20 @@ const AccountOrdersPanel = () => {
         reordering={
           selectedOrder != null && reorderingId === selectedOrder.id
         }
+        onCancel={openCancelDialog}
+        cancelling={
+          selectedOrder != null && cancellingId === selectedOrder.id
+        }
+      />
+
+      <CancelOrderConfirmDialog
+        order={orderToCancel}
+        show={!!orderToCancel}
+        loading={
+          orderToCancel != null && cancellingId === orderToCancel.id
+        }
+        onCancel={() => setOrderToCancel(null)}
+        onConfirm={confirmCancel}
       />
     </div>
   );

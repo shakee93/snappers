@@ -9,6 +9,7 @@ import ButtonClose from "@/shared/ButtonClose/ButtonClose";
 import OrderBankReceiptUpload from "@/components/global/ui/OrderBankReceiptUpload";
 import { getProductPath } from "@/lib/productUrl";
 import {
+  canCancelOrder,
   formatLineItemVariation,
   formatOrderMoney,
   formatOrderSummaryDate,
@@ -24,6 +25,7 @@ import {
 } from "@/lib/formatCustomerAddress";
 import type { MyOrder, MyOrderLineItem } from "@/graphql/defs/order";
 import ReorderButton from "@/components/account/ReorderButton";
+import CancelOrderButton from "@/components/account/CancelOrderButton";
 
 const DetailRow = ({
   label,
@@ -162,6 +164,8 @@ interface AccountOrderDetailModalProps {
   onUploadSuccess: () => void;
   onReorder: (order: MyOrder) => void;
   reordering?: boolean;
+  onCancel?: (order: MyOrder) => void;
+  cancelling?: boolean;
 }
 
 const AccountOrderDetailModal = ({
@@ -171,6 +175,8 @@ const AccountOrderDetailModal = ({
   onUploadSuccess,
   onReorder,
   reordering = false,
+  onCancel,
+  cancelling = false,
 }: AccountOrderDetailModalProps) => {
   if (!order) return null;
 
@@ -336,10 +342,18 @@ const AccountOrderDetailModal = ({
                 ) : (
                   <span />
                 )}
-                <ReorderButton
-                  loading={reordering}
-                  onClick={() => onReorder(order)}
-                />
+                <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3">
+                  {onCancel && canCancelOrder(order.status) ? (
+                    <CancelOrderButton
+                      loading={cancelling}
+                      onClick={() => onCancel(order)}
+                    />
+                  ) : null}
+                  <ReorderButton
+                    loading={reordering}
+                    onClick={() => onReorder(order)}
+                  />
+                </div>
               </div>
             </Dialog.Panel>
           </Transition.Child>
