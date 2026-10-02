@@ -81,16 +81,17 @@ export async function GET(request: NextRequest) {
             } else {
                 revalidatePath(path);
             }
-            // WP pings PDPs as /<brand>/<slug>, or /product/<slug> for products
-            // with no brand (get_custom_product_permalink_path falls back to
-            // 'product'). The storefront PDP lives at /<slug>, so bust that
-            // concrete path plus the per-product tag attached to GET_PRODUCT's
-            // SSR fetch — otherwise a regen re-serves the stale force-cached
-            // GraphQL response and bakes the old price/stock straight back in.
+            // WP pings PDPs at their storefront path /<slug>. The legacy
+            // /<brand>/<slug> and /product/<slug> (brandless) shapes are still
+            // accepted so a WP backend that hasn't switched keeps working.
+            // Bust the concrete /<slug> path plus the per-product tag attached
+            // to GET_PRODUCT's SSR fetch — otherwise a regen re-serves the
+            // stale force-cached GraphQL response and bakes the old
+            // price/stock straight back in.
             const isCollectionPath = path.startsWith('/tag') || path.startsWith('/shop')
             const productSlug = isCollectionPath
                 ? undefined
-                : path.match(/^\/[^/]+\/([^/]+)$/)?.[1]
+                : path.match(/^\/(?:[^/]+\/)?([^/]+)$/)?.[1]
             if (productSlug) {
                 revalidatePath(`/${productSlug}`);
                 revalidateTag(productTag(productSlug), 'max');
