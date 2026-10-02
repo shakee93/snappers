@@ -4,7 +4,7 @@ import { BROWSE_PRODUCTS_CACHE_TAG, DEALS_CACHE_TAG, productTag } from '@/lib/ca
 
 // Accepted values for the optional ?type= query param. Forwarded as the
 // second arg to revalidatePath. For App Router dynamic routes like
-// /[category]/[slug], passing 'page' is what makes revalidatePath actually
+// /[slug], passing 'page' is what makes revalidatePath actually
 // invalidate the cached entry instead of silently no-op'ing.
 type RevalidatePathType = 'page' | 'layout'
 function parseType(raw: string | null): RevalidatePathType | undefined {
@@ -81,25 +81,25 @@ export async function GET(request: NextRequest) {
             } else {
                 revalidatePath(path);
             }
-            if (
-                path.startsWith('/product') ||
-                path.startsWith('/tag') ||
-                path.startsWith('/shop')
-            ) {
+            // WP pings PDPs as /<brand>/<slug>, or /product/<slug> for products
+            // with no brand (get_custom_product_permalink_path falls back to
+            // 'product'). The storefront PDP lives at /<slug>, so bust that
+            // concrete path plus the per-product tag attached to GET_PRODUCT's
+            // SSR fetch — otherwise a regen re-serves the stale force-cached
+            // GraphQL response and bakes the old price/stock straight back in.
+            const isCollectionPath = path.startsWith('/tag') || path.startsWith('/shop')
+            const productSlug = isCollectionPath
+                ? undefined
+                : path.match(/^\/[^/]+\/([^/]+)$/)?.[1]
+            if (productSlug) {
+                revalidatePath(`/${productSlug}`);
+                revalidateTag(productTag(productSlug), 'max');
+            }
+            if (productSlug || isCollectionPath || path.startsWith('/product')) {
                 // Product/tag saves must also refresh homepage deals.
                 bustDealSurfaces();
-            } else {
-                // PDP paths follow /<category>/<slug>. Bust the per-product tag
-                // attached to GET_PRODUCT's SSR fetch so a regen actually
-                // re-pulls WPGraphQL instead of re-serving the stale fetch-
-                // cache entry on a path that was already invalidated.
-                const productSlug = path.match(/^\/[^/]+\/([^/]+)$/)?.[1]
-                if (productSlug) {
-                    revalidateTag(productTag(productSlug), 'max');
-                    bustDealSurfaces();
-                }
             }
-            logRevalidate({ kind: 'path', path, type: type ?? '', ms: Date.now() - startedAt })
+            logRevalidate({ kind: 'path', path, type: type ?? '', productSlug: productSlug ?? '', ms: Date.now() - startedAt })
         } catch (e) {
             logRevalidate({ kind: 'path', path, type: type ?? '', threw: String(e), ms: Date.now() - startedAt })
             throw e
