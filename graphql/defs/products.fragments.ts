@@ -365,7 +365,7 @@ export const ProductContentFull = gql`
     galleryImages {
       nodes {
         id
-        sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
+        sourceUrl
         altText
         databaseId
       }
@@ -443,7 +443,7 @@ export const ProductContentFull = gql`
       galleryImages {
         nodes {
           id
-          sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
+          sourceUrl
           altText
           databaseId
         }
@@ -493,7 +493,7 @@ export const ProductContentFull = gql`
       galleryImages {
         nodes {
           id
-          sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
+          sourceUrl
           altText
           databaseId
         }

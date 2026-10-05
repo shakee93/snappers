@@ -44,6 +44,21 @@ const hasRenderableGalleryImages = (images: unknown): boolean => {
   });
 };
 
+/** Strip WP resized suffixes (`-300x300`) so full + thumb URLs of the same file match. */
+const normalizeImageUrl = (sourceUrl: string): string => {
+  try {
+    const url = new URL(sourceUrl);
+    url.pathname = url.pathname.replace(/-\d+x\d+(?=\.[a-zA-Z]+$)/, "");
+    url.search = "";
+    url.hash = "";
+    return `${url.origin}${url.pathname}`;
+  } catch {
+    return sourceUrl.replace(/-\d+x\d+(?=\.[a-zA-Z]+)(?:\?.*)?$/, (match) =>
+      match.replace(/-\d+x\d+/, ""),
+    );
+  }
+};
+
 /** Woo featured image + product gallery are separate fields — merge both, dedupe. */
 const buildProductGalleryImages = (
   featured: GalleryImage | null | undefined,
@@ -51,18 +66,20 @@ const buildProductGalleryImages = (
   leadImage?: GalleryImage | null,
 ): GalleryImage[] => {
   const images: GalleryImage[] = [];
-  const seen = new Set<string>();
+  const seenIds = new Set<number>();
+  const seenUrls = new Set<string>();
 
   const push = (image: GalleryImage | null | undefined) => {
     if (!image?.sourceUrl) return;
 
-    const key =
-      image.databaseId != null
-        ? `id:${image.databaseId}`
-        : `url:${image.sourceUrl}`;
+    const normalizedUrl = normalizeImageUrl(image.sourceUrl);
+    const hasId = image.databaseId != null;
 
-    if (seen.has(key)) return;
-    seen.add(key);
+    if (hasId && seenIds.has(image.databaseId as number)) return;
+    if (seenUrls.has(normalizedUrl)) return;
+
+    if (hasId) seenIds.add(image.databaseId as number);
+    seenUrls.add(normalizedUrl);
     images.push(image);
   };
 
