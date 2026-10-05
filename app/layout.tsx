@@ -46,18 +46,22 @@ export const metadata: Metadata = {
     default: defaultTitle,
   },
   description: siteConfig.brand.description,
-  ...(!siteConfig.seo.indexable && {
-    robots: {
-      index: false,
-      follow: false,
-      nocache: true,
-      googleBot: {
-        index: false,
-        follow: false,
-        noimageindex: true,
-      },
-    },
-  }),
+  // Ternary, not `&&`: siteConfig is `as const`, so with indexable: true the
+  // `&&` form spreads the literal `false`, which TypeScript rejects.
+  ...(siteConfig.seo.indexable
+    ? {}
+    : {
+        robots: {
+          index: false,
+          follow: false,
+          nocache: true,
+          googleBot: {
+            index: false,
+            follow: false,
+            noimageindex: true,
+          },
+        },
+      }),
   icons: getSiteMetadataIcons(),
   openGraph: {
     title: defaultTitle,
