@@ -44,6 +44,37 @@ const hasRenderableGalleryImages = (images: unknown): boolean => {
   });
 };
 
+/** Woo featured image + product gallery are separate fields — merge both, dedupe. */
+const buildProductGalleryImages = (
+  featured: GalleryImage | null | undefined,
+  galleryNodes: Array<GalleryImage | null | undefined> | null | undefined,
+  leadImage?: GalleryImage | null,
+): GalleryImage[] => {
+  const images: GalleryImage[] = [];
+  const seen = new Set<string>();
+
+  const push = (image: GalleryImage | null | undefined) => {
+    if (!image?.sourceUrl) return;
+
+    const key =
+      image.databaseId != null
+        ? `id:${image.databaseId}`
+        : `url:${image.sourceUrl}`;
+
+    if (seen.has(key)) return;
+    seen.add(key);
+    images.push(image);
+  };
+
+  push(leadImage);
+  push(featured);
+  for (const node of galleryNodes ?? []) {
+    push(node);
+  }
+
+  return images;
+};
+
 const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [emblaMainRef, emblaMainApi] = useEmblaCarousel({});
@@ -59,19 +90,17 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   const [canScrollNext, setCanScrollNext] = useState(false);
 
   const galleryNodes = product?.galleryImages?.nodes;
-  const originalGalleryImages = galleryNodes?.length
-    ? galleryNodes
-    : product?.image?.sourceUrl
-      ? [product.image]
-      : [];
+  const featuredImage = product?.image;
 
   const preferredVariation = getPreferredVariation(product?.variations?.nodes);
   const preferredImage = preferredVariation?.image;
 
-  // If there's a preferred in-stock variation with an image, place it first
-  const initialGalleryImages = preferredImage?.sourceUrl
-    ? [preferredImage, ...originalGalleryImages.slice(1)]
-    : originalGalleryImages;
+  // Featured + gallery are separate in Woo; lead with preferred variation when present.
+  const initialGalleryImages = buildProductGalleryImages(
+    featuredImage,
+    galleryNodes,
+    preferredImage,
+  );
 
   const [galleryImages, setGalleryImages] = useState(initialGalleryImages);
 
@@ -100,22 +129,22 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   useEffect(() => {
     if (variationId === null || variationId === undefined) return;
 
-    const activeVariationImage = variationImages.find(i => i?.databaseId === variationId);
+    const activeVariationImage = variationImages.find(
+      (i) => i?.databaseId === variationId,
+    );
 
-    setGalleryImages(previousImages => {
-      if (!previousImages) {
-        return initialGalleryImages
-      }
+    if (!activeVariationImage?.sourceUrl) return;
 
-      if (activeVariationImage) {
-        const newImages = [activeVariationImage, ...originalGalleryImages.slice(1)];
-        emblaThumbsApi?.scrollTo(0);
-        setSelectedIndex(0);
-        emblaMainApi?.scrollTo(0);
-        return newImages;
-      }
-      return previousImages;
-    });
+    const newImages = buildProductGalleryImages(
+      featuredImage,
+      galleryNodes,
+      activeVariationImage,
+    );
+
+    setGalleryImages(newImages);
+    emblaThumbsApi?.scrollTo(0);
+    setSelectedIndex(0);
+    emblaMainApi?.scrollTo(0);
   }, [variationId]);
 
   const onThumbVariationClick = (variationId: string | null = null) => {
@@ -182,6 +211,13 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   }, [emblaMainApi, onSelect]);
 
   const showGallery = hasRenderableGalleryImages(galleryImages);
+  const renderableGalleryCount = Array.isArray(galleryImages)
+    ? galleryImages.filter((image) =>
+        Boolean((image as GalleryImage | null)?.sourceUrl),
+      ).length
+    : 0;
+  // Single-image products: show only the main viewer (no redundant thumb strip).
+  const showThumbs = showGallery && renderableGalleryCount > 1;
 
   return (
     <div className="embla w-full" id="product-image">
@@ -273,7 +309,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
         )}
       </div>
 
-      {showGallery && (
+      {showThumbs && (
         <div className="embla-thumbs">
           <div className="embla-thumbs__viewport " ref={emblaThumbsRef}>
             <div className="embla-thumbs__container" >
