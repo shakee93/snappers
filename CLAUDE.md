@@ -126,6 +126,8 @@ Run `npm run lint` and `npm run build` locally before pushing. A PR that fails C
 
 ## Deployment / Git workflow
 
+**Repository:** [github.com/shakee93/snappers](https://github.com/shakee93/snappers) (`origin` only). This storefront is **Snappers**, not Catlitter — **never push commits or branches to `shakee93/catlitter`** (separate project; do not add that remote).
+
 **Direct pushes to `main` are not allowed.** Every change — including small fixes — goes through review.
 
 1. **Branch** off `main` (or an active feature branch if stacking on in-flight work):
