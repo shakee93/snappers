@@ -9,3 +9,24 @@
     @apply visible;
   }
 }
+
+/** Recolor WooCommerce green category SVGs to brand navy (#071C43). */
+.header-brand-icon-tint {
+  filter: brightness(0) saturate(100%) invert(8%) sepia(29%) saturate(4879%)
+    hue-rotate(203deg) brightness(96%) contrast(104%);
+}
+
+.header-category-mega .mega-menu-panel {
+  animation: header-mega-in 0.15s ease-out;
+}
+
+@keyframes header-mega-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

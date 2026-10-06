@@ -14,12 +14,15 @@ function scaleToCssVars(prefix: "primary" | "secondary", scale: ColorScale): str
 /** CSS custom properties for :root — injected once in the root layout. */
 export function getSiteThemeCss(): string {
   const { primary, secondary } = siteConfig.theme.colors;
-  const { cream, green, peach, accent, action } = siteConfig.theme.header;
+  const { topbar, category, cream, green, peach, accent, action } =
+    siteConfig.theme.header;
   const { brown: dealBrown, accent: dealAccent } = siteConfig.theme.deal;
 
   return `:root {
 ${scaleToCssVars("primary", primary)}
 ${scaleToCssVars("secondary", secondary)}
+  --c-header-topbar: ${topbar};
+  --c-header-category: ${category};
   --c-header-cream: ${cream};
   --c-header-green: ${green};
   --c-header-peach: ${peach};

@@ -20,6 +20,35 @@ query SlidePostType {
 }
 `
 
+/** Snappers (and similar): hero carousel from `hero_slide` CPT + ACF `heroSlideFields`. */
+export const GET_HERO_SLIDES = gql`
+  query HeroSlides {
+    heroSlides(first: 10, where: { orderby: { field: MENU_ORDER, order: ASC } }) {
+      nodes {
+        databaseId
+        heroSlideFields {
+          mainTitle
+          subContent
+          buttonText
+          buttonUrl
+          backgroundImage {
+            node {
+              sourceUrl
+              altText
+            }
+          }
+          featureImage {
+            node {
+              sourceUrl
+              altText
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
 export const GET_HERO_SETTINGS = gql`
   ${ProductContentCard}
 query HeroSettings {

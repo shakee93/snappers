@@ -30,6 +30,7 @@ const config: Config = {
 			display: ["var(--font-display)", ...defaultTheme.fontFamily.sans],
 			body: ["var(--font-body)", ...defaultTheme.fontFamily.sans],
 			albra: ["var(--font-albra)", ...defaultTheme.fontFamily.sans],
+			playfair: ["var(--font-playfair)", ...defaultTheme.fontFamily.serif],
 		},
 		darkMode: 'class',
 		extend: {
@@ -57,6 +58,8 @@ const config: Config = {
 				},
 				// Header bars (cream top bar + dark-green utility bar) from site.config.
 				header: {
+					topbar: tokenColor("--c-header-topbar"),
+					category: tokenColor("--c-header-category"),
 					cream: tokenColor("--c-header-cream"),
 					green: tokenColor("--c-header-green"),
 					peach: tokenColor("--c-header-peach"),

@@ -1,61 +1,46 @@
-"use client";
+import Link from "next/link";
+import { siteConfig } from "@/site.config";
 
-import { useState } from "react";
-import Image from "next/image";
-import { AnimatePresence, motion } from "framer-motion";
-import useInterval from "react-use/lib/useInterval";
-import announcementMessages from "@/content/announcement-bar.json";
-
-const SLIDE_INTERVAL = 5000;
-/** iOS picker-style ease — snappy deceleration into place */
-const SLIDE_TRANSITION = { duration: 0.48, ease: [0.32, 0.72, 0, 1] as const };
+const { links, message, helpLabel } = siteConfig.navigation.topBar;
+const { primaryPhone, primaryPhoneDisplay } = siteConfig.contact;
 
 /**
- * Thin top announcement strip — cycles messages with an iOS alarm-picker
- * slide: current exits upward, next enters from below.
+ * Thin top bar: quick links · delivery message · support phone.
+ * Mobile shows the message only.
  */
 const HeaderAnnouncementBar = () => {
-  const [activeIndex, setActiveIndex] = useState(0);
-  const message = announcementMessages[activeIndex];
-
-  useInterval(
-    () => setActiveIndex((prev) => (prev + 1) % announcementMessages.length),
-    announcementMessages.length > 1 ? SLIDE_INTERVAL : null
-  );
-
-  if (!message) return null;
-
-  const isKokoIcon = message.icon.includes("koko");
+  const topBarBg = siteConfig.theme.brandHex.topBar;
 
   return (
-    <div className="bg-header-green text-white">
-      <div className="relative mx-auto h-9 max-w-[100vw] overflow-hidden px-4 sm:h-10 lg:px-6">
-        <AnimatePresence initial={false}>
-          <motion.div
-            key={activeIndex}
-            initial={{ y: "100%" }}
-            animate={{ y: 0 }}
-            exit={{ y: "-100%" }}
-            transition={SLIDE_TRANSITION}
-            className="absolute inset-0 flex items-center justify-center gap-2 px-4 text-center"
-          >
-            <Image
-              src={message.icon}
-              alt=""
-              width={isKokoIcon ? 52 : 18}
-              height={isKokoIcon ? 20 : 18}
-              aria-hidden
-              className={
-                isKokoIcon
-                  ? "h-6 w-auto max-w-[72px] shrink-0 object-contain sm:h-7"
-                  : "h-[18px] w-[18px] shrink-0 object-contain"
-              }
-            />
-            <span className="text-[10px] font-medium leading-tight text-white/95 lg:text-xs">
-              {message.text}
-            </span>
-          </motion.div>
-        </AnimatePresence>
+    <div
+      className="bg-header-topbar text-white"
+      style={{ backgroundColor: topBarBg }}
+    >
+      <div className="mx-auto grid h-9 max-w-[1368px] grid-cols-1 items-center px-4 text-[11px] sm:h-10 lg:grid-cols-3 lg:px-6 lg:text-xs">
+        <nav aria-label="Top bar" className="hidden items-stretch lg:flex">
+          {links.map((item, index) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex items-center whitespace-nowrap px-4 text-white/95 transition-colors first:pl-0 hover:text-white hover:underline ${
+                index < links.length - 1
+                  ? "border-r border-white/35"
+                  : ""
+              }`}
+            >
+              {item.name}
+            </Link>
+          ))}
+        </nav>
+
+        <p className="truncate text-center font-medium">{message}</p>
+
+        <p className="hidden justify-end whitespace-nowrap lg:flex">
+          {helpLabel}&nbsp;
+          <a href={`tel:${primaryPhone}`} className="hover:underline">
+            {primaryPhoneDisplay}
+          </a>
+        </p>
       </div>
     </div>
   );

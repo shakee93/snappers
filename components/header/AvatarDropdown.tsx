@@ -1,13 +1,19 @@
 "use client";
 import { Popover, Transition } from "@headlessui/react";
 import Image from "next/image";
-import { Loader2, LogIn } from "lucide-react";
+import { Loader2, LogIn, User } from "lucide-react";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import LogoutButton from "@/components/header/LogoutButton";
 import { useSession } from "@/context/SessionProvider";
 import { accountTabHref } from "@/components/account/accountTabs";
 import profileIcon from "@/public/global/profile.svg";
+import {
+  HEADER_ACTION_ICON,
+  HEADER_ACTION_ICON_BOX,
+  HEADER_ACTION_ITEM,
+  HEADER_ACTION_LABEL,
+} from "./headerActionStyles";
 
 const headerAvatarButtonClass =
   "flex h-10 w-10 items-center justify-center rounded-xl bg-header-peach text-neutral-900 transition-[filter] hover:brightness-95 focus:outline-none";
@@ -15,8 +21,12 @@ const headerAvatarButtonClass =
 const headerAvatarLoaderClass =
   "h-[18px] w-[18px] animate-spin text-neutral-900";
 
+type AvatarDropdownProps = {
+  variant?: "icon" | "labeled";
+};
+
 // Skeleton for loading
-export default function AvatarDropdown() {
+export default function AvatarDropdown({ variant = "icon" }: AvatarDropdownProps) {
   const [isLoading, setIsLoading] = useState(true);
   const { customer, fetchCustomer } = useSession();
 
@@ -40,38 +50,64 @@ export default function AvatarDropdown() {
   }, [customer]);
 
   return (
-    <div className="AvatarDropdown">
-      <Popover className="relative">
+    <div
+      className={
+        variant === "labeled"
+          ? "AvatarDropdown flex items-center"
+          : "AvatarDropdown"
+      }
+    >
+      <Popover className="relative flex items-center">
         {({ open, close }) => (
           <>
             <Popover.Button
-              className=""
+              className={
+                variant === "labeled"
+                  ? `${HEADER_ACTION_ITEM} focus:outline-none focus-visible:ring-2 focus-visible:ring-header-green/40 focus-visible:ring-offset-1`
+                  : ""
+              }
               aria-label="Account"
               onClick={() => {
                 fetchCustomer();
               }}
             >
-              <div className={headerAvatarButtonClass}>
-                {isLoading ? (
-                  <Loader2
-                    className={headerAvatarLoaderClass}
-                    aria-hidden
-                  />
-                ) : !customer || customer?.id === "guest" ? (
-                  <Image
-                    src={profileIcon}
-                    alt=""
-                    width={18}
-                    height={18}
-                    className="h-[18px] w-[18px] object-contain"
-                    aria-hidden
-                  />
-                ) : (
-                  <span className="text-lg font-bold leading-none text-neutral-900">
-                    {customerInitial}
+              {variant === "labeled" ? (
+                <>
+                  <span className={HEADER_ACTION_ICON_BOX}>
+                    {isLoading ? (
+                      <Loader2
+                        className={`${HEADER_ACTION_ICON} animate-spin`}
+                        aria-hidden
+                      />
+                    ) : (
+                      <User className={HEADER_ACTION_ICON} aria-hidden />
+                    )}
                   </span>
-                )}
-              </div>
+                  <span className={HEADER_ACTION_LABEL}>Account</span>
+                </>
+              ) : (
+                <div className={headerAvatarButtonClass}>
+                  {isLoading ? (
+                    <Loader2
+                      className={headerAvatarLoaderClass}
+                      aria-hidden
+                    />
+                  ) : !customer || customer?.id === "guest" ? (
+                    <Image
+                      src={profileIcon}
+                      alt=""
+                      width={18}
+                      height={18}
+                      className="h-[18px] w-[18px] object-contain"
+                      aria-hidden
+                    />
+                  ) : (
+                    <span className="text-lg font-bold leading-none text-neutral-900">
+                      {customerInitial}
+                    </span>
+                  )}
+                </div>
+              )}
             </Popover.Button>
             <Transition
               as={Fragment}

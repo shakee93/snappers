@@ -36,6 +36,10 @@ export type MegaMenuConfig = {
   /** Leaf categories to hide from mega-menu lists (slug/name aliases). */
   excludeLeaves?: string[][];
   featuredLinks: Record<string, { href: string; label: string }[]>;
+  /** Header split mega menu — static promo images under `public/`. */
+  featureImages?: Record<string, string>;
+  /** Flat subcategory lists: max items per column before starting the next. */
+  maxRowsPerColumn?: Record<string, number>;
 };
 
 export type MegaMenuPanelData = {
@@ -47,6 +51,51 @@ export type MegaMenuPanelData = {
   shopAllHref: string;
   shopAllLabel: string;
 };
+
+/** Header category bar: simple stacked list when there are few subcategories. */
+export const HEADER_COMPACT_MEGA_MENU_MAX_CHILDREN = 5;
+
+/** Header: menu + feature image column when subcategory count is in this range. */
+export const HEADER_SPLIT_MEGA_MENU_MAX_CHILDREN = 10;
+
+export function isHeaderCompactMegaMenu(data: MegaMenuPanelData): boolean {
+  return data.root.children.length < HEADER_COMPACT_MEGA_MENU_MAX_CHILDREN;
+}
+
+export function isHeaderSplitMegaMenu(data: MegaMenuPanelData): boolean {
+  const count = data.root.children.length;
+  return (
+    count >= HEADER_COMPACT_MEGA_MENU_MAX_CHILDREN &&
+    count < HEADER_SPLIT_MEGA_MENU_MAX_CHILDREN
+  );
+}
+
+/** Wide multi-column panels only — compact/split/≤2 cols anchor under nav item. */
+export const HEADER_VIEWPORT_CENTERED_MEGA_MENU_MIN_COLUMNS = 3;
+
+export function isHeaderViewportCenteredMegaMenu(
+  data: MegaMenuPanelData,
+): boolean {
+  if (isHeaderCompactMegaMenu(data) || isHeaderSplitMegaMenu(data)) {
+    return false;
+  }
+  return data.columns.length >= HEADER_VIEWPORT_CENTERED_MEGA_MENU_MIN_COLUMNS;
+}
+
+function resolveMegaMenuFeatureImage(
+  navSlug: string,
+  root: CategoryTreeNode,
+): string | undefined {
+  if (!config.showFeatureImage) return undefined;
+
+  const configured = config.featureImages?.[navSlug];
+  if (configured) return configured;
+
+  const browse = getBrowseFeatureImageForNavSlug(navSlug);
+  if (browse) return browse;
+
+  return root.image?.sourceUrl ?? undefined;
+}
 
 const config = megaMenuConfig as MegaMenuConfig;
 
@@ -96,6 +145,22 @@ export function distributeMegaMenuColumns(
 
   // Shallow menus (Bird, Aquarium, …) — single vertical list, not a wide row.
   const isFlatList = children.every((child) => child.children.length === 0);
+
+  if (isFlatList && navSlug) {
+    const maxRows = config.maxRowsPerColumn?.[navSlug];
+    if (maxRows != null && maxRows > 0 && children.length > maxRows) {
+      const columnTotal = Math.ceil(children.length / maxRows);
+      const columns: CategoryTreeNode[][] = Array.from(
+        { length: columnTotal },
+        () => [],
+      );
+      children.forEach((child, index) => {
+        columns[Math.floor(index / maxRows)].push(child);
+      });
+      return columns.filter((column) => column.length > 0);
+    }
+  }
+
   const count = isFlatList
     ? 1
     : Math.max(1, Math.min(columnCount, children.length));
@@ -359,9 +424,7 @@ export function getMegaMenuPanelData(
     navSlug,
     root: orderedRoot,
     columns: distributeMegaMenuColumns(orderedChildren, config.columns, navSlug),
-    featureImage: config.showFeatureImage
-      ? getBrowseFeatureImageForNavSlug(navSlug)
-      : undefined,
+    featureImage: resolveMegaMenuFeatureImage(navSlug, root),
     featuredLinks: config.featuredLinks[navSlug] ?? [],
     shopAllHref: `/${root.slug}`,
     shopAllLabel,

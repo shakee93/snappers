@@ -15,6 +15,10 @@ export function isGraphqlArchive(): boolean {
 
   const graphqlIsCatlitter = graphql.includes("catlitter");
   const typesenseIsGq = typesense.includes("gqmobiles");
+  const graphqlIsSnappers = graphql.includes("snappers");
+  const typesenseIsCatlitter = typesense.includes("catlitter");
+
+  if (graphqlIsSnappers && typesenseIsCatlitter) return true;
 
   return graphqlIsCatlitter && typesenseIsGq;
 }

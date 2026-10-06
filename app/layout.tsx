@@ -1,7 +1,7 @@
 import "../styles/index.scss";
 import "./index.css";
 import "rc-slider/assets/index.css";
-import { Inter } from "next/font/google";
+import { Inter, Playfair_Display } from "next/font/google";
 import localFont from "next/font/local";
 import ApolloWrapper from "@/graphql/apollo-client";
 import { SessionProvider } from "@/context/SessionProvider";
@@ -35,6 +35,13 @@ const albraSans = localFont({
   variable: "--font-albra",
   weight: "600",
   display: "swap",
+});
+
+/** Hero slider headlines — high-contrast serif (Playfair Display). */
+const playfairDisplay = Playfair_Display({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-playfair",
 });
 
 const defaultTitle = `${siteConfig.brand.name} - ${siteConfig.brand.tagline}`;
@@ -97,7 +104,10 @@ export default async function RootLayout({
   const isLocalhost = process.env.NODE_ENV === 'development';
 
   return (
-    <html lang="en" className={`${inter.variable} ${albraSans.variable}`}>
+    <html
+      lang="en"
+      className={`${inter.variable} ${albraSans.variable} ${playfairDisplay.variable}`}
+    >
       <head>
         <SiteThemeStyles />
         <meta

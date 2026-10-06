@@ -49,5 +49,15 @@
   "excludeLeaves": [
     ["cat-food-water-bowl-or-feeder", "cat food water bowl or feeder"]
   ],
-  "featuredLinks": {}
+  "featuredLinks": {},
+  "featureImages": {
+    "beverages": "/global/mega-menu/beverages.jpg",
+    "frozen": "/global/mega-menu/frozen.jpg",
+    "groceries": "/global/mega-menu/groceries.jpg",
+    "household": "/global/mega-menu/household.jpg"
+  },
+  "maxRowsPerColumn": {
+    "groceries": 8,
+    "household": 8
+  }
 }

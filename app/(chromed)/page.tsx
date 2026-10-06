@@ -5,8 +5,8 @@ import {
   GET_BROWSE_SECTION_PRODUCTS,
   GET_SHOP_BY_CATEGORIES,
 } from "@/graphql/defs/products";
-import { GET_HERO_SETTINGS } from "@/graphql/defs/slides";
-import { GET_GOOGLE_REVIEWS } from "@/graphql/defs/reviews";
+import { GET_HERO_SETTINGS, GET_HERO_SLIDES } from "@/graphql/defs/slides";
+import { mapGraphqlHeroSlides } from "@/lib/heroSlides";
 import {
   GET_SITE_SETTINGS,
   type SiteSettingFields,
@@ -33,13 +33,9 @@ import {
 } from "@/lib/browseCategories";
 import { getDealProductsCached } from "@/lib/dealProducts.server";
 import { HOMEPAGE_DEAL_CAROUSEL_LIMIT } from "@/lib/dealProducts";
-import SectionGoogleReviews, {
-  type GoogleReviewsFields,
-} from "@/components/home/SectionGoogleReviews";
 import SectionBrandMarquee, {
   type BrandMarqueeItem,
 } from "@/components/home/SectionBrandMarquee";
-import SectionOurStores from "@/components/home/SectionOurStores";
 import { type CategoryTreeNode } from "@/lib/categoryScope";
 import { unstable_cache } from "next/cache";
 import {
@@ -74,6 +70,16 @@ const BROWSE_PRODUCTS_QUERY_CONTEXT = {
   fetchOptions: { next: { tags: [BROWSE_PRODUCTS_CACHE_TAG] } },
 };
 
+const getHeroSlidesCached = unstable_cache(
+  () =>
+    getClient()
+      .query({ query: GET_HERO_SLIDES, context: HERO_QUERY_CONTEXT })
+      .then((res) => res.data?.heroSlides?.nodes ?? [])
+      .catch(() => []),
+  ["homepage-hero-slides-v2"],
+  { tags: [HERO_SECTION_CACHE_TAG], revalidate: 86400 },
+);
+
 const getHeroSettingsCached = unstable_cache(
   () =>
     getClient()
@@ -81,7 +87,7 @@ const getHeroSettingsCached = unstable_cache(
       .then((res) => res.data?.heroSettings?.heroSettingsFields ?? null)
       .catch(() => null),
   ["homepage-hero-settings-v3"],
-  { tags: [HERO_SECTION_CACHE_TAG], revalidate: 86400 }
+  { tags: [HERO_SECTION_CACHE_TAG], revalidate: 86400 },
 );
 
 const getSiteSettingsCached = unstable_cache(
@@ -99,15 +105,16 @@ const getSiteSettingsCached = unstable_cache(
 
 const getData = async () => {
   const [
-    heroSettings,
+    heroSlideNodes,
+    heroSettingsFromAcf,
     siteSettings,
     categories,
     dealProducts,
     browseAllTab,
     browseCategories,
-    googleReviews,
     brands,
   ] = await Promise.all([
+    getHeroSlidesCached(),
     getHeroSettingsCached(),
     getSiteSettingsCached(),
     getClient()
@@ -135,10 +142,6 @@ const getData = async () => {
       .query({ query: GET_BROWSE_CATEGORY_TABS, variables: { first: 20 } })
       .then((res) => res.data?.productCategories?.nodes || [])
       .catch(() => []),
-    getClient()
-      .query({ query: GET_GOOGLE_REVIEWS })
-      .then((res) => res.data?.googleReviews?.googleReviewsFields ?? null)
-      .catch(() => null),
     getClient()
       .query({ query: GET_ALL_BRANDS })
       .then((res) => res.data?.brands?.nodes ?? [])
@@ -190,8 +193,19 @@ const getData = async () => {
     browseCategoryTabCacheEntries
   ) as Record<number, BrowseInitialCache>;
 
+  const mappedHeroSlides = mapGraphqlHeroSlides(heroSlideNodes);
+  const heroSettings: HeroSettingsFields | null =
+    mappedHeroSlides.length > 0
+      ? {
+          sliderSettings: { slides: mappedHeroSlides },
+          dealBannerSettings: heroSettingsFromAcf?.dealBannerSettings ?? null,
+          healthSectionSettings:
+            heroSettingsFromAcf?.healthSectionSettings ?? null,
+        }
+      : (heroSettingsFromAcf as HeroSettingsFields | null);
+
   return {
-    heroSettings: heroSettings as HeroSettingsFields | null,
+    heroSettings,
     siteSettings: siteSettings as SiteSettingFields | null,
     categories: categories as SectionShopByCategoryProps["categories"],
     dealProducts: dealProducts as (SimpleProduct & VariableProduct)[],
@@ -199,7 +213,6 @@ const getData = async () => {
     browseCategoryTabs,
     browseCategoryScopes,
     browseCategoryTabCaches,
-    googleReviews: googleReviews as GoogleReviewsFields | null,
     brands: brands as BrandMarqueeItem[],
   };
 };
@@ -214,7 +227,6 @@ export default async function Home() {
     browseCategoryTabs,
     browseCategoryScopes,
     browseCategoryTabCaches,
-    googleReviews,
     brands,
   } = await getData();
 
@@ -267,13 +279,7 @@ export default async function Home() {
           />
         </div>
 
-        <div className="mt-16 md:mt-24">
-          <SectionGoogleReviews data={googleReviews} />
-        </div>
-
         <SectionBrandMarquee brands={brands} />
-
-        <SectionOurStores />
       </div>
     </main>
   );

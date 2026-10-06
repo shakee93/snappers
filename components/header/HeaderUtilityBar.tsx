@@ -1,70 +1,24 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { siteConfig } from "@/site.config";
-import { cn } from "@/lib/utils";
 import SearchBar from "./SearchBar";
+import HeaderCategoryBar from "./HeaderCategoryBar";
+import type { ProductCategory } from "@/graphql/types/graphql";
 
-const { links } = siteConfig.navigation.utility;
-
-function isUtilityLinkActive(pathname: string, href: string): boolean {
-  if (href === "/") return pathname === "/";
-  return pathname === href || pathname.startsWith(`${href}/`);
-}
+type HeaderUtilityBarProps = {
+  navCategories: ProductCategory[];
+};
 
 /**
- * Green utility bar: mobile search · desktop search + quick links.
- * Announcement messages live in `HeaderAnnouncementBar` above.
+ * Mobile: search on green bar. Desktop: dark category strip from WooCommerce.
  */
-const HeaderUtilityBar = () => {
-  const pathname = usePathname();
-
+const HeaderUtilityBar = ({ navCategories }: HeaderUtilityBarProps) => {
   return (
     <>
       <div className="bg-header-green px-4 pb-3 lg:hidden">
-        <SearchBar
-          placeholder="Search for brand, products or categories..."
-        />
+        <SearchBar placeholder="Search for brand, products or categories..." />
       </div>
 
-      <div className="hidden bg-header-green lg:block">
-      <div className="flex h-[72px] w-full items-center px-6 max-w-[1368px] mx-auto">
-        {/* Left: pill search */}
-        <div className="min-w-0 w-full max-w-3xl">
-          <SearchBar
-            placeholder="Search for brand, products or categories..."
-          />
-        </div>
-
-        {/* Right: quick links with active underline */}
-        <nav className="ml-auto flex shrink-0 items-center gap-8 pl-10 xl:gap-10">
-          {links.map((item) => {
-            const active = isUtilityLinkActive(pathname, item.href);
-
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={cn(
-                  "relative whitespace-nowrap pb-2 text-sm font-semibold transition-colors",
-                  active ? "text-white" : "text-white/80 hover:text-white"
-                )}
-              >
-                {item.name}
-                <span
-                  aria-hidden
-                  className={cn(
-                    "absolute bottom-0 left-0 h-[3px] w-full rounded-full bg-header-accent transition-opacity",
-                    active ? "opacity-100" : "opacity-0"
-                  )}
-                />
-              </Link>
-            );
-          })}
-        </nav>
-      </div>
-    </div>
+      <HeaderCategoryBar navCategories={navCategories} />
     </>
   );
 };

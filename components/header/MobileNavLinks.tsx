@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ChevronDown, Facebook, Instagram, PhoneCall } from "lucide-react";
@@ -14,6 +15,9 @@ import { getMegaMenuCategoryIcon } from "@/lib/megaMenuIcons";
 import { getCategoryPath } from "@/lib/productUrl";
 import type { CategoryTreeNode } from "@/lib/categoryTree";
 import { cn } from "@/lib/utils";
+import { getFaviconSources } from "@/lib/siteAssets";
+
+const mobileDrawerMarkSrc = getFaviconSources().light;
 
 type MobileNavLinksProps = {
   navCategories?: ProductCategory[];
@@ -60,6 +64,19 @@ const MobileNavLinks = ({ navCategories = [] }: MobileNavLinksProps) => {
         } fixed left-1/2 z-[1001] h-fit w-11/12 origin-center -translate-x-1/2 transform rounded-3xl border border-gray-300 bg-white pt-4 pb-8 shadow-xl duration-150 ease-in-out`}
       >
         <div className="m-auto w-1/5 rounded-xl bg-gray-300 py-0.5" />
+
+        <div className="mt-3 flex justify-center px-4">
+          <Link href="/" onClick={closeMenu} className="inline-flex">
+            <Image
+              src={mobileDrawerMarkSrc}
+              alt={siteConfig.brand.name}
+              width={48}
+              height={48}
+              className="h-12 w-12 object-contain"
+              priority
+            />
+          </Link>
+        </div>
 
         <div className="mt-3 flex max-h-[60vh] flex-col gap-4 overflow-y-auto">
           <ul className="items-center gap-1 px-2 text-center text-base font-medium text-primaryColor">
@@ -183,7 +200,7 @@ const MobileNavLinks = ({ navCategories = [] }: MobileNavLinksProps) => {
               href={`tel:${siteConfig.contact.primaryPhone}`}
               className="flex items-center justify-center gap-2"
             >
-              <PhoneCall size={iconSize} /> {siteConfig.contact.primaryPhone}
+              <PhoneCall size={iconSize} /> {siteConfig.contact.primaryPhoneDisplay}
             </Link>
           </div>
 

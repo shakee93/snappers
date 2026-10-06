@@ -6,12 +6,13 @@ import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import useInterval from "react-use/lib/useInterval";
 import type { ProductCardItem } from "@/components/home/ProductCard";
+import { HERO_SLIDER_TITLE_CLASS } from "@/lib/heroSlides";
 
 interface MediaNode {
   node?: { sourceUrl?: string | null } | null;
 }
 
-interface HeroSlide {
+export interface HeroSlide {
   sliderTitle?: string | null;
   sliderDiscription?: string | null;
   titleColor?: string | null;
@@ -20,7 +21,10 @@ interface HeroSlide {
   buttonLink?: string | null;
   buttonTextColor?: string | null;
   buttonBachgroundColor?: string | null;
+  buttonBorderColor?: string | null;
   sliderBackgroundImage?: MediaNode | null;
+  /** Optional art layered above the slide background (e.g. signup copy + feature on right). */
+  sliderFeatureImage?: MediaNode | null;
 }
 
 interface HeroDeal {
@@ -55,284 +59,229 @@ const SLIDE_INTERVAL = 6000;
 const CROSSFADE = { duration: 0.6, ease: [0.4, 0, 0.2, 1] as const };
 const TEXT_FADE = { duration: 0.45, ease: "easeInOut" as const };
 
+/** Cream doodle + tint when a slide has no photo (fallback under CMS slides). */
+const HERO_SLIDER_BG = "/homepage/hero/pattern-bg.webp";
+const HERO_SLIDER_SIGNUP_BG = "/homepage/hero/pattern-bg.webp";
+const HERO_SLIDER_FEATURE_IMAGE =
+  "/homepage/hero/hero-slide-snappers-coins.png";
+
+const DEFAULT_SLIDES: HeroSlide[] = [
+  {
+    sliderTitle: `<span class="${HERO_SLIDER_TITLE_CLASS}">Join Now, Receive Rs.200 Cashback.</span>`,
+    sliderDiscription: "Limited Time Offer",
+    titleColor: "#0C2016",
+    descriptionColor: "#7DA068",
+    buttonText: "Sign Up",
+    buttonLink: "/signup",
+    buttonTextColor: "#ffffff",
+    buttonBachgroundColor: "#6d7f94",
+    buttonBorderColor: "#000000",
+    sliderBackgroundImage: {
+      node: { sourceUrl: HERO_SLIDER_SIGNUP_BG },
+    },
+    sliderFeatureImage: {
+      node: { sourceUrl: HERO_SLIDER_FEATURE_IMAGE },
+    },
+  },
+  {
+    sliderBackgroundImage: {
+      node: { sourceUrl: HERO_SLIDER_FEATURE_IMAGE },
+    },
+  },
+];
+
 function stripHtml(html: string): string {
   return html.replace(/<[^>]+>/g, " ");
 }
 
-function hasDealText(content?: string | null): boolean {
-  if (!content) return false;
-  return stripHtml(content).trim().length > 0;
-}
-
-type DealTextPosition = "top-left" | "bottom-left" | "top-right" | "bottom-right";
-
-function normalizeDealTextPosition(value?: string | null): DealTextPosition {
-  const normalized = (value ?? "Top Left").toLowerCase().replace(/\s+/g, " ").trim();
-
-  if (normalized.includes("bottom") && normalized.includes("right")) {
-    return "bottom-right";
-  }
-  if (normalized.includes("bottom") && normalized.includes("left")) {
-    return "bottom-left";
-  }
-  if (normalized.includes("top") && normalized.includes("right")) {
-    return "top-right";
-  }
-  // WP ACF occasionally stores "Top Tight" instead of "Top Right".
-  if (normalized.includes("tight")) {
-    return "top-right";
-  }
-  return "top-left";
-}
-
-function dealTextPositionClasses(position: DealTextPosition): string {
-  const base =
-    "pointer-events-none absolute z-10 max-w-[90%] p-6 sm:p-8 lg:p-10";
-
-  switch (position) {
-    case "bottom-left":
-      return `${base} bottom-0 left-0 pb-12 text-left`;
-    case "top-right":
-      return `${base} right-0 top-0 text-right`;
-    case "bottom-right":
-      return `${base} bottom-0 right-0 pb-12 text-right`;
-    default:
-      return `${base} left-0 top-0 text-left`;
-  }
-}
-
-/**
- * Homepage hero: a large promo slider (left) beside a deal banner (right),
- * driven by the `heroSettings` ACF options (see `GET_HERO_SETTINGS`).
- */
+/** Homepage hero carousel — slides from GraphQL `heroSlides` or defaults. */
 const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
-  const slides = useMemo(
+  const slidesFromCms = useMemo(
     () =>
       (data?.sliderSettings?.slides ?? []).filter(
-        (s): s is HeroSlide => !!s?.sliderBackgroundImage?.node?.sourceUrl
+        (s): s is HeroSlide =>
+          !!s &&
+          (!!s.sliderBackgroundImage?.node?.sourceUrl ||
+            !!s.sliderFeatureImage?.node?.sourceUrl ||
+            !!s.sliderTitle ||
+            !!s.sliderDiscription),
       ),
-    [data]
+    [data],
   );
 
-  const deals = useMemo(
-    () =>
-      (data?.dealBannerSettings?.deals ?? []).filter(
-        (d): d is HeroDeal => !!d?.backgroundImage?.node?.sourceUrl
-      ),
-    [data]
+  const slides = useMemo(
+    () => (slidesFromCms.length > 0 ? slidesFromCms : DEFAULT_SLIDES),
+    [slidesFromCms],
   );
 
   const [current, setCurrent] = useState(0);
-  const [dealCurrent, setDealCurrent] = useState(0);
   const activeIndex = slides.length > 0 ? current % slides.length : 0;
-  const activeDealIndex = deals.length > 0 ? dealCurrent % deals.length : 0;
 
   useInterval(
     () => setCurrent((prev) => (prev + 1) % slides.length),
-    slides.length > 1 ? SLIDE_INTERVAL : null
+    slides.length > 1 ? SLIDE_INTERVAL : null,
   );
-
-  useInterval(
-    () => setDealCurrent((prev) => (prev + 1) % deals.length),
-    deals.length > 1 ? SLIDE_INTERVAL : null
-  );
-
-  if (slides.length === 0 && deals.length === 0) return null;
 
   const slide = slides[activeIndex];
-  const deal = deals[activeDealIndex];
-  const dealHasText = hasDealText(deal?.dealContent);
-  const dealTextPosition = normalizeDealTextPosition(deal?.textPosition);
 
   return (
-    <div className={`mx-auto w-full max-w-[1368px] px-3 pt-5 md:pt-0 md:px-4 lg:pt-[50px] xl:px-0 ${className}`}>
-      <div className="isolate flex flex-col gap-4 md:mt-20 md:flex-row md:items-start md:justify-between md:gap-0">
-        {/* Left: promo slider — z-20 keeps it above the hanging deal tag */}
-        {slides.length > 0 && (
-          <div className="relative z-20 h-[280px] w-full overflow-hidden rounded-[24px] bg-neutral-200 sm:h-[360px] md:h-[380px] xl:h-[451px] md:w-[72.368%]">
+    <section
+      className={`relative w-full bg-white ${className}`}
+      aria-label="Promotions"
+    >
+      <div className="relative mx-auto w-full max-w-[1368px] px-3 py-6 sm:px-4 lg:py-10 xl:px-0">
+        <div className="w-full">
+          <div className="relative min-h-[280px] w-full rounded-2xl bg-white p-2 shadow-[0_4px_24px_rgba(15,23,42,0.12)] ring-1 ring-neutral-200/80 sm:min-h-[340px] sm:p-2.5 lg:min-h-[452px]">
+            <div className="relative min-h-[calc(280px-1rem)] overflow-hidden rounded-xl bg-[#faf9f7] sm:min-h-[calc(340px-1.25rem)] lg:min-h-[calc(452px-1.25rem)]">
+              <div
+                className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat"
+                style={{ backgroundImage: `url('${HERO_SLIDER_BG}')` }}
+                aria-hidden
+              />
+
             {slides.map((item, index) => {
-              const src = item.sliderBackgroundImage!.node!.sourceUrl!;
+              const src = item.sliderBackgroundImage?.node?.sourceUrl;
               const isActive = index === activeIndex;
+
+              if (!src) {
+                return null;
+              }
 
               return (
                 <motion.div
                   key={`hero-slide-${index}`}
                   animate={{ opacity: isActive ? 1 : 0 }}
                   transition={CROSSFADE}
-                  className="absolute inset-0"
+                  className="absolute inset-0 z-0"
                   aria-hidden={!isActive}
                 >
                   <Image
                     src={src}
-                    alt={item.sliderTitle ? stripHtml(item.sliderTitle) : "Hero"}
+                    alt={item.sliderTitle ? stripHtml(item.sliderTitle) : "Hero offer"}
                     fill
                     priority={index === 0}
-                    loading={index === 0 ? undefined : "eager"}
-                    sizes="(max-width: 768px) 100vw, 66vw"
-                    className="object-cover"
+                    sizes="100vw"
+                    className="object-cover object-center"
                   />
                 </motion.div>
               );
             })}
 
-            <div
-              className="pointer-events-none absolute inset-0 z-[5] rounded-[24px] bg-black/10"
-              aria-hidden
-            />
+            {slides.map((item, index) => {
+              const featureSrc = item.sliderFeatureImage?.node?.sourceUrl;
+              const isActive = index === activeIndex;
 
-            <div className="pointer-events-none absolute inset-0 z-10 flex max-w-[90%] flex-col justify-center gap-4 p-7 sm:p-10 md:max-w-[62%] md:p-14">
-              <div className="relative min-h-[120px] w-full sm:min-h-[140px] md:min-h-[180px]">
-                <AnimatePresence mode="wait" initial={false}>
-                  <motion.div
-                    key={activeIndex}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={TEXT_FADE}
-                    className="pointer-events-auto flex flex-col gap-4"
-                  >
-                  {slide?.sliderTitle && (
-                    <h2
+              if (!featureSrc) {
+                return null;
+              }
+
+              return (
+                <motion.div
+                  key={`hero-slide-feature-${index}`}
+                  animate={{ opacity: isActive ? 1 : 0 }}
+                  transition={CROSSFADE}
+                  className="pointer-events-none absolute inset-y-0 right-0 z-[2] flex w-full max-w-[400px] items-center justify-end p-4 sm:p-5 lg:p-6"
+                  aria-hidden={!isActive}
+                >
+                  <div className="relative h-full w-full max-w-[300px]">
+                    <Image
+                      src={featureSrc}
+                      alt=""
+                      fill
+                      sizes="300px"
+                      className="object-contain object-right"
+                    />
+                  </div>
+                </motion.div>
+              );
+            })}
+
+            <div className="absolute inset-0 z-10 flex flex-col justify-center p-6 font-playfair sm:p-8 lg:max-w-[55%] lg:p-10">
+              <AnimatePresence mode="wait" initial={false}>
+                <motion.div
+                  key={activeIndex}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={TEXT_FADE}
+                  className="flex flex-col gap-3"
+                >
+                  {slide?.sliderTitle ? (
+                    <div
                       style={{ color: slide.titleColor ?? undefined }}
-                      className="text-3xl font-albra font-bold leading-tight text-white sm:text-4xl lg:text-5xl"
+                      className="leading-tight [&_*]:font-playfair [&_*]:leading-tight"
                       dangerouslySetInnerHTML={{ __html: slide.sliderTitle }}
                     />
-                  )}
-                  {slide?.sliderDiscription && (
+                  ) : null}
+                  {slide?.sliderDiscription ? (
                     <p
                       style={{ color: slide.descriptionColor ?? undefined }}
-                      className="text-sm text-white/90 sm:text-base"
+                      className="text-lg font-semibold sm:text-xl lg:text-2xl"
                     >
                       {slide.sliderDiscription}
                     </p>
-                  )}
-                  {slide?.buttonText && slide.buttonLink && (
-                    <Link
-                      href={slide.buttonLink}
-                      style={{
-                        backgroundColor: slide.buttonBachgroundColor ?? undefined,
-                        color: slide.buttonTextColor ?? undefined,
-                      }}
-                      className="mt-1 inline-flex w-fit items-center rounded-full px-6 py-2.5 text-sm font-semibold transition-transform hover:scale-105"
-                    >
-                      {slide.buttonText}
-                    </Link>
-                  )}
-                  </motion.div>
-                </AnimatePresence>
-              </div>
+                  ) : null}
+                  {slide?.buttonText && slide.buttonLink ? (
+                    (() => {
+                      const buttonStyle = {
+                        backgroundColor: slide.buttonBachgroundColor ?? "#059669",
+                        color: slide.buttonTextColor ?? "#ffffff",
+                        ...(slide.buttonBorderColor
+                          ? { border: `1px solid ${slide.buttonBorderColor}` }
+                          : {}),
+                      };
+                      const buttonClassName =
+                        "mt-1 inline-flex w-fit items-center rounded-md px-5 py-2.5 text-sm font-semibold shadow-sm transition-transform hover:scale-[1.02]";
+
+                      if (slide.buttonLink.startsWith("http")) {
+                        return (
+                          <a
+                            href={slide.buttonLink}
+                            style={buttonStyle}
+                            className={buttonClassName}
+                          >
+                            {slide.buttonText}
+                          </a>
+                        );
+                      }
+
+                      return (
+                        <Link
+                          href={slide.buttonLink}
+                          style={buttonStyle}
+                          className={buttonClassName}
+                        >
+                          {slide.buttonText}
+                        </Link>
+                      );
+                    })()
+                  ) : null}
+                </motion.div>
+              </AnimatePresence>
             </div>
 
-            {slides.length > 1 && (
-              <div className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 space-x-2">
+            {slides.length > 1 ? (
+              <div className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 gap-2">
                 {slides.map((_, index) => (
                   <button
                     key={index}
+                    type="button"
                     onClick={() => setCurrent(index)}
                     aria-label={`Go to slide ${index + 1}`}
-                    className={`h-2 rounded-full transition-all duration-300 ${
+                    className={`h-2 rounded-full transition-all ${
                       index === activeIndex
-                        ? "w-4 bg-header-accent"
-                        : "w-2 bg-white/60 hover:bg-white/90"
+                        ? "w-5 bg-emerald-600"
+                        : "w-2 bg-neutral-400/80"
                     }`}
                   />
                 ))}
               </div>
-            )}
-          </div>
-        )}
-
-        {/* Right: deal banner — hangs and gently sways from the strap top */}
-        {deals.length > 0 && (
-          <motion.div
-            className="relative z-0 w-full md:w-[25.512%]"
-            style={{ transformOrigin: "50% -135px" }}
-            animate={{ rotate: [-1.5, 1.5, -1.5] }}
-            transition={{ duration: 4.5, repeat: Infinity, ease: "easeInOut" }}
-          >
-            {/* Hanging tag decoration */}
-            <Image
-              src="/homepage/slider/tag.png"
-              alt=""
-              width={34}
-              height={167}
-              aria-hidden
-              className="pointer-events-none absolute -top-[135px] left-1/2 z-[1] -translate-x-1/2"
-            />
-
-            <div className="relative mx-auto h-[350px] w-[280px] overflow-hidden rounded-[24px] bg-neutral-200 md:mx-0 md:h-[380px] xl:h-[451px] md:w-full">
-              {deals.map((item, index) => {
-                const src = item.backgroundImage!.node!.sourceUrl!;
-                const isActive = index === activeDealIndex;
-
-                return (
-                  <motion.div
-                    key={`hero-deal-${index}`}
-                    animate={{ opacity: isActive ? 1 : 0 }}
-                    transition={CROSSFADE}
-                    className="absolute inset-0"
-                    aria-hidden={!isActive}
-                  >
-                    <Image
-                      src={src}
-                      alt={item.dealContent ? stripHtml(item.dealContent) : "Deal"}
-                      fill
-                      priority={index === 0}
-                      loading={index === 0 ? undefined : "eager"}
-                      sizes="(max-width: 768px) 280px, 33vw"
-                      className="object-cover"
-                    />
-                  </motion.div>
-                );
-              })}
-
-              <AnimatePresence mode="wait" initial={false}>
-                {dealHasText && (
-                  <motion.div
-                    key={activeDealIndex}
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    transition={TEXT_FADE}
-                    className={dealTextPositionClasses(dealTextPosition)}
-                  >
-                    <h3
-                      style={{ color: deal?.textColor ?? "#ffffff" }}
-                      className="text-xl font-albra font-bold leading-tight lg:text-2xl"
-                      dangerouslySetInnerHTML={{ __html: deal!.dealContent! }}
-                    />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {dealHasText && (
-                <div
-                  className="pointer-events-none absolute inset-0 z-[5] rounded-[24px] bg-black/10"
-                  aria-hidden
-                />
-              )}
-
-              {deals.length > 1 && (
-                <div className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 space-x-2">
-                  {deals.map((_, index) => (
-                    <button
-                      key={index}
-                      onClick={() => setDealCurrent(index)}
-                      aria-label={`Go to deal ${index + 1}`}
-                      className={`h-2 rounded-full transition-all duration-300 ${
-                        index === activeDealIndex
-                          ? "w-4 bg-header-accent"
-                          : "w-2 bg-white/60 hover:bg-white/90"
-                      }`}
-                    />
-                  ))}
-                </div>
-              )}
+            ) : null}
             </div>
-          </motion.div>
-        )}
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
   );
 };
 

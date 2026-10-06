@@ -21,4 +21,4 @@ Notifications for order collection will be sent via E-mail/SMS, and orders can b
 
 Unattended store pick-up orders after 7 working days will be canceled, with customers notified via SMS/E-mail.
 
-**For more information on delivery options and times available, please contact on 071 606 0123.**
+**For more information on delivery options and times available, please contact on 076 667 6332.**

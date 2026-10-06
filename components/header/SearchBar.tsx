@@ -125,7 +125,7 @@ const SearchBar = ({
         <div className="w-full">
             <div className="mx-auto flex w-full flex-1 items-center gap-1">
                 <div className="flex-1 bg-transparent">
-                    <div className="flex h-11 w-full items-center rounded-full bg-white px-5 shadow-sm">
+                    <div className="flex h-11 w-full items-center rounded-full border-2 border-header-green bg-white px-5 shadow-sm">
                         <input
                             value={mounted ? searchValue : ''}
                             onChange={handleSearchChange}

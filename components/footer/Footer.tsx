@@ -6,7 +6,6 @@ import {
   FaFacebookF,
   FaTiktok,
 } from "react-icons/fa6";
-import NewsletterSignup from "@/components/footer/NewsletterSignup";
 import { siteConfig } from "@/site.config";
 import contactContent from "@/content/contact.json";
 
@@ -35,38 +34,7 @@ const Footer = () => {
   const { footer } = siteConfig;
 
   return (
-    <footer className="pb-20 text-white md:pb-0 mt-20">
-      {/* Brand hero */}
-      <div className="relative overflow-hidden bg-header-green">
-        <Image
-          src="/homepage/footer-overlay.png"
-          alt=""
-          fill
-          aria-hidden
-          sizes="100vw"
-          className="object-cover"
-        />
-        <div className="container relative flex justify-center items-center h-60">
-          <Link href="/" aria-label={siteConfig.brand.name}>
-            <Image
-              src="/homepage/white-logo.png"
-              alt={siteConfig.brand.name}
-              width={819}
-              height={119}
-              className="h-12 w-auto md:h-16"
-            />
-          </Link>
-        </div>
-      </div>
-
-      {/* Newsletter */}
-      <div className="bg-header-green border-y border-white/10">
-        <div className="mx-auto flex max-w-[1088px] flex-col items-center justify-between gap-4 px-4 py-8 lg:flex-row">
-          <p className="text-base font-semibold">{footer.newsletter.heading}</p>
-          <NewsletterSignup />
-        </div>
-      </div>
-
+    <footer className="mt-20 pb-20 text-white md:pb-0">
       {/* Link columns */}
       <div className="bg-header-green">
         <div className="mx-auto grid max-w-[1088px] grid-cols-1 gap-x-8 gap-y-8 px-4 py-8 sm:grid-cols-2 lg:grid-cols-12">

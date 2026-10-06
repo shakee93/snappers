@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useCart } from "@/context/CartProvider";
 import { useSession } from "@/context/SessionProvider";
 import { siteConfig } from "@/site.config";
+import { getFaviconSources } from "@/lib/siteAssets";
 import basketIcon from "@/public/global/boxicons_basket-filled.svg";
 import dealIcon from "@/public/global/deal.svg";
 import menuIcon from "@/public/global/charm_menu-hamburger.svg";
@@ -15,6 +16,8 @@ const navItemClass =
     "flex flex-1 flex-col items-center justify-center gap-1 pt-2 text-white cursor-pointer";
 
 const mobileNavIconClass = "h-[22px] w-[22px] object-contain";
+
+const mobileMarkSrc = getFaviconSources().light;
 
 const MobileBottomNav = () => {
     const { cart, setIsCartOpen } = useCart();
@@ -34,11 +37,11 @@ const MobileBottomNav = () => {
         <div className="fixed bottom-0 z-[100] grid h-[82px] w-full grid-cols-5 items-center justify-center border-t-2 border-slate-100 bg-header-green px-1 shadow-3xl">
             <Link href="/" className="flex flex-1 items-center justify-center">
                 <Image
-                    src="/global/mobile-logo.png"
+                    src={mobileMarkSrc}
                     alt={siteConfig.brand.name}
-                    width={45}
-                    height={45}
-                    className="h-[45px] w-auto"
+                    width={40}
+                    height={40}
+                    className="h-10 w-10 object-contain"
                     priority
                 />
             </Link>

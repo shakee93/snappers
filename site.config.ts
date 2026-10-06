@@ -9,7 +9,7 @@
  */
 export const siteConfig = {
   brand: {
-    name: "Catlitter",
+    name: "Snappers",
     legalName: "Catlitter (Pvt) Ltd",
     shortName: "",
     tagline: "Best pet care in the market",
@@ -28,6 +28,9 @@ export const siteConfig = {
   theme: {
     brandHex: {
       primary: "#1b40af",
+      /** Brand navy — top bar, search border, badges, footer, accents. */
+      headerGreen: "#071C43",
+      topBar: "#071C43",
       dealBrown: "#3E251B",
       dealAccent: "#B8D962",
     },
@@ -67,8 +70,13 @@ export const siteConfig = {
      * (injected in `SiteThemeStyles`) and the Tailwind `header-*` tokens.
      */
     header: {
-      cream: "254 244 234",
-      green: "56 70 31",
+      /** Thin top announcement bar (#071C43). */
+      topbar: "7 28 67",
+      /** Category nav strip under main header (#253D4E). */
+      category: "37 61 78",
+      /** Main header bar behind logo + nav (#F2F3F4). */
+      cream: "242 243 244",
+      green: "7 28 67",
       // Soft-peach action icons + Basket pill on the cream bar.
       peach: "253 230 214",
       accent: "243 168 130",
@@ -83,22 +91,21 @@ export const siteConfig = {
   },
   assets: {
     logo: {
-      light: "https://catlitter-api.freshpixl.com/wp-content/uploads/2026/06/logo.png",
-      dark: "https://catlitter-api.freshpixl.com/wp-content/uploads/2026/06/logo.png",
-      width: 211,
-      height: 31,
+      light: "/global/snappers-logo.webp",
+      dark: "/global/snappers-logo.webp",
+      width: 204,
+      height: 64,
     },
     favicon: {
-      light: "/favicon-black.ico",
-      dark: "/favicon-white.ico",
+      light: "/global/favicon.png",
+      dark: "/global/favicon.png",
     },
-    // Optional; defaults to favicon light when omitted.
-    // appleTouchIcon: "/global/apple-touch-icon.png",
+    appleTouchIcon: "/global/apple-touch-icon.png",
   },
   url: {
     base: "https://www.catlitter.lk",
-    api: "https://catlitter-api.freshpixl.com",
-    cdn: "https://cdn.gqmobiles.lk",
+    api: "https://snappers-api.freshpixl.com",
+    cdn: "https://snappers-api.freshpixl.com",
     defaultOgImage: "/global/catlitter-og.jpg",
   },
   locale: {
@@ -110,9 +117,9 @@ export const siteConfig = {
     ogLocale: "en_US",
   },
   contact: {
-    primaryPhone: "0716060123",
-    primaryPhoneDisplay: "071 6060 123",
-    whatsapp: "94716060123",
+    primaryPhone: "0766676332",
+    primaryPhoneDisplay: "076 667 6332",
+    whatsapp: "94766676332",
     email: "catlitter.lk@gmail.com",
     storeAddress:
       "No. 107, Kirula Road, Narahenpita, Colombo 05, Sri Lanka",
@@ -122,12 +129,25 @@ export const siteConfig = {
   },
   /** Header + footer navigation (see `NavLinks`, `footer`). */
   navigation: {
+    /** Thin top bar above the header (see `HeaderAnnouncementBar`). */
+    topBar: {
+      links: [
+        { href: "/about", name: "About Us" },
+        { href: "/account", name: "My Account" },
+        { href: "/account/save-lists", name: "Wishlist" },
+      ],
+      message: "100% Secure delivery without contacting the courier",
+      helpLabel: "Need help? Call Us:",
+    },
     main: [
-      { href: "/cat", name: "Cat" },
-      { href: "/dog", name: "Dog" },
-      { href: "/bird", name: "Birds" },
-      { href: "/aquarium", name: "Aquarium" },
-      { href: "/rabbit-hamsters", name: "Rabbit & Hamsters" },
+      { href: "/deals", name: "Deals" },
+      { href: "/groceries", name: "Groceries" },
+      { href: "/bakery", name: "Bakery" },
+      { href: "/household", name: "Household" },
+      { href: "/beverages", name: "Beverages" },
+      { href: "/chilled", name: "Chilled" },
+      { href: "/fresh", name: "Fresh" },
+      { href: "/frozen", name: "Frozen" },
     ],
     /** Quick links on the dark-green utility bar (see `HeaderUtilityBar`). */
     utility: {
@@ -192,7 +212,7 @@ export const siteConfig = {
     },
     support: {
       heading: "Our experts are available 24/7",
-      phones: [{ display: "071 6060 123", tel: "0716060123" }],
+      phones: [{ display: "076 667 6332", tel: "0766676332" }],
     },
   },
   social: {

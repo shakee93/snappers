@@ -72,7 +72,7 @@ const HeaderClientWrapper = ({
         ref={headerRef}
         className={`
           ${isHeaderSticky ? "fixed top-0 left-0 right-0" : "relative"}
-          z-[100] flex flex-col justify-between bg-header-green transition-all duration-100 lg:bg-white
+          z-[100] flex flex-col justify-between overflow-visible bg-header-green transition-all duration-100 lg:bg-white
         `}
       >
         {/* Checkout-paused notice - always visible (does not hide on scroll) */}
@@ -82,18 +82,18 @@ const HeaderClientWrapper = ({
           </div>
         )}
 
-        {/* Top announcement · cream bar · utility bar */}
+        {/* Top announcement · main header row · category bar */}
         <HeaderAnnouncementBar />
-        <HeaderContent navCategories={navCategories} />
-        <HeaderUtilityBar />
+        <HeaderContent />
+        <HeaderUtilityBar navCategories={navCategories} />
       </header>
 
-      {/* Sticky-header spacer: announcement bar + cream HeaderContent + utility bar.
+      {/* Sticky-header spacer: announcement bar + HeaderContent + category bar.
           ~100px mobile / ~200px desktop (checkout notice adds ~32px when shown). */}
       {isHeaderSticky && (
         <div
           className={
-            ADD_TO_CART_DISABLED ? "h-[132px] lg:h-[240px]" : "h-[100px] lg:h-[200px]"
+            ADD_TO_CART_DISABLED ? "h-[132px] lg:h-[254px]" : "h-[100px] lg:h-[214px]"
           }
         ></div>
       )}
