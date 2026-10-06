@@ -56,7 +56,7 @@ const UpsellProducts = ({
           </p>
         </div>
 
-        <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 md:mt-10 lg:mt-12 lg:grid-cols-4 lg:gap-6">
+        <div className="mt-8 grid grid-cols-2 gap-3 sm:gap-4 md:mt-10 lg:mt-12 lg:grid-cols-5 lg:gap-4">
           {products.map((product) => (
             <ProductCard key={product.id ?? product.slug} product={product} />
           ))}

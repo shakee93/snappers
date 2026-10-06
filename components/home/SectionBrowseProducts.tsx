@@ -1,27 +1,36 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useLazyQuery } from "@apollo/client";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { GET_BROWSE_SECTION_PRODUCTS } from "@/graphql/defs/products";
 import ProductCard, {
   type ProductCardItem,
 } from "@/components/home/ProductCard";
 import ProductCardLoading from "@/components/global/primitives/Loading/ProductCardLoading";
 import {
-  BROWSE_ALL_TAB_FEATURE_IMAGE,
   BROWSE_CATEGORY_TAB_FETCH_BATCH,
   filterBrowseCategoryTabs,
-  getBrowseFeatureImageForTabIndex,
   resolveBrowseCategoryScopeIds,
 } from "@/lib/browseCategories";
 import { getCategoryPath } from "@/lib/productUrl";
 import { getCompactPageItems } from "@/lib/compactPagination";
 
-const PAGE_SIZE = 6;
+/** Two rows × four cards on desktop. */
+const PAGE_SIZE = 8;
+const BROWSE_PRODUCT_GRID_CLASS_NAME =
+  "grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-4";
 const ALL_TAB_KEY = "all";
+const CARD_ACCENT = "#3BB77E";
 
 type TabProductCache = {
   products: ProductCardItem[];
@@ -55,8 +64,6 @@ export interface SectionBrowseProductsProps {
   categories?: (BrowseCategory | null)[] | null;
   /** Parent category ID → IDs to query (parent + all subcategories). */
   categoryScopeById?: Record<number, number[]>;
-  /** Default banner for the "All" tab when no category is selected. */
-  defaultFeatureImage?: string;
 }
 
 const buildInitialTabCaches = (
@@ -85,31 +92,23 @@ const buildInitialTabCaches = (
 
 const productSkeleton = (key: string) => <ProductCardLoading key={key} />;
 
-interface BrowseFeatureBannerProps {
-  src: string;
-  alt: string;
-  className?: string;
-  priority?: boolean;
-}
+const BROWSE_PROMO_IMAGE = "/homepage/snappers-exciting-offers.jpg";
 
-/** Category feature tile — `object-cover` fills the bounded container. */
-const BrowseFeatureBanner = ({
-  src,
-  alt,
-  className = "",
-  priority = false,
-}: BrowseFeatureBannerProps) => (
-  <div className={`relative overflow-hidden rounded-xl ${className}`}>
+/** Left promo column — Snappers offers artwork (links to deals). */
+const BrowsePromoPanel = ({ priority = false }: { priority?: boolean }) => (
+  <Link
+    href="/deals"
+    className="relative block min-h-[320px] overflow-hidden rounded-2xl sm:min-h-[360px] lg:h-full lg:min-h-[520px]"
+  >
     <Image
-      key={src}
-      src={src}
-      alt={alt}
+      src={BROWSE_PROMO_IMAGE}
+      alt="Enjoy exciting offers from Snappers — minimum order Rs. 3000. Go to deals."
       fill
-      sizes="(max-width: 1024px) 100vw, 50vw"
-      className="object-cover object-center"
+      sizes="(max-width: 1024px) 100vw, 280px"
+      className="object-cover object-top"
       priority={priority}
     />
-  </div>
+  </Link>
 );
 
 /**
@@ -123,7 +122,6 @@ const SectionBrowseProducts = ({
   initialCategoryTabCaches,
   categories,
   categoryScopeById = {},
-  defaultFeatureImage = BROWSE_ALL_TAB_FEATURE_IMAGE,
 }: SectionBrowseProductsProps) => {
   const [activeCategoryId, setActiveCategoryId] = useState<number | null>(null);
   const [page, setPage] = useState(1);
@@ -135,6 +133,7 @@ const SectionBrowseProducts = ({
   const loadingMoreRef = useRef(false);
   const prefetchPromisesRef = useRef(new Map<string, Promise<void>>());
   const tabCachesRef = useRef<Record<string, TabProductCache>>({});
+  const tabsScrollRef = useRef<HTMLDivElement>(null);
 
   const [fetchBrowseProducts] = useLazyQuery(GET_BROWSE_SECTION_PRODUCTS, {
     fetchPolicy: "no-cache",
@@ -150,11 +149,7 @@ const SectionBrowseProducts = ({
         .filter(
           (c): c is BrowseCategory & { databaseId: number } =>
             !!c.databaseId && !!c.name,
-        )
-        .map((category, index) => ({
-          ...category,
-          featureImage: getBrowseFeatureImageForTabIndex(index),
-        })),
+        ),
     [categories],
   );
 
@@ -165,16 +160,6 @@ const SectionBrowseProducts = ({
     () => tabs.find((tab) => tab.databaseId === activeCategoryId) ?? null,
     [activeCategoryId, tabs],
   );
-
-  const activeFeatureImage = useMemo(() => {
-    if (activeCategoryId === null) return defaultFeatureImage;
-    return activeCategory?.featureImage ?? defaultFeatureImage;
-  }, [activeCategory?.featureImage, activeCategoryId, defaultFeatureImage]);
-
-  const activeFeatureAlt = useMemo(() => {
-    if (activeCategory?.name) return `Featured ${activeCategory.name} products`;
-    return "Featured pet products";
-  }, [activeCategory?.name]);
 
   const loadProducts = useCallback(
     async (
@@ -275,10 +260,13 @@ const SectionBrowseProducts = ({
     () => activeProducts.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE),
     [activeProducts, page],
   );
-  const rowOneProducts = visibleProducts.slice(0, 2);
-  const rowTwoProducts = visibleProducts.slice(2, PAGE_SIZE);
-
   const neededProductCount = page * PAGE_SIZE;
+
+  const scrollCategoryTabs = useCallback((direction: -1 | 1) => {
+    const el = tabsScrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: direction * 200, behavior: "smooth" });
+  }, []);
 
   useEffect(() => {
     const cache = tabCaches[activeTabKey];
@@ -329,117 +317,95 @@ const SectionBrowseProducts = ({
   const initialProducts = initialAllTab?.products ?? [];
   if (!initialProducts.length) return null;
 
+  const tabButtonClass = (isActive: boolean) =>
+    `shrink-0 whitespace-nowrap px-2 py-1 text-sm font-semibold transition-colors sm:px-3 ${
+      isActive
+        ? "text-[#253D4E]"
+        : "text-neutral-500 hover:text-neutral-800"
+    }`;
+
+  const activeTabStyle = (isActive: boolean): CSSProperties | undefined =>
+    isActive ? { color: CARD_ACCENT } : undefined;
+
   return (
     <section className={`mx-auto w-full max-w-[1368px] px-3 lg:px-0 ${className}`}>
-      <div className="mx-auto max-w-4xl text-center">
-        <p className="text-sm font-bold uppercase tracking-wider text-[#092412] sm:text-base">
-          Browse
-        </p>
-        <h2 className="mt-2 font-albra text-3xl font-bold leading-tight text-[#092412] sm:mt-3 sm:text-4xl md:mt-5 md:text-6xl">
-          Browse{" "}
-          <span className="text-[#769F5F]">All Products</span>
-        </h2>
-      </div>
-
-      <div className="-mx-3 mt-6 overflow-x-auto px-3 sm:mt-8 md:mx-0 md:mt-10 md:overflow-visible md:px-0">
-        <div className="flex w-max min-w-full flex-nowrap items-center justify-start gap-1.5 md:w-auto md:flex-wrap md:justify-center">
-          <button
-            type="button"
-            onClick={() => handleTabClick(null)}
-            aria-pressed={activeCategoryId === null}
-            className={`shrink-0 rounded-lg px-3 py-2 text-xs font-bold transition-colors sm:px-4 sm:text-sm ${
-              activeCategoryId === null
-                ? "bg-[#092412] text-white"
-                : "text-neutral-700 hover:bg-neutral-100"
-            }`}
-          >
-            All
-          </button>
-          {tabs.map((category) => (
-            <button
-              key={category.id}
-              type="button"
-              onClick={() => handleTabClick(category.databaseId)}
-              aria-pressed={activeCategoryId === category.databaseId}
-              className={`shrink-0 whitespace-nowrap rounded-lg px-3 py-2 text-xs font-bold transition-colors sm:px-4 sm:text-sm ${
-                activeCategoryId === category.databaseId
-                  ? "bg-[#092412] text-white"
-                  : "text-neutral-700 hover:bg-neutral-100"
-              }`}
-            >
-              {category.name}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      <div className="mt-6 flex flex-col gap-3 sm:mt-8 sm:gap-4 lg:gap-6">
-        <BrowseFeatureBanner
-          src={activeFeatureImage}
-          alt={activeFeatureAlt}
-          priority={activeCategoryId === null}
-          className="aspect-[16/10] sm:aspect-[5/3] lg:hidden"
-        />
-
-        <div className="hidden lg:grid lg:grid-cols-4 lg:items-start lg:gap-6">
-          <BrowseFeatureBanner
-            src={activeFeatureImage}
-            alt={activeFeatureAlt}
-            priority={activeCategoryId === null}
-            className="col-span-2 h-full"
-          />
-          {isLoadingTab
-            ? [0, 1].map((index) => productSkeleton(`row1-${index}`))
-            : rowOneProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-          {!isLoadingTab && !rowOneProducts.length && (
-            // Floor only on the empty state so Cat/Dog still size from cards;
-            // the banner's h-full fills the row this paragraph defines.
-            <p className="col-span-2 flex min-h-[clamp(280px,32vw,440px)] items-center justify-center py-8 text-sm font-medium text-neutral-500">
-              No products found in this category.
-            </p>
-          )}
+      <div className="flex flex-col gap-6 lg:flex-row lg:items-stretch lg:gap-5">
+        <div className="lg:w-[min(100%,280px)] lg:shrink-0">
+          <BrowsePromoPanel priority={activeCategoryId === null} />
         </div>
 
-        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 lg:gap-6">
-          {isLoadingTab ? (
-            Array.from({ length: PAGE_SIZE }, (_, index) => (
-              <div key={index} className={index < 2 ? "lg:hidden" : undefined}>
-                {productSkeleton(`grid-${index}`)}
-              </div>
-            ))
-          ) : (
-            <>
-              <div className="contents lg:hidden">
-                {visibleProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-                {!visibleProducts.length && (
-                  <p className="col-span-2 py-8 text-center text-sm font-medium text-neutral-500">
-                    No products found in this category.
-                  </p>
-                )}
-              </div>
-              <div className="hidden lg:contents">
-                {rowTwoProducts.map((product) => (
-                  <ProductCard key={product.id} product={product} />
-                ))}
-              </div>
-            </>
-          )}
-
-          {loadingMore &&
-            Array.from({ length: Math.min(PAGE_SIZE, 2) }, (_, index) => (
-              <div
-                key={`loading-more-${index}`}
-                className={
-                  visibleProducts.length + index < 2 ? "lg:hidden" : undefined
-                }
+        <div className="min-w-0 flex-1">
+          <div className="flex items-center gap-1 border-b border-neutral-200 pb-3 sm:gap-2">
+            <div className="flex shrink-0 items-center gap-0.5">
+              <button
+                type="button"
+                onClick={() => scrollCategoryTabs(-1)}
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-800"
+                aria-label="Scroll categories left"
               >
-                {productSkeleton(`loading-more-${index}`)}
-              </div>
-            ))}
+                <ChevronLeft className="h-5 w-5" strokeWidth={2} />
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollCategoryTabs(1)}
+                className="flex h-8 w-8 items-center justify-center rounded-lg text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-800"
+                aria-label="Scroll categories right"
+              >
+                <ChevronRight className="h-5 w-5" strokeWidth={2} />
+              </button>
+            </div>
+
+            <div
+              ref={tabsScrollRef}
+              className="flex min-w-0 flex-1 flex-nowrap items-center gap-1 overflow-x-auto [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-2 [&::-webkit-scrollbar]:hidden"
+            >
+              <button
+                type="button"
+                onClick={() => handleTabClick(null)}
+                aria-pressed={activeCategoryId === null}
+                className={tabButtonClass(activeCategoryId === null)}
+                style={activeTabStyle(activeCategoryId === null)}
+              >
+                All
+              </button>
+              {tabs.map((category) => {
+                const isActive = activeCategoryId === category.databaseId;
+                return (
+                  <button
+                    key={category.id}
+                    type="button"
+                    onClick={() => handleTabClick(category.databaseId)}
+                    aria-pressed={isActive}
+                    className={tabButtonClass(isActive)}
+                    style={activeTabStyle(isActive)}
+                  >
+                    {category.name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <div className={`mt-4 ${BROWSE_PRODUCT_GRID_CLASS_NAME}`}>
+            {isLoadingTab ? (
+              Array.from({ length: PAGE_SIZE }, (_, index) =>
+                productSkeleton(`grid-${index}`),
+              )
+            ) : visibleProducts.length ? (
+              visibleProducts.map((product) => (
+                <ProductCard key={product.id} product={product} />
+              ))
+            ) : (
+              <p className="col-span-2 py-12 text-center text-sm font-medium text-neutral-500 lg:col-span-4">
+                No products found in this category.
+              </p>
+            )}
+
+            {loadingMore &&
+              Array.from({ length: Math.min(PAGE_SIZE, 2) }, (_, index) =>
+                productSkeleton(`loading-more-${index}`),
+              )}
+          </div>
         </div>
       </div>
 

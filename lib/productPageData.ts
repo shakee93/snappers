@@ -35,7 +35,7 @@ export async function getProductPageData(
 ): Promise<ProductPageData | null> {
   try {
     const isDev = process.env.NODE_ENV === "development";
-    const { data, error } = await getClient().query({
+    const { data, error, errors } = await getClient().query({
       query: GET_PRODUCT,
       variables: {
         productId: slug,
@@ -50,27 +50,31 @@ export async function getProductPageData(
       },
     });
 
-    if (error || !data.product) {
+    const product = data?.product;
+    if (error || errors?.length || !product) {
+      if (process.env.NODE_ENV === "development" && (error || errors?.length)) {
+        console.error("GetProduct failed for slug:", slug, error ?? errors);
+      }
       return null;
     }
 
-    const productBrand = data.product?.brands?.nodes?.[0] || {
+    const productBrand = product.brands?.nodes?.[0] || {
       name: "Product",
       slug: "product",
     };
 
     const upsellProducts = withRelated
-      ? await getPdpRelatedProducts(data.product, productTag(slug))
+      ? await getPdpRelatedProducts(product, productTag(slug))
       : [];
 
-    const categories = getProductCategories(data.product);
-    const primaryCategorySlug = getPrimaryCategorySlug(data.product);
+    const categories = getProductCategories(product);
+    const primaryCategorySlug = getPrimaryCategorySlug(product);
     const primaryCategory =
       categories.find((category) => category.slug === primaryCategorySlug) ??
       categories[0];
 
     return {
-      product: data.product as SimpleProduct &
+      product: product as SimpleProduct &
         VariableProduct &
         ProductWithPriceTiers,
       brand: productBrand as Brand,

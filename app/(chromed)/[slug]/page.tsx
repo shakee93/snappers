@@ -10,6 +10,8 @@ import {
   getProductPath,
 } from "@/lib/productUrl";
 import { resolveSlug } from "@/lib/slugResolver";
+import { getClient } from "@/graphql/apollo-ssr";
+import { GET_NAV_CATEGORIES } from "@/graphql/defs/nav";
 import { siteConfig } from "@/site.config";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import { notFound } from "next/navigation";
@@ -178,6 +180,11 @@ const Page = async (props: Props) => {
         .happiestCustomersGallery ?? []
     ) as string[];
 
+    const { data: navData } = await getClient().query({
+      query: GET_NAV_CATEGORIES,
+    });
+    const sidebarCategories = navData?.productCategories?.nodes ?? [];
+
     return (
       <div className="bg-white pb-[160px] lg:pb-12">
         <main className="mx-auto flex max-w-[1368px] flex-col px-3 sm:px-4 lg:px-6">
@@ -204,13 +211,12 @@ const Page = async (props: Props) => {
             <span className="text-[#1A1A1A]">{product.name}</span>
           </nav>
 
-        <div className="rounded-2xl bg-[#FAFAF8] p-4 sm:p-6 lg:p-8">
-            <ProductPdpLayout
-              product={product}
-              brand={brand}
-              happiestCustomersImages={happiestCustomersImages}
-            />
-          </div>
+          <ProductPdpLayout
+            product={product}
+            brand={brand}
+            happiestCustomersImages={happiestCustomersImages}
+            sidebarCategories={sidebarCategories}
+          />
         </main>
 
         <UpsellProducts relatedProducts={upsellProducts} />

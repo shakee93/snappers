@@ -240,7 +240,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
     <div className="embla w-full" id="product-image">
       <div className="relative">
         <div
-          className={`embla__viewport border border-[#0000001A] bg-white ${pdpRadius}`}
+          className={`embla__viewport border border-neutral-200 bg-white ${pdpRadius}`}
           ref={showGallery ? emblaMainRef : undefined}
         >
           <div className="embla__container">

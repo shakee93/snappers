@@ -233,6 +233,7 @@ export const ProductContentCard = gql`
     name
     type
     reviewCount
+    averageRating
     image {
       id
       sourceUrl
@@ -322,6 +323,7 @@ export const ProductContentFull = gql`
     databaseId
     slug
     name
+    sku
     type
     description
     shortDescription(format: RAW)
@@ -416,9 +418,6 @@ export const ProductContentFull = gql`
     }
     ... on SimpleProduct {
       happiestCustomersGallery
-      singleProductFields {
-        videoLink
-      }
       onSale
       stockStatus
       price
@@ -451,9 +450,6 @@ export const ProductContentFull = gql`
     }
     ... on VariableProduct {
       happiestCustomersGallery
-      singleProductFields {
-        videoLink
-      }
       onSale
       price
       rawPrice: price(format: RAW)

@@ -32,7 +32,11 @@ export function normalizeHeroButtonUrl(url?: string | null): string | null {
   try {
     const parsed = new URL(trimmed);
     const siteHosts = new Set(
-      [siteConfig.api, siteConfig.cdn, process.env.NEXT_PUBLIC_DOMAIN]
+      [
+        siteConfig.url.api,
+        siteConfig.url.cdn,
+        process.env.NEXT_PUBLIC_DOMAIN,
+      ]
         .filter(Boolean)
         .map((origin) => {
           try {
@@ -59,23 +63,23 @@ export function normalizeHeroButtonUrl(url?: string | null): string | null {
 export function mapGraphqlHeroSlides(
   nodes: GraphqlHeroSlideNode[],
 ): HeroSlide[] {
-  return nodes
-    .map((node) => {
-      const fields = node.heroSlideFields;
-      if (!fields) return null;
+  return nodes.flatMap((node): HeroSlide[] => {
+    const fields = node.heroSlideFields;
+    if (!fields) return [];
 
-      const hasSlide =
-        fields.mainTitle?.trim() ||
-        fields.subContent?.trim() ||
-        fields.backgroundImage?.node?.sourceUrl ||
-        fields.featureImage?.node?.sourceUrl;
+    const hasSlide =
+      fields.mainTitle?.trim() ||
+      fields.subContent?.trim() ||
+      fields.backgroundImage?.node?.sourceUrl ||
+      fields.featureImage?.node?.sourceUrl;
 
-      if (!hasSlide) return null;
+    if (!hasSlide) return [];
 
-      const title = fields.mainTitle?.trim();
-      const buttonLink = normalizeHeroButtonUrl(fields.buttonUrl);
+    const title = fields.mainTitle?.trim();
+    const buttonLink = normalizeHeroButtonUrl(fields.buttonUrl);
 
-      return {
+    return [
+      {
         sliderTitle: title
           ? `<span class="${HERO_SLIDER_TITLE_CLASS}">${escapeHtml(title)}</span>`
           : null,
@@ -89,7 +93,7 @@ export function mapGraphqlHeroSlides(
         buttonBorderColor: "#000000",
         sliderBackgroundImage: fields.backgroundImage ?? null,
         sliderFeatureImage: fields.featureImage ?? null,
-      } satisfies HeroSlide;
-    })
-    .filter((slide): slide is HeroSlide => slide !== null);
+      },
+    ];
+  });
 }

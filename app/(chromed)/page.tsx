@@ -21,7 +21,6 @@ import SectionShopByCategory, {
 } from "@/components/home/SectionShopByCategory";
 import SectionDealCountdown from "@/components/home/SectionDealCountdown";
 import SectionDealProducts from "@/components/home/SectionDealProducts";
-import SectionHowToOrder from "@/components/home/SectionHowToOrder";
 import SectionHealthProducts from "@/components/home/SectionHealthProducts";
 import SectionBrowseProducts, {
   type BrowseInitialCache,
@@ -258,11 +257,6 @@ export default async function Home() {
             </div>
           </>
         ) : null}
-
-        <SectionHowToOrder
-          className="mt-16 md:mt-24"
-          youtubeVideoUrl={siteSettings?.videoUrlOfHowToOrderSection}
-        />
 
         <div className="mt-16 md:mt-24">
           <SectionHealthProducts

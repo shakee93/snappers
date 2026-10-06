@@ -15,9 +15,6 @@ import { useStore } from "@/store/store";
 import { twMerge } from "tailwind-merge";
 import { useImage } from "@/context/ImageChangeGrabber";
 import { getProductPath } from "@/lib/productUrl";
-import ProductStarRating from "@/components/product/ProductStarRating";
-import ProductPaymentOptions from "@/components/product/ProductPaymentOptions";
-import ProductPurchaseAccordions from "@/components/product/ProductPurchaseAccordions";
 import ProductShareControls from "@/components/product/ProductShareControls";
 import BrandLogo from "@/components/product/BrandLogo";
 import {
@@ -49,10 +46,11 @@ import {
   getPreferredVariation,
   getVariationNumericPrice,
 } from "@/lib/getPreferredVariation";
-import {
-  getProductPriceTiers,
-  type ProductWithPriceTiers,
-} from "@/lib/priceTiers";
+import { type ProductWithPriceTiers } from "@/lib/priceTiers";
+import { getShortDescriptionBullets } from "@/lib/pdpShortDescription";
+import { getProductCategories } from "@/lib/productUrl";
+
+const PDP_GREEN = "#3BB77E";
 
 const ProductDetails = ({
   product,
@@ -423,19 +421,6 @@ const ProductDetails = ({
     return "";
   }, [product, displayVariation]);
 
-  const displayNumericPrice = useMemo(() => {
-    const raw =
-      product.type === "VARIABLE" && displayVariation
-        ? displayVariation.salePrice &&
-          displayVariation.salePrice !== displayVariation.regularPrice
-          ? displayVariation.salePrice
-          : displayVariation.price
-        : product.price;
-    return parseFloat((raw || "0").toString().replace(/[^\d.]/g, "")) || 0;
-  }, [product, displayVariation]);
-
-  const priceTiers = useMemo(() => getProductPriceTiers(product), [product]);
-
   const isOnSale = useMemo(() => {
     if (product.type === "VARIABLE" && displayVariation) {
       return (
@@ -479,14 +464,24 @@ const ProductDetails = ({
     return product.stockQuantity ?? null;
   }, [product, displayVariation]);
 
-  const shortDescriptionText = useMemo(() => {
-    if (!product.shortDescription) return "";
-    const text = stripEmojis(stripReviewHtml(product.shortDescription));
-    return text.trim();
-  }, [product.shortDescription]);
+  const shortDescriptionBullets = useMemo(
+    () => getShortDescriptionBullets(product.shortDescription),
+    [product.shortDescription],
+  );
+
+  const categoryLabels = useMemo(() => {
+    return getProductCategories(product)
+      .map((c) => c.name)
+      .filter(Boolean)
+      .slice(0, 4)
+      .join(", ");
+  }, [product]);
+
+  const productSku =
+    (product as SimpleProduct & { sku?: string | null }).sku?.trim() || null;
 
   return (
-    <div className="flex flex-col gap-3 lg:gap-0">
+    <div className="flex flex-col gap-4">
       {isPriceFluctuation && (
         <div className={`bg-red-500 p-4 text-sm text-white ${pdpRadius}`}>
           Prices are being updated. For current pricing, please contact us on WhatsApp{" "}
@@ -494,40 +489,20 @@ const ProductDetails = ({
         </div>
       )}
 
-      <div className="flex flex-col gap-2 pb-2 lg:pb-4">
-        <div className="flex items-center justify-between gap-3">
-          <BrandLogo
-            brand={brand}
-            imageClassName="h-10 w-auto max-w-[220px] object-contain object-left"
-          />
-          <div className="flex items-center gap-2">
-            {saleBadge && (
-              <span
-                className={`rounded-md bg-[#F5B289] px-3 py-1.5 text-sm font-bold leading-none text-neutral-900 ${pdpRadius}`}
-              >
-                {saleBadge}
-              </span>
-            )}
-            <ProductShareControls product={product} className="w-auto shrink-0" />
-          </div>
-        </div>
+      <div className="flex flex-col gap-3">
+        {saleBadge && (
+          <span className="inline-flex w-fit rounded-md bg-[#FCE7F3] px-3 py-1 text-xs font-bold uppercase tracking-wide text-[#DB2777]">
+            Sale!
+          </span>
+        )}
 
-        <h1 className="text-[26px] font-bold leading-snug text-[#38461F] sm:text-[28px]">
+        <h1 className="text-xl font-bold leading-snug text-[#253D4E] sm:text-2xl lg:text-[26px]">
           {product.name}
         </h1>
 
-        {shortDescriptionText && (
-          <p className="text-sm leading-relaxed text-[#1A1A1A]">{shortDescriptionText}</p>
-        )}
-
-        <ProductStarRating
-          averageRating={
-            (product as SimpleProduct & { averageRating?: number | null })
-              .averageRating
-          }
-          reviewCount={product.reviewCount}
-          labelMode="rated"
-          showWhenEmpty
+        <BrandLogo
+          brand={brand}
+          imageClassName="h-8 w-auto max-w-[180px] object-contain object-left opacity-90"
         />
       </div>
 
@@ -633,50 +608,44 @@ const ProductDetails = ({
         </AnimatePresence>
       )}
 
+      {shortDescriptionBullets.length > 0 && (
+        <ul className="list-disc space-y-1.5 pl-5 text-sm leading-relaxed text-neutral-600">
+          {shortDescriptionBullets.map((line) => (
+            <li key={line}>{line}</li>
+          ))}
+        </ul>
+      )}
+
       {displayPriceHtml ? (
-        <div className="space-y-1 pt-1 pb-5 lg:py-4 lg:pb-8">
-          <div className="flex flex-wrap items-baseline gap-3">
-            <span
-              className="text-2xl font-bold text-[#38461F] sm:text-3xl"
-              dangerouslySetInnerHTML={{ __html: displayPriceHtml }}
-            />
+        <div className="space-y-2 border-b border-neutral-100 pb-4">
+          <div className="flex flex-wrap items-baseline gap-2 sm:gap-3">
             {isOnSale && displayRegularPriceHtml && (
               <span
-                className="text-lg text-[#9CA3AF] line-through"
+                className="text-base text-neutral-400 line-through sm:text-lg"
                 dangerouslySetInnerHTML={{ __html: displayRegularPriceHtml }}
               />
             )}
+            <span
+              className="text-2xl font-bold sm:text-3xl"
+              style={{ color: PDP_GREEN }}
+              dangerouslySetInnerHTML={{ __html: displayPriceHtml }}
+            />
           </div>
           {isInStock ? (
-            <p className="flex items-center gap-2 text-sm font-medium text-[#2DC014]">
-              <span
-                className="h-2 w-2 shrink-0 rounded-full bg-[#2DC014] animate-pulse"
-                aria-hidden
-              />
-              {stockCount != null && stockCount > 0 ? (
-                <>
-                  <span>In Stock </span>
-                  <span className="text-[#38461F]">({stockCount})</span>
-                </>
-              ) : (
-                "In Stock"
-              )}
+            <p className="text-sm font-semibold text-[#F59E0B]">
+              {stockCount != null && stockCount > 0
+                ? `${stockCount} in stock`
+                : "In stock"}
             </p>
           ) : (
-            <p className="flex items-center gap-2 text-sm font-medium text-[#DC2626]">
-              <span
-                className="h-2 w-2 shrink-0 rounded-full bg-[#DC2626]"
-                aria-hidden
-              />
-              Out of stock
-            </p>
+            <p className="text-sm font-semibold text-[#DC2626]">Out of stock</p>
           )}
         </div>
       ) : (
-        <p className="text-sm font-medium text-[#6B7280]">Currently unavailable</p>
+        <p className="text-sm font-medium text-neutral-500">Currently unavailable</p>
       )}
 
-      <div className="max-lg:h-0 max-lg:overflow-visible mb-4 md:mb-8">
+      <div className="max-lg:h-0 max-lg:overflow-visible">
         <ProductAddToCart
           product={product}
           variation={
@@ -687,14 +656,24 @@ const ProductDetails = ({
         />
       </div>
 
-      {(displayNumericPrice > 0 || priceTiers.length > 0) && (
-        <ProductPaymentOptions
-          numericPrice={displayNumericPrice}
-          priceTiers={priceTiers}
-        />
-      )}
+      <ProductShareControls product={product} className="w-full" />
 
-      <ProductPurchaseAccordions product={product} />
+      {(productSku || categoryLabels) && (
+        <dl className="grid grid-cols-1 gap-x-6 gap-y-2 border-t border-neutral-100 pt-4 text-sm sm:grid-cols-2">
+          {productSku && (
+            <div>
+              <dt className="font-semibold text-neutral-700">SKU</dt>
+              <dd className="text-neutral-500">{productSku}</dd>
+            </div>
+          )}
+          {categoryLabels && (
+            <div>
+              <dt className="font-semibold text-neutral-700">Categories</dt>
+              <dd className="text-neutral-500">{categoryLabels}</dd>
+            </div>
+          )}
+        </dl>
+      )}
     </div>
   );
 };

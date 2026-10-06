@@ -352,8 +352,9 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
       onClick={() => addItemToCart(false)}
       aria-label={isPreOrderProduct() ? "Pre-order" : "Add to Cart"}
       className={twMerge(
-        `${cardControlClass} min-w-0 flex-1 px-2 text-xs font-bold leading-tight text-[#38461F] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:text-sm lg:text-base`,
+        `flex h-12 min-w-0 flex-1 items-center justify-center px-4 text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:text-base ${pdpRadius}`,
       )}
+      style={{ backgroundColor: "#3BB77E" }}
     >
       {loadingAction === "cart" ? (
         <Loader className="h-4 w-4 animate-spin" />
@@ -368,28 +369,14 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
     </button>
   );
 
-  const renderBuyNowButton = () => (
-    <button
-      type="button"
-      disabled={isAddToCartDisabled}
-      onClick={() => addItemToCart(true)}
-      className={twMerge(
-        `flex h-12 min-w-0 flex-1 items-center justify-center bg-[#ACDA5A] px-2 text-xs font-bold leading-tight text-[#38461F] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:px-4 sm:text-sm lg:text-base ${pdpRadius}`,
-      )}
-    >
-      {loadingAction === "buy" ? (
-        <Loader className="h-4 w-4 animate-spin" />
-      ) : (
-        "Buy Now"
-      )}
-    </button>
-  );
-
-  const renderWishlistControl = () => (
-    <WishlistButton
-      productId={product.databaseId}
-      className={`${cardControlClass} w-12 shrink-0`}
-    />
+  const renderSecondaryRow = () => (
+    <div className="mt-3">
+      <WishlistButton
+        productId={product.databaseId}
+        className={`${cardControlClass} h-11 w-full gap-2 px-3 text-sm font-semibold text-neutral-700`}
+        showLabel
+      />
+    </div>
   );
 
   return (
@@ -400,26 +387,24 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
         {!(product.type === "VARIABLE" && !variation) && (
           <div className="lg:pb-4">
             {isInStock ? (
-              <div className="flex items-center gap-2">
-                {renderQuantityControl()}
-                {renderAddToCartButton()}
-                {renderBuyNowButton()}
-                {renderWishlistControl()}
-              </div>
+              <>
+                <div className="flex items-stretch gap-3">
+                  {renderQuantityControl()}
+                  {renderAddToCartButton()}
+                </div>
+                {renderSecondaryRow()}
+              </>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col gap-3">
                 <button
                   type="button"
                   disabled={isNotifyClicked}
                   onClick={handleNotifyClick}
-                  className={`${cardControlClass} h-12 min-w-0 flex-1 px-4 text-sm font-bold text-[#38461F] disabled:cursor-not-allowed disabled:opacity-50`}
+                  className={`${cardControlClass} h-12 min-w-0 flex-1 px-4 text-sm font-bold text-[#253D4E] disabled:cursor-not-allowed disabled:opacity-50`}
                 >
                   Notify Me
                 </button>
-                <WishlistButton
-                  productId={product.databaseId}
-                  className={`${cardControlClass} w-12 shrink-0`}
-                />
+                {renderSecondaryRow()}
               </div>
             )}
           </div>

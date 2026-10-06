@@ -279,6 +279,7 @@ export const GET_ALL_PRODUCTS = gql`
         slug
         id
         databaseId
+        parentDatabaseId
         count
       }
     }
