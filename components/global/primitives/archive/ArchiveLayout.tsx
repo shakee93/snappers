@@ -32,6 +32,7 @@ import {
   type BrowseCategoryLike,
 } from "@/lib/browseCategories";
 import type { ArchiveFilterCategoryOption } from "@/lib/archiveFilters";
+import { cn } from "@/lib/utils";
 
 async function getData(parentId?: number, tagSlug?: string) {
   const [productsResult, browseCategoryRoots, navCategoriesFlat] =
@@ -141,6 +142,8 @@ interface ArchiveLayoutProps {
   dealTags?: string[];
   inStockOnly?: boolean;
   defaultNewest?: boolean;
+  /** Hide visible page title and description (e.g. shop page with promo banner). */
+  hideHeading?: boolean;
 }
 
 const ArchiveLayout = async ({
@@ -159,6 +162,7 @@ const ArchiveLayout = async ({
   dealTags,
   inStockOnly,
   defaultNewest,
+  hideHeading = false,
 }: ArchiveLayoutProps) => {
   const graphqlArchive = isGraphqlArchive();
   const {
@@ -178,18 +182,29 @@ const ArchiveLayout = async ({
   // console.log('descriptoin', description);
 
   return (
-    <div className="container py-8 lg:py-12 space-y-16 sm:space-y-20 lg:space-y-28">
+    <div
+      className={cn(
+        "container space-y-16 sm:space-y-20 lg:space-y-28",
+        hideHeading ? "pt-4 pb-8 lg:pt-4 lg:pb-12" : "py-8 lg:py-12",
+      )}
+    >
       <div className="space-y-4 lg:space-y-6">
-        <div className="max-w-screen-sm">
-          <h1 className="block capitalize text-2xl sm:text-3xl lg:text-4xl font-semibold">
+        {hideHeading ? (
+          <h1 className="sr-only">
             {headingOverride || (tagDetails.length > 0 ? tagDetails[0].name : title)}
           </h1>
-          <span className="block mt-2 lg:mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
-            {descriptionOverride || (tagDetails.length > 0 && tagDetails[0].description
-              ? tagDetails[0].description
-              : description || `Explore ${siteConfig.brand.name} Collections – where style meets functionality. Elevate your experience with quality and diverse options. Shop now for a seamless blend of style and substance!`)}
-          </span>
-        </div>
+        ) : (
+          <div className="max-w-screen-sm">
+            <h1 className="block capitalize text-2xl sm:text-3xl lg:text-4xl font-semibold">
+              {headingOverride || (tagDetails.length > 0 ? tagDetails[0].name : title)}
+            </h1>
+            <span className="block mt-2 lg:mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
+              {descriptionOverride || (tagDetails.length > 0 && tagDetails[0].description
+                ? tagDetails[0].description
+                : description || `Explore ${siteConfig.brand.name} Collections – where style meets functionality. Elevate your experience with quality and diverse options. Shop now for a seamless blend of style and substance!`)}
+            </span>
+          </div>
+        )}
         {topLinks && topLinks.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {topLinks.map((item) => (

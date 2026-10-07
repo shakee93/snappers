@@ -1,3 +1,4 @@
+import ShopCategoriesPromoBanner from "@/components/global/ShopCategoriesPromoBanner";
 import ArchiveLayout from "@/components/global/primitives/archive/ArchiveLayout";
 import ArchiveLoading from "@/components/global/primitives/archive/ArchiveLoading";
 import { Metadata } from "next";
@@ -13,9 +14,12 @@ export const metadata: Metadata = {
 
 const Page = () => {
   return (
-    <Suspense fallback={<ArchiveLoading />}>
-      <ArchiveLayout title="All Products" filters />
-    </Suspense>
+    <>
+      <ShopCategoriesPromoBanner />
+      <Suspense fallback={<ArchiveLoading compactTop />}>
+        <ArchiveLayout title="All Products" filters hideHeading />
+      </Suspense>
+    </>
   );
 };
 
