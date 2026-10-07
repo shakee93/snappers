@@ -7,7 +7,6 @@ import {
   FaTiktok,
 } from "react-icons/fa6";
 import { siteConfig } from "@/site.config";
-import contactContent from "@/content/contact.json";
 
 const socialLinks = [
   {
@@ -38,7 +37,7 @@ const Footer = () => {
       {/* Link columns */}
       <div className="bg-header-green">
         <div className="mx-auto grid max-w-[1088px] grid-cols-1 gap-x-8 gap-y-8 px-4 py-8 sm:grid-cols-2 lg:grid-cols-12">
-          <div className="min-w-0 lg:col-span-4">
+          <div className="min-w-0 lg:col-span-6">
             <h3 className={headingClass}>{footer.openTime.heading}</h3>
             <ul className="mt-3 space-y-4">
               {footer.openTime.groups.map((group) => (
@@ -60,32 +59,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          <div className="min-w-0 sm:col-span-2 lg:col-span-4">
-            <h3 className={headingClass}>{footer.visitUsHeading}</h3>
-            <ul className="mt-3 space-y-3">
-              {contactContent.locations.map((location) => (
-                <li key={location.name} className="text-sm leading-snug text-white/70">
-                  <p className="font-medium text-white/90">{location.name}</p>
-                  <p className="mt-0.5">
-                    {location.addressLine1} {location.addressLine2}
-                  </p>
-                  <div className="mt-1 flex flex-wrap gap-x-3">
-                    {location.phones.map((phone) => (
-                      <Link
-                        key={phone.tel}
-                        href={`tel:${phone.tel}`}
-                        className="hover:text-white"
-                      >
-                        {phone.display}
-                      </Link>
-                    ))}
-                  </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="min-w-0 lg:col-span-2">
+          <div className="min-w-0 lg:col-span-3">
             <h3 className={headingClass}>{footer.shopHeading}</h3>
             <ul className="mt-3 space-y-1.5">
               {siteConfig.navigation.main.map((item) => (
@@ -101,7 +75,7 @@ const Footer = () => {
             </ul>
           </div>
 
-          <div className="min-w-0 lg:col-span-2">
+          <div className="min-w-0 lg:col-span-3">
             <h3 className={headingClass}>{footer.customerServices.heading}</h3>
             <ul className="mt-3 space-y-1.5">
               {footer.customerServices.links.map((item) => (

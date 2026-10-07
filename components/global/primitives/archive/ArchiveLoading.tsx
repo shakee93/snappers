@@ -56,7 +56,7 @@ const FilterPanelSkeleton = () => (
   </div>
 );
 
-const SidebarSkeleton = () => (
+export const ArchiveSidebarSkeleton = () => (
   <div className="hidden flex-col gap-3 lg:flex">
     <div className="flex w-full items-center justify-between border-b border-neutral-200 pb-2">
       <SkeletonBlock className="h-4 w-14" />
@@ -74,7 +74,7 @@ const TypesenseGridSkeleton = ({ count = 12 }: { count?: number }) => (
     </div>
     <div className="grid grid-cols-12 gap-4">
       <div className="hidden lg:col-span-3 lg:block">
-        <SidebarSkeleton />
+        <ArchiveSidebarSkeleton />
       </div>
       <div className="col-span-12 lg:col-span-9">
         <ProductCardsSkeleton

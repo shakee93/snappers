@@ -25,10 +25,11 @@ import SectionHealthProducts from "@/components/home/SectionHealthProducts";
 import SectionBrowseProducts, {
   type BrowseInitialCache,
 } from "@/components/home/SectionBrowseProducts";
+import { GET_NAV_CATEGORIES } from "@/graphql/defs/nav";
 import {
   buildBrowseCategoryScopeMap,
   BROWSE_CATEGORY_TAB_SSR_FIRST,
-  filterBrowseCategoryTabs,
+  resolveBrowseCategoryTabs,
 } from "@/lib/browseCategories";
 import { getDealProductsCached } from "@/lib/dealProducts.server";
 import { HOMEPAGE_DEAL_CAROUSEL_LIMIT } from "@/lib/dealProducts";
@@ -111,6 +112,7 @@ const getData = async () => {
     dealProducts,
     browseAllTab,
     browseCategories,
+    navCategoriesFlat,
     brands,
   ] = await Promise.all([
     getHeroSlidesCached(),
@@ -138,7 +140,11 @@ const getData = async () => {
         endCursor: null,
       })),
     getClient()
-      .query({ query: GET_BROWSE_CATEGORY_TABS, variables: { first: 20 } })
+      .query({ query: GET_BROWSE_CATEGORY_TABS, variables: { first: 50 } })
+      .then((res) => res.data?.productCategories?.nodes || [])
+      .catch(() => []),
+    getClient()
+      .query({ query: GET_NAV_CATEGORIES })
       .then((res) => res.data?.productCategories?.nodes || [])
       .catch(() => []),
     getClient()
@@ -147,8 +153,9 @@ const getData = async () => {
       .catch(() => []),
   ]);
 
-  const browseCategoryTabs = filterBrowseCategoryTabs(
-    browseCategories as BrowseCategoryTab[]
+  const browseCategoryTabs = resolveBrowseCategoryTabs(
+    browseCategories as BrowseCategoryTab[],
+    navCategoriesFlat as BrowseCategoryTab[],
   );
   const browseCategoryScopes = buildBrowseCategoryScopeMap(
     browseCategoryTabs,

@@ -8,6 +8,7 @@ import {
   ARCHIVE_PRICE_MIN,
   ARCHIVE_SORT_OPTIONS,
   ArchiveFilterState,
+  ArchiveFilterCategoryOption,
   ArchiveSortOption,
   normalizePriceRange,
   parseArchivePriceInput,
@@ -17,6 +18,7 @@ import {
   filterFieldLabelClassName,
 } from "@/components/global/primitives/Filters/filterStyles";
 import FilterSelect from "@/components/global/primitives/Filters/FilterSelect";
+import ArchiveSidebarCategoryFilter from "@/components/global/primitives/archive/ArchiveSidebarCategoryFilter";
 import { cn } from "@/lib/utils";
 
 interface ArchiveFilterBarProps {
@@ -26,6 +28,8 @@ interface ArchiveFilterBarProps {
   /** Locked filters are hidden — the page always applies them server-side. */
   lockedFilters?: Partial<ArchiveFilterState>;
   sortOptions?: ArchiveSortOption[];
+  filterCategories?: ArchiveFilterCategoryOption[];
+  showCategoryFilter?: boolean;
 }
 
 const priceInputWrapperClassName =
@@ -122,6 +126,8 @@ const ArchiveFilterBar = ({
   className,
   lockedFilters,
   sortOptions = ARCHIVE_SORT_OPTIONS,
+  filterCategories = [],
+  showCategoryFilter = false,
 }: ArchiveFilterBarProps) => {
   const showOnSale = lockedFilters?.onSale === undefined;
   const showInStock = lockedFilters?.inStock === undefined;
@@ -133,6 +139,15 @@ const ArchiveFilterBar = ({
         className,
       )}
     >
+      {showCategoryFilter && filterCategories.length > 0 ? (
+        <div className="mb-4 lg:hidden">
+          <ArchiveSidebarCategoryFilter
+            categories={filterCategories}
+            selectedIds={filters.categoryIds}
+            onChange={(categoryIds) => onChange({ categoryIds })}
+          />
+        </div>
+      ) : null}
       <div className="flex flex-col gap-4 lg:grid lg:grid-cols-3 lg:items-center lg:gap-4">
         <div className="flex w-full items-center gap-2 border-b border-[#E8E8E8] pb-4 sm:gap-3 lg:gap-4 lg:border-0 lg:pb-0">
           {showOnSale ? (

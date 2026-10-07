@@ -1,7 +1,7 @@
 const pulseClassName = "animate-pulse bg-neutral-200";
 
 export const ARCHIVE_PRODUCT_GRID_CLASS_NAME =
-  "grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-5 lg:gap-4";
+  "grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-3 lg:grid-cols-4 lg:gap-4";
 
 export const INSTANT_SEARCH_PRODUCT_GRID_CLASS_NAME =
   "flex-1 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-x-2 gap-y-2 lg:gap-x-3 lg:gap-y-4";

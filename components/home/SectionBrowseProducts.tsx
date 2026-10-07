@@ -19,7 +19,6 @@ import ProductCard, {
 import ProductCardLoading from "@/components/global/primitives/Loading/ProductCardLoading";
 import {
   BROWSE_CATEGORY_TAB_FETCH_BATCH,
-  filterBrowseCategoryTabs,
   resolveBrowseCategoryScopeIds,
 } from "@/lib/browseCategories";
 import { getCategoryPath } from "@/lib/productUrl";
@@ -143,11 +142,10 @@ const SectionBrowseProducts = ({
 
   const tabs = useMemo(
     () =>
-      filterBrowseCategoryTabs(
-        (categories ?? []).filter((c): c is BrowseCategory => c != null),
-      )
+      (categories ?? [])
+        .filter((c): c is BrowseCategory => c != null)
         .filter(
-          (c): c is BrowseCategory & { databaseId: number } =>
+          (c): c is BrowseCategory & { databaseId: number; name: string } =>
             !!c.databaseId && !!c.name,
         ),
     [categories],

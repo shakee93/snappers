@@ -1,6 +1,7 @@
 import { getClient } from "@/graphql/apollo-ssr";
 import { GET_BRAND, GET_CATEGORY } from "@/graphql/defs/products";
 import { Brand, ProductCategory } from "@/graphql/types/graphql";
+import { isRegisteredArchiveSlug } from "@/lib/archiveSlugRegistry";
 import { getProductPageData, ProductPageData } from "@/lib/productPageData";
 
 export type SlugResolution =
@@ -70,6 +71,20 @@ export async function resolveSlug(
   slug: string,
   opts?: { withRelated?: boolean },
 ): Promise<SlugResolution | null> {
+  // Main nav / seeded archive slugs (e.g. groceries) are categories — skip
+  // GetProduct so WPGraphQL does not error on idType SLUG misses.
+  if (isRegisteredArchiveSlug(slug)) {
+    const categoryData = await getCategoryBySlug(slug);
+    if (categoryData) {
+      return { type: "category", data: categoryData };
+    }
+
+    const brandData = await getBrandBySlug(slug);
+    if (brandData) {
+      return { type: "brand", data: brandData };
+    }
+  }
+
   const productData = await getProductPageData(slug, opts);
   if (productData) {
     return { type: "product", data: productData };

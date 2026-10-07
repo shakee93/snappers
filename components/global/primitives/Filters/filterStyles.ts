@@ -5,7 +5,7 @@ export const filterLinkClassName =
   "text-sm font-medium text-header-green hover:opacity-80";
 
 export const filterCheckboxInputClassName =
-  "rounded border border-[#E8E8E8] bg-white text-header-action focus:ring-2 focus:ring-header-action/30 focus:ring-offset-0 checked:border-header-action hover:border-header-green/50";
+  "rounded border border-[#E8E8E8] bg-white accent-[#071C43] focus:ring-2 focus:ring-[#071C43]/25 focus:ring-offset-0 checked:border-[#071C43] hover:border-header-green/40";
 
 export const filterCheckboxLabelClassName =
   "text-sm font-medium text-header-green";

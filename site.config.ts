@@ -198,7 +198,6 @@ export const siteConfig = {
         },
       ],
     },
-    visitUsHeading: "Visit Us",
     shopHeading: "Shop",
     customerServices: {
       heading: "Customer Services",

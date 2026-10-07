@@ -1,13 +1,19 @@
 import { Suspense } from "react";
 import { getClient } from "@/graphql/apollo-ssr";
-import { GET_ALL_PRODUCTS } from "@/graphql/defs/products";
-import { GET_NESTED_CATEGORIES } from "@/graphql/defs/nav";
+import {
+  GET_ALL_PRODUCTS,
+  GET_BROWSE_CATEGORY_TABS,
+} from "@/graphql/defs/products";
+import { GET_NESTED_CATEGORIES, GET_NAV_CATEGORIES } from "@/graphql/defs/nav";
 import InstantSearchWrapper from "@/components/global/primitives/InstantSearchWrapper";
 import ArchiveFilters from "@/components/global/primitives/archive/ArchiveFilters";
 import TypesenseArchiveFilters from "@/components/global/primitives/archive/TypesenseArchiveFilters";
 import ArchiveProductGrid from "@/components/global/primitives/archive/ArchiveProductGrid";
 import ProductGridGraphQL from "@/components/global/primitives/archive/ProductGridGraphQL";
-import { ArchiveFilterBarSkeleton } from "@/components/global/primitives/archive/ArchiveLoading";
+import {
+  ArchiveFilterBarSkeleton,
+  ArchiveSidebarSkeleton,
+} from "@/components/global/primitives/archive/ArchiveLoading";
 import {
   ARCHIVE_PRODUCT_GRID_CLASS_NAME,
   INSTANT_SEARCH_PRODUCT_GRID_CLASS_NAME,
@@ -19,12 +25,29 @@ import { GET_TAG_DETAILS_BY_SLUG } from "@/graphql/defs/products";
 import { DealFilterType } from "@/lib/dealFilters";
 import { isGraphqlArchive } from "@/lib/archiveSource";
 import { siteConfig } from "@/site.config";
-import { getCategoryScopeExtraIds } from "@/lib/browseCategories";
+import {
+  buildBrowseCategoryScopeMap,
+  getCategoryScopeExtraIds,
+  resolveBrowseCategoryTabs,
+  type BrowseCategoryLike,
+} from "@/lib/browseCategories";
+import type { ArchiveFilterCategoryOption } from "@/lib/archiveFilters";
 
 async function getData(parentId?: number, tagSlug?: string) {
-  const { data } = await getClient().query({
-    query: GET_ALL_PRODUCTS,
-  });
+  const [productsResult, browseCategoryRoots, navCategoriesFlat] =
+    await Promise.all([
+      getClient().query({ query: GET_ALL_PRODUCTS }),
+      getClient()
+        .query({ query: GET_BROWSE_CATEGORY_TABS, variables: { first: 50 } })
+        .then((res) => res.data?.productCategories?.nodes ?? [])
+        .catch(() => []),
+      getClient()
+        .query({ query: GET_NAV_CATEGORIES })
+        .then((res) => res.data?.productCategories?.nodes ?? [])
+        .catch(() => []),
+    ]);
+
+  const { data } = productsResult;
 
   let nestedCategories = [];
   let tagDetails = [];
@@ -55,11 +78,37 @@ async function getData(parentId?: number, tagSlug?: string) {
     }
   }
 
+  const sidebarFilterCategories: ArchiveFilterCategoryOption[] =
+    resolveBrowseCategoryTabs(
+      browseCategoryRoots as BrowseCategoryLike[],
+      navCategoriesFlat as BrowseCategoryLike[],
+    )
+      .filter(
+        (
+          item,
+        ): item is BrowseCategoryLike & {
+          databaseId: number;
+          name: string;
+        } => typeof item.databaseId === "number" && !!item.name,
+      )
+      .map((item) => ({
+        databaseId: item.databaseId,
+        name: item.name,
+        slug: item.slug,
+      }));
+
+  const categoryScopeById = buildBrowseCategoryScopeMap(
+    sidebarFilterCategories,
+    browseCategoryRoots as BrowseCategoryLike[],
+  );
+
   return {
     productCategories: data.productCategories.nodes,
     brands: data.brands.nodes,
     nestedCategories,
     tagDetails,
+    sidebarFilterCategories,
+    categoryScopeById,
   };
 }
 
@@ -112,8 +161,16 @@ const ArchiveLayout = async ({
   defaultNewest,
 }: ArchiveLayoutProps) => {
   const graphqlArchive = isGraphqlArchive();
-  const { productCategories, brands, nestedCategories, tagDetails } = await getData(category?.databaseId ?? '', tag);
+  const {
+    productCategories,
+    brands,
+    nestedCategories,
+    tagDetails,
+    sidebarFilterCategories,
+    categoryScopeById,
+  } = await getData(category?.databaseId ?? "", tag);
   const categoryScopeIds = buildCategoryScopeIds(category, nestedCategories);
+  const showSidebarCategoryFilter = filters && graphqlArchive && !category;
 
   // console.log('tagDetails', tagDetails);
   // console.log('categoryName', category.databaseId);
@@ -151,21 +208,52 @@ const ArchiveLayout = async ({
           </div>
         ) : null}
 
-        {filters ? (
+        {filters && !graphqlArchive ? (
           <Suspense fallback={<ArchiveFilterBarSkeleton />}>
-            {graphqlArchive ? (
-              <ArchiveFilters />
-            ) : (
-              <TypesenseArchiveFilters />
-            )}
+            <TypesenseArchiveFilters />
           </Suspense>
         ) : null}
 
-        <hr className="border-slate-200 dark:border-slate-700 " />
+        {filters && graphqlArchive ? (
+          <div className="lg:hidden">
+            <Suspense fallback={<ArchiveFilterBarSkeleton />}>
+              <ArchiveFilters
+                filterCategories={sidebarFilterCategories}
+                showCategoryFilter={showSidebarCategoryFilter}
+              />
+            </Suspense>
+          </div>
+        ) : null}
+
+        <hr
+          className={`border-slate-200 dark:border-slate-700 ${filters && graphqlArchive ? "lg:hidden" : ""}`}
+        />
 
         <main>
-          <div className="flex flex-col lg:flex-row">
-            <div className="flex-1 ">
+          <div
+            className={
+              filters && graphqlArchive
+                ? "grid grid-cols-12 gap-4"
+                : "flex flex-col lg:flex-row"
+            }
+          >
+            {filters && graphqlArchive ? (
+              <aside className="hidden lg:col-span-3 lg:block">
+                <Suspense fallback={<ArchiveSidebarSkeleton />}>
+                  <ArchiveFilters
+                    variant="sidebar"
+                    filterCategories={sidebarFilterCategories}
+                    showCategoryFilter={showSidebarCategoryFilter}
+                  />
+                </Suspense>
+              </aside>
+            ) : null}
+
+            <div
+              className={
+                filters && graphqlArchive ? "col-span-12 lg:col-span-9" : "flex-1"
+              }
+            >
               {graphqlArchive ? (
                 filters ? (
                   <Suspense
@@ -179,6 +267,7 @@ const ArchiveLayout = async ({
                       categoryIds={
                         categoryScopeIds.length > 0 ? categoryScopeIds : undefined
                       }
+                      categoryScopeById={categoryScopeById}
                       first={45}
                     />
                   </Suspense>

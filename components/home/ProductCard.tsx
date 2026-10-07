@@ -22,6 +22,7 @@ import { resolveProductImageUrl } from "@/lib/productImage";
 import { parsePriceString, resolveProductSale } from "@/lib/productSale";
 import type { ListingImagePatch } from "@/lib/listingImagePatch";
 import { getCartLineStockCap } from "@/lib/cartLineStockCap";
+import { isListingProductOutOfStock } from "@/lib/listingStock";
 import {
   CartItem,
   ProductVariation,
@@ -52,6 +53,9 @@ export interface ProductCardProps {
   /** GraphQL image backfill when Typesense search hits omit variation media. */
   listingImageByProductId?: Record<number, ListingImagePatch>;
 }
+
+/** Brand blue — stock status on cards. */
+const STOCK_STATUS_COLOR = "#1b40af";
 
 /** Grocery-style card accent — badges, price, brand, Add button. */
 const CARD_ACCENT = "#3BB77E";
@@ -183,7 +187,8 @@ const ProductCard = ({
   const link = useProductLink(product);
   const router = useRouter();
 
-  const { name, image, stockStatus, type, rawPrice, purchasable } = product;
+  const { name, image, stockStatus, stockQuantity, type, rawPrice, purchasable } =
+    product;
   const productDbId = getDatabaseIdFromProductLike(product) ?? product.databaseId;
 
   const sale = useMemo(() => resolveProductSale(product), [product]);
@@ -207,6 +212,11 @@ const ProductCard = ({
     if (isNewProduct) return "New";
     return null;
   }, [badgeLabel, isNewProduct]);
+
+  const cornerBadgeColor = useMemo(() => {
+    if (rightCornerBadge?.toLowerCase() === "deals") return CART_ACTIVE_ACCENT;
+    return CARD_ACCENT;
+  }, [rightCornerBadge]);
 
   const isPreOrder = useMemo(
     () =>
@@ -276,14 +286,20 @@ const ProductCard = ({
     [resolvedImage, resolvedVariations],
   );
 
+  const isOutOfStock = useMemo(
+    () => isListingProductOutOfStock(product),
+    [product],
+  );
+
   const isSimplePurchasable =
     type === "SIMPLE" &&
-    stockStatus === "IN_STOCK" &&
+    !isOutOfStock &&
     rawPrice !== "0.00" &&
     !!productDbId;
-  const isVariableInStock = type === "VARIABLE" && stockStatus === "IN_STOCK";
+  const isVariableInStock =
+    type === "VARIABLE" &&
+    !isOutOfStock;
   const canAddToCart = isSimplePurchasable;
-  const isOutOfStock = stockStatus !== "IN_STOCK" || purchasable === false;
 
   const cartLine = useMemo((): CartItem | null => {
     if (!canAddToCart || productDbId == null) return null;
@@ -414,33 +430,32 @@ const ProductCard = ({
           href={link || "#"}
           className="relative block w-full overflow-hidden rounded-xl bg-[#FAFAFA] pt-[85%]"
         >
-          {isOutOfStock ? (
+          {salePercentBadge && (
             <span
               className="absolute left-0 top-0 z-10 rounded-br-2xl px-3 py-1.5 text-xs font-bold text-white"
               style={{ backgroundColor: CARD_ACCENT }}
             >
-              Out of Stock
+              {salePercentBadge}
             </span>
-          ) : (
-            <>
-              {salePercentBadge && (
-                <span
-                  className="absolute left-0 top-0 z-10 rounded-br-2xl px-3 py-1.5 text-xs font-bold text-white"
-                  style={{ backgroundColor: CARD_ACCENT }}
-                >
-                  {salePercentBadge}
-                </span>
-              )}
-              {rightCornerBadge && (
-                <span
-                  className="absolute right-0 top-0 z-10 rounded-bl-2xl px-3 py-1.5 text-xs font-bold text-white"
-                  style={{ backgroundColor: CARD_ACCENT }}
-                >
-                  {rightCornerBadge}
-                </span>
-              )}
-            </>
           )}
+          {rightCornerBadge && (
+            <span
+              className="absolute right-0 top-0 z-10 rounded-bl-2xl px-3 py-1.5 text-xs font-bold text-white"
+              style={{ backgroundColor: cornerBadgeColor }}
+            >
+              {rightCornerBadge}
+            </span>
+          )}
+          <span
+            className="absolute bottom-0 left-0 z-10 rounded-tr-2xl px-3 py-1.5 text-xs font-bold text-white"
+            style={{ backgroundColor: STOCK_STATUS_COLOR }}
+          >
+            {isOutOfStock
+              ? "Out of Stock"
+              : stockQuantity != null && stockQuantity > 0
+                ? `${stockQuantity} in stock`
+                : "In stock"}
+          </span>
 
           {imageUrl ? (
             <Image
@@ -547,7 +562,7 @@ const ProductCard = ({
                 )}
               </p>
               {showRegularStrike && displayPricing.regularMin != null && (
-                <p className="text-[11px] font-medium text-neutral-400 line-through sm:text-xs">
+                <p className="price-strike-angled text-[11px] font-medium sm:text-xs">
                   {showRegularRange && displayPricing.regularMax != null ? (
                     <>
                       LKR {formatLkr(displayPricing.regularMin)} –{" "}

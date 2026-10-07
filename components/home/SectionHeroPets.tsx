@@ -59,9 +59,6 @@ const SLIDE_INTERVAL = 6000;
 const CROSSFADE = { duration: 0.6, ease: [0.4, 0, 0.2, 1] as const };
 const TEXT_FADE = { duration: 0.45, ease: "easeInOut" as const };
 
-/** Visible viewport minus typical chromed header (announcement + nav + category bar). */
-const HERO_VIEWPORT_MIN = "min-h-[calc(100dvh-9.5rem)] sm:min-h-[calc(100dvh-10.5rem)] lg:min-h-[calc(100dvh-11.5rem)]";
-
 /** Cream doodle + tint when a slide has no photo (fallback under CMS slides). */
 const HERO_SLIDER_BG = "/homepage/hero/pattern-bg.webp";
 const HERO_SLIDER_SIGNUP_BG = "/homepage/hero/pattern-bg.webp";
@@ -129,13 +126,13 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
 
   return (
     <section
-      className={`relative flex w-full flex-col bg-white ${HERO_VIEWPORT_MIN} ${className}`}
+      className={`relative w-full bg-white ${className}`}
       aria-label="Promotions"
     >
-      <div className="relative mx-auto flex min-h-0 w-full max-w-[1368px] flex-1 flex-col px-3 py-4 sm:px-4 sm:py-5 lg:py-6 xl:px-0">
-        <div className="flex min-h-0 w-full flex-1 flex-col">
-          <div className="relative flex min-h-0 w-full flex-1 flex-col rounded-2xl bg-white p-2 shadow-[0_4px_24px_rgba(15,23,42,0.12)] ring-1 ring-neutral-200/80 sm:p-2.5">
-            <div className="relative min-h-0 flex-1 overflow-hidden rounded-xl bg-[#faf9f7]">
+      <div className="relative mx-auto w-full max-w-[1368px] px-3 py-6 sm:px-4 lg:py-10 xl:px-0">
+        <div className="w-full">
+          <div className="relative min-h-[280px] w-full rounded-2xl bg-white p-2 shadow-[0_4px_24px_rgba(15,23,42,0.12)] ring-1 ring-neutral-200/80 sm:min-h-[340px] sm:p-2.5 lg:min-h-[452px]">
+            <div className="relative min-h-[calc(280px-1rem)] overflow-hidden rounded-xl bg-[#faf9f7] sm:min-h-[calc(340px-1.25rem)] lg:min-h-[calc(452px-1.25rem)]">
               <div
                 className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat"
                 style={{ backgroundImage: `url('${HERO_SLIDER_BG}')` }}

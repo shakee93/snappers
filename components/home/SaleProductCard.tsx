@@ -57,7 +57,7 @@ const
                 </div>
                 <div className="flex flex-col gap-1">
                   {product.regularPrice && product.regularPrice !== product.price && (
-                    <span className="text-danger font-medium leading-none line-through text-[9px]">
+                    <span className="price-strike-angled font-medium leading-none text-[9px]">
                       {product.regularPrice} {product.currency}
                     </span>
                   )}

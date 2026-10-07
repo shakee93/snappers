@@ -280,6 +280,7 @@ export const ProductContentCard = gql`
     ... on SimpleProduct {
       onSale
       stockStatus
+      purchasable
       price
       rawPrice: price(format: RAW)
       regularPrice
@@ -287,6 +288,7 @@ export const ProductContentCard = gql`
     }
     ... on VariableProduct {
       onSale
+      purchasable
       price
       rawPrice: price(format: RAW)
       regularPrice

@@ -621,7 +621,7 @@ const ProductDetails = ({
           <div className="flex flex-wrap items-baseline gap-2 sm:gap-3">
             {isOnSale && displayRegularPriceHtml && (
               <span
-                className="text-base text-neutral-400 line-through sm:text-lg"
+                className="price-strike-angled text-base sm:text-lg"
                 dangerouslySetInnerHTML={{ __html: displayRegularPriceHtml }}
               />
             )}
@@ -632,7 +632,10 @@ const ProductDetails = ({
             />
           </div>
           {isInStock ? (
-            <p className="text-sm font-semibold text-[#F59E0B]">
+            <p
+              className="text-sm font-semibold"
+              style={{ color: siteConfig.theme.brandHex.primary }}
+            >
               {stockCount != null && stockCount > 0
                 ? `${stockCount} in stock`
                 : "In stock"}

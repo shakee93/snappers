@@ -112,3 +112,14 @@ html {
     @apply bg-background text-foreground;
     }
 }
+
+@layer utilities {
+  .price-strike-angled {
+    @apply relative inline-block text-danger;
+    text-decoration: none;
+  }
+  .price-strike-angled::after {
+    content: "";
+    @apply pointer-events-none absolute left-[-2%] top-1/2 h-[1.2px] w-[104%] -translate-y-1/2 rotate-[9deg] bg-danger;
+  }
+}

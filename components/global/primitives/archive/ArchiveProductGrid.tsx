@@ -2,31 +2,35 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useLazyQuery } from "@apollo/client";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import ProductCard from "@/components/home/ProductCard";
 import {
   ARCHIVE_PRODUCT_GRID_CLASS_NAME,
   ProductCardsSkeleton,
 } from "@/components/global/primitives/Loading/ProductCardLoading";
-import { GET_ARCHIVE_PRODUCTS } from "@/graphql/defs/products";
-import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import {
   buildArchiveFilterSearchParams,
   parseArchiveFilters,
+  resolveArchiveCategoryIdIn,
   toArchiveProductsVariables,
 } from "@/lib/archiveFilters";
 import { getCompactPageItems } from "@/lib/compactPagination";
+import {
+  fetchArchiveProductsClient,
+  type ArchiveProductNode,
+} from "@/lib/fetchArchiveProductsClient";
+import { getProductListKey } from "@/lib/productListKey";
 
 export interface ArchiveProductGridProps {
+  /** Fixed scope on category archive routes. */
   categoryIds?: number[];
+  /** Root category id → GraphQL scope (parent + children). */
+  categoryScopeById?: Record<number, number[]>;
   first?: number;
 }
 
-type ArchiveProduct = SimpleProduct & VariableProduct;
-
 type ProductCache = {
-  products: ArchiveProduct[];
+  products: ArchiveProductNode[];
   hasNextPage: boolean;
   endCursor: string | null;
   loaded: boolean;
@@ -41,6 +45,7 @@ const EMPTY_CACHE: ProductCache = {
 
 const ArchiveProductGrid = ({
   categoryIds,
+  categoryScopeById,
   first = 45,
 }: ArchiveProductGridProps) => {
   const router = useRouter();
@@ -57,14 +62,25 @@ const ArchiveProductGrid = ({
     Number.parseInt(searchParams.get("page") ?? "1", 10) || 1,
   );
 
+  const resolvedCategoryIds = useMemo(
+    () =>
+      resolveArchiveCategoryIdIn(
+        filters.categoryIds,
+        categoryIds,
+        categoryScopeById,
+      ),
+    [categoryIds, categoryScopeById, filters.categoryIds],
+  );
+
   const filterKey = useMemo(
     () =>
       JSON.stringify({
         filters,
         categoryIds,
+        resolvedCategoryIds,
         first,
       }),
-    [filters, categoryIds, first],
+    [filters, categoryIds, first, resolvedCategoryIds],
   );
 
   const [cache, setCache] = useState<ProductCache>(EMPTY_CACHE);
@@ -73,34 +89,21 @@ const ArchiveProductGrid = ({
   const [error, setError] = useState<Error | null>(null);
   const loadingMoreRef = useRef(false);
 
-  const [fetchArchiveProducts] = useLazyQuery(GET_ARCHIVE_PRODUCTS, {
-    notifyOnNetworkStatusChange: true,
-  });
-
   const loadBatch = useCallback(
     async (after?: string | null): Promise<ProductCache> => {
-      const { data, error: queryError } = await fetchArchiveProducts({
-        variables: {
-          ...toArchiveProductsVariables(filters, categoryIds, first),
-          after: after ?? undefined,
-        },
+      const batch = await fetchArchiveProductsClient({
+        ...toArchiveProductsVariables(filters, resolvedCategoryIds, first),
+        after: after ?? undefined,
       });
 
-      if (queryError) {
-        throw queryError;
-      }
-
-      const nodes = (data?.products?.nodes ?? []) as ArchiveProduct[];
-      const pageInfo = data?.products?.pageInfo;
-
       return {
-        products: nodes,
-        hasNextPage: pageInfo?.hasNextPage ?? false,
-        endCursor: pageInfo?.endCursor ?? null,
+        products: batch.products,
+        hasNextPage: batch.hasNextPage,
+        endCursor: batch.endCursor,
         loaded: true,
       };
     },
-    [categoryIds, fetchArchiveProducts, filters, first],
+    [filters, first, resolvedCategoryIds],
   );
 
   useEffect(() => {
@@ -206,8 +209,11 @@ const ArchiveProductGrid = ({
             loadingMore ? "opacity-60" : ""
           }`}
         >
-          {visibleProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
+          {visibleProducts.map((product, index) => (
+            <ProductCard
+              key={getProductListKey(product, index)}
+              product={product}
+            />
           ))}
         </div>
       ) : null}

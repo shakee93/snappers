@@ -192,6 +192,9 @@ export const buildBrowseCategoryScopeMap = (
       ]),
   );
 
+const isRootBrowseCategory = (category: BrowseCategoryLike): boolean =>
+  category.parentDatabaseId == null || category.parentDatabaseId === 0;
+
 /** Keep only configured browse tabs, in nav order. */
 export const filterBrowseCategoryTabs = <T extends BrowseCategoryLike>(
   categories: T[],
@@ -216,6 +219,46 @@ export const filterBrowseCategoryTabs = <T extends BrowseCategoryLike>(
   return BROWSE_TAB_SLUGS.flatMap((tabSlug) => {
     const category = findBrowseTabCategory(eligible, tabSlug);
     return category ? [category] : [];
+  });
+};
+
+/**
+ * Homepage browse tabs in main-nav order. Prefer root categories with nested
+ * children from `GET_BROWSE_CATEGORY_TABS`; if none match (e.g. slug mismatch),
+ * fall back to any category from the flat nav list by slug.
+ */
+export const resolveBrowseCategoryTabs = <T extends BrowseCategoryLike>(
+  rootCategories: T[],
+  allCategories?: BrowseCategoryLike[],
+): T[] => {
+  const fromRoots = filterBrowseCategoryTabs(rootCategories);
+  if (fromRoots.length > 0) return fromRoots;
+
+  const flat = allCategories?.length ? allCategories : rootCategories;
+  const rootsWithChildrenById = new Map(
+    rootCategories
+      .filter(
+        (category): category is T & { databaseId: number } =>
+          typeof category.databaseId === "number",
+      )
+      .map((category) => [category.databaseId, category]),
+  );
+
+  return BROWSE_TAB_SLUGS.flatMap((tabSlug) => {
+    const rootMatch = findBrowseTabCategory(
+      rootCategories.filter(isRootBrowseCategory),
+      tabSlug,
+    );
+    if (rootMatch?.databaseId && rootMatch.name) {
+      return [rootMatch];
+    }
+
+    const flatMatch = findBrowseTabCategory(flat, tabSlug);
+    if (!flatMatch?.databaseId || !flatMatch.name) return [];
+
+    const enriched =
+      rootsWithChildrenById.get(flatMatch.databaseId) ?? flatMatch;
+    return [enriched as T];
   });
 };
 
