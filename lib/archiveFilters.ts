@@ -13,6 +13,9 @@ import {
 export const ARCHIVE_PRICE_MIN = 0;
 export const ARCHIVE_PRICE_MAX = 500_000;
 
+/** Shop archive page size — divisible by 2, 3, and 4 so the last grid row is never a single card. */
+export const ARCHIVE_PRODUCTS_PER_PAGE = 48;
+
 export interface ArchiveSortOption {
   id: string;
   label: string;

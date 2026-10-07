@@ -118,7 +118,7 @@ const ContactForm = ({ formspreeId }: ContactFormProps) => {
         <button
           type="submit"
           disabled={status === "submitting"}
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-header-action px-4 py-3 text-sm font-bold text-[#092412] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+          className="flex w-full items-center justify-center gap-2 rounded-full bg-header-action px-6 py-3 text-sm font-bold text-header-green transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {status === "submitting" ? (
             <>

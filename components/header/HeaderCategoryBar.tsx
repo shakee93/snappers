@@ -19,7 +19,7 @@ export default function HeaderCategoryBar({
   );
 
   return (
-    <div className="relative z-[250] w-full overflow-visible border-t border-neutral-200 bg-[#F2F3F4]">
+    <div className="relative z-20 w-full overflow-visible border-t border-neutral-200 bg-[#F2F3F4]">
       <div
         data-header-category-shell
         className="mx-auto flex min-h-[56px] max-w-[1368px] items-center overflow-visible px-3 py-2 lg:px-4 xl:px-6"

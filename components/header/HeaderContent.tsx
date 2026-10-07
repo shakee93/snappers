@@ -22,7 +22,7 @@ const HeaderContent = ({ navCategories }: HeaderContentProps) => {
           <SearchBar placeholder="Search for brand, products or categories..." />
         </div>
 
-        <div className="shrink-0">
+        <div className="relative z-[260] shrink-0">
           <HeaderUtilityActions />
         </div>
       </div>

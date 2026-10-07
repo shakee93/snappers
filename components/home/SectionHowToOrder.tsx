@@ -67,7 +67,7 @@ const SectionHowToOrder = ({
           </p>
           <Link
             href={ctaHref}
-            className="mt-6 inline-flex items-center gap-2 rounded-lg bg-[#B8D962] px-6 py-3 text-sm font-bold text-[#092412] transition-opacity hover:opacity-90 md:mt-8 md:text-base"
+            className="mt-6 inline-flex items-center gap-2 rounded-full bg-header-action px-8 py-3.5 text-sm font-bold text-header-green transition-opacity hover:opacity-90 md:mt-8 md:text-base"
           >
             {ctaLabel}
             <ArrowRight className="h-4 w-4" aria-hidden />

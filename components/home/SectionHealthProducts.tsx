@@ -22,6 +22,10 @@ const mapHealthEntries = (
         !!entry.product,
     );
 
+export const hasHealthSectionProducts = (
+  settings?: HeroSettingsFields["healthSectionSettings"],
+): boolean => mapHealthEntries(settings).length > 0;
+
 /** Health banner plus centre-aligned product carousel from hero settings ACF. */
 const SectionHealthProducts = ({
   className = "",

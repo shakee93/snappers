@@ -9,6 +9,7 @@ import {
   ProductCardsSkeleton,
 } from "@/components/global/primitives/Loading/ProductCardLoading";
 import {
+  ARCHIVE_PRODUCTS_PER_PAGE,
   buildArchiveFilterSearchParams,
   parseArchiveFilters,
   resolveArchiveCategoryIdIn,
@@ -46,7 +47,7 @@ const EMPTY_CACHE: ProductCache = {
 const ArchiveProductGrid = ({
   categoryIds,
   categoryScopeById,
-  first = 45,
+  first = ARCHIVE_PRODUCTS_PER_PAGE,
 }: ArchiveProductGridProps) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -128,7 +129,12 @@ const ArchiveProductGrid = ({
     };
   }, [filterKey, loadBatch]);
 
-  const pageCount = Math.max(1, Math.ceil(cache.products.length / first));
+  const knownPageCount = Math.max(1, Math.ceil(cache.products.length / first));
+  /** Cursor pagination: include at least one more page while the API has a next batch. */
+  const totalPages = cache.hasNextPage
+    ? Math.max(knownPageCount + 1, page + 1)
+    : knownPageCount;
+
   const visibleProducts = useMemo(
     () => cache.products.slice((page - 1) * first, page * first),
     [cache.products, first, page],
@@ -176,14 +182,14 @@ const ArchiveProductGrid = ({
 
   useEffect(() => {
     if (!cache.loaded || loadingMore) return;
-    if (page <= pageCount) return;
+    if (page <= knownPageCount) return;
     if (cache.hasNextPage) return;
-    if (page > 1) goToPage(pageCount);
-  }, [cache.hasNextPage, cache.loaded, goToPage, loadingMore, page, pageCount]);
+    if (page > 1) goToPage(knownPageCount);
+  }, [cache.hasNextPage, cache.loaded, goToPage, loadingMore, knownPageCount, page]);
 
   const showSkeleton = initialLoading && visibleProducts.length === 0;
   const showPagination =
-    cache.loaded && (pageCount > 1 || cache.hasNextPage) && !error;
+    cache.loaded && (totalPages > 1 || cache.hasNextPage) && !error;
 
   return (
     <>
@@ -219,65 +225,75 @@ const ArchiveProductGrid = ({
       ) : null}
 
       {showPagination ? (
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-1.5">
+        <nav
+          className="mt-10 flex max-w-full flex-wrap items-center justify-center gap-x-3 gap-y-2 px-2 text-sm font-semibold text-[#253D4E] sm:gap-x-4"
+          aria-label={`Product list pagination, page ${page} of ${totalPages}${cache.hasNextPage ? " plus" : ""}`}
+        >
           {page > 1 ? (
             <button
               type="button"
               onClick={() => goToPage(page - 1)}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#E8E8E8] bg-white text-header-green transition-colors hover:border-header-green/40 hover:bg-header-cream/30"
-              aria-label="Previous page"
+              className="inline-flex items-center gap-1.5 transition-colors hover:text-header-green"
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4 shrink-0" aria-hidden />
+              <span>Previous page</span>
             </button>
           ) : null}
 
-          {getCompactPageItems(page, Math.max(pageCount, page)).map(
-            (item, index) => {
-              if (item === "ellipsis") {
-                return (
-                  <span
-                    key={`ellipsis-${index}`}
-                    className="inline-flex h-9 w-9 items-center justify-center text-sm font-semibold text-header-green/40"
-                    aria-hidden
-                  >
-                    …
-                  </span>
-                );
-              }
-
-              const isActive = item === page;
+          {getCompactPageItems(page, totalPages, 1).map((item, index) => {
+            if (item === "ellipsis") {
               return (
-                <button
+                <span
+                  key={`ellipsis-${index}`}
+                  className="px-0.5 tracking-widest text-neutral-400"
+                  aria-hidden
+                >
+                  ...
+                </span>
+              );
+            }
+
+            const isActive = item === page;
+            const isBeyondLoaded = item > knownPageCount && cache.hasNextPage;
+
+            if (isActive) {
+              return (
+                <span
                   key={item}
-                  type="button"
-                  onClick={() => goToPage(item)}
-                  aria-label={`Go to page ${item}`}
-                  aria-current={isActive ? "page" : undefined}
-                  className={`inline-flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold transition-colors ${
-                    isActive
-                      ? "bg-header-action text-header-green"
-                      : "border border-[#E8E8E8] bg-white text-header-green hover:border-header-green/40 hover:bg-header-cream/30"
-                  }`}
+                  aria-current="page"
+                  className="inline-flex h-8 min-w-[2rem] items-center justify-center rounded-md bg-header-green px-2.5 text-white"
                 >
                   {item}
-                </button>
+                </span>
               );
-            },
-          )}
+            }
 
-          {page < pageCount || cache.hasNextPage ? (
+            return (
+              <button
+                key={item}
+                type="button"
+                onClick={() => goToPage(item)}
+                disabled={loadingMore && isBeyondLoaded}
+                aria-label={`Go to page ${item}`}
+                className="inline-flex h-8 min-w-[2rem] items-center justify-center px-1 transition-colors hover:text-header-green disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {item}
+              </button>
+            );
+          })}
+
+          {page < totalPages || cache.hasNextPage ? (
             <button
               type="button"
               onClick={() => goToPage(page + 1)}
               disabled={loadingMore}
-              className="inline-flex h-9 items-center justify-center gap-1 rounded-full border border-[#E8E8E8] bg-white px-3 text-sm font-semibold text-header-green transition-colors hover:border-header-green/40 hover:bg-header-cream/30 disabled:cursor-not-allowed disabled:opacity-50"
-              aria-label="Next page"
+              className="inline-flex items-center gap-1.5 pl-1 transition-colors hover:text-header-green disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <span className="hidden sm:inline">Next</span>
-              <ChevronRight className="h-4 w-4" />
+              <span>Next page</span>
+              <ChevronRight className="h-4 w-4 shrink-0" aria-hidden />
             </button>
           ) : null}
-        </div>
+        </nav>
       ) : null}
     </>
   );

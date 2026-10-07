@@ -16,6 +16,7 @@ import { useSession } from "@/context/SessionProvider";
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button, useDisclosure } from "@nextui-org/react";
 import PreOrderNotice from "@/components/global/ui/PreOrderNotice";
 import { pdpRadius } from "@/components/product/pdpStyles";
+import { BRAND_CTA_BUTTON_CLASS } from "@/shared/Button/ButtonBrand";
 
 interface ProductAddToCartProps {
   product: SimpleProduct & VariableProduct;
@@ -352,9 +353,9 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
       onClick={() => addItemToCart(false)}
       aria-label={isPreOrderProduct() ? "Pre-order" : "Add to Cart"}
       className={twMerge(
-        `flex h-12 min-w-0 flex-1 items-center justify-center px-4 text-sm font-bold text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:text-base ${pdpRadius}`,
+        BRAND_CTA_BUTTON_CLASS,
+        "flex h-12 min-w-0 flex-1 items-center justify-center rounded-full px-4 text-sm font-bold sm:text-base",
       )}
-      style={{ backgroundColor: "#3BB77E" }}
     >
       {loadingAction === "cart" ? (
         <Loader className="h-4 w-4 animate-spin" />

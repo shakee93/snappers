@@ -19,6 +19,7 @@ import {
 } from "@/utils/storage-keys";
 import { onError } from "@apollo/client/link/error";
 import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
+import { readUsableAuthToken } from "@/lib/clientAuthToken";
 import { Results } from "@/types";
 
 loadDevMessages();
@@ -74,7 +75,7 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
 
     const authLink = new ApolloLink((operation, forward) => {
       const sessionToken = localStorage.getItem(SESSION_TOKEN_KEY);
-      const authToken = localStorage.getItem(AUTH_TOKEN_KEY);
+      const authToken = readUsableAuthToken(AUTH_TOKEN_KEY);
       const skipAuth = AUTH_FREE_OPERATIONS.has(operation.operationName);
 
       operation.setContext({

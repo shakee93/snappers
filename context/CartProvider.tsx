@@ -13,6 +13,7 @@ import {
     SESSION_TOKEN_KEY,
     USER_DATA_KEY,
 } from "@/utils/storage-keys";
+import { parseJwtPayload } from "@/lib/clientAuthToken";
 
 /** Result of `addToCart` — Apollo mutation payload or a bail-out with `error`. */
 export type AddToCartResult =
@@ -436,35 +437,61 @@ export function CartProvider({ children }: {
             // return "Expired token"). Do not use the Apollo errorLink for this —
             // auto-replaying checkout would be unsafe.
             if (isGraphQlInternalServerError(error) && typeof window !== "undefined") {
-                const hasSessionToken = !!localStorage.getItem(SESSION_TOKEN_KEY);
-                const hasAuthToken = !!localStorage.getItem(AUTH_TOKEN_KEY);
+                console.warn(
+                    "Add to cart failed with a possible stale session/auth token. Recovering and retrying once.",
+                );
 
-                if (hasSessionToken || hasAuthToken) {
-                    console.warn(
-                        "Add to cart failed with a possible stale session/auth token. Recovering and retrying once.",
-                    );
+                await recoverSessionForAddToCart();
 
-                    await recoverSessionForAddToCart();
+                const leftoverAuth = localStorage.getItem(AUTH_TOKEN_KEY);
+                if (leftoverAuth && !parseJwtPayload(leftoverAuth)) {
+                    localStorage.removeItem(AUTH_TOKEN_KEY);
+                }
 
-                    try {
-                        const retry = await _addToCart({
-                            variables: {
-                                productId: id,
-                                quantity: quantity,
-                                variationId: variation
-                            },
-                        });
+                try {
+                    const retry = await _addToCart({
+                        variables: {
+                            productId: id,
+                            quantity: quantity,
+                            variationId: variation
+                        },
+                    });
 
-                        if (openCart && retry?.data?.addToCart?.cartItem) {
-                            setIsCartOpen(true)
-                        }
-
-                        return retry;
-                    } catch (retryError) {
-                        console.error("Add to cart retry failed:", retryError);
-                        notifyError("Unable to add item to cart. Please try again.");
-                        return { error: "Add to cart failed" };
+                    if (openCart && retry?.data?.addToCart?.cartItem) {
+                        setIsCartOpen(true)
                     }
+
+                    return retry;
+                } catch (retryError) {
+                    const retryMessage =
+                        (retryError as { graphQLErrors?: { message?: string }[] })
+                            ?.graphQLErrors?.[0]?.message ||
+                        (retryError as Error)?.message ||
+                        "";
+
+                    if (isGraphQlInternalServerError(retryError)) {
+                        localStorage.removeItem(AUTH_TOKEN_KEY);
+                        localStorage.removeItem(SESSION_TOKEN_KEY);
+                        try {
+                            const guestRetry = await _addToCart({
+                                variables: {
+                                    productId: id,
+                                    quantity: quantity,
+                                    variationId: variation
+                                },
+                            });
+                            if (openCart && guestRetry?.data?.addToCart?.cartItem) {
+                                setIsCartOpen(true)
+                            }
+                            return guestRetry;
+                        } catch {
+                            // fall through
+                        }
+                    }
+
+                    console.error("Add to cart retry failed:", retryMessage || retryError);
+                    notifyError("Unable to add item to cart. Please try again.");
+                    return { error: "Add to cart failed" };
                 }
             }
 

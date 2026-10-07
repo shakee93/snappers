@@ -73,7 +73,7 @@ const
                   </button>
                 </Link>
                 <Link href={getProductPath(product)} target="_blank" rel="noopener noreferrer">
-                  <button className="bg-primary-500 text-white text-xs px-4 py-1 rounded-full hover:bg-blue-600 transition-colors">
+                  <button className="rounded-full bg-header-action px-4 py-1.5 text-xs font-bold text-header-green transition-opacity hover:opacity-90">
                     Buy Now
                   </button>
                 </Link>

@@ -45,7 +45,7 @@ const NotFoundPageContent = () => {
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link
             href={hero.cta.primary.href}
-            className="inline-flex items-center rounded-xl bg-header-action px-8 py-3.5 text-sm font-bold text-[#092412] transition-opacity hover:opacity-90"
+            className="inline-flex items-center rounded-full bg-header-action px-8 py-3.5 text-sm font-bold text-header-green transition-opacity hover:opacity-90"
           >
             {hero.cta.primary.label}
           </Link>

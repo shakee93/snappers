@@ -1,9 +1,12 @@
 import Button, { ButtonProps } from "@/shared/Button/Button";
 import React from "react";
 
-/** Shared Catlitter CTA — lime fill, dark-green label. */
+/** Snappers primary CTA — lime fill, navy label (Shop More, checkout, etc.). */
 export const BRAND_CTA_BUTTON_CLASS =
   "bg-header-action text-header-green shadow-none hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed";
+
+/** Compact pill for product cards and inline actions. */
+export const BRAND_CTA_BUTTON_COMPACT_CLASS = `${BRAND_CTA_BUTTON_CLASS} rounded-full font-bold`;
 
 export interface ButtonBrandProps extends ButtonProps {}
 

@@ -1,6 +1,13 @@
 import { revalidatePath, revalidateTag } from 'next/cache'
 import { NextRequest } from 'next/server'
-import { BROWSE_PRODUCTS_CACHE_TAG, DEALS_CACHE_TAG, productTag } from '@/lib/cache-tags'
+import {
+  BROWSE_PRODUCTS_CACHE_TAG,
+  DEAL_COUNTDOWN_CACHE_TAG,
+  DEALS_CACHE_TAG,
+  HERO_SECTION_CACHE_TAG,
+  SITE_SETTINGS_CACHE_TAG,
+  productTag,
+} from '@/lib/cache-tags'
 
 // Accepted values for the optional ?type= query param. Forwarded as the
 // second arg to revalidatePath. For App Router dynamic routes like
@@ -28,6 +35,9 @@ function logRevalidate(fields: Record<string, unknown>) {
 function bustDealSurfaces() {
     revalidateTag(DEALS_CACHE_TAG, 'max')
     revalidateTag(BROWSE_PRODUCTS_CACHE_TAG, 'max')
+    revalidateTag(HERO_SECTION_CACHE_TAG, 'max')
+    revalidateTag(SITE_SETTINGS_CACHE_TAG, 'max')
+    revalidateTag(DEAL_COUNTDOWN_CACHE_TAG, 'max')
     revalidatePath('/')
     revalidatePath('/deals')
 }
@@ -40,7 +50,12 @@ export async function GET(request: NextRequest) {
     if (tag) {
         try {
             revalidateTag(tag, 'max')
-            if (tag === DEALS_CACHE_TAG) {
+            if (
+                tag === DEALS_CACHE_TAG ||
+                tag === HERO_SECTION_CACHE_TAG ||
+                tag === DEAL_COUNTDOWN_CACHE_TAG ||
+                tag === SITE_SETTINGS_CACHE_TAG
+            ) {
                 revalidatePath('/')
                 revalidatePath('/deals')
             }

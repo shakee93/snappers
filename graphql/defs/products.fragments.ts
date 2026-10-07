@@ -240,15 +240,6 @@ export const ProductContentCard = gql`
       altText
       databaseId
     }
-    brands {
-      nodes {
-        databaseId
-        name
-        slug
-        count
-        brandImage
-      }
-    }
     metaData(
       keysIn: [
         "tech_spec"
@@ -298,6 +289,7 @@ export const ProductContentCard = gql`
         nodes {
           price
           regularPrice
+          salePrice
           stockStatus
           image {
             sourceUrl

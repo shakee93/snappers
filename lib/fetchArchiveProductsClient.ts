@@ -1,6 +1,7 @@
 import { print } from "graphql";
 import { GET_ARCHIVE_PRODUCTS } from "@/graphql/defs/products";
 import type { ArchiveProductsQueryVariables } from "@/lib/archiveFilters";
+import { readUsableAuthToken } from "@/lib/clientAuthToken";
 import { AUTH_TOKEN_KEY, SESSION_TOKEN_KEY } from "@/utils/storage-keys";
 import type { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 
@@ -22,8 +23,12 @@ function archiveGraphqlHeaders(): HeadersInit {
   if (typeof window === "undefined") return headers;
 
   const sessionToken = localStorage.getItem(SESSION_TOKEN_KEY);
-  const authToken = localStorage.getItem(AUTH_TOKEN_KEY);
-  if (sessionToken) headers["woocommerce-session"] = sessionToken;
+  const authToken = readUsableAuthToken(AUTH_TOKEN_KEY);
+  if (sessionToken) {
+    headers["woocommerce-session"] = sessionToken.startsWith("Session ")
+      ? sessionToken
+      : `Session ${sessionToken}`;
+  }
   if (authToken) headers.Authorization = `Bearer ${authToken}`;
 
   return headers;

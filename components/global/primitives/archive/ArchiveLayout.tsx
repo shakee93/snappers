@@ -31,7 +31,10 @@ import {
   resolveBrowseCategoryTabs,
   type BrowseCategoryLike,
 } from "@/lib/browseCategories";
-import type { ArchiveFilterCategoryOption } from "@/lib/archiveFilters";
+import {
+  ARCHIVE_PRODUCTS_PER_PAGE,
+  type ArchiveFilterCategoryOption,
+} from "@/lib/archiveFilters";
 import { cn } from "@/lib/utils";
 
 async function getData(parentId?: number, tagSlug?: string) {
@@ -211,10 +214,10 @@ const ArchiveLayout = async ({
               <Link
                 key={item.href}
                 href={item.href}
-                className={`rounded-md px-4 py-2 text-sm border ${
+                className={`rounded-full px-4 py-2 text-sm font-bold border ${
                   item.active
-                    ? "bg-primary-500 text-white border-primary-500"
-                    : "bg-white text-primary-500 border-primary-500"
+                    ? "border-header-action bg-header-action text-header-green"
+                    : "border-header-green/30 bg-white text-header-green hover:bg-header-cream/40"
                 }`}
               >
                 {item.label}
@@ -283,7 +286,7 @@ const ArchiveLayout = async ({
                         categoryScopeIds.length > 0 ? categoryScopeIds : undefined
                       }
                       categoryScopeById={categoryScopeById}
-                      first={45}
+                      first={ARCHIVE_PRODUCTS_PER_PAGE}
                     />
                   </Suspense>
                 ) : (
@@ -296,7 +299,7 @@ const ArchiveLayout = async ({
                   >
                     <ProductGridGraphQL
                       categoryIds={categoryScopeIds}
-                      first={45}
+                      first={ARCHIVE_PRODUCTS_PER_PAGE}
                     />
                   </Suspense>
                 )

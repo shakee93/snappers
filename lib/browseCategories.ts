@@ -46,6 +46,25 @@ export const BROWSE_CATEGORY_SCOPE_OVERRIDES: Record<string, number[]> = {
   "rabbit-hamsters": [68, 69, 81],
 };
 
+/** Homepage "Shop by Categories" tiles (`SectionShopByCategory`). */
+export const SHOP_BY_CATEGORY_IMAGES: Record<string, string> = {
+  groceries: "/homepage/categories/groceries.jpg",
+  bakery: "/homepage/categories/bakery.jpg",
+  household: "/homepage/categories/household.jpg",
+  beverages: "/homepage/categories/beverages.jpg",
+  chilled: "/homepage/categories/chilled.jpg",
+  fresh: "/homepage/categories/fresh.jpg",
+  frozen: "/homepage/categories/frozen.jpg",
+};
+
+/** Slugs excluded from the shop-by-category grid (still in main nav). */
+export const SHOP_BY_CATEGORY_EXCLUDED_SLUGS = new Set<string>(["deals"]);
+
+export const getShopByCategoryImage = (
+  slug: string | null | undefined,
+): string | undefined =>
+  slug ? SHOP_BY_CATEGORY_IMAGES[slug] : undefined;
+
 /** Static browse banners under `public/homepage/categories/`. */
 export const BROWSE_CATEGORY_FEATURE_IMAGES: Record<string, string> = {
   "rabbit-hamsters": "/homepage/categories/rabbit.webp",

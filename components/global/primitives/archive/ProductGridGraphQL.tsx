@@ -14,7 +14,7 @@ export interface ProductGridGraphQLProps {
 
 const ProductGridGraphQL = async ({
   categoryIds,
-  first = 45,
+  first = 48,
 }: ProductGridGraphQLProps) => {
   const hasCategoryFilter = categoryIds && categoryIds.length > 0;
 

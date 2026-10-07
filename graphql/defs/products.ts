@@ -321,9 +321,9 @@ export const GET_CATEGORY_SLUGS = gql`
 `;
 
 export const GET_SHOP_BY_CATEGORIES = gql`
-  # Top-level pet categories (parent: 0) for the "Shop by Categories" grid.
-  # Accessory sub-categories have no category image and would be filtered out
-  # client-side, so restrict to roots and fetch a few extra to fill the grid.
+  # Top-level grocery categories (parent: 0) for the "Shop by Categories" grid.
+  # Tile artwork is static under public/homepage/categories/; this query supplies
+  # slugs and display names.
   query ShopByCategories($first: Int = 12) {
     productCategories(first: $first, where: { parent: 0 }) {
       nodes {
@@ -574,7 +574,7 @@ export const GET_PRODUCTS_NODES = gql`
 
 export const GET_ARCHIVE_PRODUCTS = gql`
   query GetArchiveProducts(
-    $first: Int = 45
+    $first: Int = 48
     $after: String
     $categoryIdIn: [Int]
     $stockStatus: [StockStatusEnum]

@@ -15,6 +15,35 @@ export const DEALS_PAGE_FETCH_FIRST = 50;
 
 export type DealProduct = SimpleProduct | VariableProduct;
 
+const productsWithVisibleDeal = (products: DealProduct[]): DealProduct[] =>
+  filterHiddenProducts(products).filter(
+    (product) => resolveProductSale(product as SaleResolvableProduct) !== null,
+  );
+
+/** Homepage carousel — prefer on-sale query, fall back to browse “All” pool. */
+export const pickHomepageDealProducts = (
+  fromDealsQuery: DealProduct[],
+  browseFallback: DealProduct[] = [],
+): DealProduct[] => {
+  const primary = productsWithVisibleDeal(fromDealsQuery);
+  if (primary.length > 0) {
+    return primary.slice(0, HOMEPAGE_DEAL_CAROUSEL_LIMIT);
+  }
+
+  const seen = new Set<number>();
+  const merged: DealProduct[] = [];
+  for (const product of productsWithVisibleDeal(browseFallback)) {
+    const id = product.databaseId;
+    if (id != null) {
+      if (seen.has(id)) continue;
+      seen.add(id);
+    }
+    merged.push(product);
+    if (merged.length >= HOMEPAGE_DEAL_CAROUSEL_LIMIT) break;
+  }
+  return merged;
+};
+
 const dealDisplayPrice = (product: DealProduct): number => {
   if (product.type === "VARIABLE") {
     const variations = (product as VariableProduct).variations?.nodes;

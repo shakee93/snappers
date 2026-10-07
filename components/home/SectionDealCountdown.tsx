@@ -8,7 +8,7 @@ export interface SectionDealCountdownProps {
   className?: string;
   /** Desktop banner artwork. */
   backgroundImage?: string;
-  /** Mobile banner artwork (puppy on the right). */
+  /** Mobile banner artwork. */
   backgroundImageMobile?: string;
   /** Deal end time as an ISO string. */
   endsAt?: string;
@@ -25,6 +25,30 @@ const pad = (n: number) => n.toString().padStart(2, "0");
 
 const DEFAULT_COUNTDOWN_MS = 1000 * 60 * 60 * 24 * 2;
 
+/** Parse Hero Settings ACF `dealsDate` (ISO, `Y-m-d H:i:s`, etc.). */
+const parseDealEndsAt = (value: string | undefined): number => {
+  if (!value?.trim()) return NaN;
+  const trimmed = value.trim();
+  const direct = new Date(trimmed).getTime();
+  if (Number.isFinite(direct)) return direct;
+  const normalized = trimmed.replace(" ", "T");
+  const withTz = new Date(normalized).getTime();
+  return Number.isFinite(withTz) ? withTz : NaN;
+};
+
+/** Snappers palette (replaces legacy deal-brown / peach timer colors). */
+const TITLE_PRIMARY = "#092412";
+const TITLE_ACCENT = "#769F5F";
+const TIMER_DIGIT = "#092412";
+const TIMER_LABEL = "#769F5F";
+const TIMER_DIVIDER = "#E7EAD9";
+const TIMER_BOX_BORDER = "#E7EAD9";
+const TIMER_RIBBON_BG = "#092412";
+const TIMER_RIBBON_TEXT = "#B8D962";
+
+const DEAL_BANNER_WIDTH = 1024;
+const DEAL_BANNER_HEIGHT = 341;
+
 const getTimeLeft = (target: number): TimeLeft => {
   const diff = Math.max(0, target - Date.now());
   const totalSeconds = Math.floor(diff / 1000);
@@ -39,22 +63,42 @@ const getTimeLeft = (target: number): TimeLeft => {
 const isExpiredTime = (t: TimeLeft) =>
   t.days === 0 && t.hours === 0 && t.minutes === 0 && t.seconds === 0;
 
+const DealCountdownTitle = ({
+  className,
+  align = "center",
+}: {
+  className?: string;
+  align?: "start" | "center";
+}) => (
+  <h2
+    className={cn(
+      "font-albra font-bold leading-[1.05]",
+      align === "center" ? "text-center" : "text-left",
+      className,
+    )}
+  >
+    <span className="block" style={{ color: TITLE_PRIMARY }}>
+      Deals for your
+    </span>
+    <span className="block" style={{ color: TITLE_ACCENT }}>
+      daily shopping
+    </span>
+  </h2>
+);
+
 /**
- * Promo banner with a live "deal ends in" countdown overlaid on a provided
- * background image (the cat & dog artwork).
+ * Promo banner with a live "deal ends in" countdown overlaid on grocery artwork.
  */
 const SectionDealCountdown = ({
   className = "",
   backgroundImage = "/homepage/deal-bg.png",
-  backgroundImageMobile = "/homepage/deal-m-bg.png",
+  backgroundImageMobile = "/homepage/deal-bg.png",
   endsAt,
 }: SectionDealCountdownProps) => {
-  // Countdown values depend on Date.now() — only compute after mount so SSR
-  // and the first client render match (avoids hydration mismatch).
   const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
 
   useEffect(() => {
-    const parsed = endsAt ? new Date(endsAt).getTime() : NaN;
+    const parsed = endsAt ? parseDealEndsAt(endsAt) : NaN;
     const target = Number.isFinite(parsed)
       ? parsed
       : Date.now() + DEFAULT_COUNTDOWN_MS;
@@ -65,7 +109,6 @@ const SectionDealCountdown = ({
       return isExpiredTime(next);
     };
 
-    // Already expired — no interval needed.
     if (tick()) return;
 
     const id = window.setInterval(() => {
@@ -75,9 +118,6 @@ const SectionDealCountdown = ({
   }, [endsAt]);
 
   const isExpired = timeLeft !== null && isExpiredTime(timeLeft);
-
-  // Hide only after expiry — `invisible` keeps the box in layout so the title
-  // does not shift. Loading skeleton stays visible until the first tick.
   const timerVisibilityClass = isExpired ? "invisible" : "";
 
   const units = timeLeft
@@ -91,7 +131,7 @@ const SectionDealCountdown = ({
 
   const countdownBody = (
     <div
-      className="flex min-h-[2.25rem] w-full items-center justify-evenly md:min-h-[4.25rem] md:w-auto md:justify-center"
+      className="flex min-h-[2.25rem] w-full items-center justify-evenly pt-1 md:min-h-[4.25rem] md:w-auto md:justify-center md:pt-0.5"
       aria-busy={!units}
     >
       {units ? (
@@ -99,15 +139,22 @@ const SectionDealCountdown = ({
           <div key={unit.label} className="flex items-center">
             {index > 0 && (
               <span
-                className="mx-1.5 h-8 w-px bg-[#E7D9C7] md:mx-3 md:h-10"
+                className="mx-1.5 h-8 w-px md:mx-3 md:h-10"
+                style={{ backgroundColor: TIMER_DIVIDER }}
                 aria-hidden
               />
             )}
             <div className="flex flex-col items-center">
-              <span className="text-xl font-bold tabular-nums text-deal-brown md:text-4xl">
+              <span
+                className="text-xl font-bold tabular-nums leading-none md:text-4xl md:leading-none"
+                style={{ color: TIMER_DIGIT }}
+              >
                 {pad(unit.value)}
               </span>
-              <span className="text-[9px] leading-none py-1 md:py-2 font-semibold uppercase tracking-wider text-[#EE9E7D] md:text-xs">
+              <span
+                className="py-1 text-[9px] font-semibold uppercase leading-none tracking-wider md:py-2 md:text-xs"
+                style={{ color: TIMER_LABEL }}
+              >
                 {unit.label}
               </span>
             </div>
@@ -119,13 +166,20 @@ const SectionDealCountdown = ({
             <div key={index} className="flex items-center">
               {index > 0 && (
                 <span
-                  className="mx-1.5 h-8 w-px bg-[#E7D9C7] md:mx-3 md:h-10"
+                  className="mx-1.5 h-8 w-px md:mx-3 md:h-10"
+                  style={{ backgroundColor: TIMER_DIVIDER }}
                   aria-hidden
                 />
               )}
               <div className="flex flex-col items-center gap-1.5">
-                <span className="h-7 w-8 animate-pulse rounded-md bg-[#E7D9C7]/80 md:h-9 md:w-12" />
-                <span className="h-2 w-7 animate-pulse rounded bg-[#EE9E7D]/40 md:h-2.5 md:w-8" />
+                <span
+                  className="h-7 w-8 animate-pulse rounded-md md:h-9 md:w-12"
+                  style={{ backgroundColor: `${TIMER_DIVIDER}cc` }}
+                />
+                <span
+                  className="h-2 w-7 animate-pulse rounded md:h-2.5 md:w-8"
+                  style={{ backgroundColor: `${TIMER_LABEL}40` }}
+                />
               </div>
             </div>
           ))}
@@ -134,66 +188,72 @@ const SectionDealCountdown = ({
     </div>
   );
 
+  const ribbonClass =
+    "absolute left-1/2 -translate-x-1/2 whitespace-nowrap font-bold uppercase leading-none tracking-wide";
+
   return (
-    <section className={`mx-auto w-full max-w-[1368px] px-3 lg:px-0 md:mt-[-50px] mt-[-20px] ${className}`}>
+    <section
+      className={`relative z-0 mx-auto w-full max-w-[1368px] px-3 lg:px-0 ${className}`}
+    >
       <div className="relative w-full overflow-visible rounded-[20px] md:overflow-hidden md:rounded-[28px]">
         <Image
           src={backgroundImageMobile}
           alt=""
-          width={371}
-          height={170}
+          width={DEAL_BANNER_WIDTH}
+          height={DEAL_BANNER_HEIGHT}
+          priority
+          unoptimized
+          sizes="100vw"
           aria-hidden
-          className="h-auto w-full rounded-[20px] object-cover md:hidden"
+          className="h-auto w-full rounded-[20px] object-cover object-center md:hidden"
         />
         <Image
           src={backgroundImage}
           alt=""
-          width={1368}
-          height={386}
+          width={DEAL_BANNER_WIDTH}
+          height={DEAL_BANNER_HEIGHT}
+          priority
+          unoptimized
+          sizes="(max-width: 1368px) 100vw, 1368px"
           aria-hidden
-          className="hidden h-auto w-full object-cover md:block"
+          className="hidden h-auto w-full object-cover object-center md:block"
         />
 
-        {/* Mobile: left-aligned title + countdown over puppy bg */}
-        <div className="absolute inset-0 flex flex-col items-start justify-center pl-5 pr-[30%] md:hidden ">
-          <div className="inline-block pt-10">
+        {/* Mobile: left-aligned title + compact countdown */}
+        <div className="absolute inset-0 flex flex-col items-start justify-center pl-5 pr-[28%] md:hidden">
+          <div className="inline-block pt-8">
             <div className="relative">
-              <Image
-                src="/homepage/lines.png"
-                alt=""
-                width={28}
-                height={28}
-                aria-hidden
-                className="absolute -left-5 -top-3 h-4 w-4 hidden md:block"
-              />
-              <h2 className="mb-2 text-[25px] font-albra font-bold leading-tight text-deal-brown">
-                Deals for your <span className="text-[#E79A72]">pet</span>
-              </h2>
-              <Image
-                src="/homepage/bone.png"
-                alt=""
-                width={40}
-                height={34}
-                aria-hidden
-                className="absolute -right-6 -top-2 h-5 w-6 hidden md:block"
+              <DealCountdownTitle
+                align="start"
+                className="mb-2 text-[25px]"
               />
             </div>
 
             <div
               className={cn(
-                "relative mt-2.5 w-full rounded-xl border border-[#E7D9C7] bg-white px-2 pb-1.5 pt-2.5",
+                "relative mt-2.5 w-full overflow-visible rounded-xl border bg-white px-2 pb-2 pt-6",
                 timerVisibilityClass,
               )}
+              style={{ borderColor: TIMER_BOX_BORDER }}
             >
-              <span className="absolute -top-2 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-deal-brown px-1.5 py-1 text-[8px] font-bold uppercase leading-none tracking-wide !text-[#EE9E7D]">
-                Hurry! Deals ends in:
+              <span
+                className={cn(
+                  ribbonClass,
+                  "-top-2.5 z-10 rounded px-1.5 py-1 text-[8px] tracking-wide",
+                )}
+                style={{
+                  backgroundColor: TIMER_RIBBON_BG,
+                  color: TIMER_RIBBON_TEXT,
+                }}
+              >
+                Hurry! Deal ends in:
               </span>
               {countdownBody}
             </div>
           </div>
         </div>
 
-        {/* Desktop: centered title + countdown overlay */}
+        {/* Desktop: centered title + compact countdown (original layout) */}
         <div className="absolute inset-0 hidden flex-col items-center justify-end gap-5 px-4 pb-12 md:flex">
           <div className="relative">
             <Image
@@ -204,27 +264,27 @@ const SectionDealCountdown = ({
               aria-hidden
               className="absolute -left-4 -top-5 h-7 w-7"
             />
-            <h2 className="text-6xl font-albra font-bold text-[#092412]">
-              Deals for your <span className="text-[#E79A72]">pet</span>
-            </h2>
-            <Image
-              src="/homepage/bone.png"
-              alt=""
-              width={40}
-              height={34}
-              aria-hidden
-              className="absolute -right-11 -top-4 h-8 w-10"
-            />
+            <DealCountdownTitle align="center" className="text-6xl" />
           </div>
 
           <div
             className={cn(
-              "relative rounded-2xl border border-[#E7D9C7] bg-white/70 px-7 py-0 md:pb-3 md:pt-5 backdrop-blur-sm",
+              "relative overflow-visible rounded-2xl border bg-white/70 px-7 pb-3 pt-8 backdrop-blur-sm md:pt-9",
               timerVisibilityClass,
             )}
+            style={{ borderColor: TIMER_BOX_BORDER }}
           >
-            <span className="absolute -top-3 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-md bg-deal-brown px-3 py-2 text-[10px] font-bold uppercase leading-none tracking-wider !text-[#EE9E7D]">
-              Hurry! Deals ends in:
+            <span
+              className={cn(
+                ribbonClass,
+                "-top-3.5 z-10 rounded-md px-3 py-2 text-[10px] tracking-wider",
+              )}
+              style={{
+                backgroundColor: TIMER_RIBBON_BG,
+                color: TIMER_RIBBON_TEXT,
+              }}
+            >
+              Hurry! Deal ends in:
             </span>
             {countdownBody}
           </div>

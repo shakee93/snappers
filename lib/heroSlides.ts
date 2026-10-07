@@ -1,9 +1,9 @@
 import { siteConfig } from "@/site.config";
 import type { HeroSlide } from "@/components/home/SectionHeroPets";
 
-/** Shared Tailwind classes for hero slide headlines (Playfair). */
+/** Hero slide headline — same scale as deal banner (`DealCountdownTitle`). */
 export const HERO_SLIDER_TITLE_CLASS =
-  "block font-playfair text-[2rem] font-bold leading-tight text-[#0C2016] sm:text-4xl lg:text-[60px] lg:leading-[1.1]";
+  "block font-albra text-[25px] font-bold leading-[1.05] text-[#092412] sm:text-4xl lg:text-6xl";
 
 export type GraphqlHeroSlideNode = {
   heroSlideFields?: {
@@ -60,6 +60,47 @@ export function normalizeHeroButtonUrl(url?: string | null): string | null {
   }
 }
 
+/** ACF repeater slides from Hero Settings → Slider Settings. */
+export function normalizeAcfHeroSlides(
+  slides: (HeroSlide | null | undefined)[] | null | undefined,
+): HeroSlide[] {
+  if (!slides?.length) return [];
+
+  return slides.flatMap((slide): HeroSlide[] => {
+    if (!slide) return [];
+
+    const hasSlide =
+      slide.sliderTitle?.trim() ||
+      slide.sliderDiscription?.trim() ||
+      slide.sliderBackgroundImage?.node?.sourceUrl ||
+      slide.sliderFeatureImage?.node?.sourceUrl;
+
+    if (!hasSlide) return [];
+
+    const title = slide.sliderTitle?.trim();
+    const buttonLink = normalizeHeroButtonUrl(slide.buttonLink);
+
+    return [
+      {
+        ...slide,
+        sliderTitle: title
+          ? title.includes("<")
+            ? title
+            : `<span class="${HERO_SLIDER_TITLE_CLASS}">${escapeHtml(title)}</span>`
+          : null,
+        sliderDiscription: slide.sliderDiscription?.trim() || null,
+        titleColor: slide.titleColor ?? "#092412",
+        descriptionColor: slide.descriptionColor ?? "#000000",
+        buttonText: slide.buttonText?.trim() || null,
+        buttonLink,
+        buttonTextColor: slide.buttonTextColor ?? "#ffffff",
+        buttonBachgroundColor: slide.buttonBachgroundColor ?? "#6d7f94",
+        buttonBorderColor: slide.buttonBorderColor ?? "#000000",
+      },
+    ];
+  });
+}
+
 export function mapGraphqlHeroSlides(
   nodes: GraphqlHeroSlideNode[],
 ): HeroSlide[] {
@@ -84,8 +125,8 @@ export function mapGraphqlHeroSlides(
           ? `<span class="${HERO_SLIDER_TITLE_CLASS}">${escapeHtml(title)}</span>`
           : null,
         sliderDiscription: fields.subContent?.trim() || null,
-        titleColor: "#0C2016",
-        descriptionColor: "#7DA068",
+        titleColor: "#092412",
+        descriptionColor: "#000000",
         buttonText: fields.buttonText?.trim() || null,
         buttonLink,
         buttonTextColor: "#ffffff",

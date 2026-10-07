@@ -40,7 +40,7 @@ const AboutPageContent = ({ googleReviews }: AboutPageContentProps) => {
             </p>
             <Link
               href="/shop"
-              className="mt-8 inline-flex items-center rounded-xl bg-header-action px-6 py-3 text-sm font-bold text-[#092412] transition-opacity hover:opacity-90"
+              className="mt-8 inline-flex items-center rounded-full bg-header-action px-8 py-3.5 text-sm font-bold text-header-green transition-opacity hover:opacity-90"
             >
               Shop pet essentials
             </Link>

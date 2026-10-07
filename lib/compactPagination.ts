@@ -10,7 +10,7 @@ export function getCompactPageItems(
   siblingCount = 1,
 ): CompactPageItem[] {
   if (totalPages <= 0) return [];
-  if (totalPages <= 7) {
+  if (totalPages <= 10) {
     return Array.from({ length: totalPages }, (_, index) => index + 1);
   }
 

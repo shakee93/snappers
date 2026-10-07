@@ -17,15 +17,6 @@ export const CartItemProductSlim = gql`
             sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
             altText
         }
-        brands {
-            nodes {
-                databaseId
-                name
-                slug
-                count
-                brandImage
-            }
-        }
         # productTags is required for pre-order detection in CartProvider.
         productTags(first: 20) {
             nodes {
@@ -49,14 +40,6 @@ export const CartItemProductSlim = gql`
         freeShippingMeta: metaData(keysIn: ["_wc_product_free_shipping"]) {
             key
             value
-        }
-        # woo-price-tiers plugin — per-payment-method unit price shown on the
-        # checkout summary line once a gateway is selected. Lives here rather
-        # than on a checkout-only fragment because every cart mutation response
-        # re-renders that same summary.
-        priceTiers {
-            name
-            price
         }
         ... on SimpleProduct {
             price

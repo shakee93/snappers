@@ -13,4 +13,4 @@ export const authLinkClassName =
   "font-semibold text-header-green hover:underline";
 
 export const authSubmitButtonClassName =
-  "w-full bg-header-action text-header-green shadow-md hover:opacity-90 disabled:opacity-60";
+  "w-full rounded-full bg-header-action font-bold text-header-green shadow-md hover:opacity-90 disabled:opacity-60";

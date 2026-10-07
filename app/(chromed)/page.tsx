@@ -5,8 +5,16 @@ import {
   GET_BROWSE_SECTION_PRODUCTS,
   GET_SHOP_BY_CATEGORIES,
 } from "@/graphql/defs/products";
-import { GET_HERO_SETTINGS, GET_HERO_SLIDES } from "@/graphql/defs/slides";
-import { mapGraphqlHeroSlides } from "@/lib/heroSlides";
+import {
+  GET_HERO_DEALS_DATE,
+  GET_HERO_SETTINGS,
+  GET_HERO_SLIDER_SETTINGS,
+  GET_HERO_SLIDES,
+} from "@/graphql/defs/slides";
+import {
+  mapGraphqlHeroSlides,
+  normalizeAcfHeroSlides,
+} from "@/lib/heroSlides";
 import {
   GET_SITE_SETTINGS,
   type SiteSettingFields,
@@ -15,13 +23,14 @@ import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import SectionHeroPets, {
   type HeroSettingsFields,
 } from "@/components/home/SectionHeroPets";
-import SectionFeatureBadges from "@/components/home/SectionFeatureBadges";
 import SectionShopByCategory, {
   type SectionShopByCategoryProps,
 } from "@/components/home/SectionShopByCategory";
 import SectionDealCountdown from "@/components/home/SectionDealCountdown";
 import SectionDealProducts from "@/components/home/SectionDealProducts";
-import SectionHealthProducts from "@/components/home/SectionHealthProducts";
+import SectionHealthProducts, {
+  hasHealthSectionProducts,
+} from "@/components/home/SectionHealthProducts";
 import SectionBrowseProducts, {
   type BrowseInitialCache,
 } from "@/components/home/SectionBrowseProducts";
@@ -32,7 +41,10 @@ import {
   resolveBrowseCategoryTabs,
 } from "@/lib/browseCategories";
 import { getDealProductsCached } from "@/lib/dealProducts.server";
-import { HOMEPAGE_DEAL_CAROUSEL_LIMIT } from "@/lib/dealProducts";
+import {
+  pickHomepageDealProducts,
+  type DealProduct,
+} from "@/lib/dealProducts";
 import SectionBrandMarquee, {
   type BrandMarqueeItem,
 } from "@/components/home/SectionBrandMarquee";
@@ -40,6 +52,7 @@ import { type CategoryTreeNode } from "@/lib/categoryScope";
 import { unstable_cache } from "next/cache";
 import {
   BROWSE_PRODUCTS_CACHE_TAG,
+  DEAL_COUNTDOWN_CACHE_TAG,
   HERO_SECTION_CACHE_TAG,
   SITE_SETTINGS_CACHE_TAG,
 } from "@/lib/cache-tags";
@@ -66,6 +79,15 @@ const SITE_SETTINGS_QUERY_CONTEXT = {
   fetchOptions: { next: { tags: [SITE_SETTINGS_CACHE_TAG] } },
 };
 
+const DEAL_COUNTDOWN_QUERY_CONTEXT = {
+  fetchOptions: {
+    next: {
+      tags: [DEAL_COUNTDOWN_CACHE_TAG, HERO_SECTION_CACHE_TAG],
+      revalidate: 300,
+    },
+  },
+};
+
 const BROWSE_PRODUCTS_QUERY_CONTEXT = {
   fetchOptions: { next: { tags: [BROWSE_PRODUCTS_CACHE_TAG] } },
 };
@@ -86,8 +108,47 @@ const getHeroSettingsCached = unstable_cache(
       .query({ query: GET_HERO_SETTINGS, context: HERO_QUERY_CONTEXT })
       .then((res) => res.data?.heroSettings?.heroSettingsFields ?? null)
       .catch(() => null),
-  ["homepage-hero-settings-v3"],
+  ["homepage-hero-settings-v6"],
   { tags: [HERO_SECTION_CACHE_TAG], revalidate: 86400 },
+);
+
+const getHeroSliderSettingsCached = unstable_cache(
+  () =>
+    getClient()
+      .query({
+        query: GET_HERO_SLIDER_SETTINGS,
+        context: {
+          fetchOptions: {
+            next: {
+              tags: [HERO_SECTION_CACHE_TAG, DEAL_COUNTDOWN_CACHE_TAG],
+              revalidate: 300,
+            },
+          },
+        },
+      })
+      .then(
+        (res) =>
+          res.data?.heroSettings?.heroSettingsFields?.sliderSettings ?? null,
+      )
+      .catch(() => null),
+  ["homepage-hero-slider-settings-v1"],
+  { tags: [HERO_SECTION_CACHE_TAG], revalidate: 300 },
+);
+
+const getHeroDealsDateCached = unstable_cache(
+  () =>
+    getClient()
+      .query({
+        query: GET_HERO_DEALS_DATE,
+        context: DEAL_COUNTDOWN_QUERY_CONTEXT,
+      })
+      .then(
+        (res) =>
+          res.data?.heroSettings?.heroSettingsFields?.dealsDate ?? null,
+      )
+      .catch(() => null),
+  ["homepage-hero-deals-date-v1"],
+  { tags: [DEAL_COUNTDOWN_CACHE_TAG, HERO_SECTION_CACHE_TAG], revalidate: 300 },
 );
 
 const getSiteSettingsCached = unstable_cache(
@@ -107,6 +168,8 @@ const getData = async () => {
   const [
     heroSlideNodes,
     heroSettingsFromAcf,
+    heroSliderSettings,
+    heroDealsDate,
     siteSettings,
     categories,
     dealProducts,
@@ -117,6 +180,8 @@ const getData = async () => {
   ] = await Promise.all([
     getHeroSlidesCached(),
     getHeroSettingsCached(),
+    getHeroSliderSettingsCached(),
+    getHeroDealsDateCached(),
     getSiteSettingsCached(),
     getClient()
       .query({ query: GET_SHOP_BY_CATEGORIES, variables: { first: 12 } })
@@ -200,18 +265,24 @@ const getData = async () => {
   ) as Record<number, BrowseInitialCache>;
 
   const mappedHeroSlides = mapGraphqlHeroSlides(heroSlideNodes);
-  const heroSettings: HeroSettingsFields | null =
-    mappedHeroSlides.length > 0
-      ? {
-          sliderSettings: { slides: mappedHeroSlides },
-          dealBannerSettings: heroSettingsFromAcf?.dealBannerSettings ?? null,
-          healthSectionSettings:
-            heroSettingsFromAcf?.healthSectionSettings ?? null,
-        }
-      : (heroSettingsFromAcf as HeroSettingsFields | null);
+  const acfSlides = normalizeAcfHeroSlides(
+    heroSliderSettings?.slides ??
+      heroSettingsFromAcf?.sliderSettings?.slides ??
+      [],
+  );
+  const homepageHeroSlides =
+    acfSlides.length > 0 ? acfSlides : mappedHeroSlides;
+
+  const heroSettings: HeroSettingsFields | null = {
+    dealsDate: heroSettingsFromAcf?.dealsDate ?? null,
+    sliderSettings: { slides: homepageHeroSlides },
+    dealBannerSettings: heroSettingsFromAcf?.dealBannerSettings ?? null,
+    healthSectionSettings: heroSettingsFromAcf?.healthSectionSettings ?? null,
+  };
 
   return {
     heroSettings,
+    heroDealsDate,
     siteSettings: siteSettings as SiteSettingFields | null,
     categories: categories as SectionShopByCategoryProps["categories"],
     dealProducts: dealProducts as (SimpleProduct & VariableProduct)[],
@@ -226,6 +297,7 @@ const getData = async () => {
 export default async function Home() {
   const {
     heroSettings,
+    heroDealsDate,
     siteSettings,
     categories,
     dealProducts,
@@ -236,42 +308,63 @@ export default async function Home() {
     brands,
   } = await getData();
 
-  const homepageDeals = dealProducts.slice(0, HOMEPAGE_DEAL_CAROUSEL_LIMIT);
+  const homepageDeals = pickHomepageDealProducts(
+    dealProducts as DealProduct[],
+    (browseAllTab.products ?? []) as DealProduct[],
+  );
   const hasHomepageDeals = homepageDeals.length > 0;
+  const hasHealthSection = hasHealthSectionProducts(
+    heroSettings?.healthSectionSettings,
+  );
+  const hasBlockBeforeBrowse = hasHomepageDeals || hasHealthSection;
 
   return (
     <main className="overflow-x-hidden">
       <div className="nc-PageHome relative flex flex-col overflow-x-hidden bg-white">
         <div className="z-0">
           <SectionHeroPets data={heroSettings} />
-          <SectionFeatureBadges />
         </div>
 
-        <div className="mt-16 md:mt-24">
-          <SectionShopByCategory categories={categories} />
-        </div>
-
-        {hasHomepageDeals ? (
-          <>
-            <div className="mt-16 md:mt-24">
-              <SectionDealCountdown
-                endsAt={siteSettings?.dealEnds ?? undefined}
-              />
-            </div>
-
-            <div className="mt-8 md:mt-10">
-              <SectionDealProducts products={homepageDeals} />
-            </div>
-          </>
-        ) : null}
-
-        <div className="mt-16 md:mt-24">
-          <SectionHealthProducts
-            healthSectionSettings={heroSettings?.healthSectionSettings}
+        <div className="mt-2 md:mt-3">
+          <SectionDealCountdown
+            key={
+              heroDealsDate ??
+              heroSettings?.dealsDate ??
+              siteSettings?.dealEnds ??
+              "default"
+            }
+            endsAt={
+              heroDealsDate ??
+              heroSettings?.dealsDate ??
+              siteSettings?.dealEnds ??
+              undefined
+            }
           />
         </div>
 
-        <div className="mt-16 md:mt-24">
+        {hasHomepageDeals ? (
+          <div className="mt-6 md:mt-8">
+            <SectionDealProducts products={homepageDeals} />
+          </div>
+        ) : null}
+
+        <div className="mt-12 md:mt-16">
+          <SectionShopByCategory categories={categories} />
+        </div>
+
+        {hasHealthSection ? (
+          <div className="mt-10 md:mt-14">
+            <SectionHealthProducts
+              healthSectionSettings={heroSettings?.healthSectionSettings}
+            />
+          </div>
+        ) : null}
+
+        <div
+          className={
+            hasBlockBeforeBrowse ? "mt-10 md:mt-14" : "mt-6 md:mt-8"
+          }
+        >
           <SectionBrowseProducts
             initialAllTab={browseAllTab}
             initialCategoryTabCaches={browseCategoryTabCaches}

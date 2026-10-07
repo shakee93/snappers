@@ -54,20 +54,27 @@ export interface ProductCardProps {
   listingImageByProductId?: Record<number, ListingImagePatch>;
 }
 
-/** Brand blue — stock status on cards. */
-const STOCK_STATUS_COLOR = "#1b40af";
-
-/** Grocery-style card accent — badges, price, brand, Add button. */
+/** Grocery-style card accent — price, brand, in-stock badge. */
 const CARD_ACCENT = "#3BB77E";
-const CARD_ACCENT_MUTED = "#DEF9EC";
 /** In-cart quantity stepper (after Add). */
 const CART_ACTIVE_ACCENT = "#F97316";
 const CART_ACTIVE_MUTED = "#FFEDD5";
+const STOCK_IN_BG = "#DEF9EC";
+const STOCK_IN_TEXT = CARD_ACCENT;
+const STOCK_OUT_BG = "#FFE4EC";
+const STOCK_OUT_TEXT = "#DC2626";
+/** Deal / sale percent badge. */
+const DEAL_BADGE_BG = "#F97316";
+/** Deals corner badge (orange). */
+const DEALS_BADGE_ACCENT = "#F97316";
 const TITLE_COLOR = "#253D4E";
 
 /** Shared shell so Add ↔ quantity stepper does not shift card layout. */
-const CART_ACTION_SHELL_CLASS =
-  "inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg px-3 py-2 text-xs font-bold leading-none sm:px-3.5 sm:py-2.5 sm:text-[13px]";
+const CART_ACTION_BASE =
+  "inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-bold leading-none sm:py-2.5 sm:text-[13px]";
+const CART_STEPPER_CLASS = `${CART_ACTION_BASE} min-w-0 gap-1 px-1.5 sm:px-2`;
+/** Default Add — brand navy + yellow label (tighter horizontal padding). */
+const CART_ADD_CLASS = `${CART_ACTION_BASE} min-w-0 bg-header-green px-1.5 text-[#FACC15] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:px-2`;
 
 const formatLkr = (value: number) =>
   value.toLocaleString("en-LK", {
@@ -85,12 +92,26 @@ interface ResolvedDisplayPricing {
   regularMax: number | null;
 }
 
+const effectiveCatalogSaleAmount = (
+  priceStr: string | null | undefined,
+  regularStr: string | null | undefined,
+  salePriceStr?: string | null | undefined,
+): number => {
+  const regular = parsePriceString(regularStr);
+  const fromSaleField = parsePriceString(salePriceStr);
+  if (fromSaleField > 0 && (regular <= 0 || fromSaleField < regular)) {
+    return fromSaleField;
+  }
+  return parsePriceString(priceStr ?? regularStr);
+};
+
 const resolveParentLevelPricing = (
   priceStr: string | null | undefined,
   regularStr: string | null | undefined,
+  salePriceStr?: string | null | undefined,
 ): ResolvedDisplayPricing => {
-  const sale = parsePriceString(priceStr ?? regularStr);
   const regular = parsePriceString(regularStr);
+  const sale = effectiveCatalogSaleAmount(priceStr, regularStr, salePriceStr);
   const onSale = regular > sale && sale > 0;
 
   return {
@@ -102,10 +123,17 @@ const resolveParentLevelPricing = (
   };
 };
 
+const variationUnitSaleAmount = (variation: ProductVariation): number =>
+  effectiveCatalogSaleAmount(
+    variation.price,
+    variation.regularPrice,
+    variation.salePrice,
+  );
+
 export const resolveDisplayPricing = (
   product: ProductCardItem,
 ): ResolvedDisplayPricing => {
-  const { type, price, regularPrice, variations } = product;
+  const { type, price, regularPrice, salePrice, variations } = product;
 
   if (type === "VARIABLE" && variations?.nodes?.length) {
     const nodes = variations.nodes.filter(
@@ -113,22 +141,24 @@ export const resolveDisplayPricing = (
     );
     const inStock = nodes.filter((v) => v.stockStatus === "IN_STOCK");
     const pool = inStock.length ? inStock : nodes;
-    const priced = pool.filter((v) => parsePriceString(v.price) > 0);
+    const priced = pool.filter((v) => variationUnitSaleAmount(v) > 0);
 
     if (priced.length) {
-      const saleAmounts = priced.map((v) => parsePriceString(v.price));
+      const saleAmounts = priced.map((v) => variationUnitSaleAmount(v));
 
       const lowest = priced.reduce((prev, curr) =>
-        parsePriceString(curr.price) < parsePriceString(prev.price) ? curr : prev,
+        variationUnitSaleAmount(curr) < variationUnitSaleAmount(prev)
+          ? curr
+          : prev,
       );
 
       const priceMin = Math.min(...saleAmounts);
       const priceMax = Math.max(...saleAmounts);
 
       const onSale = priced.filter((v) => {
-        const sale = parsePriceString(v.price);
+        const sale = variationUnitSaleAmount(v);
         const regular = parsePriceString(v.regularPrice);
-        return regular > sale;
+        return regular > sale && sale > 0;
       });
       const allVariationsOnSale =
         onSale.length > 0 && onSale.length === priced.length;
@@ -144,7 +174,7 @@ export const resolveDisplayPricing = (
         regularMax = regularAmounts.length ? Math.max(...regularAmounts) : null;
       } else {
         const lowestRegular = parsePriceString(lowest.regularPrice);
-        const lowestSale = parsePriceString(lowest.price);
+        const lowestSale = variationUnitSaleAmount(lowest);
         if (lowestRegular > lowestSale) {
           regularMin = lowestRegular;
           regularMax = lowestRegular;
@@ -160,10 +190,10 @@ export const resolveDisplayPricing = (
       };
     }
 
-    return resolveParentLevelPricing(price, regularPrice);
+    return resolveParentLevelPricing(price, regularPrice, salePrice);
   }
 
-  return resolveParentLevelPricing(price, regularPrice);
+  return resolveParentLevelPricing(price, regularPrice, salePrice);
 };
 
 export const resolveDisplayPrice = (product: ProductCardItem): string | null =>
@@ -214,9 +244,21 @@ const ProductCard = ({
   }, [badgeLabel, isNewProduct]);
 
   const cornerBadgeColor = useMemo(() => {
-    if (rightCornerBadge?.toLowerCase() === "deals") return CART_ACTIVE_ACCENT;
+    if (rightCornerBadge?.toLowerCase() === "deals") return DEALS_BADGE_ACCENT;
     return CARD_ACCENT;
   }, [rightCornerBadge]);
+
+  const showLeftDealBadge = useMemo(
+    () =>
+      !!salePercentBadge || rightCornerBadge?.toLowerCase() === "deals",
+    [salePercentBadge, rightCornerBadge],
+  );
+
+  const showRightCornerBadge = useMemo(
+    () =>
+      !!rightCornerBadge && rightCornerBadge.toLowerCase() !== "deals",
+    [rightCornerBadge],
+  );
 
   const isPreOrder = useMemo(
     () =>
@@ -247,15 +289,27 @@ const ProductCard = ({
     );
   }, [displayPricing]);
 
-  const showRegularRange = useMemo(() => {
-    const { regularMin, regularMax } = displayPricing;
-    return regularMin != null && regularMax != null && regularMax > regularMin;
-  }, [displayPricing]);
-
-  const showRegularStrike = useMemo(() => {
-    const { regularMin, priceMin } = displayPricing;
-    return regularMin != null && priceMin != null && regularMin > priceMin;
-  }, [displayPricing]);
+  const struckRegularPricing = useMemo(() => {
+    const { regularMin, regularMax, priceMin } = displayPricing;
+    if (
+      regularMin != null &&
+      priceMin != null &&
+      regularMin > priceMin
+    ) {
+      return {
+        min: regularMin,
+        max: regularMax ?? regularMin,
+        showRange:
+          regularMax != null &&
+          regularMin !== regularMax &&
+          regularMax > regularMin,
+      };
+    }
+    if (sale && sale.regular > sale.sale) {
+      return { min: sale.regular, max: sale.regular, showRange: false };
+    }
+    return null;
+  }, [displayPricing, sale]);
 
   const categoryLabel = useMemo(() => {
     type CategoryNode = {
@@ -336,13 +390,16 @@ const ProductCard = ({
 
     setLoading(true);
     try {
-      await addToCart(
+      const result = await addToCart(
         productDbId,
         1,
         undefined,
         product,
         cartMutationOptions,
       );
+      if (!result || ("error" in result && result.error)) {
+        return;
+      }
     } catch (error: unknown) {
       const message =
         error instanceof Error ? error.message : "Unable to add item to cart.";
@@ -350,8 +407,8 @@ const ProductCard = ({
         toast.error(
           "You've reached the maximum quantity allowed for this item.",
         );
-      } else {
-        toast.error(message);
+      } else if (!message.toLowerCase().includes("internal server error")) {
+        toast.error("Unable to add item to cart. Please try again.");
       }
     } finally {
       setLoading(false);
@@ -415,40 +472,48 @@ const ProductCard = ({
     }
   };
 
-  const addButtonLabel = isOutOfStock
-    ? "Out of Stock"
-    : isPreOrder
-      ? "Pre-order"
-      : "Add";
+  const addButtonLabel = isPreOrder ? "Pre-order" : "Add";
 
   return (
     <div
-      className={`relative flex h-full flex-col overflow-hidden rounded-2xl border border-neutral-200 bg-white ${className}`}
+      className={`product-card relative flex h-full flex-col overflow-hidden rounded-2xl border bg-white ${className}`}
     >
       <div className="relative w-full shrink-0 px-3 pt-3 sm:px-4 sm:pt-4">
         <Link
           href={link || "#"}
           className="relative block w-full overflow-hidden rounded-xl bg-[#FAFAFA] pt-[85%]"
         >
-          {salePercentBadge && (
+          {showLeftDealBadge ? (
             <span
-              className="absolute left-0 top-0 z-10 rounded-br-2xl px-3 py-1.5 text-xs font-bold text-white"
-              style={{ backgroundColor: CARD_ACCENT }}
+              className="absolute left-0 top-0 z-10 flex max-w-[calc(100%-2.5rem)] items-center overflow-hidden rounded-br-2xl py-1.5 pl-3 pr-3 text-xs font-bold text-white"
+              style={{ backgroundColor: DEAL_BADGE_BG }}
+              aria-label={
+                salePercentBadge ? `Deals, ${salePercentBadge} off` : "Deals"
+              }
             >
-              {salePercentBadge}
+              <span className="shrink-0">Deals</span>
+              {salePercentBadge ? (
+                <span className="product-card-deal-percent inline-flex max-w-0 overflow-hidden whitespace-nowrap opacity-0 transition-[max-width,opacity,margin] duration-200 ease-out">
+                  {salePercentBadge}
+                </span>
+              ) : null}
             </span>
-          )}
-          {rightCornerBadge && (
+          ) : null}
+          {showRightCornerBadge ? (
             <span
               className="absolute right-0 top-0 z-10 rounded-bl-2xl px-3 py-1.5 text-xs font-bold text-white"
               style={{ backgroundColor: cornerBadgeColor }}
             >
               {rightCornerBadge}
             </span>
-          )}
+          ) : null}
           <span
-            className="absolute bottom-0 left-0 z-10 rounded-tr-2xl px-3 py-1.5 text-xs font-bold text-white"
-            style={{ backgroundColor: STOCK_STATUS_COLOR }}
+            className="absolute bottom-0 left-0 z-10 rounded-tr-2xl px-3 py-1.5 text-xs font-bold"
+            style={
+              isOutOfStock
+                ? { backgroundColor: STOCK_OUT_BG, color: STOCK_OUT_TEXT }
+                : { backgroundColor: STOCK_IN_BG, color: STOCK_IN_TEXT }
+            }
           >
             {isOutOfStock
               ? "Out of Stock"
@@ -561,15 +626,15 @@ const ProductCard = ({
                   <>LKR {formatLkr(numericPrice)}</>
                 )}
               </p>
-              {showRegularStrike && displayPricing.regularMin != null && (
-                <p className="price-strike-angled text-[11px] font-medium sm:text-xs">
-                  {showRegularRange && displayPricing.regularMax != null ? (
+              {struckRegularPricing && (
+                <p className="text-[11px] font-medium text-danger line-through sm:text-xs">
+                  {struckRegularPricing.showRange ? (
                     <>
-                      LKR {formatLkr(displayPricing.regularMin)} –{" "}
-                      {formatLkr(displayPricing.regularMax)}
+                      LKR {formatLkr(struckRegularPricing.min)} –{" "}
+                      {formatLkr(struckRegularPricing.max)}
                     </>
                   ) : (
-                    <>LKR {formatLkr(displayPricing.regularMin)}</>
+                    <>LKR {formatLkr(struckRegularPricing.min)}</>
                   )}
                 </p>
               )}
@@ -580,11 +645,12 @@ const ProductCard = ({
 
           {showQuantityStepper ? (
             <div
-              className={CART_ACTION_SHELL_CLASS}
+              className={CART_STEPPER_CLASS}
               style={{
                 backgroundColor: CART_ACTIVE_MUTED,
                 color: CART_ACTIVE_ACCENT,
               }}
+              aria-live="polite"
             >
               <button
                 type="button"
@@ -603,10 +669,7 @@ const ProductCard = ({
                   <Minus className="h-4 w-4 shrink-0" strokeWidth={2.5} />
                 )}
               </button>
-              <span
-                className="min-w-[1.25rem] text-center tabular-nums"
-                aria-live="polite"
-              >
+              <span className="min-w-[1rem] px-0.5 text-center text-xs font-bold tabular-nums sm:text-[13px]">
                 {cartQuantity}
               </span>
               <button
@@ -627,16 +690,12 @@ const ProductCard = ({
               type="button"
               disabled={loading || isOutOfStock}
               onClick={handleAddToCart}
-              className={`${CART_ACTION_SHELL_CLASS} transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50`}
-              style={{
-                backgroundColor: CARD_ACCENT_MUTED,
-                color: CARD_ACCENT,
-              }}
+              className={CART_ADD_CLASS}
             >
               {loading ? (
                 <Loader className="h-4 w-4 animate-spin" />
               ) : (
-                <ShoppingCart className="h-4 w-4" strokeWidth={2.25} />
+                <ShoppingCart className="h-4 w-4 shrink-0" strokeWidth={2.25} />
               )}
               <span>{loading ? "Adding…" : addButtonLabel}</span>
             </button>

@@ -14,3 +14,15 @@ export const HEADER_ACTION_ITEM =
 
 export const HEADER_ACTION_LABEL =
   "hidden text-[13px] font-normal leading-none text-neutral-500 group-hover:text-neutral-800 min-[1100px]:inline xl:text-[15px]";
+
+/** Account popover — Snappers navy + cream hover. */
+export const ACCOUNT_MENU_PANEL_CLASS =
+  "overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-lg ring-0";
+
+export const ACCOUNT_MENU_INNER_CLASS = "flex flex-col gap-1 px-3 py-3";
+
+export const ACCOUNT_MENU_ITEM_CLASS =
+  "flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-left text-sm font-semibold text-header-green transition-colors hover:bg-header-cream focus:outline-none focus-visible:ring-2 focus-visible:ring-header-green/25";
+
+export const ACCOUNT_MENU_ICON_CLASS =
+  "flex h-6 w-6 shrink-0 items-center justify-center text-header-green";

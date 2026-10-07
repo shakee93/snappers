@@ -4,6 +4,8 @@ export const SITE_SETTINGS_CACHE_TAG = 'site-settings';
 // Homepage hero/bento sliders + slide CPT. Busted by the WP `acf/save_post`
 // hook on Hero Section options page saves, and by save_post on the slide CPT.
 export const HERO_SECTION_CACHE_TAG = 'hero-section';
+/** Homepage deal countdown end (`heroSettingsFields.dealsDate`). */
+export const DEAL_COUNTDOWN_CACHE_TAG = 'deal-countdown';
 // Homepage "Browse All Products" SSR fetches (All tab + per-category tabs).
 // Busted alongside deals on every product save / stock change so out-of-stock
 // items drop out, independent of path-based invalidation of the homepage.

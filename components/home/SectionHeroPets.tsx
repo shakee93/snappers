@@ -43,6 +43,8 @@ interface HealthSectionEntry {
 }
 
 export interface HeroSettingsFields {
+  /** ACF “Deals Date” — countdown target on the homepage deal banner. */
+  dealsDate?: string | null;
   sliderSettings?: { slides?: (HeroSlide | null)[] | null } | null;
   dealBannerSettings?: { deals?: (HeroDeal | null)[] | null } | null;
   healthSectionSettings?: {
@@ -65,12 +67,16 @@ const HERO_SLIDER_SIGNUP_BG = "/homepage/hero/pattern-bg.webp";
 const HERO_SLIDER_FEATURE_IMAGE =
   "/homepage/hero/hero-slide-snappers-coins.png";
 
+/** Hero CTA — navy fill, yellow label (matches product-card Add). */
+const HERO_SLIDE_BUTTON_CLASS =
+  "mt-1 inline-flex w-fit items-center rounded-md bg-header-green px-5 py-2.5 font-[family-name:var(--font-inter)] text-base font-bold text-[#FACC15] shadow-sm transition-opacity hover:opacity-90 sm:px-6 sm:py-3 sm:text-lg";
+
 const DEFAULT_SLIDES: HeroSlide[] = [
   {
     sliderTitle: `<span class="${HERO_SLIDER_TITLE_CLASS}">Join Now, Receive Rs.200 Cashback.</span>`,
     sliderDiscription: "Limited Time Offer",
-    titleColor: "#0C2016",
-    descriptionColor: "#7DA068",
+    titleColor: "#092412",
+    descriptionColor: "#000000",
     buttonText: "Sign Up",
     buttonLink: "/signup",
     buttonTextColor: "#ffffff",
@@ -94,7 +100,7 @@ function stripHtml(html: string): string {
   return html.replace(/<[^>]+>/g, " ");
 }
 
-/** Homepage hero carousel — slides from GraphQL `heroSlides` or defaults. */
+/** Homepage hero carousel — Hero Settings ACF slides, then slide CPT, then defaults. */
 const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
   const slidesFromCms = useMemo(
     () =>
@@ -129,7 +135,7 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
       className={`relative w-full bg-white ${className}`}
       aria-label="Promotions"
     >
-      <div className="relative mx-auto w-full max-w-[1368px] px-3 py-6 sm:px-4 lg:py-10 xl:px-0">
+      <div className="relative mx-auto w-full max-w-[1368px] px-3 pt-6 pb-1 sm:px-4 lg:pt-8 lg:pb-2 xl:px-0">
         <div className="w-full">
           <div className="relative min-h-[280px] w-full rounded-2xl bg-white p-2 shadow-[0_4px_24px_rgba(15,23,42,0.12)] ring-1 ring-neutral-200/80 sm:min-h-[340px] sm:p-2.5 lg:min-h-[452px]">
             <div className="relative min-h-[calc(280px-1rem)] overflow-hidden rounded-xl bg-[#faf9f7] sm:min-h-[calc(340px-1.25rem)] lg:min-h-[calc(452px-1.25rem)]">
@@ -196,7 +202,7 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
               );
             })}
 
-            <div className="absolute inset-0 z-10 flex flex-col justify-center p-6 font-playfair sm:p-8 lg:max-w-[55%] lg:p-10">
+            <div className="absolute inset-0 z-10 flex flex-col justify-center p-6 font-albra sm:p-8 lg:max-w-[70%] lg:p-10">
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={activeIndex}
@@ -209,52 +215,25 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
                   {slide?.sliderTitle ? (
                     <div
                       style={{ color: slide.titleColor ?? undefined }}
-                      className="leading-tight [&_*]:font-playfair [&_*]:leading-tight"
+                      className="leading-[1.05] [&_*]:font-albra [&_*]:leading-[1.05]"
                       dangerouslySetInnerHTML={{ __html: slide.sliderTitle }}
                     />
                   ) : null}
                   {slide?.sliderDiscription ? (
-                    <p
-                      style={{ color: slide.descriptionColor ?? undefined }}
-                      className="text-lg font-semibold sm:text-xl lg:text-2xl"
-                    >
+                    <p className="font-[family-name:var(--font-inter)] text-base font-medium text-black sm:text-lg lg:text-xl">
                       {slide.sliderDiscription}
                     </p>
                   ) : null}
                   {slide?.buttonText && slide.buttonLink ? (
-                    (() => {
-                      const buttonStyle = {
-                        backgroundColor: slide.buttonBachgroundColor ?? "#059669",
-                        color: slide.buttonTextColor ?? "#ffffff",
-                        ...(slide.buttonBorderColor
-                          ? { border: `1px solid ${slide.buttonBorderColor}` }
-                          : {}),
-                      };
-                      const buttonClassName =
-                        "mt-1 inline-flex w-fit items-center rounded-md px-5 py-2.5 text-sm font-semibold shadow-sm transition-transform hover:scale-[1.02]";
-
-                      if (slide.buttonLink.startsWith("http")) {
-                        return (
-                          <a
-                            href={slide.buttonLink}
-                            style={buttonStyle}
-                            className={buttonClassName}
-                          >
-                            {slide.buttonText}
-                          </a>
-                        );
-                      }
-
-                      return (
-                        <Link
-                          href={slide.buttonLink}
-                          style={buttonStyle}
-                          className={buttonClassName}
-                        >
-                          {slide.buttonText}
-                        </Link>
-                      );
-                    })()
+                    slide.buttonLink.startsWith("http") ? (
+                      <a href={slide.buttonLink} className={HERO_SLIDE_BUTTON_CLASS}>
+                        {slide.buttonText}
+                      </a>
+                    ) : (
+                      <Link href={slide.buttonLink} className={HERO_SLIDE_BUTTON_CLASS}>
+                        {slide.buttonText}
+                      </Link>
+                    )
                   ) : null}
                 </motion.div>
               </AnimatePresence>
