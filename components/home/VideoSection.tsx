@@ -1,5 +1,6 @@
 "use client";
 import React, { useState, useRef } from "react";
+import { BRAND_CTA_BUTTON_CLASS } from "@/shared/Button/ButtonBrand";
 
 interface VideoSectionProps {
   videoUrl: string;
@@ -158,7 +159,7 @@ const VideoSection = ({
           {productLink && (
             <button
               onClick={() => window.open(productLink, "_blank")}
-              className="flex items-center justify-center rounded-full bg-header-action px-5 py-2 text-xs font-bold text-header-green transition-opacity hover:opacity-90"
+              className={`flex items-center justify-center rounded-full px-5 py-2 text-xs font-bold transition-opacity hover:opacity-90 ${BRAND_CTA_BUTTON_CLASS}`}
               aria-label="View product"
               title="View product"
             >

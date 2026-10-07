@@ -7,7 +7,7 @@ export interface ButtonPrimaryProps extends ButtonProps {}
 
 const ButtonPrimary: React.FC<ButtonPrimaryProps> = ({
   className = "",
-  fontSize = "text-sm sm:text-base font-bold",
+  fontSize = "font-[family-name:var(--font-inter)] text-sm sm:text-base font-bold",
   ...args
 }) => {
   return (

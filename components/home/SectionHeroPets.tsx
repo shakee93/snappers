@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import useInterval from "react-use/lib/useInterval";
 import type { ProductCardItem } from "@/components/home/ProductCard";
 import { HERO_SLIDER_TITLE_CLASS } from "@/lib/heroSlides";
+import { BRAND_CTA_BUTTON_CLASS } from "@/shared/Button/ButtonBrand";
 
 interface MediaNode {
   node?: { sourceUrl?: string | null } | null;
@@ -67,9 +68,7 @@ const HERO_SLIDER_SIGNUP_BG = "/homepage/hero/pattern-bg.webp";
 const HERO_SLIDER_FEATURE_IMAGE =
   "/homepage/hero/hero-slide-snappers-coins.png";
 
-/** Hero CTA — navy fill, yellow label (matches product-card Add). */
-const HERO_SLIDE_BUTTON_CLASS =
-  "mt-1 inline-flex w-fit items-center rounded-md bg-header-green px-5 py-2.5 font-[family-name:var(--font-inter)] text-base font-bold text-[#FACC15] shadow-sm transition-opacity hover:opacity-90 sm:px-6 sm:py-3 sm:text-lg";
+const HERO_SLIDE_BUTTON_CLASS = `mt-1 inline-flex w-fit items-center rounded-md px-5 py-2.5 text-base font-bold shadow-sm sm:px-6 sm:py-3 sm:text-lg ${BRAND_CTA_BUTTON_CLASS}`;
 
 const DEFAULT_SLIDES: HeroSlide[] = [
   {

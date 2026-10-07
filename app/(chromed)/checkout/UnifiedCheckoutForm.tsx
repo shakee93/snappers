@@ -827,7 +827,8 @@ interface DeliveryOptionProps {
 }
 
 const CHIP_TONES = {
-    emerald: "bg-header-action text-header-green",
+    emerald:
+      "bg-header-green font-[family-name:var(--font-inter)] text-[#FACC15]",
     blue: "bg-header-accent text-header-green",
 } as const;
 
@@ -1561,7 +1562,7 @@ const UnifiedCheckoutForm = ({
                                 id={`bank-slip-upload-${gateway.id}`}
                                 accept="image/png, image/gif, image/jpeg, image/heic, image/heif, image/webp, image/bmp, image/tiff, application/pdf"
                                 onChange={handleBankSlipChange}
-                                className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-header-action file:text-header-green hover:file:opacity-90 file:cursor-pointer cursor-pointer"
+                                className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-header-green file:text-[#FACC15] hover:file:opacity-90 file:cursor-pointer cursor-pointer"
                             />
                             {previewUrl && bankSlipFile && (
                                 <div className="mt-2 flex items-center gap-3">

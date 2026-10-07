@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { BRAND_CTA_BUTTON_CLASS } from "@/shared/Button/ButtonBrand";
 import { ArrowRight } from "lucide-react";
 import howToOrderContent from "@/content/how-to-order.json";
 import HowToOrderVideo from "@/components/home/HowToOrderVideo";
@@ -67,7 +68,7 @@ const SectionHowToOrder = ({
           </p>
           <Link
             href={ctaHref}
-            className="mt-6 inline-flex items-center gap-2 rounded-full bg-header-action px-8 py-3.5 text-sm font-bold text-header-green transition-opacity hover:opacity-90 md:mt-8 md:text-base"
+            className={`mt-6 inline-flex items-center gap-2 rounded-full px-8 py-3.5 text-sm font-bold transition-opacity hover:opacity-90 md:mt-8 md:text-base ${BRAND_CTA_BUTTON_CLASS}`}
           >
             {ctaLabel}
             <ArrowRight className="h-4 w-4" aria-hidden />

@@ -180,7 +180,7 @@ const MobileFilterSheet = ({
         };
         return (
             <span
-                className="flex-shrink-0 w-4 h-4 rounded-full bg-header-action text-header-green flex items-center justify-center ml-3 cursor-pointer">
+                className="ml-3 flex h-4 w-4 flex-shrink-0 cursor-pointer items-center justify-center rounded-full bg-header-green text-[10px] font-bold text-[#FACC15]">
                 <XIcon className="p-0.5" onClick={handleXClearClick} />
             </span>
         );

@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { BRAND_CTA_BUTTON_CLASS } from "@/shared/Button/ButtonBrand";
 import { CheckCircle2, Loader2 } from "lucide-react";
 
 interface ContactFormProps {
@@ -118,7 +119,7 @@ const ContactForm = ({ formspreeId }: ContactFormProps) => {
         <button
           type="submit"
           disabled={status === "submitting"}
-          className="flex w-full items-center justify-center gap-2 rounded-full bg-header-action px-6 py-3 text-sm font-bold text-header-green transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+          className={`flex w-full items-center justify-center gap-2 rounded-full px-6 py-3 text-sm font-bold transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 ${BRAND_CTA_BUTTON_CLASS}`}
         >
           {status === "submitting" ? (
             <>

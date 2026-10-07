@@ -1,3 +1,5 @@
+import { BRAND_CTA_BUTTON_CLASS } from "@/shared/Button/ButtonBrand";
+
 export {
   authInputClassName as accountInputClassName,
   authLabelClassName as accountLabelClassName,
@@ -25,8 +27,7 @@ export const accountFormInputClassName =
 export const accountSelectClassName =
   "mt-1.5 block h-11 w-full rounded-lg border border-[#E8E8E8] bg-white px-4 text-sm text-neutral-900 transition-colors focus:border-header-action focus:outline-none focus:ring-2 focus:ring-header-action/20 disabled:cursor-not-allowed disabled:bg-neutral-50 disabled:text-neutral-500 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-100";
 
-export const accountSubmitButtonClassName =
-  "rounded-full bg-header-action font-bold text-header-green shadow-md hover:opacity-90 disabled:opacity-60";
+export const accountSubmitButtonClassName = `${BRAND_CTA_BUTTON_CLASS} rounded-full font-bold shadow-md disabled:opacity-60`;
 
 export const accountTabListClassName =
   "hiddenScrollbar flex gap-6 overflow-x-auto border-b border-[#E8E8E8] dark:border-neutral-700";

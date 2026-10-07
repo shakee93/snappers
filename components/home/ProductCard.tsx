@@ -17,6 +17,7 @@ import { toast } from "sonner";
 import { useCart } from "@/context/CartProvider";
 import useProductLink from "@/hooks/useProductLink";
 import WishlistButton from "@/components/product/WishlistButton";
+import { BRAND_CTA_BUTTON_COMPACT_CLASS } from "@/shared/Button/ButtonBrand";
 import { getDatabaseIdFromProductLike } from "@/lib/bogo";
 import { resolveProductImageUrl } from "@/lib/productImage";
 import { parsePriceString, resolveProductSale } from "@/lib/productSale";
@@ -74,7 +75,7 @@ const CART_ACTION_BASE =
   "inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-bold leading-none sm:py-2.5 sm:text-[13px]";
 const CART_STEPPER_CLASS = `${CART_ACTION_BASE} min-w-0 gap-1 px-1.5 sm:px-2`;
 /** Default Add — brand navy + yellow label (tighter horizontal padding). */
-const CART_ADD_CLASS = `${CART_ACTION_BASE} min-w-0 bg-header-green px-1.5 text-[#FACC15] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:px-2`;
+const CART_ADD_CLASS = `${CART_ACTION_BASE} min-w-0 px-1.5 sm:px-2 ${BRAND_CTA_BUTTON_COMPACT_CLASS}`;
 
 const formatLkr = (value: number) =>
   value.toLocaleString("en-LK", {

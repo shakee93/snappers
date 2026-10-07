@@ -216,7 +216,7 @@ const ArchiveLayout = async ({
                 href={item.href}
                 className={`rounded-full px-4 py-2 text-sm font-bold border ${
                   item.active
-                    ? "border-header-action bg-header-action text-header-green"
+                    ? "border-header-green bg-header-green font-[family-name:var(--font-inter)] text-[#FACC15]"
                     : "border-header-green/30 bg-white text-header-green hover:bg-header-cream/40"
                 }`}
               >

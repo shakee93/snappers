@@ -1,3 +1,5 @@
+import { BRAND_CTA_BUTTON_CLASS } from "@/shared/Button/ButtonBrand";
+
 export const authPageTitleClassName =
   "my-12 text-center text-3xl font-bold text-header-green dark:text-neutral-100";
 
@@ -12,5 +14,4 @@ export const authInputClassName =
 export const authLinkClassName =
   "font-semibold text-header-green hover:underline";
 
-export const authSubmitButtonClassName =
-  "w-full rounded-full bg-header-action font-bold text-header-green shadow-md hover:opacity-90 disabled:opacity-60";
+export const authSubmitButtonClassName = `${BRAND_CTA_BUTTON_CLASS} w-full rounded-full font-bold shadow-md disabled:opacity-60`;

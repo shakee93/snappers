@@ -5,6 +5,7 @@ import Link from "next/link";
 import { HIDDEN_PRODUCT_SLUGS } from "@/lib/hidden-products";
 import { getProductPath } from "@/lib/productUrl";
 import { siteConfig } from "@/site.config";
+import { BRAND_CTA_BUTTON_CLASS } from "@/shared/Button/ButtonBrand";
 
 interface SaleProductData {
   name: string;
@@ -73,7 +74,7 @@ const
                   </button>
                 </Link>
                 <Link href={getProductPath(product)} target="_blank" rel="noopener noreferrer">
-                  <button className="rounded-full bg-header-action px-4 py-1.5 text-xs font-bold text-header-green transition-opacity hover:opacity-90">
+                  <button className={`rounded-full px-4 py-1.5 text-xs font-bold transition-opacity hover:opacity-90 ${BRAND_CTA_BUTTON_CLASS}`}>
                     Buy Now
                   </button>
                 </Link>

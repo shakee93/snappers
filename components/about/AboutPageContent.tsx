@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { BRAND_CTA_BUTTON_CLASS } from "@/shared/Button/ButtonBrand";
 import aboutContent from "@/content/about.json";
 import SectionGoogleReviews, {
   type GoogleReviewsFields,
@@ -40,7 +41,7 @@ const AboutPageContent = ({ googleReviews }: AboutPageContentProps) => {
             </p>
             <Link
               href="/shop"
-              className="mt-8 inline-flex items-center rounded-full bg-header-action px-8 py-3.5 text-sm font-bold text-header-green transition-opacity hover:opacity-90"
+              className={`mt-8 inline-flex items-center rounded-full px-8 py-3.5 text-sm font-bold transition-opacity hover:opacity-90 ${BRAND_CTA_BUTTON_CLASS}`}
             >
               Shop pet essentials
             </Link>

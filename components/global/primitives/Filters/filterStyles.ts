@@ -22,7 +22,11 @@ export const filterSelectOptionsClassName =
 export const filterSelectOptionClassName = (active: boolean, selected: boolean) =>
   [
     "cursor-pointer select-none px-3 py-2 text-sm text-header-green",
-    selected ? "bg-header-action font-semibold" : active ? "bg-header-cream/50" : "",
+    selected
+      ? "bg-header-green font-semibold text-[#FACC15]"
+      : active
+        ? "bg-header-cream/50"
+        : "",
   ]
     .filter(Boolean)
     .join(" ");
