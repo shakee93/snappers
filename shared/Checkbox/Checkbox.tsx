@@ -47,7 +47,7 @@ const Checkbox: FC<CheckboxProps> = ({
       htmlFor={name}
       className={cn(
         "flex flex-col justify-center text-xs select-none",
-        labelAfter ? "pr-0" : "flex-1 pl-2.5",
+        labelAfter ? "min-w-0 flex-1 pr-2" : "flex-1 pl-2.5",
       )}
     >
       <span
@@ -71,7 +71,7 @@ const Checkbox: FC<CheckboxProps> = ({
     <div
       className={cn(
         "flex text-sm sm:text-xs",
-        labelAfter && "items-center gap-1.5",
+        labelAfter && "items-center",
         className,
       )}
     >

@@ -39,7 +39,7 @@ export type CartLineTierPrice = {
    * from Woo's line subtotal, not this field.
    */
   unitPrice: number;
-  /** Catalog unit price the tier replaces — rendered struck through when cheaper. */
+  /** Catalog unit price the tier replaces - rendered struck through when cheaper. */
   catalogUnitPrice: number;
   /** Tier name as configured in woo-price-tiers, e.g. "Visa / Master Card". */
   tierName: string;
@@ -48,7 +48,7 @@ export type CartLineTierPrice = {
 /**
  * Unit price a cart line carries under the selected payment gateway.
  * Null when the product has no tier for that gateway, or the tier quotes the
- * catalog price anyway — nothing to surface in that case.
+ * catalog price anyway - nothing to surface in that case.
  */
 export function resolveCartLineTierPrice(
   item: CheckoutCartLine,

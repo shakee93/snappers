@@ -1,67 +1,56 @@
 {
   "hero": {
     "eyebrow": "About Us",
-    "title": "Your trusted pet partner in Sri Lanka",
-    "image": "/homepage/stores/pet-co-dehiwala.jpg",
-    "imageAlt": "Pet & Co Dehiwala storefront"
+    "title": "Everyday essentials, delivered to your door",
+    "image": "/homepage/snappers-exciting-offers.jpg",
+    "imageAlt": "Snappers grocery offers and essentials"
   },
   "intro": {
-    "lead": "At Catlitter.lk, we believe every pet deserves the best and every pet owner deserves a partner they can trust.",
-    "body": "Founded in Sri Lanka, Catlitter.lk has grown from a simple idea into one of the country's most recognised names in pet care. We offer a carefully curated range of pet food, accessories, grooming essentials, litter products, and more, all selected with your pet's health and happiness in mind."
+    "lead": "Your premier online grocery shop - supermarket quality, delivered in Colombo and suburbs."
   },
-  "brands": {
-    "title": "Three brands. One commitment.",
-    "subtitle": "Our family of stores gives you more ways to shop, wherever you are:",
-    "items": [
-      {
-        "name": "Catlitter.lk",
-        "description": "Our flagship online platform, delivering quality pet essentials island-wide with ease and convenience.",
-        "accent": "#EBF3EF"
-      },
-      {
-        "name": "Petlove",
-        "description": "A warm, neighbourhood-friendly store bringing trusted pet care closer to your community.",
-        "accent": "#FDE6D6"
-      },
-      {
-        "name": "Pet & Co.",
-        "description": "A modern retail experience offering handpicked collections for the discerning pet owner.",
-        "accent": "#EAE8F3"
-      }
-    ]
+  "welcome": {
+    "dropCap": "W",
+    "body": "elcome to Snappers, the premier online grocery shop that brings the supermarket to your doorstep. Our easy-to-use website allows you to shop from the comfort of your own home, with our vast selection of fresh produce, pantry staples, snacks, and more. We pride ourselves on our unbeatable prices and strive to offer our customers the best value possible. In addition, we offer exclusive discounts and offers to our loyal customers. With Snappers, you can enjoy the convenience of online shopping without sacrificing the quality of your groceries. Shop with us today and discover the Snappers difference for yourself.",
+    "image": "/homepage/snappers-delivery-handoff.jpg",
+    "imageAlt": "Snappers delivery partner handing a grocery order to a customer"
   },
-  "philosophy": {
-    "body": "Whether you're raising a curious kitten, a loyal dog, or a playful parrot, our team is here to help you make the right choices. We combine product expertise with a genuine love for animals, because for us, this isn't just retail. It's a passion.",
-    "image": "/homepage/categories/cat-dog.webp",
-    "imageAlt": "Cat and dog"
-  },
+  "stats": [
+    { "value": "197+", "label": "Customers" },
+    { "value": "300+", "label": "Orders" },
+    { "value": "9", "label": "Categories" },
+    { "value": "2,478+", "label": "Products" }
+  ],
   "why": {
-    "title": "Why Catlitter.lk?",
+    "title": "Why Snappers?",
     "items": [
       {
-        "icon": "/icons/box-feat.png",
-        "iconAlt": "Delivery",
-        "text": "Island-wide delivery through our online store"
+        "iconKey": "delivery",
+        "title": "Fast delivery",
+        "text": "Colombo and suburbs only. Order before 2:00 PM for same-day delivery; after 2:00 PM, next-day delivery."
       },
       {
-        "icon": "/icons/verify.png",
-        "iconAlt": "Quality",
-        "text": "Trusted brands and quality-assured products"
+        "iconKey": "quality",
+        "title": "Supermarket quality",
+        "text": "Fresh produce, pantry staples, and household essentials from brands you already trust."
       },
       {
-        "icon": "/icons/support-feat.png",
-        "iconAlt": "Expert support",
-        "text": "Knowledgeable staff who care about your pet's wellbeing"
+        "iconKey": "deals",
+        "title": "Weekly deals",
+        "text": "Exclusive offers and promotions so you can stock up and save on everyday shopping."
       },
       {
-        "icon": "/icons/paw-feat.png",
-        "iconAlt": "Stores",
-        "text": "Three convenient touchpoints, online and in-store"
+        "iconKey": "shop",
+        "title": "Shop your way",
+        "text": "Browse by category, checkout securely online, and get updates until your order arrives."
       }
     ]
   },
   "closing": {
-    "body": "We're proud to be part of Sri Lanka's growing pet care community, and we're committed to making pet parenting simpler, smarter, and more rewarding, one happy pet at a time.",
-    "tagline": "Catlitter.lk - Where happy pets begin."
+    "body": "We're proud to serve Colombo and suburbs with grocery delivery that's fast, friendly, and built for everyday life. Thank you for choosing Snappers.",
+    "tagline": "Snappers - everyday essentials, delivered."
+  },
+  "cta": {
+    "label": "Start shopping",
+    "href": "/shop"
   }
 }

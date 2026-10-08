@@ -16,7 +16,7 @@ import { getSafeRedirectPath } from "@/utils/redirect";
 const GSI_SRC = "https://accounts.google.com/gsi/client";
 /** GSI's documented max button width. */
 const GSI_MAX_WIDTH = 400;
-/** GSI `size: "large"` renders at 40px — match the placeholder to it. */
+/** GSI `size: "large"` renders at 40px - match the placeholder to it. */
 const GSI_BUTTON_HEIGHT_CLASS = "h-10 py-0";
 
 type GoogleCredentialResponse = {
@@ -227,7 +227,7 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
     expiryTimerRef.current = setTimeout(() => {
       if (!mountedRef.current) return;
 
-      // Abandoned background tabs must not mint forever — wait until visible.
+      // Abandoned background tabs must not mint forever - wait until visible.
       if (document.hidden) {
         pendingRemintRef.current = true;
         return;
@@ -279,7 +279,7 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
         cancel_on_tap_outside: true,
       });
 
-      // Measure the visible wrapper — the host may still be `invisible`.
+      // Measure the visible wrapper - the host may still be `invisible`.
       const width =
         wrapper?.clientWidth || host.clientWidth || host.parentElement?.clientWidth || GSI_MAX_WIDTH;
       paintButton(width);
@@ -301,7 +301,7 @@ const GoogleSignInButton = ({ clientId }: GoogleSignInButtonProps) => {
 
   // Arm once on first user interaction (or when idle), so bounced visitors
   // often skip the nonce mint and anyone who reaches for the button finds it
-  // already live — including on touch.
+  // already live - including on touch.
   useEffect(() => {
     if (!isScriptReady) return;
 

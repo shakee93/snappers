@@ -2,13 +2,13 @@ import { siteConfig } from "@/site.config";
 
 import { buildCategoryScopeIds, type CategoryTreeNode } from "@/lib/categoryScope";
 
-/** Homepage browse grid — first batch fetched per category tab on SSR. */
+/** Homepage browse grid - first batch fetched per category tab on SSR. */
 export const BROWSE_CATEGORY_TAB_SSR_FIRST = 24;
 
 /** Client pagination batch after the SSR seed (larger cursor fetches). */
 export const BROWSE_CATEGORY_TAB_FETCH_BATCH = 100;
 
-/** Homepage browse tabs — same slugs/order as main nav pet categories. */
+/** Homepage browse tabs - same slugs/order as main nav pet categories. */
 export const BROWSE_TAB_SLUGS = siteConfig.navigation.main.map((item) =>
   item.href.replace(/^\//, ""),
 );
@@ -46,6 +46,25 @@ export const BROWSE_CATEGORY_SCOPE_OVERRIDES: Record<string, number[]> = {
   "rabbit-hamsters": [68, 69, 81],
 };
 
+/** Homepage "Shop by Categories" tiles (`SectionShopByCategory`). */
+export const SHOP_BY_CATEGORY_IMAGES: Record<string, string> = {
+  groceries: "/homepage/categories/groceries.jpg",
+  bakery: "/homepage/categories/bakery.jpg",
+  household: "/homepage/categories/household.jpg",
+  beverages: "/homepage/categories/beverages.jpg",
+  chilled: "/homepage/categories/chilled.jpg",
+  fresh: "/homepage/categories/fresh.jpg",
+  frozen: "/homepage/categories/frozen.jpg",
+};
+
+/** Slugs excluded from the shop-by-category grid (still in main nav). */
+export const SHOP_BY_CATEGORY_EXCLUDED_SLUGS = new Set<string>(["deals"]);
+
+export const getShopByCategoryImage = (
+  slug: string | null | undefined,
+): string | undefined =>
+  slug ? SHOP_BY_CATEGORY_IMAGES[slug] : undefined;
+
 /** Static browse banners under `public/homepage/categories/`. */
 export const BROWSE_CATEGORY_FEATURE_IMAGES: Record<string, string> = {
   "rabbit-hamsters": "/homepage/categories/rabbit.webp",
@@ -56,7 +75,7 @@ export const BROWSE_CATEGORY_FEATURE_IMAGES: Record<string, string> = {
   aquarium: "/homepage/categories/fish.webp",
 };
 
-/** "All" tab banner — dedicated all-pets artwork. */
+/** "All" tab banner - dedicated all-pets artwork. */
 export const BROWSE_ALL_TAB_FEATURE_IMAGE = "/homepage/categories/all.webp";
 
 /** Feature banner for a nav tab slug (`cat`, `dog`, …). */
@@ -192,6 +211,9 @@ export const buildBrowseCategoryScopeMap = (
       ]),
   );
 
+const isRootBrowseCategory = (category: BrowseCategoryLike): boolean =>
+  category.parentDatabaseId == null || category.parentDatabaseId === 0;
+
 /** Keep only configured browse tabs, in nav order. */
 export const filterBrowseCategoryTabs = <T extends BrowseCategoryLike>(
   categories: T[],
@@ -216,6 +238,46 @@ export const filterBrowseCategoryTabs = <T extends BrowseCategoryLike>(
   return BROWSE_TAB_SLUGS.flatMap((tabSlug) => {
     const category = findBrowseTabCategory(eligible, tabSlug);
     return category ? [category] : [];
+  });
+};
+
+/**
+ * Homepage browse tabs in main-nav order. Prefer root categories with nested
+ * children from `GET_BROWSE_CATEGORY_TABS`; if none match (e.g. slug mismatch),
+ * fall back to any category from the flat nav list by slug.
+ */
+export const resolveBrowseCategoryTabs = <T extends BrowseCategoryLike>(
+  rootCategories: T[],
+  allCategories?: BrowseCategoryLike[],
+): T[] => {
+  const fromRoots = filterBrowseCategoryTabs(rootCategories);
+  if (fromRoots.length > 0) return fromRoots;
+
+  const flat = allCategories?.length ? allCategories : rootCategories;
+  const rootsWithChildrenById = new Map(
+    rootCategories
+      .filter(
+        (category): category is T & { databaseId: number } =>
+          typeof category.databaseId === "number",
+      )
+      .map((category) => [category.databaseId, category]),
+  );
+
+  return BROWSE_TAB_SLUGS.flatMap((tabSlug) => {
+    const rootMatch = findBrowseTabCategory(
+      rootCategories.filter(isRootBrowseCategory),
+      tabSlug,
+    );
+    if (rootMatch?.databaseId && rootMatch.name) {
+      return [rootMatch];
+    }
+
+    const flatMatch = findBrowseTabCategory(flat, tabSlug);
+    if (!flatMatch?.databaseId || !flatMatch.name) return [];
+
+    const enriched =
+      rootsWithChildrenById.get(flatMatch.databaseId) ?? flatMatch;
+    return [enriched as T];
   });
 };
 

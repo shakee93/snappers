@@ -56,7 +56,7 @@ const CategoryFilter = ({ categories }: CategoryFilterProps) => {
     // filters (in_stock, on_sale, brand, price, variations) can update the
     // "All Categories" total and per-category counts. Once a category is
     // selected we freeze the snapshot so the unselected categories don't all
-    // collapse to (0) — they're filtered out of the active result set by the
+    // collapse to (0) - they're filtered out of the active result set by the
     // category clause, but the sidebar should still show how many items the
     // user could switch to. The search page is the exception: there we want
     // counts to follow the query live even with categories selected.

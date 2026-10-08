@@ -5,7 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 // non-ASCII byte in the path (decoded form) crashes the response with
 // `TypeError: Invalid character in header content`. Real product slugs that
 // trip this include U+2011 (non-breaking hyphen), U+2502 (box-drawing pipe)
-// and U+2033 (double-prime) — e.g. /product/oneplus-11r-5g-│-18gb-256gb.
+// and U+2033 (double-prime) - e.g. /product/oneplus-11r-5g-│-18gb-256gb.
 //
 // Short-circuit those requests with a 404 here so the route handler never
 // runs and the bad header is never set. Long-term fix is to clean the
@@ -70,7 +70,7 @@ export function middleware(request: NextRequest) {
 }
 
 // Skip Next internals, API routes, and a fixed set of static-asset
-// extensions. The earlier `.*\.[a-zA-Z0-9]+$` form was too greedy — a
+// extensions. The earlier `.*\.[a-zA-Z0-9]+$` form was too greedy - a
 // product slug like `iphone-15-1.5tb` ends in `.5tb` and would slip past
 // the guard. Listing real asset extensions keeps slugs in scope.
 export const config = {

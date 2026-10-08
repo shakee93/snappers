@@ -16,7 +16,7 @@ const SORT_BY_ITEMS = [{ label: "Default", value: "product" }];
 interface SortInputProps {
     // Sort id applied when the user hasn't picked one (store sort is empty).
     // Used by /new-arrivals to default to newest without writing ?sort= to the
-    // URL — see InstantSearchWrapper for why store/URL seeding is avoided.
+    // URL - see InstantSearchWrapper for why store/URL seeding is avoided.
     defaultSort?: string;
 }
 

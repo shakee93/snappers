@@ -16,7 +16,7 @@ export interface DealsProductGridProps {
   productCardProps?: Pick<ProductCardProps, "badgeLabel" | "accentColor">;
 }
 
-/** Deal-only grid — filters/sorts SSR deal products from URL params. */
+/** Deal-only grid - filters/sorts SSR deal products from URL params. */
 const DealsProductGrid = ({
   products,
   searchParams,
@@ -35,7 +35,7 @@ const DealsProductGrid = ({
       <p className="py-12 text-center text-sm text-neutral-500">
         {products.length
           ? "No active deals match your filters right now."
-          : "No active deals right now — check back soon."}
+          : "No active deals right now - check back soon."}
       </p>
     );
   }

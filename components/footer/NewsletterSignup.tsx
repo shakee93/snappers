@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { ArrowRight } from "lucide-react";
 import { siteConfig } from "@/site.config";
+import { BRAND_CTA_BUTTON_CLASS } from "@/shared/Button/ButtonBrand";
 
 /**
  * Newsletter email capture shown in the footer. Presentational submit that
- * confirms inline — wire to a backend endpoint when one is available.
+ * confirms inline - wire to a backend endpoint when one is available.
  */
 export default function NewsletterSignup() {
   const { placeholder, buttonLabel } = siteConfig.footer.newsletter;
@@ -43,7 +44,7 @@ export default function NewsletterSignup() {
       />
       <button
         type="submit"
-        className="flex w-full items-center justify-center gap-1.5 rounded-md bg-header-action px-5 py-2.5 text-base font-semibold text-black transition-opacity hover:opacity-90 sm:w-auto"
+        className={`flex w-full items-center justify-center gap-1.5 rounded-full px-6 py-2.5 text-base font-bold transition-opacity hover:opacity-90 sm:w-auto ${BRAND_CTA_BUTTON_CLASS}`}
       >
         {buttonLabel}
         <ArrowRight size={16} />

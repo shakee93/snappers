@@ -19,7 +19,7 @@ import { cn } from "@/lib/utils";
 
 // `displayValue` is resolved by the graphql-cart-attribute-display-value
 // mu-plugin and fetched in the cart fragment, but isn't part of the generated
-// VariationAttribute type — augment it here rather than reaching for `any`.
+// VariationAttribute type - augment it here rather than reaching for `any`.
 type CartLineAttribute = VariationAttribute & { displayValue?: string | null };
 
 interface CartDropdownItemProps {

@@ -13,8 +13,9 @@ import {
     SESSION_TOKEN_KEY,
     USER_DATA_KEY,
 } from "@/utils/storage-keys";
+import { parseJwtPayload } from "@/lib/clientAuthToken";
 
-/** Result of `addToCart` — Apollo mutation payload or a bail-out with `error`. */
+/** Result of `addToCart` - Apollo mutation payload or a bail-out with `error`. */
 export type AddToCartResult =
     | {
           data?: {
@@ -45,7 +46,7 @@ type CartSession = {
     setCustomer: React.Dispatch<React.SetStateAction<Customer | null>>
     clearCart: () => void
     refreshCart: () => Promise<any>
-    /** Push a cart returned by a mutation/query straight into state — don't wait for a refetch effect. */
+    /** Push a cart returned by a mutation/query straight into state - don't wait for a refetch effect. */
     applyCart: (next: Cart | null) => void
     isCartOpen: boolean
     setIsCartOpen: React.Dispatch<React.SetStateAction<boolean>>
@@ -176,7 +177,7 @@ export function CartProvider({ children }: {
             })
 
             // Cart state is refreshed by the removeCartData useEffect above,
-            // which also resets isClearingRef — keep that as the single path.
+            // which also resets isClearingRef - keep that as the single path.
             return result
         } finally {
             setLoading(false)
@@ -221,7 +222,7 @@ export function CartProvider({ children }: {
     }, [cart, removeFromCart])
 
     // Checkout (and other callers) need the provider's cart to match a mutation
-    // response on the same tick — waiting for the lazy-query `data` effect leaves
+    // response on the same tick - waiting for the lazy-query `data` effect leaves
     // one paint where the summary still reads the previous shipping total.
     const applyCart = useCallback((next: Cart | null) => {
         setCart(next)
@@ -231,7 +232,7 @@ export function CartProvider({ children }: {
         try {
             const result = await getCart();
             // Apply immediately. The `data` useEffect would eventually do the
-            // same, but only after paint — and the shipping-estimate row keys
+            // same, but only after paint - and the shipping-estimate row keys
             // off this state, so a deferred write shows the old rate for a beat
             // (or longer if another render interrupts the effect).
             if (result?.data?.cart !== undefined) {
@@ -261,7 +262,7 @@ export function CartProvider({ children }: {
         ) || false;
     };
 
-    /** GraphQL-level ISE only — not HTTP/network 500s (those can be transient outages). */
+    /** GraphQL-level ISE only - not HTTP/network 500s (those can be transient outages). */
     const isGraphQlInternalServerError = (error: unknown) => {
         const err = error as {
             graphQLErrors?: Array<{ message?: string; extensions?: { message?: string } }>;
@@ -331,7 +332,7 @@ export function CartProvider({ children }: {
         }
 
         if (!refreshToken) {
-            // Broken auth with nothing to refresh — fall back to guest cart.
+            // Broken auth with nothing to refresh - fall back to guest cart.
             clearStoredSessionState(false);
             return;
         }
@@ -348,7 +349,7 @@ export function CartProvider({ children }: {
                 localStorage.setItem(AUTH_TOKEN_KEY, nextAuth);
                 return;
             }
-            // Empty refresh payload — treat as auth failure.
+            // Empty refresh payload - treat as auth failure.
             clearStoredSessionState(false);
         } catch (refreshError) {
             if (isAuthRefreshFailure(refreshError)) {
@@ -433,38 +434,64 @@ export function CartProvider({ children }: {
             }
 
             // AddToCart-only: bare GraphQL ISE is often a bad JWT (WP does not
-            // return "Expired token"). Do not use the Apollo errorLink for this —
+            // return "Expired token"). Do not use the Apollo errorLink for this -
             // auto-replaying checkout would be unsafe.
             if (isGraphQlInternalServerError(error) && typeof window !== "undefined") {
-                const hasSessionToken = !!localStorage.getItem(SESSION_TOKEN_KEY);
-                const hasAuthToken = !!localStorage.getItem(AUTH_TOKEN_KEY);
+                console.warn(
+                    "Add to cart failed with a possible stale session/auth token. Recovering and retrying once.",
+                );
 
-                if (hasSessionToken || hasAuthToken) {
-                    console.warn(
-                        "Add to cart failed with a possible stale session/auth token. Recovering and retrying once.",
-                    );
+                await recoverSessionForAddToCart();
 
-                    await recoverSessionForAddToCart();
+                const leftoverAuth = localStorage.getItem(AUTH_TOKEN_KEY);
+                if (leftoverAuth && !parseJwtPayload(leftoverAuth)) {
+                    localStorage.removeItem(AUTH_TOKEN_KEY);
+                }
 
-                    try {
-                        const retry = await _addToCart({
-                            variables: {
-                                productId: id,
-                                quantity: quantity,
-                                variationId: variation
-                            },
-                        });
+                try {
+                    const retry = await _addToCart({
+                        variables: {
+                            productId: id,
+                            quantity: quantity,
+                            variationId: variation
+                        },
+                    });
 
-                        if (openCart && retry?.data?.addToCart?.cartItem) {
-                            setIsCartOpen(true)
-                        }
-
-                        return retry;
-                    } catch (retryError) {
-                        console.error("Add to cart retry failed:", retryError);
-                        notifyError("Unable to add item to cart. Please try again.");
-                        return { error: "Add to cart failed" };
+                    if (openCart && retry?.data?.addToCart?.cartItem) {
+                        setIsCartOpen(true)
                     }
+
+                    return retry;
+                } catch (retryError) {
+                    const retryMessage =
+                        (retryError as { graphQLErrors?: { message?: string }[] })
+                            ?.graphQLErrors?.[0]?.message ||
+                        (retryError as Error)?.message ||
+                        "";
+
+                    if (isGraphQlInternalServerError(retryError)) {
+                        localStorage.removeItem(AUTH_TOKEN_KEY);
+                        localStorage.removeItem(SESSION_TOKEN_KEY);
+                        try {
+                            const guestRetry = await _addToCart({
+                                variables: {
+                                    productId: id,
+                                    quantity: quantity,
+                                    variationId: variation
+                                },
+                            });
+                            if (openCart && guestRetry?.data?.addToCart?.cartItem) {
+                                setIsCartOpen(true)
+                            }
+                            return guestRetry;
+                        } catch {
+                            // fall through
+                        }
+                    }
+
+                    console.error("Add to cart retry failed:", retryMessage || retryError);
+                    notifyError("Unable to add item to cart. Please try again.");
+                    return { error: "Add to cart failed" };
                 }
             }
 

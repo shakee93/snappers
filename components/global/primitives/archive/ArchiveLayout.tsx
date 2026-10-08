@@ -1,13 +1,19 @@
 import { Suspense } from "react";
 import { getClient } from "@/graphql/apollo-ssr";
-import { GET_ALL_PRODUCTS } from "@/graphql/defs/products";
-import { GET_NESTED_CATEGORIES } from "@/graphql/defs/nav";
+import {
+  GET_ALL_PRODUCTS,
+  GET_BROWSE_CATEGORY_TABS,
+} from "@/graphql/defs/products";
+import { GET_NESTED_CATEGORIES, GET_NAV_CATEGORIES } from "@/graphql/defs/nav";
 import InstantSearchWrapper from "@/components/global/primitives/InstantSearchWrapper";
 import ArchiveFilters from "@/components/global/primitives/archive/ArchiveFilters";
 import TypesenseArchiveFilters from "@/components/global/primitives/archive/TypesenseArchiveFilters";
 import ArchiveProductGrid from "@/components/global/primitives/archive/ArchiveProductGrid";
 import ProductGridGraphQL from "@/components/global/primitives/archive/ProductGridGraphQL";
-import { ArchiveFilterBarSkeleton } from "@/components/global/primitives/archive/ArchiveLoading";
+import {
+  ArchiveFilterBarSkeleton,
+  ArchiveSidebarSkeleton,
+} from "@/components/global/primitives/archive/ArchiveLoading";
 import {
   ARCHIVE_PRODUCT_GRID_CLASS_NAME,
   INSTANT_SEARCH_PRODUCT_GRID_CLASS_NAME,
@@ -19,12 +25,36 @@ import { GET_TAG_DETAILS_BY_SLUG } from "@/graphql/defs/products";
 import { DealFilterType } from "@/lib/dealFilters";
 import { isGraphqlArchive } from "@/lib/archiveSource";
 import { siteConfig } from "@/site.config";
-import { getCategoryScopeExtraIds } from "@/lib/browseCategories";
+import {
+  buildBrowseCategoryScopeMap,
+  getCategoryScopeExtraIds,
+  resolveBrowseCategoryTabs,
+  type BrowseCategoryLike,
+} from "@/lib/browseCategories";
+import {
+  ARCHIVE_PRODUCTS_PER_PAGE,
+  type ArchiveFilterCategoryOption,
+} from "@/lib/archiveFilters";
+import { cn } from "@/lib/utils";
 
 async function getData(parentId?: number, tagSlug?: string) {
-  const { data } = await getClient().query({
-    query: GET_ALL_PRODUCTS,
-  });
+  const [productsResult, browseCategoryRoots, navCategoriesFlat] =
+    await Promise.all([
+      getClient()
+        .query({ query: GET_ALL_PRODUCTS })
+        .catch(() => ({ data: undefined })),
+      getClient()
+        .query({ query: GET_BROWSE_CATEGORY_TABS, variables: { first: 50 } })
+        .then((res) => res.data?.productCategories?.nodes ?? [])
+        .catch(() => []),
+      getClient()
+        .query({ query: GET_NAV_CATEGORIES })
+        .then((res) => res.data?.productCategories?.nodes ?? [])
+        .catch(() => []),
+    ]);
+
+  const archiveCategories =
+    productsResult.data?.productCategories?.nodes ?? navCategoriesFlat;
 
   let nestedCategories = [];
   let tagDetails = [];
@@ -35,7 +65,7 @@ async function getData(parentId?: number, tagSlug?: string) {
       variables: { parent: parentId },
     });
 
-    if (!categoryError) {
+    if (!categoryError && categoryData?.productCategories?.nodes) {
       nestedCategories = categoryData.productCategories.nodes;
     } else {
       console.error("Error fetching nested categories:", categoryError);
@@ -48,18 +78,44 @@ async function getData(parentId?: number, tagSlug?: string) {
       variables: { slug: [tagSlug] },
     });
 
-    if (!tagError) {
+    if (!tagError && tagData?.productTags?.nodes) {
       tagDetails = tagData.productTags.nodes;
     } else {
       console.error("Error fetching tag details:", tagError);
     }
   }
 
+  const sidebarFilterCategories: ArchiveFilterCategoryOption[] =
+    resolveBrowseCategoryTabs(
+      browseCategoryRoots as BrowseCategoryLike[],
+      navCategoriesFlat as BrowseCategoryLike[],
+    )
+      .filter(
+        (
+          item,
+        ): item is BrowseCategoryLike & {
+          databaseId: number;
+          name: string;
+        } => typeof item.databaseId === "number" && !!item.name,
+      )
+      .map((item) => ({
+        databaseId: item.databaseId,
+        name: item.name,
+        slug: item.slug,
+      }));
+
+  const categoryScopeById = buildBrowseCategoryScopeMap(
+    sidebarFilterCategories,
+    browseCategoryRoots as BrowseCategoryLike[],
+  );
+
   return {
-    productCategories: data.productCategories.nodes,
-    brands: data.brands.nodes,
+    productCategories: archiveCategories,
+    brands: [],
     nestedCategories,
     tagDetails,
+    sidebarFilterCategories,
+    categoryScopeById,
   };
 }
 
@@ -92,6 +148,8 @@ interface ArchiveLayoutProps {
   dealTags?: string[];
   inStockOnly?: boolean;
   defaultNewest?: boolean;
+  /** Hide visible page title and description (e.g. shop page with promo banner). */
+  hideHeading?: boolean;
 }
 
 const ArchiveLayout = async ({
@@ -110,10 +168,19 @@ const ArchiveLayout = async ({
   dealTags,
   inStockOnly,
   defaultNewest,
+  hideHeading = false,
 }: ArchiveLayoutProps) => {
   const graphqlArchive = isGraphqlArchive();
-  const { productCategories, brands, nestedCategories, tagDetails } = await getData(category?.databaseId ?? '', tag);
+  const {
+    productCategories,
+    brands,
+    nestedCategories,
+    tagDetails,
+    sidebarFilterCategories,
+    categoryScopeById,
+  } = await getData(category?.databaseId ?? "", tag);
   const categoryScopeIds = buildCategoryScopeIds(category, nestedCategories);
+  const showSidebarCategoryFilter = filters && graphqlArchive && !category;
 
   // console.log('tagDetails', tagDetails);
   // console.log('categoryName', category.databaseId);
@@ -121,28 +188,39 @@ const ArchiveLayout = async ({
   // console.log('descriptoin', description);
 
   return (
-    <div className="container py-8 lg:py-12 space-y-16 sm:space-y-20 lg:space-y-28">
+    <div
+      className={cn(
+        "container space-y-16 sm:space-y-20 lg:space-y-28",
+        hideHeading ? "pt-4 pb-8 lg:pt-4 lg:pb-12" : "py-8 lg:py-12",
+      )}
+    >
       <div className="space-y-4 lg:space-y-6">
-        <div className="max-w-screen-sm">
-          <h1 className="block capitalize text-2xl sm:text-3xl lg:text-4xl font-semibold">
+        {hideHeading ? (
+          <h1 className="sr-only">
             {headingOverride || (tagDetails.length > 0 ? tagDetails[0].name : title)}
           </h1>
-          <span className="block mt-2 lg:mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
-            {descriptionOverride || (tagDetails.length > 0 && tagDetails[0].description
-              ? tagDetails[0].description
-              : description || `Explore ${siteConfig.brand.name} Collections – where style meets functionality. Elevate your experience with quality and diverse options. Shop now for a seamless blend of style and substance!`)}
-          </span>
-        </div>
+        ) : (
+          <div className="max-w-screen-sm">
+            <h1 className="block capitalize text-2xl sm:text-3xl lg:text-4xl font-semibold">
+              {headingOverride || (tagDetails.length > 0 ? tagDetails[0].name : title)}
+            </h1>
+            <span className="block mt-2 lg:mt-4 text-neutral-500 dark:text-neutral-400 text-sm sm:text-base">
+              {descriptionOverride || (tagDetails.length > 0 && tagDetails[0].description
+                ? tagDetails[0].description
+                : description || `Explore ${siteConfig.brand.name} Collections – where style meets functionality. Elevate your experience with quality and diverse options. Shop now for a seamless blend of style and substance!`)}
+            </span>
+          </div>
+        )}
         {topLinks && topLinks.length > 0 ? (
           <div className="flex flex-wrap gap-2">
             {topLinks.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className={`rounded-md px-4 py-2 text-sm border ${
+                className={`rounded-full px-4 py-2 text-sm font-bold border ${
                   item.active
-                    ? "bg-primary-500 text-white border-primary-500"
-                    : "bg-white text-primary-500 border-primary-500"
+                    ? "border-header-green bg-header-green font-[family-name:var(--font-inter)] text-[#FACC15]"
+                    : "border-header-green/30 bg-white text-header-green hover:bg-header-cream/40"
                 }`}
               >
                 {item.label}
@@ -151,21 +229,52 @@ const ArchiveLayout = async ({
           </div>
         ) : null}
 
-        {filters ? (
+        {filters && !graphqlArchive ? (
           <Suspense fallback={<ArchiveFilterBarSkeleton />}>
-            {graphqlArchive ? (
-              <ArchiveFilters />
-            ) : (
-              <TypesenseArchiveFilters />
-            )}
+            <TypesenseArchiveFilters />
           </Suspense>
         ) : null}
 
-        <hr className="border-slate-200 dark:border-slate-700 " />
+        {filters && graphqlArchive ? (
+          <div className="lg:hidden">
+            <Suspense fallback={<ArchiveFilterBarSkeleton />}>
+              <ArchiveFilters
+                filterCategories={sidebarFilterCategories}
+                showCategoryFilter={showSidebarCategoryFilter}
+              />
+            </Suspense>
+          </div>
+        ) : null}
+
+        <hr
+          className={`border-slate-200 dark:border-slate-700 ${filters && graphqlArchive ? "lg:hidden" : ""}`}
+        />
 
         <main>
-          <div className="flex flex-col lg:flex-row">
-            <div className="flex-1 ">
+          <div
+            className={
+              filters && graphqlArchive
+                ? "grid grid-cols-12 gap-4"
+                : "flex flex-col lg:flex-row"
+            }
+          >
+            {filters && graphqlArchive ? (
+              <aside className="hidden lg:col-span-3 lg:block">
+                <Suspense fallback={<ArchiveSidebarSkeleton />}>
+                  <ArchiveFilters
+                    variant="sidebar"
+                    filterCategories={sidebarFilterCategories}
+                    showCategoryFilter={showSidebarCategoryFilter}
+                  />
+                </Suspense>
+              </aside>
+            ) : null}
+
+            <div
+              className={
+                filters && graphqlArchive ? "col-span-12 lg:col-span-9" : "flex-1"
+              }
+            >
               {graphqlArchive ? (
                 filters ? (
                   <Suspense
@@ -179,7 +288,8 @@ const ArchiveLayout = async ({
                       categoryIds={
                         categoryScopeIds.length > 0 ? categoryScopeIds : undefined
                       }
-                      first={45}
+                      categoryScopeById={categoryScopeById}
+                      first={ARCHIVE_PRODUCTS_PER_PAGE}
                     />
                   </Suspense>
                 ) : (
@@ -192,7 +302,7 @@ const ArchiveLayout = async ({
                   >
                     <ProductGridGraphQL
                       categoryIds={categoryScopeIds}
-                      first={45}
+                      first={ARCHIVE_PRODUCTS_PER_PAGE}
                     />
                   </Suspense>
                 )

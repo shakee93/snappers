@@ -6,18 +6,18 @@ Context: WP runs inside Docker on `37.60.235.46` (container `wordpress-xko4k0w4k
 
 ## Shipped
 
-**2026-04-23 — `wp_rapidload_job` full-scan eliminated**
-- Diagnosed via `performance_schema.events_statements_summary_by_digest` (top query by total time): `SELECT * FROM wp_rapidload_job WHERE URL = ?` had 517 K executions, 7.2 hours of CPU, **4.46 B rows examined** because the RapidLoad plugin wrote `url LONGTEXT` with no index — every lookup was a full scan of ~9 K rows.
-- Truncated the table (safe — it's an on-demand optimization-jobs cache) and added `ADD INDEX idx_url (url(191))`.
+**2026-04-23 - `wp_rapidload_job` full-scan eliminated**
+- Diagnosed via `performance_schema.events_statements_summary_by_digest` (top query by total time): `SELECT * FROM wp_rapidload_job WHERE URL = ?` had 517 K executions, 7.2 hours of CPU, **4.46 B rows examined** because the RapidLoad plugin wrote `url LONGTEXT` with no index - every lookup was a full scan of ~9 K rows.
+- Truncated the table (safe - it's an on-demand optimization-jobs cache) and added `ADD INDEX idx_url (url(191))`.
 - **Measured effect:** MySQL CPU 182% → ~20% within two minutes.
 
-**2026-04-23 — WPGraphQL Smart Cache enabled via an operation allowlist**
+**2026-04-23 - WPGraphQL Smart Cache enabled via an operation allowlist**
 - Flipped `graphql_cache_section.cache_toggle: off → on` and `log_purge_events: off → on`. `global_max_age` kept at 600 s.
-- Installed mu-plugin `wp-content/mu-plugins/graphql-cache-skip-session.php` (v0.2.0) that hooks `graphql_cache_is_object_cache_enabled` and returns `true` **only if the incoming operation name is in an explicit allowlist** of session-independent catalog/chrome/sitemap operations. Everything else — including anything the frontend adds later — bypasses by default. See *How the GraphQL cache works* below for the allowlist and reasoning.
-- Earlier blacklist approach (v0.1.0, regex on `cart|checkout|…` + `woocommerce-session` header bypass) was tried first and **reverted after an empty-cart-on-reload regression in incognito**. Post-mortem: the cart itself was fine (`CartProvider` is `'use client'` with `fetchPolicy: 'no-cache'` — never fetched in SSR), but Smart Cache's cache key is `(query, variables, operationName)` and doesn't vary on session headers, so any request without a session could pollute a cache entry that a different guest then read. A blacklist is one-regex-away from breaking; an allowlist fails closed.
+- Installed mu-plugin `wp-content/mu-plugins/graphql-cache-skip-session.php` (v0.2.0) that hooks `graphql_cache_is_object_cache_enabled` and returns `true` **only if the incoming operation name is in an explicit allowlist** of session-independent catalog/chrome/sitemap operations. Everything else - including anything the frontend adds later - bypasses by default. See *How the GraphQL cache works* below for the allowlist and reasoning.
+- Earlier blacklist approach (v0.1.0, regex on `cart|checkout|…` + `woocommerce-session` header bypass) was tried first and **reverted after an empty-cart-on-reload regression in incognito**. Post-mortem: the cart itself was fine (`CartProvider` is `'use client'` with `fetchPolicy: 'no-cache'` - never fetched in SSR), but Smart Cache's cache key is `(query, variables, operationName)` and doesn't vary on session headers, so any request without a session could pollute a cache entry that a different guest then read. A blacklist is one-regex-away from breaking; an allowlist fails closed.
 - **Measured effect:** WP container CPU 859% → ~541% within 60 s of enabling v0.2.0; audit log shows ~92% of real traffic (Vercel SSR + unauthenticated catalog browsing) in the allowlist, remainder (cart/customer/checkout/mutations) correctly bypassing.
 
-**2026-04-23 — operational cleanup (not a structural fix)**
+**2026-04-23 - operational cleanup (not a structural fix)**
 - Reaped ~30 stale `docker exec ... tail /var/log/apache2/...` shells that prior debugging had left running for up to a day; graceful `apache2ctl -k graceful` to recycle 121 Apache workers → 48. Container RSS dropped 6.99 GiB → 3.5 GiB. Listed for auditability.
 
 ---
@@ -26,16 +26,16 @@ Context: WP runs inside Docker on `37.60.235.46` (container `wordpress-xko4k0w4k
 
 ### Components
 
-- **WPGraphQL Smart Cache** (plugin, active) — caches query responses in the WP object cache.
-- **Redis Object Cache** (plugin + `wp-content/object-cache.php` drop-in, active) — backs the WP object cache with Redis. Smart Cache's entries land there automatically.
-- **`wp-content/mu-plugins/graphql-cache-skip-session.php`** — the policy. Tells Smart Cache *which* operations it's allowed to cache.
-- **`graphql_cache_section` option** — `cache_toggle`, `log_purge_events`, `global_max_age`. Managed via `wp option patch update graphql_cache_section …`.
+- **WPGraphQL Smart Cache** (plugin, active) - caches query responses in the WP object cache.
+- **Redis Object Cache** (plugin + `wp-content/object-cache.php` drop-in, active) - backs the WP object cache with Redis. Smart Cache's entries land there automatically.
+- **`wp-content/mu-plugins/graphql-cache-skip-session.php`** - the policy. Tells Smart Cache *which* operations it's allowed to cache.
+- **`graphql_cache_section` option** - `cache_toggle`, `log_purge_events`, `global_max_age`. Managed via `wp option patch update graphql_cache_section …`.
 
 ### The allowlist
 
-Smart Cache's native key is `(query, variables, operationName)`. It does **not** vary on cookies or custom headers. That means any operation whose response depends on session (cart contents, customer fields, current-user-scoped orders, checkout context) is unsafe to cache — one guest's response can be served to another.
+Smart Cache's native key is `(query, variables, operationName)`. It does **not** vary on cookies or custom headers. That means any operation whose response depends on session (cart contents, customer fields, current-user-scoped orders, checkout context) is unsafe to cache - one guest's response can be served to another.
 
-The mu-plugin enforces a strict allowlist. If the incoming `operationName` isn't in the list, the filter returns `false` and Smart Cache bypasses both the read and write path. This means a new GraphQL operation added to the frontend is **not cached by default** — you have to opt it in.
+The mu-plugin enforces a strict allowlist. If the incoming `operationName` isn't in the list, the filter returns `false` and Smart Cache bypasses both the read and write path. This means a new GraphQL operation added to the frontend is **not cached by default** - you have to opt it in.
 
 Currently allowlisted (see `gq_graphql_cache_allowlist()` in the mu-plugin for the canonical source):
 
@@ -67,7 +67,7 @@ The audit block should be **removed** once you're confident (it does a small fil
 
 ### Adding a new operation to the cache
 
-1. Confirm the new operation's response is session-independent. If any field reads from `cart`, `customer`, `viewer`, or similar, it isn't — stop.
+1. Confirm the new operation's response is session-independent. If any field reads from `cart`, `customer`, `viewer`, or similar, it isn't - stop.
 2. Add the operation name to the `$allow` array in `wp-content/mu-plugins/graphql-cache-skip-session.php`.
 3. Deploy the mu-plugin (ship the change in the repo if the file is tracked; otherwise `docker cp` into the container + `chown www-data:www-data`).
 4. Watch `/tmp/smart-cache-audit.log` for 5–10 min to confirm the new op shows `WOULD_CACHE` only when expected.
@@ -96,7 +96,7 @@ curl -s -X POST https://api.gqmobiles.lk/graphql \
 
 ### Outstanding concerns
 
-- `wt-smart-coupons-for-woocommerce` — verify it does not inject per-customer pricing into public catalog responses. If it does, either the offending fields need to move behind an authenticated-only path, or the affected operation(s) must leave the allowlist.
+- `wt-smart-coupons-for-woocommerce` - verify it does not inject per-customer pricing into public catalog responses. If it does, either the offending fields need to move behind an authenticated-only path, or the affected operation(s) must leave the allowlist.
 - Removing the audit-log block from the mu-plugin once the allowlist has been validated against a broader traffic window (target: after 24 h of production traffic with no alarms).
 
 ---
@@ -105,7 +105,7 @@ curl -s -X POST https://api.gqmobiles.lk/graphql \
 
 Hooks reviewed: `woocommerce_before_calculate_totals@20`, `woocommerce_cart_item_name`, product/variation save hooks, GraphQL-tag sync.
 
-### 1. No dedicated GraphQL field — biggest structural issue
+### 1. No dedicated GraphQL field - biggest structural issue
 
 Plugin only stores raw `_wc_bogo_*` postmeta. Frontend reads them via `metaData(keysIn:[6 keys])` attached to `ProductContentFull`, so **every product in every listing does 6 postmeta lookups** just to decide "is BOGO?".
 
@@ -148,8 +148,8 @@ Frontend then queries one cheap typed field, `bogoPluginMeta` can be deleted fro
 
 `woocommerce_before_calculate_totals` fires for every GraphQL cart query (WooGraphQL's cart resolver calls `calculate_totals()`), every checkout view, every mini-cart load. Each invocation:
 - Loops all cart items (`wc-bogo-simple.php:373`)
-- Calls `wc_get_product()` per configured free product ID (line 442) — DB hit each
-- Mutates the cart via `add_to_cart` / `remove_cart_item` / `set_quantity` — these can re-trigger downstream hooks (the `$is_processing` static guards against re-entrance, good)
+- Calls `wc_get_product()` per configured free product ID (line 442) - DB hit each
+- Mutates the cart via `add_to_cart` / `remove_cart_item` / `set_quantity` - these can re-trigger downstream hooks (the `$is_processing` static guards against re-entrance, good)
 
 The reentrance guard and `$last_reconcile_fingerprint` are **static-per-PHP-request**. They help only within a single request. Cross-request, every identical cart re-runs the full reconcile.
 
@@ -161,15 +161,15 @@ The reentrance guard and `$last_reconcile_fingerprint` are **static-per-PHP-requ
 
 ### 4. `wc_get_product()` inside tight loop
 
-Line 442 — `wc_get_product($free_product_id)` per free ID per paid cart item. For carts with BOGO products referencing multiple free variations, this is O(paid × free). Preload with a single `WC_Product_Data_Store_CPT::get_products()` by IDs instead.
+Line 442 - `wc_get_product($free_product_id)` per free ID per paid cart item. For carts with BOGO products referencing multiple free variations, this is O(paid × free). Preload with a single `WC_Product_Data_Store_CPT::get_products()` by IDs instead.
 
-### 5. `sync_bogo_catalog_product_tag()` on every product save — OK
+### 5. `sync_bogo_catalog_product_tag()` on every product save - OK
 
 Acceptable. Admin-only path.
 
 ---
 
-## Plugin bloat — active on every `/graphql` request
+## Plugin bloat - active on every `/graphql` request
 
 Every active plugin runs its `plugins_loaded` / `init` hooks in the hot path. These do nothing useful on a headless WP where the frontend is Next.js:
 
@@ -187,17 +187,17 @@ Every active plugin runs its `plugins_loaded` / `init` hooks in the hot path. Th
 | `all-in-one-wp-migration` + `migrate-guru` | **Two** migration plugins both active. | Keep one, deactivate the other |
 | `waitlist-woocommerce` + `waitlist-woocommerce-extend` | Two waitlist plugins both active. | Verify; likely one redundant |
 | `wordfence` (inactive) + `gotmls` (active) | Two security plugins installed. | Keep one, uninstall the other |
-| `woocommerce-email-template-customizer` | Admin-only — OK to keep | — |
-| `elementor` (inactive) | Off — fine | — |
+| `woocommerce-email-template-customizer` | Admin-only - OK to keep | - |
+| `elementor` (inactive) | Off - fine | - |
 
 ### Plugin-specific concerns
 
-- **`gotmls` (Anti-Malware)** — runs scheduled scans. Check `wp cron event list` and move to low-traffic window. Could explain some off-hour CPU spikes.
-- **`updraftplus`** — backup plugin. Verify schedule is off-peak.
-- **`wt-smart-coupons-for-woocommerce`** — also hooks `woocommerce_before_calculate_totals`. Stacks cost on top of BOGO reconcile for every cart query.
-- **`p0-connect`** — throws file-permission errors on every request (`Failed to open stream: .../uploads/plugin0/logs/plugin0_debug.log`). Fix the dir or deactivate.
-- **`2.0.5/`** (Daraz BNPL payment plugin named as version) — produces PHP deprecation warnings on every load. Upgrade or rename.
-- **`wp-graphql-woocommerce` (WooGraphQL)** — inherently expensive for cart/session queries; can't remove. Reinforces the case for query-level HTTP caching (see top).
+- **`gotmls` (Anti-Malware)** - runs scheduled scans. Check `wp cron event list` and move to low-traffic window. Could explain some off-hour CPU spikes.
+- **`updraftplus`** - backup plugin. Verify schedule is off-peak.
+- **`wt-smart-coupons-for-woocommerce`** - also hooks `woocommerce_before_calculate_totals`. Stacks cost on top of BOGO reconcile for every cart query.
+- **`p0-connect`** - throws file-permission errors on every request (`Failed to open stream: .../uploads/plugin0/logs/plugin0_debug.log`). Fix the dir or deactivate.
+- **`2.0.5/`** (Daraz BNPL payment plugin named as version) - produces PHP deprecation warnings on every load. Upgrade or rename.
+- **`wp-graphql-woocommerce` (WooGraphQL)** - inherently expensive for cart/session queries; can't remove. Reinforces the case for query-level HTTP caching (see top).
 
 ---
 
@@ -205,7 +205,7 @@ Every active plugin runs its `plugins_loaded` / `init` hooks in the hot path. Th
 
 - **`wp-graphql` introspection is on by default.** In production, disable or rate-limit it.
 - **No query depth / complexity limits** observed. A malicious query can amplify server cost. Add `register_graphql_settings_field` for max depth (~10) and complexity limits.
-- **No persisted queries.** Persisted queries pair with Smart Cache's selective caching — register the catalog operations as persisted so the frontend sends an ID instead of the full query body, and Smart Cache can cache by ID safely.
+- **No persisted queries.** Persisted queries pair with Smart Cache's selective caching - register the catalog operations as persisted so the frontend sends an ID instead of the full query body, and Smart Cache can cache by ID safely.
 
 ---
 
@@ -214,7 +214,7 @@ Every active plugin runs its `plugins_loaded` / `init` hooks in the hot path. Th
 - **Redis Object Cache is active and working** (drop-in loaded). Confirmed via `wp redis status`. No action.
 - **Traefik ACME loop for `soketi-...coolify.freshpixl.com`** (NXDOMAIN, rate-limited by Let's Encrypt since Apr 21). Drives proxy CPU uselessly. Either add the DNS record or delete the route in Coolify.
 - **One IP (`112.134.197.218`) accounts for ~24% of recent traffic.** Verify whether it's internal test traffic or external. If external, add a Traefik rate-limit middleware.
-- **67 SSH sessions** from the `w` output — mostly Coolify's Laravel Horizon SSH-loopback monitoring. Normal for Coolify but adds baseline CPU.
+- **67 SSH sessions** from the `w` output - mostly Coolify's Laravel Horizon SSH-loopback monitoring. Normal for Coolify but adds baseline CPU.
 
 ---
 
@@ -222,15 +222,15 @@ Every active plugin runs its `plugins_loaded` / `init` hooks in the hot path. Th
 
 | # | Change | Est. impact | Effort | Risk |
 |---|---|---|---|---|
-| 1 | ~~Enable WPGraphQL Smart Cache **selectively** (persisted queries + skip on session) so catalog reads are cached, cart/checkout/account are not~~ **Done 2026-04-23** via guest-session-header + op-name bypass mu-plugin. Persisted-query path deferred (not required for current win). | **~60–80% reduction in per-request CPU** | 4–6 hr | Medium — needs query registration |
-| 2 | Add typed `bogo` GraphQL field in `wc-bogo-simple`, drop `bogoPluginMeta` from Next.js `ProductContentFull` | Big — per-row cost on every listing drops | 1–2 hr | Low |
-| 3 | Deactivate the ~10 unused frontend-only plugins (Jetpack, AIOSEO, MonsterInsights, Site Kit, Hotjar, OptinMonster, UserFeedback, WPConsent, UnusedCSS, one of the migration plugins) | Medium — lowers baseline per-request cost | 30 min | Low (reversible) |
-| 4 | Add cross-request BOGO reconcile cache (Redis-backed transient keyed by cart hash) | Medium — only helps cart-heavy workloads | 3–4 hr | Medium |
-| 5 | Fix / deactivate `p0-connect` permission error | Small — removes per-request filesystem error | 15 min | Low |
+| 1 | ~~Enable WPGraphQL Smart Cache **selectively** (persisted queries + skip on session) so catalog reads are cached, cart/checkout/account are not~~ **Done 2026-04-23** via guest-session-header + op-name bypass mu-plugin. Persisted-query path deferred (not required for current win). | **~60–80% reduction in per-request CPU** | 4–6 hr | Medium - needs query registration |
+| 2 | Add typed `bogo` GraphQL field in `wc-bogo-simple`, drop `bogoPluginMeta` from Next.js `ProductContentFull` | Big - per-row cost on every listing drops | 1–2 hr | Low |
+| 3 | Deactivate the ~10 unused frontend-only plugins (Jetpack, AIOSEO, MonsterInsights, Site Kit, Hotjar, OptinMonster, UserFeedback, WPConsent, UnusedCSS, one of the migration plugins) | Medium - lowers baseline per-request cost | 30 min | Low (reversible) |
+| 4 | Add cross-request BOGO reconcile cache (Redis-backed transient keyed by cart hash) | Medium - only helps cart-heavy workloads | 3–4 hr | Medium |
+| 5 | Fix / deactivate `p0-connect` permission error | Small - removes per-request filesystem error | 15 min | Low |
 | 6 | Cron audit (`gotmls`, `updraftplus`, other scheduled scans) → move to off-peak | Prevents scheduled spikes | 30 min | Low |
 | 7 | Fix `soketi-...coolify.freshpixl.com` Traefik ACME loop | Cuts proxy-side noise | 10 min | Low |
-| 8 | Add GraphQL query depth/complexity limits | Defensive — not a perf fix per se | 1 hr | Low |
-| 9 | Pick one security plugin (Wordfence vs GOTMLS), one waitlist, one migration — uninstall the rest | Small | 30 min | Low |
+| 8 | Add GraphQL query depth/complexity limits | Defensive - not a perf fix per se | 1 hr | Low |
+| 9 | Pick one security plugin (Wordfence vs GOTMLS), one waitlist, one migration - uninstall the rest | Small | 30 min | Low |
 
 ---
 

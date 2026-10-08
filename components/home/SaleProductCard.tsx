@@ -5,6 +5,7 @@ import Link from "next/link";
 import { HIDDEN_PRODUCT_SLUGS } from "@/lib/hidden-products";
 import { getProductPath } from "@/lib/productUrl";
 import { siteConfig } from "@/site.config";
+import { BRAND_CTA_BUTTON_CLASS } from "@/shared/Button/ButtonBrand";
 
 interface SaleProductData {
   name: string;
@@ -57,7 +58,7 @@ const
                 </div>
                 <div className="flex flex-col gap-1">
                   {product.regularPrice && product.regularPrice !== product.price && (
-                    <span className="text-danger font-medium leading-none line-through text-[9px]">
+                    <span className="price-strike-angled font-medium leading-none text-[9px]">
                       {product.regularPrice} {product.currency}
                     </span>
                   )}
@@ -73,7 +74,7 @@ const
                   </button>
                 </Link>
                 <Link href={getProductPath(product)} target="_blank" rel="noopener noreferrer">
-                  <button className="bg-primary-500 text-white text-xs px-4 py-1 rounded-full hover:bg-blue-600 transition-colors">
+                  <button className={`rounded-full px-4 py-1.5 text-xs font-bold transition-opacity hover:opacity-90 ${BRAND_CTA_BUTTON_CLASS}`}>
                     Buy Now
                   </button>
                 </Link>

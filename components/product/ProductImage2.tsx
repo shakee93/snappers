@@ -59,7 +59,7 @@ const normalizeImageUrl = (sourceUrl: string): string => {
   }
 };
 
-/** Woo featured image + product gallery are separate fields — merge both, dedupe. */
+/** Woo featured image + product gallery are separate fields - merge both, dedupe. */
 const buildProductGalleryImages = (
   featured: GalleryImage | null | undefined,
   galleryNodes: Array<GalleryImage | null | undefined> | null | undefined,
@@ -240,7 +240,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
     <div className="embla w-full" id="product-image">
       <div className="relative">
         <div
-          className={`embla__viewport border border-[#0000001A] bg-white ${pdpRadius}`}
+          className={`embla__viewport border border-neutral-200 bg-white ${pdpRadius}`}
           ref={showGallery ? emblaMainRef : undefined}
         >
           <div className="embla__container">
@@ -277,7 +277,7 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
                 className="embla__slide"
                 aria-label={
                   product.name
-                    ? `${product.name} — no image available`
+                    ? `${product.name} - no image available`
                     : "No product image available"
                 }
               >

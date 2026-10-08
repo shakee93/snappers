@@ -99,7 +99,7 @@ const buildCustomerNote = ({
     `Phone Number: ${phone}`,
     ...(isStorePickup ? ["Pickup Location: Store"] : []),
     ...(isFlashDelivery
-      ? ["Delivery Method: Flash Delivery — customer arranges Uber/PickMe pickup"]
+      ? ["Delivery Method: Flash Delivery - customer arranges Uber/PickMe pickup"]
       : []),
     ...(isKokoPay ? ["Payment Method: Koko Pay"] : []),
     ...(customerNote ? ["", `Customer Note: ${customerNote}`] : []),
@@ -144,7 +144,7 @@ const CheckoutPage = () => {
   const [deliveryType, setDeliveryType] = useState<DeliveryType | null>(null);
   const noShipping = deliveryType === "store_pickup" || deliveryType === "flash_delivery";
   const [isKokoPayment, setIsKokoPayment] = useState(false);
-  // Selected gateway id — the summary lines price their woo-price-tiers unit
+  // Selected gateway id - the summary lines price their woo-price-tiers unit
   // price off it while WooCommerce keeps owning the totals.
   const [selectedPaymentGatewayId, setSelectedPaymentGatewayId] = useState("");
   const isCouponRestrictedPayment = COUPON_RESTRICTED_GATEWAY_IDS.includes(
@@ -257,11 +257,11 @@ const CheckoutPage = () => {
 
   // `quotedCart` is the cart as the server just returned it. After an address
   // push the provider's `cart` is a render behind, and the rate ids we have to
-  // choose from live on that response — so callers that just refetched pass it
+  // choose from live on that response - so callers that just refetched pass it
   // in rather than letting us read a stale set.
   const updateShippingTotal = async (quotedCart?: Cart | null) => {
     const rateSource = quotedCart ?? cart;
-    // Prefer the quoted cart's coupon set when one was just refetched —
+    // Prefer the quoted cart's coupon set when one was just refetched -
     // the provider cart can lag a render behind.
     const preferFree = cartHasFreeShippingCoupon(rateSource);
 
@@ -272,11 +272,11 @@ const CheckoutPage = () => {
     try {
       // Mirror the mapping in getShippingMethod: store_pickup uses the
       // block-based pickup_location, flash_delivery uses the zero-cost flat
-      // rate "Flash Delivery (Uber/PickMe)" — only when the store actually
+      // rate "Flash Delivery (Uber/PickMe)" - only when the store actually
       // quotes it, see resolveFlashDeliveryRate. CatLitter Delivery and
       // courier both fall through to whichever rate the store quoted for the
-      // current address — see resolveCatlitterDeliveryRate / resolveCourierRate.
-      // A free rate outranks both delivery options — see
+      // current address - see resolveCatlitterDeliveryRate / resolveCourierRate.
+      // A free rate outranks both delivery options - see
       // resolveFreeShippingRate. Pickup keeps its fixed id.
       const freeRate = preferFree ? resolveFreeShippingRate(rateSource) : null;
       const shippingMethods =
@@ -290,7 +290,7 @@ const CheckoutPage = () => {
                 : resolveCourierRate(rateSource, preferFree)?.id);
 
       // No rate means the address doesn't resolve to a serviceable zone yet.
-      // Selecting nothing is correct — the cart keeps whatever WC last quoted,
+      // Selecting nothing is correct - the cart keeps whatever WC last quoted,
       // and the summary is already showing that. The form only ever offers a
       // delivery option WooCommerce quoted, so this is the unserviceable-zone
       // case rather than a mismatched selection.
@@ -303,7 +303,7 @@ const CheckoutPage = () => {
         context: { fetchOptions: { signal: controller.signal } },
       });
 
-      // Stale response — a newer call has been started since we fired this one.
+      // Stale response - a newer call has been started since we fired this one.
       if (controller.signal.aborted) return;
 
       if (errors) {
@@ -313,7 +313,7 @@ const CheckoutPage = () => {
 
       if (data?.updateShippingMethod?.cart) {
         const updatedCart = data.updateShippingMethod.cart;
-        // Push into the provider now — the summary prefers cart.shippingTotal,
+        // Push into the provider now - the summary prefers cart.shippingTotal,
         // and without this it keeps reading the pre-address cart until a later
         // refresh effect lands (which is what made the estimate look stuck).
         applyCart(updatedCart);
@@ -324,7 +324,7 @@ const CheckoutPage = () => {
         );
       }
     } catch (error) {
-      // AbortError is expected when superseded — don't log as an error.
+      // AbortError is expected when superseded - don't log as an error.
       if (controller.signal.aborted) return;
       const name = (error as { name?: string })?.name;
       if (name === "AbortError") return;
@@ -360,7 +360,7 @@ const CheckoutPage = () => {
       console.error("Failed to re-read the cart after address sync:", error);
     }
 
-    // Surface the re-quoted cart immediately — the totals effect above picks
+    // Surface the re-quoted cart immediately - the totals effect above picks
     // the new figures up from it. Waiting for updateShippingMethod before
     // touching the provider left the estimate row on the previous rate for the
     // whole mutation round-trip.
@@ -405,7 +405,7 @@ const CheckoutPage = () => {
   );
 
   // Totals are mid-flight while address, payment, shipping or coupon
-  // recalculation is running — the summary rows and the Confirm button both key
+  // recalculation is running - the summary rows and the Confirm button both key
   // off this, so no figure can be read while a superseded one is on screen.
   const totalsRecalculating =
     shippingUpdating || addressSyncing || paymentSyncing || isCouponSyncingCart;
@@ -438,7 +438,7 @@ const CheckoutPage = () => {
 
     // Every pay-on-delivery gateway lands here, not just Cash on Delivery.
     // Gating this on `cod` alone left Card on Delivery (`cheque`) creating the
-    // order and clearing the cart but never navigating — the customer sat on
+    // order and clearing the cart but never navigating - the customer sat on
     // the checkout form with no confirmation.
     const isPayOnDelivery = PAY_ON_DELIVERY_GATEWAY_IDS.includes(
       formData?.paymentMethod?.selectedGateway?.id ?? "",
@@ -833,10 +833,10 @@ const CheckoutPage = () => {
 
     // store_pickup → block-based pickup_location method (instance 0).
     // flash_delivery → zone-bound flat rate ("Flash Delivery (Uber/PickMe)"
-    // at cost 0, id in siteConfig.shipping.flashDeliveryMethodId —
+    // at cost 0, id in siteConfig.shipping.flashDeliveryMethodId -
     // handleCheckout has already confirmed the store quotes it). Configured
     // via WooCommerce > Settings > Shipping > Everywhere. Different mechanism from store pickup, but
-    // both resolve to a free shipping line — and flat_rate keeps the
+    // both resolve to a free shipping line - and flat_rate keeps the
     // title verbatim so order admin shows "Flash Delivery (Uber/PickMe)"
     // instead of the pickup_location plugin's "<title> (<location>)" template.
     // CatLitter Delivery / courier: same dynamic rates as the cart-side
@@ -864,7 +864,7 @@ const CheckoutPage = () => {
 
     // methodTitle is the display string for the order summary; for
     // flat_rate WC writes the zone-config title, for pickup_location WC
-    // writes its own templated title — either way this string is
+    // writes its own templated title - either way this string is
     // cosmetic on the cart side. The courier label is zone-dependent
     // ("Local Delivery" vs "Standard Shipping"), so prefer the quoted one
     // over a generic stand-in.
@@ -886,15 +886,15 @@ const CheckoutPage = () => {
 
   // WooCommerce's cart-stock validator emits two distinct messages we want
   // to surface differently:
-  //   • Out of stock  — `Sorry, "<name>" is not in stock. ...`
-  //   • Insufficient  — `Sorry, we do not have enough "<name>" in stock to
+  //   • Out of stock  - `Sorry, "<name>" is not in stock. ...`
+  //   • Insufficient  - `Sorry, we do not have enough "<name>" in stock to
   //                      fulfill your order (N available)`. Older WC
-  //                      versions used "(N in stock)" — match the integer
+  //                      versions used "(N in stock)" - match the integer
   //                      and ignore the suffix wording.
   // The previous handler matched any substring "stock" and showed a single
   // "out of stock" toast, which mis-states the insufficient-quantity case.
   //
-  // This is also the safety net for cap drift — getCartLineStockCap reads
+  // This is also the safety net for cap drift - getCartLineStockCap reads
   // stockQuantity from the cart fragment at fetch time, so if WP stock
   // changes between cart render and order submit, the FE cap may be stale
   // but WC's server-side validator still rejects and we surface the live
@@ -915,9 +915,9 @@ const CheckoutPage = () => {
       // hedge the wording so we don't falsely promise a retry if a plugin
       // reuses this phrasing with different semantics.
       if (available === "0") {
-        return `"${name}" is currently unavailable — it may be held by another in-progress order, or out of stock. Please try again in a few minutes, or remove it from your cart.`;
+        return `"${name}" is currently unavailable - it may be held by another in-progress order, or out of stock. Please try again in a few minutes, or remove it from your cart.`;
       }
-      return `Only ${available} of "${name}" left in stock — please reduce the quantity in your cart.`;
+      return `Only ${available} of "${name}" left in stock - please reduce the quantity in your cart.`;
     }
 
     const outOfStock = errorMessage.match(/"([^"]+)"\s+is not in stock/i);
@@ -958,16 +958,16 @@ const CheckoutPage = () => {
 
     // Handle session errors
     // "Sorry, no session found." means the WC cart was empty server-side at
-    // process_checkout time — it does NOT mean the user is logged out.
+    // process_checkout time - it does NOT mean the user is logged out.
     // Redirecting to /login is wrong; recover the session/cart instead.
     if (error.message === "Sorry, no session found.") {
-      // Use the return value — not the closed-over `cart` state, which is stale.
+      // Use the return value - not the closed-over `cart` state, which is stale.
       let refreshedItemCount = cart?.contents?.itemCount ?? 0;
       try {
         const result = await refreshCart();
         refreshedItemCount = (result as any)?.data?.cart?.contents?.itemCount ?? refreshedItemCount;
       } catch {
-        console.debug("refreshCart failed during session recovery — using last-known item count");
+        console.debug("refreshCart failed during session recovery - using last-known item count");
       }
 
       if (refreshedItemCount === 0) {
@@ -976,7 +976,7 @@ const CheckoutPage = () => {
         return;
       }
 
-      toast.error("Session error — please reload the page to restore your cart.");
+      toast.error("Session error - please reload the page to restore your cart.");
       return;
     }
 
@@ -1066,7 +1066,7 @@ const CheckoutPage = () => {
   // shipping line from cart.total so coupons and fees stay in the quoted
   // total. Using cart.subtotal would drop percentage coupons. Assumes
   // shippingTax is 0 on this store (tax fields were trimmed from the cart
-  // fragment as unused) — if shipping tax is ever configured, pickup totals
+  // fragment as unused) - if shipping tax is ever configured, pickup totals
   // would still include it until that line is subtracted too.
   const serverOrderTotal = replaceStringinInt(cart?.total);
   const serverShippingTotal = replaceStringinInt(cart?.shippingTotal ?? "0");
@@ -1084,22 +1084,22 @@ const CheckoutPage = () => {
 
   // Card pricing now comes from WooCommerce alone: either a fee it attaches
   // once chosen_payment_method is synced, or the woo-price-tiers card price.
-  // No site-side surcharge is added on top — one was never billed, so it only
+  // No site-side surcharge is added on top - one was never billed, so it only
   // ever quoted a total higher than the amount handed to the gateway.
   const backendFees = (cart?.fees ?? []).filter(
     (fee): fee is NonNullable<typeof fee> =>
       !!fee && Number.isFinite(fee.amount) && (fee.amount ?? 0) !== 0,
   );
-  // Koko installment seam — currently identical to chargeableOrderTotal after
+  // Koko installment seam - currently identical to chargeableOrderTotal after
   // the financing markup was removed; kept named so a gateway fee can return
   // without rewiring the summary / prop plumbing.
   const kokoOrderTotal = chargeableOrderTotal;
 
   const orderTotalLabel = formatPrice(chargeableOrderTotal);
 
-  // The courier's name changes with the destination — WC quotes "Local
+  // The courier's name changes with the destination - WC quotes "Local
   // Delivery" inside the Colombo distance zone and "Standard Shipping"
-  // outstation — so name the service the customer is paying for instead of a
+  // outstation - so name the service the customer is paying for instead of a
   // generic estimate line. CatLitter Delivery is quoted per address too, so it
   // reads its own rate rather than the courier one. Falls back to the generic
   // wording while the cart has no quote yet.
@@ -1279,7 +1279,7 @@ const CheckoutPage = () => {
     if (orderDbId) {
       await clearCartSafely();
       toast.error(
-        "Your order was created, but payment could not be started. Please contact support — do not place the order again.",
+        "Your order was created, but payment could not be started. Please contact support - do not place the order again.",
       );
       return;
     }
@@ -1487,14 +1487,14 @@ const CheckoutPage = () => {
                       ) : (
                         // The refreshed cart wins over the local state. Both
                         // hold a shipping figure, but only the cart's is
-                        // re-read after every address sync — the local copy is
+                        // re-read after every address sync - the local copy is
                         // whatever the last updateShippingMethod returned and
                         // never expires, so `shippingTotal || cart` let a
                         // superseded rate shadow the live one indefinitely.
                         // That is why the row disagreed with the order total
                         // (which tracks cart.total) until a reload cleared the
                         // state. Both arrive as WooCommerce's own "Rs450.00"
-                        // string, so re-format — the rest of this summary is
+                        // string, so re-format - the rest of this summary is
                         // LKR.
                         formatPrice(
                           replaceStringinInt(cart?.shippingTotal || shippingTotal),

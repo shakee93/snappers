@@ -1,20 +1,16 @@
 "use client";
 
-import { useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import Checkbox from "@/shared/Checkbox/Checkbox";
-import { currencyCode } from "@/lib/formatPrice";
 import {
-  ARCHIVE_PRICE_MAX,
-  ARCHIVE_PRICE_MIN,
   ARCHIVE_SORT_OPTIONS,
   DEFAULT_ARCHIVE_FILTERS,
   ArchiveFilterState,
+  ArchiveFilterCategoryOption,
   ArchiveSortOption,
   buildArchiveFilterSearchParams,
-  normalizePriceRange,
-  parseArchivePriceInput,
 } from "@/lib/archiveFilters";
+import ArchiveSidebarCategoryFilter from "@/components/global/primitives/archive/ArchiveSidebarCategoryFilter";
 import {
   filterCheckboxLabelClassName,
   filterFieldLabelClassName,
@@ -29,80 +25,9 @@ interface ArchiveSidebarPanelProps {
   lockedFilters?: Partial<ArchiveFilterState>;
   filterDefaults?: Partial<ArchiveFilterState>;
   sortOptions?: ArchiveSortOption[];
+  filterCategories?: ArchiveFilterCategoryOption[];
+  showCategoryFilter?: boolean;
 }
-
-const priceInputWrapperClassName =
-  "flex h-9 min-w-0 w-full items-center gap-1 rounded-lg border border-[#E8E8E8] bg-white px-2 focus-within:border-header-action focus-within:ring-2 focus-within:ring-header-action/20";
-
-const priceInputClassName =
-  "h-full min-w-0 flex-1 border-0 bg-transparent p-0 text-sm leading-9 text-neutral-900 focus:outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:m-0 [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:m-0 [&::-webkit-outer-spin-button]:appearance-none";
-
-const ArchiveSidebarPriceInputs = ({
-  minPrice,
-  maxPrice,
-  onChange,
-}: {
-  minPrice: number;
-  maxPrice: number;
-  onChange: (next: Partial<ArchiveFilterState>) => void;
-}) => {
-  const [minPriceInput, setMinPriceInput] = useState(String(minPrice));
-  const [maxPriceInput, setMaxPriceInput] = useState(String(maxPrice));
-
-  const commitPriceRange = () => {
-    const next = normalizePriceRange(
-      parseArchivePriceInput(minPriceInput, "min"),
-      parseArchivePriceInput(maxPriceInput, "max"),
-    );
-    onChange(next);
-  };
-
-  return (
-    <div className="flex items-center gap-1.5">
-      <div className={priceInputWrapperClassName}>
-        <span className="flex h-full shrink-0 items-center text-xs font-medium leading-none text-header-green">
-          {currencyCode}
-        </span>
-        <input
-          id="archive-sidebar-min-price"
-          type="number"
-          min={ARCHIVE_PRICE_MIN}
-          max={ARCHIVE_PRICE_MAX}
-          inputMode="numeric"
-          aria-label="Minimum price"
-          className={priceInputClassName}
-          value={minPriceInput}
-          onChange={(event) => setMinPriceInput(event.target.value)}
-          onBlur={commitPriceRange}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") commitPriceRange();
-          }}
-        />
-      </div>
-      <span className="text-sm text-neutral-400">–</span>
-      <div className={priceInputWrapperClassName}>
-        <span className="flex h-full shrink-0 items-center text-xs font-medium leading-none text-header-green">
-          {currencyCode}
-        </span>
-        <input
-          id="archive-sidebar-max-price"
-          type="number"
-          min={ARCHIVE_PRICE_MIN}
-          max={ARCHIVE_PRICE_MAX}
-          inputMode="numeric"
-          aria-label="Maximum price"
-          className={priceInputClassName}
-          value={maxPriceInput}
-          onChange={(event) => setMaxPriceInput(event.target.value)}
-          onBlur={commitPriceRange}
-          onKeyDown={(event) => {
-            if (event.key === "Enter") commitPriceRange();
-          }}
-        />
-      </div>
-    </div>
-  );
-};
 
 const ArchiveSidebarPanel = ({
   filters,
@@ -110,6 +35,8 @@ const ArchiveSidebarPanel = ({
   lockedFilters,
   filterDefaults,
   sortOptions = ARCHIVE_SORT_OPTIONS,
+  filterCategories = [],
+  showCategoryFilter = false,
 }: ArchiveSidebarPanelProps) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -138,6 +65,14 @@ const ArchiveSidebarPanel = ({
           Reset
         </button>
       </div>
+
+      {showCategoryFilter && filterCategories.length > 0 ? (
+        <ArchiveSidebarCategoryFilter
+          categories={filterCategories}
+          selectedIds={filters.categoryIds}
+          onChange={(categoryIds) => onChange({ categoryIds })}
+        />
+      ) : null}
 
       <div className="space-y-2">
         <label htmlFor="archive-sidebar-sort" className={filterFieldLabelClassName}>
@@ -181,16 +116,6 @@ const ArchiveSidebarPanel = ({
           ) : null}
         </div>
       )}
-
-      <div className="space-y-2 rounded-xl border border-[#E8E8E8] bg-white px-4 py-3">
-        <span className={filterFieldLabelClassName}>Price</span>
-        <ArchiveSidebarPriceInputs
-          key={`${filters.minPrice}-${filters.maxPrice}`}
-          minPrice={filters.minPrice}
-          maxPrice={filters.maxPrice}
-          onChange={onChange}
-        />
-      </div>
     </div>
   );
 };

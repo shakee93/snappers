@@ -25,6 +25,7 @@ const TypesenseArchiveFilters = () => {
       minPrice: sidebar.priceRange[0],
       maxPrice: sidebar.priceRange[1],
       sort: typesenseSortToArchive(sidebar.sort),
+      categoryIds: sidebar.categories,
     }),
     [
       sidebar.in_stock,

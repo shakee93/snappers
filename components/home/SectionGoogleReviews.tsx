@@ -124,7 +124,7 @@ const ReviewCard = ({
 const MIN_CARDS_PER_HALF = 6;
 
 /**
- * "Real stories from happy families" — Google reviews fed by the
+ * "Real stories from happy families" - Google reviews fed by the
  * `googleReviews` ACF options page (see `GET_GOOGLE_REVIEWS`), shown as
  * three infinite marquee rows (left / right / left).
  */

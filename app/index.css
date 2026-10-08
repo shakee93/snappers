@@ -112,3 +112,28 @@ html {
     @apply bg-background text-foreground;
     }
 }
+
+@layer utilities {
+  .price-strike-angled {
+    @apply relative inline-block text-danger;
+    text-decoration: none;
+  }
+  .price-strike-angled::after {
+    content: "";
+    @apply pointer-events-none absolute left-[-2%] top-1/2 h-[1.2px] w-[104%] -translate-y-1/2 rotate-[9deg] bg-danger;
+  }
+
+  .product-card {
+    @apply border-neutral-200 transition-[box-shadow,border-color] duration-200 ease-out;
+  }
+
+  @media (hover: hover) {
+    .product-card:hover {
+      @apply border-neutral-300 shadow-md;
+    }
+
+    .product-card:hover .product-card-deal-percent {
+      @apply ml-1.5 max-w-[4rem] opacity-100;
+    }
+  }
+}

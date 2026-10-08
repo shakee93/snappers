@@ -10,7 +10,7 @@ const DEAL_PRODUCTS_QUERY_CONTEXT = {
   },
 };
 
-/** In-stock on-sale products — same source as the homepage deals carousel. */
+/** In-stock on-sale products - same source as the homepage deals carousel. */
 export const getDealProductsCached = unstable_cache(
   () =>
     getClient()

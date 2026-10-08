@@ -8,6 +8,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import koko from "@/public/koko.png";
 import { useCart } from "@/context/CartProvider";
+import { BRAND_CTA_BUTTON_CLASS } from "@/shared/Button/ButtonBrand";
 import useProductLink from "@/hooks/useProductLink";
 import { getDatabaseIdFromProductLike } from "@/lib/bogo";
 import { resolveProductImageUrl } from "@/lib/productImage";
@@ -20,7 +21,7 @@ export interface HealthFeatureCardProps {
   price: string | null;
   /** Big left-hand artwork for the slide; falls back to the product image. */
   featureImage?: string;
-  /** Centre slide in the carousel — gets the highlighted card background. */
+  /** Centre slide in the carousel - gets the highlighted card background. */
   isActive?: boolean;
 }
 
@@ -248,7 +249,7 @@ const HealthFeatureCard = ({
       type="button"
       disabled={loading || isOutOfStock}
       onClick={handleAddToCart}
-      className="inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-[10px] bg-[#C5E066] px-3.5 py-2 text-[13px] font-bold leading-none text-[#0A0A0A] transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:min-w-[160px] sm:rounded-full sm:px-6 sm:py-3 sm:text-sm sm:leading-normal"
+      className={`inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full px-3.5 py-2 text-[13px] font-bold leading-none transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:min-w-[160px] sm:px-6 sm:py-3 sm:text-sm sm:leading-normal ${BRAND_CTA_BUTTON_CLASS}`}
     >
       {loading ? (
         <Loader className="h-4 w-4 animate-spin" />

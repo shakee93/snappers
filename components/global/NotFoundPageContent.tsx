@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { BRAND_CTA_BUTTON_CLASS } from "@/shared/Button/ButtonBrand";
 import { useEffect } from "react";
 import notFoundContent from "@/content/not-found.json";
 import { useChromeVisibility } from "@/context/ChromeVisibilityProvider";
@@ -45,7 +46,7 @@ const NotFoundPageContent = () => {
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link
             href={hero.cta.primary.href}
-            className="inline-flex items-center rounded-xl bg-header-action px-8 py-3.5 text-sm font-bold text-[#092412] transition-opacity hover:opacity-90"
+            className={`inline-flex items-center rounded-full px-8 py-3.5 text-sm font-bold transition-opacity hover:opacity-90 ${BRAND_CTA_BUTTON_CLASS}`}
           >
             {hero.cta.primary.label}
           </Link>

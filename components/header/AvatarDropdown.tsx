@@ -1,14 +1,19 @@
 "use client";
 import { Popover, Transition } from "@headlessui/react";
 import Image from "next/image";
-import { Loader2, LogIn, User } from "lucide-react";
+import { ClipboardList, Loader2, LogIn, User } from "lucide-react";
 import { Fragment, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import LogoutButton from "@/components/header/LogoutButton";
 import { useSession } from "@/context/SessionProvider";
 import { accountTabHref } from "@/components/account/accountTabs";
 import profileIcon from "@/public/global/profile.svg";
+import { cn } from "@/lib/utils";
 import {
+  ACCOUNT_MENU_ICON_CLASS,
+  ACCOUNT_MENU_INNER_CLASS,
+  ACCOUNT_MENU_ITEM_CLASS,
+  ACCOUNT_MENU_PANEL_CLASS,
   HEADER_ACTION_ICON,
   HEADER_ACTION_ICON_BOX,
   HEADER_ACTION_ITEM,
@@ -16,16 +21,15 @@ import {
 } from "./headerActionStyles";
 
 const headerAvatarButtonClass =
-  "flex h-10 w-10 items-center justify-center rounded-xl bg-header-peach text-neutral-900 transition-[filter] hover:brightness-95 focus:outline-none";
+  "flex h-10 w-10 items-center justify-center rounded-xl bg-header-green text-[#FACC15] transition-[filter] hover:brightness-95 focus:outline-none";
 
 const headerAvatarLoaderClass =
-  "h-[18px] w-[18px] animate-spin text-neutral-900";
+  "h-[18px] w-[18px] animate-spin text-[#FACC15]";
 
 type AvatarDropdownProps = {
   variant?: "icon" | "labeled";
 };
 
-// Skeleton for loading
 export default function AvatarDropdown({ variant = "icon" }: AvatarDropdownProps) {
   const [isLoading, setIsLoading] = useState(true);
   const { customer, fetchCustomer } = useSession();
@@ -35,40 +39,41 @@ export default function AvatarDropdown({ variant = "icon" }: AvatarDropdownProps
     return name ? name.charAt(0).toUpperCase() : "?";
   }, [customer?.displayName]);
 
+  const isLoggedIn = Boolean(customer && customer.id !== "guest");
+
   const fetchData = async () => {
-    setIsLoading(true); // Set loading state to true
+    setIsLoading(true);
     await fetchCustomer();
-    setIsLoading(false); // Set loading state to false once fetched
+    setIsLoading(false);
   };
 
   useEffect(() => {
     if (customer == null) {
-      fetchData();
+      void fetchData();
     } else {
-      setIsLoading(false); // Ensure no loading if customer data is already available
+      setIsLoading(false);
     }
   }, [customer]);
 
   return (
     <div
       className={
-        variant === "labeled"
-          ? "AvatarDropdown flex items-center"
-          : "AvatarDropdown"
+        variant === "labeled" ? "AvatarDropdown inline-flex" : "AvatarDropdown"
       }
     >
-      <Popover className="relative flex items-center">
+      <Popover className="relative inline-flex">
         {({ open, close }) => (
           <>
             <Popover.Button
               className={
                 variant === "labeled"
-                  ? `${HEADER_ACTION_ITEM} focus:outline-none focus-visible:ring-2 focus-visible:ring-header-green/40 focus-visible:ring-offset-1`
-                  : ""
+                  ? `${HEADER_ACTION_ITEM} outline-none ring-0 focus:outline-none focus:ring-0 focus-visible:outline-none focus-visible:ring-0 data-[headlessui-state=open]:outline-none data-[headlessui-state=open]:ring-0`
+                  : "outline-none ring-0 focus:outline-none focus:ring-0"
               }
               aria-label="Account"
+              aria-expanded={open}
               onClick={() => {
-                fetchCustomer();
+                void fetchCustomer();
               }}
             >
               {variant === "labeled" ? (
@@ -79,6 +84,13 @@ export default function AvatarDropdown({ variant = "icon" }: AvatarDropdownProps
                         className={`${HEADER_ACTION_ICON} animate-spin`}
                         aria-hidden
                       />
+                    ) : isLoggedIn ? (
+                      <span
+                        className="flex h-7 w-7 items-center justify-center rounded-full bg-header-green text-sm font-bold leading-none text-[#FACC15]"
+                        aria-hidden
+                      >
+                        {customerInitial}
+                      </span>
                     ) : (
                       <User className={HEADER_ACTION_ICON} aria-hidden />
                     )}
@@ -102,7 +114,7 @@ export default function AvatarDropdown({ variant = "icon" }: AvatarDropdownProps
                       aria-hidden
                     />
                   ) : (
-                    <span className="text-lg font-bold leading-none text-neutral-900">
+                    <span className="text-lg font-bold leading-none text-[#FACC15]">
                       {customerInitial}
                     </span>
                   )}
@@ -119,125 +131,67 @@ export default function AvatarDropdown({ variant = "icon" }: AvatarDropdownProps
               leaveFrom="opacity-100 translate-y-0"
               leaveTo="opacity-0 translate-y-1"
             >
-              <Popover.Panel className="absolute z-[200] w-screen max-w-[260px] px-4 mt-3.5 -right-10 sm:right-0 sm:px-0">
-                <div className="overflow-hidden rounded-3xl shadow-lg ring-1 ring-black ring-opacity-5">
-                  <div className="relative grid grid-cols-1 gap-6 bg-white dark:bg-neutral-800 py-7 px-6">
+              <Popover.Panel
+                className={cn(
+                  "absolute top-full z-[300] mt-2 w-[min(calc(100vw-1.5rem),16.25rem)] sm:w-[16.25rem]",
+                  variant === "labeled"
+                    ? "left-1/2 -translate-x-1/2"
+                    : "right-0",
+                )}
+              >
+                <div className={ACCOUNT_MENU_PANEL_CLASS}>
+                  <div className={ACCOUNT_MENU_INNER_CLASS}>
                     {isLoading ? (
-                      <div className="space-y-3 animate-pulse" aria-hidden>
-                        <div className="h-4 w-2/3 rounded bg-neutral-200 dark:bg-neutral-700" />
-                        <div className="h-4 w-full rounded bg-neutral-200 dark:bg-neutral-700" />
-                        <div className="h-4 w-4/5 rounded bg-neutral-200 dark:bg-neutral-700" />
+                      <div className="space-y-2 px-3 py-2 animate-pulse" aria-hidden>
+                        <div className="h-4 w-2/3 rounded bg-neutral-200" />
+                        <div className="h-9 w-full rounded-xl bg-neutral-100" />
+                        <div className="h-9 w-full rounded-xl bg-neutral-100" />
                       </div>
                     ) : !customer || customer.id === "guest" ? (
                       <Link
                         href="/login"
-                        className="flex items-center p-2 -m-3 transition duration-150 ease-in-out rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50"
+                        className={ACCOUNT_MENU_ITEM_CLASS}
                         onClick={() => close()}
                       >
-                        <div className="flex items-center justify-center flex-shrink-0 text-neutral-500 dark:text-neutral-300">
-                          <LogIn />
-                        </div>
-                        <div className="ml-4">
-                          <p className="text-sm font-medium">Sign in</p>
-                        </div>
+                        <span className={ACCOUNT_MENU_ICON_CLASS}>
+                          <LogIn className="h-5 w-5" aria-hidden />
+                        </span>
+                        Sign in
                       </Link>
                     ) : (
                       <>
-                        <div className="flex items-center space-x-3">
-                          <div className="flex-grow">
-                            <h4 className="font-semibold">
-                              {customer?.displayName ?? ""}
-                            </h4>
-                          </div>
-                        </div>
-
-                        <div className="w-full border-b border-neutral-200 dark:border-neutral-700" />
+                        <p className="px-3 pb-2 pt-1 text-base font-bold text-header-green">
+                          {customer.displayName ?? ""}
+                        </p>
+                        <div
+                          className="mx-3 border-b border-neutral-200"
+                          aria-hidden
+                        />
 
                         <Link
-                          href={"/account"}
-                          className="flex items-center p-2 -m-3 transition duration-150 ease-in-out rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50"
+                          href="/account"
+                          className={ACCOUNT_MENU_ITEM_CLASS}
                           onClick={() => close()}
                         >
-                          <div className="flex items-center justify-center flex-shrink-0 text-neutral-500 dark:text-neutral-300">
-                            <svg
-                              width="24"
-                              height="24"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                              xmlns="http://www.w3.org/2000/svg"
-                            >
-                              <path
-                                d="M12.1601 10.87C12.0601 10.86 11.9401 10.86 11.8301 10.87C9.45006 10.79 7.56006 8.84 7.56006 6.44C7.56006 3.99 9.54006 2 12.0001 2C14.4501 2 16.4401 3.99 16.4401 6.44C16.4301 8.84 14.5401 10.79 12.1601 10.87Z"
-                                stroke="currentColor"
-                                strokeWidth="1.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                              <path
-                                d="M7.15997 14.56C4.73997 16.18 4.73997 18.82 7.15997 20.43C9.90997 22.27 14.42 22.27 17.17 20.43C19.59 18.81 19.59 16.17 17.17 14.56C14.43 12.73 9.91997 12.73 7.15997 14.56Z"
-                                stroke="currentColor"
-                                strokeWidth="1.5"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-                          </div>
-                          <div className="ml-4">
-                            <p className="text-sm font-medium ">
-                              {"My Account"}
-                            </p>
-                          </div>
+                          <span className={ACCOUNT_MENU_ICON_CLASS}>
+                            <User className="h-5 w-5" strokeWidth={1.75} aria-hidden />
+                          </span>
+                          My Account
                         </Link>
 
                         <Link
                           href={accountTabHref("orders")}
-                          className="flex items-center p-2 -m-3 transition duration-150 ease-in-out rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-700 focus:outline-none focus-visible:ring focus-visible:ring-orange-500 focus-visible:ring-opacity-50"
+                          className={ACCOUNT_MENU_ITEM_CLASS}
                           onClick={() => close()}
                         >
-                          <div className="flex items-center justify-center flex-shrink-0 text-neutral-500 dark:text-neutral-300">
-                            <svg
-                              width="24"
-                              height="24"
-                              viewBox="0 0 24 24"
-                              fill="none"
-                            >
-                              <path
-                                d="M8 12.2H15"
-                                stroke="currentColor"
-                                strokeWidth="1.5"
-                                strokeMiterlimit="10"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                              <path
-                                d="M8 16.2H12.38"
-                                stroke="currentColor"
-                                strokeWidth="1.5"
-                                strokeMiterlimit="10"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                              <path
-                                d="M10 6H14C16 6 16 5 16 4C16 2 15 2 14 2H10C9 2 8 2 8 4C8 6 9 6 10 6Z"
-                                stroke="currentColor"
-                                strokeWidth="1.5"
-                                strokeMiterlimit="10"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                              <path
-                                d="M16 4.02002C19.33 4.20002 21 5.43002 21 10V16C21 20 20 22 15 22H9C4 22 3 20 3 16V10C3 5.44002 4.67 4.20002 8 4.02002"
-                                stroke="currentColor"
-                                strokeWidth="1.5"
-                                strokeMiterlimit="10"
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-                          </div>
-                          <div className="ml-4">
-                            <p className="text-sm font-medium ">{"My Order"}</p>
-                          </div>
+                          <span className={ACCOUNT_MENU_ICON_CLASS}>
+                            <ClipboardList
+                              className="h-5 w-5"
+                              strokeWidth={1.75}
+                              aria-hidden
+                            />
+                          </span>
+                          My Orders
                         </Link>
 
                         <LogoutButton onClose={close} />

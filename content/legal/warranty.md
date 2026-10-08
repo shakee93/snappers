@@ -2,7 +2,7 @@ Goods once sold cannot be returned or exchanged under any circumstances.
 
 ## Warranty Terms
 
-- **Repairs only** — No replacements will be provided.
+- **Repairs only** - No replacements will be provided.
 - The product must be presented with the **original box, cables, and all accessories** to claim warranty.
 - AppleCare or manufacturer warranty claims may take a **minimum of 45 days** to process.
 - Warranty processing time depends on the **availability of spare parts and shipping schedules**.

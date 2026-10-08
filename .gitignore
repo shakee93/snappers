@@ -42,9 +42,9 @@ typesense-data
 
 .env*.prod
 
-# claude code — project-local skills (may contain secrets)
+# claude code - project-local skills (may contain secrets)
 .claude/skills/*
 # exception: shared, non-sensitive skills checked into the repo
 !.claude/skills/gq-overview/
-# claude code — machine-local settings (may contain embedded shell commands with tokens)
+# claude code - machine-local settings (may contain embedded shell commands with tokens)
 .claude/settings.local.json

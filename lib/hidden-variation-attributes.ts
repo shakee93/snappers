@@ -1,7 +1,7 @@
 // Attribute slugs that should never surface in the sidebar variation filters
 // or be sent as filter clauses to Typesense. Use this as the kill-switch for
 // duplicate/legacy taxonomies that exist in WordPress but shouldn't influence
-// the storefront filter UI — e.g. `pa_colour` shadows `pa_color` with the same
+// the storefront filter UI - e.g. `pa_colour` shadows `pa_color` with the same
 // terms split across both, producing wrong-colour results until the source
 // taxonomy is consolidated upstream.
 //

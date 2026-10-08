@@ -7,6 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import useInterval from "react-use/lib/useInterval";
 import type { ProductCardItem } from "@/components/home/ProductCard";
 import { HERO_SLIDER_TITLE_CLASS } from "@/lib/heroSlides";
+import { BRAND_CTA_BUTTON_CLASS } from "@/shared/Button/ButtonBrand";
 
 interface MediaNode {
   node?: { sourceUrl?: string | null } | null;
@@ -43,6 +44,8 @@ interface HealthSectionEntry {
 }
 
 export interface HeroSettingsFields {
+  /** ACF “Deals Date” - countdown target on the homepage deal banner. */
+  dealsDate?: string | null;
   sliderSettings?: { slides?: (HeroSlide | null)[] | null } | null;
   dealBannerSettings?: { deals?: (HeroDeal | null)[] | null } | null;
   healthSectionSettings?: {
@@ -65,12 +68,14 @@ const HERO_SLIDER_SIGNUP_BG = "/homepage/hero/pattern-bg.webp";
 const HERO_SLIDER_FEATURE_IMAGE =
   "/homepage/hero/hero-slide-snappers-coins.png";
 
+const HERO_SLIDE_BUTTON_CLASS = `mt-1 inline-flex w-fit items-center rounded-md px-5 py-2.5 text-base font-bold shadow-sm sm:px-6 sm:py-3 sm:text-lg ${BRAND_CTA_BUTTON_CLASS}`;
+
 const DEFAULT_SLIDES: HeroSlide[] = [
   {
     sliderTitle: `<span class="${HERO_SLIDER_TITLE_CLASS}">Join Now, Receive Rs.200 Cashback.</span>`,
     sliderDiscription: "Limited Time Offer",
-    titleColor: "#0C2016",
-    descriptionColor: "#7DA068",
+    titleColor: "#092412",
+    descriptionColor: "#000000",
     buttonText: "Sign Up",
     buttonLink: "/signup",
     buttonTextColor: "#ffffff",
@@ -94,7 +99,16 @@ function stripHtml(html: string): string {
   return html.replace(/<[^>]+>/g, " ");
 }
 
-/** Homepage hero carousel — slides from GraphQL `heroSlides` or defaults. */
+/** Slides with overlay copy hide full-bleed art on mobile; image-only slides need the artwork visible. */
+function heroSlideHasCopy(item: HeroSlide): boolean {
+  const title = item.sliderTitle?.trim();
+  const desc = item.sliderDiscription?.trim();
+  if (desc) return true;
+  if (!title) return false;
+  return stripHtml(title).trim().length > 0;
+}
+
+/** Homepage hero carousel - Hero Settings ACF slides, then slide CPT, then defaults. */
 const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
   const slidesFromCms = useMemo(
     () =>
@@ -129,10 +143,10 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
       className={`relative w-full bg-white ${className}`}
       aria-label="Promotions"
     >
-      <div className="relative mx-auto w-full max-w-[1368px] px-3 py-6 sm:px-4 lg:py-10 xl:px-0">
+      <div className="relative mx-auto w-full max-w-[1368px] px-3 pt-6 pb-1 sm:px-4 lg:pt-8 lg:pb-2 xl:px-0">
         <div className="w-full">
-          <div className="relative min-h-[280px] w-full rounded-2xl bg-white p-2 shadow-[0_4px_24px_rgba(15,23,42,0.12)] ring-1 ring-neutral-200/80 sm:min-h-[340px] sm:p-2.5 lg:min-h-[452px]">
-            <div className="relative min-h-[calc(280px-1rem)] overflow-hidden rounded-xl bg-[#faf9f7] sm:min-h-[calc(340px-1.25rem)] lg:min-h-[calc(452px-1.25rem)]">
+          <div className="relative w-full rounded-2xl bg-white p-2 shadow-[0_4px_24px_rgba(15,23,42,0.12)] ring-1 ring-neutral-200/80 sm:p-2.5">
+            <div className="relative aspect-[1368/452] w-full overflow-hidden rounded-xl bg-[#faf9f7]">
               <div
                 className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat"
                 style={{ backgroundImage: `url('${HERO_SLIDER_BG}')` }}
@@ -142,6 +156,7 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
             {slides.map((item, index) => {
               const src = item.sliderBackgroundImage?.node?.sourceUrl;
               const isActive = index === activeIndex;
+              const hasCopy = heroSlideHasCopy(item);
 
               if (!src) {
                 return null;
@@ -152,7 +167,7 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
                   key={`hero-slide-${index}`}
                   animate={{ opacity: isActive ? 1 : 0 }}
                   transition={CROSSFADE}
-                  className="absolute inset-0 z-0"
+                  className={`absolute inset-0 z-0 ${hasCopy ? "max-lg:hidden" : ""}`}
                   aria-hidden={!isActive}
                 >
                   <Image
@@ -161,7 +176,11 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
                     fill
                     priority={index === 0}
                     sizes="100vw"
-                    className="object-cover object-center"
+                    className={
+                      hasCopy
+                        ? "object-cover object-center"
+                        : "object-contain object-center max-lg:object-contain lg:object-cover"
+                    }
                   />
                 </motion.div>
               );
@@ -180,7 +199,7 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
                   key={`hero-slide-feature-${index}`}
                   animate={{ opacity: isActive ? 1 : 0 }}
                   transition={CROSSFADE}
-                  className="pointer-events-none absolute inset-y-0 right-0 z-[2] flex w-full max-w-[400px] items-center justify-end p-4 sm:p-5 lg:p-6"
+                  className="pointer-events-none absolute inset-y-0 right-0 z-[2] hidden w-full max-w-[400px] items-center justify-end p-4 sm:p-5 lg:flex lg:p-6"
                   aria-hidden={!isActive}
                 >
                   <div className="relative h-full w-full max-w-[300px]">
@@ -196,7 +215,7 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
               );
             })}
 
-            <div className="absolute inset-0 z-10 flex flex-col justify-center p-6 font-playfair sm:p-8 lg:max-w-[55%] lg:p-10">
+            <div className="absolute inset-0 z-10 flex flex-col justify-center p-6 font-albra sm:p-8 lg:max-w-[70%] lg:p-10">
               <AnimatePresence mode="wait" initial={false}>
                 <motion.div
                   key={activeIndex}
@@ -209,52 +228,31 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
                   {slide?.sliderTitle ? (
                     <div
                       style={{ color: slide.titleColor ?? undefined }}
-                      className="leading-tight [&_*]:font-playfair [&_*]:leading-tight"
+                      className="leading-[1.05] [&_*]:font-albra [&_*]:leading-[1.05]"
                       dangerouslySetInnerHTML={{ __html: slide.sliderTitle }}
                     />
                   ) : null}
                   {slide?.sliderDiscription ? (
-                    <p
-                      style={{ color: slide.descriptionColor ?? undefined }}
-                      className="text-lg font-semibold sm:text-xl lg:text-2xl"
-                    >
+                    <p className="font-[family-name:var(--font-inter)] text-base font-medium text-black sm:text-lg lg:text-xl">
                       {slide.sliderDiscription}
                     </p>
                   ) : null}
                   {slide?.buttonText && slide.buttonLink ? (
-                    (() => {
-                      const buttonStyle = {
-                        backgroundColor: slide.buttonBachgroundColor ?? "#059669",
-                        color: slide.buttonTextColor ?? "#ffffff",
-                        ...(slide.buttonBorderColor
-                          ? { border: `1px solid ${slide.buttonBorderColor}` }
-                          : {}),
-                      };
-                      const buttonClassName =
-                        "mt-1 inline-flex w-fit items-center rounded-md px-5 py-2.5 text-sm font-semibold shadow-sm transition-transform hover:scale-[1.02]";
-
-                      if (slide.buttonLink.startsWith("http")) {
-                        return (
-                          <a
-                            href={slide.buttonLink}
-                            style={buttonStyle}
-                            className={buttonClassName}
-                          >
-                            {slide.buttonText}
-                          </a>
-                        );
-                      }
-
-                      return (
-                        <Link
-                          href={slide.buttonLink}
-                          style={buttonStyle}
-                          className={buttonClassName}
-                        >
-                          {slide.buttonText}
-                        </Link>
-                      );
-                    })()
+                    slide.buttonLink.startsWith("http") ? (
+                      <a
+                        href={slide.buttonLink}
+                        className={`${HERO_SLIDE_BUTTON_CLASS} hidden lg:inline-flex`}
+                      >
+                        {slide.buttonText}
+                      </a>
+                    ) : (
+                      <Link
+                        href={slide.buttonLink}
+                        className={`${HERO_SLIDE_BUTTON_CLASS} hidden lg:inline-flex`}
+                      >
+                        {slide.buttonText}
+                      </Link>
+                    )
                   ) : null}
                 </motion.div>
               </AnimatePresence>

@@ -1,6 +1,7 @@
 import { getClient } from "@/graphql/apollo-ssr";
 import { GET_BRAND, GET_CATEGORY } from "@/graphql/defs/products";
 import { Brand, ProductCategory } from "@/graphql/types/graphql";
+import { isRegisteredArchiveSlug } from "@/lib/archiveSlugRegistry";
 import { getProductPageData, ProductPageData } from "@/lib/productPageData";
 
 export type SlugResolution =
@@ -10,7 +11,7 @@ export type SlugResolution =
 
 // Each lookup degrades to null on failure (mirroring getProductPageData) so a
 // transient GraphQL error on one entity type doesn't 500 the request before the
-// next type is tried — e.g. a flaky category lookup must not blow up a valid
+// next type is tried - e.g. a flaky category lookup must not blow up a valid
 // brand page.
 async function getCategoryBySlug(slug: string) {
   try {
@@ -63,13 +64,27 @@ async function getBrandBySlug(slug: string) {
  * sitemap URL rendering the wrong page. Keep slugs distinct across the three
  * namespaces; if collisions become possible, add a build/sitemap-time guard.
  *
- * `withRelated` is forwarded to the product resolver — pass `false` from
+ * `withRelated` is forwarded to the product resolver - pass `false` from
  * metadata-only callers to skip the unused related-products fetch.
  */
 export async function resolveSlug(
   slug: string,
   opts?: { withRelated?: boolean },
 ): Promise<SlugResolution | null> {
+  // Main nav / seeded archive slugs (e.g. groceries) are categories - skip
+  // GetProduct so WPGraphQL does not error on idType SLUG misses.
+  if (isRegisteredArchiveSlug(slug)) {
+    const categoryData = await getCategoryBySlug(slug);
+    if (categoryData) {
+      return { type: "category", data: categoryData };
+    }
+
+    const brandData = await getBrandBySlug(slug);
+    if (brandData) {
+      return { type: "brand", data: brandData };
+    }
+  }
+
   const productData = await getProductPageData(slug, opts);
   if (productData) {
     return { type: "product", data: productData };

@@ -205,17 +205,13 @@ const MobileNavLinks = ({ navCategories = [] }: MobileNavLinksProps) => {
           </div>
 
           <div className="flex justify-center gap-2 text-primaryColor">
-            <Link
-              href={`https://www.facebook.com/${siteConfig.social.facebook}`}
-            >
+            <Link href={siteConfig.social.facebook} target="_blank" rel="noopener noreferrer">
               <Facebook size={24} />
             </Link>
-            <Link
-              href={`https://www.instagram.com/${siteConfig.social.instagram}`}
-            >
+            <Link href={siteConfig.social.instagram} target="_blank" rel="noopener noreferrer">
               <Instagram size={24} />
             </Link>
-            <Link href={`https://www.tiktok.com/${siteConfig.social.tiktok}`}>
+            <Link href={siteConfig.social.tiktok} target="_blank" rel="noopener noreferrer">
               <FaTiktok size={24} />
             </Link>
           </div>

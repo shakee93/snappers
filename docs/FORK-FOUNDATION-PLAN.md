@@ -1,15 +1,15 @@
 # Fork Foundation Plan
 
-> Internal — do not share. Prepared 2026-05-08.
+> Internal - do not share. Prepared 2026-05-08.
 
-This doc is the work plan for cleaning up `gq-headless` so it becomes a clean starting point for a future fork (pet-food ecommerce client first; potentially others later). The goal is **internal hygiene**, not multi-tenancy machinery — the repo is the tenant, and a fork creates a new tenant's repo.
+This doc is the work plan for cleaning up `gq-headless` so it becomes a clean starting point for a future fork (pet-food ecommerce client first; potentially others later). The goal is **internal hygiene**, not multi-tenancy machinery - the repo is the tenant, and a fork creates a new tenant's repo.
 
 The plan is grounded in a two-axis audit (hardcoded values + data-fetching coupling) and a component classification pass. Counts:
 
 - **111** hardcoded findings (28 CONFIG, 32 CONTENT, 8 LIB, 14 ROUTE-DELETE, 12 THEME, 11 TENANT-COMPONENT, 6 LEAVE)
 - **22** components that own data fetches and should be extracted into `hooks/`
 - **13** tenant-only components to delete on fork
-- **12** edge cases / surprises (dead code, duplicates, debug artifacts) — see §6
+- **12** edge cases / surprises (dead code, duplicates, debug artifacts) - see §6
 
 ---
 
@@ -31,7 +31,7 @@ gq-headless/                    ← repo IS the tenant
 ├── content/                    ← FAQ.json, testimonials.json, legal.md, about.md,
 │                                 hero copy, promotion copy
 ├── app/globals.css             ← CSS variable values (the theme palette)
-├── hooks/                      ← data layer — pure, no UI assumptions
+├── hooks/                      ← data layer - pure, no UI assumptions
 │   ├── useProduct.ts
 │   ├── useProductGrid.ts
 │   ├── useTypesenseSearch.ts
@@ -88,7 +88,7 @@ gq-org/wp-gq:latest                      ← GQ-specific layer
 
 gq-org/wp-petstore:latest                ← pet-store layer (built when ready)
   FROM gq-org/wp-storefront-base:latest
-  # only what pet-store needs — likely just core, possibly wc-bogo-simple
+  # only what pet-store needs - likely just core, possibly wc-bogo-simple
 ```
 
 `gq-backend-plugins` repo becomes the **build context** for these images, not the deployment artifact. `bin/deploy.sh` becomes `bin/build.sh && docker push`. Each tenant's Coolify service pulls their own image, sets env vars, mounts their own MySQL/Redis/uploads volumes. Updates flow by rebuilding tenant images on a new base tag.
@@ -97,11 +97,11 @@ gq-org/wp-petstore:latest                ← pet-store layer (built when ready)
 
 Each phase is one or more PRs into `main`. CLAUDE.md rules apply (branch off main, conventional commits, human review, no direct pushes).
 
-### Phase 0 — Audit (DONE, 2026-05-08)
+### Phase 0 - Audit (DONE, 2026-05-08)
 
 Output: this doc. Inventory of all 111 hardcoded values, 22 hook-extraction candidates, 93-component classification, 12 edge cases.
 
-### Phase 1 — `site.config.ts` + `content/` foundation (~2 days)
+### Phase 1 - `site.config.ts` + `content/` foundation (~2 days)
 
 **Branch:** `chore/site-config-foundation`
 
@@ -176,19 +176,19 @@ content/
 #### Specific replacements landed in this phase
 
 From the CONFIG bucket (28 findings):
-- `app/layout.tsx:18-67` — title template, descriptions, OG metadata, GA script
-- `app/sitemap-helpers.ts:6`, `app/(chromed)/(sitemaps)/s/collections/sitemap.ts:6`, `app/components/SingleProductPage/ShareButtons.tsx:8` — three `BASE_URL` consts collapse to `siteConfig.url.base`
-- `app/(chromed)/(product)/[brand]/[slug]/page.tsx:71,100,578` — DEFAULT_OG_IMAGE, canonical URL, share URL
-- `app/(chromed)/(brand-archive)/[brand]/page.tsx:45,47`, `app/(chromed)/collections/(archive)/[collection]/page.tsx:49,52` — canonical and OG references
-- `app/robots.ts:10` — sitemap URL
-- `tailwind.config.ts:43` — `primaryColor: '#1b40af'` (deferred to Phase 5 if it requires touching the theme more broadly)
-- `context/PaymentProvider.tsx:22,37` — gateway order array, koko gateway ID check
-- `app/(chromed)/checkout/page.tsx:546,233,664` — currency, shipping method ID
-- `app/components/Payment/Payhere.tsx:54,61` — currency, country
-- `app/components/InstantSearchWrapper.tsx:66` — Typesense host fallback (drop fallback entirely; require env var)
-- `next.config.js` `remotePatterns` — derive from `siteConfig.url.cdn`
-- `app/(chromed)/checkout/CheckoutHeader.tsx:7-8` — support phone constants
-- `app/components/GoogleAnalytics.tsx:12` and `app/layout.tsx:67,75` — GA ID consolidated to one place
+- `app/layout.tsx:18-67` - title template, descriptions, OG metadata, GA script
+- `app/sitemap-helpers.ts:6`, `app/(chromed)/(sitemaps)/s/collections/sitemap.ts:6`, `app/components/SingleProductPage/ShareButtons.tsx:8` - three `BASE_URL` consts collapse to `siteConfig.url.base`
+- `app/(chromed)/(product)/[brand]/[slug]/page.tsx:71,100,578` - DEFAULT_OG_IMAGE, canonical URL, share URL
+- `app/(chromed)/(brand-archive)/[brand]/page.tsx:45,47`, `app/(chromed)/collections/(archive)/[collection]/page.tsx:49,52` - canonical and OG references
+- `app/robots.ts:10` - sitemap URL
+- `tailwind.config.ts:43` - `primaryColor: '#1b40af'` (deferred to Phase 5 if it requires touching the theme more broadly)
+- `context/PaymentProvider.tsx:22,37` - gateway order array, koko gateway ID check
+- `app/(chromed)/checkout/page.tsx:546,233,664` - currency, shipping method ID
+- `app/components/Payment/Payhere.tsx:54,61` - currency, country
+- `app/components/InstantSearchWrapper.tsx:66` - Typesense host fallback (drop fallback entirely; require env var)
+- `next.config.js` `remotePatterns` - derive from `siteConfig.url.cdn`
+- `app/(chromed)/checkout/CheckoutHeader.tsx:7-8` - support phone constants
+- `app/components/GoogleAnalytics.tsx:12` and `app/layout.tsx:67,75` - GA ID consolidated to one place
 
 From the CONTENT bucket (32 findings):
 - `app/components/HomePage/FAQSection.tsx:9-120` → `content/faq.json`
@@ -198,36 +198,36 @@ From the CONTENT bucket (32 findings):
 - `app/(chromed)/warranty-terms/page.tsx` body → `content/legal/warranty.md`
 - `app/(chromed)/about/page.tsx:15-79,133` → `content/about.md` + testimonial JSON
 - `app/components/HomePage/SectionPromo1.tsx:37,39` → `content/about.md` reuse or content/store-promo.json
-- `app/(chromed)/brands/page.tsx:32` — hero description → content/brands-page.json
-- `app/(chromed)/deals/page.tsx:12` — meta description → derived from `siteConfig.brand.name`
-- `app/(chromed)/contact/page.tsx:122-222` — store address, phone numbers from `siteConfig.contact`
-- `app/(chromed)/checkout/UnifiedCheckoutForm.tsx:850,864,1003,688` — pickup chip labels, "Visit GQ Mobiles" copy → content/checkout-copy.json
-- `app/(chromed)/checkout/CheckoutFooter.tsx:28` — copyright derived from `siteConfig.brand.legalName`
-- `app/(chromed)/thank-you/page.tsx:157` — "GQ Mobile" heading → `siteConfig.brand.name`
-- `app/components/HomePage/GoogleReviewsSection.tsx:5` — Google Maps deep-link → tenant-specific, move to `site.config.ts` or delete component on fork
+- `app/(chromed)/brands/page.tsx:32` - hero description → content/brands-page.json
+- `app/(chromed)/deals/page.tsx:12` - meta description → derived from `siteConfig.brand.name`
+- `app/(chromed)/contact/page.tsx:122-222` - store address, phone numbers from `siteConfig.contact`
+- `app/(chromed)/checkout/UnifiedCheckoutForm.tsx:850,864,1003,688` - pickup chip labels, "Visit GQ Mobiles" copy → content/checkout-copy.json
+- `app/(chromed)/checkout/CheckoutFooter.tsx:28` - copyright derived from `siteConfig.brand.legalName`
+- `app/(chromed)/thank-you/page.tsx:157` - "GQ Mobile" heading → `siteConfig.brand.name`
+- `app/components/HomePage/GoogleReviewsSection.tsx:5` - Google Maps deep-link → tenant-specific, move to `site.config.ts` or delete component on fork
 
 **Definition of done for Phase 1:** grep `gqmobiles\|GQ Mobiles\|GQ\s\|0777\|Sri Lanka\|Liberty Plaza\|Colombo` over `app/` `components/` `containers/` `shared/` `lib/` returns hits **only** in `site.config.ts`, `content/**`, and `data/brandColors.ts` (which is handled in a later phase).
 
-### Phase 2 — Lib lifts and currency formatting (~1 day)
+### Phase 2 - Lib lifts and currency formatting (~1 day)
 
 **Branch:** `chore/lib-extractions`
 
 The 8 LIB findings, plus a few helpers that should exist:
 
-- `lib/formatPrice.ts` — `formatPrice(amount: number)` reads `siteConfig.locale.currencySymbol` + `currencyCode`. Replaces inline `Rs ${new Intl.NumberFormat...}` at `app/(chromed)/checkout/page.tsx:888-889` and `UnifiedCheckoutForm.tsx:283`. Also kills `LKR`/`Rs.` literals in `PriceFilter.tsx`, `MobileFilterSheet.tsx`, `OrderItem.tsx`.
-- `lib/checkoutMath.ts` — exports `PAYHERE_HIDE_THRESHOLD` (currently `100000`). Reads from `siteConfig.payment.payhere.hideAboveAmount`. (`CARD_SURCHARGE_RATE` was removed — the site no longer applies a frontend surcharge; pricing comes from WooCommerce fees / woo-price-tiers.)
-- `lib/api.ts` — `apiUrl(path: string)` helper that joins `siteConfig.url.api` + path. Replaces hardcoded `https://api.gqmobiles.lk/wp-json/...` URLs in `OrderBankReceiptUpload.tsx:44`, `Payment/BankTransfer.tsx:114`, `checkout/page.tsx:1089`, `app/(chromed)/contact/page.tsx:56`.
-- `lib/jsonld/productSchema.ts:39,46,15-18` — `priceCurrency`, seller `name`, `DEFAULT_WARRANTY` from `siteConfig`.
-- `lib/collectionNavOrder.ts:5-16` — split: data array → `content/nav-category-priority.json`; ordering helpers stay in `lib/`.
-- `data/brandColors.ts` — flag for fork-time replacement; in GQ's repo, leave as-is. This is GQ catalog data, not lib code, but doesn't hurt to keep until fork.
+- `lib/formatPrice.ts` - `formatPrice(amount: number)` reads `siteConfig.locale.currencySymbol` + `currencyCode`. Replaces inline `Rs ${new Intl.NumberFormat...}` at `app/(chromed)/checkout/page.tsx:888-889` and `UnifiedCheckoutForm.tsx:283`. Also kills `LKR`/`Rs.` literals in `PriceFilter.tsx`, `MobileFilterSheet.tsx`, `OrderItem.tsx`.
+- `lib/checkoutMath.ts` - exports `PAYHERE_HIDE_THRESHOLD` (currently `100000`). Reads from `siteConfig.payment.payhere.hideAboveAmount`. (`CARD_SURCHARGE_RATE` was removed - the site no longer applies a frontend surcharge; pricing comes from WooCommerce fees / woo-price-tiers.)
+- `lib/api.ts` - `apiUrl(path: string)` helper that joins `siteConfig.url.api` + path. Replaces hardcoded `https://api.gqmobiles.lk/wp-json/...` URLs in `OrderBankReceiptUpload.tsx:44`, `Payment/BankTransfer.tsx:114`, `checkout/page.tsx:1089`, `app/(chromed)/contact/page.tsx:56`.
+- `lib/jsonld/productSchema.ts:39,46,15-18` - `priceCurrency`, seller `name`, `DEFAULT_WARRANTY` from `siteConfig`.
+- `lib/collectionNavOrder.ts:5-16` - split: data array → `content/nav-category-priority.json`; ordering helpers stay in `lib/`.
+- `data/brandColors.ts` - flag for fork-time replacement; in GQ's repo, leave as-is. This is GQ catalog data, not lib code, but doesn't hurt to keep until fork.
 
 **Definition of done for Phase 2:** no inline currency formatter, no hardcoded API URLs in components, no inline magic numbers for payment thresholds.
 
-### Phase 3 — Extract data hooks (~3–4 days)
+### Phase 3 - Extract data hooks (~3–4 days)
 
 **Branches (one per domain, parallel-merging):** `refactor/hooks-product`, `refactor/hooks-cart-checkout`, `refactor/hooks-account`, `refactor/hooks-nav-search`
 
-Per the audit: 22 EXTRACT candidates, 18 KEEP (already in correct location — context providers, server-component fetches). Order by safety (low risk first):
+Per the audit: 22 EXTRACT candidates, 18 KEEP (already in correct location - context providers, server-component fetches). Order by safety (low risk first):
 
 #### 3a. Product / PDP hooks (low risk)
 
@@ -239,13 +239,13 @@ Per the audit: 22 EXTRACT candidates, 18 KEEP (already in correct location — c
 - `useBrandArchive(slug)` ← from `ProductGrid.tsx:21`
 - `usePriceFluctuationNotice()` ← from `ProductDetails.tsx:173` and `CheckoutDetails.tsx:49` (deduplicates)
 
-#### 3b. Cart / Checkout hooks (medium risk — checkout is sensitive)
+#### 3b. Cart / Checkout hooks (medium risk - checkout is sensitive)
 
 - `useCoupon()` ← from `checkout/page.tsx:104,105` (`APPLY_COUPON`, `REMOVE_COUPONS`)
 - `useShipping()` ← from `checkout/page.tsx:143` (`UPDATE_SHIPPING_TOTAL`)
 - `useCheckout()` ← from `checkout/page.tsx:151,153,158,165` (4 mutations: checkout, guest, order, order-payment)
 - `useCheckoutUserDetails()` ← from `CheckoutDetails.tsx:48`
-- Cart context unification — `context/SessionProvider.tsx:56` duplicates `GET_CART` from `CartProvider.tsx:97`. Pick one, kill the other.
+- Cart context unification - `context/SessionProvider.tsx:56` duplicates `GET_CART` from `CartProvider.tsx:97`. Pick one, kill the other.
 
 **Caveat:** the gateway if/else logic in `checkout/page.tsx` (PayHere/Genie/Koko/NDB/bank) **stays as-is**. We are not refactoring the gateway adapter pattern in this phase. Pet-store will likely use the same gateways, so the abstraction has zero payoff for two tenants. Defer until a third tenant uses different gateways.
 
@@ -264,16 +264,16 @@ Per the audit: 22 EXTRACT candidates, 18 KEEP (already in correct location — c
 
 #### Things explicitly NOT extracted
 
-- `context/CartProvider.tsx` cart queries/mutations — already in the right place
-- `context/SessionProvider.tsx` auth queries/mutations — already in the right place
-- `context/PaymentProvider.tsx` gateway query — already in the right place
-- `context/SearchProvider.tsx` — already in the right place
-- All server-component `getClient().query(...)` calls in `page.tsx`/`layout.tsx`/server-only components — these are SSR fetches, KEEP
-- `app/(chromed)/checkout/page.tsx:944,980` `fetch("/api/koko")`, `fetch("/api/ndb-pay")` — API route boundary calls; could optionally extract to `useKokoPayment()` / `useNdbPayment()` but low value (one caller each)
+- `context/CartProvider.tsx` cart queries/mutations - already in the right place
+- `context/SessionProvider.tsx` auth queries/mutations - already in the right place
+- `context/PaymentProvider.tsx` gateway query - already in the right place
+- `context/SearchProvider.tsx` - already in the right place
+- All server-component `getClient().query(...)` calls in `page.tsx`/`layout.tsx`/server-only components - these are SSR fetches, KEEP
+- `app/(chromed)/checkout/page.tsx:944,980` `fetch("/api/koko")`, `fetch("/api/ndb-pay")` - API route boundary calls; could optionally extract to `useKokoPayment()` / `useNdbPayment()` but low value (one caller each)
 
 **Definition of done for Phase 3:** every `useQuery` / `useMutation` invocation in the codebase is either inside `hooks/`, inside a `context/*Provider.tsx` provider, or inside a server-component `page.tsx`/`layout.tsx`. Page client components and presentation components contain no GraphQL calls.
 
-### Phase 4 — Component reorganization (~2–3 days)
+### Phase 4 - Component reorganization (~2–3 days)
 
 **Branch:** `chore/components-reorg`
 
@@ -286,12 +286,12 @@ This phase is mostly directory moves with import-path updates. The risk is in im
 3. The root `components/` directory (legacy Ciseco scaffold per §6 finding 6) gets pruned: imports audit reveals what's dead, dead files get deleted, surviving files move to `components/{layout,primitives,ui}/`.
 4. `app/components/` gets folded into the new structure. Eventually only `app/` route files remain in `app/`.
 
-#### Tenant-only components — delete or keep until fork?
+#### Tenant-only components - delete or keep until fork?
 
 **Delete now (in GQ's repo):** files where the entire purpose is dead / GQ-internal-debug:
 - `app/(chromed)/test/page.tsx`
 - `app/(chromed)/thank-you/page2.tsx`
-- `app/(chromed)/terms-and-conditions/SectionFounder.tsx`, `SectionHero.tsx`, `SectionStatistic.tsx` (orphaned scaffold per §6 finding 6 — verify no imports first)
+- `app/(chromed)/terms-and-conditions/SectionFounder.tsx`, `SectionHero.tsx`, `SectionStatistic.tsx` (orphaned scaffold per §6 finding 6 - verify no imports first)
 - `httpbin.org` debug fetches at `app/(chromed)/privacy/page.tsx:12` and `app/(chromed)/warranty-terms/page.tsx:8` (§6 finding 1)
 - Dead imports in `ProductCard3.tsx:32-33` (§6 finding 5)
 - `app/api/banktransfer/route.ts:1` legacy bare-IP URL (§6 finding 3)
@@ -305,7 +305,7 @@ This phase is mostly directory moves with import-path updates. The risk is in im
 
 **Definition of done for Phase 4:** every file under `components/`, `app/components/`, or `containers/` lives in exactly one of `{layout,primitives,ui}/` and the role of each is obvious from its location.
 
-### Phase 5 — Theme tokens end-to-end (~1 day)
+### Phase 5 - Theme tokens end-to-end (~1 day)
 
 **Branch:** `style/theme-tokens-complete`
 
@@ -339,11 +339,11 @@ The CSS-variable system is half-finished. The 12 THEME findings show why: some c
 Third-party brand colors are not theme tokens:
 - Facebook blue `#1877f2` (`ShareButtons.tsx:64`)
 - WhatsApp green `#25d366` (`ShareButtons.tsx:82`, `CheckoutHeader.tsx:45`, `WhatsAppLogo.tsx:62`)
-- Decorative SVG fills in `ContactBg.tsx` (cosmetic only — could move to vars but low payoff)
+- Decorative SVG fills in `ContactBg.tsx` (cosmetic only - could move to vars but low payoff)
 
 **Definition of done for Phase 5:** grep `'\#[0-9a-fA-F]\{3,8\}'` over `app/`, `components/`, `containers/`, `shared/` returns hits only in (a) `app/globals.css`, (b) third-party brand color references with explanatory comments, (c) `tailwind.config.ts` only if it's referencing CSS vars. No `bg-[#...]` Tailwind escapes for tenant-themed colors.
 
-### Phase 6 — Backend mu-plugin reorg + Docker base image (~1.5 days)
+### Phase 6 - Backend mu-plugin reorg + Docker base image (~1.5 days)
 
 **Branch:** `chore/mu-plugin-split` in `gq-backend-plugins`
 
@@ -382,8 +382,8 @@ gq-backend-plugins/
 
 #### Docker images
 
-- `gq-org/wp-storefront-base:<version>` — built from `docker/base/Dockerfile`. CI builds and pushes on tag.
-- `gq-org/wp-gq:<version>` — built from `docker/gq/Dockerfile`, `FROM gq-org/wp-storefront-base:<version>`.
+- `gq-org/wp-storefront-base:<version>` - built from `docker/base/Dockerfile`. CI builds and pushes on tag.
+- `gq-org/wp-gq:<version>` - built from `docker/gq/Dockerfile`, `FROM gq-org/wp-storefront-base:<version>`.
 - Each tenant gets their own Dockerfile in their own backend repo / directory, all `FROM gq-org/wp-storefront-base:<version>`.
 
 #### Coolify integration
@@ -393,7 +393,7 @@ Each tenant's Coolify service is configured to:
 - Mount tenant-specific volumes for MySQL data, Redis data, `wp-content/uploads/`
 - Set tenant-specific env vars (`WP_HOME`, DB creds, Redis auth, Typesense API key)
 
-The compose file in Coolify becomes much simpler — just `image:` + volumes + env, no in-place file copies.
+The compose file in Coolify becomes much simpler - just `image:` + volumes + env, no in-place file copies.
 
 **Definition of done for Phase 6:** `gq-org/wp-storefront-base` image builds cleanly, GQ runs against the tenant-extended image without functional regression, and a "spin up a fresh tenant backend" runbook exists.
 
@@ -404,12 +404,12 @@ Week 1
   Day 1     Phase 1 starts (site.config.ts + content/)
   Day 2     Phase 1 continues
   Day 3     Phase 2 (lib lifts)
-  Day 4     Phase 5 starts in parallel (theme tokens) — independent of Phase 3
-  Day 5     Phase 3 starts (hooks 3a + 3d — low risk first)
+  Day 4     Phase 5 starts in parallel (theme tokens) - independent of Phase 3
+  Day 5     Phase 3 starts (hooks 3a + 3d - low risk first)
 
 Week 2
-  Day 6-7   Phase 3 continues (3c account, 3b cart/checkout — sensitive)
-  Day 8     Phase 4 starts (component reorg — LAYOUT first)
+  Day 6-7   Phase 3 continues (3c account, 3b cart/checkout - sensitive)
+  Day 8     Phase 4 starts (component reorg - LAYOUT first)
   Day 9     Phase 4 continues (PRIMITIVE → UI → TENANT-ONLY deletions)
   Day 10    Phase 6 (backend Docker base image)
 
@@ -454,29 +454,29 @@ Phases 1, 2, 5, 6 can run in parallel after Phase 1 lands (different files, no c
 
 These are findings outside the main inventory. Address opportunistically; flag in PR descriptions when you encounter them:
 
-1. **`httpbin.org` debug fetches in production** — `app/(chromed)/privacy/page.tsx:12` and `app/(chromed)/warranty-terms/page.tsx:8` call `fetch("https://httpbin.org/delay/3", { cache: "force-cache" })`. The result is unused; this adds 3s latency on first render and breaks in offline/CI environments. **Delete in Phase 4.**
+1. **`httpbin.org` debug fetches in production** - `app/(chromed)/privacy/page.tsx:12` and `app/(chromed)/warranty-terms/page.tsx:8` call `fetch("https://httpbin.org/delay/3", { cache: "force-cache" })`. The result is unused; this adds 3s latency on first render and breaks in offline/CI environments. **Delete in Phase 4.**
 
-2. **`BASE_URL` defined in three files** — `app/sitemap-helpers.ts:6`, `app/(chromed)/(sitemaps)/s/collections/sitemap.ts:6`, `app/components/SingleProductPage/ShareButtons.tsx:8`. Consolidate to `siteConfig.url.base` in **Phase 1**.
+2. **`BASE_URL` defined in three files** - `app/sitemap-helpers.ts:6`, `app/(chromed)/(sitemaps)/s/collections/sitemap.ts:6`, `app/components/SingleProductPage/ShareButtons.tsx:8`. Consolidate to `siteConfig.url.base` in **Phase 1**.
 
-3. **`app/api/banktransfer/route.ts:1` bare IP URL** — `const apiUrl = "http://52.45.14.64/wp-json/…"` points at an old WordPress server. Other routes use `https://api.gqmobiles.lk`. Likely dead code or half-migrated. **Verify and fix in Phase 2** (move to `apiUrl()` helper).
+3. **`app/api/banktransfer/route.ts:1` bare IP URL** - `const apiUrl = "http://52.45.14.64/wp-json/…"` points at an old WordPress server. Other routes use `https://api.gqmobiles.lk`. Likely dead code or half-migrated. **Verify and fix in Phase 2** (move to `apiUrl()` helper).
 
-4. **`thank-you/page2.tsx` orphaned** — Second implementation of the order success page. No route renders it; `page.tsx` wins. **Delete in Phase 4.**
+4. **`thank-you/page2.tsx` orphaned** - Second implementation of the order success page. No route renders it; `page.tsx` wins. **Delete in Phase 4.**
 
-5. **`ProductCard3.tsx:32-33` dead imports** — `useQuery` and `GET_QUICK_VIEW_PRODUCT` imported but never invoked. The hook execution moved to `ModalQuickView.tsx`. **Delete in Phase 4.**
+5. **`ProductCard3.tsx:32-33` dead imports** - `useQuery` and `GET_QUICK_VIEW_PRODUCT` imported but never invoked. The hook execution moved to `ModalQuickView.tsx`. **Delete in Phase 4.**
 
-6. **Root `components/` vs `app/components/` duplicates** — Root `components/` contains legacy Ciseco scaffold copies (`SectionPromo1`, `SectionPromo2`, `SectionPromo3`, `SectionHero/SectionHero2`, `SectionHero/SectionHero3`, `SectionHowItWork`, `SectionSubscribe2`, `TikTokSection`, others). Active code lives in `app/components/`. **Audit imports during Phase 4 reorg; delete unimported files; move imported survivors into the new structure.**
+6. **Root `components/` vs `app/components/` duplicates** - Root `components/` contains legacy Ciseco scaffold copies (`SectionPromo1`, `SectionPromo2`, `SectionPromo3`, `SectionHero/SectionHero2`, `SectionHero/SectionHero3`, `SectionHowItWork`, `SectionSubscribe2`, `TikTokSection`, others). Active code lives in `app/components/`. **Audit imports during Phase 4 reorg; delete unimported files; move imported survivors into the new structure.**
 
-7. **`CategoryWithSubcategories.tsx` slugs are wrong** — Hardcoded slugs (`/collections/smart-phones`, `/mobile-accessories/cases`) don't match live WC taxonomy (`/collections/mobiles-and-tablets` etc. used elsewhere). These links are likely 404 in production. The whole component is TENANT-ONLY data; the data block becomes content config or gets driven from CMS. **Fix in Phase 1 (CONTENT migration) or accept and delete on fork.**
+7. **`CategoryWithSubcategories.tsx` slugs are wrong** - Hardcoded slugs (`/collections/smart-phones`, `/mobile-accessories/cases`) don't match live WC taxonomy (`/collections/mobiles-and-tablets` etc. used elsewhere). These links are likely 404 in production. The whole component is TENANT-ONLY data; the data block becomes content config or gets driven from CMS. **Fix in Phase 1 (CONTENT migration) or accept and delete on fork.**
 
-8. **`checkout/page.tsx:114` TODO** — `// TODO: Uncomment this for the redirect on cart free`. Incomplete feature. **Decide pre-fork: ship it or remove the TODO.** Not blocking.
+8. **`checkout/page.tsx:114` TODO** - `// TODO: Uncomment this for the redirect on cart free`. Incomplete feature. **Decide pre-fork: ship it or remove the TODO.** Not blocking.
 
-9. **GA tracking ID hardcoded twice with double-fire risk** — `app/layout.tsx:67,75` `<Script>` and `app/components/GoogleAnalytics.tsx:12` constant. Both load GA. Verify in DevTools whether `gtag` fires twice; consolidate. **Fix in Phase 1.**
+9. **GA tracking ID hardcoded twice with double-fire risk** - `app/layout.tsx:67,75` `<Script>` and `app/components/GoogleAnalytics.tsx:12` constant. Both load GA. Verify in DevTools whether `gtag` fires twice; consolidate. **Fix in Phase 1.**
 
-10. **`lib/collectionNavOrder.ts` is config dressed as lib** — The `COLLECTION_NAV_PRIORITY_SLUG_GROUPS` array is GQ-specific data. Helpers (`orderCollectionNavRoots`, `orderCollectionNavForDropdown`) are reusable. **Split in Phase 2.**
+10. **`lib/collectionNavOrder.ts` is config dressed as lib** - The `COLLECTION_NAV_PRIORITY_SLUG_GROUPS` array is GQ-specific data. Helpers (`orderCollectionNavRoots`, `orderCollectionNavForDropdown`) are reusable. **Split in Phase 2.**
 
-11. **`data/brandColors.ts` is GQ catalog data** — 50-entry brand→color lookup of mobile/electronics brands. Pet-food fork has zero overlap. **Leave in GQ's repo; fork-time replacement.**
+11. **`data/brandColors.ts` is GQ catalog data** - 50-entry brand→color lookup of mobile/electronics brands. Pet-food fork has zero overlap. **Leave in GQ's repo; fork-time replacement.**
 
-12. **`ProductSpecifications.tsx` assumes phone schema** — Renders Kimovil/phone-comparison fields (`usb_type`, `sim_slot`, `operating_system`) from a `tech_spec_data` WP meta key. **Mark TENANT-ONLY; pet-store deletes and writes a pet-spec component.**
+12. **`ProductSpecifications.tsx` assumes phone schema** - Renders Kimovil/phone-comparison fields (`usb_type`, `sim_slot`, `operating_system`) from a `tech_spec_data` WP meta key. **Mark TENANT-ONLY; pet-store deletes and writes a pet-spec component.**
 
 ## 7. Things explicitly NOT in this plan
 
@@ -499,7 +499,7 @@ To prevent scope creep:
 3. **`tripwire.php` allowlist regression in Phase 6.** When the mu-plugin reorg happens, the tripwire allowlist must update or every backend request spams error_log. Verify in staging.
 4. **Vercel SSR cache invalidation during Phase 5.** Theme changes don't affect cached HTML, but if any component's class names change in ways that affect serialized output, edge cache may serve stale CSS classes. Vercel ISR rebuild handles it, but plan a manual revalidation pass after merge.
 5. **Codegen breaks on fork** if the pet backend has different PA taxonomies than the fragment expects. Pet-store team must run codegen first thing on fork; the cleanup doc should call this out.
-6. **The audit may have missed things.** 111 findings is large but not exhaustive — copy hidden in long JSX strings, third-party SDK config buried in env, pixel-tracking IDs we didn't search for. The grep-able definitions of done in each phase are the safety net.
+6. **The audit may have missed things.** 111 findings is large but not exhaustive - copy hidden in long JSX strings, third-party SDK config buried in env, pixel-tracking IDs we didn't search for. The grep-able definitions of done in each phase are the safety net.
 
 ## 9. Definition of done for the cleanup as a whole
 
@@ -518,7 +518,7 @@ When all eight of those are true, the cleanup is done. Tag a release. Begin the 
 
 ---
 
-## Appendix A — Audit raw counts
+## Appendix A - Audit raw counts
 
 | Axis | Total | Breakdown |
 |---|---|---|
@@ -527,7 +527,7 @@ When all eight of those are true, the cleanup is done. Tag a release. Begin the 
 | Components classified | 93 | 12 LAYOUT · 30 PRIMITIVE · 38 UI · 13 TENANT-ONLY |
 | Edge cases / surprises | 12 | dead code, duplicates, debug artifacts |
 
-## Appendix B — Hooks to be created (full list)
+## Appendix B - Hooks to be created (full list)
 
 Product domain: `useFreeGiftProducts`, `useProductById`, `useTechSpec`, `useQuickViewProduct`, `useBogoPluginMeta`, `useBrandArchive`, `usePriceFluctuationNotice` (7)
 
@@ -537,4 +537,4 @@ Account domain: `useMyOrders`, `useOrderById`, `useResetPassword`, `useForgotPas
 
 Nav/Homepage domain: `useNavBrands`, `useBrands`, `useSlides` (3)
 
-**Total new hooks: 18.** (The audit lists 22 EXTRACT candidates; 4 of those are duplicate callers of the same query that consolidate into one hook — see `useFreeGiftProducts`, `useProductById`, `usePriceFluctuationNotice`.)
+**Total new hooks: 18.** (The audit lists 22 EXTRACT candidates; 4 of those are duplicate callers of the same query that consolidate into one hook - see `useFreeGiftProducts`, `useProductById`, `usePriceFluctuationNotice`.)

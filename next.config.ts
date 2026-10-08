@@ -27,7 +27,7 @@ const nextConfig: NextConfig = {
       // Previous /categories/* listings (single slug pages only; index handled above)
       { source: "/categories/all", destination: "/categories", permanent: true },
       { source: "/categories/:slug", destination: "/:slug", permanent: true },
-      // Removed FAQ page — keep old links and indexed URLs working
+      // Removed FAQ page - keep old links and indexed URLs working
       { source: "/faq", destination: "/return-policy", permanent: true },
     ];
   },

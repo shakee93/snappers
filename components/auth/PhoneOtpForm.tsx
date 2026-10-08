@@ -124,7 +124,7 @@ const PhoneOtpForm = () => {
       } catch (caught) {
         const parsed = parseAuthError(caught);
         setError(parsed.message);
-        // Server cooldown may disagree with the client timer — honour it.
+        // Server cooldown may disagree with the client timer - honour it.
         const retryAfter = parsed.retryAfterSeconds;
         if (parsed.code === "RESEND_TOO_SOON" && retryAfter != null && retryAfter > 0) {
           setChallenge((current) =>
@@ -161,7 +161,7 @@ const PhoneOtpForm = () => {
   );
 
   const finishSignIn = useCallback(() => {
-    // Skip / Save / verify can all race a second call before navigation —
+    // Skip / Save / verify can all race a second call before navigation -
     // one toast and one push only.
     if (finishingRef.current) return;
     finishingRef.current = true;
@@ -172,7 +172,7 @@ const PhoneOtpForm = () => {
 
   // My Account phone lives on shipping.phone; billing.phone is used at checkout.
   // UPDATE_ACCOUNT_INFORMATION now returns id + billing/shipping phone, so the
-  // mutation itself updates the session cache — no follow-up getUser.
+  // mutation itself updates the session cache - no follow-up getUser.
   // Always write after verify (including new users): abandoning the profile
   // step must not leave an account with no phone for order/delivery contact.
   const syncVerifiedPhone = useCallback(async (): Promise<boolean> => {
@@ -238,7 +238,7 @@ const PhoneOtpForm = () => {
 
       if (!authed) return;
 
-      // Auth succeeded — failures below must not look like a bad OTP.
+      // Auth succeeded - failures below must not look like a bad OTP.
       try {
         await applyAuthSession(authed.session);
 

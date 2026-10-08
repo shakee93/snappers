@@ -56,7 +56,7 @@ const FilterPanelSkeleton = () => (
   </div>
 );
 
-const SidebarSkeleton = () => (
+export const ArchiveSidebarSkeleton = () => (
   <div className="hidden flex-col gap-3 lg:flex">
     <div className="flex w-full items-center justify-between border-b border-neutral-200 pb-2">
       <SkeletonBlock className="h-4 w-14" />
@@ -74,7 +74,7 @@ const TypesenseGridSkeleton = ({ count = 12 }: { count?: number }) => (
     </div>
     <div className="grid grid-cols-12 gap-4">
       <div className="hidden lg:col-span-3 lg:block">
-        <SidebarSkeleton />
+        <ArchiveSidebarSkeleton />
       </div>
       <div className="col-span-12 lg:col-span-9">
         <ProductCardsSkeleton
@@ -88,9 +88,11 @@ const TypesenseGridSkeleton = ({ count = 12 }: { count?: number }) => (
 
 interface ArchiveLoadingProps {
   search?: boolean;
+  /** Less top padding when a promo banner sits above (e.g. shop). */
+  compactTop?: boolean;
 }
 
-const ArchiveLoading = ({ search = false }: ArchiveLoadingProps) => {
+const ArchiveLoading = ({ search = false, compactTop = false }: ArchiveLoadingProps) => {
   const graphqlArchive = !search && isGraphqlArchive();
 
   return (
@@ -98,17 +100,22 @@ const ArchiveLoading = ({ search = false }: ArchiveLoadingProps) => {
       className={
         search
           ? "container py-16"
-          : "container py-8 lg:py-12 space-y-16 sm:space-y-20 lg:space-y-28"
+          : cn(
+              "container space-y-16 sm:space-y-20 lg:space-y-28",
+              compactTop ? "pt-4 pb-8 lg:pt-4 lg:pb-12" : "py-8 lg:py-12",
+            )
       }
     >
       <div className={search ? undefined : "space-y-4 lg:space-y-6"}>
-        <div className={`max-w-screen-sm ${search ? "mb-10" : ""}`}>
-          <SkeletonBlock className="h-8 w-48 sm:h-9 lg:h-10" />
-          <div className={`space-y-2 ${search ? "mt-4" : "mt-2 lg:mt-4"}`}>
-            <SkeletonBlock className="h-4 w-full" />
-            <SkeletonBlock className="h-4 w-3/4 md:w-2/3" />
+        {!compactTop ? (
+          <div className={`max-w-screen-sm ${search ? "mb-10" : ""}`}>
+            <SkeletonBlock className="h-8 w-48 sm:h-9 lg:h-10" />
+            <div className={`space-y-2 ${search ? "mt-4" : "mt-2 lg:mt-4"}`}>
+              <SkeletonBlock className="h-4 w-full" />
+              <SkeletonBlock className="h-4 w-3/4 md:w-2/3" />
+            </div>
           </div>
-        </div>
+        ) : null}
 
         {search ? (
           <div className="space-y-4">

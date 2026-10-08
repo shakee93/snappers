@@ -79,11 +79,11 @@ const MobileFilterSheet = ({
     // Snapshot the facet list on first non-empty result and keep it stable.
     // Once a brand is selected the InstantSearchWrapper filter narrows results
     // to that brand, so brandsFacet collapses to just the selected value and
-    // every other checkbox would disappear — blocking multi-select. Pinning
+    // every other checkbox would disappear - blocking multi-select. Pinning
     // the initial facet keeps the full list (and counts) visible while the
     // user is making selections. Same reasoning for categories. setState
     // during render is React's recommended pattern for derived snapshot
-    // state — guarded so it only fires once when the facet first populates.
+    // state - guarded so it only fires once when the facet first populates.
     const [firstBrandsFacet, setFirstBrandsFacet] = useState<typeof brandsFacet>([]);
     if (firstBrandsFacet.length === 0 && brandsFacet.length > 0) {
         setFirstBrandsFacet(brandsFacet);
@@ -180,7 +180,7 @@ const MobileFilterSheet = ({
         };
         return (
             <span
-                className="flex-shrink-0 w-4 h-4 rounded-full bg-header-action text-header-green flex items-center justify-center ml-3 cursor-pointer">
+                className="ml-3 flex h-4 w-4 flex-shrink-0 cursor-pointer items-center justify-center rounded-full bg-header-green text-[10px] font-bold text-[#FACC15]">
                 <XIcon className="p-0.5" onClick={handleXClearClick} />
             </span>
         );

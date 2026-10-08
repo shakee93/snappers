@@ -19,6 +19,7 @@ import {
 } from "@/utils/storage-keys";
 import { onError } from "@apollo/client/link/error";
 import { loadDevMessages, loadErrorMessages } from "@apollo/client/dev";
+import { readUsableAuthToken } from "@/lib/clientAuthToken";
 import { Results } from "@/types";
 
 loadDevMessages();
@@ -74,7 +75,7 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
 
     const authLink = new ApolloLink((operation, forward) => {
       const sessionToken = localStorage.getItem(SESSION_TOKEN_KEY);
-      const authToken = localStorage.getItem(AUTH_TOKEN_KEY);
+      const authToken = readUsableAuthToken(AUTH_TOKEN_KEY);
       const skipAuth = AUTH_FREE_OPERATIONS.has(operation.operationName);
 
       operation.setContext({
@@ -94,7 +95,7 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
 
     // WooGraphQL signs and returns a fresh `woocommerce-session` JWT in the
     // response header on every request that mutates session state. Capture
-    // that header and persist it so the next request uses the live token —
+    // that header and persist it so the next request uses the live token -
     // without this, localStorage drifts from WC's actual active session and
     // mutations like checkout / removeItemsFromCart fail with "Sorry, no
     // session found." or "No items in cart to remove."
@@ -102,7 +103,7 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
     // Browsers only expose response headers listed in
     // `Access-Control-Expose-Headers`. WPGraphQL-Woo adds `woocommerce-session`
     // to that list, but verify the proxy chain (Coolify / Traefik / mu-plugin)
-    // preserves it — `headers.get(...)` returns null otherwise.
+    // preserves it - `headers.get(...)` returns null otherwise.
     const sessionAfterware = new ApolloLink((operation, forward) =>
       forward(operation).map((response) => {
         if (typeof window === "undefined") return response;

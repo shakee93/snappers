@@ -12,6 +12,8 @@ interface WishlistButtonProps {
   className?: string;
   /** Heart icon size in px. */
   size?: number;
+  /** Show “Add to wishlist” label beside the icon (PDP secondary row). */
+  showLabel?: boolean;
 }
 
 /**
@@ -23,6 +25,7 @@ const WishlistButton = ({
   productId,
   className = "",
   size = 20,
+  showLabel = false,
 }: WishlistButtonProps) => {
   const { customer } = useSession();
   const { isInWishlist, toggle } = useWishlist();
@@ -36,7 +39,7 @@ const WishlistButton = ({
   );
 
   const handleClick = async (event: React.MouseEvent) => {
-    // Cards wrap the image in a Link — don't navigate when toggling.
+    // Cards wrap the image in a Link - don't navigate when toggling.
     event.preventDefault();
     event.stopPropagation();
 
@@ -74,13 +77,20 @@ const WishlistButton = ({
           style={{ width: size, height: size }}
         />
       ) : (
-        <Heart
-          style={{ width: size, height: size }}
-          className={twMerge(
-            "transition-colors",
-            active ? "fill-red-500 text-red-500" : "text-[#374151]",
+        <>
+          <Heart
+            style={{ width: size, height: size }}
+            className={twMerge(
+              "shrink-0 transition-colors",
+              active ? "fill-red-500 text-red-500" : "text-[#374151]",
+            )}
+          />
+          {showLabel && (
+            <span className="truncate">
+              {active ? "In wishlist" : "Add to wishlist"}
+            </span>
           )}
-        />
+        </>
       )}
     </button>
   );

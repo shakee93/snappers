@@ -1,5 +1,5 @@
 /**
- * Only same-origin, path-relative redirects are honoured — `//evil.com` is a
+ * Only same-origin, path-relative redirects are honoured - `//evil.com` is a
  * protocol-relative URL, not a local path.
  */
 export function getSafeRedirectPath(redirect: string | null): string {

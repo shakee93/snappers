@@ -37,7 +37,7 @@ const albraSans = localFont({
   display: "swap",
 });
 
-/** Hero slider headlines — high-contrast serif (Playfair Display). */
+/** Hero slider headlines - high-contrast serif (Playfair Display). */
 const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
   display: "swap",
@@ -80,7 +80,7 @@ export const metadata: Metadata = {
         url: getSiteOgImage(),
         width: 1200,
         height: 630,
-        alt: `${siteConfig.brand.name} — ${siteConfig.brand.tagline}`,
+        alt: `${siteConfig.brand.name} - ${siteConfig.brand.tagline}`,
       },
     ],
     locale: siteConfig.locale.ogLocale,

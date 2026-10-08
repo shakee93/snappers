@@ -11,7 +11,7 @@ function scaleToCssVars(prefix: "primary" | "secondary", scale: ColorScale): str
     .join("\n");
 }
 
-/** CSS custom properties for :root — injected once in the root layout. */
+/** CSS custom properties for :root - injected once in the root layout. */
 export function getSiteThemeCss(): string {
   const { primary, secondary } = siteConfig.theme.colors;
   const { topbar, category, cream, green, peach, accent, action } =

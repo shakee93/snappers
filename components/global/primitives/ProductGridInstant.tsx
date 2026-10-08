@@ -84,7 +84,7 @@ const ProductGridInstant = ({
   );
 
   // When the On Sale filter is active, Typesense returns every product whose
-  // `onSale` flag is true — but that flag stays true even after the last
+  // `onSale` flag is true - but that flag stays true even after the last
   // in-stock variation discount expires, so products like Sony WH-1000XM5
   // and Apple AirPods Max leak in with no visible % OFF. Post-filter on the
   // same discount-resolution the card uses so the grid only shows products

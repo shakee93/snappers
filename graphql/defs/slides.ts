@@ -49,24 +49,69 @@ export const GET_HERO_SLIDES = gql`
   }
 `;
 
+/** Homepage hero carousel - Snappers ACF `sliderSettings` (no GQ-only color fields). */
+export const GET_HERO_SLIDER_SETTINGS = gql`
+  query HeroSliderSettings {
+    heroSettings {
+      heroSettingsFields {
+        sliderSettings {
+          slides {
+            sliderTitle
+            sliderDiscription
+            buttonText
+            buttonLink
+            sliderBackgroundImage {
+              node {
+                sourceUrl
+                altText
+              }
+            }
+            sliderFeatureImage {
+              node {
+                sourceUrl
+                altText
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;
+
+/** Deal banner countdown only - avoids coupling to the heavy hero/health query. */
+export const GET_HERO_DEALS_DATE = gql`
+  query HeroDealsDate {
+    heroSettings {
+      heroSettingsFields {
+        dealsDate
+      }
+    }
+  }
+`;
+
 export const GET_HERO_SETTINGS = gql`
   ${ProductContentCard}
 query HeroSettings {
   heroSettings {
     heroSettingsFields {
+      dealsDate
       sliderSettings {
         slides {
           sliderTitle
           sliderDiscription
-          titleColor
-          descriptionColor
           buttonText
           buttonLink
-          buttonTextColor
-          buttonBachgroundColor
           sliderBackgroundImage {
             node {
               sourceUrl
+              altText
+            }
+          }
+          sliderFeatureImage {
+            node {
+              sourceUrl
+              altText
             }
           }
         }

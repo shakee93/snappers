@@ -123,7 +123,7 @@ const OrderCard = memo(function OrderCard({
             </span>
             <span className="text-neutral-300">·</span>
             <span className="text-neutral-500">
-              {order.date ? formatOrderDate(order.date) : "—"}
+              {order.date ? formatOrderDate(order.date) : "-"}
             </span>
             <span
               className={`rounded-full px-2.5 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${statusBadgeClass(order.status)}`}
@@ -177,7 +177,7 @@ const AccountOrdersPanel = () => {
   const [orderToCancel, setOrderToCancel] = useState<MyOrder | null>(null);
 
   // Close the detail modal before opening the confirm dialog so the two
-  // Headless UI dialogs don't sit as siblings — otherwise their outside-click
+  // Headless UI dialogs don't sit as siblings - otherwise their outside-click
   // and Escape handlers compete and the detail modal keeps rendering the
   // pre-cancel `selectedOrder` snapshot after refetch.
   const openCancelDialog = useCallback((order: MyOrder) => {

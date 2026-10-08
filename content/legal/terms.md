@@ -1,57 +1,66 @@
-The customer is responsible for preserving the confidentiality of the password and user name and is responsible for all activities that are carried out under them. Catlitter.lk is unable to check the identities of the registered customers and will not be held responsible for losses suffered by the customer where his/her password or user name is used by someone else unless this occurs due to our negligence or a lapse in security.
+## Product Terms
 
-The content of the Catlitter.lk website is provided for personal shopping purposes and shall not be used for any other purpose without prior permission from Catlitter.lk.
+These Terms and Conditions apply to your use of the website www.snappers.lk. Please read them carefully since they influence your legal rights and obligations. Please do not register for or use www.snappers.lk if you do not agree to these Terms and Conditions. Please keep in mind that in order to utilize any of the Site's features, you must first register as an authorized user.
 
-## Products, Pricing, Promotion Codes and Payments
+## Delivery and Returns
 
-At Catlitter.lk we only trade genuine products directly sourced from manufacturers and authorized distributors.
+We are not permitted by law to deliver meat during (full moon) poya holidays. Our delivery service may also be unavailable on some commercial holidays in Sri Lanka, which are determined at our discretion. We deliver only in the cities stated on the Site (delivery areas). The person collecting the goods will receive a digital invoice upon delivery via email.
 
-The prices of the products listed on the website are displayed in Sri Lankan Rupees (LKR) inclusive of VAT.
+However, the Customer can return an item that has not been opened, has been partially consumed, or has been harmed on your end. We will replace any things that are spoilt or damaged when the product is delivered with new ones the same day. Returns of goods are not eligible for cash reimbursements.
 
-The product images on the website are for illustration purposes only. The actual product may vary slightly due to manufacturer changes.
+## Amendments
 
-The stocks and prices of each product are subject to change without notice.
+We reserve the right to change the terms and conditions at any time without notice, including the delivery fee and delivery/pick-up time slots.
 
-All orders are subject to availability and acceptance. Catlitter.lk reserves the right to refuse or cancel any order at any time.
+## Services Excluded
 
-If any item ordered is out of stock after an order has been placed, the customer will be notified and the amount for that item will be deducted from the payment or refunded. Catlitter.lk will not be responsible for any disappointment suffered by the customer as a result.
+Access to our site requires internet and telecommunications links, which you must provide yourself. We are not responsible for any associated phone bills or expenses. Please ensure that you have the appropriate equipment and services before accessing our site.
 
-Only one promotion code or gift voucher code can be redeemed per order.
+## Restrictions
 
-Special offer prices are only valid during the time of the offer. No refunds will be given for items purchased at a higher price when not on special offer.
+The Site must not be used for distributing any material that is unlawful, abusive, harassing, libelous, harmful, vulgar, obscene, or otherwise objectionable. You may not transmit material that promotes criminal conduct, results in civil liability, or violates any applicable laws, regulations, or codes of practice. Unauthorized access to other computer systems or interfere with another person's use of the Site is prohibited. Breaching laws related to public telecommunications networks or disrupting networks or websites connected to the Site is not allowed. You may not make, transmit or store electronic copies of copyrighted material without the owner's permission. We reserve the right to refuse or remove any material posted on the Site. You will indemnify us against all losses and expenses resulting from any claims related to your use of the Site, including defamation, copyright infringement, or violation of any laws or regulations.
 
-All orders are subject to extra security checks including authentication of credit/debit card details and address information. Catlitter.lk reserves the right to request alternative payment methods or cancel orders where information cannot be authenticated. For cash payments and bank transfers, a 24-hour processing period may apply after funds are received.
+## Order Submission / Order Cancellation
 
-## Delivery
+To purchase a product from Snappers.lk, follow the onscreen prompts and click on the item of your choice. You may continue to select items and add them to your order until you click the "Checkout" button on the "Order Summary" page. After placing an order, you will receive an automated email from us acknowledging receipt of the order, but this does not necessarily mean the order has been accepted. We reserve the right to decline any part of an order if the product is out of stock or discontinued, if there is an issue with payment authorization, or if we have identified an error.
 
-Catlitter.lk reserves the right to contact customers directly in respect of orders.
+Once an order has been accepted, we will send a Dispatch Confirmation along with the invoice.
 
-Some orders may only be delivered to the Billing Address. Customers will be notified by email if this applies.
+Orders may be canceled due to item unavailability, incorrect product offering, or incorrect pricing.
 
-If an order is returned because it was not collected, the customer will be eligible for a refund but postal charges will not be refunded.
+## Registrations may be suspended or canceled
 
-Non-receipt of orders must be notified in writing or by email within 45 working days of dispatch. No claims will be accepted after this period.
+We reserve the right to suspend or cancel your registration if you violate these Terms and Conditions. You may also cancel your registration in writing and must stop using the Site. Both parties' rights and responsibilities will not be affected. You will be held responsible for all orders before registration and access to the Site.
 
-Catlitter.lk is not liable for any delays in delivery, failure to deliver, or any damage or defect to goods occurring during the delivery process.
+## Intangible assets
 
-## Cancellation, Return and Refund
+The copyright, trademarks, and other intellectual property rights governing the material on the Site are the property of Snappers.lk. You may view and save the content for your own personal, non-commercial use, but you are not allowed to copy, modify, distribute, or use it for any commercial endeavors without our express written consent. Any use of our trademarks is not subject to any conditions. If you violate this policy, your rights will be broken.
 
-Customers are advised to check all order details carefully before submitting an order as changes cannot be made once an order has been placed. No compensation will be granted for any inconvenience or loss suffered.
+## Payments and Pricing
 
-Please refer to our [Return Policy](/return-policy) page for a comprehensive guide on returns.
+At Snappers, we ensure that the prices of our products are accurately reflected on our website. All prices are inclusive of VAT but exclude delivery costs, which will be added to the total amount due once you have selected your delivery option as set out in our [Delivery Information](/delivery-details). We offer various payment options, such as credit/debit card and cash on delivery. For credit/debit card payments, you must confirm that the card belongs to you and is subject to validation and authorization. If the issuer of your card refuses payment, we will not accept your order, and we will not be liable for any delay or non-delivery for your card issuer or bank charging you as a result of our processing of your credit/debit card payment.
 
-## Complaints
+To complete your order, you must pay in full through our online payment portal or at the point of delivery. You will receive an order confirmation and payment confirmation. We cannot complete your order until you have paid in full. We will transmit your card details securely to the bank for transaction authorization. If you choose cash on delivery, you must pay in full at the point of delivery.
 
-If you are unhappy with any aspect of our service, we encourage you to contact us.
+We take the security of your payment information seriously and ensure that your card details are only used for transaction authorization using the Secure Payment Site. While we understand that payment authorization can sometimes be tricky, we aim for a smooth payment process for our customers.
 
-All complaints will be acknowledged within seven working days and you will be kept informed of the status of your complaint.
+## Black Friday Deals
 
-## Changes to Terms and Conditions
+- Minimum bill value: 3000/- LKR
+- Maximum discount value: 500/- LKR
+- Coupon code valid for 27 days.
+- Terms and conditions are subject to change without notice.
+- Customers are advised to check the website regularly for updates on offer terms.
 
-Catlitter.lk reserves the right to amend these terms and conditions at any time for legal, regulatory or security reasons.
+## Gift Card
 
-Where major changes are made, we will notify customers via the website or by email. However, it is the customer's responsibility to check for updates.
+The following are the terms and conditions for the use of our gift cards:
 
-## Further Inquiries
+- Gift cards can only be redeemed through our online website.
+- The balance amount on a gift card cannot be exchanged for cash or any other form of payment.
+- Customers have the option to use the remaining balance on their gift card to purchase a different product.
+- Gift cards cannot be used to purchase another gift card or a physical voucher.
+- It is important to note that the terms and conditions governing the use of gift cards are subject to change; customers are advised to regularly check the website for any updates on the terms of use for gift cards.
+- If you have any questions or need assistance regarding the use of gift cards, please contact our customer support team.
 
-For any further inquiries relating to these terms and conditions, please [contact us](/contact).
+It is important to note that the terms and conditions governing the use of a Gift card are subject to change; please check the website for updates on any changes to the terms of use for Gift cards. In case of a dispute, you can contact the customer support team for assistance.

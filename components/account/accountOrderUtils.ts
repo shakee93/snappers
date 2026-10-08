@@ -336,7 +336,7 @@ export function formatPaymentMethod(
   title?: string | null
 ) {
   if (title?.trim()) return decodeHtmlEntities(title);
-  if (!method) return "—";
+  if (!method) return "-";
   return PAYMENT_LABELS[method.toLowerCase()] ?? method.toUpperCase();
 }
 
