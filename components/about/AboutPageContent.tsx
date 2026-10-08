@@ -2,19 +2,12 @@ import Image from "next/image";
 import Link from "next/link";
 import { BRAND_CTA_BUTTON_CLASS } from "@/shared/Button/ButtonBrand";
 import aboutContent from "@/content/about.json";
-import SectionGoogleReviews, {
-  type GoogleReviewsFields,
-} from "@/components/home/SectionGoogleReviews";
 
 const sectionHeadingClass =
   "font-albra text-3xl font-semibold text-[#092412] md:text-5xl";
 
-interface AboutPageContentProps {
-  googleReviews?: GoogleReviewsFields | null;
-}
-
-const AboutPageContent = ({ googleReviews }: AboutPageContentProps) => {
-  const { hero, intro, brands, philosophy, why, closing } = aboutContent;
+const AboutPageContent = () => {
+  const { hero, intro, welcome, stats, why, closing, cta } = aboutContent;
 
   return (
     <div className="-mb-20 bg-white">
@@ -40,10 +33,10 @@ const AboutPageContent = ({ googleReviews }: AboutPageContentProps) => {
               {intro.lead}
             </p>
             <Link
-              href="/shop"
+              href={cta?.href ?? "/shop"}
               className={`mt-8 inline-flex items-center rounded-full px-8 py-3.5 text-sm font-bold transition-opacity hover:opacity-90 ${BRAND_CTA_BUTTON_CLASS}`}
             >
-              Shop pet essentials
+              {cta?.label ?? "Start shopping"}
             </Link>
           </div>
           <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl border border-white/20 shadow-lg md:aspect-square">
@@ -59,74 +52,49 @@ const AboutPageContent = ({ googleReviews }: AboutPageContentProps) => {
         </div>
       </section>
 
-      {/* Intro */}
-      <section className="bg-header-cream px-4 py-14 md:px-6 md:py-20">
-        <div className="mx-auto max-w-3xl text-center">
-          <p className="text-lg font-medium leading-relaxed text-[#092412] md:text-xl">
-            {intro.body}
-          </p>
-        </div>
-      </section>
-
-      {/* Three brands */}
-      <section className="px-4 py-14 md:px-6 md:py-20">
-        <div className="mx-auto max-w-[1368px]">
-          <div className="mx-auto max-w-3xl text-center">
-            <h2 className={sectionHeadingClass}>{brands.title}</h2>
-            <p className="mt-4 text-base font-medium text-black/55 md:text-lg">
-              {brands.subtitle}
-            </p>
-          </div>
-          <div className="mt-10 grid grid-cols-1 gap-5 md:grid-cols-3 md:gap-6">
-            {brands.items.map((brand) => (
-              <article
-                key={brand.name}
-                style={{ backgroundColor: brand.accent }}
-                className="flex flex-col rounded-2xl p-6 md:p-7"
-              >
-                <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/70">
-                  <Image
-                    src="/icons/paw-feat.png"
-                    alt=""
-                    width={28}
-                    height={28}
-                    aria-hidden
-                    className="h-7 w-7 object-contain"
-                  />
-                </div>
-                <h3 className="mt-5 text-xl font-bold text-[#092412]">
-                  {brand.name}
-                </h3>
-                <p className="mt-3 flex-1 text-sm leading-relaxed text-neutral-700 md:text-base">
-                  {brand.description}
-                </p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Philosophy */}
+      {/* Welcome - matches live Snappers about copy */}
       <section className="bg-[#F5F5F5] px-4 py-14 md:px-6 md:py-20">
         <div className="mx-auto grid max-w-[1368px] grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
-          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl lg:aspect-square">
+          <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-white shadow-sm lg:aspect-[5/4]">
             <Image
-              src={philosophy.image}
-              alt={philosophy.imageAlt}
+              src={welcome.image}
+              alt={welcome.imageAlt}
               fill
               sizes="(min-width: 1024px) 50vw, 100vw"
               className="object-cover"
             />
           </div>
-          <div>
-            <p className="text-lg leading-relaxed text-neutral-700 md:text-xl">
-              {philosophy.body}
+          <div className="rounded-2xl bg-white p-6 shadow-sm md:p-10">
+            <p className="text-base leading-relaxed text-neutral-700 md:text-lg md:leading-8">
+              <span
+                className="float-left mr-2 mt-0.5 font-albra text-5xl font-bold leading-[0.85] text-[#F97316] md:text-6xl"
+                aria-hidden
+              >
+                {welcome.dropCap}
+              </span>
+              {welcome.body}
             </p>
           </div>
         </div>
+
+        <ul className="mx-auto mt-10 grid max-w-[1368px] grid-cols-2 gap-4 md:grid-cols-4 md:gap-6">
+          {stats.map((stat) => (
+            <li
+              key={stat.label}
+              className="flex flex-col items-center justify-center rounded-2xl bg-white px-4 py-8 text-center shadow-sm md:py-10"
+            >
+              <p className="font-albra text-3xl font-bold text-[#F97316] md:text-4xl lg:text-5xl">
+                {stat.value}
+              </p>
+              <p className="mt-2 text-sm font-semibold uppercase tracking-wide text-header-green md:text-base">
+                {stat.label}
+              </p>
+            </li>
+          ))}
+        </ul>
       </section>
 
-      {/* Why Catlitter */}
+      {/* Why Snappers */}
       <section className="px-4 py-14 md:px-6 md:py-20">
         <div className="mx-auto max-w-[1368px]">
           <h2 className={`${sectionHeadingClass} text-center`}>{why.title}</h2>
@@ -151,8 +119,6 @@ const AboutPageContent = ({ googleReviews }: AboutPageContentProps) => {
           </div>
         </div>
       </section>
-
-      <SectionGoogleReviews data={googleReviews} disableTopOffset />
 
       {/* Closing */}
       <section className="bg-[#EDF2EE] px-4 pb-14 pt-4 text-center md:px-6 md:pb-20">

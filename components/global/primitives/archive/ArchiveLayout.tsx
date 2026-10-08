@@ -40,7 +40,9 @@ import { cn } from "@/lib/utils";
 async function getData(parentId?: number, tagSlug?: string) {
   const [productsResult, browseCategoryRoots, navCategoriesFlat] =
     await Promise.all([
-      getClient().query({ query: GET_ALL_PRODUCTS }),
+      getClient()
+        .query({ query: GET_ALL_PRODUCTS })
+        .catch(() => ({ data: undefined })),
       getClient()
         .query({ query: GET_BROWSE_CATEGORY_TABS, variables: { first: 50 } })
         .then((res) => res.data?.productCategories?.nodes ?? [])
@@ -51,7 +53,8 @@ async function getData(parentId?: number, tagSlug?: string) {
         .catch(() => []),
     ]);
 
-  const { data } = productsResult;
+  const archiveCategories =
+    productsResult.data?.productCategories?.nodes ?? navCategoriesFlat;
 
   let nestedCategories = [];
   let tagDetails = [];
@@ -62,7 +65,7 @@ async function getData(parentId?: number, tagSlug?: string) {
       variables: { parent: parentId },
     });
 
-    if (!categoryError) {
+    if (!categoryError && categoryData?.productCategories?.nodes) {
       nestedCategories = categoryData.productCategories.nodes;
     } else {
       console.error("Error fetching nested categories:", categoryError);
@@ -75,7 +78,7 @@ async function getData(parentId?: number, tagSlug?: string) {
       variables: { slug: [tagSlug] },
     });
 
-    if (!tagError) {
+    if (!tagError && tagData?.productTags?.nodes) {
       tagDetails = tagData.productTags.nodes;
     } else {
       console.error("Error fetching tag details:", tagError);
@@ -107,8 +110,8 @@ async function getData(parentId?: number, tagSlug?: string) {
   );
 
   return {
-    productCategories: data.productCategories.nodes,
-    brands: data.brands.nodes,
+    productCategories: archiveCategories,
+    brands: [],
     nestedCategories,
     tagDetails,
     sidebarFilterCategories,

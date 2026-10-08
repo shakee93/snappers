@@ -15,7 +15,7 @@ export const HEADER_ACTION_ITEM =
 export const HEADER_ACTION_LABEL =
   "hidden text-[13px] font-normal leading-none text-neutral-500 group-hover:text-neutral-800 min-[1100px]:inline xl:text-[15px]";
 
-/** Account popover — Snappers navy + cream hover. */
+/** Account popover - Snappers navy + cream hover. */
 export const ACCOUNT_MENU_PANEL_CLASS =
   "overflow-hidden rounded-2xl border border-neutral-200 bg-white shadow-lg ring-0";
 

@@ -97,7 +97,7 @@ const ContactPageContent = ({ formspreeId }: ContactPageContentProps) => {
           </div>
         </div>
 
-        {/* Form — vertically centred beside contact info on desktop */}
+        {/* Form - vertically centred beside contact info on desktop */}
         <div className="w-full lg:self-center">
           <ContactForm formspreeId={formspreeId} />
         </div>

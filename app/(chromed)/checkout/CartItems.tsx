@@ -9,7 +9,7 @@ import { Loader, Truck } from "lucide-react";
 
 // `displayValue` is resolved by the graphql-cart-attribute-display-value
 // mu-plugin and fetched in the cart fragment, but isn't part of the generated
-// VariationAttribute type — augment it here rather than reaching for `any`.
+// VariationAttribute type - augment it here rather than reaching for `any`.
 type CartLineAttribute = VariationAttribute & { displayValue?: string | null };
 import { toast } from "sonner";
 import { isLineItemFree, parseWooMoneyAmount } from "@/lib/cartLinePricing";
@@ -60,7 +60,7 @@ export interface CartItemProductNode {
 interface CartItemsProps {
   item: CartItem;
   index: number;
-  /** Selected WooCommerce gateway id — drives the woo-price-tiers line price. */
+  /** Selected WooCommerce gateway id - drives the woo-price-tiers line price. */
   paymentGatewayId: string;
   /** True while payment-method sync is re-quoting cart line subtotals. */
   pricesRecalculating?: boolean;
@@ -90,7 +90,7 @@ const CartItems = ({
   }, [type, variation?.node, node]);
   const productHref = node ? getProductPath(node) : "#";
 
-  // Payment tiers only reprice the line's unit price for display — the summary
+  // Payment tiers only reprice the line's unit price for display - the summary
   // totals stay on WooCommerce's own figures.
   const tierPrice = useMemo(
     () => resolveCartLineTierPrice(item, paymentGatewayId),
@@ -112,7 +112,7 @@ const CartItems = ({
     );
 
     const wooLineSubtotal = parseWooMoneyAmount(subtotal);
-    // Single source for both unit caption and line total — always Woo's line
+    // Single source for both unit caption and line total - always Woo's line
     // subtotal so gateway changes never show tier math beside a stale total.
     const displayUnitPrice =
       Number.isFinite(wooLineSubtotal) && wooLineSubtotal > 0 && qty > 0
@@ -139,7 +139,7 @@ const CartItems = ({
         unitSaving > 0
           ? formatPrice(unitSaving * qty)
           : null,
-      // Always WooCommerce's own number — never a client-side recalculation.
+      // Always WooCommerce's own number - never a client-side recalculation.
       lineTotalLabel: formatPrice(wooLineSubtotal),
     };
   }, [
@@ -163,7 +163,7 @@ const CartItems = ({
     if (isUpdatingQty || isRemoving || newQty === quantity) return;
     if (maxQty !== null && newQty > maxQty) {
       toast.error(
-        `Only ${maxQty} of "${name}" available — please reduce the quantity.`
+        `Only ${maxQty} of "${name}" available - please reduce the quantity.`
       );
       return;
     }

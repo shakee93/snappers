@@ -16,11 +16,11 @@ import type { CategoryTreeNode } from "@/lib/categoryTree";
 type CategoryMegaPanelProps = {
   data: MegaMenuPanelData;
   onClose: () => void;
-  /** Header category bar — white panel, column headings like storefront reference. */
+  /** Header category bar - white panel, column headings like storefront reference. */
   variant?: "default" | "header";
 };
 
-/** Header mega menus — shared link typography (compact, split, multi-column). */
+/** Header mega menus - shared link typography (compact, split, multi-column). */
 const HEADER_MEGA_MENU_LINK_CLASS =
   "block whitespace-nowrap rounded-md px-3 py-1.5 text-[13px] font-semibold leading-snug text-neutral-600 transition-colors hover:bg-neutral-50 hover:text-header-green";
 
@@ -298,7 +298,7 @@ export default function CategoryMegaPanel({
     (category) => category.children.length > 0,
   );
 
-  // Cat & Dog have the densest trees — same wide equal-column panel.
+  // Cat & Dog have the densest trees - same wide equal-column panel.
   const isWidePanel =
     (variant === "header" && !isCompactHeader && !isSplitHeader) ||
     data.navSlug === "cat" ||

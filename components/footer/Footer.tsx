@@ -1,72 +1,39 @@
 import Link from "next/link";
-import Image from "next/image";
-import { Phone } from "lucide-react";
 import {
-  FaInstagram,
   FaFacebookF,
+  FaInstagram,
   FaTiktok,
+  FaXTwitter,
 } from "react-icons/fa6";
 import { siteConfig } from "@/site.config";
 
-const socialLinks = [
-  {
-    Icon: FaInstagram,
-    href: `https://www.instagram.com/${siteConfig.social.instagram}`,
-    label: "Instagram",
-  },
-  {
-    Icon: FaFacebookF,
-    href: `https://www.facebook.com/${siteConfig.social.facebook}`,
-    label: "Facebook",
-  },
-  {
-    Icon: FaTiktok,
-    href: `https://www.tiktok.com/${siteConfig.social.tiktok}`,
-    label: "TikTok",
-  },
-];
+const footerSocialLinks = [
+  { label: "Facebook", href: siteConfig.social.facebook, Icon: FaFacebookF },
+  { label: "Instagram", href: siteConfig.social.instagram, Icon: FaInstagram },
+  { label: "X", href: siteConfig.social.x, Icon: FaXTwitter },
+  { label: "TikTok", href: siteConfig.social.tiktok, Icon: FaTiktok },
+] as const;
 
 const headingClass =
-  "text-[14px] font-semibold uppercase tracking-wider text-white whitespace-nowrap";
+  "inline-block border-b border-[#FACC15] pb-1 text-[13px] font-semibold uppercase tracking-wider text-[#FACC15]";
 
 const Footer = () => {
   const { footer } = siteConfig;
+  const quickLinks = siteConfig.navigation.footerQuickLinks;
 
   return (
-    <footer className="mt-20 pb-20 text-white md:pb-0">
-      {/* Link columns */}
+    <footer className="mt-16 pb-20 text-white md:pb-0 lg:mt-20">
       <div className="bg-header-green">
-        <div className="mx-auto grid max-w-[1088px] grid-cols-1 gap-x-8 gap-y-8 px-4 py-8 sm:grid-cols-2 lg:grid-cols-12">
-          <div className="min-w-0 lg:col-span-6">
-            <h3 className={headingClass}>{footer.openTime.heading}</h3>
-            <ul className="mt-3 space-y-4">
-              {footer.openTime.groups.map((group) => (
-                <li key={group.name}>
-                  <p className="text-sm font-medium text-white/90">{group.name}</p>
-                  <ul className="mt-1.5 space-y-1">
-                    {group.lines.map((line) => (
-                      <li
-                        key={`${group.name}-${line.label}`}
-                        className="flex flex-wrap gap-x-2 text-sm text-white/70"
-                      >
-                        <span className="font-medium text-white/80">{line.label}</span>
-                        <span>{line.hours}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div className="min-w-0 lg:col-span-3">
-            <h3 className={headingClass}>{footer.shopHeading}</h3>
+        {/* Link columns */}
+        <div className="mx-auto grid max-w-[1368px] grid-cols-1 gap-x-8 gap-y-6 px-4 py-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 lg:px-6 xl:px-0">
+          <div className="min-w-0">
+            <h3 className={headingClass}>{quickLinks.heading}</h3>
             <ul className="mt-3 space-y-1.5">
-              {siteConfig.navigation.main.map((item) => (
+              {quickLinks.links.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="text-sm text-white/70 hover:text-white"
+                    className="text-sm text-white/70 transition-colors hover:text-white"
                   >
                     {item.name}
                   </Link>
@@ -75,16 +42,85 @@ const Footer = () => {
             </ul>
           </div>
 
-          <div className="min-w-0 lg:col-span-3">
+          <div className="min-w-0">
+            <h3 className={headingClass}>{footer.shopHeading}</h3>
+            <ul className="mt-3 space-y-1.5">
+              {siteConfig.navigation.main.map((item) => (
+                <li key={item.href}>
+                  <Link
+                    href={item.href}
+                    className="text-sm text-white/70 transition-colors hover:text-white"
+                  >
+                    {item.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="min-w-0">
             <h3 className={headingClass}>{footer.customerServices.heading}</h3>
             <ul className="mt-3 space-y-1.5">
               {footer.customerServices.links.map((item) => (
                 <li key={item.href}>
                   <Link
                     href={item.href}
-                    className="text-sm text-white/70 hover:text-white"
+                    className="text-sm text-white/70 transition-colors hover:text-white"
                   >
                     {item.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="min-w-0">
+            <h3 className={headingClass}>{footer.openTime.heading}</h3>
+            <ul className="mt-3 space-y-4">
+              {footer.openTime.groups.map((group, groupIndex) => {
+                const groupName =
+                  "name" in group && typeof group.name === "string"
+                    ? group.name
+                    : undefined;
+                return (
+                <li key={groupName ?? groupIndex}>
+                  {groupName ? (
+                    <p className="text-sm font-medium text-white/90">{groupName}</p>
+                  ) : null}
+                  <ul className={groupName ? "mt-1.5 space-y-3" : "space-y-3"}>
+                    {group.lines.map((line) => (
+                      <li
+                        key={line.label}
+                        className="text-sm leading-snug text-white/70"
+                      >
+                        <p className="font-medium text-white/90">{line.label}</p>
+                        <p className="mt-0.5">{line.hours}</p>
+                      </li>
+                    ))}
+                  </ul>
+                </li>
+              );
+              })}
+            </ul>
+          </div>
+
+          <div className="min-w-0">
+            <h3 className={headingClass}>{footer.socialHeading}</h3>
+            <ul className="mt-3 space-y-1.5">
+              {footerSocialLinks.map(({ label, href, Icon }) => (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2.5 text-sm text-white/70 transition-colors hover:text-white"
+                  >
+                    <Icon
+                      size={15}
+                      className="shrink-0 text-[#FACC15]"
+                      aria-hidden
+                    />
+                    {label}
                   </Link>
                 </li>
               ))}
@@ -94,60 +130,12 @@ const Footer = () => {
       </div>
 
       {/* Bottom bar */}
-      <div className="bg-[#293417]">
-        <div className="mx-auto max-w-[1088px] py-8 px-4">
-          <div className="flex flex-col gap-6 border-b border-white/10 pb-6 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="text-sm font-semibold uppercase text-white">
-                Payment Methods
-              </p>
-              <Image
-                src="/global/payments.png"
-                alt="Accepted payment methods"
-                width={1024}
-                height={115}
-                className="mt-3 h-8 w-auto max-w-full"
-              />
-            </div>
-            <div className="md:text-right">
-              <p className="text-sm font-semibold uppercase text-white">
-                {footer.support.heading}
-              </p>
-              <div className="mt-1 flex flex-col items-start gap-1 md:items-end">
-                {footer.support.phones.map((phone) => (
-                  <Link
-                    key={phone.tel}
-                    href={`tel:${phone.tel}`}
-                    className="flex items-center gap-2 text-2xl font-bold"
-                  >
-                    <Phone size={20} className="text-[#a3c83f]" />
-                    {phone.display}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col-reverse items-center justify-between gap-4 pt-6 md:flex-row">
-            <div className="flex items-center gap-4">
-              {socialLinks.map(({ Icon, href, label }) => (
-                <Link
-                  key={label}
-                  href={href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  aria-label={label}
-                  className="text-white/40 hover:text-white"
-                >
-                  <Icon size={18} />
-                </Link>
-              ))}
-            </div>
-            <p className="text-sm text-white/60">
-              © {new Date().getFullYear()} {siteConfig.brand.name}.lk All rights
-              reserved.
-            </p>
-          </div>
+      <div className="bg-black">
+        <div className="mx-auto max-w-[1368px] px-4 py-3 lg:px-6 xl:px-0">
+          <p className="text-center text-sm text-white/60">
+            © {new Date().getFullYear()} {siteConfig.brand.name}. All rights
+            reserved.
+          </p>
         </div>
       </div>
     </footer>

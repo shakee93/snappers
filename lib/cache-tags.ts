@@ -13,6 +13,6 @@ export const BROWSE_PRODUCTS_CACHE_TAG = 'browse-products';
 
 // Per-product tag for SSR GraphQL fetches. Attached to the PDP's GET_PRODUCT
 // fetch so /api/revalidate can bust the underlying response, not just the
-// rendered HTML — revalidatePath alone can leave the fetch-cache entry intact
+// rendered HTML - revalidatePath alone can leave the fetch-cache entry intact
 // on dynamic routes and the next regen re-serves the stale upstream answer.
 export const productTag = (slug: string) => `product:${slug}`;

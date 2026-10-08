@@ -116,7 +116,7 @@ const ProductDetails = ({
   }, []);
 
   // Sync the active variation's ID to the store on a primitive dep so the
-  // write fires only when the ID actually changes — keeps subscribers
+  // write fires only when the ID actually changes - keeps subscribers
   // (FreeGiftPreview) from re-rendering on no-op activeVariation updates.
   const activeVariationDbId =
     (activeVariation as { databaseId?: number } | null | undefined)?.databaseId ?? null;
@@ -191,7 +191,7 @@ const ProductDetails = ({
   );
 
   const { isPriceFluctuation } = usePriceFluctuationNotice();
-  // Variation meta wins, parent is the fallback — mirrors the WP plugin's
+  // Variation meta wins, parent is the fallback - mirrors the WP plugin's
   // runtime rule resolution so per-variation BOGO offers render correctly.
   const bogo = useMemo(
     () => resolveBogoConfig(product, activeVariation),
@@ -212,7 +212,7 @@ const ProductDetails = ({
   }, [product, activeVariation]);
   // If the BOGO rule resolved from the variation (variation `_wc_bogo_enabled`
   // wins), the fallback for an empty `_wc_bogo_free_product_ids` becomes the
-  // variation's own ID — strip it from the cross-product list so we don't
+  // variation's own ID - strip it from the cross-product list so we don't
   // try to load it as a separate gift product.
   const bogoSourceId = useMemo(() => {
     const variationId = (activeVariation as { databaseId?: number } | null | undefined)?.databaseId;

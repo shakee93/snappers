@@ -29,7 +29,7 @@ const SHARED_ONLY_SLUGS = new Set(
   Object.values(NAV_SHARED_CATEGORY_SLUGS).flat(),
 );
 
-/** Matches `gap-2` (0.5rem) between tiles — four-up desktop, same width on row two. */
+/** Matches `gap-2` (0.5rem) between tiles - four-up desktop, same width on row two. */
 const CATEGORY_TILE_FLEX_CLASS =
   "w-full shrink-0 sm:w-[calc((100%-0.5rem)/2)] lg:w-[calc((100%-3*0.5rem)/4)]";
 
@@ -39,7 +39,7 @@ const categoryImageSrc = (category: CategoryNode): string | undefined =>
   undefined;
 
 /**
- * "Shop by Categories" — flex rows (4 + 3) with static artwork;
+ * "Shop by Categories" - flex rows (4 + 3) with static artwork;
  * backed by `GET_SHOP_BY_CATEGORIES` for names and slugs.
  */
 const SectionShopByCategory = ({

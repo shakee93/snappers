@@ -1,8 +1,8 @@
 import { gql } from "@apollo/client";
 
 // These operations are served by the `headless-wishlist.php` mu-plugin on the
-// WordPress backend (YITH bridge). They are user-scoped — the backend resolves
-// the customer from the JWT — and intentionally NOT in the Smart Cache
+// WordPress backend (YITH bridge). They are user-scoped - the backend resolves
+// the customer from the JWT - and intentionally NOT in the Smart Cache
 // allowlist, so every request hits the backend fresh.
 //
 // Codegen can't introspect this endpoint (introspection is disabled), so these

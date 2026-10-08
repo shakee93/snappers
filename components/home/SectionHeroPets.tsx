@@ -44,7 +44,7 @@ interface HealthSectionEntry {
 }
 
 export interface HeroSettingsFields {
-  /** ACF “Deals Date” — countdown target on the homepage deal banner. */
+  /** ACF “Deals Date” - countdown target on the homepage deal banner. */
   dealsDate?: string | null;
   sliderSettings?: { slides?: (HeroSlide | null)[] | null } | null;
   dealBannerSettings?: { deals?: (HeroDeal | null)[] | null } | null;
@@ -99,7 +99,7 @@ function stripHtml(html: string): string {
   return html.replace(/<[^>]+>/g, " ");
 }
 
-/** Homepage hero carousel — Hero Settings ACF slides, then slide CPT, then defaults. */
+/** Homepage hero carousel - Hero Settings ACF slides, then slide CPT, then defaults. */
 const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
   const slidesFromCms = useMemo(
     () =>

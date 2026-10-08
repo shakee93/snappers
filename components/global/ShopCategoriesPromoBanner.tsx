@@ -12,7 +12,7 @@ const ShopCategoriesPromoBanner = () => {
       <div className="relative w-full overflow-hidden rounded-[20px] md:rounded-[28px]">
         <Image
           src={BANNER_SRC}
-          alt="Snappers — Your Everyday Essentials, Delivered. Groceries, household essentials, personal care, baby care and more."
+          alt="Snappers - Your Everyday Essentials, Delivered. Groceries, household essentials, personal care, baby care and more."
           width={2172}
           height={724}
           className="h-auto w-full object-cover object-center"

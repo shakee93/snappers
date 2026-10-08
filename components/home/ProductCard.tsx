@@ -55,7 +55,7 @@ export interface ProductCardProps {
   listingImageByProductId?: Record<number, ListingImagePatch>;
 }
 
-/** Grocery-style card accent — price, brand, in-stock badge. */
+/** Grocery-style card accent - price, brand, in-stock badge. */
 const CARD_ACCENT = "#3BB77E";
 /** In-cart quantity stepper (after Add). */
 const CART_ACTIVE_ACCENT = "#F97316";
@@ -74,7 +74,7 @@ const TITLE_COLOR = "#253D4E";
 const CART_ACTION_BASE =
   "inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-bold leading-none sm:py-2.5 sm:text-[13px]";
 const CART_STEPPER_CLASS = `${CART_ACTION_BASE} min-w-0 gap-1 px-1.5 sm:px-2`;
-/** Default Add — brand navy + yellow label (tighter horizontal padding). */
+/** Default Add - brand navy + yellow label (tighter horizontal padding). */
 const CART_ADD_CLASS = `${CART_ACTION_BASE} min-w-0 px-1.5 sm:px-2 ${BRAND_CTA_BUTTON_COMPACT_CLASS}`;
 
 const formatLkr = (value: number) =>
@@ -84,7 +84,7 @@ const formatLkr = (value: number) =>
   });
 
 interface ResolvedDisplayPricing {
-  /** Lowest variation / parent formatted price — used by `resolveDisplayPrice`. */
+  /** Lowest variation / parent formatted price - used by `resolveDisplayPrice`. */
   price: string | null;
   /** When min !== max, listing cards show a sale price range. */
   priceMin: number | null;
@@ -537,7 +537,7 @@ const ProductCard = ({
                 isOutOfStock ? "opacity-50" : ""
               }`}
               aria-label={
-                name ? `${name} — no image available` : "No product image available"
+                name ? `${name} - no image available` : "No product image available"
               }
             >
               <ImageIcon

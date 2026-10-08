@@ -20,7 +20,7 @@ function parseType(raw: string | null): RevalidatePathType | undefined {
 
 // Structured log so WP-side [REVALIDATE] lines can be correlated with the
 // Vercel-side processing of the same call. Vercel returns 200 even when
-// revalidatePath silently no-ops on a dynamic route — without this log we
+// revalidatePath silently no-ops on a dynamic route - without this log we
 // can't tell whether the cache was actually invalidated.
 function logRevalidate(fields: Record<string, unknown>) {
     console.log('[REVALIDATE] ' + Object.entries(fields)
@@ -31,7 +31,7 @@ function logRevalidate(fields: Record<string, unknown>) {
 // Homepage is a concrete path, so bust it WITHOUT a type: revalidatePath('/')
 // emits the `_N_T_/` implicit tag the page is stored under. revalidatePath('/',
 // 'page') emits `_N_T_/page`, which only matches an app/page.tsx outside a
-// route group — ours lives at app/(chromed)/page.tsx, so it silently no-op'd.
+// route group - ours lives at app/(chromed)/page.tsx, so it silently no-op'd.
 function bustDealSurfaces() {
     revalidateTag(DEALS_CACHE_TAG, 'max')
     revalidateTag(BROWSE_PRODUCTS_CACHE_TAG, 'max')
@@ -100,7 +100,7 @@ export async function GET(request: NextRequest) {
             // /<brand>/<slug> and /product/<slug> (brandless) shapes are still
             // accepted so a WP backend that hasn't switched keeps working.
             // Bust the concrete /<slug> path plus the per-product tag attached
-            // to GET_PRODUCT's SSR fetch — otherwise a regen re-serves the
+            // to GET_PRODUCT's SSR fetch - otherwise a regen re-serves the
             // stale force-cached GraphQL response and bakes the old
             // price/stock straight back in.
             const isCollectionPath = path.startsWith('/tag') || path.startsWith('/shop')

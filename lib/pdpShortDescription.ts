@@ -20,6 +20,6 @@ export function getShortDescriptionBullets(raw?: string | null): string[] {
 
   return plain
     .split(/\n+|•|·/)
-    .map((line) => line.replace(/^[-–—]\s*/, "").trim())
+    .map((line) => line.replace(/^[-–-]\s*/, "").trim())
     .filter(Boolean);
 }

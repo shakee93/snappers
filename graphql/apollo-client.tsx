@@ -95,7 +95,7 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
 
     // WooGraphQL signs and returns a fresh `woocommerce-session` JWT in the
     // response header on every request that mutates session state. Capture
-    // that header and persist it so the next request uses the live token —
+    // that header and persist it so the next request uses the live token -
     // without this, localStorage drifts from WC's actual active session and
     // mutations like checkout / removeItemsFromCart fail with "Sorry, no
     // session found." or "No items in cart to remove."
@@ -103,7 +103,7 @@ export default function ApolloWrapper({ children }: React.PropsWithChildren) {
     // Browsers only expose response headers listed in
     // `Access-Control-Expose-Headers`. WPGraphQL-Woo adds `woocommerce-session`
     // to that list, but verify the proxy chain (Coolify / Traefik / mu-plugin)
-    // preserves it — `headers.get(...)` returns null otherwise.
+    // preserves it - `headers.get(...)` returns null otherwise.
     const sessionAfterware = new ApolloLink((operation, forward) =>
       forward(operation).map((response) => {
         if (typeof window === "undefined") return response;

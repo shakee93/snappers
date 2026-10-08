@@ -20,7 +20,7 @@ const productsWithVisibleDeal = (products: DealProduct[]): DealProduct[] =>
     (product) => resolveProductSale(product as SaleResolvableProduct) !== null,
   );
 
-/** Homepage carousel — prefer on-sale query, fall back to browse “All” pool. */
+/** Homepage carousel - prefer on-sale query, fall back to browse “All” pool. */
 export const pickHomepageDealProducts = (
   fromDealsQuery: DealProduct[],
   browseFallback: DealProduct[] = [],

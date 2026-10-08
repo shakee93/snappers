@@ -60,7 +60,7 @@ export const REQUEST_OTP = gql`
 ` as TypedDocumentNode<RequestOtpMutation, RequestOtpVariables>;
 
 /**
- * Sign-in payloads carry no WooCommerce session token — this is a
+ * Sign-in payloads carry no WooCommerce session token - this is a
  * WordPress-user API. The guest `woocommerce-session` token must be kept and
  * sent alongside the new Bearer token so WooCommerce links the guest cart to
  * the account.
@@ -100,7 +100,7 @@ export const VERIFY_OTP = gql`
 
 /**
  * Single-use, and it must reach the provider SDK so it comes back inside the
- * signed ID token — otherwise a captured token could be replayed until it
+ * signed ID token - otherwise a captured token could be replayed until it
  * expires. The schema marks `nonce` optional on the sign-in mutations; treat it
  * as mandatory regardless.
  */

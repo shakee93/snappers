@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 
 // Single source of truth for the WooCommerce BOGO plugin meta keys.
 // Use BogoPluginMetaOnProduct for Product types and BogoPluginMetaOnVariation
-// for ProductVariation — the key list lives only here, so adding/removing a
+// for ProductVariation - the key list lives only here, so adding/removing a
 // plugin field is a one-line change.
 export const BogoPluginMetaOnProduct = gql`
   fragment BogoPluginMetaOnProduct on Product {
@@ -403,7 +403,7 @@ export const ProductContentFull = gql`
       }
     }
     # Upsells render through ProductCard3 (via SectionSliderProductCard), identical
-    # to listing cards — reuse ProductContentCard to avoid duplicating the full
+    # to listing cards - reuse ProductContentCard to avoid duplicating the full
     # variable-product + taxonomy tree per upsell.
     upsell {
       nodes {

@@ -11,7 +11,7 @@
  * Version: 1.0.0
  * Author: catlitter-headless
  *
- * Deploy note: this WP runs opcache.validate_timestamps=Off — reset OPcache via
+ * Deploy note: this WP runs opcache.validate_timestamps=Off - reset OPcache via
  *              a web request (Apache SAPI) after copying this file, or the old
  *              bytecode keeps running. Add the operation names below to the
  *              tripwire allowlist; they intentionally stay OUT of the Smart Cache
@@ -29,7 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * We deliberately bypass YITH_WCWL_Wishlist_Factory::get_default_wishlist(): it
  * caches a `null` into the Redis `wishlists` object-cache group on the first
- * miss, then keeps returning that stale null even after a list exists — which
+ * miss, then keeps returning that stale null even after a list exists - which
  * would also make us create a DUPLICATE default list and hide the user's items.
  * Direct SQL is always fresh and avoids both problems.
  *
@@ -50,7 +50,7 @@ function hwl_default_wishlist_id( $create = false ) {
 	) );
 
 	if ( ! $id && $create && class_exists( 'YITH_WCWL_Wishlist' ) ) {
-		// Explicit create — generate_default_wishlist() throws unless is_default
+		// Explicit create - generate_default_wishlist() throws unless is_default
 		// and a name are pre-set, so we set them ourselves (proven recipe).
 		$wishlist = new YITH_WCWL_Wishlist();
 		$wishlist->set_user_id( $uid );

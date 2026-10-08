@@ -21,7 +21,7 @@ export interface HealthFeatureCardProps {
   price: string | null;
   /** Big left-hand artwork for the slide; falls back to the product image. */
   featureImage?: string;
-  /** Centre slide in the carousel — gets the highlighted card background. */
+  /** Centre slide in the carousel - gets the highlighted card background. */
   isActive?: boolean;
 }
 

@@ -1,11 +1,11 @@
 ---
 name: gq-overview
-description: "Project orientation for gq-headless — what the system is, where its pieces live, and how requests flow between them. Use this when starting work in this repo and you need the big picture before diving in: which repo owns what, where the backend lives, how the frontend talks to it, what changes go where, and which deeper skills/docs to read for specifics. Read this first; the gq-backend-debug skill is the deeper operational runbook for the backend."
+description: "Project orientation for gq-headless - what the system is, where its pieces live, and how requests flow between them. Use this when starting work in this repo and you need the big picture before diving in: which repo owns what, where the backend lives, how the frontend talks to it, what changes go where, and which deeper skills/docs to read for specifics. Read this first; the gq-backend-debug skill is the deeper operational runbook for the backend."
 ---
 
-# gq-headless — working guide
+# gq-headless - working guide
 
-`gqmobiles.lk` is a Next.js storefront for GQ Mobiles (Sri Lanka). This repo (`gq-headless`) is the frontend; everything dynamic comes from a WordPress + WPGraphQL backend on a separate host. There is no monolith — the two halves are deployed and versioned independently.
+`gqmobiles.lk` is a Next.js storefront for GQ Mobiles (Sri Lanka). This repo (`gq-headless`) is the frontend; everything dynamic comes from a WordPress + WPGraphQL backend on a separate host. There is no monolith - the two halves are deployed and versioned independently.
 
 If you only read one thing before starting work, read this.
 
@@ -18,7 +18,7 @@ If you only read one thing before starting work, read this.
 | Stack | Next.js 16 (App Router) + Apollo Client + Tailwind + NextUI | WordPress + WooCommerce + WPGraphQL + WooGraphQL |
 | Hosting | Vercel | Self-hosted Docker on a Hetzner VPS, managed by Coolify |
 | Cache | Vercel edge cache + ISR | Redis (object cache) + WPGraphQL Smart Cache |
-| Search | Typesense (also self-hosted on the VPS) | — |
+| Search | Typesense (also self-hosted on the VPS) | - |
 
 End-user request flow:
 
@@ -28,18 +28,18 @@ Browser → Vercel edge → Next.js (SSR/ISR) → POST /graphql → Traefik → 
                                                                             (Typesense for search)
 ```
 
-Most `/graphql` traffic comes from **Vercel SSR workers** (UA `node`, AWS Mumbai IPs) — not from end-user browsers. That's the single most important thing to remember when reading backend access logs: the "client IP" you see is almost always Vercel, not the user.
+Most `/graphql` traffic comes from **Vercel SSR workers** (UA `node`, AWS Mumbai IPs) - not from end-user browsers. That's the single most important thing to remember when reading backend access logs: the "client IP" you see is almost always Vercel, not the user.
 
 ## What lives in THIS repo
 
 ```
 app/                  Next.js App Router (route groups: (chromed), (payment))
-  (chromed)/...       The main shopfront — homepage, PDPs, brands, collections, cart, checkout, etc.
+  (chromed)/...       The main shopfront - homepage, PDPs, brands, collections, cart, checkout, etc.
   (payment)/checkout  Payment-only flow (split route group with its own layout)
   api/                Next.js route handlers (revalidate hooks, sitemaps, etc.)
 graphql/
   defs/               Co-located GraphQL fragments + queries (the source for codegen)
-  types/              GENERATED — do not edit by hand. Run `pnpm codegen` after editing defs.
+  types/              GENERATED - do not edit by hand. Run `pnpm codegen` after editing defs.
   apollo-client.tsx   Browser Apollo client
   apollo-ssr.ts       Server Apollo client (used by RSC / SSR)
   graphql.schema.json GENERATED schema introspection
@@ -47,7 +47,7 @@ components/, containers/, shared/  React components
 lib/                  Plain TS utilities (BOGO line pricing, JSON-LD, etc.)
 store/                Zustand stores (cart, UI state)
 hooks/                Custom React hooks
-docs/                 Internal architecture/perf docs (NOT for public consumption — see warning headers)
+docs/                 Internal architecture/perf docs (NOT for public consumption - see warning headers)
 scripts/              One-off CLI debug helpers
 ```
 
@@ -57,12 +57,12 @@ GraphQL endpoint comes from `NEXT_PUBLIC_WP_GRAPHQL` (set in `.env.local` for de
 
 `gq-backend-plugins` (cloned at `~/projects/gq-backend-plugins`) is the version-controlled mirror of:
 
-- `mu-plugins/` — must-use plugins that load automatically (schema trimming, GraphQL caching, session-skip optimizations, tripwire, the Vercel log-drain receiver, etc.)
-- `plugins/` — in-house custom plugins (e.g. `wc-bogo-simple` for BOGO/free-shipping rules, `p0-connect` for the Sri Lankan tax/HS-code engine)
+- `mu-plugins/` - must-use plugins that load automatically (schema trimming, GraphQL caching, session-skip optimizations, tripwire, the Vercel log-drain receiver, etc.)
+- `plugins/` - in-house custom plugins (e.g. `wc-bogo-simple` for BOGO/free-shipping rules, `p0-connect` for the Sri Lankan tax/HS-code engine)
 
 The Docker volume on the VPS is the **live source**; the repo is the mirror. The repo's `bin/diff.sh` detects drift, `bin/deploy.sh` rsyncs → docker cp → chown → opcache_reset. **Always prefer the repo route for changes you'd want to review.** In-place edits via `docker exec` work but create drift the next `diff.sh` will surface.
 
-## Caching — every layer matters
+## Caching - every layer matters
 
 This site lives or dies by caching. A page can pass through up to **five** caches before MySQL ever sees a query. Knowing where each one sits is essential before you "fix" a perf issue or debug stale data.
 
@@ -73,10 +73,10 @@ Browser → Vercel edge cache → Next.js ISR/SSG output → Apollo (SSR) → WP
 
 ### 1. Vercel edge cache + Next.js ISR / on-demand SSG (the most impactful layer)
 
-Most public pages — homepage, archive (brand/collection/tag), PDP — are statically generated and cached at the Vercel edge. **Removing `force-dynamic` and falling back to ISR is the single biggest perf lever** in this repo, and several recent commits (`perf(archive): cache brand/collection/tag pages at edge with on-demand SSG`, `perf(pdp): cache PDP HTML at edge by removing force-dynamic`) exist precisely for this.
+Most public pages - homepage, archive (brand/collection/tag), PDP - are statically generated and cached at the Vercel edge. **Removing `force-dynamic` and falling back to ISR is the single biggest perf lever** in this repo, and several recent commits (`perf(archive): cache brand/collection/tag pages at edge with on-demand SSG`, `perf(pdp): cache PDP HTML at edge by removing force-dynamic`) exist precisely for this.
 
 - Pages opt into caching by *not* having `export const dynamic = 'force-dynamic'` and by using `generateStaticParams` for dynamic routes.
-- Cache invalidation goes through Next.js route handlers under `app/api/` (revalidate hooks) — typically called by WordPress when content changes.
+- Cache invalidation goes through Next.js route handlers under `app/api/` (revalidate hooks) - typically called by WordPress when content changes.
 - `revalidate` on a page sets the ISR refresh window; pair it with on-demand revalidation for fresh-on-edit behavior.
 - Beware: anything that reads cookies, headers, or `searchParams` opts the page out of static generation. Audit before adding those.
 
@@ -86,29 +86,29 @@ Two separate Apollo clients (`graphql/apollo-ssr.ts` for server, `graphql/apollo
 
 ### 3. WPGraphQL Smart Cache (Redis-backed, on the backend)
 
-WPGraphQL caches GraphQL responses keyed by query + variables. The `graphql-cache-skip-session.php` mu-plugin **forces it to skip cache for any request carrying a session/auth header** (cart, account, checkout) — that's why anonymous PDPs are fast and signed-in carts are always fresh.
+WPGraphQL caches GraphQL responses keyed by query + variables. The `graphql-cache-skip-session.php` mu-plugin **forces it to skip cache for any request carrying a session/auth header** (cart, account, checkout) - that's why anonymous PDPs are fast and signed-in carts are always fresh.
 
 ### 4. Redis object cache (the WP `wp_cache_*` API)
 
-Backs WordPress's `WP_Object_Cache` and is also where the in-house mu-plugins store their custom caches (e.g., the navigation-categories response, public-user data). **Redis serializes PHP `true` as `"1"`** — `wp_cache_get(...) === true` will always fail; use `!== false` (false = miss) or store an unambiguous value. `save ""` is set on the Redis container, so it's cache-only — restarts wipe it unless you `BGSAVE` first.
+Backs WordPress's `WP_Object_Cache` and is also where the in-house mu-plugins store their custom caches (e.g., the navigation-categories response, public-user data). **Redis serializes PHP `true` as `"1"`** - `wp_cache_get(...) === true` will always fail; use `!== false` (false = miss) or store an unambiguous value. `save ""` is set on the Redis container, so it's cache-only - restarts wipe it unless you `BGSAVE` first.
 
 ### 5. PHP OPcache (bytecode, not data)
 
-Caches compiled PHP. Configured with `validate_timestamps=0` for production performance, which means **edits to backend PHP files have NO effect until OPcache is reset** — graceful Apache reload, or the `bin/deploy.sh` script does it for you. If a freshly-deployed plugin behaves like the old version, this is almost always why.
+Caches compiled PHP. Configured with `validate_timestamps=0` for production performance, which means **edits to backend PHP files have NO effect until OPcache is reset** - graceful Apache reload, or the `bin/deploy.sh` script does it for you. If a freshly-deployed plugin behaves like the old version, this is almost always why.
 
 ### Frontend perf contract
 
 The frontend's job is to **ask for less**, not to bypass caches. Recent perf wins have been about trimming what the frontend requests:
 
-- `perf(graphql): trim metaData keysIn` — fetch only the meta keys actually used
-- `perf(cart): slim cart fragment + displayValue for variation attrs` — drop unused fields from the cart query
-- `perf(graphql): split listings off the full product fragment` — listing fragment ≠ PDP fragment
+- `perf(graphql): trim metaData keysIn` - fetch only the meta keys actually used
+- `perf(cart): slim cart fragment + displayValue for variation attrs` - drop unused fields from the cart query
+- `perf(graphql): split listings off the full product fragment` - listing fragment ≠ PDP fragment
 
-When debugging "slow page", grep `graphql/defs/` first — the cheapest fix is often removing a field nobody renders.
+When debugging "slow page", grep `graphql/defs/` first - the cheapest fix is often removing a field nobody renders.
 
 ## Workflow rules
 
-These come from `CLAUDE.md` (project root). Don't violate them — every change is reviewed:
+These come from `CLAUDE.md` (project root). Don't violate them - every change is reviewed:
 
 1. **No direct pushes to `main`.** Branch off main, push the branch, open a PR with `gh pr create`, wait for CI lint to pass, get human review, merge through GitHub.
 2. **Branch-name prefixes:** `feat/`, `fix/`, `perf/`, `ci/`, `chore/`, `docs/`. Match the conventional-commit subject prefix (e.g. branch `perf/cache-x` → commit `perf(cache): trim x`).
@@ -120,12 +120,12 @@ These come from `CLAUDE.md` (project root). Don't violate them — every change 
 | You're trying to… | Look here |
 |---|---|
 | Understand the project / pick where to start | `.claude/skills/gq-overview/SKILL.md` (this file) |
-| Debug a backend issue (load, 500s, slow queries) | `.claude/skills/gq-backend-debug/SKILL.md` — the operational runbook with tested commands |
-| Read deeper backend architecture (mu-plugin internals, why each one exists) | `docs/backend-guide-dev.md` — internal, do not share |
+| Debug a backend issue (load, 500s, slow queries) | `.claude/skills/gq-backend-debug/SKILL.md` - the operational runbook with tested commands |
+| Read deeper backend architecture (mu-plugin internals, why each one exists) | `docs/backend-guide-dev.md` - internal, do not share |
 | Read frontend perf history | `docs/PERFORMANCE-NEXTJS.md`, `docs/PERFORMANCE-WORDPRESS.md` |
 | Edit a GraphQL query / fragment | `graphql/defs/...`, then run `pnpm codegen` |
 | Understand cart-line / BOGO pricing on the client | `lib/cartLinePricing.ts`, `lib/bogo.ts` |
-| Trim what fields the frontend asks for (perf) | `graphql/defs/` — often the cheapest perf win is removing unused fragment fields |
+| Trim what fields the frontend asks for (perf) | `graphql/defs/` - often the cheapest perf win is removing unused fragment fields |
 | Configure a BOGO rule or per-product free shipping | wp-admin → Products → edit → General tab (the `wc-bogo-simple` plugin renders the fields) |
 
 ## Common operations / commands

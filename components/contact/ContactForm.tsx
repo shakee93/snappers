@@ -56,7 +56,7 @@ const ContactForm = ({ formspreeId }: ContactFormProps) => {
           Message sent!
         </p>
         <p className="mt-2 text-sm text-neutral-600">
-          Thanks for reaching out — we&apos;ll get back to you shortly.
+          Thanks for reaching out - we&apos;ll get back to you shortly.
         </p>
         <button
           type="button"

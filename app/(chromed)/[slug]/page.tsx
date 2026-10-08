@@ -45,7 +45,7 @@ export async function generateMetadata(
   parent: ResolvingMetadata,
 ): Promise<Metadata> {
   const params = await props.params;
-  // Metadata only needs name/price/brand — skip the related-products fetch.
+  // Metadata only needs name/price/brand - skip the related-products fetch.
   const resolved = await resolveSlug(params.slug, { withRelated: false });
 
   if (!resolved) {

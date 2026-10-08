@@ -23,7 +23,7 @@ const SIDE_CART_CHECKOUT_CLASS =
 
 /**
  * Radix Sheet locks the page via react-remove-scroll-bar's `data-scroll-locked`
- * attribute (a reference count + injected stylesheet — not inline overflow
+ * attribute (a reference count + injected stylesheet - not inline overflow
  * styles). Checkout hides the header (HeaderGate), so the sheet can unmount
  * mid-close and leave that attribute behind.
  *
@@ -55,7 +55,7 @@ export default function SideCart({ variant = "default" }: SideCartProps) {
         setIsCartOpen(false);
     }, [setIsCartOpen]);
 
-    // Eager lock clear only on the /checkout hop — HeaderGate unmounts this
+    // Eager lock clear only on the /checkout hop - HeaderGate unmounts this
     // tree there. Other close paths stay mounted long enough for Radix cleanup.
     const leaveForCheckout = useCallback(() => {
         setIsCartOpen(false);

@@ -39,7 +39,7 @@ const WishlistButton = ({
   );
 
   const handleClick = async (event: React.MouseEvent) => {
-    // Cards wrap the image in a Link — don't navigate when toggling.
+    // Cards wrap the image in a Link - don't navigate when toggling.
     event.preventDefault();
     event.stopPropagation();
 

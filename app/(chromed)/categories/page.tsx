@@ -16,7 +16,7 @@ export const revalidate = 1800;
 
 export const metadata: Metadata = {
   title: "All Categories",
-  description: `Browse every category at ${siteConfig.brand.name} — cat, dog, bird, and aquarium food, health products, and accessories.`,
+  description: `Browse every category at ${siteConfig.brand.name} - cat, dog, bird, and aquarium food, health products, and accessories.`,
 };
 
 type CategoryNode = FlatCategoryNode & { count?: number | null };

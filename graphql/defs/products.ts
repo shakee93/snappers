@@ -73,7 +73,7 @@ export const GET_PRODUCT = gql`
   query GetProduct($productId: ID!) {
     product(id: $productId, idType: SLUG) {
       ...ProductContentFull
-      # woo-price-tiers plugin — reference prices per payment option.
+      # woo-price-tiers plugin - reference prices per payment option.
       # PDP-only: listings don't render payment options.
       # Requires the plugin on every GraphQL backend this app targets; if
       # priceTiers is absent from the schema, GetProduct fails and PDPs 404.
@@ -82,7 +82,7 @@ export const GET_PRODUCT = gql`
         price
         imageUrl
       }
-      # Related products feed the PDP "you may also like" slider. PDP-only —
+      # Related products feed the PDP "you may also like" slider. PDP-only -
       # kept out of ProductContentFull so brand / category / homepage archives
       # that share that fragment don't each pull 12 extra product cards.
       related(first: 12) {
@@ -91,7 +91,7 @@ export const GET_PRODUCT = gql`
         }
       }
       # Per-variation BOGO rule (variation meta wins, parent meta is the
-      # fallback). PDP-only — kept out of ProductContentFull so brand /
+      # fallback). PDP-only - kept out of ProductContentFull so brand /
       # category / homepage archives that share that fragment don't pay
       # the extra per-variation meta fetch.
       ... on VariableProduct {
@@ -135,7 +135,7 @@ export const GET_PRODUCTS_BY_DATABASE_IDS = gql`
 // (the same fragment the homepage/archive cards render) so ProductCard works
 // as-is. WooGraphQL doesn't preserve `include` order, so the page re-sorts the
 // nodes to match the wishlist's newest-first id order.
-// `first: 100` caps the page at 100 saved products — fine for launch; revisit
+// `first: 100` caps the page at 100 saved products - fine for launch; revisit
 // with pagination if wishlists are expected to grow larger.
 export const GET_WISHLIST_PRODUCTS = gql`
   ${ProductContentCard}
@@ -271,6 +271,7 @@ export const GET_TAG_DETAILS_BY_SLUG = gql`
 }
 `;
 
+/** Category + brand counts for Typesense archive filters. No `brands` root field on Snappers API. */
 export const GET_ALL_PRODUCTS = gql`
   query GetAllProducts {
     productCategories(first: 100, where: { orderby: COUNT }) {
@@ -280,14 +281,6 @@ export const GET_ALL_PRODUCTS = gql`
         id
         databaseId
         parentDatabaseId
-        count
-      }
-    }
-    brands(first: 100, where: { orderby: COUNT }) {
-      nodes {
-        databaseId
-        name
-        slug
         count
       }
     }
@@ -352,7 +345,7 @@ export const GET_BROWSE_CATEGORY_TABS = gql`
         image {
           sourceUrl
         }
-        # Nested children are hard-capped at 3 levels — sufficient for the
+        # Nested children are hard-capped at 3 levels - sufficient for the
         # current taxonomy; deeper subcategories need BROWSE_CATEGORY_SCOPE_OVERRIDES.
         children {
           nodes {
@@ -533,7 +526,7 @@ export const GET_CATEGORY_ARCHIVE_IN_STOCK = gql`
   ${ProductContentCard}
 `;
 
-/** Same-category PDP fallback — includes out-of-stock so the row can still render. */
+/** Same-category PDP fallback - includes out-of-stock so the row can still render. */
 export const GET_CATEGORY_ARCHIVE_RELATED = gql`
   query GetCategoryArchiveRelated(
     $categoryIdIn: [Int] = null
@@ -607,7 +600,7 @@ export const GET_ARCHIVE_PRODUCTS = gql`
   ${ProductContentCard}
 `;
 
-/** Homepage browse grid — discovery section; includes out-of-stock so sparse categories still render. */
+/** Homepage browse grid - discovery section; includes out-of-stock so sparse categories still render. */
 export const GET_BROWSE_SECTION_PRODUCTS = gql`
   query GetBrowseSectionProducts(
     $categoryIdIn: [Int] = null
@@ -690,7 +683,7 @@ export const GET_PRODUCTS_NODES_HOMEPAGE = gql`
   ${ProductContentCard}
 `;
 
-/** Homepage deals grid — in-stock products currently on sale. */
+/** Homepage deals grid - in-stock products currently on sale. */
 export const GET_HOMEPAGE_DEAL_PRODUCTS = gql`
   query GetHomepageDealProducts($first: Int = 50) {
     products(

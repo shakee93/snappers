@@ -7,7 +7,7 @@ import { BRAND_CTA_BUTTON_CLASS } from "@/shared/Button/ButtonBrand";
 
 /**
  * Newsletter email capture shown in the footer. Presentational submit that
- * confirms inline — wire to a backend endpoint when one is available.
+ * confirms inline - wire to a backend endpoint when one is available.
  */
 export default function NewsletterSignup() {
   const { placeholder, buttonLabel } = siteConfig.footer.newsletter;

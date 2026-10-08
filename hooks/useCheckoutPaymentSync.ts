@@ -9,7 +9,7 @@ import { toast } from "sonner";
  * Pushes the selected payment gateway into the WooCommerce session
  * (`chosen_payment_method`) so plugins that reprice by payment method
  * (woo-price-tiers, fees, etc.) can recalculate the cart, then runs
- * `onSynced` to pull the refreshed totals — same shape as address sync.
+ * `onSynced` to pull the refreshed totals - same shape as address sync.
  *
  * Concurrent calls are generation-guarded: only the latest sync may clear
  * `paymentSyncing` or invoke `onSynced`.
@@ -60,7 +60,7 @@ export function useCheckoutPaymentSync(onSynced: () => Promise<void> | void) {
               },
             });
           } catch {
-            // best-effort — totals will resync when a gateway is re-selected
+            // best-effort - totals will resync when a gateway is re-selected
           }
 
           if (!isCurrent()) return;
@@ -94,7 +94,7 @@ export function useCheckoutPaymentSync(onSynced: () => Promise<void> | void) {
       }
 
       setPaymentSyncing(true);
-      // In flux until this generation lands — don't let a revert short-circuit
+      // In flux until this generation lands - don't let a revert short-circuit
       // on a stale lastSyncedGatewayRef while WC still quotes the old method.
       lastSyncedGatewayRef.current = null;
 

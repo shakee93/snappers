@@ -123,7 +123,7 @@ export function getReorderCandidates(
     const live = stockById.get(productId);
     const displayName = live?.name?.trim() || name;
 
-    // After a live stock check, missing products are unavailable — not assumed
+    // After a live stock check, missing products are unavailable - not assumed
     // in-stock. Prefer "unavailable" over OOS so messaging stays accurate.
     if (stockChecked && !live) {
       skipped.push({ name: displayName, reason: "unavailable" });
@@ -148,7 +148,7 @@ export function getReorderCandidates(
       (variation) => variation?.databaseId === variationId,
     );
 
-    // Never fall back to parent stock for a variation once live data is loaded —
+    // Never fall back to parent stock for a variation once live data is loaded -
     // parent IN_STOCK would let OOS / missing variations through to addToCart.
     if (stockChecked && isVariable && !variationStock) {
       skipped.push({ name: displayName, reason: "unavailable" });

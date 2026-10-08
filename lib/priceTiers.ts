@@ -40,7 +40,7 @@ export function isCardTier(name: string | null | undefined): boolean {
   return /\b(visa|master\s*card|mastercard|card)\b/i.test(name ?? "");
 }
 
-/** Backend KOKO tier price is the final payable total — split into 3 installments. */
+/** Backend KOKO tier price is the final payable total - split into 3 installments. */
 export function kokoInstallmentAmount(totalPrice: number): number {
   return totalPrice > 0 ? totalPrice / 3 : 0;
 }
@@ -73,7 +73,7 @@ export function findTierForGateway(
 }
 
 /**
- * Treat price <= 0 as missing — variable parents return null tier prices, so
+ * Treat price <= 0 as missing - variable parents return null tier prices, so
  * the caller's own price stands in.
  */
 export function resolveTierUnitPrice(

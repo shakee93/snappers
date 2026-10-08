@@ -9,7 +9,7 @@ type HeaderCategoryBarProps = {
   navCategories: ProductCategory[];
 };
 
-/** Category strip — brand icon + label (desktop). */
+/** Category strip - brand icon + label (desktop). */
 export default function HeaderCategoryBar({
   navCategories,
 }: HeaderCategoryBarProps) {

@@ -93,7 +93,7 @@ const productSkeleton = (key: string) => <ProductCardLoading key={key} />;
 
 const BROWSE_PROMO_IMAGE = "/homepage/snappers-exciting-offers.jpg";
 
-/** Left promo column — Snappers offers artwork (links to deals). */
+/** Left promo column - Snappers offers artwork (links to deals). */
 const BrowsePromoPanel = ({ priority = false }: { priority?: boolean }) => (
   <Link
     href="/deals"
@@ -101,7 +101,7 @@ const BrowsePromoPanel = ({ priority = false }: { priority?: boolean }) => (
   >
     <Image
       src={BROWSE_PROMO_IMAGE}
-      alt="Enjoy exciting offers from Snappers — minimum order Rs. 3000. Go to deals."
+      alt="Enjoy exciting offers from Snappers - minimum order Rs. 3000. Go to deals."
       fill
       sizes="(max-width: 1024px) 100vw, 280px"
       className="object-cover object-top"
@@ -113,7 +113,7 @@ const BrowsePromoPanel = ({ priority = false }: { priority?: boolean }) => (
 /**
  * "Browse All Products" section: main-category tab filters, a feature artwork tile
  * plus a paginated product grid. Loads products in batches (100) and fetches more
- * from GraphQL as the user pages — same category scope as archive pages.
+ * from GraphQL as the user pages - same category scope as archive pages.
  */
 const SectionBrowseProducts = ({
   className = "",

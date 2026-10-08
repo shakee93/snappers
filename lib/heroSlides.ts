@@ -1,7 +1,7 @@
 import { siteConfig } from "@/site.config";
 import type { HeroSlide } from "@/components/home/SectionHeroPets";
 
-/** Hero slide headline — same scale as deal banner (`DealCountdownTitle`). */
+/** Hero slide headline - same scale as deal banner (`DealCountdownTitle`). */
 export const HERO_SLIDER_TITLE_CLASS =
   "block font-albra text-[25px] font-bold leading-[1.05] text-[#092412] sm:text-4xl lg:text-6xl";
 

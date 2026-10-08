@@ -2,13 +2,13 @@ import { siteConfig } from "@/site.config";
 
 import { buildCategoryScopeIds, type CategoryTreeNode } from "@/lib/categoryScope";
 
-/** Homepage browse grid — first batch fetched per category tab on SSR. */
+/** Homepage browse grid - first batch fetched per category tab on SSR. */
 export const BROWSE_CATEGORY_TAB_SSR_FIRST = 24;
 
 /** Client pagination batch after the SSR seed (larger cursor fetches). */
 export const BROWSE_CATEGORY_TAB_FETCH_BATCH = 100;
 
-/** Homepage browse tabs — same slugs/order as main nav pet categories. */
+/** Homepage browse tabs - same slugs/order as main nav pet categories. */
 export const BROWSE_TAB_SLUGS = siteConfig.navigation.main.map((item) =>
   item.href.replace(/^\//, ""),
 );
@@ -75,7 +75,7 @@ export const BROWSE_CATEGORY_FEATURE_IMAGES: Record<string, string> = {
   aquarium: "/homepage/categories/fish.webp",
 };
 
-/** "All" tab banner — dedicated all-pets artwork. */
+/** "All" tab banner - dedicated all-pets artwork. */
 export const BROWSE_ALL_TAB_FEATURE_IMAGE = "/homepage/categories/all.webp";
 
 /** Feature banner for a nav tab slug (`cat`, `dog`, …). */

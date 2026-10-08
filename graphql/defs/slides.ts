@@ -49,7 +49,7 @@ export const GET_HERO_SLIDES = gql`
   }
 `;
 
-/** Homepage hero carousel — Snappers ACF `sliderSettings` (no GQ-only color fields). */
+/** Homepage hero carousel - Snappers ACF `sliderSettings` (no GQ-only color fields). */
 export const GET_HERO_SLIDER_SETTINGS = gql`
   query HeroSliderSettings {
     heroSettings {
@@ -79,7 +79,7 @@ export const GET_HERO_SLIDER_SETTINGS = gql`
   }
 `;
 
-/** Deal banner countdown only — avoids coupling to the heavy hero/health query. */
+/** Deal banner countdown only - avoids coupling to the heavy hero/health query. */
 export const GET_HERO_DEALS_DATE = gql`
   query HeroDealsDate {
     heroSettings {

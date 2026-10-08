@@ -25,7 +25,7 @@ interface ArchiveFilterBarProps {
   filters: ArchiveFilterState;
   onChange: (next: Partial<ArchiveFilterState>) => void;
   className?: string;
-  /** Locked filters are hidden — the page always applies them server-side. */
+  /** Locked filters are hidden - the page always applies them server-side. */
   lockedFilters?: Partial<ArchiveFilterState>;
   sortOptions?: ArchiveSortOption[];
   filterCategories?: ArchiveFilterCategoryOption[];

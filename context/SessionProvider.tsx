@@ -47,7 +47,7 @@ type PersistableTokens = {
  * link the guest cart to the authenticated user. The sessionAfterware then
  * rotates SESSION_TOKEN_KEY to the user-owned token via the woocommerce-session
  * response header. Overwriting with the sign-in payload's sessionToken here
- * orphans the guest cart — as does clearing it, which is why the OTP flow (whose
+ * orphans the guest cart - as does clearing it, which is why the OTP flow (whose
  * payload carries no sessionToken at all) goes through this same path.
  */
 function persistAuthTokens({ authToken, refreshToken, sessionToken }: PersistableTokens): string | null {
@@ -81,7 +81,7 @@ export function SessionProvider({ children }: {
         const cached = localStorage.getItem(USER_DATA_KEY);
         const hasAuthToken = !!localStorage.getItem(AUTH_TOKEN_KEY);
 
-        // Optimistic: paint cached state only when there is an auth token —
+        // Optimistic: paint cached state only when there is an auth token -
         // no token means the cache is definitionally stale, skip the flash.
         // Only set when customer is not already loaded to avoid redundant renders.
         if (cached && hasAuthToken && !customer) {
@@ -91,7 +91,7 @@ export function SessionProvider({ children }: {
                     setCustomer(parsed as Customer);
                 }
             } catch {
-                // Corrupted cache — fall through to server validation.
+                // Corrupted cache - fall through to server validation.
             }
         }
 
@@ -102,12 +102,12 @@ export function SessionProvider({ children }: {
                 localStorage.setItem(USER_DATA_KEY, JSON.stringify(data.customer));
                 return data;
             }
-            // Server says guest — cached data is stale; clear it.
+            // Server says guest - cached data is stale; clear it.
             setCustomer(null);
             localStorage.removeItem(USER_DATA_KEY);
             return null;
         } catch {
-            console.warn('fetchCustomer: server validation failed — clearing customer state');
+            console.warn('fetchCustomer: server validation failed - clearing customer state');
             setCustomer(null);
             return null;
         }
@@ -120,7 +120,7 @@ export function SessionProvider({ children }: {
      */
     const applyAuthSession = useCallback(async (session: AuthSessionTokens) => {
         // No customer payload accompanies these sessions, so any cached user
-        // belongs to a previous sign-in — drop it before fetchCustomer paints it.
+        // belongs to a previous sign-in - drop it before fetchCustomer paints it.
         localStorage.removeItem(USER_DATA_KEY);
 
         const tokenToStore = persistAuthTokens({

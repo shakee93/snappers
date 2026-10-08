@@ -35,7 +35,7 @@ export const CartItemProductSlim = gql`
                 parentDatabaseId
             }
         }
-        # Parent free-shipping flag — fallback when the cart line's variation
+        # Parent free-shipping flag - fallback when the cart line's variation
         # has no explicit value. Variation flag is on ProductVariationContentSlice.
         freeShippingMeta: metaData(keysIn: ["_wc_product_free_shipping"]) {
             key
@@ -90,7 +90,7 @@ export const CartItemContent = gql`
 // MobileBottomNav) is the only surface that reads the response, and it only
 // renders contents + subtotal. Dropping shippingTotal/total/etc. avoids
 // triggering WC's shipping-zone evaluation and full calculate_totals on
-// every add — saved ~1.7s of TTFB in measurements.
+// every add - saved ~1.7s of TTFB in measurements.
 export const CartContentSlim = gql`
   fragment CartContentSlim on Cart {
     contents(first: 100) {
@@ -106,7 +106,7 @@ export const CartContentSlim = gql`
 
 // Full cart fragment for /cart, quantity/coupon mutations, and sidecart
 // surfaces that need totals but not rate ids. Trimmed to fields with actual
-// consumers — subtotalTax / shippingTax / totalTax / feeTax / feeTotal /
+// consumers - subtotalTax / shippingTax / totalTax / feeTax / feeTotal /
 // discountTax / needsShippingAddress / appliedCoupons.discountTax all had
 // zero readers in the codebase.
 //
@@ -135,7 +135,7 @@ export const CartContent = gql`
 `;
 
 // Checkout-only cart fragment. availableShippingMethods costs a WC
-// shipping-zone evaluation, so it lives here — not on CartContent — and is
+// shipping-zone evaluation, so it lives here - not on CartContent - and is
 // spread only by GET_CART and UPDATE_SHIPPING_TOTAL.
 //
 // Only id / methodId / label / cost are read (resolveCourierRate +

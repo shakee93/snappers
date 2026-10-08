@@ -1,7 +1,7 @@
 import Button, { ButtonProps } from "@/shared/Button/Button";
 import React from "react";
 
-/** Snappers primary CTA — navy fill, yellow Inter label (checkout, shop, auth, etc.). */
+/** Snappers primary CTA - navy fill, yellow Inter label (checkout, shop, auth, etc.). */
 export const BRAND_CTA_BUTTON_CLASS =
   "bg-header-green font-[family-name:var(--font-inter)] text-[#FACC15] shadow-none hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed";
 

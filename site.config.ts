@@ -2,7 +2,7 @@
  * Single source of truth for every tenant-specific value in the storefront.
  *
  * Forking this repo for a new tenant means editing THIS file (plus `content/`
- * `app/index.css` (shadcn base tokens only), and this file — not hunting hardcoded
+ * `app/index.css` (shadcn base tokens only), and this file - not hunting hardcoded
  * strings through components.
  * Anything brand-, locale-, contact-, payment-, or analytics-specific lives
  * here. See docs/FORK-FOUNDATION-PLAN.md §2.
@@ -12,23 +12,23 @@ export const siteConfig = {
     name: "Snappers",
     legalName: "Catlitter (Pvt) Ltd",
     shortName: "",
-    tagline: "Best pet care in the market",
+    tagline: "Everyday essentials, delivered.",
     description:
-      "Shop the best pet care products in the market. Find the latest products from top brands.",
+      "Shop groceries, bakery, household essentials, and deals online. Delivery in Colombo and suburbs from Snappers.lk.",
   },
   /**
    * Paths are under `public/` (e.g. `/global/logo.png` → `public/global/logo.png`).
    * Provide separate `dark` entries for class-based UI; favicons use OS `prefers-color-scheme`.
    */
   /**
-   * Brand palette — space-separated RGB channels (e.g. "27 64 175" for #1b40af).
+   * Brand palette - space-separated RGB channels (e.g. "27 64 175" for #1b40af).
    * Drives Tailwind `primary-*`, `primaryColor`, and `secondary-*` via CSS variables
    * injected in the root layout (`SiteThemeStyles`).
    */
   theme: {
     brandHex: {
       primary: "#1b40af",
-      /** Brand navy — top bar, search border, badges, footer, accents. */
+      /** Brand navy - top bar, search border, badges, footer, accents. */
       headerGreen: "#071C43",
       topBar: "#071C43",
       dealBrown: "#3E251B",
@@ -65,7 +65,7 @@ export const siteConfig = {
       danger: "#d71e1e",
     },
     /**
-     * Header palette — space-separated RGB channels (e.g. "62 75 35" for #3e4b23).
+     * Header palette - space-separated RGB channels (e.g. "62 75 35" for #3e4b23).
      * Drives the cream top bar and dark-green utility bar via `--c-header-*`
      * (injected in `SiteThemeStyles`) and the Tailwind `header-*` tokens.
      */
@@ -80,10 +80,10 @@ export const siteConfig = {
       // Soft-peach action icons + Basket pill on the cream bar.
       peach: "253 230 214",
       accent: "243 168 130",
-      /** Primary CTA fill — Add to cart, checkout, confirm order (#ACDA5A). */
+      /** Primary CTA fill - Add to cart, checkout, confirm order (#ACDA5A). */
       action: "172 218 90",
     },
-    /** Deal section — countdown, carousel controls, product-card accent. */
+    /** Deal section - countdown, carousel controls, product-card accent. */
     deal: {
       brown: "62 37 27",
       accent: "184 217 98",
@@ -123,7 +123,7 @@ export const siteConfig = {
     email: "catlitter.lk@gmail.com",
     storeAddress:
       "No. 107, Kirula Road, Narahenpita, Colombo 05, Sri Lanka",
-    /** Formspree form ID — set `NEXT_PUBLIC_FORMSPREE_CONTACT_ID` in env. */
+    /** Formspree form ID - set `NEXT_PUBLIC_FORMSPREE_CONTACT_ID` in env. */
     formspreeContactFormId:
       process.env.NEXT_PUBLIC_FORMSPREE_CONTACT_ID ?? "",
   },
@@ -132,10 +132,10 @@ export const siteConfig = {
     /** Thin top bar above the header (see `HeaderAnnouncementBar`). */
     topBar: {
       links: [
-        { href: "/about", name: "About Us" },
         { href: "/account", name: "My Account" },
         { href: "/account/save-lists", name: "Wishlist" },
       ],
+      /** Center column uses `footerQuickLinks` (see `HeaderAnnouncementBar`). */
       message: "100% Secure delivery without contacting the courier",
       helpLabel: "Need help? Call Us:",
     },
@@ -160,64 +160,65 @@ export const siteConfig = {
       message: ["Cash on Delivery Available Island-wide |", "Shop with Confidence"],
     },
     footerQuickLinks: {
-      heading: "Quick Links",
+      heading: "Quick links",
       links: [
+        { href: "/", name: "Home" },
         { href: "/shop", name: "Shop" },
+        { href: "/deals", name: "Deals" },
         { href: "/about", name: "About us" },
-        { href: "/contact", name: "Contact Us" },
-        { href: "/privacy", name: "Privacy Policy" },
-        { href: "/warranty-terms", name: "Warranty Terms" },
-        { href: "/terms-and-conditions", name: "Terms & Conditions" },
+        { href: "/contact", name: "Contact us" },
       ],
     },
   },
   /** Footer layout content (see `components/footer/Footer.tsx`). */
   footer: {
+    tagline: "Everyday essentials, delivered across Sri Lanka.",
     newsletter: {
-      heading: "Sign up for our email newsletter",
+      heading: "Deals & updates in your inbox",
       placeholder: "yourname@mail.com",
       buttonLabel: "Subscribe",
     },
     openTime: {
-      heading: "Open Time",
+      heading: "Delivery & support",
       groups: [
         {
-          name: "Catlitter & Petlove",
           lines: [
-            { label: "Mon – Sat", hours: "9:00 AM – 9:00 PM" },
-            { label: "Sun & Poya", hours: "9:30 AM – 6:00 PM" },
-          ],
-        },
-        {
-          name: "Pet & Co",
-          lines: [
-            { label: "Mon – Sat", hours: "9:30 AM – 7:00 PM" },
-            { label: "Poya", hours: "9:30 AM – 6:00 PM" },
-            { label: "Sunday", hours: "Closed" },
+            {
+              label: "Where we deliver",
+              hours: "Colombo and suburbs only - not island-wide.",
+            },
+            {
+              label: "Same-day delivery",
+              hours: "Place your order before 2:00 PM.",
+            },
+            {
+              label: "Next-day delivery",
+              hours: "Orders after 2:00 PM arrive the following day.",
+            },
           ],
         },
       ],
     },
-    shopHeading: "Shop",
+    shopHeading: "Shop categories",
     customerServices: {
-      heading: "Customer Services",
+      heading: "Customer service",
       links: [
-        { href: "/about", name: "About Us" },
-        { href: "/privacy", name: "Privacy Policy" },
-        { href: "/terms-and-conditions", name: "Terms & Conditions" },
-        { href: "/delivery-details", name: "Delivery Details" },
-        { href: "/return-policy", name: "Return Policy" },
+        { href: "/privacy", name: "Privacy policy" },
+        { href: "/terms-and-conditions", name: "Terms & conditions" },
       ],
     },
     support: {
-      heading: "Our experts are available 24/7",
+      heading: "Need help?",
       phones: [{ display: "076 667 6332", tel: "0766676332" }],
+      email: { display: "info@snappers.lk", mailto: "info@snappers.lk" },
     },
+    socialHeading: "Follow us",
   },
   social: {
-    facebook: "catlitter.lk",
-    instagram: "catlittersrilanka",
-    tiktok: "@catlitter.lk",
+    facebook: "https://www.facebook.com/Snapperslanka",
+    instagram: "https://www.instagram.com/snapperslk/",
+    x: "https://x.com/snapperslk",
+    tiktok: "https://www.tiktok.com/@snapperslk",
     googleReviewUrl:
       "https://www.google.com/search?q=catlitter.lk&newwindow=1&sca_esv=47fdd52eba661d26&rlz=1C5CHFA_enLK1163LK1163&biw=1710&bih=985&sxsrf=APpeQnt9vKUXvlC8bmdZEbb-YhBaKGCIKw%3A1782983829933&ei=lSxGasnAOM6wwcsPpsKluQI&ved=0ahUKEwiJ38qu1LOVAxVOWHADHSZhKScQ4dUDCBI&uact=5&oq=catlitter.lk&gs_lp=Egxnd3Mtd2l6LXNlcnAiDGNhdGxpdHRlci5sazIEECMYJzILEC4YrwEYxwEYgAQyBRAAGIAEMgUQABiABDIEEAAYHjIEEAAYHjICECZI4AdQyARY0AVwAXgBkAEAmAGRAaAB6wGqAQMxLjG4AQPIAQD4AQGYAgKgAmnCAgoQABhHGNYEGLADmAMAiAYBkAYIkgcDMS4xoAffE7IHAzAuMbgHZcIHBzAuMS4wLjHIBwuACAE&sclient=gws-wiz-serp#",
   },
@@ -226,7 +227,7 @@ export const siteConfig = {
     kokoGatewayId: "darazbnpl",
     // Gateways the customer settles on delivery rather than online. They take
     // no payment step during checkout, so the order is confirmed in-app and
-    // the customer goes straight to the thank-you page — and they all need a
+    // the customer goes straight to the thank-you page - and they all need a
     // delivery leg to collect at, so Store Pickup / Flash Delivery disable them.
     // "cheque" is WooCommerce's built-in cheque gateway, retitled "Card on
     // Delivery" in wp-admin; the id stays `cheque`.
@@ -291,7 +292,7 @@ export const siteConfig = {
     freeShippingMethodId: "wbs:5c9bd062_free_shipping",
     weightBasedShippingMethodId: "wbs:0dd3bc79_weight_based_shipping",
     /**
-     * CatLitter Delivery — our own fleet, priced by distance server-side.
+     * CatLitter Delivery - our own fleet, priced by distance server-side.
      *
      * The dwbs instance in WooCommerce > Settings > Shipping > Sri Lanka
      * quotes BOTH of its sub-modes at once inside the delivery radius:
@@ -300,17 +301,17 @@ export const siteConfig = {
      * the weight rate is quoted, and the checkout offers Courier delivery in
      * place of CatLitter Delivery.
      *
-     * So this must name the sub-mode, not just the instance — a bare `dwbs:2`
+     * So this must name the sub-mode, not just the instance - a bare `dwbs:2`
      * prefix would claim both rates and leave the courier option with none.
      * A single-rate method such as `flat_rate:5` is matched exactly.
      *
      * Empty string keeps the delivery option hidden. Keep it empty until the
-     * WooCommerce rate exists — offering a rate the store cannot quote makes
+     * WooCommerce rate exists - offering a rate the store cannot quote makes
      * `updateShippingMethod` fail and leaves the cart on a stale rate.
      */
     catlitterDeliveryMethodId: "dwbs:2:distance",
     /**
-     * Flash Delivery — the customer books an Uber / PickMe to collect. A
+     * Flash Delivery - the customer books an Uber / PickMe to collect. A
      * zero-cost flat rate in WooCommerce > Settings > Shipping titled
      * "Flash Delivery (Uber/PickMe)". Checkout refuses a Flash order when the
      * store doesn't quote this rate: WooCommerce silently swaps an unknown

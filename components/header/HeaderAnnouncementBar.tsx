@@ -1,12 +1,17 @@
 import Link from "next/link";
 import { siteConfig } from "@/site.config";
 
-const { links, message, helpLabel } = siteConfig.navigation.topBar;
+const { links, helpLabel } = siteConfig.navigation.topBar;
+const centerLinks = siteConfig.navigation.footerQuickLinks.links;
 const { primaryPhone, primaryPhoneDisplay } = siteConfig.contact;
 
+const topBarLinkClass = (isLast: boolean) =>
+  `flex items-center whitespace-nowrap px-3 text-white/95 transition-colors first:pl-0 hover:text-white hover:underline sm:px-4 ${
+    isLast ? "" : "border-r border-white/35"
+  }`;
+
 /**
- * Thin top bar: quick links · delivery message · support phone.
- * Mobile shows the message only.
+ * Thin top bar: account links · quick links (center) · support phone.
  */
 const HeaderAnnouncementBar = () => {
   const topBarBg = siteConfig.theme.brandHex.topBar;
@@ -22,18 +27,27 @@ const HeaderAnnouncementBar = () => {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center whitespace-nowrap px-4 text-white/95 transition-colors first:pl-0 hover:text-white hover:underline ${
-                index < links.length - 1
-                  ? "border-r border-white/35"
-                  : ""
-              }`}
+              className={topBarLinkClass(index >= links.length - 1)}
             >
               {item.name}
             </Link>
           ))}
         </nav>
 
-        <p className="truncate text-center font-medium">{message}</p>
+        <nav
+          aria-label="Quick links"
+          className="flex items-stretch justify-center overflow-x-auto scrollbar-none"
+        >
+          {centerLinks.map((item, index) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={topBarLinkClass(index >= centerLinks.length - 1)}
+            >
+              {item.name}
+            </Link>
+          ))}
+        </nav>
 
         <p className="hidden justify-end whitespace-nowrap lg:flex">
           {helpLabel}&nbsp;

@@ -1,4 +1,4 @@
-/** Client-side JWT helpers — avoid sending expired/invalid Bearer tokens (WP returns ISE on addToCart). */
+/** Client-side JWT helpers - avoid sending expired/invalid Bearer tokens (WP returns ISE on addToCart). */
 
 type JwtPayload = {
   exp?: number;
