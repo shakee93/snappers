@@ -11,8 +11,8 @@
   "welcome": {
     "dropCap": "W",
     "body": "elcome to Snappers, the premier online grocery shop that brings the supermarket to your doorstep. Our easy-to-use website allows you to shop from the comfort of your own home, with our vast selection of fresh produce, pantry staples, snacks, and more. We pride ourselves on our unbeatable prices and strive to offer our customers the best value possible. In addition, we offer exclusive discounts and offers to our loyal customers. With Snappers, you can enjoy the convenience of online shopping without sacrificing the quality of your groceries. Shop with us today and discover the Snappers difference for yourself.",
-    "image": "/homepage/hero/Snappers%20Bag%20and%20Golden%20Coins.png",
-    "imageAlt": "Snappers grocery bag in a supermarket aisle"
+    "image": "/homepage/snappers-delivery-handoff.jpg",
+    "imageAlt": "Snappers delivery partner handing a grocery order to a customer"
   },
   "stats": [
     { "value": "197+", "label": "Customers" },
@@ -24,24 +24,24 @@
     "title": "Why Snappers?",
     "items": [
       {
-        "icon": "/icons/box-feat.png",
-        "iconAlt": "Delivery",
-        "text": "Delivery in Colombo and suburbs - same day before 2:00 PM"
+        "iconKey": "delivery",
+        "title": "Fast delivery",
+        "text": "Colombo and suburbs only. Order before 2:00 PM for same-day delivery; after 2:00 PM, next-day delivery."
       },
       {
-        "icon": "/icons/verify.png",
-        "iconAlt": "Quality",
-        "text": "Trusted brands and quality-assured products"
+        "iconKey": "quality",
+        "title": "Supermarket quality",
+        "text": "Fresh produce, pantry staples, and household essentials from brands you already trust."
       },
       {
-        "icon": "/icons/support-feat.png",
-        "iconAlt": "Support",
-        "text": "Friendly support when you need help with an order"
+        "iconKey": "deals",
+        "title": "Weekly deals",
+        "text": "Exclusive offers and promotions so you can stock up and save on everyday shopping."
       },
       {
-        "icon": "/icons/paw-feat.png",
-        "iconAlt": "Shop online",
-        "text": "Easy online ordering - browse, checkout, and track from home"
+        "iconKey": "shop",
+        "title": "Shop your way",
+        "text": "Browse by category, checkout securely online, and get updates until your order arrives."
       }
     ]
   },

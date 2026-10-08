@@ -6,7 +6,7 @@ const BANNER_SRC =
 const ShopCategoriesPromoBanner = () => {
   return (
     <section
-      className="container pt-4 lg:pt-6"
+      className="container hidden pt-4 md:block lg:pt-6"
       aria-label="Your everyday essentials, delivered"
     >
       <div className="relative w-full overflow-hidden rounded-[20px] md:rounded-[28px]">

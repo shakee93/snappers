@@ -195,7 +195,7 @@ const SectionDealCountdown = ({
     <section
       className={`relative z-0 mx-auto w-full max-w-[1368px] px-3 lg:px-0 ${className}`}
     >
-      <div className="relative w-full overflow-visible rounded-[20px] md:overflow-hidden md:rounded-[28px]">
+      <div className="relative w-full overflow-hidden rounded-[20px] md:rounded-[28px]">
         <Image
           src={backgroundImageMobile}
           alt=""
@@ -205,7 +205,7 @@ const SectionDealCountdown = ({
           unoptimized
           sizes="100vw"
           aria-hidden
-          className="h-auto w-full rounded-[20px] object-cover object-center md:hidden"
+          className="h-auto w-full object-cover object-center md:hidden"
         />
         <Image
           src={backgroundImage}
@@ -219,37 +219,28 @@ const SectionDealCountdown = ({
           className="hidden h-auto w-full object-cover object-center md:block"
         />
 
-        {/* Mobile: left-aligned title + compact countdown */}
-        <div className="absolute inset-0 flex flex-col items-start justify-center pl-5 pr-[28%] md:hidden">
-          <div className="inline-block pt-8">
-            <div className="relative">
-              <DealCountdownTitle
-                align="start"
-                className="mb-2 text-[25px]"
-              />
-            </div>
-
-            <div
-              className={cn(
-                "relative mt-2.5 w-full overflow-visible rounded-xl border bg-white px-2 pb-2 pt-6",
-                timerVisibilityClass,
-              )}
-              style={{ borderColor: TIMER_BOX_BORDER }}
+        {/* Mobile: title + countdown below artwork (no overlay overlap) */}
+        <div className="border-t border-[#E7EAD9] bg-white px-4 py-5 md:hidden">
+          <DealCountdownTitle align="center" className="text-[26px] sm:text-[30px]" />
+          <div
+            className={cn(
+              "relative mt-4 overflow-hidden rounded-xl border bg-white px-3 pb-3 pt-3 shadow-sm",
+              timerVisibilityClass,
+            )}
+            style={{ borderColor: TIMER_BOX_BORDER }}
+          >
+            <p
+              className="mb-2 text-center text-[10px] font-bold uppercase tracking-wide"
+              style={{
+                backgroundColor: TIMER_RIBBON_BG,
+                color: TIMER_RIBBON_TEXT,
+              }}
             >
-              <span
-                className={cn(
-                  ribbonClass,
-                  "-top-2.5 z-10 rounded px-1.5 py-1 text-[8px] tracking-wide",
-                )}
-                style={{
-                  backgroundColor: TIMER_RIBBON_BG,
-                  color: TIMER_RIBBON_TEXT,
-                }}
-              >
+              <span className="inline-block rounded px-2 py-1">
                 Hurry! Deal ends in:
               </span>
-              {countdownBody}
-            </div>
+            </p>
+            {countdownBody}
           </div>
         </div>
 

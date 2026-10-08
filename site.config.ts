@@ -120,7 +120,7 @@ export const siteConfig = {
     primaryPhone: "0766676332",
     primaryPhoneDisplay: "076 667 6332",
     whatsapp: "94766676332",
-    email: "catlitter.lk@gmail.com",
+    email: "info@snappers.lk",
     storeAddress:
       "No. 107, Kirula Road, Narahenpita, Colombo 05, Sri Lanka",
     /** Formspree form ID - set `NEXT_PUBLIC_FORMSPREE_CONTACT_ID` in env. */

@@ -1348,7 +1348,7 @@ const UnifiedCheckoutForm = ({
                 return {
                     title:
                         gateway.title
-                            ?.replace(/[\s:()–--]*powered by citypak\)?\.?/i, "")
+                            ?.replace(/[\s:()\u2013-]*powered by citypak\)?\.?/gi, "")
                             .trim() || "Cash on delivery",
                     subtitle: "",
                     icon: <Banknote className="w-5 h-5" strokeWidth={1.75} />,

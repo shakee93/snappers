@@ -1,9 +1,10 @@
 import Link from "next/link";
-import { Mail, MapPin, Store } from "lucide-react";
+import { Mail, MapPin, Phone, Truck } from "lucide-react";
 import contactContent from "@/content/contact.json";
 import ContactForm from "@/components/contact/ContactForm";
+import { siteConfig } from "@/site.config";
 
-const locationAccents = ["#EBF3EF", "#FDE6D6", "#EAE8F3"];
+const locationAccents = ["#EBF3EF"];
 
 interface ContactPageContentProps {
   formspreeId: string;
@@ -11,24 +12,38 @@ interface ContactPageContentProps {
 
 const ContactPageContent = ({ formspreeId }: ContactPageContentProps) => {
   const email = contactContent.email;
+  const { primaryPhone, primaryPhoneDisplay, whatsapp } = siteConfig.contact;
+  const pageIntro =
+    "pageIntro" in contactContent && contactContent.pageIntro
+      ? contactContent.pageIntro
+      : null;
+  const registeredOffice =
+    "registeredOffice" in contactContent ? contactContent.registeredOffice : null;
 
   return (
     <section className="-mb-20 bg-white px-4 py-14 md:px-6 md:py-20 lg:py-24">
+      <header className="mx-auto mb-10 max-w-[1368px] text-center md:mb-12">
+        <p className="text-sm font-semibold text-header-green">Contact Us</p>
+        <h1 className="mt-2 font-albra text-3xl font-semibold leading-tight text-[#092412] sm:text-4xl md:text-5xl">
+          Get in touch with us
+        </h1>
+        {pageIntro ? (
+          <p className="mx-auto mt-4 max-w-2xl text-base leading-relaxed text-neutral-600 md:text-lg">
+            {pageIntro}
+          </p>
+        ) : null}
+      </header>
+
       <div className="mx-auto grid max-w-[1368px] grid-cols-1 items-start gap-12 lg:grid-cols-2 lg:items-center lg:gap-16">
         {/* Contact info */}
         <div>
-          <p className="text-sm font-semibold text-header-green">Contact Us</p>
-          <h1 className="mt-2 font-albra text-3xl font-semibold uppercase leading-tight text-[#092412] sm:text-4xl md:text-5xl">
-            Get in touch with us
-          </h1>
-
-          <div className="mt-10 flex gap-4">
+          <div className="flex gap-4">
             <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-header-cream text-header-green">
-              <Store className="h-6 w-6" aria-hidden />
+              <Truck className="h-6 w-6" aria-hidden />
             </div>
             <div className="min-w-0 flex-1">
               <h2 className="text-lg font-bold text-header-green md:text-xl">
-                Our Locations &amp; contact
+                Delivery &amp; support
               </h2>
               <div className="mt-5 space-y-4">
                 {contactContent.locations.map((location, index) => (
@@ -76,6 +91,41 @@ const ContactPageContent = ({ formspreeId }: ContactPageContentProps) => {
                   </article>
                 ))}
               </div>
+              {registeredOffice &&
+              registeredOffice.label &&
+              registeredOffice.addressLine1 ? (
+                <p className="mt-4 text-sm text-neutral-500">
+                  <span className="font-semibold text-neutral-700">
+                    {registeredOffice.label}:
+                  </span>{" "}
+                  {registeredOffice.addressLine1} {registeredOffice.addressLine2}
+                </p>
+              ) : null}
+            </div>
+          </div>
+
+          <div className="mt-8 flex gap-4">
+            <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-header-cream text-header-green">
+              <Phone className="h-6 w-6" aria-hidden />
+            </div>
+            <div>
+              <h2 className="text-lg font-bold text-header-green md:text-xl">
+                Phone &amp; WhatsApp
+              </h2>
+              <Link
+                href={`tel:${primaryPhone}`}
+                className="mt-1 inline-block text-base font-semibold text-header-green hover:underline"
+              >
+                {primaryPhoneDisplay}
+              </Link>
+              <Link
+                href={`https://wa.me/${whatsapp}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-2 block text-sm text-neutral-600 hover:text-header-green hover:underline"
+              >
+                Chat on WhatsApp
+              </Link>
             </div>
           </div>
 
@@ -85,7 +135,7 @@ const ContactPageContent = ({ formspreeId }: ContactPageContentProps) => {
             </div>
             <div>
               <h2 className="text-lg font-bold text-header-green md:text-xl">
-                Email Address
+                Email
               </h2>
               <Link
                 href={`mailto:${email}`}

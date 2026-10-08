@@ -4,7 +4,7 @@ import { siteConfig } from "@/site.config";
 
 export const metadata: Metadata = {
   title: "Contact Us",
-  description: `Get in touch with ${siteConfig.brand.name}. Visit our stores or send us a message.`,
+  description: `Contact ${siteConfig.brand.name} - grocery delivery in Colombo and suburbs. Phone, email, or send a message.`,
 };
 
 export const revalidate = 86400;

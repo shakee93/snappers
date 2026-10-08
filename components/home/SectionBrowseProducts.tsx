@@ -328,7 +328,7 @@ const SectionBrowseProducts = ({
   return (
     <section className={`mx-auto w-full max-w-[1368px] px-3 lg:px-0 ${className}`}>
       <div className="flex flex-col gap-6 lg:flex-row lg:items-stretch lg:gap-5">
-        <div className="lg:w-[min(100%,280px)] lg:shrink-0">
+        <div className="hidden lg:block lg:w-[min(100%,280px)] lg:shrink-0">
           <BrowsePromoPanel priority={activeCategoryId === null} />
         </div>
 
