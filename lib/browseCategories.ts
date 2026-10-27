@@ -65,24 +65,6 @@ export const getShopByCategoryImage = (
 ): string | undefined =>
   slug ? SHOP_BY_CATEGORY_IMAGES[slug] : undefined;
 
-/** Static browse banners under `public/homepage/categories/`. */
-export const BROWSE_CATEGORY_FEATURE_IMAGES: Record<string, string> = {
-  "rabbit-hamsters": "/homepage/categories/rabbit.webp",
-  cat: "/homepage/categories/Cat.webp",
-  dog: "/homepage/categories/Dog.webp",
-  "cat-dog": "/homepage/categories/cat-dog.webp",
-  bird: "/homepage/categories/bird.webp",
-  aquarium: "/homepage/categories/fish.webp",
-};
-
-/** "All" tab banner - dedicated all-pets artwork. */
-export const BROWSE_ALL_TAB_FEATURE_IMAGE = "/homepage/categories/all.webp";
-
-/** Feature banner for a nav tab slug (`cat`, `dog`, …). */
-export const getBrowseFeatureImageForNavSlug = (
-  navSlug: string,
-): string | undefined => BROWSE_CATEGORY_FEATURE_IMAGES[navSlug];
-
 const slugMatchesBrowseTab = (categorySlug: string, tabSlug: string) => {
   const aliases = BROWSE_TAB_SLUG_ALIASES[tabSlug] ?? [tabSlug];
   return aliases.includes(categorySlug);
@@ -106,22 +88,6 @@ export const getBrowseNavSlugForCategory = (
     if (slugMatchesBrowseTab(categorySlug, tabSlug)) return tabSlug;
   }
   return undefined;
-};
-
-/** Resolve the homepage browse banner for a category slug. */
-export const getBrowseCategoryFeatureImage = (
-  slug: string,
-): string | undefined => {
-  const navSlug = getBrowseNavSlugForCategory(slug);
-  return navSlug ? BROWSE_CATEGORY_FEATURE_IMAGES[navSlug] : undefined;
-};
-
-/** Nav-order feature banner for a filtered browse tab (index matches `BROWSE_TAB_SLUGS`). */
-export const getBrowseFeatureImageForTabIndex = (
-  tabIndex: number,
-): string | undefined => {
-  const navSlug = BROWSE_TAB_SLUGS[tabIndex];
-  return navSlug ? BROWSE_CATEGORY_FEATURE_IMAGES[navSlug] : undefined;
 };
 
 export type BrowseCategoryLike = {

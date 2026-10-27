@@ -5,10 +5,7 @@ import {
   type CategoryTreeNode,
   type FlatCategoryNode,
 } from "@/lib/categoryTree";
-import {
-  getBrowseFeatureImageForNavSlug,
-  getBrowseNavSlugForCategory,
-} from "@/lib/browseCategories";
+import { getBrowseNavSlugForCategory } from "@/lib/browseCategories";
 
 export type MegaMenuConfig = {
   columns: number;
@@ -90,9 +87,6 @@ function resolveMegaMenuFeatureImage(
 
   const configured = config.featureImages?.[navSlug];
   if (configured) return configured;
-
-  const browse = getBrowseFeatureImageForNavSlug(navSlug);
-  if (browse) return browse;
 
   return root.image?.sourceUrl ?? undefined;
 }

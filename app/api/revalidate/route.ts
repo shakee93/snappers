@@ -82,8 +82,6 @@ export async function GET(request: NextRequest) {
             revalidatePath('/');
             revalidatePath('/new-arrivals');
             revalidatePath('/back-in-stock');
-            revalidatePath('/smartwatches');
-            revalidatePath('/explore-speakers');
             bustDealSurfaces();
             logRevalidate({ kind: 'homepage', ms: Date.now() - startedAt })
             return Response.json({ revalidated: 'homepage', now: Date.now() })
