@@ -6,7 +6,7 @@ import { apiUrl } from "@/lib/api";
 // only notification WebXPay sends, so relay it to WordPress, where the WebXPay
 // plugin verifies the signature and updates the order. On a verified result the
 // plugin redirects to the order-received URL, which the headless-frontend-urls
-// mu-plugin rewrites to /checkout/{id}?order_id=…&key=… — pass that on. Anything
+// mu-plugin rewrites to /checkout/{id}?order_id=…&key=… - pass that on. Anything
 // else (bad signature, backend error) means the order wasn't updated.
 export async function POST(request: NextRequest) {
   try {

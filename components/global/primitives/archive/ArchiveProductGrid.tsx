@@ -2,31 +2,36 @@
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useLazyQuery } from "@apollo/client";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import ProductCard from "@/components/home/ProductCard";
 import {
   ARCHIVE_PRODUCT_GRID_CLASS_NAME,
   ProductCardsSkeleton,
 } from "@/components/global/primitives/Loading/ProductCardLoading";
-import { GET_ARCHIVE_PRODUCTS } from "@/graphql/defs/products";
-import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import {
+  ARCHIVE_PRODUCTS_PER_PAGE,
   buildArchiveFilterSearchParams,
   parseArchiveFilters,
+  resolveArchiveCategoryIdIn,
   toArchiveProductsVariables,
 } from "@/lib/archiveFilters";
 import { getCompactPageItems } from "@/lib/compactPagination";
+import {
+  fetchArchiveProductsClient,
+  type ArchiveProductNode,
+} from "@/lib/fetchArchiveProductsClient";
+import { getProductListKey } from "@/lib/productListKey";
 
 export interface ArchiveProductGridProps {
+  /** Fixed scope on category archive routes. */
   categoryIds?: number[];
+  /** Root category id → GraphQL scope (parent + children). */
+  categoryScopeById?: Record<number, number[]>;
   first?: number;
 }
 
-type ArchiveProduct = SimpleProduct & VariableProduct;
-
 type ProductCache = {
-  products: ArchiveProduct[];
+  products: ArchiveProductNode[];
   hasNextPage: boolean;
   endCursor: string | null;
   loaded: boolean;
@@ -41,7 +46,8 @@ const EMPTY_CACHE: ProductCache = {
 
 const ArchiveProductGrid = ({
   categoryIds,
-  first = 45,
+  categoryScopeById,
+  first = ARCHIVE_PRODUCTS_PER_PAGE,
 }: ArchiveProductGridProps) => {
   const router = useRouter();
   const pathname = usePathname();
@@ -57,14 +63,25 @@ const ArchiveProductGrid = ({
     Number.parseInt(searchParams.get("page") ?? "1", 10) || 1,
   );
 
+  const resolvedCategoryIds = useMemo(
+    () =>
+      resolveArchiveCategoryIdIn(
+        filters.categoryIds,
+        categoryIds,
+        categoryScopeById,
+      ),
+    [categoryIds, categoryScopeById, filters.categoryIds],
+  );
+
   const filterKey = useMemo(
     () =>
       JSON.stringify({
         filters,
         categoryIds,
+        resolvedCategoryIds,
         first,
       }),
-    [filters, categoryIds, first],
+    [filters, categoryIds, first, resolvedCategoryIds],
   );
 
   const [cache, setCache] = useState<ProductCache>(EMPTY_CACHE);
@@ -73,34 +90,21 @@ const ArchiveProductGrid = ({
   const [error, setError] = useState<Error | null>(null);
   const loadingMoreRef = useRef(false);
 
-  const [fetchArchiveProducts] = useLazyQuery(GET_ARCHIVE_PRODUCTS, {
-    notifyOnNetworkStatusChange: true,
-  });
-
   const loadBatch = useCallback(
     async (after?: string | null): Promise<ProductCache> => {
-      const { data, error: queryError } = await fetchArchiveProducts({
-        variables: {
-          ...toArchiveProductsVariables(filters, categoryIds, first),
-          after: after ?? undefined,
-        },
+      const batch = await fetchArchiveProductsClient({
+        ...toArchiveProductsVariables(filters, resolvedCategoryIds, first),
+        after: after ?? undefined,
       });
 
-      if (queryError) {
-        throw queryError;
-      }
-
-      const nodes = (data?.products?.nodes ?? []) as ArchiveProduct[];
-      const pageInfo = data?.products?.pageInfo;
-
       return {
-        products: nodes,
-        hasNextPage: pageInfo?.hasNextPage ?? false,
-        endCursor: pageInfo?.endCursor ?? null,
+        products: batch.products,
+        hasNextPage: batch.hasNextPage,
+        endCursor: batch.endCursor,
         loaded: true,
       };
     },
-    [categoryIds, fetchArchiveProducts, filters, first],
+    [filters, first, resolvedCategoryIds],
   );
 
   useEffect(() => {
@@ -125,7 +129,12 @@ const ArchiveProductGrid = ({
     };
   }, [filterKey, loadBatch]);
 
-  const pageCount = Math.max(1, Math.ceil(cache.products.length / first));
+  const knownPageCount = Math.max(1, Math.ceil(cache.products.length / first));
+  /** Cursor pagination: include at least one more page while the API has a next batch. */
+  const totalPages = cache.hasNextPage
+    ? Math.max(knownPageCount + 1, page + 1)
+    : knownPageCount;
+
   const visibleProducts = useMemo(
     () => cache.products.slice((page - 1) * first, page * first),
     [cache.products, first, page],
@@ -173,14 +182,14 @@ const ArchiveProductGrid = ({
 
   useEffect(() => {
     if (!cache.loaded || loadingMore) return;
-    if (page <= pageCount) return;
+    if (page <= knownPageCount) return;
     if (cache.hasNextPage) return;
-    if (page > 1) goToPage(pageCount);
-  }, [cache.hasNextPage, cache.loaded, goToPage, loadingMore, page, pageCount]);
+    if (page > 1) goToPage(knownPageCount);
+  }, [cache.hasNextPage, cache.loaded, goToPage, loadingMore, knownPageCount, page]);
 
   const showSkeleton = initialLoading && visibleProducts.length === 0;
   const showPagination =
-    cache.loaded && (pageCount > 1 || cache.hasNextPage) && !error;
+    cache.loaded && (totalPages > 1 || cache.hasNextPage) && !error;
 
   return (
     <>
@@ -206,72 +215,85 @@ const ArchiveProductGrid = ({
             loadingMore ? "opacity-60" : ""
           }`}
         >
-          {visibleProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
+          {visibleProducts.map((product, index) => (
+            <ProductCard
+              key={getProductListKey(product, index)}
+              product={product}
+            />
           ))}
         </div>
       ) : null}
 
       {showPagination ? (
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-1.5">
+        <nav
+          className="mt-10 flex max-w-full flex-wrap items-center justify-center gap-x-3 gap-y-2 px-2 text-sm font-semibold text-[#253D4E] sm:gap-x-4"
+          aria-label={`Product list pagination, page ${page} of ${totalPages}${cache.hasNextPage ? " plus" : ""}`}
+        >
           {page > 1 ? (
             <button
               type="button"
               onClick={() => goToPage(page - 1)}
-              className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-[#E8E8E8] bg-white text-header-green transition-colors hover:border-header-green/40 hover:bg-header-cream/30"
-              aria-label="Previous page"
+              className="inline-flex items-center gap-1.5 transition-colors hover:text-header-green"
             >
-              <ChevronLeft className="h-4 w-4" />
+              <ChevronLeft className="h-4 w-4 shrink-0" aria-hidden />
+              <span>Previous page</span>
             </button>
           ) : null}
 
-          {getCompactPageItems(page, Math.max(pageCount, page)).map(
-            (item, index) => {
-              if (item === "ellipsis") {
-                return (
-                  <span
-                    key={`ellipsis-${index}`}
-                    className="inline-flex h-9 w-9 items-center justify-center text-sm font-semibold text-header-green/40"
-                    aria-hidden
-                  >
-                    …
-                  </span>
-                );
-              }
-
-              const isActive = item === page;
+          {getCompactPageItems(page, totalPages, 1).map((item, index) => {
+            if (item === "ellipsis") {
               return (
-                <button
+                <span
+                  key={`ellipsis-${index}`}
+                  className="px-0.5 tracking-widest text-neutral-400"
+                  aria-hidden
+                >
+                  ...
+                </span>
+              );
+            }
+
+            const isActive = item === page;
+            const isBeyondLoaded = item > knownPageCount && cache.hasNextPage;
+
+            if (isActive) {
+              return (
+                <span
                   key={item}
-                  type="button"
-                  onClick={() => goToPage(item)}
-                  aria-label={`Go to page ${item}`}
-                  aria-current={isActive ? "page" : undefined}
-                  className={`inline-flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold transition-colors ${
-                    isActive
-                      ? "bg-header-action text-header-green"
-                      : "border border-[#E8E8E8] bg-white text-header-green hover:border-header-green/40 hover:bg-header-cream/30"
-                  }`}
+                  aria-current="page"
+                  className="inline-flex h-8 min-w-[2rem] items-center justify-center rounded-md bg-header-green px-2.5 text-white"
                 >
                   {item}
-                </button>
+                </span>
               );
-            },
-          )}
+            }
 
-          {page < pageCount || cache.hasNextPage ? (
+            return (
+              <button
+                key={item}
+                type="button"
+                onClick={() => goToPage(item)}
+                disabled={loadingMore && isBeyondLoaded}
+                aria-label={`Go to page ${item}`}
+                className="inline-flex h-8 min-w-[2rem] items-center justify-center px-1 transition-colors hover:text-header-green disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {item}
+              </button>
+            );
+          })}
+
+          {page < totalPages || cache.hasNextPage ? (
             <button
               type="button"
               onClick={() => goToPage(page + 1)}
               disabled={loadingMore}
-              className="inline-flex h-9 items-center justify-center gap-1 rounded-full border border-[#E8E8E8] bg-white px-3 text-sm font-semibold text-header-green transition-colors hover:border-header-green/40 hover:bg-header-cream/30 disabled:cursor-not-allowed disabled:opacity-50"
-              aria-label="Next page"
+              className="inline-flex items-center gap-1.5 pl-1 transition-colors hover:text-header-green disabled:cursor-not-allowed disabled:opacity-50"
             >
-              <span className="hidden sm:inline">Next</span>
-              <ChevronRight className="h-4 w-4" />
+              <span>Next page</span>
+              <ChevronRight className="h-4 w-4 shrink-0" aria-hidden />
             </button>
           ) : null}
-        </div>
+        </nav>
       ) : null}
     </>
   );

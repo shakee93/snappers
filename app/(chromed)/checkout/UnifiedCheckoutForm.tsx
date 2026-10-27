@@ -60,7 +60,7 @@ const PinLocationMap = dynamic(() => import("./components/PinLocationMap"), {
     ),
 });
 
-// Account shown inline in the BACS panel — sourced from site.config so the
+// Account shown inline in the BACS panel - sourced from site.config so the
 // full bank list (rendered on the bank-details view) stays the single source.
 const FEATURED_BANK_ACCOUNT =
     siteConfig.payment.bankAccounts.find((a) => a.featuredAtCheckout) ??
@@ -202,7 +202,7 @@ const LOCATION_FIELDS = ["address", "city", "state", "postal"] as const;
  * Merges an address patch, dropping any map pin the edit has invalidated.
  *
  * Once the customer types a different street, city, province or postcode, the
- * coordinates they pinned earlier describe somewhere else — handing the driver
+ * coordinates they pinned earlier describe somewhere else - handing the driver
  * a pin that disagrees with the address is worse than handing them none. So a
  * real change to any location field clears the pin, which also means reopening
  * the Pin tab re-finds the newly typed address instead of restoring the old
@@ -210,7 +210,7 @@ const LOCATION_FIELDS = ["address", "city", "state", "postal"] as const;
  *
  * Two things deliberately do not clear it: a patch that carries coordinates
  * (that *is* the pin being applied, along with the address it resolved to),
- * and a patch that re-sends a field's existing value — the city combobox
+ * and a patch that re-sends a field's existing value - the city combobox
  * commits on every blur, and a mere focus-and-leave must not drop the pin.
  */
 const mergeAddressPatch = (
@@ -322,7 +322,7 @@ const CitySelectField = memo(({ id, value, onChange }: CitySelectFieldProps) => 
     // off the list, and then they are authoritative: the courier quotes city
     // and postcode as a pair, so keeping the previously-picked city's code
     // (which is what "only fill when empty" did from the second pick onwards)
-    // sends a mismatched destination — Angoda gets quoted against Kolonnawa's
+    // sends a mismatched destination - Angoda gets quoted against Kolonnawa's
     // 10600. Typing a city commits without a postcode/province and never
     // touches those fields.
     const commitCity = useCallback(
@@ -620,7 +620,7 @@ const AddressFields = memo(({ idPrefix, values, onChange }: AddressFieldsProps) 
     );
 
     // Only used to place the pin the first time the tab opens, so a partial
-    // address is still worth sending — Google will land in the right suburb.
+    // address is still worth sending - Google will land in the right suburb.
     const addressQuery = useMemo(() => {
         const parts = [values.address, values.city, values.state, values.postal]
             .map((part) => part.trim())
@@ -632,7 +632,7 @@ const AddressFields = memo(({ idPrefix, values, onChange }: AddressFieldsProps) 
     // snapshot, so applying a pin costs exactly one shipping recalculation.
     //
     // Every field falls back to what was already typed when Google has nothing
-    // for it — except the postal code, which is replaced *whenever a city was
+    // for it - except the postal code, which is replaced *whenever a city was
     // resolved*, empty or not. A stale postcode left paired with a new city is
     // what silently misprices delivery, so an empty one (which the required
     // field then makes the customer fill) is the safer failure. With no city
@@ -820,14 +820,15 @@ interface DeliveryOptionProps {
     chip?: { label: string; tone: "emerald" | "blue" };
     trailing?: React.ReactNode;
     /**
-     * Held while the cart re-quotes — for any reason, not only an address
-     * change — because switching mid-flight races the in-flight totals.
+     * Held while the cart re-quotes - for any reason, not only an address
+     * change - because switching mid-flight races the in-flight totals.
      */
     disabled?: boolean;
 }
 
 const CHIP_TONES = {
-    emerald: "bg-header-action text-header-green",
+    emerald:
+      "bg-header-green font-[family-name:var(--font-inter)] text-[#FACC15]",
     blue: "bg-header-accent text-header-green",
 } as const;
 
@@ -959,13 +960,13 @@ const UnifiedCheckoutForm = ({
     const [billingAddress, setBillingAddress] = useState<AddressFieldValues>(EMPTY_ADDRESS);
     const [shippingAddress, setShippingAddress] = useState<AddressFieldValues>(EMPTY_ADDRESS);
     const [shippingDifferent, setShippingDifferent] = useState(false);
-    // City list picks and applied map pins both set city+postcode together —
+    // City list picks and applied map pins both set city+postcode together -
     // a finished destination, not a half-typed one. Flag the next snapshot so
     // the parent skips the typing debounce and quotes immediately.
     const immediateAddressSyncRef = useRef(false);
 
     const handleBillingChange = useCallback((patch: Partial<AddressFieldValues>) => {
-        // Immediate sync only when billing is the shipping destination —
+        // Immediate sync only when billing is the shipping destination -
         // a billing city pick can't move the courier quote when shipping
         // uses a separate address.
         if (
@@ -1004,7 +1005,7 @@ const UnifiedCheckoutForm = ({
     // choice the store overrides and reprices behind the customer's back, so
     // show whichever is actually quoted and hide the other.
     //
-    // Neither shows an amount — the order summary is the one place the
+    // Neither shows an amount - the order summary is the one place the
     // shipping charge is quoted. This resolves to null while the option is
     // unconfigured, which is what keeps it hidden on a store without it.
     const catlitterRate = useMemo(
@@ -1015,7 +1016,7 @@ const UnifiedCheckoutForm = ({
     const showCourierDelivery = !catlitterRate;
 
     // Editing the address can pull the selected option out from under the
-    // customer — a Colombo address swaps Courier for CatLitter Delivery and
+    // customer - a Colombo address swaps Courier for CatLitter Delivery and
     // vice versa. Move the selection onto the option that survived so the
     // section is never left with nothing selected, and say why, since the
     // shipping total changes with it.
@@ -1036,7 +1037,7 @@ const UnifiedCheckoutForm = ({
         setOverrideNotice(strandedOn);
     }, [strandedOn, setDeliveryType]);
 
-    // The customer picking an option themselves is an acknowledgement — drop a
+    // The customer picking an option themselves is an acknowledgement - drop a
     // stale notice rather than leaving it to describe a choice they've moved on
     // from. Store Pickup and Flash Delivery clear it too.
     const handlePickupTypeChange = (type: DeliveryType) => {
@@ -1214,7 +1215,7 @@ const UnifiedCheckoutForm = ({
     // Gateways that should appear but be greyed-out for the current delivery
     // method. Cash on Delivery needs a delivery to collect at: the Flash
     // Delivery driver doesn't collect on our behalf, and Store Pickup has no
-    // delivery leg at all. Greying out rather than hiding is deliberate here —
+    // delivery leg at all. Greying out rather than hiding is deliberate here -
     // the reason doubles as the instruction ("pay online instead").
     //
     // Card on Delivery is not handled here: it is filtered out of
@@ -1223,10 +1224,10 @@ const UnifiedCheckoutForm = ({
     const gatewayDisabledReason = (gatewayId: string): string | null => {
         if (!PAY_ON_DELIVERY_GATEWAY_IDS.includes(gatewayId)) return null;
         if (deliveryType === "flash_delivery") {
-            return "Not available with Flash Delivery — pay online instead";
+            return "Not available with Flash Delivery - pay online instead";
         }
         if (deliveryType === "store_pickup") {
-            return "Not available with Store Pickup — pay online instead";
+            return "Not available with Store Pickup - pay online instead";
         }
         return null;
     };
@@ -1250,7 +1251,7 @@ const UnifiedCheckoutForm = ({
     // Keyed on whether the row is still selectable, not on
     // gatewayDisabledReason: a gateway can leave in two ways, and that function
     // only reports one of them. Card on Delivery is *hidden* off our own fleet
-    // rather than greyed out, so checking the reason alone missed it — picking
+    // rather than greyed out, so checking the reason alone missed it - picking
     // it under CatLitter Delivery and then editing the address out of range
     // auto-switched delivery to Courier, dropped the row, and left `cheque`
     // selected and submittable on a courier shipment no rider can take a card
@@ -1347,7 +1348,7 @@ const UnifiedCheckoutForm = ({
                 return {
                     title:
                         gateway.title
-                            ?.replace(/[\s:()–—-]*powered by citypak\)?\.?/i, "")
+                            ?.replace(/[\s:()\u2013-]*powered by citypak\)?\.?/gi, "")
                             .trim() || "Cash on delivery",
                     subtitle: "",
                     icon: <Banknote className="w-5 h-5" strokeWidth={1.75} />,
@@ -1373,7 +1374,7 @@ const UnifiedCheckoutForm = ({
             case "bacs":
                 return {
                     title: gateway.title || "Direct bank transfer",
-                    subtitle: `${FEATURED_BANK_ACCOUNT.bank} — upload your slip after transfer`,
+                    subtitle: `${FEATURED_BANK_ACCOUNT.bank} - upload your slip after transfer`,
                     icon: <Landmark className="w-5 h-5" strokeWidth={1.75} />,
                     trailing: (
                         <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300">
@@ -1413,7 +1414,7 @@ const UnifiedCheckoutForm = ({
                     ),
                 };
             default: {
-                // WP gateway titles can be a long card/wallet list — show a clean label.
+                // WP gateway titles can be a long card/wallet list - show a clean label.
                 const rawTitle = gateway.title || "";
                 const looksLikeCardList =
                     rawTitle.includes("Visa") && rawTitle.includes("/");
@@ -1561,7 +1562,7 @@ const UnifiedCheckoutForm = ({
                                 id={`bank-slip-upload-${gateway.id}`}
                                 accept="image/png, image/gif, image/jpeg, image/heic, image/heif, image/webp, image/bmp, image/tiff, application/pdf"
                                 onChange={handleBankSlipChange}
-                                className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-header-action file:text-header-green hover:file:opacity-90 file:cursor-pointer cursor-pointer"
+                                className="block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-bold file:bg-header-green file:text-[#FACC15] hover:file:opacity-90 file:cursor-pointer cursor-pointer"
                             />
                             {previewUrl && bankSlipFile && (
                                 <div className="mt-2 flex items-center gap-3">
@@ -1675,7 +1676,7 @@ const UnifiedCheckoutForm = ({
                 </div>
             </div>
 
-            {/* Address Section — billing, plus a separate shipping address when
+            {/* Address Section - billing, plus a separate shipping address when
                 the customer asks for one. Sits ahead of the delivery method:
                 which methods exist at all depends on what WooCommerce quotes
                 for this address. */}

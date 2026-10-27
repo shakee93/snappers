@@ -13,6 +13,9 @@ import {
 export const ARCHIVE_PRICE_MIN = 0;
 export const ARCHIVE_PRICE_MAX = 500_000;
 
+/** Shop archive page size - divisible by 2, 3, and 4 so the last grid row is never a single card. */
+export const ARCHIVE_PRODUCTS_PER_PAGE = 48;
+
 export interface ArchiveSortOption {
   id: string;
   label: string;
@@ -20,7 +23,7 @@ export interface ArchiveSortOption {
   order: OrderEnum;
 }
 
-/** Sort options exposed on /deals — popular/rating are no-ops client-side. */
+/** Sort options exposed on /deals - popular/rating are no-ops client-side. */
 export const DEALS_ARCHIVE_SORT_OPTIONS: ArchiveSortOption[] = [
   {
     id: "newest",
@@ -95,6 +98,8 @@ export interface ArchiveFilterState {
   minPrice: number;
   maxPrice: number;
   sort: string;
+  /** Selected root category databaseIds (shop sidebar); empty = all. */
+  categoryIds: number[];
 }
 
 export const DEFAULT_ARCHIVE_FILTERS: ArchiveFilterState = {
@@ -103,9 +108,43 @@ export const DEFAULT_ARCHIVE_FILTERS: ArchiveFilterState = {
   minPrice: ARCHIVE_PRICE_MIN,
   maxPrice: ARCHIVE_PRICE_MAX,
   sort: DEFAULT_ARCHIVE_SORT,
+  categoryIds: [],
 };
 
-/** /deals — always query on-sale; default to in-stock unless URL overrides. */
+export type ArchiveFilterCategoryOption = {
+  databaseId: number;
+  name: string;
+  slug?: string | null;
+};
+
+export function parseCategoryIdsParam(value: string | null): number[] {
+  if (!value?.trim()) return [];
+  return value
+    .split(",")
+    .map((part) => Number.parseInt(part.trim(), 10))
+    .filter((id) => Number.isFinite(id) && id > 0);
+}
+
+/** GraphQL `categoryIdIn` from sidebar selection + optional fixed archive scope. */
+export function resolveArchiveCategoryIdIn(
+  filterCategoryIds: number[],
+  pageCategoryIds: number[] | undefined,
+  categoryScopeById: Record<number, number[]> | undefined,
+): number[] | undefined {
+  if (pageCategoryIds && pageCategoryIds.length > 0) {
+    return pageCategoryIds;
+  }
+  if (!filterCategoryIds.length) return undefined;
+  if (!categoryScopeById || Object.keys(categoryScopeById).length === 0) {
+    return filterCategoryIds;
+  }
+  const scoped = filterCategoryIds.flatMap(
+    (id) => categoryScopeById[id] ?? [id],
+  );
+  return Array.from(new Set(scoped));
+}
+
+/** /deals - always query on-sale; default to in-stock unless URL overrides. */
 export const DEALS_LOCKED_FILTERS: Partial<ArchiveFilterState> = { onSale: true };
 export const DEALS_FILTER_DEFAULTS: Partial<ArchiveFilterState> = {
   inStock: true,
@@ -156,6 +195,7 @@ export function parseArchiveFilters(
       defaults.maxPrice ?? ARCHIVE_PRICE_MAX,
     ),
     sort: validSort && sort ? sort : (defaults.sort ?? DEFAULT_ARCHIVE_SORT),
+    categoryIds: parseCategoryIdsParam(searchParams.get("categories")),
   };
 
   return { ...parsed, ...locked };
@@ -191,6 +231,10 @@ export function buildArchiveFilterSearchParams(
 
   if (filters.sort !== base.sort) {
     params.set("sort", filters.sort);
+  }
+
+  if (filters.categoryIds.length > 0) {
+    params.set("categories", filters.categoryIds.join(","));
   }
 
   return params.toString();

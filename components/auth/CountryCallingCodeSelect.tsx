@@ -18,7 +18,7 @@ const PANEL_HEIGHT = 264;
 
 type CountrySearchEntry = Country & { haystack: string };
 
-/** Precomputed once — avoids rebuilding lowercased strings per keystroke. */
+/** Precomputed once - avoids rebuilding lowercased strings per keystroke. */
 const COUNTRY_SEARCH_INDEX: readonly CountrySearchEntry[] = countries.map(
   (country) => ({
     ...country,
@@ -26,7 +26,7 @@ const COUNTRY_SEARCH_INDEX: readonly CountrySearchEntry[] = countries.map(
   })
 );
 
-/** Windows does not render emoji flags — use PNGs instead. */
+/** Windows does not render emoji flags - use PNGs instead. */
 function flagSrc(countryCode: string): string {
   return `https://flagcdn.com/20x15/${countryCode.toLowerCase()}.png`;
 }
@@ -66,7 +66,7 @@ function resolveSelected(value: string): Country {
 
 /**
  * Empty query: selected country first, then the rest of the alphabet up to the
- * cap — so opening the list always shows where you are. With a query: filter
+ * cap - so opening the list always shows where you are. With a query: filter
  * by precomputed haystack and cap the same way.
  */
 function filterCountries(
@@ -198,7 +198,7 @@ const CountryCallingCodeSelect = ({
   };
 
   const handleInputBlur = () => {
-    // Calling codes must come from the list — free text would break E.164.
+    // Calling codes must come from the list - free text would break E.164.
     closeList();
   };
 
@@ -261,7 +261,7 @@ const CountryCallingCodeSelect = ({
           }
 
           if (event.key === "Enter") {
-            // Dropdown owns Enter while focused — never submit the phone form.
+            // Dropdown owns Enter while focused - never submit the phone form.
             event.preventDefault();
             if (isOpen && activeOptionIndex >= 0) {
               commitCountry(filteredCountries[activeOptionIndex]);

@@ -4,6 +4,7 @@ import { useCallback, useMemo } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import ArchiveFilterBar from "@/components/global/primitives/archive/ArchiveFilterBar";
 import ArchiveSidebarPanel from "@/components/global/primitives/archive/ArchiveSidebarPanel";
+import type { ArchiveFilterCategoryOption } from "@/lib/archiveFilters";
 import {
   ArchiveFilterState,
   buildArchiveFilterSearchParams,
@@ -21,6 +22,8 @@ interface ArchiveFiltersProps {
   lockedFilters?: Partial<ArchiveFilterState>;
   dealsOnly?: boolean;
   variant?: "bar" | "sidebar";
+  filterCategories?: ArchiveFilterCategoryOption[];
+  showCategoryFilter?: boolean;
 }
 
 const ArchiveFilters = ({
@@ -28,6 +31,8 @@ const ArchiveFilters = ({
   lockedFilters,
   dealsOnly = false,
   variant = "bar",
+  filterCategories = [],
+  showCategoryFilter = false,
 }: ArchiveFiltersProps) => {
   const resolvedLockedFilters = useMemo(
     () => (dealsOnly ? DEALS_LOCKED_FILTERS : lockedFilters),
@@ -90,6 +95,8 @@ const ArchiveFilters = ({
         lockedFilters={resolvedLockedFilters}
         filterDefaults={resolvedBuildDefaults}
         sortOptions={sortOptions}
+        filterCategories={filterCategories}
+        showCategoryFilter={showCategoryFilter}
       />
     );
   }
@@ -100,6 +107,8 @@ const ArchiveFilters = ({
       onChange={updateFilters}
       lockedFilters={resolvedLockedFilters}
       sortOptions={sortOptions}
+      filterCategories={filterCategories}
+      showCategoryFilter={showCategoryFilter}
     />
   );
 };

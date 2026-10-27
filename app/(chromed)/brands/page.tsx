@@ -8,13 +8,13 @@ import brandsPageContent from "@/content/brands-page.json";
 import { getLogoSources } from "@/lib/siteAssets";
 import { siteConfig } from "@/site.config";
 
-// Safety-net ISR — primary invalidation is the WP webhook; this keeps the
+// Safety-net ISR - primary invalidation is the WP webhook; this keeps the
 // page self-healing if a build-time fetch is rate-limited.
 export const revalidate = 1800;
 
 async function getData(): Promise<{ brands: Brand[] }> {
   // The SSR client retries transient 429s with backoff; if it still fails,
-  // degrade to an empty list so the build doesn't hard-fail — ISR/webhook
+  // degrade to an empty list so the build doesn't hard-fail - ISR/webhook
   // revalidation backfills the brands shortly after.
   try {
     const { data } = await getClient().query({ query: GET_ALL_BRANDS });

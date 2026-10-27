@@ -6,17 +6,17 @@
 // the stock fields directly.
 //
 // `manageStock` arrives as the WPGraphQL `ManageStockEnum`:
-//   • "TRUE"   — stock is tracked, stockQuantity is the cap
-//   • "FALSE"  — not tracked, no cap (NcInputNumber falls back to its
+//   • "TRUE"   - stock is tracked, stockQuantity is the cap
+//   • "FALSE"  - not tracked, no cap (NcInputNumber falls back to its
 //                default of 99)
-//   • "PARENT" — variation defers to parent; we treat it as "no cap"
+//   • "PARENT" - variation defers to parent; we treat it as "no cap"
 //                here. Server-side stock check is the safety net.
-//   • null     — not an InventoriedProduct (or VariableProduct parent)
+//   • null     - not an InventoriedProduct (or VariableProduct parent)
 //
 // The cap is best-effort: stockQuantity is read at fragment-fetch time
 // and can drift if WP stock changes between cart render and order
 // submit. The checkout error handler (parseStockError) is the
-// ultimate fallback — when WC rejects an order it surfaces a toast
+// ultimate fallback - when WC rejects an order it surfaces a toast
 // with the live available count.
 
 type ManageStockEnum = "TRUE" | "FALSE" | "PARENT" | null | undefined;

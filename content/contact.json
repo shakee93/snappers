@@ -1,38 +1,22 @@
 {
-  "email": "catlitter.lk@gmail.com",
+  "pageIntro": "Snappers is an online grocery shop serving Colombo and suburbs. Reach us by phone, email, or the form - we’ll get back to you as soon as we can.",
+  "email": "info@snappers.lk",
   "locations": [
     {
-      "name": "Catlitter.lk (Main)",
-      "addressLine1": "No. 107, Kirula Road, Narahenpita,",
-      "addressLine2": "Colombo 05, Sri Lanka",
-      "phones": [
-        { "display": "076 667 6332", "tel": "0766676332" }
-      ],
-      "hours": [
-        "Mon – Sat: 9:00 AM – 9:00 PM",
-        "Sun & Poya: 9:30 AM – 6:00 PM"
-      ]
-    },
-    {
-      "name": "Pet & Co.",
-      "addressLine1": "No. 122, Galle Road,",
-      "addressLine2": "Dehiwala-Mount Lavinia",
+      "name": "Delivery area",
+      "addressLine1": "Colombo and suburbs",
+      "addressLine2": "Island-wide delivery is not available online",
       "phones": [{ "display": "076 667 6332", "tel": "0766676332" }],
       "hours": [
-        "Mon – Sat: 9:30 AM – 7:00 PM",
-        "Poya: 9:30 AM – 6:00 PM",
-        "Sunday: Closed"
-      ]
-    },
-    {
-      "name": "Pet Love.lk",
-      "addressLine1": "No. 680, Avissawella Road,",
-      "addressLine2": "Wellampitiya",
-      "phones": [{ "display": "076 667 6332", "tel": "0766676332" }],
-      "hours": [
-        "Mon – Sat: 9:00 AM – 9:00 PM",
-        "Sun & Poya: 9:30 AM – 6:00 PM"
+        "Order before 2:00 PM - same-day delivery",
+        "Order after 2:00 PM - next-day delivery",
+        "Support hours: Mon – Sun, 8:00 AM – 10:00 PM"
       ]
     }
-  ]
+  ],
+  "registeredOffice": {
+    "label": "Registered office",
+    "addressLine1": "No. 107, Kirula Road, Narahenpita,",
+    "addressLine2": "Colombo 05, Sri Lanka"
+  }
 }

@@ -64,7 +64,7 @@ export default function FreeGiftPreview({
   // Track the actively selected variation through the same store ProductDetails
   // writes to, so this preview hides/updates as the user toggles variations.
   // Pre-selection (initial load) falls back to the preferred (in-stock, lowest
-  // price) variation — same default ProductDetails uses.
+  // price) variation - same default ProductDetails uses.
   const activeVariationId = useStore((s) => s.product.activeVariationId);
   const variationNodes = useMemo(
     () =>

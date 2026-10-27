@@ -12,7 +12,7 @@ const STOCK_POLL_MS = 60_000;
  * updates even when the SSR fetch-cache entry is stale (missed webhook, local
  * dev, etc.). Add-to-cart still re-validates at cart time.
  *
- * Note: GET_PRODUCT_STOCK caps variations at 50 — variants beyond that fall
+ * Note: GET_PRODUCT_STOCK caps variations at 50 - variants beyond that fall
  * back to SSR stock status.
  */
 export function useProductStock(slug: string | null | undefined) {

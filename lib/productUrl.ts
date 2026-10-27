@@ -20,13 +20,13 @@ type ProductLike = {
 const FALLBACK_CATEGORY_SLUG = "shop";
 export const FALLBACK_CATEGORY_NAME = "Shop";
 
-/** Product listing archive — all products with filters. */
+/** Product listing archive - all products with filters. */
 export const SHOP_PATH = "/shop";
 
-/** Category index — browse all categories. */
+/** Category index - browse all categories. */
 export const CATEGORIES_ARCHIVE_PATH = "/categories";
 
-/** Brand index — browse all brands. */
+/** Brand index - browse all brands. */
 export const BRANDS_ARCHIVE_PATH = "/brands";
 
 export function getProductCategories(product: ProductLike): CategoryLike[] {
@@ -66,7 +66,7 @@ export function getPrimaryCategorySlug(product: ProductLike): string {
   return categories[0].slug!;
 }
 
-/** Canonical PDP path — flat at /{slug}. Product slugs are globally unique. */
+/** Canonical PDP path - flat at /{slug}. Product slugs are globally unique. */
 export function getProductPath(product: ProductLike): string {
   const slug = product.slug;
   if (!slug) {
@@ -76,13 +76,13 @@ export function getProductPath(product: ProductLike): string {
   return `/${slug}`;
 }
 
-/** Canonical category listing path — flat at /{slug}. */
+/** Canonical category listing path - flat at /{slug}. */
 export function getCategoryPath(slug: string): string {
   const canonicalSlug = getBrowseNavSlugForCategory(slug) ?? slug;
   return `/${canonicalSlug}`;
 }
 
-/** Canonical brand archive path — flat at /{slug}. */
+/** Canonical brand archive path - flat at /{slug}. */
 export function getBrandPath(slug: string): string {
   return `/${slug}`;
 }

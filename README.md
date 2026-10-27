@@ -91,7 +91,7 @@ The policy is an **explicit allowlist** defined in `wp-content/mu-plugins/graphq
 2. Add the operation name to the `$allow` array in the mu-plugin.
 3. Watch `/tmp/smart-cache-audit.log` inside the WP container for 5–10 min to confirm it shows `WOULD_CACHE` only when expected.
 
-User-specific queries stay client-only. `context/CartProvider.tsx` is `'use client'` with `fetchPolicy: 'no-cache'` on every cart query and mutation — Vercel SSR never renders cart state, which is what makes the allowlist safe.
+User-specific queries stay client-only. `context/CartProvider.tsx` is `'use client'` with `fetchPolicy: 'no-cache'` on every cart query and mutation - Vercel SSR never renders cart state, which is what makes the allowlist safe.
 
 Cache TTL is 10 min; event-based purges (stock updates, product edits, WooGraphQL mutations) invalidate affected entries within a second. See **[docs/PERFORMANCE-WORDPRESS.md](docs/PERFORMANCE-WORDPRESS.md)** for the full allowlist, invalidation hooks, and operational commands.
 
@@ -116,7 +116,7 @@ Direct pushes to `main` are blocked (including for admins). All changes must go 
 
 GitHub Actions runs on every PR and every `main` push:
 
-- **`lint`** (`.github/workflows/lint.yml`) — runs `npm ci && npm run lint` (ESLint 9, flat config at `eslint.config.mjs`). This check is **required** by branch protection.
+- **`lint`** (`.github/workflows/lint.yml`) - runs `npm ci && npm run lint` (ESLint 9, flat config at `eslint.config.mjs`). This check is **required** by branch protection.
 
 To run the same lint locally:
 
@@ -128,7 +128,7 @@ Currently many `react-hooks/*` rules are set to `warn` (not `error`) because Nex
 
 ## Deployment
 
-Deployment is handled by **Vercel's Git integration** — no manual step required:
+Deployment is handled by **Vercel's Git integration** - no manual step required:
 
 - **Production:** every merge to `main` triggers a production deploy to Vercel.
 - **Preview:** every PR gets a preview deployment; the URL is posted as a check on the PR.

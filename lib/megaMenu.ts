@@ -36,7 +36,7 @@ export type MegaMenuConfig = {
   /** Leaf categories to hide from mega-menu lists (slug/name aliases). */
   excludeLeaves?: string[][];
   featuredLinks: Record<string, { href: string; label: string }[]>;
-  /** Header split mega menu — static promo images under `public/`. */
+  /** Header split mega menu - static promo images under `public/`. */
   featureImages?: Record<string, string>;
   /** Flat subcategory lists: max items per column before starting the next. */
   maxRowsPerColumn?: Record<string, number>;
@@ -70,7 +70,7 @@ export function isHeaderSplitMegaMenu(data: MegaMenuPanelData): boolean {
   );
 }
 
-/** Wide multi-column panels only — compact/split/≤2 cols anchor under nav item. */
+/** Wide multi-column panels only - compact/split/≤2 cols anchor under nav item. */
 export const HEADER_VIEWPORT_CENTERED_MEGA_MENU_MIN_COLUMNS = 3;
 
 export function isHeaderViewportCenteredMegaMenu(
@@ -143,7 +143,7 @@ export function distributeMegaMenuColumns(
 ): CategoryTreeNode[][] {
   if (children.length === 0) return [];
 
-  // Shallow menus (Bird, Aquarium, …) — single vertical list, not a wide row.
+  // Shallow menus (Bird, Aquarium, …) - single vertical list, not a wide row.
   const isFlatList = children.every((child) => child.children.length === 0);
 
   if (isFlatList && navSlug) {
@@ -350,7 +350,7 @@ export function mergeSharedCategoriesIntoRoot(
     for (const sharedChild of sharedRoot.children) {
       const target = findMergeTarget(mergedRoot.children, sharedChild);
       if (!target) {
-        // No matching section — keep as its own mid-level column.
+        // No matching section - keep as its own mid-level column.
         if (
           sharedChild.slug &&
           mergedRoot.children.some((child) => child.slug === sharedChild.slug)

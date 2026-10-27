@@ -3,8 +3,14 @@
 import Logo from "./Logo";
 import SearchBar from "./SearchBar";
 import HeaderUtilityActions from "./HeaderUtilityActions";
+import HeaderCategoryBar from "./HeaderCategoryBar";
+import type { ProductCategory } from "@/graphql/types/graphql";
 
-const HeaderContent = () => {
+type HeaderContentProps = {
+  navCategories: ProductCategory[];
+};
+
+const HeaderContent = ({ navCategories }: HeaderContentProps) => {
   return (
     <div className="relative hidden overflow-visible bg-white lg:block">
       <div className="mx-auto flex h-[96px] w-full max-w-[1368px] items-center gap-2 px-3 lg:gap-3 lg:px-4 xl:h-[104px] xl:gap-6 xl:px-6">
@@ -16,10 +22,12 @@ const HeaderContent = () => {
           <SearchBar placeholder="Search for brand, products or categories..." />
         </div>
 
-        <div className="shrink-0">
+        <div className="relative z-[260] shrink-0">
           <HeaderUtilityActions />
         </div>
       </div>
+
+      <HeaderCategoryBar navCategories={navCategories} />
     </div>
   );
 };

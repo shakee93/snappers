@@ -1,8 +1,8 @@
-# Fork Procedure — spinning up a new tenant
+# Fork Procedure - spinning up a new tenant
 
 Step-by-step for creating a new tenant storefront (e.g. `petstore-headless`) from
 this cleaned-up repo. After the Fork Foundation work, most of this is config/content
-swaps — not code surgery. Companion to [`FORK-FOUNDATION-PLAN.md`](./FORK-FOUNDATION-PLAN.md)
+swaps - not code surgery. Companion to [`FORK-FOUNDATION-PLAN.md`](./FORK-FOUNDATION-PLAN.md)
 (§5) and [`FORK-FOUNDATION-CHECKLIST.md`](./FORK-FOUNDATION-CHECKLIST.md).
 
 ---
@@ -20,15 +20,15 @@ npm install
 
 Every brand-tunable value lives here now. Edit each section for the new tenant:
 
-- `brand` — name, legalName, shortName, tagline, description
-- `url` — base, api, cdn, defaultOgImage
-- `locale` — countryCode/Name, currencyCode/Symbol, phoneCountryCode, ogLocale
-- `contact` — phones, whatsapp, email, storeAddress
-- `social` — facebook, instagram, tiktok, googleReviewUrl
-- `payment` — gatewayOrder, kokoGatewayId, payhere thresholds, bankAccounts
-- `shipping` — free + weight-based method IDs (match the new WC shipping zones)
-- `analytics` — googleAnalyticsId
-- `product` — defaultWarranty
+- `brand` - name, legalName, shortName, tagline, description
+- `url` - base, api, cdn, defaultOgImage
+- `locale` - countryCode/Name, currencyCode/Symbol, phoneCountryCode, ogLocale
+- `contact` - phones, whatsapp, email, storeAddress
+- `social` - facebook, instagram, tiktok, googleReviewUrl
+- `payment` - gatewayOrder, kokoGatewayId, payhere thresholds, bankAccounts
+- `shipping` - free + weight-based method IDs (match the new WC shipping zones)
+- `analytics` - googleAnalyticsId
+- `product` - defaultWarranty
 
 ## 3. Replace `content/*.json` (copy, no code edits)
 
@@ -43,8 +43,8 @@ Also swap brand assets in `public/` (logos, store photos, OG image).
 
 ## 4. Theme colors
 
-- Edit `styles/__theme_colors.scss` — the `--c-primary-*` / `--c-secondary-*` /
-  `--c-neutral-*` RGB scale — for the new palette.
+- Edit `styles/__theme_colors.scss` - the `--c-primary-*` / `--c-secondary-*` /
+  `--c-neutral-*` RGB scale - for the new palette.
 - In `tailwind.config.ts`: update `primaryColor`, `success`, `danger`.
 - **Caveat (deferred work):** the `primary-*` / `secondary-*` scale entries in
   `tailwind.config.ts` are still the buggy quoted-string `'customColors(...)'`
@@ -82,7 +82,7 @@ and add only the mu-plugins that apply (core baked in; skip GQ-specific ones).
 ## 8. Search + hosting + env
 
 - New Typesense collection/cluster; set `NEXT_PUBLIC_TYPESENSE_*`.
-  **`NEXT_PUBLIC_TYPESENSE_HOST` is required** (the tenant fallback was removed) —
+  **`NEXT_PUBLIC_TYPESENSE_HOST` is required** (the tenant fallback was removed) -
   set it in every Vercel environment or search throws.
 - New Vercel project pointed at the new repo; set all env vars
   (`NEXT_PUBLIC_WP_GRAPHQL`, `NEXT_PUBLIC_DOMAIN`, merchant keys, etc.).
@@ -101,9 +101,9 @@ A fork **today** still has to deal with these until the deferred items land:
 - **Legal pages** (`privacy`, `terms-and-conditions`, `warranty-terms`) are still
   hardcoded JSX (not extracted to `content/legal/*.md`), and still contain the
   `httpbin.org` debug fetches. Edit by hand.
-- **Component layout** — files are not yet moved into `components/{layout,primitives,ui}`,
+- **Component layout** - files are not yet moved into `components/{layout,primitives,ui}`,
   and root `components/` still mixes with `app/components/`. Finding the per-design
   components to replace is harder than it should be.
-- **Theme** — the two-blue split + buggy `customColors` strings (see §4) aren't unified.
+- **Theme** - the two-blue split + buggy `customColors` strings (see §4) aren't unified.
 
 Doing these first makes the fork meaningfully cleaner.

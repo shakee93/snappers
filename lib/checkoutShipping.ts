@@ -38,7 +38,7 @@ const parseRateCost = (cost: string | number | null | undefined): number => {
 
 /**
  * Rates WooCommerce quoted for the address it currently holds. Assumes a
- * single package — this store ships everything as one.
+ * single package - this store ships everything as one.
  */
 const quotedRates = (cart: Cart | null | undefined): ShippingRate[] =>
   (cart?.availableShippingMethods?.[0]?.rates ?? []).filter(
@@ -60,7 +60,7 @@ const isCatlitterDeliveryRate = (rate: ShippingRate): boolean =>
   (rate.id === CATLITTER_DELIVERY_METHOD_ID ||
     rate.id.startsWith(`${CATLITTER_DELIVERY_METHOD_ID}:`));
 
-/** Matched exactly — a flat rate quotes a single, unsuffixed id. */
+/** Matched exactly - a flat rate quotes a single, unsuffixed id. */
 const isFlashDeliveryRate = (rate: ShippingRate): boolean =>
   rate.id === FLASH_DELIVERY_METHOD_ID;
 
@@ -85,7 +85,7 @@ export const resolveFlashDeliveryRate = (
 ): ShippingRate | null => quotedRates(cart).find(isFlashDeliveryRate) ?? null;
 
 /**
- * A zero-cost rate WooCommerce quoted for the current address — the
+ * A zero-cost rate WooCommerce quoted for the current address - the
  * free-shipping coupon's rate, or a method configured at no charge.
  *
  * Free shipping is a property of the cart, not of the delivery option, so this
@@ -108,9 +108,9 @@ export const resolveFreeShippingRate = (
 
 /**
  * The courier rate is not a constant on this store. Its id *and* its label
- * change with the destination — the distance/weight method quotes
+ * change with the destination - the distance/weight method quotes
  * `dwbs:2:distance` "Local Delivery" inside the Colombo zone and
- * `dwbs:2:weight` "Standard Shipping" outstation — so a hard-coded id is
+ * `dwbs:2:weight` "Standard Shipping" outstation - so a hard-coded id is
  * rejected outright ("… is not an available shipping method for shipping
  * package …") and the cart silently keeps the rate quoted for the previous
  * address. Read it off the rates WooCommerce returned for the address it

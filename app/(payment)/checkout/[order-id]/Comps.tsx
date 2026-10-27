@@ -31,7 +31,7 @@ function isPlaceholderAddressPart(value: string | undefined | null): boolean {
 function formatPaymentAddress(
   details?: PaymentAddressDetails | null,
 ): string {
-  if (!details) return "—";
+  if (!details) return "-";
 
   const billingLine1 = details.billingAddress1 ?? details.billingaddress1;
   const billingLine2 = details.billingAddress2 ?? details.billingaddress2;
@@ -47,7 +47,7 @@ function formatPaymentAddress(
     details.country,
   ].filter((part) => part && !isPlaceholderAddressPart(part));
 
-  return lines.length > 0 ? lines.join("\n") : "—";
+  return lines.length > 0 ? lines.join("\n") : "-";
 }
 
 function formatMoneyValue(value: string | number | null | undefined): string {
@@ -99,13 +99,13 @@ export const OrderDetails = ({ orderData }: OrderDetailsProps) => {
         month: "long",
         day: "numeric",
       })
-    : "—";
+    : "-";
 
   const orderNumber =
     orderData.order.orderNumber ??
     orderData.order.databaseId ??
     orderData.order.id ??
-    "—";
+    "-";
 
   const rows = [
     { label: "Order Id", value: String(orderNumber), isOrderId: true },

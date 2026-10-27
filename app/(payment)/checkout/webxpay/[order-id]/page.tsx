@@ -69,7 +69,7 @@ export default async function WebxpayPaymentPage({
       <h1 className="text-2xl font-bold">Payment could not be started</h1>
       <p className="mt-4 text-gray-600">
         This order may already be paid or is no longer awaiting payment. Please
-        don&apos;t place the order again — contact us and we&apos;ll help:
+        don&apos;t place the order again - contact us and we&apos;ll help:
       </p>
       <div className="mt-4 space-y-1">
         <p>

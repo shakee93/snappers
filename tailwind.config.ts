@@ -36,7 +36,7 @@ const config: Config = {
 		extend: {
 			colors: {
 				transparent: 'transparent',
-				// Legacy alias — same brand blue as primary-500 (#1b40af).
+				// Legacy alias - same brand blue as primary-500 (#1b40af).
 				primaryColor: tokenColor("--c-primary-500"),
 				// Semantic status tokens (a fork swaps these). Plain hex so they
 				// render identically to the literals they replace.

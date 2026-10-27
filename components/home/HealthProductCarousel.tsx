@@ -128,7 +128,7 @@ const HealthProductCarousel = ({
 
     const onInit = () => {
       syncActiveFromViewport(emblaApi);
-      // Plugin is only attached when canLoop — don't destroy() an un-inited plugin.
+      // Plugin is only attached when canLoop - don't destroy() an un-inited plugin.
       // When attached but Embla declined loop, destroy so mouseLeave can't startAutoplay().
       if (!canLoop) return;
       if (emblaApi.internalEngine().options.loop) {

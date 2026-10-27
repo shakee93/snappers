@@ -73,7 +73,7 @@ const WP_REST_BASE = new URL(
 
 export type UploadedReviewImage = { id: number; url: string };
 
-/** Max files / size — keep in sync with the backend mu-plugin. */
+/** Max files / size - keep in sync with the backend mu-plugin. */
 export const REVIEW_IMAGE_MAX_FILES = 5;
 export const REVIEW_IMAGE_MAX_BYTES = 5 * 1024 * 1024;
 

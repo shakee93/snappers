@@ -195,12 +195,16 @@ export default function PayherePaymentPage(props: { params: Promise<{ "order-id"
           </div>
         </div>
 
-        <h1 className="pb-4 pt-20 text-center text-2xl font-bold">
-          To Explore Our Product Range Further!
-        </h1>
-        <Link href="/">
-          <ButtonPrimary>Shop More</ButtonPrimary>
-        </Link>
+        <div className="flex flex-col items-center pb-16 pt-20 text-center">
+          <h2 className="text-2xl font-bold text-header-green">
+            To Explore Our Product Range Further!
+          </h2>
+          <Link href="/shop" className="mt-5">
+            <ButtonPrimary sizeClass="px-10 py-3.5 sm:px-12 sm:py-4">
+              Shop More
+            </ButtonPrimary>
+          </Link>
+        </div>
       </div>
     </>
   );

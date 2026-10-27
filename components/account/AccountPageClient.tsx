@@ -89,7 +89,7 @@ const AccountPageClient = () => {
     return () => {
       cancelled = true;
     };
-    // Validate once on mount — fetchCustomer identity changes when customer updates.
+    // Validate once on mount - fetchCustomer identity changes when customer updates.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

@@ -9,7 +9,7 @@ interface PlaceSearchFieldProps {
     id: string;
     /**
      * Current map viewport, read lazily so panning does not re-render this
-     * field. Results are biased toward it — searching "temple road" should
+     * field. Results are biased toward it - searching "temple road" should
      * offer the one the customer is looking at first.
      */
     getLocationBias: () => google.maps.LatLngBounds | null;
@@ -175,7 +175,7 @@ const PlaceSearchField = ({ id, getLocationBias, onSelect }: PlaceSearchFieldPro
             } catch (error) {
                 console.error("Failed to load the selected place:", error);
             } finally {
-                // The session ended with fetchFields either way — the next
+                // The session ended with fetchFields either way - the next
                 // search must start a new one or it is billed per request.
                 sessionTokenRef.current = null;
                 if (generationRef.current === generation) setIsSearching(false);

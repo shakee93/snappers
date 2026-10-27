@@ -18,7 +18,7 @@ const SearchBar = ({
     const router = useRouter();
     const [searchValue, setSearchValue] = useState('');
     // Tracks the last value the user typed locally. Used to ignore the
-    // store→input mirror effect while typing — otherwise rapid deletion races
+    // store→input mirror effect while typing - otherwise rapid deletion races
     // with URL/router echoes that briefly re-set store.search to a stale value
     // and flicker the deleted letters back into the input.
     const lastTypedRef = useRef('');
@@ -87,7 +87,7 @@ const SearchBar = ({
 
     const handleSearchKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         // Pressing Enter commits the current value immediately and bypasses
-        // the 1s debounce — gives power users a way to skip the wait.
+        // the 1s debounce - gives power users a way to skip the wait.
         if (e.key === 'Enter') {
             e.preventDefault();
             if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);

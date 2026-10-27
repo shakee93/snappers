@@ -35,7 +35,7 @@ export interface SectionOurStoresProps {
 const isExternalHref = (href: string) => /^https?:\/\//.test(href);
 
 /**
- * "Our store" location cards — static copy in `content/our-stores.json` until
+ * "Our store" location cards - static copy in `content/our-stores.json` until
  * a WP ACF options page is exposed over GraphQL.
  */
 const SectionOurStores = ({ className = "" }: SectionOurStoresProps) => {
@@ -67,7 +67,7 @@ const SectionOurStores = ({ className = "" }: SectionOurStoresProps) => {
             const store = normalizeStore(raw);
             const external = isExternalHref(store.href);
             const imageSrc = store.image || coverImage;
-            const imageAlt = store.imageAlt || `${store.name} — ${store.location}`;
+            const imageAlt = store.imageAlt || `${store.name} - ${store.location}`;
             const hasHours = store.hours.length > 0;
 
             return (

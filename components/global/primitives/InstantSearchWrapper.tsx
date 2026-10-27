@@ -63,7 +63,7 @@ interface InstantSearchWrapperProps {
   brands?: Brand[];
   brand?: Brand;
   category?: ProductCategory;
-  /** Parent category + direct children — used to include subcategory products on archive pages. */
+  /** Parent category + direct children - used to include subcategory products on archive pages. */
   categoryScopeIds?: number[];
   subCategories?: ProductCategory[];
   routing?: boolean;
@@ -147,7 +147,7 @@ const InstantSearchWrapperInner = ({
 
   // Pages that opt in via `defaultNewest` (i.e. /new-arrivals) lead with the
   // most recently published products. Typesense has no publish-date field, so
-  // SORT_NEWEST_ID (databaseId:desc) is the canonical proxy — the same id the
+  // SORT_NEWEST_ID (databaseId:desc) is the canonical proxy - the same id the
   // Newest radio uses. We apply it purely at the InstantSearch UiState layer
   // (SortInput + routeToState below) and deliberately DO NOT write it to the
   // store or the URL: doing so routes the sort through the same ?sort= →
@@ -159,7 +159,7 @@ const InstantSearchWrapperInner = ({
   const [hitsPerPage, setHitsPerPage] = useState<number>(12);
   // useSearchParams here triggers BAILOUT_TO_CLIENT_SIDE_RENDERING for the
   // InstantSearch subtree on routes that wrap ArchiveLayout in <Suspense>.
-  // That bailout is what makes the response cacheable at the edge — without
+  // That bailout is what makes the response cacheable at the edge - without
   // it, InstantSearchNext runs SSR and its internal headers() call marks
   // the response private/no-store. Don't replace this hook with a state +
   // effect bridge: that breaks ISR caching for /new-arrivals and the
@@ -175,7 +175,7 @@ const InstantSearchWrapperInner = ({
   // The URL precedence below is only needed for the very first render so the
   // SSR-built filterQuery already reflects a shared-link's params before
   // routeToState's queueMicrotask catches the store up. After that one frame
-  // the store is the source of truth — otherwise stale URL params mask
+  // the store is the source of truth - otherwise stale URL params mask
   // subsequent user changes (slider drag, mobile sheet clear) because the URL
   // doesn't update until stateToRoute fires from a UiState change, which
   // priceRange/on_sale/in_stock don't trigger on their own.
@@ -248,7 +248,7 @@ const InstantSearchWrapperInner = ({
 
   const getFilterQuery: () => string = () => {
     // `rawPrice` is an array of all variation prices, so a range on it matches
-    // when ANY variation falls in range — that bled in Rs 9,900 products when
+    // when ANY variation falls in range - that bled in Rs 9,900 products when
     // the user picked 10,000–50,000. `rawPriceNumber` is the single canonical
     // price (the same field sort uses), so the range bound is strict.
     const f = [
@@ -339,14 +339,14 @@ const InstantSearchWrapperInner = ({
   // first routeToState microtask yet, falls back to parsing the current
   // window.location.search directly. We can't trust uiState as the fallback
   // because react-instantsearch normalises UiState through widget connectors
-  // and drops custom keys (categories, brands, …) that no widget reads —
+  // and drops custom keys (categories, brands, …) that no widget reads -
   // without the URL fallback, the initial-mount race where stateToRoute
   // fires before our queueMicrotask sync would write an empty params object
   // and strip a shared-link URL like ?brands=1625.
   //
   // The `storeHydratedRef` gate is load-bearing: once routeToState has
   // populated the store from the URL (or the first user action lands in the
-  // store), an empty/false value means the user CLEARED that filter — re-
+  // store), an empty/false value means the user CLEARED that filter - re-
   // injecting from URL at that point would silently re-enable filters
   // (e.g. unchecking On Sale, then selecting a category would re-write
   // ?on_sale=true into the URL because it lingered there).
@@ -418,7 +418,7 @@ const InstantSearchWrapperInner = ({
   //   1. Return UiState that mirrors the URL params synchronously, so
   //      InstantSearch's canonical UiState is correct on the very first
   //      render (no shared-link strip on mount).
-  //   2. Schedule a microtask that fully resets the store from the URL —
+  //   2. Schedule a microtask that fully resets the store from the URL -
   //      including clearing fields the URL omits, which fixes back/forward
   //      navigation. The deferral avoids React's setState-in-render warning.
   const routeToState = useCallback((routeState: any) => {
@@ -451,7 +451,7 @@ const InstantSearchWrapperInner = ({
     };
 
     queueMicrotask(() => {
-      // Full reset — fields not present in URL go back to default. Single
+      // Full reset - fields not present in URL go back to default. Single
       // setState call so subscribers re-render once.
       // Bail out when values are unchanged to avoid triggering differedSidebar
       // on every pagination click, which causes setFilterQuery to fire 800 ms
@@ -483,7 +483,7 @@ const InstantSearchWrapperInner = ({
           },
         };
       });
-      // Store now mirrors the URL — stateToRoute can stop falling back to
+      // Store now mirrors the URL - stateToRoute can stop falling back to
       // window.location.search and instead trust the store as the source of
       // truth. Without this, clearing a filter (e.g. unchecking On Sale) and
       // then changing any other filter would re-inject the cleared param
@@ -530,7 +530,7 @@ const InstantSearchWrapperInner = ({
             writeDelay: 0,
             // Route URL writes through Next.js's router instead of the default
             // history.pushState. On live, the default path raced with Next.js's
-            // own navigation handling for ?page=N — the param appeared then was
+            // own navigation handling for ?page=N - the param appeared then was
             // wiped on the first click. router.push stays inside Next.js's
             // navigation pipeline so the URL update isn't reverted, and keeps
             // the browser back/forward buttons working across pagination.
@@ -539,7 +539,7 @@ const InstantSearchWrapperInner = ({
             // initial UiState→URL pass (which Next.js 16 rejects with "Router
             // action dispatched before initialization") becomes a no-op
             // instead of an error, while real navigations still go through
-            // synchronously — deferring real pushes to a microtask races with
+            // synchronously - deferring real pushes to a microtask races with
             // IS's internal state tracking and causes sort to bounce back.
             push(url: string) {
               const parsed = new URL(url, window.location.href);
@@ -638,7 +638,7 @@ const InstantSearchWrapperInner = ({
 
 const InstantSearchWrapper = (props: InstantSearchWrapperProps) => {
   if (!typesenseInstantSearchAdapter) {
-    // NEXT_PUBLIC_TYPESENSE_HOST is unset — surface a quiet fallback instead of
+    // NEXT_PUBLIC_TYPESENSE_HOST is unset - surface a quiet fallback instead of
     // crashing the page. This is a deploy-config issue, not a user error.
     return (
       <div className="container py-16 text-center text-sm text-gray-500">

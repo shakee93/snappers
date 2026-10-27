@@ -7,7 +7,7 @@ import { useMemo, useState } from "react";
 import { DealFilterType, VALID_DEAL_FILTER_TYPES } from "@/lib/dealFilters";
 
 type DealsTypeFilterProps = {
-  // SSR default — mirrors what the deals page passes when there's no
+  // SSR default - mirrors what the deals page passes when there's no
   // `?filter=` in the URL. After hydration we read the URL directly so
   // tab clicks toggle the active state without needing the page itself
   // to re-render (the page is intentionally static for edge caching).

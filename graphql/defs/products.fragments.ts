@@ -2,7 +2,7 @@ import { gql } from "@apollo/client";
 
 // Single source of truth for the WooCommerce BOGO plugin meta keys.
 // Use BogoPluginMetaOnProduct for Product types and BogoPluginMetaOnVariation
-// for ProductVariation — the key list lives only here, so adding/removing a
+// for ProductVariation - the key list lives only here, so adding/removing a
 // plugin field is a one-line change.
 export const BogoPluginMetaOnProduct = gql`
   fragment BogoPluginMetaOnProduct on Product {
@@ -233,20 +233,12 @@ export const ProductContentCard = gql`
     name
     type
     reviewCount
+    averageRating
     image {
       id
       sourceUrl
       altText
       databaseId
-    }
-    brands {
-      nodes {
-        databaseId
-        name
-        slug
-        count
-        brandImage
-      }
     }
     metaData(
       keysIn: [
@@ -279,6 +271,7 @@ export const ProductContentCard = gql`
     ... on SimpleProduct {
       onSale
       stockStatus
+      purchasable
       price
       rawPrice: price(format: RAW)
       regularPrice
@@ -286,6 +279,7 @@ export const ProductContentCard = gql`
     }
     ... on VariableProduct {
       onSale
+      purchasable
       price
       rawPrice: price(format: RAW)
       regularPrice
@@ -295,6 +289,7 @@ export const ProductContentCard = gql`
         nodes {
           price
           regularPrice
+          salePrice
           stockStatus
           image {
             sourceUrl
@@ -322,6 +317,7 @@ export const ProductContentFull = gql`
     databaseId
     slug
     name
+    sku
     type
     description
     shortDescription(format: RAW)
@@ -407,7 +403,7 @@ export const ProductContentFull = gql`
       }
     }
     # Upsells render through ProductCard3 (via SectionSliderProductCard), identical
-    # to listing cards — reuse ProductContentCard to avoid duplicating the full
+    # to listing cards - reuse ProductContentCard to avoid duplicating the full
     # variable-product + taxonomy tree per upsell.
     upsell {
       nodes {
@@ -416,9 +412,6 @@ export const ProductContentFull = gql`
     }
     ... on SimpleProduct {
       happiestCustomersGallery
-      singleProductFields {
-        videoLink
-      }
       onSale
       stockStatus
       price
@@ -451,9 +444,6 @@ export const ProductContentFull = gql`
     }
     ... on VariableProduct {
       happiestCustomersGallery
-      singleProductFields {
-        videoLink
-      }
       onSale
       price
       rawPrice: price(format: RAW)

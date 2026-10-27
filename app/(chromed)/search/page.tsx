@@ -7,17 +7,16 @@ export const dynamic = 'force-dynamic'
 async function getData(categories: number[] | null = null) {
     const startTime = new Date().getTime(); // Record the start time
 
-    const { data, error } = await getClient().query({
+    const { data } = await getClient().query({
         query: GET_ALL_PRODUCTS,
-
     });
 
     const endTime = new Date().getTime();
     const executionTime = endTime - startTime; 
 
     return {
-        productCategories: data.productCategories.nodes,
-        brands: data.brands.nodes,
+        productCategories: data?.productCategories?.nodes ?? [],
+        brands: [],
         executionTime
     };
 }

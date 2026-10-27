@@ -38,7 +38,7 @@ export function NavigationEvents() {
 
         // Only clear filters the destination URL does NOT carry. routeToState
         // re-applies URL-carried filters via a microtask whose order vs this
-        // effect isn't guaranteed by InstantSearchNext — making the reset
+        // effect isn't guaranteed by InstantSearchNext - making the reset
         // URL-aware removes the race entirely (per PR #107 review).
         if (!searchParams.get('categories')) syncCategories([])
         if (!searchParams.get('brands')) syncBrands([])

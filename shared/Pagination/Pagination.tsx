@@ -8,13 +8,14 @@ import {
 import { twMerge } from "tailwind-merge";
 import { SearchResults } from "algoliasearch-helper";
 import { ChevronLast, ChevronLeft, ChevronRight } from "lucide-react";
+import { BRAND_CTA_BUTTON_CLASS } from "@/shared/Button/ButtonBrand";
 
 const paginationNavButtonClassName = (twFocusClass: string) =>
   `inline-flex items-center justify-center rounded-full border border-[#E8E8E8] bg-white px-2.5 text-header-green transition-colors hover:border-header-green/40 hover:bg-header-cream/30 disabled:cursor-not-allowed disabled:opacity-50 ${twFocusClass}`;
 
 const paginationPageButtonClassName = (twFocusClass: string, active: boolean) =>
   active
-    ? `inline-flex h-11 w-11 items-center justify-center rounded-full bg-header-action font-semibold text-header-green ${twFocusClass}`
+    ? `inline-flex h-11 w-11 items-center justify-center rounded-full font-semibold ${BRAND_CTA_BUTTON_CLASS} ${twFocusClass}`
     : `inline-flex h-11 w-11 items-center justify-center rounded-full border border-[#E8E8E8] bg-white text-header-green transition-colors hover:border-header-green/40 hover:bg-header-cream/30 ${twFocusClass}`;
 
 const paginationFirstButtonClassName = (twFocusClass: string) =>

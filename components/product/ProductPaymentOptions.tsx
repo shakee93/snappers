@@ -15,7 +15,7 @@ import {
 } from "@/lib/priceTiers";
 
 interface ProductPaymentOptionsProps {
-  /** Selected variation / simple product price — used when a tier's price is null (e.g. variable parents). */
+  /** Selected variation / simple product price - used when a tier's price is null (e.g. variable parents). */
   numericPrice: number;
   priceTiers?: ResolvedPriceTier[];
 }
@@ -53,7 +53,7 @@ function resolveTierVisual(tier: ResolvedPriceTier): TierVisual {
   const name = tier.name.trim();
   const fallback = fallbackByName.find((entry) => entry.match.test(name));
 
-  // Prefer local assets for known payment methods — backend thumbs are often
+  // Prefer local assets for known payment methods - backend thumbs are often
   // cropped squares that clip wordmarks (COD) or look tiny (KOKO).
   if (fallback && (isKokoTier(name) || isCodTier(name))) {
     return {
@@ -133,7 +133,7 @@ const ProductPaymentOptions = ({
   }
 
   if (tiers.length === 0) {
-    // Legacy path — no woo-price-tiers data. Koko installment is base / 3
+    // Legacy path - no woo-price-tiers data. Koko installment is base / 3
     // (financing markup removed sitewide; see checkout Koko totals).
     const kokoInstallment = kokoInstallmentAmount(numericPrice);
     const formattedPrice = formatPrice(numericPrice);
@@ -192,7 +192,7 @@ const ProductPaymentOptions = ({
                   <>
                     <p className="text-xs text-[#9CA3AF]">Price</p>
                     <p className="text-sm font-bold text-[#1A1A1A]">
-                      {amount > 0 ? formatPrice(amount) : "—"}
+                      {amount > 0 ? formatPrice(amount) : "-"}
                     </p>
                   </>
                 )}

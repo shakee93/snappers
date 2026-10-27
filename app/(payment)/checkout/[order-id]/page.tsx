@@ -40,10 +40,10 @@ function OrderConfirmationLayout({ children }: { children: ReactNode }) {
 function OrderConfirmationFooter() {
   return (
     <div className="mt-16 text-center">
-      <p className="text-lg font-semibold text-[#092412]">
+      <p className="text-lg font-bold text-header-green sm:text-2xl">
         To Explore Our Product Range Further!
       </p>
-      <ButtonBrand href="/" className="mt-5">
+      <ButtonBrand href="/shop" className="mt-5 px-10 py-3.5 sm:px-12 sm:py-4">
         Shop More
       </ButtonBrand>
     </div>

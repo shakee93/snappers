@@ -30,7 +30,7 @@ const DEMO_DATA = [
   {
     name: "How it Fits",
     content:
-      "Use this as a guide. Preference is a huge factor — if you're near the top of a size range and/or prefer more coverage, you may want to size up.",
+      "Use this as a guide. Preference is a huge factor - if you're near the top of a size range and/or prefer more coverage, you may want to size up.",
   },
   {
     name: "FAQ",

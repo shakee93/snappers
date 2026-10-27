@@ -8,7 +8,7 @@ import { siteConfig } from '@/site.config'
 const BASE_URL = siteConfig.url.base
 
 // The SSR client retries transient 429s with backoff; if it still fails,
-// degrade to an empty list so the sitemap build doesn't hard-fail — the root
+// degrade to an empty list so the sitemap build doesn't hard-fail - the root
 // collection entries below still ship, and ISR/webhook revalidation backfills
 // the per-collection URLs.
 const getCollections = async (): Promise<ProductCategory[]> => {

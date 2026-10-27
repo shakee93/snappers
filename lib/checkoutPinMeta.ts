@@ -3,7 +3,7 @@
  *
  * Note this is *not* what prices the delivery: WooCommerce quotes the rate
  * from the customer address long before an order exists, so these keys are
- * for fulfilment — the shipping team opens `shipping_map_url` to find the
+ * for fulfilment - the shipping team opens `shipping_map_url` to find the
  * door. Keys are only emitted when a pin was actually set.
  */
 
@@ -17,7 +17,7 @@ export interface OrderMetaEntry {
   value: string;
 }
 
-/** Six decimals is ~10cm — more precision than a delivery ever needs. */
+/** Six decimals is ~10cm - more precision than a delivery ever needs. */
 const formatCoordinate = (value: number): string => value.toFixed(6);
 
 const mapUrl = (lat: string, lng: string): string =>
@@ -54,7 +54,7 @@ export const buildPinMetaData = ({
     );
   }
 
-  // Only worth recording when billing was pinned to somewhere else — an
+  // Only worth recording when billing was pinned to somewhere else - an
   // identical pair is noise on the order screen.
   if (
     hasPin(billing) &&

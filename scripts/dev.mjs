@@ -2,14 +2,14 @@
  * Dev-server launcher.
  *
  * `next dev` resolves its port from the shell environment before it loads any
- * env file, so a plain `PORT=` in `.env.local` is ignored — Next falls through
+ * env file, so a plain `PORT=` in `.env.local` is ignored - Next falls through
  * to 3000 and hunts for the next free port. This loads the env files first and
  * then passes the port to Next explicitly.
  *
  * Precedence: an explicit `--port` / `-p` on the command line wins, then `PORT`
  * from the env files, then Next's own "first available port from 3000".
  *
- * Local only — `build` and `start` don't go through here, so nothing about
+ * Local only - `build` and `start` don't go through here, so nothing about
  * this affects Vercel.
  */
 import { spawn } from "node:child_process";

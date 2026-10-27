@@ -247,7 +247,7 @@ const AccountOrderDetailModal = ({
                   </span>{" "}
                   was placed on{" "}
                   <span className="font-bold text-neutral-900">
-                    {order.date ? formatOrderSummaryDate(order.date) : "—"}
+                    {order.date ? formatOrderSummaryDate(order.date) : "-"}
                   </span>{" "}
                   and is currently{" "}
                   <span className="font-bold text-neutral-900">

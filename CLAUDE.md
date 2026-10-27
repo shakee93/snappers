@@ -22,9 +22,9 @@ Codegen reads from `NEXT_PUBLIC_WP_GRAPHQL` and writes to `graphql/types/`. Run 
 ### App Router layout
 
 Routes live under `app/` with three layout groups:
-- `(chromed)` — public pages with header/footer (products, brands, account, checkout)
-- `(payment)` — payment return/callback pages
-- `(sitemaps)` — dynamic XML sitemap routes
+- `(chromed)` - public pages with header/footer (products, brands, account, checkout)
+- `(payment)` - payment return/callback pages
+- `(sitemaps)` - dynamic XML sitemap routes
 
 API routes at `app/api/` handle payment webhooks (PayHere, Genie, Koko, NDB Pay, bank transfer) and cache revalidation.
 
@@ -32,15 +32,15 @@ API routes at `app/api/` handle payment webhooks (PayHere, Genie, Koko, NDB Pay,
 
 The most important architectural pattern: two separate Apollo clients serve different purposes.
 
-**SSR client** (`graphql/apollo-ssr.ts`) — server components only. Uses Next.js `force-cache` (indefinite caching) at the fetch layer. Invalidated by WordPress firing a webhook to `/api/revalidate` when product/stock data changes. `registerApolloClient()` is the entry point.
+**SSR client** (`graphql/apollo-ssr.ts`) - server components only. Uses Next.js `force-cache` (indefinite caching) at the fetch layer. Invalidated by WordPress firing a webhook to `/api/revalidate` when product/stock data changes. `registerApolloClient()` is the entry point.
 
-**Client Apollo** (`graphql/apollo-client.tsx`) — browser only (`"use client"`). Injects JWT `Authorization` and `woocommerce-session` headers. An `errorLink` intercepts "Expired token" errors, auto-refreshes via `GET_AUTH_TOKEN` mutation, and retries the original request. Used for all user-scoped operations (cart, checkout, orders, account).
+**Client Apollo** (`graphql/apollo-client.tsx`) - browser only (`"use client"`). Injects JWT `Authorization` and `woocommerce-session` headers. An `errorLink` intercepts "Expired token" errors, auto-refreshes via `GET_AUTH_TOKEN` mutation, and retries the original request. Used for all user-scoped operations (cart, checkout, orders, account).
 
 Never use the SSR client for user-scoped queries or the client Apollo in server components.
 
 ### GraphQL organization
 
-Queries and fragments live in `graphql/defs/` as `*.ts` / `*.fragments.ts` pairs (e.g., `products.ts` + `products.fragments.ts`). Codegen produces typed document nodes in `graphql/types/`. Always import the generated `gql` tag from `graphql/types/gql` — it returns `TypedDocumentNode` and is what Apollo's types flow from.
+Queries and fragments live in `graphql/defs/` as `*.ts` / `*.fragments.ts` pairs (e.g., `products.ts` + `products.fragments.ts`). Codegen produces typed document nodes in `graphql/types/`. Always import the generated `gql` tag from `graphql/types/gql` - it returns `TypedDocumentNode` and is what Apollo's types flow from.
 
 Fragment masking is enabled; use the `useFragment` helper from `graphql/types/fragment-masking` rather than casting fragment types directly.
 
@@ -63,18 +63,18 @@ Typesense powers search (host: `search.gqmobiles.lk`). The integration uses `rea
 ## Environment variables
 
 Key vars (full list in Vercel dashboard):
-- `NEXT_PUBLIC_WP_GRAPHQL` — WordPress GraphQL endpoint
-- `NEXT_PUBLIC_DOMAIN` — base URL
-- `NEXT_PUBLIC_TYPESENSE_*` — search backend
-- `NEXT_PUBLIC_MERCHANT_ID`, `GQ_PAYHERE_MERCHANT_SECRET_KEY` — PayHere
-- `GENIE_MERCHANT_ID`, `GENIE_API_KEY`, `GENIE_SANDBOX` — Genie
+- `NEXT_PUBLIC_WP_GRAPHQL` - WordPress GraphQL endpoint
+- `NEXT_PUBLIC_DOMAIN` - base URL
+- `NEXT_PUBLIC_TYPESENSE_*` - search backend
+- `NEXT_PUBLIC_MERCHANT_ID`, `GQ_PAYHERE_MERCHANT_SECRET_KEY` - PayHere
+- `GENIE_MERCHANT_ID`, `GENIE_API_KEY`, `GENIE_SANDBOX` - Genie
 
 ## Performance
 
 This is a high-traffic production storefront. Treat performance as a correctness requirement, not a nice-to-have.
 
 **Rendering**
-- `useMemo` any value derived solely from props inside client components that have frequent state changes (hover, carousel, quantity). The computation cost is irrelevant — the principle is that prop-derived values should not recompute on unrelated state updates.
+- `useMemo` any value derived solely from props inside client components that have frequent state changes (hover, carousel, quantity). The computation cost is irrelevant - the principle is that prop-derived values should not recompute on unrelated state updates.
 - Product card components are rendered in bulk (sliders, grids). A render-time cost that looks trivial for one instance multiplies across every visible card.
 
 **Data fetching**
@@ -83,7 +83,7 @@ This is a high-traffic production storefront. Treat performance as a correctness
 - All parallel queries must use `Promise.all`. Never await them sequentially.
 - Every new SSR page must export `revalidate`. The WP webhook is the primary cache invalidation path, but `revalidate` is the safety net when webhooks are missed.
 
-## Code quality — write it right the first time
+## Code quality - write it right the first time
 
 PRs on this repo receive thorough review. Every round trip costs time. The goal is to ship code that passes review on the first submission, not to iterate through reviewer feedback.
 
@@ -95,9 +95,9 @@ PRs on this repo receive thorough review. Every round trip costs time. The goal 
 - All props must be typed. No implicit `{}` or untyped destructured props.
 
 **React / Next.js**
-- No unnecessary `"use client"` — keep server components as server components. Only push to the client what genuinely needs interactivity or browser APIs.
-- No `useEffect` for derived state — compute it during render or via `useMemo`.
-- No inline object/array/function literals passed as props to memoized children — they defeat memoization.
+- No unnecessary `"use client"` - keep server components as server components. Only push to the client what genuinely needs interactivity or browser APIs.
+- No `useEffect` for derived state - compute it during render or via `useMemo`.
+- No inline object/array/function literals passed as props to memoized children - they defeat memoization.
 - Suspense boundaries must be present for every async client boundary.
 - Never fetch in a client component what can be fetched in a server component above it.
 
@@ -109,7 +109,7 @@ PRs on this repo receive thorough review. Every round trip costs time. The goal 
 
 **Performance (non-negotiable for this storefront)**
 - `useMemo` every prop-derived value inside components that re-render on state changes.
-- Never introduce a per-card computation in product sliders/grids — it multiplies across every visible card.
+- Never introduce a per-card computation in product sliders/grids - it multiplies across every visible card.
 - No synchronous work in the render path that can be moved outside the component.
 
 **Accessibility & markup**
@@ -118,17 +118,17 @@ PRs on this repo receive thorough review. Every round trip costs time. The goal 
 
 **General**
 - Remove all debug `console.log` statements before committing.
-- No dead code — remove unused imports, variables, and components entirely.
+- No dead code - remove unused imports, variables, and components entirely.
 - Keep each component doing one thing. If a component is doing layout + data fetching + business logic, split it.
-- Match the surrounding code style exactly — spacing, naming conventions, file structure.
+- Match the surrounding code style exactly - spacing, naming conventions, file structure.
 
 Run `npm run lint` and `npm run build` locally before pushing. A PR that fails CI is a wasted review cycle.
 
 ## Deployment / Git workflow
 
-**Repository:** [github.com/shakee93/snappers](https://github.com/shakee93/snappers) (`origin` only). This storefront is **Snappers**, not Catlitter — **never push commits or branches to `shakee93/catlitter`** (separate project; do not add that remote).
+**Repository:** [github.com/shakee93/snappers](https://github.com/shakee93/snappers) (`origin` only). This storefront is **Snappers**, not Catlitter - **never push commits or branches to `shakee93/catlitter`** (separate project; do not add that remote).
 
-**Direct pushes to `main` are not allowed.** Every change — including small fixes — goes through review.
+**Direct pushes to `main` are not allowed.** Every change - including small fixes - goes through review.
 
 1. **Branch** off `main` (or an active feature branch if stacking on in-flight work):
    ```
@@ -143,7 +143,7 @@ Run `npm run lint` and `npm run build` locally before pushing. A PR that fails C
    git push -u origin <branch>
    ```
 
-4. **Open a PR** against `main` with `gh pr create`. CI (lint workflow) runs on PRs — wait for it to pass.
+4. **Open a PR** against `main` with `gh pr create`. CI (lint workflow) runs on PRs - wait for it to pass.
 
 5. **Review.** A human reviewer approves before merge. Do not self-merge.
 

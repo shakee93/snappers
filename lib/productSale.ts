@@ -9,7 +9,7 @@ export const parsePriceString = (value: unknown): number => {
 export interface ResolvedSale {
   regular: number;
   sale: number;
-  /** Discount rounded to the nearest 5% — what the badge actually renders. */
+  /** Discount rounded to the nearest 5% - what the badge actually renders. */
   roundedPercent: number;
 }
 
@@ -39,7 +39,7 @@ const finalize = (regular: number, sale: number): ResolvedSale | null => {
 /**
  * Resolve the visible discount for a product card. Falls back from parent
  * salePrice/regularPrice (reliable on SIMPLE products) to the largest in-stock
- * variation percentage discount — VARIABLE products often leave parent prices
+ * variation percentage discount - VARIABLE products often leave parent prices
  * empty even when individual variations are discounted, and the storefront
  * already trusts this fallback to drive the % OFF badge.
  *

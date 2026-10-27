@@ -2,7 +2,7 @@
  * Turns a Google reverse-geocode result into the checkout address fields.
  *
  * The courier quotes city and postcode *as a pair*, so a Google locality is
- * only trusted once it has been snapped onto `SRI_LANKAN_CITIES` — the same
+ * only trusted once it has been snapped onto `SRI_LANKAN_CITIES` - the same
  * dataset the city combobox commits from. When a pin lands on a known city we
  * take that row's postcode and province and ignore Google's, which is what
  * keeps a pinned destination priced identically to a picked one.
@@ -15,7 +15,7 @@ import {
 } from "@/data/sriLankanProvinces";
 
 export interface ResolvedPinAddress {
-  /** Street line, best effort — empty when Google has no street for the pin. */
+  /** Street line, best effort - empty when Google has no street for the pin. */
   address: string;
   city: string;
   state: SriLankanProvince | "";
@@ -32,7 +32,7 @@ let cityIndex: Map<string, SriLankanCity> | null = null;
  *
  * Google zero-pads Colombo's numbered suburbs ("Colombo 05") while the rate
  * dataset does not ("Colombo 5"), so an exact match misses every one of
- * Colombo 1–9 — the densest delivery area we serve. Verified against live
+ * Colombo 1–9 - the densest delivery area we serve. Verified against live
  * Geocoding responses: a pin on Narahenpita returns "Colombo 05", and a pin
  * on Colombo Fort returns "Colombo 01" with no postcode at all, which would
  * otherwise land the customer on an unsnapped city and a cleared postal.
@@ -44,7 +44,7 @@ const normaliseCityKey = (name: string): string =>
     .replace(/\s+/g, " ")
     .replace(/\b0+(\d)/g, "$1");
 
-/** Built on first pin, not at module scope — the map tab may never open. */
+/** Built on first pin, not at module scope - the map tab may never open. */
 const getCityIndex = (): Map<string, SriLankanCity> => {
   if (!cityIndex) {
     cityIndex = new Map<string, SriLankanCity>();
@@ -75,7 +75,7 @@ const normaliseProvince = (raw: string): SriLankanProvince | "" => {
 };
 
 /**
- * Google returns several nested place names for one pin — in Sri Lanka the
+ * Google returns several nested place names for one pin - in Sri Lanka the
  * `locality` is often the district capital ("Colombo") while the row our rate
  * table knows is the suburb ("Wellampitiya"). Walk from most to least
  * specific and take the first name that exists in the rate dataset; fall back
@@ -98,7 +98,7 @@ const resolveCity = (
   for (const candidate of candidates) {
     const match = index.get(normaliseCityKey(candidate));
     if (match) {
-      // The dataset's spelling wins, not Google's — the shipping zone is
+      // The dataset's spelling wins, not Google's - the shipping zone is
       // configured against these names.
       return { city: match.name, match };
     }
@@ -140,7 +140,7 @@ export const resolvePinAddress = (
 
   // A snapped city's postcode and province outrank Google's: they are the
   // pair the shipping zone is configured against. A known city with no
-  // postcode on file falls through to Google's, then to empty — which the
+  // postcode on file falls through to Google's, then to empty - which the
   // postal field's own validation then forces the customer to fill.
   const postal = match?.postcode ?? componentOf(components, "postal_code");
   const state =
@@ -159,7 +159,7 @@ export const resolvePinAddress = (
 /**
  * Picks the most useful of Google's candidate results. Google orders them
  * most- to least-specific, but the first entry for a rural pin is often a
- * plus-code with no street data — prefer the first result that carries a
+ * plus-code with no street data - prefer the first result that carries a
  * route, and fall back to Google's own ordering.
  */
 export const pickBestGeocodeResult = (

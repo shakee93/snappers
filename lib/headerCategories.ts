@@ -1,4 +1,5 @@
 import type { ProductCategory } from "@/graphql/types/graphql";
+import { siteConfig } from "@/site.config";
 
 const DEALS_SLUG = "deals";
 const GROCERIES_SLUG = "groceries";
@@ -17,6 +18,30 @@ const HIDDEN_CATEGORY_SLUGS = new Set([
 function isRootCategory(category: ProductCategory): boolean {
   const parent = category.parentDatabaseId;
   return parent == null || parent === 0;
+}
+
+/** Static shop nav from site config when GraphQL category lists are unavailable. */
+export function getConfigHeaderBarCategories(): ProductCategory[] {
+  return siteConfig.navigation.main
+    .map((item) => {
+      const slug = item.href.replace(/^\//, "").split("/")[0]?.trim();
+      if (!slug) return null;
+      return {
+        slug,
+        name: item.name,
+        parentDatabaseId: null,
+      } as ProductCategory;
+    })
+    .filter((category): category is ProductCategory => !!category?.slug);
+}
+
+/** GraphQL roots first; then site-config shop links (never an empty bar). */
+export function resolveHeaderBarCategories(
+  navCategories: ProductCategory[],
+): ProductCategory[] {
+  const fromGraphql = getHeaderBarCategories(navCategories);
+  if (fromGraphql.length > 0) return fromGraphql;
+  return getConfigHeaderBarCategories();
 }
 
 function compareCategoryName(a: ProductCategory, b: ProductCategory): number {

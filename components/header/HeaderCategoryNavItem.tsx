@@ -76,6 +76,7 @@ export default function HeaderCategoryNavItem({
     top: number;
     left: number;
     anchor: "viewport-center" | "nav-start" | "nav-center" | "nav-end";
+    maxWidth?: number;
   } | null>(null);
   const mounted = useSyncExternalStore(
     () => () => {},
@@ -97,10 +98,21 @@ export default function HeaderCategoryNavItem({
     const el = anchorRef.current;
     if (!el || !panelData) return;
     const rect = el.getBoundingClientRect();
-    const viewportCenter = isHeaderViewportCenteredMegaMenu(panelData);
-    const compact = isHeaderCompactMegaMenu(panelData);
     const shell = el.closest("[data-header-category-shell]");
     const shellRect = shell?.getBoundingClientRect();
+
+    if (panelData.navSlug === "groceries") {
+      setPanelPos({
+        top: rect.bottom + 4,
+        left: shellRect?.left ?? rect.left,
+        anchor: "nav-start",
+        maxWidth: shellRect?.width,
+      });
+      return;
+    }
+
+    const viewportCenter = isHeaderViewportCenteredMegaMenu(panelData);
+    const compact = isHeaderCompactMegaMenu(panelData);
 
     let left = window.innerWidth / 2;
     let anchor: "viewport-center" | "nav-start" | "nav-center" | "nav-end" =
@@ -184,12 +196,16 @@ export default function HeaderCategoryNavItem({
       <div
         className={
           panelPos.anchor === "nav-start"
-            ? "header-category-mega fixed z-[500]"
+            ? "header-category-mega fixed z-[500] w-max"
             : panelPos.anchor === "nav-end"
-              ? "header-category-mega fixed z-[500] -translate-x-full"
-              : "header-category-mega fixed z-[500] -translate-x-1/2"
+              ? "header-category-mega fixed z-[500] w-max -translate-x-full"
+              : "header-category-mega fixed z-[500] w-max -translate-x-1/2"
         }
-        style={{ top: panelPos.top, left: panelPos.left }}
+        style={{
+          top: panelPos.top,
+          left: panelPos.left,
+          ...(panelPos.maxWidth != null ? { maxWidth: panelPos.maxWidth } : {}),
+        }}
         onMouseEnter={showPanel}
         onMouseLeave={scheduleHidePanel}
       >

@@ -33,7 +33,7 @@ interface PinLocationMapProps {
     addressQuery: string;
     /** Pin already applied to this address block, so re-opening returns to it. */
     pin: PinCoordinates | null;
-    /** Fired only on "Use this location" — never while the pin is being moved. */
+    /** Fired only on "Use this location" - never while the pin is being moved. */
     onApply: (resolved: ResolvedPinAddress, coordinates: PinCoordinates) => void;
 }
 
@@ -42,12 +42,12 @@ const REVERSE_GEOCODE_DEBOUNCE_MS = 500;
 /**
  * Geolocation runs only when the customer presses "Use my current location".
  * Opening the tab must not raise a browser permission prompt on a payment
- * page — an unprompted request there reads as the site grabbing at something,
+ * page - an unprompted request there reads as the site grabbing at something,
  * and a denial is sticky. Without a pin or a typed address the map simply
  * opens on the default centre and waits to be searched or dragged.
  */
 const REQUESTED_GEOLOCATION = { enableHighAccuracy: true, timeout: 10000 };
-/** ~10cm — below this the pin has not meaningfully moved. */
+/** ~10cm - below this the pin has not meaningfully moved. */
 const COORDINATE_EPSILON = 1e-6;
 
 /**
@@ -108,7 +108,7 @@ const PinLocationMap = ({
     const geocoderRef = useRef<google.maps.Geocoder | null>(null);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const lastGeocodedRef = useRef<PinCoordinates | null>(null);
-    /** Where the pin currently sits — the value "Use this location" applies. */
+    /** Where the pin currently sits - the value "Use this location" applies. */
     const positionRef = useRef<PinCoordinates | null>(pin);
     /** Invalidates in-flight geocodes when the pin moves again, or unmounts. */
     const generationRef = useRef(0);
@@ -147,7 +147,7 @@ const PinLocationMap = ({
         } catch {
             if (!isCurrent()) return;
             // A dropped lookup blanks the preview rather than describing the
-            // pin's previous position — the customer can nudge it to retry.
+            // pin's previous position - the customer can nudge it to retry.
             setResolved(null);
             // Forget the position too, or dragging back to a spot whose lookup
             // failed would dedupe against it and leave the preview empty for
@@ -203,7 +203,7 @@ const PinLocationMap = ({
             geocoderRef.current = new maps.Geocoder();
 
             // Placement order: an existing pin, then the typed address, then
-            // the default centre. No GPS here — see REQUESTED_GEOLOCATION.
+            // the default centre. No GPS here - see REQUESTED_GEOLOCATION.
             let position: PinCoordinates = DEFAULT_MAP_CENTER;
             let zoom = DEFAULT_MAP_ZOOM;
 
@@ -224,7 +224,7 @@ const PinLocationMap = ({
                             zoom = LOCATED_MAP_ZOOM;
                         }
                     } catch {
-                        // Unresolvable typed address — open on the default centre
+                        // Unresolvable typed address - open on the default centre
                         // and let the customer search or drag from there.
                     }
                 }
@@ -248,7 +248,7 @@ const PinLocationMap = ({
                 position,
                 gmpDraggable: true,
                 content: createPinElement(),
-                title: "Delivery location — drag to move",
+                title: "Delivery location - drag to move",
             });
 
             mapRef.current = map;
@@ -304,7 +304,7 @@ const PinLocationMap = ({
         const fix = await geolocate(REQUESTED_GEOLOCATION);
         setIsLocating(false);
         if (!fix || !mapRef.current) {
-            // Silence here would read as a dead button — the usual cause is a
+            // Silence here would read as a dead button - the usual cause is a
             // denied permission, which only the customer can undo.
             toast.error(
                 "We couldn't get your location. Check location permissions, or drag the pin instead.",
@@ -400,15 +400,15 @@ const PinLocationMap = ({
                         <dl className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-600 dark:text-slate-400">
                             <div className="flex gap-1">
                                 <dt className="font-medium">City:</dt>
-                                <dd>{resolved.city || "—"}</dd>
+                                <dd>{resolved.city || "-"}</dd>
                             </div>
                             <div className="flex gap-1">
                                 <dt className="font-medium">Province:</dt>
-                                <dd>{resolved.state || "—"}</dd>
+                                <dd>{resolved.state || "-"}</dd>
                             </div>
                             <div className="flex gap-1">
                                 <dt className="font-medium">Postal code:</dt>
-                                <dd>{resolved.postal || "—"}</dd>
+                                <dd>{resolved.postal || "-"}</dd>
                             </div>
                         </dl>
                     </>
@@ -429,7 +429,7 @@ const PinLocationMap = ({
                 Use this location
             </ButtonBrand>
             <p className="text-xs text-slate-500 dark:text-slate-400">
-                Drag the pin onto your door — or tap anywhere on the map to move it —
+                Drag the pin onto your door - or tap anywhere on the map to move it -
                 then apply it. Your delivery cost updates once, when you apply.
             </p>
         </div>

@@ -1,6 +1,6 @@
 /**
  * Shared deal-filter types. The UI tab slugs (`DealFilterType`) and the
- * underlying WP tag slugs (`DealTagSlug`) are intentionally separate —
+ * underlying WP tag slugs (`DealTagSlug`) are intentionally separate -
  * the URL uses short tab labels (`offers`) while the GraphQL/Typesense
  * query needs the full WP tag slug (`bogo-offer`).
  */

@@ -21,10 +21,10 @@ They run on the WP server (Coolify/Docker), **not** in this Next.js app.
 These edits were made to **existing** server files (they live on the server, not
 here). Re-apply if the backend is rebuilt:
 
-- **`mu-plugins/tripwire.php`** — added `headless-wishlist.php` and
+- **`mu-plugins/tripwire.php`** - added `headless-wishlist.php` and
   `headless-auth-header.php` to the `$expected` mu-plugin allowlist (otherwise
   the tripwire logs them as unexpected files).
-- **`mu-plugins/graphql-cache-skip-session.php`** — no change needed: the
+- **`mu-plugins/graphql-cache-skip-session.php`** - no change needed: the
   wishlist operations are intentionally **kept off** the Smart Cache allowlist
   because they are user-scoped and must never be cached.
 

@@ -1,7 +1,7 @@
 next js app router project
-WordPress headless project — Snappers grocery (snappers.lk), NOT Catlitter
+WordPress headless project - Snappers grocery (snappers.lk), NOT Catlitter
 uses typesense for search with instant search react
 graphql to communicate with wordpress headless instance
 
 Git remotes: origin is https://github.com/shakee93/snappers.git only.
-This repo is a separate project from shakee93/catlitter — never push branches or commits to catlitter (no catlitter remote, no push URLs to that repo).
+This repo is a separate project from shakee93/catlitter - never push branches or commits to catlitter (no catlitter remote, no push URLs to that repo).

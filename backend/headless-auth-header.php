@@ -9,7 +9,7 @@
  *                 no rewrite rule). The JWT plugin reads ONLY $_SERVER, so it
  *                 never saw the Bearer token and treated every authenticated
  *                 request as a guest. We copy it across from
- *                 apache_request_headers() at mu-plugin load — the earliest point,
+ *                 apache_request_headers() at mu-plugin load - the earliest point,
  *                 before anything resolves & caches the (guest) current user; a
  *                 later hook is too late, WPGraphQL has already cached user 0.
  *                 We expose the header ONLY for a currently-valid token (verified
@@ -19,18 +19,18 @@
  *                 WPGraphQL masks as "Internal server error" (GRAPHQL_DEBUG off),
  *                 which would break login/register and any request made while
  *                 holding a stale token. Gating on validity means expired/invalid
- *                 tokens are ignored and the request degrades to guest — the safe
+ *                 tokens are ignored and the request degrades to guest - the safe
  *                 pre-existing behaviour.
  *
  *              2) TOKEN LIFETIME. `headless-theme-support` pins the auth-token
  *                 expiry to 10 seconds (`graphql_jwt_auth_expire` => 10), which
  *                 made authenticated state (account, orders, wishlist) impossible
- *                 to keep — fine while auth was broken, useless once it works. We
+ *                 to keep - fine while auth was broken, useless once it works. We
  *                 override it to HWL_AUTH_TOKEN_TTL below.
  * Version: 3.0.0
  * Author: catlitter-headless
  *
- * Security note: this does not weaken auth — a valid, signed, unexpired JWT is
+ * Security note: this does not weaken auth - a valid, signed, unexpired JWT is
  *                still required. It only lets the already-sent token reach the
  *                validator and gives it a sane lifetime.
  */
@@ -64,7 +64,7 @@ function hwl_b64url_decode( $data ) {
 /**
  * Dependency-free validation of an HS256 JWT: correct signature against the
  * configured secret, not expired, not used-before-valid, and carrying a user id.
- * We deliberately do NOT enforce `iss` here — a mismatched iss already degrades
+ * We deliberately do NOT enforce `iss` here - a mismatched iss already degrades
  * to guest cleanly in the plugin; signature + expiry are the only gates that
  * matter for avoiding the "Internal server error" path.
  *
@@ -108,7 +108,7 @@ function hwl_jwt_is_valid( $jwt, $secret ) {
 
 /**
  * Expose the Bearer header to the JWT plugin (via $_SERVER) when, and only when,
- * the token is valid. Runs at include time — i.e. as early as possible.
+ * the token is valid. Runs at include time - i.e. as early as possible.
  */
 ( function () {
 	if ( ! empty( $_SERVER['HTTP_AUTHORIZATION'] ) || ! empty( $_SERVER['REDIRECT_HTTP_AUTHORIZATION'] ) ) {
@@ -132,7 +132,7 @@ function hwl_jwt_is_valid( $jwt, $secret ) {
 
 	$secret = defined( 'GRAPHQL_JWT_AUTH_SECRET_KEY' ) ? GRAPHQL_JWT_AUTH_SECRET_KEY : '';
 	if ( '' === $secret ) {
-		return; // can't validate — fail closed (guest)
+		return; // can't validate - fail closed (guest)
 	}
 
 	$token = trim( substr( $header, 7 ) );

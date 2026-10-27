@@ -5,7 +5,7 @@ export const filterLinkClassName =
   "text-sm font-medium text-header-green hover:opacity-80";
 
 export const filterCheckboxInputClassName =
-  "rounded border border-[#E8E8E8] bg-white text-header-action focus:ring-2 focus:ring-header-action/30 focus:ring-offset-0 checked:border-header-action hover:border-header-green/50";
+  "rounded border border-[#E8E8E8] bg-white accent-[#071C43] focus:ring-2 focus:ring-[#071C43]/25 focus:ring-offset-0 checked:border-[#071C43] hover:border-header-green/40";
 
 export const filterCheckboxLabelClassName =
   "text-sm font-medium text-header-green";
@@ -22,7 +22,11 @@ export const filterSelectOptionsClassName =
 export const filterSelectOptionClassName = (active: boolean, selected: boolean) =>
   [
     "cursor-pointer select-none px-3 py-2 text-sm text-header-green",
-    selected ? "bg-header-action font-semibold" : active ? "bg-header-cream/50" : "",
+    selected
+      ? "bg-header-green font-semibold text-[#FACC15]"
+      : active
+        ? "bg-header-cream/50"
+        : "",
   ]
     .filter(Boolean)
     .join(" ");

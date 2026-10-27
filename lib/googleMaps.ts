@@ -3,7 +3,7 @@
  *
  * The checkout bundle must not pay for this: nothing here runs until the
  * customer opens the "Pin location" tab. Billing and shipping each mount
- * their own map, so the promise is memoised at module scope — the second
+ * their own map, so the promise is memoised at module scope - the second
  * map reuses the first one's script instead of injecting a duplicate.
  */
 
@@ -12,14 +12,14 @@ export const GOOGLE_MAPS_API_KEY =
 
 /**
  * Required by `AdvancedMarkerElement` (the draggable pin). `DEMO_MAP_ID` is
- * Google's development placeholder — it works, but it is rate-limited and
+ * Google's development placeholder - it works, but it is rate-limited and
  * ignores any map styling. Create a real Map ID under Google Maps Platform →
  * Map Management and set `NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID` before production.
  */
 export const GOOGLE_MAPS_MAP_ID =
   process.env.NEXT_PUBLIC_GOOGLE_MAPS_MAP_ID || "DEMO_MAP_ID";
 
-/** Colombo — the fallback centre when we have neither an address nor a GPS fix. */
+/** Colombo - the fallback centre when we have neither an address nor a GPS fix. */
 export const DEFAULT_MAP_CENTER = { lat: 6.9271, lng: 79.8612 } as const;
 export const DEFAULT_MAP_ZOOM = 12;
 /** Zoom used once we actually know where the customer is. */

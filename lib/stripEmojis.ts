@@ -2,7 +2,7 @@
 export function stripEmojis(text: string): string {
   if (!text) return "";
 
-  // Surrogate-pair emoji blocks plus common symbol ranges — avoids stripping
+  // Surrogate-pair emoji blocks plus common symbol ranges - avoids stripping
   // typographic punctuation (en/em dashes, curly quotes, bullets, etc.).
   return text
     .replace(

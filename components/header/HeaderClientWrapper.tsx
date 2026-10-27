@@ -24,11 +24,18 @@ interface HeaderClientWrapperProps {
 const HeaderClientWrapper = ({
   productCategories,
   brands,
-  navCategories
+  navCategories,
 }: HeaderClientWrapperProps) => {
   const [isHeaderSticky, setIsHeaderSticky] = useState(false);
   const headerRef = useRef<HTMLElement>(null);
   const stickyOffsetRef = useRef(0);
+
+  /** Nav query carries hierarchy + images; fall back if SSR returns an empty list. */
+  const categoryBarSource = useMemo(() => {
+    if (navCategories.length > 0) return navCategories;
+    if (productCategories.length > 0) return productCategories;
+    return navCategories;
+  }, [navCategories, productCategories]);
 
   const archiveSlugsFromNav = useMemo(
     () => [
@@ -84,8 +91,12 @@ const HeaderClientWrapper = ({
 
         {/* Top announcement · main header row · category bar */}
         <HeaderAnnouncementBar />
-        <HeaderContent />
-        <HeaderUtilityBar navCategories={navCategories} />
+        <HeaderContent
+          navCategories={
+            navCategories.length > 0 ? navCategories : productCategories
+          }
+        />
+        <HeaderUtilityBar />
       </header>
 
       {/* Sticky-header spacer: announcement bar + HeaderContent + category bar.
@@ -98,7 +109,7 @@ const HeaderClientWrapper = ({
         ></div>
       )}
 
-      <MobileNavLinks navCategories={navCategories} />
+      <MobileNavLinks navCategories={categoryBarSource} />
 
       <HeaderSearchResults
         productCategories={productCategories}

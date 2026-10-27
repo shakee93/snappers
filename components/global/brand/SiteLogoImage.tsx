@@ -11,7 +11,7 @@ type SiteLogoImageProps = Omit<ImageProps, "src" | "alt"> & {
 };
 
 /**
- * Brand logo from `site.config` — swaps light/dark assets with the `dark` class on `<html>`.
+ * Brand logo from `site.config` - swaps light/dark assets with the `dark` class on `<html>`.
  */
 export default function SiteLogoImage({
   className,

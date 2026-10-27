@@ -3,7 +3,7 @@ import { ApolloError } from "@apollo/client";
 /**
  * The auth API prefixes every `errors[].message` with a machine-readable code
  * (`OTP_INVALID: That code is not valid.`). GRAPHQL_DEBUG is off in production,
- * so the prefix is the only reliable signal — never match on the sentence.
+ * so the prefix is the only reliable signal - never match on the sentence.
  */
 export const AUTH_ERROR_CODES = [
   "PHONE_INVALID",
@@ -70,7 +70,7 @@ export function parseAuthError(error: unknown): ParsedAuthError {
 }
 
 /**
- * Codes that burn the challenge server-side — the entered code can never
+ * Codes that burn the challenge server-side - the entered code can never
  * succeed, so the user has to request a fresh one.
  */
 export function isChallengeDead(code: ParsedAuthError["code"]): boolean {

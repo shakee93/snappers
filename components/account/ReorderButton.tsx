@@ -1,6 +1,7 @@
 "use client";
 
 import { Loader, RotateCw } from "lucide-react";
+import { BRAND_CTA_BUTTON_CLASS } from "@/shared/Button/ButtonBrand";
 
 interface ReorderButtonProps {
   loading?: boolean;
@@ -30,8 +31,8 @@ const ReorderButton = ({
       aria-label="Reorder items"
       className={
         isCompact
-          ? "inline-flex items-center gap-1.5 rounded-full bg-header-action px-3 py-1.5 text-xs font-bold text-header-green transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
-          : "inline-flex items-center justify-center gap-2 rounded-full bg-header-action px-5 py-2.5 text-sm font-bold text-header-green shadow-md transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60"
+          ? `inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-bold transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 ${BRAND_CTA_BUTTON_CLASS}`
+          : `inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold shadow-md transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-60 ${BRAND_CTA_BUTTON_CLASS}`
       }
     >
       {loading ? (

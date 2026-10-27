@@ -45,9 +45,9 @@ const CheckoutCouponField = ({
     [appliedCoupons],
   );
   const hasAppliedCoupons = activeCoupons.length > 0;
-  // Applied coupons force the panel open — no disclosure trigger then.
+  // Applied coupons force the panel open - no disclosure trigger then.
   const showTrigger = !hasAppliedCoupons;
-  // Open when the user asked, or when a coupon is already on the cart — no
+  // Open when the user asked, or when a coupon is already on the cart - no
   // useEffect for derived open state (see CLAUDE.md).
   const couponFieldOpen = showCouponField || hasAppliedCoupons;
 
@@ -113,7 +113,7 @@ const CheckoutCouponField = ({
 
   return (
     <div>
-      {/* Applied coupons force the panel open — no disclosure trigger then,
+      {/* Applied coupons force the panel open - no disclosure trigger then,
           so we don't stack a disabled "Discount code" above the field label. */}
       {showTrigger && (
         <button
@@ -127,7 +127,7 @@ const CheckoutCouponField = ({
         </button>
       )}
 
-      {/* Prefer the `hidden` attribute over a display utility — Tailwind
+      {/* Prefer the `hidden` attribute over a display utility - Tailwind
           preflight's `[hidden] { display: none }` loses to any `flex`/`block`
           class on the same element. */}
       <div
