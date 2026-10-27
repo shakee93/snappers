@@ -31,6 +31,18 @@ const nextConfig: NextConfig = {
       { source: "/faq", destination: "/return-policy", permanent: true },
     ];
   },
+  // Pre-launch: send noindex on every response (sitemaps, images, API), not
+  // just HTML pages that carry the robots meta tag.
+  async headers() {
+    return siteConfig.seo.indexable
+      ? []
+      : [
+          {
+            source: "/:path*",
+            headers: [{ key: "X-Robots-Tag", value: "noindex, nofollow" }],
+          },
+        ];
+  },
   sassOptions: {
     includePaths: [path.join(__dirname, "styles")],
   },
