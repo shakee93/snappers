@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
@@ -139,6 +139,21 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
   const activeBgSrc = activeSlide?.sliderBackgroundImage?.node?.sourceUrl;
   const activeFeatureSrc = activeSlide?.sliderFeatureImage?.node?.sourceUrl;
 
+  const nextSlide = slides.length > 1 ? slides[(activeIndex + 1) % slides.length] : null;
+  const nextBgSrc = nextSlide?.sliderBackgroundImage?.node?.sourceUrl;
+  const nextFeatureSrc = nextSlide?.sliderFeatureImage?.node?.sourceUrl;
+
+  useEffect(() => {
+    if (nextBgSrc) {
+      const img = new Image();
+      img.src = nextBgSrc;
+    }
+    if (nextFeatureSrc) {
+      const img = new Image();
+      img.src = nextFeatureSrc;
+    }
+  }, [nextBgSrc, nextFeatureSrc]);
+
   return (
     <section
       className={`relative w-full bg-white ${className}`}
@@ -164,8 +179,10 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
                   transition={CROSSFADE}
                   className="absolute inset-0 z-[1]"
                 >
-                  {activeBgSrc && !activeHasCopy ? (
-                    <div className="absolute inset-0">
+                  {activeBgSrc ? (
+                    <div
+                      className={`absolute inset-0 ${activeHasCopy ? "max-lg:hidden" : ""}`}
+                    >
                       <Image
                         src={activeBgSrc}
                         alt={
@@ -176,7 +193,11 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
                         fill
                         priority={activeIndex === 0}
                         sizes="100vw"
-                        className="object-contain object-center max-lg:object-contain lg:object-cover"
+                        className={
+                          activeHasCopy
+                            ? "object-cover object-center"
+                            : "object-contain object-center max-lg:object-contain lg:object-cover"
+                        }
                       />
                     </div>
                   ) : null}
@@ -201,7 +222,7 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
                         {activeSlide.sliderTitle ? (
                           <div
                             style={{ color: activeSlide.titleColor ?? undefined }}
-                            className="flex flex-col gap-2 leading-[1.05] [&_*]:font-lexend [&_*]:leading-[1.05] [&_*]:block [&_*]:text-header-green"
+                            className="flex flex-col gap-2 leading-[1.05] [&_*]:font-lexend [&_*]:leading-[1.05]"
                             dangerouslySetInnerHTML={{
                               __html: activeSlide.sliderTitle,
                             }}
@@ -258,6 +279,7 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
                 ))}
               </div>
             ) : null}
+
             </div>
           </div>
         </div>

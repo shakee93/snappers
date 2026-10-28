@@ -7,7 +7,7 @@ export const sectionEyebrowClass =
 
 /** Primary section headings — 40px from tablet up. */
 export const sectionTitleClass =
-  `${titleFontClass} text-left text-[1.75rem] font-bold leading-[1.08] tracking-tight text-black min-[768px]:text-[40px] min-[768px]:leading-[1.1] min-[768px]:whitespace-nowrap`;
+  `${titleFontClass} text-left text-[1.75rem] font-bold leading-[1.08] tracking-tight text-black min-[768px]:text-[40px] min-[768px]:leading-[1.1] lg:whitespace-nowrap`;
 
 /** Optional inline span inside a section title (same black as parent). */
 export const sectionTitleAccentClass = "text-black";
@@ -15,9 +15,6 @@ export const sectionTitleAccentClass = "text-black";
 /** Subtitle under section headings (shop by category, deals strip, etc.). */
 export const sectionDescriptionClass =
   "mt-2 max-w-2xl text-sm font-medium leading-snug text-black/60 md:mt-3 md:text-lg md:leading-normal";
-
-/** @deprecated Use `sectionTitleClass` — kept for imports. */
-export const dealSectionTitleClass = sectionTitleClass;
 
 /** CMS hero carousel headlines. */
 export const heroSlideTitleClass =

@@ -2,7 +2,7 @@ import { siteConfig } from "@/site.config";
 import type { HeroSlide } from "@/components/home/SectionHeroPets";
 import { heroSlideTitleClass } from "@/lib/sectionTypography";
 
-/** Hero slide headline — Playfair display (Snappers, not Catlitter Albra). */
+/** Hero slide headline — Lexend (Snappers, not Catlitter Albra). */
 export const HERO_SLIDER_TITLE_CLASS = heroSlideTitleClass;
 
 export type GraphqlHeroSlideNode = {
