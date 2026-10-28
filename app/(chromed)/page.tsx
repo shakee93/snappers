@@ -11,6 +11,7 @@ import {
   GET_HERO_SLIDER_SETTINGS,
   GET_HERO_SLIDES,
 } from "@/graphql/defs/slides";
+import { isDealExpired } from "@/lib/dealCountdown";
 import {
   mapGraphqlHeroSlides,
   normalizeAcfHeroSlides,
@@ -317,6 +318,11 @@ export default async function Home() {
     heroSettings?.healthSectionSettings,
   );
   const hasBlockBeforeBrowse = hasHomepageDeals || hasHealthSection;
+  const dealEndsAt =
+    heroDealsDate ??
+    heroSettings?.dealsDate ??
+    siteSettings?.dealEnds ??
+    undefined;
 
   return (
     <main className="overflow-x-hidden">
@@ -327,18 +333,9 @@ export default async function Home() {
 
         <div className="mt-2 md:mt-3">
           <SectionDealCountdown
-            key={
-              heroDealsDate ??
-              heroSettings?.dealsDate ??
-              siteSettings?.dealEnds ??
-              "default"
-            }
-            endsAt={
-              heroDealsDate ??
-              heroSettings?.dealsDate ??
-              siteSettings?.dealEnds ??
-              undefined
-            }
+            key={dealEndsAt ?? "default"}
+            endsAt={dealEndsAt}
+            hideTimer={isDealExpired(dealEndsAt)}
           />
         </div>
 

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { parseDealEndsAt } from "@/lib/dealCountdown";
 import { cn } from "@/lib/utils";
 
 export interface SectionDealCountdownProps {
@@ -12,6 +13,8 @@ export interface SectionDealCountdownProps {
   backgroundImageMobile?: string;
   /** Deal end time as an ISO string. */
   endsAt?: string;
+  /** From SSR: deal already ended when the page HTML was generated. */
+  hideTimer?: boolean;
 }
 
 interface TimeLeft {
@@ -24,17 +27,6 @@ interface TimeLeft {
 const pad = (n: number) => n.toString().padStart(2, "0");
 
 const DEFAULT_COUNTDOWN_MS = 1000 * 60 * 60 * 24 * 2;
-
-/** Parse Hero Settings ACF `dealsDate` (ISO, `Y-m-d H:i:s`, etc.). */
-const parseDealEndsAt = (value: string | undefined): number => {
-  if (!value?.trim()) return NaN;
-  const trimmed = value.trim();
-  const direct = new Date(trimmed).getTime();
-  if (Number.isFinite(direct)) return direct;
-  const normalized = trimmed.replace(" ", "T");
-  const withTz = new Date(normalized).getTime();
-  return Number.isFinite(withTz) ? withTz : NaN;
-};
 
 /** Snappers palette (replaces legacy deal-brown / peach timer colors). */
 const TITLE_PRIMARY = "#092412";
@@ -94,6 +86,7 @@ const SectionDealCountdown = ({
   backgroundImage = "/homepage/deal-bg.png",
   backgroundImageMobile = "/homepage/deal-bg.png",
   endsAt,
+  hideTimer = false,
 }: SectionDealCountdownProps) => {
   const [timeLeft, setTimeLeft] = useState<TimeLeft | null>(null);
 
@@ -117,11 +110,8 @@ const SectionDealCountdown = ({
     return () => window.clearInterval(id);
   }, [endsAt]);
 
-  const parsedEnd = endsAt ? parseDealEndsAt(endsAt) : NaN;
-  const scheduleExpired =
-    Number.isFinite(parsedEnd) && parsedEnd <= Date.now();
   const liveExpired = timeLeft !== null && isExpiredTime(timeLeft);
-  const showTimer = !scheduleExpired && !liveExpired;
+  const showTimer = !hideTimer && !liveExpired;
 
   const units = timeLeft
     ? [
@@ -222,9 +212,21 @@ const SectionDealCountdown = ({
           className="hidden h-auto w-full object-cover object-center md:block"
         />
 
-        {/* Mobile: title + countdown below artwork (no overlay overlap) */}
-        <div className="border-t border-[#E7EAD9] bg-white px-4 py-5 md:hidden">
-          <DealCountdownTitle align="center" className="text-[26px] sm:text-[30px]" />
+        {/* Title below artwork when the countdown is hidden; mobile-only strip when it is live */}
+        <div
+          className={cn(
+            "border-t border-[#E7EAD9] bg-white px-4 py-5",
+            showTimer ? "md:hidden" : "md:py-6",
+          )}
+        >
+          <DealCountdownTitle
+            align="center"
+            className={
+              showTimer
+                ? "text-[26px] sm:text-[30px]"
+                : "text-[26px] sm:text-[30px] md:text-5xl lg:text-6xl"
+            }
+          />
           {showTimer ? (
             <div
               className="relative mt-4 overflow-hidden rounded-xl border bg-white px-3 pb-3 pt-3 shadow-sm"
@@ -246,26 +248,20 @@ const SectionDealCountdown = ({
           ) : null}
         </div>
 
-        {/* Desktop: centered title + compact countdown (original layout) */}
-        <div
-          className={cn(
-            "absolute inset-0 hidden flex-col items-center justify-end px-4 md:flex",
-            showTimer ? "gap-5 pb-12" : "pb-8",
-          )}
-        >
-          <div className="relative">
-            <Image
-              src="/homepage/lines.png"
-              alt=""
-              width={28}
-              height={28}
-              aria-hidden
-              className="absolute -left-4 -top-5 h-7 w-7"
-            />
-            <DealCountdownTitle align="center" className="text-6xl" />
-          </div>
+        {showTimer ? (
+          <div className="absolute inset-0 hidden flex-col items-center justify-end gap-5 px-4 pb-12 md:flex">
+            <div className="relative">
+              <Image
+                src="/homepage/lines.png"
+                alt=""
+                width={28}
+                height={28}
+                aria-hidden
+                className="absolute -left-4 -top-5 h-7 w-7"
+              />
+              <DealCountdownTitle align="center" className="text-6xl" />
+            </div>
 
-          {showTimer ? (
             <div
               className="relative overflow-visible rounded-2xl border bg-white/70 px-7 pb-3 pt-8 backdrop-blur-sm md:pt-9"
               style={{ borderColor: TIMER_BOX_BORDER }}
@@ -284,8 +280,8 @@ const SectionDealCountdown = ({
               </span>
               {countdownBody}
             </div>
-          ) : null}
-        </div>
+          </div>
+        ) : null}
       </div>
     </section>
   );
