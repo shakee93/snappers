@@ -6,6 +6,7 @@ import {
   FaXTwitter,
 } from "react-icons/fa6";
 import { siteConfig } from "@/site.config";
+import { titleFontClass } from "@/lib/sectionTypography";
 
 const footerSocialLinks = [
   { label: "Facebook", href: siteConfig.social.facebook, Icon: FaFacebookF },
@@ -15,7 +16,7 @@ const footerSocialLinks = [
 ] as const;
 
 const headingClass =
-  "inline-block border-b border-[#FACC15] pb-1 text-[13px] font-semibold uppercase tracking-wider text-[#FACC15]";
+  `${titleFontClass} inline-block border-b border-[#FACC15] pb-1 text-[13px] font-semibold uppercase tracking-wider text-[#FACC15]`;
 
 const Footer = () => {
   const { footer } = siteConfig;

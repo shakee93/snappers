@@ -6,6 +6,8 @@ import { BRAND_CTA_BUTTON_CLASS } from "@/shared/Button/ButtonBrand";
 import { useEffect } from "react";
 import notFoundContent from "@/content/not-found.json";
 import { useChromeVisibility } from "@/context/ChromeVisibilityProvider";
+import { pageTitleClass, titleFontClass } from "@/lib/sectionTypography";
+import { cn } from "@/lib/utils";
 
 const NotFoundPageContent = () => {
   const { hero } = notFoundContent;
@@ -32,14 +34,12 @@ const NotFoundPageContent = () => {
           {hero.eyebrow}
         </p>
         <p
-          className="mt-2 font-albra text-8xl font-semibold leading-none text-header-green md:text-9xl"
+          className={`mt-2 ${titleFontClass} text-8xl font-bold leading-none text-header-green md:text-9xl`}
           aria-hidden
         >
           {hero.code}
         </p>
-        <h1 className="mt-3 font-albra text-3xl font-semibold leading-tight text-header-green md:text-4xl">
-          {hero.title}
-        </h1>
+        <h1 className={cn(pageTitleClass, "mt-3")}>{hero.title}</h1>
         <p className="mt-4 text-base leading-relaxed text-neutral-700 md:text-lg">
           {hero.description}
         </p>

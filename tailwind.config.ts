@@ -12,6 +12,7 @@ const config: Config = {
 	content: [
 		"./app/**/*.{js,jsx,ts,tsx}",
 		"./components/**/*.{js,jsx,ts,tsx}",
+		"./lib/**/*.{js,jsx,ts,tsx}",
 		"./shared/**/*.{js,jsx,ts,tsx}",
 		"./public/index.html",
 		"./node_modules/@nextui-org/theme/dist/**/*.{js,ts,jsx,tsx}",
@@ -27,10 +28,12 @@ const config: Config = {
 			}
 		},
 		fontFamily: {
+			sans: ["var(--font-inter)", ...defaultTheme.fontFamily.sans],
 			display: ["var(--font-display)", ...defaultTheme.fontFamily.sans],
 			body: ["var(--font-body)", ...defaultTheme.fontFamily.sans],
 			albra: ["var(--font-albra)", ...defaultTheme.fontFamily.sans],
 			playfair: ["var(--font-playfair)", ...defaultTheme.fontFamily.serif],
+			lexend: ["var(--font-lexend)", ...defaultTheme.fontFamily.sans],
 		},
 		darkMode: 'class',
 		extend: {

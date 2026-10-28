@@ -3,6 +3,18 @@
 @tailwind utilities;
 @tailwind variants;
 
+@layer base {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-lexend), var(--font-inter), ui-sans-serif, system-ui,
+      sans-serif;
+  }
+}
+
 .hidden-scrollbar::-webkit-scrollbar {
     display: none;
 }

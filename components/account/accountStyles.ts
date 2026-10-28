@@ -1,4 +1,5 @@
 import { BRAND_CTA_BUTTON_CLASS } from "@/shared/Button/ButtonBrand";
+import { titleFontClass } from "@/lib/sectionTypography";
 
 export {
   authInputClassName as accountInputClassName,
@@ -7,13 +8,13 @@ export {
 } from "@/components/auth/authStyles";
 
 export const accountLayoutTitleClassName =
-  "text-3xl font-bold text-header-green xl:text-4xl dark:text-neutral-100";
+  `${titleFontClass} text-3xl font-bold text-header-green xl:text-4xl dark:text-neutral-100`;
 
 export const accountPageTitleClassName =
-  "text-2xl font-bold text-header-green sm:text-3xl dark:text-neutral-100";
+  `${titleFontClass} text-2xl font-bold text-header-green sm:text-3xl dark:text-neutral-100`;
 
 export const accountSubheadingClassName =
-  "text-xl font-semibold text-header-green sm:text-2xl";
+  `${titleFontClass} text-xl font-semibold text-header-green sm:text-2xl`;
 
 export const accountFormClassName = "max-w-lg space-y-5";
 

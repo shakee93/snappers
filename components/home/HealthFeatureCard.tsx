@@ -9,6 +9,7 @@ import { toast } from "sonner";
 import koko from "@/public/koko.png";
 import { useCart } from "@/context/CartProvider";
 import { BRAND_CTA_BUTTON_CLASS } from "@/shared/Button/ButtonBrand";
+import { cardTitleClass } from "@/lib/sectionTypography";
 import useProductLink from "@/hooks/useProductLink";
 import { getDatabaseIdFromProductLike } from "@/lib/bogo";
 import { resolveProductImageUrl } from "@/lib/productImage";
@@ -81,7 +82,7 @@ const HealthFeatureDetails = ({
   return (
   <>
     <Link href={link || "#"} className="block shrink-0">
-      <h3 className="font-albra text-xl font-bold leading-tight text-[#0A0A0A] sm:text-[1.65rem] sm:leading-[1.25] lg:text-[1.85rem]">
+      <h3 className={cardTitleClass}>
         {name}
       </h3>
     </Link>
