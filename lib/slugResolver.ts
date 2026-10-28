@@ -15,14 +15,14 @@ export type SlugResolution =
 // brand page.
 async function getCategoryBySlug(slug: string) {
   try {
-    const { data, error } = await getClient().query({
+    const { data, error, errors } = await getClient().query({
       query: GET_CATEGORY,
       variables: {
         categoryId: slug,
       },
     });
 
-    if (error || !data.productCategory) {
+    if (error || errors?.length || !data?.productCategory?.databaseId) {
       return null;
     }
 

@@ -70,12 +70,12 @@ const DEAL_BADGE_BG = "#F97316";
 const DEALS_BADGE_ACCENT = "#F97316";
 const TITLE_COLOR = "#253D4E";
 
-/** Shared shell so Add ↔ quantity stepper does not shift card layout. */
-const CART_ACTION_BASE =
-  "inline-flex shrink-0 items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-bold leading-none sm:py-2.5 sm:text-[13px]";
-const CART_STEPPER_CLASS = `${CART_ACTION_BASE} min-w-0 gap-1 px-1.5 sm:px-2`;
-/** Default Add - brand navy + yellow label (tighter horizontal padding). */
-const CART_ADD_CLASS = `${CART_ACTION_BASE} min-w-0 px-1.5 sm:px-2 ${BRAND_CTA_BUTTON_COMPACT_CLASS}`;
+/** Shared shell so Add ↔ quantity stepper does not shift card layout (always full width). */
+const CART_ACTION_SHELL =
+  "flex w-full items-center rounded-lg py-2.5 text-sm font-bold leading-none sm:py-3 sm:text-base";
+const CART_STEPPER_CLASS = `${CART_ACTION_SHELL} min-w-0 justify-between gap-0 px-3 sm:px-4`;
+/** Default Add - brand navy + yellow label. */
+const CART_ADD_CLASS = `${CART_ACTION_SHELL} min-w-0 justify-center gap-2 px-3 ${BRAND_CTA_BUTTON_COMPACT_CLASS}`;
 
 const formatLkr = (value: number) =>
   value.toLocaleString("en-LK", {
@@ -609,9 +609,9 @@ const ProductCard = ({
           </p>
         )}
 
-        <div className="mt-auto flex items-end justify-between gap-2 pt-3">
+        <div className="mt-auto flex flex-col gap-2 pt-3">
           {numericPrice > 0 ? (
-            <div className="min-w-0 flex-1 text-left">
+            <div className="min-w-0 w-full text-left">
               <p
                 className="text-sm font-bold leading-tight sm:text-base"
                 style={{ color: CARD_ACCENT }}
@@ -670,7 +670,7 @@ const ProductCard = ({
                   <Minus className="h-4 w-4 shrink-0" strokeWidth={2.5} />
                 )}
               </button>
-              <span className="min-w-[1rem] px-0.5 text-center text-xs font-bold tabular-nums sm:text-[13px]">
+              <span className="min-w-[1rem] px-0.5 text-center text-sm font-bold tabular-nums sm:text-base">
                 {cartQuantity}
               </span>
               <button
@@ -694,9 +694,12 @@ const ProductCard = ({
               className={CART_ADD_CLASS}
             >
               {loading ? (
-                <Loader className="h-4 w-4 animate-spin" />
+                <Loader className="h-5 w-5 animate-spin sm:h-5 sm:w-5" />
               ) : (
-                <ShoppingCart className="h-4 w-4 shrink-0" strokeWidth={2.25} />
+                <ShoppingCart
+                  className="h-5 w-5 shrink-0 sm:h-5 sm:w-5"
+                  strokeWidth={2.25}
+                />
               )}
               <span>{loading ? "Adding…" : addButtonLabel}</span>
             </button>

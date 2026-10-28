@@ -60,15 +60,6 @@ export const ProductContentSlice = gql`
     purchasable
     description
     shortDescription(format: RAW)
-    brands {
-      nodes {
-        databaseId
-        name
-        slug
-        count
-        brandImage
-      }
-    }
     image {
       id
       sourceUrl(size: WOOCOMMERCE_THUMBNAIL)
@@ -85,13 +76,6 @@ export const ProductContentSlice = gql`
       price
       regularPrice
       soldIndividually
-      brands {
-        nodes {
-          id
-          name
-          slug
-        }
-      }
     }
     productCategories {
       nodes {
@@ -100,95 +84,9 @@ export const ProductContentSlice = gql`
       }
     }
     ... on VariableProduct {
-      allPaCapacity {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaConnectivity {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaColor {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaColour {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaSpecification {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaVariant {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaWarranty {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaModel {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaPacks {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaWatchSize {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaSize {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaConnectorType {
-        nodes {
-          name
-          slug
-        }
-      }
-      allPaAmount {
-        nodes {
-          name
-          slug
-        }
-      }
-
       price
       regularPrice
       soldIndividually
-      brands {
-        nodes {
-          id
-          name
-          slug
-        }
-      }
     }
   }
 `;
@@ -328,15 +226,6 @@ export const ProductContentFull = gql`
       sourceUrl
       altText
       databaseId
-    }
-    brands {
-      nodes {
-        databaseId
-        name
-        slug
-        count
-        brandImage
-      }
     }
     metaData(
       keysIn: [

@@ -147,17 +147,12 @@ const HealthFeatureDetails = ({
         />
       )}
     </Link>
-    {footerLayout === "mobile" ? (
-      <div className="flex shrink-0 flex-col gap-2">
-        <div className="min-w-0 overflow-hidden">{priceRow ?? <span />}</div>
-        <div className="flex justify-end">{addToCartButton}</div>
-      </div>
-    ) : (
-      <div className="flex shrink-0 flex-col gap-4">
-        {priceRow}
-        <div className="flex justify-end">{addToCartButton}</div>
-      </div>
-    )}
+    <div
+      className={`flex shrink-0 flex-col ${isDesktop ? "gap-4" : "gap-2"}`}
+    >
+      <div className="min-w-0 w-full overflow-hidden">{priceRow ?? <span />}</div>
+      <div className="w-full">{addToCartButton}</div>
+    </div>
   </>
   );
 };
@@ -250,12 +245,12 @@ const HealthFeatureCard = ({
       type="button"
       disabled={loading || isOutOfStock}
       onClick={handleAddToCart}
-      className={`inline-flex shrink-0 items-center justify-center gap-2 whitespace-nowrap rounded-full px-3.5 py-2 text-[13px] font-bold leading-none transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:min-w-[160px] sm:px-6 sm:py-3 sm:text-sm sm:leading-normal ${BRAND_CTA_BUTTON_CLASS}`}
+      className={`flex w-full items-center justify-center gap-2 whitespace-nowrap rounded-full px-4 py-2.5 text-sm font-bold leading-none transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50 sm:py-3 sm:text-base sm:leading-normal ${BRAND_CTA_BUTTON_CLASS}`}
     >
       {loading ? (
-        <Loader className="h-4 w-4 animate-spin" />
+        <Loader className="h-5 w-5 animate-spin" />
       ) : !isOutOfStock ? (
-        <ButtonIcon className="h-4 w-4" strokeWidth={2.25} />
+        <ButtonIcon className="h-5 w-5" strokeWidth={2.25} />
       ) : null}
       <span>{buttonLabel}</span>
     </button>

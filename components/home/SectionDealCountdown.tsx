@@ -28,8 +28,9 @@ const pad = (n: number) => n.toString().padStart(2, "0");
 
 const DEFAULT_COUNTDOWN_MS = 1000 * 60 * 60 * 24 * 2;
 
+/** Snappers deal timer (matches legacy banner countdown palette). */
 const TIMER_DIVIDER = "#E7EAD9";
-const TIMER_BOX_BORDER = "#E7EAD9";
+const TIMER_LABEL = "#769F5F";
 
 const getTimeLeft = (target: number): TimeLeft => {
   const diff = Math.max(0, target - Date.now());
@@ -89,46 +90,53 @@ const SectionDealCountdown = ({
 
   const countdownBody = (
     <div
-      className="flex min-h-[2.25rem] w-full items-center justify-evenly pt-1 md:min-h-[4.25rem] md:w-auto md:justify-center md:pt-0.5"
+      className="flex w-full items-center justify-evenly"
       aria-busy={!units}
+      aria-live="polite"
     >
       {units ? (
         units.map((unit, index) => (
           <div key={unit.label} className="flex items-center">
             {index > 0 && (
               <span
-                className="mx-1.5 h-8 w-px md:mx-3 md:h-10"
+                className="mx-2 h-9 w-px md:mx-2.5 md:h-10"
                 style={{ backgroundColor: TIMER_DIVIDER }}
                 aria-hidden
               />
             )}
-            <div className="flex flex-col items-center">
-              <span className="text-xl font-bold tabular-nums leading-none text-header-green md:text-4xl md:leading-none">
+            <div className="flex min-w-[2.75rem] flex-col items-center md:min-w-[3.25rem]">
+              <span className="font-lexend text-2xl font-bold tabular-nums leading-none text-header-green md:text-[2rem] md:leading-none">
                 {pad(unit.value)}
               </span>
-              <span className="py-1 text-[9px] font-semibold uppercase leading-none tracking-wider text-primary-600 md:py-2 md:text-xs">
+              <span
+                className="mt-1.5 text-[9px] font-semibold uppercase leading-none tracking-wider md:text-[10px]"
+                style={{ color: TIMER_LABEL }}
+              >
                 {unit.label}
               </span>
             </div>
           </div>
         ))
       ) : (
-        <div className="flex w-full items-center justify-center gap-1 md:gap-4">
+        <div className="flex w-full items-center justify-center gap-1">
           {[0, 1, 2, 3].map((index) => (
             <div key={index} className="flex items-center">
               {index > 0 && (
                 <span
-                  className="mx-1.5 h-8 w-px md:mx-3 md:h-10"
+                  className="mx-2 h-9 w-px"
                   style={{ backgroundColor: TIMER_DIVIDER }}
                   aria-hidden
                 />
               )}
               <div className="flex flex-col items-center gap-1.5">
                 <span
-                  className="h-7 w-8 animate-pulse rounded-md md:h-9 md:w-12"
+                  className="h-8 w-9 animate-pulse rounded-md md:h-9 md:w-10"
                   style={{ backgroundColor: `${TIMER_DIVIDER}cc` }}
                 />
-                <span className="h-2 w-7 animate-pulse rounded bg-primary-600/25 md:h-2.5 md:w-8" />
+                <span
+                  className="h-2 w-8 animate-pulse rounded"
+                  style={{ backgroundColor: `${TIMER_LABEL}40` }}
+                />
               </div>
             </div>
           ))}
@@ -137,41 +145,39 @@ const SectionDealCountdown = ({
     </div>
   );
 
-  const ribbonClass =
-    "absolute left-1/2 -translate-x-1/2 whitespace-nowrap font-bold uppercase leading-none tracking-wide";
-
   return (
     <section
       className={`relative z-0 mx-auto w-full max-w-[1368px] px-4 ${className}`}
     >
-      <div className={cn("w-full py-2", showTimer ? "md:py-4" : "md:py-3")}>
-        <p className={sectionEyebrowClass}>Deals</p>
-        <h2
-          className={cn(
-            sectionTitleClass,
-            "mt-2 md:mt-3",
-          )}
-        >
-          Deals for your daily shopping
-        </h2>
-        <p className={sectionDescriptionClass}>
-          Limited-time savings on groceries, household essentials, and favourites
-          across the store — updated regularly.
-        </p>
+      <div
+        className={cn(
+          "w-full py-2",
+          showTimer ? "md:py-4" : "md:py-3",
+          showTimer && "md:flex md:items-center md:justify-between md:gap-8 lg:gap-10",
+        )}
+      >
+        <div className="min-w-0 flex-1">
+          <p className={sectionEyebrowClass}>Deals</p>
+          <h2 className={cn(sectionTitleClass, "mt-2 md:mt-3")}>
+            Deals for your daily shopping
+          </h2>
+          <p className={sectionDescriptionClass}>
+            Limited-time savings on groceries, household essentials, and favourites
+            across the store - updated regularly.
+          </p>
+        </div>
+
         {showTimer ? (
           <div
-            className="relative mt-4 max-w-xl overflow-hidden rounded-xl border bg-[#faf9f7] px-3 pb-3 pt-3 md:mt-6 md:px-7 md:pb-3 md:pt-9"
-            style={{ borderColor: TIMER_BOX_BORDER }}
+            className={cn(
+              "mt-4 w-full shrink-0 overflow-hidden rounded-2xl border border-[#E7EAD9] bg-white shadow-sm",
+              "md:mt-0 md:w-[min(100%,20.5rem)]",
+            )}
           >
-            <span
-              className={cn(
-                ribbonClass,
-                "-top-3.5 z-10 rounded-md bg-header-green px-3 py-2 text-[10px] tracking-wider text-deal-accent",
-              )}
-            >
+            <p className="bg-header-green px-3 py-2.5 text-center font-lexend text-[10px] font-bold uppercase leading-none tracking-wider text-deal-accent md:px-4 md:py-3 md:text-xs">
               Hurry! Deal ends in:
-            </span>
-            {countdownBody}
+            </p>
+            <div className="px-3 py-3.5 md:px-4 md:py-4">{countdownBody}</div>
           </div>
         ) : null}
       </div>

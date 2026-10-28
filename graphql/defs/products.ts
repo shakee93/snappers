@@ -73,15 +73,6 @@ export const GET_PRODUCT = gql`
   query GetProduct($productId: ID!) {
     product(id: $productId, idType: SLUG) {
       ...ProductContentFull
-      # woo-price-tiers plugin - reference prices per payment option.
-      # PDP-only: listings don't render payment options.
-      # Requires the plugin on every GraphQL backend this app targets; if
-      # priceTiers is absent from the schema, GetProduct fails and PDPs 404.
-      priceTiers {
-        name
-        price
-        imageUrl
-      }
       # Related products feed the PDP "you may also like" slider. PDP-only -
       # kept out of ProductContentFull so brand / category / homepage archives
       # that share that fragment don't each pull 12 extra product cards.
@@ -438,6 +429,7 @@ export const GET_BRAND = gql`
   }
 `;
 
+/** Category archive + slug resolution. No root `brands` — not on Snappers WPGraphQL. */
 export const GET_CATEGORY = gql`
   query GetCategory($categoryId: ID!) {
     productCategory(id: $categoryId, idType: SLUG) {
@@ -447,23 +439,6 @@ export const GET_CATEGORY = gql`
       databaseId
       image {
         sourceUrl
-      }
-    }
-    productCategories(first: 100, where: { orderby: COUNT }) {
-      nodes {
-        name
-        slug
-        id
-        databaseId
-        count
-      }
-    }
-    brands(first: 100, where: { orderby: COUNT }) {
-      nodes {
-        databaseId
-        name
-        slug
-        count
       }
     }
   }

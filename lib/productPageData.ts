@@ -26,8 +26,8 @@ export type ProductPageData = {
  * `GET_PRODUCT` query itself is `force-cache`d, so the page-body call that does
  * need related products reuses the same cached response.
  *
- * GET_PRODUCT includes woo-price-tiers `priceTiers` - deploy the plugin (or
- * remove the field) before pointing this frontend at a WP instance without it.
+ * Payment-option tiers (`priceTiers`) are optional - Snappers WP does not expose
+ * the woo-price-tiers field; PDP payment UI falls back when tiers are absent.
  */
 export async function getProductPageData(
   slug: string,

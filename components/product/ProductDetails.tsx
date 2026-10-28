@@ -15,7 +15,6 @@ import { useStore } from "@/store/store";
 import { twMerge } from "tailwind-merge";
 import { useImage } from "@/context/ImageChangeGrabber";
 import { getProductPath } from "@/lib/productUrl";
-import ProductShareControls from "@/components/product/ProductShareControls";
 import BrandLogo from "@/components/product/BrandLogo";
 import {
   stripReviewHtml,
@@ -489,14 +488,14 @@ const ProductDetails = ({
         </div>
       )}
 
-      <div className="flex flex-col gap-3">
+      <div className="flex w-full flex-col gap-3 pt-11 pr-0 sm:pt-0 sm:pr-[10rem]">
         {saleBadge && (
           <span className="inline-flex w-fit rounded-md bg-[#FCE7F3] px-3 py-1 text-xs font-bold uppercase tracking-wide text-[#DB2777]">
             Sale!
           </span>
         )}
 
-        <h1 className="text-xl font-bold leading-snug text-[#253D4E] sm:text-2xl lg:text-[26px]">
+        <h1 className="w-full text-xl font-bold leading-snug text-[#253D4E] sm:text-2xl lg:text-[26px]">
           {product.name}
         </h1>
 
@@ -617,7 +616,7 @@ const ProductDetails = ({
       )}
 
       {displayPriceHtml ? (
-        <div className="space-y-2 border-b border-neutral-100 pb-4">
+        <div className="space-y-3 lg:border-b lg:border-neutral-100 lg:pb-4">
           <div className="flex flex-wrap items-baseline gap-2 sm:gap-3">
             {isOnSale && displayRegularPriceHtml && (
               <span
@@ -643,26 +642,21 @@ const ProductDetails = ({
           ) : (
             <p className="text-sm font-semibold text-[#DC2626]">Out of stock</p>
           )}
+          <ProductAddToCart
+            product={product}
+            variation={
+              (displayVariation ?? defaultVariation) as ProductVariation & {
+                rawPrice: string;
+              }
+            }
+          />
         </div>
       ) : (
         <p className="text-sm font-medium text-neutral-500">Currently unavailable</p>
       )}
 
-      <div className="max-lg:h-0 max-lg:overflow-visible">
-        <ProductAddToCart
-          product={product}
-          variation={
-            (displayVariation ?? defaultVariation) as ProductVariation & {
-              rawPrice: string;
-            }
-          }
-        />
-      </div>
-
-      <ProductShareControls product={product} className="w-full" />
-
       {(productSku || categoryLabels) && (
-        <dl className="grid grid-cols-1 gap-x-6 gap-y-2 border-t border-neutral-100 pt-4 text-sm sm:grid-cols-2">
+        <dl className="grid grid-cols-1 gap-x-6 gap-y-2 border-t border-neutral-100 pt-4 text-sm max-lg:mt-0 sm:grid-cols-2">
           {productSku && (
             <div>
               <dt className="font-semibold text-neutral-700">SKU</dt>

@@ -1,11 +1,11 @@
-/** Snappers titles — Lexend across section, page, hero, and card headings. */
+/** Snappers titles - Lexend across section, page, hero, and card headings. */
 
 export const titleFontClass = "font-lexend";
 
 export const sectionEyebrowClass =
   "text-left text-xs font-semibold uppercase tracking-[0.16em] text-primary-600 sm:text-sm";
 
-/** Primary section headings — 40px from tablet up. */
+/** Primary section headings - 40px from tablet up. */
 export const sectionTitleClass =
   `${titleFontClass} text-left text-[1.75rem] font-bold leading-[1.08] tracking-tight text-black min-[768px]:text-[40px] min-[768px]:leading-[1.1] lg:whitespace-nowrap`;
 

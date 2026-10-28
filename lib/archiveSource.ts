@@ -16,9 +16,14 @@ export function isGraphqlArchive(): boolean {
   const graphqlIsCatlitter = graphql.includes("catlitter");
   const typesenseIsGq = typesense.includes("gqmobiles");
   const graphqlIsSnappers = graphql.includes("snappers");
-  const typesenseIsCatlitter = typesense.includes("catlitter");
+  const typesenseIsSnappers = typesense.includes("snappers");
 
-  if (graphqlIsSnappers && typesenseIsCatlitter) return true;
+  // Snappers WP has no dedicated Typesense index yet — never query another
+  // tenant's search cluster (catlitter / gqmobiles) or category grids stay empty.
+  if (graphqlIsSnappers) {
+    if (typesenseIsSnappers) return false;
+    return true;
+  }
 
   return graphqlIsCatlitter && typesenseIsGq;
 }

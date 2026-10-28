@@ -16,11 +16,17 @@ import facebookIcon from "@/public/product/logos_facebook.png";
 type ProductShareControlsProps = {
   product: SimpleProduct & VariableProduct;
   className?: string;
+  /** Overlay on the gallery card (top-left), not full-width in details. */
+  variant?: "inline" | "floating";
 };
 
 const shareIconClass = "h-6 w-6 object-contain";
 
-const ProductShareControls = ({ product, className = "" }: ProductShareControlsProps) => {
+const ProductShareControls = ({
+  product,
+  className = "",
+  variant = "inline",
+}: ProductShareControlsProps) => {
   const [linkCopied, setLinkCopied] = useState(false);
   const copyResetTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -98,14 +104,23 @@ const ProductShareControls = ({ product, className = "" }: ProductShareControlsP
     };
   }, []);
 
+  const isFloating = variant === "floating";
+
   return (
     <div
       className={twMerge(
-        `flex h-11 w-full shrink-0 items-stretch overflow-hidden border border-[#E8E8E8] bg-white p-1 ${pdpRadius}`,
+        `flex shrink-0 items-stretch overflow-hidden border border-[#E8E8E8] bg-white p-0.5 shadow-md ${pdpRadius}`,
+        isFloating ? "h-9 w-[8.75rem]" : "h-11 w-full",
+        variant === "inline" && "p-1 shadow-none",
         className,
       )}
     >
-      <div className={`flex min-w-0 flex-1 items-center justify-evenly bg-[#F3F4F6] px-2 ${pdpRadius}`}>
+      <div
+        className={twMerge(
+          `flex min-w-0 flex-1 items-center bg-[#F3F4F6] ${pdpRadius}`,
+          isFloating ? "justify-center gap-3 px-1.5" : "justify-evenly px-2",
+        )}
+      >
         <a
           href={whatsappShareUrl}
           target="_blank"
@@ -135,7 +150,10 @@ const ProductShareControls = ({ product, className = "" }: ProductShareControlsP
       <button
         type="button"
         onClick={copyProductLink}
-        className="flex w-10 shrink-0 items-center justify-center transition-opacity hover:opacity-70"
+        className={twMerge(
+          "flex shrink-0 items-center justify-center transition-opacity hover:opacity-70",
+          isFloating ? "w-8" : "w-10",
+        )}
         aria-label={linkCopied ? "Link copied!" : "Copy link"}
       >
         {linkCopied ? (

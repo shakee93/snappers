@@ -37,7 +37,7 @@ import {
 } from "@/lib/archiveFilters";
 import { cn } from "@/lib/utils";
 
-async function getData(parentId?: number, tagSlug?: string) {
+async function getData(parentId?: number | null, tagSlug?: string) {
   const [productsResult, browseCategoryRoots, navCategoriesFlat] =
     await Promise.all([
       getClient()
@@ -59,7 +59,7 @@ async function getData(parentId?: number, tagSlug?: string) {
   let nestedCategories = [];
   let tagDetails = [];
 
-  if (parentId) {
+  if (typeof parentId === "number" && parentId > 0) {
     const { data: categoryData, error: categoryError } = await getClient().query({
       query: GET_NESTED_CATEGORIES,
       variables: { parent: parentId },
@@ -120,11 +120,13 @@ async function getData(parentId?: number, tagSlug?: string) {
 }
 
 function buildCategoryScopeIds(
-  category: { databaseId: number; slug?: string | null } | undefined,
+  category: { databaseId?: number | null; slug?: string | null } | undefined,
   nestedCategories: { databaseId: number }[],
 ): number[] {
-  if (!category) return [];
-  const childIds = nestedCategories.map((item) => item.databaseId);
+  if (!category || typeof category.databaseId !== "number") return [];
+  const childIds = nestedCategories
+    .map((item) => item.databaseId)
+    .filter((id) => typeof id === "number" && id > 0);
   const extras = getCategoryScopeExtraIds(category.slug);
   return Array.from(
     new Set([category.databaseId, ...childIds, ...extras]),
@@ -178,7 +180,7 @@ const ArchiveLayout = async ({
     tagDetails,
     sidebarFilterCategories,
     categoryScopeById,
-  } = await getData(category?.databaseId ?? "", tag);
+  } = await getData(category?.databaseId, tag);
   const categoryScopeIds = buildCategoryScopeIds(category, nestedCategories);
   const showSidebarCategoryFilter = filters && graphqlArchive && !category;
 
