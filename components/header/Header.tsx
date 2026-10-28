@@ -3,7 +3,8 @@ import { getClient } from "@/graphql/apollo-ssr";
 import { GET_ALL_PRODUCTS } from "@/graphql/defs/products";
 import { GET_OPTIONS } from "@/graphql/defs/options";
 import { GET_NAV_CATEGORIES } from "@/graphql/defs/nav";
-import type { ProductCategory } from "@/graphql/types/graphql";
+import type { Brand, ProductCategory } from "@/graphql/types/graphql";
+import { registerArchiveSlugs } from "@/lib/archiveSlugRegistry";
 import HeaderClientWrapper from "./HeaderClientWrapper";
 
 const NAV_CATEGORIES_QUERY = `
@@ -83,6 +84,12 @@ const HeaderSkeleton = () => (
 
 const HeaderInner = async () => {
   const { productCategories, brands, options, navCategories } = await getData();
+
+  registerArchiveSlugs([
+    ...productCategories.map((category: ProductCategory) => category.slug),
+    ...navCategories.map((category: ProductCategory) => category.slug),
+    ...brands.map((brand: Brand) => brand.slug),
+  ]);
 
   return (
     <HeaderClientWrapper

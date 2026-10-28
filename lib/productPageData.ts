@@ -9,6 +9,7 @@ import {
   getProductCategories,
 } from "@/lib/productUrl";
 import type { ProductWithPriceTiers } from "@/lib/priceTiers";
+import { isWpProductSlugNotFoundError } from "@/lib/graphqlErrors";
 
 export type ProductPageData = {
   product: SimpleProduct & VariableProduct & ProductWithPriceTiers;
@@ -52,7 +53,15 @@ export async function getProductPageData(
 
     const product = data?.product;
     if (error || errors?.length || !product) {
-      if (process.env.NODE_ENV === "development" && (error || errors?.length)) {
+      const graphQLErrors = errors?.length
+        ? errors
+        : error?.graphQLErrors;
+      const isExpectedMiss = isWpProductSlugNotFoundError(graphQLErrors);
+      if (
+        process.env.NODE_ENV === "development" &&
+        (error || errors?.length) &&
+        !isExpectedMiss
+      ) {
         console.error("GetProduct failed for slug:", slug, error ?? errors);
       }
       return null;

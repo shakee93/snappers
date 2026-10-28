@@ -11,6 +11,7 @@ function hrefToSlug(href: string): string {
 
 const seededSlugs = [
   ...siteConfig.navigation.main.map((item) => hrefToSlug(item.href)),
+  ...siteConfig.navigation.extraArchiveCategorySlugs,
   ...navCategoryPriority.flat(),
 ];
 

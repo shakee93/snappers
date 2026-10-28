@@ -152,6 +152,8 @@ export const siteConfig = {
       { href: "/fresh", name: "Fresh" },
       { href: "/frozen", name: "Frozen" },
     ],
+    /** WP category slugs in mega menu / nav but not listed in `main` (skip GetProduct on `/[slug]`). */
+    extraArchiveCategorySlugs: ["snap-deals"],
     /** Quick links on the dark-green utility bar (see `HeaderUtilityBar`). */
     utility: {
       links: [
