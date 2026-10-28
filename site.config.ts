@@ -324,7 +324,7 @@ export const siteConfig = {
   },
   /** Set `indexable: true` when the site goes live. */
   seo: {
-    indexable: true,
+    indexable: false,
   },
   product: {
     // Default warranty used in product JSON-LD when a product has none set.
