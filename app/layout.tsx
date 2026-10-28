@@ -20,6 +20,7 @@ import { siteConfig } from "@/site.config";
 import {
   getSiteMetadataIcons,
   getSiteOgImage,
+  getSiteOgImageDimensions,
   getSiteTwitterImage,
 } from "@/lib/siteAssets";
 import SiteThemeStyles from "@/components/global/theme/SiteThemeStyles";
@@ -84,8 +85,7 @@ export const metadata: Metadata = {
     images: [
       {
         url: getSiteOgImage(),
-        width: 2172,
-        height: 724,
+        ...getSiteOgImageDimensions(),
         alt: `${siteConfig.brand.name} - ${siteConfig.brand.tagline}`,
       },
     ],
