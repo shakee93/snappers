@@ -145,11 +145,11 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
 
   useEffect(() => {
     if (nextBgSrc) {
-      const img = new Image();
+      const img = document.createElement("img");
       img.src = nextBgSrc;
     }
     if (nextFeatureSrc) {
-      const img = new Image();
+      const img = document.createElement("img");
       img.src = nextFeatureSrc;
     }
   }, [nextBgSrc, nextFeatureSrc]);
