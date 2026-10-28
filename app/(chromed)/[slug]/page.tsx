@@ -20,6 +20,9 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
+/** Slug pages resolve products/categories at request time; avoid SSG + layout no-store fetch mismatch (Next 16 static-to-dynamic error → 500). */
+export const dynamic = "force-dynamic";
+
 export const revalidate = 1800;
 
 export async function generateStaticParams() {
