@@ -44,8 +44,17 @@ export function getSiteMetadataIcons(): NonNullable<Metadata["icons"]> {
   };
 }
 
+/** Default share/preview image — always absolute for crawlers (WhatsApp, Discord, etc.). */
 export function getSiteOgImage(): string {
-  return getPublicAssetUrl(siteConfig.url.defaultOgImage);
+  const configured = siteConfig.url.defaultOgImage;
+  if (/^https?:\/\//.test(configured)) return configured;
+
+  const base = (
+    process.env.NEXT_PUBLIC_DOMAIN?.trim().replace(/\/$/, "") ||
+    siteConfig.url.base.replace(/\/$/, "")
+  );
+  const path = configured.startsWith("/") ? configured : `/${configured}`;
+  return `${base}${path}`;
 }
 
 export function getSiteTwitterImage(): string {

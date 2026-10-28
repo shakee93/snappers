@@ -84,8 +84,8 @@ export const metadata: Metadata = {
     images: [
       {
         url: getSiteOgImage(),
-        width: 1200,
-        height: 630,
+        width: 2172,
+        height: 724,
         alt: `${siteConfig.brand.name} - ${siteConfig.brand.tagline}`,
       },
     ],

@@ -10,6 +10,7 @@ import {
   getProductPath,
 } from "@/lib/productUrl";
 import { resolveSlug } from "@/lib/slugResolver";
+import { getSiteOgImage } from "@/lib/siteAssets";
 import { siteConfig } from "@/site.config";
 import { SimpleProduct, VariableProduct } from "@/graphql/types/graphql";
 import { notFound } from "next/navigation";
@@ -25,7 +26,7 @@ export async function generateStaticParams() {
   return [];
 }
 
-const DEFAULT_OG_IMAGE = siteConfig.url.defaultOgImage;
+const DEFAULT_OG_IMAGE = getSiteOgImage();
 
 function getProductOgImage(product: SimpleProduct & VariableProduct): string {
   const mainImage = product.image?.sourceUrl;
@@ -94,7 +95,7 @@ export async function generateMetadata(
       `Discover our exclusive ${productCategory.name} category. Shop now for top-quality products at unbeatable prices.`;
     const pageUrl = `${siteConfig.url.base}${getCategoryPath(params.slug)}`;
     const imageUrl =
-      productCategory.image?.sourceUrl || siteConfig.url.defaultOgImage;
+      productCategory.image?.sourceUrl || getSiteOgImage();
 
     return {
       title: pageTitle,
@@ -127,7 +128,7 @@ export async function generateMetadata(
     brand.description ||
     `Discover premium products from ${brand.name}. Explore exclusive collections at unbeatable prices. Shop with ${siteConfig.brand.name} for quality and style.`;
   const pageUrl = `${siteConfig.url.base}/${params.slug}`;
-  const imageUrl = siteConfig.url.defaultOgImage;
+  const imageUrl = getSiteOgImage();
 
   return {
     title: pageTitle,
