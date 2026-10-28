@@ -6,6 +6,10 @@ import type {
   SimpleProduct,
   VariableProduct,
 } from "@/graphql/types/graphql";
+import {
+  sectionTitleAccentClass,
+  sectionTitleClass,
+} from "@/lib/sectionTypography";
 
 const DISPLAY_LIMIT = 4;
 
@@ -47,9 +51,9 @@ const UpsellProducts = ({
   return (
     <section className="w-full bg-white px-3 py-12 md:py-16 lg:px-6">
       <div className="mx-auto w-full max-w-[1368px]">
-        <div className="mx-auto max-w-3xl text-center">
-          <h2 className="font-albra text-3xl font-bold leading-tight text-[#092412] sm:text-4xl md:text-5xl lg:text-6xl">
-            You May Also <span className="text-[#769F5F]">Want</span>
+        <div className="max-w-3xl">
+          <h2 className={sectionTitleClass}>
+            You May Also <span className={sectionTitleAccentClass}>Want</span>
           </h2>
           <p className="mt-4 text-sm leading-relaxed text-neutral-600 md:mt-5 md:text-base">
             {description}

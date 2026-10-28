@@ -1,6 +1,8 @@
 import { getOrderShippingRowLabel } from "@/components/account/accountOrderUtils";
 import { isLineItemFree, parseWooMoneyAmount } from "@/lib/cartLinePricing";
 import { currencySymbol, formatPrice, toDisplayCurrency } from "@/lib/formatPrice";
+import { pageSectionTitleClass, pageTitleClass } from "@/lib/sectionTypography";
+import { cn } from "@/lib/utils";
 
 type PaymentAddressDetails = {
   first_name?: string | null;
@@ -13,8 +15,7 @@ type PaymentAddressDetails = {
   country?: string | null;
 };
 
-const SECTION_TITLE_CLASS =
-  "font-albra text-xl font-semibold uppercase text-header-green sm:text-2xl";
+const SECTION_TITLE_CLASS = `${pageSectionTitleClass} uppercase sm:text-2xl`;
 
 const SUMMARY_CARD_CLASS =
   "rounded-2xl border border-[#E8E8E8] bg-white p-5";
@@ -118,7 +119,7 @@ export const OrderDetails = ({ orderData }: OrderDetailsProps) => {
   return (
     <div>
       <p className="text-sm font-semibold text-header-green">Order confirmed</p>
-      <h1 className="mt-2 font-albra text-2xl font-semibold uppercase leading-tight text-[#092412] sm:text-3xl">
+      <h1 className={cn(pageTitleClass, "mt-2 text-2xl uppercase sm:text-3xl")}>
         We&apos;ve got your order. Thank you for choosing us. 📦
       </h1>
 

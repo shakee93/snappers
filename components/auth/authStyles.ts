@@ -1,7 +1,8 @@
 import { BRAND_CTA_BUTTON_CLASS } from "@/shared/Button/ButtonBrand";
+import { titleFontClass } from "@/lib/sectionTypography";
 
 export const authPageTitleClassName =
-  "my-12 text-center text-3xl font-bold text-header-green dark:text-neutral-100";
+  `${titleFontClass} my-12 text-center text-3xl font-bold text-header-green dark:text-neutral-100`;
 
 export const authPageWrapperClassName = "mx-auto max-w-[400px] space-y-6";
 

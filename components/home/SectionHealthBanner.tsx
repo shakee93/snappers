@@ -1,4 +1,9 @@
 import Image from "next/image";
+import {
+  sectionTitleAccentClass,
+  sectionTitleClass,
+} from "@/lib/sectionTypography";
+import { cn } from "@/lib/utils";
 
 export interface SectionHealthBannerProps {
   className?: string;
@@ -38,25 +43,17 @@ const SectionHealthBanner = ({
 
         {/* Mobile: left-aligned title over rabbit bg */}
         <div className="absolute inset-0 flex flex-col items-start justify-end pb-8 pl-5 pr-[38%] md:hidden">
-          <h2 className="text-left text-[#092412]">
-            <span className="block font-albra text-[25px] font-semibold leading-tight">
-              We Care About
-            </span>
-            <span className="mt-0.5 block font-albra text-[25px] font-bold leading-tight">
-              Your <span className="text-[#769F5F]">Pet&apos;s Health</span>
-            </span>
+          <h2 className={cn(sectionTitleClass, "text-left text-[1.35rem] sm:text-4xl")}>
+            We care about your{" "}
+            <span className={sectionTitleAccentClass}>pet&apos;s health</span>
           </h2>
         </div>
 
         {/* Desktop: centered title overlay */}
         <div className="absolute inset-0 hidden flex-col items-center justify-end px-4 pb-8 sm:pb-28 md:flex">
-          <h2 className="text-center text-[#092412]">
-            <span className="block font-albra text-6xl font-semibold text-[#092412]">
-              We Care About Your
-            </span>
-            <span className="mt-1 block font-albra text-6xl font-bold text-[#769F5F]">
-              Pet&apos;s Health
-            </span>
+          <h2 className={cn(sectionTitleClass, "text-left")}>
+            We care about your{" "}
+            <span className={sectionTitleAccentClass}>pet&apos;s health</span>
           </h2>
         </div>
       </div>

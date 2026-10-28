@@ -1,7 +1,7 @@
 import "../styles/index.scss";
 import "./index.css";
 import "rc-slider/assets/index.css";
-import { Inter, Playfair_Display } from "next/font/google";
+import { Inter, Lexend, Playfair_Display } from "next/font/google";
 import localFont from "next/font/local";
 import ApolloWrapper from "@/graphql/apollo-client";
 import { SessionProvider } from "@/context/SessionProvider";
@@ -42,6 +42,12 @@ const playfairDisplay = Playfair_Display({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-playfair",
+});
+
+const lexend = Lexend({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-lexend",
 });
 
 const defaultTitle = `${siteConfig.brand.name} - ${siteConfig.brand.tagline}`;
@@ -106,7 +112,7 @@ export default async function RootLayout({
   return (
     <html
       lang="en"
-      className={`${inter.variable} ${albraSans.variable} ${playfairDisplay.variable}`}
+      className={`${inter.variable} ${albraSans.variable} ${playfairDisplay.variable} ${lexend.variable}`}
     >
       <head>
         <SiteThemeStyles />
@@ -153,7 +159,7 @@ export default async function RootLayout({
       </head>
       <body
         suppressHydrationWarning
-        className="bg-white text-base dark:bg-slate-900 text-slate-900 dark:text-slate-200"
+        className="bg-white font-sans text-base text-slate-900 dark:bg-slate-900 dark:text-slate-200"
       >
         <ApolloWrapper>
           <CartProvider>

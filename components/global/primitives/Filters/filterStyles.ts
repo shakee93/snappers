@@ -1,3 +1,5 @@
+import { titleFontClass } from "@/lib/sectionTypography";
+
 export const filterResetClassName =
   "text-sm font-medium text-header-green hover:underline underline-offset-2";
 
@@ -35,7 +37,7 @@ export const filterPanelClassName =
   "overflow-hidden relative w-full rounded-xl border border-[#E8E8E8] bg-white";
 
 export const filterPanelTitleClassName =
-  "text-sm font-semibold text-header-green";
+  `${titleFontClass} text-sm font-semibold text-header-green`;
 
 export const filterPanelToggleClassName =
   "flex w-full items-center justify-between gap-2 text-left text-sm font-semibold text-header-green transition-opacity hover:opacity-80";

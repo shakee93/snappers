@@ -7,6 +7,11 @@ import {
   type LucideIcon,
 } from "lucide-react";
 import aboutContent from "@/content/about.json";
+import {
+  pageSectionTitleClass,
+  pageTitleClass,
+  titleFontClass,
+} from "@/lib/sectionTypography";
 
 const whyIconMap: Record<string, LucideIcon> = {
   delivery: Truck,
@@ -15,8 +20,7 @@ const whyIconMap: Record<string, LucideIcon> = {
   shop: ShoppingCart,
 };
 
-const sectionHeadingClass =
-  "font-albra text-3xl font-semibold text-[#092412] md:text-5xl";
+const sectionHeadingClass = pageSectionTitleClass;
 
 const AboutPageContent = () => {
   const { hero, intro, welcome, stats, why, closing } = aboutContent;
@@ -25,10 +29,8 @@ const AboutPageContent = () => {
     <div className="-mb-20 bg-white">
       {/* Welcome - matches live Snappers about copy */}
       <section className="bg-[#F5F5F5] px-4 py-14 md:px-6 md:py-20">
-        <header className="mx-auto mb-10 max-w-[1368px] text-center md:mb-12">
-          <h1 className="font-albra text-3xl font-semibold text-header-green md:text-5xl">
-            {hero.eyebrow}
-          </h1>
+        <header className="mx-auto mb-10 max-w-[1368px] text-left md:mb-12">
+          <h1 className={pageTitleClass}>{hero.eyebrow}</h1>
           {intro.lead ? (
             <p className="mx-auto mt-3 max-w-2xl text-base text-neutral-600 md:text-lg">
               {intro.lead}
@@ -49,7 +51,7 @@ const AboutPageContent = () => {
           <div className="rounded-2xl bg-white p-6 shadow-sm md:p-10">
             <p className="text-base leading-relaxed text-neutral-700 md:text-lg md:leading-8">
               <span
-                className="float-left mr-2 mt-0.5 font-albra text-5xl font-bold leading-[0.85] text-[#F97316] md:text-6xl"
+                className={`float-left mr-2 mt-0.5 ${titleFontClass} text-5xl font-bold leading-[0.85] text-[#F97316] md:text-6xl`}
                 aria-hidden
               >
                 {welcome.dropCap}
@@ -65,7 +67,7 @@ const AboutPageContent = () => {
               key={stat.label}
               className="flex flex-col items-center justify-center rounded-2xl bg-white px-4 py-8 text-center shadow-sm md:py-10"
             >
-              <p className="font-albra text-3xl font-bold text-[#F97316] md:text-4xl lg:text-5xl">
+              <p className={`${titleFontClass} text-3xl font-bold text-[#F97316] md:text-4xl lg:text-5xl`}>
                 {stat.value}
               </p>
               <p className="mt-2 text-sm font-semibold uppercase tracking-wide text-header-green md:text-base">
@@ -79,7 +81,7 @@ const AboutPageContent = () => {
       {/* Why Snappers */}
       <section className="px-4 py-14 md:px-6 md:py-20">
         <div className="mx-auto max-w-[1368px]">
-          <h2 className={`${sectionHeadingClass} text-center`}>{why.title}</h2>
+          <h2 className={sectionHeadingClass}>{why.title}</h2>
           <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
             {why.items.map((item) => {
               const Icon =
@@ -120,12 +122,12 @@ const AboutPageContent = () => {
       </section>
 
       {/* Closing */}
-      <section className="bg-[#EDF2EE] px-4 pb-14 pt-4 text-center md:px-6 md:pb-20">
+      <section className="bg-[#EDF2EE] px-4 pb-14 pt-4 text-left md:px-6 md:pb-20">
         <div className="mx-auto max-w-3xl">
           <p className="text-base leading-relaxed text-neutral-700 md:text-lg">
             {closing.body}
           </p>
-          <p className="mt-8 font-albra text-2xl font-semibold text-[#769F5F] md:text-4xl">
+          <p className={`mt-8 ${titleFontClass} text-2xl font-bold text-primary-600 md:text-3xl`}>
             {closing.tagline}
           </p>
         </div>

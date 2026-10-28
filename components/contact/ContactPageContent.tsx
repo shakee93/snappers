@@ -3,6 +3,8 @@ import { Mail, MapPin, Phone, Truck } from "lucide-react";
 import contactContent from "@/content/contact.json";
 import ContactForm from "@/components/contact/ContactForm";
 import { siteConfig } from "@/site.config";
+import { pageTitleClass } from "@/lib/sectionTypography";
+import { cn } from "@/lib/utils";
 
 const locationAccents = ["#EBF3EF"];
 
@@ -22,9 +24,9 @@ const ContactPageContent = ({ formspreeId }: ContactPageContentProps) => {
 
   return (
     <section className="-mb-20 bg-white px-4 py-14 md:px-6 md:py-20 lg:py-24">
-      <header className="mx-auto mb-10 max-w-[1368px] text-center md:mb-12">
+      <header className="mx-auto mb-10 max-w-[1368px] text-left md:mb-12">
         <p className="text-sm font-semibold text-header-green">Contact Us</p>
-        <h1 className="mt-2 font-albra text-3xl font-semibold leading-tight text-[#092412] sm:text-4xl md:text-5xl">
+        <h1 className={cn(pageTitleClass, "mt-2")}>
           Get in touch with us
         </h1>
         {pageIntro ? (

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
@@ -60,8 +60,6 @@ export interface SectionHeroPetsProps {
 
 const SLIDE_INTERVAL = 6000;
 const CROSSFADE = { duration: 0.6, ease: [0.4, 0, 0.2, 1] as const };
-const TEXT_FADE = { duration: 0.45, ease: "easeInOut" as const };
-
 /** Cream doodle + tint when a slide has no photo (fallback under CMS slides). */
 const HERO_SLIDER_BG = "/homepage/hero/pattern-bg.webp";
 const HERO_SLIDER_SIGNUP_BG = "/homepage/hero/pattern-bg.webp";
@@ -99,7 +97,7 @@ function stripHtml(html: string): string {
   return html.replace(/<[^>]+>/g, " ");
 }
 
-/** Slides with overlay copy hide full-bleed art on mobile; image-only slides need the artwork visible. */
+/** Slides with CMS copy use pattern + HTML overlay; image-only slides show full-bleed art. */
 function heroSlideHasCopy(item: HeroSlide): boolean {
   const title = item.sliderTitle?.trim();
   const desc = item.sliderDiscription?.trim();
@@ -136,7 +134,25 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
     slides.length > 1 ? SLIDE_INTERVAL : null,
   );
 
-  const slide = slides[activeIndex];
+  const activeSlide = slides[activeIndex];
+  const activeHasCopy = activeSlide ? heroSlideHasCopy(activeSlide) : false;
+  const activeBgSrc = activeSlide?.sliderBackgroundImage?.node?.sourceUrl;
+  const activeFeatureSrc = activeSlide?.sliderFeatureImage?.node?.sourceUrl;
+
+  const nextSlide = slides.length > 1 ? slides[(activeIndex + 1) % slides.length] : null;
+  const nextBgSrc = nextSlide?.sliderBackgroundImage?.node?.sourceUrl;
+  const nextFeatureSrc = nextSlide?.sliderFeatureImage?.node?.sourceUrl;
+
+  useEffect(() => {
+    if (nextBgSrc) {
+      const img = new Image();
+      img.src = nextBgSrc;
+    }
+    if (nextFeatureSrc) {
+      const img = new Image();
+      img.src = nextFeatureSrc;
+    }
+  }, [nextBgSrc, nextFeatureSrc]);
 
   return (
     <section
@@ -153,110 +169,98 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
                 aria-hidden
               />
 
-            {slides.map((item, index) => {
-              const src = item.sliderBackgroundImage?.node?.sourceUrl;
-              const isActive = index === activeIndex;
-              const hasCopy = heroSlideHasCopy(item);
-
-              if (!src) {
-                return null;
-              }
-
-              return (
+            <AnimatePresence mode="wait" initial={false}>
+              {activeSlide ? (
                 <motion.div
-                  key={`hero-slide-${index}`}
-                  animate={{ opacity: isActive ? 1 : 0 }}
+                  key={`hero-slide-${activeIndex}`}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
                   transition={CROSSFADE}
-                  className={`absolute inset-0 z-0 ${hasCopy ? "max-lg:hidden" : ""}`}
-                  aria-hidden={!isActive}
+                  className="absolute inset-0 z-[1]"
                 >
-                  <Image
-                    src={src}
-                    alt={item.sliderTitle ? stripHtml(item.sliderTitle) : "Hero offer"}
-                    fill
-                    priority={index === 0}
-                    sizes="100vw"
-                    className={
-                      hasCopy
-                        ? "object-cover object-center"
-                        : "object-contain object-center max-lg:object-contain lg:object-cover"
-                    }
-                  />
-                </motion.div>
-              );
-            })}
-
-            {slides.map((item, index) => {
-              const featureSrc = item.sliderFeatureImage?.node?.sourceUrl;
-              const isActive = index === activeIndex;
-
-              if (!featureSrc) {
-                return null;
-              }
-
-              return (
-                <motion.div
-                  key={`hero-slide-feature-${index}`}
-                  animate={{ opacity: isActive ? 1 : 0 }}
-                  transition={CROSSFADE}
-                  className="pointer-events-none absolute inset-y-0 right-0 z-[2] hidden w-full max-w-[400px] items-center justify-end p-4 sm:p-5 lg:flex lg:p-6"
-                  aria-hidden={!isActive}
-                >
-                  <div className="relative h-full w-full max-w-[300px]">
-                    <Image
-                      src={featureSrc}
-                      alt=""
-                      fill
-                      sizes="300px"
-                      className="object-contain object-right"
-                    />
-                  </div>
-                </motion.div>
-              );
-            })}
-
-            <div className="absolute inset-0 z-10 flex flex-col justify-center p-6 font-albra sm:p-8 lg:max-w-[70%] lg:p-10">
-              <AnimatePresence mode="wait" initial={false}>
-                <motion.div
-                  key={activeIndex}
-                  initial={{ opacity: 0, y: 8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={TEXT_FADE}
-                  className="flex flex-col gap-3"
-                >
-                  {slide?.sliderTitle ? (
+                  {activeBgSrc ? (
                     <div
-                      style={{ color: slide.titleColor ?? undefined }}
-                      className="leading-[1.05] [&_*]:font-albra [&_*]:leading-[1.05]"
-                      dangerouslySetInnerHTML={{ __html: slide.sliderTitle }}
-                    />
+                      className={`absolute inset-0 ${activeHasCopy ? "max-lg:hidden" : ""}`}
+                    >
+                      <Image
+                        src={activeBgSrc}
+                        alt={
+                          activeSlide.sliderTitle
+                            ? stripHtml(activeSlide.sliderTitle)
+                            : "Hero offer"
+                        }
+                        fill
+                        priority={activeIndex === 0}
+                        sizes="100vw"
+                        className={
+                          activeHasCopy
+                            ? "object-cover object-center"
+                            : "object-contain object-center max-lg:object-contain lg:object-cover"
+                        }
+                      />
+                    </div>
                   ) : null}
-                  {slide?.sliderDiscription ? (
-                    <p className="font-[family-name:var(--font-inter)] text-base font-medium text-black sm:text-lg lg:text-xl">
-                      {slide.sliderDiscription}
-                    </p>
+
+                  {activeFeatureSrc ? (
+                    <div className="pointer-events-none absolute inset-y-0 right-0 hidden w-full max-w-[400px] items-center justify-end p-4 sm:p-5 lg:flex lg:p-6">
+                      <div className="relative h-full w-full max-w-[300px]">
+                        <Image
+                          src={activeFeatureSrc}
+                          alt=""
+                          fill
+                          sizes="300px"
+                          className="object-contain object-right"
+                        />
+                      </div>
+                    </div>
                   ) : null}
-                  {slide?.buttonText && slide.buttonLink ? (
-                    slide.buttonLink.startsWith("http") ? (
-                      <a
-                        href={slide.buttonLink}
-                        className={`${HERO_SLIDE_BUTTON_CLASS} hidden lg:inline-flex`}
-                      >
-                        {slide.buttonText}
-                      </a>
-                    ) : (
-                      <Link
-                        href={slide.buttonLink}
-                        className={`${HERO_SLIDE_BUTTON_CLASS} hidden lg:inline-flex`}
-                      >
-                        {slide.buttonText}
-                      </Link>
-                    )
+
+                  {activeHasCopy ? (
+                    <div className="absolute inset-0 z-10 flex flex-col justify-center p-6 font-lexend sm:p-8 lg:max-w-[70%] lg:p-10">
+                      <div className="flex flex-col gap-3">
+                        {activeSlide.sliderTitle ? (
+                          <div
+                            style={{ color: activeSlide.titleColor ?? undefined }}
+                            className="flex flex-col gap-2 leading-[1.05] [&_*]:font-lexend [&_*]:leading-[1.05]"
+                            dangerouslySetInnerHTML={{
+                              __html: activeSlide.sliderTitle,
+                            }}
+                          />
+                        ) : null}
+                        {activeSlide.sliderDiscription ? (
+                          <p
+                            className="font-[family-name:var(--font-inter)] text-base font-medium text-black sm:text-lg lg:text-xl"
+                            style={{
+                              color: activeSlide.descriptionColor ?? undefined,
+                            }}
+                          >
+                            {activeSlide.sliderDiscription}
+                          </p>
+                        ) : null}
+                        {activeSlide.buttonText && activeSlide.buttonLink ? (
+                          activeSlide.buttonLink.startsWith("http") ? (
+                            <a
+                              href={activeSlide.buttonLink}
+                              className={`${HERO_SLIDE_BUTTON_CLASS} hidden lg:inline-flex`}
+                            >
+                              {activeSlide.buttonText}
+                            </a>
+                          ) : (
+                            <Link
+                              href={activeSlide.buttonLink}
+                              className={`${HERO_SLIDE_BUTTON_CLASS} hidden lg:inline-flex`}
+                            >
+                              {activeSlide.buttonText}
+                            </Link>
+                          )
+                        ) : null}
+                      </div>
+                    </div>
                   ) : null}
                 </motion.div>
-              </AnimatePresence>
-            </div>
+              ) : null}
+            </AnimatePresence>
 
             {slides.length > 1 ? (
               <div className="absolute bottom-4 left-1/2 z-20 flex -translate-x-1/2 gap-2">
@@ -275,6 +279,7 @@ const SectionHeroPets = ({ className = "", data }: SectionHeroPetsProps) => {
                 ))}
               </div>
             ) : null}
+
             </div>
           </div>
         </div>

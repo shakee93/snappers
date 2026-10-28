@@ -1,16 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
 import { parseDealEndsAt } from "@/lib/dealCountdown";
+import {
+  sectionDescriptionClass,
+  sectionEyebrowClass,
+  sectionTitleClass,
+} from "@/lib/sectionTypography";
 import { cn } from "@/lib/utils";
 
 export interface SectionDealCountdownProps {
   className?: string;
-  /** Desktop banner artwork. */
-  backgroundImage?: string;
-  /** Mobile banner artwork. */
-  backgroundImageMobile?: string;
   /** Deal end time as an ISO string. */
   endsAt?: string;
   /** From SSR: deal already ended when the page HTML was generated. */
@@ -28,18 +28,8 @@ const pad = (n: number) => n.toString().padStart(2, "0");
 
 const DEFAULT_COUNTDOWN_MS = 1000 * 60 * 60 * 24 * 2;
 
-/** Snappers palette (replaces legacy deal-brown / peach timer colors). */
-const TITLE_PRIMARY = "#092412";
-const TITLE_ACCENT = "#769F5F";
-const TIMER_DIGIT = "#092412";
-const TIMER_LABEL = "#769F5F";
 const TIMER_DIVIDER = "#E7EAD9";
 const TIMER_BOX_BORDER = "#E7EAD9";
-const TIMER_RIBBON_BG = "#092412";
-const TIMER_RIBBON_TEXT = "#B8D962";
-
-const DEAL_BANNER_WIDTH = 1024;
-const DEAL_BANNER_HEIGHT = 341;
 
 const getTimeLeft = (target: number): TimeLeft => {
   const diff = Math.max(0, target - Date.now());
@@ -55,36 +45,11 @@ const getTimeLeft = (target: number): TimeLeft => {
 const isExpiredTime = (t: TimeLeft) =>
   t.days === 0 && t.hours === 0 && t.minutes === 0 && t.seconds === 0;
 
-const DealCountdownTitle = ({
-  className,
-  align = "center",
-}: {
-  className?: string;
-  align?: "start" | "center";
-}) => (
-  <h2
-    className={cn(
-      "font-albra font-bold leading-[1.05]",
-      align === "center" ? "text-center" : "text-left",
-      className,
-    )}
-  >
-    <span className="block" style={{ color: TITLE_PRIMARY }}>
-      Deals for your
-    </span>
-    <span className="block" style={{ color: TITLE_ACCENT }}>
-      daily shopping
-    </span>
-  </h2>
-);
-
 /**
- * Promo banner with a live "deal ends in" countdown overlaid on grocery artwork.
+ * Promo strip with optional live "deal ends in" countdown (no decorative banner artwork).
  */
 const SectionDealCountdown = ({
   className = "",
-  backgroundImage = "/homepage/deal-bg.png",
-  backgroundImageMobile = "/homepage/deal-bg.png",
   endsAt,
   hideTimer = false,
 }: SectionDealCountdownProps) => {
@@ -138,16 +103,10 @@ const SectionDealCountdown = ({
               />
             )}
             <div className="flex flex-col items-center">
-              <span
-                className="text-xl font-bold tabular-nums leading-none md:text-4xl md:leading-none"
-                style={{ color: TIMER_DIGIT }}
-              >
+              <span className="text-xl font-bold tabular-nums leading-none text-header-green md:text-4xl md:leading-none">
                 {pad(unit.value)}
               </span>
-              <span
-                className="py-1 text-[9px] font-semibold uppercase leading-none tracking-wider md:py-2 md:text-xs"
-                style={{ color: TIMER_LABEL }}
-              >
+              <span className="py-1 text-[9px] font-semibold uppercase leading-none tracking-wider text-primary-600 md:py-2 md:text-xs">
                 {unit.label}
               </span>
             </div>
@@ -169,10 +128,7 @@ const SectionDealCountdown = ({
                   className="h-7 w-8 animate-pulse rounded-md md:h-9 md:w-12"
                   style={{ backgroundColor: `${TIMER_DIVIDER}cc` }}
                 />
-                <span
-                  className="h-2 w-7 animate-pulse rounded md:h-2.5 md:w-8"
-                  style={{ backgroundColor: `${TIMER_LABEL}40` }}
-                />
+                <span className="h-2 w-7 animate-pulse rounded bg-primary-600/25 md:h-2.5 md:w-8" />
               </div>
             </div>
           ))}
@@ -186,100 +142,36 @@ const SectionDealCountdown = ({
 
   return (
     <section
-      className={`relative z-0 mx-auto w-full max-w-[1368px] px-3 lg:px-0 ${className}`}
+      className={`relative z-0 mx-auto w-full max-w-[1368px] px-4 ${className}`}
     >
-      <div className="relative w-full overflow-hidden rounded-[20px] md:rounded-[28px]">
-        <Image
-          src={backgroundImageMobile}
-          alt=""
-          width={DEAL_BANNER_WIDTH}
-          height={DEAL_BANNER_HEIGHT}
-          priority
-          unoptimized
-          sizes="100vw"
-          aria-hidden
-          className="h-auto w-full object-cover object-center md:hidden"
-        />
-        <Image
-          src={backgroundImage}
-          alt=""
-          width={DEAL_BANNER_WIDTH}
-          height={DEAL_BANNER_HEIGHT}
-          priority
-          unoptimized
-          sizes="(max-width: 1368px) 100vw, 1368px"
-          aria-hidden
-          className="hidden h-auto w-full object-cover object-center md:block"
-        />
-
-        {/* Title below artwork when the countdown is hidden; mobile-only strip when it is live */}
-        <div
+      <div className={cn("w-full py-2", showTimer ? "md:py-4" : "md:py-3")}>
+        <p className={sectionEyebrowClass}>Deals</p>
+        <h2
           className={cn(
-            "border-t border-[#E7EAD9] bg-white px-4 py-5",
-            showTimer ? "md:hidden" : "md:py-6",
+            sectionTitleClass,
+            "mt-2 md:mt-3",
           )}
         >
-          <DealCountdownTitle
-            align="center"
-            className={
-              showTimer
-                ? "text-[26px] sm:text-[30px]"
-                : "text-[26px] sm:text-[30px] md:text-5xl lg:text-6xl"
-            }
-          />
-          {showTimer ? (
-            <div
-              className="relative mt-4 overflow-hidden rounded-xl border bg-white px-3 pb-3 pt-3 shadow-sm"
-              style={{ borderColor: TIMER_BOX_BORDER }}
-            >
-              <p
-                className="mb-2 text-center text-[10px] font-bold uppercase tracking-wide"
-                style={{
-                  backgroundColor: TIMER_RIBBON_BG,
-                  color: TIMER_RIBBON_TEXT,
-                }}
-              >
-                <span className="inline-block rounded px-2 py-1">
-                  Hurry! Deal ends in:
-                </span>
-              </p>
-              {countdownBody}
-            </div>
-          ) : null}
-        </div>
-
+          Deals for your daily shopping
+        </h2>
+        <p className={sectionDescriptionClass}>
+          Limited-time savings on groceries, household essentials, and favourites
+          across the store — updated regularly.
+        </p>
         {showTimer ? (
-          <div className="absolute inset-0 hidden flex-col items-center justify-end gap-5 px-4 pb-12 md:flex">
-            <div className="relative">
-              <Image
-                src="/homepage/lines.png"
-                alt=""
-                width={28}
-                height={28}
-                aria-hidden
-                className="absolute -left-4 -top-5 h-7 w-7"
-              />
-              <DealCountdownTitle align="center" className="text-6xl" />
-            </div>
-
-            <div
-              className="relative overflow-visible rounded-2xl border bg-white/70 px-7 pb-3 pt-8 backdrop-blur-sm md:pt-9"
-              style={{ borderColor: TIMER_BOX_BORDER }}
+          <div
+            className="relative mt-4 max-w-xl overflow-hidden rounded-xl border bg-[#faf9f7] px-3 pb-3 pt-3 md:mt-6 md:px-7 md:pb-3 md:pt-9"
+            style={{ borderColor: TIMER_BOX_BORDER }}
+          >
+            <span
+              className={cn(
+                ribbonClass,
+                "-top-3.5 z-10 rounded-md bg-header-green px-3 py-2 text-[10px] tracking-wider text-deal-accent",
+              )}
             >
-              <span
-                className={cn(
-                  ribbonClass,
-                  "-top-3.5 z-10 rounded-md px-3 py-2 text-[10px] tracking-wider",
-                )}
-                style={{
-                  backgroundColor: TIMER_RIBBON_BG,
-                  color: TIMER_RIBBON_TEXT,
-                }}
-              >
-                Hurry! Deal ends in:
-              </span>
-              {countdownBody}
-            </div>
+              Hurry! Deal ends in:
+            </span>
+            {countdownBody}
           </div>
         ) : null}
       </div>

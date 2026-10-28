@@ -8,6 +8,12 @@ import {
   SHOP_BY_CATEGORY_EXCLUDED_SLUGS,
   sortByMainNavCategoryOrder,
 } from "@/lib/browseCategories";
+import {
+  sectionEyebrowClass,
+  sectionDescriptionClass,
+  sectionTitleClass,
+} from "@/lib/sectionTypography";
+import { cn } from "@/lib/utils";
 
 interface CategoryNode {
   id: string;
@@ -29,9 +35,9 @@ const SHARED_ONLY_SLUGS = new Set(
   Object.values(NAV_SHARED_CATEGORY_SLUGS).flat(),
 );
 
-/** Matches `gap-2` (0.5rem) between tiles - four-up desktop, same width on row two. */
+/** 2-up → 3-up (`md`) → 5-up (`lg` / 1024px) → one row (`xl`). */
 const CATEGORY_TILE_FLEX_CLASS =
-  "w-full shrink-0 sm:w-[calc((100%-0.5rem)/2)] lg:w-[calc((100%-3*0.5rem)/4)]";
+  "w-[calc((100%-0.5rem)/2)] shrink-0 md:w-[calc((100%-1rem)/3)] lg:w-[calc((100%-2rem)/5)] xl:max-w-none xl:w-0 xl:min-w-0 xl:flex-1 xl:shrink";
 
 const categoryImageSrc = (category: CategoryNode): string | undefined =>
   getShopByCategoryImage(category.slug) ??
@@ -39,7 +45,7 @@ const categoryImageSrc = (category: CategoryNode): string | undefined =>
   undefined;
 
 /**
- * "Shop by Categories" - flex rows (4 + 3) with static artwork;
+ * "Shop by Categories" - single row of category tiles;
  * backed by `GET_SHOP_BY_CATEGORIES` for names and slugs.
  */
 const SectionShopByCategory = ({
@@ -56,9 +62,6 @@ const SectionShopByCategory = ({
 
   if (items.length === 0) return null;
 
-  const firstRow = items.slice(0, 4);
-  const secondRow = items.slice(4);
-
   const renderCategoryCard = (category: CategoryNode, index: number) => {
     const name = category.name ?? "";
     const pillColor = PILL_COLORS[index % PILL_COLORS.length];
@@ -70,7 +73,7 @@ const SectionShopByCategory = ({
         href={getCategoryPath(category.slug!)}
         className={`group flex flex-col items-center ${CATEGORY_TILE_FLEX_CLASS}`}
       >
-        <div className="relative flex h-[200px] w-full items-end justify-center sm:h-[220px] lg:h-[240px]">
+        <div className="relative flex h-[110px] w-full items-end justify-center md:h-[140px] lg:h-[160px]">
           <Image
             src={imageSrc}
             alt={name}
@@ -83,7 +86,7 @@ const SectionShopByCategory = ({
 
         <div
           style={{ backgroundColor: pillColor }}
-          className="mt-1.5 flex w-fit min-w-[160px] items-center justify-between gap-3 rounded-lg px-5 py-3 transition-shadow group-hover:shadow-md"
+          className="mt-1.5 flex w-full items-center justify-between gap-2 rounded-lg px-3 py-2.5 transition-shadow group-hover:shadow-md xl:w-fit xl:min-w-[160px] xl:gap-3 xl:px-5 xl:py-3"
         >
           <span className="whitespace-nowrap text-sm font-bold text-neutral-900">
             {name}
@@ -96,33 +99,26 @@ const SectionShopByCategory = ({
 
   return (
     <section
-      className={`mx-auto w-full max-w-[1024px] overflow-visible px-3 lg:px-0 ${className}`}
+      className={`mx-auto w-full max-w-[1368px] overflow-visible px-4 ${className}`}
     >
-      <div className="mx-auto max-w-4xl text-center">
-        <p className="text-base font-bold uppercase tracking-wider text-[#092412]">
-          Shop by Categories
-        </p>
-        <h2 className="mt-2 text-4xl font-albra font-bold leading-tight text-[#092412] sm:text-6xl md:mt-3 lg:text-nowrap">
-          Everything for your{" "}
-          <span className="text-[#769F5F]">daily shopping</span>
+      <div className="w-full">
+        <p className={sectionEyebrowClass}>Shop by Categories</p>
+        <h2
+          className={cn(
+            sectionTitleClass,
+            "mt-2 md:mt-3",
+          )}
+        >
+          Everything for your daily shopping
         </h2>
-        <p className="mx-auto mt-2 max-w-2xl text-lg font-medium text-black/60 md:mt-3">
+        <p className={sectionDescriptionClass}>
           From fresh produce and bakery picks to household essentials and
           chilled favourites - discover what you need, all in one place.
         </p>
       </div>
 
-      <div className="mt-2 flex flex-col gap-y-2 pb-4 sm:mt-3 md:pb-6">
-        <div className="flex flex-wrap items-start justify-center gap-2 sm:justify-start lg:flex-nowrap">
-          {firstRow.map((category, index) => renderCategoryCard(category, index))}
-        </div>
-        {secondRow.length > 0 ? (
-          <div className="flex flex-wrap items-start justify-center gap-2 lg:flex-nowrap">
-            {secondRow.map((category, index) =>
-              renderCategoryCard(category, index + firstRow.length),
-            )}
-          </div>
-        ) : null}
+      <div className="mt-2 flex flex-wrap items-start justify-start gap-2 pb-4 sm:mt-3 md:pb-6 xl:flex-nowrap">
+        {items.map((category, index) => renderCategoryCard(category, index))}
       </div>
     </section>
   );

@@ -1,9 +1,9 @@
 import { siteConfig } from "@/site.config";
 import type { HeroSlide } from "@/components/home/SectionHeroPets";
+import { heroSlideTitleClass } from "@/lib/sectionTypography";
 
-/** Hero slide headline - same scale as deal banner (`DealCountdownTitle`). */
-export const HERO_SLIDER_TITLE_CLASS =
-  "block font-albra text-[25px] font-bold leading-[1.05] text-[#092412] sm:text-4xl lg:text-6xl";
+/** Hero slide headline — Lexend (Snappers, not Catlitter Albra). */
+export const HERO_SLIDER_TITLE_CLASS = heroSlideTitleClass;
 
 export type GraphqlHeroSlideNode = {
   heroSlideFields?: {
@@ -89,8 +89,8 @@ export function normalizeAcfHeroSlides(
             : `<span class="${HERO_SLIDER_TITLE_CLASS}">${escapeHtml(title)}</span>`
           : null,
         sliderDiscription: slide.sliderDiscription?.trim() || null,
-        titleColor: slide.titleColor ?? "#092412",
-        descriptionColor: slide.descriptionColor ?? "#000000",
+        titleColor: slide.titleColor ?? undefined,
+        descriptionColor: slide.descriptionColor ?? undefined,
         buttonText: slide.buttonText?.trim() || null,
         buttonLink,
         buttonTextColor: slide.buttonTextColor ?? "#ffffff",
@@ -125,8 +125,8 @@ export function mapGraphqlHeroSlides(
           ? `<span class="${HERO_SLIDER_TITLE_CLASS}">${escapeHtml(title)}</span>`
           : null,
         sliderDiscription: fields.subContent?.trim() || null,
-        titleColor: "#092412",
-        descriptionColor: "#000000",
+        titleColor: null,
+        descriptionColor: null,
         buttonText: fields.buttonText?.trim() || null,
         buttonLink,
         buttonTextColor: "#ffffff",
