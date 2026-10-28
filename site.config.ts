@@ -106,7 +106,9 @@ export const siteConfig = {
     base: "https://www.snappers.lk",
     api: "https://snappers-api.freshpixl.com",
     cdn: "https://snappers-api.freshpixl.com",
-    defaultOgImage: "/global/snappers-og.jpg",
+    /** Absolute URL so link previews work before the apex/www domain serves the Next app. */
+    defaultOgImage:
+      "https://snappers-api.freshpixl.com/wp-content/uploads/2026/10/Everyday-Essentials-Delivered-2.png",
   },
   locale: {
     countryCode: "LK",
