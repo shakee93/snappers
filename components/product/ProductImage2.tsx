@@ -237,10 +237,13 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
   const showThumbs = showGallery && renderableGalleryCount > 1;
 
   return (
-    <div className="embla w-full" id="product-image">
-      <div className="relative">
+    <div
+      className="embla flex w-full min-h-[280px] flex-col xl:h-full xl:min-h-0"
+      id="product-image"
+    >
+      <div className="relative flex min-h-[280px] flex-1 flex-col xl:min-h-0">
         <div
-          className={`embla__viewport border border-neutral-200 bg-white ${pdpRadius}`}
+          className={`embla__viewport flex min-h-[280px] flex-1 flex-col border border-neutral-200 bg-white xl:min-h-0 ${pdpRadius} [&_.embla__container]:min-h-[inherit] [&_.embla__container]:xl:h-full [&_.embla__slide]:flex [&_.embla__slide]:min-h-[inherit] [&_.embla__slide]:xl:h-full`}
           ref={showGallery ? emblaMainRef : undefined}
         >
           <div className="embla__container">
@@ -258,14 +261,15 @@ const EmblaCarousel: React.FC<PropType> = ({ product }) => {
                       setLightboxOpen(true);
                     }}
                   >
-                    <div className="relative aspect-square w-full overflow-hidden">
+                    <div className="box-border flex h-full w-full min-h-[248px] max-h-full items-center justify-center p-4 sm:p-6 max-xl:aspect-square max-xl:min-h-0 max-xl:max-h-none">
                       <Image
                         fetchPriority={index === 0 ? "high" : undefined}
                         loading={index === 0 ? "eager" : "lazy"}
-                        className="image h-full w-full object-cover transition-transform duration-300"
-                        alt={product.name ?? "Product"}
                         width={1000}
                         height={1000}
+                        sizes="(max-width: 1280px) 90vw, 41vw"
+                        className="h-auto max-h-full w-auto max-w-full object-contain"
+                        alt={product.name ?? "Product"}
                         src={sourceUrl}
                       />
                     </div>

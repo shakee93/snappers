@@ -370,33 +370,31 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
     </button>
   );
 
-  const renderSecondaryRow = () => (
-    <div className="mt-3">
-      <WishlistButton
-        productId={product.databaseId}
-        className={`${cardControlClass} h-11 w-full gap-2 px-3 text-sm font-semibold text-neutral-700`}
-        showLabel
-      />
-    </div>
+  const renderWishlistButton = () => (
+    <WishlistButton
+      productId={product.databaseId}
+      className={`${cardControlClass} h-12 shrink-0 gap-2 px-2.5 text-sm font-semibold text-neutral-700 sm:px-3 [&_span]:hidden sm:[&_span]:inline`}
+      showLabel
+    />
   );
 
   return (
     <div className="w-full">
       {isPreOrderProduct() && <PreOrderNotice className="mb-4" />}
 
-      <div className="fixed bottom-[82px] left-0 z-40 w-full border-t border-[#E8E8E8] bg-white p-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] lg:static lg:border-0 lg:bg-transparent lg:p-0 lg:shadow-none">
+      <div className="w-full">
         {!(product.type === "VARIABLE" && !variation) && (
-          <div className="lg:pb-4">
+          <div>
             {isInStock ? (
               <>
-                <div className="flex items-stretch gap-3">
+                <div className="flex items-stretch gap-2 sm:gap-3">
                   {renderQuantityControl()}
                   {renderAddToCartButton()}
+                  {renderWishlistButton()}
                 </div>
-                {renderSecondaryRow()}
               </>
             ) : (
-              <div className="flex flex-col gap-3">
+              <div className="flex items-stretch gap-2 sm:gap-3">
                 <button
                   type="button"
                   disabled={isNotifyClicked}
@@ -405,7 +403,7 @@ const ProductAddToCart: React.FC<ProductAddToCartProps> = ({ product, variation 
                 >
                   Notify Me
                 </button>
-                {renderSecondaryRow()}
+                {renderWishlistButton()}
               </div>
             )}
           </div>

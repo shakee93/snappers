@@ -103,10 +103,10 @@ export const siteConfig = {
     appleTouchIcon: "/global/apple-touch-icon.png",
   },
   url: {
-    base: "https://www.catlitter.lk",
+    base: "https://www.snappers.lk",
     api: "https://snappers-api.freshpixl.com",
     cdn: "https://snappers-api.freshpixl.com",
-    defaultOgImage: "/global/catlitter-og.jpg",
+    defaultOgImage: "/global/snappers-og.jpg",
   },
   locale: {
     countryCode: "LK",

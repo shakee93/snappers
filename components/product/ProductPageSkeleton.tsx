@@ -30,7 +30,7 @@ const AddToCartRowSkeleton = () => (
 );
 
 const ProductPageSkeleton = () => (
-  <div className="bg-white pb-[160px] lg:pb-12">
+  <div className="bg-white pb-24 lg:pb-12">
     <main className="mx-auto flex max-w-[1368px] flex-col px-3 sm:px-4 lg:px-6">
       <nav aria-hidden className="flex flex-wrap items-center gap-1.5 py-4">
         <SkeletonBlock className="h-3 w-10 rounded sm:h-3.5" />
@@ -68,7 +68,7 @@ const ProductPageSkeleton = () => (
               <SkeletonBlock className="h-4 w-20 rounded" />
             </div>
 
-            <div className="mb-4 hidden md:mb-8 lg:block">
+            <div className="mb-4 mt-4 md:mb-8">
               <AddToCartRowSkeleton />
             </div>
 
@@ -181,12 +181,6 @@ const ProductPageSkeleton = () => (
       </div>
     </section>
 
-    <div
-      aria-hidden
-      className="fixed bottom-[82px] left-0 z-40 w-full border-t border-[#E8E8E8] bg-white p-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] lg:hidden"
-    >
-      <AddToCartRowSkeleton />
-    </div>
   </div>
 );
 

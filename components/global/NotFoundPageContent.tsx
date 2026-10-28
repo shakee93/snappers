@@ -6,7 +6,7 @@ import { BRAND_CTA_BUTTON_CLASS } from "@/shared/Button/ButtonBrand";
 import { useEffect } from "react";
 import notFoundContent from "@/content/not-found.json";
 import { useChromeVisibility } from "@/context/ChromeVisibilityProvider";
-import { pageTitleClass, titleFontClass } from "@/lib/sectionTypography";
+import { titleFontClass } from "@/lib/sectionTypography";
 import { cn } from "@/lib/utils";
 
 const NotFoundPageContent = () => {
@@ -19,40 +19,53 @@ const NotFoundPageContent = () => {
   }, [setHideChrome]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center overflow-y-auto py-12">
+    <div className="fixed inset-0 z-50 flex min-h-[100dvh] items-center justify-center overflow-y-auto bg-[#F9F7F2] py-10 sm:py-12">
       <Image
         src="/404bg.png"
         alt=""
         fill
         priority
         sizes="100vw"
-        className="object-cover"
+        className="object-cover object-center"
         aria-hidden
       />
-      <div className="relative z-10 mx-auto max-w-xl px-6 text-center">
-        <p className="text-sm font-semibold uppercase tracking-[0.14em] text-header-green/80">
+      <div className="relative z-10 mx-auto w-full max-w-2xl px-6 text-center">
+        <p className="text-xs font-semibold uppercase tracking-[0.2em] text-neutral-600 sm:text-sm">
           {hero.eyebrow}
         </p>
         <p
-          className={`mt-2 ${titleFontClass} text-8xl font-bold leading-none text-header-green md:text-9xl`}
+          className={cn(
+            titleFontClass,
+            "mt-3 text-[5.5rem] font-bold leading-none text-header-green sm:text-[7rem] md:text-[8.5rem]",
+          )}
           aria-hidden
         >
           {hero.code}
         </p>
-        <h1 className={cn(pageTitleClass, "mt-3")}>{hero.title}</h1>
-        <p className="mt-4 text-base leading-relaxed text-neutral-700 md:text-lg">
+        <h1
+          className={cn(
+            titleFontClass,
+            "mt-4 text-3xl font-bold tracking-tight text-header-green sm:text-4xl md:text-[2.75rem] md:leading-tight",
+          )}
+        >
+          {hero.title}
+        </h1>
+        <p className="mx-auto mt-4 max-w-lg text-base leading-relaxed text-neutral-600 md:text-lg">
           {hero.description}
         </p>
-        <div className="mt-8 flex flex-wrap justify-center gap-3">
+        <div className="mt-8 flex flex-wrap justify-center gap-3 sm:mt-10 sm:gap-4">
           <Link
             href={hero.cta.primary.href}
-            className={`inline-flex items-center rounded-full px-8 py-3.5 text-sm font-bold transition-opacity hover:opacity-90 ${BRAND_CTA_BUTTON_CLASS}`}
+            className={cn(
+              "inline-flex items-center rounded-full px-8 py-3.5 text-sm font-bold transition-opacity hover:opacity-90",
+              BRAND_CTA_BUTTON_CLASS,
+            )}
           >
             {hero.cta.primary.label}
           </Link>
           <Link
             href={hero.cta.secondary.href}
-            className="inline-flex items-center rounded-xl border border-header-green/25 bg-white/80 px-8 py-3.5 text-sm font-bold text-header-green backdrop-blur-sm transition-colors hover:bg-white"
+            className="inline-flex items-center rounded-full border border-neutral-300 bg-white px-8 py-3.5 text-sm font-bold text-header-green transition-colors hover:bg-neutral-50"
           >
             {hero.cta.secondary.label}
           </Link>

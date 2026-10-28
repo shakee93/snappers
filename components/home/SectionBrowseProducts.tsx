@@ -91,7 +91,7 @@ const buildInitialTabCaches = (
 
 const productSkeleton = (key: string) => <ProductCardLoading key={key} />;
 
-const BROWSE_PROMO_IMAGE = "/homepage/snappers-exciting-offers.jpg";
+const BROWSE_PROMO_IMAGE = "/homepage/everyday-essentials-delivered.jpg";
 
 /** Left promo column - Snappers offers artwork (links to deals). */
 const BrowsePromoPanel = ({ priority = false }: { priority?: boolean }) => (
@@ -101,7 +101,7 @@ const BrowsePromoPanel = ({ priority = false }: { priority?: boolean }) => (
   >
     <Image
       src={BROWSE_PROMO_IMAGE}
-      alt="Enjoy exciting offers from Snappers - minimum order Rs. 3000. Go to deals."
+      alt="Snappers - Your Everyday Essentials, Delivered. Groceries, household essentials, personal care, baby care and more."
       fill
       sizes="(max-width: 1024px) 100vw, 280px"
       className="object-cover object-top"
