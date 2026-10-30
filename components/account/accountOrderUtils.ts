@@ -2,6 +2,7 @@ import { parseWooMoneyAmount } from "@/lib/cartLinePricing";
 import { decodeHtmlEntities } from "@/lib/decodeHtmlEntities";
 import { formatPrice } from "@/lib/formatPrice";
 import { normalizeProductImageUrl } from "@/lib/productImage";
+import { siteConfig } from "@/site.config";
 import type { MyOrder, MyOrderLineItem, MyOrderProduct } from "@/graphql/defs/order";
 
 export type OrderCatalogProduct = {
@@ -329,6 +330,27 @@ export function getOrderShippingRowLabel(order: OrderShippingLabelSource): strin
   }
 
   return "Shipping";
+}
+
+export const ORDER_SERVICE_CHARGE_LABEL = siteConfig.fees.serviceChargeLabel;
+
+/**
+ * Fees on an order (the packaging & service charge), read as whatever the
+ * total carries above subtotal + shipping - the order sources here only hand
+ * over totals, not fee lines. A coupon discount nets against it, so a
+ * discounted order can read lower than the fee or not at all.
+ */
+export function getOrderFeeAmount(order: {
+  total?: string | null;
+  subtotal?: string | null;
+  shippingTotal?: string | null;
+}): number {
+  const amount = (value: string | null | undefined) => {
+    const parsed = parseWooMoneyAmount(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  };
+  const fee = amount(order.total) - amount(order.subtotal) - amount(order.shippingTotal);
+  return Math.round(fee * 100) / 100;
 }
 
 export function formatPaymentMethod(

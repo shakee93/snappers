@@ -12,8 +12,9 @@ import { buildPinMetaData } from "@/lib/checkoutPinMeta";
 import {
   resolveCatlitterDeliveryRate,
   resolveCourierRate,
-  resolveFlashDeliveryRate,
+  resolveDeliveryType,
   resolveFreeShippingRate,
+  type DeliveryType,
 } from "@/lib/checkoutShipping";
 import { useCheckoutPaymentSync } from "@/hooks/useCheckoutPaymentSync";
 import { useCheckout } from "@/hooks/useCheckout";
@@ -25,7 +26,7 @@ import {
 } from "@/graphql/types/graphql";
 import koko from "@/public/koko.png";
 import CheckoutDetails from "./CheckoutDetails";
-import { CheckoutSubmitPayload, DeliveryType } from "./UnifiedCheckoutForm";
+import { CheckoutSubmitPayload } from "./UnifiedCheckoutForm";
 import CartItems, { CartItem } from "./CartItems";
 import CheckoutCouponField from "./CheckoutCouponField";
 import { OrderSummarySkeleton } from "./CheckoutSkeletons";
@@ -82,25 +83,17 @@ const webxpayPaymentPath = (
 const buildCustomerNote = ({
   email,
   phone,
-  isStorePickup,
-  isFlashDelivery,
   isKokoPay,
   customerNote,
 }: {
   email: string;
   phone: string;
-  isStorePickup: boolean;
-  isFlashDelivery: boolean;
   isKokoPay: boolean;
   customerNote: string;
 }) => {
   const lines = [
     `Customer Email: ${email}`,
     `Phone Number: ${phone}`,
-    ...(isStorePickup ? ["Pickup Location: Store"] : []),
-    ...(isFlashDelivery
-      ? ["Delivery Method: Flash Delivery - customer arranges Uber/PickMe pickup"]
-      : []),
     ...(isKokoPay ? ["Payment Method: Koko Pay"] : []),
     ...(customerNote ? ["", `Customer Note: ${customerNote}`] : []),
   ];
@@ -141,8 +134,7 @@ const CheckoutPage = () => {
   const [payhereHandleStatus, setPayhereHandleStatus] =
     useState<PayhereStatus>("idle");
 
-  const [deliveryType, setDeliveryType] = useState<DeliveryType | null>(null);
-  const noShipping = deliveryType === "store_pickup" || deliveryType === "flash_delivery";
+  const deliveryType = useMemo(() => resolveDeliveryType(cart), [cart]);
   const [isKokoPayment, setIsKokoPayment] = useState(false);
   // Selected gateway id - the summary lines price their woo-price-tiers unit
   // price off it while WooCommerce keeps owning the totals.
@@ -189,12 +181,10 @@ const CheckoutPage = () => {
       router.push("/");
     }
 
-    if (noShipping) {
-      setShippingTotal("0");
-    } else if (cart?.shippingTotal != null) {
+    if (cart?.shippingTotal != null) {
       setShippingTotal(cart.shippingTotal);
     }
-  }, [cart, hasSeenCartWithItems, isCouponSyncingCart, noShipping]);
+  }, [cart, hasSeenCartWithItems, isCouponSyncingCart]);
 
   useEffect(() => {
     fetchCustomer();
@@ -270,30 +260,19 @@ const CheckoutPage = () => {
     shippingAbortRef.current = controller;
 
     try {
-      // Mirror the mapping in getShippingMethod: store_pickup uses the
-      // block-based pickup_location, flash_delivery uses the zero-cost flat
-      // rate "Flash Delivery (Uber/PickMe)" - only when the store actually
-      // quotes it, see resolveFlashDeliveryRate. CatLitter Delivery and
-      // courier both fall through to whichever rate the store quoted for the
-      // current address - see resolveCatlitterDeliveryRate / resolveCourierRate.
-      // A free rate outranks both delivery options - see
-      // resolveFreeShippingRate. Pickup keeps its fixed id.
+      // Mirror the mapping in getShippingMethod. Read off `rateSource` rather
+      // than `deliveryType`: right after an address push the quoted cart is a
+      // render ahead of the memoised delivery type. A free rate outranks both
+      // delivery modes - see resolveFreeShippingRate.
       const freeRate = preferFree ? resolveFreeShippingRate(rateSource) : null;
       const shippingMethods =
-        deliveryType === "flash_delivery"
-          ? resolveFlashDeliveryRate(rateSource)?.id
-          : deliveryType === "store_pickup"
-            ? "pickup_location:0"
-            : freeRate?.id ??
-              (deliveryType === "catlitter_delivery"
-                ? resolveCatlitterDeliveryRate(rateSource)?.id
-                : resolveCourierRate(rateSource, preferFree)?.id);
+        freeRate?.id ??
+        resolveCatlitterDeliveryRate(rateSource)?.id ??
+        resolveCourierRate(rateSource, preferFree)?.id;
 
       // No rate means the address doesn't resolve to a serviceable zone yet.
       // Selecting nothing is correct - the cart keeps whatever WC last quoted,
-      // and the summary is already showing that. The form only ever offers a
-      // delivery option WooCommerce quoted, so this is the unserviceable-zone
-      // case rather than a mismatched selection.
+      // and the summary is already showing that.
       if (!shippingMethods) {
         return;
       }
@@ -317,7 +296,7 @@ const CheckoutPage = () => {
         // and without this it keeps reading the pre-address cart until a later
         // refresh effect lands (which is what made the estimate look stuck).
         applyCart(updatedCart);
-        setShippingTotal(noShipping ? "0" : updatedCart.shippingTotal);
+        setShippingTotal(updatedCart.shippingTotal);
       } else {
         console.error(
           "Failed to update cart shipping total. No valid data returned."
@@ -417,7 +396,7 @@ const CheckoutPage = () => {
     if (!cart?.contents?.itemCount) return;
     updateShippingTotal().then((r) => r);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- intentionally omit the unstable mutation fn ref
-  }, [deliveryType, preferFreeShipping, cart?.contents?.itemCount]);
+  }, [preferFreeShipping, cart?.contents?.itemCount]);
 
   // Abort any pending shipping-update on unmount so we don't write to
   // unmounted-component state.
@@ -553,8 +532,6 @@ const CheckoutPage = () => {
       const isPayhere = gatewayId === "payhere";
       const paymentMethodId = gatewayId;
       const orderDeliveryType = data.deliveryType;
-      const isStorePickupOrder = orderDeliveryType === "store_pickup";
-      const isFlashDeliveryOrder = orderDeliveryType === "flash_delivery";
       const contactEmail = data.contactInfo.email;
       const contactPhone = data.contactInfo.phone;
 
@@ -564,50 +541,18 @@ const CheckoutPage = () => {
         return null;
       }
 
-      // WooCommerce swaps an unquoted shipping method for the first rate it
-      // has, so submitting Flash without its rate bills a delivery charge the
-      // summary never showed. Refuse instead.
-      if (isFlashDeliveryOrder && !resolveFlashDeliveryRate(cart)) {
-        toast.error("Flash Delivery isn't available right now. Please choose another delivery option.");
-        return null;
-      }
-
       const shippingMethod = getShippingMethod(shippingTotal, orderDeliveryType);
-      const storePickupAddressOverride = {
-        address1: "",
-        address2: "",
-        city: "",
-        state: "",
-        postcode: "",
-        country: "LK",
+      const shippingDetails = transformAddress(data.deliveryAddress);
+      const billingDetails = {
+        ...transformAddress(data.billingAddress),
+        email: contactEmail,
+        phone: contactPhone,
       };
-
-      const shippingDetails = isStorePickupOrder
-        ? {
-          ...transformAddress(data.deliveryAddress),
-          ...storePickupAddressOverride,
-        }
-        : transformAddress(data.deliveryAddress);
-
-      const billingDetails = isStorePickupOrder
-        ? {
-          ...transformAddress(data.billingAddress),
-          ...storePickupAddressOverride,
-          email: contactEmail,
-          phone: contactPhone,
-        }
-        : {
-          ...transformAddress(data.billingAddress),
-          email: contactEmail,
-          phone: contactPhone,
-        };
 
       const trimmedCustomerNote = data.customerNote?.trim() ?? "";
       const customerNote = buildCustomerNote({
         email: contactEmail,
         phone: contactPhone,
-        isStorePickup: isStorePickupOrder,
-        isFlashDelivery: isFlashDeliveryOrder,
         isKokoPay: gatewayId === "darazbnpl",
         customerNote: trimmedCustomerNote,
       });
@@ -624,13 +569,10 @@ const CheckoutPage = () => {
               key: "payhere_order_id",
               value: payherPaymentID ?? "",
             },
-            ...(orderDeliveryType
-              ? [{ key: "delivery_type", value: orderDeliveryType }]
-              : []),
+            { key: "delivery_type", value: orderDeliveryType },
             ...buildPinMetaData({
               shipping: data.deliveryAddress,
               billing: data.billingAddress,
-              isStorePickup: isStorePickupOrder,
             }),
           ],
         },
@@ -670,12 +612,10 @@ const CheckoutPage = () => {
           `order_shipping_label_${orderDbId}`,
           shippingMethod.methodTitle,
         );
-        if (orderDeliveryType) {
-          sessionStorage.setItem(
-            `order_delivery_type_${orderDbId}`,
-            orderDeliveryType,
-          );
-        }
+        sessionStorage.setItem(
+          `order_delivery_type_${orderDbId}`,
+          orderDeliveryType,
+        );
       }
 
       if (gatewayId === "darazbnpl") {
@@ -693,14 +633,7 @@ const CheckoutPage = () => {
         const numericAmount = parseFloat(rawAmount).toFixed(2);
 
         const billingAddress = transformAddress(data.billingAddress);
-        const shippingAddress = isStorePickupOrder
-          ? {
-              ...transformAddress(data.deliveryAddress),
-              address1: "",
-              address2: "",
-              city: "",
-            }
-          : transformAddress(data.deliveryAddress);
+        const shippingAddress = transformAddress(data.deliveryAddress);
 
         const orderData = {
           order_id: mutationData?.checkout?.order?.databaseId,
@@ -825,63 +758,37 @@ const CheckoutPage = () => {
 
   const getShippingMethod = (
     shippingTotal: any,
-    orderDeliveryType: DeliveryType | null,
+    orderDeliveryType: DeliveryType,
   ) => {
-    const noCharge =
-      orderDeliveryType === "store_pickup" ||
-      orderDeliveryType === "flash_delivery";
-
-    // store_pickup → block-based pickup_location method (instance 0).
-    // flash_delivery → zone-bound flat rate ("Flash Delivery (Uber/PickMe)"
-    // at cost 0, id in siteConfig.shipping.flashDeliveryMethodId -
-    // handleCheckout has already confirmed the store quotes it). Configured
-    // via WooCommerce > Settings > Shipping > Everywhere. Different mechanism from store pickup, but
-    // both resolve to a free shipping line - and flat_rate keeps the
-    // title verbatim so order admin shows "Flash Delivery (Uber/PickMe)"
-    // instead of the pickup_location plugin's "<title> (<location>)" template.
-    // CatLitter Delivery / courier: same dynamic rates as the cart-side
-    // lookup. Falling back to the configured constant keeps the order writable
-    // if the cart somehow has no rates to read, but the resolved id is what
-    // the store actually quoted.
+    // Same dynamic rates as the cart-side lookup. Falling back to the
+    // configured constant keeps the order writable if the cart somehow has no
+    // rates to read, but the resolved id is what the store actually quoted.
     const courierRate = resolveCourierRate(cart, preferFreeShipping);
     const catlitterRate = resolveCatlitterDeliveryRate(cart);
-    // Mirrors updateShippingTotal: a free rate outranks either delivery option,
+    // Mirrors updateShippingTotal: a free rate outranks either delivery mode,
     // so the order is written with the same line the cart was priced at.
     const freeRate = preferFreeShipping ? resolveFreeShippingRate(cart) : null;
 
     const methodId =
-      orderDeliveryType === "flash_delivery"
-        ? siteConfig.shipping.flashDeliveryMethodId
-        : orderDeliveryType === "store_pickup"
-          ? "pickup_location:0"
-          : freeRate?.id ??
-            (orderDeliveryType === "catlitter_delivery"
-              ? catlitterRate?.id ?? siteConfig.shipping.catlitterDeliveryMethodId
-              : courierRate?.id ??
-                (preferFreeShipping
-                  ? siteConfig.shipping.freeShippingMethodId
-                  : siteConfig.shipping.weightBasedShippingMethodId));
+      freeRate?.id ??
+      (orderDeliveryType === "catlitter_delivery"
+        ? catlitterRate?.id ?? siteConfig.shipping.catlitterDeliveryMethodId
+        : courierRate?.id ??
+          (preferFreeShipping
+            ? siteConfig.shipping.freeShippingMethodId
+            : siteConfig.shipping.weightBasedShippingMethodId));
 
-    // methodTitle is the display string for the order summary; for
-    // flat_rate WC writes the zone-config title, for pickup_location WC
-    // writes its own templated title - either way this string is
-    // cosmetic on the cart side. The courier label is zone-dependent
-    // ("Local Delivery" vs "Standard Shipping"), so prefer the quoted one
-    // over a generic stand-in.
-    const methodTitle = orderDeliveryType === "store_pickup"
-      ? "Store Pickup"
-      : orderDeliveryType === "flash_delivery"
-        ? "Flash Delivery (Uber/PickMe)"
-        : freeRate
-          ? freeRate.label ?? "Free Shipping"
-          : orderDeliveryType === "catlitter_delivery"
-            ? catlitterRate?.label ?? CATLITTER_DELIVERY_TITLE
-            : courierRate?.label ??
-              (preferFreeShipping ? "Free Shipping" : "Weight Based Shipping");
+    // methodTitle is the display string for the order summary - cosmetic on
+    // the cart side. The courier label is zone-dependent ("Local Delivery" vs
+    // "Standard Shipping"), so prefer the quoted one over a generic stand-in.
+    const methodTitle = freeRate
+      ? freeRate.label ?? "Free Shipping"
+      : orderDeliveryType === "catlitter_delivery"
+        ? catlitterRate?.label ?? CATLITTER_DELIVERY_TITLE
+        : courierRate?.label ??
+          (preferFreeShipping ? "Free Shipping" : "Weight Based Shipping");
 
-    const total = noCharge ? "0" : shippingTotal;
-
-    return { methodId, methodTitle, total };
+    return { methodId, methodTitle, total: shippingTotal };
   };
 
   // WooCommerce's cart-stock validator emits two distinct messages we want
@@ -1062,16 +969,16 @@ const CheckoutPage = () => {
     return orderTotalNumber;
   };
 
-  // For pickup / flash / free shipping, strip only the (possibly stale)
-  // shipping line from cart.total so coupons and fees stay in the quoted
-  // total. Using cart.subtotal would drop percentage coupons. Assumes
-  // shippingTax is 0 on this store (tax fields were trimmed from the cart
-  // fragment as unused) - if shipping tax is ever configured, pickup totals
-  // would still include it until that line is subtracted too.
+  // For free shipping, strip only the (possibly stale) shipping line from
+  // cart.total so coupons and fees stay in the quoted total. Using
+  // cart.subtotal would drop percentage coupons. Assumes shippingTax is 0 on
+  // this store (tax fields were trimmed from the cart fragment as unused) - if
+  // shipping tax is ever configured, free-shipping totals would still include
+  // it until that line is subtracted too.
   const serverOrderTotal = replaceStringinInt(cart?.total);
   const serverShippingTotal = replaceStringinInt(cart?.shippingTotal ?? "0");
   const chargeableOrderTotal =
-    noShipping || preferFreeShipping
+    preferFreeShipping
       ? Math.max(
           0,
           (Number.isFinite(serverOrderTotal) ? serverOrderTotal : 0) -
@@ -1384,7 +1291,6 @@ const CheckoutPage = () => {
                 ? (paymentGateways || []).filter((g: any) => g.id === 'cod' || g.id === 'bacs')
                 : (paymentGateways || [])
               }
-              setDeliveryType={setDeliveryType}
               deliveryType={deliveryType}
               totalPayment={chargeableOrderTotal}
               kokoTotal={kokoOrderTotal}
@@ -1400,10 +1306,6 @@ const CheckoutPage = () => {
               // address push OR the shipping recalculation is in flight, so
               // the user can't submit at a stale total.
               loading={loading || totalsRecalculating || redirecting}
-              // Separate from `loading`: the delivery options must not call a
-              // rate unavailable while the address push that would quote it is
-              // still in flight.
-              ratesRecalculating={totalsRecalculating}
               orderTotalLabel={orderTotalLabel}
             />
           </div>
@@ -1474,35 +1376,33 @@ const CheckoutPage = () => {
                   </div>
                 )}
 
-                {!noShipping && (
-                  <div className="flex justify-between">
-                    <span className="text-slate-600 dark:text-slate-400">
-                      {shippingRateLabel}
-                    </span>
-                    <span className="font-medium text-slate-900 dark:text-slate-200">
-                      {totalsRecalculating ? (
-                        <RecalculatingAmount />
-                      ) : preferFreeShipping ? (
-                        formatPrice(0)
-                      ) : (
-                        // The refreshed cart wins over the local state. Both
-                        // hold a shipping figure, but only the cart's is
-                        // re-read after every address sync - the local copy is
-                        // whatever the last updateShippingMethod returned and
-                        // never expires, so `shippingTotal || cart` let a
-                        // superseded rate shadow the live one indefinitely.
-                        // That is why the row disagreed with the order total
-                        // (which tracks cart.total) until a reload cleared the
-                        // state. Both arrive as WooCommerce's own "Rs450.00"
-                        // string, so re-format - the rest of this summary is
-                        // LKR.
-                        formatPrice(
-                          replaceStringinInt(cart?.shippingTotal || shippingTotal),
-                        )
-                      )}
-                    </span>
-                  </div>
-                )}
+                <div className="flex justify-between">
+                  <span className="text-slate-600 dark:text-slate-400">
+                    {shippingRateLabel}
+                  </span>
+                  <span className="font-medium text-slate-900 dark:text-slate-200">
+                    {totalsRecalculating ? (
+                      <RecalculatingAmount />
+                    ) : preferFreeShipping ? (
+                      formatPrice(0)
+                    ) : (
+                      // The refreshed cart wins over the local state. Both
+                      // hold a shipping figure, but only the cart's is
+                      // re-read after every address sync - the local copy is
+                      // whatever the last updateShippingMethod returned and
+                      // never expires, so `shippingTotal || cart` let a
+                      // superseded rate shadow the live one indefinitely.
+                      // That is why the row disagreed with the order total
+                      // (which tracks cart.total) until a reload cleared the
+                      // state. Both arrive as WooCommerce's own "Rs450.00"
+                      // string, so re-format - the rest of this summary is
+                      // LKR.
+                      formatPrice(
+                        replaceStringinInt(cart?.shippingTotal || shippingTotal),
+                      )
+                    )}
+                  </span>
+                </div>
 
                 {backendFees.map((fee) => (
                   <div

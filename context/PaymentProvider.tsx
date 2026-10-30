@@ -19,20 +19,15 @@ export const PaymentProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const { data, loading, error } = useQuery(GET_PAYMENT_GATEWAYS);
 
-  // Define custom order for payment gateways
   const gatewayOrder: readonly string[] = siteConfig.payment.gatewayOrder;
 
-  // Sort payment gateways based on custom order
+  // Only the configured gateways, in the configured order.
   const paymentGateways: PaymentGateway[] = (data?.paymentGateways?.nodes || [])
-    .slice()
-    .sort((a: PaymentGateway, b: PaymentGateway) => {
-      const indexA = gatewayOrder.indexOf(a.id || '');
-      const indexB = gatewayOrder.indexOf(b.id || '');
-      // If gateway not in order list, put it at the end
-      const orderA = indexA === -1 ? gatewayOrder.length : indexA;
-      const orderB = indexB === -1 ? gatewayOrder.length : indexB;
-      return orderA - orderB;
-    });
+    .filter((gateway: PaymentGateway) => gatewayOrder.includes(gateway.id || ''))
+    .sort(
+      (a: PaymentGateway, b: PaymentGateway) =>
+        gatewayOrder.indexOf(a.id || '') - gatewayOrder.indexOf(b.id || ''),
+    );
 
   // Check if Koko payment (darazbnpl) is enabled
   const isKokoEnabled = paymentGateways.some(gateway => gateway.id === siteConfig.payment.kokoGatewayId);

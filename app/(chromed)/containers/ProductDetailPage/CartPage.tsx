@@ -1,6 +1,8 @@
 "use client";
+import { useMemo } from "react";
 import Link from "next/link";
 import { useCart } from "@/context/CartProvider";
+import { formatPrice } from "@/lib/formatPrice";
 import CartItemProduct from "@/app/(chromed)/containers/ProductDetailPage/CartItem";
 import BackdropSpinner from "@/components/global/ui/BackdropSpinner";
 import ButtonBrand, { BRAND_CTA_BUTTON_CLASS } from "shared/Button/ButtonBrand";
@@ -8,6 +10,13 @@ import ButtonBrand, { BRAND_CTA_BUTTON_CLASS } from "shared/Button/ButtonBrand";
 const CartPage = () => {
   const { cart, loading } = useCart();
   const checkoutDisabled = loading || (cart?.contents?.itemCount ?? 0) === 0;
+  const cartFees = useMemo(
+    () =>
+      (cart?.fees ?? []).filter(
+        (fee): fee is NonNullable<typeof fee> => !!fee && (fee.amount ?? 0) !== 0,
+      ),
+    [cart?.fees],
+  );
 
   return (
     <div className="nc-CartPage">
@@ -56,6 +65,14 @@ const CartPage = () => {
                     />
                   </span>
                 </div>
+                {cartFees.map((fee) => (
+                  <div key={fee.id} className="flex justify-between py-4">
+                    <span>{fee.name}</span>
+                    <span className="font-semibold text-slate-900 dark:text-slate-200">
+                      {formatPrice(fee.amount ?? 0)}
+                    </span>
+                  </div>
+                ))}
                 <div className="flex justify-between pt-4 text-base font-semibold text-slate-900 dark:text-slate-200">
                   <span>Order total</span>
                   <span className="font-semibold text-slate-900 dark:text-slate-200">
