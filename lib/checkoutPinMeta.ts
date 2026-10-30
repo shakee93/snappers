@@ -33,15 +33,10 @@ const hasPin = (
 export const buildPinMetaData = ({
   shipping,
   billing,
-  isStorePickup,
 }: {
   shipping: PinnedAddress | null | undefined;
   billing: PinnedAddress | null | undefined;
-  /** Store pickup has no destination, so a pin would only mislead. */
-  isStorePickup: boolean;
 }): OrderMetaEntry[] => {
-  if (isStorePickup) return [];
-
   const meta: OrderMetaEntry[] = [];
 
   if (hasPin(shipping)) {

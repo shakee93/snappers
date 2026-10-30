@@ -130,6 +130,14 @@ export const CartContent = gql`
     shippingTotal
     total
     discountTotal
+    # Cart fees (the packaging & service charge, plus any payment-method fee
+    # WooCommerce attaches once chosen_payment_method is set). feeTotal is not
+    # fetched: cart.total already includes it, and summaries itemise the rows.
+    fees {
+      id
+      name
+      amount
+    }
   }
   ${CartItemContent}
 `;
@@ -152,15 +160,6 @@ export const CartContentWithRates = gql`
         label
         cost
       }
-    }
-    # Payment-method fees (card processing etc.) WooCommerce attaches after
-    # chosen_payment_method is set on the session and the cart is recalculated.
-    # feeTotal is not fetched: cart.total already includes it, and the summary
-    # itemises the individual fee rows.
-    fees {
-      id
-      name
-      amount
     }
   }
   ${CartContent}

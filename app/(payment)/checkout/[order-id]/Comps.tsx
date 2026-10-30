@@ -1,4 +1,8 @@
-import { getOrderShippingRowLabel } from "@/components/account/accountOrderUtils";
+import {
+  getOrderFeeAmount,
+  getOrderShippingRowLabel,
+  ORDER_SERVICE_CHARGE_LABEL,
+} from "@/components/account/accountOrderUtils";
 import { isLineItemFree, parseWooMoneyAmount } from "@/lib/cartLinePricing";
 import { currencySymbol, formatPrice, toDisplayCurrency } from "@/lib/formatPrice";
 import { pageSectionTitleClass, pageTitleClass } from "@/lib/sectionTypography";
@@ -108,12 +112,15 @@ export const OrderDetails = ({ orderData }: OrderDetailsProps) => {
     orderData.order.id ??
     "-";
 
-  const rows = [
-    { label: "Order Id", value: String(orderNumber), isOrderId: true },
-    { label: "Date", value: date },
-    { label: "Order Total", value: formatMoneyValue(orderData.order.total) },
-    { label: "Delivery Fee", value: formatMoneyValue(orderData.order.shippingTotal) },
-    { label: "Sub Total", value: formatMoneyValue(orderData.order.subtotal) },
+  const feeAmount = getOrderFeeAmount(orderData.order);
+
+  // Listed in the order they add up to the total.
+  const breakdown = [
+    { label: "Subtotal", value: formatMoneyValue(orderData.order.subtotal) },
+    { label: "Delivery fee", value: formatMoneyValue(orderData.order.shippingTotal) },
+    ...(feeAmount > 0
+      ? [{ label: ORDER_SERVICE_CHARGE_LABEL, value: formatPrice(feeAmount) }]
+      : []),
   ];
 
   return (
@@ -123,20 +130,45 @@ export const OrderDetails = ({ orderData }: OrderDetailsProps) => {
         We&apos;ve got your order. Thank you for choosing us. 📦
       </h1>
 
-      <div className={`mt-8 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-5 ${SUMMARY_CARD_CLASS}`}>
-        {rows.map((row) => (
-          <div key={row.label} className="min-w-0 text-left">
-            <p className="text-sm font-semibold text-slate-600">{row.label}</p>
-            {row.isOrderId ? (
-              <p className="mt-1 text-3xl font-bold text-[#092412]">{row.value}</p>
-            ) : (
-              <p
-                className="mt-1 text-sm font-medium text-[#092412] sm:text-base [&_*]:inline"
+      <div
+        className={cn(
+          SUMMARY_CARD_CLASS,
+          "mt-8 flex flex-col gap-6 sm:p-6 md:flex-row md:items-stretch md:gap-0",
+        )}
+      >
+        <dl className="flex flex-wrap gap-x-10 gap-y-4 md:w-2/5 md:flex-col md:justify-center md:border-r md:border-[#E8E8E8] md:pr-8">
+          <div>
+            <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+              Order number
+            </dt>
+            <dd className="mt-1 text-3xl font-bold text-[#092412]">#{String(orderNumber)}</dd>
+          </div>
+          <div>
+            <dt className="text-xs font-semibold uppercase tracking-wide text-slate-500">
+              Date
+            </dt>
+            <dd className="mt-1 text-sm font-medium text-[#092412] sm:text-base">{date}</dd>
+          </div>
+        </dl>
+
+        <dl className="flex-1 border-t border-[#E8E8E8] pt-5 text-sm sm:text-base md:border-t-0 md:pl-8 md:pt-0">
+          {breakdown.map((row) => (
+            <div key={row.label} className="flex items-baseline justify-between gap-4 py-1.5">
+              <dt className="text-slate-600">{row.label}</dt>
+              <dd
+                className="whitespace-nowrap font-medium text-[#092412] [&_*]:inline"
                 dangerouslySetInnerHTML={{ __html: row.value }}
               />
-            )}
+            </div>
+          ))}
+          <div className="mt-2 flex items-baseline justify-between gap-4 border-t border-dashed border-[#D9D9D9] pt-3">
+            <dt className="font-semibold text-[#092412]">Order total</dt>
+            <dd
+              className="whitespace-nowrap text-xl font-bold text-header-green sm:text-2xl [&_*]:inline"
+              dangerouslySetInnerHTML={{ __html: formatMoneyValue(orderData.order.total) }}
+            />
           </div>
-        ))}
+        </dl>
       </div>
     </div>
   );
@@ -155,103 +187,89 @@ const ProductTable = ({
 }: ProductTableProps) => {
   if (!lineItems) return null;
 
-  const subtotalNumeric = parseWooMoneyAmount(orderData?.order?.subtotal);
-  const totalNumeric = parseWooMoneyAmount(orderData?.order?.total);
-  const shippingNumeric = parseWooMoneyAmount(orderData?.order?.shippingTotal);
-  const bankCharge =
-    (Number.isFinite(totalNumeric) ? totalNumeric : 0) -
-    (Number.isFinite(subtotalNumeric) ? subtotalNumeric : 0) -
-    (Number.isFinite(shippingNumeric) ? shippingNumeric : 0);
+  const feeAmount = orderData?.order ? getOrderFeeAmount(orderData.order) : 0;
   const shippingRowLabel = orderData?.order
     ? getOrderShippingRowLabel(orderData.order)
     : "Shipping";
 
+  const itemCount = lineItems.reduce((sum, item) => sum + (item?.quantity ?? 0), 0);
+
+  // Same order as the summary card above, so the two read alike.
+  const breakdown = [
+    { label: "Subtotal", value: formatMoneyValue(orderData?.order?.subtotal) },
+    {
+      label: "Delivery",
+      hint: shippingRowLabel,
+      value: formatMoneyValue(orderData?.order?.shippingTotal),
+    },
+    ...(feeAmount > 0
+      ? [{ label: ORDER_SERVICE_CHARGE_LABEL, value: formatPrice(feeAmount) }]
+      : []),
+  ];
+
   return (
     <div className="mt-10 space-y-8">
       <div>
-        <h2 className={SECTION_TITLE_CLASS}>Order Details</h2>
+        <div className="flex items-baseline justify-between gap-4">
+          <h2 className={SECTION_TITLE_CLASS}>Order Details</h2>
+          <span className="text-sm font-medium text-slate-500">
+            {itemCount} {itemCount === 1 ? "item" : "items"}
+          </span>
+        </div>
+
         <div className={`mt-4 ${TABLE_WRAPPER_CLASS}`}>
-          <div className="max-sm:overflow-x-auto">
-            <table className="w-full divide-y divide-[#E8E8E8] max-sm:table-fixed">
-              <colgroup className="sm:hidden">
-                <col />
-                <col className="w-12" />
-                <col className="w-28" />
-              </colgroup>
-              <thead className="bg-header-cream text-sm font-semibold text-header-green sm:text-base">
-                <tr>
-                  <th scope="col" className="px-3 py-3 text-left font-semibold sm:px-6 sm:py-3">
-                    Product
-                  </th>
-                  <th scope="col" className="w-16 px-2 py-3 text-center font-semibold sm:w-28 sm:px-4">
-                    <span className="sm:hidden">Qty</span>
-                    <span className="hidden sm:inline">Quantity</span>
-                  </th>
-                  <th scope="col" className="w-32 px-3 py-3 text-right font-semibold sm:w-40 sm:px-6">
-                    Total
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-[#E8E8E8] text-slate-800">
-                {lineItems.map((item, index) => (
-                  <tr key={index}>
-                    <td className="px-3 py-3 text-left align-top break-words text-sm font-medium leading-snug sm:px-6 sm:py-4 sm:text-base">
-                      {item?.product.node.name}
-                    </td>
-                    <td className="px-2 py-3 text-center align-top text-sm whitespace-nowrap sm:px-4 sm:py-4 sm:text-base">
-                      {item?.quantity}
-                    </td>
-                    <td className="px-3 py-3 text-right align-top text-sm whitespace-nowrap font-medium sm:px-6 sm:py-4 sm:text-base">
-                      {isLineItemFree(item?.total, item?.subtotal) ? (
-                        <span className="font-semibold text-header-green">Free</span>
-                      ) : (
-                        formatPrice(
-                          parseWooMoneyAmount(item?.total ?? item?.subtotal) || 0,
-                        )
-                      )}
-                    </td>
-                  </tr>
-                ))}
-                <tr>
-                  <td className="px-3 py-3 font-medium sm:px-6 sm:py-4">
-                    {shippingRowLabel}
-                  </td>
-                  <td />
-                  <td className="px-3 py-3 text-right text-sm whitespace-nowrap font-medium [&_*]:inline sm:px-6 sm:py-4 sm:text-base">
-                    <span
-                      dangerouslySetInnerHTML={{
-                        __html:
-                          formatMoneyValue(orderData?.order?.shippingTotal) ||
-                          `${currencySymbol} 0.00`,
-                      }}
-                    />
-                  </td>
-                </tr>
+          <ul className="divide-y divide-[#E8E8E8]">
+            {lineItems.map((item, index) => (
+              <li
+                key={index}
+                className="flex items-start justify-between gap-4 px-4 py-4 sm:px-6"
+              >
+                <div className="min-w-0">
+                  <p className="break-words text-sm font-medium leading-snug text-[#092412] sm:text-base">
+                    {item?.product.node.name}
+                  </p>
+                  <p className="mt-1 text-xs text-slate-500 sm:text-sm">
+                    Qty {item?.quantity ?? 0}
+                  </p>
+                </div>
+                <p className="shrink-0 whitespace-nowrap text-sm font-semibold text-[#092412] sm:text-base">
+                  {isLineItemFree(item?.total, item?.subtotal) ? (
+                    <span className="text-header-green">Free</span>
+                  ) : (
+                    formatPrice(
+                      parseWooMoneyAmount(item?.total ?? item?.subtotal) || 0,
+                    )
+                  )}
+                </p>
+              </li>
+            ))}
+          </ul>
 
-                {bankCharge > 0 && (
-                  <tr>
-                    <td className="px-3 py-3 font-medium sm:px-6 sm:py-4">3% Bank Charge</td>
-                    <td />
-                    <td className="px-3 py-3 text-right whitespace-nowrap font-medium sm:px-6 sm:py-4">
-                      {formatPrice(bankCharge)}
-                    </td>
-                  </tr>
-                )}
-
-                <tr className="bg-[#FAFAF8]/60">
-                  <td className="px-3 py-3 font-semibold text-[#092412] sm:px-6 sm:py-4">Total</td>
-                  <td />
-                  <td className="px-3 py-3 text-right text-sm font-semibold whitespace-nowrap text-[#092412] [&_*]:inline sm:px-6 sm:py-4 sm:text-base">
-                    <span
-                      dangerouslySetInnerHTML={{
-                        __html: formatMoneyValue(orderData?.order?.total),
-                      }}
-                    />
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <dl className="border-t border-[#E8E8E8] bg-[#FAFAF8] px-4 py-4 text-sm sm:px-6 sm:text-base">
+            {breakdown.map((row) => (
+              <div key={row.label} className="flex items-baseline justify-between gap-4 py-1.5">
+                <dt className="text-slate-600">
+                  {row.label}
+                  {row.hint && row.hint !== row.label && (
+                    <span className="ml-1.5 text-xs text-slate-400 sm:text-sm">
+                      ({row.hint})
+                    </span>
+                  )}
+                </dt>
+                <dd
+                  className="whitespace-nowrap font-medium text-[#092412] [&_*]:inline"
+                  dangerouslySetInnerHTML={{ __html: row.value }}
+                />
+              </div>
+            ))}
+            <div className="mt-2 flex items-baseline justify-between gap-4 border-t border-dashed border-[#D9D9D9] pt-3">
+              <dt className="font-semibold text-[#092412]">Total</dt>
+              <dd
+                className="whitespace-nowrap text-lg font-bold text-header-green sm:text-xl [&_*]:inline"
+                dangerouslySetInnerHTML={{ __html: formatMoneyValue(orderData?.order?.total) }}
+              />
+            </div>
+          </dl>
         </div>
       </div>
 

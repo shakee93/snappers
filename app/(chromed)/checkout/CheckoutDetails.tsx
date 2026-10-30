@@ -12,8 +12,7 @@ import { CheckoutFormSkeleton } from "./CheckoutSkeletons";
 
 interface CheckoutLeftProps {
   paymentGateways: any[];
-  setDeliveryType: (v: DeliveryType | null) => void;
-  deliveryType: DeliveryType | null;
+  deliveryType: DeliveryType;
   totalPayment: any;
   kokoTotal: number;
   setIsKokoPayment: (v: boolean) => void;
@@ -28,13 +27,11 @@ interface CheckoutLeftProps {
   onTOCChange: () => void;
   tocError: boolean;
   loading: boolean;
-  ratesRecalculating: boolean;
   orderTotalLabel: string;
 }
 
 const CheckoutDetails = ({
   paymentGateways,
-  setDeliveryType,
   deliveryType,
   totalPayment,
   kokoTotal,
@@ -47,7 +44,6 @@ const CheckoutDetails = ({
   onTOCChange,
   tocError,
   loading,
-  ratesRecalculating,
   orderTotalLabel,
 }: CheckoutLeftProps) => {
 
@@ -82,7 +78,6 @@ const CheckoutDetails = ({
         initialContactData={initContactInformation!}
         initialShippingData={shippingDetails}
         paymentGateways={paymentGateways}
-        setDeliveryType={setDeliveryType}
         deliveryType={deliveryType}
         totalPayment={totalPayment}
         kokoTotal={kokoTotal}
@@ -96,7 +91,6 @@ const CheckoutDetails = ({
         onTOCChange={onTOCChange}
         tocError={tocError}
         loading={loading}
-        ratesRecalculating={ratesRecalculating}
         orderTotalLabel={orderTotalLabel}
       />
     </div>

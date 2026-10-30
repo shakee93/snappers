@@ -15,9 +15,12 @@ import {
   formatOrderSummaryDate,
   formatPaymentMethod,
   formatStatus,
+  getOrderFeeAmount,
   getOrderLineItemImageUrl,
   getOrderLineItemName,
+  ORDER_SERVICE_CHARGE_LABEL,
 } from "@/components/account/accountOrderUtils";
+import { formatPrice } from "@/lib/formatPrice";
 import { isLineItemFree, parseWooMoneyAmount } from "@/lib/cartLinePricing";
 import { decodeHtmlEntities } from "@/lib/decodeHtmlEntities";
 import {
@@ -212,6 +215,7 @@ const AccountOrderDetailModal = ({
         ? formatOrderMoney(order.shippingTotal)
         : "Free shipping")
   );
+  const feeAmount = getOrderFeeAmount(order);
 
   return (
     <Transition appear show={show} as={Fragment}>
@@ -287,6 +291,12 @@ const AccountOrderDetailModal = ({
                           value={formatOrderMoney(order.subtotal)}
                         />
                         <DetailRow label="Shipping:" value={shippingLabel} />
+                        {feeAmount > 0 && (
+                          <DetailRow
+                            label={`${ORDER_SERVICE_CHARGE_LABEL}:`}
+                            value={formatPrice(feeAmount)}
+                          />
+                        )}
                         <DetailRow
                           label="Total:"
                           value={formatOrderMoney(order.total)}

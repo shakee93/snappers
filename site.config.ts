@@ -228,12 +228,13 @@ export const siteConfig = {
       "https://www.google.com/search?q=catlitter.lk&newwindow=1&sca_esv=47fdd52eba661d26&rlz=1C5CHFA_enLK1163LK1163&biw=1710&bih=985&sxsrf=APpeQnt9vKUXvlC8bmdZEbb-YhBaKGCIKw%3A1782983829933&ei=lSxGasnAOM6wwcsPpsKluQI&ved=0ahUKEwiJ38qu1LOVAxVOWHADHSZhKScQ4dUDCBI&uact=5&oq=catlitter.lk&gs_lp=Egxnd3Mtd2l6LXNlcnAiDGNhdGxpdHRlci5sazIEECMYJzILEC4YrwEYxwEYgAQyBRAAGIAEMgUQABiABDIEEAAYHjIEEAAYHjICECZI4AdQyARY0AVwAXgBkAEAmAGRAaAB6wGqAQMxLjG4AQPIAQD4AQGYAgKgAmnCAgoQABhHGNYEGLADmAMAiAYBkAYIkgcDMS4xoAffE7IHAzAuMbgHZcIHBzAuMS4wLjHIBwuACAE&sclient=gws-wiz-serp#",
   },
   payment: {
-    gatewayOrder: ["payhere", "ndb-pay", "cod", "cheque", "darazbnpl", "bacs"],
+    // Gateways offered on the storefront, in display order. Anything else
+    // WooCommerce returns is hidden.
+    gatewayOrder: ["cod"],
     kokoGatewayId: "darazbnpl",
     // Gateways the customer settles on delivery rather than online. They take
     // no payment step during checkout, so the order is confirmed in-app and
-    // the customer goes straight to the thank-you page - and they all need a
-    // delivery leg to collect at, so Store Pickup / Flash Delivery disable them.
+    // the customer goes straight to the thank-you page.
     // "cheque" is WooCommerce's built-in cheque gateway, retitled "Card on
     // Delivery" in wp-admin; the id stays `cheque`.
     payOnDeliveryGatewayIds: ["cod", "cheque"] as const,
@@ -303,26 +304,32 @@ export const siteConfig = {
      * quotes BOTH of its sub-modes at once inside the delivery radius:
      * `dwbs:2:distance` "Local Delivery" is our fleet, `dwbs:2:weight`
      * "Standard Shipping" is the island-wide courier. Outside the radius only
-     * the weight rate is quoted, and the checkout offers Courier delivery in
-     * place of CatLitter Delivery.
+     * the weight rate is quoted, and the order goes by courier instead.
      *
      * So this must name the sub-mode, not just the instance - a bare `dwbs:2`
-     * prefix would claim both rates and leave the courier option with none.
+     * prefix would claim both rates and leave the courier with none.
      * A single-rate method such as `flat_rate:5` is matched exactly.
      *
-     * Empty string keeps the delivery option hidden. Keep it empty until the
+     * Empty string sends every order by courier. Keep it empty until the
      * WooCommerce rate exists - offering a rate the store cannot quote makes
      * `updateShippingMethod` fail and leaves the cart on a stale rate.
      */
     catlitterDeliveryMethodId: "dwbs:2:distance",
     /**
-     * Flash Delivery - the customer books an Uber / PickMe to collect. A
-     * zero-cost flat rate in WooCommerce > Settings > Shipping titled
-     * "Flash Delivery (Uber/PickMe)". Checkout refuses a Flash order when the
-     * store doesn't quote this rate: WooCommerce silently swaps an unknown
-     * method for the first rate it has, which bills a delivery charge.
+     * Rate ids WooCommerce may still quote that the storefront never offers.
+     * `flat_rate:4` is the zero-cost "Flash Delivery (Uber/PickMe)" rate:
+     * left in, it would be picked as the courier or free-shipping rate.
      */
-    flashDeliveryMethodId: "flat_rate:4",
+    excludedRateIds: ["flat_rate:4"] as const,
+  },
+  fees: {
+    /**
+     * Name of the flat fee `backend/snappers-service-charge.php` adds to every
+     * cart. Cart and checkout read fee rows off the cart itself; order views
+     * only get totals, so they label the amount above subtotal + shipping with
+     * this.
+     */
+    serviceChargeLabel: "Packaging & Service Charge",
   },
   analytics: {
     googleAnalyticsId: "G-LS3EVR93ZH",

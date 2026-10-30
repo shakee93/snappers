@@ -21,20 +21,13 @@ import { useCart } from "@/context/CartProvider";
 import checkoutCopy from "@/content/checkout-copy.json";
 import { formatPrice } from "@/lib/formatPrice";
 import { PAYHERE_HIDE_THRESHOLD } from "@/lib/checkoutMath";
-import {
-    resolveCatlitterDeliveryRate,
-    type DeliveryType,
-} from "@/lib/checkoutShipping";
+import { type DeliveryType } from "@/lib/checkoutShipping";
 import Checkbox from "@/shared/Checkbox/Checkbox";
 import ButtonBrand from "shared/Button/ButtonBrand";
 import PreOrderNotice from "@/components/global/ui/PreOrderNotice";
 import { SRI_LANKAN_CITIES, type SriLankanCity } from "@/data/sriLankanCities";
 import { SRI_LANKAN_PROVINCES, type SriLankanProvince } from "@/data/sriLankanProvinces";
 import {
-    Bike,
-    Store,
-    Truck,
-    Zap,
     CreditCard,
     Banknote,
     Landmark,
@@ -66,8 +59,6 @@ const FEATURED_BANK_ACCOUNT =
     siteConfig.payment.bankAccounts.find((a) => a.featuredAtCheckout) ??
     siteConfig.payment.bankAccounts[0];
 
-const PAY_ON_DELIVERY_GATEWAY_IDS =
-    siteConfig.payment.payOnDeliveryGatewayIds as readonly string[];
 const OWN_FLEET_ONLY_GATEWAY_IDS =
     siteConfig.payment.ownFleetOnlyGatewayIds as readonly string[];
 
@@ -810,108 +801,11 @@ const AddressFields = memo(({ idPrefix, values, onChange }: AddressFieldsProps) 
 });
 AddressFields.displayName = "AddressFields";
 
-interface DeliveryOptionProps {
-    value: DeliveryType;
-    selected: boolean;
-    onSelect: (v: DeliveryType) => void;
-    icon: React.ReactNode;
-    title: string;
-    subtitle: string;
-    chip?: { label: string; tone: "emerald" | "blue" };
-    trailing?: React.ReactNode;
-    /**
-     * Held while the cart re-quotes - for any reason, not only an address
-     * change - because switching mid-flight races the in-flight totals.
-     */
-    disabled?: boolean;
-}
-
-const CHIP_TONES = {
-    emerald:
-      "bg-header-green font-[family-name:var(--font-inter)] text-[#FACC15]",
-    blue: "bg-header-accent text-header-green",
-} as const;
-
-const DeliveryOption = ({
-    value,
-    selected,
-    onSelect,
-    icon,
-    title,
-    subtitle,
-    chip,
-    trailing,
-    disabled = false,
-}: DeliveryOptionProps) => (
-    <label
-        aria-disabled={disabled || undefined}
-        className={`group flex items-center gap-4 w-full p-4 rounded-xl border-2 transition-colors ${
-            disabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"
-        } ${
-            selected
-                ? "border-primary-500 bg-primary-50/60 dark:bg-primary-900/20"
-                : `border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/40 ${
-                      disabled
-                          ? ""
-                          : "hover:border-slate-300 hover:bg-slate-100 dark:hover:border-slate-600"
-                  }`
-        }`}
-    >
-        <input
-            type="radio"
-            name="pickup"
-            value={value}
-            checked={selected}
-            disabled={disabled}
-            onChange={() => onSelect(value)}
-            className="sr-only"
-        />
-        <span
-            aria-hidden="true"
-            className={`flex items-center justify-center w-5 h-5 rounded-full border-2 shrink-0 transition-colors ${
-                selected
-                    ? "border-primary-500 bg-primary-500"
-                    : "border-slate-300 dark:border-slate-600 group-hover:border-slate-400"
-            }`}
-        >
-            {selected && <span className="w-2 h-2 rounded-full bg-white" />}
-        </span>
-        <span
-            className={`flex items-center justify-center w-10 h-10 rounded-lg shrink-0 ${
-                selected
-                    ? "bg-primary-500/10 text-primary-500"
-                    : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
-            }`}
-        >
-            {icon}
-        </span>
-        <div className="flex-1 min-w-0">
-            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
-                <span className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-                    {title}
-                </span>
-                {chip && (
-                    <span
-                        className={`inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold whitespace-nowrap ${CHIP_TONES[chip.tone]}`}
-                    >
-                        {chip.label}
-                    </span>
-                )}
-            </div>
-            <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                {subtitle}
-            </div>
-        </div>
-        {trailing && <div className="shrink-0">{trailing}</div>}
-    </label>
-);
-
 interface Props {
     initialContactData: contactInformation;
     initialShippingData: CustomerAddress | null;
     paymentGateways: PaymentGateway[];
-    setDeliveryType: (v: DeliveryType | null) => void;
-    deliveryType: DeliveryType | null;
+    deliveryType: DeliveryType;
     totalPayment: number;
     kokoTotal: number;
     setIsKokoPayment: (v: boolean) => void;
@@ -927,7 +821,6 @@ interface Props {
     onTOCChange: () => void;
     tocError: boolean;
     loading: boolean;
-    ratesRecalculating: boolean;
     orderTotalLabel: string;
 }
 
@@ -935,7 +828,6 @@ const UnifiedCheckoutForm = ({
     initialContactData,
     initialShippingData,
     paymentGateways,
-    setDeliveryType,
     deliveryType,
     totalPayment,
     kokoTotal,
@@ -949,7 +841,6 @@ const UnifiedCheckoutForm = ({
     onTOCChange,
     tocError,
     loading,
-    ratesRecalculating,
     orderTotalLabel,
 }: Props) => {
     // Contact Info State
@@ -997,53 +888,6 @@ const UnifiedCheckoutForm = ({
     const [customerNote, setCustomerNote] = useState("");
 
     const { cart } = useCart();
-
-    // Courier and CatLitter Delivery are two answers to the same question, and
-    // WooCommerce has already decided it for the address the customer entered:
-    // inside our radius it quotes (and forces) the distance rate, outside it
-    // quotes only the island-wide courier one. Offering both would invite a
-    // choice the store overrides and reprices behind the customer's back, so
-    // show whichever is actually quoted and hide the other.
-    //
-    // Neither shows an amount - the order summary is the one place the
-    // shipping charge is quoted. This resolves to null while the option is
-    // unconfigured, which is what keeps it hidden on a store without it.
-    const catlitterRate = useMemo(
-        () => resolveCatlitterDeliveryRate(cart),
-        [cart],
-    );
-    const showCatlitterDelivery = !!catlitterRate;
-    const showCourierDelivery = !catlitterRate;
-
-    // Editing the address can pull the selected option out from under the
-    // customer - a Colombo address swaps Courier for CatLitter Delivery and
-    // vice versa. Move the selection onto the option that survived so the
-    // section is never left with nothing selected, and say why, since the
-    // shipping total changes with it.
-    const [overrideNotice, setOverrideNotice] = useState<DeliveryType | null>(null);
-
-    // Never mid-quote: until the address push lands the cart still holds the
-    // previous address's rates, and switching on those would announce a change
-    // we'd have to undo a moment later.
-    const strandedOn = ratesRecalculating
-        ? null
-        : (deliveryType === "courier" && !showCourierDelivery && "catlitter_delivery") ||
-          (deliveryType === "catlitter_delivery" && !showCatlitterDelivery && "courier") ||
-          null;
-
-    useEffect(() => {
-        if (!strandedOn) return;
-        setDeliveryType(strandedOn);
-        setOverrideNotice(strandedOn);
-    }, [strandedOn, setDeliveryType]);
-
-    // The customer picking an option themselves is an acknowledgement - drop a
-    // stale notice rather than leaving it to describe a choice they've moved on
-    // from. Store Pickup and Flash Delivery clear it too.
-    const handlePickupTypeChange = (type: DeliveryType) => {
-        setOverrideNotice(null);
-        setDeliveryType(type);
-    };
 
     const handleBankSlipChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const fileList = event.target.files;
@@ -1093,11 +937,6 @@ const UnifiedCheckoutForm = ({
     // the totals on this page are only correct once the address the customer
     // typed has been pushed to it. Report every address edit upward; the page
     // debounces and dedupes.
-    //
-    // This no longer waits on a delivery selection: the address is collected
-    // first now, and which delivery options exist at all is decided by the
-    // rates WooCommerce quotes for it. Gating the push on deliveryType would
-    // mean the options could never appear.
     const addressSnapshot = useMemo<CheckoutAddressSnapshot | null>(() => {
         const billing = transformAddress({ ...billingAddress, country: "LK" });
         const shipping = shippingDifferent
@@ -1212,52 +1051,24 @@ const UnifiedCheckoutForm = ({
         deliveryType,
     ]);
 
-    // Gateways that should appear but be greyed-out for the current delivery
-    // method. Cash on Delivery needs a delivery to collect at: the Flash
-    // Delivery driver doesn't collect on our behalf, and Store Pickup has no
-    // delivery leg at all. Greying out rather than hiding is deliberate here -
-    // the reason doubles as the instruction ("pay online instead").
-    //
-    // Card on Delivery is not handled here: it is filtered out of
-    // visiblePaymentGateways entirely, because "switch delivery method" is not
-    // an instruction that belongs on a payment row.
-    const gatewayDisabledReason = (gatewayId: string): string | null => {
-        if (!PAY_ON_DELIVERY_GATEWAY_IDS.includes(gatewayId)) return null;
-        if (deliveryType === "flash_delivery") {
-            return "Not available with Flash Delivery - pay online instead";
-        }
-        if (deliveryType === "store_pickup") {
-            return "Not available with Store Pickup - pay online instead";
-        }
-        return null;
-    };
-
-    // Auto-select first enabled gateway when none is selected.
+    // Auto-select the first gateway when none is selected.
     useEffect(() => {
         if (!visiblePaymentGateways.length || selectedGateway.id) return;
-        const g = visiblePaymentGateways.find((gw) => !gatewayDisabledReason(gw.id));
-        if (!g) return;
+        const g = visiblePaymentGateways[0];
         setMethodActive(g.id);
         const meta = getGatewayMeta(g);
         setSelectedGateway({ id: g.id, title: meta.title });
         setIsKokoPayment(g.id === "darazbnpl");
         onPaymentMethodChange(g.id);
-        // eslint-disable-next-line react-hooks/exhaustive-deps -- gatewayDisabledReason depends on deliveryType which is already in deps
-    }, [visiblePaymentGateways, selectedGateway.id, deliveryType, setIsKokoPayment, onPaymentMethodChange]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps -- getGatewayMeta is recreated every render
+    }, [visiblePaymentGateways, selectedGateway.id, setIsKokoPayment, onPaymentMethodChange]);
 
     // Clear a selection the customer can no longer act on, so the form can't
-    // submit through a gateway that is off the page.
-    //
-    // Keyed on whether the row is still selectable, not on
-    // gatewayDisabledReason: a gateway can leave in two ways, and that function
-    // only reports one of them. Card on Delivery is *hidden* off our own fleet
-    // rather than greyed out, so checking the reason alone missed it - picking
-    // it under CatLitter Delivery and then editing the address out of range
-    // auto-switched delivery to Courier, dropped the row, and left `cheque`
-    // selected and submittable on a courier shipment no rider can take a card
-    // for. Membership of visiblePaymentGateways covers hidden and disabled both.
+    // submit through a gateway that is off the page. Card on Delivery leaves
+    // when an address edit moves the order off our own fleet: picked under
+    // CatLitter Delivery, it would otherwise stay selected and submittable on a
+    // courier shipment no rider can take a card for.
     const selectableGatewayIds = visiblePaymentGateways
-        .filter((gw) => !gatewayDisabledReason(gw.id ?? ""))
         .map((gw) => gw.id)
         .join(",");
 
@@ -1273,11 +1084,6 @@ const UnifiedCheckoutForm = ({
 
     const handleFormSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
-        if (!deliveryType) {
-            toast.error("Please select a delivery method.");
-            return;
-        }
 
         if (!selectedGateway.id) {
             toast.error("Please select a payment method.");
@@ -1305,10 +1111,9 @@ const UnifiedCheckoutForm = ({
             addressType: "home",
         };
 
-        const shippingFields =
-            shippingDifferent && deliveryType !== "store_pickup"
-                ? { ...shippingAddress, country: "LK", addressType: "home" }
-                : billingFields;
+        const shippingFields = shippingDifferent
+            ? { ...shippingAddress, country: "LK", addressType: "home" }
+            : billingFields;
 
         const payload: CheckoutSubmitPayload = {
             contactInfo: { phone, email, country },
@@ -1438,7 +1243,6 @@ const UnifiedCheckoutForm = ({
     };
 
     const selectGateway = (gateway: PaymentGateway) => {
-        if (gatewayDisabledReason(gateway.id)) return;
         setMethodActive(gateway.id);
         const meta = getGatewayMeta(gateway);
         setSelectedGateway({ id: gateway.id, title: meta.title });
@@ -1458,71 +1262,57 @@ const UnifiedCheckoutForm = ({
     const PaymentMethodCard = ({ gateway }: { gateway: PaymentGateway }) => {
         const active = methodActive === gateway.id;
         const meta = getGatewayMeta(gateway);
-        const disabledReason = gatewayDisabledReason(gateway.id);
-        const isDisabled = !!disabledReason;
 
         return (
             <div
                 className={`rounded-xl border-2 transition-colors ${
-                    isDisabled
-                        ? "border-slate-200 bg-slate-100/60 dark:border-slate-800 dark:bg-slate-900/40 opacity-60"
-                        : active
-                            ? "border-primary-500 bg-primary-50/60 dark:bg-primary-900/20"
-                            : "border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/40 hover:border-slate-300 hover:bg-slate-100 dark:hover:border-slate-600"
+                    active
+                        ? "border-primary-500 bg-primary-50/60 dark:bg-primary-900/20"
+                        : "border-slate-200 bg-slate-50 dark:border-slate-700 dark:bg-slate-800/40 hover:border-slate-300 hover:bg-slate-100 dark:hover:border-slate-600"
                 }`}
-                aria-disabled={isDisabled || undefined}
             >
                 <label
                     htmlFor={gateway.id}
-                    className={`flex items-center gap-4 p-4 ${isDisabled ? "cursor-not-allowed" : "cursor-pointer"}`}
+                    className="flex items-center gap-4 p-4 cursor-pointer"
                 >
                     <input
                         id={gateway.id}
                         type="radio"
                         name="payment-method"
                         checked={active}
-                        disabled={isDisabled}
                         onChange={() => selectGateway(gateway)}
                         className="sr-only"
                     />
                     <span
                         aria-hidden="true"
                         className={`flex items-center justify-center w-5 h-5 rounded-full border-2 shrink-0 transition-colors ${
-                            isDisabled
-                                ? "border-slate-300 bg-slate-100 dark:border-slate-700 dark:bg-slate-800"
-                                : active
-                                    ? "border-primary-500 bg-primary-500"
-                                    : "border-slate-300 dark:border-slate-600"
+                            active
+                                ? "border-primary-500 bg-primary-500"
+                                : "border-slate-300 dark:border-slate-600"
                         }`}
                     >
-                        {active && !isDisabled && <span className="w-2 h-2 rounded-full bg-white" />}
+                        {active && <span className="w-2 h-2 rounded-full bg-white" />}
                     </span>
                     <span
                         className={`flex items-center justify-center w-10 h-10 rounded-lg shrink-0 ${
-                            isDisabled
-                                ? "bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500"
-                                : active
-                                    ? "bg-primary-500/10 text-primary-500"
-                                    : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+                            active
+                                ? "bg-primary-500/10 text-primary-500"
+                                : "bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
                         }`}
                     >
                         {meta.icon}
                     </span>
                     <div className="flex-1 min-w-0">
-                        <div className={`text-sm font-semibold ${isDisabled ? "text-slate-500 dark:text-slate-400" : "text-slate-900 dark:text-slate-100"}`}>
+                        <div className="text-sm font-semibold text-slate-900 dark:text-slate-100">
                             {meta.title}
                         </div>
-                        {isDisabled ? (
-                            <div className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
-                                {disabledReason}
-                            </div>
-                        ) : meta.subtitle ? (
+                        {meta.subtitle ? (
                             <div className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                                 {meta.subtitle}
                             </div>
                         ) : null}
                     </div>
-                    {!isDisabled && meta.trailing && <div className="shrink-0">{meta.trailing}</div>}
+                    {meta.trailing && <div className="shrink-0">{meta.trailing}</div>}
                 </label>
 
                 {active && gateway.id === "bacs" && (
@@ -1614,7 +1404,6 @@ const UnifiedCheckoutForm = ({
     const contactDone = /^[0-9]{9,12}$/.test(phone) && /.+@.+\..+/.test(email);
     const nameDone = !!billingAddress.firstName && !!billingAddress.lastName;
     const deliveryDone =
-        deliveryType !== null &&
         nameDone &&
         isAddressComplete(billingAddress) &&
         (!shippingDifferent || isAddressComplete(shippingAddress));
@@ -1677,9 +1466,7 @@ const UnifiedCheckoutForm = ({
             </div>
 
             {/* Address Section - billing, plus a separate shipping address when
-                the customer asks for one. Sits ahead of the delivery method:
-                which methods exist at all depends on what WooCommerce quotes
-                for this address. */}
+                the customer asks for one. */}
             <div>
                 <div className="p-0">
                     <h3 className="text-lg font-semibold mb-4">Billing address</h3>
@@ -1714,141 +1501,41 @@ const UnifiedCheckoutForm = ({
                 </div>
             </div>
 
-            {/* Delivery Method Section */}
+            {/* Customer Note Section */}
             <div>
-                <div className="p-0">
-                    <h3 className="text-lg font-semibold mb-4 flex flex-wrap items-center gap-x-2 gap-y-1">
-                        Delivery Method
-                        {ratesRecalculating && (
-                            <span className="inline-flex items-center gap-1.5 text-xs font-normal text-slate-500 dark:text-slate-400">
-                                <Loader className="w-3.5 h-3.5 animate-spin" aria-hidden="true" />
-                                Updating…
-                            </span>
-                        )}
-                    </h3>
-
-                    <div className="space-y-3" aria-busy={ratesRecalculating}>
-                        {showCatlitterDelivery && (
-                            <DeliveryOption
-                                value="catlitter_delivery"
-                                selected={deliveryType === "catlitter_delivery"}
-                                onSelect={handlePickupTypeChange}
-                                disabled={ratesRecalculating}
-                                icon={<Bike className="w-5 h-5" strokeWidth={1.75} />}
-                                title="CatLitter Delivery"
-                                subtitle={checkoutCopy.catlitterDeliverySubtitle}
-                                chip={{ label: checkoutCopy.catlitterDeliveryChipLabel, tone: "emerald" }}
-                            />
-                        )}
-                        {showCourierDelivery && (
-                            <DeliveryOption
-                                value="courier"
-                                selected={deliveryType === "courier"}
-                                onSelect={handlePickupTypeChange}
-                                disabled={ratesRecalculating}
-                                icon={<Truck className="w-5 h-5" strokeWidth={1.75} />}
-                                title="Courier delivery"
-                                subtitle="Island-wide delivery in 2–3 business working days"
-                            />
-                        )}
-                        <DeliveryOption
-                            value="store_pickup"
-                            selected={deliveryType === "store_pickup"}
-                            onSelect={handlePickupTypeChange}
-                            disabled={ratesRecalculating}
-                            icon={<Store className="w-5 h-5" strokeWidth={1.75} />}
-                            title="Store Pickup"
-                            subtitle="Ready during working hours"
-                            chip={{ label: checkoutCopy.pickupChipLabel, tone: "emerald" }}
-                            trailing={
-                                <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">
-                                    Free
-                                </span>
-                            }
-                        />
-                        <DeliveryOption
-                            value="flash_delivery"
-                            selected={deliveryType === "flash_delivery"}
-                            onSelect={handlePickupTypeChange}
-                            disabled={ratesRecalculating}
-                            icon={<Zap className="w-5 h-5" strokeWidth={1.75} />}
-                            title="Flash Delivery"
-                            subtitle="You arrange Uber / PickMe pickup"
-                            chip={{ label: checkoutCopy.flashDeliveryChipLabel, tone: "blue" }}
-                            trailing={
-                                <div className="hidden sm:flex items-center gap-1.5">
-                                    <BrandBadge src="/logos/uber.png" alt="Uber" />
-                                    <BrandBadge src="/logos/pickme.png" alt="PickMe" />
-                                </div>
-                            }
-                        />
-                    </div>
-
-                    {!deliveryType && (
-                        <div className="mt-3 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-2">
-                            <span className="inline-block w-1 h-1 rounded-full bg-primary-500 animate-pulse" />
-                            Select a delivery method to continue
-                        </div>
-                    )}
-
-                    {overrideNotice && (
-                        <p
-                            role="alert"
-                            className="mt-3 rounded-lg border border-amber-300 bg-amber-50 px-3 py-2 text-xs text-amber-800 dark:border-amber-800 dark:bg-amber-900/20 dark:text-amber-200"
-                        >
-                            {overrideNotice === "catlitter_delivery"
-                                ? checkoutCopy.switchedToCatlitterDeliveryNote
-                                : checkoutCopy.switchedToCourierDeliveryNote}
-                        </p>
-                    )}
-
-                    {deliveryType === "store_pickup" && (
-                        <p className="mt-4 text-sm text-slate-600 dark:text-slate-400">
-                            {checkoutCopy.storePickupNote}
-                        </p>
-                    )}
+                <h3 className="text-lg font-semibold mb-4">Order Notes</h3>
+                <div>
+                    <label
+                        htmlFor="checkout-customer-note"
+                        className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5"
+                    >
+                        Customer note{" "}
+                        <span className="font-normal text-slate-500 dark:text-slate-400">
+                            (optional)
+                        </span>
+                    </label>
+                    <textarea
+                        id="checkout-customer-note"
+                        name="customerNote"
+                        rows={3}
+                        maxLength={500}
+                        placeholder="Special instructions for your order, delivery preferences, etc."
+                        value={customerNote}
+                        onChange={(e) => setCustomerNote(e.target.value)}
+                        className={`block w-full rounded-xl px-4 py-3 text-sm font-normal resize-none mt-0 bg-white dark:bg-neutral-900 ${FIELD_CLASS}`}
+                    />
                 </div>
             </div>
 
-            {/* Customer Note Section */}
-            {deliveryType && (
-                <div>
-                    <h3 className="text-lg font-semibold mb-4">Order Notes</h3>
-                    <div>
-                        <label
-                            htmlFor="checkout-customer-note"
-                            className="block text-sm font-semibold text-slate-900 dark:text-slate-100 mb-1.5"
-                        >
-                            Customer note{" "}
-                            <span className="font-normal text-slate-500 dark:text-slate-400">
-                                (optional)
-                            </span>
-                        </label>
-                        <textarea
-                            id="checkout-customer-note"
-                            name="customerNote"
-                            rows={3}
-                            maxLength={500}
-                            placeholder="Special instructions for your order, delivery preferences, etc."
-                            value={customerNote}
-                            onChange={(e) => setCustomerNote(e.target.value)}
-                            className={`block w-full rounded-xl px-4 py-3 text-sm font-normal resize-none mt-0 bg-white dark:bg-neutral-900 ${FIELD_CLASS}`}
-                        />
-                    </div>
-                </div>
-            )}
-
             {/* Payment Method Section */}
-            {deliveryType && (
-                <div>
-                    <h3 className="text-lg font-semibold mb-4">Payment Method</h3>
-                    <div className="space-y-3">
-                        {visiblePaymentGateways.map((gateway) => (
-                            <PaymentMethodCard key={gateway.id} gateway={gateway} />
-                        ))}
-                    </div>
+            <div>
+                <h3 className="text-lg font-semibold mb-4">Payment Method</h3>
+                <div className="space-y-3">
+                    {visiblePaymentGateways.map((gateway) => (
+                        <PaymentMethodCard key={gateway.id} gateway={gateway} />
+                    ))}
                 </div>
-            )}
+            </div>
 
             {isPreOrderCart && <PreOrderNotice className="mt-2" />}
 
